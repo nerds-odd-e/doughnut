@@ -48,7 +48,7 @@ disk.
 
 Hand-writing `.worktree.local.json` remains supported, for example to reuse a
 specific already-provisioned database (including one created by an earlier
-automatic first use, or a `quick/054`-style manual setup):
+automatic first use, or a one-time manual database setup):
 
 1. Choose an identity matching `wt_[a-z0-9_]{1,32}` (for example `wt_a7c2`).
    Two checkouts that reuse an ID share a database; that is operator error.

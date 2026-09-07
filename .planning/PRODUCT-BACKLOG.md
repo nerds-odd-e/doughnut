@@ -11,15 +11,18 @@ commit batching stays later: pull already rebases over several accepted
 content commits. This advances the direction in
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
 the selected queue does not cover its complete synchronization contract.
-Worktree backend-test isolation still leads: 1a–1b delivered an automatic
-opt-in workflow, so the remaining gap is ordinary test commands sharing
-`doughnut_test`. Leftover checkout-lock exclusivity from 1b is
-[quick/058](quick/058-exclusive-worktree-checkout-lock/PLAN.md), not a new
-story.
+Enable developers and AI tasks to verify changes concurrently in local
+worktrees without interfering with each other's data or running services.
+This development priority leads the queue: 1a–1b delivered automatic opt-in
+backend-test isolation; next cover ordinary commands, then browser E2E without
+external-service mocks, then independent mocks. Prove the smallest usable
+browser workflow before broadening coverage.
 
 1. [Use ordinary backend test and migration commands in isolated worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-1c) — SEED-015
-2. [Move a folder while preserving descendant identities](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7) — SEED-009
-3. [See one stable commit for one continuous web edit](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-10) — SEED-009
+2. [Run browser E2E scenarios concurrently without external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-2) — SEED-015
+3. [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
+4. [Move a folder while preserving descendant identities](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7) — SEED-009
+5. [See one stable commit for one continuous web edit](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-10) — SEED-009
 
 ## Recently done
 

@@ -304,12 +304,10 @@ useful before adding broader deletion or identity-inference behavior.
 
 **Status:** delivered; merged directly to main through `980114d23d` on
 2026-09-07; `eaa59f5d69` removed the completed quick plan. Recover the final
-plan at `980114d23d`. Two guidance/diagnostic corrections are tracked in
-[Plan 52](../quick/052-clarify-note-rename-publication/PLAN.md); that plan owns
-their current execution status. Address them before the next feature;
-they do not reopen the delivered identity-preservation outcome or create a
-duplicate backlog story. Backlog implications are recorded under Ordering
-and Scope Reduction.
+plan at `980114d23d`. Two guidance/diagnostic corrections (Plan 52) are also
+delivered; recover that plan from `9ea8d70741`. They do not reopen the
+delivered identity-preservation outcome or create a duplicate backlog story.
+Backlog implications are recorded under Ordering and Scope Reduction.
 
 **Goal**
 
@@ -358,44 +356,104 @@ Donut. This is useful even if moving between folders is deferred indefinitely.
 
 ### 7. Move a folder while preserving descendant identities
 
-- **For / why:** The owner wants to reorganize a group of notes without losing
-  the individual Donut identities and learning data under that folder.
-- **Evaluation:** The owner commits one unambiguous folder relocation and
-  synchronizes it; Donut shows the folder and descendants at their new paths,
-  and each corresponding Note or Folder entity retains its private data.
-- **Boundary learned from deletion:** Start with a folder represented by
-  tracked content and require exact correspondence for the whole relocation,
-  including any tracked README. An empty, unrepresented Donut folder has no
-  Git move to infer. Disappearance of its last tracked note alone must continue
-  to leave the container intact, as Story 5 promises. Reject destination
-  collisions, partial moves, and ambiguous correspondence without deleting
-  containers or inventing README files. Clarify unrepresented empty descendants
-  during story refinement before claiming their identities can be inferred.
-- **Boundary learned from renaming:** A successful equal-blob file pair proves
-  one note's correspondence, not the identity of its containing folder. Reuse
-  the unchanged-authored-tree and private-data contract; do not infer a folder
-  move from one note's accepted rename or add similarity-based identity guesses.
-- **Value / learning:** Extends safe reorganization from one file to the
-  common notebook-level operation. Note-level moves remain valuable if this
-  story is cancelled.
-- **Effort hypothesis:** L — low confidence; assumes exact descendant
-  correspondence can define a bounded folder-move case and excludes ambiguous
-  partial rewrites.
-- **Depends on:** Story 12.
-- **Safe stopping point:** Incomplete or multiply plausible descendant
-  correspondence rejects the commit atomically.
-- **Reminder from Story 9:** Ordinary Git rebase and a native conflict pause
-  apply only to one unpublished existing-note *content* commit over
-  content-only accepted history. A folder move is structural. Do not implement
-  this story as text merge, identity inference from a successful rebase, or a
-  new Donut continue/abort command. Pull and publish already refuse an
-  unfinished Git operation. Mixed folder-move-plus-content in one commit, and
-  rebasing unpublished local content over an accepted folder move, stay
-  refused until separately selected; this story is the identity-preserving
-  *publication* of one unambiguous folder relocation (Story 12 at folder
-  scale), plus clean-checkout receipt. Unrepresented empty descendants still
-  need refinement before claiming their identities. Use
-  **story-refinement** before slice planning.
+**Goal**
+
+An owner organizing a notebook in Obsidian or an AI IDE can move one existing
+folder and its notes to a better location in that same notebook, then publish
+and see the same folder and descendant identities in Donut, with learning
+history intact.
+
+**Scope**
+
+- Use `donut notebook publish <directory>` from the existing authenticated,
+  bound, clean checkout on `main`, with no unfinished Git operation. Publish
+  exactly one single-parent commit directly after current accepted `main`;
+  the current Donut Portable tree must match that accepted parent.
+- Conservative first-delivery boundary: the source folder must already have
+  its own tracked `README.md` in accepted history. Move that README and the
+  entire tracked subtree together, preserving every file's bytes, mode, and
+  relative path, with no other changes. Require one unambiguous source-folder
+  to destination-folder correspondence; never use content similarity or Git's
+  rename label as identity evidence. The README represents the container under
+  [Accepted ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md).
+- Change only the source folder's parent, keeping its name. The destination
+  parent is the notebook root or an existing Donut folder represented in the
+  accepted tree (including by descendant content or its own README). Resolve
+  the full path. The final folder path must be available under existing
+  folder/title rules; do not merge with or overwrite an existing container,
+  create missing parents, reuse a reserved deleted destination, or move a
+  folder into itself or its descendants.
+- Every active descendant folder must be represented by accepted tracked
+  content, directly or through descendants. Reject a source subtree containing
+  an unrepresented empty descendant rather than decide its relocation from
+  absent Git evidence. A folder represented only by its existing README is
+  eligible. Do not author or generate README files to make a move eligible.
+- Move the same source Folder and preserve its descendant Folder and Note
+  identities and hierarchy. Keep readmes and note content unchanged, and retain
+  learning schedules, tracker activation, history, questions, conversations,
+  and other identity-bound data. No recreation, copying of private data,
+  restoration, or cleanup of deleted entities is part of this operation.
+- Preserve all authored links, both within the moved subtree and in external
+  referrers. Ordinary current-state resolution applies: old exact-path links
+  can stop resolving. No link rewrite, redirects, aliases, or reference-policy
+  chooser. Publish and accept the move before making a separate supported
+  content edit, including any desired link correction.
+- Accept the authored commit and complete folder relocation together, or
+  neither. Invalid, partial, ambiguous, colliding, stale, or drifted folder
+  proposals and publication failures leave accepted history and remote
+  entities unchanged; retain the local commit for correction. An already
+  accepted retry with matching projection is unchanged success.
+- Ordinary clone/pull into an eligible clean checkout exposes the new paths
+  with prior history retained. A subsequently authored and published content
+  edit at a moved note's new path updates that same identity. Extend existing
+  CLI guidance with this eligibility boundary and path-specific rejection
+  guidance; no new command or web interaction is needed.
+- Retain existing single-note relocation and deletion semantics. Moving one
+  ordinary file, even the last file in a directory, still moves only that
+  note and leaves its Donut folder intact. A partial directory operation whose
+  diff already qualifies as a supported note operation retains that behavior;
+  do not claim to detect filesystem intent from the resulting Git tree.
+- Exclusions: folders without their own accepted README, unrepresented empty
+  descendants, folder renaming, multiple folder moves, descendant renames or
+  edits, unrelated file changes, new destination parents, folder merging,
+  cross-notebook moves, attachments, README authoring, web structural sync,
+  drift repair, multiple unpublished commits, and structural rebase/conflict
+  handling. Story 9's content-only rebase does not expand to folder moves or
+  unpublished content over accepted folder moves.
+
+These are conservative scope assumptions for this refinement, not additional
+human-approved product policies. The excluded cases need no resolution for
+this bounded outcome; expanding them requires revisiting the story.
+
+**Key examples**
+
+1. Accepted `Topics/README.md`, `Topics/A.md`, and `Topics/Sub/B.md` represent
+   a folder and nested notes; `Archive` is an existing represented folder and
+   has no `Topics` child. The owner moves the whole directory to
+   `Archive/Topics`, commits without editing files, and publishes → Donut shows
+   the same folder and descendant entities there, preserving their private
+   data; another clean checkout receives the move through ordinary pull.
+   A later separately published edit to `Archive/Topics/Sub/B.md` updates the
+   same learned note. An unchanged identical note elsewhere keeps its identity.
+2. An eligible `Archive/Topics` is moved back to the available root path
+   `Topics`, keeping every relative path and byte → the same folder and notes
+   return to the root. A source with only its own README is also eligible.
+3. The source contains an empty descendant with no tracked content, or the
+   target already contains a folder of the same name → publication rejects
+   the folder move without changing either tree or any identities. Moving
+   only the README while leaving descendant files behind is also rejected.
+4. `Topics/A.md` is the sole tracked file and there is no `Topics/README.md`.
+   Moving it to an existing eligible folder → existing single-note relocation
+   applies; the `Topics` Folder remains in Donut. This is not a folder move.
+5. Another note links to `Topics/A` before the accepted folder move → its
+   authored link remains unchanged and may become unresolved. Editing that
+   referrer in the move commit is outside scope; a later content edit can fix it.
+
+**Effort hypothesis:** L — low confidence, retained from decomposition; assumes
+this exact-subtree boundary is sufficient without broader identity inference.
+**Depends on:** delivered Story 12.
+**Open decisions:** none blocking this bounded scope. Folder moves without a
+source README and treatment of unrepresented empty descendants remain deferred.
 
 <a id="story-8"></a>
 
@@ -458,10 +516,10 @@ commit batching, or new metadata in the Portable tree.
 
 ### 9. Resolve an overlapping edit with ordinary Git
 
-**Status:** delivered (2026-09-07).
-[Execution plan](../quick/056-resolve-overlapping-note-edits/PLAN.md).
-Story 8's completed Plan 53 excluded same-path edits; this story reuses its
-rebase machinery and replaces that overlap refusal with ordinary Git.
+**Status:** delivered (2026-09-07). The completed quick plan was removed;
+recover the last execution PLAN from `5232ca147d`. Story 8's completed Plan 53
+excluded same-path edits; this story reuses its rebase machinery and replaces
+that overlap refusal with ordinary Git.
 
 **Goal**
 
@@ -672,7 +730,8 @@ SEED-015 worktree isolation currently precedes it in that queue.
   Referrers remain unchanged (`bde458d888`), so old-path links can stop resolving.
   The owner must publish/accept the rename before making the later edit.
   The retrospective found incomplete CLI instructions and missing destination
-  context for a reserved-title rejection; Plan 52 owns those corrections.
+  context for a reserved-title rejection; Plan 52 delivered those corrections
+  (`9ea8d70741`).
 - **No evidence supports broader identity inference yet.** Folder moves,
   rename-with-edit commits, and structural conflicts still need their own
   bounded outcomes. Passing automated examples establish feasibility and
@@ -831,9 +890,9 @@ Unsupported operations must fail clearly rather than be approximated.
 
 No open decision blocks the bounded rename or relocation scope. Story 9
 delivered the developer's ordinary-Git overlap policy, including empty-result
-reporting. Same-path creation, unrepresented empty
-descendants in folder moves, and structural conflict policies need refinement
-before those capabilities are selected or expanded.
+reporting. Same-path creation and structural conflict policies remain deferred. Story 7
+now excludes folders without their own accepted README and unrepresented empty
+descendants; those cases need refinement before expanding its bounded scope.
 
 ADR 0002 now reflects the later human discussion recorded here: v1 permits a
 required CLI-assisted acquisition and synchronization workflow and defers direct
@@ -849,7 +908,8 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 
 Stories 1–6, 8, 9, 11, and 12 are delivered. Select one remaining story from
 the [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Story 7
-still needs **story-refinement** (Goal/Scope) before an executable plan. Do not
+has refined Goal/Scope and key examples for its bounded folder relocation;
+use **slice-planning** when execution planning is requested. Do not
 turn the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
 boundary as a human-owned advice task; it does not change these story outcomes.
 

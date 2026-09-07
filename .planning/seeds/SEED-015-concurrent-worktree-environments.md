@@ -138,7 +138,9 @@ serializing tests avoids overlap but does not test or deliver concurrency.
 
 #### 1a. Run concurrent backend tests using explicitly configured databases
 
-**Status:** Delivered. Guide: `docs/worktree-backend-tests.md`.
+**Status:** Delivered. Guide: `docs/worktree-backend-tests.md`. Recover
+quick/054 from `1089be2573` and the suite-datasource repair (quick/055) from
+`d0287db6a2`.
 
 **Goal**
 
@@ -173,10 +175,9 @@ environment manager, database cleanup, or changes to existing command selection.
 
 #### 1b. Run the first backend tests in a fresh worktree without manual setup
 
-**Status:** Delivered. Guide: `docs/worktree-backend-tests.md`. Leftover
-exclusive stale-lock reclaim and gitignore of `.worktree.local.lock` are
-[quick/058](../quick/058-exclusive-worktree-checkout-lock/PLAN.md), not a new
-story.
+**Status:** Delivered. Guide: `docs/worktree-backend-tests.md`. Recover
+quick/057 from `fce6bd68f4` and exclusive checkout-lock follow-up (quick/058)
+from `8114cfc16b`.
 
 **Goal**
 
@@ -215,38 +216,85 @@ makes isolated verification practical even if ordinary command integration in
 
 #### 1c. Use ordinary backend test and migration commands in isolated worktrees
 
-**Status:** Queued. Settle the open compatibility decisions below before slice
-planning. 1a and 1b are delivered; do not rediscover them.
+**Status:** Refined; awaiting the two compatibility decisions below before
+slice planning. 1a and 1b are delivered; do not rediscover them.
 
-- **For / why:** Developers and AI tasks can use familiar commands and focused
-  test loops without remembering which entry point provides isolation.
-- **Scope:** Normal local Nix invocations of `pnpm backend:test`,
+**Goal**
+
+Developers and AI tasks can verify backend changes concurrently in local linked
+worktrees using ordinary test and migration commands, without remembering an
+opt-in command or manually preparing a database. Switching commands must keep
+each task on its own persistent database. This removes accidental shared-state
+interference from normal backend verification; browser isolation is a later
+story.
+
+**Scope**
+
+- Support local Nix invocations of `pnpm backend:test`,
   `pnpm backend:test_only`, and underlying Gradle `test` and `migrateTestDB`
-  tasks resolve the same worktree configuration. Starting with a test-only or
-  focused-test invocation in a fresh linked worktree also prepares its assigned
-  database. A separate migration command and later test command agree on the
-  target across shells. The special command-selection requirement from 1a ends.
-- **Evaluation:** In two worktrees, use different supported entry points to
-  migrate and run focused tests concurrently. Repeat with a fresh worktree
-  starting directly with test-only execution. Each actually executes its tests
-  against its own prepared database; switching commands does not select shared
-  state or allocate another environment.
-- **Value / learning:** Makes isolation part of normal development practice,
-  avoiding accidental use of legacy endpoints when a developer changes commands.
-  This remains useful without any later browser or client story.
-- **Safety boundary:** All shared boundaries apply. Preserve non-worktree
-  workflows according to the compatibility decision below; a conflicting
-  explicit URL cannot silently bypass an assigned worktree target.
+  tasks, including focused Gradle `--tests` filters.
+- A fresh linked worktree may start with any supported entry point. Prepare
+  its isolated database and apply that checkout's migrations before tests run,
+  including when the first invocation is test-only. A migration-only command
+  prepares and migrates without running tests.
+- Reuse the same identity and database when changing entry points, opening a
+  fresh shell, or making an ordinary branch change. A checkout with existing
+  local configuration uses it; do not replace or repair an operator-supplied
+  identity or silently provision its missing database.
+- Retain the existing opt-in workflow and reuse its allocation and checkout
+  ownership behavior. One invocation at a time owns a checkout's test database;
+  commands in different worktrees may overlap. Print the selected database
+  and stop visibly on invalid configuration, preparation, or migration failure.
+- All group-1 shared boundaries apply. Primary-checkout compatibility and
+  conflicting explicit URLs remain proposals below, not settled requirements.
+
+**Exclusions:** Browser/E2E and development-profile isolation, ports, service
+startup or shutdown redesign, Cloud VM/CI changes, worktree hooks, database
+cleanup, automatic schema rollback/rebuild, duplicate-ID recovery, multiple
+simultaneous runners in one checkout, and changes to unrelated Gradle tasks.
+
+**Key examples**
+
+1. Two fresh linked worktrees have no local configuration and MySQL is already
+   running → one uses `pnpm backend:test`, the other starts with
+   `pnpm backend:test_only` → both actually execute tests against distinct,
+   prepared databases; each run's fixtures and cleanup affect only its target.
+2. A fresh linked worktree starts with Gradle `test --tests '<pattern>'` → its
+   database is initialized and migrated before the selected tests execute;
+   focused execution needs no earlier setup or full-suite invocation.
+3. A worktree runs Gradle `migrateTestDB`, then opens a new shell and invokes
+   `test` or a pnpm test command → migration runs without tests, and the later
+   test command uses the same identity and database rather than allocating again.
+4. A checkout has malformed configuration, an inaccessible configured database,
+   or a migration failure → an ordinary supported command fails visibly without
+   running tests against fallback state or repairing/replacing the identity.
+5. One supported invocation owns a checkout → another supported test or
+   migration invocation overlaps → the second refuses visibly; an invocation
+   in a different worktree remains independent.
+
+**Open questions — proposed compatibility policy**
+
+- Keep ordinary commands in a primary checkout without local configuration on
+  their existing behavior (default `doughnut_test`), while fresh linked
+  worktrees automatically initialize isolation. A primary checkout with local
+  configuration uses that configured environment. Is this the desired boundary?
+- When isolation applies, reject an explicit `SPRING_DATASOURCE_URL`, `DB_URL`,
+  or `SPRING_FLYWAY_URL` that conflicts with the assigned target, following the
+  existing opt-in command. Is visible rejection the desired override policy?
+
+These choices affect ordinary-command compatibility and cannot be excluded
+without leaving the selected story incomplete. Slice planning awaits answers.
+
+**Readiness and dependencies**
+
 - **Effort hypothesis:** M — medium confidence. 1b proved first-use allocation
   and live checkout ownership on the opt-in command. Remaining risk is the
   ordinary entry-point fan-out agreeing on one target without a second
   allocator. Reassess if that fan-out makes this larger than L.
 - **Depends on:** The configured workflow from 1a and automatic first use from
   1b for the fresh-worktree case. Reuse `scripts/backend-test-worktree.sh`
-  identity, database, and checkout lock; do not invent a parallel provisioner.
-  Finish or incorporate [quick/058](../quick/058-exclusive-worktree-checkout-lock/PLAN.md)
-  so ordinary commands inherit exclusive stale-lock reclaim and a gitignored
-  `.worktree.local.lock` rather than copying the current `mv` reclaim.
+  identity, database, and checkout lock (exclusive stale reclaim and gitignored
+  `.worktree.local.lock`); do not invent a parallel provisioner.
 - **Reminder from 1a–1b:** Separate databases on the existing MySQL 8.4 server
   already make concurrent backend tests independent; local nix mysqld already
   starts with `max_connections=1000`. Do not serialize across worktrees. Do
@@ -268,17 +316,15 @@ scope reduction, drop 1c first, retaining 1a–1b.
 - The developer accepted manually supplied distinct databases and one supported
   workflow for 1a. Automatic first use on that opt-in command is delivered in
   1b. Neither is an open choice anymore.
-- Before selecting 1c, settle the compatibility proposal: a primary checkout
-  without local configuration keeps `doughnut_test`, while fresh linked
-  worktrees initialize isolation automatically. Also settle how normal
-  commands handle conflicting explicit database URLs; the recommendation is
-  visible rejection (the opt-in command already refuses a conflicting
-  `SPRING_DATASOURCE_URL`, `DB_URL`, or `SPRING_FLYWAY_URL`). These proposals
-  need not expand 1a's opt-in workflow.
+- Story [1c](#story-1c) owns the two remaining compatibility questions about
+  the primary checkout and conflicting explicit database URLs.
 
 <a id="story-2"></a>
 
 ### 2. Run browser E2E scenarios concurrently without external-service mocks
+
+**Status:** Queued after 1c. Refine the representative browser workflow and
+its environment boundary before slice planning.
 
 - **For / why:** Developers and AI tasks can verify ordinary browser workflows
   against their own running code while another worktree does the same.
@@ -303,6 +349,9 @@ scope reduction, drop 1c first, retaining 1a–1b.
 <a id="story-3"></a>
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
+
+**Status:** Queued after story 2. Refine the supported external-service scope
+before slice planning; story 2 supplies the required browser environment.
 
 - **For / why:** Developers and AI tasks can verify browser behavior involving
   mocked external services without another task changing their responses.
@@ -360,6 +409,20 @@ scope reduction, drop 1c first, retaining 1a–1b.
 
 ## Ordering and Scope Reduction
 
+**Backlog selection, 2026-09-07:** Retain 1c first and promote stories 2 and 3
+ahead of the remaining notebook-sync stories. Story 2 offers the highest next
+learning value: backend database isolation is proven, but application endpoint,
+fixture-reset, and restart ownership still need a concurrent browser proof.
+Story 3 then makes that environment useful for browser workflows involving
+external services and tests independent mock state. These are priority
+judgments from the seed's stated interference problem, not measured usage or
+delivery estimates. The [product backlog](../PRODUCT-BACKLOG.md) owns global
+order. Keep CLI and MCP stories 4–5 unqueued until the browser environment
+provides evidence for their scope and relative value; neither is cancelled.
+Replenishment does not settle 1c's compatibility decisions or authorize
+implementation. Stories 2–3 retain their low-confidence estimates and need
+refinement before executable planning.
+
 Start with child 1a: it tests the central shared-MySQL assumption with manual
 provisioning and one supported workflow. Follow with 1b and 1c to remove setup
 and command-selection friction. 1a and 1b are delivered; 1c is the remaining
@@ -416,7 +479,6 @@ Select and refine one story before creating an executable plan.
   `e2e_test/step_definitions/hook.ts`, and `scripts/sut-restart.mjs`.
 - [ADR 0006: Failure handling](../../docs/adrs/0006-failure-handling-accepted.md).
 - [Problem decomposition](../../.cursor/rules/problem-decomposition.mdc).
-- Quick/054 and quick/057: concurrent suites on shared MySQL 8.4.11 work;
-  automatic first-use of `pnpm backend:test:worktree` works in two fresh
-  worktrees. Leftover exclusive stale-lock reclaim and lock gitignore:
-  [quick/058](../quick/058-exclusive-worktree-checkout-lock/PLAN.md).
+- Stories 1a–1b: concurrent suites on shared MySQL 8.4.11 work; automatic
+  first-use of `pnpm backend:test:worktree` works in two fresh worktrees,
+  including exclusive stale-lock reclaim and a gitignored checkout lock.
