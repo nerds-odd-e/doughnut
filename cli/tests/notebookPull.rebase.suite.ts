@@ -18,6 +18,7 @@ import {
   NESTED_NOTE,
   OTHER_NOTE,
   prepareEligibleDivergence,
+  withNoAmbientGitIdentityOrEditor,
 } from './notebookPull.rebase.testHelpers.js'
 
 export function describeNotebookPullRebase(): void {
@@ -110,6 +111,28 @@ export function describeNotebookPullRebase(): void {
       expect(fs.readFileSync(join(setup.directory, 'note.md'), 'utf8')).toBe(
         LOCAL_NOTE
       )
+    })
+
+    test('rebases a one-shot-identity unpublished commit without stored identity or an editor', async () => {
+      await withNoAmbientGitIdentityOrEditor(async () => {
+        const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
+          remoteEdits: 1,
+          oneShotCommitIdentity: true,
+        })
+        serveAcceptedBundle(ctx, setup.source, 'rebase-one-shot-identity')
+
+        await run(['notebook', 'pull', setup.directory])
+
+        expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(
+          setup.acceptedHead
+        )
+        expect(fs.readFileSync(join(setup.directory, 'note.md'), 'utf8')).toBe(
+          LOCAL_NOTE
+        )
+        expect(
+          runGit(['log', '-1', '--format=%an <%ae>'], setup.directory)
+        ).toBe('Donut E2E <donut-e2e@example.com>')
+      })
     })
 
     test('rebases a nested ordinary-note content edit', async () => {

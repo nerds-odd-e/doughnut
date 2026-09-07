@@ -360,6 +360,14 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
 
 - Slice 1 shares one read-only `assertReadyCheckout` for pull and publish; later
   conflict UX (leaf 4) can rely on this gate remaining first.
+- Installed other-note rebase CI failed on this execution's slice-1 SHA
+  (`1c55df91d4`, run 34115115045) with `failed to rebase ... Rebasing (1/1)`.
+  Cause: Donut-invoked `git rebase` had no committer identity or noninteractive
+  editor; E2E commits with one-shot `-c` identity and never stores repo
+  identity. Repair at HEAD: pass unpublished-commit `user.name`/`user.email`
+  and `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR=true` for Donut-invoked rebase only;
+  `runSystemGitOrThrow` includes stdout+stderr. Leaves 2/4/5/9/10 reuse that
+  rebase path.
 - Pre-existing CI on main, not this execution's pushes, fails installed other-note
   rebase in `cli_notebook_clone.feature` with
   `failed to rebase ... Rebasing (1/1)` (runs 34112403473 / 34113740661 /

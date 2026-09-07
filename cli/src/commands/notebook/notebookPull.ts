@@ -31,6 +31,50 @@ function assertCheckoutStillReady(
   }
 }
 
+function unpublishedCommitAuthor(directory: string): {
+  name: string
+  email: string
+} {
+  const text = runSystemGitOrThrow(
+    ['-C', directory, 'log', '-1', '--format=%an%n%ae'],
+    (detail, status) =>
+      `failed to read the unpublished local commit identity${detail ? `: ${detail}` : ` (exit code ${status})`}`
+  ).trimEnd()
+  const [name = '', email = ''] = text.split('\n')
+  return { name, email }
+}
+
+function rebaseUnpublishedCommit(
+  directory: string,
+  acceptedHead: string,
+  localParent: string
+): void {
+  const { name, email } = unpublishedCommitAuthor(directory)
+  runSystemGitOrThrow(
+    [
+      '-C',
+      directory,
+      '-c',
+      `user.name=${name}`,
+      '-c',
+      `user.email=${email}`,
+      'rebase',
+      '--onto',
+      acceptedHead,
+      localParent,
+    ],
+    (detail, status) =>
+      `failed to rebase the unpublished local commit onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`,
+    {
+      env: {
+        ...process.env,
+        GIT_EDITOR: 'true',
+        GIT_SEQUENCE_EDITOR: 'true',
+      },
+    }
+  )
+}
+
 /**
  * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
  * unchanged, an eligible already-based unpublished commit stays unpublished, eligible other-note
@@ -100,17 +144,10 @@ export async function receiveAcceptedNotebookHead(
 
       assertCheckoutStillReady(directory, capturedHead)
       if (localHistory.kind === 'rebase') {
-        runSystemGitOrThrow(
-          [
-            '-C',
-            directory,
-            'rebase',
-            '--onto',
-            acceptedHead,
-            localHistory.localParent,
-          ],
-          (detail, status) =>
-            `failed to rebase the unpublished local commit onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`
+        rebaseUnpublishedCommit(
+          directory,
+          acceptedHead,
+          localHistory.localParent
         )
         return {
           kind: 'rebased',

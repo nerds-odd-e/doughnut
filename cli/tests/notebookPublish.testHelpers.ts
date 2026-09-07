@@ -105,12 +105,15 @@ export function cloneAsBoundCheckout(
   workDir: string,
   sourceRepoDir: string,
   apiOrigin: string,
-  name: string
+  name: string,
+  options?: { configureIdentity?: boolean }
 ): string {
   const dir = join(workDir, name)
   runGit(['clone', '--quiet', sourceRepoDir, dir], workDir)
   bindNotebookCheckout(dir, apiOrigin)
-  configureTestGitIdentity(dir)
+  if (options?.configureIdentity !== false) {
+    configureTestGitIdentity(dir)
+  }
   runGit(['remote', 'remove', 'origin'], dir)
   return dir
 }
