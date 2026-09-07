@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–12 done.
+Status: in progress; slices 1–13 done.
 
 ## Goal and scope
 
@@ -286,10 +286,11 @@ Sizing basis: existing accepted-move fixture plus one ordinary fast-forward loop
 
 ### 13. Edit a descendant after receiving its accepted move
 Type: Behavior
-Status: planned
+Status: done
 Proof: One installed-CLI scenario starts after the accepted move is received,
 authors/publishes one separate content commit at the new path, and observes the
 same Donut note ID with the changed content.
+`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_folder_relocation.feature` passed (3 scenarios). Folder-relocation scenarios live in that feature after a 250-line split from `cli_notebook_clone.feature`.
 
 Behavior: The move is accepted and received → edit and separately publish one
 moved note → update that same identity. Do not batch move/edit or expand rebase.
@@ -351,7 +352,7 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–12 done. Remaining: subsequent edit, CLI guidance.
+Slices 1–13 done. Remaining: CLI guidance.
 
 CI observer delivered run 34142166098 on `9f35dbcff2` (slice 9, test-only).
 The only Cypress failure was `record_live_audio_with_real_open_ai_service`

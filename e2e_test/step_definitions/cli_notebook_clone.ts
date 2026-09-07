@@ -50,6 +50,12 @@ When(
 )
 
 When(
+  'I commit the following edit to {string} in the second cloned checkout:',
+  (relativePath: string, content: string) =>
+    cli.notebookCloneCheckout().commitReceiverEdit(relativePath, content)
+)
+
+When(
   'I add and commit the following note at {string} in the cloned checkout:',
   (relativePath: string, content: string) =>
     cli.notebookCloneCheckout().commitAddition(relativePath, content)
@@ -57,6 +63,10 @@ When(
 
 When('I publish the cloned checkout using the installed CLI', () =>
   cli.notebookCloneCheckout().publish()
+)
+
+When('I publish the second cloned checkout using the installed CLI', () =>
+  cli.notebookCloneCheckout().publishReceiver()
 )
 
 When(

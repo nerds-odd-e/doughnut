@@ -5,6 +5,7 @@
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 import { notebookCloneCheckoutRebaseObservations } from './notebookCloneCheckoutRebase'
 import {
+  commitNoteChangesAt,
   expectCanonicalTreeAt,
   notebookCloneCheckoutReceiver,
   runInstalledOn,
@@ -15,23 +16,7 @@ function notebookCloneCheckout() {
   function commitNoteChanges(
     files: { relativePath: string; content: string }[]
   ): Cypress.Chainable<null> {
-    return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
-      cy
-        .task<string>('commitCliNotebookCheckoutNoteChange', {
-          checkoutDir,
-          files,
-        })
-        .then((head) => {
-          cy.wrap(head).as('cliNotebookPublishHead')
-          cy.wrap(
-            files.map(({ relativePath, content }) => ({
-              relativePath,
-              content: `${content}\n`,
-            }))
-          ).as('cliNotebookProposalFiles')
-          return cy.wrap(null)
-        })
-    )
+    return commitNoteChangesAt('cliCloneDestination', files)
   }
 
   function readCheckoutState(): Cypress.Chainable<CliNotebookCheckoutState> {

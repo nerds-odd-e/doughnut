@@ -1,6 +1,6 @@
 /**
- * Second-clone receipt: pull accepted history onto a clean checkout
- * that did not publish the move, then observe its tree and ancestry.
+ * Second-clone checkout: pull accepted history, then commit and publish
+ * from the checkout that received the move.
  */
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 
@@ -39,8 +39,50 @@ function expectCanonicalTreeAt(
   })
 }
 
+function commitNoteChangesAt(
+  destinationAlias: CliNotebookCloneDestinationAlias,
+  files: { relativePath: string; content: string }[]
+): Cypress.Chainable<null> {
+  return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
+    cy
+      .task<string>('commitCliNotebookCheckoutNoteChange', {
+        checkoutDir,
+        files,
+      })
+      .then((head) => {
+        cy.wrap(head).as('cliNotebookPublishHead')
+        cy.wrap(
+          files.map(({ relativePath, content }) => ({
+            relativePath,
+            content: `${content}\n`,
+          }))
+        ).as('cliNotebookProposalFiles')
+        return cy.wrap(null)
+      })
+  )
+}
+
 function notebookCloneCheckoutReceiver() {
   return {
+    /**
+     * Commits a content-only edit in `@cliCloneReceiverDestination` after
+     * that checkout has received accepted history. Sets `@cliNotebookPublishHead`.
+     */
+    commitReceiverEdit(
+      relativePath: string,
+      content: string
+    ): Cypress.Chainable<null> {
+      return commitNoteChangesAt('cliCloneReceiverDestination', [
+        { relativePath, content },
+      ])
+    },
+    publishReceiver(): Cypress.Chainable<null> {
+      return runInstalledOn(
+        'cliCloneReceiverDestination',
+        'publish',
+        'runInstalledCli'
+      )
+    },
     /**
      * Pulls accepted history onto `@cliCloneReceiverDestination` without
      * publishing. Captures the pre-pull head for the ancestor assertion.
@@ -92,4 +134,9 @@ function notebookCloneCheckoutReceiver() {
   }
 }
 
-export { expectCanonicalTreeAt, notebookCloneCheckoutReceiver, runInstalledOn }
+export {
+  commitNoteChangesAt,
+  expectCanonicalTreeAt,
+  notebookCloneCheckoutReceiver,
+  runInstalledOn,
+}
