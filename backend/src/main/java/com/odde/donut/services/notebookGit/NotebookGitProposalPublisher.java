@@ -22,6 +22,7 @@ import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ public class NotebookGitProposalPublisher {
   private final NoteFactory noteFactory;
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
+  private final NotebookGitProposalFolderAcceptance folderAcceptance;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -56,7 +58,8 @@ public class NotebookGitProposalPublisher {
       NotebookGitProposalFilenameTitle filenameTitle,
       NoteFactory noteFactory,
       NoteService noteService,
-      NoteTitlePlacementRules noteTitlePlacementRules) {
+      NoteTitlePlacementRules noteTitlePlacementRules,
+      NotebookGitProposalFolderAcceptance folderAcceptance) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
@@ -68,6 +71,7 @@ public class NotebookGitProposalPublisher {
     this.noteFactory = noteFactory;
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
+    this.folderAcceptance = folderAcceptance;
   }
 
   @Transactional(
@@ -105,9 +109,16 @@ public class NotebookGitProposalPublisher {
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
 
-    List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
-        NotebookGitProposalTreeShape.requireRegularNoteChanges(
+    List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
+        NotebookGitProposalTreeShape.inspectRegularFiles(
             proposal.repository(), acceptedHead, proposal.mainHead());
+    Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
+        NotebookGitProposalFolderShape.requireExactOrEmpty(files);
+    if (relocation.isPresent()) {
+      return folderAcceptance.accept(state, proposal, acceptedHead, relocation.get());
+    }
+    List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
+        NotebookGitProposalTreeShape.requireAllowedNoteChangesFromInspectedFiles(files);
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
     projection.requireMatchingAcceptedTree(
@@ -163,7 +174,7 @@ public class NotebookGitProposalPublisher {
     try {
       addedNote = noteFactory.create(notebook, destinationFolder, title);
     } catch (ApiException exception) {
-      throw withContext(exception, "Cannot add note at path \"" + path + "\"");
+      throw exception.withContext("Cannot add note at path \"" + path + "\"");
     }
     authoredNoteDocumentPersistence.persist(addedNote, document, publishedAt);
     return addedNote;
@@ -184,7 +195,7 @@ public class NotebookGitProposalPublisher {
     try {
       noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, destinationFolder, newTitle);
     } catch (ApiException exception) {
-      throw withContext(exception, "Cannot rename to path \"" + noteChange.path() + "\"");
+      throw exception.withContext("Cannot rename to path \"" + noteChange.path() + "\"");
     }
     note.setTitle(new DisplayName(newTitle));
     note.setFolder(destinationFolder);
@@ -211,19 +222,8 @@ public class NotebookGitProposalPublisher {
     try {
       AuthoredNoteContent.assertValidForSave(content);
     } catch (ApiException exception) {
-      throw withContext(exception, "Invalid authored property at path \"" + path + "\"");
+      throw exception.withContext("Invalid authored property at path \"" + path + "\"");
     }
     return AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin);
-  }
-
-  private static ApiException withContext(ApiException exception, String context) {
-    ApiException contextualException =
-        new ApiException(
-            exception.getMessage(),
-            exception.getErrorBody().getErrorType(),
-            context + ": " + exception.getErrorBody().getMessage());
-    contextualException.getErrorBody().getErrors().putAll(exception.getErrorBody().getErrors());
-    contextualException.initCause(exception);
-    return contextualException;
   }
 }

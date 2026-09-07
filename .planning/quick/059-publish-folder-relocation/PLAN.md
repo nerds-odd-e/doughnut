@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: planned; implementation not authorized by this planning request.
+Status: in progress; slices 1–12 done.
 
 ## Goal and scope
 
@@ -32,10 +32,15 @@ operations retain their meanings, including a last-note move leaving its folder.
   REQUIRES_NEW acceptance transaction and binding lock. Retain that ownership,
   owner authorization, ancestry checks, typed Markdown validation, drift checks,
   bundle storage, and idempotent retry. No new endpoint, schema, or transport.
-- `NotebookGitProposalTreeShape` currently rejects changed README paths and
-  returns note changes. Separate raw safe regular-file tree inspection from the
-  existing note-only classifier only as needed for the next Behavior. Recognize
-  folder relocation as a distinct proposal, not a list of note renames.
+- Publisher inspects files, then `requireExactOrEmpty`. Exact `FolderRelocation`
+  is accepted by `NotebookGitProposalFolderAcceptance`: eligibility (represented
+  parent, empty descendants, placement), Markdown, accepted-tree drift, reparent
+  source Folder only, reload `foldersOf`, proposed-tree match, then existing
+  bundle/binding write. Missing/unrepresented dest parents name
+  `{destPrefix}/README.md`. Collision/cycle use
+  `Cannot move folder to path "{destPrefix}/README.md": …`. Empty source
+  descendants name `Descendant folder "{path}/"`. Note operations still use the
+  existing classifier, including a last-note move leaving its folder.
 - Use source/destination prefixes and complete relative-path/blob correspondence,
   not independent equal-blob pairing. Require exactly one eligible folder mapping;
   identical note content elsewhere must not affect it. Nested README files belong
@@ -64,7 +69,7 @@ operations retain their meanings, including a last-note move leaving its folder.
 
 ## Refinement assessment
 
-No execution has started and no completed evidence is being replaced.
+Slice 1 extracted raw inspection; no completed evidence was replaced.
 Original leaves 1, 3, 4, 7, and 8 are Ready, with their dependency/proof references
 updated below. Original 2 is Refine (recognition, placement, and acceptance beats);
 5 is Refine (rollback and retry); 6 is Refine (publication and receipt). None
@@ -87,9 +92,10 @@ additional boundary evidence, not gratuitous production changes.
 
 ### 1. Separate raw proposal inspection from note eligibility
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing tree-shape controller coverage, including README refusal and
 ordinary note operations, remains green with unchanged observable behavior.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed (~50s).
 
 Structure: Extract the existing raw safe regular-file walk with paths and blob
 IDs, preserving its current caller and errors. Its immediate consumer is leaf 2's
@@ -98,10 +104,13 @@ Sizing basis: mechanical extraction of the existing walk, no new acceptance logi
 
 ### 2. Explain why a proposed folder move is not an exact subtree relocation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Through publishNotebookGitProposal, a table of partial, mixed, multiple,
 renamed, or edited directory proposals receives a path-specific shape refusal;
 the binding and projection remain unchanged.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed (~53s).
+`NotebookGitProposalFolderRelocationShapeControllerTest` names the breaking
+path; exact nested-README candidates still get reserved-README.
 
 Behavior: A proposal changes a folder README but is not one complete unchanged
 same-name prefix relocation → publish → explain the unsupported shape. Derive
@@ -115,9 +124,13 @@ use full subtree sets, not combinations of independent equal-blob note pairs.
 
 ### 3. Reject a destination parent absent from accepted history
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller proposals to missing and unrepresented parents name the final
 Portable path and leave folders and the binding unchanged.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationDestinationControllerTest` asserts the
+canonical missing-parent reason and folder-id stability; unrepresented is the
+path delta; represented parents still reserved-README.
 
 Behavior: An exact candidate names an unavailable destination parent → publish →
 reject without creating it. Resolve the source Folder and destination parent by
@@ -128,10 +141,13 @@ Sizing basis: adapt existing full-path resolution, with one refusal proof loop.
 
 ### 4. Reject a folder destination that collides or creates a cycle
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller data variants for an existing same-name destination (including
 an invisible empty container) and self/descendant destination retain the original
 hierarchy and report the placement reason at the requested path.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationPlacementControllerTest` covers collision
+(canonical), invisible empty (delta), self, and descendant.
 
 Behavior: An exact candidate resolves a parent but violates existing placement
 rules → publish → reject without merging or overwriting. Use
@@ -142,9 +158,12 @@ Sizing basis: wire existing placement rules and contextual errors in one loop.
 
 ### 5. Reject a source containing an unrepresented empty descendant
 Type: Behavior
-Status: planned
+Status: done
 Proof: Add an empty descendant to an otherwise exact source subtree → controller
 publication names that excluded folder; all parents/IDs and accepted head remain.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationEmptyDescendantControllerTest` names
+`Topics/Empty/`; deeper-content descendants still reserved-README.
 
 Behavior: A represented source has an active descendant folder with no tracked
 accepted content anywhere below it → publish → refuse the whole move. Compare
@@ -155,11 +174,14 @@ Sizing basis: one set-membership rule over existing export rows and tree paths.
 
 ### 6. Accept the validated folder move by reparenting the same Folder
 Type: Behavior
-Status: planned
+Status: done
 Proof: A controller publication with source README and nested note accepts the
 exact proposed tree and retains source/descendant IDs. Parameterized eligible
 placements cover root, nested parent, README-only source, and a represented
 ancestor without its own README. Assert canonical tree/identity shape once.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationControllerTest` canonical IDs+tree; placements
+assert parent delta only. Interim reserved-README tests removed.
 
 Behavior: A candidate passes leaves 2–5 and existing owner/ancestry/Markdown/drift
 checks → publish → reparent the existing source and accept that exact authored
@@ -173,11 +195,15 @@ transaction/bundle acceptance stays intact. Re-run their refusal proofs here.
 
 ### 7. Retain identity-bound data through folder publication
 Type: Behavior
-Status: planned
+Status: done
 Proof: Reuse NotebookGitProposalRelocationPrivateAssociationControllerTest's
 fixtures for a learned descendant and inactive tracker; reload tracker schedule,
 history, question/conversation associations and an unchanged identical outside
 note after publishing. Assert preservation deltas only.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationPrivateAssociationControllerTest` asserts
+tracker/MCQ/conversation deltas, untouched tracker, and deleted sibling stays
+deleted.
 
 Behavior: An eligible source contains learned notes → publish its move → those
 same identities retain their private associations and activation state; an
@@ -187,10 +213,13 @@ no new copying or mutation should be necessary.
 
 ### 8. Preserve authored references after the folder changes location
 Type: Behavior
-Status: planned
+Status: done
 Proof: Reuse the relocation referrer controller pattern with body/property links
 inside and outside the source; observe authored bytes unchanged and an old exact
 path unresolved using ordinary current-state resolution.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationReferrerControllerTest` asserts authored
+`[[Topics/Cell]]` bytes and unresolved old path for inside and outside referrers.
 
 Behavior: Notes refer to the old source path → publish the folder move → links
 stay authored even when that path stops resolving. No rewrite or index-repair
@@ -199,9 +228,12 @@ Sizing basis: one existing reference-resolution proof pattern and one fixture.
 
 ### 9. Roll back a folder move when late acceptance fails
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing late binding-save injection, committed fixture, and fresh read
 transaction show original parent, descendant IDs, head, and bundle after failure.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationRollbackControllerTest` uses the existing
+atomic-test annotation mix.
 
 Behavior: An eligible move fails after parent mutation → publication fails →
 the entire accepted state remains at its old location. Reset failure injection
@@ -211,9 +243,12 @@ failure case; one failure and one readback, no resubmission in this leaf.
 
 ### 10. Retry an accepted folder proposal without another mutation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publish an eligible proposal, then submit that accepted head again;
 observe unchanged parent, IDs, binding head/bundle/timestamp.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`retriesAnAcceptedFolderRelocationWithoutChangingParentIdsOrBinding` reuses
+nested placement; existing drift tests remain green.
 
 Behavior: A folder proposal is already accepted with matching projection →
 retry publication → unchanged success. Retain existing drift rejection on retry.
@@ -221,10 +256,12 @@ Sizing basis: reuse the existing accepted-head branch and fixture; one retry loo
 
 ### 11. Publish a local directory move through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend the active cli_notebook_clone.feature: installed clone, ordinary
 Git directory move/commit, installed publish, then show the same Donut folder/note
 at the accepted new path. Use the existing Recipes README fixture.
+`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature` passed (12 scenarios).
+Existing `git mv` handled the directory; Kitchen is the represented dest parent.
 
 Behavior: The owner commits an eligible local directory move → installed publish
 → Donut displays the accepted location. Add only a directory move step/task if
@@ -235,11 +272,12 @@ one filesystem operation is the only anticipated harness addition.
 
 ### 12. Receive the accepted folder location in a clean checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: In the same active feature, prepare a clean checkout at the old accepted
 head; after the move is accepted, installed pull exposes the exact new tree and
 retains the old head as an ancestor. Also check fresh clone sees the accepted tree
 through existing clone coverage where it already observes arbitrary tree paths.
+`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature` passed (13 scenarios).
 
 Behavior: A folder move is accepted elsewhere → pull a clean eligible checkout →
 receive its new paths and retained history without publishing. Keep structural
@@ -313,13 +351,17 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Ready for execution when authorized. The remaining leaves are target-sized
-hypotheses based on existing helpers and proof boundaries, not time guarantees.
-No execution overrun or product-code experiment occurred during refinement.
-No sizing exception is pre-approved; record actual test/external wait runtime
-separately during execution. If correspondence in leaf 2 or integration in leaf 6
-fails to converge within the limits, refine this same plan under the existing
-learning rules rather than bypass a safety gate or expand the story.
+Slices 1–12 done. Remaining: subsequent edit, CLI guidance.
+
+CI observer delivered run 34142166098 on `9f35dbcff2` (slice 9, test-only).
+The only Cypress failure was `record_live_audio_with_real_open_ai_service`
+(`OpenAIInvalidDataException`); mocked `record_live_audio.feature` passed;
+sibling E2E jobs were fail-fast canceled. Slice 8 CI on `911becd8db` succeeded
+5 minutes earlier. Disposition: external OpenAI service failure, no repair.
+
+CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
+That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`
+succeeded. Disposition: superseded historical failure, no repair.
 
 Refinement learning: useful path-specific rejection allows eligibility work to
 land safely before acceptance; the old plan unnecessarily bundled these outcomes.

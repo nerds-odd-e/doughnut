@@ -8,7 +8,8 @@ import testability from '../../testability'
 function notebookClone() {
   function cloneWithTask(
     notebookName: string,
-    task: 'runInstalledCli' | 'runInstalledCliExpectingRejection'
+    task: 'runInstalledCli' | 'runInstalledCliExpectingRejection',
+    destinationAlias: 'cliCloneDestination' | 'cliCloneReceiverDestination'
   ): Cypress.Chainable<null> {
     return testability()
       .getNotebookIdByName(notebookName)
@@ -16,7 +17,7 @@ function notebookClone() {
         cy
           .task<string>('createCliNotebookCloneDestination')
           .then((destination) => {
-            cy.wrap(destination).as('cliCloneDestination')
+            cy.wrap(destination).as(destinationAlias)
             return cy.get<string>('@donutPath').then((donutPath) =>
               cy.get<string>('@cliConfigDir').then((configDir) =>
                 cy.get<string>('@savedAccessToken').then((token) =>
@@ -66,12 +67,32 @@ function notebookClone() {
      * into a fresh test-owned destination (aliased `@cliCloneDestination`).
      */
     cloneNotebookInto(notebookName: string): Cypress.Chainable<null> {
-      return cloneWithTask(notebookName, 'runInstalledCli')
+      return cloneWithTask(
+        notebookName,
+        'runInstalledCli',
+        'cliCloneDestination'
+      )
+    },
+    /**
+     * A second clean checkout of the same accepted head, aliased
+     * `@cliCloneReceiverDestination`. Does not publish. Use before the
+     * publisher checkout advances accepted history, then pull this checkout.
+     */
+    cloneNotebookIntoReceiver(notebookName: string): Cypress.Chainable<null> {
+      return cloneWithTask(
+        notebookName,
+        'runInstalledCli',
+        'cliCloneReceiverDestination'
+      )
     },
     cloneNotebookExpectingRejection(
       notebookName: string
     ): Cypress.Chainable<null> {
-      return cloneWithTask(notebookName, 'runInstalledCliExpectingRejection')
+      return cloneWithTask(
+        notebookName,
+        'runInstalledCliExpectingRejection',
+        'cliCloneDestination'
+      )
     },
     expectDestinationAbsent(): Cypress.Chainable<null> {
       return cy.get<string>('@cliCloneDestination').then((destination) => {

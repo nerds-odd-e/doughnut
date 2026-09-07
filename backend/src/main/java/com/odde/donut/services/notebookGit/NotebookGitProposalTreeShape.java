@@ -24,23 +24,28 @@ public final class NotebookGitProposalTreeShape {
 
   private NotebookGitProposalTreeShape() {}
 
+  static List<NoteChange> requireAllowedNoteChangesFromInspectedFiles(
+      List<InspectedRegularFile> files) {
+    return requireAllowedNoteChanges(noteChangesFrom(files));
+  }
+
   /**
-   * @return the note changes, once every constraint holds
-   * @throws ResponseStatusException 400 BAD_REQUEST naming the offending path/reason when the tree
-   *     shape is unsupported, or when either commit cannot be inspected
+   * Walks both trees for every safe regular file, including unchanged paths and folder READMEs.
+   * Missing side blobs are {@code null}. Path-safety and regular-file-mode refusals match the note
+   * classification path; note-path eligibility is not applied here.
    */
-  public static List<NoteChange> requireRegularNoteChanges(
+  static List<InspectedRegularFile> inspectRegularFiles(
       Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
     try (RevWalk revWalk = new RevWalk(repository)) {
       RevCommit acceptedCommit = revWalk.parseCommit(acceptedHead);
       RevCommit proposedCommit = revWalk.parseCommit(proposedHead);
-      return walkTreeShape(repository, acceptedCommit, proposedCommit);
+      return walkRegularFiles(repository, acceptedCommit, proposedCommit);
     } catch (IOException e) {
       throw unsupportedTreeShape("proposal tree could not be inspected", e);
     }
   }
 
-  private static List<NoteChange> walkTreeShape(
+  private static List<InspectedRegularFile> walkRegularFiles(
       Repository repository, RevCommit acceptedCommit, RevCommit proposedCommit)
       throws IOException {
     try (TreeWalk walk = new TreeWalk(repository)) {
@@ -48,7 +53,7 @@ public final class NotebookGitProposalTreeShape {
       walk.addTree(proposedCommit.getTree());
       walk.setRecursive(true);
 
-      List<NoteChange> changes = new ArrayList<>();
+      List<InspectedRegularFile> files = new ArrayList<>();
       while (walk.next()) {
         String path = walk.getPathString();
         assertPathIsSafe(path);
@@ -56,31 +61,41 @@ public final class NotebookGitProposalTreeShape {
         FileMode acceptedMode = walk.getFileMode(0);
         FileMode proposedMode = walk.getFileMode(1);
         if (FileMode.MISSING.equals(proposedMode)) {
-          if (!FileMode.REGULAR_FILE.equals(acceptedMode)) {
-            throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
-          }
-          changes.add(new NoteChange(path, ChangeKind.DELETED, walk.getObjectId(0), null));
+          requireRegularFileMode(path, acceptedMode);
+          files.add(new InspectedRegularFile(path, walk.getObjectId(0), null));
           continue;
         }
         if (FileMode.MISSING.equals(acceptedMode)) {
-          if (!FileMode.REGULAR_FILE.equals(proposedMode)) {
-            throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
-          }
-          changes.add(new NoteChange(path, ChangeKind.ADDED, walk.getObjectId(1), null));
+          requireRegularFileMode(path, proposedMode);
+          files.add(new InspectedRegularFile(path, null, walk.getObjectId(1)));
           continue;
         }
-        if (!FileMode.REGULAR_FILE.equals(acceptedMode)
-            || !FileMode.REGULAR_FILE.equals(proposedMode)) {
-          throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
-        }
-
-        if (!walk.getObjectId(0).equals(walk.getObjectId(1))) {
-          changes.add(new NoteChange(path, ChangeKind.MODIFIED, walk.getObjectId(1), null));
-        }
+        requireRegularFileMode(path, acceptedMode);
+        requireRegularFileMode(path, proposedMode);
+        files.add(new InspectedRegularFile(path, walk.getObjectId(0), walk.getObjectId(1)));
       }
-
-      return requireAllowedNoteChanges(changes);
+      return files;
     }
+  }
+
+  private static void requireRegularFileMode(String path, FileMode mode) {
+    if (!FileMode.REGULAR_FILE.equals(mode)) {
+      throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
+    }
+  }
+
+  private static List<NoteChange> noteChangesFrom(List<InspectedRegularFile> files) {
+    List<NoteChange> changes = new ArrayList<>();
+    for (InspectedRegularFile file : files) {
+      if (file.proposedBlobId() == null) {
+        changes.add(new NoteChange(file.path(), ChangeKind.DELETED, file.acceptedBlobId(), null));
+      } else if (file.acceptedBlobId() == null) {
+        changes.add(new NoteChange(file.path(), ChangeKind.ADDED, file.proposedBlobId(), null));
+      } else if (!file.acceptedBlobId().equals(file.proposedBlobId())) {
+        changes.add(new NoteChange(file.path(), ChangeKind.MODIFIED, file.proposedBlobId(), null));
+      }
+    }
+    return changes;
   }
 
   private static List<NoteChange> requireAllowedNoteChanges(List<NoteChange> changes) {
@@ -167,7 +182,7 @@ public final class NotebookGitProposalTreeShape {
     return lastSlash < 0 ? path : path.substring(lastSlash + 1);
   }
 
-  private static ResponseStatusException unsupportedTreeShape(String reason) {
+  static ResponseStatusException unsupportedTreeShape(String reason) {
     return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported tree shape: " + reason);
   }
 
@@ -175,6 +190,12 @@ public final class NotebookGitProposalTreeShape {
     return new ResponseStatusException(
         HttpStatus.BAD_REQUEST, "Unsupported tree shape: " + reason, cause);
   }
+
+  /**
+   * One regular file present on either side of the two-tree walk. A missing side's blob is {@code
+   * null}; equal non-null blobs are an unchanged file.
+   */
+  record InspectedRegularFile(String path, ObjectId acceptedBlobId, ObjectId proposedBlobId) {}
 
   /**
    * @param path the current (proposed-tree) Portable path; for RENAMED this is the new path
