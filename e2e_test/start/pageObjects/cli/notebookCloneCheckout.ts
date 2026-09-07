@@ -4,6 +4,11 @@
  */
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 import { notebookCloneCheckoutRebaseObservations } from './notebookCloneCheckoutRebase'
+import {
+  expectCanonicalTreeAt,
+  notebookCloneCheckoutReceiver,
+  runInstalledOn,
+} from './notebookCloneCheckoutReceiver'
 import { nonInteractiveOutput } from './outputAssertions'
 
 function notebookCloneCheckout() {
@@ -44,17 +49,7 @@ function notebookCloneCheckout() {
     subcommand: 'publish' | 'pull',
     task: 'runInstalledCli' | 'runInstalledCliExpectingRejection'
   ): Cypress.Chainable<null> {
-    return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
-      cy.get<string>('@donutPath').then((donutPath) =>
-        cy.get<string>('@cliConfigDir').then((configDir) =>
-          cy.task<null>(task, {
-            donutPath,
-            args: ['notebook', subcommand, checkoutDir],
-            env: { DONUT_CONFIG_DIR: configDir },
-          })
-        )
-      )
-    )
+    return runInstalledOn('cliCloneDestination', subcommand, task)
   }
 
   function expectPublishedAcceptedHead(head: string): Cypress.Chainable<null> {
@@ -222,14 +217,9 @@ function notebookCloneCheckout() {
     },
     /** Canonical ADR-0004 tree only: seeded readmes/notes, no `.donut`, manifest, id, sidecar, or db files. */
     expectCanonicalTreeFor(seededEntries: string[]): Cypress.Chainable<null> {
-      return cy.get<string>('@cliCloneDestination').then((destination) => {
-        cy.task<string[]>('listNotebookCheckoutEntries', destination).should(
-          'deep.equal',
-          [...seededEntries].sort()
-        )
-        return cy.wrap(null)
-      })
+      return expectCanonicalTreeAt('cliCloneDestination', seededEntries)
     },
+    ...notebookCloneCheckoutReceiver(),
     ...notebookCloneCheckoutRebaseObservations(),
   }
 }

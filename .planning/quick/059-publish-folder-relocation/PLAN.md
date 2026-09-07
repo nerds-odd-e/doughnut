@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–11 done.
+Status: in progress; slices 1–12 done.
 
 ## Goal and scope
 
@@ -272,11 +272,12 @@ one filesystem operation is the only anticipated harness addition.
 
 ### 12. Receive the accepted folder location in a clean checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: In the same active feature, prepare a clean checkout at the old accepted
 head; after the move is accepted, installed pull exposes the exact new tree and
 retains the old head as an ancestor. Also check fresh clone sees the accepted tree
 through existing clone coverage where it already observes arbitrary tree paths.
+`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature` passed (13 scenarios).
 
 Behavior: A folder move is accepted elsewhere → pull a clean eligible checkout →
 receive its new paths and retained history without publishing. Keep structural
@@ -350,7 +351,7 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–11 done. Remaining: pull receipt, subsequent edit, CLI guidance.
+Slices 1–12 done. Remaining: subsequent edit, CLI guidance.
 
 CI observer delivered run 34142166098 on `9f35dbcff2` (slice 9, test-only).
 The only Cypress failure was `record_live_audio_with_real_open_ai_service`

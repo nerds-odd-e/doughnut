@@ -136,6 +136,28 @@ export function createCliE2eNotebookCloneTasks() {
     listNotebookCheckoutEntries(checkoutDir: string): string[] {
       return listFilesRecursively(checkoutDir, checkoutDir).sort()
     },
+    /**
+     * Whether `ancestor` is an ancestor of `HEAD` (`git merge-base --is-ancestor`).
+     * Status 1 is “not an ancestor”; any other non-zero is a Git failure.
+     */
+    cliNotebookCheckoutIsAncestorOfHead({
+      checkoutDir,
+      ancestor,
+    }: {
+      checkoutDir: string
+      ancestor: string
+    }): boolean {
+      const result = spawnSync(
+        'git',
+        ['-C', checkoutDir, 'merge-base', '--is-ancestor', ancestor, 'HEAD'],
+        { encoding: 'utf8' }
+      )
+      if (result.status === 0) return true
+      if (result.status === 1) return false
+      throw new Error(
+        `git merge-base --is-ancestor failed:\n${result.stdout}\n${result.stderr}`
+      )
+    },
     readCliNotebookCheckoutConflictState(
       checkoutDir: string
     ): CliNotebookCheckoutConflictState {

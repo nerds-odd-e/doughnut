@@ -28,6 +28,12 @@ When(
 )
 
 When(
+  'I clone the notebook {string} into a second temporary destination using the installed CLI',
+  (notebookName: string) =>
+    cli.notebookClone().cloneNotebookIntoReceiver(notebookName)
+)
+
+When(
   'I clone the notebook {string} expecting rejection from the installed CLI',
   (notebookName: string) =>
     cli.notebookClone().cloneNotebookExpectingRejection(notebookName)
@@ -103,8 +109,23 @@ Then('the cloned checkout contains exactly:', (data: DataTable) =>
     .expectCanonicalTreeFor(data.raw().map((row) => row[0] as string))
 )
 
+Then('the second cloned checkout contains exactly:', (data: DataTable) =>
+  cli
+    .notebookCloneCheckout()
+    .expectReceiverCanonicalTreeFor(data.raw().map((row) => row[0] as string))
+)
+
 When('I pull the cloned checkout using the installed CLI', () =>
   cli.notebookCloneCheckout().pull()
+)
+
+When('I pull the second cloned checkout using the installed CLI', () =>
+  cli.notebookCloneCheckout().pullReceiver()
+)
+
+Then(
+  'the second cloned checkout retains its original head as an ancestor',
+  () => cli.notebookCloneCheckout().expectReceiverOriginalHeadIsAncestor()
 )
 
 When(

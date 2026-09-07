@@ -106,6 +106,21 @@ Feature: CLI notebook clone
     Then the installed CLI reports the committed change as the accepted head
     And I should see note "CLI Clone Notebook/Kitchen/Recipes/Pasta" has content "Boil water"
 
+  Scenario: Pulling a clean checkout receives an accepted folder relocation
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I commit a rename of "Recipes" to "Kitchen/Recipes" in the cloned checkout
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout contains exactly:
+      | README.md                     |
+      | Overview.md                   |
+      | Kitchen/README.md             |
+      | Kitchen/Recipes/README.md     |
+      | Kitchen/Recipes/Pasta.md      |
+    And the second cloned checkout retains its original head as an ancestor
+
   Scenario: Rejecting duplicate metadata keeps the local proposal available for correction
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I add and commit the following note at "Duplicate Keys.md" in the cloned checkout:
