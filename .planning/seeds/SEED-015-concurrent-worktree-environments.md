@@ -140,7 +140,7 @@ serializing tests avoids overlap but does not test or deliver concurrency.
 
 **Status:** Delivered. Guide: `docs/worktree-backend-tests.md`. Recover
 quick/054 from `1089be2573` and the suite-datasource repair (quick/055) from
-`d0287db6a2`.
+`d0287db6a2`. Ordinary-command isolation is [1c](#story-1c), not this story.
 
 **Goal**
 
@@ -284,11 +284,29 @@ its environment boundary before slice planning.
   guidance. That workflow stays [Story 4](#story-4). This story remains one
   representative browser note create/edit path; do not pull CLI clone, `git
   mv`, or notebook publish into it to “cover folder moves.”
+- **Reminder from 1c (quick/060):** Reuse `.worktree.local.json` identity and
+  first-use allocation; do not invent a second worktree id. Backend isolation
+  is unit-test MySQL via the Gradle wrapper and `SPRING_DATASOURCE_URL` for
+  `test` / `migrateTestDB` only — `pnpm sut`, Cypress, the e2e profile,
+  `doughnut_e2e_test`, and ports 5173/5174/9081/2525 remain shared. Prefer
+  ordinary SUT and Cypress commands in linked worktrees; do not make a special
+  opt-in the required path. Keep an unconfigured primary on current shared E2E
+  defaults unless refinement changes that. `.worktree.local.lock` owns
+  backend-test invocations only; do not reuse it as a SUT/Cypress lock without
+  an explicit decision. Do not extend the wrapper's task parser to
+  `bootRun`/E2E unless a supported command actually needs it. Leftover
+  databases stay acceptable; no cleanup story. Shared MySQL already held two
+  backend suites; revisit capacity only if two application stacks fail. Before
+  slice planning, refine (and split if still larger than L) along the
+  user-visible workflow, not layers: 1c showed bundling first isolation with
+  every entry point overruns. The first browser increment should prove two
+  worktrees can each reach their own app and reset only their own fixtures.
 - **Effort hypothesis:** L — low confidence; deliberately limited to browser
   scenarios without external-service mocks or spawned CLI/MCP clients. If this
   minimum usable path exceeds L, revisit the story boundary before planning.
-- **Depends on:** None as a product prerequisite; story 1 is the recommended
-  earlier learning step, not a requirement to run browser tests.
+- **Depends on:** None as a product prerequisite. Story 1 is delivered and
+  supplies the reusable identity; it is not required in order to run browser
+  tests, but a second identity would duplicate it.
 
 <a id="story-3"></a>
 
@@ -308,6 +326,10 @@ before slice planning; story 2 supplies the required browser environment.
 - **Safety boundary:** Includes mock management and serving endpoints plus the
   application connections using them. Spawned CLI/MCP scenarios remain outside
   this boundary.
+- **Reminder from 1c / story 2:** Mountebank on 2525 stays shared through
+  backend-test isolation and through story 2's no-mock browser path. Do not
+  assume either isolated mock state. Reuse the same worktree identity; isolate
+  ordinary mock-using Cypress commands rather than a second opt-in.
 - **Effort hypothesis:** L — low confidence; assumes the existing browser mock
   workflows can share the environment identity. Refine around one external
   service first if the category is likely larger than L.
@@ -332,6 +354,9 @@ before slice planning; story 2 supplies the required browser environment.
   bound clone, `git mv` of a represented folder, a second clone, and pull;
   isolation must own install, config, and checkout directories. Do not treat
   that coverage as a reason to start this story before the browser proof.
+- **Reminder from 1c:** Ordinary Gradle `test` / `migrateTestDB` isolation
+  does not cover CLI processes, `DONUT_CONFIG_DIR`, or clone checkouts. Reuse
+  the worktree identity once an isolated application environment exists.
 - **Effort hypothesis:** L — low confidence; assumes endpoint and local-state
   selection can reuse the earlier environment behavior. Interactive or OAuth
   cases may need a separate story if refinement shows a larger-than-L scope.
@@ -358,20 +383,15 @@ before slice planning; story 2 supplies the required browser environment.
 
 ## Ordering and Scope Reduction
 
-**Backlog selection, 2026-09-07:** Retain 1c first and promote stories 2 and 3
-ahead of the remaining notebook-sync stories. Story 2 offers the highest next
-learning value: backend database isolation is proven, but application endpoint,
-fixture-reset, and restart ownership still need a concurrent browser proof.
-Story 3 then makes that environment useful for browser workflows involving
-external services and tests independent mock state. These are priority
-judgments from the seed's stated interference problem, not measured usage or
-delivery estimates. The [product backlog](../PRODUCT-BACKLOG.md) owns global
-order. Keep CLI and MCP stories 4–5 unqueued until the browser environment
-provides evidence for their scope and relative value; neither is cancelled.
-Story 1c's subsequent refinement records the accepted compatibility policies;
-backlog selection does not authorize implementation.
-Stories 2–3 retain their low-confidence estimates and need
-refinement before executable planning.
+**Backlog selection, 2026-09-08:** After 1c, keep stories 2 then 3 ahead of
+remaining notebook-sync stories. 1c proved shared-MySQL unit-test isolation
+and ordinary-command reuse; it did not isolate the running application, Cypress,
+fixture reset, or ports. Story 2 is still the highest next learning value.
+Story 3 then covers mock-using browser workflows. Do not queue cleanup, Cloud
+VM, development-profile isolation, or a second worktree identity. Keep CLI and
+MCP stories 4–5 unqueued until the browser environment provides evidence;
+neither is cancelled. The [product backlog](../PRODUCT-BACKLOG.md) owns global
+order. Stories 2–3 still need refinement before executable planning.
 
 Start with child 1a: it tests the central shared-MySQL assumption with manual
 provisioning and one supported workflow. Follow with 1b and 1c to remove setup
@@ -399,13 +419,18 @@ deferred scope. Reconsider them only when an actual workflow requires them.
 - Decide whether persistent development-profile use is needed before the later
   E2E categories. Its database naming is captured above, but its user workflow
   is not promised by these initial candidates.
-- Story 1c's compatibility policies are accepted in its refinement. First-use
-  automation in 1b is delivered without a particular AI tool or worktree-creation
-  hook; keep that.
+- Story 1c's compatibility policies are accepted and delivered: unconfigured
+  primary keeps shared unit-test defaults; linked worktrees and configured
+  checkouts isolate ordinary `pnpm backend:test` / wrapper `test` and
+  `migrateTestDB`. First-use automation in 1b is delivered without a particular
+  AI tool or worktree-creation hook; keep that.
 - Concurrent unit tests on shared MySQL 8.4 did not require a separate server;
   local nix mysqld already starts with `max_connections=1000` after 1a. Revisit
   the parent direction only if a later workflow (full-suite overlap, E2E, or
   application stacks) hits a new capacity or lifecycle limit.
+- Story 2 refinement should decide whether an unconfigured primary keeps shared
+  E2E defaults (the 1c unit-test policy) and how SUT/Cypress ownership relates
+  to the backend-test lock. Do not treat those as decided by 1c.
 
 ## When to Surface
 
@@ -430,3 +455,5 @@ Select and refine one story before creating an executable plan.
 - Stories 1a–1c: concurrent suites on shared MySQL 8.4.11 work; automatic
   first-use and ordinary `pnpm backend:test` / wrapper migrate and test
   isolate in linked worktrees, including exclusive stale-lock reclaim.
+  Recover 1c (quick/060) from `c96676002f`. Story 2 must still isolate SUT,
+  Cypress, E2E data, and ports.

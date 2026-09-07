@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-07T14:30:00Z"
-last_activity: 2026-09-07
-last_activity_desc: "Completed quick plans 052 and 054–058 dropped"
+last_updated: "2026-09-08T07:11:00Z"
+last_activity: 2026-09-08
+last_activity_desc: "SEED-015 1c delivered; backlog keeps story 2 next with 1c reminders"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -41,7 +41,8 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 Parked undecomposed seeds: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008.
 Git-native Portable notebook tree synchronization is proposed in ADR 0002;
 remaining v1 stories live in SEED-009. Stories 8 and 9 are delivered.
-SEED-015 1a–1b are delivered, including exclusive checkout-lock reclaim.
+SEED-015 1a–1c are delivered (ordinary backend-test isolation in linked
+worktrees). Next queued worktree story is browser E2E without mocks.
 See [ROADMAP.md](ROADMAP.md) and [PRODUCT-BACKLOG.md](PRODUCT-BACKLOG.md).
 
 Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); live authored-note-reference resolution; question-generation batch latest-only retry + failed-request purge; recall E2E suite cut (~78% wall time).

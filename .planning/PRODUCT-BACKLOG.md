@@ -17,10 +17,14 @@ commits. This advances the direction in
 the selected queue does not cover its complete synchronization contract.
 Enable developers and AI tasks to verify changes concurrently in local
 worktrees without interfering with each other's data or running services.
-This development priority still leads the queue: 1a–1c delivered ordinary and
-opt-in backend-test isolation; next cover browser E2E without
-external-service mocks, then independent mocks. Prove the smallest usable
-browser workflow before broadening to CLI or MCP.
+This development priority still leads the queue. 1a–1c delivered opt-in and
+ordinary backend-test isolation on a persistent worktree identity; that does
+not isolate `pnpm sut`, Cypress, E2E data, or ports. Next is the smallest
+usable concurrent browser workflow without external-service mocks, then
+independent mocks. Reuse the 1c identity; prove ordinary SUT/Cypress commands
+in linked worktrees before broadening to CLI or MCP. Do not insert cleanup,
+Cloud VM, or development-profile isolation until a selected workflow needs
+them.
 
 1. [Run browser E2E scenarios concurrently without external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-2) — SEED-015
 2. [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
