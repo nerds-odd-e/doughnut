@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–7 done.
+Status: in progress; slices 1–8 done.
 
 ## Goal and scope
 
@@ -213,10 +213,13 @@ no new copying or mutation should be necessary.
 
 ### 8. Preserve authored references after the folder changes location
 Type: Behavior
-Status: planned
+Status: done
 Proof: Reuse the relocation referrer controller pattern with body/property links
 inside and outside the source; observe authored bytes unchanged and an old exact
 path unresolved using ordinary current-state resolution.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationReferrerControllerTest` asserts authored
+`[[Topics/Cell]]` bytes and unresolved old path for inside and outside referrers.
 
 Behavior: Notes refer to the old source path → publish the folder move → links
 stay authored even when that path stops resolving. No rewrite or index-repair
@@ -339,7 +342,7 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–7 done. Remaining leaves are target-sized hypotheses, not time guarantees.
+Slices 1–8 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
 separately.
 
