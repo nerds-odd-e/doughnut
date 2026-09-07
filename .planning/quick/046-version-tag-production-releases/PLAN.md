@@ -147,7 +147,8 @@ Detailed regeneration/resumption support belongs to Story 2; fail loudly here.
 
 ### 6. Give existing publication one shared owner
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 60/60. Actual publisher trace proves frontend → CLI → backend, matching-hash skip and force-token rollout; parsed callers retain independent CLI tag/version/build. Existing regressions passed: `CURSOR_DEV=true nix develop -c bash scripts/test/upload-cli-binary-to-gcs.sh.test`; `CURSOR_DEV=true nix develop -c bash scripts/test/upload-frontend-static-to-gcs.sh.test`; `CURSOR_DEV=true nix develop -c bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test`. Independent refactor: no edits.
 Proof: Extracted command retains frontend → CLI → backend operation order;
 existing CLI upload tests and independent tag/version wiring remain green.
 

@@ -129,7 +129,9 @@ test('all admitted-run downloads and preflight precede the first production step
   }
   assert.ok(
     preflight <
-      steps.findIndex((step) => step.name === 'Upload frontend static to GCS')
+      steps.findIndex(
+        (step) => step.run === 'bash infra/gcp/scripts/publish-application.sh'
+      )
   )
   assert.equal(
     env.DEPLOY_JAR_PATH,

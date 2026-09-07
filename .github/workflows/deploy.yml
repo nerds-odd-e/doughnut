@@ -109,16 +109,8 @@ jobs:
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
           skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
-      - name: Upload frontend static to GCS
-        run: infra/gcp/scripts/upload-frontend-static-to-gcs.sh
-      - name: Upload CLI install binary to GCS
-        run: infra/gcp/scripts/upload-cli-binary-to-gcs.sh
-      - name: Conditional GCS upload, MIG rolling replace, record last success
-        run: |
-          if git log -1 --format=%B "$GITHUB_SHA" | grep -qE 'force-deployment[[:space:]]*:[[:space:]]*true'; then
-            export FORCE_FULL_DEPLOY=1
-          fi
-          infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh
+      - name: Publish application to GCS and MIG
+        run: bash infra/gcp/scripts/publish-application.sh
 
   Notify-on-failure:
     name: Slack notification on deploy failure
