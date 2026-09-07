@@ -2,11 +2,22 @@ import { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, vi } from 'vitest'
+import { getApiConfig } from 'donut-api'
 import {
   installNotebookCliRunFixture,
   runGit,
 } from './notebookClone.testHelpers.js'
-import { bundleGetResponse, bundleMain } from './notebookPublish.testHelpers.js'
+import {
+  buildSourceRepo,
+  bundleGetResponse,
+  bundleMain,
+  cloneAsBoundCheckout,
+} from './notebookPublish.testHelpers.js'
+
+export const GIT_BUNDLE_GET = [
+  `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,
+  { headers: { Authorization: 'Bearer fake-bearer' } },
+] as const
 
 export function installNotebookPullAcceptedHistoryTest(workDirPrefix: string) {
   const base = installNotebookCliRunFixture(workDirPrefix)
@@ -109,4 +120,35 @@ export function serveAcceptedBundle(
   const bundleFile = join(ctx.getWorkDir(), `accepted-${name}.bundle`)
   bundleMain(source, bundleFile)
   ctx.getFetchMock().mockResolvedValue(bundleGetResponse(bundleFile))
+}
+
+export function cloneWithLocalNoteEdit(
+  workDir: string,
+  baseBytes: string,
+  localBytes: string,
+  relativePath = 'note.md'
+): {
+  directory: string
+  source: string
+  localTip: string
+} {
+  const source = buildSourceRepo(workDir)
+  commitPortableFile(source, relativePath, baseBytes, 'portable shared base')
+  const directory = cloneAsBoundCheckout(
+    workDir,
+    source,
+    getApiConfig().apiBaseUrl,
+    'checkout'
+  )
+  commitPortableFile(
+    directory,
+    relativePath,
+    localBytes,
+    'unpublished note edit'
+  )
+  return {
+    directory,
+    source,
+    localTip: runGit(['rev-parse', 'HEAD'], directory),
+  }
 }

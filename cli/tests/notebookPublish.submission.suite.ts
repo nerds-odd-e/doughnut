@@ -12,6 +12,7 @@ import {
   buildSourceRepo,
   bundleMain,
   cloneAsBoundCheckout,
+  rejectionPost,
   stubFetchForSubmission,
 } from './notebookPublish.testHelpers.js'
 
@@ -73,11 +74,10 @@ export function describeNotebookPublishSubmission(): void {
       'a %i ApiError reports the publication rejection reason and leaves local state untouched',
       async (status, message, errorType) => {
         const workDir = ctx.getWorkDir()
-        const { dir } = setUpEligibleCheckoutWithPostResponse(workDir, {
-          status,
-          ok: false,
-          text: () => Promise.resolve(JSON.stringify({ message, errorType })),
-        })
+        const { dir } = setUpEligibleCheckoutWithPostResponse(
+          workDir,
+          rejectionPost(status, message, errorType)
+        )
         const headBefore = runGit(['rev-parse', 'main'], dir)
         const statusBefore = runGit(['status', '--porcelain'], dir)
 

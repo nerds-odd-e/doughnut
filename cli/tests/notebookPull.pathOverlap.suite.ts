@@ -9,6 +9,7 @@ import {
   cloneAsBoundCheckout,
 } from './notebookPublish.testHelpers.js'
 import {
+  cloneWithLocalNoteEdit,
   commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
@@ -110,7 +111,7 @@ export function describeNotebookPullPathOverlap(): void {
       expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
       expect(ctx.getFetchMock().mock.calls[0]?.[0]).toContain('/git-bundle')
       expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-        `Rebased onto the accepted history. Local head: ${localHead}. Accepted head: ${acceptedHead}. Inspect the result with "git status".`
+        `Rebased onto the accepted history. Unpublished local commit: ${localHead}. Accepted head: ${acceptedHead}. Inspect the result, then run "donut notebook publish ${setup.directory}".`
       )
     })
 
@@ -220,29 +221,4 @@ export function describeNotebookPullPathOverlap(): void {
       )
     })
   })
-}
-
-function cloneWithLocalNoteEdit(
-  workDir: string,
-  baseBytes: string,
-  localBytes: string
-): {
-  directory: string
-  source: string
-  localTip: string
-} {
-  const source = buildSourceRepo(workDir)
-  commitPortableFile(source, 'note.md', baseBytes, 'portable shared base')
-  const directory = cloneAsBoundCheckout(
-    workDir,
-    source,
-    getApiConfig().apiBaseUrl,
-    'checkout'
-  )
-  commitPortableFile(directory, 'note.md', localBytes, 'unpublished note edit')
-  return {
-    directory,
-    source,
-    localTip: runGit(['rev-parse', 'HEAD'], directory),
-  }
 }

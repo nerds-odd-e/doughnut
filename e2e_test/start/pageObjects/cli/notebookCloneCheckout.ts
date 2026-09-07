@@ -133,6 +133,39 @@ function notebookCloneCheckout() {
         )
       })
     },
+    /**
+     * Captures original L as `@cliNotebookOriginalCheckout`, then runs installed
+     * `notebook pull` expecting rejection. Does not capture L′; native continue
+     * records `@cliNotebookResolvedCheckout`.
+     */
+    pullExpectingRejection(): Cypress.Chainable<null> {
+      return readCheckoutState().then((original) => {
+        cy.wrap(original).as('cliNotebookOriginalCheckout')
+        return runInstalledOnCheckout(
+          'pull',
+          'runInstalledCliExpectingRejection'
+        )
+      })
+    },
+    continueWithChosenEdit(
+      relativePath: string,
+      content: string
+    ): Cypress.Chainable<null> {
+      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+        cy
+          .task<null>('continueCliNotebookCheckoutRebaseWithChosenBytes', {
+            checkoutDir,
+            relativePath,
+            content,
+          })
+          .then(() =>
+            readCheckoutState().then((resolved) => {
+              cy.wrap(resolved).as('cliNotebookResolvedCheckout')
+              return cy.wrap(null)
+            })
+          )
+      )
+    },
     expectProposalRetained(): Cypress.Chainable<null> {
       return cy.get<string>('@cliCloneDestination').then((destination) => {
         cy.get<string>('@cliNotebookPublishHead').then((head) => {
@@ -158,6 +191,11 @@ function notebookCloneCheckout() {
       return cy
         .get<CliNotebookCheckoutState>('@cliNotebookRebasedCheckout')
         .then((rebased) => expectPublishedAcceptedHead(rebased.head))
+    },
+    expectResolvedHeadAccepted(): Cypress.Chainable<null> {
+      return cy
+        .get<CliNotebookCheckoutState>('@cliNotebookResolvedCheckout')
+        .then((resolved) => expectPublishedAcceptedHead(resolved.head))
     },
     expectCheckoutFile(
       relativePath: string,

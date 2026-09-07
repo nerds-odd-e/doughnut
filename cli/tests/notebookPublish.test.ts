@@ -3,6 +3,8 @@ import { describeNotebookPublishAncestry } from './notebookPublish.ancestry.suit
 import { describeNotebookPublishBinding } from './notebookPublish.binding.suite.js'
 import { describeNotebookPublishReadiness } from './notebookPublish.readiness.suite.js'
 import { describeNotebookPublishRebasedRejection } from './notebookPublish.rebasedRejection.suite.js'
+import { describeNotebookPublishResolvedContinuation } from './notebookPublish.resolvedContinuation.suite.js'
+import { describeNotebookPublishResolvedContinuationRejection } from './notebookPublish.resolvedContinuationRejection.suite.js'
 import { describeNotebookPublishSubmission } from './notebookPublish.submission.suite.js'
 
 // Keep every publish-flow suite registered from this one test entrypoint. The ancestry
@@ -17,3 +19,5 @@ describeNotebookPublishReadiness()
 describeNotebookPublishAncestry()
 describeNotebookPublishSubmission()
 describeNotebookPublishRebasedRejection()
+describeNotebookPublishResolvedContinuation()
+describeNotebookPublishResolvedContinuationRejection()

@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–2 done.
+Status: in progress; slices 1–9 done.
 
 ## Goal and scope
 
@@ -170,11 +170,8 @@ or preparation framework. Separate outcome policies belong to leaves 3–6.
 
 ### 3. Report when accepted history already contains the local change
 Type: Behavior
-Status: planned
-Proof: Real-Git pull fixture where accepted history independently contains L's
-patch → completed rebase with HEAD=B, clean main, original L recoverable, no
-invented child and no POST. Output says no unpublished change remains; repeat
-pull stays unchanged. A nonempty result still identifies L′ as unpublished.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts` — absorbed same-note patch: HEAD=B, clean main, ORIG_HEAD/L recoverable, no unpublished copy, repeat pull unchanged, GET only; nonempty rebase names L′ as unpublished.
 
 Behavior: Eligible same-note rebase has no remaining local change → pull →
 the owner receives accepted content without being told an unpublished commit
@@ -188,14 +185,8 @@ the owner's skip/abort choice; never resolve it through a reset.
 
 ### 4. Explain and retain a real text-conflict pause
 Type: Behavior
-Status: planned
-Proof: Real same-line conflict through `run(['notebook','pull',directory])`
-returns nonzero, names the Portable path (include a path with spaces), shows
-usable edit/stage/continue/abort guidance and leaves an active rebase, unmerged
-index and both versions accessible. Assert no POST and removal of command-temp
-downloads. Cover a body-line conflict and a nested-note YAML-key conflict as
-data variations of the same pause; assert the canonical state only once.
-Invoke Donut pull/publish again to reuse leaf 1's no-mutation refusal.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts` — Donut pull creates a same-line body conflict at a path with spaces: nonzero, quoted path, `git status` / add / `rebase --continue` / `rebase --abort` / later publish, rebase-merge, unmerged stages, both blobs, GET only, temp download gone; nested YAML-key conflict names its path; repeat pull/publish refuse without mutation; a non-pause rebase failure keeps `failed to rebase`.
 
 Behavior: Git cannot merge the eligible content edit → pull → the owner is
 left at an understandable ordinary Git conflict pause. Enrich the current
@@ -208,16 +199,8 @@ cross-command state machine, stop and revisit that implementation assumption.
 
 ### 5. Continue with the chosen text and submit the resolved commit
 Type: Behavior
-Status: planned
-Proof: Pull creates a real conflict; after CLI return and temporary cleanup,
-write the chosen valid note bytes, `git add` that file, then ordinary
-`git rebase --continue` with a noninteractive editor only in the test fixture.
-Observe clean main, one child L′ of B, chosen bytes and original author/message.
-The frontmatter-conflict variant retains the owner's chosen valid YAML value.
-Repeat pull keeps L′. Explicit CLI publish submits a bundle whose head is L′
-and whose expected head is B; mock only HTTP, with no earlier POST.
-An accepted-side/explicit-skip variant asserts its unique no-child result and
-subsequent truthful pull output rather than repeating the canonical shape.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts tests/notebookPublish.test.ts` — after conflict pull and temp cleanup, test-owned `git rebase --continue` (GIT_EDITOR only on that spawn) yields clean main, one child L′ of B, chosen bytes and original author/message; nested YAML variant keeps chosen frontmatter; repeat pull keeps L′. Publish POSTs a bundle whose head is L′ and expected head is B, with no earlier POST. Explicit accepted-side `git rebase --skip` ends at B; subsequent pull reports unchanged.
 
 Behavior: Owner resolves and continues a paused rebase → the chosen content
 becomes an ordinary publishable local commit. Native continuation, not a new
@@ -229,12 +212,8 @@ publication stubs. Backend acceptance is deliberately proved separately in 8.
 
 ### 6. Abort back to the original local work
 Type: Behavior
-Status: planned
-Proof: After conflict-producing pull exits and deletes its temporary download,
-ordinary `git rebase --abort` restores original L on main, its exact committed
-files and clean index, with no operation remaining. B remains available without
-any publication request. Also check that simply returning from the CLI did not
-abort the operation before the owner chose to do so.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts` — after conflict pull and temp cleanup, rebase still paused (CLI return did not abort); test-owned `git rebase --abort` restores original L on attached main, exact committed files and clean index, no rebase-merge; B remains as an object; no POST.
 
 Behavior: Owner chooses to abandon resolution → native abort → original
 unpublished work is restored. Keep recovery entirely within ordinary Git;
@@ -244,14 +223,8 @@ imported-object ownership is reused; no server change.
 
 ### 7. Retain the chosen resolution when publication rejects
 Type: Behavior
-Status: planned
-Proof: Reuse the completed native conflict fixture from 5 and
-`notebookPublish.rebasedRejection.suite.ts`. A newer head before submission,
-stale expected-head response after submission, projection drift, or invalid
-resolved YAML produces the appropriate rejection and preserves L′/files without
-retry. The invalid-content response stub proves retention only; real Portable
-validation stays covered by `NotebookGitProposalMarkdownFormatControllerTest`
-in leaf 8's backend run.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPublish.test.ts` — sibling suite `notebookPublish.resolvedContinuationRejection.suite.ts`: after native continue of the leaf-5 conflict fixture, newer head before submission (ancestry, GET only), stale expected-head after POST, projection drift, and invalid-YAML BINDING_ERROR stub each report the existing rejection and leave L′/files unchanged with no retry. Invalid-content stub proves CLI retention only.
 
 Behavior: Resolved work is not currently acceptable → publish → explain why
 and retain it for correction or another eligible pull. Keep existing validation,
@@ -262,13 +235,8 @@ at the existing publication boundary, not several new transport implementations.
 
 ### 8. Accept the chosen text on the same learned note
 Type: Behavior
-Status: planned
-Proof: Real controller boundary: create a learned note, accept a web content
-save on it, then publish a direct child containing chosen valid same-note
-resolution bytes. Fresh reads and downloaded bundle show the exact new content,
-same note/tracker and retained scheduling/private associations, exact proposed
-head and accepted parent. Preserve authored frontmatter in the chosen bytes.
-Reuse existing `makeMe` and committed-transaction patterns; run backend suite.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — `NotebookGitLocalContentOverWebEditPublicationControllerTest` same-note case: web save on a learned note, then a direct child with chosen valid YAML (`authored: chosen`); fresh note/tracker ids, exact chosen content, proposed head parented on the web-save head, downloaded tree matches. No production change. Full suite ~50s (focused-test exception).
 
 Behavior: Owner publishes a valid resolved child of current accepted main →
 the same learned note receives the chosen text. Extend the existing
@@ -283,9 +251,8 @@ runtime exception, not extra implementation scope.
 
 ### 9. Enable the installed conflict scenario's native Git actions
 Type: Structure
-Status: planned
-Proof: Existing `cli_notebook_clone.feature` remains green. Add no failing
-scenario or generic shell task; the immediate next leaf owns the new journey.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature` — 10 passing, no new scenario. Rejected pull, conflict-state, and write-stage-continue are on the existing tasks/steps/page objects.
 
 Internal change: Add thin rejected-pull/conflict-state and write-stage-continue
 actions to the existing installed CLI tasks, steps and notebook checkout page
@@ -363,7 +330,33 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   `runSystemGitOrThrow` includes stdout+stderr. Leaves 4/5/9/10 reuse that path.
 - Slice 2 removed `acceptedIntervalTouchesPath` and inlined the remaining
   structural walk. Same-path reversed-rename lives in the structural `test.each`
-  table. Rebase completion is interim-neutral until leaf 3.
+  table.
+- Slice 3: Git 2.50 drops an already-present patch and completes at B. Pull
+  returns `absorbed` vs `rebased` from resulting HEAD. Do not auto-skip.
+- Slice 4: Classify a paused conflict by rebase-merge/apply plus unmerged
+  `ls-files -u`, then prepend native continue/abort guidance and keep the
+  original rebase cause. A failure with no unmerged stages is not labeled a
+  merge conflict. Leaf 5/6 can continue or abort after CLI return and temp
+  cleanup.
+- Slice 5: Existing ancestry/submission already accepted L′ as a direct child
+  of B. No production change; native continue/skip after CLI return and temp
+  cleanup is sufficient. Repeat pull is already-based (keeps L′); skip then
+  pull is unchanged (HEAD=B).
+- Slice 6: No production change. Ordinary `git rebase --abort` after CLI return
+  and temp cleanup restores original L, files, and a clean attached main. Imported
+  B remains locally without publication.
+- Slice 7: No production change. Existing ancestry/submission already retain L′
+  on rejection (no retry, no local mutation). Other-note `rebasedRejection` cannot
+  take the same-note continue fixture without mixing outcomes; sibling suite
+  covers remote advance, stale expected-head, drift, and invalid-YAML stub.
+- Slice 8: No production change. Existing proposal acceptance already applies
+  chosen same-note bytes after a web save of that learned note. Canonical
+  tracker/private-state shape stays in the other-note sibling; the new case
+  asserts same note id, chosen authored frontmatter, and downloaded head/parent.
+- Slice 9: No production change. Rejected pull reuses `runInstalledCliExpectingRejection`
+  and captures original L only. Resolved L′ is `@cliNotebookResolvedCheckout`
+  (not the auto-merge alias). Continue uses spawn-only `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR`
+  plus one-shot `-c` identity; no `git config`. No abort E2E or generic shell task.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.
