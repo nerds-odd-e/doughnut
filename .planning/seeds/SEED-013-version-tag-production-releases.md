@@ -41,57 +41,28 @@ an arbitrary midpoint in the old leaf list.
 
 ### 1. Release one chosen Donut version while ordinary pushes publish nothing
 
-**Status:** Branch implementation and local proof complete; parent-owned post-merge platform observation pending in Quick 046.
+**Status:** Complete; merged and pushed to main at a6f2745b8e. Normal main CI
+started; the installed workflow is tag-only. Real tagged production publication
+remains operator confirmation; no test release tag was created.
 
 **Goal:** A maintainer deliberately releases an exact tested main commit by
 pushing a stable application version tag.
 
-**Scope:** Ordinary main pushes continue CI and publish nothing. An application
-tag releases backend, frontend and bundled CLI from that tagged commit, after
-its exact CI run has succeeded. The tag may precede or follow CI; main advancing
-does not change the selected release. Keep existing CLI tags, CLI version
-handling, destination and common publishing logic. Preserve conditional backend
-rollout, static routing and existing failure visibility.
-
-**Interim operating boundary:** Maintainers issue one application release at a
-time, in increasing version order, keep tags immutable, and do not replay old
-application releases. Finish or resolve the current attempt before issuing the
-next application tag. The workflow retains a single non-canceling application
-deployment group. Automated pending-version selection, durable duplicate/moved-
-tag/downgrade protection, and supported recovery of failed attempts belong to
-Story 2. This is an explicit reduced first-story boundary, not the final policy.
-An unsuccessful attempt fails visibly without publishing unvalidated artifacts;
-manual recovery is a newly tested correction/revert and the next patch tag.
-During initial cutover, the release source must contain the new tag trigger;
-reconciling older pre-cutover sources is deferred with Story 2's CI-event path.
-
-**Key examples:**
-
-- Untagged main push → CI runs → application and CLI download stay unchanged.
-- Push v1.3.1 for A after A's CI succeeds → publish A's complete payload.
-- Push v1.3.1 before A's CI finishes → wait for A's success, then publish A;
-  failed/canceled checks or unavailable artifacts prevent publication.
-- Main advances to B while A waits → publish A, not B or an untagged newer build.
-- Push v1.3, v1.3.1-rc.1, or an unrelated tag → no application release.
-- Push an existing-style CLI tag → preserve its independent CLI-only release.
-- A release needs correction → test a corrective/revert commit and issue the
-  next patch; schema migrations are not reversed automatically.
-
-**Evaluation:** Observe a tagged end-to-end application release and unchanged
-production after an ordinary push; verify both CI/tag arrival orders.
-
-**Value / learning:** Release timing becomes deliberate immediately; verify
-exact-commit CI/artifact selection before adding recovery state.
-
-**Effort hypothesis:** M (about 1–2 hours), medium confidence, assuming existing
-publication commands remain reusable and a single outstanding release is an
-acceptable intermediate operating rule. **Depends on:** no other product story.
-
-**Plan:** [Quick 046](../quick/046-version-tag-production-releases/PLAN.md).
+**Scope:** Ordinary pushes keep CI without publishing. Stable vMAJOR.MINOR.PATCH
+application tags publish the tagged main commit's backend, frontend and bundled
+CLI after exact-SHA CI succeeds. Independent CLI behavior stays intact. The
+interim rule is one application release at a time, increasing immutable tags,
+no old reruns, and correction through a tested change/revert plus next patch.
+No durable recovery or ordering guarantees until Story 2. The tagged source must
+contain the tag workflow until Story 2 adds default-branch event reconciliation.
+Enduring behavior and commands live in docs/gcp/conditional-backend-deploy.md
+and scripts/ci/application-release*.mjs tests.
 
 <a id="story-2"></a>
 
 ### 2. Recover and coordinate application releases without manual ordering
+
+**Status:** Planned; refined from completed Story 1 and ready for separate execution.
 
 **Goal:** A maintainer can retry a failed release or submit a newer version while
 another release is active, without moving tags or accidentally replacing a newer
@@ -100,16 +71,21 @@ release with older code.
 **Scope:** Build on Story 1. Record complete application outcomes, including
 frontend-only releases. Retry an interrupted release with its immutable tag/SHA;
 permit fresh successful CI for the same SHA when artifacts must be regenerated.
-Reject moved identities; completed duplicates do not publish again. Keep one
-application deployment active and let it finish. Retain the highest numeric
+Persist raw tag object as well as peeled commit; reject moved identities;
+completed duplicates do not publish again. Keep one application deployment active
+and let it finish. Retain the highest numeric
 pending version, even while its CI is pending. Old events and retries cannot
 replace a newer deployed/admitted version. Reconcile tag and CI-completion
 wakeups without holding a runner while CI is pending.
 
 Initialize the new tracking from the existing published application release so
 activation cannot rediscover it as new and overwrite an independently released
-CLI. Preserve the independent CLI stream; do not impose application-version
-ordering on CLI tags. Keep correction by a tested revert and a new patch version.
+CLI. Verified absence of any prior tag-driven application publication permits
+empty initial tracking; missing evidence of an existing release must fail visibly.
+Reuse the implemented one-shot CI query, publication preflight and separate
+source/control checkouts. Preserve the independent CLI stream; do not impose
+application-version ordering on CLI tags. Keep correction by a tested revert and
+a new patch version.
 
 **Key examples:**
 
@@ -158,7 +134,7 @@ The previously accepted final behavior is preserved across these two stories.
 No automatic version bumps, changelog/GitHub Release creation, staging environment,
 application-visible version changes, automatic database rollback, or new CLI
 version ordering are included. Creating tags is an operator action, not an
-agent verification step. No implementation has started.
+agent verification step. Story 1 is implemented; Story 2 remains planned.
 
 ## Open Decisions
 
@@ -170,12 +146,14 @@ if simultaneous releases are required in the first increment.
 
 ## When to Surface
 
-Execute the narrowed Story 1 when selected. Revisit Story 2 after Story 1 is
-complete; rebase its plan on the actual entry-point names and preserve proven
-behavior. Planning does not authorize implementation, commits, pushes or tags.
+Story 1 is complete. Execute Story 2 from its plan, which now records actual
+entry points and preserved proof. The
+developer explicitly authorized sequential fresh-context worktree execution,
+merge/push, main-only observation and branch/worktree cleanup for both stories.
+This authorization does not include creating production tags as tests.
 
 ## Breadcrumbs
 
 - Original developer requirement and accepted tag, CI, CLI and recovery policies.
 - Developer request to decompose the 18-leaf story into two balanced stories.
-- Existing workflow and GCP runbook references are recorded in the two plans.
+- Existing workflow and GCP runbook references are recorded in the remaining plan.

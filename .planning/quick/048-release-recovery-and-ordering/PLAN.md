@@ -1,10 +1,11 @@
 # Recover and coordinate application releases
 
 Source: [SEED-013 Story 2](../../seeds/SEED-013-version-tag-production-releases.md#story-2).
-Status: planned; depends on completed Story 1.
-Predecessor: [Story 1 plan](../046-version-tag-production-releases/PLAN.md).
-Readiness: scoped and leaf-refined; rebase command/fixture names on Story 1's
-actual implementation before starting. Do not execute concurrently with Story 1.
+Status: planned; Story 1 merged to main at a6f2745b8e.
+Predecessor: implemented tag release path; see scripts/ci/application-release*.mjs
+and docs/gcp/conditional-backend-deploy.md.
+Readiness: updated from Story 1 implementation and merge observations; ready for
+a fresh execute-plan worktree. Defer only post-merge platform observations to parent.
 
 ## Goal and scope
 
@@ -26,8 +27,8 @@ correction still uses a tested revert and new patch tag.
   publisher and focused tests. Keep the tag-only bounded wait operational until
   final cutover; do not suspend the working release feature during this story.
 - Use a separate application-state object in the existing private GCS deploy
-  bucket, holding admitted tag/SHA, CI run/attempt and publishing/succeeded
-  outcome. Backend last-successful-deploy.json only describes backend hashes and
+  bucket, holding admitted tag, raw Git refOid, peeled SHA, CI run/attempt and
+  publishing/succeeded outcome. Backend last-successful-deploy.json only describes backend hashes and
   must remain separate. Persist identity before production writes, success only
   after all publication operations finish, including when MIG is skipped.
 - Extend the existing publisher with this outcome ownership; do not create a
@@ -39,13 +40,19 @@ correction still uses a tested revert and new patch tag.
   run or successful no-publication workflow is not proof of deployment. Latest
   CLI-only publication is not application state. If the required evidence is
   unavailable, fail visibly and require the operator to identify the published
-  release; never silently treat an existing release as undeployed.
+  release; never silently treat an existing release as undeployed. A verified
+  absence of prior tag-driven application publication permits initial empty
+  tracking; legacy automatic main deployments have no application tag to replay.
+  Recheck bounded workflow history at activation, not just the current tag list.
+  On 2026-09-07 the deploy.yml push-event API returned total_count 0 and remote
+  v* tag listing was empty. This observation is not an enduring empty-state
+  assumption: Story 1 can publish before this story activates.
 - A publishing/incomplete record permits the same tag/SHA to retry after CI and
   artifacts are revalidated. A fresh successful run for that SHA may replace the
   recorded CI identity. Successful duplicate identity is checked before artifact
   download and produces no writes, so it cannot overwrite an independent CLI.
-- Verify current peeled ref against the frozen/persisted identity; forced update
-  or tag deletion must not create a new release request. Older versions cannot
+- Verify raw tag object and peeled commit against the frozen/persisted identity;
+  forced update or tag deletion must not create a new release request. Older versions cannot
   replace higher admitted/deployed state. Normal corrections use higher versions.
 - Add tag and ci.yml main workflow_run completion as wakeups for one reconciliation
   command. Pending/failed CI reports waiting/blocked and returns without sleeping;
@@ -64,6 +71,36 @@ correction still uses a tested revert and new patch tag.
 - Preserve [ADR 0005](../../../docs/adrs/0005-web-routes-accepted.md) routing
   ownership and [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md)
   error policy. There are no database changes or new storage-engine experiments.
+
+## Implementation findings that constrain these leaves
+
+- `scripts/ci/application-release-ci.mjs` already exports `querySelectedCi` and
+  supports `--once`: reuse exact repository/workflow/main-push/SHA selection,
+  pagination, latest attempt and error context. Only `waitForSelectedCi` and its
+  timer/cancellation tests are temporary. At cutover replace their callers/tests
+  with immediate-return event outcomes; keep all exact-CI admission coverage.
+- `scripts/ci/application-release.mjs` currently owns event identity and
+  `--verify-ref`; it is a command, not an import-safe helper. Extract only a needed
+  shared identity boundary when reconciliation calls it. Raw `refOid` detects an
+  annotated-tag replacement even when its peeled SHA is unchanged. Per-invocation
+  movement checks already work; leaf 4 adds durable cross-attempt identity.
+- `infra/gcp/scripts/publish-application.sh` preflights all three artifacts,
+  validates the selected checkout, prepares its URL map and verifies the remote
+  ref immediately before writes. Keep tracking around that proven boundary;
+  invalid payload/routing/source must not become a partially published release.
+  Keep current orchestration, selected routing/startup/force-token inputs and
+  workflow's explicit `GITHUB_SHA="$RELEASE_SHA"` shell assignment.
+- Three existing download-artifact actions own artifact transport. Check successful
+  duplicates before those actions; artifact recovery improves diagnostics and
+  replay proof, not archive downloading. Reading state earlier requires existing
+  GCP authentication in admission, under the same workflow concurrency owner.
+- The backend hash record cannot represent a frontend-only application release.
+  No durable application ledger exists. Bootstrap uses successful publication-step
+  evidence (selected identity), not green CI, whole-workflow success or CLI state.
+- The first tag-only source must contain that workflow trigger. The default-branch
+  CI-completion adapter will allow reconciliation of older main sources with
+  available successful exact-SHA CI; neither CI history nor artifacts are promised
+  recoverable beyond GitHub retention.
 
 ## Proof ownership
 
@@ -101,14 +138,18 @@ existing serialized workflow and private bucket. Preserve working tag releases.
 Type: Behavior
 Status: planned
 Proof: A verified Story 1 publication fixture initializes application state with
-no payload writes; CI-only or CLI-only successes cannot qualify as that evidence.
+no payload writes; CI-only or CLI-only successes cannot qualify. Verified absence
+of prior tag publication initializes empty tracking; ambiguous history fails.
 
 Behavior: Tracking is introduced to an already deployed installation → recognize
 its actual application tag/SHA instead of treating it as a new pending release.
 Run bootstrap under the application concurrency owner. Reuse existing workflow
 metadata transport; inspect successful publication evidence, not just run status.
 If a new tracked release has already established state, leave it unchanged.
-Missing/unverifiable evidence fails visibly rather than guessing a version.
+Missing/unverifiable evidence of a prior tag publication fails visibly rather
+than guessing a version. Explicitly distinguish the observed no-tag-publication
+installation from lost history; do not require inventing a version for legacy
+automatic main deployments.
 
 ### 3. Make completed-release replays a no-op
 Type: Behavior
@@ -123,10 +164,11 @@ or ordering rule belongs in this leaf.
 ### 4. Reject a moved release identity
 Type: Behavior
 Status: planned
-Proof: Retarget a real fixture tag after selection or a failed attempt; the public
-entry rejects before production writes.
+Proof: Retarget a real fixture tag after a failed attempt, including changing an
+annotated tag object without changing its peeled SHA; the public entry rejects
+before production writes. Reuse existing in-invocation movement proof.
 
-Behavior: A release tag no longer resolves to its selected/persisted SHA → fail
+Behavior: A release tag no longer matches its persisted refOid/SHA → fail
 with an identity mismatch. Reuse record and Git fixtures; reject forced-update
 and deletion inputs. Do not mutate tag protection rules or CLI policy.
 
@@ -204,15 +246,18 @@ retry, duplicate, moved-tag, pending-version and forward-correction instructions
 ## Verification, sizing and wrap-up
 
 Each leaf targets about five minutes including its focused proof and cleanup,
-medium confidence. No advance sizing exceptions. Compare the actual Story 1
-interfaces before execution; adjust this plan's file names, not its story scope.
+medium confidence. No advance sizing exceptions. The actual Story 1
+interfaces are recorded above; refine an actual overrun in place without changing
+the story scope. Existing guard coverage should reduce leaf 4 and 6 work.
 If bootstrap evidence requires a broader investigation, fail visibly at that
 boundary and refine the leaf rather than inventing production state.
 
 ```bash
-CURSOR_DEV=true nix develop -c node --test scripts/ci/application-release.test.mjs
+CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test
 CURSOR_DEV=true nix develop -c bash scripts/test/upload-cli-binary-to-gcs.sh.test
 CURSOR_DEV=true nix develop -c bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test
+CURSOR_DEV=true nix develop -c bash scripts/test/upload-frontend-static-to-gcs.sh.test
+CURSOR_DEV=true nix develop -c bash scripts/test/apply-doughnut-app-service-url-map-wiring.test
 ```
 
 Use named scenarios per leaf and repeat other existing deployment regressions
@@ -232,7 +277,11 @@ Former leaves 6–7 and 10–14 belong here; recovery/operator guidance from for
 16 is distributed into their owning behaviors. Bootstrap and event cutover make
 this a safe upgrade from an independently finished Story 1. Former global waiting
 and ordering assumptions no longer leak into the narrowed predecessor plan.
-All accepted final promises are retained. No implementation evidence existed.
+All accepted final promises are retained. Story 1's 73-test wrapper and combined
+deployment regressions passed. The main merge started donut CI run 34071938563;
+remote deploy.yml is tag-only and no deployment was observed for that push.
+Real production credentials/scheduling remain operator confirmation, not local
+proof. No release tags were created for verification.
 
 Platform references already checked during the original planning:
 
