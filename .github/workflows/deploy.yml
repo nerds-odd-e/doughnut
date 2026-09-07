@@ -1,10 +1,8 @@
 name: donut deploy
 
 on:
-  workflow_run:
-    workflows: ["donut CI"]
-    types: [completed]
-    branches: [main]
+  push:
+    tags: ["v*.*.*"]
 
 concurrency:
   group: deploy-production
@@ -30,8 +28,6 @@ jobs:
     name: Admit selected application release
     runs-on: ${{ vars.RUNNER }}
     timeout-minutes: 70
-    # Application publication is paused until the version-tag release path is enabled.
-    if: ${{ false }}
     outputs:
       control_sha: ${{ steps.control.outputs.sha }}
       deploy: ${{ steps.ci.outputs.state == 'ready' }}

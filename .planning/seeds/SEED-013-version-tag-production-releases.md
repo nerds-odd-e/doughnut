@@ -41,6 +41,8 @@ an arbitrary midpoint in the old leaf list.
 
 ### 1. Release one chosen Donut version while ordinary pushes publish nothing
 
+**Status:** Branch implementation and local proof complete; parent-owned post-merge platform observation pending in Quick 046.
+
 **Goal:** A maintainer deliberately releases an exact tested main commit by
 pushing a stable application version tag.
 

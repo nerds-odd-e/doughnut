@@ -1,8 +1,8 @@
 # Release one chosen Donut version
 
 Source: [SEED-013 Story 1](../../seeds/SEED-013-version-tag-production-releases.md#story-1).
-Status: in progress on codex/version-tag-production-releases.
-Readiness: ready for direct execution within the reduced single-release scope.
+Status: branch implementation complete on codex/version-tag-production-releases; post-merge observation pending.
+Readiness: ready for parent merge and platform observation; no code leaf remains unimplemented.
 Continuation: [Story 2 plan](../048-release-recovery-and-ordering/PLAN.md).
 
 ## Goal, scope and stopping point
@@ -195,7 +195,10 @@ no new policy, state or diagnostic behavior is added in this wiring leaf.
 
 ### 10. Enable working tag releases with the interim operating rule
 Type: Behavior
-Status: planned
+Status: in-progress
+Implementation: complete on branch; only parent-owned post-merge observation remains.
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 73/73 after activation. Joined tag-first and CI-first replays drive actual identity, real bounded CI query/wait with fake transport/time, and literal workflow publisher; captured SPA/CLI bytes and jar hash belong to the selected run/SHA. Parsed trigger is tag-only with no false gate or workflow_run. All five requested runbook/overview files updated; independent refactor made no edits.
+Combined proof before activation: `CURSOR_DEV=true nix develop -c bash -c 'bash scripts/test/application-release.test && bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test && bash scripts/test/apply-doughnut-app-service-url-map-wiring.test && bash scripts/test/upload-frontend-static-to-gcs.sh.test && bash scripts/test/upload-cli-binary-to-gcs.sh.test'` passed. Subsequent activation changed only trigger assertions and docs; the full release wrapper was rerun.
 Proof: Tag-first and CI-first entry-point replays publish the selected payload;
 ordinary main push has no publication trigger. Runbook examples match outcomes.
 
@@ -216,10 +219,10 @@ scrutinize; at ten finer-decompose unless an observed focused-test runtime expla
 it. This story has simpler integration work than Story 2's state transitions;
 leaf count is not a time guarantee.
 
-Proposed focused release suite and existing regressions:
+Focused release suite and existing regressions:
 
 ```bash
-CURSOR_DEV=true nix develop -c node --test scripts/ci/application-release.test.mjs
+CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test
 CURSOR_DEV=true nix develop -c bash scripts/test/upload-cli-binary-to-gcs.sh.test
 CURSOR_DEV=true nix develop -c bash scripts/test/upload-frontend-static-to-gcs.sh.test
 CURSOR_DEV=true nix develop -c bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test
@@ -253,3 +256,47 @@ existed to invalidate. The user explicitly requested the new two-plan split.
 - No production tags, settings, deployment calls, or main changes are authorized in this worktree. Post-merge scheduling/first-real-release observation belongs to the parent; local workflow activation remains branch work.
 
 - Final wiring learning: GitHub reserves default GITHUB_* YAML variables. Leaf 9 now carries RELEASE_SHA and invokes the publisher with explicit shell GITHUB_SHA assignment; old YAML override removed.
+
+## Parent handoff and remaining observation
+
+Leaves 1–9 are committed/pushed. Leaf 10 has all implementation, local proof and
+runbook work complete. Its remaining work is **post-merge observation**, not an
+unimplemented code leaf or a disabled activation switch:
+
+1. Parent merges this branch to main; this worktree must not modify main.
+2. Observe normal main CI and absence of application publication after that push.
+   Branch pushes cannot demonstrate this repository's main-only CI scheduling.
+3. Treat the operator's first actual qualifying release as confirmation of GitHub
+   tag scheduling, selected-run artifact download, GCP credentials and production
+   outcome. No release tag was created as a test; no production write, Slack send
+   or GitHub settings change was made by this execution.
+4. After required observation, parent can mark completion, reduce only Story 1's
+   spent seed detail, remove this spent PLAN, and remove the branch/worktree.
+   Keep Quick 048 and Story 2 intact for its separately authorized continuation.
+
+CI observation was unavailable as recorded above; pendingCi: unobserved. All
+implementer/refactor subprocesses and coordinator command sessions have exited;
+the failed observer created no mailbox/process to stop. Every leaf received a
+fresh implementer and independent refactor, coordinator formatting, lint hook,
+commit and branch push. API generation was not needed.
+
+### Lessons for Story 2
+
+- There is no durable application ledger. Backend last-successful-deploy.json
+  still advances only on full jar/startup rollout, so it cannot bootstrap the
+  last frontend-only release. Successful Deploy job evidence and selected
+  tag/SHA/run/attempt diagnostics are available; do not infer app state from the
+  backend record alone or replay an old app bundle over an independent CLI.
+- querySelectedCi owns exact repo/ci.yml/main-push/SHA lookup, optional @ref workflow
+  path handling, latest run/attempt, bounded pagination and transport errors.
+  waitForSelectedCi adds the temporary runner-holding wait; Story 2 can replace
+  that owner with tag/CI-event reconciliation without duplicating CI selection.
+- The first Story 1 source must contain the tag trigger. Historical pre-cutover
+  source reconciliation needs the later default-branch CI-event mechanism.
+- Preserve pinned current orchestration versus selected source and explicit
+  shell GITHUB_SHA assignment from RELEASE_SHA when event ownership changes.
+- Admission downloads all three named artifacts from the selected run; missing
+  or expired artifacts stop before writes. Regeneration/retry, moved identity,
+  duplicate suppression and numeric overlapping-version policy remain Story 2.
+  The current non-canceling concurrency group is only sufficient with the
+  documented one-application-release-at-a-time operating rule.

@@ -12,13 +12,14 @@ const workflow = (name) =>
     )
   )
 
-test('main CI remains enabled while application publication is paused', () => {
+test('main CI remains enabled and only application tag pushes trigger publication', () => {
   const ci = workflow('ci')
   const deploy = workflow('deploy')
 
   assert.deepEqual(ci.on.push.branches, ['main'])
   assert.equal(ci.name, 'donut CI')
-  assert.equal(deploy.jobs['release-admission'].if, '${{ false }}')
+  assert.deepEqual(deploy.on, { push: { tags: ['v*.*.*'] } })
+  assert.equal(deploy.jobs['release-admission'].if, undefined)
   assert.equal(deploy.jobs.Deploy.needs, 'release-admission')
   assert.equal(
     deploy.jobs.Deploy.if,
@@ -26,7 +27,7 @@ test('main CI remains enabled while application publication is paused', () => {
   )
 })
 
-test('gated release pins orchestration separately from source and preserves deployment credentials', () => {
+test('release pins orchestration separately from source and preserves deployment credentials', () => {
   const deploy = workflow('deploy')
   const admission = deploy.jobs['release-admission']
   const publication = deploy.jobs.Deploy
@@ -117,7 +118,7 @@ test('independent CLI tags retain their release trigger', () => {
   assert.deepEqual(workflow('cli-release').on.push.tags, ['cli-*'])
 })
 
-test('paused admission exposes the event identity using full Git history', () => {
+test('admission exposes the event identity using full Git history', () => {
   const admission = workflow('deploy').jobs['release-admission']
   assert.equal(admission.outputs.sha, '${{ steps.identity.outputs.sha }}')
   assert.equal(
