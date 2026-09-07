@@ -6,8 +6,8 @@ import {
   fetchWorkflowRunJobs,
 } from './application-release-bootstrap-history.mjs'
 import { writeReleaseOutput } from './application-release-output.mjs'
+import { applicationTagFromRef } from './application-release-version.mjs'
 
-const applicationTag = /^refs\/tags\/v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 const objectId = /^[0-9a-f]{40}$/
 function applicationTags(repositoryRoot) {
   try {
@@ -19,7 +19,7 @@ function applicationTags(repositoryRoot) {
       .trim()
       .split('\n')
       .map((line) => line.split('\t')[1])
-      .filter((ref) => applicationTag.test(ref))
+      .filter((ref) => applicationTagFromRef(ref))
   } catch (error) {
     throw new Error('Application tag lookup failed for origin', {
       cause: error,
@@ -41,8 +41,8 @@ function releaseIdentityFromLog(log) {
     (record) =>
       typeof record === 'object' &&
       record !== null &&
-      applicationTag.test(record.ref) &&
-      record.tag === record.ref.slice('refs/tags/'.length) &&
+      typeof record.tag === 'string' &&
+      applicationTagFromRef(record.ref) === record.tag &&
       objectId.test(record.refOid) &&
       objectId.test(record.sha)
   )
@@ -153,11 +153,12 @@ export async function classifyApplicationPublication({
     (run) => String(run.id) === currentRunId && run.status !== 'completed'
   )
   const hasVerifiedCurrentRun = currentRuns.length === 1
+  const currentTag = applicationTagFromRef(currentRef)
   const runs = hasVerifiedCurrentRun
     ? observedRuns.filter((run) => run !== currentRuns[0])
     : observedRuns
   const tags =
-    hasVerifiedCurrentRun && applicationTag.test(currentRef)
+    hasVerifiedCurrentRun && currentTag
       ? observedTags.filter((tag) => tag !== currentRef)
       : observedTags
   if (tags.length === 0 && runs.length === 0) return { state: 'empty' }

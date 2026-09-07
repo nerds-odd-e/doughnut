@@ -291,7 +291,7 @@ the tag. Unrecoverable retained history requires a tested correction and new pat
 
 ### 7. Keep the highest pending version despite event order
 Type: Behavior
-Status: planned
+Status: done
 Proof: Reversed v1.3.9/v1.3.10 wakeups always select v1.3.10 and wait if its CI
 is unfinished; late older completion re-evaluates that same pending selection.
 
@@ -299,6 +299,11 @@ Behavior: Several application tags are pending → retain the highest numeric
 version for the next release. Add reconciliation at the existing command boundary;
 exercise it locally before exposing the new trigger. Never select based only on
 incoming event order. Do not interrupt the active command's frozen identity.
+
+Learning: the new read-only reconciliation command enumerates stable remote
+application tags, validates their raw/peeled identity and main ancestry, chooses
+the highest version by numeric components, then calls `querySelectedCi` once.
+Reversed tag and main wakeup fixtures therefore select the same pending release.
 
 ### 8. Prevent older retries and late CI from replacing newer state
 Type: Behavior

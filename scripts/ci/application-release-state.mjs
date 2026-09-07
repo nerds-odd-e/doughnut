@@ -2,9 +2,9 @@ import { execFileSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
 import { classifyApplicationPublication } from './application-release-bootstrap.mjs'
 import { writeReleaseOutput } from './application-release-output.mjs'
+import { isApplicationTag } from './application-release-version.mjs'
 
 const recordName = 'deploy/application-release.json'
-const applicationTag = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 const objectId = /^[0-9a-f]{40}$/
 const positiveInteger = /^[1-9]\d*$/
 
@@ -77,7 +77,7 @@ function validateState(record) {
   if (
     keys.every((key) => Object.hasOwn(record, key)) &&
     Object.keys(record).length === keys.length &&
-    applicationTag.test(record.tag) &&
+    isApplicationTag(record.tag) &&
     objectId.test(record.ref_oid) &&
     objectId.test(record.sha) &&
     positiveInteger.test(record.ci_run_id) &&
@@ -177,7 +177,7 @@ export async function checkApplicationReleaseState({
   token = accessToken(),
 }) {
   if (!bucket) throw new Error('GCS_BUCKET is required')
-  if (!applicationTag.test(tag)) throw new Error('RELEASE_TAG is invalid')
+  if (!isApplicationTag(tag)) throw new Error('RELEASE_TAG is invalid')
   if (!objectId.test(refOid)) throw new Error('RELEASE_REF_OID is invalid')
   if (!objectId.test(sha)) throw new Error('RELEASE_SHA is invalid')
 
