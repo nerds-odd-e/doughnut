@@ -1,33 +1,11 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: resume at leaf 9. Slices 1–8 done and pushed.
-
-## Resume (new session)
-
-Work only in this checkout:
-
-- Path: `/Users/terryyin/git/doughnut-wt-054`
-- Branch: `feat/configured-worktree-backend-tests` (tracks origin)
-- Plan: `.planning/quick/054-configured-worktree-backend-tests/PLAN.md`
-- Skill: `.agents/skills/execute-plan/SKILL.md` (wrap-up per slice; do not write `.planning/STATE.md`)
-- Do not edit `/Users/terryyin/git/doughnut` except the final merge to `main`
-
-Leaf 5 accepted after raising instance `max_connections` to 1000. Leaf 6 missing-database failure stops before tests. Leaf 7: interrupting A leaves B and MySQL usable. Leaf 8: A-only next migration stayed off B. Continue leaf 9. When the plan is complete: merge the feature branch to `main`, push `main`, delete the feature branch, and drop worktrees `doughnut-wt-054`, `-a`, and `-b`. Do not drop MySQL databases unless this PLAN later says to.
-
-Disposable proof environments (keep until leaves 6–8 finish):
-
-| Role | Path | ID | Database |
-|---|---|---|---|
-| A | `/Users/terryyin/git/doughnut-wt-054-a` | `wt_054a` | `doughnut_wt_054a_test` |
-| B | `/Users/terryyin/git/doughnut-wt-054-b` | `wt_054b` | `doughnut_wt_054b_test` |
-
-A/B are detached at `49d4f30544` (implementation). Shared MySQL is `127.0.0.1:3309` using `/Users/terryyin/git/doughnut/mysql/data`, started with `--max-connections=1000`.
+Status: complete. Slices 1–9 done and pushed. Merge to `main`, then drop
+worktrees `doughnut-wt-054`, `-a`, and `-b`. Do not drop MySQL databases.
 
 Original request: execute quick plan 54 in a new worktree/branch, merge to main when done, drop worktree and branch.
 Source: [SEED-015, story 1a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1a).
-Stories 1a, 1b, and 1c occupy the first three product-backlog positions.
-This plan covers only 1a. No implementation or database experiment was performed
-while writing it.
+This plan covers only 1a.
 
 ## Goal and scope
 
@@ -476,7 +454,7 @@ CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
 
 ### 9. Repeat the supported workflow from its setup instructions
 Type: Behavior
-Status: planned
+Status: done
 Proof: Cross-check the guide with setup commands and target observations from
 leaves 4–8; verify its agent-map link. Show the full and focused forms and the
 explicit limitation on legacy commands. Documentation alone does not require
@@ -488,6 +466,11 @@ unique ID, creating database/grants with the existing collation, writing ignored
 config, and invoking tests. State that duplicate manual IDs are operator error,
 old commands are not automatically isolated, and no cleanup is automatic.
 Sizing: about 5 minutes, high confidence; document observed behavior only.
+
+Guide: `docs/worktree-backend-tests.md`. Linked from `.cursor/agent-map.md`
+Commands and README database-migrations. Full and focused forms, legacy-command
+limitation, setup (unique ID, utf8mb4_unicode_ci, doughnut grants, ignored
+`.worktree.local.json`), no auto cleanup. Example ID `wt_a7c2`.
 
 ## Contract coverage and verification
 
@@ -541,15 +524,16 @@ gated on the opt-in property. Temporary refusal is gone.
 Slice 3: `--tests '<pattern>'` is one Gradle token after `test`; missing values
 and unrelated args refuse before Gradle; unmatched filter keeps child failure.
 
-Slice 4: disposable worktrees `/Users/terryyin/git/doughnut-wt-054-a` (`wt_054a`)
-and `/Users/terryyin/git/doughnut-wt-054-b` (`wt_054b`) with empty utf8mb4
-databases on MySQL 8.4.11; configs ignored; legacy DBs unmodified. Preserve
-them for leaves 5–8.
+Slice 4: two disposable worktrees with distinct utf8mb4 databases on MySQL 8.4.11.
 
-Slice 8: A-only V300000321 created `wt_054_concurrency_proof` (Flyway 23);
-B stayed at 22. Both suites passed. doughnut_test incidental write restored.
-Next: leaf 9.
+Slice 5: overlapping full suites both passed after `max_connections=1000`.
 
-If an actual run contradicts a lifecycle/storage assumption, preserve its
-observations and stop at that leaf for the repository's learning escalation.
-Remove spent planning history only after the complete story is delivered.
+Slice 6: missing database fails `:migrateTestDB` before `:test`.
+
+Slice 7: SIGINT stops A's Test Executor; B and MySQL remain usable.
+
+Slice 8: A-only next migration stayed off B; both suites passed. An existing
+test hardcodes `doughnut_test`; incidental Flyway write there was restored.
+
+Slice 9: setup guide `docs/worktree-backend-tests.md` linked from agent-map
+and README. All slices delivered.

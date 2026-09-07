@@ -94,9 +94,8 @@ supported kind per worktree, across two concurrent local worktrees.
 
 ### 1. Run backend unit tests concurrently in separate worktrees
 
-**Status:** Children 1a–1c accepted and queued at the top of the product
-backlog on 2026-09-07. Child 1a is selected for refinement and slice planning;
-none is implemented. Legacy-command compatibility choices remain proposals.
+**Status:** Child 1a delivered. Children 1b–1c remain queued at the top of the
+product backlog. Legacy-command compatibility choices remain with 1c.
 
 **Parent goal**
 
@@ -139,9 +138,7 @@ serializing tests avoids overlap but does not test or deliver concurrency.
 
 #### 1a. Run concurrent backend tests using explicitly configured databases
 
-**Status:** Refined on 2026-09-07; execution is owned by
-[the configured-worktree backend test plan](../quick/054-configured-worktree-backend-tests/PLAN.md).
-Planning is authorized; implementation has not started.
+**Status:** Delivered. Guide: `docs/worktree-backend-tests.md`.
 
 **Goal**
 
@@ -158,65 +155,19 @@ to existing commands.
   The command does not allocate identities, create databases, or grant access.
 - Store the ID in a gitignored file at each worktree root. It determines one
   unit-test database; no URLs or port settings need repeating each run. Reuse
-  the file across fresh shells and ordinary branch changes. Configuration
-  format and command spelling below are planning choices, not a new user flow.
+  the file across fresh shells and ordinary branch changes.
 - One documented command migrates the chosen database with that worktree's
   code, then executes the complete backend unit suite by default. It also
-  accepts a test-name filter for a focused invocation. Both stages must select
-  the same database and report the selected name. Cached/up-to-date Gradle test
-  results do not count as execution against the selected database.
+  accepts a test-name filter for a focused invocation.
 - Missing/invalid configuration, conflicting explicit target overrides, and a
   missing/inaccessible database stop this opt-in workflow without fallback.
-  Migration failure prevents the test stage; test failure produces a failing
-  command result. No automatic repair of user-selected identity or destructive
-  rebuilding is added. Existing migration semantics otherwise remain intact.
-- Cancellation stops the owned foreground run without stopping MySQL or other
-  worktree runs. Ordinary runs never modify another worktree's migration
-  history or fixtures. Development and E2E databases are outside this workflow.
-- Documentation includes manual setup, both command forms, and the limitation
-  that two configurations pointing to the same ID/database are operator error.
-  Automatic collision detection belongs to later allocation work. Existing
-  `backend:test`, `backend:test_only`, and direct Gradle entry points keep their
-  current behavior and must not be advertised as automatically isolated.
+  Cancellation stops the owned foreground run without stopping MySQL or other
+  worktree runs.
+- Existing `backend:test`, `backend:test_only`, and direct Gradle entry points
+  keep their current behavior and are not automatically isolated.
 
-**Key examples**
-
-1. **Configured full run:** With A's ID and accessible database already supplied,
-   run the opt-in command without filters. Its output identifies A's database;
-   migrations and the full suite execute there. A new shell repeats the run
-   using the same ID and actually executes tests again.
-2. **Two codebases, independent data:** With A and B configured to different
-   databases, overlap their full suite runs with the same fixture names. Both
-   pass against their own code and state; neither resets the other's database.
-3. **Different migration history:** With one additional valid migration only in
-   A, run A while B uses its original code. Only A's schema/history changes and
-   both test results remain correct. Do not promise rollback when an existing
-   database is later paired with an incompatible branch.
-4. **Focused invocation:** Supply one test-name filter. The same database is
-   migrated, and only the requested tests execute. An unmatched filter fails
-   rather than reporting successful verification with no tests.
-5. **Cannot run against the selected target:** Invalid or absent local settings,
-   a contradictory explicit URL, inaccessible database, or failed migration
-   produces a visible failure without proceeding against the legacy database.
-   A failing test stays a failed command. Cancellation ends the owned run;
-   other worktrees and shared MySQL remain usable.
-
-**Value / learning:** Real concurrent backend verification proves or refutes
-the shared-server approach before investing in automated provisioning. Manual
-setup remains a useful stopping point if 1b/1c or E2E work is cancelled.
-
-**Effort hypothesis:** M — medium-low confidence; one command and local ID,
-with existing migration/test tasks. Real concurrent suite runtime may exceed
-active editing time. Implementation discovery can require finer slice sizing.
-
-**Depends on:** No sibling story. Running MySQL, distinct manually provisioned
-databases, and normal checkout dependencies are preconditions.
-
-**Exclusions / decisions:** All group boundaries apply. No automatic first use,
-port allocation, hooks, generic environment manager, database cleanup, or changes
-to existing command selection. The developer accepted the manual first increment.
-No unresolved product decision blocks this opt-in story; primary-checkout defaults
-and ordinary-command override compatibility remain with 1c.
+**Exclusions:** No automatic first use, port allocation, hooks, generic
+environment manager, database cleanup, or changes to existing command selection.
 
 <a id="story-1b"></a>
 
