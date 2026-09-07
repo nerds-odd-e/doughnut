@@ -1,7 +1,7 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: slices 1–4 done; next is slice 5.
+Status: slices 1–5 done; next is slice 6.
 
 ## Learnings
 
@@ -30,6 +30,9 @@ Slice 4 added `git rm --` checkout commit harness (`commitCliNotebookCheckoutNot
 `commitRemoval`) without a new Gherkin scenario. Existing
 `cli_notebook_clone.feature` stayed green (6 scenarios). Git identity/commit
 helpers were collapsed in the clone tasks file.
+
+Slice 5 adds an installed-CLI scenario: remove `Recipes/Pasta.md`, publish,
+accepted head reported, Donut sidebar tree no longer shows Pasta.
 
 ## Goal and scope
 
@@ -211,7 +214,7 @@ path; existing rejection proof remains in the CLI suites.
 
 ### 5. Publish the local removal through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Proof: One scenario in `e2e_test/features/cli/cli_notebook_clone.feature` clones,
 removes and commits `Recipes/Pasta.md`, publishes, and observes the authored
 accepted head and Donut's remaining note tree. Run the focused notebook E2E.
@@ -357,9 +360,9 @@ Keep existing title reuse and restore policy unchanged.
 
 ## Sizing, readiness, and learning checkpoint
 
-Slices 1–4 delivered isolation rejection, isolated-deletion acceptance,
-late-failure rollback, and the E2E removal-commit harness. Remaining leaves
-execute in order from slice 5.
+Slices 1–5 delivered isolation rejection, isolated-deletion acceptance,
+late-failure rollback, E2E removal harness, and installed-CLI publication.
+Remaining leaves execute in order from slice 6.
 Four bundled original slices were replaced; four were retained and reordered.
 The result is 13 Behavior leaves and one immediately enabling Structure leaf.
 No completed proof was discarded and no product scope was added or removed.

@@ -59,6 +59,17 @@ Feature: CLI notebook clone
     Then the installed CLI reports the committed change as the accepted head
     And note "Pasta" should have content "Simmer until al dente"
 
+  Scenario: Publishing a committed note removal deletes the note in Donut
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I commit a removal of "Recipes/Pasta.md" in the cloned checkout
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I open the notebook "CLI Clone Notebook" from the notebook catalog
+    And I open the folder page for "Recipes" from the sidebar
+    Then I should see the note tree in the sidebar
+      | note-title |
+      | Overview   |
+
   Scenario: Publishing related additions and an edit updates every Donut note
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I commit the following related additions and edit together in the cloned checkout:
