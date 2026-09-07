@@ -322,7 +322,7 @@ outcome, so deleting the newer remote tag cannot permit an older downgrade.
 
 ### 9. Connect reconciliation without changing the active trigger
 Type: Structure
-Status: planned
+Status: done
 Proof: Parsed workflow contracts and existing command tests cover both adapters:
 current bounded tag wait and new immediate-return reconciliation. One application
 concurrency group encloses selection, admission, publication and record writes.
@@ -331,6 +331,11 @@ Internal change: Factor the proven common admission/publication call so the new
 tag/CI wakeup adapter can use it. Keep the working tag-only adapter active until
 leaf 10. This preparation immediately enables that Behavior; no dual permanent
 release engine, new state format or second lock is introduced.
+
+Learning: the tag identity plus bounded-CI adapter and the dormant immediate
+reconciliation adapter now normalize the same release identity and CI outputs
+into the existing state/publication path. The tag-only trigger remains active,
+and workflow-level `deploy-production` concurrency encloses both selections.
 
 ### 10. Enable recovery and overlapping-release coordination
 Type: Behavior

@@ -13,6 +13,10 @@ const workflow = (name) =>
 
 const nonTerminalRelease =
   "steps.release_state.outputs.state != 'already-released' && steps.release_state.outputs.state != 'superseded'"
+const selected = (field) =>
+  `\${{ steps.identity.outputs.${field} || steps.reconciliation.outputs.${field} }}`
+const selectedCi = (field) =>
+  `\${{ steps.ci.outputs.${field} || steps.reconciliation.outputs.${field} }}`
 
 test('main CI remains enabled and only application tag pushes trigger publication', () => {
   const ci = workflow('ci')
@@ -42,6 +46,9 @@ test('release pins orchestration separately from source and preserves deployment
     (step) => step.run === 'node scripts/ci/application-release-state.mjs'
   )
   const identity = admission.steps.find((step) => step.id === 'identity')
+  const reconciliation = admission.steps.find(
+    (step) => step.id === 'reconciliation'
+  )
   const releaseState = admission.steps.find(
     (step) => step.id === 'release_state'
   )
@@ -76,6 +83,17 @@ test('release pins orchestration separately from source and preserves deployment
     admission.steps.indexOf(trackingInitialization) <
       admission.steps.indexOf(identity)
   )
+  assert.equal(identity.if, "github.event_name == 'push'")
+  assert.equal(reconciliation.if, "github.event_name == 'workflow_run'")
+  assert.equal(
+    reconciliation.run,
+    'node scripts/ci/application-release-reconciliation.mjs'
+  )
+  assert.equal(reconciliation.env.GITHUB_TOKEN, '${{ secrets.GITHUB_TOKEN }}')
+  assert.ok(
+    admission.steps.indexOf(trackingInitialization) <
+      admission.steps.indexOf(reconciliation)
+  )
   assert.ok(
     admission.steps.indexOf(identity) < admission.steps.indexOf(ciAdmission)
   )
@@ -86,10 +104,14 @@ test('release pins orchestration separately from source and preserves deployment
     admission.steps.indexOf(releaseState) < admission.steps.indexOf(ciAdmission)
   )
   assert.deepEqual(releaseState.env, {
-    RELEASE_TAG: '${{ steps.identity.outputs.tag }}',
-    RELEASE_REF_OID: '${{ steps.identity.outputs.refOid }}',
-    RELEASE_SHA: '${{ steps.identity.outputs.sha }}',
+    RELEASE_TAG: selected('tag'),
+    RELEASE_REF_OID: selected('refOid'),
+    RELEASE_SHA: selected('sha'),
   })
+  assert.equal(
+    releaseState.if,
+    "(steps.identity.outputs.tag || steps.reconciliation.outputs.tag) != ''"
+  )
   assert.equal(
     releaseState.run,
     'node scripts/ci/application-release-state.mjs --check-release'
@@ -135,10 +157,7 @@ test('release pins orchestration separately from source and preserves deployment
   )
   assert.equal(deploy.env.GITHUB_SHA, undefined)
   assert.equal(publication.env.GITHUB_SHA, undefined)
-  assert.doesNotMatch(
-    JSON.stringify(deploy.jobs),
-    /workflow_run|main-head-guard|head_guard/
-  )
+  assert.doesNotMatch(JSON.stringify(deploy.jobs), /main-head-guard|head_guard/)
   assert.deepEqual(deploy.concurrency, {
     group: 'deploy-production',
     'cancel-in-progress': false,
@@ -181,11 +200,11 @@ test('terminal release outcomes bypass CI and every publication operation', () =
 
   assert.equal(
     admission.outputs.deploy,
-    `\${{ ${nonTerminalRelease} && steps.ci.outputs.state == 'ready' }}`
+    `\${{ ${nonTerminalRelease} && (steps.ci.outputs.state == 'ready' || steps.reconciliation.outputs.state == 'ready') }}`
   )
   assert.equal(
     admission.steps.find((step) => step.id === 'ci').if,
-    nonTerminalRelease
+    `github.event_name == 'push' && ${nonTerminalRelease}`
   )
   assert.equal(
     publication.if,
@@ -202,13 +221,14 @@ test('independent CLI tags retain their release trigger', () => {
   assert.deepEqual(workflow('cli-release').on.push.tags, ['cli-*'])
 })
 
-test('admission exposes the event identity using full Git history', () => {
+test('admission exposes the selected release identity using full Git history', () => {
   const admission = workflow('deploy').jobs['release-admission']
-  assert.equal(admission.outputs.sha, '${{ steps.identity.outputs.sha }}')
-  assert.equal(
-    admission.outputs.ref_oid,
-    '${{ steps.identity.outputs.refOid }}'
-  )
+  assert.equal(admission.outputs.tag, selected('tag'))
+  assert.equal(admission.outputs.sha, selected('sha'))
+  assert.equal(admission.outputs.ref, selected('ref'))
+  assert.equal(admission.outputs.ref_oid, selected('refOid'))
+  assert.equal(admission.outputs.run_id, selectedCi('runId'))
+  assert.equal(admission.outputs.run_attempt, selectedCi('runAttempt'))
   assert.equal(admission.steps[0].with['fetch-depth'], 0)
   assert.match(
     admission.steps.find((step) => step.id === 'identity').run,

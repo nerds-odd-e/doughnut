@@ -92,7 +92,10 @@ test('all admitted-run downloads and preflight precede the first production step
     )
   )
   const admission = deploy.jobs['release-admission']
-  assert.equal(admission.outputs.run_id, '${{ steps.ci.outputs.runId }}')
+  assert.equal(
+    admission.outputs.run_id,
+    '${{ steps.ci.outputs.runId || steps.reconciliation.outputs.runId }}'
+  )
   const ci = admission.steps.find((step) => step.id === 'ci')
   assert.equal(ci.env.RELEASE_SHA, '${{ steps.identity.outputs.sha }}')
   assert.match(ci.run, /node scripts\/ci\/application-release-ci.mjs/)
