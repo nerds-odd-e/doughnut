@@ -229,7 +229,7 @@ scenarios green.
 
 ### 7. Explain same-folder renaming through existing CLI guidance
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing clone-output expectations explain unchanged bytes, same parent,
 separate rename then edit, and unchanged links; existing submission tests
 retain rejected local commits/files. CLI clone/publish tests; focused E2E
@@ -239,6 +239,12 @@ Behavior: Owner clones → reads next steps → knows how to publish a rename
 without losing identity. Update nonInteractiveCli.ts and its exact-copy
 assertions. Say parent changes remain unsupported until Story 12; no new
 command/preview or misleading deletion workaround.
+Learning: Updated the one clone-guidance sentence in nonInteractiveCli.ts and
+kept its two verbatim test copies (notebookClone.test.ts, the E2E feature) in
+sync: names same-folder unchanged-content rename as a supported shape, keeps
+cross-folder moves and rename+edit-in-one-commit unsupported, and nudges
+toward a separate rename commit then a separate edit commit instead of
+delete-and-recreate.
 
 ### 8. Leave referring Markdown authored
 Type: Behavior
