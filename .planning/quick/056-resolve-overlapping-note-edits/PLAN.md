@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–9 done.
+Status: in progress; slices 1–10 done.
 
 ## Goal and scope
 
@@ -267,13 +267,8 @@ existing runner and tasks. Missing unrelated harness is a refinement trigger.
 
 ### 10. Complete the installed conflict journey
 Type: Behavior
-Status: planned
-Proof: One scenario in `cli_notebook_clone.feature`: installed clone → local
-Pasta commit → real web save changing the same sentence → installed pull
-reports conflict → Donut still shows the web version → edit/stage/continue
-with ordinary Git → installed publish → chosen content appears on Pasta and
-reported accepted head is the observed L′. Check accepted parent ancestry;
-leaf 8 owns learning-state proof and leaf 6 owns abort proof.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature` — 11 passing (31s). Scenario *Resolving a Pasta conflict then publishing updates Donut with the chosen text*: same-sentence web save, rejected pull conflict for Recipes/Pasta.md, Donut still “Salt the water first” after pull and after native continue, publish reports resolved L′ and Pasta shows “Finish in the sauce”.
 
 Behavior: Owner follows the installed workflow → chosen resolution reaches
 Donut only after explicit publication.
@@ -357,6 +352,9 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   and captures original L only. Resolved L′ is `@cliNotebookResolvedCheckout`
   (not the auto-merge alias). Continue uses spawn-only `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR`
   plus one-shot `-c` identity; no `git config`. No abort E2E or generic shell task.
+- Slice 10: No production change. One scenario reuses leaf-9 steps; baseline
+  snapshot stays in Background only. Donut shows the web Pasta body until
+  explicit publish. Chosen continue bytes differ from both L and the web save.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.

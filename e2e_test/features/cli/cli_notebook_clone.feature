@@ -172,3 +172,45 @@ Feature: CLI notebook clone
     Then the installed CLI reports the rebased local head as the accepted head
     And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
     And I should see note "CLI Clone Notebook/Overview" has content "Weekly meal plan"
+
+  Scenario: Resolving a Pasta conflict then publishing updates Donut with the chosen text
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I commit the following edit to "Recipes/Pasta.md" in the cloned checkout:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Simmer until al dente
+      """
+    And I open the note "Pasta" for editing
+    And I view the note content as rich content
+    And I update note "Pasta" content to become "Salt the water first"
+    When I pull the cloned checkout expecting rejection from the installed CLI
+    Then I should see "Git paused a rebase with a conflict in" in the non-interactive output
+    And I should see "Recipes/Pasta.md" in the non-interactive output
+    And I should see "git rebase --continue" in the non-interactive output
+    And the cloned checkout has a paused rebase conflict for "Recipes/Pasta.md"
+    And note "Pasta" should have content "Salt the water first"
+    When I write, stage, and continue the cloned checkout rebase with the following edit to "Recipes/Pasta.md":
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Finish in the sauce
+      """
+    Then the cloned checkout is a clean resolved child of the accepted head
+    And the cloned checkout retains the original local commit author and message for "Recipes/Pasta.md"
+    And the cloned checkout file "Recipes/Pasta.md" is:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Finish in the sauce
+      """
+    And note "Pasta" should have content "Salt the water first"
+    When I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the resolved local head as the accepted head
+    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Finish in the sauce"
