@@ -2,5 +2,5 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-node --test "$REPO_ROOT/scripts/ci/application-release.test.mjs" "$REPO_ROOT/scripts/ci/application-release-ci.test.mjs" "$REPO_ROOT/scripts/ci/application-release-ci-wait.test.mjs" "$REPO_ROOT/scripts/ci/application-release-bootstrap.test.mjs" "$REPO_ROOT/scripts/ci/application-release-payload.test.mjs" "$REPO_ROOT/scripts/ci/application-release-publication.test.mjs" "$REPO_ROOT/scripts/ci/application-release-notification.test.mjs"
+node --test "$REPO_ROOT/scripts/ci/application-release.test.mjs" "$REPO_ROOT/scripts/ci/application-release-ci.test.mjs" "$REPO_ROOT/scripts/ci/application-release-ci-wait.test.mjs" "$REPO_ROOT/scripts/ci/application-release-bootstrap.test.mjs" "$REPO_ROOT/scripts/ci/application-release-state.test.mjs" "$REPO_ROOT/scripts/ci/application-release-payload.test.mjs" "$REPO_ROOT/scripts/ci/application-release-publication.test.mjs" "$REPO_ROOT/scripts/ci/application-release-notification.test.mjs"
 node --test "$REPO_ROOT/scripts/ci/application-release-entry.test.mjs"

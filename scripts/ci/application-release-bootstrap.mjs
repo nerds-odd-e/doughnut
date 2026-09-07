@@ -137,17 +137,30 @@ export async function classifyApplicationPublication({
   repositoryRoot = process.cwd(),
   apiBase = process.env.GITHUB_API_URL || 'https://api.github.com',
   token = process.env.GITHUB_TOKEN,
+  currentRunId = process.env.GITHUB_RUN_ID,
+  currentRef = process.env.GITHUB_REF,
 }) {
-  const [tags, runs] = await Promise.all([
+  const [observedTags, observedRuns] = await Promise.all([
     Promise.resolve(applicationTags(repositoryRoot)),
     fetchDeployWorkflowRuns({ repository, apiBase, token }),
   ])
-  if (tags.length === 0 && runs.length === 0) return { state: 'empty' }
-  if (runs.some((run) => !isDeployPush(run, repository))) {
+  if (observedRuns.some((run) => !isDeployPush(run, repository))) {
     throw new Error(
       'Deploy workflow history contains an unexpected run identity'
     )
   }
+  const currentRuns = observedRuns.filter(
+    (run) => String(run.id) === currentRunId && run.status !== 'completed'
+  )
+  const hasVerifiedCurrentRun = currentRuns.length === 1
+  const runs = hasVerifiedCurrentRun
+    ? observedRuns.filter((run) => run !== currentRuns[0])
+    : observedRuns
+  const tags =
+    hasVerifiedCurrentRun && applicationTag.test(currentRef)
+      ? observedTags.filter((tag) => tag !== currentRef)
+      : observedTags
+  if (tags.length === 0 && runs.length === 0) return { state: 'empty' }
   if (runs.some((run) => run.status !== 'completed')) {
     throw new Error('Deploy workflow history contains an incomplete run')
   }

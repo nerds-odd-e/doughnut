@@ -167,7 +167,7 @@ the observed zero-tag/zero-run case classifies as empty.
 
 ### 2b. Initialize application tracking from classified evidence
 Type: Behavior
-Status: planned
+Status: done
 Proof: The public state command leaves a valid existing record byte-for-byte
 unchanged. When the object is absent, controlled GitHub/GCS fixtures seed exact
 succeeded identity or initialized-empty state with create-only generation
@@ -183,6 +183,11 @@ and omit only its verified current application tag from the empty-history tag
 set. Other incomplete runs remain ambiguous. Never infer a version from green
 CI, whole-workflow status, CLI state or legacy automatic main deployment.
 Require operator identification when relevant history cannot be verified.
+
+Learning: the public state initializer now validates existing state without a
+write, treats only GCS 404 as absent, and creates succeeded or initialized-empty
+state with `ifGenerationMatch=0`. The classifier excludes only its verified
+current run/current stable tag; unrelated incomplete history remains ambiguous.
 
 ### 2c. Gate release admission on initialized tracking
 Type: Behavior
