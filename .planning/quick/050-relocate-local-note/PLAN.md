@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–7 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaves 1–8 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -279,10 +279,17 @@ Sizing: ~5 minutes active work, high confidence; one container outcome.
 
 ### 7. Reject destinations absent from accepted content
 Type: Behavior
-Status: planned
+Status: done
 Proof: Missing Donut folder and existing unrepresented folder, including a
 source emptied by leaf 6's accepted move, yield a path-specific rejection;
-source, containers and accepted binding remain unchanged. Backend suite.
+source, containers and accepted binding remain unchanged. Backend suite
+(`source /workspace/scripts/cloud_agent_setup.sh && pnpm backend:test_only`).
+Canonical rejection in
+`NotebookGitProposalRelocationDestinationControllerTest.rejectsRelocationIntoAMissingFolderWithoutCreatingIt`
+(full unrepresented-parent message, source stays at root, no folder created).
+Siblings: existing unrepresented Physics folder; Source emptied by accepted
+move. Success:
+`relocatesIntoAFolderRepresentedOnlyByDescendantTrackedContent`.
 
 Behavior: Local path implies an ineligible destination → publish → reject
 without creating a folder or manufacturing representation. Also retain a
@@ -377,7 +384,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–6 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–7 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -391,6 +398,7 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 - Leaf 4: cross-parent relocation keeps tracker/MCQ/conversation on the same note; proof in `NotebookGitProposalRelocationPrivateAssociationControllerTest`. No production change.
 - Leaf 5: late binding-save failure rolls back relocate-and-rename folder/title using the existing atomic-test profile.
 - Leaf 6: emptying a README-less source by relocating its last note keeps the Donut folder ID and invents no README.
+- Leaf 7: missing/unrepresented destinations reject with the existing parent-folder message; descendant-only tracked content still represents an ancestor.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are

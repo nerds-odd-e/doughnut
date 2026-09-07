@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import com.odde.donut.controllers.dto.ApiError;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -54,7 +55,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
             additionProposal,
             ApiException.class);
 
-    assertContextualSoftDeletedTitleConflict(exception, deletion.reserved());
+    assertContextualSoftDeletedTitleConflict(exception, deletion.reserved(), RESERVED_PATH);
 
     PublicationState afterRejection =
         publicationState(notebook, deletion.reserved(), deletion.tracker());
@@ -95,7 +96,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
         assertProposalRejectedWithoutMutatingBinding(
             notebook, deletion.afterDeletion().acceptedHead(), renameProposal, ApiException.class);
 
-    assertContextualSoftDeletedTitleConflict(exception, deletion.reserved());
+    assertContextualSoftDeletedTitleConflict(exception, deletion.reserved(), RESERVED_PATH);
 
     PublicationState afterRejection =
         publicationState(notebook, deletion.reserved(), deletion.tracker());
@@ -115,8 +116,54 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
                 contains(renamedSource.getId())));
   }
 
-  private void assertContextualSoftDeletedTitleConflict(ApiException exception, Note reserved) {
-    assertThat(exception.getErrorBody().getMessage(), containsString(RESERVED_PATH));
+  @Test
+  void rejectsARelocationIntoAnAcceptedDeletionWithoutResurrectingOrMutatingTheSource()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder source = makeMe.aFolder().notebook(notebook).name("Source").please();
+    Folder destination = makeMe.aFolder().notebook(notebook).name("Dest").please();
+    Note relocating =
+        makeMe.aNote().folder(source).title("note").content(ORIGINAL_CONTENT).please();
+    makeMe.aNote().folder(destination).title("other").content(ORIGINAL_CONTENT).please();
+    AcceptedDeletion deletion =
+        acceptDeletionReservingTitle(
+            notebook,
+            destination,
+            List.of(
+                new NotebookGitProposalFile("Source/note.md", ORIGINAL_CONTENT),
+                new NotebookGitProposalFile("Dest/other.md", ORIGINAL_CONTENT)));
+    String reservedPath = "Dest/" + RESERVED_PATH;
+
+    ApiException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook,
+            deletion.afterDeletion().acceptedHead(),
+            proposalBundleBytes(
+                deletion.afterDeletionBinding(),
+                List.of(
+                    new NotebookGitProposalFile("Dest/other.md", ORIGINAL_CONTENT),
+                    new NotebookGitProposalFile(reservedPath, ORIGINAL_CONTENT))),
+            ApiException.class);
+
+    assertContextualSoftDeletedTitleConflict(exception, deletion.reserved(), reservedPath);
+
+    PublicationState afterRejection =
+        publicationState(notebook, deletion.reserved(), deletion.tracker());
+    assertThat(afterRejection.noteDeletedAt(), equalTo(deletion.afterDeletion().noteDeletedAt()));
+    assertThat(
+        afterRejection.trackerDeletedAt(), equalTo(deletion.afterDeletion().trackerDeletedAt()));
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          Note reloadedSource = noteRepository.findById(relocating.getId()).orElseThrow();
+          assertThat(reloadedSource.getTitle(), equalTo("note"));
+          assertThat(reloadedSource.getFolder().getId(), equalTo(source.getId()));
+        });
+  }
+
+  private void assertContextualSoftDeletedTitleConflict(
+      ApiException exception, Note reserved, String reservedPath) {
+    assertThat(exception.getErrorBody().getMessage(), containsString(reservedPath));
     assertThat(exception.getErrorBody().getMessage(), containsString(SOFT_DELETED_TITLE_REASON));
     assertThat(
         exception.getErrorBody().getErrorType(),
@@ -134,13 +181,27 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
 
   /**
    * Soft-deletes a tracked "Reserved destination" note via an accepted isolated deletion, keeping
-   * only {@code survivingNote}'s file in the accepted tree, so the title stays reserved for the
-   * rejection scenarios below.
+   * {@code remainingFiles} in the accepted tree, so the title stays reserved in {@code
+   * reservedFolder} (notebook root when null).
    */
   private AcceptedDeletion acceptDeletionReservingTitle(Notebook notebook, Note survivingNote)
       throws Exception {
+    return acceptDeletionReservingTitle(
+        notebook,
+        null,
+        List.of(new NotebookGitProposalFile(survivingNote.getTitle() + ".md", ORIGINAL_CONTENT)));
+  }
+
+  private AcceptedDeletion acceptDeletionReservingTitle(
+      Notebook notebook, Folder reservedFolder, List<NotebookGitProposalFile> remainingFiles)
+      throws Exception {
     Note reserved =
-        makeMe.aNote().notebook(notebook).title(RESERVED_TITLE).content(ORIGINAL_CONTENT).please();
+        (reservedFolder == null
+                ? makeMe.aNote().notebook(notebook)
+                : makeMe.aNote().folder(reservedFolder))
+            .title(RESERVED_TITLE)
+            .content(ORIGINAL_CONTENT)
+            .please();
     MemoryTracker tracker =
         inCommittedTransaction(
             transactionManager,
@@ -149,11 +210,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
                     .aMemoryTrackerFor(noteRepository.findById(reserved.getId()).orElseThrow())
                     .please());
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] deletionProposal =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile(survivingNote.getTitle() + ".md", ORIGINAL_CONTENT)));
+    byte[] deletionProposal = proposalBundleBytes(binding, remainingFiles);
 
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), deletionProposal);
