@@ -6,17 +6,21 @@ Let notebook owners refine notes in Obsidian or an AI IDE and Donut without
 discarding either side's work or losing learning history. Other-note and
 same-note concurrent content edits can already be pulled and then published,
 with ordinary Git pausing on real conflicts. Represented folder relocation
-that preserves descendant identities is delivered. Next among notebook-sync
-stories is seeing one stable commit for one continuous web edit. Pull already
-rebases over several accepted content commits. This advances the direction in
+that preserves descendant identities is delivered. Remaining notebook-sync
+gaps — unpublished content over an accepted folder move, folders without
+their own README, and web structural sync — are not yet stories and are not
+in this queue. The next queued notebook-sync story is seeing one stable
+commit for one continuous web edit; that is history granularity, not a
+synchronization unlock. Pull already rebases over several accepted content
+commits. This advances the direction in
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
 the selected queue does not cover its complete synchronization contract.
 Enable developers and AI tasks to verify changes concurrently in local
 worktrees without interfering with each other's data or running services.
-This development priority leads the queue: 1a–1c delivered ordinary and
+This development priority still leads the queue: 1a–1c delivered ordinary and
 opt-in backend-test isolation; next cover browser E2E without
 external-service mocks, then independent mocks. Prove the smallest usable
-browser workflow before broadening coverage.
+browser workflow before broadening to CLI or MCP.
 
 1. [Run browser E2E scenarios concurrently without external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-2) — SEED-015
 2. [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015

@@ -552,7 +552,10 @@ commit batching, metadata in the Portable tree, or a new heuristic that treats
 arbitrary authored conflict-marker text as unresolved Git state. Existing
 publication rules remain authoritative for arbitrary edits made outside this
 bounded workflow. A rename must still be accepted before a separate content
-edit; Story 12's relocation scope stays separate.
+edit; Story 12's relocation scope stays separate. Story 7 later delivered
+accepted folder relocation; that commit is a structural edge. Pull still
+refuses unpublished content over it — a later story, not an expansion of this
+one.
 
 <a id="story-10"></a>
 
@@ -579,6 +582,15 @@ edit; Story 12's relocation scope stays separate.
   must not amend a commit already visible to clone or pull. Keep explicit
   publish, the unfinished-Git-operation gate, and “publish only if unpublished
   work remains.”
+- **Reminder from Story 7:** An accepted folder relocation is now a real
+  structural commit on `main`. Continuous same-note web saves must not fold,
+  amend, or share a commit with a folder, README, or other structural change.
+  A folder relocation cuts the batch the same way any other intervening
+  accepted commit does. Do not expand this story to unpublished local content
+  over an accepted folder move: Stories 8 and 9 still refuse structural
+  edges, and Story 7 excluded that rebase. Web folder creation or moves
+  remain deferred structural synchronization, not part of this batching
+  policy. Refine Goal/Scope before slice planning.
 
 <a id="story-11"></a>
 
@@ -701,10 +713,12 @@ queued after current SEED-015 worktree isolation work.
   The retrospective found incomplete CLI instructions and missing destination
   context for a reserved-title rejection; Plan 52 delivered those corrections
   (`9ea8d70741`).
-- **No evidence supports broader identity inference yet.** Folder moves,
-  rename-with-edit commits, and structural conflicts still need their own
-  bounded outcomes. Passing automated examples establish feasibility and
-  safety in the delivered scope, not user demand or calibrated effort estimates.
+- **No evidence supports broader identity inference yet.** Rename-with-edit
+  commits and structural conflicts still need their own bounded outcomes.
+  Story 7 later delivered one exact README-backed folder relocation; it does
+  not authorize inferring identity from Git rename labels or incomplete
+  subtrees. Passing automated examples establish feasibility and safety in
+  the delivered scope, not user demand or calibrated effort estimates.
 
 ### Learning from the merged deletion story
 
@@ -798,14 +812,30 @@ Story 12 has a new anchor. Their union preserves the former Story 6 scope.
 The first story remains M with low confidence because identity safety is still
 essential; the split removes folder policy rather than disguising it as tests.
 
+### Learning from the delivered folder-relocation story
+
+- **Exact README-backed subtree publication is delivered.** One complete
+  same-name move to an existing represented parent preserves folder and
+  descendant identities, private associations, and authored bytes. Clone/pull
+  receives the new paths; a later separate content edit updates the same note.
+  Path-specific refusals (inexact shape, unrepresented parent, collision,
+  cycle, empty descendant) leave remote state unchanged.
+- **Links stay authored; publish the move before editing.** Referring
+  `[[old/path]]` bytes are not rewritten and can stop resolving. Combined
+  relocate-and-edit in one commit remains unsupported.
+- **Content rebase does not cover this structural commit.** Stories 8 and 9
+  still refuse unpublished local content over an accepted folder move. Do not
+  fold that gap into Story 10.
+
 ### Priority and deferred follow-ons
 
-Same-folder renaming, single-note relocation, other-note rebase, and same-note
-ordinary-Git overlap are delivered. Whole-folder moves are next among
-notebook-sync stories. Batching web commits improves history quality after
-that synchronization already works; it is not a prerequisite of Story 7.
+Same-folder renaming, single-note relocation, other-note rebase, same-note
+ordinary-Git overlap, and represented folder relocation are delivered. The
+[product backlog](../PRODUCT-BACKLOG.md) queues Story 10 next among
+notebook-sync stories: web-commit batching improves history quality; it is
+not the remaining “don’t discard work” synchronization gap.
 
-No new feature story is promoted from the deletion or rename proofs alone.
+No new feature story is promoted from the folder-relocation proofs alone.
 Keep these possibilities deferred until the stated learning warrants selecting
 and refining a concrete outcome:
 
@@ -828,8 +858,17 @@ and refining a concrete outcome:
 - **Delete/edit or rename/edit conflicts and multiple unpublished commits:**
   Story 9 delivered the first content-conflict workflow (native Git pause,
   continue, abort, explicit publish). Identity intent for deletion or
-  recreation is still unresolved, so do not enqueue or fold this into Story 7.
-  Select a new story only after that policy is refined.
+  recreation is still unresolved. Select a new story only after that policy
+  is refined.
+- **Unpublished content over an accepted folder move:** Story 7 confirmed
+  pull still refuses this structural interval. Revisit when owners lose a
+  local content edit because a represented folder moved in accepted history.
+  Do not fold it into Story 10.
+- **Folder moves without a source README, unrepresented empty descendants,
+  folder renaming, new destination parents, or authored-link rewrite:**
+  Story 7's conservative correspondence boundary still stands. Expanding it
+  needs its own refined story, not a silent widening of the delivered
+  publisher.
 
 Safe stopping points:
 
@@ -859,8 +898,10 @@ Unsupported operations must fail clearly rather than be approximated.
 No open decision blocks the bounded rename or relocation scope. Story 9
 delivered the developer's ordinary-Git overlap policy, including empty-result
 reporting. Same-path creation and structural conflict policies remain deferred.
-Expanding delivered Story 7 to folders without their own accepted README or
-unrepresented empty descendants needs a new refinement.
+Expanding delivered Story 7 to folders without their own accepted README,
+unrepresented empty descendants, folder renaming, new destination parents,
+authored-link rewrite, or unpublished content over an accepted folder move
+needs a new refined story. Those outcomes are not queued.
 
 ADR 0002 now reflects the later human discussion recorded here: v1 permits a
 required CLI-assisted acquisition and synchronization workflow and defers direct
@@ -875,9 +916,11 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 ## When to Surface
 
 Stories 1–9, 11, and 12 are delivered. Select one remaining story from
-the [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Do not
-turn the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
-boundary as a human-owned advice task; it does not change these story outcomes.
+the [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Story 10
+still needs Goal/Scope refinement; do not treat it as covering unpublished
+content over an accepted folder move. Do not turn the whole seed into one
+executable plan. Reconcile the Proposed ADR's v1 CLI boundary as a human-owned
+advice task; it does not change these story outcomes.
 
 ## Breadcrumbs
 

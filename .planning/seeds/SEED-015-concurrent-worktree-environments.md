@@ -279,6 +279,11 @@ its environment boundary before slice planning.
   state needed by this workflow. Unsupported scenario categories must not
   silently use shared services. Dedicated persistent development-profile
   workflows are outside this story.
+- **Reminder from SEED-009 Story 7:** Installed-CLI folder relocation now has
+  its own feature (`cli_notebook_folder_relocation.feature`) plus clone
+  guidance. That workflow stays [Story 4](#story-4). This story remains one
+  representative browser note create/edit path; do not pull CLI clone, `git
+  mv`, or notebook publish into it to “cover folder moves.”
 - **Effort hypothesis:** L — low confidence; deliberately limited to browser
   scenarios without external-service mocks or spawned CLI/MCP clients. If this
   minimum usable path exceeds L, revisit the story boundary before planning.
@@ -322,6 +327,11 @@ before slice planning; story 2 supplies the required browser environment.
   whether MCP verification is added later.
 - **Safety boundary:** Own all client processes and mutable local artifacts
   involved in the supported workflows; do not redirect to shared defaults.
+- **Reminder from SEED-009 Story 7:** When this story is selected, include or
+  explicitly bound the installed-CLI folder-relocation feature. It uses a
+  bound clone, `git mv` of a represented folder, a second clone, and pull;
+  isolation must own install, config, and checkout directories. Do not treat
+  that coverage as a reason to start this story before the browser proof.
 - **Effort hypothesis:** L — low confidence; assumes endpoint and local-state
   selection can reuse the earlier environment behavior. Interactive or OAuth
   cases may need a separate story if refinement shows a larger-than-L scope.
