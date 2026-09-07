@@ -35,24 +35,32 @@ export function describeNotebookPullStructuralHistory(): void {
         apply: (source: string) => {
           runGit(['rm', '--quiet', 'other.md'], source)
           runGit(['commit', '--quiet', '-m', 'accepted delete'], source)
-          fs.writeFileSync(
-            join(source, 'other.md'),
-            '---\ntype: Note\n---\n# Other\n\nRecreated.\n'
+          commitPortableFile(
+            source,
+            'other.md',
+            '---\ntype: Note\n---\n# Other\n\nRecreated.\n',
+            'accepted recreate'
           )
-          runGit(['add', 'other.md'], source)
-          runGit(['commit', '--quiet', '-m', 'accepted recreate'], source)
         },
         path: 'other.md',
       },
       {
         shape: 'readme',
-        apply: (source: string) => {
-          fs.writeFileSync(
-            join(source, 'README.md'),
-            '---\ntype: Readme\n---\n# Notebook\n\nAccepted readme.\n'
+        seed: (source: string) => {
+          commitPortableFile(
+            source,
+            'README.md',
+            '---\ntype: Readme\n---\n# Notebook\n',
+            'add notebook readme'
           )
-          runGit(['add', 'README.md'], source)
-          runGit(['commit', '--quiet', '-m', 'accepted readme'], source)
+        },
+        apply: (source: string) => {
+          commitPortableFile(
+            source,
+            'README.md',
+            '---\ntype: Readme\n---\n# Notebook\n\nAccepted readme.\n',
+            'accepted readme'
+          )
         },
         path: 'README.md',
       },
@@ -77,9 +85,10 @@ export function describeNotebookPullStructuralHistory(): void {
       },
     ] as const)(
       'names the structural path for remote $shape and leaves the checkout unchanged',
-      async ({ shape, apply, path }) => {
+      async ({ shape, apply, path, ...rest }) => {
         const { directory, source } = cloneWithLocalNoteAndRemoteOther(
-          ctx.getWorkDir()
+          ctx.getWorkDir(),
+          'seed' in rest ? rest.seed : undefined
         )
         apply(source)
         serveAcceptedBundle(ctx, source, `structural-${shape}`)
@@ -100,28 +109,43 @@ export function describeNotebookPullStructuralHistory(): void {
   })
 }
 
-function cloneWithLocalNoteAndRemoteOther(workDir: string): {
+function cloneWithLocalNoteAndRemoteOther(
+  workDir: string,
+  seed?: (source: string) => void
+): {
   directory: string
   source: string
 } {
   const source = buildSourceRepo(workDir)
-  fs.writeFileSync(
-    join(source, 'other.md'),
-    '---\ntype: Note\n---\n# Other\n\nAccepted body.\n'
+  commitPortableFile(
+    source,
+    'other.md',
+    '---\ntype: Note\n---\n# Other\n\nAccepted body.\n',
+    'add other note'
   )
-  runGit(['add', 'other.md'], source)
-  runGit(['commit', '--quiet', '-m', 'add other note'], source)
+  seed?.(source)
   const directory = cloneAsBoundCheckout(
     workDir,
     source,
     getApiConfig().apiBaseUrl,
     'checkout'
   )
-  fs.writeFileSync(
-    join(directory, 'note.md'),
-    '---\ntype: Note\n---\n# Note\n\nLocal body.\n'
+  commitPortableFile(
+    directory,
+    'note.md',
+    '---\ntype: Note\n---\n# Note\n\nLocal body.\n',
+    'unpublished note edit'
   )
-  runGit(['add', 'note.md'], directory)
-  runGit(['commit', '--quiet', '-m', 'unpublished note edit'], directory)
   return { directory, source }
+}
+
+function commitPortableFile(
+  directory: string,
+  relativePath: string,
+  bytes: string,
+  message: string
+): void {
+  fs.writeFileSync(join(directory, relativePath), bytes)
+  runGit(['add', relativePath], directory)
+  runGit(['commit', '--quiet', '-m', message], directory)
 }
