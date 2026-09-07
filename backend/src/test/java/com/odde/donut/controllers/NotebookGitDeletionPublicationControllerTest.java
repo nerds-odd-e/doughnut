@@ -2,12 +2,17 @@ package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteRecallInfo;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -26,6 +31,8 @@ import org.springframework.http.ResponseEntity;
 class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
+  private static final String REFERRER_CONTENT =
+      "---\n" + "type: Note\n" + "example of: \"[[Target]]\"\n" + "---\n" + "Body [[Target]]\n";
 
   @Autowired NoteController noteController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
@@ -99,5 +106,43 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
       assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
       assertThat(downloadedCommit.parent(), equalTo(acceptedHead));
     }
+  }
+
+  @Test
+  void leavesReferringBodyAndPropertyLinksAuthoredWhenPublishingTheTargetsDeletion()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    makeMe.aNote().notebook(notebook).title("Target").content(ORIGINAL_CONTENT).please();
+    Note referrer =
+        makeMe.aNote().notebook(notebook).title("Referrer").content(REFERRER_CONTENT).please();
+    inCommittedTransaction(
+        transactionManager,
+        () ->
+            makeMe.authorReferencingContent(
+                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_CONTENT));
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    List<WikiLink.Resolution> resolutionsBeforePublish =
+        targetResolutions(
+            noteController.showNote(noteRepository.findById(referrer.getId()).orElseThrow()));
+    assertThat(resolutionsBeforePublish, not(empty()));
+    assertThat(resolutionsBeforePublish, everyItem(equalTo(WikiLink.Resolution.RESOLVED)));
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding, List.of(new NotebookGitProposalFile("Referrer.md", REFERRER_CONTENT)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    NoteRealm shown =
+        noteController.showNote(noteRepository.findById(referrer.getId()).orElseThrow());
+    assertThat(shown.getNote().getContent(), equalTo(REFERRER_CONTENT));
+    assertThat(targetResolutions(shown), empty());
+  }
+
+  private static List<WikiLink.Resolution> targetResolutions(NoteRealm shown) {
+    return shown.getWikiLinks().stream()
+        .filter(link -> "Target".equals(link.getTarget()))
+        .map(WikiLink::getResolution)
+        .toList();
   }
 }

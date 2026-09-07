@@ -251,7 +251,7 @@ preview, chooser, or confirmation flow.
 
 ### 7. Receive the accepted deletion in another checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: `cli/tests/notebookPull.fastForward.suite.ts` drives `run` with real Git:
 checkout at the accepted parent → supply the accepted deletion bundle → pull;
 assert absent file, exact head/tree, clean `main`, retained ancestry, unchanged
@@ -372,7 +372,7 @@ Keep existing title reuse and restore policy unchanged.
 
 Slices 1–5 delivered isolation rejection, isolated-deletion acceptance,
 late-failure rollback, E2E removal harness, and installed-CLI publication.
-Remaining leaves execute in order from slice 7.
+Remaining leaves execute in order from slice 8.
 Four bundled original slices were replaced; four were retained and reordered.
 The result is 13 Behavior leaves and one immediately enabling Structure leaf.
 No completed proof was discarded and no product scope was added or removed.
