@@ -1,6 +1,6 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: in progress; slices 1–2 done.
+Status: in progress; slices 1–3 done.
 Source: [SEED-015, story 1a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1a).
 Stories 1a, 1b, and 1c occupy the first three product-backlog positions.
 This plan covers only 1a. No implementation or database experiment was performed
@@ -164,7 +164,7 @@ custom supervision, stop and refine this leaf rather than extending its scope.
 
 ### 3. Select focused tests without changing the configured database
 Type: Behavior
-Status: planned
+Status: done
 Proof: Command-boundary fixture receives a literal `--tests` pattern on the
 `test` task, with migration and datasource arguments unchanged. Wildcards stay
 one token; missing values and unrelated task/target arguments refuse execution.
@@ -335,6 +335,9 @@ Slice 2: the same fixture's Gradle stand-in records one exec of migrateTestDB
 then test with `-PworktreeTestRun`, `--rerun-tasks --no-build-cache --no-daemon`,
 and the resolved JDBC URL; child failure stays nonzero. `mustRunAfter` is
 gated on the opt-in property. Temporary refusal is gone.
+
+Slice 3: `--tests '<pattern>'` is one Gradle token after `test`; missing values
+and unrelated args refuse before Gradle; unmatched filter keeps child failure.
 
 Ready for execution under the existing workflow; no additional story refinement
 or slice-plan pass is currently required. All leaves have one bounded proof
