@@ -22,7 +22,7 @@ export function ciRun(overrides = {}) {
   }
 }
 
-export async function runCiCommand(t, pages) {
+export async function runCiCommand(t, pages, args = ['--once']) {
   const requests = []
   const server = createServer((request, response) => {
     const url = new URL(request.url, 'http://localhost')
@@ -37,7 +37,10 @@ export async function runCiCommand(t, pages) {
   t.after(() => server.close())
   const child = spawn(
     process.execPath,
-    [fileURLToPath(new URL('./application-release-ci.mjs', import.meta.url))],
+    [
+      fileURLToPath(new URL('./application-release-ci.mjs', import.meta.url)),
+      ...args,
+    ],
     {
       env: {
         ...process.env,

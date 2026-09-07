@@ -124,7 +124,8 @@ transport errors. No state store or search for another release candidate.
 
 ### 4. Wait for the selected commit's unfinished CI
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 46/46. Fake-clock selected-CI boundary proves appearance/completion, already-green, newer attempts, terminal fail/cancel, 60-minute deadline including transport, pause/lookup cancellation and timer cleanup; actual default command waits. Independent refactor: no edits.
 Proof: Tag-before-CI, already-green and newer-rerun fixtures converge to the
 correct readiness outcome; fake time proves failure/timeout terminates waiting.
 
