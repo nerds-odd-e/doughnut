@@ -17,7 +17,9 @@ import { parse } from 'yaml'
 import { makeReleaseRepository } from './application-release-fixtures.mjs'
 
 const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
-const scripts = join(repositoryRoot, 'infra/gcp/scripts')
+const publicationCommand = parse(
+  readFileSync(join(repositoryRoot, '.github/workflows/deploy.yml'), 'utf8')
+).jobs.Deploy.steps.find((step) => step.id === 'publish').run
 const hash = (content) => createHash('sha256').update(content).digest('hex')
 
 for (const scenario of [
@@ -131,36 +133,33 @@ printf 'OK . Commit: %s' "$GITHUB_SHA" > "$2"
 printf 200`
     )
     const trace = join(root, 'trace')
-    const result = spawnSync(
-      'bash',
-      [join(scripts, 'publish-application.sh')],
-      {
-        cwd: root,
-        encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${bin}:${process.env.PATH}`,
-          TRACE: trace,
-          RECORD: record,
-          SAVED_RECORD: join(root, 'saved-record'),
-          GITHUB_SHA: sha,
-          RELEASE_SOURCE_ROOT: root,
-          RELEASE_REF: 'refs/tags/v1.2.3',
-          RELEASE_REF_OID: refOid,
-          CAPTURED_MAP: join(root, 'captured-map'),
-          CAPTURED_STARTUP: join(root, 'captured-startup'),
-          GCS_BUCKET: 'private-backend',
-          GCS_FRONTEND_BUCKET: 'public-frontend',
-          ARTIFACT: 'donut',
-          VERSION: '0.0.1-SNAPSHOT',
-          FRONTEND_STATIC_DIR: frontend,
-          CLI_BUNDLE_SOURCE: cli,
-          DEPLOY_JAR_PATH: jar,
-          FORCE_FULL_DEPLOY: '',
-          HEALTHCHECK_RETRY_SLEEP_SECONDS: '0',
-        },
-      }
-    )
+    const result = spawnSync('bash', ['-c', publicationCommand], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        PATH: `${bin}:${process.env.PATH}`,
+        TRACE: trace,
+        RECORD: record,
+        SAVED_RECORD: join(root, 'saved-record'),
+        GITHUB_SHA: 'f'.repeat(40),
+        RELEASE_SHA: sha,
+        RELEASE_SOURCE_ROOT: root,
+        RELEASE_REF: 'refs/tags/v1.2.3',
+        RELEASE_REF_OID: refOid,
+        CAPTURED_MAP: join(root, 'captured-map'),
+        CAPTURED_STARTUP: join(root, 'captured-startup'),
+        GCS_BUCKET: 'private-backend',
+        GCS_FRONTEND_BUCKET: 'public-frontend',
+        ARTIFACT: 'donut',
+        VERSION: '0.0.1-SNAPSHOT',
+        FRONTEND_STATIC_DIR: frontend,
+        CLI_BUNDLE_SOURCE: cli,
+        DEPLOY_JAR_PATH: jar,
+        FORCE_FULL_DEPLOY: '',
+        HEALTHCHECK_RETRY_SLEEP_SECONDS: '0',
+      },
+    })
     if (['moved', 'invalid-routing', 'wrong-source'].includes(scenario)) {
       assert.notEqual(result.status, 0)
       assert.equal(existsSync(trace), false, result.stdout)
@@ -222,11 +221,7 @@ test('workflows share publication commands and retain independent CLI build vers
       )
     )
   const application = workflow('deploy').jobs.Deploy.steps
-  assert.ok(
-    application.some(
-      (step) => step.run === 'bash infra/gcp/scripts/publish-application.sh'
-    )
-  )
+  assert.ok(application.some((step) => step.id === 'publish'))
   const cli = workflow('cli-release')
   assert.deepEqual(cli.on.push.tags, ['cli-*'])
   const steps = cli.jobs['build-and-publish'].steps

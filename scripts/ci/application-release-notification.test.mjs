@@ -134,17 +134,17 @@ test('workflow notifies admission and deployment failures using selected outputs
       'utf8'
     )
   )
-  const admission = workflow.jobs['main-head-guard']
+  const admission = workflow.jobs['release-admission']
   const deploy = workflow.jobs.Deploy
   const notify = workflow.jobs['Notify-on-failure']
-  assert.deepEqual(notify.needs, ['main-head-guard', 'Deploy'])
+  assert.deepEqual(notify.needs, ['release-admission', 'Deploy'])
   assert.equal(
     notify.if,
-    "always() && (needs.main-head-guard.result == 'failure' || needs.Deploy.result == 'failure')"
+    "always() && (needs.release-admission.result == 'failure' || needs.Deploy.result == 'failure')"
   )
   assert.match(
     admission.outputs.failure_stage,
-    /steps.head_guard.outcome != 'success'.*'identity'.*'CI admission'/
+    /steps.identity.outcome != 'success'.*'identity'.*'CI admission'/
   )
   assert.equal(
     admission.outputs.run_attempt,
@@ -165,11 +165,11 @@ test('workflow notifies admission and deployment failures using selected outputs
   const renderStep = notify.steps.find((step) => step.id === 'ctx')
   assert.equal(
     renderStep.env.RELEASE_SHA,
-    '${{ needs.main-head-guard.outputs.sha }}'
+    '${{ needs.release-admission.outputs.sha }}'
   )
   assert.match(
     renderStep.env.FAILURE_STAGE,
-    /needs.main-head-guard.result == 'failure'/
+    /needs.release-admission.result == 'failure'/
   )
   assert.equal(
     notify.steps.at(-1).with.payload,

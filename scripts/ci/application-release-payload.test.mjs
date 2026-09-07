@@ -91,10 +91,10 @@ test('all admitted-run downloads and preflight precede the first production step
       'utf8'
     )
   )
-  const admission = deploy.jobs['main-head-guard']
+  const admission = deploy.jobs['release-admission']
   assert.equal(admission.outputs.run_id, '${{ steps.ci.outputs.runId }}')
   const ci = admission.steps.find((step) => step.id === 'ci')
-  assert.equal(ci.env.RELEASE_SHA, '${{ steps.head_guard.outputs.sha }}')
+  assert.equal(ci.env.RELEASE_SHA, '${{ steps.identity.outputs.sha }}')
   assert.match(ci.run, /node scripts\/ci\/application-release-ci.mjs/)
   const { steps, env } = deploy.jobs.Deploy
   const downloads = steps.filter(
@@ -122,17 +122,12 @@ test('all admitted-run downloads and preflight precede the first production step
   for (const download of downloads) {
     assert.equal(
       download.with['run-id'],
-      '${{ needs.main-head-guard.outputs.run_id }}'
+      '${{ needs.release-admission.outputs.run_id }}'
     )
     assert.equal(download['continue-on-error'], undefined)
     assert.ok(steps.indexOf(download) < preflight)
   }
-  assert.ok(
-    preflight <
-      steps.findIndex(
-        (step) => step.run === 'bash infra/gcp/scripts/publish-application.sh'
-      )
-  )
+  assert.ok(preflight < steps.findIndex((step) => step.id === 'publish'))
   assert.equal(
     env.DEPLOY_JAR_PATH,
     'release-artifacts/backend/donut-0.0.1-SNAPSHOT.jar'

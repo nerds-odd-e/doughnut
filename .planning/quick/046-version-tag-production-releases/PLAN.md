@@ -183,7 +183,8 @@ failure coverage for both admission and publication jobs.
 
 ### 9. Wire the single-release path before activating it
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 71/71. Parsed graph pins control SHA and selected source/run/artifacts/auth with one non-canceling group; actual workflow publication command overrides deliberately wrong inherited GITHUB_SHA via RELEASE_SHA. Admission timeout 70 minutes, publication 60. False gate retained for leaf 10. Refactor removed redundant concurrency assertion and re-proved 71/71.
 Proof: Parsed workflow connects tag identity, bounded CI wait, artifact run ID,
 separate source/control checkouts and existing credentials before publication;
 one non-canceling application concurrency group and the false gate remain.
@@ -251,4 +252,4 @@ existed to invalidate. The user explicitly requested the new two-plan split.
 - CI observer attempted before first push via `./scripts/run.sh node .agents/skills/execute-plan/scripts/ci-mailbox.mjs stream --execution nerds-odd-e/doughnut main`. Nix daemon socket returned Operation not permitted before observer startup; cell 6 exited, no mailbox/PID/session created. CI observation unavailable; pendingCi: unobserved. Branch pushes do not trigger this repository's main-only CI.
 - No production tags, settings, deployment calls, or main changes are authorized in this worktree. Post-merge scheduling/first-real-release observation belongs to the parent; local workflow activation remains branch work.
 
-- Final wiring learning: GitHub reserves default GITHUB_* YAML variables. Leaf 9 must carry RELEASE_SHA and invoke the publisher with explicit shell GITHUB_SHA assignment; remove old YAML override.
+- Final wiring learning: GitHub reserves default GITHUB_* YAML variables. Leaf 9 now carries RELEASE_SHA and invokes the publisher with explicit shell GITHUB_SHA assignment; old YAML override removed.

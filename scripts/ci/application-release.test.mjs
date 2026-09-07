@@ -18,13 +18,99 @@ test('main CI remains enabled while application publication is paused', () => {
 
   assert.deepEqual(ci.on.push.branches, ['main'])
   assert.equal(ci.name, 'donut CI')
-  assert.equal(deploy.jobs['main-head-guard'].if, '${{ false }}')
-  assert.equal(deploy.jobs.Deploy.needs, 'main-head-guard')
+  assert.equal(deploy.jobs['release-admission'].if, '${{ false }}')
+  assert.equal(deploy.jobs.Deploy.needs, 'release-admission')
   assert.equal(
     deploy.jobs.Deploy.if,
-    "needs.main-head-guard.outputs.deploy == 'true'"
+    "needs.release-admission.outputs.deploy == 'true'"
   )
-  assert.equal(deploy.concurrency['cancel-in-progress'], false)
+})
+
+test('gated release pins orchestration separately from source and preserves deployment credentials', () => {
+  const deploy = workflow('deploy')
+  const admission = deploy.jobs['release-admission']
+  const publication = deploy.jobs.Deploy
+  const notify = deploy.jobs['Notify-on-failure']
+  const control = admission.steps.find((step) => step.id === 'control')
+  assert.equal(admission.steps[0].with.ref, 'main')
+  assert.equal(admission.steps[1], control)
+  assert.equal(
+    control.run,
+    'echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"'
+  )
+  assert.equal(
+    admission.outputs.control_sha,
+    '${{ steps.control.outputs.sha }}'
+  )
+  assert.deepEqual(
+    publication.steps.slice(0, 2).map((step) => step.with),
+    [
+      {
+        ref: '${{ needs.release-admission.outputs.control_sha }}',
+        'fetch-depth': 1,
+      },
+      {
+        ref: '${{ needs.release-admission.outputs.sha }}',
+        path: 'release-source',
+        'fetch-depth': 1,
+      },
+    ]
+  )
+  assert.equal(
+    notify.steps[0].with.ref,
+    "${{ needs.release-admission.outputs.control_sha || 'main' }}"
+  )
+  assert.equal(
+    publication.env.RELEASE_SHA,
+    '${{ needs.release-admission.outputs.sha }}'
+  )
+  assert.equal(
+    publication.env.RELEASE_SOURCE_ROOT,
+    '${{ github.workspace }}/release-source'
+  )
+  assert.equal(
+    publication.env.RELEASE_REF,
+    '${{ needs.release-admission.outputs.ref }}'
+  )
+  assert.equal(
+    publication.env.RELEASE_REF_OID,
+    '${{ needs.release-admission.outputs.ref_oid }}'
+  )
+  assert.equal(
+    publication.steps.find((step) => step.id === 'publish').run,
+    'GITHUB_SHA="$RELEASE_SHA" bash infra/gcp/scripts/publish-application.sh'
+  )
+  assert.equal(deploy.env.GITHUB_SHA, undefined)
+  assert.equal(publication.env.GITHUB_SHA, undefined)
+  assert.doesNotMatch(
+    JSON.stringify(deploy.jobs),
+    /workflow_run|main-head-guard|head_guard/
+  )
+  assert.deepEqual(deploy.concurrency, {
+    group: 'deploy-production',
+    'cancel-in-progress': false,
+  })
+  assert.equal(admission['timeout-minutes'], 70)
+  assert.equal(publication['timeout-minutes'], 60)
+  assert.deepEqual(deploy.permissions, { actions: 'read', contents: 'read' })
+  assert.equal(
+    admission.steps.find((step) => step.id === 'ci').env.GITHUB_TOKEN,
+    '${{ secrets.GITHUB_TOKEN }}'
+  )
+  assert.ok(
+    publication.steps
+      .filter((step) => step.uses === 'actions/download-artifact@v8')
+      .every(
+        (step) => step.with['github-token'] === '${{ secrets.GITHUB_TOKEN }}'
+      )
+  )
+  assert.equal(deploy.env.GCP_CREDENTIALS, '${{ secrets.GCP_CREDENTIALS }}')
+  assert.equal(
+    publication.steps.find(
+      (step) => step.uses === './.github/gcloud_auth_n_sdk'
+    ).with.credentials_json,
+    '${{ env.GCP_CREDENTIALS }}'
+  )
 })
 
 test('independent CLI tags retain their release trigger', () => {
@@ -32,15 +118,15 @@ test('independent CLI tags retain their release trigger', () => {
 })
 
 test('paused admission exposes the event identity using full Git history', () => {
-  const admission = workflow('deploy').jobs['main-head-guard']
-  assert.equal(admission.outputs.sha, '${{ steps.head_guard.outputs.sha }}')
+  const admission = workflow('deploy').jobs['release-admission']
+  assert.equal(admission.outputs.sha, '${{ steps.identity.outputs.sha }}')
   assert.equal(
     admission.outputs.ref_oid,
-    '${{ steps.head_guard.outputs.refOid }}'
+    '${{ steps.identity.outputs.refOid }}'
   )
   assert.equal(admission.steps[0].with['fetch-depth'], 0)
   assert.match(
-    admission.steps.find((step) => step.id === 'head_guard').run,
+    admission.steps.find((step) => step.id === 'identity').run,
     /node scripts\/ci\/application-release.mjs/
   )
 })
