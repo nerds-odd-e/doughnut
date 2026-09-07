@@ -275,7 +275,7 @@ attempt for the same SHA, republishes its admitted artifacts, and records
 
 ### 6. Recover a release whose CI artifacts are unavailable
 Type: Behavior
-Status: planned
+Status: done
 Proof: Missing/expired artifacts cause zero writes and actionable diagnostics;
 a newer successful CI attempt for the same SHA supplies the payload on retry.
 
@@ -283,6 +283,11 @@ Behavior: Release artifacts cannot be retrieved → guide the maintainer to reru
 that exact commit's CI → resume the same tag after success. Do not silently
 rebuild, use newer main artifacts or promise to rerun history GitHub has discarded.
 If historical CI cannot be recovered, use a newly tested correction and new patch.
+
+Learning: artifact admission failure remains before every publication and state
+write. Notifications and the runbook direct an exact-SHA CI rerun followed by the
+same immutable release retry; proof selects the fresh run/attempt and completes
+the tag. Unrecoverable retained history requires a tested correction and new patch.
 
 ### 7. Keep the highest pending version despite event order
 Type: Behavior

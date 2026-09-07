@@ -104,6 +104,21 @@ test('CI lookup failure before selecting a run preserves the validated commit', 
   assert.equal(fields['CI run'], 'unknown (CI not selected)')
 })
 
+test('artifact failure tells the maintainer how to recover the exact immutable release', (t) => {
+  const { fields } = render(t, {
+    RELEASE_TAG: 'v2.3.4',
+    RELEASE_SHA: selectedSha,
+    RELEASE_CI_RUN_ID: '42',
+    RELEASE_CI_RUN_ATTEMPT: '3',
+    FAILURE_STAGE: 'artifact admission',
+  })
+
+  assert.match(fields.recovery, /rerun CI/i)
+  assert.match(fields.recovery, new RegExp(selectedSha))
+  assert.match(fields.recovery, /same immutable tag v2\.3\.4/i)
+  assert.match(fields.recovery, /new patch/i)
+})
+
 for (const stage of ['artifact admission', 'publication']) {
   test(`${stage} failure retains the selected release context`, (t) => {
     const { fields } = render(t, {

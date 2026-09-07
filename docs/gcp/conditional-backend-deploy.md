@@ -72,6 +72,23 @@ attempt's artifact source. Publication repeats permitted uploads and records
 `succeeded` only after every operation finishes. There is no compensating rollback
 or cross-service transaction.
 
+When the failure stage is **artifact admission**, rerun the reported CI run for
+the reported exact commit, wait for its new attempt to succeed, and then rerun the
+reported donut deploy workflow:
+
+```bash
+gh run rerun <CI_RUN_ID>
+gh run watch <CI_RUN_ID>
+gh run rerun <DONUT_DEPLOY_RUN_ID>
+```
+
+Keep the tag, raw refOid and peeled SHA unchanged. The retry may use the newer
+successful CI run/attempt for that same SHA; it must not rebuild from current
+`main` or select another commit's artifacts. If GitHub no longer retains enough
+history to rerun that CI and regenerate its artifacts, make and test a correction
+on `main`, then release a new patch version. The old tag is not recoverable by
+silently rebuilding a different source revision.
+
 If the release identity must change or the selected application needs correction,
 commit a correction or revert on main, test that new commit, then release it under
 the **next patch version**, after the previous workflow has ended. Never retarget
