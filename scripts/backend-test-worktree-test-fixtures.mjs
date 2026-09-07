@@ -166,6 +166,12 @@ export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
     cwd: checkout.root,
     env: launcherChildEnv(checkout, { ...env, GRADLE_HOLD: '1' }),
   })
+  // No input is ever sent. Unlike runLauncher's spawnSync (which closes an
+  // unwritten stdin immediately), async spawn() leaves stdin open until
+  // explicitly ended, so a descendant reading stdin (e.g. the mysql
+  // stand-in's `[ ! -t 0 ]` check during provisioning) would otherwise block
+  // forever waiting for EOF.
+  child.stdin.end()
 
   let stdout = ''
   let stderr = ''

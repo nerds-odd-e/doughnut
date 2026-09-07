@@ -9,6 +9,7 @@ import {
   readGradleInvocation,
   readMysqlInvocation,
   runLauncher,
+  runLauncherAsync,
 } from './backend-test-worktree-test-fixtures.mjs'
 
 const allocatedIdPattern =
@@ -78,6 +79,46 @@ test('failed database administration leaves no config and never reaches gradle',
   assertRefusedBeforeGradle(checkout, result)
   assert.equal(existsSync(`${checkout.root}/.worktree.local.json`), false)
   assert.doesNotMatch(outputOf(result), /Selected database/)
+})
+
+test('an overlapping command refuses while first-use provisioning is in flight, leaving one usable environment', async (t) => {
+  const checkout = makeCheckout(t)
+  const owner = runLauncherAsync(checkout)
+  await owner.waitForGradleReached()
+
+  const configPath = `${checkout.root}/.worktree.local.json`
+  const provisionedConfig = JSON.parse(readFileSync(configPath, 'utf8'))
+  assert.match(provisionedConfig.id, /^wt_[a-z0-9]{32}$/)
+  const mysqlAfterProvisioning = readMysqlInvocation(checkout)
+
+  const second = runLauncher(checkout)
+  assert.notEqual(second.status, 0)
+  assert.match(outputOf(second), /already running/i)
+  assert.doesNotMatch(outputOf(second), /Allocated new worktree environment/)
+  assert.doesNotMatch(outputOf(second), /GRADLE_STDOUT|GRADLE_REACHED/)
+
+  // The overlapping command never reached provisioning or config: no second
+  // mysql call, and the owner's config is untouched.
+  assert.deepEqual(readMysqlInvocation(checkout), mysqlAfterProvisioning)
+  assert.deepEqual(
+    JSON.parse(readFileSync(configPath, 'utf8')),
+    provisionedConfig
+  )
+
+  owner.release()
+  const ownerResult = await owner.waitForExit()
+  assert.equal(ownerResult.status, 0, ownerResult.stderr)
+
+  const database = `doughnut_${provisionedConfig.id}_test`
+  assert.equal(readGradleInvocation(checkout).url, jdbcUrl(database))
+
+  // The environment remains usable after the owner exits: the config is
+  // complete, parseable, and still names the database the owner actually
+  // migrated and tested against.
+  assert.deepEqual(
+    JSON.parse(readFileSync(configPath, 'utf8')),
+    provisionedConfig
+  )
 })
 
 test('existing configuration skips provisioning entirely', (t) => {

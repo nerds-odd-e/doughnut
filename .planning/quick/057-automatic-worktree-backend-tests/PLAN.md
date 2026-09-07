@@ -222,12 +222,28 @@ has no search/retry policy or separate registry.
 
 ### 5. Converge overlapping first-use commands on one environment
 Type: Behavior
-Status: planned
+Status: done
 Proof: Start two launcher processes against one missing-config fixture, holding
 the owner's Gradle stand-in after provisioning. The owner leaves one complete
 config/database mapping and reaches Gradle; the overlapping process refuses
 before MySQL and Gradle. Release the owner and verify the fixture remains usable.
 Run `node --test scripts/backend-test-worktree.test.mjs`.
+
+Learning: No production ordering gap existed — the ownership lock (slice 2)
+is already acquired before provisioning (slice 4), so an overlapping launcher
+refuses immediately without touching mysql or the config. Added the
+integration test proving this in
+`scripts/backend-test-worktree-provisioning.test.mjs`, and fixed a real latent
+fixture bug: `runLauncherAsync` (used by `spawn`, unlike `runLauncher`'s
+`spawnSync`) left the child's stdin open indefinitely, which hangs the mysql
+stand-in's EOF wait — only exposed once this slice combined
+`runLauncherAsync` with missing-config provisioning. Fixed with
+`child.stdin.end()`. "Remains usable" is interpreted as: after the owner
+exits, `.worktree.local.json` stays complete/parseable and names the exact
+database the owner migrated/tested against (a bare re-run without reclaim is
+out of scope — slice 7).
+`CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passes
+(20/20).
 
 Behavior: One unconfigured checkout receives overlapping first-use commands →
 one command initializes and tests → the other refuses, leaving one complete
