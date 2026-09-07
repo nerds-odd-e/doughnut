@@ -20,10 +20,10 @@ import org.springframework.web.server.ResponseStatusException;
  * Verifies {@code publishNotebookGitProposal}'s tree-shape gating: a proposal that is not an
  * identical-heads no-op must change one regular Markdown note, include an addition among several
  * added or modified notes, delete exactly one ordinary note in isolation, or rename exactly one
- * ordinary note with unchanged content (same-parent filename change, or parent change keeping the
- * filename). Equal-content rename acceptance is covered in {@link
- * NotebookGitProposalRenameControllerTest}; relocation acceptance in {@link
- * NotebookGitProposalRelocationControllerTest}.
+ * ordinary note with unchanged content. Equal-content rename acceptance is covered in {@link
+ * NotebookGitProposalRenameControllerTest}; filename-preserving relocation in {@link
+ * NotebookGitProposalRelocationControllerTest}; combined parent-and-filename acceptance in {@link
+ * NotebookGitProposalRelocateAndRenameControllerTest}.
  */
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
 
@@ -91,27 +91,6 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     assertThat(
         exception.getReason(), containsString("not represented in accepted Portable content"));
     assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-  }
-
-  @Test
-  void rejectsACombinedParentAndFilenameChangeWithoutMutatingTheAcceptedBinding() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Folder destination = makeMe.aFolder().notebook(notebook).name("Folder").please();
-    makeMe.aNote().folder(destination).title("keep").content(TYPED_NOTE_CONTENT).please();
-    makeMe.aNote().notebook(notebook).title("note").content(TYPED_NOTE_CONTENT).please();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] bundleBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile("Folder/keep.md", TYPED_NOTE_CONTENT),
-                new NotebookGitProposalFile("Folder/renamed.md", TYPED_NOTE_CONTENT)));
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString("isolated deletion"));
   }
 
   @Test

@@ -22,8 +22,8 @@ import org.springframework.http.ResponseEntity;
 /**
  * Verifies {@code publishNotebookGitProposal} relocates an unchanged note to an existing folder or
  * the notebook root, keeping filename and identity. Same-parent filename changes are covered in
- * {@link NotebookGitProposalRenameControllerTest}. Combined parent-and-filename pairs remain
- * covered as rejections in {@link NotebookGitProposalTreeShapeControllerTest}.
+ * {@link NotebookGitProposalRenameControllerTest}. Combined parent-and-filename pairs are covered
+ * in {@link NotebookGitProposalRelocateAndRenameControllerTest}.
  */
 class NotebookGitProposalRelocationControllerTest extends NotebookGitBundleControllerTestBase {
 

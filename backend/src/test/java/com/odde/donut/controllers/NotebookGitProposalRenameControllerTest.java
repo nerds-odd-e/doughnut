@@ -32,8 +32,9 @@ import org.springframework.http.ResponseEntity;
 /**
  * Verifies {@code publishNotebookGitProposal} accepts a same-parent equal-content rename, retaining
  * the original note's identity. Cross-parent relocation is covered in {@link
- * NotebookGitProposalRelocationControllerTest}. Combined parent-and-filename and content-changed
- * pairs remain covered as rejections in {@link NotebookGitProposalTreeShapeControllerTest}.
+ * NotebookGitProposalRelocationControllerTest}. Combined parent-and-filename pairs are covered in
+ * {@link NotebookGitProposalRelocateAndRenameControllerTest}. Content-changed mixed pairs remain
+ * covered as rejections in {@link NotebookGitProposalTreeShapeControllerTest}.
  */
 class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControllerTestBase {
 

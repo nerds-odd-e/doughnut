@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–2 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaves 1–3 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -207,10 +207,16 @@ and transaction keep this one placement loop. Scrutinize at five minutes.
 
 ### 3. Relocate and rename using only the final destination
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller variants with a deleted title at the source/new-title or
 destination/old-title hypothetical intermediate; final folder/title is free and
-the original note appears there. Backend suite.
+the original note appears there. Backend suite
+(`source /workspace/scripts/cloud_agent_setup.sh && pnpm backend:test_only`).
+Canonical in
+`NotebookGitProposalRelocateAndRenameControllerTest.relocatesAndRenamesANoteDespiteADeletedTitleAtTheSourceAndNewFilename`
+(original ID, Dest folder, title `renamed`, unchanged bytes). Sibling
+`...DespiteADeletedTitleAtTheDestinationAndOldFilename` asserts placement only.
+Classifier `detectEqualBlobRename` now accepts any isolated equal-blob pair.
 
 Behavior: The isolated pair changes folder and filename → publish → accept
 only the final validated placement. Remove leaf 2's temporary filename limit.
@@ -357,7 +363,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–2 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–3 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -366,7 +372,7 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 ## Learnings
 
 - Leaf 1 extracted `NotebookGitProposalFilenameTitle` as a Spring collaborator; publisher still owns the transaction.
-- Leaf 2 generalized `detectEqualBlobRename` (same filename, different parent), shared `requireRepresentedFolderId`, and assigns destination folder after deleted-title check. Combined parent+filename still rejected until leaf 3. Relocation tests live in `NotebookGitProposalRelocationControllerTest`.
+- Leaf 3 accepts combined parent+filename at the final path only; deleted titles at `Source/renamed.md` or `Dest/note.md` do not block `Dest/renamed.md`. Proof class: `NotebookGitProposalRelocateAndRenameControllerTest`.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are
