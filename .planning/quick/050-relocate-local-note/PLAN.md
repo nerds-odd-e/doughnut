@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–11 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaves 1–12 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -370,10 +370,14 @@ shared-file coordination treated as an external wait if it blocks progress.
 
 ### 12. Edit the same note after accepted relocation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Sequential controller publication accepts relocation, then a separately
 committed content edit at the final path, updating the original note with its
-retained tracker. Backend suite.
+retained tracker. Backend suite
+(`source /workspace/scripts/cloud_agent_setup.sh && pnpm backend:test_only`).
+`NotebookGitRenameThenEditControllerTest.publishesALaterSeparatelyAuthoredEditAtTheRelocatedPathOntoTheSameNote`
+publishes Source/note.md → Dest/note.md, then a separate Dest/note.md content
+edit; original ID stays at Dest with EDITED_CONTENT and the same tracker.
 
 Behavior: Relocation has been accepted → separately publish an edit there →
 update the same learned concept. Reuse NotebookGitRenameThenEditControllerTest
@@ -397,7 +401,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–11 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–12 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -416,7 +420,9 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 - Leaf 9: path-qualified `[[Inbox/Cell]]` referrers stay authored after relocation; old path no longer resolves.
 - Leaf 10: installed CLI `git mv Recipes/Pasta.md Pasta basics.md` publishes the same note at the notebook root.
 - Leaf 11: clone guidance describes equal-content folder/filename moves to root or represented folders; content edits remain a later commit. First Cypress run needed a rebuilt e2e-install CLI bundle.
+- Leaf 12: sequential Dest/note.md content edit after accepted Source→Dest relocation keeps the original note ID and tracker. No production change.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
+- Observer notified CI failure on `2855618cb0` (`test(e2e): keep local Pasta and web Overview through installed pull then publish`, run 34106310343). SHA is on main, not this branch's pushed history. Disposition: ignore; do not repair.
 
 Ready for execution with the parallel coordination above. Estimates are
 hypotheses: ~5 minutes including focused verification and local cleanup; at five
