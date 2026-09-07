@@ -1,6 +1,6 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: resume at leaf 6. Slices 1–5 done and pushed.
+Status: resume at leaf 7. Slices 1–6 done and pushed.
 
 ## Resume (new session)
 
@@ -12,7 +12,7 @@ Work only in this checkout:
 - Skill: `.agents/skills/execute-plan/SKILL.md` (wrap-up per slice; do not write `.planning/STATE.md`)
 - Do not edit `/Users/terryyin/git/doughnut` except the final merge to `main`
 
-Leaf 5 accepted after raising instance `max_connections` to 1000. Continue leaves 6–9. When the plan is complete: merge the feature branch to `main`, push `main`, delete the feature branch, and drop worktrees `doughnut-wt-054`, `-a`, and `-b`. Do not drop MySQL databases unless this PLAN later says to.
+Leaf 5 accepted after raising instance `max_connections` to 1000. Leaf 6 missing-database failure stops before tests. Continue leaves 7–9. When the plan is complete: merge the feature branch to `main`, push `main`, delete the feature branch, and drop worktrees `doughnut-wt-054`, `-a`, and `-b`. Do not drop MySQL databases unless this PLAN later says to.
 
 Disposable proof environments (keep until leaves 6–8 finish):
 
@@ -364,7 +364,7 @@ CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
 
 ### 6. Stop before tests when real database preparation fails
 Type: Behavior
-Status: planned
+Status: done
 Proof: In a disposable configured worktree, temporarily select a fresh valid ID
 whose database has not been created. Invoke the real workflow. Capture the
 migration task's failure, nonzero command status, and that Gradle never starts
@@ -380,6 +380,23 @@ error handling or change unrelated API-document generation.
 Sizing: about 5 minutes active work, medium confidence; one failure invocation
 on the already prepared environment, with process startup as an external wait.
 No newly generated invalid product migration is required.
+
+Recorded missing-database run in A (`/Users/terryyin/git/doughnut-wt-054-a`):
+saved `{"id":"wt_054a"}`, wrote `{"id":"wt_054missing"}` (DB confirmed absent),
+then:
+
+```
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
+```
+
+Selected `doughnut_wt_054missing_test`. `:migrateTestDB FAILED` (JVM exit 1)
+during Flyway/Spring startup with MySQL 1044 access denied to that missing
+database. No `> Task :test`. `BUILD FAILED in 9s`, `4 actionable tasks: 4 executed`
+(full suite is 7). Command exit 1. Did not select `doughnut_wt_054a_test` or
+`doughnut_test`. Restored A's config to `{"id":"wt_054a"}`. Missing DB still
+absent; A 42 tables / 22 Flyway; legacy `doughnut_test` 42 / 22. No product
+code change; no stage-gating correction.
 
 ### 7. Interrupt one owned run while another environment remains usable
 Type: Behavior
@@ -491,9 +508,8 @@ and `/Users/terryyin/git/doughnut-wt-054-b` (`wt_054b`) with empty utf8mb4
 databases on MySQL 8.4.11; configs ignored; legacy DBs unmodified. Preserve
 them for leaves 5–8.
 
-Slice 5: overlapping full suites both passed after `max_connections=1000`.
-Distinct selected databases, 2246/0 JUnit each, 7 tasks executed, Flyway 22
-rows per worktree DB. Next: leaves 6–9.
+Slice 6: missing `doughnut_wt_054missing_test` fails `:migrateTestDB` (exit 1)
+before `:test`; A's config restored. Next: leaves 7–9.
 
 If an actual run contradicts a lifecycle/storage assumption, preserve its
 observations and stop at that leaf for the repository's learning escalation.
