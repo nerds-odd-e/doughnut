@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–7 done.
+Status: in progress; slices 1–8 done.
 
 ## Goal and scope
 
@@ -235,13 +235,8 @@ at the existing publication boundary, not several new transport implementations.
 
 ### 8. Accept the chosen text on the same learned note
 Type: Behavior
-Status: planned
-Proof: Real controller boundary: create a learned note, accept a web content
-save on it, then publish a direct child containing chosen valid same-note
-resolution bytes. Fresh reads and downloaded bundle show the exact new content,
-same note/tracker and retained scheduling/private associations, exact proposed
-head and accepted parent. Preserve authored frontmatter in the chosen bytes.
-Reuse existing `makeMe` and committed-transaction patterns; run backend suite.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — `NotebookGitLocalContentOverWebEditPublicationControllerTest` same-note case: web save on a learned note, then a direct child with chosen valid YAML (`authored: chosen`); fresh note/tracker ids, exact chosen content, proposed head parented on the web-save head, downloaded tree matches. No production change. Full suite ~50s (focused-test exception).
 
 Behavior: Owner publishes a valid resolved child of current accepted main →
 the same learned note receives the chosen text. Extend the existing
@@ -355,6 +350,10 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   on rejection (no retry, no local mutation). Other-note `rebasedRejection` cannot
   take the same-note continue fixture without mixing outcomes; sibling suite
   covers remote advance, stale expected-head, drift, and invalid-YAML stub.
+- Slice 8: No production change. Existing proposal acceptance already applies
+  chosen same-note bytes after a web save of that learned note. Canonical
+  tracker/private-state shape stays in the other-note sibling; the new case
+  asserts same note id, chosen authored frontmatter, and downloaded head/parent.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.
