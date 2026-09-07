@@ -116,7 +116,7 @@ subprocesses; fake GCS/GitHub/MIG calls only. Do not build a fake Actions schedu
 | Promise | Leaves | Observation |
 |---|---|---|
 | Complete application outcome, including frontend-only, without changing backend record | 1 | Ordered record/upload trace and failure residue |
-| Existing publication is recognized on upgrade | 2 | Verified app publication evidence seeds state, with zero uploads |
+| Existing publication is recognized on upgrade | 2a–2b | Bounded history is classified from publication-step evidence, then seeds state with zero uploads |
 | Successful duplicate does not replace application or CLI | 3 | Same identity replay produces no writes, even with expired artifacts |
 | Moved identity rejects before writes | 4 | Actual changed tag/current record fixture |
 | Interrupted attempt retries without changing tag/SHA | 5 | Failure then same-identity completion with current validation |
@@ -144,22 +144,45 @@ source, routing and ref preflights. Two writes to the private deploy object reco
 `publishing` before payload writes and `succeeded` after the complete publisher;
 MIG-skip success leaves backend hash bookkeeping untouched.
 
-### 2. Recognize the application version already deployed before tracking
+### 2a. Classify existing application publication evidence
 Type: Behavior
 Status: planned
-Proof: A verified Story 1 publication fixture initializes application state with
-no payload writes; CI-only or CLI-only successes cannot qualify. Verified absence
-of prior tag publication initializes empty tracking; ambiguous history fails.
+Proof: Controlled workflow-history and log fixtures return a published identity
+only when the Deploy publication step succeeded and the admission log supplies
+tag, raw refOid, peeled SHA and selected CI identity. CI-only, CLI-only and
+no-publication successes do not qualify. Zero application tags plus zero deploy
+push-event runs is verified empty; incomplete, missing or unparsable relevant
+history is ambiguous.
 
-Behavior: Tracking is introduced to an already deployed installation → recognize
-its actual application tag/SHA instead of treating it as a new pending release.
-Run bootstrap under the application concurrency owner. Reuse existing workflow
-metadata transport; inspect successful publication evidence, not just run status.
-If a new tracked release has already established state, leave it unchanged.
-Missing/unverifiable evidence of a prior tag publication fails visibly rather
-than guessing a version. Explicitly distinguish the observed no-tag-publication
-installation from lost history; do not require inventing a version for legacy
-automatic main deployments.
+Behavior: Application tracking is absent → inspect bounded deploy workflow
+history and existing admission JSON logs → classify a verified published
+identity, verified empty installation or ambiguous history without writing
+production state. Existing `writeReleaseOutput` JSON is the identity transport;
+the jobs API alone is insufficient because it omits job outputs.
+
+### 2b. Initialize application tracking from classified evidence
+Type: Behavior
+Status: planned
+Proof: Existing state remains byte-for-byte unchanged. A verified publication
+classification seeds succeeded application state and a verified-empty
+classification persists an initialized-empty state, both with zero payload/CLI/
+backend writes. Ambiguous history fails visibly with zero state or payload writes.
+
+Behavior: Tracking is introduced to an installation → under the existing
+application concurrency owner, preserve established state or initialize the
+same application-state object from the evidence classification. Never infer an
+application version from green CI, whole-workflow status, CLI state or legacy
+automatic main deployment. Require operator-supplied published-release identity
+when relevant history cannot be verified.
+
+Refinement learning: the first leaf-2 attempt spent about 13 minutes on mandatory
+reading and boundary analysis, made no edits and hit the hard sizing trigger.
+The disproved assumption was that GitHub's jobs API exposes Story 1 job outputs;
+it exposes step conclusions, while the existing admission commands log their
+identity JSON. Classification and state initialization therefore need separate
+proof loops. On 2026-09-07 activation evidence was rechecked: remote `v*` tags
+were empty and deploy.yml push-event history had `total_count: 0`; that observed
+empty case is not an enduring assumption.
 
 ### 3. Make completed-release replays a no-op
 Type: Behavior
