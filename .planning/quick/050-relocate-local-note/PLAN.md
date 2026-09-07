@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–4 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaves 1–5 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -245,10 +245,15 @@ Sizing: ~5 minutes active work, medium confidence; existing fixture variant.
 
 ### 5. Roll back a failed folder change
 Type: Behavior
-Status: planned
+Status: done
 Proof: Relocation-plus-rename variant of the existing late binding-save failure
 fixture. Fresh original folder/title, note timestamp and tracker state, and
-accepted head/bundle/timestamp remain. Backend suite.
+accepted head/bundle/timestamp remain. Backend suite
+(`source /workspace/scripts/cloud_agent_setup.sh && pnpm backend:test_only`).
+`NotebookGitProposalRenameRollbackControllerTest.lateBindingSaveFailureRollsBackARelocateAndRenameLeavingTheOldFolderTitleTrackerAndAcceptedBinding`
+uses the same atomic-test profile and `FAIL_ON_BINDING_SAVE`; after failure,
+source folder, title `note`, note timestamp, tracker, and accepted
+head/bundle/timestamp remain.
 
 Behavior: Folder/title mutation occurs but acceptance fails late → publication
 fails → original placement and accepted revision survive. Reuse the exact
@@ -368,7 +373,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–4 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–5 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -378,7 +383,9 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 
 - Leaf 1 extracted `NotebookGitProposalFilenameTitle` as a Spring collaborator; publisher still owns the transaction.
 - Leaf 2 generalized equal-blob parent changes, shared `requireRepresentedFolderId`, and assigns destination folder after the deleted-title check. Filename-preserving relocation tests: `NotebookGitProposalRelocationControllerTest`.
+- Leaf 3 accepts combined parent+filename at the final path only; proof in `NotebookGitProposalRelocateAndRenameControllerTest`.
 - Leaf 4: cross-parent relocation keeps tracker/MCQ/conversation on the same note; proof in `NotebookGitProposalRelocationPrivateAssociationControllerTest`. No production change.
+- Leaf 5: late binding-save failure rolls back relocate-and-rename folder/title using the existing atomic-test profile.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are
