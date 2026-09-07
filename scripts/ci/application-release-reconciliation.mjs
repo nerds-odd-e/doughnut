@@ -117,10 +117,7 @@ export async function reconcileApplicationRelease({
   }
 
   const result = await releaseCiOutcome(githubRepository, release)
-  if (
-    ['waiting', 'blocked'].includes(result.state) &&
-    admission.state === 'continue'
-  ) {
+  if (admission.state === 'continue') {
     await selectApplicationReleaseState({ bucket, ...release })
   }
   return result

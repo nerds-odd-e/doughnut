@@ -96,7 +96,7 @@ fails before CI lookup and a lower tag is superseded without rewriting state.
 
 ### 3. Freeze a ready release before downloads
 Type: Behavior
-Status: planned
+Status: done
 Proof: A public reconciliation fixture with ready exact-SHA CI persists the exact
 tag/refOid/SHA before returning `ready`; workflow proof keeps artifact download
 behind that successful admission. Existing waiting/blocked, publishing/succeeded
@@ -104,6 +104,10 @@ retry, completed duplicate and selected-source publication tests remain green.
 
 Behavior: Reconciliation finds ready exact-SHA CI for a new or higher candidate →
 freeze its immutable release identity → only then expose it for artifact download.
+
+Learning: The same `continue` admission that freezes waiting and blocked releases
+also freezes a ready release before reconciliation returns its CI outcome; the
+existing job dependency keeps every artifact download behind that admission.
 
 ### 4. Resume the selected release with fresh artifacts
 Type: Behavior

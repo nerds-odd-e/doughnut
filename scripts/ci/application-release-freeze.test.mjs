@@ -42,6 +42,24 @@ for (const [scenario, runs, expectedState] of [
   })
 }
 
+test('ready exact-SHA CI freezes the release before reporting ready', async (t) => {
+  const fixture = makeReleaseRepository(t)
+  fixture.tag('v1.2.3', true)
+  fixture.clone()
+  const release = fixture.release()
+
+  const result = await runReconciliationCommand(
+    t,
+    fixture,
+    'refs/tags/v1.2.3',
+    { [release.sha]: [ciRun({ head_sha: release.sha })] }
+  )
+
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(JSON.parse(result.stdout).state, 'ready')
+  assert.deepEqual(result.uploads, [selectedRecord(release)])
+})
+
 for (const scenario of ['lightweight ref', 'annotated ref', 'peeled commit']) {
   test(`a replaced ${scenario} is rejected against its frozen identity`, async (t) => {
     const fixture = makeReleaseRepository(t)
