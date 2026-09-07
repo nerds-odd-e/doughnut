@@ -3,6 +3,24 @@
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
 Status: blocked at slice 1 verification; implementation is uncommitted.
 
+## Open Dough ADR assessment (v0.2.1, 2026-09-07)
+
+Source: public Open Dough `v0.2.1` (`22b65e63090836b5441c8b4c9a4b3e8afd271d50`),
+native Codex `$dough-adr-awareness`.
+
+Conclusion: the planned isolated single-note deletion respects current Accepted
+[ADR 0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+and [ADR 0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md).
+[ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
+remains Proposed and non-binding. No architectural exception or supersession
+is required. Index and in-file statuses agree.
+
+Next step: do not begin slice 2 or further deletion implementation yet. Slice 1
+verification is blocked by unrelated committed-fixture deadlocks. Repairing
+those deadlocks is a delivery-scope decision, not an ADR-policy decision. If
+authorized, repair them, rerun the required backend verification, then complete
+slice 1 wrap-up.
+
 ## Execution handoff
 
 Slice 1 implements complete-diff isolation guidance, removed-path/mode checks,
