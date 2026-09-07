@@ -1,7 +1,7 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: slice 1 done; next is slice 2.
+Status: slices 1–2 done; next is slice 3.
 
 ## Learnings
 
@@ -13,6 +13,12 @@ Earlier local InnoDB deadlocks in untouched
 `QuestionGenerationBatchRetentionWithoutTransactionTest` fixture cleanup are
 a pre-existing committed-fixture concurrency defect, not slice 1 proof; they
 are not in this plan's scope.
+
+Slice 2 accepts one isolated learned-note deletion through the existing
+publisher (`destroy` with `LEAVE_DEAD_LINKS`) and keeps mixed deletions
+rejected. Full `pnpm backend:test_only` passed (2222 tests). The success
+scenario lives in `NotebookGitDeletionPublicationControllerTest` after a
+file-size split from the general publication tests.
 
 ## Goal and scope
 
@@ -46,9 +52,10 @@ as part of this plan.
   unit tests passed; Spotless failures are repaired in wrap-up.
 
 - `NotebookController.publishNotebookGitProposal` is the stable publication
-  boundary. `NotebookGitProposalTreeShape` currently rejects every removed
-  path; `NotebookGitProposalPublisher` handles additions and modifications.
-  Extend that existing acceptance path, without a new API or transport.
+  boundary. `NotebookGitProposalTreeShape` accepts exactly one isolated
+  ordinary-note deletion and still rejects mixed deletions/moves.
+  `NotebookGitProposalPublisher` applies additions, modifications, and that
+  isolated deletion via `NoteService.destroy` with `LEAVE_DEAD_LINKS`.
 - A deletion must pass the accepted file's regular-mode and ordinary-note-path
   checks. Validate the complete diff before mutating notes: any deletion plus
   another change rejects the entire proposal, including exact-content moves.
@@ -144,7 +151,7 @@ single-deletion rejection remains green here and is replaced in slice 2.
 
 ### 2. Publish one learned note's deletion
 Type: Behavior
-Status: planned
+Status: done
 Proof: One controller success scenario accepts the authored deletion head/tree,
 soft-deletes the target and its trackers, and excludes it from live notes/recall
 while an unrelated learned note remains active. Run backend verification,
@@ -339,8 +346,8 @@ Keep existing title reuse and restore policy unchanged.
 
 ## Sizing, readiness, and learning checkpoint
 
-Slice 1 delivered isolation rejection and kept single deletions rejected.
-Remaining leaves execute in order from slice 2.
+Slices 1–2 delivered isolation rejection and isolated-deletion acceptance.
+Remaining leaves execute in order from slice 3.
 Four bundled original slices were replaced; four were retained and reordered.
 The result is 13 Behavior leaves and one immediately enabling Structure leaf.
 No completed proof was discarded and no product scope was added or removed.

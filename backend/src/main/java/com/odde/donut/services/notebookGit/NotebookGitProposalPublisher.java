@@ -2,6 +2,7 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
+import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
@@ -14,6 +15,7 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteFactory;
+import com.odde.donut.services.NoteService;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
@@ -43,6 +45,7 @@ public class NotebookGitProposalPublisher {
   private final EntityPersister entityPersister;
   private final Validator validator;
   private final NoteFactory noteFactory;
+  private final NoteService noteService;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -53,7 +56,8 @@ public class NotebookGitProposalPublisher {
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
       Validator validator,
-      NoteFactory noteFactory) {
+      NoteFactory noteFactory,
+      NoteService noteService) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
@@ -63,6 +67,7 @@ public class NotebookGitProposalPublisher {
     this.entityPersister = entityPersister;
     this.validator = validator;
     this.noteFactory = noteFactory;
+    this.noteService = noteService;
   }
 
   @Transactional(
@@ -120,6 +125,14 @@ public class NotebookGitProposalPublisher {
         Note changedNote =
             projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());
         authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
+      } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.DELETED) {
+        Note deletedNote =
+            projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());
+        noteService.destroy(
+            deletedNote,
+            NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS,
+            authorizationService.getCurrentUser());
+        proposedLiveNotes.remove(deletedNote);
       }
     }
 
