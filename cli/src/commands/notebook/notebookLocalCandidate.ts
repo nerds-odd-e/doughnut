@@ -42,19 +42,23 @@ function structuralChangeError(changedPath: string): string {
   )
 }
 
+export type UnpublishedLocalHistoryDecision =
+  | { kind: 'fast-forward' }
+  | { kind: 'rebase'; localParent: string }
+  | { kind: 'reject'; message: string }
+
 /**
- * Returns undefined when local main is already an ancestor of accepted (fast-forward).
- * Otherwise returns specific guidance for an unsupported local history shape, same-path
- * overlap or structural accepted history, or the receive-gate message when the unpublished
- * work is one existing ordinary-note content edit of a disjoint content-only interval.
+ * Returns fast-forward when local main is already an ancestor of accepted.
+ * Eligible one-note content edits over disjoint content-only accepted history
+ * rebase. Local-ahead without accepted advancement stays rejected until later.
  */
-export function unpublishedLocalHistoryRejection(
+export function inspectUnpublishedLocalHistory(
   acceptedRepoDir: string,
   localHead: string,
   acceptedHead: string
-): string | undefined {
+): UnpublishedLocalHistoryDecision {
   if (historiesAreUnrelated(acceptedRepoDir, localHead, acceptedHead)) {
-    return LOCAL_UNRELATED
+    return { kind: 'reject', message: LOCAL_UNRELATED }
   }
 
   const unpublished = listCommits(
@@ -63,20 +67,24 @@ export function unpublishedLocalHistoryRejection(
     '--not',
     acceptedHead
   )
-  if (unpublished.length === 0) return undefined
-  if (unpublished.length > 1) return LOCAL_MULTIPLE_COMMITS
+  if (unpublished.length === 0) return { kind: 'fast-forward' }
+  if (unpublished.length > 1) {
+    return { kind: 'reject', message: LOCAL_MULTIPLE_COMMITS }
+  }
 
   const [candidate] = unpublished
   const parent = candidate.parents[0]
   if (parent === undefined || candidate.parents.length !== 1) {
-    return LOCAL_MERGE
+    return { kind: 'reject', message: LOCAL_MERGE }
   }
   const localPath = ordinaryNoteContentEditPath(
     acceptedRepoDir,
     parent,
     candidate.sha
   )
-  if (localPath === undefined) return LOCAL_NOT_CONTENT_EDIT
+  if (localPath === undefined) {
+    return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
+  }
   if (
     acceptedIntervalTouchesPath(
       acceptedRepoDir,
@@ -85,7 +93,7 @@ export function unpublishedLocalHistoryRejection(
       localPath
     )
   ) {
-    return samePathOverlapError(localPath)
+    return { kind: 'reject', message: samePathOverlapError(localPath) }
   }
   const structuralPath = firstStructuralPathInAcceptedInterval(
     acceptedRepoDir,
@@ -93,9 +101,12 @@ export function unpublishedLocalHistoryRejection(
     acceptedHead
   )
   if (structuralPath !== undefined) {
-    return structuralChangeError(structuralPath)
+    return { kind: 'reject', message: structuralChangeError(structuralPath) }
   }
-  return RECEIVE_ANCESTRY_ERROR
+  if (parent === acceptedHead) {
+    return { kind: 'reject', message: RECEIVE_ANCESTRY_ERROR }
+  }
+  return { kind: 'rebase', localParent: parent }
 }
 
 function commitCount(acceptedRepoDir: string, ...revs: string[]): number {

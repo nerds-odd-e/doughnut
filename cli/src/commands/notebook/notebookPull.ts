@@ -1,7 +1,7 @@
 import * as path from 'node:path'
 import { withDownloadedAcceptedNotebookHistory } from './notebookAcceptedHistory.js'
 import { assertLocalMainIsReadyToReceive } from './notebookCheckoutReadiness.js'
-import { unpublishedLocalHistoryRejection } from './notebookLocalCandidate.js'
+import { inspectUnpublishedLocalHistory } from './notebookLocalCandidate.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 const RECEIVE_CHECKOUT_CHANGED =
@@ -9,7 +9,9 @@ const RECEIVE_CHECKOUT_CHANGED =
 
 interface AcceptedNotebookReceiveResult {
   acceptedHead: string
+  localHead: string
   changed: boolean
+  rebased: boolean
 }
 
 function readHead(directory: string): string {
@@ -46,7 +48,12 @@ export async function receiveAcceptedNotebookHead(
       assertCheckoutStillReady(directory, capturedHead)
 
       if (capturedHead === acceptedHead) {
-        return { acceptedHead, changed: false }
+        return {
+          acceptedHead,
+          localHead: capturedHead,
+          changed: false,
+          rebased: false,
+        }
       }
 
       runSystemGitOrThrow(
@@ -62,12 +69,12 @@ export async function receiveAcceptedNotebookHead(
         (detail, status) =>
           `failed to import local main for ancestry inspection${detail ? `: ${detail}` : ` (exit code ${status})`}`
       )
-      const localHistoryRejection = unpublishedLocalHistoryRejection(
+      const localHistory = inspectUnpublishedLocalHistory(
         acceptedRepoDir,
         capturedHead,
         acceptedHead
       )
-      if (localHistoryRejection) throw new Error(localHistoryRejection)
+      if (localHistory.kind === 'reject') throw new Error(localHistory.message)
 
       runSystemGitOrThrow(
         [
@@ -85,13 +92,39 @@ export async function receiveAcceptedNotebookHead(
       )
 
       assertCheckoutStillReady(directory, capturedHead)
+      if (localHistory.kind === 'rebase') {
+        runSystemGitOrThrow(
+          [
+            '-C',
+            directory,
+            'rebase',
+            '--onto',
+            acceptedHead,
+            localHistory.localParent,
+          ],
+          (detail, status) =>
+            `failed to rebase the unpublished local commit onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`
+        )
+        return {
+          acceptedHead,
+          localHead: readHead(directory),
+          changed: true,
+          rebased: true,
+        }
+      }
+
       runSystemGitOrThrow(
         ['-C', directory, 'merge', '--quiet', '--ff-only', acceptedHead],
         (detail, status) =>
           `failed to fast-forward local main to the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`
       )
 
-      return { acceptedHead, changed: true }
+      return {
+        acceptedHead,
+        localHead: acceptedHead,
+        changed: true,
+        rebased: false,
+      }
     }
   )
 }

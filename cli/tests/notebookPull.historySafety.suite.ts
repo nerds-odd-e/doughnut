@@ -64,44 +64,5 @@ export function describeNotebookPullHistorySafety(): void {
       ).not.toThrow()
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
     })
-
-    test('refuses eligible other-note divergence with the receive-gate error and an unchanged checkout', async () => {
-      const source = buildSourceRepo(ctx.getWorkDir())
-      fs.writeFileSync(
-        join(source, 'other.md'),
-        '---\ntype: Note\n---\n# Other\n\nAccepted body.\n'
-      )
-      runGit(['add', 'other.md'], source)
-      runGit(['commit', '--quiet', '-m', 'add other note'], source)
-      const directory = cloneAsBoundCheckout(
-        ctx.getWorkDir(),
-        source,
-        getApiConfig().apiBaseUrl,
-        'checkout'
-      )
-      fs.writeFileSync(
-        join(directory, 'note.md'),
-        '---\ntype: Note\n---\n# Local edit\n\nUnpublished body.\n'
-      )
-      runGit(['add', 'note.md'], directory)
-      runGit(['commit', '--quiet', '-m', 'unpublished note edit'], directory)
-      fs.writeFileSync(
-        join(source, 'other.md'),
-        '---\ntype: Note\n---\n# Other\n\nAccepted edit.\n'
-      )
-      runGit(['add', 'other.md'], source)
-      runGit(['commit', '--quiet', '-m', 'accepted other-note edit'], source)
-      serveAcceptedBundle(ctx, source, 'eligible-divergence')
-      const before = checkoutState(directory)
-
-      await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
-        ProcessExitForTest
-      )
-
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        `donut: ${RECEIVE_GATE_ERROR}`
-      )
-      expect(checkoutState(directory)).toEqual(before)
-    })
   })
 }

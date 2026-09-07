@@ -144,6 +144,12 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
     console.log(`Notebook unchanged. Accepted head: ${result.acceptedHead}`)
     return
   }
+  if (result.rebased) {
+    console.log(
+      `Rebased the unpublished local commit onto the accepted history. Local head: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
+    )
+    return
+  }
   console.log(
     `Received accepted notebook history. Accepted head: ${result.acceptedHead}. This accepted history may not include all current web content.`
   )

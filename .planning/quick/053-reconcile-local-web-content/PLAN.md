@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slices 1–3 done; next is slice 4.
+Status: in progress. Slices 1–4 done; next is slice 5.
 
 ## Goal and scope
 
@@ -169,7 +169,7 @@ Sizing: ~5 minutes, medium confidence; one extension to the same edge reader.
 
 ### 4. Rebase the eligible local edit over accepted other-note edits
 Type: Behavior
-Status: planned
+Status: done
 Proof: Pull suite drives real Git with one and several remote commits, root
 and nested note paths and authored YAML. Observe L′ parent B, retained accepted
 hashes, exact two-sided content, author/message, clean main, original L in
@@ -323,10 +323,14 @@ preparatory Structure sits immediately before its Behavior.
   is not ordinary-note content (rename, delete/recreate, README, mode),
   including a later reversal. Rename edges name the first no-rename path Git
   reports (`Renamed.md`). Proofs live in `notebookPull.structuralHistory.suite.ts`.
-  Eligible other-note content-only divergence still uses the receive-gate error
-  until leaf 4.
+  Eligible other-note content-only divergence rebases with system Git
+  `--onto` after the existing object import and readiness check. Output names
+  the unpublished local head separately from the accepted head and points to
+  `donut notebook publish`. Original L remains in `ORIG_HEAD`. Local-ahead
+  without accepted advancement still uses the receive-gate error until leaf 5.
+  Proofs live in `notebookPull.rebase.suite.ts`.
 
-Remaining leaves 4–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaves 5–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
