@@ -356,6 +356,9 @@ Donut. This is useful even if moving between folders is deferred indefinitely.
 
 ### 7. Move a folder while preserving descendant identities
 
+**Status:** delivered (2026-09-07). The completed quick plan was removed;
+recover the last execution PLAN from `8a0f70687f`.
+
 **Goal**
 
 An owner organizing a notebook in Obsidian or an AI IDE can move one existing
@@ -420,40 +423,6 @@ history intact.
   drift repair, multiple unpublished commits, and structural rebase/conflict
   handling. Story 9's content-only rebase does not expand to folder moves or
   unpublished content over accepted folder moves.
-
-These are conservative scope assumptions for this refinement, not additional
-human-approved product policies. The excluded cases need no resolution for
-this bounded outcome; expanding them requires revisiting the story.
-
-**Key examples**
-
-1. Accepted `Topics/README.md`, `Topics/A.md`, and `Topics/Sub/B.md` represent
-   a folder and nested notes; `Archive` is an existing represented folder and
-   has no `Topics` child. The owner moves the whole directory to
-   `Archive/Topics`, commits without editing files, and publishes → Donut shows
-   the same folder and descendant entities there, preserving their private
-   data; another clean checkout receives the move through ordinary pull.
-   A later separately published edit to `Archive/Topics/Sub/B.md` updates the
-   same learned note. An unchanged identical note elsewhere keeps its identity.
-2. An eligible `Archive/Topics` is moved back to the available root path
-   `Topics`, keeping every relative path and byte → the same folder and notes
-   return to the root. A source with only its own README is also eligible.
-3. The source contains an empty descendant with no tracked content, or the
-   target already contains a folder of the same name → publication rejects
-   the folder move without changing either tree or any identities. Moving
-   only the README while leaving descendant files behind is also rejected.
-4. `Topics/A.md` is the sole tracked file and there is no `Topics/README.md`.
-   Moving it to an existing eligible folder → existing single-note relocation
-   applies; the `Topics` Folder remains in Donut. This is not a folder move.
-5. Another note links to `Topics/A` before the accepted folder move → its
-   authored link remains unchanged and may become unresolved. Editing that
-   referrer in the move commit is outside scope; a later content edit can fix it.
-
-**Effort hypothesis:** L — low confidence, retained from decomposition; assumes
-this exact-subtree boundary is sufficient without broader identity inference.
-**Depends on:** delivered Story 12.
-**Open decisions:** none blocking this bounded scope. Folder moves without a
-source README and treatment of unrepresented empty descendants remain deferred.
 
 <a id="story-8"></a>
 
@@ -710,9 +679,9 @@ learning history again. Renaming in place cannot achieve this outcome.
 
 ## Ordering and Scope Reduction
 
-Stories 1–6, 8, 9, 11, and 12 are delivered. The [product backlog](../PRODUCT-BACKLOG.md)
-owns the global story order. Among unfinished SEED-009 stories, Story 7 is next;
-SEED-015 worktree isolation currently precedes it in that queue.
+Stories 1–9, 11, and 12 are delivered. The [product backlog](../PRODUCT-BACKLOG.md)
+owns the global story order. Among unfinished SEED-009 stories, Story 10 remains
+queued after current SEED-015 worktree isolation work.
 
 ### Learning from the delivered rename story
 
@@ -879,7 +848,6 @@ Safe stopping points:
 First-to-defer order among unfinished queued SEED-009 stories is:
 
 1. Story 10, accepting extra immutable web commits.
-2. Story 7, rejecting folder moves while retaining note relocation.
 
 The delivered and queued boundaries still leave parts of Proposed ADR 0002
 uncovered, including web structural synchronization and broader accumulated
@@ -890,9 +858,9 @@ Unsupported operations must fail clearly rather than be approximated.
 
 No open decision blocks the bounded rename or relocation scope. Story 9
 delivered the developer's ordinary-Git overlap policy, including empty-result
-reporting. Same-path creation and structural conflict policies remain deferred. Story 7
-now excludes folders without their own accepted README and unrepresented empty
-descendants; those cases need refinement before expanding its bounded scope.
+reporting. Same-path creation and structural conflict policies remain deferred.
+Expanding delivered Story 7 to folders without their own accepted README or
+unrepresented empty descendants needs a new refinement.
 
 ADR 0002 now reflects the later human discussion recorded here: v1 permits a
 required CLI-assisted acquisition and synchronization workflow and defers direct
@@ -906,10 +874,8 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 
 ## When to Surface
 
-Stories 1–6, 8, 9, 11, and 12 are delivered. Select one remaining story from
-the [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Story 7
-has refined Goal/Scope and key examples for its bounded folder relocation;
-use **slice-planning** when execution planning is requested. Do not
+Stories 1–9, 11, and 12 are delivered. Select one remaining story from
+the [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Do not
 turn the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
 boundary as a human-owned advice task; it does not change these story outcomes.
 
