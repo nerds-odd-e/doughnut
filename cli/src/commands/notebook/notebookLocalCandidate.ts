@@ -1,4 +1,12 @@
 import { runSystemGitOrThrow } from './systemGit.js'
+import {
+  acceptedIntervalTouchesPath,
+  firstStructuralPathInAcceptedInterval,
+  inspectAncestryFailure,
+  isOrdinaryNoteContentChange,
+  listCommitChanges,
+  listCommits,
+} from './notebookAcceptedInterval.js'
 
 const RECEIVE_ANCESTRY_ERROR =
   'Local main cannot receive the accepted history because it contains unpublished or unrelated commits. ' +
@@ -27,13 +35,18 @@ function samePathOverlapError(changedPath: string): string {
   )
 }
 
-const REGULAR_FILE_MODE = '100644'
+function structuralChangeError(changedPath: string): string {
+  return (
+    `Local main cannot receive the accepted history because accepted history includes a structural change at "${changedPath}". ` +
+    'Divergent structural history is not supported yet.'
+  )
+}
 
 /**
  * Returns undefined when local main is already an ancestor of accepted (fast-forward).
  * Otherwise returns specific guidance for an unsupported local history shape, same-path
- * overlap in accepted history, or the receive-gate message when the unpublished work is
- * one existing ordinary-note content edit of a disjoint path.
+ * overlap or structural accepted history, or the receive-gate message when the unpublished
+ * work is one existing ordinary-note content edit of a disjoint content-only interval.
  */
 export function unpublishedLocalHistoryRejection(
   acceptedRepoDir: string,
@@ -74,14 +87,15 @@ export function unpublishedLocalHistoryRejection(
   ) {
     return samePathOverlapError(localPath)
   }
+  const structuralPath = firstStructuralPathInAcceptedInterval(
+    acceptedRepoDir,
+    parent,
+    acceptedHead
+  )
+  if (structuralPath !== undefined) {
+    return structuralChangeError(structuralPath)
+  }
   return RECEIVE_ANCESTRY_ERROR
-}
-
-function inspectAncestryFailure(
-  detail: string | undefined,
-  status: number | null
-): string {
-  return `failed to inspect local main's ancestry${detail ? `: ${detail}` : ` (exit code ${status})`}`
 }
 
 function commitCount(acceptedRepoDir: string, ...revs: string[]): number {
@@ -109,49 +123,6 @@ function historiesAreUnrelated(
   return unionCount === localCount + acceptedCount
 }
 
-function listCommits(
-  acceptedRepoDir: string,
-  ...revListArgs: string[]
-): { sha: string; parents: string[] }[] {
-  const text = runSystemGitOrThrow(
-    ['-C', acceptedRepoDir, 'rev-list', '--parents', ...revListArgs],
-    inspectAncestryFailure
-  ).trim()
-  if (text === '') return []
-  return text.split('\n').map((line) => {
-    const [sha, ...parents] = line.split(/\s+/).filter((part) => part !== '')
-    if (!sha) {
-      throw new Error("failed to inspect local main's ancestry")
-    }
-    return { sha, parents }
-  })
-}
-
-function listCommitChanges(
-  acceptedRepoDir: string,
-  parent: string,
-  commit: string
-): { srcMode: string; dstMode: string; status: string; path: string }[] {
-  const raw = runSystemGitOrThrow(
-    [
-      '-C',
-      acceptedRepoDir,
-      '-c',
-      'diff.renames=false',
-      'diff-tree',
-      '-r',
-      '--raw',
-      '-z',
-      '--no-renames',
-      '--no-commit-id',
-      parent,
-      commit,
-    ],
-    inspectAncestryFailure
-  )
-  return parseDiffTreeRawZ(raw)
-}
-
 function ordinaryNoteContentEditPath(
   acceptedRepoDir: string,
   parent: string,
@@ -160,84 +131,5 @@ function ordinaryNoteContentEditPath(
   const changes = listCommitChanges(acceptedRepoDir, parent, commit)
   if (changes.length !== 1) return undefined
   const [change] = changes
-  if (
-    change.status === 'M' &&
-    change.srcMode === REGULAR_FILE_MODE &&
-    change.dstMode === REGULAR_FILE_MODE &&
-    isOrdinaryNotePath(change.path)
-  ) {
-    return change.path
-  }
-  return undefined
-}
-
-function acceptedIntervalTouchesPath(
-  acceptedRepoDir: string,
-  localParent: string,
-  acceptedHead: string,
-  changedPath: string
-): boolean {
-  const interval = listCommits(
-    acceptedRepoDir,
-    acceptedHead,
-    '--not',
-    localParent
-  )
-  return interval.some((commit) =>
-    commit.parents.some((parent) =>
-      listCommitChanges(acceptedRepoDir, parent, commit.sha).some(
-        (change) => change.path === changedPath
-      )
-    )
-  )
-}
-
-function parseDiffTreeRawZ(
-  output: string
-): { srcMode: string; dstMode: string; status: string; path: string }[] {
-  if (output === '') return []
-  const parts = output.split('\0')
-  if (parts[parts.length - 1] === '') parts.pop()
-  if (parts.length % 2 !== 0) {
-    throw new Error(
-      "failed to inspect local main's ancestry: malformed diff-tree output"
-    )
-  }
-  const changes: {
-    srcMode: string
-    dstMode: string
-    status: string
-    path: string
-  }[] = []
-  for (let i = 0; i < parts.length; i += 2) {
-    const meta = parts[i]
-    const path = parts[i + 1]
-    const match =
-      /^:(\d{6}) (\d{6}) ([0-9a-f]+) ([0-9a-f]+) ([A-Z][0-9]*)$/.exec(meta)
-    if (!match || path === undefined || path === '') {
-      throw new Error(
-        "failed to inspect local main's ancestry: malformed diff-tree output"
-      )
-    }
-    changes.push({
-      srcMode: match[1],
-      dstMode: match[2],
-      status: match[5],
-      path,
-    })
-  }
-  return changes
-}
-
-function isOrdinaryNotePath(changedPath: string): boolean {
-  if (!changedPath.endsWith('.md')) return false
-  const segments = changedPath.split('/')
-  if (
-    segments.some(
-      (segment) => segment === '' || segment === '.' || segment === '..'
-    )
-  ) {
-    return false
-  }
-  return segments[segments.length - 1] !== 'README.md'
+  return isOrdinaryNoteContentChange(change) ? change.path : undefined
 }

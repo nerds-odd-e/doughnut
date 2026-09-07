@@ -21,6 +21,7 @@ import { describeNotebookPullFastForward } from './notebookPull.fastForward.suit
 import { describeNotebookPullHistorySafety } from './notebookPull.historySafety.suite.js'
 import { describeNotebookPullLocalCandidate } from './notebookPull.localCandidate.suite.js'
 import { describeNotebookPullPathOverlap } from './notebookPull.pathOverlap.suite.js'
+import { describeNotebookPullStructuralHistory } from './notebookPull.structuralHistory.suite.js'
 
 export function describeNotebookPullAcceptedHistory(): void {
   describe('notebook pull (downloaded accepted history)', () => {
@@ -112,4 +113,5 @@ export function describeNotebookPullAcceptedHistory(): void {
   describeNotebookPullHistorySafety()
   describeNotebookPullLocalCandidate()
   describeNotebookPullPathOverlap()
+  describeNotebookPullStructuralHistory()
 }

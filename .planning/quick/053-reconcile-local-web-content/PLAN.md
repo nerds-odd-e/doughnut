@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slices 1–2 done; next is slice 3.
+Status: in progress. Slices 1–3 done; next is slice 4.
 
 ## Goal and scope
 
@@ -154,7 +154,7 @@ Sizing: ~5 minutes, medium confidence; history walk plus one rejection outcome.
 
 ### 3. Reject structural changes in divergent history
 Type: Behavior
-Status: planned
+Status: done
 Proof: Pull suite data variants: remote rename, delete/recreate, README edit
 and mode change, including a reversed structural change on another path.
 Observe offending path and unchanged checkout. Retain fast-forward accepted
@@ -318,8 +318,15 @@ preparatory Structure sits immediately before its Behavior.
   parent, with rename inference disabled. Disjoint paragraphs and remote
   edit→revert both name `note.md` and leave the checkout unchanged. Proofs live
   in `notebookPull.pathOverlap.suite.ts`.
+- Accepted-interval inspection lives in `notebookAcceptedInterval.ts`. A
+  divergent local content edit is rejected when any intervening accepted edge
+  is not ordinary-note content (rename, delete/recreate, README, mode),
+  including a later reversal. Rename edges name the first no-rename path Git
+  reports (`Renamed.md`). Proofs live in `notebookPull.structuralHistory.suite.ts`.
+  Eligible other-note content-only divergence still uses the receive-gate error
+  until leaf 4.
 
-Remaining leaves 3–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaves 4–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
