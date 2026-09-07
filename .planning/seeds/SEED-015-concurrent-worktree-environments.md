@@ -95,7 +95,8 @@ supported kind per worktree, across two concurrent local worktrees.
 ### 1. Run backend unit tests concurrently in separate worktrees
 
 **Status:** Children 1a–1b delivered. Child 1c remains queued at the top of
-the product backlog. Legacy-command compatibility choices remain with 1c.
+the product backlog. Its accepted compatibility policies and refined plan are
+recorded in 1c.
 
 **Parent goal**
 
@@ -216,8 +217,9 @@ makes isolated verification practical even if ordinary command integration in
 
 #### 1c. Use ordinary backend test and migration commands in isolated worktrees
 
-**Status:** Refined; awaiting the two compatibility decisions below before
-slice planning. 1a and 1b are delivered; do not rediscover them.
+**Status:** Refined; both compatibility policies accepted on 2026-09-07.
+Plan: [quick/060](../quick/060-ordinary-worktree-backend-commands/PLAN.md).
+1a and 1b are delivered; do not rediscover them.
 
 **Goal**
 
@@ -245,8 +247,8 @@ story.
   ownership behavior. One invocation at a time owns a checkout's test database;
   commands in different worktrees may overlap. Print the selected database
   and stop visibly on invalid configuration, preparation, or migration failure.
-- All group-1 shared boundaries apply. Primary-checkout compatibility and
-  conflicting explicit URLs remain proposals below, not settled requirements.
+- All group-1 shared boundaries and the accepted compatibility policies below
+  apply.
 
 **Exclusions:** Browser/E2E and development-profile isolation, ports, service
 startup or shutdown redesign, Cloud VM/CI changes, worktree hooks, database
@@ -272,18 +274,19 @@ simultaneous runners in one checkout, and changes to unrelated Gradle tasks.
    migration invocation overlaps → the second refuses visibly; an invocation
    in a different worktree remains independent.
 
-**Open questions — proposed compatibility policy**
+**Accepted compatibility policies**
 
 - Keep ordinary commands in a primary checkout without local configuration on
   their existing behavior (default `doughnut_test`), while fresh linked
   worktrees automatically initialize isolation. A primary checkout with local
-  configuration uses that configured environment. Is this the desired boundary?
+  configuration uses that configured environment.
 - When isolation applies, reject an explicit `SPRING_DATASOURCE_URL`, `DB_URL`,
   or `SPRING_FLYWAY_URL` that conflicts with the assigned target, following the
-  existing opt-in command. Is visible rejection the desired override policy?
+  existing opt-in command. Matching overrides remain usable.
 
-These choices affect ordinary-command compatibility and cannot be excluded
-without leaving the selected story incomplete. Slice planning awaits answers.
+The developer accepted both policies on 2026-09-07. No story-level questions
+remain. An unconfigured primary checkout retains its existing explicit-URL
+behavior as well as its default database.
 
 **Readiness and dependencies**
 
@@ -311,13 +314,13 @@ E2E isolation becomes more urgent, reconsider whether story 2 should precede
 1c; that is a backlog-order choice, not a new group-1 child. For group-only
 scope reduction, drop 1c first, retaining 1a–1b.
 
-**Open decisions for group 1**
+**Decisions for group 1**
 
 - The developer accepted manually supplied distinct databases and one supported
   workflow for 1a. Automatic first use on that opt-in command is delivered in
   1b. Neither is an open choice anymore.
-- Story [1c](#story-1c) owns the two remaining compatibility questions about
-  the primary checkout and conflicting explicit database URLs.
+- Story [1c](#story-1c) records both accepted compatibility policies;
+  no group-1 compatibility questions remain.
 
 <a id="story-2"></a>
 
@@ -419,8 +422,9 @@ judgments from the seed's stated interference problem, not measured usage or
 delivery estimates. The [product backlog](../PRODUCT-BACKLOG.md) owns global
 order. Keep CLI and MCP stories 4–5 unqueued until the browser environment
 provides evidence for their scope and relative value; neither is cancelled.
-Replenishment does not settle 1c's compatibility decisions or authorize
-implementation. Stories 2–3 retain their low-confidence estimates and need
+Story 1c's subsequent refinement records the accepted compatibility policies;
+backlog selection does not authorize implementation.
+Stories 2–3 retain their low-confidence estimates and need
 refinement before executable planning.
 
 Start with child 1a: it tests the central shared-MySQL assumption with manual
@@ -451,9 +455,9 @@ deferred scope. Reconsider them only when an actual workflow requires them.
 - Decide whether persistent development-profile use is needed before the later
   E2E categories. Its database naming is captured above, but its user workflow
   is not promised by these initial candidates.
-- Before selecting 1c, settle the legacy-checkout and explicit-override
-  compatibility policy recorded in group 1. First-use automation in 1b is
-  delivered without a particular AI tool or worktree-creation hook; keep that.
+- Story 1c's compatibility policies are accepted in its refinement. First-use
+  automation in 1b is delivered without a particular AI tool or worktree-creation
+  hook; keep that.
 - Concurrent unit tests on shared MySQL 8.4 did not require a separate server;
   local nix mysqld already starts with `max_connections=1000` after 1a. Revisit
   the parent direction only if a later workflow (full-suite overlap, E2E, or
