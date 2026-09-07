@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
-import { appendFileSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
+import { writeReleaseOutput } from './application-release-output.mjs'
 
 const git = (repository, ...args) =>
   execFileSync('git', args, { cwd: repository, encoding: 'utf8' }).trim()
@@ -58,12 +59,4 @@ function runApplicationRelease({ event, repository = process.cwd() }) {
 const release = runApplicationRelease({
   event: JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')),
 })
-console.log(JSON.stringify(release))
-if (process.env.GITHUB_OUTPUT) {
-  appendFileSync(
-    process.env.GITHUB_OUTPUT,
-    Object.entries(release)
-      .map(([key, value]) => `${key}=${value}\n`)
-      .join('')
-  )
-}
+writeReleaseOutput(release)

@@ -113,7 +113,8 @@ wrapper. Expose selected identity to the workflow while publication is disabled.
 
 ### 3. Require successful CI for that exact commit
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 36/36. Actual CI command HTTP fixtures cover exact repo/workflow/main-push/SHA, latest run/attempt, pagination/cap, transport errors and pending/terminal outcomes. GitHub workflow paths may include @ref suffix; covered. Refactor shared JSON/GITHUB_OUTPUT serialization, reran 36/36.
 Proof: Transport fixtures admit only the matching repository/ci.yml/main-push
 run for the selected SHA, with its latest applicable conclusion.
 
