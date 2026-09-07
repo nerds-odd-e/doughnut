@@ -116,7 +116,7 @@ subprocesses; fake GCS/GitHub/MIG calls only. Do not build a fake Actions schedu
 | Promise | Leaves | Observation |
 |---|---|---|
 | Complete application outcome, including frontend-only, without changing backend record | 1 | Ordered record/upload trace and failure residue |
-| Existing publication is recognized on upgrade | 2a–2b | Bounded history is classified from publication-step evidence, then seeds state with zero uploads |
+| Existing publication is recognized on upgrade | 2a–2c | Bounded history is classified from publication-step evidence, initializes state with zero payload writes, then gates workflow admission |
 | Successful duplicate does not replace application or CLI | 3 | Same identity replay produces no writes, even with expired artifacts |
 | Moved identity rejects before writes | 4 | Actual changed tag/current record fixture |
 | Interrupted attempt retries without changing tag/SHA | 5 | Failure then same-identity completion with current validation |
@@ -168,17 +168,35 @@ the observed zero-tag/zero-run case classifies as empty.
 ### 2b. Initialize application tracking from classified evidence
 Type: Behavior
 Status: planned
-Proof: Existing state remains byte-for-byte unchanged. A verified publication
-classification seeds succeeded application state and a verified-empty
-classification persists an initialized-empty state, both with zero payload/CLI/
-backend writes. Ambiguous history fails visibly with zero state or payload writes.
+Proof: The public state command leaves a valid existing record byte-for-byte
+unchanged. When the object is absent, controlled GitHub/GCS fixtures seed exact
+succeeded identity or initialized-empty state with create-only generation
+matching and zero payload/CLI/backend writes. Ambiguous evidence and every
+non-404 read, transport, parse or schema failure write nothing and fail loudly.
 
-Behavior: Tracking is introduced to an installation → under the existing
-application concurrency owner, preserve established state or initialize the
-same application-state object from the evidence classification. Never infer an
-application version from green CI, whole-workflow status, CLI state or legacy
-automatic main deployment. Require operator-supplied published-release identity
-when relevant history cannot be verified.
+Behavior: Tracking is introduced to an installation → preserve established
+state or initialize the same application-state object from the evidence
+classification. Read/write the private bucket through the authenticated GCS JSON
+API; only object-not-found is initial state. Exclude a workflow run only when the
+verified current run ID matches this repository's incomplete deploy.yml push,
+and omit only its verified current application tag from the empty-history tag
+set. Other incomplete runs remain ambiguous. Never infer a version from green
+CI, whole-workflow status, CLI state or legacy automatic main deployment.
+Require operator identification when relevant history cannot be verified.
+
+### 2c. Gate release admission on initialized tracking
+Type: Behavior
+Status: planned
+Proof: Parsed workflow and controlled command fixtures show private-GCS auth and
+bootstrap complete before release admission. The one workflow-level
+`deploy-production` concurrency group still encloses bootstrap, selection,
+publication and record writes with `cancel-in-progress: false`; all three artifact
+downloads and the explicit publisher `GITHUB_SHA="$RELEASE_SHA"` remain intact.
+
+Behavior: A tag-driven application release begins after tracking is introduced
+→ authenticate and initialize tracking before admitting or publishing that
+release. Keep the current tag-only adapter and bounded CI wait active; this leaf
+only installs the bootstrap prerequisite that later reconciliation reuses.
 
 Refinement learning: the first leaf-2 attempt spent about 13 minutes on mandatory
 reading and boundary analysis, made no edits and hit the hard sizing trigger.
@@ -188,6 +206,15 @@ identity JSON. Classification and state initialization therefore need separate
 proof loops. On 2026-09-07 activation evidence was rechecked: remote `v*` tags
 were empty and deploy.yml push-event history had `total_count: 0`; that observed
 empty case is not an enduring assumption.
+
+Story reassessment after a second hard overrun: leaf 1's durable outcome and leaf
+2a's evidence classifier are delivered; state initialization, replay/recovery,
+ordering and event cutover remain. The maintainer goal, examples, scope and sibling
+ordering are unchanged and still form one 3V story. The disproved sizing assumption
+was that private-state transitions and workflow activation shared one proof loop.
+The reverted leaf-2b attempt spent more than 10 minutes on reading and scaffolding,
+made no production edits, and established the concrete GCS/current-run boundary;
+state initialization and workflow gating are now separate behavior leaves.
 
 ### 3. Make completed-release replays a no-op
 Type: Behavior
