@@ -173,30 +173,58 @@ environment manager, database cleanup, or changes to existing command selection.
 
 #### 1b. Run the first backend tests in a fresh worktree without manual setup
 
-- **For / why:** Developers and AI tasks can create disposable worktrees and
-  immediately test without naming databases, creating them, or assigning access.
-- **Scope:** The supported workflow from 1a initializes a fresh worktree on
-  first use, assigning a persistent identity and preparing its own database
-  before migration and tests. Existing valid explicit configuration remains
-  usable. No AI tool or worktree-creation hook is required.
-- **Evaluation:** Start that workflow concurrently in two fresh worktrees with
-  neither local configuration nor databases. Each provisions a distinct target
-  and executes its tests successfully. Later shells reuse the same environments.
-  Overlapping initialization requests for one worktree converge on one complete
-  configuration; this does not permit two test runners sharing that database.
-- **Value / learning:** Removes the manual work that makes frequent AI-created
-  worktrees expensive. If 1c is cancelled, users still have one automatic,
-  repeatable concurrent test workflow.
-- **Safety boundary:** Allocation and provisioning must not adopt another
-  worktree's database or overwrite an established identity. A failure leaves
-  other environments intact and does not start tests against fallback state.
-  Automatic identity allocation replaces 1a's manual uniqueness precondition
-  for fresh worktrees; duplicate operator-supplied configurations are not a
-  promised recovery workflow. All shared boundaries apply.
-- **Effort hypothesis:** M — low confidence; assumes existing local database
-  administration access and a bounded allocation mechanism. Concurrent
-  first-use correctness is part of this outcome, not a separate hardening story.
-- **Depends on:** The working isolated test workflow from 1a.
+**Status:** Refined. Depends on the delivered isolated test workflow from 1a.
+
+**Goal**
+
+Developers and AI tasks can create disposable local worktrees and immediately
+run backend tests through the opt-in worktree workflow without choosing an
+identity, creating a database, or granting access. Removing this repeated setup
+makes isolated verification practical even if ordinary command integration in
+1c is cancelled.
+
+**Scope**
+
+- When the 1a opt-in workflow starts without local configuration, it assigns a
+  new bounded identity, prepares a database with the existing local MySQL
+  administration access, persists the completed environment, then migrates and
+  runs the requested backend tests. No AI skill or worktree-creation hook is
+  required.
+- A later invocation from the same checkout, including a fresh shell or an
+  ordinary branch change, reuses that identity and database. An already
+  configured 1a environment remains unchanged and usable; automatic first use
+  does not repair, replace, or provision an operator-supplied identity.
+- Allocation must create a new database rather than adopt an existing name, and
+  configuration becomes durable only after provisioning succeeds. A failed
+  attempt never runs tests against fallback state or changes another worktree's
+  environment. It may leave its own unreferenced newly created database when a
+  process is interrupted; automatic cleanup remains excluded.
+- At most one invocation owns a checkout's environment at a time. Concurrent
+  first-use attempts leave one complete persistent configuration and never run
+  two test processes against the same database; an overlapping invocation may
+  fail visibly and be retried after the owner finishes.
+- All group-1 shared boundaries apply. Ordinary backend commands, database
+  cleanup, worktree hooks, port allocation, application/E2E services,
+  Cloud VM/CI behavior, and recovery from duplicate operator-supplied
+  configurations remain excluded.
+- **Effort hypothesis:** M — medium confidence. Existing 1a evidence proves the
+  test workflow and local MySQL 8.4 database/grant operations; the remaining
+  work is bounded first-use allocation, checkout ownership, and reuse.
+
+**Key examples**
+
+- Two fresh worktrees have neither `.worktree.local.json` nor corresponding
+  databases → their opt-in test commands overlap → each creates a distinct
+  environment and its requested tests pass against that worktree's database.
+- One automatically initialized worktree opens a fresh shell and runs the
+  command again → the same identity and database are selected without another
+  allocation or manual setup.
+- One worktree receives two overlapping first-use invocations → one invocation
+  owns initialization and testing, the other refuses visibly, and the checkout
+  is left with one complete reusable configuration.
+- Database creation, access assignment, or persistent configuration fails →
+  no Gradle migration/test starts, no fallback database is selected, and other
+  configured environments remain unchanged.
 
 <a id="story-1c"></a>
 
