@@ -3,18 +3,13 @@
 ## Near-future direction
 
 Let notebook owners refine notes in Obsidian or an AI IDE and Donut without
-discarding either side's work or losing learning history. Other-note and
-same-note concurrent content edits can already be pulled and then published,
-with ordinary Git pausing on real conflicts. Represented folder relocation
-that preserves descendant identities is delivered. Remaining notebook-sync
-gaps — unpublished content over an accepted folder move, folders without
-their own README, and web structural sync — are not yet stories and are not
-in this queue. The next queued notebook-sync story is seeing one stable
-commit for one continuous web edit; that is history granularity, not a
-synchronization unlock. Pull already rebases over several accepted content
-commits. This advances the direction in
-[Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
-the selected queue does not cover its complete synchronization contract.
+discarding either side's work or losing learning history. Next, keep web note
+creation inside the sequential synchronization loop, then support related edits
+to several existing notes in one local commit. Content rebase and bounded local
+note/folder reorganization are delivered. Reconciliation across folder moves and
+web autosave batching remain unqueued candidates in SEED-009. This advances
+[Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
+without claiming its complete synchronization contract.
 Enable developers and AI tasks to verify changes concurrently in local
 worktrees without interfering with each other's data or running services.
 This development priority still leads the queue. 1a–1c delivered opt-in and
@@ -28,7 +23,8 @@ them.
 
 1. [Run browser E2E scenarios concurrently without external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-2) — SEED-015
 2. [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
-3. [See one stable commit for one continuous web edit](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-10) — SEED-009
+3. [Create a note on the web and continue refining it locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13) — SEED-009
+4. [Publish a related batch of edits to existing notes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-14) — SEED-009
 
 ## Recently done
 

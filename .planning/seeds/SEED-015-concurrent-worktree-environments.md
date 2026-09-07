@@ -262,51 +262,106 @@ simultaneous runners in one checkout, and changes to unrelated Gradle tasks.
 
 ### 2. Run browser E2E scenarios concurrently without external-service mocks
 
-**Status:** Queued. Refine the representative browser workflow and
-its environment boundary before slice planning.
+**Status:** Refined, 2026-09-08. No open product questions within the scope
+below. [Slice plan](../quick/061-concurrent-worktree-browser-e2e/PLAN.md).
 
-- **For / why:** Developers and AI tasks can verify ordinary browser workflows
-  against their own running code while another worktree does the same.
-- **Evaluation:** Run a representative note creation/editing scenario in both
-  worktrees concurrently. Each browser reaches its own application, each
-  reset affects only its own fixtures, and restarting one environment leaves
-  the other usable.
-- **Value / learning:** Establishes a usable browser E2E subset and tests whether
-  database isolation plus application endpoint ownership is sufficient for
-  that subset. This remains useful without later mocked-service or client
-  coverage.
-- **Safety boundary:** Includes all frontend, backend, proxy, and other mutable
-  state needed by this workflow. Unsupported scenario categories must not
-  silently use shared services. Dedicated persistent development-profile
-  workflows are outside this story.
-- **Reminder from SEED-009 Story 7:** Installed-CLI folder relocation now has
-  its own feature (`cli_notebook_folder_relocation.feature`) plus clone
-  guidance. That workflow stays [Story 4](#story-4). This story remains one
-  representative browser note create/edit path; do not pull CLI clone, `git
-  mv`, or notebook publish into it to “cover folder moves.”
-- **Reminder from 1c (quick/060):** Reuse `.worktree.local.json` identity and
-  first-use allocation; do not invent a second worktree id. Backend isolation
-  is unit-test MySQL via the Gradle wrapper and `SPRING_DATASOURCE_URL` for
-  `test` / `migrateTestDB` only — `pnpm sut`, Cypress, the e2e profile,
-  `doughnut_e2e_test`, and ports 5173/5174/9081/2525 remain shared. Prefer
-  ordinary SUT and Cypress commands in linked worktrees; do not make a special
-  opt-in the required path. Keep an unconfigured primary on current shared E2E
-  defaults unless refinement changes that. `.worktree.local.lock` owns
-  backend-test invocations only; do not reuse it as a SUT/Cypress lock without
-  an explicit decision. Do not extend the wrapper's task parser to
-  `bootRun`/E2E unless a supported command actually needs it. Leftover
-  databases stay acceptable; no cleanup story. Shared MySQL already held two
-  backend suites; revisit capacity only if two application stacks fail. Before
-  slice planning, refine (and split if still larger than L) along the
-  user-visible workflow, not layers: 1c showed bundling first isolation with
-  every entry point overruns. The first browser increment should prove two
-  worktrees can each reach their own app and reset only their own fixtures.
-- **Effort hypothesis:** L — low confidence; deliberately limited to browser
-  scenarios without external-service mocks or spawned CLI/MCP clients. If this
-  minimum usable path exceeds L, revisit the story boundary before planning.
-- **Depends on:** None as a product prerequisite. Story 1 is delivered and
-  supplies the reusable identity; it is not required in order to run browser
-  tests, but a second identity would duplicate it.
+**Goal**
+
+Developers and AI tasks can run a representative browser note create/edit
+workflow against their own checkout while another local worktree does the
+same, without either runner resetting the other's data or restarting its app.
+This makes concurrent browser verification useful before external-service
+mocks or spawned clients are supported.
+
+**Scope**
+
+- Two local linked worktrees, dependencies installed, existing Nix environment
+  and shared MySQL already running; one SUT and one Cypress runner per worktree.
+  Start with ordinary `pnpm sut`, then `pnpm cypress run --spec` against a
+  focused browser note create/edit feature. Include `pnpm sut:healthcheck` and
+  `pnpm sut:restart`; do not promise every script alias or direct Gradle launch.
+- First SUT use prepares an isolated E2E database and application endpoints
+  without manual IDs, database setup, or repeated URL overrides. Reuse the
+  `.worktree.local.json` identity supplied by 1a–1c; a fresh worktree obtains
+  that same kind of identity. Persist successful allocation for later shells,
+  restarts, and ordinary branch changes. Do not replace an existing identity.
+- Browser traffic, backend fixture injection/reset, and saved note content all
+  belong to the same worktree. Include frontend, backend, proxy, and mutable
+  storage required by this path. Do not start, reset, or require Mountebank
+  for the isolated no-mock path. Unsupported specs must fail before fixture
+  reset or external-service/client setup; an allowlisted focused feature is
+  sufficient for this first increment.
+- Health checks identify the owning environment. Restart terminates only its
+  verified owned processes. A foreign listener or unverifiable stale process
+  record causes a visible refusal, never adoption or port-based termination.
+  Startup failure releases its own processes; shared services remain running.
+- Concurrent initialization must leave one complete configuration per checkout
+  and no conflicting endpoints across the two supported worktrees. Duplicate
+  SUT starts or Cypress runs in one checkout fail visibly. SUT may run while
+  its Cypress runner is active; restart during that runner is refused.
+- Invalid configuration, conflicting database/origin overrides, unavailable
+  ports, or migration failure stop the supported operation without shared-state
+  fallback. Output identifies the selected E2E database and browser origin.
+
+**Boundary assumptions chosen in refinement**
+
+- Preserve unconfigured primary-checkout E2E defaults, consistent with 1c.
+  A primary with local identity uses isolation. CI and Cloud VM behavior stay
+  unchanged. These are conservative refinement choices, not new developer
+  decisions attributed to the prior discussion.
+- SUT lifetime and Cypress-run ownership are separate from the backend-test
+  lock. Share only brief identity initialization coordination; do not hold the
+  backend-test lock for the SUT lifetime. This avoids blocking backend tests
+  merely because the application is running; concurrent compilation within
+  one checkout is not an additional supported workflow.
+- The first E2E allocation may create its new identity-derived E2E database
+  for an existing 1c identity. Once recorded, a missing database is an error,
+  not permission to rebuild it. Leftover resources after interrupted first
+  use are acceptable; destructive recovery remains excluded.
+
+**Key examples**
+
+1. Two fresh worktrees → each runs `pnpm sut`, then the focused Cypress spec
+   concurrently → each logs its own database/origin, creates a note, edits its
+   content, and sees the saved content after reload through its own app.
+2. Both environments contain distinct marker notes → A's ordinary scenario
+   reset runs while B reads/edits its note → B retains its note and completes
+   the edit. Repeat with A and B exchanged; shared E2E/unit-test data remain.
+3. B is healthy with a saved note and A has no active Cypress run → restart A
+   → A becomes healthy on its persisted allocation while B remains usable
+   with its saved note and original processes.
+4. An isolated runner selects a mock/CLI/MCP or other unapproved spec → run
+   refuses before resetting fixtures or contacting shared mocks/clients.
+5. A recorded port belongs to an unrelated listener, or configuration targets
+   another database → start/restart/run refuses with the conflict identified;
+   the unrelated listener and database remain unchanged.
+6. Open a fresh shell in a configured worktree → start and run again → reuse
+   its identity and E2E allocation. An unconfigured primary still follows its
+   existing defaults.
+
+**Architecture**
+
+Keep the local proxy route contract and named browser navigation from
+[ADR 0005](../../docs/adrs/0005-web-routes-accepted.md); vary environment
+origins, not route semantics. Follow
+[ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md): report a target
+or ownership conflict clearly rather than silently falling back. Port records
+are allocation metadata, not operating-system reservations.
+
+**Exclusions:** General parallel E2E support, external-service mocks or live
+external API calls, CLI/MCP (including installed-CLI folder relocation), direct
+`bootRun` entry points, every Cypress alias/open mode, persistent development
+profiles, cleanup/retirement, schema rollback/rebuild, copied-ID recovery,
+worktree hooks, Cloud VM/CI changes, and concurrency scheduling.
+
+**Effort hypothesis:** L (2–4 hours), low confidence. One focused feature and
+four ordinary commands bound the workflow; automatic setup reuses 1c. No
+separate storage engine is assumed. Startup integration is the sizing risk;
+refine execution leaves before attempting a large implementation beat. If
+evidence makes the story larger than L, revisit this story boundary.
+
+**Depends on:** Reuse delivered 1a–1c identity/provisioning behavior. Independent
+mocks and CLI/MCP are not prerequisites.
 
 <a id="story-3"></a>
 
@@ -391,7 +446,7 @@ Story 3 then covers mock-using browser workflows. Do not queue cleanup, Cloud
 VM, development-profile isolation, or a second worktree identity. Keep CLI and
 MCP stories 4–5 unqueued until the browser environment provides evidence;
 neither is cancelled. The [product backlog](../PRODUCT-BACKLOG.md) owns global
-order. Stories 2–3 still need refinement before executable planning.
+order. Story 2 is refined and has a slice plan; story 3 still needs refinement.
 
 Start with child 1a: it tests the central shared-MySQL assumption with manual
 provisioning and one supported workflow. Follow with 1b and 1c to remove setup
@@ -428,9 +483,9 @@ deferred scope. Reconsider them only when an actual workflow requires them.
   local nix mysqld already starts with `max_connections=1000` after 1a. Revisit
   the parent direction only if a later workflow (full-suite overlap, E2E, or
   application stacks) hits a new capacity or lifecycle limit.
-- Story 2 refinement should decide whether an unconfigured primary keeps shared
-  E2E defaults (the 1c unit-test policy) and how SUT/Cypress ownership relates
-  to the backend-test lock. Do not treat those as decided by 1c.
+- Story 2 refinement preserves unconfigured primary E2E defaults and separates
+  SUT/Cypress ownership from the backend-test lock; see its boundary assumptions.
+  These no longer block planning story 2.
 
 ## When to Surface
 
