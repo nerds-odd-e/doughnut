@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url'
 const launcherSrc = fileURLToPath(
   new URL('./backend-test-worktree.sh', import.meta.url)
 )
+const repoBackend = fileURLToPath(new URL('../backend', import.meta.url))
 
 const jdbcParams =
   'connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true'
@@ -22,7 +23,7 @@ export function jdbcUrl(database) {
   return `jdbc:mysql://127.0.0.1:3309/${database}?${jdbcParams}`
 }
 
-// Writes a recording stand-in script (e.g. for `gradlew` or `mysql`) and
+// Writes a recording stand-in script (e.g. for `java` or `mysql`) and
 // makes it executable. `lines` is the shell script body, one array entry per
 // line.
 function writeStandIn(scriptPath, lines) {
@@ -34,7 +35,7 @@ function writeStandIn(scriptPath, lines) {
 // is set, the stand-in announces it has been reached (writing to
 // <root>/<reachedName>) and then blocks until <root>/<releaseName> appears,
 // polling every 50ms. Lets a test pause a stand-in mid-invocation to inject
-// external activity at that exact point. Shared by the gradlew and mysql
+// external activity at that exact point. Shared by the java and mysql
 // stand-ins below.
 function holdReleaseLines(envVar, reachedName, releaseName) {
   return [
@@ -58,15 +59,32 @@ export function makeCheckout(t, { config } = {}) {
   copyFileSync(launcherSrc, launcher)
   chmodSync(launcher, 0o755)
 
+  copyFileSync(
+    path.join(repoBackend, 'gradlew'),
+    path.join(root, 'backend', 'gradlew')
+  )
+  chmodSync(path.join(root, 'backend', 'gradlew'), 0o755)
+  const wrapperDir = path.join(root, 'backend', 'gradle', 'wrapper')
+  mkdirSync(wrapperDir, { recursive: true })
+  for (const name of ['gradle-wrapper.jar', 'gradle-wrapper.properties']) {
+    copyFileSync(
+      path.join(repoBackend, 'gradle', 'wrapper', name),
+      path.join(wrapperDir, name)
+    )
+  }
+
   const gradleInvocation = path.join(root, 'gradle-invocation')
   const gradleReached = path.join(root, 'gradle-reached')
   const gradleRelease = path.join(root, 'gradle-release')
-  writeStandIn(path.join(root, 'backend', 'gradlew'), [
+  // The real wrapper execs `$JAVA_HOME/bin/java` when JAVA_HOME is set (Nix
+  // sets it). PATH-only `java` interception would miss that endpoint.
+  const javaHome = path.join(root, 'java-home')
+  mkdirSync(path.join(javaHome, 'bin'), { recursive: true })
+  writeStandIn(path.join(javaHome, 'bin', 'java'), [
     '#!/bin/sh',
-    'root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"',
+    'root="$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)"',
     'record="$root/gradle-invocation"',
     '{',
-    '  printf \'wrapper=%s\\n\' "$0"',
     '  printf \'cwd=%s\\n\' "$PWD"',
     '  printf \'SPRING_DATASOURCE_URL=%s\\n\' "${SPRING_DATASOURCE_URL-}"',
     '  for arg in "$@"; do',
@@ -85,10 +103,9 @@ export function makeCheckout(t, { config } = {}) {
 
   // A recording stand-in for the `mysql` administration CLI, invoked by
   // backend-test-worktree.sh to create/grant a first-use database. Lives at
-  // `<root>/bin/mysql` (mirroring gradlew's `<root>/backend/gradlew` layout)
-  // so it can be put ahead of the real `mysql` on PATH. Records every
-  // argument and any piped stdin (e.g. the heredoc SQL) to mysqlInvocation,
-  // then exits with FAKE_MYSQL_EXIT (default 0).
+  // `<root>/bin/mysql` so it can be put ahead of the real `mysql` on PATH.
+  // Records every argument and any piped stdin (e.g. the heredoc SQL) to
+  // mysqlInvocation, then exits with FAKE_MYSQL_EXIT (default 0).
   const binDir = path.join(root, 'bin')
   mkdirSync(binDir, { recursive: true })
   const mysqlStandIn = path.join(binDir, 'mysql')
@@ -114,6 +131,7 @@ export function makeCheckout(t, { config } = {}) {
   return {
     root,
     launcher,
+    javaHome,
     gradleInvocation,
     gradleReached,
     gradleRelease,
@@ -127,18 +145,22 @@ export function makeCheckout(t, { config } = {}) {
 
 export function readGradleInvocation(checkout) {
   const text = readFileSync(checkout.gradleInvocation, 'utf8')
-  const args = []
-  let wrapper
+  const javaArgs = []
   let cwd
   let url
   for (const line of text.split('\n')) {
-    if (line.startsWith('wrapper=')) wrapper = line.slice('wrapper='.length)
-    else if (line.startsWith('cwd=')) cwd = line.slice('cwd='.length)
+    if (line.startsWith('cwd=')) cwd = line.slice('cwd='.length)
     else if (line.startsWith('SPRING_DATASOURCE_URL=')) {
       url = line.slice('SPRING_DATASOURCE_URL='.length)
-    } else if (line.startsWith('arg:')) args.push(line.slice('arg:'.length))
+    } else if (line.startsWith('arg:')) javaArgs.push(line.slice('arg:'.length))
   }
-  return { wrapper, cwd, url, args }
+  const jarAt = javaArgs.indexOf('-jar')
+  const jarPath = jarAt >= 0 ? javaArgs[jarAt + 1] : undefined
+  const wrapper = jarPath
+    ? path.normalize(path.join(path.dirname(jarPath), '..', '..', 'gradlew'))
+    : undefined
+  const args = jarAt >= 0 ? javaArgs.slice(jarAt + 2) : javaArgs
+  return { wrapper, cwd, url, args, javaArgs }
 }
 
 export function readMysqlInvocation(checkout) {

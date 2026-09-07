@@ -102,6 +102,28 @@ test('valid configuration execs one gradle migrate-then-test run', (t) => {
   assert.equal(args.includes('--tests'), false)
 })
 
+test('checkout wrapper is the real gradle wrapper, not a short stand-in', (t) => {
+  const checkout = makeCheckout(t, {
+    config: JSON.stringify({ id: 'wt_a7c2' }),
+  })
+  const result = runLauncher(checkout)
+  assert.equal(result.status, 0, result.stderr)
+
+  const repoWrapper = fileURLToPath(
+    new URL('../backend/gradlew', import.meta.url)
+  )
+  assert.equal(
+    readFileSync(path.join(checkout.root, 'backend', 'gradlew'), 'utf8'),
+    readFileSync(repoWrapper, 'utf8')
+  )
+
+  const { javaArgs } = readGradleInvocation(checkout)
+  assert.equal(javaArgs.includes('-Dorg.gradle.appname=gradlew'), true)
+  const jarAt = javaArgs.indexOf('-jar')
+  assert.ok(jarAt >= 0, javaArgs.join(' '))
+  assert.match(javaArgs[jarAt + 1], /gradle-wrapper\.jar$/)
+})
+
 test('matching URL overrides still exec gradle against the selected database', (t) => {
   const expected = jdbcUrl('doughnut_wt_a7c2_test')
   const checkout = makeCheckout(t, {

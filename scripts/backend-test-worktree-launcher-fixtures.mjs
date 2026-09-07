@@ -16,11 +16,13 @@ function sanitizedChildEnv(env) {
 }
 
 // Puts the checkout's fake `mysql` stand-in ahead of the real one on PATH so
-// the launcher's `mysql` invocation is intercepted, then applies the usual
-// sanitization/overrides.
+// the launcher's `mysql` invocation is intercepted, points JAVA_HOME at the
+// recording `bin/java` (the real wrapper execs `$JAVA_HOME/bin/java` when
+// JAVA_HOME is set), then applies the usual sanitization/overrides.
 function launcherChildEnv(checkout, env) {
   return sanitizedChildEnv({
     PATH: `${checkout.binDir}${path.delimiter}${process.env.PATH ?? ''}`,
+    JAVA_HOME: checkout.javaHome,
     ...env,
   })
 }

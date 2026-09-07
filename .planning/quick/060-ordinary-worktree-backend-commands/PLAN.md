@@ -1,8 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: planned; slice plan refined 2026-09-07; ready for direct execution.
-Implementation not started.
+Status: in progress; slice 1 done.
 
 ## Goal and scope
 
@@ -82,7 +81,7 @@ root-qualified forms). Preserve unrelated task behavior. Document this boundary.
 
 ### 1. Exercise the real wrapper at the command boundary
 Type: Structure
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` stays green.
 
 Internal change: Extend the fixture to copy the real wrapper and intercept its
@@ -256,11 +255,14 @@ suite runtime is an explicit exception. No new background supervisor is planned.
 
 ## Execution discipline and learnings
 
-No product implementation authorized by this planning request. Later execute-plan
-uses Jidoka, fresh post-change-refactor agent, one selective format, PLAN update,
-commit/push per leaf. Preserve unrelated changes. Keep all new supported paths
-validated/locked from their first leaf; later proof leaves do not permit interim
-unsafe behavior. Keep opt-in usable at every stopping point.
+Keep all new supported paths validated/locked from their first leaf; later proof
+leaves do not permit interim unsafe behavior. Keep opt-in usable at every
+stopping point.
+
+- Slice 1: the real wrapper execs `$JAVA_HOME/bin/java` when JAVA_HOME is set
+  (Nix sets it). The fixture copies `backend/gradlew` and intercepts that
+  Java endpoint; PATH-only `java` would miss it. Reuse this for ordinary-command
+  routing in leaf 2.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining
