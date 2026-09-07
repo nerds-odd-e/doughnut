@@ -173,7 +173,10 @@ environment manager, database cleanup, or changes to existing command selection.
 
 #### 1b. Run the first backend tests in a fresh worktree without manual setup
 
-**Status:** Refined. Depends on the delivered isolated test workflow from 1a.
+**Status:** Delivered. Guide: `docs/worktree-backend-tests.md`. Leftover
+exclusive stale-lock reclaim and gitignore of `.worktree.local.lock` are
+[quick/058](../quick/058-exclusive-worktree-checkout-lock/PLAN.md), not a new
+story.
 
 **Goal**
 
@@ -207,28 +210,13 @@ makes isolated verification practical even if ordinary command integration in
   cleanup, worktree hooks, port allocation, application/E2E services,
   Cloud VM/CI behavior, and recovery from duplicate operator-supplied
   configurations remain excluded.
-- **Effort hypothesis:** M — medium confidence. Existing 1a evidence proves the
-  test workflow and local MySQL 8.4 database/grant operations; the remaining
-  work is bounded first-use allocation, checkout ownership, and reuse.
-
-**Key examples**
-
-- Two fresh worktrees have neither `.worktree.local.json` nor corresponding
-  databases → their opt-in test commands overlap → each creates a distinct
-  environment and its requested tests pass against that worktree's database.
-- One automatically initialized worktree opens a fresh shell and runs the
-  command again → the same identity and database are selected without another
-  allocation or manual setup.
-- One worktree receives two overlapping first-use invocations → one invocation
-  owns initialization and testing, the other refuses visibly, and the checkout
-  is left with one complete reusable configuration.
-- Database creation, access assignment, or persistent configuration fails →
-  no Gradle migration/test starts, no fallback database is selected, and other
-  configured environments remain unchanged.
 
 <a id="story-1c"></a>
 
 #### 1c. Use ordinary backend test and migration commands in isolated worktrees
+
+**Status:** Queued. Settle the open compatibility decisions below before slice
+planning. 1a and 1b are delivered; do not rediscover them.
 
 - **For / why:** Developers and AI tasks can use familiar commands and focused
   test loops without remembering which entry point provides isolation.
@@ -249,31 +237,44 @@ makes isolated verification practical even if ordinary command integration in
 - **Safety boundary:** All shared boundaries apply. Preserve non-worktree
   workflows according to the compatibility decision below; a conflicting
   explicit URL cannot silently bypass an assigned worktree target.
-- **Effort hypothesis:** M — low confidence; assumes the proven first-use
-  behavior can serve the bounded set of commands above without changing
-  unrelated tooling. Reassess if entry-point behavior makes this larger than L.
+- **Effort hypothesis:** M — medium confidence. 1b proved first-use allocation
+  and live checkout ownership on the opt-in command. Remaining risk is the
+  ordinary entry-point fan-out agreeing on one target without a second
+  allocator. Reassess if that fan-out makes this larger than L.
 - **Depends on:** The configured workflow from 1a and automatic first use from
-  1b for the fresh-worktree case.
+  1b for the fresh-worktree case. Reuse `scripts/backend-test-worktree.sh`
+  identity, database, and checkout lock; do not invent a parallel provisioner.
+  Finish or incorporate [quick/058](../quick/058-exclusive-worktree-checkout-lock/PLAN.md)
+  so ordinary commands inherit exclusive stale-lock reclaim and a gitignored
+  `.worktree.local.lock` rather than copying the current `mv` reclaim.
+- **Reminder from 1a–1b:** Separate databases on the existing MySQL 8.4 server
+  already make concurrent backend tests independent; local nix mysqld already
+  starts with `max_connections=1000`. Do not serialize across worktrees. Do
+  not repair or replace an operator-supplied identity, and do not start tests
+  when the configured database is missing. No AI or worktree-creation hook is
+  required. At most one test invocation per checkout remains in force when
+  ordinary commands share the environment.
 
 **Ordering and stopping points within group 1**
 
-Recommend 1a → 1b → 1c. First prove real concurrent tests, then remove manual
-setup, then remove the need to remember a special command. If the broader E2E
-need becomes more urgent, a working 1a is a useful point to reconsider whether
-browser isolation should precede convenience improvements 1b/1c. The new cuts
-preserve the parent outcome; none is merely a file, loader, or provisioning
-component. For group-only scope reduction, drop 1c first, then 1b, retaining 1a.
+Recommend 1a → 1b → 1c. 1a and 1b are delivered. 1c remains the group-1
+convenience story: remove the need to remember a special command. If browser
+E2E isolation becomes more urgent, reconsider whether story 2 should precede
+1c; that is a backlog-order choice, not a new group-1 child. For group-only
+scope reduction, drop 1c first, retaining 1a–1b.
 
 **Open decisions for group 1**
 
 - The developer accepted manually supplied distinct databases and one supported
-  workflow for 1a. This interim compromise preserves the eventual automatic-setup
-  goal; it is no longer an open choice for 1a.
+  workflow for 1a. Automatic first use on that opt-in command is delivered in
+  1b. Neither is an open choice anymore.
 - Before selecting 1c, settle the compatibility proposal: a primary checkout
   without local configuration keeps `doughnut_test`, while fresh linked
   worktrees initialize isolation automatically. Also settle how normal
   commands handle conflicting explicit database URLs; the recommendation is
-  visible rejection. These proposals need not expand 1a's opt-in workflow.
+  visible rejection (the opt-in command already refuses a conflicting
+  `SPRING_DATASOURCE_URL`, `DB_URL`, or `SPRING_FLYWAY_URL`). These proposals
+  need not expand 1a's opt-in workflow.
 
 <a id="story-2"></a>
 
@@ -361,18 +362,18 @@ component. For group-only scope reduction, drop 1c first, then 1b, retaining 1a.
 
 Start with child 1a: it tests the central shared-MySQL assumption with manual
 provisioning and one supported workflow. Follow with 1b and 1c to remove setup
-and command-selection friction; reconsider their priority after 1a if earlier
-browser coverage is more valuable. Story 2 then
+and command-selection friction. 1a and 1b are delivered; 1c is the remaining
+queued convenience story. Reconsider 1c versus story 2 if browser coverage
+becomes more valuable than ordinary-command isolation. Story 2 then
 delivers a concrete browser workflow. Story 3 broadens browser coverage before
 stories 4 and 5 extend verification to other clients. CLI-before-MCP is a
 provisional value ordering, not a technical dependency.
 
 Each delivered story is a safe stopping point with an explicitly supported
 workflow. Do not claim general parallel E2E support after only story 2.
-First-to-drop order is 5, 4, 3, 2, 1c, then 1b; retain 1a as the smallest
-useful delivery. Estimates are rough hypotheses without a new implementation
-audit: children 1a–1c are M; existing stories 2–4 are L and 5 is M. These are
-low-confidence bands, not a delivery commitment.
+First-to-drop order is 5, 4, 3, 2, then 1c; retain 1a–1b. Estimates are rough
+hypotheses without a new implementation audit: 1c is M; existing stories 2–4
+are L and 5 is M. These are low-confidence bands, not a delivery commitment.
 
 Worktree creation integration and safe process ownership belong within the
 first story that needs them. A dedicated retirement/cleanup command, persistent
@@ -388,10 +389,12 @@ deferred scope. Reconsider them only when an actual workflow requires them.
   E2E categories. Its database naming is captured above, but its user workflow
   is not promised by these initial candidates.
 - Before selecting 1c, settle the legacy-checkout and explicit-override
-  compatibility policy recorded in group 1. First-use automation in 1b must
-  remain usable without a particular AI tool or worktree-creation hook.
-- If concurrent unit tests expose material shared-server capacity or lifecycle
-  problems, revisit the parent direction before broadening E2E support.
+  compatibility policy recorded in group 1. First-use automation in 1b is
+  delivered without a particular AI tool or worktree-creation hook; keep that.
+- Concurrent unit tests on shared MySQL 8.4 did not require a separate server;
+  local nix mysqld already starts with `max_connections=1000` after 1a. Revisit
+  the parent direction only if a later workflow (full-suite overlap, E2E, or
+  application stacks) hits a new capacity or lifecycle limit.
 
 ## When to Surface
 
@@ -413,3 +416,7 @@ Select and refine one story before creating an executable plan.
   `e2e_test/step_definitions/hook.ts`, and `scripts/sut-restart.mjs`.
 - [ADR 0006: Failure handling](../../docs/adrs/0006-failure-handling-accepted.md).
 - [Problem decomposition](../../.cursor/rules/problem-decomposition.mdc).
+- Quick/054 and quick/057: concurrent suites on shared MySQL 8.4.11 work;
+  automatic first-use of `pnpm backend:test:worktree` works in two fresh
+  worktrees. Leftover exclusive stale-lock reclaim and lock gitignore:
+  [quick/058](../quick/058-exclusive-worktree-checkout-lock/PLAN.md).

@@ -384,6 +384,18 @@ Donut. This is useful even if moving between folders is deferred indefinitely.
 - **Depends on:** Story 12.
 - **Safe stopping point:** Incomplete or multiply plausible descendant
   correspondence rejects the commit atomically.
+- **Reminder from Story 9:** Ordinary Git rebase and a native conflict pause
+  apply only to one unpublished existing-note *content* commit over
+  content-only accepted history. A folder move is structural. Do not implement
+  this story as text merge, identity inference from a successful rebase, or a
+  new Donut continue/abort command. Pull and publish already refuse an
+  unfinished Git operation. Mixed folder-move-plus-content in one commit, and
+  rebasing unpublished local content over an accepted folder move, stay
+  refused until separately selected; this story is the identity-preserving
+  *publication* of one unambiguous folder relocation (Story 12 at folder
+  scale), plus clean-checkout receipt. Unrepresented empty descendants still
+  need refinement before claiming their identities. Use
+  **story-refinement** before slice planning.
 
 <a id="story-8"></a>
 
@@ -533,6 +545,13 @@ edit; Story 12's relocation scope stays separate.
 - **Depends on:** Story 3.
 - **Safe stopping point:** Prefer extra immutable commits over amending any
   history already visible to a client.
+- **Reminder from Story 9:** Pull already rebases one unpublished content
+  commit over several linear accepted same-note content commits, including
+  absorb/empty-result (“no unpublished change remains”). This story improves
+  web-authored history granularity; it is not a synchronization unlock and
+  must not amend a commit already visible to clone or pull. Keep explicit
+  publish, the unfinished-Git-operation gate, and “publish only if unpublished
+  work remains.”
 
 <a id="story-11"></a>
 
@@ -695,11 +714,11 @@ SEED-015 worktree isolation currently precedes it in that queue.
   separately from accepted head and does not POST. Publication of L′ keeps
   original note identities and learning data on the existing one-child
   contract. Repeat pull of an already-based commit is unchanged success.
-- **Same-path is still a refusal, not a Git merge.** Overlap walks every
-  accepted edge with rename inference disabled. Disjoint paragraphs and remote
-  edit-then-restore both name the path and leave the checkout unchanged.
-  Story 9 now replaces that refusal with the developer's selected ordinary-Git
-  policy: auto-merge when possible and pause on actual conflicts.
+- **Same-path was a refusal in this delivery.** Overlap walked every accepted
+  edge with rename inference disabled. Disjoint paragraphs and remote
+  edit-then-restore named the path and left the checkout unchanged.
+  Story 9 later replaced that refusal with ordinary Git auto-merge and a
+  native pause on actual conflicts.
 - **Structural divergence with unpublished local work stays rejected.** Remote
   rename, delete/recreate, README, and mode — including a later reversal —
   stop before rebase. A clean checkout can still fast-forward an accepted
@@ -707,6 +726,21 @@ SEED-015 worktree isolation currently precedes it in that queue.
 - **Drift remains visible, not repaired.** Pull downloads accepted history
   only; publication still rejects projection mismatch and retains local work.
   Do not promote drift recovery from this delivery alone.
+
+### Learning from the delivered same-note overlap story
+
+- **Native Git is the recovery UI.** Auto-merge when Git can; otherwise leave
+  a paused rebase with path-named continue/abort guidance. Donut still changes
+  only on a later explicit publish. Do not add continue/abort/sync verbs, and
+  do not invent an empty commit when Git absorbs the patch.
+- **Structural unpublished work stays refused.** Every accepted edge is still
+  inspected; a later reversal does not make a rename, deletion, or folder move
+  eligible for content rebase. Story 7 publishes a folder relocation; it does
+  not rebase unpublished content over that move.
+- **Installed clone/pull copy already describes this contract.** Content-only
+  eligibility, native continue/abort, and publish only if unpublished work
+  remains. Later stories should extend that guidance, not replace it with a
+  second workflow document.
 
 These are implementation and executable-example findings, not evidence of
 real-user frequency or satisfaction. The removed plan has no reliable completed
@@ -738,12 +772,10 @@ essential; the split removes folder policy rather than disguising it as tests.
 
 ### Priority and deferred follow-ons
 
-Same-folder renaming and single-note relocation have delivered identity-preserving
-reorganization for one note. Non-overlapping other-note concurrent edits can be
-pulled and then published. Overlapping same-note handling remains next among
-notebook-sync stories because that refusal still blocks the delivered lifecycle.
-Whole-folder moves follow Story 12. Batching improves history quality after
-synchronization works.
+Same-folder renaming, single-note relocation, other-note rebase, and same-note
+ordinary-Git overlap are delivered. Whole-folder moves are next among
+notebook-sync stories. Batching web commits improves history quality after
+that synchronization already works; it is not a prerequisite of Story 7.
 
 No new feature story is promoted from the deletion or rename proofs alone.
 Keep these possibilities deferred until the stated learning warrants selecting
@@ -765,9 +797,11 @@ and refining a concrete outcome:
 - **Same-path auto-merge and remote edit-then-restore:** delivered in Story 9
   with ordinary Git auto-merge and a native rebase pause on real conflicts.
   No separate follow-on story is needed.
-- **Delete/edit or rename/edit conflicts and multiple unpublished commits:** revisit after
-  the first content divergence/conflict workflow; explicitly settle identity
-  intent before broadening conflict resolution to deletion or recreation.
+- **Delete/edit or rename/edit conflicts and multiple unpublished commits:**
+  Story 9 delivered the first content-conflict workflow (native Git pause,
+  continue, abort, explicit publish). Identity intent for deletion or
+  recreation is still unresolved, so do not enqueue or fold this into Story 7.
+  Select a new story only after that policy is refined.
 
 Safe stopping points:
 
@@ -814,8 +848,9 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 ## When to Surface
 
 Stories 1–6, 8, 9, 11, and 12 are delivered. Select one remaining story from
-the [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Do not turn
-the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
+the [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Story 7
+still needs **story-refinement** (Goal/Scope) before an executable plan. Do not
+turn the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
 boundary as a human-owned advice task; it does not change these story outcomes.
 
 ## Breadcrumbs
