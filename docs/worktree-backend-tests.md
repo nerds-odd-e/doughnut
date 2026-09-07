@@ -31,7 +31,8 @@ When this checkout has no `.worktree.local.json` yet, the command:
    an existing database fails visibly and is never adopted.
 3. Persists `{"id":"<id>"}` to gitignored `.worktree.local.json` (ignore entry
    `/.worktree.local.json`) only after provisioning succeeds, printing
-   `Allocated new worktree environment: <id>`.
+   `Allocated new worktree environment: <id>`. Git also ignores the leftover
+   checkout lock with `/.worktree.local.lock`.
 
 The command then prints `Selected database: doughnut_<id>_test`, migrates it,
 and runs the requested tests (the full form runs the complete suite; the
@@ -73,7 +74,8 @@ FLUSH PRIVILEGES;
 ```
 
 Replace `wt_a7c2` / `doughnut_wt_a7c2_test` with the chosen identity. Confirm
-the ignore with `git check-ignore -v .worktree.local.json`.
+the ignore with `git check-ignore -v .worktree.local.json`. The leftover
+checkout lock is ignored the same way (`/.worktree.local.lock`).
 
 With this config present, the command selects it directly: it never creates
 the database, never replaces the identity, and does not repair a missing or

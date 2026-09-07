@@ -154,7 +154,8 @@ sut.log
 sut.log.*
 sut.pid
 
-# checkout-local worktree identity (opt-in backend tests)
+# checkout-local worktree identity and leftover lock (opt-in backend tests)
 /.worktree.local.json
+/.worktree.local.lock
 # CocoIndex Code (ccc)
 /.cocoindex_code/

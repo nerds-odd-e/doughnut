@@ -1,6 +1,6 @@
 # Exclusive worktree checkout lock after first-use
 
-Status: in progress (slices 1–2 done).
+Status: complete.
 Source: [SEED-015 story 1b](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1b).
 Reviewed first-use commits: `162feeacca`..`987d0fbc52` (recover the completed
 quick/057 PLAN from `fce6bd68f4`).
@@ -27,93 +27,36 @@ wait queue or process supervisor.
 
 ## Current decisions
 
-- Reclaim must use the same exclusive-creation rule as first acquire. Replacing
-  `owner.pid` with `mv` is not exclusive: two processes that both observe a
-  dead PID can both proceed into Gradle against the same database. Do not add
-  a wait queue, trap, or supervisor. Live and malformed records remain
-  immediate refusals. Follow [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md).
+- Reclaim uses exclusive `mkdir` of `reclaimed.<pid>`, the same exclusive-creation
+  rule as first acquire. Live and malformed records remain immediate refusals.
+  Follow [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md).
 - Ignore `/.worktree.local.lock` at the repo root next to `/.worktree.local.json`.
-  The lock directory is still left in place after `exec`; reclaim remains the
-  reuse path. Ignoring it is not lock retirement.
-- Split the fixture along cohesive seams (stand-ins vs launchers vs lock
-  helpers). Do not export allocation helpers for direct tests.
-
-## Execution context
-
-- `scripts/backend-test-worktree.sh` creates `.worktree.local.lock` with
-  `mkdir` and writes `owner.pid`. A dead numeric PID is reclaimed only by
-  exclusive `mkdir` of `reclaimed.<pid>` inside that lock; a live or already
-  reclaimed owner is an immediate refusal.
-- Command-boundary tests: `scripts/backend-test-worktree-lock.test.mjs` (live
-  owner, malformed record, other checkout, single stale reclaim, overlapping
-  reclaimers). Fixtures are stand-in / launcher / lock modules.
-- `.gitignore` has `/.worktree.local.json` only. Slice 12 of quick/057 needed
-  `git worktree remove --force` because the leftover lock directory was
-  untracked.
-- Focused proof: `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree`.
+  The lock directory stays after `exec`; reclaim is the reuse path.
+- Fixtures split along stand-ins / launchers / lock helpers. Allocation helpers
+  stay unexported.
 
 ## Ordered slices
 
 ### 1. Split the oversized worktree launcher fixture
 Type: Structure
 Status: done
-Proof: `wc -l` on each resulting fixture module is ≤250. Historical comments
-that record superseded missing-config refusal or slice numbers are gone from
-the launcher test files. Existing tests remain green:
+Proof: stand-in 153 / launcher 101 / lock 24 lines.
 `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree`.
-
-Internal change: Split `scripts/backend-test-worktree-test-fixtures.mjs`
-along cohesive seams so lock overlap helpers can be added without growing a
-file already over the limit. Immediate next Behavior: slice 2.
-
-Sizing: about 5 minutes, high confidence; file split and import updates only.
 
 ### 2. Refuse a second reclaimer of a stale checkout lock
 Type: Behavior
 Status: done
-Proof: Given a valid `.worktree.local.json` and a stale owner PID, start two
-launcher processes without waiting for the first to reach Gradle. One reaches
-Gradle against the configured database; the other exits nonzero with the
-existing in-checkout owner message and never writes a Gradle invocation.
-Single stale reclaim, live owner, and malformed record remain as they are.
+Proof: two reclaimers against one stale lock; one Gradle owner, one
+in-checkout refusal before Gradle.
 `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree`.
-
-Behavior: A previous launcher has exited and left a dead owner record, and two
-later commands start in that checkout → only one owns the run and reaches
-tests; the other refuses rather than sharing the database.
-
-Close the reclaim TOCTOU with exclusive creation, not `mv` over `owner.pid`.
-Do not wait, retry past a live owner, or serialize across checkouts.
-
-Sizing: about 5 minutes, medium confidence; one overlap proof on the existing
-async launcher fixture.
 
 ### 3. Ignore the leftover checkout lock in Git
 Type: Behavior
-Status: planned
-Proof: `git check-ignore -v .worktree.local.lock` reports the root ignore
-entry. `docs/worktree-backend-tests.md` names that entry beside
-`.worktree.local.json`. Identity-file ignore and lock/reclaim behavior stay
-unchanged.
+Status: done
+Proof: `git check-ignore -v .worktree.local.lock` →
+`.gitignore:159:/.worktree.local.lock`. Guide names that entry beside
+`.worktree.local.json`.
 `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree`.
-
-Behavior: A checkout has run the opt-in command and still has
-`.worktree.local.lock` on disk → Git treats that path as ignored, so status
-and worktree removal are not dirtied by the leftover lock.
-
-Sizing: about 5 minutes, high confidence; one ignore entry and guide sentence.
-
-## Learnings
-
-Execution retrospective of quick/057 (`162feeacca`–`987d0fbc52`): first-use
-provisioning, reuse, live-owner refusal, and real two-worktree proof stand.
-Remaining gap is gitignore for the lock directory.
-
-Slice 1 split `backend-test-worktree-test-fixtures.mjs` into stand-in (153),
-launcher (101), and lock (24) modules. `makeStaleOwnerPid` stays unexported.
-
-Slice 2 reclaims a dead owner with exclusive `mkdir` of `reclaimed.<pid>`;
-two overlapping reclaimers leave one Gradle owner.
 
 ## Considered but excluded
 
