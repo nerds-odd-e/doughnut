@@ -29,14 +29,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(
-    properties = {
-      "spring.datasource.url=jdbc:mysql://127.0.0.1:3309/doughnut_test",
-      "spring.datasource.username=doughnut",
-      "spring.datasource.password=doughnut",
-      "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver"
-    })
-@Import(DataSourceAutoConfiguration.class)
+@SpringBootTest
 @ActiveProfiles("test")
 class QuestionGenerationBatchMaintenanceConcurrencyTest {
 

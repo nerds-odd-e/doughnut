@@ -1,6 +1,6 @@
 # Worktree backend tests inherit the suite datasource
 
-Status: planned; not executed.
+Status: in progress; slice 1 done.
 Source: [SEED-015 Story 1a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1a)
 and execution-retrospective of
 [quick/054-configured-worktree-backend-tests](../054-configured-worktree-backend-tests/PLAN.md)
@@ -43,7 +43,7 @@ the literal database name `doughnut_test`.
 
 ### 1. Test-profile lock tests use the suite datasource
 Type: Behavior
-Status: planned
+Status: done
 Proof: `QuestionGenerationBatchMaintenanceConcurrencyTest` does not set a
 `doughnut_test` JDBC URL. Focused backend tests for that class stay green.
 `node --test scripts/backend-test-worktree.test.mjs` stays green.
@@ -69,3 +69,10 @@ suite-selected database rather than `doughnut_test`.
   removes the pins in the tests that actually broke isolation.
 - Backend package tests normally run as a complete suite; use focused classes
   while red/green, then the complete backend unit-test command before wrap-up.
+
+## Learnings
+
+- Dropping the test-profile `@SpringBootTest` datasource properties (and the
+  extra `DataSourceAutoConfiguration` import) is enough: the class starts from
+  `db-test.properties` / `SPRING_DATASOURCE_URL`. Leave `ShedLockConfigProdTest`
+  pinned until slice 2; it may still need an explicit URL under `prod`.
