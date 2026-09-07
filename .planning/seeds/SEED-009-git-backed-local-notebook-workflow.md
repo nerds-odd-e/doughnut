@@ -121,8 +121,8 @@ from Git.
 
 ### 2. Publish a local content edit to the same Donut note
 
-**Status:** delivered by the completed
-[publication plan](../quick/004-publish-local-note-content/PLAN.md).
+**Status:** delivered. The completed publication plan was removed; implementation
+and proof remain recoverable from Git history.
 
 The owner can publish one direct-child Git commit that edits one existing
 Portable Markdown note. Donut advances the accepted head and updates that same
@@ -243,8 +243,9 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
 
 ### 5. Delete a note locally without transferring its private data
 
-**Status:** delivered. The completed quick plan was removed; implementation and
-proof remain recoverable from Git history.
+**Status:** delivered in PR #1623, merged as `e60f9ba369` on 2026-09-07.
+The completed quick plan was removed in `cad4b44737`; recover it from that
+commit's parent. Backlog implications are recorded under Ordering and Scope Reduction.
 
 **Goal**
 
@@ -299,23 +300,92 @@ useful before adding broader deletion or identity-inference behavior.
 
 <a id="story-6"></a>
 
-### 6. Rename or move a note without losing its learning history
+### 6. Rename a note without losing its learning history
 
-- **For / why:** Obsidian and AI IDE users routinely reorganize files and expect
-  a moved note to remain the same learned concept in Donut.
-- **Evaluation:** The owner commits an unambiguous move-only rename or move and
-  synchronizes it; Donut shows the new Portable path on the same note entity,
-  with its memory trackers and other private data still attached. A combined
-  move-and-rewrite whose identity is ambiguous is rejected with enough guidance
-  to split it into a move commit followed by an edit.
-- **Value / learning:** Tests the defining Donut-specific risk that Git itself
-  does not solve: conservative projection from path changes to stable private
-  identity.
-- **Effort hypothesis:** L — low confidence; assumes exact one-to-one
-  correspondence is a sufficiently narrow first identity case.
-- **Depends on:** Story 2.
-- **Safe stopping point:** Similarity alone never transfers private data; the
-  remote remains unchanged when correspondence is ambiguous.
+**Status:** refined and [slice-planned](../quick/049-publish-local-note-move/PLAN.md);
+the plan has been refined for this narrower story; not implemented.
+
+**Goal**
+
+An owner using Obsidian or an AI IDE can improve a note's filename in its
+current location and keep the same learned concept and private history in
+Donut. This is useful even if moving between folders is deferred indefinitely.
+
+**Scope**
+
+- Use the existing authenticated owner publish flow from a clean bound
+  checkout on main. Accept one single-parent commit directly after accepted
+  main, with current Donut Portable content matching that parent.
+- Rename exactly one ordinary Markdown note at the root or within its current
+  folder, including nested folders. The complete commit removes one file and
+  adds one with identical authored bytes in the same parent directory; no
+  other file changes. Compare the removed/added pair in that commit, not
+  similarity or unchanged copies elsewhere.
+- Update the same note's filename-derived title. Preserve tracker activation
+  and scheduling, learning history, questions, conversations, and other
+  identity-bound data. An inactive tracker remains inactive; an unchanged
+  identical copy keeps its own data. Keep YAML title, headings, and all other
+  authored bytes unchanged.
+- Preserve referring body and property links as authored, using ordinary
+  current-state resolution. Links to the old exact path can become unresolved.
+  No automatic link rewrite, alias, or reference-policy chooser is included;
+  a referrer can be edited in a separate supported content-edit commit.
+- Validate the final filename under current title/path/sibling rules, including
+  reserved names and soft-deleted destinations. Accept the exact authored
+  commit and identity-preserving change together, or neither. Invalid,
+  ambiguous, rewritten, mixed, stale, or drifted proposals retain the owner's
+  local work and leave accepted remote state unchanged.
+- An accepted retry with a matching projection is unchanged. Ordinary clone/pull
+  exposes the renamed file with earlier history intact. After publishing the
+  rename, a separately authored and published content edit at the new path
+  changes that same identity.
+- Reject changes of parent directory, even when Git labels them renames.
+  [Story 12](#story-12) owns relocation. Also exclude folder/README changes,
+  new folders, cross-notebook moves, attachments, multiple unpublished commits,
+  rebase/conflict handling, drift repair, restore/deleted-path reuse, and web
+  structural synchronization.
+- Retain delivered add/edit/delete behavior. In particular, an accepted
+  deletion followed by a separate addition at another available path creates
+  fresh identity; this must never become a delayed rename.
+
+**CLI interaction**
+
+Use existing publish output and clone guidance. Explain same-folder,
+unchanged-content renaming in its own commit, then a separately published edit.
+Editor-generated link rewrites must be separated. Cross-folder changes remain
+unsupported until Story 12. No new command, preview, web interaction, identity
+metadata, sidecar, commit trailer, or watcher is required.
+
+**Key examples**
+
+1. Rename Biology/Cell.md to Biology/Cell basics.md without changing bytes →
+   publish → the same learned note appears with the new title; another clean
+   checkout pulls that filename.
+2. A renamed note has active and inactive trackers, questions, and conversations,
+   while another unchanged note has identical text → publish → each identity's
+   private data and tracker state remain its own.
+3. A referrer names the old exact path → publish rename → its body/property
+   references remain authored and resolve against current state. Separately
+   publish a content edit at the new path → update the original note.
+4. Rename plus rewrite, several candidates, a reserved deleted destination, or
+   a changed parent directory → reject atomically. Rename-plus-rewrite guidance
+   recommends rename-only then edit, never delete-then-create to retain history.
+5. A newer accepted web edit or projection drift intervenes → reject without
+   renaming the note. Retry a successfully accepted, still-matching rename →
+   unchanged success.
+
+- **Evaluation:** Installed CLI publication and another checkout's receipt,
+  with Donut displaying the same learned note under its new name.
+- **Value / learning:** Tests the first exact-correspondence identity promise
+  without also deciding how notes change folders.
+- **Effort hypothesis:** M (about 1–2 hours), low confidence. Assumes one-note,
+  same-parent, unchanged-content behavior bounds the first identity case.
+  Safety and the complete publish/receive loop stay inside this story.
+- **Depends on:** delivered Stories 2 and 3.
+- **Safe stopping point:** Same-folder renaming is independently usable;
+  cross-folder proposals reject clearly if Story 12 is deferred.
+- **Open decisions:** none for this scope. Automatic reference maintenance
+  would require a separate scope decision before expanding this story.
 
 <a id="story-7"></a>
 
@@ -326,13 +396,21 @@ useful before adding broader deletion or identity-inference behavior.
 - **Evaluation:** The owner commits one unambiguous folder relocation and
   synchronizes it; Donut shows the folder and descendants at their new paths,
   and each corresponding Note or Folder entity retains its private data.
+- **Boundary learned from deletion:** Start with a folder represented by
+  tracked content and require exact correspondence for the whole relocation,
+  including any tracked README. An empty, unrepresented Donut folder has no
+  Git move to infer. Disappearance of its last tracked note alone must continue
+  to leave the container intact, as Story 5 promises. Reject destination
+  collisions, partial moves, and ambiguous correspondence without deleting
+  containers or inventing README files. Clarify unrepresented empty descendants
+  during story refinement before claiming their identities can be inferred.
 - **Value / learning:** Extends safe reorganization from one file to the
   common notebook-level operation. Note-level moves remain valuable if this
   story is cancelled.
 - **Effort hypothesis:** L — low confidence; assumes exact descendant
   correspondence can define a bounded folder-move case and excludes ambiguous
   partial rewrites.
-- **Depends on:** Story 6.
+- **Depends on:** Story 12.
 - **Safe stopping point:** Incomplete or multiply plausible descendant
   correspondence rejects the commit atomically.
 
@@ -347,6 +425,17 @@ useful before adding broader deletion or identity-inference behavior.
   different notes. Synchronization rebases the local work onto remote `main`,
   publishes a linear result, and leaves both changes visible locally and in
   Donut.
+- **Scope:** First demonstrate one unpublished existing-note content edit
+  against accepted web content edits to other notes, using a clean bound
+  checkout on `main`. Preserve the unpublished commit boundary rather than
+  squashing independent edits into an unsupported edits-only batch. Several
+  unpublished commits, structural changes, and delete/edit conflicts remain
+  outside this first divergent outcome. A concurrent remote advance must stop
+  publication safely and retain recoverable local work.
+- **Key examples:** Local edit to `Cell.md` plus accepted web edit to `DNA.md`
+  → rebase and publish → both edits survive. An unsynchronized web creation
+  causes projection drift instead → retain the rejection; rebase does not
+  repair drift or turn that creation into accepted Git history.
 - **Value / learning:** Delivers the first genuinely divergent workflow and
   tests the chosen rebase-only policy with accumulated changes.
 - **Effort hypothesis:** M — low confidence; assumes Stories 2 and 3 make the
@@ -366,6 +455,13 @@ useful before adding broader deletion or identity-inference behavior.
   Synchronization presents an ordinary Git rebase conflict, leaves the accepted
   remote unchanged, and, after the owner resolves and continues the rebase,
   accepts the resulting linear history and displays the resolution in Donut.
+- **Scope / examples:** Begin with one unpublished content edit conflicting
+  with an accepted web content edit at the same unchanged path. Resolve and
+  continue → publish the resolved content on the same note identity. Abort →
+  recover the original unpublished work without altering accepted history.
+  Delete/edit and rename/edit conflicts are deferred: a clean text result or
+  conflict resolution must not silently authorize restoration, same-path
+  recreation, or a change of private identity.
 - **Value / learning:** Completes the safety promise for overlapping
   accumulated changes while validating that standard Git conflict handling is
   understandable in the CLI-assisted v1 workflow.
@@ -424,18 +520,168 @@ authored Git commit and see the complete change in Donut.
   structural synchronization/batching, drift repair, direct Git remotes, bulk-import
   optimization, preview, partial publication and automatic commit splitting.
 
+<a id="story-12"></a>
+
+### 12. Move a note between existing folders without losing its learning history
+
+**Status:** refined and [slice-planned](../quick/050-relocate-local-note/PLAN.md);
+not implemented. Execute only after Story 6 is delivered.
+
+**Goal**
+
+An owner organizing notes in Obsidian or an AI IDE can put a learned concept
+in a better existing folder, or at the notebook root, without starting its
+learning history again. Renaming in place cannot achieve this outcome.
+
+**Scope**
+
+- Extend the identity-preserving publication contract delivered by
+  [Story 6](#story-6) to exactly one change of parent directory within the same
+  notebook, optionally changing the filename in the same commit. Retain its
+  exact-byte, one-pair/no-other-changes rule, ownership/readiness, atomicity,
+  private-data preservation, unchanged references, retry, and rejection rules.
+- Support root→existing represented folder, folder→root, and folder→folder,
+  including nested destinations and folders represented only by a README.
+  The destination must exist in Donut and be represented in accepted parent
+  history. Do not infer a new folder from a local directory or an invisible
+  empty Donut folder.
+- Validate the final folder/title together. Neither a hypothetical intermediate
+  title at the source nor the old title at the destination should block an
+  otherwise valid combined relocation/rename. An occupied or soft-deleted
+  final destination remains unavailable.
+- Preserve source and destination folder identities. Moving the last tracked
+  note out of a folder can make it unrepresented in Git; leave its Donut
+  container intact without generating a README. Story 7 owns folder moves.
+- Publish through the installed CLI and expose the accepted location through
+  ordinary clone/pull with retained history. A separate later content edit at
+  that location updates the same note. Extend existing CLI guidance to name
+  the newly supported destinations and keep rejected work available.
+- Keep Story 6's exclusions: no changed content or accompanying reference
+  rewrite, multiple moves, new/unrepresented destination folders, folder or
+  README relocation, cross-notebook moves, restore, deleted-path reuse,
+  multiple unpublished commits, divergence, drift repair, or new UI/metadata.
+
+**Key examples**
+
+1. Move Inbox/Cell.md to Biology/Cell.md → publish → the same note appears in
+   the existing represented Biology folder; another checkout receives it.
+2. Move Inbox/Cell.md to Biology/Cell basics.md → publish → validate only that
+   final available destination, even if Cell basics is reserved in Inbox.
+3. Move Inbox's only tracked note to the root → publish → Inbox remains a
+   Donut folder, with no generated README. Other identities remain untouched.
+4. Target a missing or unrepresented folder, or a reserved final path → reject
+   without changing the source note, containers, or accepted history.
+5. Publish relocation, then separately publish a content edit there → receive
+   both commits in another clean checkout → same learned note, new location
+   and content, original ancestry retained.
+
+- **Evaluation:** Installed CLI relocation changes the note's visible folder
+  while preserving its identity and private data; another checkout receives it.
+- **Value / learning:** Delivers filing/reorganization independently of moving
+  a whole folder; tests destination eligibility and container preservation.
+- **Effort hypothesis:** M (about 1–2 hours), low confidence. Assumes exact
+  single-note relocation to already represented folders stays bounded and
+  Story 6's identity contract remains usable. This is a behavior-level
+  hypothesis, not an estimate inferred from implementation size.
+- **Depends on:** Story 6's delivered identity-preserving publication contract.
+  Stories 8 and 9 are higher priorities, not technical prerequisites.
+- **Safe stopping point:** Owners can rename and file one note while whole
+  folder moves remain unsupported.
+- **Open decisions:** none within existing represented destinations.
+
 ## Ordering and Scope Reduction
 
-Stories 1–3 delivered the automatic local baseline, the user's highest-value
-workflow (refine locally, then publish), and the opposite receive loop. Story 4
-next starts the basic file lifecycle with note creation. Story 11 follows it
-in the product backlog to support coherent commits containing several note
-additions or additions with edits. Stories 5–7 then cover
-deletion and the identity-preservation risk unique to Donut. Stories 8 and 9
-add accumulated divergence and conflict handling on top of two already working
-directions. Story 10 is last because commit batching improves history quality
-but is not required for safe synchronization. This is the initial recommended
-order; the product backlog owns subsequent reprioritization.
+Stories 1–5 and 11 are delivered. The 2026-09-07 review of merged deletion
+story PR #1623 keeps the first identity-preserving rename next. The subsequent
+story-size review separates Story 6 (same-folder rename) from Story 12
+(cross-folder relocation). Stories 8 and 9 remain ahead of Story 12, followed
+by Story 7; Story 10 remains last. The [product backlog](../PRODUCT-BACKLOG.md) owns the
+global order.
+
+### Learning from the merged deletion story
+
+- **Decision — commit boundaries express identity intent.** Isolated deletion
+  followed by a separate addition at an available path leaves private data
+  with the old identity. A move needs a distinct same-identity acceptance
+  rule; delete then create is not a workaround for Story 6. Evidence:
+  `2f9ca9c366` and
+  [fresh-identity publication proof](../../backend/src/test/java/com/odde/donut/controllers/NotebookGitCopyIdentityControllerTest.java).
+- **Lesson — successful receipt does not solve divergence.** Accepted deletion
+  can already arrive through ordinary pull, but a newer accepted web edit
+  blocks stale deletion, and unsynchronized web creation still blocks
+  publication as projection drift. Evidence: `a0cf7fefef`, `cad4b44737`, and
+  [projection-drift proof](../../backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java).
+  This supports prioritizing recovery from ordinary content divergence before
+  broader folder reorganization. Drift repair is a separate unresolved need.
+- **Pattern — accept the authored tree without hidden collateral edits.**
+  Deletion leaves referring body and property links authored and unresolved;
+  rollback and retry protect the complete accepted outcome. Reuse that visible
+  contract when refining moves instead of adding silent link cleanup.
+  Evidence: `d703f095c3`, `a2c337142f`, and
+  [deletion publication proof](../../backend/src/test/java/com/odde/donut/controllers/NotebookGitDeletionPublicationControllerTest.java).
+- **Boundary — absent files do not imply absent identities or containers.**
+  Same-path recreation remains rejected; deleting a folder's last note leaves
+  its Donut folder intact even when it vanishes from the Portable files.
+  Folder relocation therefore needs stronger evidence than a disappearing
+  directory. Evidence: `cad4b44737`, `2f9ca9c366`,
+  [reserved-path proof](../../backend/src/test/java/com/odde/donut/controllers/NotebookGitDeletedDestinationControllerTest.java),
+  and [container proof](../../backend/src/test/java/com/odde/donut/controllers/NotebookGitDeletionContainerPublicationControllerTest.java).
+
+These are implementation and executable-example findings, not evidence of
+real-user frequency or satisfaction. The removed plan has no reliable completed
+duration summary; do not infer actual effort from commit timestamps or claim
+estimate calibration. Retain low confidence for the remaining story estimates.
+
+### Rename/relocation split and alternatives
+
+For the same Obsidian/AI-IDE owner, rejected file reorganization should become
+safe identity-preserving publication under the existing Portable-tree and
+single-commit constraints. The owner's request to split the 17-leaf plan
+authorizes this story-boundary review; no execution evidence is discarded.
+
+- **Defer all reorganization:** leaves users unable to rename a learned concept.
+- **Deliver same-folder rename first:** selected. A useful, evaluable naming
+  improvement tests exact correspondence without parent-placement policy.
+- **Manual workaround:** keep the old filename, or delete then create through
+  the delivered flow. Keeping it does not deliver better naming; delete/create
+  deliberately gives fresh identity and therefore cannot preserve learning.
+- **Deliver all rename/relocation together:** retains the old broad scope and
+  delays the first usable result behind folder rules; split into Stories 6/12.
+
+Both children pass 3V: the owner sees a useful renamed or refiled note through
+the complete CLI/Donut/receive loop. Safety checks are acceptance obligations,
+not independent product stories. Story 6 retains its anchor and narrower title;
+Story 12 has a new anchor. Their union preserves the former Story 6 scope.
+The first story remains M with low confidence because identity safety is still
+essential; the split removes folder policy rather than disguising it as tests.
+
+### Priority and deferred follow-ons
+
+Same-folder renaming remains first because it tests the central identity
+promise with the smallest useful reorganization. Content divergence and conflict
+handling follow because ordinary local/web overlap blocks the delivered
+lifecycle. Single-note relocation follows them, then whole-folder moves; this
+preserves the earlier choice to address broader workflow blockage before
+folder policy. Story 12 depends on Story 6, and Story 7 follows Story 12.
+Batching improves history quality after synchronization works.
+
+No new story is promoted from deletion alone. Keep these possibilities deferred
+until the stated learning warrants selecting and refining a concrete outcome:
+
+- **Same-path fresh creation:** revisit when owners need to reuse deleted
+  names; decide its interaction with restore and authored path references.
+  A separately published addition at another available path is today's
+  supported alternative. This is not required for moving a live note.
+- **Multiple or mixed deletions and reference cleanup:** revisit when separate
+  deletion commits and subsequent referrer edits obstruct real cleanup work.
+  Keep the small supported workflow rather than infer demand from a rejected
+  test case. Story 11 remains completed within its additions/edits scope.
+- **Web structural synchronization or drift recovery:** revisit when web
+  creation/deletion/moves interrupt the local workflow. Stories 8 and 9 must
+  not claim to repair an uncommitted projection change through Git rebase.
+- **Delete/edit conflicts and multiple unpublished commits:** revisit after
+  the first content divergence/conflict workflow; explicitly settle identity
+  intent before broadening conflict resolution to deletion or recreation.
 
 Safe stopping points:
 
@@ -443,30 +689,34 @@ Safe stopping points:
   creation, deletion, moves, and divergence remain rejected or unsupported.
 - After Story 5: basic note content lifecycle without structural identity
   inference.
-- After Story 7: ordinary linear note and folder reorganization preserves
-  private identity.
-- After Story 9: the six synchronization needs are covered for the supported
-  dedicated-repository v1.
+- After Story 6: one unambiguous same-folder rename preserves private identity.
+- After Stories 8 and 9: one unpublished content edit can be reconciled with
+  accepted web content edits, including a manually resolved text conflict.
+- After Story 12: one note can change existing folders while retaining identity.
+- After Story 7: represented folder reorganization also preserves private
+  identity within its refined correspondence boundary.
 - After Story 10: web-authored history also has the desired editing granularity.
 
-First-to-drop order when reducing an initial release is:
+First-to-defer order among unfinished queued stories is:
 
 1. Story 10, accepting extra immutable web commits.
-2. Story 11, retaining single-note commits as a usable interim workflow.
-3. Story 7, rejecting folder moves while retaining note moves.
-4. Story 5, rejecting local deletions while retaining edits and additions.
-5. Story 4, limiting local publication to edits of existing notes.
-6. Stories 8 and 9 together, limiting the product to an explicitly sequential
-   synchronize-before-edit workflow.
-7. Story 6, rejecting all local rename/move operations.
+2. Story 7, rejecting folder moves while retaining note relocation.
+3. Story 12, retaining same-folder rename while deferring cross-folder filing.
+4. Story 9, retaining automatic non-conflicting content rebase from Story 8
+   while stopping safely on text conflicts.
+5. Story 8, retaining the explicitly sequential synchronize-before-edit loop.
+6. Story 6, rejecting local renames and leaving dependent relocation deferred.
 
-Dropping any of Stories 4–9 creates an honest interim capability, not complete
-ADR-0002 v1 synchronization. Unsupported operations must fail clearly rather
-than be approximated.
+The delivered and queued boundaries still leave parts of Proposed ADR 0002
+uncovered, including web structural synchronization and broader accumulated
+history. Finishing this queue is not proof of complete ADR-0002 v1 support.
+Unsupported operations must fail clearly rather than be approximated.
 
 ## Open Decisions
 
-No open product decision changes the candidate-story order.
+No open decision blocks the bounded rename and relocation stories. Same-path
+creation, unrepresented empty descendants in folder moves, and structural conflict
+policies need refinement before those capabilities are selected or expanded.
 
 ADR 0002 now reflects the later human discussion recorded here: v1 permits a
 required CLI-assisted acquisition and synchronization workflow and defers direct
@@ -480,7 +730,7 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 
 ## When to Surface
 
-Stories 1–3 are delivered. Select one remaining story from the
+Stories 1–5 and 11 are delivered. Select one remaining story from the
 [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Do not turn
 the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
 boundary as a human-owned advice task; it does not change these story outcomes.
