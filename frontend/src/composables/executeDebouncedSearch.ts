@@ -1,7 +1,7 @@
 import type { SearchTerm } from "@generated/donut-backend-api"
 import { SearchController } from "@generated/donut-backend-api/sdk.gen"
 import type { SearchResultsModel } from "@/models/searchResultsModel"
-import { appendSearchKeyToHistory } from "@/utils/searchKeyHistoryCookie"
+import { appendSearchKeyToHistory } from "@/utils/searchKeyHistory"
 
 export async function executeDebouncedSearch(opts: {
   model: SearchResultsModel

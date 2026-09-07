@@ -1,45 +1,26 @@
-import { SearchController } from "@generated/donut-backend-api/sdk.gen"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper from "@tests/helpers"
 import {
-  appendSearchKeyToHistory,
-  clearSearchKeyHistoryCookie,
-  readSearchKeyHistory,
-} from "@/utils/searchKeyHistoryCookie"
+  seedSearchKeyHistory,
+  seedEncodedSearchKeyHistory,
+} from "@tests/helpers/searchKeyHistoryTestSupport"
 import { describe, expect, it } from "vitest"
 import {
   historyDropdown,
-  makeNoteHit,
+  historyItems,
   openSearchKeyHistoryDropdown,
   renderSearchForm,
   renderSearchFormInModal,
   renderSearchWithKeyHistory,
-  setupSearchDialogFakeTimers,
   setupSearchDialogTests,
   titleEl,
-  typeInSearch,
 } from "./searchDialogTestSupport"
 
 describe("SearchForm search key history", () => {
   setupSearchDialogTests()
-
-  describe("search key recording", () => {
-    setupSearchDialogFakeTimers()
-
-    it("records trimmed search key after debounced search completes", async () => {
-      clearSearchKeyHistoryCookie()
-      const note = MakeMe.aNote.please()
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Hit", note.noteTopology.id + 1),
-      ])
-      const searchInput = await renderSearchForm({ note })
-      await typeInSearch(searchInput, "  debounced-term  ")
-      expect(readSearchKeyHistory()).toEqual(["debounced-term"])
-    })
-  })
 
   it("shows empty message when cookie has no entries", async () => {
     helper
@@ -54,12 +35,28 @@ describe("SearchForm search key history", () => {
     expect(screen.getByText("No search history yet")).toBeInTheDocument()
   })
 
-  it("lists cookie keys and fills the input when one is chosen", async () => {
-    appendSearchKeyToHistory("older")
-    appendSearchKeyToHistory("newer")
-    const note = MakeMe.aNote.please()
-    await renderSearchWithKeyHistory(note, ["older", "newer"])
+  it.each(["%%%bad%%%", encodeURIComponent(JSON.stringify({ a: 1 })), "%7B"])(
+    "ignores malformed history %s",
+    async (encoded) => {
+      seedEncodedSearchKeyHistory(encoded)
+      await renderSearchForm({ note: null })
+      await openSearchKeyHistoryDropdown()
+      expect(screen.getByText("No search history yet")).toBeInTheDocument()
+    }
+  )
+
+  it("lists only string entries from stored history", async () => {
+    seedSearchKeyHistory(["newer", null, 42, "older"])
+    await renderSearchForm({ note: null })
     await openSearchKeyHistoryDropdown()
+    expect(historyItems()).toEqual(["newer", "older"])
+  })
+
+  it("lists cookie keys and fills the input when one is chosen", async () => {
+    const note = MakeMe.aNote.please()
+    await renderSearchWithKeyHistory(note, ["newer", "older"])
+    await openSearchKeyHistoryDropdown()
+    expect(historyItems()).toEqual(["newer", "older"])
     fireEvent.click(screen.getByTestId("search-key-history-item-0"))
     await flushPromises()
     const input = screen.getByPlaceholderText("Search") as HTMLInputElement
@@ -81,7 +78,7 @@ describe("SearchForm search key history", () => {
 
   it("renders history panel inside the modal dialog", async () => {
     const note = MakeMe.aNote.please()
-    appendSearchKeyToHistory("older")
+    seedSearchKeyHistory(["older"])
     await renderSearchFormInModal(note)
     await openSearchKeyHistoryDropdown()
 

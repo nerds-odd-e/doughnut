@@ -68,8 +68,13 @@ describe("Search popup result navigation", () => {
 
   it("navigates to a different result and dismisses the popup", async () => {
     const { router, other } = await openSearch()
-    await fireEvent.click(screen.getByText("Another note"))
+    const link = screen.getByText("Another note").closest("a")!
+    const activation = new Promise<MouseEvent>((resolve) => {
+      link.addEventListener("click", resolve, { once: true })
+    })
+    await userEvent.click(link)
     await flushPromises()
+    expect((await activation).defaultPrevented).toBe(true)
     expect(router.currentRoute.value.fullPath).toBe(
       router.resolve(noteShowLocation(other.noteTopology.id)).fullPath
     )
