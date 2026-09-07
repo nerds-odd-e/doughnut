@@ -320,11 +320,22 @@ command-boundary proof loop.
 
 ### 8. Stop when database administration fails
 Type: Behavior
-Status: planned
+Status: done
 Proof: Make the MySQL stand-in fail the create/grant request. The first-use
 command exits nonzero, writes no config, records no Gradle invocation or
 fallback URL, and reports the generated target/stage without hiding the native
 failure. Run `node --test scripts/backend-test-worktree.test.mjs`.
+
+Learning: Slice 4's admin-failure test already proved nonzero exit / no
+config / no gradle via `set -euo pipefail` alone. The remaining gap was
+diagnosability: added one unconditional
+`echo "Provisioning database administration: creating ${new_database}
+(worktree id ${new_worktree_id})..." >&2` immediately before the mysql call,
+so the target/stage is always visible before a possible failure — no
+try/catch, no message substitution, native mysql failure still terminates
+untouched.
+`CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passes
+(22/22).
 
 Behavior: The fresh checkout's database cannot be created or granted → automatic
 setup fails → no identity is published and no migration/test starts.

@@ -60,6 +60,7 @@ if [[ ! -f "${config_path}" ]]; then
   new_database="$(database_for_worktree "${new_worktree_id}")"
 
   provisioning_sql="CREATE DATABASE ${new_database} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON ${new_database}.* TO 'doughnut'@'localhost'; GRANT ALL PRIVILEGES ON ${new_database}.* TO 'doughnut'@'127.0.0.1'; FLUSH PRIVILEGES;"
+  echo "Provisioning database administration: creating ${new_database} (worktree id ${new_worktree_id})..." >&2
   mysql -u root -h "${mysql_host}" -P "${mysql_port}" -e "${provisioning_sql}"
 
   WORKTREE_CONFIG="${config_path}" WORKTREE_ID="${new_worktree_id}" node -e '

@@ -80,6 +80,16 @@ test('failed database administration leaves no config and never reaches gradle',
   assertRefusedBeforeGradle(checkout, result)
   assert.equal(existsSync(`${checkout.root}/.worktree.local.json`), false)
   assert.doesNotMatch(outputOf(result), /Selected database/)
+
+  // The failure reports the generated target/stage it was diagnosing, and
+  // the native mysql failure (nonzero exit) still terminates the script
+  // rather than being caught and replaced with a generic message.
+  const match = outputOf(result).match(
+    /Provisioning database administration.*(doughnut_wt_[a-z0-9]{32}_test).*worktree id (wt_[a-z0-9]{32})/
+  )
+  assert.ok(match, outputOf(result))
+  const [, reportedDatabase, reportedId] = match
+  assert.equal(reportedDatabase, `doughnut_${reportedId}_test`)
 })
 
 test('an overlapping command refuses while first-use provisioning is in flight, leaving one usable environment', async (t) => {
