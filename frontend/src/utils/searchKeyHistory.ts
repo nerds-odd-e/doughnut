@@ -63,22 +63,26 @@ function readLocalHistory(): string[] | null {
   return parseHistory(raw)
 }
 
-function readLegacyHistory(): string[] {
+function readLegacyHistory(): string[] | null {
   const encoded = parseCookieValue(document.cookie, SEARCH_KEY_HISTORY_KEY)
-  if (!encoded) return []
+  if (!encoded) return null
   let decoded: string
   try {
     decoded = decodeURIComponent(encoded)
   } catch (error) {
-    if (error instanceof URIError) return []
+    if (error instanceof URIError) return null
     throw error
   }
-  return parseHistory(decoded) ?? []
+  return parseHistory(decoded)
 }
 
 export function readSearchKeyHistory(): string[] {
   if (typeof document === "undefined") return []
-  return readLocalHistory() ?? readLegacyHistory()
+  return readLocalHistory() ?? readLegacyHistory() ?? []
+}
+
+function expireLegacyHistory(): void {
+  document.cookie = `${SEARCH_KEY_HISTORY_KEY}=; Path=/; Max-Age=0; SameSite=Lax`
 }
 
 function writeSearchKeyHistory(keys: string[]): void {
@@ -90,7 +94,17 @@ function writeSearchKeyHistory(keys: string[]): void {
     if (isStorageUnavailable(error)) return
     throw error
   }
-  document.cookie = `${SEARCH_KEY_HISTORY_KEY}=; Path=/; Max-Age=0; SameSite=Lax`
+  expireLegacyHistory()
+}
+
+export function migrateSearchKeyHistory(): void {
+  if (typeof document === "undefined") return
+  if (readLocalHistory() !== null) {
+    expireLegacyHistory()
+    return
+  }
+  const legacyHistory = readLegacyHistory()
+  if (legacyHistory !== null) writeSearchKeyHistory(legacyHistory)
 }
 
 export function appendSearchKeyToHistory(rawKey: string): void {

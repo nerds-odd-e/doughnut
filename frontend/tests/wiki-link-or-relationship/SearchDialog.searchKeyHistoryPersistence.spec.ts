@@ -3,6 +3,7 @@ import { SEARCH_KEY_HISTORY_KEY } from "@/utils/searchKeyHistory"
 import { cleanup, fireEvent, screen } from "@testing-library/vue"
 import MakeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
+import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
 import {
   seedSearchKeyHistory,
   seedEncodedSearchKeyHistory,
@@ -151,6 +152,8 @@ describe("SearchForm search history persistence", () => {
       expect(
         (screen.getByPlaceholderText("Search") as HTMLInputElement).value
       ).toBe("x".repeat(512))
+      await advanceSearchDebounce()
+      expect(screen.getByText("Hit")).toBeInTheDocument()
     })
 
     it.each(["", "   "])("does not record an empty search %j", async (key) => {

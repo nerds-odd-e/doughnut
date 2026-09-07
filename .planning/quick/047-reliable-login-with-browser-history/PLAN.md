@@ -1,8 +1,8 @@
 # Reliable login with accumulated browser history
 
 Source: [SEED-014 Story 1](../../seeds/SEED-014-reliable-login-with-browser-history.md#story-1).
-Status: in progress on `codex/reliable-login-browser-history`.
-Readiness: recovery and local search persistence delivered; continue with leaf 6.
+Status: all six leaves verified on `codex/reliable-login-browser-history`.
+Readiness: final leaf wrap-up, observer shutdown and planning cleanup.
 Execution worktree: `/Users/terryyin/.codex/worktrees/f8d7/doughnut`.
 CI observer: coordinator `047-f8d7`, repository `nerds-odd-e/doughnut`, main;
 cell 10 / PTY session 29699 / PID 65697; mailbox `/tmp/donut-ci-501/watch-8lFX2v`.
@@ -318,8 +318,24 @@ completing searches migrate without loss; users who do not still have recovery.
 
 ### 6. Retire legacy history on arrival before login
 Type: Behavior
-Status: planned
+Status: done
 Proof: One mounted DonutApp startup loop with real history behavior.
+
+Four startup regressions failed before implementation. Passed
+`CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test tests/DonutApp.searchHistoryMigration.spec.ts --retry=0`
+(11 tests, 3s), and `CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test --retry=0`
+(342 files / 1871 tests, 66.45s). Independent refactor found no edits; coordinator
+formatting passed. The agent service rejected fresh spawns with its thread limit,
+so the final independent reviewer was reused; this process limitation is explicit.
+
+The preceding refactor's 23-pass report concealed a CI retry: a screenshot
+showed a prior 512-character selected query in the next empty-search case.
+With retries disabled, this reproduced (14 pass / 1 fail). The selection test
+now awaits its debounced search and result before returning, preventing teardown
+from starting an unawaited history write across test reset. Both history files
+passed 23 cases with `--retry=0`; the final full suite above also disables retries.
+Only the test lifecycle needed repair. Logs `/tmp/search-history-lifecycle-{red,green}.log`
+and `/tmp/startup-history-full-no-retry.log`; diagnostics preserved outside Git.
 
 Behavior: A returning learner opens Donut without opening search → startup
 attempts safe migration before current-user requests → successful persistence
