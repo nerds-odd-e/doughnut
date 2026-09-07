@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: planned. Refinement recommended for leaves 2 and 3 before execution.
+Status: planned; refined into 13 ordered leaves, ready for execution.
 This plan authorizes no implementation by itself.
 
 ## Goal and scope
@@ -51,7 +51,9 @@ capacity scheduling. No second worktree identity or separate MySQL server.
 - `e2e_test/config/common.ts` owns Cypress node setup; both root config and
   `ci.ts` use it. `config/constants.ts` fixes browser/backend origins. Supply
   browser-safe settings from node configuration; do not read local files in
-  browser code. Follow generated-client setup through its actual consumers.
+  browser code. `support/e2eAppUrl.ts` already reads Cypress baseUrl and
+  `start/clientConfig.ts` uses relative generated-client requests. Verify
+  pre-navigation reset resolution; leave unused CLI/MCP constants alone.
 - `step_definitions/hook.ts` resets through testability at Before order 0;
   mock and client hooks follow. Guard supported scope before that reset.
 - Reuse note creation/editing page objects and named navigation from
@@ -95,143 +97,354 @@ Relevant accepted ADRs: [0005](../../../docs/adrs/0005-web-routes-accepted.md)
 [0006](../../../docs/adrs/0006-failure-handling-accepted.md)
 (visible failures, no silent fallback). No ADR change is proposed.
 
+## Refinement assessment
+
+All five original leaves are unstarted; no runtime evidence or execution overrun
+exists to preserve. Original leaves 1–5 are **Refine**: identity extraction is
+premature before the configured workflow, startup and Cypress contain several
+beats, restart mixes ownership checks with real-stack verification, and failure
+handling mixes startup cancellation with post-readiness failure.
+
+Keep the same story. Deliver a temporarily operator-configured environment
+first, then remove database/port/identity setup in leaves 10–13. This is an
+interim usable workflow, not a new requirement or a reduced final promise.
+Until a command is supported, isolated mode refuses it before side effects.
+Primary defaults and CI continue to work throughout.
+
+No story escalation is indicated by inspection: the original L hypothesis
+remains plausible for these bounded leaves. Execution must reassess it if the
+actual integration work invalidates that hypothesis.
+
 ## Outside-in proof and promise ownership
 
-| Contract promise | Owner | Observation |
+| Contract promise | Owner | Observable proof |
 |---|---|---|
-| Existing identity and backend command behavior survive extraction | 1 | Existing launcher/lock/provisioning/ordinary-command tests stay green |
-| First SUT use creates and reuses a distinct E2E environment | 2 | Two real SUTs report different databases/origins; fixture marker fetched through each app belongs to that app; shell restart reuses allocation |
-| Allocation/startup cannot adopt foreign state | 2 | Concurrent initialization and occupied-port/preparation-failure boundary cases preserve foreign resources; recorded missing DB fails |
-| Browser creates, edits, reloads its own note | 3 | Focused ordinary Cypress spec passes through each worktree's proxy |
-| A reset leaves B's fixtures and edits intact | 3 | Coordinated two-worktree browser run observes B marker after A reset and vice versa; shared/unit-test sentinels survive |
-| Unsupported specs never reset or start external services/clients | 3 | Guard rejection observed before reset/mock/client invocation; no Mountebank startup required |
-| Concurrent use within one worktree respects ownership | 2, 3, 4 | Duplicate SUT (2), duplicate Cypress (3), and restart during run (4) visibly refuse |
-| Restart affects only owning processes | 4 | Restart A while B keeps its original processes and saved note; foreign PID/port record is refused |
-| Health reports the correct environment | 2, 4 | Readiness fails when owning child is absent even with unrelated healthy listeners |
-| Child failure/cancellation releases owned peers promptly | 5 | Running supervisor observes forced child exit, logs failure without another command, releases peers; unrelated process survives |
-| Overrides cannot redirect work to shared targets | 2, 3 | Conflicting SUT target (2) and Cypress origin (3) refuse before mutations; matching values work |
-| Primary/CI compatibility and no new route semantics | 2, 3 | Default launcher/config regression tests plus focused app navigation |
-| Developer can repeat the supported workflow | 3, 4 | Capability guide includes exact ordinary commands, origin output, exclusions, and restart behavior |
+| Primary defaults and CI remain usable; configured primary isolates | 1, 3, 6 | Command/config boundary regression cases select legacy defaults only in the documented contexts |
+| Invalid or incomplete isolation never falls back | 1; enabled paths in 3, 6, 10–13 | Refusal before spawn/reset/provisioning against a foreign target |
+| Backend identity/allocation semantics remain compatible | 9, 13 | Existing backend launcher, lock, provisioning and ordinary-command cases remain green; SUT-first then backend uses the same ID |
+| Owning application uses its allocated database and three ports | 2–3 | Real configured SUT serves its injected marker through its proxy and reports its database/origin |
+| No Mountebank dependency | 3, 6 | Supported start/spec works with no mock listener; no mock process is launched |
+| Foreign listeners are never adopted or terminated; duplicate SUT refused | 3 | Occupied-port and concurrent-start command cases leave the foreign listener and first owner alive |
+| Health belongs to the live owning stack | 3, 5 | Foreign healthy listener cannot satisfy owning health; exited owner is unhealthy |
+| Startup timeout/cancellation releases owned processes | 4 | Actual child processes disappear; foreign process survives |
+| Background failure is observed without another command | 5 | Supervisor logs forced child exit when observed and releases owned peers while its lifecycle is exercised |
+| Browser creates, edits, reloads its own note | 6 | Ordinary focused Cypress feature asserts saved content after reload |
+| Unsupported/mixed specs refuse before reset/mock/client setup | 1, 6 | No reset or tagged setup side effects on rejected selection |
+| Cypress run ownership and target consistency | 6 | Second runner/conflicting origin refuses before reset; completion/cancellation permits later run |
+| A reset preserves B and vice versa | 7 | Barrier-controlled overlapping browser runs read the peer marker after each reset; both edits finish |
+| Shared E2E and unit-test data remain unchanged | 7 | Read-only observations of existing sentinels before/after the paired run |
+| Only idle owning SUT can restart | 8 | A recovers; B keeps its process identity and marker; active Cypress/unverifiable owner refuses |
+| Existing identity gains an E2E database without changing unit-test state | 9–10 | First setup launches app on new E2E DB; existing unit database is untouched |
+| First allocation never adopts an existing database | 10 | Name collision fails before config completion or app launch |
+| Endpoint allocation is distinct across concurrent worktrees | 11–12 | Concurrent ordinary starts persist different claims and both apps bind their recorded endpoints |
+| Fresh SUT-first worktree obtains the canonical identity | 13 | SUT then backend command reuses one ID; overlapping initialization publishes one complete config |
+| Persisted settings survive shells/restarts; missing DB/migration errors fail | 3, 10–13 | Second invocation reuses values; recorded missing DB is not recreated and migration failure does not become healthy |
+| Conflicting overrides are rejected, matching ones remain usable | 3, 6 | SUT target/origin cases refuse before mutation; matching settings use the assigned target |
+| Route semantics and repeatable instructions | 2, 6, 8, 10–13 | Existing named routes/proxy tests remain green; guide evolves with each delivered ordinary command |
 
 ## Ordered slices
 
-### 1. Share identity initialization without changing backend verification
+Every leaf includes its implementation, focused proof, and local cleanup.
+Numbers below replace the original leaves; no completed evidence is discarded.
+
+### 1. Refuse unsupported isolated commands before shared-state effects
+
+Type: Behavior
+Status: planned
+Proof: Command-boundary cases for linked, configured-primary, unconfigured-
+primary and CI contexts. Observe refusal before service spawn, listener signals,
+or Cypress reset; existing primary/CI commands retain their defaults.
+
+Behavior: A local isolated checkout has no supported browser environment yet →
+start, health, restart or ordinary Cypress run → actionable refusal instead of
+contacting shared defaults.
+
+Scope: One common isolation applicability/validation gate wired at the four
+command boundaries. Do not allocate, spawn, or parse every shell alias. Malformed
+local JSON fails clearly. Initially refuse all isolated runs; leaves 3, 6 and 8
+replace that refusal for their supported cases. This creates a safe stopping
+point before wiring new runtime behavior.
+
+Sizing: ~5 minutes, medium confidence; one command-selection matrix.
+
+### 2. Feed one runtime target through the existing application launcher
 
 Type: Structure
 Status: planned
-Proof: Existing backend worktree command-boundary tests remain green, including
-concurrent first use, stale-lock reclaim, configured environments, and primary
-compatibility: `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree`.
+Proof: Existing SUT service/start/health and proxy routing tests remain green
+with legacy settings. Exercise the launcher boundary with one explicit target
+fixture; no test-only exports of individual configuration helpers.
 
-Internal change: Separate reusable identity/config initialization from the
-backend-test run lock only as needed for leaf 2. Preserve validation, provisioning
-and config publication guarantees. Keep one canonical initializer; no general
-environment framework. Backend invocation behavior remains unchanged.
+Internal change: Pass one resolved runtime target through backend environment,
+Vite port/proxy, local-LB upstream/listen settings, and readiness. Remove the
+package-script literal that overrides the selected Vite upstream. Keep the
+legacy target as the current default. No allocation, ownership redesign, or
+Cypress changes in this leaf; isolated command gate stays closed.
 
-Immediate next Behavior: First ordinary SUT start obtains a persistent isolated
-browser environment (leaf 2).
+Immediate next Behavior: Launch an already configured isolated app (leaf 3).
+This is parameter plumbing through existing seams, not a new environment
+manager. It does not change route paths or generated APIs.
 
-Sizing: about 5 minutes, medium confidence, one existing regression loop.
-If extraction grows into provisioning/lifecycle redesign, refine this leaf.
+Sizing: ~5 minutes, medium confidence; one launcher regression loop. Restrict
+changes to target propagation; do not absorb leaf 3.
 
-### 2. Start and identify an isolated application in each worktree
-
-Type: Behavior
-Status: planned
-Proof: Drive ordinary SUT start/health boundaries in focused Node tests, then
-start two real worktrees and read distinct injected fixture markers through
-their proxies. Record literal commands, IDs, origins, and observations here.
-
-Behavior: A fresh linked worktree (or identity-only configured checkout) with
-MySQL running → `pnpm sut` → a healthy, identifiable app backed by its own
-migrated E2E database and persisted endpoints, without Mountebank.
-
-Implementation scope: Reuse leaf 1 initialization; provision only the new E2E
-allocation; consistently configure backend, Vite, local proxy and healthchecks.
-Acquire owning startup state before spawning; reject conflicts and duplicate
-starts. Include basic failed-start cleanup and ownership validation so this
-commit never exposes the old port-killing restart to an isolated environment.
-Until leaf 4, isolated restart should refuse explicitly. Preserve primary/CI
-defaults and old identity files. Document the supported startup command.
-
-Proof variations: Fresh versus configured identity, concurrent initialization,
-reuse from a new shell, foreign listener, conflicting override, missing recorded
-DB, provisioning/migration failure. These establish one startup contract but
-contain separable implementation and verification beats.
-
-Sizing: low confidence; likely above 10 minutes of implementation. **Refinement
-recommended** before execution. Do not call this target-sized or run one giant
-startup slice. Split around narrower usable startup conditions and immediately
-enabling Structure while preserving first-use scope in the final story.
-
-### 3. Run a focused browser note edit without cross-worktree reset
+### 3. Start an already configured isolated application
 
 Type: Behavior
 Status: planned
-Proof: Ordinary `CURSOR_DEV=true nix develop -c pnpm cypress run --spec
-e2e_test/features/note_creation_and_update/worktree_note_editing.feature` in
-both worktrees; synchronize the proof so B reads its marker after A's reset,
-then reverse roles. A simple pair of independently passing runs is insufficient.
+Proof: Start/health command-boundary tests and one real configured SUT smoke
+case: inject/read a unique marker through its proxy, observe selected database
+and origin, then start again from a fresh shell using the same allocation.
 
-Behavior: Two healthy owning SUTs → each runs the focused note create/edit spec
-with overlapping execution → each sees its own saved note after reload despite
-the other runner resetting fixtures.
+Behavior: A checkout has a valid identity, deliberately provisioned E2E database
+and recorded free application ports → ordinary `pnpm sut` → its own healthy
+application starts without Mountebank.
 
-Implementation scope: Resolve persisted environment in Cypress node setup,
-propagate both browser and backend targets to the actual request consumers,
-and validate target consistency before any reset. Add focused feature with
-existing page objects and a bounded two-worktree orchestration proof. Require
-owning SUT readiness; Cypress alone need not start/provision services. Acquire
-one Cypress-run lease, release it on completion/cancellation, and fail duplicate
-runs. In isolated mode reject unapproved specs before hooks, including mixed
-supported/unsupported selections; do not silently filter and report success.
-Keep default primary/CI selection unchanged. Add the repeatable browser command
-and exclusions to `docs/worktree-browser-tests.md` and update origin guidance.
+Scope: Consume the runtime target from leaf 2. Add a separate atomic SUT
+ownership claim and a live supervisor identity. Refuse duplicate starts,
+foreign port occupancy, mismatched overrides, missing DB, and invalid migration
+before reporting health. Verify own binds as well as readiness; a foreign
+ready endpoint is not success. Do not recreate a recorded DB or renumber ports.
+Use the existing run-p process tree; no alternate process manager.
 
-Sizing: low confidence; multiple integration/proof beats remain. **Refinement
-recommended** before execution (ordinary spec safety/ownership and coordinated
-reset proof need smaller leaves). Keep the full coordinated scenario `@wip`
-until green; do not commit failing active tests.
+Ownership implementation boundary: bind ownership to the living supervisor,
+not a stored PID alone. A checkout-local control endpoint with a per-run token
+can verify that owner; later restart must ask that live owner to stop its own
+children. Keep isolated restart and Cypress refused for now. Document the
+temporary manual allocation in `docs/worktree-browser-tests.md`; leaves 10–13
+remove it. Failure remains visible; cleanup improvements follow immediately.
 
-### 4. Restart only the idle owning application
+Sizing: ~5–8 minutes, medium confidence; one configured-start proof loop.
+Real JVM startup duration is a focused-test exception. If implementing live
+ownership requires a separate framework, stop and refine instead.
 
-Type: Behavior
-Status: planned
-Proof: Focused restart command tests using real disposable child processes;
-restart A in the two-worktree fixture and verify B retains its PID set, marker,
-and browser edit ability while A recovers on its recorded origin.
-
-Behavior: A is idle and B is running → `pnpm sut:restart` in A → only A's
-verified owned application processes are replaced, and A becomes healthy.
-
-Implementation scope: Replace isolated-mode refusal from leaf 2 with owner-
-verified termination and restart. A live Cypress lease refuses restart before
-signalling anything. Missing/unverifiable ownership fails visibly; port lookup
-never confers ownership. Extend the guide with restart and conflict recovery
-limits; no database deletion or standalone retirement command.
-
-Sizing: about 5 minutes of implementation, medium confidence if leaf 2 supplies
-ownership records; real startup time is an explicit focused-test exception.
-
-### 5. Observe and release a failed running application
+### 4. Release a startup that is cancelled or cannot become ready
 
 Type: Behavior
 Status: planned
-Proof: Run the real supervisor over disposable child processes. Force one child
-to exit after readiness; observe the failure log while the supervisor still
-owns the run, failed health, and peer termination without a follow-up command.
-Also cancel startup and verify child release; an unrelated child stays alive.
+Proof: Start the real launcher with disposable service child processes. Trigger
+timeout/cancellation while waiting for readiness and observe owned children
+exit and the ownership claim release; an unrelated process remains alive.
 
-Behavior: An owned SUT is running → one application child exits unexpectedly
-→ failure is visible immediately on exit observation, and owned peers stop.
+Behavior: An owning SUT startup has spawned children but is not ready →
+cancellation or readiness failure → the startup exits with diagnostics and
+leaves no owned service processes.
 
-Implementation scope: Complete supervisor post-readiness failure observation
-and cleanup; share basic cleanup supplied by leaf 2. Do not add restart retries
-or recovery into another allocation. Keep evidence at the owning process
-boundary, rather than asserting only an awaited startup throw.
+Scope: One startup-finalization path for timeout, early exit and signal
+cancellation. Signal only the owned child tree and await termination; never
+discover ownership by port. Reuse the start seam and owner from leaf 3.
+No database or port-allocation retirement.
 
-Sizing: about 5 minutes, medium confidence, one supervisor proof loop. If
-existing process-group behavior requires redesign, refine before changing it.
+Sizing: ~5 minutes, medium confidence; one real-process startup-failure loop.
+
+### 5. Release the running stack when a service fails
+
+Type: Behavior
+Status: planned
+Proof: Keep the real supervisor running, force a disposable application child
+to exit after readiness, and observe the failure log and peer exit without
+issuing another command. The owning health check then fails; foreign peers live.
+
+Behavior: The SUT has become healthy → an application child exits unexpectedly
+→ the running owner reports failure on exit observation and releases its peers.
+
+Scope: Reuse leaf 4 child-tree cleanup from the supervisor's post-readiness exit
+path. Verify actual run-p propagation, not a fake EventEmitter alone. No retry,
+new allocation, or automatic recovery. If the existing supervisor already
+delivers this, retain boundary evidence and make only necessary changes.
+
+Sizing: ~5 minutes, medium confidence; one supervisor failure loop.
+
+### 6. Run the supported note edit through the owning Cypress environment
+
+Type: Behavior
+Status: planned
+Proof: Ordinary `pnpm cypress run --spec
+e2e_test/features/note_creation_and_update/worktree_note_editing.feature`
+creates a note, edits it, and observes saved content after reload. Command
+boundary variations establish rejection before reset for a conflicting origin,
+unsupported/mixed spec selection, or a duplicate runner.
+
+Behavior: An owning SUT is healthy → the focused ordinary Cypress command →
+the browser completes a saved note edit against that same environment.
+
+Scope: Replace the blanket gate from leaf 1 only for this exact supported spec.
+Set the browser origin in Cypress node configuration; use the existing
+`e2eAppBaseUrl()` and relative generated-client requests where they already
+follow it. Verify the reset request before the first SPA visit too. Do not
+rewrite unused CLI/MCP endpoint consumers.
+
+Acquire one runner lease before hooks and release on run completion/cancellation;
+serialize lease acquisition with owner shutdown so later restart cannot race a
+new runner. Require the verified owning SUT. Fail the whole mixed selection,
+rather than silently skipping specs. Reuse existing page objects in the focused
+feature, without an orchestration harness yet. Update the guide and local-origin
+guidance with the working command. Primary/CI selection remains unchanged.
+
+Sizing: ~5–8 minutes, medium confidence; one focused feature loop. Cypress
+runtime alone may exceed ten minutes and must be recorded separately.
+
+### 7. Keep the peer's note when the other browser resets fixtures
+
+Type: Behavior
+Status: planned
+Proof: Run the focused browser scenario in two configured real worktrees with
+a barrier at reset. B seeds its marker before A resets; B reads and edits it
+afterwards. Repeat with roles exchanged. Both browsers reload saved content.
+Record read-only before/after values for existing shared/unit-test sentinels.
+
+Behavior: Both worktrees have independently saved notes → one runner resets
+its scenario fixtures during the other's run → the peer retains and edits its
+note successfully.
+
+Scope: Add only the bounded paired-run coordination needed for this observation,
+reusing leaf 6's feature and API/page objects. Use a temporary harness-local
+barrier to establish ordering, not arbitrary sleeps or a reusable scheduler.
+Extend environment wiring only if this proof exposes leakage within the promised
+note path. Record literal commands, targets and observations in this PLAN.
+Independent passing runs are not proof of reset isolation.
+
+Sizing: ~5 minutes of harness/assertion work, medium confidence; one paired-run
+proof loop. Two JVM startups and Cypress runtime are explicit runtime exceptions.
+A new shared-store dependency changes the story assumption: stop for review.
+
+### 8. Restart only the idle live owner
+
+Type: Behavior
+Status: planned
+Proof: Drive restart against disposable live owners: idle A restarts, busy A or
+an unverifiable owner refuses before signals. Reuse the paired fixture to
+observe B retain its original processes and marker while A returns healthy.
+
+Behavior: A has a verified live owner and no Cypress lease → ordinary restart
+in A → only A's app is replaced on its existing allocation.
+
+Scope: Replace isolated restart refusal from leaf 1. Ask the verified supervisor
+from leaf 3 to stop its own children, using the cleanup from leaves 4–5; hold
+the lifecycle claim across stop/start to exclude a new runner or second restart.
+Do not send signals to a PID discovered from a file/port. An unverified stale
+owner remains a visible refusal. Add restart instructions to the guide.
+
+Sizing: ~5 minutes, medium confidence; one restart proof loop. Reuse existing
+process fixtures and paired stack; JVM startup is a runtime exception.
+
+### 9. Separate identity initialization from backend-test lifetime ownership
+
+Type: Structure
+Status: planned
+Proof: Existing `pnpm test:backend-test-worktree` command-boundary coverage
+remains green: original and configured identities, provisioning failure, stale
+lock reclaim, concurrent first use, and ordinary-command compatibility.
+
+Internal change: Extract only canonical identity/config initialization needed
+by leaf 10, with a brief shared initialization lock. Preserve backend-test run
+locking and old identity-only JSON. The initializer returns identity to its
+caller; it does not hold the backend run lock for SUT lifetime or interpret SUT
+datasource overrides as backend-test overrides.
+
+Immediate next Behavior: Add the E2E database to an existing identity (leaf 10).
+Do not create a general registry or port allocator here.
+
+Sizing: ~5 minutes, medium confidence; one existing command-regression loop.
+Move only the identity initialization seam, not the complete backend launcher.
+
+### 10. Prepare the E2E database on first SUT use of an existing identity
+
+Type: Behavior
+Status: planned
+Proof: Ordinary SUT start with an existing identity and selected ports but no
+E2E database allocates its new DB, migrates and serves its marker. Boundary
+cases observe collision/preparation failure without adopting existing data;
+two same-checkout starts publish one complete allocation.
+
+Behavior: A configured identity has no recorded completed E2E database setup →
+`pnpm sut` → a new identity-derived database is prepared and the app starts.
+
+Scope: Reuse shared identity initialization from leaf 9; provision E2E under
+initialization ownership and record success only after provisioning. Keep unit
+DB state untouched. A pre-existing unrecorded database name is a collision;
+a missing previously recorded database is an error. No IF-NOT-EXISTS adoption
+or destructive repair. Ports are still explicitly configured at this interim
+boundary. Remove manual database setup from the guide.
+
+Sizing: ~5 minutes, medium confidence; one first-use database proof loop.
+Reuse proven MySQL CREATE/GRANT behavior, not a new storage experiment.
+
+### 11. Centralize port claims for the immediately following first-use path
+
+Type: Structure
+Status: planned
+Proof: Existing configured start/conflict command cases from leaf 3 remain
+green through the same launcher. No automatic port selection is exposed yet.
+
+Internal change: Put recorded port validation and claim publication behind one
+bounded allocator seam, with machine-local serialization for cooperating
+worktrees. Preserve explicitly configured ports and visible conflict refusal.
+Claiming metadata never confers ownership of a listener. No cleanup UI,
+reclamation policy, development ports, or external mock ports.
+
+Immediate next Behavior: Start an identity-only checkout without manual port
+selection (leaf 12). Use one atomic claim mechanism for the three application
+ports; do not create independently allocating service loaders.
+
+Sizing: ~5 minutes, medium confidence; one configured-start regression loop.
+
+### 12. Start an existing identity without choosing ports
+
+Type: Behavior
+Status: planned
+Proof: Two identity-only worktrees invoke ordinary SUT start concurrently;
+their persisted port claims differ, both bind those endpoints, and both serve
+their own markers. A later shell invocation reuses its claim.
+
+Behavior: The identity exists but has no E2E endpoint allocation →
+`pnpm sut` → application ports are allocated automatically and the app starts.
+
+Scope: Enable the allocator from leaf 11 and compose the first-use database
+path from leaf 10. Publish only a complete E2E allocation; retain collision
+refusal and real bind validation. Interruption may leave owned orphan resources,
+but never silently adopts another worktree's claim. Reuse one checkout's
+initialization ownership for competing starts. Remove manual ports from the
+guide; preserve already configured allocations.
+
+Sizing: ~5 minutes, medium confidence; one concurrent-first-use loop. Real
+dual-stack boot time is an explicit runtime exception.
+
+### 13. Start a fresh worktree before any backend-test invocation
+
+Type: Behavior
+Status: planned
+Proof: Ordinary SUT start in a fresh linked worktree creates one canonical ID
+and completes the same focused browser edit. A subsequent ordinary backend-test
+invocation uses that ID. A synchronized SUT/backend first-use boundary case
+shows one complete identity, with distinct purpose databases.
+
+Behavior: A linked worktree has no local configuration → `pnpm sut` →
+the identity and E2E allocation are prepared without operator setup.
+
+Scope: Compose leaf 9's shared initializer with leaf 12; retain the delivered
+backend-first path and configured-primary behavior. Do not launch backend tests
+from SUT or hold their lifetime lock. Shared initialization cannot publish a
+partial or competing identity. Remove the final manual-identity prerequisite
+from the guide and rerun the paired browser workflow through automatic setup.
+
+Sizing: ~5 minutes, medium confidence; one fresh-first-use composition loop.
+Existing backend regression suite and real stack runtime may dominate elapsed
+time; record those focused-test exceptions, not an implementation exemption.
+
+## Readiness and stopping points
+
+Ready for execution as a sizing hypothesis. Leaves 3 and 6 target 5–8 minutes
+because they connect existing seams; all other leaves target about five minutes.
+At five minutes inspect for hidden work; at ten minutes of implementation
+stop/refine unless a concrete exception was recorded. Do not count this estimate
+as an execution-time guarantee.
+
+The safe interim states are explicit: leaf 1 refuses isolated use; leaf 3
+supports manually configured startup; leaf 6 supports the focused browser run;
+leaf 8 supports owned restart; leaves 10, 12 and 13 remove manual database,
+ports and identity setup respectively. Unsupported commands keep their earlier
+refusal until enabled. Final scope and proof promises remain unchanged.
 
 ## Verification and delivery
 
@@ -259,4 +472,7 @@ existing process-group behavior requires redesign, refine before changing it.
 Planning inspection found fixed origins in both Cypress and service commands,
 unconditional Mountebank startup/readiness, and restart by listener port rather
 than owner. These explain why a database-only change cannot deliver this story.
+Refinement also found reusable Cypress origin handling and a supervisor that
+already delegates service-tree handling to run-p. Use real-process evidence to
+check its failure propagation; do not assume EventEmitter-only tests prove it.
 No implementation or runtime verification has been performed for this plan.

@@ -259,29 +259,113 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 13. Create a note on the web and continue refining it locally
 
-**Status:** queued.
+**Status:** queued; refined for slice planning.
 
-- **For / why:** A notebook owner captures an idea in Donut, then wants to refine
-  it in Obsidian or an AI IDE without web creation blocking later publication.
-- **Evaluation:** From a notebook whose Portable content matches accepted main,
-  create one valid ordinary note on the web at the root or in an existing
-  represented folder. Pull into a clean up-to-date checkout, edit that new note,
-  commit and publish; Donut shows the refinement on that same note identity.
-- **Value / learning:** Removes a break in the sequential two-way workflow.
-  Tests web capture followed by local refinement before broad structural sync.
-- **Effort hypothesis:** L — low confidence; assumes existing web creation and
-  accepted-content synchronization can support one ordinary-note addition
-  without changing the Portable profile or solving earlier drift.
-- **Depends on:** delivered acquisition, content publish/pull, and local creation
-  capabilities (Stories 1–4); no unfinished product prerequisite.
-- **Safe stopping point:** Web-created notes can participate in the existing
-  loop even if every other new story is cancelled. Creation and accepted history
-  must agree; failure must not leave a new unsynchronized note. Existing notes'
-  private data stays untouched.
-- **Boundary:** One note creation from matching state, including an empty
-  notebook with matching accepted tree. No new folder/README, attachment, web
-  delete/rename/move, pre-existing drift repair, or unpublished local work during
-  receipt. Those are separate outcomes, not hidden acceptance obligations.
+**Goal**
+
+A notebook owner can capture a new idea through Donut's ordinary web note
+creation flow, then refine that same note in Obsidian or an AI IDE and publish
+it back without manual copying or web creation leaving synchronization blocked.
+The new note keeps its Donut identity and any learning data acquired before the
+local refinement. This extends the sequential two-way workflow to web capture;
+it does not promise synchronization of every structural operation.
+
+**Scope**
+
+- Start with an existing Git-backed notebook whose current Portable tree
+  matches accepted `main`. Include an empty notebook whose accepted tree is
+  also empty. Use the existing authorized owner's ordinary web note-creation
+  flow; no synchronization activation or special creation command is required.
+- Create one fresh ordinary note at the notebook root or in an existing folder
+  represented in accepted history, including nested folders. Representation may
+  come from tracked descendants or a folder README; the destination does not
+  need its own README. The notebook root needs none.
+- Include normal title-first creation with an initially empty body. The newly
+  created note must already have a valid Portable representation under
+  [Accepted ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md);
+  do not require the owner to hand-author YAML before pulling it. Existing
+  title/path validation and advisory-name warnings still apply. Creation at
+  an occupied or reserved deleted-note destination is not a fresh creation.
+- Successful eligible creation adds the new note's canonical Markdown file in
+  one immutable commit after the current accepted head. Existing Portable
+  files remain unchanged. The web note and accepted history succeed together
+  or neither succeeds; a Git acceptance failure must not leave a visible new
+  note absent from accepted history. Earlier commit IDs remain unchanged.
+- Subsequent ordinary web body/frontmatter saves on that note use the delivered
+  content-save behavior. The owner may finish writing before pulling; receiving
+  creation plus later accepted content commits must work. No autosave batching
+  or new save/finalize interaction is part of this story.
+- From an authenticated, bound, clean local checkout on `main`, at or behind
+  the accepted head with no unpublished work or unfinished Git operation,
+  `donut notebook pull <directory>` receives the new file and accepted content.
+  Repeating pull against the same head is an unchanged success. Existing
+  readiness refusals continue to preserve dirty or divergent local work.
+- The owner edits the received note's body or valid authored frontmatter at
+  its unchanged path, makes one local commit, and explicitly uses
+  `donut notebook publish <directory>`. With no intervening remote advance or
+  projection drift, Donut displays the refinement on the same web-created
+  identity, retaining learning schedules/history and other private associations.
+  Existing notes and their private data are unaffected; no IDs or sync metadata
+  enter the Portable tree. Pull itself never publishes.
+- Reuse ordinary publication validation and safe stale-head/drift rejection;
+  a later remote change does not authorize overwrite or automatic retries.
+  Creation of a new path is a structural accepted edge: existing content-only
+  rebase does not thereby gain support for unpublished work across that edge.
+- This prevents drift from the included creation flow when starting state
+  matches. It does not reconcile earlier unsynchronized web content, reset
+  history, or silently absorb other projection differences. Outside the
+  eligible starting state, retain existing web behavior without claiming
+  synchronization or advancing accepted history to include unrelated drift.
+
+Excluded: new notebooks or folders, creation inside an unrepresented empty
+folder, notebook/folder README authoring, web delete/rename/move, restoring a
+deleted note or reusing its reserved path, relationship-note creation, bulk
+import, AI extraction and external-data-assisted creation, attachments, multiple
+unpublished commits, divergent receipt across additions, earlier drift repair,
+direct standard-Git remote access, and history batching. These are conservative
+scope boundaries for this refinement, not claims that those existing web
+features should be removed or disabled.
+
+**Key examples**
+
+1. **Capture, finish writing, refine locally.** A matching notebook has a clean
+   bound checkout. The owner creates `Ideas.md` on the web with a title and empty
+   body, then writes a paragraph through the normal editor. Pull receives valid
+   Markdown containing the paragraph. The owner revises it locally, commits,
+   and publishes; the same Donut note displays the revision and keeps a learning
+   tracker acquired before publication.
+2. **First note and nested placement.** In a matching empty notebook, create
+   `First.md` at the root and complete the same round trip. In a populated
+   notebook, creation under an existing represented `Topics/Science` folder
+   produces `Topics/Science/Gravity.md`; it neither creates parents nor changes
+   their identities or READMEs. These are destination variations of one outcome.
+3. **Creation cannot become an unsynchronized success.** Eligible creation
+   cannot accept its Git revision. The operation fails and neither a new note
+   nor a new accepted head remains. Existing notes/history stay intact. An
+   invalid or occupied title likewise does not advance accepted history.
+4. **Local work is not overwritten by receipt.** After web creation, the local
+   checkout has dirty files or an unpublished content commit. Pull retains that
+   work and follows the existing refusal/guidance; this story does not rebase
+   it across the new-note addition. A clean checkout can receive the addition.
+5. **Earlier drift is not repaired accidentally.** An unrelated unsupported web
+   change already makes the notebook differ from accepted history. Creating
+   another note does not bundle that earlier change into an accepted commit or
+   make pull/publication claim the notebook is synchronized. The round-trip
+   promise applies only from the matching starting state.
+
+**Effort hypothesis:** L — low confidence; assumes ordinary creation can join
+the established accepted-content workflow without redesigning the Portable
+profile. The limited inspection confirmed the existing creation entry point and
+restore branch; it did not establish implementation cost.
+
+**Depends on:** delivered Stories 1–4; no unfinished product prerequisite.
+
+**Safe stopping point:** Web capture participates in the sequential local/web
+loop even if all later synchronization stories are cancelled.
+
+**Open decisions:** None blocks this bounded ordinary-note journey. Supporting
+external-data-assisted creation, restore, unrepresented folders, or pre-existing
+drift would require revisiting scope; they are not implicit requirements here.
 
 <a id="story-14"></a>
 
