@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slices 1–6 done; next is slice 7.
+Status: in progress. Slices 1–7 done; next is slice 8.
 
 ## Goal and scope
 
@@ -215,7 +215,7 @@ Sizing: ~5 minutes, high confidence; one guard boundary, one pull proof loop.
 
 ### 7. Accept the rebased content on the original learned note
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller fixture based on `NotebookGitWebContentControllerTestBase`:
 web-save another note, then publish a one-child proposal representing L′;
 observe original local-note ID/tracker state, preserved web-note bytes and
@@ -342,8 +342,13 @@ preparatory Structure sits immediately before its Behavior.
   other branch, and active MERGE_HEAD injected at download completion leave
   the captured checkout and temp dirs unchanged. Proofs live in
   `notebookPull.concurrentChange.suite.ts`.
+- Existing publication accepts a one-child proposal of local note A above an
+  accepted web save of note B on the original identities: A's id and tracker
+  remain, B's web bytes remain, and a fresh download matches the proposal
+  head and tree. Proofs live in
+  `NotebookGitLocalContentOverWebEditPublicationControllerTest`.
 
-Remaining leaves 7–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaves 8–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
