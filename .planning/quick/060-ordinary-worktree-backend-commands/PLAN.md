@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–5 done.
+Status: in progress; slices 1–6 done.
 
 ## Goal and scope
 
@@ -151,7 +151,7 @@ Do not mistake `CURSOR_DEV` quiet mode for the only form of local Nix usage.
 
 ### 6. Reject explicit target conflicts on ordinary isolated commands
 Type: Behavior
-Status: planned
+Status: done
 Proof: Each conflicting URL environment variable refuses before migration/tests;
 matching URLs succeed. Relevant CLI datasource/Flyway URL system-property forms
 also cannot override the selected target silently; reject conflicting forms.
@@ -276,6 +276,8 @@ stopping point.
 - Slice 5: unconfigured primary (git-dir == git-common-dir, no config) keeps
   default/explicit URLs and CI-shaped test flags; isolation stays config or
   linked-worktree plus migrate/test.
+- Slice 6: prepare refuses conflicting env and `-D`/`--` datasource/Flyway URL
+  args; matching values still launch against the assigned database.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining

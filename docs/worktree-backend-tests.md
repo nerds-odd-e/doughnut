@@ -198,8 +198,9 @@ primary or a linked worktree.
   (and an unreferenced one left behind by a failed or interrupted first use)
   persists until removed manually. There is no machine-wide allocation
   registry and no recovery from duplicate operator-supplied IDs.
-- Conflicting `SPRING_DATASOURCE_URL` / `DB_URL` / `SPRING_FLYWAY_URL` refuse
-  before launch.
+- Conflicting `SPRING_DATASOURCE_URL` / `DB_URL` / `SPRING_FLYWAY_URL`, or a
+  conflicting Gradle `-Dspring.datasource.url=` / `-Dspring.flyway.url=`,
+  refuse before launch. Matching URLs remain valid.
 - Concurrent full suites on one mysqld need enough `max_connections`. Local
   nix mysqld starts with 1000 via `scripts/mysql_nix_shared.sh`. Do not
   serialize concurrent suites as the supported workaround.

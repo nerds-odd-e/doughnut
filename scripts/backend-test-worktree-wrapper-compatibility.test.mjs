@@ -73,6 +73,21 @@ test('unconfigured primary preserves an explicit SPRING_DATASOURCE_URL', (t) => 
   assert.equal(readGradleInvocation(checkout).url, callerUrl)
 })
 
+test('unconfigured primary forwards -Dspring.datasource.url without isolating', (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const callerUrl = jdbcUrl('doughnut_test')
+  const flag = `-Dspring.datasource.url=${callerUrl}`
+  const result = runWrapper(checkout, {
+    command: 'backend/gradlew',
+    args: ['-p', 'backend', 'test', flag],
+  })
+  assert.equal(result.status, 0, outputOf(result))
+  assertDidNotPrepare(checkout)
+  const invocation = readGradleInvocation(checkout)
+  assert.equal(invocation.url, '')
+  assert.equal(invocation.args.includes(flag), true)
+})
+
 test('configured primary migrateTestDB uses the assigned id', (t) => {
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify({ id: 'wt_a7c2' }),

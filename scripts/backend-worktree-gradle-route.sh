@@ -64,7 +64,7 @@ fi
 if [[ "${isolate_backend}" == true && ( -n "${test_task}" || "${has_migrate}" == true ) ]]; then
   # shellcheck source=backend-test-worktree-owner.sh
   source "${script_dir}/backend-test-worktree-owner.sh"
-  backend_test_worktree_prepare "${checkout_root}"
+  backend_test_worktree_prepare "${checkout_root}" "$@"
   if [[ -n "${test_task}" ]]; then
     export DONUT_WORKTREE_HANDOFF=1
 

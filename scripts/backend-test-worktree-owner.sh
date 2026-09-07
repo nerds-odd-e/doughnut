@@ -6,10 +6,12 @@ database_for_worktree() {
   echo "doughnut_${1}_test"
 }
 
-# Exclusive lock, first-use provision when needed, config validation, and
-# SPRING_DATASOURCE_URL export for ${1} (checkout root). Leaves cwd unchanged.
+# Exclusive lock, first-use provision when needed, config validation, URL
+# conflict refusal (env and remaining CLI args), and SPRING_DATASOURCE_URL
+# export for ${1} (checkout root). Leaves cwd unchanged.
 backend_test_worktree_prepare() {
   local checkout_root="$1"
+  shift
   local config_path="${checkout_root}/.worktree.local.json"
   local mysql_host="127.0.0.1"
   local mysql_port="3309"
@@ -22,7 +24,7 @@ backend_test_worktree_prepare() {
   local database
   local expected_url
   local var_name
-  local value
+  local arg
 
   if ! mkdir "${lock_dir}" 2>/dev/null; then
     owner_pid="$(cat "${lock_dir}/owner.pid" 2>/dev/null || true)"
@@ -79,12 +81,25 @@ process.stdout.write(config.id)
   database="$(database_for_worktree "${worktree_id}")"
   expected_url="jdbc:mysql://${mysql_host}:${mysql_port}/${database}?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true"
 
-  for var_name in SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL; do
-    value="${!var_name:-}"
+  refuse_conflicting_url() {
+    local name="$1"
+    local value="$2"
     if [[ -n "${value}" && "${value}" != "${expected_url}" ]]; then
-      echo "Conflicting ${var_name} does not match the configured worktree database ${database}." >&2
+      echo "Conflicting ${name} does not match the configured worktree database ${database}." >&2
       exit 1
     fi
+  }
+
+  for var_name in SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL; do
+    refuse_conflicting_url "${var_name}" "${!var_name:-}"
+  done
+
+  for arg in "$@"; do
+    case "${arg}" in
+      -Dspring.datasource.url=*|--spring.datasource.url=*|-Dspring.flyway.url=*|--spring.flyway.url=*)
+        refuse_conflicting_url "${arg%%=*}" "${arg#*=}"
+        ;;
+    esac
   done
 
   echo "Selected database: ${database}"
