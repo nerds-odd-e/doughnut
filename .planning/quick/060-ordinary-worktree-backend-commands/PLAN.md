@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–10 done.
+Status: in progress; slices 1–11 done.
 
 ## Goal and scope
 
@@ -220,7 +220,7 @@ Gradle startup/migration runtime is an explicit possible timing exception.
 
 ### 11. Reuse an environment across migration and focused-test commands
 Type: Behavior
-Status: planned
+Status: done
 Proof: In another fresh disposable linked checkout, start with
 `CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test`.
 In a new shell use
@@ -296,6 +296,11 @@ stopping point.
 - Slice 10: disposable worktree ordinary `backend/gradlew -p backend test --continue`
   failed Flyway on `V300000399` (MySQL 1064), exit 1, no `:test` and no
   test reports. Shared schemas unchanged. Temp migration removed.
+- Slice 11: fresh linked checkout migrate-only allocated
+  `wt_679f319515a74117bc3503696a5b2fe3`; new-shell focused
+  `test --tests 'com.odde.donut.controllers.*'` (root and `backend/` cwd)
+  reused that ID/DB, executed 1052 tests, Flyway unchanged, no second
+  provision.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining
