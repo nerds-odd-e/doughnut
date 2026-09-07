@@ -1,6 +1,9 @@
 import { spawn } from 'node:child_process'
 import { createServer } from 'node:http'
 import { fileURLToPath } from 'node:url'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 export const selectedSha = 'a'.repeat(40)
 export const repository = 'nerds-odd-e/doughnut'
@@ -23,6 +26,9 @@ export function ciRun(overrides = {}) {
 }
 
 export async function runCiCommand(t, pages, args = ['--once']) {
+  const root = mkdtempSync(join(tmpdir(), 'release-ci-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  const output = join(root, 'output')
   const requests = []
   const server = createServer((request, response) => {
     const url = new URL(request.url, 'http://localhost')
@@ -48,7 +54,7 @@ export async function runCiCommand(t, pages, args = ['--once']) {
         GITHUB_REPOSITORY: repository,
         RELEASE_SHA: selectedSha,
         GITHUB_TOKEN: '',
-        GITHUB_OUTPUT: '',
+        GITHUB_OUTPUT: output,
       },
     }
   )
@@ -60,5 +66,11 @@ export async function runCiCommand(t, pages, args = ['--once']) {
     child.on('error', reject)
     child.on('close', resolve)
   })
-  return { status, stdout, stderr, requests }
+  let githubOutput = ''
+  try {
+    githubOutput = readFileSync(output, 'utf8')
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
+  }
+  return { status, stdout, stderr, requests, output: githubOutput }
 }

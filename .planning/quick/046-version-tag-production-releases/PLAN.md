@@ -172,7 +172,8 @@ the selected source. Remote publication remains gated until leaf 10.
 
 ### 8. Identify the failed release in existing diagnostics
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 70/70. Actual failed CI outputs retain run/attempt and feed selected-release notification; renderer covers early unknown identity, CI/artifact/publication stage and safe JSON. Parsed job dependencies/outcomes include admission failure with skipped Deploy. No Slack sent. Independent refactor: no edits.
 Proof: Early CI/artifact and late publication failure fixtures render selected
 tag/SHA/CI context when known, without claiming main HEAD or sending Slack.
 
@@ -249,3 +250,5 @@ existed to invalidate. The user explicitly requested the new two-plan split.
 - Worktree: `/Users/terryyin/.codex/worktrees/c158/doughnut`; coordinator task Story 1 / c158.
 - CI observer attempted before first push via `./scripts/run.sh node .agents/skills/execute-plan/scripts/ci-mailbox.mjs stream --execution nerds-odd-e/doughnut main`. Nix daemon socket returned Operation not permitted before observer startup; cell 6 exited, no mailbox/PID/session created. CI observation unavailable; pendingCi: unobserved. Branch pushes do not trigger this repository's main-only CI.
 - No production tags, settings, deployment calls, or main changes are authorized in this worktree. Post-merge scheduling/first-real-release observation belongs to the parent; local workflow activation remains branch work.
+
+- Final wiring learning: GitHub reserves default GITHUB_* YAML variables. Leaf 9 must carry RELEASE_SHA and invoke the publisher with explicit shell GITHUB_SHA assignment; remove old YAML override.

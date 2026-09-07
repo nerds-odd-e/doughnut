@@ -40,6 +40,8 @@ jobs:
       ref: ${{ steps.head_guard.outputs.ref }}
       ref_oid: ${{ steps.head_guard.outputs.refOid }}
       run_id: ${{ steps.ci.outputs.runId }}
+      run_attempt: ${{ steps.ci.outputs.runAttempt }}
+      failure_stage: ${{ steps.head_guard.outcome != 'success' && 'identity' || 'CI admission' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -62,6 +64,8 @@ jobs:
   Deploy:
     name: GCP deploy (GCS + MIG + health probe)
     runs-on: ${{ vars.RUNNER }}
+    outputs:
+      failure_stage: ${{ steps.publish.outcome == 'failure' && 'publication' || (steps.backend_artifact.outcome == 'failure' || steps.frontend_artifact.outcome == 'failure' || steps.cli_artifact.outcome == 'failure' || steps.payload.outcome == 'failure') && 'artifact admission' || 'deployment setup' }}
     needs: main-head-guard
     if: needs.main-head-guard.outputs.deploy == 'true'
     env:
@@ -91,6 +95,7 @@ jobs:
           npm install --prefix "$(pwd)/.ci-urlmap-node-deps" yaml@2.8.3
           ln -sfn "$(pwd)/.ci-urlmap-node-deps/node_modules/yaml" "$RELEASE_SOURCE_ROOT/node_modules/yaml"
       - name: Download CI artifacts
+        id: backend_artifact
         uses: actions/download-artifact@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -98,6 +103,7 @@ jobs:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
           path: release-artifacts/backend
       - name: Download frontend dist artifact
+        id: frontend_artifact
         uses: actions/download-artifact@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -105,6 +111,7 @@ jobs:
           name: ${{ env.FRONTEND_DIST_ARTIFACT }}
           path: release-artifacts/frontend
       - name: Download CLI bundle artifact
+        id: cli_artifact
         uses: actions/download-artifact@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -112,59 +119,40 @@ jobs:
           name: ${{ env.CLI_DIST_ARTIFACT }}
           path: release-artifacts/cli
       - name: Validate complete application payload
+        id: payload
         run: node scripts/ci/application-release-payload.mjs
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
           skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
       - name: Publish application to GCS and MIG
+        id: publish
         run: bash infra/gcp/scripts/publish-application.sh
 
   Notify-on-failure:
-    name: Slack notification on deploy failure
+    name: Slack notification on release failure
     runs-on: ${{ vars.RUNNER }}
-    needs: [Deploy]
-    if: always() && needs.Deploy.result == 'failure'
+    needs: [main-head-guard, Deploy]
+    if: always() && (needs.main-head-guard.result == 'failure' || needs.Deploy.result == 'failure')
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: main
           fetch-depth: 1
-      - name: Compute short SHA, URLs, and sanitized commit subject
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+      - name: Render selected release failure
         id: ctx
         env:
-          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          echo "short_sha=${DEPLOY_SHA:0:8}" >> "$GITHUB_OUTPUT"
-          echo "commit_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${DEPLOY_SHA}" >> "$GITHUB_OUTPUT"
-          echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
-          echo "ci_run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
-          echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
-          echo "subject=$(git log -1 --format=%s "$DEPLOY_SHA" | tr -d '"')" >> "$GITHUB_OUTPUT"
+          RELEASE_TAG: ${{ needs.main-head-guard.outputs.tag }}
+          RELEASE_SHA: ${{ needs.main-head-guard.outputs.sha }}
+          RELEASE_CI_RUN_ID: ${{ needs.main-head-guard.outputs.run_id }}
+          RELEASE_CI_RUN_ATTEMPT: ${{ needs.main-head-guard.outputs.run_attempt }}
+          FAILURE_STAGE: ${{ needs.main-head-guard.result == 'failure' && needs.main-head-guard.outputs.failure_stage || needs.Deploy.outputs.failure_stage }}
+        run: node scripts/ci/application-release-notification.mjs
       - uses: slackapi/slack-github-action@v4.0.0
         with:
           webhook: ${{ env.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
-          payload: |
-            text: "Deploy failure on ${{ github.repository }} @ ${{ steps.ctx.outputs.short_sha }}"
-            attachments:
-              - color: "#E01E5A"
-                blocks:
-                  - type: header
-                    text:
-                      type: plain_text
-                      text: "Failed production deploy"
-                  - type: section
-                    fields:
-                      - type: mrkdwn
-                        text: "*repo*\n<${{ steps.ctx.outputs.repo_url }}|${{ github.repository }}>"
-                      - type: mrkdwn
-                        text: "*message*\n${{ steps.ctx.outputs.subject }}"
-                      - type: mrkdwn
-                        text: "*commit*\n<${{ steps.ctx.outputs.commit_url }}|${{ steps.ctx.outputs.short_sha }}>"
-                      - type: mrkdwn
-                        text: "*deploy run*\n<${{ steps.ctx.outputs.run_url }}|${{ github.workflow }}>"
-                      - type: mrkdwn
-                        text: "*CI run*\n<${{ steps.ctx.outputs.ci_run_url }}|donut CI>"
-                      - type: mrkdwn
-                        text: "*event*\nworkflow_run on `${{ github.event.workflow_run.head_branch }}`"
+          payload: ${{ steps.ctx.outputs.payload }}

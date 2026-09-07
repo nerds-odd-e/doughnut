@@ -70,8 +70,11 @@ export async function querySelectedCi({
     return { state: 'pending', ...identity }
   }
   if (latest.conclusion !== 'success') {
-    throw new Error(
-      `CI ${latest.id} attempt ${latest.run_attempt} for ${sha} finished with ${latest.conclusion}`
+    throw Object.assign(
+      new Error(
+        `CI ${latest.id} attempt ${latest.run_attempt} for ${sha} finished with ${latest.conclusion}`
+      ),
+      { ci: { state: 'failed', ...identity } }
     )
   }
   return { state: 'ready', ...identity }
@@ -112,14 +115,19 @@ export async function waitForSelectedCi({
       ),
     timeoutMs
   )
+  let observed
   try {
     while (true) {
       signal.throwIfAborted()
       const result = await querySelectedCi({ ...selection, signal })
+      observed = result
       signal.throwIfAborted()
       if (result.state === 'ready') return result
       await pause(pollMs, signal, clock)
     }
+  } catch (error) {
+    error.ci ??= observed
+    throw error
   } finally {
     clock.clearTimeout(timer)
   }
@@ -129,9 +137,14 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const query = process.argv.includes('--once')
     ? querySelectedCi
     : waitForSelectedCi
-  const result = await query({
-    repository: process.env.GITHUB_REPOSITORY,
-    sha: process.env.RELEASE_SHA,
-  })
-  writeReleaseOutput(result)
+  try {
+    const result = await query({
+      repository: process.env.GITHUB_REPOSITORY,
+      sha: process.env.RELEASE_SHA,
+    })
+    writeReleaseOutput(result)
+  } catch (error) {
+    if (error.ci) writeReleaseOutput(error.ci)
+    throw error
+  }
 }
