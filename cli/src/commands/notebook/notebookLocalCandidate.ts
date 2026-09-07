@@ -8,10 +8,6 @@ import {
   listCommits,
 } from './notebookAcceptedInterval.js'
 
-const RECEIVE_ANCESTRY_ERROR =
-  'Local main cannot receive the accepted history because it contains unpublished or unrelated commits. ' +
-  'Publish or reconcile those commits, then try again.'
-
 const LOCAL_UNRELATED =
   'Local main cannot receive the accepted history because it does not share Git history with the accepted notebook. ' +
   'Clone the notebook with "donut notebook clone", then try again.'
@@ -44,13 +40,15 @@ function structuralChangeError(changedPath: string): string {
 
 export type UnpublishedLocalHistoryDecision =
   | { kind: 'fast-forward' }
+  | { kind: 'already-based' }
   | { kind: 'rebase'; localParent: string }
   | { kind: 'reject'; message: string }
 
 /**
  * Returns fast-forward when local main is already an ancestor of accepted.
+ * Eligible one-note content edits already based on accepted main stay as-is.
  * Eligible one-note content edits over disjoint content-only accepted history
- * rebase. Local-ahead without accepted advancement stays rejected until later.
+ * rebase.
  */
 export function inspectUnpublishedLocalHistory(
   acceptedRepoDir: string,
@@ -104,7 +102,7 @@ export function inspectUnpublishedLocalHistory(
     return { kind: 'reject', message: structuralChangeError(structuralPath) }
   }
   if (parent === acceptedHead) {
-    return { kind: 'reject', message: RECEIVE_ANCESTRY_ERROR }
+    return { kind: 'already-based' }
   }
   return { kind: 'rebase', localParent: parent }
 }

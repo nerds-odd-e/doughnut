@@ -141,6 +141,12 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
   }
 
   if (!result.changed) {
+    if (result.localHead !== result.acceptedHead) {
+      console.log(
+        `Unpublished local commit is already based on the accepted history. Local head: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
+      )
+      return
+    }
     console.log(`Notebook unchanged. Accepted head: ${result.acceptedHead}`)
     return
   }

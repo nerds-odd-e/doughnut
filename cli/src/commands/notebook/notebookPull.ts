@@ -75,6 +75,14 @@ export async function receiveAcceptedNotebookHead(
         acceptedHead
       )
       if (localHistory.kind === 'reject') throw new Error(localHistory.message)
+      if (localHistory.kind === 'already-based') {
+        return {
+          acceptedHead,
+          localHead: capturedHead,
+          changed: false,
+          rebased: false,
+        }
+      }
 
       runSystemGitOrThrow(
         [

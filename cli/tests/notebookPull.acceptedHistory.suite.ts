@@ -18,7 +18,7 @@ import {
 } from './notebookPull.testHelpers.js'
 import { describeNotebookPullConcurrentChange } from './notebookPull.concurrentChange.suite.js'
 import { describeNotebookPullFastForward } from './notebookPull.fastForward.suite.js'
-import { describeNotebookPullHistorySafety } from './notebookPull.historySafety.suite.js'
+import { describeNotebookPullAlreadyBased } from './notebookPull.alreadyBased.suite.js'
 import { describeNotebookPullLocalCandidate } from './notebookPull.localCandidate.suite.js'
 import { describeNotebookPullPathOverlap } from './notebookPull.pathOverlap.suite.js'
 import { describeNotebookPullStructuralHistory } from './notebookPull.structuralHistory.suite.js'
@@ -111,7 +111,7 @@ export function describeNotebookPullAcceptedHistory(): void {
 
   describeNotebookPullFastForward()
   describeNotebookPullConcurrentChange()
-  describeNotebookPullHistorySafety()
+  describeNotebookPullAlreadyBased()
   describeNotebookPullLocalCandidate()
   describeNotebookPullPathOverlap()
   describeNotebookPullStructuralHistory()

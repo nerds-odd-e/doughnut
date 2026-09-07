@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slices 1–4 done; next is slice 5.
+Status: in progress. Slices 1–5 done; next is slice 6.
 
 ## Goal and scope
 
@@ -188,7 +188,7 @@ refine this leaf before broadening implementation; do not introduce a sync engin
 
 ### 5. Repeat pull without recreating unpublished work
 Type: Behavior
-Status: planned
+Status: done
 Proof: Pull twice against B → same L′/files and publish guidance. Then serve a
 new eligible other-note accepted commit → pull → one child of that new head
 with the same local patch. Pull suite; no backend stubbed acceptance claim.
@@ -326,11 +326,16 @@ preparatory Structure sits immediately before its Behavior.
   Eligible other-note content-only divergence rebases with system Git
   `--onto` after the existing object import and readiness check. Output names
   the unpublished local head separately from the accepted head and points to
-  `donut notebook publish`. Original L remains in `ORIG_HEAD`. Local-ahead
-  without accepted advancement still uses the receive-gate error until leaf 5.
+  `donut notebook publish`. Original L remains in `ORIG_HEAD`.
   Proofs live in `notebookPull.rebase.suite.ts`.
+- An eligible one-note content commit already based on accepted main, including
+  the result of a prior rebase, is an unchanged pull success. Output names the
+  unpublished local head separately from the accepted head and points to
+  publish. A later eligible other-note accepted commit rebases that same patch
+  once more. Unsupported ahead cases stay rejected. Proofs live in
+  `notebookPull.alreadyBased.suite.ts`.
 
-Remaining leaves 5–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaves 6–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
