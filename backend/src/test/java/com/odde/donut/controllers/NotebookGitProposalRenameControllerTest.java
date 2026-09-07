@@ -30,10 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Verifies {@code publishNotebookGitProposal} accepts the one rename shape the tree-shape gate
- * recognizes: an isolated same-parent, equal-content remove/add pair, retaining the original note's
- * identity under its filename-derived title. Cross-parent and content-changed pairs remain covered
- * as rejections in {@link NotebookGitProposalTreeShapeControllerTest}.
+ * Verifies {@code publishNotebookGitProposal} accepts a same-parent equal-content rename, retaining
+ * the original note's identity. Cross-parent relocation is covered in {@link
+ * NotebookGitProposalRelocationControllerTest}. Combined parent-and-filename pairs are covered in
+ * {@link NotebookGitProposalRelocateAndRenameControllerTest}. Content-changed mixed pairs remain
+ * covered as rejections in {@link NotebookGitProposalTreeShapeControllerTest}.
  */
 class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControllerTestBase {
 

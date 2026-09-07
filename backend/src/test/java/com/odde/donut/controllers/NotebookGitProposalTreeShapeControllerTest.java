@@ -20,8 +20,10 @@ import org.springframework.web.server.ResponseStatusException;
  * Verifies {@code publishNotebookGitProposal}'s tree-shape gating: a proposal that is not an
  * identical-heads no-op must change one regular Markdown note, include an addition among several
  * added or modified notes, delete exactly one ordinary note in isolation, or rename exactly one
- * ordinary note within the same parent folder with unchanged content. Same-parent rename acceptance
- * is covered separately in {@link NotebookGitProposalRenameControllerTest}.
+ * ordinary note with unchanged content. Equal-content rename acceptance is covered in {@link
+ * NotebookGitProposalRenameControllerTest}; filename-preserving relocation in {@link
+ * NotebookGitProposalRelocationControllerTest}; combined parent-and-filename acceptance in {@link
+ * NotebookGitProposalRelocateAndRenameControllerTest}.
  */
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
 
@@ -89,25 +91,6 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     assertThat(
         exception.getReason(), containsString("not represented in accepted Portable content"));
     assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-  }
-
-  @Test
-  void rejectsProposalThatMovesAFileAcrossParentFoldersWithoutMutatingTheAcceptedBinding()
-      throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, baselineEntries());
-    byte[] bundleBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile("Folder/note.md", "original content"),
-                new NotebookGitProposalFile("README.md", "readme original")));
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString("isolated deletion"));
   }
 
   @Test

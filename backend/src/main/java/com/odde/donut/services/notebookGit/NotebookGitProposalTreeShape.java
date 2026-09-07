@@ -15,11 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit,
  * and permits one modified note, a set containing added ordinary Markdown notes at regular file
- * modes, exactly one isolated ordinary-note deletion, or exactly one same-parent equal-content
- * rename (one removed and one added note sharing a blob in the same directory) - never mixed,
- * multiple, or cross-parent removed/added pairs, unsafe paths, non-regular modes, or the
- * folder-reserved {@code README.md}. Callers only invoke this once proposal ancestry is confirmed
- * to be a direct single-parent child of the accepted commit.
+ * modes, exactly one isolated ordinary-note deletion, or exactly one equal-content rename (one
+ * removed and one added note sharing a blob). Never mixed or multiple pairs, unsafe paths,
+ * non-regular modes, or the folder-reserved {@code README.md}. Callers only invoke this once
+ * proposal ancestry is confirmed to be a direct single-parent child of the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -91,15 +90,15 @@ public final class NotebookGitProposalTreeShape {
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
-    List<NoteChange> renameDetected = detectSameParentRename(changes);
+    List<NoteChange> renameDetected = detectEqualBlobRename(changes);
     if (renameDetected != null) {
       return renameDetected;
     }
     if (changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)
         && changes.size() > 1) {
       throw unsupportedTreeShape(
-          "publish each removed note in an isolated deletion commit, or an isolated same-parent"
-              + " rename with unchanged content, without other file changes");
+          "publish each removed note in an isolated deletion commit, or an isolated equal-content"
+              + " rename, without other file changes");
     }
     if (changes.size() > 1
         && changes.stream().noneMatch(change -> change.kind() == ChangeKind.ADDED)) {
@@ -114,11 +113,11 @@ public final class NotebookGitProposalTreeShape {
 
   /**
    * Recognizes the one rename shape this proposal type accepts: a proposal containing exactly one
-   * removed and one added ordinary note, with identical blob content, in the same parent directory.
-   * Returns {@code null} when the proposal does not match this shape, so callers fall back to the
-   * existing removal/addition eligibility rules.
+   * removed and one added ordinary note with identical blob content. Returns {@code null} when the
+   * proposal does not match this shape, so callers fall back to the existing removal/addition
+   * eligibility rules.
    */
-  private static List<NoteChange> detectSameParentRename(List<NoteChange> changes) {
+  private static List<NoteChange> detectEqualBlobRename(List<NoteChange> changes) {
     if (changes.size() != 2) {
       return null;
     }
@@ -138,16 +137,8 @@ public final class NotebookGitProposalTreeShape {
     if (!deleted.blobId().equals(added.blobId())) {
       return null;
     }
-    if (!parentDirectory(deleted.path()).equals(parentDirectory(added.path()))) {
-      return null;
-    }
     return List.of(
         new NoteChange(added.path(), ChangeKind.RENAMED, added.blobId(), deleted.path()));
-  }
-
-  private static String parentDirectory(String path) {
-    int lastSlash = path.lastIndexOf('/');
-    return lastSlash < 0 ? "" : path.substring(0, lastSlash + 1);
   }
 
   private static void assertRegularNotePath(String changedPath) {

@@ -3,7 +3,6 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
-import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -20,12 +19,9 @@ import com.odde.donut.services.NoteTitlePlacementRules;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -44,7 +40,7 @@ public class NotebookGitProposalPublisher {
   private final CanonicalDonutOrigin canonicalDonutOrigin;
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
-  private final Validator validator;
+  private final NotebookGitProposalFilenameTitle filenameTitle;
   private final NoteFactory noteFactory;
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
@@ -57,7 +53,7 @@ public class NotebookGitProposalPublisher {
       CanonicalDonutOrigin canonicalDonutOrigin,
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
-      Validator validator,
+      NotebookGitProposalFilenameTitle filenameTitle,
       NoteFactory noteFactory,
       NoteService noteService,
       NoteTitlePlacementRules noteTitlePlacementRules) {
@@ -68,7 +64,7 @@ public class NotebookGitProposalPublisher {
     this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
-    this.validator = validator;
+    this.filenameTitle = filenameTitle;
     this.noteFactory = noteFactory;
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
@@ -137,7 +133,7 @@ public class NotebookGitProposalPublisher {
             authorizationService.getCurrentUser());
         proposedLiveNotes.remove(deletedNote);
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.RENAMED) {
-        applyRename(folders, liveNotes, noteChange, publishedAt);
+        applyRename(notebook, folders, proposal, acceptedHead, liveNotes, noteChange, publishedAt);
       }
     }
 
@@ -161,14 +157,8 @@ public class NotebookGitProposalPublisher {
       String path,
       Timestamp publishedAt) {
     AuthoredNoteDocument document = readValidatedDocument(proposal, path);
-    String title = validFilenameDerivedTitle(path);
-    Integer destinationFolderId =
-        projection.requireRepresentedFolderIdForAddition(
-            folders, proposal.repository(), acceptedHead, path);
-    Folder destinationFolder =
-        destinationFolderId == null
-            ? null
-            : entityPersister.find(Folder.class, destinationFolderId);
+    String title = filenameTitle.requireValid(path);
+    Folder destinationFolder = representedDestinationFolder(folders, proposal, acceptedHead, path);
     Note addedNote;
     try {
       addedNote = noteFactory.create(notebook, destinationFolder, title);
@@ -180,21 +170,38 @@ public class NotebookGitProposalPublisher {
   }
 
   private void applyRename(
+      Notebook notebook,
       List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
       List<Note> liveNotes,
       NotebookGitProposalTreeShape.NoteChange noteChange,
       Timestamp publishedAt) {
     Note note = projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.fromPath());
-    String newTitle = validFilenameDerivedTitle(noteChange.path());
+    String newTitle = filenameTitle.requireValid(noteChange.path());
+    Folder destinationFolder =
+        representedDestinationFolder(folders, proposal, acceptedHead, noteChange.path());
     try {
-      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-          note.getNotebook(), note.getFolder(), newTitle);
+      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, destinationFolder, newTitle);
     } catch (ApiException exception) {
       throw withContext(exception, "Cannot rename to path \"" + noteChange.path() + "\"");
     }
     note.setTitle(new DisplayName(newTitle));
+    note.setFolder(destinationFolder);
     note.setUpdatedAt(publishedAt);
     entityPersister.save(note);
+  }
+
+  private Folder representedDestinationFolder(
+      List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      String path) {
+    Integer destinationFolderId =
+        projection.requireRepresentedFolderId(folders, proposal.repository(), acceptedHead, path);
+    return destinationFolderId == null
+        ? null
+        : entityPersister.find(Folder.class, destinationFolderId);
   }
 
   private AuthoredNoteDocument readValidatedDocument(
@@ -218,33 +225,5 @@ public class NotebookGitProposalPublisher {
     contextualException.getErrorBody().getErrors().putAll(exception.getErrorBody().getErrors());
     contextualException.initCause(exception);
     return contextualException;
-  }
-
-  private String validFilenameDerivedTitle(String path) {
-    String filename = path.substring(path.lastIndexOf('/') + 1);
-    String title = filename.substring(0, filename.length() - ".md".length());
-    NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
-    titleDto.setNewTitle(title);
-    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(titleDto);
-    if (!violations.isEmpty()) {
-      String reason =
-          violations.stream()
-              .map(ConstraintViolation::getMessage)
-              .sorted()
-              .findFirst()
-              .orElseThrow();
-      throw invalidFilenameDerivedTitle(path, reason);
-    }
-    String normalizedTitle = new DisplayName(title).value();
-    if (!normalizedTitle.equals(title)) {
-      throw invalidFilenameDerivedTitle(
-          path, "filename title would be normalized to \"" + normalizedTitle + "\"");
-    }
-    return title;
-  }
-
-  private static ResponseStatusException invalidFilenameDerivedTitle(String path, String reason) {
-    return new ResponseStatusException(
-        HttpStatus.BAD_REQUEST, "Invalid note title at path \"" + path + "\": " + reason);
   }
 }

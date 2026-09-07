@@ -28,28 +28,33 @@ import org.springframework.web.server.ResponseStatusException;
 /** Compares the live MySQL projection with a notebook's accepted Portable tree. */
 @Service
 public class NotebookGitProjection {
-  public Integer requireRepresentedFolderIdForAddition(
+  /**
+   * Resolves the destination folder for an added or relocated note from the accepted Portable tree.
+   * Root paths return {@code null}. Nested folders, including README-only ones, are selected by
+   * their full path when any tracked accepted content sits under that path.
+   */
+  public Integer requireRepresentedFolderId(
       List<ExportFolderRow> folders,
       Repository repository,
       ObjectId acceptedHead,
-      String addedNotePath) {
-    int folderPathEnd = addedNotePath.lastIndexOf('/');
+      String notePath) {
+    int folderPathEnd = notePath.lastIndexOf('/');
     if (folderPathEnd < 0) {
       return null;
     }
 
-    String requiredFolderPath = addedNotePath.substring(0, folderPathEnd + 1);
+    String requiredFolderPath = notePath.substring(0, folderPathEnd + 1);
     Map<Integer, ExportFolderRow> folderById = indexFoldersById(folders);
     ExportFolderRow folder =
         folders.stream()
             .filter(candidate -> folderPath(candidate, folderById).equals(requiredFolderPath))
             .findFirst()
-            .orElseThrow(() -> unrepresentedParentFolder(addedNotePath));
+            .orElseThrow(() -> unrepresentedParentFolder(notePath));
     boolean representedInAcceptedContent =
         readEntries(repository, acceptedHead).stream()
             .anyMatch(entry -> entry.path().startsWith(requiredFolderPath));
     if (!representedInAcceptedContent) {
-      throw unrepresentedParentFolder(addedNotePath);
+      throw unrepresentedParentFolder(notePath);
     }
     return folder.id();
   }
@@ -98,11 +103,11 @@ public class NotebookGitProjection {
             + " before publishing.");
   }
 
-  private static ResponseStatusException unrepresentedParentFolder(String addedNotePath) {
+  private static ResponseStatusException unrepresentedParentFolder(String notePath) {
     return new ResponseStatusException(
         HttpStatus.BAD_REQUEST,
         "Parent folder for path \""
-            + addedNotePath
+            + notePath
             + "\" is not represented in accepted Portable content; add this note at the notebook"
             + " root or inside an existing represented folder.");
   }

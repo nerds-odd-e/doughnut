@@ -607,12 +607,10 @@ authored Git commit and see the complete change in Donut.
 
 ### 12. Move a note between existing folders without losing its learning history
 
-**Status:** re-refined on 2026-09-07 and
-[slice-plan refined](../quick/050-relocate-local-note/PLAN.md); not implemented.
-Story 6 and Plan 52's guidance/diagnostic corrections are delivered. Story 8
-content rebase is delivered. Stories 9 and 12 retain their backlog order;
-neither is a technical prerequisite of the other. This refinement does not
-start execution.
+**Status:** delivered. The completed quick plan was removed; implementation
+and proof remain recoverable from Git history. Story 8 content rebase is also
+delivered. Story 9 remains a higher product priority, not a technical
+prerequisite of this outcome.
 
 **Goal**
 
@@ -629,8 +627,8 @@ learning history again. Renaming in place cannot achieve this outcome.
   private-data preservation, unchanged references, retry, and rejection rules.
 - Reuse the delivered raw removed/added blob correspondence and same-note
   mutation; receiving a rename and a later edit already works through ordinary
-  pull. The new learning here is final destination eligibility and container
-  preservation, not a second transport or identity mechanism.
+  pull. Destination eligibility and container preservation use that same
+  identity mechanism.
 - Support root→existing represented folder, folder→root, and folder→folder,
   including nested destinations and folders represented only by a README.
   The destination must exist in Donut and be represented in accepted parent
@@ -672,57 +670,9 @@ learning history again. Renaming in place cannot achieve this outcome.
   README relocation, cross-notebook moves, restore, deleted-path reuse,
   multiple unpublished commits, divergence, drift repair, or new UI/metadata.
 
-**Key examples**
-
-1. Move Inbox/Cell.md to Biology/Cell.md → publish → the same note appears in
-   the existing represented Biology folder; another checkout receives it.
-2. Move Inbox/Cell.md to Biology/Cell basics.md → publish → validate only that
-   final available destination, even if Cell basics is reserved in Inbox or
-   Cell is reserved in Biology. Neither hypothetical intermediate is used.
-3. Move Inbox's only tracked note to the root → publish → Inbox remains a
-   Donut folder, with no generated README. Other identities remain untouched.
-   A later move back into that unrepresented Inbox rejects without inventing
-   content to make the folder eligible.
-4. Target a missing or unrepresented folder, or a reserved final path → reject
-   without changing the source note, containers, or accepted history.
-5. Publish relocation, then separately publish a content edit there → receive
-   both commits in another clean checkout → same learned note, new location
-   and content, original ancestry retained.
-6. Move into Courses/Biology where a different root Biology also exists →
-   publish → choose Courses/Biology by its full represented path. An untouched
-   note with identical content elsewhere keeps its own learning data.
-7. A referrer contains an exact Inbox/Cell link in body and YAML → publish the
-   move to Biology/Cell → authored references stay unchanged and the old exact
-   path no longer resolves; no automatic referrer edits accompany the move.
-8. Accepted main advances after the checkout's base → publish relocation →
-   retain the stale-head rejection and local commit. This story adds no
-   structural rebase, including when Story 8 is installed alongside it.
-
-- **Evaluation:** Installed CLI relocation changes the note's visible folder
-  while preserving its identity and private data; another checkout receives it.
-- **Value / learning:** Delivers filing/reorganization independently of moving
-  a whole folder; tests destination eligibility and container preservation.
-- **Effort hypothesis:** M (about 1–2 hours), low confidence. Assumes exact
-  single-note relocation to already represented folders stays bounded and
-  Story 6's identity contract remains usable. This is a behavior-level
-  hypothesis, not an estimate inferred from implementation size.
-- **Depends on:** Story 6's delivered identity-preserving publication contract.
-  Story 9 is a higher product priority, not a technical prerequisite.
-- **Safe stopping point:** Owners can rename and file one note while whole
-  folder moves remain unsupported.
-- **Open decisions:** none within existing represented destinations.
-- **Parallel boundary:** Plan 50 owns relocation publication and its proofs.
-  Story 8's other-note content rebase is delivered: an accepted relocation
-  remains receivable by a clean checkout; pull still rejects divergent
-  structural history while unpublished local work exists. Do not expand
-  relocation to rebase a local content edit over a move, or a move over local
-  edits. Shared clone/pull guidance and the installed clone feature already
-  include Story 8's pull observations; keep relocation guidance from claiming
-  structural rebase.
-
 ## Ordering and Scope Reduction
 
-Stories 1–6, 8, and 11 are delivered. The [product backlog](../PRODUCT-BACKLOG.md)
+Stories 1–6, 8, 11, and 12 are delivered. The [product backlog](../PRODUCT-BACKLOG.md)
 owns the global story order. Among unfinished SEED-009 stories, Story 9 is next;
 SEED-015 worktree isolation currently precedes it in that queue.
 
@@ -827,12 +777,12 @@ essential; the split removes folder policy rather than disguising it as tests.
 
 ### Priority and deferred follow-ons
 
-Same-folder renaming has delivered the first identity promise. Non-overlapping
-other-note concurrent edits can be pulled and then published. Overlapping
-same-note handling remains next among notebook-sync stories because that
-refusal still blocks the delivered lifecycle. Single-note relocation follows
-them, then whole-folder moves. Story 12 depends on Story 6, and Story 7 follows
-Story 12. Batching improves history quality after synchronization works.
+Same-folder renaming and single-note relocation have delivered identity-preserving
+reorganization for one note. Non-overlapping other-note concurrent edits can be
+pulled and then published. Overlapping same-note handling remains next among
+notebook-sync stories because that refusal still blocks the delivered lifecycle.
+Whole-folder moves follow Story 12. Batching improves history quality after
+synchronization works.
 
 No new feature story is promoted from the deletion or rename proofs alone.
 Keep these possibilities deferred until the stated learning warrants selecting
@@ -875,8 +825,7 @@ First-to-defer order among unfinished queued SEED-009 stories is:
 
 1. Story 10, accepting extra immutable web commits.
 2. Story 7, rejecting folder moves while retaining note relocation.
-3. Story 12, retaining same-folder rename while deferring cross-folder filing.
-4. Story 9, retaining automatic non-conflicting other-note rebase from Story 8
+3. Story 9, retaining automatic non-conflicting other-note rebase from Story 8
    while stopping safely on unresolved same-path overlap.
 
 The delivered and queued boundaries still leave parts of Proposed ADR 0002
@@ -904,7 +853,7 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 
 ## When to Surface
 
-Stories 1–6, 8, and 11 are delivered. Select one remaining story from the
+Stories 1–6, 8, 11, and 12 are delivered. Select one remaining story from the
 [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Story 9 has a
 refined execution plan linked in its home section. Do not turn
 the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI

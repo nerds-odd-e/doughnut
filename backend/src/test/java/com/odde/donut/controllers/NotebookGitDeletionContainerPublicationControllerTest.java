@@ -12,14 +12,11 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.TreeWalk;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -76,7 +73,7 @@ class NotebookGitDeletionContainerPublicationControllerTest
       assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
       assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
       assertThat(downloadedCommit.parent(), equalTo(acceptedHead));
-      assertThat(pathsIn(readBack, downloadedCommit.head()), empty());
+      assertThat(GitBundleTestReader.pathsIn(readBack, downloadedCommit.head()), empty());
       assertThat(
           NotebookGitProposalBlobText.readUtf8(readBack, downloadedCommit.parent(), deletedPath),
           equalTo(CONTENT));
@@ -95,19 +92,5 @@ class NotebookGitDeletionContainerPublicationControllerTest
     }
     Folder folder = makeMe.aFolder().notebook(notebook).name(folderName).please();
     makeMe.aNote().folder(folder).title("Only").content(CONTENT).please();
-  }
-
-  private static List<String> pathsIn(InMemoryRepository repository, ObjectId commitId)
-      throws Exception {
-    try (RevWalk revWalk = new RevWalk(repository);
-        TreeWalk treeWalk = new TreeWalk(repository)) {
-      treeWalk.addTree(revWalk.parseCommit(commitId).getTree());
-      treeWalk.setRecursive(true);
-      List<String> paths = new ArrayList<>();
-      while (treeWalk.next()) {
-        paths.add(treeWalk.getPathString());
-      }
-      return paths;
-    }
   }
 }
