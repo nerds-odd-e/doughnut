@@ -114,12 +114,41 @@ These commands reuse the checkout's assigned database and the same exclusive
 invocation lock as `pnpm backend:test:worktree`. They do not allocate a
 first-use environment.
 
+## Ordinary tests in a configured checkout
+
+When `.worktree.local.json` is already present, the repository Gradle wrapper
+migrates the assigned database once, then runs the requested tests against it
+with the test profile and actual-run flags (`--rerun-tasks --no-build-cache
+--no-daemon`). A failed migration stops the command before tests start, even
+when the caller passed `--continue`.
+
+From the checkout root:
+
+```bash
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test --tests '<pattern>'
+```
+
+From `backend/`:
+
+```bash
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c ./gradlew test
+CURSOR_DEV=true nix develop -c ./gradlew test --tests '<pattern>'
+```
+
+These commands reuse the checkout's assigned database and the same exclusive
+invocation lock as `pnpm backend:test:worktree`. They do not allocate a
+first-use environment. The caller does not need to pass
+`-Dspring.profiles.active=test`.
+
 ## Limits
 
-- `pnpm backend:test`, `pnpm backend:test_only`, and direct Gradle `test` are
-  not automatically isolated; they keep the legacy default (`doughnut_test`).
-  Configured-checkout `migrateTestDB` through the repository wrapper is isolated
-  as described above.
+- `pnpm backend:test` and `pnpm backend:test_only` are not automatically
+  isolated; they keep the legacy default (`doughnut_test`). Configured-checkout
+  `migrateTestDB` and `test` through the repository wrapper are isolated as
+  described above.
 - No automatic cleanup, retirement, or orphan removal: a provisioned database
   (and an unreferenced one left behind by a failed or interrupted first use)
   persists until removed manually. There is no machine-wide allocation

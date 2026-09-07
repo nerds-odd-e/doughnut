@@ -88,6 +88,12 @@ export function makeCheckout(t, { config } = {}) {
   writeStandIn(path.join(javaHome, 'bin', 'java'), [
     '#!/bin/sh',
     'root="$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)"',
+    'count="$root/gradle-invocation-count"',
+    'n=1',
+    'if [ -f "$count" ]; then',
+    '  n=$(($(cat "$count") + 1))',
+    'fi',
+    'printf \'%s\\n\' "$n" > "$count"',
     'record="$root/gradle-invocation"',
     '{',
     '  printf \'cwd=%s\\n\' "$PWD"',
@@ -97,10 +103,15 @@ export function makeCheckout(t, { config } = {}) {
     '    printf \'arg:%s\\n\' "$arg"',
     '  done',
     '} > "$record"',
+    'cp "$record" "$root/gradle-invocation.$n"',
     "printf 'GRADLE_STDOUT\\n'",
     "printf 'GRADLE_REACHED\\n' >&2",
     ...holdReleaseLines('GRADLE_HOLD', 'gradle-reached', 'gradle-release'),
-    'exit "${FAKE_GRADLE_EXIT:-0}"',
+    'exit_code="${FAKE_GRADLE_EXIT:-0}"',
+    'if [ -n "${FAKE_GRADLE_FAIL_INVOCATION:-}" ] && [ "$n" -ne "${FAKE_GRADLE_FAIL_INVOCATION}" ]; then',
+    '  exit_code=0',
+    'fi',
+    'exit "$exit_code"',
   ])
 
   if (config !== undefined) {
@@ -149,8 +160,7 @@ export function makeCheckout(t, { config } = {}) {
   }
 }
 
-export function readGradleInvocation(checkout) {
-  const text = readFileSync(checkout.gradleInvocation, 'utf8')
+function parseGradleInvocation(text) {
   const javaArgs = []
   let cwd
   let url
@@ -170,6 +180,25 @@ export function readGradleInvocation(checkout) {
     : undefined
   const args = jarAt >= 0 ? javaArgs.slice(jarAt + 2) : javaArgs
   return { wrapper, cwd, url, args, javaArgs, handoff }
+}
+
+export function readGradleInvocation(checkout) {
+  return parseGradleInvocation(readFileSync(checkout.gradleInvocation, 'utf8'))
+}
+
+export function readGradleInvocations(checkout) {
+  const count = Number(
+    readFileSync(path.join(checkout.root, 'gradle-invocation-count'), 'utf8')
+  )
+  const invocations = []
+  for (let n = 1; n <= count; n += 1) {
+    invocations.push(
+      parseGradleInvocation(
+        readFileSync(path.join(checkout.root, `gradle-invocation.${n}`), 'utf8')
+      )
+    )
+  }
+  return invocations
 }
 
 export function readMysqlInvocation(checkout) {

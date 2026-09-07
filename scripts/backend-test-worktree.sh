@@ -45,4 +45,5 @@ gradle_cmd=(
 if [[ -n "${test_pattern}" ]]; then
   gradle_cmd+=(--tests "${test_pattern}")
 fi
+export DONUT_WORKTREE_HANDOFF=1
 exec "${gradle_cmd[@]}"

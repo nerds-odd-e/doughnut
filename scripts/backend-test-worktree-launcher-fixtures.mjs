@@ -11,6 +11,7 @@ function sanitizedChildEnv(env) {
   delete childEnv.SPRING_FLYWAY_URL
   delete childEnv.DONUT_WORKTREE_HANDOFF
   delete childEnv.FAKE_GRADLE_EXIT
+  delete childEnv.FAKE_GRADLE_FAIL_INVOCATION
   delete childEnv.FAKE_MYSQL_EXIT
   Object.assign(childEnv, env)
   return childEnv

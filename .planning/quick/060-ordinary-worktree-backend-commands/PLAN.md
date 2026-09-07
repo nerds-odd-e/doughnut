@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–2 done.
+Status: in progress; slices 1–3 done.
 
 ## Goal and scope
 
@@ -113,7 +113,7 @@ before extending it; do not implement a general Gradle parser.
 
 ### 3. Run ordinary focused tests after preparing the configured database
 Type: Behavior
-Status: planned
+Status: done
 Proof: Wrapper fixture observes one migration before tests, the test profile
 without requiring caller flags, a preserved `--tests` token, actual-run settings,
 and nonzero unmatched-filter behavior. Migration failure prevents tests even
@@ -266,8 +266,12 @@ stopping point.
 - Slice 2: `backend/gradlew` is a symlink to root `gradlew`, so APP_HOME is
   the checkout root. Isolation policy lives in
   `scripts/backend-worktree-gradle-route.sh`; an invocation-local
-  `DONUT_WORKTREE_HANDOFF` prevents recursive lock. Configured `migrateTestDB`
-  (not `test`) is the only ordinary form routed so far.
+  `DONUT_WORKTREE_HANDOFF` prevents recursive lock.
+- Slice 3: ordinary configured `test` runs a separate migrate invocation
+  first (so `--continue` cannot start tests after migrate failure), then
+  execs the original test args with the test profile and actual-run flags.
+  Opt-in sets `DONUT_WORKTREE_HANDOFF` after prepare so it stays one
+  migrate-then-test exec without re-entering the owner.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining
