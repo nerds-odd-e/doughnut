@@ -182,10 +182,17 @@ same-class hooks). File stayed at 196 lines, no split needed.
 
 ### 4. Roll back a rename when acceptance fails
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing late-binding-save failure profile observes old title, note
 timestamp, tracker state, accepted head/bundle and binding timestamp through
 fresh committed reads. Backend.
+Learning: Pure proof addition, no production change needed — the existing
+REQUIRES_NEW/SERIALIZABLE publish transaction already rolls back the
+in-place title mutation. Added a new
+NotebookGitProposalRenameRollbackControllerTest reusing
+NotebookGitPublicationAtomicTestSupport's exact FailingBindingSaveConfig
+profile/reset-hook pattern (kept as a sibling file rather than extending
+NotebookGitPublicationAtomicControllerTest to stay under ~250 lines).
 
 Behavior: The new title is projected but binding acceptance fails → publication
 fails → original identity state and accepted revision survive. Reuse
