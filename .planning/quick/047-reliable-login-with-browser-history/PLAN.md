@@ -2,11 +2,14 @@
 
 Source: [SEED-014 Story 1](../../seeds/SEED-014-reliable-login-with-browser-history.md#story-1).
 Status: in progress on `codex/reliable-login-browser-history`.
-Readiness: connector recovery delivered; continue with leaf 3.
+Readiness: server and tablet recovery delivered; continue with leaf 4.
 Execution worktree: `/Users/terryyin/.codex/worktrees/f8d7/doughnut`.
 CI observer: coordinator `047-f8d7`, repository `nerds-odd-e/doughnut`, main;
 cell 10 / PTY session 29699 / PID 65697; mailbox `/tmp/donut-ci-501/watch-8lFX2v`.
 Only main triggers push CI; this branch has no push CI runs.
+Observed main CI failure run `34069104930` attempt 1 (packaging job) at
+`7aa2cced52f7cafe0bc1e743301dc29b1b515230`; it is outside this execution's
+pushed history and is not an ancestor of this branch, so no repair is owned here.
 
 ## Goal and scope
 
@@ -200,8 +203,16 @@ loop. Stop-safe: returning users already receive actionable instructions.
 
 ### 3. Read and use recovery instructions on a tablet
 Type: Behavior
-Status: planned
+Status: done
 Proof: Browser rendering of the exact packaged recovery document.
+
+Red on missing viewport, then 2 focused browser tests passed. Full frontend
+passed 341 files / 1850 tests (66.91s) after the navigation repair below; isolated
+full backend passed (47s). Literal commands are the leaf commands with `CI=true`
+for frontend and the leaf 2 database override for backend. Logs:
+`/tmp/recovery-tablet-frontend-resumed.log`, `/tmp/recovery-tablet-backend.log`.
+Fresh refactor made no edits; coordinator formatting passed. Chromium's tablet
+layout is verified; Safari-specific engine behavior is not claimed.
 
 Behavior: A learner opens the server's recovery document on an iPad-sized
 viewport → the full instructions are readable without horizontal scrolling,
@@ -375,5 +386,5 @@ covered. This is a bounded repair required for the planned suite proof.
 Passed `CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.navigation.spec.ts`
 (6 tests), then `CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test`
 (340 files, 1848 tests). Fresh refactor required no edits; coordinator formatting
-passed. Tablet WIP remains parked in exact stash
-`d541b3f1855b3e9c59bc022a1ed378e27ecfd30d` until this repair is pushed.
+passed. Repair `42f944df0a` was pushed; tablet WIP restored, content compared,
+and its exact stash dropped. No parked work remains from this repair.
