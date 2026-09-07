@@ -408,7 +408,7 @@ is an external-wait exception rather than implementation scope.
 
 ### 11. Run first backend tests concurrently in two fresh worktrees
 Type: Behavior
-Status: planned
+Status: done
 Proof: Start the same representative focused database-backed test through
 `pnpm backend:test:worktree`, selecting
 `com.odde.donut.controllers.NoteTitlePersistenceTest`, in both slice-10
@@ -416,6 +416,15 @@ worktrees with overlapping execution. Capture each command's allocated ID,
 selected database, success result, and target-specific Flyway history. The two
 IDs and databases differ; neither legacy database nor the other worktree's
 configuration changes.
+
+Learning: Real overlapping run (4s apart, ~20+s concurrent Gradle execution).
+Worktree 1 allocated `wt_33aa1ea6c06e48e0888e4f8e82b8e7b5`
+(`doughnut_wt_33aa1ea6c06e48e0888e4f8e82b8e7b5_test`), BUILD SUCCESSFUL, 22
+Flyway rows. Worktree 2 allocated `wt_e84c4b082eec4b09a99eb0bee1b9c349`
+(`doughnut_wt_e84c4b082eec4b09a99eb0bee1b9c349_test`), BUILD SUCCESSFUL, 22
+Flyway rows. Ids/databases differ; each `.worktree.local.json` names only its
+own id; the pre-existing `doughnut_test` database was unaffected. No
+anomalies.
 
 Behavior: Two fresh local worktrees start their first opt-in backend tests at
 the same time → both automatically provision distinct environments and both
