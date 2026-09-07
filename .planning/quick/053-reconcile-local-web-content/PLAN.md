@@ -1,8 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: planned; explicit slice-plan refinement complete; ready for execution
-after the existing Story 6 correction work in Plan 52 closes.
+Status: in progress. Slice 1 done; next is slice 2.
 
 ## Goal and scope
 
@@ -127,7 +126,7 @@ leaf rather than declaring the promise covered by a historical pass.
 
 ### 1. Explain why local work cannot be rebased
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run(['notebook', 'pull', directory])` with real Git fixtures;
 unsupported local shape yields specific actionable guidance and unchanged
 checkoutState. Pull suite.
@@ -304,7 +303,19 @@ precede mutation because opening the success path without them would accept
 excluded outcomes. Each diagnostic is independently actionable; the only
 preparatory Structure sits immediately before its Behavior.
 
-All remaining leaves are Ready as sizing hypotheses. Target ~5 minutes each
+## Learnings
+
+- Local candidate classification lives in `notebookLocalCandidate.ts`. Pull
+  inspects unpublished ancestry in the isolated accepted repo and rejects
+  before mutating user refs/index/worktree. Unrelated, multiple unpublished
+  commits, merge, and non-content-edit (add/rename/README/mode) each have
+  specific guidance. Eligible one-note content edits, including other-note
+  divergence, still use the existing receive-gate error until leaf 4.
+- Unsupported-shape pull proofs live in `notebookPull.localCandidate.suite.ts`,
+  registered through the accepted-history suite tree so leak checks stay in one
+  worker.
+
+Remaining leaves 2–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
@@ -323,10 +334,6 @@ Commands during execution:
 - Installed: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`.
 - Whitespace: `scripts/check_diff_whitespace.sh`.
 
-No product tests were run for this planning-only request. Preserve the existing
-uncommitted work, particularly Plan 52 and its production/test edits. Execute
-only when requested, with per-leaf Jidoka → fresh post-change-refactor agent →
-API generation if needed → coordinator format:changed once → plan update →
-commit/push and asynchronous CI observation. Keep resume state here, not STATE.
-On full delivery, update Story 8/Recently done and clean spent planning detail;
-do not mark Story 9 or broader Git synchronization delivered.
+Keep resume state here, not STATE. On full delivery, update Story 8/Recently
+done and clean spent planning detail; do not mark Story 9 or broader Git
+synchronization delivered.

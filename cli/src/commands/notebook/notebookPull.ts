@@ -1,11 +1,9 @@
 import * as path from 'node:path'
 import { withDownloadedAcceptedNotebookHistory } from './notebookAcceptedHistory.js'
 import { assertLocalMainIsReadyToReceive } from './notebookCheckoutReadiness.js'
+import { unpublishedLocalHistoryRejection } from './notebookLocalCandidate.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
-const RECEIVE_ANCESTRY_ERROR =
-  'Local main cannot receive the accepted history because it contains unpublished or unrelated commits. ' +
-  'Publish or reconcile those commits, then try again.'
 const RECEIVE_CHECKOUT_CHANGED =
   'Local main changed while the accepted history was downloading. Try again from the unchanged clean main.'
 
@@ -64,22 +62,12 @@ export async function receiveAcceptedNotebookHead(
         (detail, status) =>
           `failed to import local main for ancestry inspection${detail ? `: ${detail}` : ` (exit code ${status})`}`
       )
-      const localCommitOutsideAcceptedHistory = runSystemGitOrThrow(
-        [
-          '-C',
-          acceptedRepoDir,
-          'rev-list',
-          '--max-count=1',
-          capturedHead,
-          '--not',
-          acceptedHead,
-        ],
-        (detail, status) =>
-          `failed to inspect local main's ancestry${detail ? `: ${detail}` : ` (exit code ${status})`}`
-      ).trim()
-
-      if (localCommitOutsideAcceptedHistory)
-        throw new Error(RECEIVE_ANCESTRY_ERROR)
+      const localHistoryRejection = unpublishedLocalHistoryRejection(
+        acceptedRepoDir,
+        capturedHead,
+        acceptedHead
+      )
+      if (localHistoryRejection) throw new Error(localHistoryRejection)
 
       runSystemGitOrThrow(
         [

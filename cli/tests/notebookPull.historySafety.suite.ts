@@ -4,11 +4,8 @@ import { describe, expect, test } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
-import { initBoundCheckout } from './notebookGit.testHelpers.js'
 import {
   buildSourceRepo,
-  bundleGetResponse,
-  bundleMain,
   cloneAsBoundCheckout,
 } from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
@@ -16,6 +13,10 @@ import {
   checkoutState,
   installNotebookPullAcceptedHistoryTest,
 } from './notebookPull.testHelpers.js'
+import { serveAcceptedBundle } from './notebookPull.historySafety.testHelpers.js'
+
+const RECEIVE_GATE_ERROR =
+  'Local main cannot receive the accepted history because it contains unpublished or unrelated commits. Publish or reconcile those commits, then try again.'
 
 export function describeNotebookPullHistorySafety(): void {
   describe('notebook pull (local history safety)', () => {
@@ -23,43 +24,30 @@ export function describeNotebookPullHistorySafety(): void {
       'donut-cli-pull-history-safety-test-'
     )
 
-    test.each(['local-ahead', 'divergent', 'unrelated'] as const)(
+    test.each(['local-ahead', 'divergent'] as const)(
       'refuses %s local history without changing the checkout or losing its tip',
       async (historyShape) => {
         const source = buildSourceRepo(ctx.getWorkDir())
-        const directory =
-          historyShape === 'unrelated'
-            ? initBoundCheckout(ctx.getWorkDir(), getApiConfig().apiBaseUrl)
-            : cloneAsBoundCheckout(
-                ctx.getWorkDir(),
-                source,
-                getApiConfig().apiBaseUrl,
-                'checkout'
-              )
+        const directory = cloneAsBoundCheckout(
+          ctx.getWorkDir(),
+          source,
+          getApiConfig().apiBaseUrl,
+          'checkout'
+        )
 
-        if (historyShape !== 'unrelated') {
-          fs.writeFileSync(
-            join(directory, 'note.md'),
-            '# unpublished local edit\n'
-          )
-          runGit(['add', 'note.md'], directory)
-          runGit(
-            ['commit', '--quiet', '-m', 'unpublished local edit'],
-            directory
-          )
-        }
+        fs.writeFileSync(
+          join(directory, 'note.md'),
+          '# unpublished local edit\n'
+        )
+        runGit(['add', 'note.md'], directory)
+        runGit(['commit', '--quiet', '-m', 'unpublished local edit'], directory)
         if (historyShape === 'divergent') {
           fs.writeFileSync(join(source, 'note.md'), '# accepted remote edit\n')
           runGit(['add', 'note.md'], source)
           runGit(['commit', '--quiet', '-m', 'accepted remote edit'], source)
         }
 
-        const bundleFile = join(
-          ctx.getWorkDir(),
-          `accepted-${historyShape}.bundle`
-        )
-        bundleMain(source, bundleFile)
-        ctx.getFetchMock().mockResolvedValue(bundleGetResponse(bundleFile))
+        serveAcceptedBundle(ctx, source, historyShape)
         const localTip = runGit(['rev-parse', 'main'], directory)
         const noteBefore = fs.readFileSync(join(directory, 'note.md'), 'utf8')
         const before = checkoutState(directory)
@@ -70,7 +58,7 @@ export function describeNotebookPullHistorySafety(): void {
         )
 
         expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-          'donut: Local main cannot receive the accepted history because it contains unpublished or unrelated commits. Publish or reconcile those commits, then try again.'
+          `donut: ${RECEIVE_GATE_ERROR}`
         )
         expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
         expect(ctx.getFetchMock()).toHaveBeenCalledWith(
@@ -87,5 +75,44 @@ export function describeNotebookPullHistorySafety(): void {
         expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
       }
     )
+
+    test('refuses eligible other-note divergence with the receive-gate error and an unchanged checkout', async () => {
+      const source = buildSourceRepo(ctx.getWorkDir())
+      fs.writeFileSync(
+        join(source, 'other.md'),
+        '---\ntype: Note\n---\n# Other\n\nAccepted body.\n'
+      )
+      runGit(['add', 'other.md'], source)
+      runGit(['commit', '--quiet', '-m', 'add other note'], source)
+      const directory = cloneAsBoundCheckout(
+        ctx.getWorkDir(),
+        source,
+        getApiConfig().apiBaseUrl,
+        'checkout'
+      )
+      fs.writeFileSync(
+        join(directory, 'note.md'),
+        '---\ntype: Note\n---\n# Local edit\n\nUnpublished body.\n'
+      )
+      runGit(['add', 'note.md'], directory)
+      runGit(['commit', '--quiet', '-m', 'unpublished note edit'], directory)
+      fs.writeFileSync(
+        join(source, 'other.md'),
+        '---\ntype: Note\n---\n# Other\n\nAccepted edit.\n'
+      )
+      runGit(['add', 'other.md'], source)
+      runGit(['commit', '--quiet', '-m', 'accepted other-note edit'], source)
+      serveAcceptedBundle(ctx, source, 'eligible-divergence')
+      const before = checkoutState(directory)
+
+      await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+        ProcessExitForTest
+      )
+
+      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+        `donut: ${RECEIVE_GATE_ERROR}`
+      )
+      expect(checkoutState(directory)).toEqual(before)
+    })
   })
 }
