@@ -1,6 +1,6 @@
 # Worktree backend tests inherit the suite datasource
 
-Status: planned; not executed.
+Status: complete.
 Source: [SEED-015 Story 1a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1a)
 and execution-retrospective of
 [quick/054-configured-worktree-backend-tests](../054-configured-worktree-backend-tests/PLAN.md)
@@ -13,24 +13,12 @@ When a developer runs `pnpm backend:test:worktree` against a selected
 database. They must not reopen the shared `doughnut_test` schema by hardcoding
 its JDBC URL.
 
-Leaf 8 of plan 054 proved the hole: a worktree-only Flyway script on checkout A
-also applied to `doughnut_test` (history `flyway_schema_history.installed_rank`
-23, version `300000321`) while A’s selected DB was `doughnut_wt_054a_test`.
-`QuestionGenerationBatchMaintenanceConcurrencyTest` and `ShedLockConfigProdTest`
-still set `spring.datasource.url=jdbc:mysql://127.0.0.1:3309/doughnut_test`.
-
 This is a bounded repair of 1a’s selected-DB isolation, not a new concurrency
 story.
 
 **Exclude:** launcher/Gradle overrides of arbitrary `@SpringBootTest`
 properties (not a sandbox); other tests that might pin a database; stories 1b
 and 1c; raising `max_connections` further; deleting leftover proof databases.
-
-**Assumption:** a test-profile `@SpringBootTest` without an explicit datasource
-URL uses `db-test.properties` plus `SPRING_DATASOURCE_URL` from the worktree
-launcher. If the prod-profile ShedLock slice cannot start without an explicit
-URL, pass the suite URL through the existing env/property chain rather than
-the literal database name `doughnut_test`.
 
 ## Outside-in proof
 
@@ -43,7 +31,7 @@ the literal database name `doughnut_test`.
 
 ### 1. Test-profile lock tests use the suite datasource
 Type: Behavior
-Status: planned
+Status: done
 Proof: `QuestionGenerationBatchMaintenanceConcurrencyTest` does not set a
 `doughnut_test` JDBC URL. Focused backend tests for that class stay green.
 `node --test scripts/backend-test-worktree.test.mjs` stays green.
@@ -54,7 +42,7 @@ opens that database instead of a hardcoded `doughnut_test`.
 
 ### 2. Prod-profile ShedLock tests use the suite datasource
 Type: Behavior
-Status: planned
+Status: done
 Proof: `ShedLockConfigProdTest` does not set a `doughnut_test` JDBC URL.
 Focused tests for that class stay green. The worktree guide no longer treats
 hardcoded test datasources as an accepted exception.
@@ -64,8 +52,11 @@ suite-selected database rather than `doughnut_test`.
 
 ## Current decisions
 
-- Plan 054’s “custom Spring configuration injection is outside the workflow”
-  still means the launcher does not fight `@TestPropertySource`. This repair
-  removes the pins in the tests that actually broke isolation.
-- Backend package tests normally run as a complete suite; use focused classes
-  while red/green, then the complete backend unit-test command before wrap-up.
+- The launcher still does not fight `@TestPropertySource` / `@SpringBootTest`
+  properties. Isolation is restored by removing the pins in the tests that
+  broke it.
+- Test-profile lock tests inherit `db-test.properties` /
+  `SPRING_DATASOURCE_URL` with no explicit datasource properties.
+- Prod-profile ShedLock tests pass the suite URL as
+  `${SPRING_DATASOURCE_URL:${db.url}}` (and `db.user` / `db.password`) so
+  `application-prod.yml` does not send JDBC to `db-server`.
