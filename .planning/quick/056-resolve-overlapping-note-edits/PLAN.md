@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–5 done.
+Status: in progress; slices 1–6 done.
 
 ## Goal and scope
 
@@ -212,12 +212,8 @@ publication stubs. Backend acceptance is deliberately proved separately in 8.
 
 ### 6. Abort back to the original local work
 Type: Behavior
-Status: planned
-Proof: After conflict-producing pull exits and deletes its temporary download,
-ordinary `git rebase --abort` restores original L on main, its exact committed
-files and clean index, with no operation remaining. B remains available without
-any publication request. Also check that simply returning from the CLI did not
-abort the operation before the owner chose to do so.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts` — after conflict pull and temp cleanup, rebase still paused (CLI return did not abort); test-owned `git rebase --abort` restores original L on attached main, exact committed files and clean index, no rebase-merge; B remains as an object; no POST.
 
 Behavior: Owner chooses to abandon resolution → native abort → original
 unpublished work is restored. Keep recovery entirely within ordinary Git;
@@ -358,6 +354,9 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   of B. No production change; native continue/skip after CLI return and temp
   cleanup is sufficient. Repeat pull is already-based (keeps L′); skip then
   pull is unchanged (HEAD=B).
+- Slice 6: No production change. Ordinary `git rebase --abort` after CLI return
+  and temp cleanup restores original L, files, and a clean attached main. Imported
+  B remains locally without publication.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.

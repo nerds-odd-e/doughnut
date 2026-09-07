@@ -55,7 +55,7 @@ const TEST_OWNED_REBASE_EDITOR_ENV = {
 
 function runTestOwnedRebase(
   directory: string,
-  action: 'continue' | 'skip'
+  action: 'continue' | 'skip' | 'abort'
 ): void {
   const result = spawnSync('git', ['rebase', `--${action}`], {
     cwd: directory,
@@ -94,4 +94,8 @@ export function skipPausedRebaseWithChosenBytes(
 ): void {
   stageChosenBytes(directory, relativePath, chosenBytes)
   runTestOwnedRebase(directory, 'skip')
+}
+
+export function abortPausedRebase(directory: string): void {
+  runTestOwnedRebase(directory, 'abort')
 }
