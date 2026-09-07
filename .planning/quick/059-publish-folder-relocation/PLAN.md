@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–9 done.
+Status: in progress; slices 1–10 done.
 
 ## Goal and scope
 
@@ -243,9 +243,12 @@ failure case; one failure and one readback, no resubmission in this leaf.
 
 ### 10. Retry an accepted folder proposal without another mutation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publish an eligible proposal, then submit that accepted head again;
 observe unchanged parent, IDs, binding head/bundle/timestamp.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`retriesAnAcceptedFolderRelocationWithoutChangingParentIdsOrBinding` reuses
+nested placement; existing drift tests remain green.
 
 Behavior: A folder proposal is already accepted with matching projection →
 retry publication → unchanged success. Retain existing drift rejection on retry.
@@ -345,12 +348,13 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–9 done. Remaining leaves are target-sized hypotheses, not time guarantees.
-No sizing exception is pre-approved; record actual test/external wait runtime
-separately.
+Slices 1–10 done. Remaining leaves 11–14 are installed CLI/E2E and guidance.
 
-Leaf 7 learning: no production change. Shared fixture lives on
-`NotebookGitMovedNotePrivateAssociationControllerTestBase`.
+CI observer delivered run 34142166098 on `9f35dbcff2` (slice 9, test-only).
+The only Cypress failure was `record_live_audio_with_real_open_ai_service`
+(`OpenAIInvalidDataException`); mocked `record_live_audio.feature` passed;
+sibling E2E jobs were fail-fast canceled. Slice 8 CI on `911becd8db` succeeded
+5 minutes earlier. Disposition: external OpenAI service failure, no repair.
 
 CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
 That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`
