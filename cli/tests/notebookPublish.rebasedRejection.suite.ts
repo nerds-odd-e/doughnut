@@ -10,6 +10,8 @@ import {
 import {
   bundleGetResponse,
   bundleMain,
+  postCount,
+  rejectionPost,
   stubFetchForSubmission,
   stubFetchWithBundleFile,
 } from './notebookPublish.testHelpers.js'
@@ -25,28 +27,6 @@ const STALE_HEAD_MESSAGE =
   "expectedHead no longer matches the notebook's current accepted head."
 const DRIFT_MESSAGE =
   "The notebook's current Portable content differs from accepted main; refresh the checkout before publishing."
-
-function conflictPost(message: string): {
-  status: number
-  ok: boolean
-  text: () => Promise<string>
-} {
-  return {
-    status: 409,
-    ok: false,
-    text: () =>
-      Promise.resolve(
-        JSON.stringify({ message, errorType: 'RESOURCE_CONFLICT' })
-      ),
-  }
-}
-
-function postCount(fetchMock: ReturnType<typeof vi.fn>): number {
-  return fetchMock.mock.calls.filter(
-    ([, init]: [unknown, { method?: string } | undefined]) =>
-      init?.method === 'POST'
-  ).length
-}
 
 function rebasedWork(directory: string) {
   return {
@@ -96,7 +76,7 @@ export function describeNotebookPublishRebasedRejection(): void {
       const pulled = await pullEligibleRebase(workDir)
       const fetchMock = stubFetchForSubmission(
         pulled.acceptedBundle,
-        conflictPost(STALE_HEAD_MESSAGE)
+        rejectionPost(409, STALE_HEAD_MESSAGE, 'RESOURCE_CONFLICT')
       )
       const afterRebase = rebasedWork(pulled.directory)
       expect(afterRebase).toEqual({
@@ -150,7 +130,10 @@ export function describeNotebookPublishRebasedRejection(): void {
 
     test('a projection-drift rejection reports the drift', async () => {
       const pulled = await pullEligibleRebase(ctx.getWorkDir())
-      stubFetchForSubmission(pulled.acceptedBundle, conflictPost(DRIFT_MESSAGE))
+      stubFetchForSubmission(
+        pulled.acceptedBundle,
+        rejectionPost(409, DRIFT_MESSAGE, 'RESOURCE_CONFLICT')
+      )
 
       await expect(
         run(['notebook', 'publish', pulled.directory])

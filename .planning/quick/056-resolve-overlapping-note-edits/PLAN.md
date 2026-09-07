@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–6 done.
+Status: in progress; slices 1–7 done.
 
 ## Goal and scope
 
@@ -223,14 +223,8 @@ imported-object ownership is reused; no server change.
 
 ### 7. Retain the chosen resolution when publication rejects
 Type: Behavior
-Status: planned
-Proof: Reuse the completed native conflict fixture from 5 and
-`notebookPublish.rebasedRejection.suite.ts`. A newer head before submission,
-stale expected-head response after submission, projection drift, or invalid
-resolved YAML produces the appropriate rejection and preserves L′/files without
-retry. The invalid-content response stub proves retention only; real Portable
-validation stays covered by `NotebookGitProposalMarkdownFormatControllerTest`
-in leaf 8's backend run.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPublish.test.ts` — sibling suite `notebookPublish.resolvedContinuationRejection.suite.ts`: after native continue of the leaf-5 conflict fixture, newer head before submission (ancestry, GET only), stale expected-head after POST, projection drift, and invalid-YAML BINDING_ERROR stub each report the existing rejection and leave L′/files unchanged with no retry. Invalid-content stub proves CLI retention only.
 
 Behavior: Resolved work is not currently acceptable → publish → explain why
 and retain it for correction or another eligible pull. Keep existing validation,
@@ -357,6 +351,10 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
 - Slice 6: No production change. Ordinary `git rebase --abort` after CLI return
   and temp cleanup restores original L, files, and a clean attached main. Imported
   B remains locally without publication.
+- Slice 7: No production change. Existing ancestry/submission already retain L′
+  on rejection (no retry, no local mutation). Other-note `rebasedRejection` cannot
+  take the same-note continue fixture without mixing outcomes; sibling suite
+  covers remote advance, stale expected-head, drift, and invalid-YAML stub.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.

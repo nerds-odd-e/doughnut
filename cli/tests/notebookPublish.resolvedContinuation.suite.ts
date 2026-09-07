@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 import { join } from 'node:path'
-import { describe, expect, test, type vi } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { run } from '../src/run.js'
 import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
@@ -19,15 +19,9 @@ import {
 } from './notebookPull.testHelpers.js'
 import {
   bundleMain,
+  postCount,
   stubFetchForSubmission,
 } from './notebookPublish.testHelpers.js'
-
-function postCount(fetchMock: ReturnType<typeof vi.fn>): number {
-  return fetchMock.mock.calls.filter(
-    ([, init]: [unknown, { method?: string } | undefined]) =>
-      init?.method === 'POST'
-  ).length
-}
 
 export function describeNotebookPublishResolvedContinuation(): void {
   describe('notebook publish (resolved same-note continuation)', () => {

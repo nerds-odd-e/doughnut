@@ -39,6 +39,30 @@ function successfulPostResponse(): {
   }
 }
 
+// Failed publication POST: JSON ApiError body (`message` + `errorType`) at `status`.
+export function rejectionPost(
+  status: number,
+  message: string,
+  errorType: string
+): {
+  status: number
+  ok: boolean
+  text: () => Promise<string>
+} {
+  return {
+    status,
+    ok: false,
+    text: () => Promise.resolve(JSON.stringify({ message, errorType })),
+  }
+}
+
+export function postCount(fetchMock: ReturnType<typeof vi.fn>): number {
+  return fetchMock.mock.calls.filter(
+    ([, init]: [unknown, { method?: string } | undefined]) =>
+      init?.method === 'POST'
+  ).length
+}
+
 /**
  * Stubs global fetch to distinguish the ancestry check's GET (accepted-bundle download) from the
  * submission's POST (proposal upload): GET requests are served `bundleFile`'s bytes; POST
