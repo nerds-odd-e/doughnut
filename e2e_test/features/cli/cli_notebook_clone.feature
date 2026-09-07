@@ -105,7 +105,7 @@ Feature: CLI notebook clone
 
   Scenario: Publishing a nested-metadata note preserves metadata through a rich body edit
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    Then I should see "one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, or a single edited Markdown note. Use the notebook root or existing folders represented in accepted history." in the non-interactive output
+    Then I should see "one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, or a single edited Markdown note, or one isolated Markdown note deletion that leaves existing links authored; mixed deletion and same-path recreation are unsupported. Use the notebook root or existing folders represented in accepted history." in the non-interactive output
     When I add and commit the following note at "Recipes/Pantry Staples.md" in the cloned checkout:
       """
       ---

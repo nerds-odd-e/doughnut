@@ -1,7 +1,7 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: slices 1–5 done; next is slice 6.
+Status: slices 1–6 done; next is slice 7.
 
 ## Learnings
 
@@ -33,6 +33,12 @@ helpers were collapsed in the clone tasks file.
 
 Slice 5 adds an installed-CLI scenario: remove `Recipes/Pasta.md`, publish,
 accepted head reported, Donut sidebar tree no longer shows Pasta.
+
+Slice 6 extends clone publication-shape guidance: isolated deletion that
+leaves links authored; mixed deletion and same-path recreation unsupported.
+CLI clone/publish/pull tests and `cli_notebook_clone.feature` exact-copy
+passed. Cloud VM git `commit.gpgsign`/`core.fsmonitor` needed process-local
+disable for CLI tests; E2E install bundle cache can hide source changes.
 
 ## Goal and scope
 
@@ -227,7 +233,7 @@ early end-to-end evidence before later boundary variations. Guidance is slice 6.
 
 ### 6. Explain the supported deletion in existing CLI guidance
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing clone-output assertion includes isolated deletion and its
 leave-links-untouched policy. Run the focused CLI clone test and update/run the
 existing notebook E2E exact-copy assertion if it changes.
@@ -362,7 +368,7 @@ Keep existing title reuse and restore policy unchanged.
 
 Slices 1–5 delivered isolation rejection, isolated-deletion acceptance,
 late-failure rollback, E2E removal harness, and installed-CLI publication.
-Remaining leaves execute in order from slice 6.
+Remaining leaves execute in order from slice 7.
 Four bundled original slices were replaced; four were retained and reordered.
 The result is 13 Behavior leaves and one immediately enabling Structure leaf.
 No completed proof was discarded and no product scope was added or removed.
