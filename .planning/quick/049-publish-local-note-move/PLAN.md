@@ -319,10 +319,14 @@ publish-then-rebind-then-publish-again idiom.
 
 ### 12. Receive the rename and later edit in another checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI run with real Git and an accepted rename-then-edit bundle:
 old filename absent, new content present, exact head/tree, retained ancestry,
 clean main and no Portable metadata. CLI pull tests.
+Learning: Pure proof addition, no production change — pull's fast-forward
+logic is content-agnostic real-git history application. Added one test to
+notebookPull.fastForward.suite.ts (git mv commit + separate edit commit,
+then pull) reusing the existing deletion test's idiom.
 
 Behavior: A second clean checkout is at the rename's parent → pull →
 receive both accepted commits and the new filename without history loss.

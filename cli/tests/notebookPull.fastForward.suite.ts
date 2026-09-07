@@ -190,5 +190,50 @@ export function describeNotebookPullFastForward(): void {
         keptPath
       )
     })
+
+    test('receives an accepted rename and a later edit with exact bytes, no leftover old filename, and no Portable metadata', async () => {
+      const source = buildSourceRepo(ctx.getWorkDir())
+      const directory = cloneAsBoundCheckout(
+        ctx.getWorkDir(),
+        source,
+        getApiConfig().apiBaseUrl,
+        'checkout'
+      )
+      const originalHead = runGit(['rev-parse', 'HEAD'], directory)
+
+      runGit(['mv', 'note.md', 'Renamed note.md'], source)
+      runGit(['commit', '--quiet', '-m', 'accepted rename'], source)
+      const editedBytes = Buffer.from(
+        '---\ntype: Note\nauthored: retained\n---\n# Renamed note\n\nEdited body.\n'
+      )
+      fs.writeFileSync(join(source, 'Renamed note.md'), editedBytes)
+      runGit(['add', 'Renamed note.md'], source)
+      runGit(['commit', '--quiet', '-m', 'accepted edit after rename'], source)
+
+      const acceptedHead = runGit(['rev-parse', 'main'], source)
+      const acceptedTree = runGit(['rev-parse', 'main^{tree}'], source)
+      const bundleFile = join(
+        ctx.getWorkDir(),
+        'accepted-rename-then-edit.bundle'
+      )
+      bundleMain(source, bundleFile)
+      ctx.getFetchMock().mockResolvedValue(bundleGetResponse(bundleFile))
+
+      await run(['notebook', 'pull', directory])
+
+      expect(fs.existsSync(join(directory, 'note.md'))).toBe(false)
+      expect(fs.readFileSync(join(directory, 'Renamed note.md'))).toEqual(
+        editedBytes
+      )
+      expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(acceptedHead)
+      expect(runGit(['rev-parse', 'HEAD^{tree}'], directory)).toBe(acceptedTree)
+      expect(() =>
+        runGit(['merge-base', '--is-ancestor', originalHead, 'HEAD'], directory)
+      ).not.toThrow()
+      expect(runGit(['status', '--porcelain=v1'], directory)).toBe('')
+      expect(runGit(['ls-tree', '-r', '--name-only', 'HEAD'], directory)).toBe(
+        'Renamed note.md'
+      )
+    })
   })
 }
