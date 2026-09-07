@@ -17,8 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Verifies {@code publishNotebookGitProposal} explains why a README-shaped directory proposal is
- * not one exact same-name subtree relocation. An exact candidate still reaches the existing
- * reserved-README refusal; this class does not accept folder moves.
+ * not one exact same-name subtree relocation. Exact candidates are accepted in {@link
+ * NotebookGitProposalFolderRelocationControllerTest}.
  */
 class NotebookGitProposalFolderRelocationShapeControllerTest
     extends NotebookGitBundleControllerTestBase {
@@ -118,28 +118,6 @@ class NotebookGitProposalFolderRelocationShapeControllerTest
                 new PortableTreeEntry("Archive/Topics/Sub/README.md", README),
                 new PortableTreeEntry("Archive/Topics/Sub/B.md", NOTE)),
             "Archive/Topics/A.md"));
-  }
-
-  @Test
-  void stillRefusesAnExactFolderRelocationAsAReservedReadme() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README).please();
-    makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README).please();
-    ResponseStatusException exception =
-        publishRejected(
-            notebook,
-            topicsAndArchive(),
-            List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("note.md", NOTE),
-                new PortableTreeEntry("Copy.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Topics/README.md", README),
-                new PortableTreeEntry("Archive/Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/Topics/Sub/README.md", README),
-                new PortableTreeEntry("Archive/Topics/Sub/B.md", NOTE)));
-
-    assertThat(exception.getReason(), containsString("folder README, which is reserved"));
   }
 
   private ResponseStatusException publishRejected(

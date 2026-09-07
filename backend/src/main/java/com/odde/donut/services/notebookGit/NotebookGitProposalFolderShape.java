@@ -11,8 +11,7 @@ import org.eclipse.jgit.lib.ObjectId;
 /**
  * Recognizes one exact same-name folder relocation from removed and added README paths using
  * complete relative-path/blob correspondence. Inexact README relocations are refused; an exact
- * candidate is returned so callers can keep the existing reserved-README refusal until acceptance
- * is enabled.
+ * candidate is returned so the publisher can reparent that source Folder.
  */
 final class NotebookGitProposalFolderShape {
 

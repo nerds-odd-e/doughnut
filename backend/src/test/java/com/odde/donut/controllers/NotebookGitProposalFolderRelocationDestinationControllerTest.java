@@ -13,19 +13,15 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Verifies an exact folder relocation is refused when the destination parent is missing or
- * unrepresented in accepted Portable content, without creating that parent. Represented parents
- * still reach the interim reserved-README refusal.
+ * unrepresented in accepted Portable content, without creating that parent. Represented parents are
+ * accepted in {@link NotebookGitProposalFolderRelocationControllerTest}.
  */
 class NotebookGitProposalFolderRelocationDestinationControllerTest
     extends NotebookGitBundleControllerTestBase {
@@ -93,75 +89,6 @@ class NotebookGitProposalFolderRelocationDestinationControllerTest
                     .map(Folder::getId)
                     .toList(),
                 containsInAnyOrder(topics.getId(), empty.getId())));
-  }
-
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("representedDestinationParents")
-  void stillRefusesAnExactFolderRelocationWhenTheDestinationParentIsRepresented(
-      String scenario, List<PortableTreeEntry> accepted, List<PortableTreeEntry> proposed)
-      throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    seedRepresentedFolders(notebook, scenario);
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, accepted);
-
-    ResponseStatusException exception = publishRejected(notebook, binding, proposed);
-
-    assertThat(exception.getReason(), containsString("folder README, which is reserved"));
-  }
-
-  static Stream<Arguments> representedDestinationParents() {
-    return Stream.of(
-        Arguments.of(
-            "root",
-            List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Topics/README.md", README),
-                new PortableTreeEntry("Archive/Topics/A.md", NOTE)),
-            List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Topics/README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE))),
-        Arguments.of(
-            "readme-only",
-            List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README)),
-            List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Topics/README.md", README),
-                new PortableTreeEntry("Archive/Topics/A.md", NOTE))),
-        Arguments.of(
-            "descendant-only",
-            List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE),
-                new PortableTreeEntry("Courses/Physics/Motion.md", NOTE)),
-            List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Courses/Physics/Motion.md", NOTE),
-                new PortableTreeEntry("Courses/Topics/README.md", README),
-                new PortableTreeEntry("Courses/Topics/A.md", NOTE))));
-  }
-
-  private void seedRepresentedFolders(Notebook notebook, String scenario) {
-    if ("root".equals(scenario)) {
-      Folder archive =
-          makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README).please();
-      makeMe.aFolder().parentFolder(archive).name("Topics").readmeContent(README).please();
-      return;
-    }
-    makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README).please();
-    if ("readme-only".equals(scenario)) {
-      makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README).please();
-      return;
-    }
-    makeMe.aFolder().notebook(notebook).name("Courses").please();
   }
 
   private ResponseStatusException publishRejected(

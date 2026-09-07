@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–5 done.
+Status: in progress; slices 1–6 done.
 
 ## Goal and scope
 
@@ -33,15 +33,14 @@ operations retain their meanings, including a last-note move leaving its folder.
   owner authorization, ancestry checks, typed Markdown validation, drift checks,
   bundle storage, and idempotent retry. No new endpoint, schema, or transport.
 - Publisher inspects files, then `requireExactOrEmpty`. Exact `FolderRelocation`
-  is checked with `requireRepresentedFolderRelocation` (source prefix and dest
-  parent via `requireRepresentedFolderPath`) before note classification.
-  Missing/unrepresented dest parents name `{destPrefix}/README.md` with the
-  existing unrepresented-parent wording and create nothing. Root dest parent
-  is null/valid. Exact represented-parent candidates still reserved-README
-  until leaf 6. Placement then uses `NotebookGitProposalFolderPlacement`:
-  collision (`FOLDER_NAME_CONFLICT`) and self/descendant 400, both contextualized
-  as `Cannot move folder to path "{destPrefix}/README.md": …`. Invisible empty
-  same-name destinations collide. No merge.
+  is accepted by `NotebookGitProposalFolderAcceptance`: eligibility (represented
+  parent, empty descendants, placement), Markdown, accepted-tree drift, reparent
+  source Folder only, reload `foldersOf`, proposed-tree match, then existing
+  bundle/binding write. Missing/unrepresented dest parents name
+  `{destPrefix}/README.md`. Collision/cycle use
+  `Cannot move folder to path "{destPrefix}/README.md": …`. Empty source
+  descendants name `Descendant folder "{path}/"`. Note operations still use the
+  existing classifier, including a last-note move leaving its folder.
 - Use source/destination prefixes and complete relative-path/blob correspondence,
   not independent equal-blob pairing. Require exactly one eligible folder mapping;
   identical note content elsewhere must not affect it. Nested README files belong
@@ -175,11 +174,14 @@ Sizing basis: one set-membership rule over existing export rows and tree paths.
 
 ### 6. Accept the validated folder move by reparenting the same Folder
 Type: Behavior
-Status: planned
+Status: done
 Proof: A controller publication with source README and nested note accepts the
 exact proposed tree and retains source/descendant IDs. Parameterized eligible
 placements cover root, nested parent, README-only source, and a represented
 ancestor without its own README. Assert canonical tree/identity shape once.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationControllerTest` canonical IDs+tree; placements
+assert parent delta only. Interim reserved-README tests removed.
 
 Behavior: A candidate passes leaves 2–5 and existing owner/ancestry/Markdown/drift
 checks → publish → reparent the existing source and accept that exact authored
@@ -333,17 +335,13 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–5 done. Remaining leaves are target-sized hypotheses, not time guarantees.
+Slices 1–6 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
-separately. If integration in leaf 6 fails to converge, refine this same plan
-rather than bypass a safety gate or expand the story.
+separately.
 
-Leaf 5 learning: empty descendants compared as `ExportFolderRow` paths (trailing
-slash) vs accepted file prefixes. Error:
-`Descendant folder "{path}" is not represented in accepted Portable content; every active descendant must have tracked content before the folder can be moved.`
-Publisher `requireEligibleFolderRelocation` owns represented + empty-descendant +
-placement; leaf 6 should reparent after these refusals instead of falling through
-to reserved-README.
+Leaf 6 learning: `NotebookGitProposalFolderAcceptance` reparents source then
+`notebookGitStateLoader.foldersOf(notebook)` before proposed-tree check. Eligible
+moves no longer hit reserved-README. Leaves 7–10 reuse this publication path.
 
 CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
 That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`

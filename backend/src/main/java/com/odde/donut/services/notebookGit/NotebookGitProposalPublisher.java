@@ -13,7 +13,6 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.NoteFactory;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.services.NoteTitlePlacementRules;
@@ -23,6 +22,7 @@ import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class NotebookGitProposalPublisher {
   private final NoteFactory noteFactory;
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
-  private final FolderSiblingNameValidation folderSiblingNameValidation;
+  private final NotebookGitProposalFolderAcceptance folderAcceptance;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -59,7 +59,7 @@ public class NotebookGitProposalPublisher {
       NoteFactory noteFactory,
       NoteService noteService,
       NoteTitlePlacementRules noteTitlePlacementRules,
-      FolderSiblingNameValidation folderSiblingNameValidation) {
+      NotebookGitProposalFolderAcceptance folderAcceptance) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
@@ -71,7 +71,7 @@ public class NotebookGitProposalPublisher {
     this.noteFactory = noteFactory;
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
-    this.folderSiblingNameValidation = folderSiblingNameValidation;
+    this.folderAcceptance = folderAcceptance;
   }
 
   @Transactional(
@@ -112,10 +112,11 @@ public class NotebookGitProposalPublisher {
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
         NotebookGitProposalTreeShape.inspectRegularFiles(
             proposal.repository(), acceptedHead, proposal.mainHead());
-    NotebookGitProposalFolderShape.requireExactOrEmpty(files)
-        .ifPresent(
-            relocation ->
-                requireEligibleFolderRelocation(folders, proposal, acceptedHead, relocation));
+    Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
+        NotebookGitProposalFolderShape.requireExactOrEmpty(files);
+    if (relocation.isPresent()) {
+      return folderAcceptance.accept(state, proposal, acceptedHead, relocation.get());
+    }
     List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
         NotebookGitProposalTreeShape.requireAllowedNoteChangesFromInspectedFiles(files);
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
@@ -157,20 +158,6 @@ public class NotebookGitProposalPublisher {
     binding.setUpdatedAt(publishedAt);
     entityPersister.save(binding);
     return written.headObjectId();
-  }
-
-  private void requireEligibleFolderRelocation(
-      List<ExportFolderRow> folders,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookGitProposalFolderShape.FolderRelocation relocation) {
-    NotebookGitProjection.RepresentedFolderRelocation represented =
-        projection.requireRepresentedFolderRelocation(
-            folders, proposal.repository(), acceptedHead, relocation);
-    projection.requireNoUnrepresentedEmptySourceDescendants(
-        folders, proposal.repository(), acceptedHead, represented.sourceFolderId());
-    NotebookGitProposalFolderPlacement.requireAllowed(
-        represented, entityPersister, folderSiblingNameValidation, relocation.destPrefix());
   }
 
   private Note applyAddition(
