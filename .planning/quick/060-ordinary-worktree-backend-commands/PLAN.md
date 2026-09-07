@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–9 done.
+Status: in progress; slices 1–10 done.
 
 ## Goal and scope
 
@@ -205,7 +205,7 @@ verification; focused filter checks supplement rather than replace them.
 
 ### 10. Stop ordinary tests after a real migration failure
 Type: Behavior
-Status: planned
+Status: done
 Proof: Use only an attempt-owned disposable worktree/database. Supply an invalid
 new, unapplied migration, invoke ordinary wrapper `test --continue`, and observe
 nonzero migration failure with no test execution/new test report. Remove only
@@ -293,6 +293,9 @@ stopping point.
   histories (22 rows, distinct `installed_on`). Shared
   `doughnut_development` / `doughnut_test` / `doughnut_e2e_test` sentinels
   unchanged. Leave these two checkouts for leaf 12.
+- Slice 10: disposable worktree ordinary `backend/gradlew -p backend test --continue`
+  failed Flyway on `V300000399` (MySQL 1064), exit 1, no `:test` and no
+  test reports. Shared schemas unchanged. Temp migration removed.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining
