@@ -304,13 +304,18 @@ source note stays completely unmutated on rejection.
 
 ### 11. Edit the same note after its accepted rename
 Type: Behavior
-Status: planned
+Status: done
 Proof: Accept rename, then publish one separately authored content-edit child
 at the new path → new content on the original note ID with retained tracker.
 Backend; reuse existing sequential-publication fixtures.
 
 Behavior: The rename is accepted → owner publishes a later edit → update the
 same learned concept. Do not batch unpublished rename/edit commits.
+Learning: Pure proof addition, no production change — the existing MODIFIED
+change-kind path already handles an edit published against the post-rename
+head. Added NotebookGitRenameThenEditControllerTest (new sibling file, one
+test) reusing NotebookGitCopyIdentityControllerTest's
+publish-then-rebind-then-publish-again idiom.
 
 ### 12. Receive the rename and later edit in another checkout
 Type: Behavior
