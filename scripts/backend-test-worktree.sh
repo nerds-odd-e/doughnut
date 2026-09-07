@@ -2,8 +2,7 @@
 #
 # Usage: pnpm backend:test:worktree
 # Reads this checkout's .worktree.local.json and selects doughnut_<id>_test.
-# Valid configuration currently refuses execution; database work is not
-# enabled yet.
+# Migrates that database and runs the complete backend unit test suite.
 #
 # Resolve paths from this launcher's checkout, not the shared Git directory.
 
@@ -12,7 +11,7 @@ set -euo pipefail
 usage() {
   echo 'Usage: pnpm backend:test:worktree' >&2
   echo "Reads this checkout's .worktree.local.json and selects doughnut_<id>_test." >&2
-  echo 'Valid configuration currently refuses execution; database work is not enabled yet.' >&2
+  echo 'Migrates that database and runs the complete backend unit test suite.' >&2
 }
 
 if [[ $# -ne 0 ]]; then
@@ -52,5 +51,14 @@ for var_name in SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL; do
 done
 
 echo "Selected database: ${database}"
-echo 'Worktree backend tests are not enabled yet; configuration was accepted without starting database work.' >&2
-exit 1
+export SPRING_DATASOURCE_URL="${expected_url}"
+cd "${checkout_root}"
+exec "${checkout_root}/backend/gradlew" \
+  -p backend \
+  -PworktreeTestRun \
+  -Dspring.profiles.active=test \
+  --rerun-tasks \
+  --no-build-cache \
+  --no-daemon \
+  migrateTestDB \
+  test

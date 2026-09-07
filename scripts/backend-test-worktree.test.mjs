@@ -1,83 +1,16 @@
 import assert from 'node:assert/strict'
-import { spawnSync } from 'node:child_process'
-import {
-  chmodSync,
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs'
-import { tmpdir } from 'node:os'
+import { existsSync, readFileSync, realpathSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-
-const launcherSrc = fileURLToPath(
-  new URL('./backend-test-worktree.sh', import.meta.url)
-)
-
-const jdbcParams =
-  'connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true'
-
-function jdbcUrl(database) {
-  return `jdbc:mysql://127.0.0.1:3309/${database}?${jdbcParams}`
-}
-
-function makeCheckout(t, { config } = {}) {
-  const root = mkdtempSync(path.join(tmpdir(), 'backend-test-worktree-'))
-  t.after(() => rmSync(root, { recursive: true, force: true }))
-  mkdirSync(path.join(root, 'scripts'), { recursive: true })
-  mkdirSync(path.join(root, 'backend'), { recursive: true })
-
-  const launcher = path.join(root, 'scripts', 'backend-test-worktree.sh')
-  copyFileSync(launcherSrc, launcher)
-  chmodSync(launcher, 0o755)
-
-  const gradleMarker = path.join(root, 'gradle-reached')
-  writeFileSync(
-    path.join(root, 'backend', 'gradlew'),
-    [
-      '#!/bin/sh',
-      "printf 'GRADLE_REACHED\\n' >&2",
-      `touch ${JSON.stringify(gradleMarker)}`,
-      'exit 99',
-      '',
-    ].join('\n')
-  )
-  chmodSync(path.join(root, 'backend', 'gradlew'), 0o755)
-
-  if (config !== undefined) {
-    writeFileSync(path.join(root, '.worktree.local.json'), config)
-  }
-
-  return { root, launcher, gradleMarker }
-}
-
-function runLauncher(checkout, { env = {}, args = [] } = {}) {
-  const childEnv = { ...process.env }
-  delete childEnv.SPRING_DATASOURCE_URL
-  delete childEnv.DB_URL
-  delete childEnv.SPRING_FLYWAY_URL
-  Object.assign(childEnv, env)
-  return spawnSync(checkout.launcher, args, {
-    cwd: checkout.root,
-    encoding: 'utf8',
-    env: childEnv,
-  })
-}
-
-function outputOf(result) {
-  return `${result.stdout}${result.stderr}`
-}
-
-function assertRefusedBeforeGradle(checkout, result) {
-  assert.equal(result.error, undefined, result.stderr)
-  assert.notEqual(result.status, 0)
-  assert.equal(existsSync(checkout.gradleMarker), false)
-  assert.doesNotMatch(outputOf(result), /GRADLE_REACHED/)
-}
+import {
+  assertRefusedBeforeGradle,
+  jdbcUrl,
+  makeCheckout,
+  outputOf,
+  readGradleInvocation,
+  runLauncher,
+} from './backend-test-worktree-test-fixtures.mjs'
 
 test('missing configuration refuses before gradle', (t) => {
   const checkout = makeCheckout(t)
@@ -138,17 +71,42 @@ test('conflicting SPRING_FLYWAY_URL refuses before gradle', (t) => {
   assert.match(outputOf(result), /SPRING_FLYWAY_URL/)
 })
 
-test('valid id shows derived database and refuses execution', (t) => {
+test('valid configuration execs one gradle migrate-then-test run', (t) => {
   const checkout = makeCheckout(t, {
     config: JSON.stringify({ id: 'wt_a7c2' }),
   })
   const result = runLauncher(checkout)
-  assertRefusedBeforeGradle(checkout, result)
-  assert.match(result.stdout, /Selected database: doughnut_wt_a7c2_test/)
-  assert.match(result.stderr, /not enabled yet/i)
+  assert.equal(result.error, undefined, result.stderr)
+  assert.equal(result.status, 0)
+  assert.match(
+    result.stdout,
+    /Selected database: doughnut_wt_a7c2_test[\s\S]*GRADLE_STDOUT/
+  )
+  assert.match(result.stderr, /GRADLE_REACHED/)
+
+  const invocation = readGradleInvocation(checkout)
+  assert.equal(
+    realpathSync(invocation.wrapper),
+    realpathSync(path.join(checkout.root, 'backend', 'gradlew'))
+  )
+  assert.equal(realpathSync(invocation.cwd), realpathSync(checkout.root))
+  assert.equal(invocation.url, jdbcUrl('doughnut_wt_a7c2_test'))
+
+  const { args } = invocation
+  assert.equal(args[args.indexOf('-p') + 1], 'backend')
+  assert.equal(args.includes('-PworktreeTestRun'), true)
+  assert.equal(args.includes('-Dspring.profiles.active=test'), true)
+  assert.equal(args.includes('--rerun-tasks'), true)
+  assert.equal(args.includes('--no-build-cache'), true)
+  assert.equal(args.includes('--no-daemon'), true)
+  assert.equal(args.includes('--continue'), false)
+  const migrateAt = args.indexOf('migrateTestDB')
+  const testAt = args.indexOf('test')
+  assert.ok(migrateAt >= 0, args.join(' '))
+  assert.ok(testAt > migrateAt, args.join(' '))
 })
 
-test('matching URL overrides reach the same temporary refusal', (t) => {
+test('matching URL overrides still exec gradle against the selected database', (t) => {
   const expected = jdbcUrl('doughnut_wt_a7c2_test')
   const checkout = makeCheckout(t, {
     config: JSON.stringify({ id: 'wt_a7c2' }),
@@ -160,9 +118,30 @@ test('matching URL overrides reach the same temporary refusal', (t) => {
       SPRING_FLYWAY_URL: expected,
     },
   })
-  assertRefusedBeforeGradle(checkout, result)
-  assert.match(result.stdout, /Selected database: doughnut_wt_a7c2_test/)
-  assert.match(result.stderr, /not enabled yet/i)
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(readGradleInvocation(checkout).url, expected)
+})
+
+test('gradle child failure stays nonzero', (t) => {
+  const checkout = makeCheckout(t, {
+    config: JSON.stringify({ id: 'wt_a7c2' }),
+  })
+  const result = runLauncher(checkout, { env: { FAKE_GRADLE_EXIT: '7' } })
+  assert.equal(existsSync(checkout.gradleInvocation), true)
+  assert.equal(result.status, 7)
+})
+
+test('worktreeTestRun opts test into mustRunAfter migrateTestDB', () => {
+  const gradle = readFileSync(
+    fileURLToPath(new URL('../backend/build.gradle', import.meta.url)),
+    'utf8'
+  )
+  const optIn =
+    /if\s*\(\s*project\.hasProperty\(\s*['"]worktreeTestRun['"]\s*\)\s*\)\s*\{\s*tasks\.named\(\s*['"]test['"]\s*\)\s*\{\s*mustRunAfter\s+['"]migrateTestDB['"]\s*\}\s*\}/
+  assert.match(gradle, optIn)
+  const unguarded = gradle.replace(optIn, '')
+  assert.doesNotMatch(unguarded, /mustRunAfter\s+['"]migrateTestDB['"]/)
+  assert.doesNotMatch(unguarded, /dependsOn\(?\s*['"]migrateTestDB['"]/)
 })
 
 test('command arguments are refused before configuration or gradle', (t) => {

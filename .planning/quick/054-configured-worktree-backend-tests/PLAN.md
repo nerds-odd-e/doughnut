@@ -1,6 +1,6 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: in progress; slice 1 done.
+Status: in progress; slices 1–2 done.
 Source: [SEED-015, story 1a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1a).
 Stories 1a, 1b, and 1c occupy the first three product-backlog positions.
 This plan covers only 1a. No implementation or database experiment was performed
@@ -143,7 +143,7 @@ and command test loop, with no Gradle orchestration or background fixture.
 
 ### 2. Execute the full suite through the owned Gradle invocation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend that command fixture with a controllable foreground Gradle
 stand-in. Observe the same selected environment and checkout, ordered task
 arguments, force-execution flags, and inherited output/exit status. A child
@@ -330,6 +330,11 @@ Slice 1: command-boundary fixture proves missing/malformed/invalid IDs and
 conflicting URL overrides refuse before a fixture Gradle wrapper; a valid ID
 prints `doughnut_<id>_test` and the temporary execution refusal. Native
 JSON/ENOENT errors propagate. No remaining-slice adjustment.
+
+Slice 2: the same fixture's Gradle stand-in records one exec of migrateTestDB
+then test with `-PworktreeTestRun`, `--rerun-tasks --no-build-cache --no-daemon`,
+and the resolved JDBC URL; child failure stays nonzero. `mustRunAfter` is
+gated on the opt-in property. Temporary refusal is gone.
 
 Ready for execution under the existing workflow; no additional story refinement
 or slice-plan pass is currently required. All leaves have one bounded proof

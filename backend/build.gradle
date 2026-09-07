@@ -156,6 +156,12 @@ tasks.register("migrateTestDB", JavaExec) {
   }
 }
 
+if (project.hasProperty('worktreeTestRun')) {
+  tasks.named('test') {
+    mustRunAfter 'migrateTestDB'
+  }
+}
+
 // Register and configure the generateOpenAPIDocs task
 tasks.register('generateOpenAPIDocs', JavaExec) {
   configureSpringBootTask(delegate, 'Generate OpenAPI documentation', "generateOpenAPIDocs")
