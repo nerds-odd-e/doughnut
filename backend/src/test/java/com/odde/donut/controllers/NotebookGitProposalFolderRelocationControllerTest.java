@@ -27,8 +27,10 @@ import org.springframework.http.ResponseEntity;
 /**
  * Verifies {@code publishNotebookGitProposal} accepts one exact folder relocation by reparenting
  * the existing source Folder. Shape, destination, placement, and empty-descendant refusals stay in
- * their dedicated classes. Note relocation, including a last-note move that keeps its container, is
- * covered in {@link NotebookGitProposalRelocationControllerTest} and {@link
+ * their dedicated classes. Private-association retention is covered in {@link
+ * NotebookGitProposalFolderRelocationPrivateAssociationControllerTest}. Note relocation, including
+ * a last-note move that keeps its container, is covered in {@link
+ * NotebookGitProposalRelocationControllerTest} and {@link
  * NotebookGitProposalRelocationContainerControllerTest}.
  */
 class NotebookGitProposalFolderRelocationControllerTest

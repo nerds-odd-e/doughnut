@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–6 done.
+Status: in progress; slices 1–7 done.
 
 ## Goal and scope
 
@@ -195,11 +195,15 @@ transaction/bundle acceptance stays intact. Re-run their refusal proofs here.
 
 ### 7. Retain identity-bound data through folder publication
 Type: Behavior
-Status: planned
+Status: done
 Proof: Reuse NotebookGitProposalRelocationPrivateAssociationControllerTest's
 fixtures for a learned descendant and inactive tracker; reload tracker schedule,
 history, question/conversation associations and an unchanged identical outside
 note after publishing. Assert preservation deltas only.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationPrivateAssociationControllerTest` asserts
+tracker/MCQ/conversation deltas, untouched tracker, and deleted sibling stays
+deleted.
 
 Behavior: An eligible source contains learned notes → publish its move → those
 same identities retain their private associations and activation state; an
@@ -335,13 +339,12 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–6 done. Remaining leaves are target-sized hypotheses, not time guarantees.
+Slices 1–7 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
 separately.
 
-Leaf 6 learning: `NotebookGitProposalFolderAcceptance` reparents source then
-`notebookGitStateLoader.foldersOf(notebook)` before proposed-tree check. Eligible
-moves no longer hit reserved-README. Leaves 7–10 reuse this publication path.
+Leaf 7 learning: no production change. Shared fixture lives on
+`NotebookGitMovedNotePrivateAssociationControllerTestBase`.
 
 CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
 That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`
