@@ -302,8 +302,10 @@ useful before adding broader deletion or identity-inference behavior.
 
 ### 6. Rename a note without losing its learning history
 
-**Status:** refined and [slice-planned](../quick/049-publish-local-note-move/PLAN.md);
-the plan has been refined for this narrower story; not implemented.
+**Status:** delivered; merged directly to main through `980114d23d` on
+2026-09-07. The completed quick plan was removed after delivery; recover it
+from that commit's parent. Backlog implications are recorded under Ordering
+and Scope Reduction.
 
 **Goal**
 
