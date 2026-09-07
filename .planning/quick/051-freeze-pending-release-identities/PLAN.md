@@ -1,8 +1,9 @@
 # Freeze pending release identities
 
-Source: [SEED-013 Stories 1–2](../../seeds/SEED-013-version-tag-production-releases.md#story-decomposition).
-Created by the aggregate execution retrospective after both stories merged to
-`main`. Status: planned.
+Source: Aggregate execution retrospective of the completed version-tag release
+implementation; commit evidence is retained below. Enduring contract:
+[application release runbook](../../../docs/gcp/conditional-backend-deploy.md).
+Status: planned.
 
 ## Goal and scope
 
@@ -12,6 +13,8 @@ unavailable. A moved or deleted observed tag must never become a new release
 request, and a durable higher selected version must continue to prevent an older
 release from replacing it. Align the overlapping-release guidance in the README
 and Definition of Done with the implemented event-driven policy.
+Add a discoverable repository `release-application` skill that guides an agent
+through a user-requested application release using the canonical release runbook.
 
 Keep Story 2's one non-cancelling `deploy-production` concurrency owner, numeric
 version selection, exact-CI/artifact admission, selected-source publication,
@@ -48,6 +51,7 @@ The review also found obsolete one-release-at-a-time/CI-waiting instructions in
 | Artifact failure cannot reopen tag identity | 1, 3 | Ready candidate with missing artifacts leaves frozen identity; moved/deleted replay rejects before publication |
 | Higher selected version remains the durable ceiling | 2–3 | Higher waiting candidate persists; a late lower wakeup is superseded even if the higher remote tag disappears |
 | Operator guidance matches overlapping reconciliation | 4 | README and Definition of Done agree with the release runbook and workflow tests |
+| Agents can carry out a requested application release and report actual publication evidence | 5 | Skill validation and a simulated operator walkthrough distinguish release requests, status checks, non-ready CI, skipped publication and successful deployment |
 
 ## Ordered slices
 
@@ -107,13 +111,45 @@ Behavior: A maintainer reads either top-level release overview → receives the
 current overlapping-release policy → can submit a newer version or recover the
 same immutable release without obsolete manual serialization advice.
 
+### 5. Guide agents through an application release
+Type: Behavior
+Status: planned
+Proof: Validate the new skill's frontmatter and links, then walk through simulated
+requests to release an exact tested main commit and to check deployment status.
+The release walkthrough identifies the intended unused increasing version,
+exact-SHA CI and available artifacts, immutable tag push, selected release
+admission, actual publication job and production smoke-check evidence. Waiting,
+blocked, failed and skipped publication must not be reported as deployed; a
+status-only request must not create a tag or rerun a workflow. Use supplied or
+fake results for the walkthrough, without production mutations.
+
+Behavior: A maintainer asks an agent to release Donut → the agent discovers
+`release-application` and follows the canonical runbook → completes the authorized
+release or reports its specific blocker with tag, SHA and workflow evidence.
+
+Create `.agents/skills/release-application/SKILL.md` with concise name/description
+frontmatter and a link to `docs/gcp/conditional-backend-deploy.md`; add a release
+entry to `.cursor/agent-map.md`. Keep mechanics in the runbook rather than copying
+them. Distinguish application releases from independent `cli-*` releases and
+`gsd-ship` PR delivery. Preserve existing user authorization; resolve missing
+release identity or authorization before tag push, without imposing repeated
+confirmation when already supplied. Follow immutable retry/next-patch correction
+guidance and stop on a concrete failure rather than adding automatic retry loops,
+version bumps or GitHub Release creation. Report success only after publication
+and smoke checks, and disclose any verification that could not be completed.
+
+Sizing: About five minutes for one short skill, its navigation pointer and a
+focused walkthrough; no helper scripts or new release machinery are needed.
+
 ## Verification and wrap-up
 
 Each leaf targets one commit-sized outcome. Use the existing real-Git/fake-GitHub
 and fake-GCS fixtures; no production tag or production payload write is permitted.
-Run the focused application-release suite after each behavior and the standard
-execute-plan refactor/format/check/commit/push wrap-up only when this plan is
-explicitly executed.
+Run the focused application-release suite for release implementation changes;
+use documentation consistency review for leaf 4 and skill validation plus the
+simulated walkthrough for leaf 5. Run the standard execute-plan
+refactor/format/check/commit/push wrap-up only when this plan is explicitly
+executed. Implementing the skill does not authorize a real application release.
 
 ```bash
 CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test
