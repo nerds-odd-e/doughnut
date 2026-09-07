@@ -389,10 +389,9 @@ Donut. This is useful even if moving between folders is deferred indefinitely.
 
 ### 8. Keep non-overlapping accumulated local and web changes
 
-**Refinement status:** Refined on 2026-09-07. The developer selected explicit
-`pull`, then `publish`; the conservative content boundary below is the current
-planning understanding. [Plan 53](../quick/053-reconcile-local-web-content/PLAN.md)
-owns execution leaves and proof. No implementation has started for this story.
+**Status:** delivered on 2026-09-07 through Plan 53
+([`053-reconcile-local-web-content`](../quick/053-reconcile-local-web-content/PLAN.md)).
+Do not mark Story 9 or broader Git synchronization delivered.
 
 **Goal**
 
@@ -441,51 +440,7 @@ commits or multiple local edited notes; additions, deletions, renames, folder,
 README, attachment or mode changes on either divergent side; structural changes
 hidden by a later reversal; drift repair; squash/merge commits, automatic stash,
 force/reset recovery, new sync commands, remote transport, background sync,
-commit batching, or new metadata in the Portable tree. Git author identity is
-not a new server-provenance test: eligibility depends on accepted ancestry and
-content shape, with actual web saves used to demonstrate the selected journey.
-
-**Key examples**
-
-1. **Keep both edits:** From accepted A, commit L editing `Biology/Cell.md`
-   locally; Donut accepts B editing `Biology/DNA.md` → pull → local L′ is one
-   child of B with both edits and a clean checkout; Donut still has B → publish
-   → accepted L′ displays both edits on their original note identities.
-2. **Receive accumulated web work:** A→B→C edits other notes, including valid
-   authored YAML → pull the one local edit → A, B and C remain unchanged and
-   the local patch is reapplied once above C. Repeat pull before publish → no
-   duplicate or rewritten local commit; the result remains ready to publish.
-3. **Same path is outside this increment:** Both sides edit `Cell.md`, even
-   different paragraphs, or remote edits then restores it → pull → identify
-   the overlapping path without rebasing, publishing, or leaving conflict markers.
-4. **Do not infer structural intent:** Either side renames a note, edits a
-   README, or remote deletes then recreates a path → pull with divergent local
-   work → explain the unsupported change and preserve local state. An ordinary
-   clean checkout with no local commit can still receive an accepted rename.
-5. **Preserve work across races:** An editor changes the checkout during
-   download → pull rejects without overwriting that change. After a successful
-   rebase, remote advances again → publish rejects safely and the rebased local
-   commit remains available for another pull or ordinary Git inspection.
-6. **Keep drift visible:** An unsupported web creation is absent from accepted
-   Git history → pull only incorporates accepted commits, and publication
-   continues to reject the projection mismatch without losing local content.
-
-**Decisions and dependencies**
-
-- The explicit pull-then-publish workflow was confirmed by the developer in
-  this refinement. No unresolved decision blocks this bounded plan.
-- Depends on delivered Stories 2 and 3; finish the existing Story 6 corrections
-  in Plan 52 before feature execution, as already recorded in the seed.
-- Story 9 owns conflicting same-path content recovery. Story 12 owns note
-  relocation; neither is a prerequisite for this different-note rebase.
-- **Effort hypothesis:** M (about 1–2 hours), low confidence, retaining the
-  original comparative estimate for the different-note outcome. Assumes the
-  delivered receive/publish workflows remain reusable; history eligibility and
-  the complete owner journey are the main sizing risks. Plan 53 records the
-  separate execution-leaf sizing hypotheses.
-- **Safe stopping point:** After pull, both edits are inspectable locally and
-  publication is still explicit. After rejection, remote accepted history has
-  not advanced through this command and local work remains recoverable.
+commit batching, or new metadata in the Portable tree.
 
 <a id="story-9"></a>
 
@@ -682,11 +637,8 @@ learning history again. Renaming in place cannot achieve this outcome.
 
 ## Ordering and Scope Reduction
 
-Stories 1–6 and 11 are delivered. The 2026-09-07 review after Plan 49 keeps
-Stories 8 and 9 next, ahead of Story 12, followed by Story 7; Story 10 remains
-last. Complete the bounded Story 6 corrections in Plan 52 before expanding
-the workflow. The [product backlog](../PRODUCT-BACKLOG.md) owns the global
-story order; corrective execution leaves remain attached to their home story.
+Stories 1–6, 8, and 11 are delivered. The [product backlog](../PRODUCT-BACKLOG.md)
+owns the global story order; Story 9 is next among unfinished SEED-009 stories.
 
 ### Learning from the delivered rename story
 

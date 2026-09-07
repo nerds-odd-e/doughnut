@@ -55,7 +55,7 @@ const NOTEBOOK_CLONE_USAGE =
 const NOTEBOOK_PUBLISH_USAGE = 'usage: donut notebook publish <directory>'
 const NOTEBOOK_PULL_USAGE =
   'usage: donut notebook pull <directory>\n' +
-  'Receives accepted notebook history by fast-forwarding a clean local main. Accepted history may not include all current web content.'
+  'Receives accepted notebook history onto a clean local main. When one unpublished commit edits one existing note at an unchanged path and accepted history advanced through other notes only, pull rebases that unpublished commit. Pull does not publish. Inspect the result, then run "donut notebook publish <directory>". Accepted history may not include all current web content.'
 
 async function completeNotebookSubcommand(
   notebookArgs: string[]
@@ -93,7 +93,7 @@ async function completeNotebookClone(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
   console.log(
-    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, a single edited Markdown note, a single Markdown note renamed within its current folder with unchanged content, or one isolated Markdown note deletion that leaves existing links authored; moving a note to a different folder, and renaming together with a content edit in the same commit, are not supported yet. To preserve note identity, commit and publish the unchanged same-folder rename, wait for it to be accepted, then edit and separately commit and publish the content change. Authored referring links are not rewritten by a rename, so links to the old path may no longer resolve. Do not delete and recreate the note. Use the notebook root or existing folders represented in accepted history. Run "donut notebook pull ${destination}" to receive newer accepted history; accepted history may not include all current web content.`
+    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, a single edited Markdown note, a single Markdown note renamed within its current folder with unchanged content, or one isolated Markdown note deletion that leaves existing links authored; moving a note to a different folder, and renaming together with a content edit in the same commit, are not supported yet. To preserve note identity, commit and publish the unchanged same-folder rename, wait for it to be accepted, then edit and separately commit and publish the content change. Authored referring links are not rewritten by a rename, so links to the old path may no longer resolve. Do not delete and recreate the note. Use the notebook root or existing folders represented in accepted history. Run "donut notebook pull ${destination}" to receive newer accepted history; when one unpublished commit edits one existing note at an unchanged path and accepted history advanced through other notes only, pull rebases that unpublished commit. Pull does not publish. Inspect the result, then run "donut notebook publish ${destination}". Accepted history may not include all current web content.`
   )
 }
 
