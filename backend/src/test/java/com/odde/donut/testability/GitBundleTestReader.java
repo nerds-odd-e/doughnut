@@ -3,6 +3,7 @@ package com.odde.donut.testability;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -11,11 +12,13 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.FetchConnection;
 import org.eclipse.jgit.transport.TransportBundleStream;
 import org.eclipse.jgit.transport.URIish;
+import org.eclipse.jgit.treewalk.TreeWalk;
 
 /**
  * Fetches an accepted Git binding's bundle bytes into a scratch in-memory repository so a test can
@@ -48,6 +51,19 @@ public final class GitBundleTestReader {
   }
 
   public record SingleParentGitCommit(ObjectId head, ObjectId tree, ObjectId parent) {}
+
+  public static List<String> pathsIn(Repository repository, ObjectId commitId) throws IOException {
+    try (RevWalk revWalk = new RevWalk(repository);
+        TreeWalk treeWalk = new TreeWalk(repository)) {
+      treeWalk.addTree(revWalk.parseCommit(commitId).getTree());
+      treeWalk.setRecursive(true);
+      List<String> paths = new ArrayList<>();
+      while (treeWalk.next()) {
+        paths.add(treeWalk.getPathString());
+      }
+      return paths;
+    }
+  }
 
   /**
    * The bundle's advertised {@code HEAD} object id, or {@code null} if the bundle never included

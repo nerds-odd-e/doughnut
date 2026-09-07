@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–5 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaves 1–6 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -263,10 +263,14 @@ Sizing: ~5 minutes active work, high confidence; one rollback fixture variant.
 
 ### 6. Retain a source folder after its last tracked note moves
 Type: Behavior
-Status: planned
+Status: done
 Proof: Source has no README and contains only the moved note → publish →
 original source/destination folder IDs survive; exact accepted Portable paths
-omit the now-empty source and contain no invented README. Backend suite.
+omit the now-empty source and contain no invented README. Backend suite
+(`source /workspace/scripts/cloud_agent_setup.sh && pnpm backend:test_only`).
+`NotebookGitProposalRelocationContainerControllerTest.publishesRelocationOfTheLastNoteWithoutRemovingItsSourceContainer`
+keeps original Source/Dest IDs, null readmes, and downloaded paths
+`Dest/note.md` + `Dest/other.md` matching the proposed head/tree.
 
 Behavior: Relocation empties the source's tracked content → publication →
 retain the Donut container. Use the existing deletion-container fixture
@@ -373,7 +377,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–5 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–6 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -386,6 +390,7 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 - Leaf 3 accepts combined parent+filename at the final path only; proof in `NotebookGitProposalRelocateAndRenameControllerTest`.
 - Leaf 4: cross-parent relocation keeps tracker/MCQ/conversation on the same note; proof in `NotebookGitProposalRelocationPrivateAssociationControllerTest`. No production change.
 - Leaf 5: late binding-save failure rolls back relocate-and-rename folder/title using the existing atomic-test profile.
+- Leaf 6: emptying a README-less source by relocating its last note keeps the Donut folder ID and invents no README.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are
