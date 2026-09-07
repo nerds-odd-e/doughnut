@@ -1,6 +1,6 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: resume at leaf 7. Slices 1–6 done and pushed.
+Status: resume at leaf 8. Slices 1–7 done and pushed.
 
 ## Resume (new session)
 
@@ -12,7 +12,7 @@ Work only in this checkout:
 - Skill: `.agents/skills/execute-plan/SKILL.md` (wrap-up per slice; do not write `.planning/STATE.md`)
 - Do not edit `/Users/terryyin/git/doughnut` except the final merge to `main`
 
-Leaf 5 accepted after raising instance `max_connections` to 1000. Leaf 6 missing-database failure stops before tests. Continue leaves 7–9. When the plan is complete: merge the feature branch to `main`, push `main`, delete the feature branch, and drop worktrees `doughnut-wt-054`, `-a`, and `-b`. Do not drop MySQL databases unless this PLAN later says to.
+Leaf 5 accepted after raising instance `max_connections` to 1000. Leaf 6 missing-database failure stops before tests. Leaf 7: interrupting A leaves B and MySQL usable. Continue leaves 8–9. When the plan is complete: merge the feature branch to `main`, push `main`, delete the feature branch, and drop worktrees `doughnut-wt-054`, `-a`, and `-b`. Do not drop MySQL databases unless this PLAN later says to.
 
 Disposable proof environments (keep until leaves 6–8 finish):
 
@@ -400,7 +400,7 @@ code change; no stage-gating correction.
 
 ### 7. Interrupt one owned run while another environment remains usable
 Type: Behavior
-Status: planned
+Status: done
 Proof: Reuse the configured worktrees. While A has an active real Gradle test
 worker, interrupt A's owned foreground run through its terminal/process group.
 Observe termination of A's active worker/run, failing interruption status,
@@ -416,6 +416,25 @@ manager, broad signal compatibility feature, or cleanup of unrelated daemons.
 Sizing: about 5 minutes active launch/observation, medium confidence; waiting
 for an actual test worker is an external runtime exception. Existing prepared
 environments suffice; no new lifecycle harness is expected.
+
+Recorded interrupt (2026-09-07): A and B ran
+
+```
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
+```
+
+- A started 10:05:30Z, selected `doughnut_wt_054a_test`, migrate succeeded.
+  At 10:05:46Z `Gradle Test Executor 1` PID 19755 was live for A's tests
+  (tmpdir `doughnut-wt-054-a/backend/build/tmp/test/work`). SIGINT to A's
+  owned process group `-18831` (wrapper/pnpm/gradlew). A ended 10:05:47Z;
+  pnpm `[ELIFECYCLE] Command failed with exit code 130`. Worker 19755 gone;
+  group 18831 empty at +5s. Log stopped after `:testClasses` (no BUILD).
+- B started 10:05:41Z, selected `doughnut_wt_054b_test`, still running after
+  A's interrupt (gradlew + B's Test Executor). Ended 10:06:46Z
+  `BUILD SUCCESSFUL` in 1m 4s, `7 actionable tasks: 7 executed`, exit 0.
+- MySQL `SELECT 1` succeeded after A's stop; Flyway still 22 rows on A and B.
+  Unrelated primary-checkout Gradle processes were not killed.
 
 ### 8. Keep migration history independent on a later invocation
 Type: Behavior
@@ -508,8 +527,8 @@ and `/Users/terryyin/git/doughnut-wt-054-b` (`wt_054b`) with empty utf8mb4
 databases on MySQL 8.4.11; configs ignored; legacy DBs unmodified. Preserve
 them for leaves 5–8.
 
-Slice 6: missing `doughnut_wt_054missing_test` fails `:migrateTestDB` (exit 1)
-before `:test`; A's config restored. Next: leaves 7–9.
+Slice 7: SIGINT to A's process group stopped A's Test Executor (exit 130);
+B finished BUILD SUCCESSFUL; MySQL stayed up. Next: leaves 8–9.
 
 If an actual run contradicts a lifecycle/storage assumption, preserve its
 observations and stop at that leaf for the repository's learning escalation.
