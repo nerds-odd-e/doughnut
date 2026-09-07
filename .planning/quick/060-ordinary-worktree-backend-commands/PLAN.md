@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–6 done.
+Status: in progress; slices 1–7 done.
 
 ## Goal and scope
 
@@ -163,7 +163,7 @@ Sizing: ~5 minutes, medium confidence; reuse URL validation at argument forwardi
 
 ### 7. Keep pnpm verification in one isolated invocation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Invoke actual package entry points with external process stand-ins:
 backend:test still formats and executes one owned migration/test run; test_only
 also prepares before testing. Primary legacy path remains green.
@@ -278,6 +278,9 @@ stopping point.
   linked-worktree plus migrate/test.
 - Slice 6: prepare refuses conflicting env and `-D`/`--` datasource/Flyway URL
   args; matching values still launch against the assigned database.
+- Slice 7: `pnpm backend:test` always formats then `test_only`; isolated
+  checkouts skip the extra migrate step because wrapper `test` already
+  migrates once. Isolation predicate is shared (`backend_worktree_isolation_applies`).
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining

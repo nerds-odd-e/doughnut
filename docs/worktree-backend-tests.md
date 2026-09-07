@@ -37,7 +37,8 @@ When this checkout has no `.worktree.local.json` yet, the command:
 The command then prints `Selected database: doughnut_<id>_test`, migrates it,
 and runs the requested tests (the full form runs the complete suite; the
 `--tests` form keeps the same database and filters tests). Repository-wrapper
-`migrateTestDB` and `test` in a fresh Git linked worktree allocate the same
+`migrateTestDB` and `test`, and ordinary `pnpm backend:test` /
+`pnpm backend:test_only`, in a fresh Git linked worktree allocate the same
 way (see Ordinary commands in a fresh linked worktree).
 
 Later invocations in the same checkout find `.worktree.local.json` already
@@ -116,6 +117,22 @@ These commands reuse the checkout's assigned database and the same exclusive
 invocation lock as `pnpm backend:test:worktree`. They do not allocate a
 first-use environment.
 
+## Ordinary pnpm verification in a configured checkout
+
+When `.worktree.local.json` is already present, ordinary pnpm backend
+verification uses the assigned database under one invocation owner:
+
+```bash
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+```
+
+`pnpm backend:test` still formats first (`spotlessApply`), then migrates and
+tests once. `pnpm backend:test_only` skips formatting and prepares before
+testing. Both reuse the same exclusive invocation lock as
+`pnpm backend:test:worktree`. They do not allocate a first-use environment.
+
 ## Ordinary tests in a configured checkout
 
 When `.worktree.local.json` is already present, the repository Gradle wrapper
@@ -149,10 +166,11 @@ first-use environment. The caller does not need to pass
 
 A Git linked worktree (`git worktree add`) with no `.worktree.local.json` yet
 allocates its persistent isolated database on the first repository-wrapper
-`migrateTestDB` or `test` command, then uses that database for the workload.
+`migrateTestDB` or `test` command, or on `pnpm backend:test` /
+`pnpm backend:test_only`, then uses that database for the workload.
 Allocation follows the same first-use steps as `pnpm backend:test:worktree`
-above. Migration-only does not run tests; `test` migrates once then runs
-tests, as in a configured checkout.
+above. Migration-only does not run tests; `test` and the pnpm test commands
+migrate once then run tests, as in a configured checkout.
 
 From the checkout root:
 
@@ -160,6 +178,8 @@ From the checkout root:
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
 CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB
 CURSOR_DEV=true nix develop -c backend/gradlew -p backend test
+CURSOR_DEV=true nix develop -c pnpm backend:test
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
 ```
 
 Later invocations in the same linked checkout skip provisioning and reuse the
@@ -175,11 +195,13 @@ it.
   `migrateTestDB` and `test` keep the established default target. They do not
   allocate an identity, do not create `.worktree.local.json`, and do not take
   the checkout lock. An explicit `SPRING_DATASOURCE_URL` or `DB_URL` stays as
-  the caller set it. Existing CI-shaped forms such as
+  the caller set it. `pnpm backend:test` keeps format, migrate, then
+  `test_only`. Existing CI-shaped forms such as
   `backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel`
   (`pnpm backend:test_only`) stay on this path.
-- **Configured** (`.worktree.local.json` already present): `migrateTestDB` and
-  `test` use that assigned ID, as in Ordinary migration / Ordinary tests
+- **Configured** (`.worktree.local.json` already present): `migrateTestDB`,
+  `test`, `pnpm backend:test`, and `pnpm backend:test_only` use that assigned
+  ID, as in Ordinary migration / Ordinary pnpm verification / Ordinary tests
   above.
 
 Unrelated wrapper tasks (`spotlessApply`, `help`, `generateOpenAPIDocs`, and
@@ -191,9 +213,10 @@ primary or a linked worktree.
 
 - An unconfigured primary checkout keeps the established default
   (`doughnut_test`) and any caller-supplied URL; it does not allocate.
-  `pnpm backend:test` and `pnpm backend:test_only` follow that path.
-  Configured-checkout and fresh linked-worktree `migrateTestDB` and `test`
-  through the repository wrapper are isolated as described above.
+  `pnpm backend:test` and `pnpm backend:test_only` follow that legacy path.
+  Configured-checkout and fresh linked-worktree `migrateTestDB`, `test`,
+  `pnpm backend:test`, and `pnpm backend:test_only` are isolated as described
+  above.
 - No automatic cleanup, retirement, or orphan removal: a provisioned database
   (and an unreferenced one left behind by a failed or interrupted first use)
   persists until removed manually. There is no machine-wide allocation

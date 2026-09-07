@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url'
 const scriptsSrc = fileURLToPath(new URL('.', import.meta.url))
 const repoRoot = fileURLToPath(new URL('..', import.meta.url))
 const checkoutScriptNames = [
+  'backend-test.sh',
   'backend-test-worktree.sh',
   'backend-test-worktree-owner.sh',
   'backend-worktree-gradle-route.sh',
@@ -69,6 +70,20 @@ export function makeCheckout(t, { config } = {}) {
   copyFileSync(path.join(repoRoot, 'gradlew'), path.join(root, 'gradlew'))
   chmodSync(path.join(root, 'gradlew'), 0o755)
   symlinkSync('../gradlew', path.join(root, 'backend', 'gradlew'))
+  const pkg = JSON.parse(
+    readFileSync(path.join(repoRoot, 'package.json'), 'utf8')
+  )
+  writeFileSync(
+    path.join(root, 'package.json'),
+    `${JSON.stringify({
+      name: 'donut-worktree-fixture',
+      scripts: {
+        'backend:format': pkg.scripts['backend:format'],
+        'backend:test_only': pkg.scripts['backend:test_only'],
+        'backend:test': pkg.scripts['backend:test'],
+      },
+    })}\n`
+  )
   const wrapperDir = path.join(root, 'gradle', 'wrapper')
   mkdirSync(wrapperDir, { recursive: true })
   for (const name of ['gradle-wrapper.jar', 'gradle-wrapper.properties']) {

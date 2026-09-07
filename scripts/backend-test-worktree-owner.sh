@@ -6,6 +6,21 @@ database_for_worktree() {
   echo "doughnut_${1}_test"
 }
 
+# Linked worktrees have a distinct git-dir under the shared common dir.
+# Unconfigured primary checkouts keep pass-through (no allocation here).
+is_linked_git_worktree() {
+  local git_dir common_dir
+  git_dir="$(git -C "${1}" rev-parse --git-dir 2>/dev/null)" || return 1
+  common_dir="$(git -C "${1}" rev-parse --git-common-dir 2>/dev/null)" || return 1
+  git_dir="$(cd "${1}" && cd "${git_dir}" && pwd)" || return 1
+  common_dir="$(cd "${1}" && cd "${common_dir}" && pwd)" || return 1
+  [[ "${git_dir}" != "${common_dir}" ]]
+}
+
+backend_worktree_isolation_applies() {
+  [[ -f "${1}/.worktree.local.json" ]] || is_linked_git_worktree "${1}"
+}
+
 # Exclusive lock, first-use provision when needed, config validation, URL
 # conflict refusal (env and remaining CLI args), and SPRING_DATASOURCE_URL
 # export for ${1} (checkout root). Leaves cwd unchanged.
