@@ -1,6 +1,38 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: awaiting story review at leaf 5 (SEED-015 story 1a). Slices 1–4 done.
+Status: resume at leaf 5. Slices 1–4 done and pushed.
+
+## Resume (new session)
+
+Work only in this checkout:
+
+- Path: `/Users/terryyin/git/doughnut-wt-054`
+- Branch: `feat/configured-worktree-backend-tests` (tracks origin)
+- Plan: `.planning/quick/054-configured-worktree-backend-tests/PLAN.md`
+- Skill: `.agents/skills/execute-plan/SKILL.md` (wrap-up per slice; do not write `.planning/STATE.md`)
+- Do not edit `/Users/terryyin/git/doughnut` except the final merge to `main`
+
+Capacity fix committed: `scripts/mysql_nix_shared.sh` starts mysqld with `--max-connections=1000`. Instance currently reports 1000. Retry leaf 5 overlap next.
+
+Disposable proof environments (keep until leaves 5–8 finish):
+
+| Role | Path | ID | Database |
+|---|---|---|---|
+| A | `/Users/terryyin/git/doughnut-wt-054-a` | `wt_054a` | `doughnut_wt_054a_test` |
+| B | `/Users/terryyin/git/doughnut-wt-054-b` | `wt_054b` | `doughnut_wt_054b_test` |
+
+A/B are detached at `49d4f30544` (implementation). Shared MySQL is `127.0.0.1:3309` using `/Users/terryyin/git/doughnut/mysql/data`, currently started with `--max-connections=1000`.
+
+Leaf 5 first overlap failed with instance 1040 at 300 connections while using **distinct** databases (not the same-DB bug). Solo A passed. Developer chose to raise the instance ceiling, not serialize. Retry overlapping:
+
+```
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
+```
+
+in A and B at the same time. Then leaves 6–9. When the plan is complete: merge the feature branch to `main`, push `main`, delete the feature branch, and drop worktrees `doughnut-wt-054`, `-a`, and `-b`.
+
+Original request: execute quick plan 54 in a new worktree/branch, merge to main when done, drop worktree and branch.
 Source: [SEED-015, story 1a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1a).
 Stories 1a, 1b, and 1c occupy the first three product-backlog positions.
 This plan covers only 1a. No implementation or database experiment was performed
@@ -262,7 +294,7 @@ a legacy name):
 
 ### 5. Obtain independent full-suite results in two configured worktrees
 Type: Behavior
-Status: awaiting story review
+Status: planned (retry after max_connections=1000)
 Proof: Overlap complete suite runs in the leaf-4 worktrees, including the same
 fixture names. Capture literal commands, start/end overlap, selected targets,
 active MySQL database connections, per-database Flyway history, and JUnit
@@ -440,15 +472,10 @@ and `/Users/terryyin/git/doughnut-wt-054-b` (`wt_054b`) with empty utf8mb4
 databases on MySQL 8.4.11; configs ignored; legacy DBs unmodified. Preserve
 them for leaves 5–8.
 
-**Awaiting story review — SEED-015 story 1a.** Overlapping full suites used
-the correct per-worktree databases and actually executed tests, but both
-failed with MySQL 1040 (`Too many connections`, `max_connections=300`). A
-solo rerun on A passed. This is shared-server capacity, not silent fallback
-to `doughnut_test`. Do not serialize or skip tests to claim the concurrency
-promise. Remaining leaves 6–9 paused until the developer chooses how two
-full suites should fit one MySQL (raise `max_connections`, shrink the
-opt-in Hikari/worker footprint, narrow the concurrency promise, or another
-explicit exception).
+**Resume at leaf 5.** Distinct-database overlap previously failed on instance
+1040 at 300 connections. `scripts/mysql_nix_shared.sh` now starts mysqld with
+`--max-connections=1000`; the running instance reports 1000. Retry concurrent
+full suites, then leaves 6–9.
 
 If an actual run contradicts a lifecycle/storage assumption, preserve its
 observations and stop at that leaf for the repository's learning escalation.
