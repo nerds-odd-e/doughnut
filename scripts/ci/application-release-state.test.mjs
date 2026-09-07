@@ -211,3 +211,28 @@ test('a different release tag continues through existing admission', async (t) =
   assert.deepEqual(JSON.parse(result.stdout), { state: 'continue' })
   assert.deepEqual(result.uploads, [])
 })
+
+for (const outcome of ['publishing', 'succeeded']) {
+  test(`a higher ${outcome} release supersedes an older candidate after its tag disappears`, async (t) => {
+    const record = {
+      ...publishedRecord(outcome),
+      tag: 'v1.3.10',
+    }
+    const result = await runStateCommand(t, {
+      args: ['--check-release'],
+      existingBody: JSON.stringify(record),
+      release: {
+        tag: 'v1.3.9',
+        refOid: 'c'.repeat(40),
+        sha: 'd'.repeat(40),
+      },
+    })
+
+    assert.equal(result.status, 0, result.stderr)
+    assert.deepEqual(JSON.parse(result.stdout), { state: 'superseded' })
+    assert.equal(result.output, 'state=superseded\n')
+    assert.equal(result.requests.length, 1)
+    assert.equal(result.requests[0].method, 'GET')
+    assert.deepEqual(result.uploads, [])
+  })
+}

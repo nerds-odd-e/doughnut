@@ -307,13 +307,18 @@ Reversed tag and main wakeup fixtures therefore select the same pending release.
 
 ### 8. Prevent older retries and late CI from replacing newer state
 Type: Behavior
-Status: planned
+Status: done
 Proof: Higher persisted version rejects a stale attempt with zero writes, even
 if the newer tag is absent from the current tag listing.
 
 Behavior: An older candidate reaches admission after a newer release → report
 superseded and retain the newer application. Reuse numeric comparison and record
 lookup; this protects stored state beyond leaf 7's pending-tag selection.
+
+Learning: admission now compares the candidate with any higher persisted
+`publishing` or `succeeded` version and returns `superseded` from that durable
+record alone. Workflow gating skips both CI and publication for this terminal
+outcome, so deleting the newer remote tag cannot permit an older downgrade.
 
 ### 9. Connect reconciliation without changing the active trigger
 Type: Structure

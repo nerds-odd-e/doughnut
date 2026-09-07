@@ -2,7 +2,10 @@ import { execFileSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
 import { classifyApplicationPublication } from './application-release-bootstrap.mjs'
 import { writeReleaseOutput } from './application-release-output.mjs'
-import { isApplicationTag } from './application-release-version.mjs'
+import {
+  compareApplicationVersionsDescending,
+  isApplicationTag,
+} from './application-release-version.mjs'
 
 const recordName = 'deploy/application-release.json'
 const objectId = /^[0-9a-f]{40}$/
@@ -195,6 +198,12 @@ export async function checkApplicationReleaseState({
       return { state: 'already-released' }
     }
     return { state: 'retry' }
+  }
+  if (
+    current.outcome !== 'initialized-empty' &&
+    compareApplicationVersionsDescending(current.tag, tag) < 0
+  ) {
+    return { state: 'superseded' }
   }
   return { state: 'continue' }
 }

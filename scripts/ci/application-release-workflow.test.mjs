@@ -11,6 +11,9 @@ const workflow = (name) =>
     )
   )
 
+const nonTerminalRelease =
+  "steps.release_state.outputs.state != 'already-released' && steps.release_state.outputs.state != 'superseded'"
+
 test('main CI remains enabled and only application tag pushes trigger publication', () => {
   const ci = workflow('ci')
   const deploy = workflow('deploy')
@@ -91,10 +94,6 @@ test('release pins orchestration separately from source and preserves deployment
     releaseState.run,
     'node scripts/ci/application-release-state.mjs --check-release'
   )
-  assert.equal(
-    ciAdmission.if,
-    "steps.release_state.outputs.state != 'already-released'"
-  )
   assert.equal(ciAdmission.run, 'node scripts/ci/application-release-ci.mjs')
   assert.deepEqual(
     publication.steps.slice(0, 2).map((step) => step.with),
@@ -172,7 +171,7 @@ test('release pins orchestration separately from source and preserves deployment
   )
 })
 
-test('an already-released outcome bypasses CI and every publication operation', () => {
+test('terminal release outcomes bypass CI and every publication operation', () => {
   const deploy = workflow('deploy')
   const admission = deploy.jobs['release-admission']
   const publication = deploy.jobs.Deploy
@@ -182,7 +181,11 @@ test('an already-released outcome bypasses CI and every publication operation', 
 
   assert.equal(
     admission.outputs.deploy,
-    "${{ steps.release_state.outputs.state != 'already-released' && steps.ci.outputs.state == 'ready' }}"
+    `\${{ ${nonTerminalRelease} && steps.ci.outputs.state == 'ready' }}`
+  )
+  assert.equal(
+    admission.steps.find((step) => step.id === 'ci').if,
+    nonTerminalRelease
   )
   assert.equal(
     publication.if,
