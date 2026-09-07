@@ -94,8 +94,8 @@ supported kind per worktree, across two concurrent local worktrees.
 
 ### 1. Run backend unit tests concurrently in separate worktrees
 
-**Status:** Child 1a delivered. Children 1b–1c remain queued at the top of the
-product backlog. Legacy-command compatibility choices remain with 1c.
+**Status:** Children 1a–1b delivered. Child 1c remains queued at the top of
+the product backlog. Legacy-command compatibility choices remain with 1c.
 
 **Parent goal**
 
