@@ -102,5 +102,17 @@ export function createCliE2eNotebookCloneTasks() {
       git(checkoutDir, 'rm', '--', relativePath)
       return commitCheckout(checkoutDir, 'Remove cloned notebook note')
     },
+    commitCliNotebookCheckoutNoteRename({
+      checkoutDir,
+      fromRelativePath,
+      toRelativePath,
+    }: {
+      checkoutDir: string
+      fromRelativePath: string
+      toRelativePath: string
+    }): string {
+      git(checkoutDir, 'mv', fromRelativePath, toRelativePath)
+      return commitCheckout(checkoutDir, 'Rename cloned notebook note')
+    },
   }
 }

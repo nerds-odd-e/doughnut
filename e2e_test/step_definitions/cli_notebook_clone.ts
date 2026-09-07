@@ -72,6 +72,12 @@ When(
 )
 
 When(
+  'I commit a rename of {string} to {string} in the cloned checkout',
+  (fromRelativePath: string, toRelativePath: string) =>
+    cli.notebookCloneCheckout().commitRename(fromRelativePath, toRelativePath)
+)
+
+When(
   'I publish the cloned checkout expecting rejection from the installed CLI',
   () => cli.notebookCloneCheckout().publishExpectingRejection()
 )

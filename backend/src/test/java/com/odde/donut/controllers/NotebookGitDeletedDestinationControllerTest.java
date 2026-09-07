@@ -34,6 +34,111 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
   @Test
   void rejectsASamePathAdditionAfterAcceptedDeletionWithoutResurrectingTheNote() throws Exception {
     Notebook notebook = createGitBackedNotebook();
+    Note retained =
+        makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
+    AcceptedDeletion deletion = acceptDeletionReservingTitle(notebook, retained);
+
+    byte[] additionProposal =
+        proposalBundleBytes(
+            deletion.afterDeletionBinding(),
+            List.of(
+                new NotebookGitProposalFile("Retained.md", ORIGINAL_CONTENT),
+                new NotebookGitProposalFile("Reserved destination.md", PROPOSED_CONTENT)));
+
+    ApiException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook,
+            deletion.afterDeletion().acceptedHead(),
+            additionProposal,
+            ApiException.class);
+
+    assertThat(exception.getErrorBody().getMessage(), containsString("Reserved destination.md"));
+    assertThat(exception.getErrorBody().getMessage(), containsString(SOFT_DELETED_TITLE_REASON));
+    assertThat(
+        exception.getErrorBody().getErrorType(),
+        is(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
+    assertThat(
+        exception.getErrorBody().getErrors().get("deletedNoteId"),
+        equalTo(String.valueOf(deletion.reserved().getId())));
+    assertThat(
+        exception.getErrorBody().getErrors().get("_originalMessage"),
+        equalTo(SOFT_DELETED_TITLE_REASON));
+    ApiException original = assertInstanceOf(ApiException.class, exception.getCause());
+    assertThat(original.getMessage(), equalTo(SOFT_DELETED_TITLE_REASON));
+    assertThat(exception.getErrorBody().getErrors(), equalTo(original.getErrorBody().getErrors()));
+
+    PublicationState afterRejection =
+        publicationState(notebook, deletion.reserved(), deletion.tracker());
+    assertThat(afterRejection.noteDeletedAt(), equalTo(deletion.afterDeletion().noteDeletedAt()));
+    assertThat(
+        afterRejection.trackerDeletedAt(), equalTo(deletion.afterDeletion().trackerDeletedAt()));
+    inCommittedTransaction(
+        transactionManager,
+        () ->
+            assertThat(
+                noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+                    .map(Note::getId)
+                    .toList(),
+                contains(retained.getId())));
+  }
+
+  @Test
+  void rejectsASameParentRenameIntoAnAcceptedDeletionWithoutResurrectingOrMutatingTheSource()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note renamedSource =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .title("Renamed source")
+            .content(ORIGINAL_CONTENT)
+            .please();
+    AcceptedDeletion deletion = acceptDeletionReservingTitle(notebook, renamedSource);
+    Timestamp sourceUpdatedAtBeforeRename =
+        noteRepository.findById(renamedSource.getId()).orElseThrow().getUpdatedAt();
+
+    byte[] renameProposal =
+        proposalBundleBytes(
+            deletion.afterDeletionBinding(),
+            List.of(new NotebookGitProposalFile("Reserved destination.md", ORIGINAL_CONTENT)));
+
+    ApiException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, deletion.afterDeletion().acceptedHead(), renameProposal, ApiException.class);
+
+    assertThat(exception.getErrorBody().getMessage(), equalTo(SOFT_DELETED_TITLE_REASON));
+    assertThat(
+        exception.getErrorBody().getErrorType(),
+        is(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
+    assertThat(
+        exception.getErrorBody().getErrors().get("deletedNoteId"),
+        equalTo(String.valueOf(deletion.reserved().getId())));
+
+    PublicationState afterRejection =
+        publicationState(notebook, deletion.reserved(), deletion.tracker());
+    assertThat(afterRejection.noteDeletedAt(), equalTo(deletion.afterDeletion().noteDeletedAt()));
+    assertThat(
+        afterRejection.trackerDeletedAt(), equalTo(deletion.afterDeletion().trackerDeletedAt()));
+    Note reloadedSource = noteRepository.findById(renamedSource.getId()).orElseThrow();
+    assertThat(reloadedSource.getTitle(), equalTo("Renamed source"));
+    assertThat(reloadedSource.getUpdatedAt(), equalTo(sourceUpdatedAtBeforeRename));
+    inCommittedTransaction(
+        transactionManager,
+        () ->
+            assertThat(
+                noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+                    .map(Note::getId)
+                    .toList(),
+                contains(renamedSource.getId())));
+  }
+
+  /**
+   * Soft-deletes a tracked "Reserved destination" note via an accepted isolated deletion, keeping
+   * only {@code survivingNote}'s file in the accepted tree, so the title stays reserved for the
+   * rejection scenarios below.
+   */
+  private AcceptedDeletion acceptDeletionReservingTitle(Notebook notebook, Note survivingNote)
+      throws Exception {
     Note reserved =
         makeMe
             .aNote()
@@ -41,8 +146,6 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
             .title("Reserved destination")
             .content(ORIGINAL_CONTENT)
             .please();
-    Note retained =
-        makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
     MemoryTracker tracker =
         inCommittedTransaction(
             transactionManager,
@@ -53,7 +156,9 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] deletionProposal =
         proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("Retained.md", ORIGINAL_CONTENT)));
+            binding,
+            List.of(
+                new NotebookGitProposalFile(survivingNote.getTitle() + ".md", ORIGINAL_CONTENT)));
 
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), deletionProposal);
@@ -61,44 +166,14 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
     PublicationState afterDeletion = publicationState(notebook, reserved, tracker);
     NotebookGitBinding afterDeletionBinding =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    byte[] additionProposal =
-        proposalBundleBytes(
-            afterDeletionBinding,
-            List.of(
-                new NotebookGitProposalFile("Retained.md", ORIGINAL_CONTENT),
-                new NotebookGitProposalFile("Reserved destination.md", PROPOSED_CONTENT)));
-
-    ApiException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, afterDeletion.acceptedHead(), additionProposal, ApiException.class);
-
-    assertThat(exception.getErrorBody().getMessage(), containsString("Reserved destination.md"));
-    assertThat(exception.getErrorBody().getMessage(), containsString(SOFT_DELETED_TITLE_REASON));
-    assertThat(
-        exception.getErrorBody().getErrorType(),
-        is(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
-    assertThat(
-        exception.getErrorBody().getErrors().get("deletedNoteId"),
-        equalTo(String.valueOf(reserved.getId())));
-    assertThat(
-        exception.getErrorBody().getErrors().get("_originalMessage"),
-        equalTo(SOFT_DELETED_TITLE_REASON));
-    ApiException original = assertInstanceOf(ApiException.class, exception.getCause());
-    assertThat(original.getMessage(), equalTo(SOFT_DELETED_TITLE_REASON));
-    assertThat(exception.getErrorBody().getErrors(), equalTo(original.getErrorBody().getErrors()));
-
-    PublicationState afterRejection = publicationState(notebook, reserved, tracker);
-    assertThat(afterRejection.noteDeletedAt(), equalTo(afterDeletion.noteDeletedAt()));
-    assertThat(afterRejection.trackerDeletedAt(), equalTo(afterDeletion.trackerDeletedAt()));
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            assertThat(
-                noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-                    .map(Note::getId)
-                    .toList(),
-                contains(retained.getId())));
+    return new AcceptedDeletion(reserved, tracker, afterDeletion, afterDeletionBinding);
   }
+
+  private record AcceptedDeletion(
+      Note reserved,
+      MemoryTracker tracker,
+      PublicationState afterDeletion,
+      NotebookGitBinding afterDeletionBinding) {}
 
   private PublicationState publicationState(Notebook notebook, Note note, MemoryTracker tracker) {
     return inCommittedTransaction(

@@ -83,6 +83,13 @@ Feature: CLI notebook clone
     And I should see note "CLI Clone Notebook/Recipes/Sauce" has content "Simmer tomatoes with basil"
     And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Serve al dente pasta with tomato sauce"
 
+  Scenario: Publishing a committed note rename updates the same Donut note under its new title
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I commit a rename of "Recipes/Pasta.md" to "Recipes/Pasta basics.md" in the cloned checkout
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I should see note "CLI Clone Notebook/Recipes/Pasta basics" has content "Boil water"
+
   Scenario: Rejecting duplicate metadata keeps the local proposal available for correction
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I add and commit the following note at "Duplicate Keys.md" in the cloned checkout:
@@ -105,7 +112,7 @@ Feature: CLI notebook clone
 
   Scenario: Publishing a nested-metadata note preserves metadata through a rich body edit
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    Then I should see "one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, or a single edited Markdown note, or one isolated Markdown note deletion that leaves existing links authored; mixed deletion and same-path recreation are unsupported. Use the notebook root or existing folders represented in accepted history." in the non-interactive output
+    Then I should see "one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, a single edited Markdown note, a single Markdown note renamed within its current folder with unchanged content, or one isolated Markdown note deletion that leaves existing links authored; moving a note to a different folder, and renaming together with a content edit in the same commit, are not supported yet — commit the rename on its own, then edit separately, rather than deleting and recreating a note to preserve its identity. Use the notebook root or existing folders represented in accepted history." in the non-interactive output
     When I add and commit the following note at "Recipes/Pantry Staples.md" in the cloned checkout:
       """
       ---
