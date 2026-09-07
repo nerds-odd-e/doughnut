@@ -1,40 +1,18 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: blocked at slice 1 verification; implementation is uncommitted.
+Status: slice 1 done; next is slice 2.
 
-## Execution handoff
+## Learnings
 
-Slice 1 implements complete-diff isolation guidance, removed-path/mode checks,
-and explicit modification dispatch; isolated deletion remains rejected.
-Changes are in `NotebookGitProposalTreeShape`, `NotebookGitProposalPublisher`,
-and new `NotebookGitDeletionRejectionControllerTest`. No slice is delivered;
-refactor, formatting, commit, and push have not run.
-
-Required command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
-All nine new rejection cases and eight existing tree-shape cases passed in
-both implementation runs. Initial red proof: 2221 tests, exactly eight expected
-assertion failures, 48 seconds. Implementation runs: 2222 tests, one deadlock in
-52 seconds, then five deadlocks in 48 seconds. No further retry was performed.
-
-Bounded failure evidence: InnoDB at 08:06:34 showed recall fixture `INSERT mcq`
-holding a note lock while waiting for an mcq FK-index gap; concurrent
-`DELETE note ... external_identifier LIKE 'batch-prune-committed-%'` held the
-gap and waited for that note. The cleanup belongs to untouched
-`QuestionGenerationBatchRetentionWithoutTransactionTest`. At 08:08:16,
-committed Git fixture cleanup held a question-generation-batch index gap while
-waiting for a note, and batch insertion held that note while waiting for the
-gap. Retry failures were fixture insert/cleanup `PessimisticLockException`s,
-including existing publication-concurrency cleanup, with no distinct assertion
-failure. The recurring committed-fixture concurrency defect remains unrepaired;
-the required full backend proof is blocked. A passing retry would not repair it.
-
-Next action requires developer scope decision: repair the unrelated committed
-fixture deadlocks, then resume slice 1 verification and normal wrap-up. Preserve
-the existing implementation and unrelated release-planning work. Approximate
-elapsed time: ten minutes; implementation about four minutes, backend runs
-148 seconds plus Nix startup, remainder bounded diagnosis. No commands remain
-running from the implementer.
+Slice 1 production and rejection tests landed on `main` in `7aa2cced52` before
+wrap-up. GitHub Actions run 34069104930 **Backend Unit tests passed**; Lint
+and Package failed only on Spotless in
+`NotebookGitDeletionRejectionControllerTest`. Wrap-up applied that format.
+Earlier local InnoDB deadlocks in untouched
+`QuestionGenerationBatchRetentionWithoutTransactionTest` fixture cleanup are
+a pre-existing committed-fixture concurrency defect, not slice 1 proof; they
+are not in this plan's scope.
 
 ## Goal and scope
 
@@ -62,13 +40,10 @@ as part of this plan.
 
 ## Execution context and current decisions
 
-- CI observation: Codex coordinator `/root`, checkout `/Users/terryyin/git/doughnut`,
-  repository `nerds-odd-e/doughnut`, branch `main`. Sandbox blocked initial Nix
-  startup. Escalated bridge cell 7 failed to publish a receipt/session handle;
-  terminated the bridge after bounded inspection. No exact observer ownership
-  could be recovered, so no guessed process termination or replacement launch.
-  Notification coverage is unavailable; observer shutdown is unconfirmed and
-  pending CI is unobserved.
+- CI observation: Cursor coordinator mailbox `/tmp/donut-ci-1000/watch-Rllv3B`,
+  repository `nerds-odd-e/doughnut`, observing `main`. Cloud Agent delivers on
+  `cursor/publish-local-note-deletion-1c31`. Slice 1 SHA `7aa2cced52` backend
+  unit tests passed; Spotless failures are repaired in wrap-up.
 
 - `NotebookController.publishNotebookGitProposal` is the stable publication
   boundary. `NotebookGitProposalTreeShape` currently rejects every removed
@@ -149,7 +124,7 @@ gaps. Do not manufacture extra production changes for proof-only variations.
 
 ### 1. Explain why a deletion must be isolated
 Type: Behavior
-Status: in-progress
+Status: done
 Proof: A parameterized controller rejection case covers deletion+edit,
 deletion+addition (including identical-blob rename), and two deletions; each
 reports isolation guidance and leaves accepted binding and live notes unchanged.
@@ -364,7 +339,8 @@ Keep existing title reuse and restore policy unchanged.
 
 ## Sizing, readiness, and learning checkpoint
 
-Ready for direct execution of the revised plan; implementation has not begun.
+Slice 1 delivered isolation rejection and kept single deletions rejected.
+Remaining leaves execute in order from slice 2.
 Four bundled original slices were replaced; four were retained and reordered.
 The result is 13 Behavior leaves and one immediately enabling Structure leaf.
 No completed proof was discarded and no product scope was added or removed.
