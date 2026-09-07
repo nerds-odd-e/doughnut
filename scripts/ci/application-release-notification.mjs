@@ -19,6 +19,12 @@ const context = [
   ],
   ['release run', `${repositoryUrl}/actions/runs/${env.GITHUB_RUN_ID}`],
 ]
+if (env.FAILURE_STAGE === 'artifact admission') {
+  context.push([
+    'recovery',
+    `Rerun CI ${env.RELEASE_CI_RUN_ID} for exact commit ${env.RELEASE_SHA}, then rerun release ${env.GITHUB_RUN_ID} with the same immutable tag ${tag}. Do not substitute current main. If GitHub can no longer regenerate that history and its artifacts, test a correction and release a new patch.`,
+  ])
+}
 const payload = {
   text: `Production release failed: ${tag}`,
   attachments: [

@@ -80,65 +80,9 @@ export async function querySelectedCi({
   return { state: 'ready', ...identity }
 }
 
-function pause(milliseconds, signal, clock) {
-  signal.throwIfAborted()
-  return new Promise((resolve, reject) => {
-    const finish = () => {
-      signal.removeEventListener('abort', abort)
-      resolve()
-    }
-    const timer = clock.setTimeout(finish, milliseconds)
-    const abort = () => {
-      clock.clearTimeout(timer)
-      signal.removeEventListener('abort', abort)
-      reject(signal.reason)
-    }
-    signal.addEventListener('abort', abort, { once: true })
-  })
-}
-
-export async function waitForSelectedCi({
-  timeoutMs = 60 * 60 * 1000,
-  pollMs = 30_000,
-  signal: callerSignal,
-  clock = globalThis,
-  ...selection
-}) {
-  const deadline = new AbortController()
-  const signal = callerSignal
-    ? AbortSignal.any([callerSignal, deadline.signal])
-    : deadline.signal
-  const timer = clock.setTimeout(
-    () =>
-      deadline.abort(
-        new Error(`Timed out waiting for CI for ${selection.sha}`)
-      ),
-    timeoutMs
-  )
-  let observed
-  try {
-    while (true) {
-      signal.throwIfAborted()
-      const result = await querySelectedCi({ ...selection, signal })
-      observed = result
-      signal.throwIfAborted()
-      if (result.state === 'ready') return result
-      await pause(pollMs, signal, clock)
-    }
-  } catch (error) {
-    error.ci ??= observed
-    throw error
-  } finally {
-    clock.clearTimeout(timer)
-  }
-}
-
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const query = process.argv.includes('--once')
-    ? querySelectedCi
-    : waitForSelectedCi
   try {
-    const result = await query({
+    const result = await querySelectedCi({
       repository: process.env.GITHUB_REPOSITORY,
       sha: process.env.RELEASE_SHA,
     })

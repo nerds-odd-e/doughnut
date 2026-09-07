@@ -1,12 +1,7 @@
-import { execFileSync, spawnSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const command = fileURLToPath(
-  new URL('./application-release.mjs', import.meta.url)
-)
 
 export function makeReleaseRepository(t) {
   const root = mkdtempSync(join(tmpdir(), 'application-release-'))
@@ -33,21 +28,14 @@ export function makeReleaseRepository(t) {
     git('tag', ...(annotated ? ['-a', '-m', name] : []), name, target)
     return git('rev-parse', `refs/tags/${name}`)
   }
-  const run = (event) => {
-    const eventPath = join(root, 'event.json')
-    const outputPath = join(root, 'output')
-    writeFileSync(eventPath, JSON.stringify(event))
-    writeFileSync(outputPath, '')
-    const result = spawnSync(process.execPath, [command], {
-      cwd: repository,
-      encoding: 'utf8',
-      env: {
-        ...process.env,
-        GITHUB_EVENT_PATH: eventPath,
-        GITHUB_OUTPUT: outputPath,
-      },
-    })
-    return { ...result, output: readFileSync(outputPath, 'utf8') }
+  const release = (name = 'v1.2.3') => {
+    const ref = `refs/tags/${name}`
+    return {
+      tag: name,
+      ref,
+      refOid: git('rev-parse', ref),
+      sha: git('rev-parse', `${ref}^{commit}`),
+    }
   }
   const clone = () =>
     execFileSync(
@@ -55,5 +43,5 @@ export function makeReleaseRepository(t) {
       ['clone', '--depth=1', `file://${origin}`, repository],
       { stdio: 'ignore' }
     )
-  return { git, commit, tag, clone, run, sha, repository }
+  return { git, commit, tag, clone, release, sha, repository }
 }

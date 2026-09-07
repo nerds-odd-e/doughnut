@@ -7,25 +7,29 @@ Production is published only by a stable `vMAJOR.MINOR.PATCH` tag through the
 CI and publish nothing. A release selects the tag's exact main commit, even when
 main has advanced. Two-component tags such as `v1.2`, prereleases such as
 `v1.2.3-rc.1` and unrelated tags do not deploy the application.
-The workflow waits up to **60 minutes** for that commit's
-latest applicable `ci.yml` main-push run/attempt to succeed. Failed or cancelled
-CI fails admission; it never substitutes an older green run or another commit.
+The workflow checks that commit's latest applicable `ci.yml` main-push run and
+attempt once per tag or completed-CI wakeup. Missing or unfinished CI reports
+`waiting`; failed or cancelled CI reports `blocked`. Neither substitutes an older
+green run or another commit, and neither keeps a runner in a polling loop.
 
-## Release one version
+## Release application versions
 
-1. Coordinate **one application release at a time**; wait until its workflow
-   finishes and inspect its result before issuing another version. The workflow
-   uses one non-canceling production concurrency group; it is not a version queue
-   or a duplicate/retry recovery mechanism.
-2. Choose an exact commit on `main` with successful CI and available jar, frontend
-   and CLI artifacts. A tag may arrive before CI finishes; the bounded wait handles
-   that ordering. Use increasing versions and immutable tags; do not move/delete
-   tags, rerun old releases, or overlap release requests.
+1. Choose exact commits on `main` and use increasing, immutable application
+   versions. Multiple release tags may overlap. One non-canceling production
+   concurrency group lets the active publication finish; a surviving queued tag
+   or completed-CI wakeup then re-evaluates all current tags and selects the
+   highest numeric pending version.
+2. CI and a tag may arrive in either order. A tag with missing or unfinished CI
+   reports `waiting` and releases the runner; completion of `donut CI` wakes the
+   deploy workflow again. Failed or cancelled exact-commit CI reports `blocked`.
+   Rerunning that same CI provides another completion wakeup without moving the
+   tag. An older wakeup never determines the selected version from its own SHA or
+   conclusion.
 3. Confirm the selected source contains the tag-triggered `deploy.yml`. **The first
    release must include this workflow cutover.** Older pre-cutover source does not
    acquire a tag trigger when main changes. Later, a tested earlier main commit
    containing the trigger can be selected without selecting main's current tip.
-4. Create and push one new version, substituting the selected full SHA and next
+4. Create and push a new version, substituting the selected full SHA and next
    unused increasing version:
 
    ```bash
@@ -44,6 +48,12 @@ CI fails admission; it never substitutes an older green run or another commit.
    Local tests do not prove GitHub scheduling, artifact service or GCP credentials;
    the first actual release confirms those platform paths.
 
+A replay of an already successful tag is a no-op before artifact download or
+production writes. If a newer version is waiting for CI, it remains the pending
+selection instead of allowing an older ready version to publish. A newer
+`publishing` or `succeeded` application record also makes every older attempt
+`superseded`, even if the newer tag is later absent from the remote tag listing.
+
 Publication uploads the frontend, then the bundled CLI, then applies routing and
 conditionally deploys the backend. Independent `cli-*` releases retain their own
 tag-derived CLI version. Application tags do not change the validated CLI bundle's
@@ -58,12 +68,46 @@ CLI publication and URL-map application still run.
 
 Inspect the reported tag, SHA, CI run/attempt and failure stage. Missing/expired
 artifacts or failed validation stop before uploads. Later publication failure can
-leave a partial frontend/CLI/backend change; this workflow has no automatic
-rollback or durable application release ledger. Do not rerun the old release or
-retarget its tag. Commit a correction or revert on main, test that new commit, then
-release it under the **next patch version**, after the previous workflow has ended.
-There is **no automatic schema rollback**; assess existing production schema and
-migration compatibility when preparing that correction/revert.
+leave a partial frontend/CLI/backend change. The application release record stays
+`publishing`; retry that workflow without moving or deleting its immutable tag.
+The non-canceling concurrency group lets an active release finish before a queued
+retry reconciles current state:
+
+```bash
+gh run rerun <DONUT_DEPLOY_RUN_ID>
+```
+
+Admission must report the same tag, raw refOid and SHA. It reselects successful CI
+for that exact SHA, so a newer successful run/attempt can replace the interrupted
+attempt's artifact source. Publication repeats permitted uploads and records
+`succeeded` only after every operation finishes. There is no compensating rollback
+or cross-service transaction.
+
+When the failure stage is **artifact admission**, rerun the reported CI run for
+the reported exact commit. Its completed workflow automatically wakes release
+reconciliation; manually rerunning the reported donut deploy workflow is also safe:
+
+```bash
+gh run rerun <CI_RUN_ID>
+gh run watch <CI_RUN_ID>
+gh run rerun <DONUT_DEPLOY_RUN_ID>
+```
+
+Keep the tag, raw refOid and peeled SHA unchanged. The retry may use the newer
+successful CI run/attempt for that same SHA; it must not rebuild from current
+`main` or select another commit's artifacts. If GitHub no longer retains enough
+history to rerun that CI and regenerate its artifacts, make and test a correction
+on `main`, then release a new patch version. The old tag is not recoverable by
+silently rebuilding a different source revision.
+
+If the release identity must change or the selected application needs correction,
+commit a correction or revert on main, test that new commit, then release it under
+the **next patch version**. Never retarget the old tag: a tag whose persisted raw
+refOid or peeled SHA changes is rejected, including an annotated-tag replacement
+that still peels to the same commit. Forward correction is the supported recovery
+for an identity change or unrecoverable historical artifacts. There is **no
+automatic schema rollback**; assess existing production schema and migration
+compatibility when preparing that correction/revert.
 
 ## Last successful deploy record
 

@@ -19,6 +19,11 @@ const publicationCommand = parse(
 ).jobs.Deploy.steps.find((step) => step.id === 'publish').run
 export const hash = (content) =>
   createHash('sha256').update(content).digest('hex')
+export const readApplicationRecords = (path) =>
+  readFileSync(path, 'utf8')
+    .trim()
+    .split('\n')
+    .map((record) => JSON.parse(record))
 
 export function makePublication(t, scenario = 'skip') {
   const fixture = makeReleaseRepository(t)
@@ -82,15 +87,15 @@ export function makePublication(t, scenario = 'skip') {
   for (const runId of [42, 99]) {
     const payload = artifacts(runId)
     mkdirSync(payload.frontend, { recursive: true })
-    const label = runId === 42 ? 'selected' : 'other'
+    const label = runId === 42 ? 'selected' : 'fresh'
     writeFileSync(join(payload.frontend, 'index.html'), `${label} SPA`)
     writeFileSync(payload.cli, `${label} CLI`)
     writeFileSync(payload.jar, `${label} jar`)
   }
   const { frontend, cli, jar } = artifacts(42)
-  const record = join(root, 'record.json')
+  const backendRecord = join(root, 'record.json')
   writeFileSync(
-    record,
+    backendRecord,
     JSON.stringify({
       sha256: hash('selected jar'),
       startup_script_sha256: hash(startup),
@@ -108,7 +113,13 @@ export function makePublication(t, scenario = 'skip') {
 if [[ "$1" == cat ]]; then cat "$RECORD"; fi
 if [[ "$1" == -m ]]; then cp "$4/index.html" "$CAPTURED_SPA"; fi
 if [[ "$1" == cp && "$2" == -a ]]; then cp "$4" "$CAPTURED_CLI"; fi
-if [[ "$1" == cp && "$2" == - ]]; then cat > "$SAVED_RECORD"; fi`
+if [[ -n "\${FAIL_GSUTIL_MATCH:-}" && "$*" == *"$FAIL_GSUTIL_MATCH"* ]]; then exit 37; fi
+if [[ "$1" == cp && "$2" == - && "$3" == */application-release.json ]]; then
+  cat >> "$APP_RECORDS"
+fi
+if [[ "$1" == cp && "$2" == - && "$3" == */last-successful-deploy.json ]]; then
+  cat > "$SAVED_RECORD"
+fi`
   )
   fake(
     'gcloud',
@@ -129,7 +140,8 @@ printf 200`
   const trace = join(root, 'trace')
   const publish = (
     release = { sha, ref: 'refs/tags/v1.2.3', refOid },
-    ci = { runId: 42 }
+    ci = { runId: 42, runAttempt: 3 },
+    { failGsutilMatch = '' } = {}
   ) =>
     spawnSync('bash', ['-c', publicationCommand], {
       cwd: repositoryRoot,
@@ -138,7 +150,8 @@ printf 200`
         ...process.env,
         PATH: `${bin}:${process.env.PATH}`,
         TRACE: trace,
-        RECORD: record,
+        RECORD: backendRecord,
+        APP_RECORDS: join(root, 'application-records'),
         SAVED_RECORD: join(root, 'saved-record'),
         CAPTURED_SPA: join(root, 'captured-spa'),
         CAPTURED_CLI: join(root, 'captured-cli'),
@@ -147,6 +160,8 @@ printf 200`
         RELEASE_SOURCE_ROOT: root,
         RELEASE_REF: release.ref,
         RELEASE_REF_OID: release.refOid,
+        RELEASE_CI_RUN_ID: String(ci.runId),
+        RELEASE_CI_RUN_ATTEMPT: String(ci.runAttempt),
         CAPTURED_MAP: join(root, 'captured-map'),
         CAPTURED_STARTUP: join(root, 'captured-startup'),
         GCS_BUCKET: 'private-backend',
@@ -158,6 +173,8 @@ printf 200`
         DEPLOY_JAR_PATH: artifacts(ci.runId).jar,
         FORCE_FULL_DEPLOY: '',
         HEALTHCHECK_RETRY_SLEEP_SECONDS: '0',
+        FAIL_GSUTIL_MATCH:
+          failGsutilMatch || (scenario === 'failed-frontend' ? 'rsync' : ''),
       },
     })
   return {
@@ -167,6 +184,8 @@ printf 200`
     sha,
     refOid,
     trace,
+    applicationRecords: join(root, 'application-records'),
+    backendRecord,
     frontend,
     cli,
     jar,
