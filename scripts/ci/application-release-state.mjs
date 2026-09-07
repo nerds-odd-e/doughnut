@@ -168,7 +168,7 @@ export async function initializeApplicationReleaseState({
   return { state: 'initialized', record }
 }
 
-export async function checkCompletedApplicationRelease({
+export async function checkApplicationReleaseState({
   bucket,
   tag,
   refOid,
@@ -185,23 +185,25 @@ export async function checkCompletedApplicationRelease({
   if (!current) {
     throw new Error('Application release state is missing after initialization')
   }
-  if (
-    current.outcome === 'succeeded' &&
-    current.tag === tag &&
-    current.ref_oid === refOid &&
-    current.sha === sha
-  ) {
-    return { state: 'already-released' }
+  if (current.tag === tag) {
+    if (current.ref_oid !== refOid || current.sha !== sha) {
+      throw new Error(
+        `Application release identity mismatch for ${tag}: persisted refOid ${current.ref_oid} and SHA ${current.sha}, current refOid ${refOid} and SHA ${sha}`
+      )
+    }
+    if (current.outcome === 'succeeded') {
+      return { state: 'already-released' }
+    }
   }
   return { state: 'continue' }
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const checkCompleted = process.argv[2] === '--check-completed'
+  const checkRelease = process.argv[2] === '--check-release'
   try {
     writeReleaseOutput(
-      checkCompleted
-        ? await checkCompletedApplicationRelease({
+      checkRelease
+        ? await checkApplicationReleaseState({
             bucket: process.env.GCS_BUCKET,
             tag: process.env.RELEASE_TAG,
             refOid: process.env.RELEASE_REF_OID,
@@ -214,8 +216,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     )
   } catch (error) {
     console.error(
-      checkCompleted
-        ? `Application release replay check failed: ${error.message}`
+      checkRelease
+        ? `Application release state check failed: ${error.message}`
         : `Application release tracking initialization failed: ${error.message}. ` +
             'Identify the published application release (tag, raw refOid, peeled SHA, selected CI run ID and attempt) before retrying.'
     )

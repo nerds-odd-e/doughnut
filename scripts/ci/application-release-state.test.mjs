@@ -178,7 +178,7 @@ test('a create-only conflict fails without replacing state', async (t) => {
 test('the exact succeeded release is reported as already released without changing state', async (t) => {
   const record = publishedRecord('succeeded')
   const result = await runStateCommand(t, {
-    args: ['--check-completed'],
+    args: ['--check-release'],
     existingBody: JSON.stringify(record),
     release: {
       tag: record.tag,
@@ -195,13 +195,13 @@ test('the exact succeeded release is reported as already released without changi
   assert.deepEqual(result.uploads, [])
 })
 
-test('a nonmatching release continues through existing admission', async (t) => {
+test('a different release tag continues through existing admission', async (t) => {
   const record = publishedRecord('succeeded')
   const result = await runStateCommand(t, {
-    args: ['--check-completed'],
+    args: ['--check-release'],
     existingBody: JSON.stringify(record),
     release: {
-      tag: record.tag,
+      tag: 'v1.2.4',
       refOid: 'c'.repeat(40),
       sha: record.sha,
     },

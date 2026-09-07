@@ -9,6 +9,36 @@ import {
 } from './application-release-publication-fixtures.mjs'
 import { runStateCommand } from './application-release-state-fixtures.mjs'
 
+const publishingRecord = (release) => ({
+  tag: release.tag,
+  ref_oid: release.refOid,
+  sha: release.sha,
+  ci_run_id: '42',
+  ci_run_attempt: '3',
+  outcome: 'publishing',
+})
+
+async function assertPersistedIdentityRejects(t, fixture, persistedRelease) {
+  const identity = fixture.run({
+    ref: 'refs/tags/v1.2.3',
+    after: fixture.git('rev-parse', 'refs/tags/v1.2.3'),
+  })
+  assert.equal(identity.status, 0, identity.stderr)
+
+  const result = await runStateCommand(t, {
+    args: ['--check-release'],
+    existingBody: JSON.stringify(publishingRecord(persistedRelease)),
+    release: JSON.parse(identity.stdout),
+    repository: fixture.repository,
+  })
+
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /release identity mismatch/i)
+  assert.equal(result.requests.length, 1)
+  assert.equal(result.requests[0].method, 'GET')
+  assert.deepEqual(result.uploads, [])
+}
+
 for (const ordering of ['tag-first', 'CI-first']) {
   test(`${ordering} release entry publishes the exact tagged main payload`, async (t) => {
     const fixture = makePublication(t, 'forced')
@@ -105,7 +135,7 @@ test('a completed release replay succeeds after artifacts expire without any pro
   writeFileSync(`${fixture.root}/captured-cli`, 'independent CLI')
 
   const replay = await runStateCommand(t, {
-    args: ['--check-completed'],
+    args: ['--check-release'],
     existingBody: `${JSON.stringify(record)}\n`,
     release,
     repository: fixture.root,
@@ -126,4 +156,45 @@ test('a completed release replay succeeds after artifacts expire without any pro
   )
   assert.equal(existsSync(`${fixture.root}/saved-record`), false)
   assert.equal(existsSync(`${fixture.root}/captured-map`), false)
+})
+
+test('a tag moved to another commit is rejected against its persisted failed identity', async (t) => {
+  const fixture = makePublication(t, 'forced').fixture
+  const original = fixture.run({
+    ref: 'refs/tags/v1.2.3',
+    after: fixture.git('rev-parse', 'refs/tags/v1.2.3'),
+  })
+  assert.equal(original.status, 0, original.stderr)
+  const persistedRelease = JSON.parse(original.stdout)
+  const replacement = fixture.commit('Replacement release')
+  fixture.git('tag', '-f', 'v1.2.3', replacement)
+
+  await assertPersistedIdentityRejects(t, fixture, persistedRelease)
+})
+
+test('an annotated tag object replacement is rejected when its commit is unchanged', async (t) => {
+  const fixture = makePublication(t, 'forced').fixture
+  fixture.git('tag', '-d', 'v1.2.3')
+  const originalRefOid = fixture.tag('v1.2.3', true, fixture.sha)
+  const original = fixture.run({
+    ref: 'refs/tags/v1.2.3',
+    after: originalRefOid,
+  })
+  assert.equal(original.status, 0, original.stderr)
+  const persistedRelease = JSON.parse(original.stdout)
+  fixture.git(
+    'tag',
+    '-f',
+    '-a',
+    '-m',
+    'replacement annotation',
+    'v1.2.3',
+    fixture.sha
+  )
+  assert.equal(
+    fixture.git('rev-parse', 'refs/tags/v1.2.3^{}'),
+    persistedRelease.sha
+  )
+
+  await assertPersistedIdentityRejects(t, fixture, persistedRelease)
 })

@@ -39,7 +39,9 @@ test('release pins orchestration separately from source and preserves deployment
     (step) => step.run === 'node scripts/ci/application-release-state.mjs'
   )
   const identity = admission.steps.find((step) => step.id === 'identity')
-  const replay = admission.steps.find((step) => step.id === 'replay')
+  const releaseState = admission.steps.find(
+    (step) => step.id === 'release_state'
+  )
   const ciAdmission = admission.steps.find((step) => step.id === 'ci')
   const artifactDownloads = publication.steps.filter(
     (step) => step.uses === 'actions/download-artifact@v8'
@@ -74,22 +76,24 @@ test('release pins orchestration separately from source and preserves deployment
   assert.ok(
     admission.steps.indexOf(identity) < admission.steps.indexOf(ciAdmission)
   )
-  assert.ok(admission.steps.indexOf(identity) < admission.steps.indexOf(replay))
   assert.ok(
-    admission.steps.indexOf(replay) < admission.steps.indexOf(ciAdmission)
+    admission.steps.indexOf(identity) < admission.steps.indexOf(releaseState)
   )
-  assert.deepEqual(replay.env, {
+  assert.ok(
+    admission.steps.indexOf(releaseState) < admission.steps.indexOf(ciAdmission)
+  )
+  assert.deepEqual(releaseState.env, {
     RELEASE_TAG: '${{ steps.identity.outputs.tag }}',
     RELEASE_REF_OID: '${{ steps.identity.outputs.refOid }}',
     RELEASE_SHA: '${{ steps.identity.outputs.sha }}',
   })
   assert.equal(
-    replay.run,
-    'node scripts/ci/application-release-state.mjs --check-completed'
+    releaseState.run,
+    'node scripts/ci/application-release-state.mjs --check-release'
   )
   assert.equal(
     ciAdmission.if,
-    "steps.replay.outputs.state != 'already-released'"
+    "steps.release_state.outputs.state != 'already-released'"
   )
   assert.equal(ciAdmission.run, 'node scripts/ci/application-release-ci.mjs')
   assert.deepEqual(
@@ -178,7 +182,7 @@ test('an already-released outcome bypasses CI and every publication operation', 
 
   assert.equal(
     admission.outputs.deploy,
-    "${{ steps.replay.outputs.state != 'already-released' && steps.ci.outputs.state == 'ready' }}"
+    "${{ steps.release_state.outputs.state != 'already-released' && steps.ci.outputs.state == 'ready' }}"
   )
   assert.equal(
     publication.if,

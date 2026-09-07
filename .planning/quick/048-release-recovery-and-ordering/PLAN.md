@@ -243,7 +243,7 @@ outside the replay path.
 
 ### 4. Reject a moved release identity
 Type: Behavior
-Status: planned
+Status: done
 Proof: Retarget a real fixture tag after a failed attempt, including changing an
 annotated tag object without changing its peeled SHA; the public entry rejects
 before production writes. Reuse existing in-invocation movement proof.
@@ -251,6 +251,11 @@ before production writes. Reuse existing in-invocation movement proof.
 Behavior: A release tag no longer matches its persisted refOid/SHA → fail
 with an identity mismatch. Reuse record and Git fixtures; reject forced-update
 and deletion inputs. Do not mutate tag protection rules or CLI policy.
+
+Learning: the shared state check now treats either a changed raw tag object or
+changed peeled commit for the persisted tag as an identity mismatch before CI
+or artifacts. Real-Git entry tests cover both retargeting a tag to another commit
+and replacing an annotated tag object while retaining its peeled commit.
 
 ### 5. Retry an interrupted release with the same tag
 Type: Behavior
