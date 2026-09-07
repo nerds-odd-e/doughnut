@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, rmSync } from 'node:fs'
 import { test } from 'node:test'
 import {
   assertRefusedBeforeGradle,
   jdbcUrl,
+  lockPaths,
   makeCheckout,
   outputOf,
   readGradleInvocation,
@@ -134,4 +135,35 @@ test('existing configuration skips provisioning entirely', (t) => {
       .id,
     'wt_a7c2'
   )
+})
+
+test('a later invocation reuses the config a first-use provisioning run produced, without provisioning again', (t) => {
+  const checkout = makeCheckout(t)
+  const first = runLauncher(checkout)
+  assert.equal(first.status, 0, outputOf(first))
+
+  const configPath = `${checkout.root}/.worktree.local.json`
+  const provisionedConfig = readFileSync(configPath, 'utf8')
+  const mysqlAfterFirstRun = readMysqlInvocation(checkout)
+  const database = `doughnut_${JSON.parse(provisionedConfig).id}_test`
+
+  // The checkout lock outlives its owner's process (slice 2; reclaiming a
+  // stale owner is slice 7's separate concern). Clear it to isolate this
+  // "later command reuses the established identity" behavior from lock
+  // reclaim.
+  rmSync(lockPaths(checkout).dir, { recursive: true, force: true })
+
+  const second = runLauncher(checkout)
+  assert.equal(second.status, 0, outputOf(second))
+  assert.doesNotMatch(outputOf(second), /Allocated new worktree environment/)
+  assert.match(outputOf(second), new RegExp(`Selected database: ${database}`))
+
+  // No new mysql call: the invocation record is exactly what the first run
+  // left behind.
+  assert.deepEqual(readMysqlInvocation(checkout), mysqlAfterFirstRun)
+
+  // The config is unchanged, field-for-field.
+  assert.equal(readFileSync(configPath, 'utf8'), provisionedConfig)
+
+  assert.equal(readGradleInvocation(checkout).url, jdbcUrl(database))
 })

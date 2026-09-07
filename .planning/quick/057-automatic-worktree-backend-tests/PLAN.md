@@ -258,11 +258,24 @@ the fixture capabilities already established.
 
 ### 6. Reuse an established identity without provisioning
 Type: Behavior
-Status: planned
+Status: done
 Proof: Run the command fixture with both a manually supplied 1a config and the
 config produced by slice 4. Each selects its existing database and reaches
 Gradle without calling MySQL administration or changing the config. Run
 `node --test scripts/backend-test-worktree.test.mjs`.
+
+Learning: A manually supplied 1a config was already fully proven (slice 4's
+"existing configuration skips provisioning entirely" test asserts no mysql
+invocation). The real gap was a config *produced by slice 4's own
+provisioning*, reused on a second launcher run: added a test proving the
+second run reuses the same id/database with no new mysql call and a
+byte-identical config, clearing the ownership lock directory between
+invocations (test-local, commented) since lock reclaim is a separate,
+not-yet-implemented concern (slice 7). Malformed/invalid config refusal
+remains proven by the untouched existing 1a tests. No production code change
+was needed.
+`CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passes
+(21/21).
 
 Behavior: A checkout already has a valid persistent environment → a later
 command starts → it reuses the same identity/database without allocation,
