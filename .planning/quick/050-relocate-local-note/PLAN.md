@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–8 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaves 1–9 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -319,10 +319,14 @@ Sizing: ~5 minutes active work, high confidence; deleted-destination fixture.
 
 ### 9. Leave exact-path referrers authored across relocation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller fixture resolves a source-note Portable path from both body
 and YAML before publication; after moving that note, authored referrer bytes
-remain exact and the old exact path is no longer resolved. Backend suite.
+remain exact and the old exact path is no longer resolved. Backend suite
+(`source /workspace/scripts/cloud_agent_setup.sh && pnpm backend:test_only`).
+`NotebookGitProposalRelocationReferrerControllerTest.leavesPathQualifiedReferringBodyAndPropertyLinksAuthoredWhenPublishingRelocation`
+keeps `[[Inbox/Cell]]` YAML/body bytes and drops Inbox/Cell resolutions after
+`Inbox/Cell.md` → `Biology/Cell.md`.
 
 Behavior: Referrers name Inbox/Cell, with target moving to Biology/Cell →
 publish → retain authored links and resolve against current placement.
@@ -389,7 +393,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–8 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–9 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -405,6 +409,7 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 - Leaf 6: emptying a README-less source by relocating its last note keeps the Donut folder ID and invents no README.
 - Leaf 7: missing/unrepresented destinations reject with the existing parent-folder message; descendant-only tracked content still represents an ancestor.
 - Leaf 8: relocating onto a dest-folder title reserved by accepted deletion keeps Plan 52 contextual conflict semantics.
+- Leaf 9: path-qualified `[[Inbox/Cell]]` referrers stay authored after relocation; old path no longer resolves.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are
