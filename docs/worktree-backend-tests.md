@@ -4,18 +4,56 @@ Use `pnpm backend:test:worktree` when a local checkout (including a Git
 worktree) should migrate and run backend unit tests against its own MySQL
 database instead of the shared `doughnut_test` default.
 
-MySQL must already be listening on `127.0.0.1:3309`. The command does not
-start MySQL, create databases, allocate identities, or clean up afterward.
+MySQL must already be listening on `127.0.0.1:3309` with the established
+passwordless local root administration and the existing `doughnut` test user.
+The command does not start MySQL and does not clean up databases afterward.
 
-## Setup
+## First use (automatic, primary workflow)
 
-1. Choose a unique identity matching `wt_[a-z0-9_]{1,32}` (for example
-   `wt_a7c2`). Two checkouts that reuse an ID share a database; that is
-   operator error.
+Just run the command in any fresh local checkout — no setup step required.
+Unset conflicting datasource URLs first, since a conflicting
+`SPRING_DATASOURCE_URL`, `DB_URL`, or `SPRING_FLYWAY_URL` refuses before
+launch:
 
-2. Create an empty database named `doughnut_<id>_test` with the project's
-   test collation, then grant the existing `doughnut` user. Do not invent
-   credentials.
+```bash
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
+CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '<pattern>'
+```
+
+When this checkout has no `.worktree.local.json` yet, the command:
+
+1. Generates an identity matching `wt_[a-z0-9_]{1,32}` (`wt_` plus 32 lowercase
+   hexadecimal characters).
+2. Creates database `doughnut_<id>_test` with `utf8mb4` /
+   `utf8mb4_unicode_ci`, then grants the existing `doughnut` user access at
+   both `localhost` and `127.0.0.1`. A generated identity that collides with
+   an existing database fails visibly and is never adopted.
+3. Persists `{"id":"<id>"}` to gitignored `.worktree.local.json` (ignore entry
+   `/.worktree.local.json`) only after provisioning succeeds, printing
+   `Allocated new worktree environment: <id>`.
+
+The command then prints `Selected database: doughnut_<id>_test`, migrates it,
+and runs the requested tests (the full form runs the complete suite; the
+`--tests` form keeps the same database and filters tests).
+
+Later invocations in the same checkout find `.worktree.local.json` already
+present, skip provisioning entirely (no database administration call, no
+identity change), and reuse the same database — from a fresh shell, after a
+restart, or from a different terminal, as long as it is the same checkout on
+disk.
+
+## Explicit configuration (compatibility path)
+
+Hand-writing `.worktree.local.json` remains supported, for example to reuse a
+specific already-provisioned database (including one created by an earlier
+automatic first use, or a `quick/054`-style manual setup):
+
+1. Choose an identity matching `wt_[a-z0-9_]{1,32}` (for example `wt_a7c2`).
+   Two checkouts that reuse an ID share a database; that is operator error.
+2. If the database doesn't already exist, create an empty
+   `doughnut_<id>_test` with the project's test collation and grant the
+   existing `doughnut` user:
 
 ```bash
 CURSOR_DEV=true nix develop -c mysql -h127.0.0.1 -P3309 -u root
@@ -28,39 +66,38 @@ GRANT ALL PRIVILEGES ON doughnut_wt_a7c2_test.* TO 'doughnut'@'127.0.0.1';
 FLUSH PRIVILEGES;
 ```
 
-Replace `wt_a7c2` / `doughnut_wt_a7c2_test` with the chosen identity.
-
 3. At this checkout's root, write gitignored `.worktree.local.json`:
 
 ```json
 {"id":"wt_a7c2"}
 ```
 
-The ignore entry is `/.worktree.local.json`. Confirm with
-`git check-ignore -v .worktree.local.json`.
+Replace `wt_a7c2` / `doughnut_wt_a7c2_test` with the chosen identity. Confirm
+the ignore with `git check-ignore -v .worktree.local.json`.
 
-## Invoke
+With this config present, the command selects it directly: it never creates
+the database, never replaces the identity, and does not repair a missing or
+inaccessible explicitly configured database — it fails rather than being
+silently provisioned or adopted.
 
-From this checkout root. Git has no Nix prefix; other tooling does. Unset
-conflicting datasource URLs first — a conflicting `SPRING_DATASOURCE_URL`,
-`DB_URL`, or `SPRING_FLYWAY_URL` refuses before launch.
+## One invocation at a time per checkout
 
-```bash
-unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
-CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
-CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '<pattern>'
-```
-
-The full form migrates then runs the complete suite against the selected
-database. The focused form keeps the same database. The command prints
-`Selected database: doughnut_<id>_test` before Gradle runs.
+Regardless of which workflow started it, only one worktree test invocation
+runs at a time per checkout: an overlapping second command in the same
+checkout refuses immediately rather than sharing the run. If a previous
+invocation's process has exited without releasing ownership, the next
+invocation reclaims it automatically. Commands in different checkouts remain
+fully independent and may run concurrently.
 
 ## Limits
 
 - `pnpm backend:test`, `pnpm backend:test_only`, and direct Gradle `test` /
   `migrateTestDB` are not automatically isolated; they keep the legacy default
   (`doughnut_test`).
-- No automatic database creation, identity allocation, or cleanup.
+- No automatic cleanup, retirement, or orphan removal: a provisioned database
+  (and an unreferenced one left behind by a failed or interrupted first use)
+  persists until removed manually. There is no machine-wide allocation
+  registry and no recovery from duplicate operator-supplied IDs.
 - Conflicting `SPRING_DATASOURCE_URL` / `DB_URL` / `SPRING_FLYWAY_URL` refuse
   before launch.
 - Concurrent full suites on one mysqld need enough `max_connections`. Local

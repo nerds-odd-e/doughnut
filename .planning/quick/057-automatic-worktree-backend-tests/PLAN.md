@@ -439,12 +439,26 @@ Gradle, and focused-test runtime are explicit external-wait exceptions.
 
 ### 12. Reuse the real allocated environment from a later shell
 Type: Behavior
-Status: planned
+Status: done
 Proof: In one environment produced by slice 11, record the config and target,
 clear inherited datasource overrides, and rerun the same focused command from a
 fresh shell. It retains the ID/database and passes. Update the guide and
 agent-map wording to make automatic first use the primary opt-in workflow and
 explicit configuration the compatibility path.
+
+Learning: Rerunning `pnpm backend:test:worktree --tests
+'com.odde.donut.controllers.NoteTitlePersistenceTest'` in
+doughnut-057-proof-1 with no inherited datasource overrides reused
+`doughnut_wt_33aa1ea6c06e48e0888e4f8e82b8e7b5_test` (no "Allocated..."
+message, `.worktree.local.json` byte-identical before/after), BUILD
+SUCCESSFUL. `docs/worktree-backend-tests.md` now documents automatic first
+use as the primary workflow, explicit `.worktree.local.json` authoring as a
+compatibility path, and the one-invocation-per-checkout lock/reclaim
+behavior (applies to both paths, given its own section).
+`.cursor/agent-map.md`'s pointer now says "From any local checkout
+(auto-provisions on first use)". Both temporary proof worktrees were removed
+via `git worktree remove --force` (leftover untracked
+`.worktree.local.lock/` required force); their databases were retained.
 
 Behavior: A checkout has completed automatic first use → a later shell invokes
 the worktree test command → it reuses the same isolated environment without
