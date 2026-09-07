@@ -43,7 +43,7 @@ CURSOR_DEV=true nix develop -c <command>
 Useful focused checks:
 
 - Backend: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
-- Opt-in worktree backend tests: setup, invocation, and limits in [`docs/worktree-backend-tests.md`](../docs/worktree-backend-tests.md). From any local checkout (auto-provisions on first use): `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree`
+- Isolated worktree backend tests: [`docs/worktree-backend-tests.md`](../docs/worktree-backend-tests.md). Linked worktrees isolate ordinary `pnpm backend:test` / `backend:test_only` and wrapper `test` / `migrateTestDB` automatically. Opt-in remains: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree`
 - Frontend single file: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts`
 - E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/path/to.feature`
 - Log inspection: `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`)

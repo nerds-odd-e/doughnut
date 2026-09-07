@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–11 done.
+Status: complete; all 12 slices done 2026-09-07.
 
 ## Goal and scope
 
@@ -239,7 +239,7 @@ explicit possible exception. Complete-suite evidence is already owned by leaf 9.
 
 ### 12. Cancel one ordinary run without disturbing another
 Type: Behavior
-Status: planned
+Status: done
 Proof: Reuse the two isolated checkouts from leaf 9. Start overlapping ordinary
 test runs, interrupt one owned foreground process group, and observe its Gradle
 and test workload exit promptly. The other runner completes and a MySQL query
@@ -253,73 +253,20 @@ stops while the other worktree and shared MySQL remain usable.
 Sizing: ~5 minutes active work, medium confidence; one lifecycle proof. Remaining
 suite runtime is an explicit exception. No new background supervisor is planned.
 
-## Execution discipline and learnings
+## Delivered notes
 
-Keep all new supported paths validated/locked from their first leaf; later proof
-leaves do not permit interim unsafe behavior. Keep opt-in usable at every
-stopping point.
+Guide: `docs/worktree-backend-tests.md`. Isolation policy:
+`scripts/backend-worktree-gradle-route.sh` and shared owner
+`scripts/backend-test-worktree-owner.sh`. `backend/gradlew` is a symlink to
+root `gradlew` (APP_HOME is the checkout root). Linked vs primary is
+`git-dir` ≠ `git-common-dir`. Ordinary isolated `test` migrates in a
+separate invocation so `--continue` cannot start tests after Flyway
+failure. Isolated `pnpm backend:test` formats then `test_only` (wrapper
+`test` already migrates).
 
-- Slice 1: the real wrapper execs `$JAVA_HOME/bin/java` when JAVA_HOME is set
-  (Nix sets it). The fixture copies `backend/gradlew` and intercepts that
-  Java endpoint; PATH-only `java` would miss it. Reuse this for ordinary-command
-  routing in leaf 2.
-- Slice 2: `backend/gradlew` is a symlink to root `gradlew`, so APP_HOME is
-  the checkout root. Isolation policy lives in
-  `scripts/backend-worktree-gradle-route.sh`; an invocation-local
-  `DONUT_WORKTREE_HANDOFF` prevents recursive lock.
-- Slice 3: ordinary configured `test` runs a separate migrate invocation
-  first (so `--continue` cannot start tests after migrate failure), then
-  execs the original test args with the test profile and actual-run flags.
-- Slice 4: linked vs primary is `git-dir` ≠ `git-common-dir`. Ordinary
-  migrate/test on a linked worktree without config call the same prepare
-  path; unconfigured primary still passes through.
-- Slice 5: unconfigured primary (git-dir == git-common-dir, no config) keeps
-  default/explicit URLs and CI-shaped test flags; isolation stays config or
-  linked-worktree plus migrate/test.
-- Slice 6: prepare refuses conflicting env and `-D`/`--` datasource/Flyway URL
-  args; matching values still launch against the assigned database.
-- Slice 7: `pnpm backend:test` always formats then `test_only`; isolated
-  checkouts skip the extra migrate step because wrapper `test` already
-  migrates once. Isolation predicate is shared (`backend_worktree_isolation_applies`).
-- Slice 8: ordinary wrapper and opt-in share `.worktree.local.lock`; held
-  migrate refuses overlapping opt-in or ordinary migrate; stale reclaim works
-  on both entry points.
-- Slice 9: overlapping `pnpm backend:test` (A) and `pnpm backend:test_only`
-  (B) in linked worktrees
-  `/Users/terryyin/.cursor/worktrees/doughnut/q060-conc-a` and `q060-conc-b`
-  each executed 2263 tests (0 fail/skip) against distinct DBs
-  `doughnut_wt_bc303497f9664f2cb862e5295749a3d2_test` and
-  `doughnut_wt_d7458993b9304d83ab323dd31129a91e_test`. Independent Flyway
-  histories (22 rows, distinct `installed_on`). Shared
-  `doughnut_development` / `doughnut_test` / `doughnut_e2e_test` sentinels
-  unchanged. Leave these two checkouts for leaf 12.
-- Slice 10: disposable worktree ordinary `backend/gradlew -p backend test --continue`
-  failed Flyway on `V300000399` (MySQL 1064), exit 1, no `:test` and no
-  test reports. Shared schemas unchanged. Temp migration removed.
-- Slice 11: fresh linked checkout migrate-only allocated
-  `wt_679f319515a74117bc3503696a5b2fe3`; new-shell focused
-  `test --tests 'com.odde.donut.controllers.*'` (root and `backend/` cwd)
-  reused that ID/DB, executed 1052 tests, Flyway unchanged, no second
-  provision.
+Real proofs: overlapping `pnpm backend:test` / `backend:test_only` in two
+linked worktrees each executed 2263 tests against distinct DBs; ordinary
+`test --continue` with a broken migration never started `:test`; migrate
+then focused controller tests reused one ID/DB; SIGINT of one process
+group left the other suite and MySQL usable.
 
-Quick/058 completed during refinement; no remaining lock-fix prerequisite.
-No new storage experiment is needed. Repository-wrapper routing is the remaining
-integration seam; command fixtures alone cannot establish real Gradle execution.
-
-## Sizing review
-
-Refinement performed in place on 2026-09-07:
-
-- Replaced preparatory leaf 1 with the real-wrapper fixture needed immediately
-  by leaf 2; bounded production sharing stays inside the migration outcome.
-- Split original leaf 9 into real concurrency (9) and migration refusal (10).
-- Split original leaf 10 into environment reuse (11) and cancellation (12).
-- Repointed every proof promise. Existing first-use failure, identity, and lock
-  coverage is reused; changed entry-point boundaries receive new observations.
-- All leaves now have one cohesive green loop and a ~5-minute active-work
-  hypothesis, medium confidence. Real Gradle/backend runtime exceptions are
-  explicit in 9–12. No execution-time guarantee or unexplained >10-minute path.
-
-Ready for direct execution when implementation is requested. No further open
-questions. On an execution overrun follow problem-decomposition learning
-escalation; keep compatible evidence and refine this same PLAN.
