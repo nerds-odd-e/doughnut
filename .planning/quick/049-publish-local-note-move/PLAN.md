@@ -265,7 +265,7 @@ no implicit link rewrite or hidden alias exists for the old name.
 
 ### 9. Reject unavailable or invalid ordinary filenames
 Type: Behavior
-Status: planned
+Status: done
 Proof: Same-parent rename-shaped data variations exercise normalized/invalid
 title, reserved name, non-regular modes and occupied live destination;
 rejection preserves source/binding and identifies the path. Backend.
@@ -275,6 +275,13 @@ contract → publish → keep the original name without partial mutation.
 Reuse title/format/tree-shape tests and shared validators. Both old and new
 paths must be checked. Keep advisory-name behavior; never repair the filename.
 Deleted-title collisions have their different persisted fixture in leaf 10.
+Learning: Pure proof addition, no production change — all four variations
+(invalid/normalized title, reserved README.md, non-regular mode on either
+side, occupied-live-destination mixed delete+modify) already rejected
+correctly by leaves 1-2's design. Added
+NotebookGitProposalRenameRejectionControllerTest (new sibling file, 5 tests)
+with a small local `seedAcceptedBindingWithFileMode` helper for the
+non-regular-mode fixture (existing `seedAcceptedBinding` can't produce one).
 
 ### 10. Keep a deleted filename reserved
 Type: Behavior
