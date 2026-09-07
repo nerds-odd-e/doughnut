@@ -309,8 +309,7 @@ preparatory Structure sits immediately before its Behavior.
   inspects unpublished ancestry in the isolated accepted repo and rejects
   before mutating user refs/index/worktree. Unrelated, multiple unpublished
   commits, merge, and non-content-edit (add/rename/README/mode) each have
-  specific guidance. Eligible one-note content edits, including other-note
-  divergence, still use the existing receive-gate error until leaf 4.
+  specific guidance.
 - Unsupported-shape pull proofs live in `notebookPull.localCandidate.suite.ts`,
   registered through the accepted-history suite tree so leak checks stay in one
   worker.
@@ -329,11 +328,15 @@ preparatory Structure sits immediately before its Behavior.
   `donut notebook publish`. Original L remains in `ORIG_HEAD`.
   Proofs live in `notebookPull.rebase.suite.ts`.
 - An eligible one-note content commit already based on accepted main, including
-  the result of a prior rebase, is an unchanged pull success. Output names the
-  unpublished local head separately from the accepted head and points to
-  publish. A later eligible other-note accepted commit rebases that same patch
-  once more. Unsupported ahead cases stay rejected. Proofs live in
-  `notebookPull.alreadyBased.suite.ts`.
+  the result of a prior rebase, is an unchanged pull success. The receive
+  result `kind` distinguishes already-based from equal-head unchanged, rebase,
+  and fast-forward. Output names the unpublished local head separately from
+  the accepted head and points to publish. A later eligible other-note
+  accepted commit rebases that same patch as one child of the new head.
+  Unsupported ahead cases stay rejected. Proofs live in
+  `notebookPull.alreadyBased.suite.ts`. Bundle serving lives in
+  `notebookPull.testHelpers.ts`; unsupported-local fixtures live in
+  `notebookPull.localCandidate.testHelpers.ts`.
 
 Remaining leaves 6–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and

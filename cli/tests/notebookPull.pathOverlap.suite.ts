@@ -12,8 +12,8 @@ import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.te
 import {
   checkoutState,
   installNotebookPullAcceptedHistoryTest,
+  serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
-import { serveAcceptedBundle } from './notebookPull.historySafety.testHelpers.js'
 
 const NOTE_PATH_OVERLAP =
   'Local main cannot receive the accepted history because accepted history also edited "note.md". Same-note reconciliation is not supported yet.'

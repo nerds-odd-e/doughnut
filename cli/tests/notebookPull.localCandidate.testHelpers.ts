@@ -3,22 +3,7 @@ import { join } from 'node:path'
 import { getApiConfig } from 'donut-api'
 import { runGit } from './notebookClone.testHelpers.js'
 import { initBoundCheckout } from './notebookGit.testHelpers.js'
-import {
-  bundleGetResponse,
-  bundleMain,
-  cloneAsBoundCheckout,
-} from './notebookPublish.testHelpers.js'
-import type { installNotebookPullAcceptedHistoryTest } from './notebookPull.testHelpers.js'
-
-export function serveAcceptedBundle(
-  ctx: ReturnType<typeof installNotebookPullAcceptedHistoryTest>,
-  source: string,
-  name: string
-): void {
-  const bundleFile = join(ctx.getWorkDir(), `accepted-${name}.bundle`)
-  bundleMain(source, bundleFile)
-  ctx.getFetchMock().mockResolvedValue(bundleGetResponse(bundleFile))
-}
+import { cloneAsBoundCheckout } from './notebookPublish.testHelpers.js'
 
 export function prepareUnsupportedLocalHistory(
   workDir: string,

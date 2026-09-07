@@ -1,8 +1,10 @@
+import { join } from 'node:path'
 import { afterEach, beforeEach, vi } from 'vitest'
 import {
   installNotebookCliRunFixture,
   runGit,
 } from './notebookClone.testHelpers.js'
+import { bundleGetResponse, bundleMain } from './notebookPublish.testHelpers.js'
 
 export function installNotebookPullAcceptedHistoryTest(workDirPrefix: string) {
   const base = installNotebookCliRunFixture(workDirPrefix)
@@ -48,4 +50,14 @@ export function checkoutState(directory: string) {
       directory
     ),
   }
+}
+
+export function serveAcceptedBundle(
+  ctx: ReturnType<typeof installNotebookPullAcceptedHistoryTest>,
+  source: string,
+  name: string
+): void {
+  const bundleFile = join(ctx.getWorkDir(), `accepted-${name}.bundle`)
+  bundleMain(source, bundleFile)
+  ctx.getFetchMock().mockResolvedValue(bundleGetResponse(bundleFile))
 }

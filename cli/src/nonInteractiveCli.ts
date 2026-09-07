@@ -140,17 +140,17 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
 
-  if (!result.changed) {
-    if (result.localHead !== result.acceptedHead) {
-      console.log(
-        `Unpublished local commit is already based on the accepted history. Local head: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
-      )
-      return
-    }
+  if (result.kind === 'already-based') {
+    console.log(
+      `Unpublished local commit is already based on the accepted history. Local head: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
+    )
+    return
+  }
+  if (result.kind === 'unchanged') {
     console.log(`Notebook unchanged. Accepted head: ${result.acceptedHead}`)
     return
   }
-  if (result.rebased) {
+  if (result.kind === 'rebased') {
     console.log(
       `Rebased the unpublished local commit onto the accepted history. Local head: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
     )

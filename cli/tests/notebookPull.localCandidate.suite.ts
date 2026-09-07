@@ -6,11 +6,9 @@ import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.te
 import {
   checkoutState,
   installNotebookPullAcceptedHistoryTest,
-} from './notebookPull.testHelpers.js'
-import {
-  prepareUnsupportedLocalHistory,
   serveAcceptedBundle,
-} from './notebookPull.historySafety.testHelpers.js'
+} from './notebookPull.testHelpers.js'
+import { prepareUnsupportedLocalHistory } from './notebookPull.localCandidate.testHelpers.js'
 
 const NOT_EXISTING_NOTE_CONTENT_EDIT =
   'Local main cannot receive the accepted history because the unpublished commit is not one existing-note content edit. Recreate it as one unpublished commit that edits one existing ordinary Markdown note at an unchanged path, then try again.'

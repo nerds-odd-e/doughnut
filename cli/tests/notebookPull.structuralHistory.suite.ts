@@ -12,8 +12,8 @@ import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.te
 import {
   checkoutState,
   installNotebookPullAcceptedHistoryTest,
+  serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
-import { serveAcceptedBundle } from './notebookPull.historySafety.testHelpers.js'
 
 export function describeNotebookPullStructuralHistory(): void {
   describe('notebook pull (divergent structural accepted history)', () => {

@@ -4,21 +4,30 @@ import { describe, expect, test } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import { runGit } from './notebookClone.testHelpers.js'
-import {
-  buildSourceRepo,
-  cloneAsBoundCheckout,
-} from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
   checkoutState,
   installNotebookPullAcceptedHistoryTest,
+  serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
-import { serveAcceptedBundle } from './notebookPull.historySafety.testHelpers.js'
 import {
   LATER_OTHER_NOTE,
   LOCAL_NOTE,
   prepareEligibleDivergence,
 } from './notebookPull.rebase.testHelpers.js'
+
+const GIT_BUNDLE_GET = [
+  `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,
+  { headers: { Authorization: 'Bearer fake-bearer' } },
+] as const
+
+function alreadyBasedMessage(
+  directory: string,
+  localHead: string,
+  acceptedHead: string
+): string {
+  return `Unpublished local commit is already based on the accepted history. Local head: ${localHead}. Accepted head: ${acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
+}
 
 export function describeNotebookPullAlreadyBased(): void {
   describe('notebook pull (already-based unpublished commit)', () => {
@@ -27,41 +36,23 @@ export function describeNotebookPullAlreadyBased(): void {
     )
 
     test('reports an eligible local-ahead commit as already based without rewriting it', async () => {
-      const source = buildSourceRepo(ctx.getWorkDir())
-      const directory = cloneAsBoundCheckout(
-        ctx.getWorkDir(),
-        source,
-        getApiConfig().apiBaseUrl,
-        'checkout'
-      )
-      const acceptedHead = runGit(['rev-parse', 'main'], source)
-
-      fs.writeFileSync(join(directory, 'note.md'), LOCAL_NOTE)
-      runGit(['add', 'note.md'], directory)
-      runGit(['commit', '--quiet', '-m', 'unpublished local edit'], directory)
-
-      serveAcceptedBundle(ctx, source, 'local-ahead')
-      const localTip = runGit(['rev-parse', 'main'], directory)
-      const before = checkoutState(directory)
+      const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
+        remoteEdits: 0,
+      })
+      serveAcceptedBundle(ctx, setup.source, 'local-ahead')
+      const before = checkoutState(setup.directory)
       const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
 
-      await run(['notebook', 'pull', directory])
+      await run(['notebook', 'pull', setup.directory])
 
       expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-        `Unpublished local commit is already based on the accepted history. Local head: ${localTip}. Accepted head: ${acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
+        alreadyBasedMessage(setup.directory, setup.localTip, setup.acceptedHead)
       )
-      expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
-      expect(ctx.getFetchMock()).toHaveBeenCalledWith(
-        `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,
-        { headers: { Authorization: 'Bearer fake-bearer' } }
-      )
-      expect(checkoutState(directory)).toEqual(before)
-      expect(fs.readFileSync(join(directory, 'note.md'), 'utf8')).toBe(
+      expect(ctx.getFetchMock().mock.calls).toEqual([GIT_BUNDLE_GET])
+      expect(checkoutState(setup.directory)).toEqual(before)
+      expect(fs.readFileSync(join(setup.directory, 'note.md'), 'utf8')).toBe(
         LOCAL_NOTE
       )
-      expect(() =>
-        runGit(['cat-file', '-e', `${localTip}^{commit}`], directory)
-      ).not.toThrow()
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
     })
 
@@ -85,24 +76,21 @@ export function describeNotebookPullAlreadyBased(): void {
       await run(['notebook', 'pull', setup.directory])
 
       expect(runGit(['rev-parse', 'HEAD'], setup.directory)).toBe(rebasedHead)
+      expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(
+        setup.acceptedHead
+      )
       expect(fs.readFileSync(join(setup.directory, 'note.md'), 'utf8')).toBe(
         noteAfterRebase
       )
       expect(fs.readFileSync(join(setup.directory, 'other.md'), 'utf8')).toBe(
         otherAfterRebase
       )
-      expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-        `Unpublished local commit is already based on the accepted history. Local head: ${rebasedHead}. Accepted head: ${setup.acceptedHead}. Inspect the result, then run "donut notebook publish ${setup.directory}".`
-      )
+      expect(ctx.getLogSpy().mock.calls.at(-1)).toEqual([
+        alreadyBasedMessage(setup.directory, rebasedHead, setup.acceptedHead),
+      ])
       expect(ctx.getFetchMock().mock.calls).toEqual([
-        [
-          `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,
-          { headers: { Authorization: 'Bearer fake-bearer' } },
-        ],
-        [
-          `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,
-          { headers: { Authorization: 'Bearer fake-bearer' } },
-        ],
+        GIT_BUNDLE_GET,
+        GIT_BUNDLE_GET,
       ])
     })
 
@@ -125,6 +113,12 @@ export function describeNotebookPullAlreadyBased(): void {
       await run(['notebook', 'pull', setup.directory])
 
       const laterLocalHead = runGit(['rev-parse', 'HEAD'], setup.directory)
+      expect(
+        runGit(
+          ['rev-list', '--count', 'HEAD', '--not', laterAccepted],
+          setup.directory
+        )
+      ).toBe('1')
       expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(
         laterAccepted
       )
@@ -134,9 +128,9 @@ export function describeNotebookPullAlreadyBased(): void {
       expect(fs.readFileSync(join(setup.directory, 'other.md'), 'utf8')).toBe(
         LATER_OTHER_NOTE
       )
-      expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-        `Rebased the unpublished local commit onto the accepted history. Local head: ${laterLocalHead}. Accepted head: ${laterAccepted}. Inspect the result, then run "donut notebook publish ${setup.directory}".`
-      )
+      expect(ctx.getLogSpy().mock.calls.at(-1)).toEqual([
+        `Rebased the unpublished local commit onto the accepted history. Local head: ${laterLocalHead}. Accepted head: ${laterAccepted}. Inspect the result, then run "donut notebook publish ${setup.directory}".`,
+      ])
     })
   })
 }

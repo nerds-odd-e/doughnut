@@ -9,8 +9,10 @@ import {
   cloneAsBoundCheckout,
 } from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
-import { installNotebookPullAcceptedHistoryTest } from './notebookPull.testHelpers.js'
-import { serveAcceptedBundle } from './notebookPull.historySafety.testHelpers.js'
+import {
+  installNotebookPullAcceptedHistoryTest,
+  serveAcceptedBundle,
+} from './notebookPull.testHelpers.js'
 import {
   LOCAL_NOTE,
   NESTED_NOTE,

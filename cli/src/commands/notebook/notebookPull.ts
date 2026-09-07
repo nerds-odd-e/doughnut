@@ -8,10 +8,9 @@ const RECEIVE_CHECKOUT_CHANGED =
   'Local main changed while the accepted history was downloading. Try again from the unchanged clean main.'
 
 interface AcceptedNotebookReceiveResult {
+  kind: 'unchanged' | 'already-based' | 'rebased' | 'fast-forward'
   acceptedHead: string
   localHead: string
-  changed: boolean
-  rebased: boolean
 }
 
 function readHead(directory: string): string {
@@ -33,8 +32,10 @@ function assertCheckoutStillReady(
 }
 
 /**
- * Downloads accepted history and advances an unchanged, clean local main with Git's non-forced
- * fast-forward operation. Imported objects do not install a remote or a persistent remote ref.
+ * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
+ * unchanged, an eligible already-based unpublished commit stays unpublished, eligible other-note
+ * divergence rebases, and ancestor checkouts fast-forward. Imported objects do not install a
+ * remote or a persistent remote ref.
  */
 export async function receiveAcceptedNotebookHead(
   directory: string,
@@ -49,10 +50,9 @@ export async function receiveAcceptedNotebookHead(
 
       if (capturedHead === acceptedHead) {
         return {
+          kind: 'unchanged',
           acceptedHead,
           localHead: capturedHead,
-          changed: false,
-          rebased: false,
         }
       }
 
@@ -77,10 +77,9 @@ export async function receiveAcceptedNotebookHead(
       if (localHistory.kind === 'reject') throw new Error(localHistory.message)
       if (localHistory.kind === 'already-based') {
         return {
+          kind: 'already-based',
           acceptedHead,
           localHead: capturedHead,
-          changed: false,
-          rebased: false,
         }
       }
 
@@ -114,10 +113,9 @@ export async function receiveAcceptedNotebookHead(
             `failed to rebase the unpublished local commit onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`
         )
         return {
+          kind: 'rebased',
           acceptedHead,
           localHead: readHead(directory),
-          changed: true,
-          rebased: true,
         }
       }
 
@@ -128,10 +126,9 @@ export async function receiveAcceptedNotebookHead(
       )
 
       return {
+        kind: 'fast-forward',
         acceptedHead,
         localHead: acceptedHead,
-        changed: true,
-        rebased: false,
       }
     }
   )
