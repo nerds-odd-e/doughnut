@@ -1,6 +1,5 @@
 import { runSystemGitOrThrow } from './systemGit.js'
 import {
-  acceptedIntervalTouchesPath,
   firstStructuralPathInAcceptedInterval,
   inspectAncestryFailure,
   isOrdinaryNoteContentChange,
@@ -24,13 +23,6 @@ const LOCAL_NOT_CONTENT_EDIT =
   'Local main cannot receive the accepted history because the unpublished commit is not one existing-note content edit. ' +
   'Recreate it as one unpublished commit that edits one existing ordinary Markdown note at an unchanged path, then try again.'
 
-function samePathOverlapError(changedPath: string): string {
-  return (
-    `Local main cannot receive the accepted history because accepted history also edited "${changedPath}". ` +
-    'Same-note reconciliation is not supported yet.'
-  )
-}
-
 function structuralChangeError(changedPath: string): string {
   return (
     `Local main cannot receive the accepted history because accepted history includes a structural change at "${changedPath}". ` +
@@ -47,8 +39,8 @@ export type UnpublishedLocalHistoryDecision =
 /**
  * Returns fast-forward when local main is already an ancestor of accepted.
  * Eligible one-note content edits already based on accepted main stay as-is.
- * Eligible one-note content edits over disjoint content-only accepted history
- * rebase.
+ * Eligible one-note content edits over content-only accepted history rebase,
+ * including same-note content edits.
  */
 export function inspectUnpublishedLocalHistory(
   acceptedRepoDir: string,
@@ -75,23 +67,8 @@ export function inspectUnpublishedLocalHistory(
   if (parent === undefined || candidate.parents.length !== 1) {
     return { kind: 'reject', message: LOCAL_MERGE }
   }
-  const localPath = ordinaryNoteContentEditPath(
-    acceptedRepoDir,
-    parent,
-    candidate.sha
-  )
-  if (localPath === undefined) {
+  if (!isOneOrdinaryNoteContentEdit(acceptedRepoDir, parent, candidate.sha)) {
     return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
-  }
-  if (
-    acceptedIntervalTouchesPath(
-      acceptedRepoDir,
-      parent,
-      acceptedHead,
-      localPath
-    )
-  ) {
-    return { kind: 'reject', message: samePathOverlapError(localPath) }
   }
   const structuralPath = firstStructuralPathInAcceptedInterval(
     acceptedRepoDir,
@@ -132,13 +109,13 @@ function historiesAreUnrelated(
   return unionCount === localCount + acceptedCount
 }
 
-function ordinaryNoteContentEditPath(
+function isOneOrdinaryNoteContentEdit(
   acceptedRepoDir: string,
   parent: string,
   commit: string
-): string | undefined {
+): boolean {
   const changes = listCommitChanges(acceptedRepoDir, parent, commit)
-  if (changes.length !== 1) return undefined
+  if (changes.length !== 1) return false
   const [change] = changes
-  return isOrdinaryNoteContentChange(change) ? change.path : undefined
+  return change !== undefined && isOrdinaryNoteContentChange(change)
 }

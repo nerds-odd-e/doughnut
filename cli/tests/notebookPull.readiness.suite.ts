@@ -35,7 +35,7 @@ export function describeNotebookPullReadiness(): void {
       )
 
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        'donut: usage: donut notebook pull <directory>\nReceives accepted notebook history onto a clean local main. When one unpublished commit edits one existing note at an unchanged path and accepted history advanced through other notes only, pull rebases that unpublished commit. Pull does not publish. Inspect the result, then run "donut notebook publish <directory>". Accepted history may not include all current web content.'
+        'donut: usage: donut notebook pull <directory>\nReceives accepted notebook history onto a clean local main. When one unpublished commit edits one existing note at an unchanged path and accepted history advanced through ordinary-note content changes at unchanged paths, pull rebases that unpublished commit. Pull does not publish. Inspect the result, then run "donut notebook publish <directory>". Accepted history may not include all current web content.'
       )
       expect(fetchMock).not.toHaveBeenCalled()
     })

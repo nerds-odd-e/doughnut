@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, vi } from 'vitest'
 import {
   installNotebookCliRunFixture,
@@ -86,6 +86,19 @@ export function startPausedSameLineRebase(directory: string): void {
   if (rebase.status === 0) {
     throw new Error('expected git rebase to pause with unmerged stages')
   }
+}
+
+export function commitPortableFile(
+  directory: string,
+  relativePath: string,
+  bytes: string,
+  message: string
+): void {
+  const absolutePath = join(directory, relativePath)
+  fs.mkdirSync(dirname(absolutePath), { recursive: true })
+  fs.writeFileSync(absolutePath, bytes)
+  runGit(['add', relativePath], directory)
+  runGit(['commit', '--quiet', '-m', message], directory)
 }
 
 export function serveAcceptedBundle(

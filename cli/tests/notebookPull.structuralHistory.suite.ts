@@ -11,6 +11,7 @@ import {
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
   checkoutState,
+  commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
@@ -83,6 +84,16 @@ export function describeNotebookPullStructuralHistory(): void {
         },
         path: 'Renamed.md',
       },
+      {
+        shape: 'same-path-reversed-rename',
+        apply: (source: string) => {
+          runGit(['mv', 'note.md', 'Renamed.md'], source)
+          runGit(['commit', '--quiet', '-m', 'accepted rename away'], source)
+          runGit(['mv', 'Renamed.md', 'note.md'], source)
+          runGit(['commit', '--quiet', '-m', 'accepted rename back'], source)
+        },
+        path: 'Renamed.md',
+      },
     ] as const)(
       'names the structural path for remote $shape and leaves the checkout unchanged',
       async ({ shape, apply, path, ...rest }) => {
@@ -137,15 +148,4 @@ function cloneWithLocalNoteAndRemoteOther(
     'unpublished note edit'
   )
   return { directory, source }
-}
-
-function commitPortableFile(
-  directory: string,
-  relativePath: string,
-  bytes: string,
-  message: string
-): void {
-  fs.writeFileSync(join(directory, relativePath), bytes)
-  runGit(['add', relativePath], directory)
-  runGit(['commit', '--quiet', '-m', message], directory)
 }

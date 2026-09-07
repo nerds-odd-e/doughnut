@@ -129,7 +129,7 @@ export function describeNotebookPullAlreadyBased(): void {
         LATER_OTHER_NOTE
       )
       expect(ctx.getLogSpy().mock.calls.at(-1)).toEqual([
-        `Rebased the unpublished local commit onto the accepted history. Local head: ${laterLocalHead}. Accepted head: ${laterAccepted}. Inspect the result, then run "donut notebook publish ${setup.directory}".`,
+        `Rebased onto the accepted history. Local head: ${laterLocalHead}. Accepted head: ${laterAccepted}. Inspect the result with "git status".`,
       ])
     })
   })

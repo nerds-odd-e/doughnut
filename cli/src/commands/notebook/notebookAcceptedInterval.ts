@@ -81,42 +81,11 @@ export function isOrdinaryNoteContentChange(change: CommitChange): boolean {
   )
 }
 
-export function acceptedIntervalTouchesPath(
-  acceptedRepoDir: string,
-  localParent: string,
-  acceptedHead: string,
-  changedPath: string
-): boolean {
-  return forEachAcceptedEdge(
-    acceptedRepoDir,
-    localParent,
-    acceptedHead,
-    (change) => change.path === changedPath
-  )
-}
-
 export function firstStructuralPathInAcceptedInterval(
   acceptedRepoDir: string,
   localParent: string,
   acceptedHead: string
 ): string | undefined {
-  let structuralPath: string | undefined
-  forEachAcceptedEdge(acceptedRepoDir, localParent, acceptedHead, (change) => {
-    if (!isOrdinaryNoteContentChange(change)) {
-      structuralPath = change.path
-      return true
-    }
-    return false
-  })
-  return structuralPath
-}
-
-function forEachAcceptedEdge(
-  acceptedRepoDir: string,
-  localParent: string,
-  acceptedHead: string,
-  visit: (change: CommitChange) => boolean
-): boolean {
   const interval = listCommits(
     acceptedRepoDir,
     '--reverse',
@@ -124,11 +93,18 @@ function forEachAcceptedEdge(
     '--not',
     localParent
   )
-  return interval.some((commit) =>
-    commit.parents.some((parent) =>
-      listCommitChanges(acceptedRepoDir, parent, commit.sha).some(visit)
-    )
-  )
+  for (const commit of interval) {
+    for (const parent of commit.parents) {
+      for (const change of listCommitChanges(
+        acceptedRepoDir,
+        parent,
+        commit.sha
+      )) {
+        if (!isOrdinaryNoteContentChange(change)) return change.path
+      }
+    }
+  }
+  return undefined
 }
 
 function parseDiffTreeRawZ(output: string): CommitChange[] {

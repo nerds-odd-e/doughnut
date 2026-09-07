@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slice 1 done.
+Status: in progress; slices 1–2 done.
 
 ## Goal and scope
 
@@ -149,14 +149,8 @@ readiness function and real-Git fixture pattern. Safe to stop with overlap refus
 
 ### 2. Receive auto-mergeable same-note edits
 Type: Behavior
-Status: planned
-Proof: Replace `notebookPull.pathOverlap.suite.ts`'s obsolete disjoint-paragraph
-and edit-then-restore rejection assertions with actual Git success. Canonical
-case observes L′ parent B, exact combined content, author/message, original L
-recovery and no POST. Nested/frontmatter and several accepted commits assert
-their delta. Run the owning pull suite, retaining local-candidate, structural,
-already-based and concurrent-change cases; a same-path structural reversal must
-still reject before changing checkout state.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts tests/notebookClone.test.ts` — disjoint/edit-then-restore/nested-frontmatter/several-commit same-note rebase with L′ parent B and exact merged bytes; same-path reversed-rename still refuses; clone/pull usage is content-only; rebase completion is neutral (`git status`). Re-ran after CI-repair merge.
 
 Behavior: One eligible local note edit overlaps accepted content at that path,
 but Git can merge it → pull → clean local content incorporating both changes
@@ -364,16 +358,12 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   (`1c55df91d4`, run 34115115045) with `failed to rebase ... Rebasing (1/1)`.
   Cause: Donut-invoked `git rebase` had no committer identity or noninteractive
   editor; E2E commits with one-shot `-c` identity and never stores repo
-  identity. Repair at HEAD: pass unpublished-commit `user.name`/`user.email`
-  and `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR=true` for Donut-invoked rebase only;
-  `runSystemGitOrThrow` includes stdout+stderr. Leaves 2/4/5/9/10 reuse that
-  rebase path.
-- Pre-existing CI on main, not this execution's pushes, fails installed other-note
-  rebase in `cli_notebook_clone.feature` with
-  `failed to rebase ... Rebasing (1/1)` (runs 34112403473 / 34113740661 /
-  34113989993). Leaves 2, 4, 9, and 10 should classify that by Git state rather
-  than treat it as slice-1 breakage. Story 12 (Plan 50) merged on main; do not
-  rescope this plan to relocation.
+  identity. Repair: pass unpublished-commit `user.name`/`user.email` and
+  `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR=true` for Donut-invoked rebase only;
+  `runSystemGitOrThrow` includes stdout+stderr. Leaves 4/5/9/10 reuse that path.
+- Slice 2 removed `acceptedIntervalTouchesPath` and inlined the remaining
+  structural walk. Same-path reversed-rename lives in the structural `test.each`
+  table. Rebase completion is interim-neutral until leaf 3.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.

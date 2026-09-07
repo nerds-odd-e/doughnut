@@ -77,7 +77,7 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        `Run "donut notebook pull ${destinationPath}" to receive newer accepted history; when one unpublished commit edits one existing note at an unchanged path and accepted history advanced through other notes only, pull rebases that unpublished commit. Pull does not publish. Inspect the result, then run "donut notebook publish ${destinationPath}". Accepted history may not include all current web content.`
+        `Run "donut notebook pull ${destinationPath}" to receive newer accepted history; when one unpublished commit edits one existing note at an unchanged path and accepted history advanced through ordinary-note content changes at unchanged paths, pull rebases that unpublished commit. Pull does not publish. Inspect the result, then run "donut notebook publish ${destinationPath}". Accepted history may not include all current web content.`
       )
     )
   })
