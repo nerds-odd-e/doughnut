@@ -30,14 +30,16 @@ jobs:
   main-head-guard:
     name: Identify tagged main commit
     runs-on: ${{ vars.RUNNER }}
+    timeout-minutes: 70
     # Application publication is paused until the version-tag release path is enabled.
     if: ${{ false }}
     outputs:
-      deploy: ${{ steps.head_guard.outputs.deploy }}
+      deploy: ${{ steps.ci.outputs.state == 'ready' }}
       tag: ${{ steps.head_guard.outputs.tag }}
       sha: ${{ steps.head_guard.outputs.sha }}
       ref: ${{ steps.head_guard.outputs.ref }}
       ref_oid: ${{ steps.head_guard.outputs.refOid }}
+      run_id: ${{ steps.ci.outputs.runId }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -50,13 +52,23 @@ jobs:
         id: head_guard
         run: |
           node scripts/ci/application-release.mjs
-          echo "deploy=true" >> "$GITHUB_OUTPUT"
+      - name: Wait for successful CI of selected commit
+        id: ci
+        env:
+          RELEASE_SHA: ${{ steps.head_guard.outputs.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/ci/application-release-ci.mjs
 
   Deploy:
     name: GCP deploy (GCS + MIG + health probe)
     runs-on: ${{ vars.RUNNER }}
     needs: main-head-guard
     if: needs.main-head-guard.outputs.deploy == 'true'
+    env:
+      GITHUB_SHA: ${{ needs.main-head-guard.outputs.sha }}
+      DEPLOY_JAR_PATH: release-artifacts/backend/donut-0.0.1-SNAPSHOT.jar
+      FRONTEND_STATIC_DIR: release-artifacts/frontend
+      CLI_BUNDLE_SOURCE: release-artifacts/cli/donut-cli.bundle.mjs
     steps:
       - uses: actions/checkout@v7
         with:
@@ -74,22 +86,25 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ needs.main-head-guard.outputs.run_id }}
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
+          path: release-artifacts/backend
       - name: Download frontend dist artifact
         uses: actions/download-artifact@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ needs.main-head-guard.outputs.run_id }}
           name: ${{ env.FRONTEND_DIST_ARTIFACT }}
-          path: frontend/dist
+          path: release-artifacts/frontend
       - name: Download CLI bundle artifact
         uses: actions/download-artifact@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ needs.main-head-guard.outputs.run_id }}
           name: ${{ env.CLI_DIST_ARTIFACT }}
-          path: cli/dist
+          path: release-artifacts/cli
+      - name: Validate complete application payload
+        run: node scripts/ci/application-release-payload.mjs
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}

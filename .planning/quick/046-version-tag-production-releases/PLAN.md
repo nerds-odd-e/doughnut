@@ -136,7 +136,8 @@ CI. This wait is removed by Story 2's final activation leaf.
 
 ### 5. Stage the validated payload before any publication
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 57/57. Actual preflight permits complete payload and prevents subsequent write for missing/empty/directory backend, SPA shell or CLI. Parsed downloads retain action/name, admitted run_id and dedicated paths before preflight/publication; expired downloads use action failure propagation (no live download tested). Independent refactor: no edits.
 Proof: Selected-run artifact fixtures stage backend/frontend/CLI in dedicated
 paths; missing or expired content produces no production calls.
 
