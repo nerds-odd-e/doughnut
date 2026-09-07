@@ -18,7 +18,7 @@
         <NoteTitleWithLink
           v-if="searchHit.hitKind === 'NOTE' && searchHit.noteSearchResult"
           :note-topology="searchHit.noteSearchResult.noteTopology"
-          @click.capture="onTitleNavigation"
+          @click="onTitleNavigation"
         />
         <router-link
           v-else-if="
@@ -34,7 +34,7 @@
             },
           }"
           class="folder-hit-title no-underline"
-          @click.capture="onTitleNavigation"
+          @click="onTitleNavigation"
         >{{ searchHit.folderName }}</router-link>
         <span
           v-else-if="searchHit.hitKind === 'FOLDER'"
@@ -44,7 +44,7 @@
           v-else-if="searchHit.hitKind === 'NOTEBOOK' && searchHit.notebookId != null"
           :to="{ name: 'notebookPage', params: { notebookId: searchHit.notebookId } }"
           class="notebook-hit-title no-underline"
-          @click.capture="onTitleNavigation"
+          @click="onTitleNavigation"
         >{{ searchHit.notebookName }}</router-link>
       </div>
       <div
@@ -105,7 +105,6 @@ const emit = defineEmits<{ navigate: [] }>()
 
 function onTitleNavigation(event: MouseEvent) {
   if (
-    event.defaultPrevented ||
     event.button !== 0 ||
     event.metaKey ||
     event.ctrlKey ||

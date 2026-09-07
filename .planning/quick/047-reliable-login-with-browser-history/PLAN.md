@@ -361,3 +361,19 @@ Read-only source inspection found:
 These findings replace the previously open placement/rendering choices with
 bounded execution paths. Real runtime confirmation belongs to leaves 1–2,
 not this refinement task. No feature code or tests were added or run.
+
+## Verification blocker repair
+
+Leaf 3's full frontend suite and an independent navigation-only run exposed
+an existing test-frame escape to `/n8`. Separate capture/bubble Vue invokers
+can skip Vue Router's native-default guard when attachment/event timestamps
+share a millisecond. Search result links now use a normal merged click handler,
+so router handling precedes popup dismissal. Native click regression asserts
+default cancellation, route destination and popup closure. Modified clicks stay
+covered. This is a bounded repair required for the planned suite proof.
+
+Passed `CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.navigation.spec.ts`
+(6 tests), then `CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test`
+(340 files, 1848 tests). Fresh refactor required no edits; coordinator formatting
+passed. Tablet WIP remains parked in exact stash
+`d541b3f1855b3e9c59bc022a1ed378e27ecfd30d` until this repair is pushed.
