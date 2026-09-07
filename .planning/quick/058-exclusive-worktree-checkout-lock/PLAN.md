@@ -1,6 +1,6 @@
 # Exclusive worktree checkout lock after first-use
 
-Status: planned.
+Status: in progress (slice 1 done).
 Source: [SEED-015 story 1b](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1b)
 via completed [quick/057](../057-automatic-worktree-backend-tests/PLAN.md).
 Reviewed commits: `162feeacca`..`987d0fbc52` (first-parent execution set).
@@ -55,7 +55,7 @@ wait queue or process supervisor.
 
 ### 1. Split the oversized worktree launcher fixture
 Type: Structure
-Status: planned
+Status: done
 Proof: `wc -l` on each resulting fixture module is ≤250. Historical comments
 that record superseded missing-config refusal or slice numbers are gone from
 the launcher test files. Existing tests remain green:
@@ -106,8 +106,10 @@ Sizing: about 5 minutes, high confidence; one ignore entry and guide sentence.
 
 Execution retrospective of quick/057 (`162feeacca`–`987d0fbc52`): first-use
 provisioning, reuse, live-owner refusal, and real two-worktree proof stand.
-Remaining gaps are exclusive stale reclaim, gitignore for the lock directory,
-and the 277-line fixture.
+Remaining gaps are exclusive stale reclaim and gitignore for the lock directory.
+
+Slice 1 split `backend-test-worktree-test-fixtures.mjs` into stand-in (153),
+launcher (101), and lock (24) modules. `makeStaleOwnerPid` stays unexported.
 
 ## Considered but excluded
 

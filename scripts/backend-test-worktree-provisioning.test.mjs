@@ -2,16 +2,18 @@ import assert from 'node:assert/strict'
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { test } from 'node:test'
 import {
-  assertRefusedBeforeGradle,
   jdbcUrl,
-  lockPaths,
   makeCheckout,
-  outputOf,
   readGradleInvocation,
   readMysqlInvocation,
+} from './backend-test-worktree-stand-in-fixtures.mjs'
+import {
+  assertRefusedBeforeGradle,
+  outputOf,
   runLauncher,
   runLauncherAsync,
-} from './backend-test-worktree-test-fixtures.mjs'
+} from './backend-test-worktree-launcher-fixtures.mjs'
+import { lockPaths } from './backend-test-worktree-lock-fixtures.mjs'
 
 const allocatedIdPattern =
   /Allocated new worktree environment: (wt_[a-z0-9]{32})/
@@ -178,9 +180,8 @@ test('a later invocation reuses the config a first-use provisioning run produced
   const mysqlAfterFirstRun = readMysqlInvocation(checkout)
   const database = `doughnut_${JSON.parse(provisionedConfig).id}_test`
 
-  // The checkout lock outlives its owner's process (slice 2; reclaiming a
-  // stale owner is slice 7's separate concern). Clear it to isolate this
-  // "later command reuses the established identity" behavior from lock
+  // Clear the leftover checkout lock so a later command can acquire a fresh
+  // lock and reuse the established identity without going through stale
   // reclaim.
   rmSync(lockPaths(checkout).dir, { recursive: true, force: true })
 

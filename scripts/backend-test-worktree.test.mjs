@@ -4,17 +4,15 @@ import path from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import {
-  assertRefusedBeforeGradle,
   jdbcUrl,
   makeCheckout,
-  outputOf,
   readGradleInvocation,
+} from './backend-test-worktree-stand-in-fixtures.mjs'
+import {
+  assertRefusedBeforeGradle,
+  outputOf,
   runLauncher,
-} from './backend-test-worktree-test-fixtures.mjs'
-
-// Missing configuration no longer refuses: it provisions a new database and
-// identity before running gradle. See
-// backend-test-worktree-provisioning.test.mjs.
+} from './backend-test-worktree-launcher-fixtures.mjs'
 
 test('malformed configuration refuses before gradle', (t) => {
   const checkout = makeCheckout(t, { config: '{"id":' })

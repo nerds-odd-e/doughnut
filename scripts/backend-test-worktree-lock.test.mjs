@@ -3,16 +3,20 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import {
-  assertRefusedBeforeGradle,
   jdbcUrl,
-  lockPaths,
   makeCheckout,
-  outputOf,
   readGradleInvocation,
+} from './backend-test-worktree-stand-in-fixtures.mjs'
+import {
+  assertRefusedBeforeGradle,
+  outputOf,
   runLauncher,
   runLauncherAsync,
+} from './backend-test-worktree-launcher-fixtures.mjs'
+import {
+  lockPaths,
   writeStaleOwnerLock,
-} from './backend-test-worktree-test-fixtures.mjs'
+} from './backend-test-worktree-lock-fixtures.mjs'
 
 test('active owner refuses a second launcher before it reads a malformed replacement config or reaches gradle', async (t) => {
   const checkout = makeCheckout(t, {
