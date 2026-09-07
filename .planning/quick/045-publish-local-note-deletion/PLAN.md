@@ -1,7 +1,7 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: slices 1–2 done; next is slice 3.
+Status: slices 1–3 done; next is slice 4.
 
 ## Learnings
 
@@ -19,6 +19,12 @@ publisher (`destroy` with `LEAVE_DEAD_LINKS`) and keeps mixed deletions
 rejected. Full `pnpm backend:test_only` passed (2222 tests). The success
 scenario lives in `NotebookGitDeletionPublicationControllerTest` after a
 file-size split from the general publication tests.
+
+Slice 3 proves late binding-save failure rolls back isolated deletion using
+the existing `FAIL_ON_BINDING_SAVE` harness in
+`NotebookGitDeletionPublicationAtomicControllerTest` (sibling of the
+193-line add/edit atomic class). Full `pnpm backend:test_only` passed
+(2223 tests). No production change.
 
 ## Goal and scope
 
@@ -172,7 +178,7 @@ fixture rather than making this first success loop build every association.
 
 ### 3. Roll back a deletion when acceptance fails late
 Type: Behavior
-Status: planned
+Status: done
 Proof: One deletion scenario in the existing late-binding-save failure harness
 observes fresh committed note/tracker flags and timestamps, accepted head,
 bundle and binding timestamp all unchanged. Run backend verification.
@@ -346,8 +352,8 @@ Keep existing title reuse and restore policy unchanged.
 
 ## Sizing, readiness, and learning checkpoint
 
-Slices 1–2 delivered isolation rejection and isolated-deletion acceptance.
-Remaining leaves execute in order from slice 3.
+Slices 1–3 delivered isolation rejection, isolated-deletion acceptance, and
+late-failure rollback. Remaining leaves execute in order from slice 4.
 Four bundled original slices were replaced; four were retained and reordered.
 The result is 13 Behavior leaves and one immediately enabling Structure leaf.
 No completed proof was discarded and no product scope was added or removed.
