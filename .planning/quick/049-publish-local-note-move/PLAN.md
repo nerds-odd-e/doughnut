@@ -134,7 +134,7 @@ No similarity engine, generic operation framework, or folder preparation.
 
 ### 2. Accept one unchanged same-folder rename
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller rename at root or in the same nested folder → original note
 ID with new filename-derived title, unchanged content/YAML title/headings and
 tracker, exact authored accepted head/tree/parent. Eligibility matrix retains
@@ -148,6 +148,17 @@ Keep folder unchanged. Both paths/modes remain validated and the final
 projection must equal the proposal. Replace the obsolete exact-rename
 rejection row with acceptance; retain other rejection cases and give safe
 rename-only-then-edit guidance. Never suggest deletion to preserve identity.
+Learning: Added `ChangeKind.RENAMED`/`fromPath` and `detectSameParentRename`
+(equal-blob, equal-parent DELETED+ADDED pair) in NotebookGitProposalTreeShape;
+publisher's new `applyRename` mutates title/updatedAt in place via
+`NoteTitlePlacementRules` + shared `validFilenameDerivedTitle`, no folder
+change, no web title-rename workflow called. Root/nested acceptance and
+cross-parent rejection tests split into a new
+NotebookGitProposalRenameControllerTest to keep file size in bounds. Actual
+runtime ~14 min (implementer ~9.5 min + refactor ~4.4 min) exceeded the ~5 min
+target on this plan's explicitly flagged highest-risk loop; landed as one
+coherent, fully green, proven behavior, so recorded per the plan's sizing note
+rather than reverted/split further.
 
 ### 3. Preserve private associations when the name changes
 Type: Behavior
@@ -268,6 +279,15 @@ can be accepted. No second-checkout Cypress harness is needed.
 
 ## Verification and execution wrap-up
 
+- CI disposition: main CI run 34084118736 (attempt 1, triggered by leaf 1's
+  push, SHA 9355a2000769fa40a3f1ccc075f714f768fe08ab) failed one unrelated
+  Cypress spec, `record_live_audio_with_real_open_ai`
+  ("live recording transcription with real OpenAI"), with
+  `AssertionError: Timed out retrying after 6000ms: expected
+  '<button.daisy-btn>' not to be 'disabled'` and server-side root cause
+  `com.openai.errors.OpenAIInvalidDataException: Error reading response` from
+  the real OpenAI API. Unrelated to notebookGit/tree-shape/rename code; treated
+  as an external-service outage and ignored without a repair commit.
 - Backend: CURSOR_DEV=true nix develop -c pnpm backend:test_only.
   Backend rules require the complete backend unit suite for each backend leaf.
 - CLI: CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run

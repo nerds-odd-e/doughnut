@@ -16,6 +16,7 @@ import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteFactory;
 import com.odde.donut.services.NoteService;
+import com.odde.donut.services.NoteTitlePlacementRules;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
@@ -46,6 +47,7 @@ public class NotebookGitProposalPublisher {
   private final Validator validator;
   private final NoteFactory noteFactory;
   private final NoteService noteService;
+  private final NoteTitlePlacementRules noteTitlePlacementRules;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -57,7 +59,8 @@ public class NotebookGitProposalPublisher {
       EntityPersister entityPersister,
       Validator validator,
       NoteFactory noteFactory,
-      NoteService noteService) {
+      NoteService noteService,
+      NoteTitlePlacementRules noteTitlePlacementRules) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
@@ -68,6 +71,7 @@ public class NotebookGitProposalPublisher {
     this.validator = validator;
     this.noteFactory = noteFactory;
     this.noteService = noteService;
+    this.noteTitlePlacementRules = noteTitlePlacementRules;
   }
 
   @Transactional(
@@ -133,6 +137,8 @@ public class NotebookGitProposalPublisher {
             NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS,
             authorizationService.getCurrentUser());
         proposedLiveNotes.remove(deletedNote);
+      } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.RENAMED) {
+        applyRename(folders, liveNotes, noteChange, publishedAt);
       }
     }
 
@@ -156,7 +162,7 @@ public class NotebookGitProposalPublisher {
       String path,
       Timestamp publishedAt) {
     AuthoredNoteDocument document = readValidatedDocument(proposal, path);
-    String title = validAdditionTitle(path);
+    String title = validFilenameDerivedTitle(path);
     Integer destinationFolderId =
         projection.requireRepresentedFolderIdForAddition(
             folders, proposal.repository(), acceptedHead, path);
@@ -172,6 +178,20 @@ public class NotebookGitProposalPublisher {
     }
     authoredNoteDocumentPersistence.persist(addedNote, document, publishedAt);
     return addedNote;
+  }
+
+  private void applyRename(
+      List<ExportFolderRow> folders,
+      List<Note> liveNotes,
+      NotebookGitProposalTreeShape.NoteChange noteChange,
+      Timestamp publishedAt) {
+    Note note = projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.fromPath());
+    String newTitle = validFilenameDerivedTitle(noteChange.path());
+    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
+        note.getNotebook(), note.getFolder(), newTitle);
+    note.setTitle(new DisplayName(newTitle));
+    note.setUpdatedAt(publishedAt);
+    entityPersister.save(note);
   }
 
   private AuthoredNoteDocument readValidatedDocument(
@@ -197,7 +217,7 @@ public class NotebookGitProposalPublisher {
     return contextualException;
   }
 
-  private String validAdditionTitle(String path) {
+  private String validFilenameDerivedTitle(String path) {
     String filename = path.substring(path.lastIndexOf('/') + 1);
     String title = filename.substring(0, filename.length() - ".md".length());
     NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
@@ -210,17 +230,17 @@ public class NotebookGitProposalPublisher {
               .sorted()
               .findFirst()
               .orElseThrow();
-      throw invalidAdditionTitle(path, reason);
+      throw invalidFilenameDerivedTitle(path, reason);
     }
     String normalizedTitle = new DisplayName(title).value();
     if (!normalizedTitle.equals(title)) {
-      throw invalidAdditionTitle(
+      throw invalidFilenameDerivedTitle(
           path, "filename title would be normalized to \"" + normalizedTitle + "\"");
     }
     return title;
   }
 
-  private static ResponseStatusException invalidAdditionTitle(String path, String reason) {
+  private static ResponseStatusException invalidFilenameDerivedTitle(String path, String reason) {
     return new ResponseStatusException(
         HttpStatus.BAD_REQUEST, "Invalid note title at path \"" + path + "\": " + reason);
   }

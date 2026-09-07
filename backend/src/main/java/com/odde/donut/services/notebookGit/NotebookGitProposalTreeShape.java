@@ -13,12 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Walks the raw two-tree diff (no rename detection) between a proposal's accepted-parent commit and
- * its proposed commit, and permits one modified note, a set containing added ordinary Markdown
- * notes at regular file modes, or exactly one isolated ordinary-note deletion - never mixed
- * deletions/moves, unsafe paths, non-regular modes, or the folder-reserved {@code README.md}.
- * Callers only invoke this once proposal ancestry is confirmed to be a direct single-parent child
- * of the accepted commit.
+ * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit,
+ * and permits one modified note, a set containing added ordinary Markdown notes at regular file
+ * modes, exactly one isolated ordinary-note deletion, or exactly one same-parent equal-content
+ * rename (one removed and one added note sharing a blob in the same directory) - never mixed,
+ * multiple, or cross-parent removed/added pairs, unsafe paths, non-regular modes, or the
+ * folder-reserved {@code README.md}. Callers only invoke this once proposal ancestry is confirmed
+ * to be a direct single-parent child of the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -59,14 +60,14 @@ public final class NotebookGitProposalTreeShape {
           if (!FileMode.REGULAR_FILE.equals(acceptedMode)) {
             throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
           }
-          changes.add(new NoteChange(path, ChangeKind.DELETED, walk.getObjectId(0)));
+          changes.add(new NoteChange(path, ChangeKind.DELETED, walk.getObjectId(0), null));
           continue;
         }
         if (FileMode.MISSING.equals(acceptedMode)) {
           if (!FileMode.REGULAR_FILE.equals(proposedMode)) {
             throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
           }
-          changes.add(new NoteChange(path, ChangeKind.ADDED, walk.getObjectId(1)));
+          changes.add(new NoteChange(path, ChangeKind.ADDED, walk.getObjectId(1), null));
           continue;
         }
         if (!FileMode.REGULAR_FILE.equals(acceptedMode)
@@ -75,7 +76,7 @@ public final class NotebookGitProposalTreeShape {
         }
 
         if (!walk.getObjectId(0).equals(walk.getObjectId(1))) {
-          changes.add(new NoteChange(path, ChangeKind.MODIFIED, walk.getObjectId(1)));
+          changes.add(new NoteChange(path, ChangeKind.MODIFIED, walk.getObjectId(1), null));
         }
       }
 
@@ -90,11 +91,15 @@ public final class NotebookGitProposalTreeShape {
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
+    List<NoteChange> renameDetected = detectSameParentRename(changes);
+    if (renameDetected != null) {
+      return renameDetected;
+    }
     if (changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)
         && changes.size() > 1) {
       throw unsupportedTreeShape(
-          "publish each removed note in an isolated deletion commit, without other file changes"
-              + " (no rename detection is performed)");
+          "publish each removed note in an isolated deletion commit, or an isolated same-parent"
+              + " rename with unchanged content, without other file changes");
     }
     if (changes.size() > 1
         && changes.stream().noneMatch(change -> change.kind() == ChangeKind.ADDED)) {
@@ -105,6 +110,44 @@ public final class NotebookGitProposalTreeShape {
     }
 
     return changes;
+  }
+
+  /**
+   * Recognizes the one rename shape this proposal type accepts: a proposal containing exactly one
+   * removed and one added ordinary note, with identical blob content, in the same parent directory.
+   * Returns {@code null} when the proposal does not match this shape, so callers fall back to the
+   * existing removal/addition eligibility rules.
+   */
+  private static List<NoteChange> detectSameParentRename(List<NoteChange> changes) {
+    if (changes.size() != 2) {
+      return null;
+    }
+    NoteChange deleted =
+        changes.stream()
+            .filter(change -> change.kind() == ChangeKind.DELETED)
+            .findFirst()
+            .orElse(null);
+    NoteChange added =
+        changes.stream()
+            .filter(change -> change.kind() == ChangeKind.ADDED)
+            .findFirst()
+            .orElse(null);
+    if (deleted == null || added == null) {
+      return null;
+    }
+    if (!deleted.blobId().equals(added.blobId())) {
+      return null;
+    }
+    if (!parentDirectory(deleted.path()).equals(parentDirectory(added.path()))) {
+      return null;
+    }
+    return List.of(
+        new NoteChange(added.path(), ChangeKind.RENAMED, added.blobId(), deleted.path()));
+  }
+
+  private static String parentDirectory(String path) {
+    int lastSlash = path.lastIndexOf('/');
+    return lastSlash < 0 ? "" : path.substring(0, lastSlash + 1);
   }
 
   private static void assertRegularNotePath(String changedPath) {
@@ -143,15 +186,19 @@ public final class NotebookGitProposalTreeShape {
   }
 
   /**
+   * @param path the current (proposed-tree) Portable path; for RENAMED this is the new path
    * @param blobId the raw blob object id relevant to this change: the added blob (proposed tree)
-   *     for ADDED, the removed blob (accepted tree) for DELETED, and the proposed blob for MODIFIED
-   *     (not meaningfully used by callers today).
+   *     for ADDED, the removed blob (accepted tree) for DELETED, the proposed blob for MODIFIED
+   *     (not meaningfully used by callers today), and the shared blob for RENAMED
+   * @param fromPath the original (accepted-tree) Portable path being renamed from; present only for
+   *     RENAMED, {@code null} otherwise
    */
-  record NoteChange(String path, ChangeKind kind, ObjectId blobId) {}
+  record NoteChange(String path, ChangeKind kind, ObjectId blobId, String fromPath) {}
 
   enum ChangeKind {
     ADDED,
     MODIFIED,
-    DELETED
+    DELETED,
+    RENAMED
   }
 }

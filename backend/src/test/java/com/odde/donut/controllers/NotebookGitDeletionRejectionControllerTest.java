@@ -77,7 +77,10 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
             List.of(new NotebookGitProposalFile("Second.md", "---\ntype: Note\n---\nedited"))),
         Arguments.of(
             List.of(second, new NotebookGitProposalFile("Added.md", "---\ntype: Note\n---\nnew"))),
-        Arguments.of(List.of(second, new NotebookGitProposalFile("Renamed.md", ORIGINAL))),
+        Arguments.of(
+            List.of(
+                second,
+                new NotebookGitProposalFile("Renamed.md", "---\ntype: Note\n---\nrewritten"))),
         Arguments.of(List.of()));
   }
 
