@@ -48,10 +48,10 @@ The review also found obsolete one-release-at-a-time/CI-waiting instructions in
 | Promise | Leaves | Observation |
 |---|---|---|
 | First-observed stable-tag identity survives non-ready CI | 1–2 | Waiting and blocked public-entry fixtures persist tag/refOid/SHA before returning |
-| Artifact failure cannot reopen tag identity | 1, 3 | Ready candidate with missing artifacts leaves frozen identity; moved/deleted replay rejects before publication |
-| Higher selected version remains the durable ceiling | 2–3 | Higher waiting candidate persists; a late lower wakeup is superseded even if the higher remote tag disappears |
-| Operator guidance matches overlapping reconciliation | 4 | README and Definition of Done agree with the release runbook and workflow tests |
-| Agents can carry out a requested application release and report actual publication evidence | 5 | Skill validation and a simulated operator walkthrough distinguish release requests, status checks, non-ready CI, skipped publication and successful deployment |
+| Artifact failure cannot reopen tag identity | 1, 3–5 | Ready selection survives failed artifact admission; same identity recovers and moved/deleted replay rejects before publication |
+| Higher selected version remains the durable ceiling | 2–4 | Higher waiting or ready candidate persists; a late lower wakeup is superseded even if the higher remote tag disappears |
+| Operator guidance matches overlapping reconciliation | 6 | README and Definition of Done agree with the release runbook and workflow tests |
+| Agents can carry out a requested application release and report actual publication evidence | 7 | Skill validation and a simulated operator walkthrough distinguish release requests, status checks, non-ready CI, skipped publication and successful deployment |
 
 ## Ordered slices
 
@@ -94,21 +94,48 @@ before querying CI. Waiting and blocked outcomes freeze a new or higher identity
 an unchanged selected identity retries, while a missing or changed selected tag
 fails before CI lookup and a lower tag is superseded without rewriting state.
 
-### 3. Freeze ready identity before artifact admission
+### 3. Freeze a ready release before downloads
 Type: Behavior
 Status: planned
-Proof: A ready exact-SHA CI candidate is durably selected before download actions.
-Missing/expired artifacts leave that identity selected. After the tag is moved,
-recreated, or deleted, a later exact-CI/artifact wakeup fails identity admission
-with no production write; the unchanged tag can still recover through a newer
-successful CI attempt. Existing publishing/succeeded retry and duplicate tests
-remain green.
+Proof: A public reconciliation fixture with ready exact-SHA CI persists the exact
+tag/refOid/SHA before returning `ready`; workflow proof keeps artifact download
+behind that successful admission. Existing waiting/blocked, publishing/succeeded
+retry, completed duplicate and selected-source publication tests remain green.
 
-Behavior: A selected CI run is ready but its payload cannot be admitted → retain
-the immutable release request → recover only the same tag/refOid/SHA rather than
-treating a replacement ref as a fresh release.
+Behavior: Reconciliation finds ready exact-SHA CI for a new or higher candidate →
+freeze its immutable release identity → only then expose it for artifact download.
 
-### 4. Publish the overlapping-release policy consistently
+### 4. Resume the selected release with fresh artifacts
+Type: Behavior
+Status: planned
+Proof: A ready selection followed by missing/expired artifact admission leaves the
+selected record unchanged. A later wakeup for the same tag/refOid/SHA accepts a
+newer successful CI run/attempt and returns `ready` without rewriting identity;
+publishing and succeeded retry/duplicate behavior stays green.
+
+Behavior: A selected release loses or lacks its chosen artifacts → a later exact-
+identity CI completion supplies fresh artifacts → reconciliation resumes that same
+immutable release request rather than rebuilding from another commit.
+
+### 5. Reject a replacement after artifact failure
+Type: Behavior
+Status: planned
+Proof: Start from a ready selection whose artifact admission fails, then move or
+recreate its lightweight ref, annotated ref object or peeled commit—or delete the
+tag. The next public reconciliation fails identity admission before CI lookup,
+artifact actions or production writes; the selected record is not overwritten.
+
+Behavior: Artifact admission leaves a selected release pending → its tag identity
+is changed or removed → a later wakeup rejects the replacement and requires an
+immutable retry or next-patch correction.
+
+Refinement learning: The original ready-identity slice exceeded the ten-minute
+hard limit and all attempt-owned WIP was reverted after the 97-command/4-entry
+baseline stayed green. It combined three proof loops. Reconciliation fixtures
+must use `makeReleaseRepository`; the shallow publication checkout proves only
+its own payload/publication boundary.
+
+### 6. Publish the overlapping-release policy consistently
 Type: Behavior
 Status: planned
 Proof: Repository search finds no active instruction to issue application releases
@@ -121,7 +148,7 @@ Behavior: A maintainer reads either top-level release overview → receives the
 current overlapping-release policy → can submit a newer version or recover the
 same immutable release without obsolete manual serialization advice.
 
-### 5. Guide agents through an application release
+### 7. Guide agents through an application release
 Type: Behavior
 Status: planned
 Proof: Validate the new skill's frontmatter and links, then walk through simulated
@@ -160,8 +187,8 @@ checkout `/Users/terryyin/.codex/worktrees/be43/doughnut`, receipt
 Each leaf targets one commit-sized outcome. Use the existing real-Git/fake-GitHub
 and fake-GCS fixtures; no production tag or production payload write is permitted.
 Run the focused application-release suite for release implementation changes;
-use documentation consistency review for leaf 4 and skill validation plus the
-simulated walkthrough for leaf 5. Run the standard execute-plan
+use documentation consistency review for leaf 6 and skill validation plus the
+simulated walkthrough for leaf 7. Run the standard execute-plan
 refactor/format/check/commit/push wrap-up only when this plan is explicitly
 executed. Implementing the skill does not authorize a real application release.
 
