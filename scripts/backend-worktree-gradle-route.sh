@@ -42,12 +42,26 @@ if [[ "${PWD}" -ef "${backend_dir}" ]]; then
   is_backend_project=true
 fi
 
-configured_backend=false
-if [[ "${is_backend_project}" == true && -f "${checkout_root}/.worktree.local.json" ]]; then
-  configured_backend=true
+# Linked worktrees have a distinct git-dir under the shared common dir.
+# Unconfigured primary checkouts keep pass-through (no allocation here).
+is_linked_git_worktree() {
+  local git_dir common_dir
+  git_dir="$(git -C "${1}" rev-parse --git-dir 2>/dev/null)" || return 1
+  common_dir="$(git -C "${1}" rev-parse --git-common-dir 2>/dev/null)" || return 1
+  git_dir="$(cd "${1}" && cd "${git_dir}" && pwd)" || return 1
+  common_dir="$(cd "${1}" && cd "${common_dir}" && pwd)" || return 1
+  [[ "${git_dir}" != "${common_dir}" ]]
+}
+
+isolate_backend=false
+if [[ "${is_backend_project}" == true ]]; then
+  if [[ -f "${checkout_root}/.worktree.local.json" ]] \
+    || is_linked_git_worktree "${checkout_root}"; then
+    isolate_backend=true
+  fi
 fi
 
-if [[ "${configured_backend}" == true && ( -n "${test_task}" || "${has_migrate}" == true ) ]]; then
+if [[ "${isolate_backend}" == true && ( -n "${test_task}" || "${has_migrate}" == true ) ]]; then
   # shellcheck source=backend-test-worktree-owner.sh
   source "${script_dir}/backend-test-worktree-owner.sh"
   backend_test_worktree_prepare "${checkout_root}"

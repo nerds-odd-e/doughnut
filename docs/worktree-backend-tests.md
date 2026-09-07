@@ -36,7 +36,9 @@ When this checkout has no `.worktree.local.json` yet, the command:
 
 The command then prints `Selected database: doughnut_<id>_test`, migrates it,
 and runs the requested tests (the full form runs the complete suite; the
-`--tests` form keeps the same database and filters tests).
+`--tests` form keeps the same database and filters tests). Repository-wrapper
+`migrateTestDB` and `test` in a fresh Git linked worktree allocate the same
+way (see Ordinary commands in a fresh linked worktree).
 
 Later invocations in the same checkout find `.worktree.local.json` already
 present, skip provisioning entirely (no database administration call, no
@@ -143,12 +145,32 @@ invocation lock as `pnpm backend:test:worktree`. They do not allocate a
 first-use environment. The caller does not need to pass
 `-Dspring.profiles.active=test`.
 
+## Ordinary commands in a fresh linked worktree
+
+A Git linked worktree (`git worktree add`) with no `.worktree.local.json` yet
+allocates its persistent isolated database on the first repository-wrapper
+`migrateTestDB` or `test` command, then uses that database for the workload.
+Allocation follows the same first-use steps as `pnpm backend:test:worktree`
+above. Migration-only does not run tests; `test` migrates once then runs
+tests, as in a configured checkout.
+
+From the checkout root:
+
+```bash
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test
+```
+
+Later invocations in the same linked checkout skip provisioning and reuse the
+same identity.
+
 ## Limits
 
 - `pnpm backend:test` and `pnpm backend:test_only` are not automatically
   isolated; they keep the legacy default (`doughnut_test`). Configured-checkout
-  `migrateTestDB` and `test` through the repository wrapper are isolated as
-  described above.
+  and fresh linked-worktree `migrateTestDB` and `test` through the repository
+  wrapper are isolated as described above.
 - No automatic cleanup, retirement, or orphan removal: a provisioned database
   (and an unreferenced one left behind by a failed or interrupted first use)
   persists until removed manually. There is no machine-wide allocation

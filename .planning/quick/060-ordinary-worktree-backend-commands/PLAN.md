@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–3 done.
+Status: in progress; slices 1–4 done.
 
 ## Goal and scope
 
@@ -126,7 +126,7 @@ Sizing: ~5 minutes, medium confidence; one isolated task-dispatch policy.
 
 ### 4. Initialize fresh linked worktrees through ordinary commands
 Type: Behavior
-Status: planned
+Status: done
 Proof: Fixtures use real Git primary/linked topology. Fresh migration-only and
 test-only commands allocate once before workload; subsequent entry points reuse
 the ID. Existing invalid-config/provision-failure/no-repair proofs stay green.
@@ -270,8 +270,9 @@ stopping point.
 - Slice 3: ordinary configured `test` runs a separate migrate invocation
   first (so `--continue` cannot start tests after migrate failure), then
   execs the original test args with the test profile and actual-run flags.
-  Opt-in sets `DONUT_WORKTREE_HANDOFF` after prepare so it stays one
-  migrate-then-test exec without re-entering the owner.
+- Slice 4: linked vs primary is `git-dir` ≠ `git-common-dir`. Ordinary
+  migrate/test on a linked worktree without config call the same prepare
+  path; unconfigured primary still passes through.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining
