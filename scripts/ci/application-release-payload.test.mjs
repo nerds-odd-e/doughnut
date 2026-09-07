@@ -1,22 +1,16 @@
 import assert from 'node:assert/strict'
-import { spawnSync } from 'node:child_process'
 import {
   mkdtempSync,
   mkdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
-  existsSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { fileURLToPath } from 'node:url'
 import { parse } from 'yaml'
-
-const command = fileURLToPath(
-  new URL('./application-release-payload.mjs', import.meta.url)
-)
+import { runPayloadAdmission } from './application-release-payload-fixtures.mjs'
 
 function makePayload(t) {
   const root = mkdtempSync(join(tmpdir(), 'release-payload-'))
@@ -35,27 +29,12 @@ function makePayload(t) {
   return {
     files,
     run() {
-      const trace = join(root, 'production-writes')
-      const result = spawnSync(
-        'bash',
-        [
-          '-c',
-          'node "$1" && printf published > "$2"',
-          'payload-test',
-          command,
-          trace,
-        ],
-        {
-          encoding: 'utf8',
-          env: {
-            ...process.env,
-            DEPLOY_JAR_PATH: files.backend,
-            FRONTEND_STATIC_DIR: join(root, 'frontend'),
-            CLI_BUNDLE_SOURCE: files.cli,
-          },
-        }
-      )
-      return { ...result, published: existsSync(trace) }
+      return runPayloadAdmission({
+        backend: files.backend,
+        frontend: join(root, 'frontend'),
+        cli: files.cli,
+        publicationTrace: join(root, 'production-writes'),
+      })
     },
   }
 }
@@ -63,7 +42,7 @@ function makePayload(t) {
 test('complete selected payload permits the publication boundary', (t) => {
   const result = makePayload(t).run()
   assert.equal(result.status, 0, result.stderr)
-  assert.equal(result.published, true)
+  assert.equal(result.publicationReached, true)
 })
 
 for (const component of ['backend', 'frontend', 'cli']) {
@@ -79,7 +58,7 @@ for (const component of ['backend', 'frontend', 'cli']) {
       const result = payload.run()
       assert.equal(result.status, 1)
       assert.ok(result.stderr.includes(path), result.stderr)
-      assert.equal(result.published, false)
+      assert.equal(result.publicationReached, false)
     })
   }
 }

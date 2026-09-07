@@ -111,7 +111,7 @@ existing job dependency keeps every artifact download behind that admission.
 
 ### 4. Resume the selected release with fresh artifacts
 Type: Behavior
-Status: planned
+Status: done
 Proof: A ready selection followed by missing/expired artifact admission leaves the
 selected record unchanged. A later wakeup for the same tag/refOid/SHA accepts a
 newer successful CI run/attempt and returns `ready` without rewriting identity;
@@ -120,6 +120,11 @@ publishing and succeeded retry/duplicate behavior stays green.
 Behavior: A selected release loses or lacks its chosen artifacts → a later exact-
 identity CI completion supplies fresh artifacts → reconciliation resumes that same
 immutable release request rather than rebuilding from another commit.
+
+Learning: No production change was needed. Payload admission fails before its
+publication boundary while the selected record remains durable; a later wakeup
+for the unchanged identity selects a newer successful run and attempt without a
+state rewrite.
 
 ### 5. Reject a replacement after artifact failure
 Type: Behavior

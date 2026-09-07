@@ -1,20 +1,17 @@
 import assert from 'node:assert/strict'
-import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync, rmSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { fileURLToPath } from 'node:url'
 import { querySelectedCi } from './application-release-ci.mjs'
 import { ciRun, repository } from './application-release-ci-fixtures.mjs'
+import { makeReleaseRepository } from './application-release-fixtures.mjs'
+import { runPayloadAdmission } from './application-release-payload-fixtures.mjs'
 import {
   hash,
   makePublication,
   readApplicationRecords,
 } from './application-release-publication-fixtures.mjs'
+import { runReconciliationCommand as reconcile } from './application-release-reconciliation-fixtures.mjs'
 import { runStateCommand } from './application-release-state-fixtures.mjs'
-
-const payloadCommand = fileURLToPath(
-  new URL('./application-release-payload.mjs', import.meta.url)
-)
 
 async function selectFreshSuccessfulCiAttempt(t, sha) {
   const queries = []
@@ -112,62 +109,80 @@ test('an interrupted release retries the same identity with freshly selected CI 
   )
 })
 
-test('missing artifacts stop before writes and a newer exact-SHA CI attempt resumes the same tag', async (t) => {
-  const fixture = makePublication(t, 'forced')
-  const release = fixture.fixture.release()
-  rmSync(`${fixture.root}/artifacts-42`, { recursive: true })
+test('a selected release resumes with a newer exact-identity CI attempt after artifacts expire', async (t) => {
+  const fixture = makeReleaseRepository(t)
+  const refOid = fixture.tag('v1.2.3', true)
+  const release = fixture.release()
+  fixture.clone()
+  assert.notEqual(refOid, release.sha)
 
-  const unavailable = spawnSync(process.execPath, [payloadCommand], {
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      DEPLOY_JAR_PATH: fixture.jar,
-      FRONTEND_STATIC_DIR: fixture.frontend,
-      CLI_BUNDLE_SOURCE: fixture.cli,
+  const ready = await reconcile(t, fixture, release.ref, {
+    [release.sha]: [
+      ciRun({
+        head_sha: release.sha,
+        run_attempt: 3,
+      }),
+    ],
+  })
+  assert.equal(ready.status, 0, ready.stderr)
+  assert.deepEqual(JSON.parse(ready.stdout), {
+    state: 'ready',
+    ...release,
+    runId: 42,
+    runAttempt: 3,
+  })
+  assert.deepEqual(ready.uploads, [
+    {
+      tag: release.tag,
+      ref_oid: refOid,
+      sha: release.sha,
+      outcome: 'selected',
     },
+  ])
+  const selectedRecord = ready.uploads[0]
+
+  const productionWrites = `${fixture.repository}/production-writes`
+  const missingArtifacts = `${fixture.repository}/release-artifacts`
+
+  const unavailable = runPayloadAdmission({
+    backend: `${missingArtifacts}/backend/donut.jar`,
+    frontend: `${missingArtifacts}/frontend`,
+    cli: `${missingArtifacts}/cli/donut-cli.bundle.mjs`,
+    publicationTrace: productionWrites,
   })
 
   assert.equal(unavailable.status, 1)
-  assert.equal(existsSync(fixture.trace), false)
-  assert.equal(existsSync(fixture.applicationRecords), false)
-  assert.equal(existsSync(`${fixture.root}/captured-spa`), false)
-  assert.equal(existsSync(`${fixture.root}/captured-cli`), false)
-  assert.equal(existsSync(`${fixture.root}/saved-record`), false)
+  assert.equal(unavailable.publicationReached, false)
 
-  const { ci: freshCi } = await selectFreshSuccessfulCiAttempt(t, release.sha)
-  const recovered = fixture.publish(release, freshCi)
+  const recovered = await reconcile(
+    t,
+    fixture,
+    'refs/heads/main',
+    {
+      [release.sha]: [
+        ciRun({
+          id: 99,
+          run_number: 13,
+          run_attempt: 4,
+          head_sha: release.sha,
+        }),
+      ],
+    },
+    selectedRecord
+  )
 
   assert.equal(recovered.status, 0, recovered.stderr)
-  assert.equal(freshCi.sha, release.sha)
-  assert.equal(
-    readFileSync(`${fixture.root}/captured-spa`, 'utf8'),
-    'fresh SPA'
-  )
+  assert.deepEqual(JSON.parse(recovered.stdout), {
+    state: 'ready',
+    ...release,
+    runId: 99,
+    runAttempt: 4,
+  })
+  assert.deepEqual(recovered.uploads, [])
   assert.deepEqual(
-    readApplicationRecords(fixture.applicationRecords).map(
-      ({ tag, sha, ci_run_id, ci_run_attempt, outcome }) => ({
-        tag,
-        sha,
-        ci_run_id,
-        ci_run_attempt,
-        outcome,
-      })
-    ),
-    [
-      {
-        tag: release.tag,
-        sha: release.sha,
-        ci_run_id: '99',
-        ci_run_attempt: '4',
-        outcome: 'publishing',
-      },
-      {
-        tag: release.tag,
-        sha: release.sha,
-        ci_run_id: '99',
-        ci_run_attempt: '4',
-        outcome: 'succeeded',
-      },
-    ]
+    recovered.requests
+      .filter((request) => request.url.searchParams.has('head_sha'))
+      .map((request) => request.url.searchParams.get('head_sha')),
+    [release.sha]
   )
 })
