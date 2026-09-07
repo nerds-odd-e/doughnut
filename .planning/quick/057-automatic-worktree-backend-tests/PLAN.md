@@ -180,13 +180,31 @@ launcher test command.
 
 ### 4. Provision the first isolated environment and run its tests
 Type: Behavior
-Status: planned
+Status: done
 Proof: Invoke the launcher in a fixture with no local configuration. Its MySQL
 stand-in receives one create-and-grant request for a generated bounded target;
 only after success does the checkout contain the matching config. The launcher
 prints allocation and selection, then the existing Gradle stand-in receives the
 same JDBC URL. Verify the complete outcome through
 `node --test scripts/backend-test-worktree.test.mjs`.
+
+Learning: When `.worktree.local.json` is absent, `backend-test-worktree.sh`
+generates `wt_<32-lowercase-hex>` (Node's `crypto.randomUUID()` sans dashes),
+runs `mysql -u root -h 127.0.0.1 -P 3309 -e "..."` (CREATE DATABASE
+utf8mb4/utf8mb4_unicode_ci + GRANT to `doughnut`@`localhost`/`127.0.0.1` +
+FLUSH PRIVILEGES, matching quick/054's semantics via shared
+`database_for_worktree()`/`mysql_host`/`mysql_port`), and — relying on
+`set -euo pipefail` for nonzero propagation on failure — writes
+`.worktree.local.json` exclusively (`fs.writeFileSync(..., { flag: 'wx' })`)
+only after success, printing "Allocated new worktree environment: wt_xxxx"
+before the existing "Selected database: ..." line. An existing config skips
+this block entirely. The fixture's mysql stand-in moved to `<root>/bin/mysql`
+on `PATH` via a new `launcherChildEnv` helper. New tests live in
+`scripts/backend-test-worktree-provisioning.test.mjs`; the now-obsolete
+"missing configuration refuses" test was removed (superseded by this slice's
+intentional behavior change) with equivalent coverage in the new file.
+`CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passes
+(19/19).
 
 Behavior: A local checkout has no worktree configuration → the developer runs
 the opt-in command, optionally with its existing `--tests` filter → one new

@@ -75,16 +75,19 @@ export function makeCheckout(t, { config } = {}) {
     writeFileSync(path.join(root, '.worktree.local.json'), config)
   }
 
-  // A recording stand-in for the `mysql` administration CLI slice 4 will
-  // invoke to create/grant a first-use database. Records every argument and
-  // any piped stdin (e.g. `-e '<SQL>'` or SQL piped in) to mysqlInvocation,
-  // then exits with FAKE_MYSQL_EXIT (default 0). Unused by production code
-  // until backend-test-worktree.sh is wired to invoke it in a later slice.
-  const mysqlStandIn = path.join(root, 'mysql-stand-in')
+  // A recording stand-in for the `mysql` administration CLI, invoked by
+  // backend-test-worktree.sh to create/grant a first-use database. Lives at
+  // `<root>/bin/mysql` (mirroring gradlew's `<root>/backend/gradlew` layout)
+  // so it can be put ahead of the real `mysql` on PATH. Records every
+  // argument and any piped stdin (e.g. the heredoc SQL) to mysqlInvocation,
+  // then exits with FAKE_MYSQL_EXIT (default 0).
+  const binDir = path.join(root, 'bin')
+  mkdirSync(binDir, { recursive: true })
+  const mysqlStandIn = path.join(binDir, 'mysql')
   const mysqlInvocation = path.join(root, 'mysql-invocation')
   writeStandIn(mysqlStandIn, [
     '#!/bin/sh',
-    'root="$(CDPATH= cd -- "$(dirname "$0")" && pwd)"',
+    'root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"',
     'record="$root/mysql-invocation"',
     '{',
     '  for arg in "$@"; do',
@@ -103,6 +106,7 @@ export function makeCheckout(t, { config } = {}) {
     gradleInvocation,
     gradleReached,
     gradleRelease,
+    binDir,
     mysqlStandIn,
     mysqlInvocation,
   }
@@ -119,11 +123,21 @@ function sanitizedChildEnv(env) {
   return childEnv
 }
 
+// Puts the checkout's fake `mysql` stand-in ahead of the real one on PATH so
+// the launcher's `mysql` invocation is intercepted, then applies the usual
+// sanitization/overrides.
+function launcherChildEnv(checkout, env) {
+  return sanitizedChildEnv({
+    PATH: `${checkout.binDir}${path.delimiter}${process.env.PATH ?? ''}`,
+    ...env,
+  })
+}
+
 export function runLauncher(checkout, { env = {}, args = [] } = {}) {
   return spawnSync(checkout.launcher, args, {
     cwd: checkout.root,
     encoding: 'utf8',
-    env: sanitizedChildEnv(env),
+    env: launcherChildEnv(checkout, env),
   })
 }
 
@@ -150,7 +164,7 @@ async function waitForFile(
 export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
   const child = spawn(checkout.launcher, args, {
     cwd: checkout.root,
-    env: sanitizedChildEnv({ ...env, GRADLE_HOLD: '1' }),
+    env: launcherChildEnv(checkout, { ...env, GRADLE_HOLD: '1' }),
   })
 
   let stdout = ''

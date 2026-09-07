@@ -12,12 +12,9 @@ import {
   runLauncher,
 } from './backend-test-worktree-test-fixtures.mjs'
 
-test('missing configuration refuses before gradle', (t) => {
-  const checkout = makeCheckout(t)
-  const result = runLauncher(checkout)
-  assertRefusedBeforeGradle(checkout, result)
-  assert.match(outputOf(result), /ENOENT|no such file/i)
-})
+// Missing configuration no longer refuses: it provisions a new database and
+// identity before running gradle. See
+// backend-test-worktree-provisioning.test.mjs.
 
 test('malformed configuration refuses before gradle', (t) => {
   const checkout = makeCheckout(t, { config: '{"id":' })

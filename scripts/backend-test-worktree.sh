@@ -27,6 +27,13 @@ fi
 checkout_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 config_path="${checkout_root}/.worktree.local.json"
 
+mysql_host="127.0.0.1"
+mysql_port="3309"
+
+database_for_worktree() {
+  echo "doughnut_${1}_test"
+}
+
 lock_dir="${checkout_root}/.worktree.local.lock"
 if mkdir "${lock_dir}" 2>/dev/null; then
   echo "$$" > "${lock_dir}/owner.pid"
@@ -38,6 +45,25 @@ else
     echo "Backend worktree tests are already running in this checkout (owner lock record is invalid). Refusing to start a second run." >&2
   fi
   exit 1
+fi
+
+if [[ ! -f "${config_path}" ]]; then
+  new_worktree_id="wt_$(node -e 'process.stdout.write(require("crypto").randomUUID().replace(/-/g, ""))')"
+  new_database="$(database_for_worktree "${new_worktree_id}")"
+
+  provisioning_sql="CREATE DATABASE ${new_database} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON ${new_database}.* TO 'doughnut'@'localhost'; GRANT ALL PRIVILEGES ON ${new_database}.* TO 'doughnut'@'127.0.0.1'; FLUSH PRIVILEGES;"
+  mysql -u root -h "${mysql_host}" -P "${mysql_port}" -e "${provisioning_sql}"
+
+  WORKTREE_CONFIG="${config_path}" WORKTREE_ID="${new_worktree_id}" node -e '
+const fs = require("fs")
+fs.writeFileSync(
+  process.env.WORKTREE_CONFIG,
+  JSON.stringify({ id: process.env.WORKTREE_ID }),
+  { flag: "wx" }
+)
+'
+
+  echo "Allocated new worktree environment: ${new_worktree_id}"
 fi
 
 worktree_id="$(
@@ -57,8 +83,8 @@ if ! printf '%s\n' "${worktree_id}" | grep -Eq '^wt_[a-z0-9_]{1,32}$'; then
   exit 1
 fi
 
-database="doughnut_${worktree_id}_test"
-expected_url="jdbc:mysql://127.0.0.1:3309/${database}?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true"
+database="$(database_for_worktree "${worktree_id}")"
+expected_url="jdbc:mysql://${mysql_host}:${mysql_port}/${database}?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true"
 
 for var_name in SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL; do
   value="${!var_name:-}"
