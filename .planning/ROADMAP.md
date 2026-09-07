@@ -16,8 +16,10 @@ No active milestone. Start the next one with `/gsd-new-milestone`.
 Selected unfinished stories: [PRODUCT-BACKLOG.md](PRODUCT-BACKLOG.md).
 
 Parked undecomposed seeds: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008.
-Also deferred: Git-native Portable notebook tree synchronization proposed in
-ADR 0002 (v1 stories live in SEED-009).
+Git-backed notebook work is active through ad-hoc SEED-009 stories, with
+sequential editing and same-folder renaming delivered. The next selected
+outcomes address content divergence and conflicts. Proposed ADR 0002 remains
+the broader direction; completing the current queue will not cover all of it.
 
 ---
-*Last updated: 2026-09-05*
+*Last updated: 2026-09-07*

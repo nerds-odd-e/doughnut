@@ -2,8 +2,12 @@
 
 ## Near-future direction
 
-Implement the Git-native Portable notebook tree synchronization described in
-[ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md).
+Let notebook owners refine notes in Obsidian or an AI IDE and Donut without
+discarding either side's work or losing learning history. Build on the delivered
+sequential Git workflow by next handling concurrent local and web content edits,
+then broader reorganization. This advances the direction in
+[Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
+the selected queue does not cover its complete synchronization contract.
 
 1. [Keep non-overlapping accumulated local and web changes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8) — SEED-009
 2. [Resolve an overlapping edit with ordinary Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9) — SEED-009

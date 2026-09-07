@@ -18,10 +18,15 @@ Healthy mainline for learning and knowledge work.
 
 **Shipped v1.0 (2026-07-23):** Notebook Health lint + Health tab + gated empty-folder purge.
 
-Portable content format follows Accepted ADR 0004. Git-native two-way
-synchronization is proposed in
+Portable content format follows Accepted ADR 0004. The Git workflow in
+[SEED-009](seeds/SEED-009-git-backed-local-notebook-workflow.md) has delivered
+clone, sequential content publish/pull, additions, isolated deletion, and
+same-folder identity-preserving rename. Content divergence/conflict handling
+is next in [the product backlog](PRODUCT-BACKLOG.md). These bounded deliveries
+advance the direction in Proposed
 [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
-catalog ZIP download remains (`notebook_export.feature`).
+they do not establish full v1 synchronization. Catalog ZIP download remains
+(`notebook_export.feature`).
 
 ## Requirements
 
@@ -49,8 +54,9 @@ catalog ZIP download remains (`notebook_export.feature`).
 
 ### Out of Scope
 
-- Portable notebook two-way synchronization — deferred pending advice and a
-  human decision on Proposed ADR 0002
+- Full Proposed ADR 0002 synchronization beyond the selected SEED-009 story
+  boundaries — including web structural synchronization, drift repair, and
+  broader accumulated history; direct standard-Git remote access remains later
 - Spelling follow-ons (MCQ / fuzzy / `Notebook:Title`) — parked as SEED-001
 - Broad unrelated refactors not required by the current milestone
 - Stacked matched `NoteShow` bodies on accidental-match result — replaced by dialog
@@ -90,4 +96,4 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-09-04*
+*Last updated: 2026-09-07*

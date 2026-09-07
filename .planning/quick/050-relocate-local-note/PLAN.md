@@ -1,8 +1,10 @@
 # Publish an identity-preserving note relocation
 
-Status: planned; waiting for Story 6 delivery.
+Status: planned; Story 6 prerequisite delivered. Stories 8 and 9 remain higher
+product priorities; this plan has not been executed.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
-Prerequisite: [Story 6 rename plan](../049-publish-local-note-move/PLAN.md).
+Prerequisite: [delivered Story 6](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-6).
+Related corrections: [Plan 52](../052-clarify-note-rename-publication/PLAN.md).
 
 ## Goal and scope
 
@@ -34,9 +36,13 @@ priority. Story 7 (whole-folder moves) follows this story.
 
 ## Reused execution context
 
-After Story 6 is delivered, inspect its actual rename representation and
-publication handler; extend those instead of creating another identity path.
-The original planning inspection identified these reusable boundaries:
+Story 6 is delivered through `980114d23d`. Its implementation classifies one
+raw equal-blob removed/added pair in
+`NotebookGitProposalTreeShape.detectSameParentRename` and mutates the same
+Note in `NotebookGitProposalPublisher.applyRename`. Extend that representation
+and handler instead of creating another identity path. Recheck their current
+form at execution, including any completed Plan 52 corrections.
+The reusable boundaries are:
 
 - NotebookGitProjection.requireRepresentedFolderIdForAddition already resolves
   a full destination folder path against accepted parent content, including
@@ -44,6 +50,9 @@ The original planning inspection identified these reusable boundaries:
 - NoteTitlePlacementRules checks a deleted final title at a chosen folder.
   Resolve and validate the destination first, then assign the final title and
   folder inside NotebookGitProposalPublisher's existing transaction.
+  Preserve path-specific conflict context from the Story 6 correction; if
+  Plan 52 is still pending when this story is selected, reconcile its error
+  correction with leaf 6 once rather than duplicate the work.
 - NoteMotionService flushes and validates its current title; web movement also
   rewrites references. Do not sequence those workflows to implement an atomic
   final placement or accidentally validate an intermediate collision.
@@ -182,8 +191,11 @@ root/existing represented destinations, unchanged content/links and a separately
 published later edit. CLI clone/publish tests and focused E2E.
 
 Behavior: Owner reads next-step guidance → learns the expanded destination
-boundary without being promised folder creation or mixed moves. Update the
-same guidance introduced for renaming; no parallel help surface.
+boundary without being promised folder creation or mixed moves. Extend the
+same guidance corrected by Plan 52: commit and publish the relocation, wait
+for acceptance, then edit and separately commit/publish. Keep the explanation
+that links remain authored and may stop resolving. If Plan 52 remains pending,
+reconcile its guidance correction here once; no parallel help surface.
 
 ### 9. Edit the same note after its accepted relocation
 Type: Behavior
@@ -228,10 +240,11 @@ observation. Preserve unrelated files, and keep slice state here, not STATE.md.
 
 ## Readiness and sizing
 
-This is the separately mapped initial relocation plan, not the plan selected
-for refinement in this request. Do not execute before Story 6 is delivered.
-Target approximately five minutes per eventual execution leaf; estimates
-remain hypotheses. Recheck against the actual delivered rename code and proof.
+Story 6's technical prerequisite is met. Select this story through the product
+backlog after the higher-priority content divergence/conflict outcomes;
+Stories 8/9 are not technical dependencies. Target approximately five minutes
+per eventual execution leaf; estimates remain hypotheses. Recheck against
+the delivered rename code and proof when execution is selected.
 
 The split retains 10 Behavior leaves. Backend continuation and CLI receipt
 remain separate proof loops as in the original plan; no verification is bundled
