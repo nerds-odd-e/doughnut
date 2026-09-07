@@ -66,8 +66,5 @@ database. The focused form keeps the same database. The command prints
 - Concurrent full suites on one mysqld need enough `max_connections`. Local
   nix mysqld starts with 1000 via `scripts/mysql_nix_shared.sh`. Do not
   serialize concurrent suites as the supported workaround.
-- Some tests may still touch the legacy test database. One existing test
-  (`QuestionGenerationBatchMaintenanceConcurrencyTest`) hardcodes
-  `doughnut_test` through custom Spring configuration, not this selector.
 - Cancellation interrupts the owned foreground command (the usual
   terminal/process-group interrupt).
