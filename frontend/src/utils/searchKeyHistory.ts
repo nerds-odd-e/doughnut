@@ -1,10 +1,7 @@
-export const SEARCH_KEY_HISTORY_COOKIE_NAME = "donut.searchKeyHistory"
+export const SEARCH_KEY_HISTORY_KEY = "donut.searchKeyHistory"
 
 const MAX_KEYS = 100
-/** Stored substring length so long queries still fit in a single cookie with ~4KB total limit. */
 const MAX_CHARS_PER_KEY = 512
-const MAX_AGE_SECONDS = 60 * 60 * 24 * 400
-const MAX_COOKIE_PAYLOAD_CHARS = 3800
 
 function normalizeKey(raw: string): string {
   const t = raw.trim()
@@ -25,36 +22,75 @@ function parseCookieValue(
   return null
 }
 
-export function readSearchKeyHistory(): string[] {
-  if (typeof document === "undefined") return []
-  const encoded = parseCookieValue(
-    document.cookie,
-    SEARCH_KEY_HISTORY_COOKIE_NAME
-  )
-  if (encoded == null || encoded === "") return []
-  try {
-    const parsed: unknown = JSON.parse(decodeURIComponent(encoded))
-    if (!Array.isArray(parsed)) return []
-    return parsed.filter((x): x is string => typeof x === "string")
-  } catch {
-    return []
-  }
+function normalizeHistory(keys: unknown[]): string[] {
+  return [
+    ...new Set(
+      keys
+        .filter((key): key is string => typeof key === "string")
+        .map(normalizeKey)
+        .filter(Boolean)
+    ),
+  ].slice(0, MAX_KEYS)
 }
 
-function cookiePayloadWithinLimit(keys: string[]): string {
-  let list = [...keys]
-  let payload = encodeURIComponent(JSON.stringify(list))
-  while (payload.length > MAX_COOKIE_PAYLOAD_CHARS && list.length > 1) {
-    list = list.slice(0, -1)
-    payload = encodeURIComponent(JSON.stringify(list))
+function parseHistory(raw: string | null): string[] | null {
+  if (raw === null) return null
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch (error) {
+    if (error instanceof SyntaxError) return null
+    throw error
   }
-  return payload
+  return Array.isArray(parsed) ? normalizeHistory(parsed) : null
+}
+
+function isStorageUnavailable(error: unknown): boolean {
+  return (
+    error instanceof DOMException &&
+    (error.name === "SecurityError" || error.name === "QuotaExceededError")
+  )
+}
+
+function readLocalHistory(): string[] | null {
+  let raw: string | null
+  try {
+    raw = localStorage.getItem(SEARCH_KEY_HISTORY_KEY)
+  } catch (error) {
+    if (isStorageUnavailable(error)) return null
+    throw error
+  }
+  return parseHistory(raw)
+}
+
+function readLegacyHistory(): string[] {
+  const encoded = parseCookieValue(document.cookie, SEARCH_KEY_HISTORY_KEY)
+  if (!encoded) return []
+  let decoded: string
+  try {
+    decoded = decodeURIComponent(encoded)
+  } catch (error) {
+    if (error instanceof URIError) return []
+    throw error
+  }
+  return parseHistory(decoded) ?? []
+}
+
+export function readSearchKeyHistory(): string[] {
+  if (typeof document === "undefined") return []
+  return readLocalHistory() ?? readLegacyHistory()
 }
 
 function writeSearchKeyHistory(keys: string[]): void {
   if (typeof document === "undefined") return
-  const payload = cookiePayloadWithinLimit(keys)
-  document.cookie = `${SEARCH_KEY_HISTORY_COOKIE_NAME}=${payload}; Path=/; Max-Age=${MAX_AGE_SECONDS}; SameSite=Lax`
+  const payload = JSON.stringify(keys)
+  try {
+    localStorage.setItem(SEARCH_KEY_HISTORY_KEY, payload)
+  } catch (error) {
+    if (isStorageUnavailable(error)) return
+    throw error
+  }
+  document.cookie = `${SEARCH_KEY_HISTORY_KEY}=; Path=/; Max-Age=0; SameSite=Lax`
 }
 
 export function appendSearchKeyToHistory(rawKey: string): void {

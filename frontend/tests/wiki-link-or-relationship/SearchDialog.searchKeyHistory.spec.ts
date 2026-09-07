@@ -1,9 +1,8 @@
-import { SearchController } from "@generated/donut-backend-api/sdk.gen"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
-import { cleanup, fireEvent, screen } from "@testing-library/vue"
+import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper from "@tests/helpers"
 import {
   seedSearchKeyHistory,
   seedEncodedSearchKeyHistory,
@@ -11,69 +10,17 @@ import {
 import { describe, expect, it } from "vitest"
 import {
   historyDropdown,
-  makeNoteHit,
+  historyItems,
   openSearchKeyHistoryDropdown,
   renderSearchForm,
   renderSearchFormInModal,
   renderSearchWithKeyHistory,
-  setupSearchDialogFakeTimers,
   setupSearchDialogTests,
   titleEl,
-  typeInSearch,
 } from "./searchDialogTestSupport"
 
 describe("SearchForm search key history", () => {
   setupSearchDialogTests()
-
-  describe("search key recording", () => {
-    setupSearchDialogFakeTimers()
-
-    async function searchAndRemount(key: string) {
-      const note = MakeMe.aNote.please()
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Hit", note.noteTopology.id + 1),
-      ])
-      const searchInput = await renderSearchForm({ note })
-      await typeInSearch(searchInput, key)
-      cleanup()
-      await renderSearchForm({ note })
-      await openSearchKeyHistoryDropdown()
-    }
-
-    it("records trimmed searches newest first and deduplicates after remount", async () => {
-      seedSearchKeyHistory(["beta", "alpha", "older"])
-      await searchAndRemount("  alpha  ")
-      expect(historyItems()).toEqual(["alpha", "beta", "older"])
-    })
-
-    it("keeps the newest 100 entries after a completed search", async () => {
-      seedSearchKeyHistory(Array.from({ length: 100 }, (_, i) => `k${99 - i}`))
-      await searchAndRemount("k100")
-      expect(historyItems()).toEqual(
-        Array.from({ length: 100 }, (_, i) => `k${100 - i}`)
-      )
-    })
-
-    it("limits a saved query to 512 characters", async () => {
-      await searchAndRemount("x".repeat(600))
-      expect(historyItems()).toEqual(["x".repeat(512)])
-      await fireEvent.click(screen.getByTestId("search-key-history-item-0"))
-      expect(
-        (screen.getByPlaceholderText("Search") as HTMLInputElement).value
-      ).toBe("x".repeat(512))
-    })
-
-    it.each(["", "   "])("does not record an empty search %j", async (key) => {
-      await searchAndRemount(key)
-      expect(screen.getByText("No search history yet")).toBeInTheDocument()
-    })
-  })
-
-  function historyItems() {
-    return screen
-      .queryAllByTestId(/^search-key-history-item-/)
-      .map((item) => item.textContent?.trim())
-  }
 
   it("shows empty message when cookie has no entries", async () => {
     helper

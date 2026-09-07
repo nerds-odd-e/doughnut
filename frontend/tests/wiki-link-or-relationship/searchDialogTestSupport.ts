@@ -36,6 +36,12 @@ export function historyDropdown(): HTMLDetailsElement {
   return screen.getByTestId("search-key-history-dropdown") as HTMLDetailsElement
 }
 
+export function historyItems() {
+  return screen
+    .queryAllByTestId(/^search-key-history-item-/)
+    .map((item) => item.textContent?.trim())
+}
+
 export function makeNoteHit(title: string, notebookId: number) {
   return {
     hitKind: "NOTE" as const,

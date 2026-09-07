@@ -2,7 +2,7 @@
 
 Source: [SEED-014 Story 1](../../seeds/SEED-014-reliable-login-with-browser-history.md#story-1).
 Status: in progress on `codex/reliable-login-browser-history`.
-Readiness: recovery and history boundary consolidation delivered; continue with leaf 5.
+Readiness: recovery and local search persistence delivered; continue with leaf 6.
 Execution worktree: `/Users/terryyin/.codex/worktrees/f8d7/doughnut`.
 CI observer: coordinator `047-f8d7`, repository `nerds-odd-e/doughnut`, main;
 cell 10 / PTY session 29699 / PID 65697; mailbox `/tmp/donut-ci-501/watch-8lFX2v`.
@@ -272,8 +272,17 @@ Stop-safe: no product behavior change or duplicate history owner.
 
 ### 5. Keep completed searches locally without growing a cookie
 Type: Behavior
-Status: planned
+Status: done
 Proof: One mounted SearchForm persistence loop across completed search/remount.
+
+Eight regression cases failed before production change. Passed:
+`CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts tests/wiki-link-or-relationship/SearchDialog.searchKeyHistoryPersistence.spec.ts`
+(23 cases) and `CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test`
+(341 files / 1860 tests, 66.74s). Persistence coverage split into the second file
+to keep each test file small. Fresh refactor consolidated the dropdown observer
+in existing support and reran both files (23 passed, 3.41s). Coordinator
+formatting passed. Implementation converged around six minutes; legacy reads
+remain available for the arrival trigger in leaf 6.
 
 Behavior: A learner completes a search with current or legacy history →
 bounded MRU history persists in localStorage → the next visit sees those
