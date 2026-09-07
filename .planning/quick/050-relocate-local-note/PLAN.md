@@ -300,10 +300,15 @@ Sizing: ~5 minutes active work, medium confidence; one eligibility policy loop.
 
 ### 8. Preserve an unavailable final destination
 Type: Behavior
-Status: planned
+Status: done
 Proof: A prior accepted deletion reserves the target folder/title → relocating
 there returns final Portable path, original conflict type/fields/deletedNoteId
-and cause; source, deleted identity and binding remain unchanged. Backend suite.
+and cause; source, deleted identity and binding remain unchanged. Backend suite
+(`source /workspace/scripts/cloud_agent_setup.sh && pnpm backend:test_only`).
+`NotebookGitDeletedDestinationControllerTest.rejectsARelocationIntoAnAcceptedDeletionWithoutResurrectingOrMutatingTheSource`
+names `Dest/Reserved destination.md`, `SOFT_DELETED_TITLE_CONFLICT`,
+`deletedNoteId`, `_originalMessage`, and cause; source stays `Source/note`;
+deleted note and tracker `deletedAt` and accepted binding stay unchanged.
 
 Behavior: Final placement is reserved → publish → reject atomically using the
 destination's title rule and the delivered contextual-error behavior.
@@ -384,7 +389,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–7 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–8 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -399,6 +404,7 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 - Leaf 5: late binding-save failure rolls back relocate-and-rename folder/title using the existing atomic-test profile.
 - Leaf 6: emptying a README-less source by relocating its last note keeps the Donut folder ID and invents no README.
 - Leaf 7: missing/unrepresented destinations reject with the existing parent-folder message; descendant-only tracked content still represents an ancestor.
+- Leaf 8: relocating onto a dest-folder title reserved by accepted deletion keeps Plan 52 contextual conflict semantics.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are
