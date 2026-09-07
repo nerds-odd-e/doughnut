@@ -12,7 +12,7 @@ PROJECT_ID="carbon-syntax-298809"
 ZONE="us-east1-b"
 MIG_NAME="doughnut-app-group"
 TEMPLATE_NAME="doughnut-app-debian12-zulu25-openai-mig-template"
-STARTUP_SCRIPT="${SCRIPTPATH}/mig-zulu25-openai-app-instance-startup.sh"
+STARTUP_SCRIPT="${STARTUP_SCRIPT_PATH:-${SCRIPTPATH}/mig-zulu25-openai-app-instance-startup.sh}"
 
 echo "Updating MIG instance template with new startup script..."
 
@@ -83,4 +83,3 @@ echo "  ./infra/gcp/scripts/check-mig-rollout.sh"
 echo ""
 echo "Or check health with:"
 echo "  ./infra/gcp/scripts/check-mig-doughnut-app-service-health.sh"
-

@@ -135,7 +135,7 @@ Expect the Vue production build under `frontend/dist`. The CLI install URL is se
 
 ### 10. Production environment
 
-- [GCP production notes](./docs/gcp/prod_env.md) — includes **conditional backend deploy** (when CI skips GCS/MIG on unchanged jar) and how to **force a full deploy** with `force-deployment: true` in the deploy commit message; details in [conditional-backend-deploy.md](./docs/gcp/conditional-backend-deploy.md).
+- [GCP production notes](./docs/gcp/prod_env.md) — ordinary main pushes run CI only. Increasing immutable `vMAJOR.MINOR.PATCH` tags release an exact tested main commit, one application release at a time; see the [release runbook](./docs/gcp/conditional-backend-deploy.md) for CI waiting, conditional backend deployment and next-patch correction.
 
 ### 11. [Donut source code secrets management](./docs/secrets_management.md)
 

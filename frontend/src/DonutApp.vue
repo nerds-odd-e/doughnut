@@ -20,6 +20,9 @@ import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
 import SoftKeyboardPrimer from "./components/commons/SoftKeyboardPrimer.vue"
 import { useFeatureToggle } from "./composables/useFeatureToggle"
+import { migrateSearchKeyHistory } from "./utils/searchKeyHistory"
+
+migrateSearchKeyHistory()
 
 const apiStatus: Ref<ApiStatus> = ref({
   states: [],

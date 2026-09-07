@@ -64,6 +64,7 @@ const config = defineConfig({
       "file-saver",
       "turndown",
       "vue-toastification",
+      "vue-toastification/dist/index.mjs",
       "marked",
       "turndown-plugin-gfm",
     ],

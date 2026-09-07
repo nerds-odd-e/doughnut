@@ -79,13 +79,15 @@ gcloud sql instances describe doughnut-db-instance \
   --format="table(settings.databaseFlags[].name, settings.databaseFlags[].value)"
 ```
 
-## 5. CI/CD: conditional backend deploy
+## 5. Version-tag releases and conditional backend deploy
 
-Green `main` builds may **skip** GCS jar upload and MIG rollout when the jar hash and startup script hash match the last successful deploy record. To **force** upload + rolling replace anyway, use the commit-message token and merge caveats in [conditional-backend-deploy.md](conditional-backend-deploy.md).
+Ordinary `main` pushes run CI without publishing. One increasing immutable `vMAJOR.MINOR.PATCH` tag selects the exact tested main commit for release, with a bounded 60-minute wait if CI is unfinished. Issue one application release at a time; use a tested correction/revert and next patch after failure. No automatic schema rollback is provided. See the [release runbook](conditional-backend-deploy.md).
+
+A selected release may **skip** GCS jar upload and MIG rollout when the jar hash and startup script hash match the last successful deploy record. To **force** upload + rolling replace anyway, use the commit-message token and merge caveats in [conditional-backend-deploy.md](conditional-backend-deploy.md).
 
 ## 6. Frontend static in GCS (CI publish + prod LB)
 
-Each green `main` CI run builds the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) and CLI bundle as GitHub Actions artifacts. The deploy workflow then uploads them to:
+Each green `main` CI run builds the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) and CLI bundle as GitHub Actions artifacts. A qualifying application tag admits that exact CI run; the deploy workflow uploads its artifacts to:
 
 `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`
 
