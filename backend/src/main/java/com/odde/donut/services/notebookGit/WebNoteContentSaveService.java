@@ -1,6 +1,7 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NoteRepository;
@@ -81,8 +82,13 @@ public class WebNoteContentSaveService {
               state.notebook().getReadmeContent(),
               state.folders(),
               NotebookExportRows.notes(state.liveNotes()));
-      acceptedSnapshotPersistence.persist(
-          accepted, entries, binding, updatedAt, "Edit note content: " + note.getTitle());
+      String message = "Edit note content: " + note.getTitle();
+      if (NoteConceptType.isOrdinary(document.content())) {
+        acceptedSnapshotPersistence.persistOrdinaryNoteContentEdit(
+            accepted, entries, binding, updatedAt, message, note.getId());
+      } else {
+        acceptedSnapshotPersistence.persist(accepted, entries, binding, updatedAt, message);
+      }
     }
     return note;
   }

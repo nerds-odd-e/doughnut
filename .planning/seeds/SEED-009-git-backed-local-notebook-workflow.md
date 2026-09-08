@@ -65,15 +65,14 @@ The product constraints established in the discussion are:
 3. **Edits-only multi-note publish:** delivered as Story 14, independent of
    receiving additions. Story 11 already publishes mixed additions and edits.
 4. **Complete synchronization:** defer the broad contract. The owner also
-   values readable history, so Story 10 remains queued after delivered Story 15.
-   The owner selected a rolling ten-minute amendment window for Story 10:
-   durable web commits may change until exposed to a client or followed by
-   another accepted change. Published history remains immutable.
+   values readable history; Story 10 (rolling ten-minute web autosave batching)
+   is delivered. Durable web commits may change until exposed to a client or
+   followed by another accepted change. Published history remains immutable.
 
-**Priority:** Stories 13, 16, 14, 17, 18, 18a, and 15 are delivered. Web autosave
-batching (10) remains queued after concurrent worktree isolation as the global
-backlog lead. This is not a claim that usage data proves these are the most
-frequent failures.
+**Priority:** Stories 13, 16, 14, 17, 18, 18a, 15, and 10 are delivered.
+Remaining SEED-009 work follows the product backlog after concurrent worktree
+isolation as the global backlog lead. This is not a claim that usage data
+proves these are the most frequent failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
@@ -113,12 +112,13 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 - **Goal:** Receive accepted web content edits without copying files or cloning
   again.
 - **Scope:** Changed durable saves of existing ordinary-note body/frontmatter at
-  unchanged paths create immutable commits when the current Portable projection
-  matches accepted main. Clean bound main checkouts can fast-forward accepted
-  history, including accepted structural changes. Ordinary web note creation is
-  delivered in Story 13. Web deletion/rename/move and notebook/folder README
-  edits are not synchronized; existing projection drift is neither absorbed nor
-  repaired.
+  unchanged paths create accepted commits when the current Portable projection
+  matches accepted main. Unexposed same-note web content tips may be amended
+  within Story 10's window; once exposed to a client, that tip and its ancestors
+  stay immutable. Clean bound main checkouts can fast-forward accepted history,
+  including accepted structural changes. Ordinary web note creation is delivered
+  in Story 13. Web deletion/rename/move and notebook/folder README edits are not
+  synchronized; existing projection drift is neither absorbed nor repaired.
 
 <a id="story-4"></a>
 
@@ -213,7 +213,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 10. See one stable commit for one continuous web edit
 
-**Status:** refined; selected for slice planning.
+**Status:** delivered. Plan: [quick/071](../quick/071-web-autosave-commit-batching/PLAN.md).
 
 - **Goal:** A notebook owner reading Git history sees one editing unit for
   consecutive web content edits to the same ordinary note, including thinking
@@ -226,38 +226,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   replaces the tip with the same parent and latest content, preserving note
   identity and learning data. Only the current unexposed web-content tip is
   eligible; existing history, cutover, creation and client-authored commits
-  are immutable.
-- **Publication boundary:** Downloading the Git bundle (clone/acquisition or
-  pull, regardless of client) freezes the current tip before returning bytes.
-  Returning the current head from an idempotent publish freezes it too.
-  Subsequent saves start a fresh amendable batch. Another accepted notebook
-  change ends the old batch, including another note's save, creation, and
-  supported local publication/structural changes. A failed client operation
-  after download does not undo freezing.
-- **Key examples:** Saves at 10:00, 10:08 and 10:16 leave one edit commit;
-  another at 10:27 leaves two. A save exactly ten minutes after the previous
-  changed save starts a second commit. Pull between two saves preserves the
-  pulled commit as the next commit's parent. Save A, save B, save A produces
-  three commits even within ten minutes. Creation remains a separate commit
-  before the newly created note's content-edit batch. Reloading server state
-  does not lose eligibility or unfreeze a downloaded commit. Concurrent save
-  and download serialize so every downloaded head remains in later history.
-- **Conservative details:** Canonical no-op saves retain existing behavior:
-  no Git commit and no extension of the changed-save interval. Reading note
-  content or exporting Markdown is not Git-history exposure. Eligibility is
-  durable and decided on the server; no browser-session tracking or timer job.
-- **Exclusions:** No new editor UI, explicit publish button, configurable
-  timeout, native Git transport, structural web synchronization, historical
-  rewriting of exposed commits, broader rebase support, or projection-drift
-  repair. Existing drift, validation and authorization policies remain.
-- **Architecture:** The owner explicitly agreed in this discussion to amend
-  durable but unexposed web tips, replacing this seed's previous blanket
-  accepted-commit immutability rule for this case. ADR 0002 remains Proposed;
-  its accepted-versus-advertised wording is not silently changed or approved.
-  Accepted ADR 0004's Portable format is unchanged. Persist the amendment state
-  with the binding and serialize exposure with existing Git writers.
-- **Open decisions:** None blocking the selected scope.
-- **Plan:** [Web autosave commit batching](../quick/071-web-autosave-commit-batching/PLAN.md).
+  are immutable. Bundle download and idempotent publish freeze the returned
+  tip. No UI, configurable timeout, native Git transport, structural web sync,
+  or rewriting of exposed commits. ADR 0002 remains Proposed/unedited.
 
 <a id="story-11"></a>
 
@@ -466,8 +437,6 @@ Preserve these boundaries in future refinement:
 - **Priority assumption open to revision:** no real-user frequency evidence
   ranks folder divergence or history readability. Do not displace the
   developer's concurrent-worktree priority.
-- **Story 10, before planning:** define the end-of-edit/publication boundary
-  and acceptable delay without losing durable saves or rewriting visible history.
 - **Batch follow-ons:** Repeated pull, three-or-more-note rebase, and multiple
   accepted saves are distinct excluded outcomes, not delivered by Story 18.
   Capture the blocking owner journey before selecting a broader batch story;
@@ -477,8 +446,9 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Story 15 is delivered. Refine Story 10 when it reaches selection for planning.
-This seed is non-executable; queue selection does not authorize implementation.
+Story 10 is delivered. Remaining SEED-009 stories stay non-executable until
+selected from the product backlog; queue selection does not authorize
+implementation.
 
 ## Breadcrumbs
 
