@@ -4,11 +4,12 @@ import { Imposter, Mountebank, type Stub } from '@anev/ts-mountebank'
 import request from 'superagent'
 
 class MountebankWrapper {
-  mountebank = new Mountebank()
+  mountebank: Mountebank
   port: number
 
-  constructor(port: number) {
+  constructor(port: number, managementUrl: string) {
     this.port = port
+    this.mountebank = new Mountebank().withURL(managementUrl)
   }
 
   public get serviceUrl(): string {

@@ -1,7 +1,7 @@
 # Isolated OpenAI browser mocks
 
 Source: [SEED-015 story 3](../../seeds/SEED-015-concurrent-worktree-environments.md#story-3).
-Status: planned. Planning only; implementation has not started.
+Status: in-progress. Slice 1 done.
 
 ## Goal and scope
 
@@ -80,19 +80,18 @@ and protection against malicious post-verification listener replacement.
 
 ### 1. Bind OpenAI mock operations to one endpoint context
 Type: Structure
-Status: planned
-Proof: Existing note-content completion remains green on shared defaults;
-focused support tests exercise explicit management/serving URLs through mock
-setup and recorded-request fetching, mocking only external HTTP.
+Status: done
+Proof: Focused support test
+`pnpm -C cli exec tsx --test ../e2e_test/start/mock_services/openAiMockEndpointContext.test.ts`
+exercises explicit management/serving URLs through mock setup and
+recorded-request fetching (local HTTP stand-in). Shared 2525/5001 defaults
+remain at the OpenAI service boundary. Linked-worktree Cypress shared-default
+regression deferred to leaf 2 allowlist expansion.
 
-Internal change: Make OpenAI setup, service URL and recording reads consume one
-small endpoint context, supplied explicitly to the existing mock helpers. Keep
-default selection at the current shared boundary, not scattered among helpers.
-No isolated allowlist expansion yet. This immediately enables leaf 2 to pass a
-private context without leaving a separate request-recording route behind.
-
-Sizing: About 5 minutes plus focused Cypress runtime if used; the constructor
-and URL call sites above bound the edit. No new mock abstraction hierarchy.
+Internal change: OpenAI setup, service URL and recording reads consume one
+`OpenAiMockEndpointContext`, supplied explicitly to the existing mock helpers.
+Default selection stays at `openAiService` / `SHARED_OPEN_AI_MOCK_ENDPOINT_CONTEXT`.
+No isolated allowlist expansion yet. Enables leaf 2 to pass a private context.
 
 ### 2. Accept a content suggestion through a private mock run
 Type: Behavior
@@ -226,3 +225,6 @@ Backend mock destination injection already exists. Runner-scoped temporary
 mock endpoints avoid new persistent port fields and preserve no-mock startup.
 The existing paired reset harness supplies a focused coordination pattern;
 its database-reset success is not evidence of independent mock state.
+Slice 1: `OpenAiMockEndpointContext` unifies management URL + serving port for
+OpenAI helpers; Google/Wikidata unchanged. Linked worktree cannot yet run the
+note-content Cypress feature under the current allowlist (leaf 2).
