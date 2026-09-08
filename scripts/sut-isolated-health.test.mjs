@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
 import {
+  allocateFreePort,
   closeServer,
   completeIsolatedConfig,
   isTcpListening,
@@ -10,15 +11,9 @@ import {
   listenTcp,
   startLiveOwner,
   writeIsolatedConfig,
+  writeIsolatedE2ePorts,
 } from './sut-isolated-fixtures.mjs'
 import { startOwnedListeningOwner } from './sut-owned-listening-fixtures.mjs'
-
-async function allocateFreePort() {
-  const temporary = await listenTcp()
-  const { port } = temporary
-  await closeServer(temporary.server)
-  return port
-}
 
 test('isolated health requires the live owner even when a foreign ready listener exists', async (t) => {
   const checkout = makePrimaryCheckout(t)
@@ -98,10 +93,7 @@ test('isolated health fails when a recorded endpoint listener is outside the app
             : await allocateFreePort(),
       }
 
-      writeIsolatedConfig(checkout.root, {
-        ...completeIsolatedConfig,
-        e2e: { ...completeIsolatedConfig.e2e, ...ports },
-      })
+      writeIsolatedE2ePorts(checkout.root, ports)
       await startOwnedListeningOwner(t, checkout.root, {
         ...ports,
         omitService,
@@ -118,21 +110,12 @@ test('isolated health fails when a recorded endpoint listener is outside the app
 
 test('isolated health passes when recorded listeners belong to the application group', async (t) => {
   const checkout = makePrimaryCheckout(t)
-  const backend = await listenTcp()
-  const vite = await listenTcp()
-  const ready = await listenHttpReady()
   const ports = {
-    backendPort: backend.port,
-    vitePort: vite.port,
-    lbListenPort: ready.port,
+    backendPort: await allocateFreePort(),
+    vitePort: await allocateFreePort(),
+    lbListenPort: await allocateFreePort(),
   }
-  await closeServer(backend.server)
-  await closeServer(vite.server)
-  await closeServer(ready.server)
-  writeIsolatedConfig(checkout.root, {
-    ...completeIsolatedConfig,
-    e2e: { ...completeIsolatedConfig.e2e, ...ports },
-  })
+  writeIsolatedE2ePorts(checkout.root, ports)
   await startOwnedListeningOwner(t, checkout.root, ports)
   const health = await runSutHealthcheck({
     checkoutRoot: checkout.root,

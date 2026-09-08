@@ -6,44 +6,18 @@ import {
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
 } from './isolated-cypress.mjs'
 import {
+  assertRefusesBeforeReset,
+  cypressArgv,
+  isolatedCypressOpts,
+  isolatedCypressSpec,
+  isolatedOrigin,
+  supportedConfig,
+} from './isolated-cypress-test-helpers.mjs'
+import {
   completeIsolatedConfig,
   startLiveOwner,
 } from './sut-isolated-fixtures.mjs'
-import { isolatedBrowserOrigin } from './sut-runtime-target.mjs'
 import { beginSutOwnerShutdown } from './sut-owner.mjs'
-
-const isolatedCypressSpec = /only supports|spec selection/i
-const isolatedOrigin = isolatedBrowserOrigin(completeIsolatedConfig.e2e)
-
-function cypressArgv(spec = SUPPORTED_ISOLATED_CYPRESS_SPEC) {
-  return ['node', 'cypress', 'run', '--spec', spec]
-}
-
-function isolatedCypressOpts(extra = {}) {
-  const env = { ...process.env, ...(extra.env ?? {}) }
-  if (!(extra.env && Object.hasOwn(extra.env, 'CYPRESS_baseUrl'))) {
-    delete env.CYPRESS_baseUrl
-  }
-  return {
-    argv: extra.argv ?? cypressArgv(),
-    healthcheckFn: extra.healthcheckFn ?? (async () => ({ ok: true })),
-    env,
-    on: extra.on,
-  }
-}
-
-function supportedConfig(baseUrl = 'http://localhost:5173') {
-  return { specPattern: SUPPORTED_ISOLATED_CYPRESS_SPEC, baseUrl }
-}
-
-async function assertRefusesBeforeReset(run, pattern) {
-  const hooks = { reset: false }
-  await assert.rejects(async () => {
-    await run()
-    hooks.reset = true
-  }, pattern)
-  assert.equal(hooks.reset, false)
-}
 
 test('unsupported or mixed isolated Cypress specs refuse before reset', async (t) => {
   const checkout = makePrimaryCheckout(t, {
@@ -182,7 +156,7 @@ test('conflicting Cypress origin refuses before reset; matching origin remains u
   assert.equal(config.baseUrl, isolatedOrigin)
 })
 
-test('isolated Cypress without a live owner or healthy SUT refuses before reset', async (t) => {
+test('isolated Cypress without a live owner refuses before reset', async (t) => {
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
@@ -194,20 +168,6 @@ test('isolated Cypress without a live owner or healthy SUT refuses before reset'
         isolatedCypressOpts()
       ),
     /verified live SUT owner/
-  )
-
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
-  await assertRefusesBeforeReset(
-    () =>
-      guardCypressNodeSetup(
-        checkout.root,
-        supportedConfig(),
-        isolatedCypressOpts({
-          healthcheckFn: async () => ({ ok: false }),
-        })
-      ),
-    /healthy owning SUT/
   )
 })
 

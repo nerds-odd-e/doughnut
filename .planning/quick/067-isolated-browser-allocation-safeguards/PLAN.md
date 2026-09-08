@@ -128,22 +128,14 @@ with listeners left alive; owned application-group listeners pass.
 ### 3. Refuse browser verification before reset on foreign endpoints
 
 Type: Behavior
-Status: planned
+Status: done
 Behavior: The supported isolated spec targets an allocation with a live owner
 but foreign ready listeners → `guardCypressNodeSetup` → refuse before fixture
 reset. A healthy owned allocation still passes setup.
-Proof: Extend `isolated-cypress.test.mjs` through real `runSutHealthcheck`, using
-slice 2's process fixtures. Observe no reset hook reached and the foreign
-listener still alive; retain the healthy setup/lease behavior. Reuse the
-existing startup health-wait tests to confirm unhealthy results cannot produce
-successful start readiness. Extend the wait boundary only if its existing
-observations do not cover that refusal.
-Focused command:
-`CURSOR_DEV=true nix develop -c node --test scripts/isolated-cypress.test.mjs scripts/sut-start-health-wait.test.mjs`
-Scope: Existing health consumers should need no new policy; this proof closes
-the user-visible path. Do not expand the supported spec allowlist.
-Sizing: about 5 minutes, medium confidence; one consumer refusal proof loop,
-reusing the preceding real-listener fixtures.
+Proof: Real-health foreign LB refusal before reset (listener stays up); owned
+allocation leases; health-wait still refuses unhealthy.
+`CURSOR_DEV=true nix develop -c node --test scripts/isolated-cypress.test.mjs scripts/isolated-cypress-owning-health.test.mjs scripts/sut-start-health-wait.test.mjs scripts/sut-isolated-health.test.mjs`
+(pass).
 
 ### 4. Refuse present invalid database allocation
 

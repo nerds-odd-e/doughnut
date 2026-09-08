@@ -45,6 +45,13 @@ export function writeIsolatedConfig(
   )
 }
 
+export function writeIsolatedE2ePorts(checkoutRoot, ports) {
+  writeIsolatedConfig(checkoutRoot, {
+    ...completeIsolatedConfig,
+    e2e: { ...completeIsolatedConfig.e2e, ...ports },
+  })
+}
+
 export function readIsolatedConfig(checkoutRoot) {
   return JSON.parse(
     readFileSync(path.join(checkoutRoot, '.worktree.local.json'), 'utf8')
@@ -91,6 +98,13 @@ export function listenHttpReady() {
 }
 
 export { closeListeningServer as closeServer }
+
+export async function allocateFreePort() {
+  const temporary = await listenTcp()
+  const { port } = temporary
+  await closeListeningServer(temporary.server)
+  return port
+}
 
 export function isTcpListening(port) {
   return new Promise((resolve) => {
