@@ -41,7 +41,8 @@ export type UnpublishedLocalHistoryDecision =
  * Eligible one-note content edits already based on accepted main stay as-is.
  * Eligible one-note content edits rebase over content-only accepted history,
  * including same-note content edits, and over one accepted ordinary-note
- * addition at the root or an already represented folder.
+ * addition at the root or an already represented folder, optionally followed
+ * by one content save of that same newly added note.
  */
 export function inspectUnpublishedLocalHistory(
   acceptedRepoDir: string,

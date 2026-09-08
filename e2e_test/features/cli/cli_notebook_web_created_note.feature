@@ -122,3 +122,45 @@ Feature: CLI notebook web-created note
     Then the installed CLI reports the rebased local head as the accepted head
     And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
     And I should see note "CLI Clone Notebook/Shopping list" has content ""
+
+  Scenario: Pulling a web-created then saved Shopping list while retaining a local Pasta edit
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I commit the following edit to "Recipes/Pasta.md" in the cloned checkout:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Simmer until al dente
+      """
+    And I create a title-only root note titled "Shopping list" in the notebook "CLI Clone Notebook"
+    And I view the note content as rich content
+    And I update note "Shopping list" content to become "Milk and eggs"
+    When I pull the cloned checkout using the installed CLI
+    Then the cloned checkout is a clean rebased child of the accepted head
+    And the cloned checkout retains the original local commit for "Recipes/Pasta.md"
+    And "Shopping list.md" in the cloned checkout matches the accepted parent
+    And the cloned checkout contains exactly:
+      | README.md          |
+      | Overview.md        |
+      | Shopping list.md   |
+      | Kitchen/README.md  |
+      | Recipes/README.md  |
+      | Recipes/Pasta.md   |
+    And the cloned checkout file "Shopping list.md" is:
+      """
+      ---
+      type: Note
+      ---
+      Milk and eggs
+      """
+    And the cloned checkout file "Recipes/Pasta.md" is:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Simmer until al dente
+
+      """
+    And note "Pasta" should have content "Boil water"

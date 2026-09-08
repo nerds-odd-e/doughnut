@@ -1,7 +1,7 @@
 # Keep a local edit across web creation and one save
 
 Source: [SEED-009 Story 17](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-17).
-Status: planned; refined in place, ready for direct execution when authorized.
+Status: in progress — slice 1 done; slice 2 next.
 
 ## Goal and scope
 
@@ -51,30 +51,28 @@ no accepted commit still uses existing single-addition support.
 ### 1. Receive the saved new note while keeping the local edit
 
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Local A is committed but unpublished; accepted history creates B and
 saves B once → `donut notebook pull` → clean local main contains saved B and
 local A as one unpublished child of the unchanged accepted head.
-
-Work: Extend the bounded interval predicate and its existing boundary tests.
-Cover root and represented-folder destinations using existing fixtures. Add
-the web creation/save plus divergent pull scenario using existing E2E steps;
-end this slice's scenario after pull with A still unchanged on the server.
 
 Proof: CLI success observes saved B, retained A, parent equal to the accepted
 save commit, creation commit retained as that commit's parent, original local
 commit recoverable, and no publication request. Refusal variants observe
 unchanged checkout and no publication: third remote commit, second addition,
 save of another note, accompanying other-note edit, unrepresented folder,
-and a two-note local batch. Reuse existing dirty/multiple-local-commit,
-structural, content-only, and single-addition cases for unchanged guards.
-The installed CLI/browser example observes both local contents and server A
-still unchanged after pull.
+and a two-note local batch. Browser scenario ends after pull with server A
+unchanged.
 
 Verification:
 `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts`
-and
-`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature`.
+(75 pass) and
+`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature`
+(4 scenarios; Cypress wall ~27s).
+
+Learning: Predicate extension stayed within existing ordinary-file / note-path /
+represented-parent checks; refactor split oversized accepted-interval and
+structural-history modules without changing the pull contract.
 
 ### 2. Publish the retained edit onto the same learned note
 

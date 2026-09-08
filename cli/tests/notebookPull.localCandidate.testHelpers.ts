@@ -16,6 +16,7 @@ export function prepareUnsupportedLocalHistory(
     | 'rename'
     | 'readme'
     | 'mode'
+    | 'two-note-batch'
 ): string {
   if (shape === 'unrelated') {
     return initBoundCheckout(workDir, getApiConfig().apiBaseUrl)
@@ -28,6 +29,14 @@ export function prepareUnsupportedLocalHistory(
     )
     runGit(['add', 'README.md'], source)
     runGit(['commit', '--quiet', '-m', 'add notebook readme'], source)
+  }
+  if (shape === 'two-note-batch') {
+    fs.writeFileSync(
+      join(source, 'other.md'),
+      '---\ntype: Note\n---\n# Other\n\nAccepted body.\n'
+    )
+    runGit(['add', 'other.md'], source)
+    runGit(['commit', '--quiet', '-m', 'add other note'], source)
   }
   if (shape === 'merge') {
     fs.writeFileSync(
@@ -104,6 +113,21 @@ export function prepareUnsupportedLocalHistory(
       fs.chmodSync(join(directory, 'note.md'), 0o755)
       runGit(['add', 'note.md'], directory)
       runGit(['commit', '--quiet', '-m', 'make note executable'], directory)
+      return directory
+    case 'two-note-batch':
+      fs.writeFileSync(
+        join(directory, 'note.md'),
+        '---\ntype: Note\n---\n# Note\n\nLocal note.\n'
+      )
+      fs.writeFileSync(
+        join(directory, 'other.md'),
+        '---\ntype: Note\n---\n# Other\n\nLocal other.\n'
+      )
+      runGit(['add', 'note.md', 'other.md'], directory)
+      runGit(
+        ['commit', '--quiet', '-m', 'unpublished two-note batch'],
+        directory
+      )
       return directory
   }
 }

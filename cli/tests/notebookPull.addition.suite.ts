@@ -24,6 +24,7 @@ export function describeNotebookPullAddition(): void {
     const originalNote = '---\ntype: Note\n---\n# Note\n\nOriginal.\n'
     const localBody = '---\ntype: Note\n---\n# Note\n\nLocal body.\n'
     const addedNote = '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n'
+    const savedNote = '---\ntype: Note\n---\n# Added\n\nAccepted save.\n'
     const localFrontmatter =
       '---\ntype: Note\nauthored: local-yaml\n---\n# Note\n\nOriginal.\n'
     const nestedAdded = '---\ntype: Note\n---\n# Added\n\nNested addition.\n'
@@ -109,5 +110,73 @@ export function describeNotebookPullAddition(): void {
         fs.readFileSync(join(directory, 'Nested', 'Beta.md'), 'utf8')
       ).toBe(nestedAdded)
     })
+
+    test.each([
+      {
+        destination: 'root',
+        addedPath: 'added.md',
+        bundleName: 'creation-save-root',
+        seed: undefined as ((source: string) => void) | undefined,
+      },
+      {
+        destination: 'represented-folder',
+        addedPath: 'Nested/Beta.md',
+        bundleName: 'creation-save-nested',
+        seed: (source: string) => {
+          commitPortableFile(
+            source,
+            'Nested/Cell.md',
+            '---\ntype: Note\n---\n# Nested\n\nOriginal.\n',
+            'add nested folder'
+          )
+        },
+      },
+    ] as const)(
+      'rebases one local note edit over accepted $destination creation then save',
+      async ({ addedPath, bundleName, seed }) => {
+        const workDir = ctx.getWorkDir()
+        const source = buildSourceRepo(workDir)
+        seed?.(source)
+        const directory = cloneAsBoundCheckout(
+          workDir,
+          source,
+          getApiConfig().apiBaseUrl,
+          'checkout'
+        )
+        commitPortableFile(
+          directory,
+          'note.md',
+          localBody,
+          'unpublished note edit'
+        )
+        const localTip = runGit(['rev-parse', 'HEAD'], directory)
+        commitPortableFile(source, addedPath, addedNote, 'accepted addition')
+        const creationCommit = runGit(['rev-parse', 'main'], source)
+        commitPortableFile(source, addedPath, savedNote, 'accepted save')
+        const acceptedHead = runGit(['rev-parse', 'main'], source)
+        serveAcceptedBundle(ctx, source, bundleName)
+
+        await run(['notebook', 'pull', directory])
+
+        const localHead = runGit(['rev-parse', 'HEAD'], directory)
+        expect(runGit(['rev-parse', 'HEAD^'], directory)).toBe(acceptedHead)
+        expect(runGit(['rev-parse', 'HEAD^^'], directory)).toBe(creationCommit)
+        expect(fs.readFileSync(join(directory, 'note.md'), 'utf8')).toBe(
+          localBody
+        )
+        expect(fs.readFileSync(join(directory, addedPath), 'utf8')).toBe(
+          savedNote
+        )
+        expect(runGit(['rev-parse', 'ORIG_HEAD'], directory)).toBe(localTip)
+        expect(() =>
+          runGit(['cat-file', '-e', `${localTip}^{commit}`], directory)
+        ).not.toThrow()
+        expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
+        expect(ctx.getFetchMock().mock.calls[0]?.[0]).toContain('/git-bundle')
+        expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+          `Rebased onto the accepted history. Unpublished local commit: ${localHead}. Accepted head: ${acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
+        )
+      }
+    )
   })
 }

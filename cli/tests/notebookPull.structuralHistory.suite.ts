@@ -1,13 +1,8 @@
 import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
-import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
-import {
-  buildSourceRepo,
-  cloneAsBoundCheckout,
-} from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
   checkoutState,
@@ -15,6 +10,7 @@ import {
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
+import { cloneWithLocalNoteAndRemoteOther } from './notebookPull.structuralHistory.testHelpers.js'
 
 export function describeNotebookPullStructuralHistory(): void {
   describe('notebook pull (divergent structural accepted history)', () => {
@@ -130,24 +126,6 @@ export function describeNotebookPullStructuralHistory(): void {
         path: 'added.md',
       },
       {
-        shape: 'creation-then-save',
-        apply: (source: string) => {
-          commitPortableFile(
-            source,
-            'added.md',
-            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n',
-            'accepted addition'
-          )
-          commitPortableFile(
-            source,
-            'added.md',
-            '---\ntype: Note\n---\n# Added\n\nAccepted save.\n',
-            'accepted save'
-          )
-        },
-        path: 'added.md',
-      },
-      {
         shape: 'new-folder',
         apply: (source: string) => {
           commitPortableFile(
@@ -183,34 +161,4 @@ export function describeNotebookPullStructuralHistory(): void {
       }
     )
   })
-}
-
-function cloneWithLocalNoteAndRemoteOther(
-  workDir: string,
-  seed?: (source: string) => void
-): {
-  directory: string
-  source: string
-} {
-  const source = buildSourceRepo(workDir)
-  commitPortableFile(
-    source,
-    'other.md',
-    '---\ntype: Note\n---\n# Other\n\nAccepted body.\n',
-    'add other note'
-  )
-  seed?.(source)
-  const directory = cloneAsBoundCheckout(
-    workDir,
-    source,
-    getApiConfig().apiBaseUrl,
-    'checkout'
-  )
-  commitPortableFile(
-    directory,
-    'note.md',
-    '---\ntype: Note\n---\n# Note\n\nLocal body.\n',
-    'unpublished note edit'
-  )
-  return { directory, source }
 }
