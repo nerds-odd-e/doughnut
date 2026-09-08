@@ -23,8 +23,12 @@ abstract class NotebookGitWebContentAmendmentControllerTestSupport
     extends NotebookGitWebContentControllerTestBase {
 
   static final Instant T1000 = Instant.parse("2026-09-08T10:00:00Z");
+  static final Instant T1000_600 = Instant.parse("2026-09-08T10:00:00.600Z");
+  static final Instant T1000_800 = Instant.parse("2026-09-08T10:00:00.800Z");
   static final Instant T1008 = Instant.parse("2026-09-08T10:08:00Z");
   static final Instant T100959 = Instant.parse("2026-09-08T10:09:59Z");
+  static final Instant T1010_599 = Instant.parse("2026-09-08T10:10:00.599Z");
+  static final Instant T1010_600 = Instant.parse("2026-09-08T10:10:00.600Z");
   static final Instant T1016 = Instant.parse("2026-09-08T10:16:00Z");
   static final Instant T1027 = Instant.parse("2026-09-08T10:27:00Z");
 

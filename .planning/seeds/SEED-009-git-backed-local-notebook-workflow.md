@@ -213,7 +213,8 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 10. See one stable commit for one continuous web edit
 
-**Status:** delivered. Recover quick/071 from `e0645adaeb`; precision correction is Story 10a.
+**Status:** delivered. Recover quick/071 from `e0645adaeb`; precision
+correction delivered as Story 10a.
 
 - **Goal:** A notebook owner reading Git history sees one editing unit for
   consecutive web content edits to the same ordinary note, including thinking
@@ -234,22 +235,13 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 10a. Apply the web edit batching interval accurately across durable saves
 
-**Status:** Refined; queued after the owned-SUT shutdown correction, before
-expansions. [Corrective plan](../quick/074-web-autosave-clock-precision/PLAN.md), not executed.
+**Status:** delivered. Recover quick/074 from this story's delivery commit.
 
 - **Goal:** Notebook owners get the agreed rolling ten-minute grouping even
   when consecutive saves occur at fractional seconds and in fresh transactions.
 - **Scope:** Preserve the millisecond save clock through persisted amendment
   eligibility. Retain immediate durability, no-op timing, and exposure freezing.
   No configurable interval, UI, broader synchronization, or fleet-wide 2038 fix.
-- **Key examples:** A changed save at 10:00:00.600 followed by one at
-  10:00:00.800 stays in one batch. At 10:10:00.600 it starts a new batch;
-  at 10:10:00.599 it still amends. Each example reloads persisted state.
-- **Evidence:** Quick/071 adds a whole-second `TIMESTAMP` but compares elapsed
-  milliseconds. Local MySQL 8.4.11 rounds .600 up to the next second, making an
-  actual 600,000 ms gap appear as 599,600 ms. Existing tests use whole seconds.
-- **Effort hypothesis:** S, medium confidence; one precision migration and
-  controller proof loop. No open product decision; preserve existing policy.
 
 <a id="story-11"></a>
 
