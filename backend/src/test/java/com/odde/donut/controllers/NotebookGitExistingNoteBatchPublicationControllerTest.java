@@ -29,9 +29,10 @@ import org.springframework.http.ResponseEntity;
  * Verifies an edits-only revision of existing learned notes across Note projection and Git history.
  */
 class NotebookGitExistingNoteBatchPublicationControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitWebContentControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
+  private static final String WEB_CONTENT = "---\ntype: Note\n---\nWeb save on the third note.\n";
   private static final String PUBLISHED_CONTENT =
       "---\n"
           + "type: FieldObservation\n"
@@ -40,7 +41,6 @@ class NotebookGitExistingNoteBatchPublicationControllerTest
           + "---\n"
           + "Precisely preserved authored bytes linking [[Reference Target|the target]].\n";
 
-  @Autowired NoteController noteController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
@@ -91,6 +91,47 @@ class NotebookGitExistingNoteBatchPublicationControllerTest
               readBack, downloadedCommit.head(), "Research/Refined Note.md"),
           equalTo(PUBLISHED_CONTENT));
     }
+  }
+
+  @Test
+  void keepsAllThreeLearnedNotesWhenPublishingTwoNoteRevisionOntoAcceptedWebSave()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note noteA =
+        makeMe.aNote().notebook(notebook).title("First").content(ORIGINAL_CONTENT).please();
+    Folder folder = makeMe.aFolder().notebook(notebook).name("Research").please();
+    Note noteB =
+        makeMe.aNote().folder(folder).title("Refined Note").content(ORIGINAL_CONTENT).please();
+    Note noteC =
+        makeMe.aNote().notebook(notebook).title("Other").content(ORIGINAL_CONTENT).please();
+    MemoryTracker trackerA = learnedTracker(noteA, 7f);
+    MemoryTracker trackerB = learnedTracker(noteB, 4f);
+    MemoryTracker trackerC = learnedTracker(noteC, 5f);
+    snapshotCurrentPortableTree(notebook);
+
+    textContentController.updateNoteContent(noteC, contentDto(WEB_CONTENT));
+    NotebookGitBinding afterWebSave = binding(notebook);
+    ObjectId webSaveHead = ObjectId.fromString(afterWebSave.getAcceptedGitObjectId());
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            afterWebSave,
+            List.of(
+                new NotebookGitProposalFile("First.md", PUBLISHED_CONTENT),
+                new NotebookGitProposalFile("Research/Refined Note.md", PUBLISHED_CONTENT),
+                new NotebookGitProposalFile("Other.md", WEB_CONTENT)));
+
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit proposedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+      assertThat(proposedCommit.parent(), equalTo(webSaveHead));
+    }
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), afterWebSave.getAcceptedGitObjectId(), proposalBytes);
+
+    assertShownContentAndRetainedLearning(noteA, trackerA, PUBLISHED_CONTENT);
+    assertShownContentAndRetainedLearning(noteB, trackerB, PUBLISHED_CONTENT);
+    assertShownContentAndRetainedLearning(noteC, trackerC, WEB_CONTENT);
   }
 
   @Test

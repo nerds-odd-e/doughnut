@@ -382,7 +382,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 18. Keep a related local edit batch when the web changes a different note
 
-**Status:** refined; planned in [quick/066](../quick/066-local-edit-batch-rebase/PLAN.md).
+**Status:** delivered ([quick/066](../quick/066-local-edit-batch-rebase/PLAN.md)).
 
 - **Goal:** An owner can retain one related local revision when a web edit to
   a different note arrives, then publish the revision without splitting it.
@@ -392,40 +392,6 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   over the accepted commit; explicit publish keeps all three note identities
   and learning data. No overlap, additions, moves, README changes, multiple
   local/remote commits, dirty trees, or drift repair.
-- **Key examples:** Commit edits to A and B locally; save C on the web; pull,
-  inspect all three contents, and explicitly publish the retained batch.
-  Preserve the accepted web commit ID; pull makes no publication request.
-- **Reminders from Story 17:** Local commit shape and accepted interval shape
-  are separate boundaries. Supporting two local edits here must not also admit
-  that batch across an addition, creation-then-save, or a move. Preserve the
-  delivered one-note receipt cases. Judge accepted edges, not only the final
-  tree; an extra remote commit remains outside this story even if its net
-  content looks equivalent to one save.
-- **Key boundary examples:** After pull, A and B remain together in one
-  unpublished child of the unchanged accepted C commit, with the original
-  local commit recoverable and server A/B unchanged. Explicit publish then
-  accepts the whole revision and retains all three identities and learning
-  data. A web save of A or B, an extra accepted commit, or a structural edge
-  is refused with local HEAD/files and accepted history unchanged.
-- **Boundary assumptions:** Exactly two locally edited notes and exactly one
-  accepted single-parent commit editing only C. Use a bound, clean `main`, valid
-  supported body/frontmatter, and a matching server projection. Three or more
-  locally edited notes and an already-based batch pull remain outside this
-  increment; existing batch publication on an unchanged base still works.
-  Repeat pull after the successful rebase is not added here. Keep the current
-  commands and update their existing guidance to describe this narrow case.
-- **Open questions:** None for this bounded story. Broader batch receipt and
-  conflict policy remain excluded rather than prerequisites.
-- **Value / learning:** Story 14 proves stale publication preserves the batch,
-  but current pull still rejects multi-note local work. Test the smallest
-  reconciliation of that newly supported revision, independently of structural
-  history. Publishing before web work avoids divergence only with advance
-  coordination; manually splitting the batch loses the related revision unit.
-- **Effort hypothesis:** M — low confidence; one disjoint web save bounds the
-  reconciliation. Revisit the boundary if conflict policy becomes necessary.
-- **Depends on:** Delivered Stories 8 and 14. Story 17 supplies regression
-  boundaries, not a structural-reconciliation prerequisite. Useful even if
-  broader batch rebase is deferred.
 
 ## Ordering and Scope Reduction
 
@@ -433,14 +399,14 @@ The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, **13**, **16**, **14**, and **17** are delivered. Remaining
-selected story is **18** (retain a local batch across a disjoint web save).
+Within this seed, **13**, **16**, **14**, **17**, and **18** are delivered.
 Keep **15 → 10** as unqueued candidates: folder-move divergence is
 consequential but narrower and has unresolved identity-policy risk; batching
 changes readability without unlocking synchronization.
 
-First-to-drop order among remaining items: **10, 15, 18**. Delivered batch
-publication stays useful even if batch reconciliation is deferred.
+First-to-drop order among remaining items: **10, 15**. Delivered batch
+publication and batch reconciliation across one disjoint web save stay useful
+even if broader reconciliation is deferred.
 
 Preserve these boundaries in future refinement:
 
@@ -457,8 +423,7 @@ Preserve these boundaries in future refinement:
 ## Open Decisions
 
 - **Priority assumption open to revision:** no real-user frequency evidence
-  ranks batch reconciliation, folder divergence, or history readability.
-  Keep selected Story 18 next after Story 17 delivery, without displacing the
+  ranks folder divergence or history readability. Do not displace the
   developer's concurrent-worktree priority.
 - **Story 15, before selection:** confirm same-identity correspondence and the
   refusal boundary for ambiguity; do not assume ordinary Git rename detection
@@ -470,10 +435,9 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Refine queued Story 18 in this seed before slice planning. Reconsider
-15 when folder relocation blocks unpublished work, and 10 when history
-readability is an observed problem. This seed is non-executable; queue selection
-does not authorize implementation.
+Reconsider 15 when folder relocation blocks unpublished work, and 10 when
+history readability is an observed problem. This seed is non-executable; queue
+selection does not authorize implementation.
 
 ## Breadcrumbs
 
