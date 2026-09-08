@@ -344,8 +344,8 @@ replacement.
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
-**Status:** Queued after story 2a. Refine the supported external-service scope
-before slice planning; story 2 supplies the required browser environment.
+**Status:** Queued. Refine the supported external-service scope before slice
+planning; stories 2 and 2a supply the required browser environment.
 
 - **For / why:** Developers and AI tasks can verify browser behavior involving
   mocked external services without another task changing their responses.
@@ -457,13 +457,12 @@ before slice planning; story 2 supplies the required browser environment.
 
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08:** Stories 1a–1c and 2 are delivered. Put verified
-story 2a safeguards first, then preserve the existing 3 → 6 → 4 → 5 order.
-Trustworthy allocation and owning health precede broader browser support;
-database reclamation follows mocks before expanding to clients. CLI-before-MCP
-is value ordering, not a technical dependency. The
-[product backlog](../PRODUCT-BACKLOG.md) owns global order. Story 2a has a plan;
-stories 3–6 need refinement, and story 6's approach remains undecided.
+**Backlog review, 2026-09-08:** Stories 1a–1c, 2, and 2a are delivered. Preserve
+the existing 3 → 6 → 4 → 5 order for remaining work. Trustworthy allocation and
+owning health precede broader browser support; database reclamation follows
+mocks before expanding to clients. CLI-before-MCP is value ordering, not a
+technical dependency. The [product backlog](../PRODUCT-BACKLOG.md) owns global
+order. Stories 3–6 need refinement, and story 6's approach remains undecided.
 
 Do not claim general parallel E2E support from the focused no-mock workflow.
 First-to-drop order among expansions is 5, 4, 6, then 3. Persistent development
