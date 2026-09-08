@@ -2,7 +2,7 @@
 
 Source: [SEED-015 story 2b](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2b),
 correcting the supporting ownership change delivered during quick/070.
-Status: planned; story and slice refinement complete, not executed.
+Status: in progress; leaf 1 done, leaf 2 planned.
 
 ## Goal and scope
 
@@ -58,35 +58,19 @@ Open questions: none for this boundary.
 
 ### 1. Stop forked children even when the parent exits first
 Type: Behavior
-Status: planned
-Proof: Extend the existing real-supervisor restart case in
-`scripts/sut-isolated-restart.test.mjs`, using the owned-supervisor fixtures.
-Have the owned parent spawn a detached backend listener and wait for explicit
-readiness before restart. Verify its separate group as a fixture precondition.
-At restart's existing start callback, observe that the captured parent/backend
-PIDs have exited and bind the old backend port successfully. Verify a separate
-peer endpoint still responds. Keep fixture cleanup responsible for every PID
-even when the assertion fails.
+Status: done
+Proof: `scripts/sut-isolated-restart.test.mjs` owned-supervisor restart case:
+separate-PGID detached backend precondition; at restart start callback,
+captured parent/backend PIDs exited, old backend port bindable, peer still
+responds; existing same-group and busy/stale-owner refusal cases retained.
+Focused: `CURSOR_DEV=true nix develop -c node --test
+scripts/sut-isolated-restart.test.mjs`.
 
 Behavior: Owned SUT with a separately grouped backend → ordinary owned shutdown
 → parent and backend exit without touching peer processes.
 
-Capture the owned descendant set before termination can erase parent links;
-use it for graceful signals and completion checks. Coordinate the supervisor's
-close callback with the active shutdown so it cannot exit early. Keep fixture,
-implementation, and this one observable proof in the same green commit.
-
-Likely files: `scripts/sut-owned-process-tree.mjs`, `scripts/sut-services.mjs`,
-`scripts/sut-owned-supervisor-fixtures.mjs`, and the restart test above.
-No preceding Structure slice: fixture setup serves this immediate behavior.
-Sizing: about 5 minutes, medium confidence; one fixture variant and one shutdown
-path. Scrutinize at 5 minutes; stop and refine at 10 unless focused test runtime
-alone explains the duration. A new ownership protocol requires story review.
-
-Focused command: `CURSOR_DEV=true nix develop -c node --test
-scripts/sut-isolated-restart.test.mjs`. This also retains same-group and
-busy/stale-owner refusal evidence. Port rebinding is test evidence only;
-production shutdown must never find targets by port.
+Learning: Capture descendants before SIGTERM; one shared stop promise coordinates
+control shutdown and the services close callback.
 
 ### 2. Complete bounded shutdown when a forked child ignores termination
 Type: Behavior

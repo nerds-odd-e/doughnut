@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import {
+  allocateFreePort,
   closeServer,
   isPidAlive,
   isTcpListening,
@@ -12,8 +14,10 @@ import {
   startLiveOwner,
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
+import { processGroupId } from './sut-listener-pids.mjs'
 import {
   spawnDetachedOwnedSupervisor,
+  waitForDetachedBackendListener,
   waitForPeerPids,
   waitUntil,
   writeOwnedSupervisorRunPPeers,
@@ -33,6 +37,44 @@ function lsofMustNotRun() {
   }
 }
 
+function assertPortBindable(port) {
+  execFileSync(
+    process.execPath,
+    [
+      '-e',
+      `import net from 'node:net'
+const server = net.createServer()
+server.once('error', (error) => {
+  console.error(error)
+  process.exit(1)
+})
+server.listen(${port}, '127.0.0.1', () => {
+  server.close(() => process.exit(0))
+})
+`,
+    ],
+    { stdio: 'pipe' }
+  )
+}
+
+function assertTcpResponding(port) {
+  execFileSync(
+    process.execPath,
+    [
+      '-e',
+      `import net from 'node:net'
+const socket = net.createConnection({ host: '127.0.0.1', port: ${port} }, () => {
+  socket.end()
+  process.exit(0)
+})
+socket.on('error', () => process.exit(1))
+setTimeout(() => process.exit(1), 1000)
+`,
+    ],
+    { stdio: 'pipe' }
+  )
+}
+
 test('idle live owner restart stops owned children, holds the claim, and starts on the same allocation', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
@@ -40,10 +82,12 @@ test('idle live owner restart stops owned children, holds the claim, and starts 
   const owner = await claimSutOwnership(checkout.root)
   const foreign = spawnForeignProcess()
   const foreignListener = await listenTcp()
+  const backendPort = await allocateFreePort()
   const { supervisor, state } = spawnDetachedOwnedSupervisor(t, {
     checkoutRoot: checkout.root,
     owner,
     logFile: path.join(checkout.root, 'sut.log'),
+    env: { SUT_FIXTURE_BACKEND_PORT: String(backendPort) },
     afterCleanup: () => {
       try {
         foreign.kill('SIGKILL')
@@ -60,12 +104,33 @@ test('idle live owner restart stops owned children, holds the claim, and starts 
     'timed out waiting for live SUT owner'
   )
   state.pids = await waitForPeerPids(checkout.root)
+  state.pids.backendListener = await waitForDetachedBackendListener(
+    checkout.root,
+    backendPort
+  )
+  const backendParentPgid = await processGroupId(state.pids.backend)
+  const backendListenerPgid = await processGroupId(state.pids.backendListener)
+  assert.notEqual(
+    backendListenerPgid,
+    backendParentPgid,
+    'detached backend listener must be in a separate process group'
+  )
+  assert.equal(await isTcpListening(backendPort), true)
+
   const supervisorPid = supervisor.pid
+  const ownedParentPid = state.pids.backend
+  const ownedBackendPid = state.pids.backendListener
   const start = makeStartSpy()
   const code = await runSutRestart({
     checkoutRoot: checkout.root,
     execFileFn: lsofMustNotRun(),
-    spawnFn: start.spawnFn,
+    spawnFn: (...args) => {
+      assert.equal(isPidAlive(ownedParentPid), false)
+      assert.equal(isPidAlive(ownedBackendPid), false)
+      assertPortBindable(backendPort)
+      assertTcpResponding(foreignListener.port)
+      return start.spawnFn(...args)
+    },
     log: () => undefined,
     errLog: () => undefined,
     healthcheckFn: healthyOnce,
@@ -81,6 +146,7 @@ test('idle live owner restart stops owned children, holds the claim, and starts 
     () =>
       !(
         isPidAlive(state.pids.backend) ||
+        isPidAlive(state.pids.backendListener) ||
         isPidAlive(state.pids.lb) ||
         isPidAlive(state.pids.frontend) ||
         isPidAlive(supervisorPid)
