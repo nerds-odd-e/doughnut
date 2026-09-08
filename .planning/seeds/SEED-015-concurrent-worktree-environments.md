@@ -314,66 +314,31 @@ mocks and CLI/MCP are not prerequisites.
 
 ### 2a. Refuse isolated browser verification against an unverified allocation
 
-**Status:** Refined; corrective follow-up to delivered story 2, queued first.
+**Status:** Delivered.
 [Slice plan](../quick/067-isolated-browser-allocation-safeguards/PLAN.md).
 
 **Goal**
 
 Developers and AI tasks can trust that the supported isolated browser check
-verifies their owning application on its recorded allocation. Restore the two
-story-2 safeguards identified by the retrospective before extending browser
-support.
+verifies their owning application on its recorded allocation.
 
 **Scope**
 
-- Keep story 2's local Nix, one-SUT/one-runner, focused no-mock browser boundary.
-  Health and startup readiness require the recorded backend, Vite, and local
-  LB listeners to belong to the live owner's application process group, as
-  well as the existing readiness checks. A live control socket alone is
-  insufficient. Missing or unverifiable listener ownership is unhealthy.
-- Cypress uses that owning health result and refuses before fixture reset
-  when it cannot verify the allocation. Refusal leaves foreign listeners
-  running; retain the existing owner and cleanup lifecycle.
-- Distinguish omitted first-use allocation fields from present invalid values.
-  An omitted `e2e` object or database field can initialize normally; a present
-  `e2e` must be an object, and a present database must meet the existing name
-  rule. Null, empty, or wrongly typed values are not missing fields.
-- All three application ports may be omitted for automatic allocation.
-  Otherwise require all three, distinct integer values from 1 through 65535.
-  Reject partial or invalid recorded ports before database provisioning,
-  port-claim publication, configuration replacement, or application launch.
-  Apply the same recorded-value rules to the supported readers of allocation.
+- Health and startup readiness require recorded backend, Vite, and local LB
+  listeners to belong to the live owner's application process group, plus
+  existing readiness checks. A live control socket alone is insufficient.
+- Cypress refuses before fixture reset when owning health fails; foreign
+  listeners remain running.
+- Distinguish omitted first-use allocation fields from present invalid values;
+  refuse the latter without provisioning or rewriting. Ports are all omitted
+  or three distinct integers 1–65535.
 - Retain valid allocation reuse, missing-recorded-database refusal, and
-  unconfigured primary-checkout defaults. Do not introduce a stricter database
-  naming/identity policy or change the existing automatic port-selection policy.
+  primary-checkout defaults.
 
 **Exclusions:** Mocks, additional specs or clients, retirement, copied-ID
 recovery, automatic repair/reallocation, lifecycle redesign, Cloud VM/CI
-changes, and continuous protection against a malicious local process replacing
-listeners after a completed check.
-
-**Key examples**
-
-1. A live owner exists but an unrelated process serves a recorded endpoint,
-   even with HTTP 200 → health check → unhealthy; Cypress setup refuses before
-   reset, and the unrelated process stays running.
-2. All three recorded listeners belong to the owner's application group and
-   satisfy readiness → health check and supported Cypress setup → accepted.
-3. `e2e.database` is `null` or `invalid-name`, or `e2e` is a scalar → start →
-   visible refusal with the saved configuration unchanged and no provisioning.
-4. All ports are strings, one is 65536, two are equal, or only one is present
-   → start → refusal before allocating any missing database or ports.
-5. A valid identity has no `e2e` fields → start → ordinary first-use allocation;
-   a valid recorded allocation → later start → reuse it.
-
-**Open questions:** None for this bounded correction. These are conservative
-refinement choices based on the existing contract, not new broader isolation
-promises.
-
-**Evidence:** Quick 061 retrospective, 2026-09-08: real unrelated listeners plus
-a control socket returned healthy without app children; malformed allocation
-values were replaced and a fake launch succeeded (fake MySQL, no real DB writes).
-**Effort hypothesis:** M, medium confidence; retain the existing owner lifecycle.
+changes, and continuous protection against malicious post-check listener
+replacement.
 
 <a id="story-3"></a>
 

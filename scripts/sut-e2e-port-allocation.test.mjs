@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { existsSync } from 'node:fs'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import {
@@ -8,6 +9,8 @@ import {
   isTcpListening,
   listenTcp,
   readIsolatedConfig,
+  recordingMysql,
+  runConfiguredStart,
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
 import {
@@ -20,6 +23,7 @@ import {
   spawnEnsurePorts,
   waitForClose,
 } from './sut-e2e-port-test-helpers.mjs'
+import { makeStartSpy } from './sut-start-fixtures.mjs'
 
 test('identity-only allocation records three distinct non-reserved ports', async (t) => {
   const checkout = makePrimaryCheckout(t)
@@ -120,3 +124,40 @@ test('competing same-checkout identity-only starts publish one claim', async (t)
     wt_a7c2: ports,
   })
 })
+
+const presentInvalidPortShapes = [
+  ['all-invalid', { backendPort: 'bad', vitePort: 'bad', lbListenPort: 'bad' }],
+  ['null', { backendPort: null, vitePort: null, lbListenPort: null }],
+  ['fractional', { backendPort: 1.5, vitePort: 2.5, lbListenPort: 3.5 }],
+  ['nonpositive', { backendPort: 0, vitePort: -1, lbListenPort: -2 }],
+  ['above 65535', { backendPort: 65536, vitePort: 15174, lbListenPort: 15173 }],
+  ['duplicated', { backendPort: 19081, vitePort: 19081, lbListenPort: 15173 }],
+  ['partial', { backendPort: 19081 }],
+]
+
+async function assertStartRefusesInvalidPorts(checkoutRoot, e2e) {
+  const config = { id: 'wt_a7c2', e2e }
+  writeIsolatedConfig(checkoutRoot, config)
+  const spawn = makeStartSpy()
+  const mysql = recordingMysql()
+  const claimRoot = `${checkoutRoot}/.doughnut-e2e-port-claims`
+  await assert.rejects(
+    runConfiguredStart(checkoutRoot, spawn, {
+      schemaExistsFn: () => false,
+      mysqlExecFn: mysql.mysqlExecFn,
+      portClaimRoot: claimRoot,
+    }),
+    /Missing or invalid/
+  )
+  assert.deepEqual(readIsolatedConfig(checkoutRoot), config)
+  assert.equal(mysql.calls.length, 0)
+  assert.equal(spawn.calls.length, 0)
+  assert.equal(existsSync(claimRoot), false)
+}
+
+for (const [label, e2e] of presentInvalidPortShapes) {
+  test(`present ${label} application ports refuse before allocation`, async (t) => {
+    const checkout = makePrimaryCheckout(t)
+    await assertStartRefusesInvalidPorts(checkout.root, e2e)
+  })
+}

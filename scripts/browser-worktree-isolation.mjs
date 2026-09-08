@@ -4,6 +4,7 @@ import path from 'node:path'
 import {
   E2E_PORT_CONFIG_FIELDS,
   collectMissingE2ePorts,
+  collectPresentInvalidE2ePortFields,
   refusePartialIsolatedE2ePorts,
 } from './sut-e2e-ports.mjs'
 import {
@@ -98,13 +99,15 @@ function allocationError(checkoutRoot, missing, { start } = {}) {
 function collectPresentInvalidE2eFields(config) {
   if (!Object.hasOwn(config, 'e2e')) return []
   if (!isPlainObject(config.e2e)) return ['e2e']
+  const missing = []
   if (
     Object.hasOwn(config.e2e, 'database') &&
     !isRecordedE2eDatabase(config.e2e.database)
   ) {
-    return ['e2e.database']
+    missing.push('e2e.database')
   }
-  return []
+  missing.push(...collectPresentInvalidE2ePortFields(config.e2e))
+  return missing
 }
 
 export function refusePresentInvalidIsolatedE2eAllocation(

@@ -132,6 +132,38 @@ test('present invalid e2e container refuses start, health, restart, and Cypress 
   })
 })
 
+test('present invalid application ports refuse start, health, restart, and Cypress readers', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify({
+      id: 'wt_a7c2',
+      e2e: {
+        backendPort: 'bad',
+        vitePort: 'bad',
+        lbListenPort: 'bad',
+      },
+    }),
+  })
+  await assertReadersRefuseIncompleteAllocation(checkout.root, {
+    refuseStartAllocation: true,
+  })
+})
+
+test('duplicated application ports refuse start, health, restart, and Cypress readers', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify({
+      id: 'wt_a7c2',
+      e2e: {
+        backendPort: 19081,
+        vitePort: 19081,
+        lbListenPort: 15173,
+      },
+    }),
+  })
+  await assertReadersRefuseIncompleteAllocation(checkout.root, {
+    refuseStartAllocation: true,
+  })
+})
+
 test('malformed isolation JSON refuses clearly before shared-state effects', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeFileSync(path.join(checkout.root, '.worktree.local.json'), '{"id":')

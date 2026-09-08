@@ -26,17 +26,42 @@ export const E2E_PORT_CONFIG_FIELDS = E2E_PORT_FIELDS.map(
 export const RESERVED_ISOLATED_E2E_PORTS = [5173, 5174, 9081, 2525]
 const ALLOCATE_ATTEMPTS = 24
 
+export function isRecordedE2eApplicationPort(port) {
+  return Number.isInteger(port) && port >= 1 && port <= 65535
+}
+
 export function collectMissingE2ePorts(e2e) {
   if (!e2e || typeof e2e !== 'object') {
     return [...E2E_PORT_CONFIG_FIELDS]
   }
   const missing = []
   for (const field of E2E_PORT_FIELDS) {
-    if (!Number.isInteger(e2e[field]) || e2e[field] <= 0) {
+    if (!isRecordedE2eApplicationPort(e2e[field])) {
       missing.push(`e2e.${field}`)
     }
   }
+  if (missing.length === 0) {
+    const values = E2E_PORT_FIELDS.map((field) => e2e[field])
+    if (new Set(values).size !== values.length) {
+      return [...E2E_PORT_CONFIG_FIELDS]
+    }
+  }
   return missing
+}
+
+export function collectPresentInvalidE2ePortFields(e2e) {
+  if (!e2e || typeof e2e !== 'object') return []
+  if (!E2E_PORT_FIELDS.some((field) => Object.hasOwn(e2e, field))) {
+    return []
+  }
+  return collectMissingE2ePorts(e2e)
+}
+
+export function refusePresentInvalidIsolatedE2ePorts(checkoutRoot, e2e) {
+  const missing = collectPresentInvalidE2ePortFields(e2e)
+  if (missing.length > 0) {
+    throw isolatedE2ePortsRequiredError(checkoutRoot, missing)
+  }
 }
 
 function recordedE2eApplicationPorts(e2e) {
@@ -133,6 +158,7 @@ function publishClaim(claimRoot, worktreeId, ports) {
 
 async function publishOrAllocatePorts(claimRoot, checkoutRoot) {
   const config = readCheckoutConfig(checkoutRoot)
+  refusePresentInvalidIsolatedE2ePorts(checkoutRoot, config.e2e)
   const missing = refusePartialIsolatedE2ePorts(checkoutRoot, config.e2e)
   if (missing.length === 0) {
     const ports = recordedE2eApplicationPorts(config.e2e)
