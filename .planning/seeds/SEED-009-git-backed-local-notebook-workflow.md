@@ -411,18 +411,18 @@ The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, and **15**
-are delivered. Queue **10** after the existing worktree priorities. Story 10
-remains separately valuable to the owner for history readability, with its
-publication boundary still to refine.
+Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, **15**, and
+**10** are delivered. Remaining SEED-009 work follows the product backlog after
+worktree priorities.
 
-First-to-drop order among remaining items: **10**. Delivered batch
-publication and batch reconciliation across one disjoint web save stay useful
-even if broader reconciliation is deferred.
+First-to-drop order among remaining unselected items follows the backlog.
+Delivered batch publication and batch reconciliation across one disjoint web
+save stay useful even if broader reconciliation is deferred.
 
 Preserve these boundaries in future refinement:
 
-- Accepted history is immutable; pull receives accepted history, never repairs
+- Exposed accepted history is immutable; unexposed web-content tips may amend
+  within Story 10's window. Pull receives accepted history, never repairs
   unsynchronized web state or publishes automatically.
 - Commit boundaries distinguish deletion/new identity from same-identity moves.
   Missing files do not establish missing Donut containers or identity intent.
