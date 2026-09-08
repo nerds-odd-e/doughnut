@@ -87,6 +87,17 @@ class NotebookGitNoteCreationAtomicControllerTest extends NotebookGitBundleContr
 
   @Test
   void lateBindingSaveFailureRollsBackCreatedNoteCreatorAndAcceptedBinding() throws Exception {
+    assertLateBindingSaveRollsBack(titleOnly("First Note"));
+  }
+
+  @Test
+  void lateBindingSaveFailureRollsBackCreatedNoteWithInitialContentReference() throws Exception {
+    NoteCreationDTO creation = titleOnly("First Note");
+    creation.setContent("See [[Link]]\n");
+    assertLateBindingSaveRollsBack(creation);
+  }
+
+  private void assertLateBindingSaveRollsBack(NoteCreationDTO creation) throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding =
         inCommittedTransaction(
@@ -101,13 +112,18 @@ class NotebookGitNoteCreationAtomicControllerTest extends NotebookGitBundleContr
         inCommittedTransaction(
             transactionManager,
             () -> countRowsForNotebook("note_creator", "note_id", notebook.getId()));
+    long originalReferenceCount =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                countRowsForNotebook(
+                    "authored_note_reference", "source_note_id", notebook.getId()));
 
     NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
 
     RuntimeException failure =
         assertThrows(
-            RuntimeException.class,
-            () -> controller.createNoteAtNotebookRoot(notebook, titleOnly("First Note")));
+            RuntimeException.class, () -> controller.createNoteAtNotebookRoot(notebook, creation));
     assertThat(failure.getMessage(), is("forced failure after note projection"));
 
     inCommittedTransaction(
@@ -121,6 +137,9 @@ class NotebookGitNoteCreationAtomicControllerTest extends NotebookGitBundleContr
           assertThat(
               countRowsForNotebook("note_creator", "note_id", notebook.getId()),
               is(originalCreatorCount));
+          assertThat(
+              countRowsForNotebook("authored_note_reference", "source_note_id", notebook.getId()),
+              is(originalReferenceCount));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));

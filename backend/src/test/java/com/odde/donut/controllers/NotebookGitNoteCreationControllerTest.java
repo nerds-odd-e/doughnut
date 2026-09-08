@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -20,6 +21,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.io.IOException;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -33,6 +35,9 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 
 class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerTestBase {
+
+  private static final String CANONICAL_INITIAL_CONTENT =
+      "---\ntype: Note\naliases:\n  - hello\n---\nSee [[Link]]\n";
 
   @Test
   void missingBindingKeepsTitleOnlyWebCreationWithoutAcquiringABinding() throws Exception {
@@ -65,16 +70,47 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerT
   }
 
   @Test
-  void initialContentKeepsExistingWebCreationAndAcceptedHead() throws Exception {
+  void initialOrdinaryMarkdownIsAcceptedAsCanonicalRootFile() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding accepted = binding(notebook);
+    ObjectId acceptedHead = ObjectId.fromString(accepted.getAcceptedGitObjectId());
     NoteCreationDTO creation = titleOnly("With Body");
-    creation.setContent("# Hello");
+    creation.setContent("---\naliases:\n  - hello\n---\nSee [[Link]]\n");
 
     NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
 
     Note created = noteRepository.findById(result.getId()).orElseThrow();
-    assertThat(created.getContent(), containsString("# Hello"));
+    assertThat(created.getContent(), is(CANONICAL_INITIAL_CONTENT));
+
+    byte[] downloaded =
+        controller
+            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
+            .getBody();
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId newHead = GitBundleTestReader.fetchHead(repository, downloaded);
+      try (RevWalk revWalk = new RevWalk(repository)) {
+        RevCommit commit = revWalk.parseCommit(newHead);
+        assertThat(commit.getParentCount(), is(1));
+        assertThat(commit.getParent(0).getId(), is(acceptedHead));
+      }
+      assertThat(GitBundleTestReader.pathsIn(repository, newHead), contains("With Body.md"));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repository, newHead, "With Body.md"),
+          is(CANONICAL_INITIAL_CONTENT));
+    }
+  }
+
+  @Test
+  void relationshipNoteKeepsExistingWebCreationAndAcceptedHead() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding accepted = binding(notebook);
+    NoteCreationDTO creation = titleOnly("Relates");
+    creation.setContent("---\ntype: Relationship\nsource: \"[[A]]\"\ntarget: \"[[B]]\"\n---\n");
+
+    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
+
+    Note created = noteRepository.findById(result.getId()).orElseThrow();
+    assertThat(created.getContent(), containsString("type: Relationship"));
     assertBindingUnchanged(notebook, accepted);
   }
 

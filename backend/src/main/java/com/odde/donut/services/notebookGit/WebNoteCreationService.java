@@ -1,5 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
+import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
@@ -45,7 +46,7 @@ public class WebNoteCreationService {
       User user,
       WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException {
-    if (!isTitleOnlyRoot(noteCreation)) {
+    if (wikidataIdWithApi != null || !isEligibleOrdinaryRoot(noteCreation)) {
       return noteConstructionService.createRootNoteWithWikidataService(
           notebook, noteCreation, user, wikidataIdWithApi);
     }
@@ -88,8 +89,9 @@ public class WebNoteCreationService {
     }
   }
 
-  private static boolean isTitleOnlyRoot(NoteCreationDTO noteCreation) {
-    return noteCreation.getFolderId() == null && noteCreation.getContent() == null;
+  private static boolean isEligibleOrdinaryRoot(NoteCreationDTO noteCreation) {
+    return noteCreation.getFolderId() == null
+        && NoteConceptType.isOrdinary(noteCreation.getContent());
   }
 
   private boolean acceptedTreeMatches(

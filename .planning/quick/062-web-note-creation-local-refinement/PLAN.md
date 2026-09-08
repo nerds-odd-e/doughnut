@@ -5,7 +5,7 @@
 [SEED-009, story 13](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13)
 — Create a note on the web and continue refining it locally.
 
-Status: in progress. Slices 1–3 done; next is slice 4.
+Status: in progress. Slices 1–4 done; next is slice 5.
 Sizing remains a hypothesis, not a time guarantee.
 
 ## Goal and scope
@@ -195,7 +195,7 @@ drift and missing-binding states remain outside synchronization.
 
 ### 4. Accept initial ordinary Markdown as the creation content
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: Eligible root creation includes initial ordinary-note Markdown,
 possibly authored frontmatter and a wiki reference.
 Trigger: Create the note through the existing request.
@@ -429,3 +429,8 @@ remove spent plan history only when the full outcome and proof are complete.
   title-only root file (existing blob IDs retained). Earlier drift still
   creates on the web without advancing accepted HEAD. Leaf 2 atomicity tests
   remain green. Title-only and root-only gates stay until leaves 4–5.
+- Slice 4 accepts ordinary root Markdown (including authored frontmatter and
+  wiki references) as one canonical accepted file. Wikidata-assisted and
+  `type: Relationship` creates still skip Git acceptance. Drift fixtures that
+  needed an unsynchronized web create now use relationship content. Root-only
+  remains until leaf 5. `NoteConceptType.isOrdinary` is the eligibility check.
