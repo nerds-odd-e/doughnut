@@ -5,7 +5,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.notebookExport.NotebookExportRows;
@@ -27,7 +26,7 @@ public class WebNoteContentSaveService {
   private final AuthorizationService authorizationService;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final NotebookGitProjection projection;
-  private final EntityPersister entityPersister;
+  private final AcceptedSnapshotPersistence acceptedSnapshotPersistence;
 
   public WebNoteContentSaveService(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -35,13 +34,13 @@ public class WebNoteContentSaveService {
       AuthorizationService authorizationService,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       NotebookGitProjection projection,
-      EntityPersister entityPersister) {
+      AcceptedSnapshotPersistence acceptedSnapshotPersistence) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.projection = projection;
-    this.entityPersister = entityPersister;
+    this.acceptedSnapshotPersistence = acceptedSnapshotPersistence;
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
@@ -82,20 +81,8 @@ public class WebNoteContentSaveService {
               state.notebook().getReadmeContent(),
               state.folders(),
               NotebookExportRows.notes(state.liveNotes()));
-      NotebookGitBundleBuilder.append(
-          accepted.repository(),
-          accepted.mainHead(),
-          entries,
-          NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
-          NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,
-          "Edit note content: " + note.getTitle(),
-          updatedAt.toInstant());
-      NotebookGitBundleWriter.BundleWriteResult written =
-          NotebookGitBundleWriter.write(accepted.repository());
-      binding.setAcceptedGitObjectId(written.headObjectId());
-      binding.setBundleBytes(written.bundleBytes());
-      binding.setUpdatedAt(updatedAt);
-      entityPersister.save(binding);
+      acceptedSnapshotPersistence.persist(
+          accepted, entries, binding, updatedAt, "Edit note content: " + note.getTitle());
     }
     return note;
   }
