@@ -126,11 +126,8 @@ entry points, one refusal proof loop.
 
 ### 2b. Refuse retirement when a backend outlives its owner
 Type: Behavior
-Status: planned
-Proof: Public `--check` refuses for a reparented backend fixture with a database
-session and for a disconnected orphan with no listener/session. Each remains
-alive. Failed or ambiguous inspection refuses; a verified idle fixture reports
-an idle snapshot, not a reservation.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement*.test.mjs` (21/21) — refuses reparented JVM with session and disconnected orphan without listener/session; failed/ambiguous inspection refuses; verified idle reports idle snapshot; fixtures remain alive.
 
 Behavior: No live recorded owner → inspect remaining checkout process evidence
 → a surviving backend still prevents retirement.

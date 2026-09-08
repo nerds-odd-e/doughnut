@@ -8,6 +8,7 @@ import {
   isOwnedByApplicationTree,
 } from './sut-listener-pids.mjs'
 import { sutOwnerLockDir, verifyLiveSutOwner } from './sut-owner-control.mjs'
+import { inspectCheckoutBackendProcesses } from './worktree-retirement-checkout-processes.mjs'
 
 const WORKTREE_BACKEND_LOCK_DIR_NAME = '.worktree.local.lock'
 
@@ -203,8 +204,9 @@ async function inspectDatabaseSessions(
 }
 
 /**
- * Bounded vetoes from recorded ownership, listeners, and DB sessions.
- * Never reclaims stale locks. Never authorizes idleness or deletion.
+ * Bounded vetoes from recorded ownership, listeners, database sessions, and
+ * surviving checkout backend JVMs. Never reclaims stale locks. Never authorizes
+ * deletion.
  */
 export async function collectRecordedRetirementVetoes(
   checkoutRoot,
@@ -217,6 +219,7 @@ export async function collectRecordedRetirementVetoes(
   vetoes.push(...sutVetoes)
   vetoes.push(...(await inspectRecordedListeners(checkoutRoot, live, deps)))
   vetoes.push(...(await inspectDatabaseSessions(targets, deps)))
+  vetoes.push(...(await inspectCheckoutBackendProcesses(checkoutRoot, deps)))
   return vetoes
 }
 

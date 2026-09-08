@@ -73,10 +73,10 @@ test('linked checkout with identity reports exact unit target', async (t) => {
 
   const result = await runCheck(checkout.root)
   assert.equal(result.code, 0, result.err)
-  assert.match(result.out, /inspection only/i)
+  assert.match(result.out, /idle snapshot/i)
   assert.match(result.out, /Worktree id: wt_a7c2/)
   assert.match(result.out, /Unit database: doughnut_wt_a7c2_test/)
-  assert.match(result.out, /Idleness verification incomplete/)
+  assert.match(result.out, /not a deletion reservation/i)
   assert.equal(result.out.includes('E2E database:'), false)
   assert.deepEqual(inspectDisposableDatabaseTargets(checkout.root), {
     id: 'wt_a7c2',
@@ -96,7 +96,7 @@ test('linked checkout with canonical E2E allocation reports both targets', async
   assert.equal(result.code, 0, result.err)
   assert.match(result.out, /Unit database: doughnut_wt_a7c2_test/)
   assert.match(result.out, /E2E database: doughnut_e2e_wt_a7c2/)
-  assert.match(result.out, /Idleness verification incomplete/)
+  assert.match(result.out, /idle snapshot/i)
 })
 
 test('mutation mode without --check refuses visibly', async (t) => {

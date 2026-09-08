@@ -142,7 +142,7 @@ export function inspectDisposableDatabaseTargets(checkoutRoot) {
 
 function formatInspection(targets) {
   const lines = [
-    'Disposable database targets (inspection only; not authorization or idleness verification).',
+    'Disposable database targets (idle snapshot; not a deletion reservation).',
     `Worktree id: ${targets.id}`,
     `Unit database: ${targets.unitDatabase}`,
   ]
@@ -150,8 +150,7 @@ function formatInspection(targets) {
     lines.push(`E2E database: ${targets.e2eDatabase}`)
   }
   lines.push(
-    'Recorded ownership, listeners, and database sessions: no busy evidence found.',
-    'Idleness verification incomplete until orphan process inspection.'
+    'Idle snapshot: no busy recorded ownership, listeners, database sessions, or surviving checkout backend JVMs.'
   )
   return `${lines.join('\n')}\n`
 }
