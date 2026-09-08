@@ -5,7 +5,7 @@
 [SEED-009, story 13](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13)
 — Create a note on the web and continue refining it locally.
 
-Status: in progress. Slices 1–2 done; next is slice 3.
+Status: in progress. Slices 1–3 done; next is slice 4.
 Sizing remains a hypothesis, not a time guarantee.
 
 ## Goal and scope
@@ -176,7 +176,7 @@ root-only restriction by leaf 5. All other existing web behavior stays available
 
 ### 3. Accept a root addition without absorbing earlier drift
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: Existing notebook has accepted content and an available root
 name; creation is still title-only and otherwise eligible.
 Trigger: Create another ordinary root note.
@@ -425,3 +425,7 @@ remove spent plan history only when the full outcome and proof are complete.
   `type: Note` child of old head; late binding-save rolls back note/creator/
   binding). Guard proof: `NotebookGitNoteCreationControllerTest`. Full
   `pnpm backend:test_only` green.
+- Slice 3 removed the empty-tree gate. Matching notebooks append only the new
+  title-only root file (existing blob IDs retained). Earlier drift still
+  creates on the web without advancing accepted HEAD. Leaf 2 atomicity tests
+  remain green. Title-only and root-only gates stay until leaves 4–5.

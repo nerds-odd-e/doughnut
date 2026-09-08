@@ -63,7 +63,7 @@ public class WebNoteCreationService {
       if (!accepted.mainHead().equals(persistedAcceptedHead)) {
         throw new IllegalStateException("Accepted bundle main does not match its persisted head");
       }
-      boolean eligible = emptyMatchingAcceptedTree(state, accepted);
+      boolean eligible = acceptedTreeMatches(state, accepted);
       NoteRealm realm =
           noteConstructionService.createRootNoteWithWikidataService(
               state.notebook(), noteCreation, user, wikidataIdWithApi);
@@ -92,20 +92,14 @@ public class WebNoteCreationService {
     return noteCreation.getFolderId() == null && noteCreation.getContent() == null;
   }
 
-  private boolean emptyMatchingAcceptedTree(
+  private boolean acceptedTreeMatches(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitBundleImporter.ImportedBundle accepted) {
-    List<PortableTreeEntry> currentEntries =
-        PortableTreeSnapshot.build(
-            state.notebook().getReadmeContent(),
-            state.folders(),
-            NotebookExportRows.notes(state.liveNotes()));
-    return currentEntries.isEmpty()
-        && projection.matchesAcceptedTree(
-            state.notebook(),
-            state.folders(),
-            state.liveNotes(),
-            accepted.repository(),
-            accepted.mainHead());
+    return projection.matchesAcceptedTree(
+        state.notebook(),
+        state.folders(),
+        state.liveNotes(),
+        accepted.repository(),
+        accepted.mainHead());
   }
 }

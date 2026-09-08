@@ -1,9 +1,12 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -17,6 +20,15 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.testability.GitBundleTestReader;
+import java.io.IOException;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.TreeWalk;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 
@@ -67,6 +79,39 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerT
   }
 
   @Test
+  void matchingAcceptedContentAppendsOnlyTheNewTitleOnlyRootFile() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    makeMe.aNote().notebook(notebook).title("Existing").please();
+    NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedHead = ObjectId.fromString(accepted.getAcceptedGitObjectId());
+
+    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, titleOnly("Another"));
+
+    Note created = noteRepository.findById(result.getId()).orElseThrow();
+    assertThat(created.getTitle(), is("Another"));
+
+    byte[] downloaded =
+        controller
+            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
+            .getBody();
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId newHead = GitBundleTestReader.fetchHead(repository, downloaded);
+      try (RevWalk revWalk = new RevWalk(repository)) {
+        RevCommit commit = revWalk.parseCommit(newHead);
+        assertThat(commit.getParentCount(), is(1));
+        assertThat(commit.getParent(0).getId(), is(acceptedHead));
+        assertThat(revWalk.parseCommit(acceptedHead).getId(), is(acceptedHead));
+      }
+      assertThat(
+          GitBundleTestReader.pathsIn(repository, newHead),
+          containsInAnyOrder("Another.md", "Existing.md"));
+      assertThat(
+          blobIdAt(repository, newHead, "Existing.md"),
+          is(blobIdAt(repository, acceptedHead, "Existing.md")));
+    }
+  }
+
+  @Test
   void earlierProjectionDriftKeepsExistingWebCreationAndAcceptedHead() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote().notebook(notebook).title("Unsynchronized").please();
@@ -77,6 +122,18 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerT
     Note created = noteRepository.findById(result.getId()).orElseThrow();
     assertThat(created.getTitle(), is("Another"));
     assertBindingUnchanged(notebook, accepted);
+
+    byte[] downloaded =
+        controller
+            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
+            .getBody();
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId head = GitBundleTestReader.fetchHead(repository, downloaded);
+      assertThat(GitBundleTestReader.pathsIn(repository, head), not(hasItem("Another.md")));
+      assertThat(
+          GitBundleTestReader.fetchAdvertisedHead(downloaded).getName(),
+          is(accepted.getAcceptedGitObjectId()));
+    }
   }
 
   @Test
@@ -134,5 +191,17 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerT
     assertThat(after.getAcceptedGitObjectId(), is(before.getAcceptedGitObjectId()));
     assertThat(after.getBundleBytes(), equalTo(before.getBundleBytes()));
     assertThat(after.getUpdatedAt(), is(before.getUpdatedAt()));
+  }
+
+  private static ObjectId blobIdAt(Repository repository, ObjectId commitId, String path)
+      throws IOException {
+    try (RevWalk revWalk = new RevWalk(repository);
+        TreeWalk treeWalk =
+            TreeWalk.forPath(repository, path, revWalk.parseCommit(commitId).getTree())) {
+      if (treeWalk == null) {
+        throw new IOException("missing path: " + path);
+      }
+      return treeWalk.getObjectId(0);
+    }
   }
 }
