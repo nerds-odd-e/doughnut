@@ -9,7 +9,7 @@ overrides:
   '@hono/node-server': 2.1.1
   '@isaacs/brace-expansion': '>=5.0.5'
   '@tootallnate/once': '>=3.0.1'
-  '@xmldom/xmldom': '>=0.9.10'
+  '@xmldom/xmldom': '>=0.9.12'
   ajv: '>=8.18.0'
   axios: '>=1.15.0'
   body-parser: '>=2.2.1'
@@ -2522,8 +2522,8 @@ packages:
   '@webcontainer/env@1.1.1':
     resolution: {integrity: sha512-6aN99yL695Hi9SuIk1oC88l9o0gmxL1nGWWQ/kNy81HigJ0FoaoTXpytCj6ItzgyCEwA9kF1wixsTuv5cjsgng==}
 
-  '@xmldom/xmldom@0.9.10':
-    resolution: {integrity: sha512-A9gOqLdi6cV4ibazAjcQufGj0B1y/vDqYrcuP6d/6x8P27gRS8643Dj9o1dEKtB6O7fwxb2FgBmJS2mX7gpvdw==}
+  '@xmldom/xmldom@0.9.12':
+    resolution: {integrity: sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==}
     engines: {node: '>=14.6'}
 
   '@xterm/headless@6.0.0':
@@ -7812,7 +7812,7 @@ snapshots:
 
   '@mbtest/mountebank@2.9.4(supports-color@8.1.1)':
     dependencies:
-      '@xmldom/xmldom': 0.9.10
+      '@xmldom/xmldom': 0.9.12
       cors: 2.8.5
       csv-parse: 5.6.0
       ejs: 6.0.1
@@ -8881,7 +8881,7 @@ snapshots:
 
   '@webcontainer/env@1.1.1': {}
 
-  '@xmldom/xmldom@0.9.10': {}
+  '@xmldom/xmldom@0.9.12': {}
 
   '@xterm/headless@6.0.0': {}
 
@@ -9776,7 +9776,7 @@ snapshots:
   epubjs@0.3.93:
     dependencies:
       '@types/localforage': 0.0.34
-      '@xmldom/xmldom': 0.9.10
+      '@xmldom/xmldom': 0.9.12
       core-js: 3.49.0
       event-emitter: 0.3.5
       jszip: 3.10.1
