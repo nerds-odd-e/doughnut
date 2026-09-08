@@ -301,7 +301,7 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ### 4. Run CLI E2E workflows against the owning worktree's environment
 
-**Status:** Queued after retirement correction 6a; needs refinement before slice planning.
+**Status:** Queued; needs refinement before slice planning.
 
 - **For / why:** Developers and AI tasks changing CLI behavior can verify it
   concurrently with another worktree's CLI or browser tests.
@@ -426,8 +426,9 @@ them is not required to free database storage.
 
 ### 6a. Retire worktree databases without admitting late runners or overlooking uncertain JVMs
 
-**Status:** Queued correction of delivered story 6; refined 2026-09-08.
-Plan: [quick/077](../quick/077-retirement-admission-and-process-evidence/PLAN.md).
+**Status:** Delivered 2026-09-08 via quick/077 (admission recheck after gate
+acquire; uncertain supported-JVM cwd refuses before DROP; backend Limits
+aligned with unit + recorded E2E reclamation).
 
 **Goal**
 
@@ -444,31 +445,14 @@ concurrency. This corrects story 6's promised behavior; it adds no new resource
 management capability. Inspection uncertainty must remain visible, consistent
 with [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md).
 
-**Key examples**
-
-- A runner sees no marker, pauses, and retirement completes → the runner
-  resumes → refuse before provisioning or launch; leave the marker intact.
-- A supported JVM appears in the process table without a checkout path and
-  its working directory cannot be inspected → retirement refuses without DROP,
-  marker publication, or process interruption. No active session proves nothing
-  about whether that disconnected JVM can reconnect.
-- A positively identified peer JVM does not veto an otherwise idle checkout;
-  ordinary same-identity retirement retry still succeeds.
-
-**Priority:** Before client expansion because the delivered destructive command
-can currently misclassify eligibility. CLI-before-MCP remains value ordering.
-Manual `--check` is insufficient: it is only a snapshot and shares the incomplete
-inspection path. No new parent-problem decision is needed.
-
 **Exclusions:** New process supervision, automatic gate recovery, force mode,
 unretirement, copied/moved checkout recovery, CLI/MCP implementation, port cleanup,
 Cloud VM/CI changes, and broader database management.
 
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08, retrospective of quick/075:** Story 6 is delivered
-with two reproduced eligibility gaps; correction 6a takes priority. Queue is
-6a → 4 → 5; CLI-before-MCP is value ordering, not a dependency. The
+**Backlog review, 2026-09-08:** Stories 6 and 6a are delivered. Queue is
+4 → 5; CLI-before-MCP is value ordering, not a dependency. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order. The
 recording-exclusivity proof correction stays with story 3 in quick/073;
 it does not require a duplicate product story or broader mock support.
