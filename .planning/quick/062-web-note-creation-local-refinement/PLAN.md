@@ -5,7 +5,7 @@
 [SEED-009, story 13](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13)
 — Create a note on the web and continue refining it locally.
 
-Status: in progress. Slices 1–4 done; next is slice 5.
+Status: in progress. Slices 1–5 done; next is slice 6.
 Sizing remains a hypothesis, not a time guarantee.
 
 ## Goal and scope
@@ -218,7 +218,7 @@ no unrelated assisted or relationship creation is silently enabled.
 
 ### 5. Accept creation in an existing represented folder
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: Matching notebook, ordinary note, valid existing represented
 folder, including nested placement without its own README.
 Trigger: Create using the current folder selection.
@@ -434,3 +434,9 @@ remove spent plan history only when the full outcome and proof are complete.
   `type: Relationship` creates still skip Git acceptance. Drift fixtures that
   needed an unsynchronized web create now use relationship content. Root-only
   remains until leaf 5. `NoteConceptType.isOrdinary` is the eligibility check.
+- Slice 5 accepts into a pre-create represented folder (tracked descendant or
+  README) at the full Portable path without creating parents or changing
+  README bytes. Unrepresented empty folders keep the unsynchronized web path.
+  `NotebookGitProjection.isRepresentedFolder` is the non-throwing query;
+  publication `requireRepresented*` still throws. Folder destination proofs
+  live in `NotebookGitNoteCreationFolderControllerTest`.

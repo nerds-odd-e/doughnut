@@ -33,7 +33,8 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class NotebookGitNoteCreationAtomicControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitNoteCreationAtomicControllerTest
+    extends NotebookGitNoteCreationControllerTestSupport {
 
   private static final String TITLE_ONLY_CONTENT = "---\ntype: Note\n---\n";
 
@@ -144,12 +145,6 @@ class NotebookGitNoteCreationAtomicControllerTest extends NotebookGitBundleContr
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
-  }
-
-  private static NoteCreationDTO titleOnly(String title) {
-    NoteCreationDTO dto = new NoteCreationDTO();
-    dto.setNewTitle(title);
-    return dto;
   }
 
   private long countNotesForNotebook(Integer notebookId) {

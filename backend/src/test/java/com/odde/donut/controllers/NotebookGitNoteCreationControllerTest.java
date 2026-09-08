@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -23,18 +22,15 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
-import java.io.IOException;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.TreeWalk;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 
-class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationControllerTestSupport {
 
   private static final String CANONICAL_INITIAL_CONTENT =
       "---\ntype: Note\naliases:\n  - hello\n---\nSee [[Link]]\n";
@@ -52,21 +48,6 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerT
     assertThat(created.getFolder(), nullValue());
     assertThat(
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).isEmpty(), is(true));
-  }
-
-  @Test
-  void folderDestinationKeepsExistingWebCreationAndAcceptedHead() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Folder folder = makeMe.aFolder().notebook(notebook).name("Box").please();
-    NotebookGitBinding accepted = binding(notebook);
-    NoteCreationDTO creation = titleOnly("Nested");
-    creation.setFolderId(folder.getId());
-
-    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
-
-    Note created = noteRepository.findById(result.getId()).orElseThrow();
-    assertThat(created.getFolder().getId(), is(folder.getId()));
-    assertBindingUnchanged(notebook, accepted);
   }
 
   @Test
@@ -142,8 +123,8 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerT
           GitBundleTestReader.pathsIn(repository, newHead),
           containsInAnyOrder("Another.md", "Existing.md"));
       assertThat(
-          blobIdAt(repository, newHead, "Existing.md"),
-          is(blobIdAt(repository, acceptedHead, "Existing.md")));
+          GitBundleTestReader.blobIdAt(repository, newHead, "Existing.md"),
+          is(GitBundleTestReader.blobIdAt(repository, acceptedHead, "Existing.md")));
     }
   }
 
@@ -210,34 +191,5 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitBundleControllerT
         ConstraintViolationException.class,
         () -> controller.createNoteAtNotebookRoot(notebook, titleOnly("Taken")));
     assertBindingUnchanged(notebook, accepted);
-  }
-
-  private static NoteCreationDTO titleOnly(String title) {
-    NoteCreationDTO dto = new NoteCreationDTO();
-    dto.setNewTitle(title);
-    return dto;
-  }
-
-  private NotebookGitBinding binding(Notebook notebook) {
-    return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-  }
-
-  private void assertBindingUnchanged(Notebook notebook, NotebookGitBinding before) {
-    NotebookGitBinding after = binding(notebook);
-    assertThat(after.getAcceptedGitObjectId(), is(before.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(before.getBundleBytes()));
-    assertThat(after.getUpdatedAt(), is(before.getUpdatedAt()));
-  }
-
-  private static ObjectId blobIdAt(Repository repository, ObjectId commitId, String path)
-      throws IOException {
-    try (RevWalk revWalk = new RevWalk(repository);
-        TreeWalk treeWalk =
-            TreeWalk.forPath(repository, path, revWalk.parseCommit(commitId).getTree())) {
-      if (treeWalk == null) {
-        throw new IOException("missing path: " + path);
-      }
-      return treeWalk.getObjectId(0);
-    }
   }
 }

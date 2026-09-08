@@ -46,7 +46,7 @@ public class WebNoteCreationService {
       User user,
       WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException {
-    if (wikidataIdWithApi != null || !isEligibleOrdinaryRoot(noteCreation)) {
+    if (wikidataIdWithApi != null || !NoteConceptType.isOrdinary(noteCreation.getContent())) {
       return noteConstructionService.createRootNoteWithWikidataService(
           notebook, noteCreation, user, wikidataIdWithApi);
     }
@@ -64,7 +64,13 @@ public class WebNoteCreationService {
       if (!accepted.mainHead().equals(persistedAcceptedHead)) {
         throw new IllegalStateException("Accepted bundle main does not match its persisted head");
       }
-      boolean eligible = acceptedTreeMatches(state, accepted);
+      boolean eligible =
+          acceptedTreeMatches(state, accepted)
+              && projection.isRepresentedFolder(
+                  noteCreation.getFolderId(),
+                  state.folders(),
+                  accepted.repository(),
+                  accepted.mainHead());
       NoteRealm realm =
           noteConstructionService.createRootNoteWithWikidataService(
               state.notebook(), noteCreation, user, wikidataIdWithApi);
@@ -87,11 +93,6 @@ public class WebNoteCreationService {
           "Add note: " + realm.getNote().getTitle());
       return realm;
     }
-  }
-
-  private static boolean isEligibleOrdinaryRoot(NoteCreationDTO noteCreation) {
-    return noteCreation.getFolderId() == null
-        && NoteConceptType.isOrdinary(noteCreation.getContent());
   }
 
   private boolean acceptedTreeMatches(
