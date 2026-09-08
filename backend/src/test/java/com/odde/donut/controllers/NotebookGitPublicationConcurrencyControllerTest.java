@@ -12,6 +12,8 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -35,21 +37,27 @@ class NotebookGitPublicationConcurrencyControllerTest
       "---\ntype: Note\n---\nweb edit after publication";
 
   @Test
-  void twoQueuedWebSavesAppendInAcceptedOrder() throws Exception {
+  void twoQueuedWebSavesKeepOneFinalContentBatch() throws Exception {
     Fixture fixture = fixture();
+    Instant firstAt = Instant.parse("2026-09-08T10:00:00Z");
+    Instant secondAt = Instant.parse("2026-09-08T10:08:00Z");
 
     NotebookGitConcurrentWriterTestSupport.Result<NoteRealm, NoteRealm> race =
         queuedWriters(
             fixture.notebook().getId(),
-            () -> saveContent(fixture.note().getId(), FIRST_WEB_CONTENT),
-            () -> saveContent(fixture.note().getId(), SECOND_WEB_CONTENT));
+            () -> {
+              testabilitySettings.timeTravelTo(Timestamp.from(firstAt));
+              return saveContent(fixture.note().getId(), FIRST_WEB_CONTENT);
+            },
+            () -> {
+              testabilitySettings.timeTravelTo(Timestamp.from(secondAt));
+              return saveContent(fixture.note().getId(), SECOND_WEB_CONTENT);
+            });
 
     assertThat(race.first().getNote().getContent(), is(FIRST_WEB_CONTENT));
     assertThat(race.second().getNote().getContent(), is(SECOND_WEB_CONTENT));
     assertAcceptedHistory(
-        fixture,
-        List.of(SECOND_WEB_CONTENT, FIRST_WEB_CONTENT, ACCEPTED_CONTENT),
-        SECOND_WEB_CONTENT);
+        fixture, List.of(SECOND_WEB_CONTENT, ACCEPTED_CONTENT), SECOND_WEB_CONTENT);
   }
 
   @Test

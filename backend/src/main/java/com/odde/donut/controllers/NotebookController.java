@@ -17,7 +17,6 @@ import com.odde.donut.controllers.dto.NotebooksViewedByUser;
 import com.odde.donut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookGroupRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -33,6 +32,7 @@ import com.odde.donut.services.NotebookGroupService;
 import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
+import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
 import com.odde.donut.services.notebookGit.WebNoteCreationService;
@@ -76,7 +76,7 @@ class NotebookController {
   private final FolderConstructionService folderConstructionService;
   private final FolderRelocationService folderRelocationService;
   private final NotebookExportService notebookExportService;
-  private final NotebookGitBindingRepository notebookGitBindingRepository;
+  private final NotebookGitBundleDownloadService notebookGitBundleDownloadService;
   private final NotebookGitProposalPublisher notebookGitProposalPublisher;
 
   public NotebookController(
@@ -97,7 +97,7 @@ class NotebookController {
       FolderConstructionService folderConstructionService,
       FolderRelocationService folderRelocationService,
       NotebookExportService notebookExportService,
-      NotebookGitBindingRepository notebookGitBindingRepository,
+      NotebookGitBundleDownloadService notebookGitBundleDownloadService,
       NotebookGitProposalPublisher notebookGitProposalPublisher) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -116,7 +116,7 @@ class NotebookController {
     this.folderConstructionService = folderConstructionService;
     this.folderRelocationService = folderRelocationService;
     this.notebookExportService = notebookExportService;
-    this.notebookGitBindingRepository = notebookGitBindingRepository;
+    this.notebookGitBundleDownloadService = notebookGitBundleDownloadService;
     this.notebookGitProposalPublisher = notebookGitProposalPublisher;
   }
 
@@ -461,17 +461,16 @@ class NotebookController {
       operationId = "downloadNotebookGitBundle",
       summary = "Download the notebook's accepted Git bundle")
   @GetMapping(value = "/{notebook}/git-bundle", produces = "application/x-git-bundle")
-  @Transactional(readOnly = true)
   public ResponseEntity<byte[]> downloadNotebookGitBundle(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    NotebookGitBinding binding = requireGitBinding(notebook);
+    byte[] bundleBytes = notebookGitBundleDownloadService.selectAndFreeze(notebook.getId());
     String filename = "notebook-" + notebook.getId() + ".bundle";
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
         .contentType(MediaType.valueOf("application/x-git-bundle"))
-        .body(binding.getBundleBytes());
+        .body(bundleBytes);
   }
 
   @Operation(
@@ -490,14 +489,6 @@ class NotebookController {
     } finally {
       proposal.repository().close();
     }
-  }
-
-  private NotebookGitBinding requireGitBinding(Notebook notebook) {
-    return notebookGitBindingRepository
-        .findByNotebook_Id(notebook.getId())
-        .orElseThrow(
-            () ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
   }
 
   private Notebook resolveDestinationNotebookForFolderMove(FolderMoveRequest request)
