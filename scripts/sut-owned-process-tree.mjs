@@ -36,26 +36,25 @@ function pause(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function anyDescendantAlive(rootPid) {
-  const descendants = await descendantPidsByParentWalk(rootPid)
+function anyCapturedAlive(descendants) {
   return descendants.some((pid) => processAlive(pid))
 }
 
-async function ownedTreeStillRunning(child, pgid) {
+function ownedTreeStillRunning(child, pgid, descendants) {
   return (
     childStillRunning(child) ||
     processAlive(-pgid) ||
-    (await anyDescendantAlive(pgid))
+    anyCapturedAlive(descendants)
   )
 }
 
-async function waitUntilOwnedTreeStops(child, pgid, timeoutMs) {
+async function waitUntilOwnedTreeStops(child, pgid, descendants, timeoutMs) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
-    if (!(await ownedTreeStillRunning(child, pgid))) return true
+    if (!ownedTreeStillRunning(child, pgid, descendants)) return true
     await pause(20)
   }
-  return !(await ownedTreeStillRunning(child, pgid))
+  return !ownedTreeStillRunning(child, pgid, descendants)
 }
 
 function signalChild(child, signal) {
@@ -66,13 +65,12 @@ function signalChild(child, signal) {
   }
 }
 
-async function signalOwnedTree(child, pgid, signal) {
-  signalChild(child, signal)
-  signalTarget(-pgid, signal)
-  const descendants = await descendantPidsByParentWalk(pgid)
+function signalOwnedTree(child, pgid, descendants, signal) {
   for (const pid of descendants) {
     signalTarget(pid, signal)
   }
+  signalChild(child, signal)
+  signalTarget(-pgid, signal)
 }
 
 export async function stopOwnedSutProcessTree(
@@ -82,8 +80,14 @@ export async function stopOwnedSutProcessTree(
   if (typeof child?.kill !== 'function') return
   const pgid = child.pid
   if (!Number.isInteger(pgid) || pgid <= 0) return
-  await signalOwnedTree(child, pgid, 'SIGTERM')
-  if (await waitUntilOwnedTreeStops(child, pgid, timeoutMs)) return
-  await signalOwnedTree(child, pgid, 'SIGKILL')
-  await waitUntilOwnedTreeStops(child, pgid, 1_000)
+  // Capture before signals can reparent separately grouped children away from
+  // the PPID walk; reuse that set for signaling and completion checks.
+  const descendants = await descendantPidsByParentWalk(pgid)
+  signalOwnedTree(child, pgid, descendants, 'SIGTERM')
+  if (await waitUntilOwnedTreeStops(child, pgid, descendants, timeoutMs)) return
+  signalOwnedTree(child, pgid, descendants, 'SIGKILL')
+  if (await waitUntilOwnedTreeStops(child, pgid, descendants, 1_000)) return
+  throw new Error(
+    'Owned SUT process tree did not exit after SIGKILL within the bounded wait'
+  )
 }

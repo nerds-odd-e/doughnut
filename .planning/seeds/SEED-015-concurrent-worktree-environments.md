@@ -18,7 +18,8 @@ capacity of one development machine using the existing Nix environment.
 
 Backend tests and the two supported browser specs now isolate databases, app
 endpoints, and OpenAI mocks. Other mock and client workflows remain unsupported;
-general parallel E2E support is unfinished. Shutdown correction is queued in 2b.
+general parallel E2E support is unfinished. Owned SUT descendant shutdown (2b)
+is delivered.
 
 The developer endorsed unit-test isolation before E2E. Shared-MySQL isolation
 proved useful; it does not promise faster parallel suites on limited hardware.
@@ -63,7 +64,7 @@ kind per worktree, across two concurrent local worktrees.
 
 ### 1. Run backend unit tests concurrently in separate worktrees
 
-**Status:** Children 1a–1c, stories 2, 2a, and 3 delivered. Correction 2b precedes story 6.
+**Status:** Children 1a–1c, stories 2, 2a, 2b, and 3 delivered. Next queued story is 6.
 
 **Parent goal**
 
@@ -312,8 +313,7 @@ replacement.
 
 ### 2b. Stop an isolated SUT without leaving its forked backend running
 
-**Status:** Refined; first in backlog. [Corrective plan](../quick/072-owned-sut-descendant-shutdown/PLAN.md)
-is ready for execution; implementation has not started.
+**Status:** Delivered, 2026-09-08. [Corrective plan](../quick/072-owned-sut-descendant-shutdown/PLAN.md).
 
 **Goal**
 
@@ -340,24 +340,6 @@ unrelated process termination, recovery of children already orphaned before
 shutdown starts, supervisor hard-kill recovery, processes newly forked during
 shutdown, PID-reuse hardening, general process supervision, CLI/MCP expansion,
 and Cloud VM/CI changes. No continuous ancestry tracking is implied.
-
-**Key examples**
-
-1. A live owned parent has a backend in another process group → request owned
-   shutdown for restart → the parent and backend exit, the backend port can be
-   rebound for restart, and a peer endpoint still responds.
-2. The same backend ignores SIGTERM while its parent exits → bounded shutdown
-   escalates → the backend exits before cleanup completes; the peer stays usable.
-3. A Cypress runner holds the existing lease, or the owner is unverifiable →
-   request restart → existing refusal leaves processes untouched. No new
-   allocation or stale-process recovery is introduced.
-
-**Open questions:** None for this bounded correction. The exclusions above
-are conservative planning assumptions, not additional developer decisions.
-
-**Evidence:** `005898f8d4` signals the parent before enumerating descendants;
-the retrospective reproduced an owned detached child surviving completed stop.
-**Effort hypothesis:** S, medium confidence; existing shutdown boundary and fixtures.
 
 <a id="story-3"></a>
 
@@ -464,7 +446,7 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ### 6. Reclaim databases from retired worktrees
 
-**Status:** Queued after correction 2b; retirement policy remains unrefined.
+**Status:** First in backlog; retirement policy remains unrefined.
 
 - **For / why:** Developers and AI tasks creating disposable worktrees need to
   avoid accumulating databases after those worktrees are retired.
@@ -484,8 +466,8 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   dropping databases, replacing allocations, or terminating those listeners.
 - **Reminder from quick/070:** Private mock ports belong to a Cypress run and
   are not persistent allocation fields or database inventory. A completed mock
-  run leaves the SUT/database allocated. Correction 2b reproduced a child alive
-  after its parent stopped; missing parent/lease alone cannot prove retirement.
+  run leaves the SUT/database allocated. Delivered correction 2b showed a child
+  alive after its parent stopped; missing parent/lease alone cannot prove retirement.
   Example: a surviving backend still using a candidate database → reclaim →
   refuse; an explicitly retired, verified idle allocation may follow the chosen
   reclamation policy. Resolve identification and drop-versus-reuse before planning.
@@ -493,7 +475,7 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 ## Ordering and Scope Reduction
 
 **Backlog review, 2026-09-08:** Quick/070 delivered focused OpenAI mocks.
-Queue the reproduced shutdown correction 2b before 6 → 4 → 5; reclaim remains
+Correction 2b is delivered. Queue remains 6 → 4 → 5; reclaim remains
 the next expansion, followed by CLI and MCP. CLI-before-MCP is value ordering,
 not a dependency. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 The recording-exclusivity proof correction stays with story 3 in quick/073;

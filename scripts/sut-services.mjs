@@ -41,6 +41,7 @@ export function runSutServices({
   checkoutRoot = env.SUT_CHECKOUT_ROOT ?? repoRoot,
   serviceArgs,
   retainOwnershipOnExit,
+  stopOwnedTree = stopOwnedSutProcessTree,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget, env })
   const child = spawnFn('pnpm', serviceArgs ?? sutServiceArgs(target), {
@@ -66,7 +67,7 @@ export function runSutServices({
     if (finished) return
     finished = true
     logWriter.write(message)
-    await stopOwnedSutProcessTree(child)
+    await stopOwnedTree(child)
     if (env.SUT_OWNER_TOKEN && !retainOwnershipOnExit?.()) {
       await releaseSutOwnership(checkoutRoot)
     }
@@ -101,11 +102,17 @@ export function runSutServices({
 
 export async function startOwnedSutSupervisor(opts = {}) {
   const env = opts.env ?? process.env
-  const state = { child: undefined, retain: false }
+  const state = { child: undefined, retain: false, shutdown: undefined }
+  const sharedStop = (child) => {
+    if (!state.shutdown) {
+      state.shutdown = stopOwnedSutProcessTree(child ?? state.child)
+    }
+    return state.shutdown
+  }
   await startSutOwnerControlFromEnv(env, {
     onShutdown: async () => {
       state.retain = true
-      await stopOwnedSutProcessTree(state.child)
+      await sharedStop(state.child)
     },
     getApplicationGroupId: () => {
       const pid = state.child?.pid
@@ -116,6 +123,7 @@ export async function startOwnedSutSupervisor(opts = {}) {
     ...opts,
     env,
     retainOwnershipOnExit: () => state.retain,
+    stopOwnedTree: sharedStop,
   })
   return state.child
 }
