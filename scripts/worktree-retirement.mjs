@@ -18,14 +18,27 @@ import {
 
 export { inspectDisposableDatabaseTargets, unitDatabaseNameForIdentity }
 
+function retirementDropPlan(targets) {
+  const plan = [
+    { kind: 'unit', label: 'Unit database', database: targets.unitDatabase },
+  ]
+  if (targets.e2eDatabase) {
+    plan.push({
+      kind: 'E2E',
+      label: 'E2E database',
+      database: targets.e2eDatabase,
+    })
+  }
+  return plan
+}
+
 function formatInspection(targets) {
   const lines = [
     'Disposable database targets (idle snapshot; not a deletion reservation).',
     `Worktree id: ${targets.id}`,
-    `Unit database: ${targets.unitDatabase}`,
   ]
-  if (targets.e2eDatabase) {
-    lines.push(`E2E database: ${targets.e2eDatabase}`)
+  for (const entry of retirementDropPlan(targets)) {
+    lines.push(`${entry.label}: ${entry.database}`)
   }
   lines.push(
     'Idle snapshot: no busy recorded ownership, listeners, database sessions, or surviving checkout backend JVMs.'
@@ -33,14 +46,44 @@ function formatInspection(targets) {
   return `${lines.join('\n')}\n`
 }
 
-function formatRetirementReport(targets, unitResult) {
-  return [
-    'Worktree database retirement complete (unit-test allocation).',
+function formatDropLine(label, database, result) {
+  return `${label}: ${database} — ${result}`
+}
+
+function formatRetirementReport(targets, dropResults) {
+  const lines = [
+    'Worktree database retirement complete.',
     `Worktree id: ${targets.id}`,
-    `Unit database: ${targets.unitDatabase} — ${unitResult}`,
+  ]
+  for (const entry of dropResults) {
+    lines.push(formatDropLine(entry.label, entry.database, entry.result))
+  }
+  lines.push(
     'Retirement marker retained; identity and checkout left in place for you to remove afterward.',
-    'Supported starts refuse this marker; retry retirement to complete any missing drops.',
-  ].join('\n')
+    'Supported starts refuse this marker; retry retirement to complete any missing drops.'
+  )
+  return lines.join('\n')
+}
+
+function formatPartialRetirementFailure({
+  targets,
+  completed,
+  failed,
+  detail,
+}) {
+  const lines = [
+    `Partial worktree database retirement: ${failed.kind} DROP failed after the retirement marker was written.`,
+    `Worktree id: ${targets.id}`,
+  ]
+  for (const entry of completed) {
+    lines.push(formatDropLine(entry.label, entry.database, entry.result))
+  }
+  lines.push(
+    `${failed.label} target: ${failed.database}`,
+    `Failure: ${detail}`,
+    'Retirement marker retained; retry pnpm worktree:retire to complete missing drops. Supported starts remain blocked.'
+  )
+  return lines.join('\n')
 }
 
 function parseArgs(argv) {
@@ -51,14 +94,6 @@ function parseArgs(argv) {
     return { mode: 'check' }
   }
   throw new Error(`Unknown worktree retirement arguments: ${argv.join(' ')}`)
-}
-
-/** Unit-only mutation refuses a recorded E2E allocation before marking or DROP. */
-function refuseRecordedE2eAllocation(targets) {
-  if (!targets.e2eDatabase) return
-  throw new Error(
-    `Refusing database retirement: recorded E2E database ${targets.e2eDatabase} is not reclaimable yet. Unit-only allocations can be retired; E2E reclaim is not enabled in this command version.`
-  )
 }
 
 export function defaultCheckoutRoot() {
@@ -78,15 +113,13 @@ async function assessIdleTargets(checkoutRoot, evidenceDeps) {
   return targets
 }
 
-async function retireUnitAllocation({
+async function retireAllocation({
   checkoutRoot,
   out,
   evidenceDeps,
   mysqlExecFn,
   hooks = {},
 }) {
-  refuseRecordedE2eAllocation(inspectDisposableDatabaseTargets(checkoutRoot))
-
   let gateHeld = false
   try {
     acquireRetirementAdmission(checkoutRoot, { allowRetired: true })
@@ -96,30 +129,36 @@ async function retireUnitAllocation({
     }
 
     const targets = await assessIdleTargets(checkoutRoot, evidenceDeps)
-    refuseRecordedE2eAllocation(targets)
 
     writeRetirementMarker(checkoutRoot)
     if (hooks.afterMarkerPublished) {
       await hooks.afterMarkerPublished(checkoutRoot, targets)
     }
 
-    let unitResult
-    try {
-      unitResult = dropRetirementDatabase(targets.unitDatabase, { mysqlExecFn })
-    } catch (error) {
-      const detail = error instanceof Error ? error.message : String(error)
-      throw new Error(
-        [
-          'Partial worktree database retirement: unit DROP failed after the retirement marker was written.',
-          `Worktree id: ${targets.id}`,
-          `Unit database target: ${targets.unitDatabase}`,
-          `Failure: ${detail}`,
-          'Retirement marker retained; retry pnpm worktree:retire to complete missing drops. Supported starts remain blocked.',
-        ].join('\n')
-      )
+    const completed = []
+    for (const drop of retirementDropPlan(targets)) {
+      try {
+        if (hooks.beforeDrop) {
+          await hooks.beforeDrop(drop.database, targets)
+        }
+        completed.push({
+          ...drop,
+          result: dropRetirementDatabase(drop.database, { mysqlExecFn }),
+        })
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error)
+        throw new Error(
+          formatPartialRetirementFailure({
+            targets,
+            completed,
+            failed: drop,
+            detail,
+          })
+        )
+      }
     }
 
-    out.write(`${formatRetirementReport(targets, unitResult)}\n`)
+    out.write(`${formatRetirementReport(targets, completed)}\n`)
     return 0
   } finally {
     if (gateHeld) {
@@ -144,7 +183,7 @@ export async function runWorktreeRetire({
       out.write(formatInspection(targets))
       return 0
     }
-    return await retireUnitAllocation({
+    return await retireAllocation({
       checkoutRoot,
       out,
       evidenceDeps,

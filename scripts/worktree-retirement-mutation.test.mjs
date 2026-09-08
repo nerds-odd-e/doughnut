@@ -17,46 +17,7 @@ import {
   bindWorktreeRetirementMysqlTestAdapter,
   retirementSchemaExists,
 } from './worktree-retirement-mysql.mjs'
-import {
-  clearEvidenceDeps,
-  makeWritable,
-} from './worktree-retirement-test-helpers.mjs'
-import { runWorktreeRetire } from './worktree-retirement.mjs'
-
-async function runRetire(checkoutRoot, extras = {}) {
-  const out = makeWritable()
-  const err = makeWritable()
-  const code = await runWorktreeRetire({
-    argv: [],
-    checkoutRoot,
-    out,
-    err,
-    evidenceDeps: clearEvidenceDeps,
-    ...extras,
-  })
-  return { code, out: out.content(), err: err.content() }
-}
-
-test('recorded E2E allocation refuses mutation before marker or DROP', async (t) => {
-  const checkout = makeLinkedWorktreeCheckout(t)
-  writeIsolatedConfig(checkout.root, {
-    id: 'wt_a7c2',
-    e2e: { database: 'doughnut_e2e_wt_a7c2' },
-  })
-  const drops = []
-  const result = await runRetire(checkout.root, {
-    mysqlExecFn() {
-      drops.push('called')
-      return ''
-    },
-  })
-  assert.equal(result.code, 1)
-  assert.match(result.err, /recorded E2E database/)
-  assert.match(result.err, /not reclaimable yet/)
-  assert.equal(existsSync(retirementMarkerPath(checkout.root)), false)
-  assert.equal(existsSync(retirementAdmissionGatePath(checkout.root)), false)
-  assert.equal(drops.length, 0)
-})
+import { runRetire } from './worktree-retirement-test-helpers.mjs'
 
 test('competing runner cannot pass the admission gate during retirement', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
@@ -213,6 +174,7 @@ test('DROP failure after marker reports partial progress and retains marker', as
   })
   assert.equal(result.code, 1)
   assert.match(result.err, /Partial worktree database retirement/)
+  assert.match(result.err, /unit DROP failed/)
   assert.match(result.err, /doughnut_wt_d0f5_test/)
   assert.match(result.err, /simulated mysql DROP failure/)
   assert.equal(existsSync(retirementMarkerPath(checkout.root)), true)

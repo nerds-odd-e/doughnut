@@ -1,7 +1,7 @@
 # Retire worktree databases before removing the checkout
 
 Source: [SEED-015 story 6](../../seeds/SEED-015-concurrent-worktree-environments.md#story-6).
-Status: in progress; story scope accepted 2026-09-08.
+Status: done; delivered 2026-09-08.
 
 ## Goal and scope
 
@@ -184,11 +184,8 @@ exception only, record actual elapsed time rather than disguising coding overrun
 
 ### 5. Retire the same worktree's allocated E2E database too
 Type: Behavior
-Status: planned
-Proof: Same real command/database harness with both allocated targets, populated
-tables, peer sentinel and port-claim fixture. Both targets disappear, peer and
-claims survive. Fail the second DROP once: report partial retirement, block starts,
-then retry to completion. An unrecorded E2E-shaped database stays untouched.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement*.test.mjs` (33/33) on disposable MySQL **8.4.11** — unit + recorded E2E schemas dropped, peer sentinel and port claims preserved, partial second-DROP reports then retry completes, unrecorded E2E-shaped schema untouched.
 
 Behavior: Verified idle allocation with its canonical recorded E2E database →
 explicitly retire → its unit and E2E schemas are reclaimed as one retirement.

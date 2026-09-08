@@ -41,6 +41,20 @@ export async function runCheck(checkoutRoot, evidenceDeps = clearEvidenceDeps) {
   return { code, out: out.content(), err: err.content() }
 }
 
+export async function runRetire(checkoutRoot, extras = {}) {
+  const out = makeWritable()
+  const err = makeWritable()
+  const code = await runWorktreeRetire({
+    argv: [],
+    checkoutRoot,
+    out,
+    err,
+    evidenceDeps: clearEvidenceDeps,
+    ...extras,
+  })
+  return { code, out: out.content(), err: err.content() }
+}
+
 function compileHoldClass(checkoutRoot) {
   const source = path.join(checkoutRoot, 'Hold.java')
   writeFileSync(
