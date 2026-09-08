@@ -49,7 +49,7 @@ kind per worktree, across two concurrent local worktrees.
 
 ### 1. Run backend unit tests concurrently in separate worktrees
 
-**Status:** Children 1a–1c, stories 2, 2a, 2b, and 3 delivered. Next queued story is 6.
+**Status:** Children 1a–1c delivered; global priority lives in the product backlog.
 
 **Goal**
 
@@ -87,32 +87,19 @@ quick/054 from `1089be2573` and the suite-datasource repair (quick/055) from
 
 **Goal**
 
-Developers and AI tasks can execute backend unit tests concurrently against
-each worktree's code and schema. Accept one-time manual provisioning and one
-opt-in command to establish useful isolation before automatic setup or changes
-to existing commands.
+Developers and AI tasks can run concurrent backend suites against manually
+provisioned worktree databases through one opt-in command.
 
 **Scope**
 
-- Start with local MySQL already running on port 3309, dependencies installed,
-  and two worktrees with different manually chosen IDs. The developer creates
-  each corresponding database and grants the existing local test user access.
-  The command does not allocate identities, create databases, or grant access.
-- Store the ID in a gitignored file at each worktree root. It determines one
-  unit-test database; no URLs or port settings need repeating each run. Reuse
-  the file across fresh shells and ordinary branch changes.
-- One documented command migrates the chosen database with that worktree's
-  code, then executes the complete backend unit suite by default. It also
-  accepts a test-name filter for a focused invocation.
-- Missing/invalid configuration, conflicting explicit target overrides, and a
-  missing/inaccessible database stop this opt-in workflow without fallback.
-  Cancellation stops the owned foreground run without stopping MySQL or other
-  worktree runs.
-- Existing `backend:test`, `backend:test_only`, and direct Gradle entry points
-  keep their current behavior and are not automatically isolated.
-
-**Exclusions:** No automatic first use, port allocation, hooks, generic
-environment manager, database cleanup, or changes to existing command selection.
+- Existing local MySQL on 3309, installed dependencies, distinct developer-chosen
+  IDs, precreated schemas and grants. Persist each ID in gitignored checkout
+  configuration across shells and ordinary branch changes.
+- Migrate with owning code, then run the complete suite or a focused filter.
+  Invalid configuration, conflicting targets and unavailable schemas refuse
+  without fallback; cancellation leaves MySQL and peer runs alive.
+- Automatic provisioning belongs to 1b and ordinary-command routing to 1c.
+  Port allocation, hooks, generic environment management and cleanup are excluded.
 
 <a id="story-1b"></a>
 
@@ -124,36 +111,21 @@ from `8114cfc16b`.
 
 **Goal**
 
-Developers and AI tasks can create disposable local worktrees and immediately
-run backend tests through the opt-in worktree workflow without choosing an
-identity, creating a database, or granting access. Removing this repeated setup
-makes isolated verification practical even if ordinary command integration in
-1c is cancelled.
+Developers and AI tasks can run the opt-in backend workflow in fresh disposable
+worktrees without manually choosing an identity, creating schemas or grants.
 
 **Scope**
 
-- When the 1a opt-in workflow starts without local configuration, it assigns a
-  new bounded identity, prepares a database with the existing local MySQL
-  administration access, persists the completed environment, then migrates and
-  runs the requested backend tests. No AI skill or worktree-creation hook is
-  required.
-- A later invocation from the same checkout, including a fresh shell or an
-  ordinary branch change, reuses that identity and database. An already
-  configured 1a environment remains unchanged and usable; automatic first use
-  does not repair, replace, or provision an operator-supplied identity.
-- Allocation must create a new database rather than adopt an existing name, and
-  configuration becomes durable only after provisioning succeeds. A failed
-  attempt never runs tests against fallback state or changes another worktree's
-  environment. It may leave its own unreferenced newly created database when a
-  process is interrupted; automatic cleanup remains excluded.
-- At most one invocation owns a checkout's environment at a time. Concurrent
-  first-use attempts leave one complete persistent configuration and never run
-  two test processes against the same database; an overlapping invocation may
-  fail visibly and be retried after the owner finishes.
-- All group-1 shared boundaries apply. Ordinary backend commands, database
-  cleanup, worktree hooks, port allocation, application/E2E services,
-  Cloud VM/CI behavior, and recovery from duplicate operator-supplied
-  configurations remain excluded.
+- Missing configuration triggers a new bounded identity and schema using local
+  administration access; persist configuration only after provisioning succeeds,
+  then migrate and test. Never adopt an existing schema or fall back to peer data.
+- Reuse configured identities across shells/branch changes. First-use allocation
+  does not repair, replace or provision operator-supplied identities.
+- One checkout owner at a time; overlapping first use may refuse and be retried.
+  Interrupted provisioning may leave an unreferenced schema; no automatic cleanup.
+- Group-1 boundaries apply. Ordinary-command integration belongs to 1c; hooks,
+  ports, application/E2E services, cleanup, duplicate-ID recovery and Cloud VM/CI
+  changes are excluded.
 
 <a id="story-1c"></a>
 
@@ -164,42 +136,24 @@ quick/060 from `c96676002f`.
 
 **Goal**
 
-Developers and AI tasks can verify backend changes concurrently in local linked
-worktrees using ordinary test and migration commands, without remembering an
-opt-in command or manually preparing a database. Switching commands must keep
-each task on its own persistent database. This removes accidental shared-state
-interference from normal backend verification; browser isolation is a later
-story.
+Developers and AI tasks can use ordinary backend test and migration commands
+in linked worktrees, automatically selecting the same persistent isolated
+database across entry points without manual setup.
 
 **Scope**
 
-- Support local Nix invocations of `pnpm backend:test`,
-  `pnpm backend:test_only`, and underlying Gradle `test` and `migrateTestDB`
-  tasks, including focused Gradle `--tests` filters.
-- A fresh linked worktree may start with any supported entry point. Prepare
-  its isolated database and apply that checkout's migrations before tests run,
-  including when the first invocation is test-only. A migration-only command
-  prepares and migrates without running tests.
-- Reuse the same identity and database when changing entry points, opening a
-  fresh shell, or making an ordinary branch change. A checkout with existing
-  local configuration uses it; do not replace or repair an operator-supplied
-  identity or silently provision its missing database.
-- Retain the existing opt-in workflow and reuse its allocation and checkout
-  ownership behavior. One invocation at a time owns a checkout's test database;
-  commands in different worktrees may overlap. Print the selected database
-  and stop visibly on invalid configuration, preparation, or migration failure.
-- Keep ordinary commands in a primary checkout without local configuration on
-  their existing behavior (default `doughnut_test`), while fresh linked
-  worktrees automatically initialize isolation. A primary checkout with local
-  configuration uses that configured environment.
-- When isolation applies, reject an explicit `SPRING_DATASOURCE_URL`, `DB_URL`,
-  or `SPRING_FLYWAY_URL` that conflicts with the assigned target. Matching
-  overrides remain usable.
-
-**Exclusions:** Browser/E2E and development-profile isolation, ports, service
-startup or shutdown redesign, Cloud VM/CI changes, worktree hooks, database
-cleanup, automatic schema rollback/rebuild, duplicate-ID recovery, multiple
-simultaneous runners in one checkout, and changes to unrelated Gradle tasks.
+- Local Nix `backend:test`, `backend:test_only`, Gradle `test`/`migrateTestDB`
+  and focused filters. Prepare and migrate before tests, even on first test-only
+  use; migration-only invocation runs no tests. Retain the opt-in workflow.
+- Reuse identity and checkout ownership across commands, shells and branches;
+  one test owner per checkout, concurrent peers allowed. Print the database;
+  invalid configuration, preparation or migration refuses visibly.
+- Unconfigured primary checkouts retain `doughnut_test`; fresh linked checkouts
+  initialize isolation and configured checkouts use their identity. No identity
+  repair/replacement. Matching datasource overrides work; conflicts refuse.
+- Exclude browser/development isolation, ports, service lifecycle redesign,
+  Cloud VM/CI, hooks, cleanup, automatic schema rollback/rebuild, duplicate-ID
+  recovery, multiple same-checkout runners and unrelated Gradle tasks.
 
 <a id="story-2"></a>
 
@@ -347,7 +301,7 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ### 4. Run CLI E2E workflows against the owning worktree's environment
 
-**Status:** Queued after story 6; needs refinement before slice planning.
+**Status:** Queued after retirement correction 6a; needs refinement before slice planning.
 
 - **For / why:** Developers and AI tasks changing CLI behavior can verify it
   concurrently with another worktree's CLI or browser tests.
@@ -389,6 +343,14 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   (SEED-009 story 18). Prove reset, cancellation, and teardown preserve peer
   files/processes. Require owning application health before client setup/reset;
   a live owner with a foreign ready endpoint must refuse without touching peers.
+- **Retirement reminder from story 6:** Establish owning application/runner
+  protection before client setup or reset and keep it through child cleanup.
+  A retired allocation, including a partial retirement, must refuse before
+  install/config/clone mutation or database recreation. Prove that retirement
+  refuses while a supported CLI run is active and that a late start after
+  retirement cannot resume using stale eligibility. Reuse the existing
+  admission and lifetime ownership contracts; do not add a second identity or
+  assume every CLI descendant is covered by backend-JVM inspection.
 
 <a id="story-5"></a>
 
@@ -421,6 +383,13 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   after disconnect and failed-client cleanup before admitting the chosen spec.
   Require owning application health before MCP setup/reset, including refusal
   of a foreign ready endpoint despite a live control owner (story 2a).
+- **Retirement reminder from story 6:** Keep owning application/runner
+  protection through MCP disconnect and child cleanup, including periods with
+  no database session. Refuse setup/reset against a retired or partially retired
+  allocation before changing client state. Prove retirement refuses during an
+  active supported MCP run and that late starts cannot recreate retired data.
+  Reuse existing admission/ownership; backend-JVM inspection alone does not
+  establish ownership or cleanup of an MCP server process.
 
 <a id="story-6"></a>
 
@@ -453,16 +422,59 @@ removal hooks, copied/moved checkout recovery, process supervision, port-claim
 cleanup, and Cloud VM/CI changes. Port claims are a separate resource; reclaiming
 them is not required to free database storage.
 
+<a id="story-6a"></a>
+
+### 6a. Retire worktree databases without admitting late runners or overlooking uncertain JVMs
+
+**Status:** Queued correction of delivered story 6; refined 2026-09-08.
+Plan: [quick/077](../quick/077-retirement-admission-and-process-evidence/PLAN.md).
+
+**Goal**
+
+Developers and AI tasks can rely on the existing retirement safety boundary:
+retired databases stay retired, and uncertain evidence about a surviving
+supported backend JVM prevents deletion.
+
+**Scope**
+
+Close the marker-check/admission race and refuse incomplete working-directory
+evidence for a potentially relevant supported JVM. Preserve exact target
+selection, idle retirement/retry, peer usability, and ordinary supported
+concurrency. This corrects story 6's promised behavior; it adds no new resource
+management capability. Inspection uncertainty must remain visible, consistent
+with [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md).
+
+**Key examples**
+
+- A runner sees no marker, pauses, and retirement completes → the runner
+  resumes → refuse before provisioning or launch; leave the marker intact.
+- A supported JVM appears in the process table without a checkout path and
+  its working directory cannot be inspected → retirement refuses without DROP,
+  marker publication, or process interruption. No active session proves nothing
+  about whether that disconnected JVM can reconnect.
+- A positively identified peer JVM does not veto an otherwise idle checkout;
+  ordinary same-identity retirement retry still succeeds.
+
+**Priority:** Before client expansion because the delivered destructive command
+can currently misclassify eligibility. CLI-before-MCP remains value ordering.
+Manual `--check` is insufficient: it is only a snapshot and shares the incomplete
+inspection path. No new parent-problem decision is needed.
+
+**Exclusions:** New process supervision, automatic gate recovery, force mode,
+unretirement, copied/moved checkout recovery, CLI/MCP implementation, port cleanup,
+Cloud VM/CI changes, and broader database management.
+
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08, after quick/075:** Story 6 is delivered. Queue is
-4 → 5; CLI-before-MCP is value ordering, not a dependency. The
+**Backlog review, 2026-09-08, retrospective of quick/075:** Story 6 is delivered
+with two reproduced eligibility gaps; correction 6a takes priority. Queue is
+6a → 4 → 5; CLI-before-MCP is value ordering, not a dependency. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order. The
 recording-exclusivity proof correction stays with story 3 in quick/073;
 it does not require a duplicate product story or broader mock support.
 
 Do not claim general parallel E2E support from the focused no-mock workflow.
-First-to-drop order among expansions is 5, 4, 6, then 3. Persistent development
+First-to-drop order among remaining expansions is 5, then 4. Persistent development
 profiles, capacity scheduling, multiple E2E workers inside one worktree,
 Cloud VM, separate MySQL instances, and a second identity remain deferred.
 
@@ -481,15 +493,6 @@ select and refine one story before creating an executable plan.
 
 ## Breadcrumbs
 
-- Developer discussion, 2026-09-07: shared MySQL across worktrees; endorse
-  unit-test-first delivery; propose a gitignored worktree identity/database
-  suffix and allocated service ports initialized by a hook or skill.
 - [ADR 0006: Failure handling](../../docs/adrs/0006-failure-handling-accepted.md).
 - [Problem decomposition](../../.cursor/rules/problem-decomposition.mdc).
-- Stories 1a–1c: concurrent suites on shared MySQL 8.4.11 work; automatic
-  first-use and ordinary `pnpm backend:test` / wrapper migrate and test
-  isolate in linked worktrees, including exclusive stale-lock reclaim.
-  Recover 1c (quick/060) from `c96676002f`; story 2 (quick/061) from
-  `ef7044e07c`. Current guides: `docs/worktree-backend-tests.md` and
-  `docs/worktree-browser-tests.md`. SUT/Cypress ownership is separate from
-  backend-test ownership; no worktree-creation hook is required.
+- Guides: `docs/worktree-backend-tests.md`, `docs/worktree-browser-tests.md`.

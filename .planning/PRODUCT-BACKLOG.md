@@ -22,6 +22,7 @@ changes.
 
 ## Backlog
 
+- [Retire worktree databases without admitting late runners or overlooking uncertain JVMs](seeds/SEED-015-concurrent-worktree-environments.md#story-6a) — SEED-015
 - [Run CLI E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
 - [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
 
@@ -37,4 +38,3 @@ changes.
 - [Understand how to proceed when batch pull refuses divergent history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-18a) — SEED-009
 - [Keep a related local edit batch when the web changes a different note](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-18) — SEED-009
 - [Run browser E2E scenarios concurrently without external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-2) — SEED-015
-- [Keep a local note edit when a web-created note is then saved](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-17) — SEED-009
