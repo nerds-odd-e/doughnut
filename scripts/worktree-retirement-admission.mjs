@@ -3,9 +3,9 @@
  * Checkout-local retirement admission gate and durable retirement marker.
  *
  * Runners hold the gate only from start through establishing their existing
- * ownership, then release it. Retirement (later) holds it across final
- * validation, marking, and deletion. A present gate or marker is a refusal —
- * not a queue, lease recovery, or timeout-based reclaim.
+ * ownership, then release it. Retirement holds it across final validation,
+ * marking, and deletion. A present gate or marker is a refusal — not a queue,
+ * lease recovery, or timeout-based reclaim.
  */
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -56,6 +56,10 @@ export function acquireRetirementAdmission(
     throw error
   }
   writeFileSync(path.join(gateDir, 'owner.pid'), String(process.pid))
+  if (!allowRetired && isCheckoutRetired(checkoutRoot)) {
+    releaseRetirementAdmission(checkoutRoot)
+    assertCheckoutNotRetired(checkoutRoot)
+  }
 }
 
 export function releaseRetirementAdmission(checkoutRoot) {
@@ -76,7 +80,7 @@ export function holdRetirementAdmission(checkoutRoot, options = {}) {
   }
 }
 
-/** Seed a durable retirement marker (tests and later retirement mutation). */
+/** Seed a durable retirement marker (tests and retirement mutation). */
 export function writeRetirementMarker(checkoutRoot) {
   writeFileSync(
     retirementMarkerPath(checkoutRoot),
