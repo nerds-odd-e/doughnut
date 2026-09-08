@@ -69,11 +69,11 @@ The product constraints established in the discussion are:
    concrete interruption; batching already-accepted saves risks conflicting
    with immutable history unless its publication boundary is clarified.
 
-**Priority hypothesis:** Story 13 (web capture in the sequential loop) is
-delivered. Next selected remaining story is keeping a local content edit across
-one accepted addition (Story 16), then a related local edits-only batch
-(Story 14). This follows the established beneficiary and two-way workflow goal.
-It is not a claim that usage data proves these are the most frequent failures.
+**Priority hypothesis:** Stories 13 (web capture in the sequential loop) and 16
+(keep a local content edit across one accepted addition) are delivered. Next
+selected remaining story is a related local edits-only batch (Story 14). This
+follows the established beneficiary and two-way workflow goal. It is not a claim
+that usage data proves these are the most frequent failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
@@ -343,53 +343,20 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 16. Keep a local note edit when accepted history adds a different note
 
-**Status:** queued; refined.
+**Status:** delivered.
 
-**Goal:** A notebook owner can receive a new web-created note while keeping one
-committed, unpublished local refinement, then publish that refinement without
-losing either note's identity or learning history.
-
-**Scope:**
-
-- Start from a bound `main` checkout with a clean working tree and exactly one
-  unpublished single-parent commit editing the body/frontmatter of one existing
-  ordinary note at its unchanged path. The remote projection matches accepted
-  history.
-- Since the shared base, accepted history contains exactly one new commit,
-  adding exactly one different ordinary note at the root or an existing
-  represented folder, with no accompanying edits.
-- Pull receives the added note and rebases the local edit, keeping it
-  unpublished. Accepted commit IDs remain unchanged. A later explicit publish
-  updates the original edited note; both notes retain their own identities and
-  private learning data.
-- Exclude uncommitted edits/automatic stash, multiple local commits or edited
-  notes, multiple remote commits or additions, accompanying remote content
-  edits, same-path collisions, moves, deletes, renames, README changes, new
-  folders, and projection-drift repair. Existing supported content-only rebase
-  remains as delivered; this adds no general structural reconciliation.
-
-**Key examples:**
-
-1. From a shared base containing `Alpha.md`, commit a local body edit to Alpha;
-   create `Beta.md` on the web in one accepted commit → pull → Beta appears
-   locally and Alpha retains its local edit in an unpublished commit. Donut's
-   Alpha is still unchanged. The same receipt works when Beta is created in an
-   existing represented folder.
-2. After that pull → explicitly publish → Donut's original Alpha contains the
-   refinement and keeps its learning history; Beta's content, identity, and
-   private data are unchanged.
-3. With the same local edit, accepted history adds Beta and also renames another
-   note → pull → refuse this unsupported divergence, retaining local work and
-   leaving accepted history unchanged. Likewise, uncommitted local edits still
-   require the owner to clean the working tree; pull does not stash them.
-
-- **Effort hypothesis:** M — low confidence; assumes unique path correspondence
-  is enough to rebase one content edit over one addition. Revisit size if the
-  new note's identity policy needs more than Stories 8 and 13 already prove.
-- **Depends on:** delivered Stories 8 and 13; independent of Story 14.
-
-No unresolved decisions within this narrow scope. Broader receipt across a
-creation followed by web edits is excluded from this story.
+- **Goal:** A notebook owner can receive a new web-created note while keeping one
+  committed, unpublished local refinement, then publish that refinement without
+  losing either note's identity or learning history.
+- **Scope:** Bound clean `main` with exactly one unpublished single-parent
+  content edit of one existing ordinary note; accepted history since the shared
+  base is exactly one single-parent commit adding one different ordinary note at
+  root or an already represented folder. Pull receives the addition and retains
+  the unpublished edit; explicit publish updates the original edited note and
+  preserves both identities and private learning data. Excludes dirty trees,
+  multiple local/remote commits or additions, accompanying remote edits,
+  collisions, moves, renames, deletes, README/new-folder changes, drift repair,
+  and creation followed by another web save.
 
 ## Ordering and Scope Reduction
 
@@ -397,10 +364,8 @@ The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, **13** is delivered. Remaining selected stories are **16**
-(keep a local edit across one accepted addition) then **14** (related local
-revisions). These are independent vertical outcomes, not technical
-prerequisites for each other. Keep **15 → 10** as unqueued candidates:
+Within this seed, **13** and **16** are delivered. Remaining selected story is
+**14** (related local revisions). Keep **15 → 10** as unqueued candidates:
 folder-move divergence is consequential but narrower and has unresolved
 identity-policy risk; batching changes readability without unlocking
 synchronization.
