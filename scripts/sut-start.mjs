@@ -60,14 +60,18 @@ export function spawnSutServices({
   logFile = LOG_FILE,
   runtimeTarget,
   owner,
+  checkoutRoot = repoRoot,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget })
-  const ownerEnv = owner
-    ? {
-        SUT_OWNER_TOKEN: owner.token,
-        SUT_OWNER_CONTROL_PATH: owner.controlPath,
-      }
-    : {}
+  const ownerEnv = {
+    SUT_CHECKOUT_ROOT: checkoutRoot,
+    ...(owner
+      ? {
+          SUT_OWNER_TOKEN: owner.token,
+          SUT_OWNER_CONTROL_PATH: owner.controlPath,
+        }
+      : {}),
+  }
   const child = spawnFn(
     process.execPath,
     [path.join(repoRoot, 'scripts/sut-services.mjs')],
@@ -186,6 +190,7 @@ export async function runSutStart({
       logFile,
       runtimeTarget: target,
       owner,
+      checkoutRoot,
     })
     child = spawned.child
     await writePidFile(child.pid, { pidFile })

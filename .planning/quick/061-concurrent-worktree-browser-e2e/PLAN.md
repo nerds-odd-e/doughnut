@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–4 done, slices 5–13 planned.
+Status: in progress; slices 1–5 done, slices 6–13 planned.
 
 ## Goal and scope
 
@@ -256,10 +256,14 @@ Sizing: ~5 minutes, medium confidence; one real-process startup-failure loop.
 ### 5. Release the running stack when a service fails
 
 Type: Behavior
-Status: planned
-Proof: Keep the real supervisor running, force a disposable application child
-to exit after readiness, and observe the failure log and peer exit without
-issuing another command. The owning health check then fails; foreign peers live.
+Status: done
+Proof: `pnpm exec node --test scripts/sut-services-child-exit.test.mjs` —
+real `run-p -lnr` supervisor; SIGKILL one peer after live owner; log
+`Forced SUT service child exit` without another command; owned peers and
+supervisor die; lock released; owning health fails; foreign process and
+listener remain. `pnpm test:sut-start` still covers leaf 4 release.
+Learned: `-clnr` (`-c` continue-on-error) does not tear down peers on crash;
+supervisor now uses `-lnr`.
 
 Behavior: The SUT has become healthy → an application child exits unexpectedly
 → the running owner reports failure on exit observation and releases its peers.
@@ -505,8 +509,10 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   `docs/worktree-browser-tests.md`.
 - Slice 4: failed isolated start signals the spawned process group (not ports),
   waits for the tree to die, then `releaseSutOwnership`. Shared helper:
-  `scripts/sut-owned-process-tree.mjs`. Leaf 5 should reuse it for
-  post-readiness child exit.
+  `scripts/sut-owned-process-tree.mjs`.
+- Slice 5: `run-p -clnr` does not kill peers on non-zero child exit (`-c`).
+  Supervisor now uses `-lnr` and, on close, logs the forced exit, stops the
+  owned tree, and releases the lock so health fails without another command.
 - Planning inspection found fixed origins in both Cypress and service commands,
   unconditional Mountebank startup/readiness, and restart by listener port rather
   than owner. These explain why a database-only change cannot deliver this story.
