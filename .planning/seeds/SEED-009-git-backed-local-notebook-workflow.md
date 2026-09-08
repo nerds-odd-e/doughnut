@@ -213,7 +213,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 10. See one stable commit for one continuous web edit
 
-**Status:** delivered. Plan: [quick/071](../quick/071-web-autosave-commit-batching/PLAN.md).
+**Status:** delivered. Recover quick/071 from `e0645adaeb`; precision correction is Story 10a.
 
 - **Goal:** A notebook owner reading Git history sees one editing unit for
   consecutive web content edits to the same ordinary note, including thinking
@@ -229,6 +229,27 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   are immutable. Bundle download and idempotent publish freeze the returned
   tip. No UI, configurable timeout, native Git transport, structural web sync,
   or rewriting of exposed commits. ADR 0002 remains Proposed/unedited.
+
+<a id="story-10a"></a>
+
+### 10a. Apply the web edit batching interval accurately across durable saves
+
+**Status:** Refined; queued after the owned-SUT shutdown correction, before
+expansions. [Corrective plan](../quick/074-web-autosave-clock-precision/PLAN.md), not executed.
+
+- **Goal:** Notebook owners get the agreed rolling ten-minute grouping even
+  when consecutive saves occur at fractional seconds and in fresh transactions.
+- **Scope:** Preserve the millisecond save clock through persisted amendment
+  eligibility. Retain immediate durability, no-op timing, and exposure freezing.
+  No configurable interval, UI, broader synchronization, or fleet-wide 2038 fix.
+- **Key examples:** A changed save at 10:00:00.600 followed by one at
+  10:00:00.800 stays in one batch. At 10:10:00.600 it starts a new batch;
+  at 10:10:00.599 it still amends. Each example reloads persisted state.
+- **Evidence:** Quick/071 adds a whole-second `TIMESTAMP` but compares elapsed
+  milliseconds. Local MySQL 8.4.11 rounds .600 up to the next second, making an
+  actual 600,000 ms gap appear as 599,600 ms. Existing tests use whole seconds.
+- **Effort hypothesis:** S, medium confidence; one precision migration and
+  controller proof loop. No open product decision; preserve existing policy.
 
 <a id="story-11"></a>
 
@@ -424,6 +445,11 @@ Preserve these boundaries in future refinement:
 - Exposed accepted history is immutable; unexposed web-content tips may amend
   within Story 10's window. Pull receives accepted history, never repairs
   unsynchronized web state or publishes automatically.
+- For [CLI isolation Story 4](SEED-015-concurrent-worktree-environments.md#story-4),
+  clone/pull downloads freeze a batch even if the later client operation fails.
+  Avoid inspection downloads between saves intended to exercise amendment.
+  Count accepted commits, not UI saves, when checking bounded rebase support;
+  batching does not deliver repeated pull or broader divergent reconciliation.
 - Commit boundaries distinguish deletion/new identity from same-identity moves.
   Missing files do not establish missing Donut containers or identity intent.
 - Authored links remain unchanged during supported structural publication.
