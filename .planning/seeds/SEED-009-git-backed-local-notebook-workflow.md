@@ -62,19 +62,18 @@ The product constraints established in the discussion are:
    web creation followed by that note's first ordinary save. It removes the
    interruption Stories 13 and 16 just enabled, without opening folder-move
    divergence or commit batching.
-3. **Edits-only multi-note publish:** still the next selected SEED-009 story
-   (Story 14), independent of receiving additions. Story 11 already publishes
-   mixed additions and edits; this is convenience, not the newly live block.
+3. **Edits-only multi-note publish:** delivered as Story 14, independent of
+   receiving additions. Story 11 already publishes mixed additions and edits.
 4. **Complete synchronization or web-commit batching:** defer the broad contract
    and readability polish. Neither is the smallest way to remove the next
    concrete interruption; batching already-accepted saves risks conflicting
    with immutable history unless its publication boundary is clarified.
 
-**Priority hypothesis:** Stories 13 (web capture in the sequential loop) and 16
-(keep a local content edit across one accepted addition) are delivered. Next
-selected remaining story is a related local edits-only batch (Story 14). This
-follows the established beneficiary and two-way workflow goal. It is not a claim
-that usage data proves these are the most frequent failures.
+**Priority hypothesis:** Stories 13, 16, and 14 are delivered. Next selected
+remaining story is keeping a local content edit when a web-created note is then
+saved (Story 17). This follows the established beneficiary and two-way workflow
+goal. It is not a claim that usage data proves these are the most frequent
+failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
@@ -286,7 +285,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 14. Publish a related batch of edits to existing notes
 
-**Status:** queued.
+**Status:** delivered.
 
 - **Goal:** A notebook owner refining related notes in Obsidian or an AI IDE
   can publish the revision together, without creating a dummy note or splitting
@@ -307,25 +306,6 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   UI, commands, or identity policy. Delivered additions-and-edits publication
   remains Story 11; receiving web additions beside unpublished work remains
   Stories 16–17. A previously web-created note is simply an existing note here.
-- **Key examples:**
-  1. A clean bound checkout has one commit revising the body of `Topic.md` and
-     valid frontmatter in `Reading/Example.md`; remote `main` has not advanced
-     and its projection matches. Publish → both revisions appear in Donut on
-     their original notes, with their learning history intact. A second clean
-     checkout pulls → it receives both edits in that same accepted commit.
-  2. The same batch contains one valid edit and one invalid Portable note.
-     Publish → neither edit is accepted; remote notes and history stay as they
-     were, and the local commit remains available to correct.
-  3. Both edits are valid, but a web save advances remote `main` after the local
-     commit's base. Publish → the whole batch is refused; the accepted web save
-     and local commit remain intact. Reconciling that batch is outside scope.
-- **Effort hypothesis:** M — low confidence; assumes the delivered mixed
-  additions/edits behavior can extend to edits-only batches without new identity
-  policy. No code audit was used to estimate this.
-- **Depends on:** delivered Stories 2 and 11; independent of Story 13.
-- **Safe stopping point:** A sequential multi-note revision is useful without
-  expanding concurrent synchronization. No unresolved product decision is
-  needed within this boundary.
 
 <a id="story-15"></a>
 

@@ -1,6 +1,6 @@
 /**
  * Second-clone checkout: pull accepted history, then commit and publish
- * from the checkout that received the move.
+ * from the checkout that received it.
  */
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 
@@ -37,6 +37,39 @@ function expectCanonicalTreeAt(
     )
     return cy.wrap(null)
   })
+}
+
+function expectCheckoutFileAt(
+  destinationAlias: CliNotebookCloneDestinationAlias,
+  relativePath: string,
+  content: string
+): Cypress.Chainable<null> {
+  return cy.get<string>(`@${destinationAlias}`).then((destination) => {
+    cy.readFile(`${destination}/${relativePath}`).should('equal', content)
+    return cy.wrap(null)
+  })
+}
+
+function expectCleanAcceptedHeadAt(
+  destinationAlias: CliNotebookCloneDestinationAlias
+): Cypress.Chainable<null> {
+  return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
+    cy.get<string>('@cliNotebookPublishHead').then((acceptedHead) =>
+      cy
+        .task<CliNotebookCheckoutState>(
+          'readCliNotebookCheckoutState',
+          checkoutDir
+        )
+        .then((state) => {
+          expect(
+            state.head,
+            `HEAD should equal accepted commit ${acceptedHead}`
+          ).to.equal(acceptedHead)
+          expect(state.status, 'checkout should be clean').to.equal('')
+          return cy.wrap(null)
+        })
+    )
+  )
 }
 
 function commitNoteChangesAt(
@@ -131,12 +164,27 @@ function notebookCloneCheckoutReceiver() {
           )
         )
     },
+    expectReceiverAtAcceptedHead(): Cypress.Chainable<null> {
+      return expectCleanAcceptedHeadAt('cliCloneReceiverDestination')
+    },
+    expectReceiverCheckoutFile(
+      relativePath: string,
+      content: string
+    ): Cypress.Chainable<null> {
+      return expectCheckoutFileAt(
+        'cliCloneReceiverDestination',
+        relativePath,
+        content
+      )
+    },
   }
 }
 
 export {
   commitNoteChangesAt,
   expectCanonicalTreeAt,
+  expectCheckoutFileAt,
+  expectCleanAcceptedHeadAt,
   notebookCloneCheckoutReceiver,
   runInstalledOn,
 }

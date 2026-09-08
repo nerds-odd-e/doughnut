@@ -69,16 +69,26 @@ When('I publish the second cloned checkout using the installed CLI', () =>
   cli.notebookCloneCheckout().publishReceiver()
 )
 
+function relatedNoteChanges(data: DataTable) {
+  return data
+    .hashes()
+    .map(({ path, content }) => ({ relativePath: path, content }))
+}
+
 When(
   'I commit the following related additions and edit together in the cloned checkout:',
   (data: DataTable) =>
     cli
       .notebookCloneCheckout()
-      .commitRelatedNoteChanges(
-        data
-          .hashes()
-          .map(({ path, content }) => ({ relativePath: path, content }))
-      )
+      .commitRelatedNoteChanges(relatedNoteChanges(data))
+)
+
+When(
+  'I commit the following related edits together in the cloned checkout:',
+  (data: DataTable) =>
+    cli
+      .notebookCloneCheckout()
+      .commitRelatedNoteChanges(relatedNoteChanges(data))
 )
 
 When(
@@ -136,6 +146,19 @@ When('I pull the second cloned checkout using the installed CLI', () =>
 Then(
   'the second cloned checkout retains its original head as an ancestor',
   () => cli.notebookCloneCheckout().expectReceiverOriginalHeadIsAncestor()
+)
+
+Then(
+  'the second cloned checkout is a clean checkout of the accepted head',
+  () => cli.notebookCloneCheckout().expectReceiverAtAcceptedHead()
+)
+
+Then(
+  'the second cloned checkout file {string} is:',
+  (relativePath: string, content: string) =>
+    cli
+      .notebookCloneCheckout()
+      .expectReceiverCheckoutFile(relativePath, content)
 )
 
 When(
