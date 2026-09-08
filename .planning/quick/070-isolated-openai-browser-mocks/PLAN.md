@@ -1,7 +1,7 @@
 # Isolated OpenAI browser mocks
 
 Source: [SEED-015 story 3](../../seeds/SEED-015-concurrent-worktree-environments.md#story-3).
-Status: in-progress. Slices 1–4 done.
+Status: in-progress. Slices 1–5 done.
 
 ## Goal and scope
 
@@ -139,22 +139,16 @@ lease release); does not wait for the next browser request.
 
 ### 5. Cancel a mocked run without blocking its next run
 Type: Behavior
-Status: planned
-Proof: Cancel the active runner through the spawned runner boundary. Its mock
-listeners disappear before the lease becomes available; a later runner starts
-and the peer continues serving its configured response. Use the existing
-supported SIGINT/SIGTERM paths as data variations of this same outcome.
+Status: done
+Proof: `node --test scripts/isolated-cypress-openai-mock-cancel.test.mjs` —
+SIGINT and SIGTERM cancel the alive spawned runner; owned mock gone; lease
+reacquired; peer response intact.
 
 Behavior: A private mocked run is active → the developer cancels it → its
 owned mock is stopped and the checkout becomes available for the next run.
 
-Use the cleanup owner already established in leaves 2/4; align signal and
-exit registration rather than create a second lifecycle. Test cancellation
-while the runner is alive, not just a direct call to its cleanup function.
-No hard-kill recovery protocol or persistent process registry is added.
+Same cleanup owner as leaf 4; signals run cleanup then exit.
 
-Sizing: About 5 minutes; one cancellation proof loop using spawned-process
-fixtures, plus the existing bounded process-shutdown wait if needed.
 
 ### 6. Preserve a peer's content suggestion across mock resets
 Type: Behavior

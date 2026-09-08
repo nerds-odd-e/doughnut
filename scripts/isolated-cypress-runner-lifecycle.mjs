@@ -56,12 +56,13 @@ export function registerRunnerCleanup(cleanup) {
     released = true
     await cleanup()
   }
-  process.once('SIGINT', () => {
-    releaseOnce().catch(failLoudly)
-  })
-  process.once('SIGTERM', () => {
-    releaseOnce().catch(failLoudly)
-  })
+  const onCancelSignal = () => {
+    releaseOnce()
+      .then(() => process.exit(1))
+      .catch(failLoudly)
+  }
+  process.once('SIGINT', onCancelSignal)
+  process.once('SIGTERM', onCancelSignal)
   return releaseOnce
 }
 

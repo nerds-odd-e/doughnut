@@ -1,7 +1,7 @@
 /**
- * Spawned runner boundary for the owned-mock-failure proof.
+ * Spawned runner boundary for idle private-mock lifecycle proofs.
  * Starts isolated Cypress setup with an idle private mock, writes ready.json,
- * then stays alive until observePrivateMockFailure fails the process.
+ * then stays alive until the parent test cancels the runner or kills the mock.
  */
 import { writeFileSync } from 'node:fs'
 import { guardCypressNodeSetup } from './isolated-cypress.mjs'
@@ -28,5 +28,5 @@ writeFileSync(
   JSON.stringify({ mockPid: isolated.privateMock.child.pid })
 )
 setInterval(() => {
-  /* keep runner alive until the test kills the mock */
+  /* keep runner alive until the test ends the process */
 }, 1000)
