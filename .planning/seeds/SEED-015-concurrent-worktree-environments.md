@@ -338,7 +338,7 @@ replacement.
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
 **Status:** Refined, 2026-09-08. Ready for the
-[slice plan](../quick/069-isolated-openai-browser-mocks/PLAN.md).
+[slice plan](../quick/070-isolated-openai-browser-mocks/PLAN.md).
 
 **Goal**
 
