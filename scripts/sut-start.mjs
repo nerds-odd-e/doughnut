@@ -3,7 +3,7 @@
  * Start SUT services in the background, wait for health, then exit.
  *
  * Exit 0: all services healthy.
- * Exit 1: timeout or early process exit — diagnostics on stderr, log path printed.
+ * Exit 1: timeout, cancellation, or early process exit — diagnostics on stderr, log path printed.
  *
  * Topology reference: docs/gcp/prod_env.md (Local dev / Cypress).
  * Log file: sut.log (repo root, gitignored).
@@ -22,12 +22,18 @@ import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isol
 import { LOG_TARGETS } from './log-utils.mjs'
 import { checkTcpPort } from './sut-healthcheck.mjs'
 import {
+  assertAllocatedPortsFree,
   assertE2eDatabaseExists,
   isolatedBrowserOrigin,
   refuseConflictingSutOverrides,
   resolveSutCheckoutTarget,
 } from './sut-isolated-target.mjs'
-import { assertNoLiveSutOwner, claimSutOwnership } from './sut-owner.mjs'
+import {
+  assertNoLiveSutOwner,
+  claimSutOwnership,
+  releaseSutOwnership,
+} from './sut-owner.mjs'
+import { stopOwnedSutProcessTree } from './sut-owned-process-tree.mjs'
 import { waitForSutHealthy } from './sut-start-health-wait.mjs'
 import {
   resolveSutRuntimeTarget,
@@ -91,6 +97,11 @@ export async function writePidFile(pid, { pidFile = PID_FILE } = {}) {
   await writeFile(pidFile, String(pid), 'utf8')
 }
 
+async function releaseFailedIsolatedStart({ child, checkoutRoot }) {
+  await stopOwnedSutProcessTree(child)
+  await releaseSutOwnership(checkoutRoot)
+}
+
 /**
  * Full start flow: spawn services, write PID file, wait for health.
  *
@@ -107,6 +118,8 @@ export async function writePidFile(pid, { pidFile = PID_FILE } = {}) {
  *   runtimeTarget?: object,
  *   databaseExistsFn?: (database: string) => boolean,
  *   isPortOccupiedFn?: (port: number) => Promise<boolean>,
+ *   signal?: AbortSignal,
+ *   attachCancelSignals?: boolean,
  * }} [opts]
  * @returns {Promise<number>} exit code (0 = healthy, 1 = failed)
  */
@@ -123,6 +136,8 @@ export async function runSutStart({
   runtimeTarget,
   databaseExistsFn,
   isPortOccupiedFn,
+  signal,
+  attachCancelSignals = false,
 } = {}) {
   refuseUnsupportedIsolatedBrowserCommand({
     checkoutRoot,
@@ -133,6 +148,9 @@ export async function runSutStart({
     runtimeTarget,
   })
   let owner
+  let child
+  let effectiveSignal = signal
+  let detachCancelSignals = () => undefined
   if (isolated) {
     refuseConflictingSutOverrides(process.env, target)
     assertE2eDatabaseExists(target.database, { existsFn: databaseExistsFn })
@@ -144,28 +162,54 @@ export async function runSutStart({
     owner = await claimSutOwnership(checkoutRoot)
     log(`Selected database: ${target.database}`)
     log(`Browser origin: ${isolatedBrowserOrigin(target)}`)
+    if (!effectiveSignal && attachCancelSignals) {
+      const controller = new AbortController()
+      effectiveSignal = controller.signal
+      const onCancel = () => controller.abort()
+      process.once('SIGINT', onCancel)
+      process.once('SIGTERM', onCancel)
+      detachCancelSignals = () => {
+        process.off('SIGINT', onCancel)
+        process.off('SIGTERM', onCancel)
+      }
+    }
   }
-  log(`Starting SUT services... (log: ${logFile})`)
-  const { child } = spawnSutServices({
-    spawnFn,
-    logFile,
-    runtimeTarget: target,
-    owner,
-  })
-  await writePidFile(child.pid, { pidFile })
+  const releaseIfOwned = async () => {
+    if (!owner) return
+    await releaseFailedIsolatedStart({ child, checkoutRoot })
+    owner = undefined
+  }
+  try {
+    log(`Starting SUT services... (log: ${logFile})`)
+    const spawned = spawnSutServices({
+      spawnFn,
+      logFile,
+      runtimeTarget: target,
+      owner,
+    })
+    child = spawned.child
+    await writePidFile(child.pid, { pidFile })
 
-  const { exitCode } = await waitForSutHealthy({
-    child,
-    timeoutMs,
-    pollMs,
-    logFile,
-    log,
-    errLog,
-    healthcheckFn,
-    runtimeTarget: target,
-    checkoutRoot,
-  })
-  return exitCode
+    const { exitCode } = await waitForSutHealthy({
+      child,
+      timeoutMs,
+      pollMs,
+      logFile,
+      log,
+      errLog,
+      healthcheckFn,
+      runtimeTarget: target,
+      checkoutRoot,
+      signal: effectiveSignal,
+    })
+    if (exitCode !== 0) await releaseIfOwned()
+    return exitCode
+  } catch (error) {
+    await releaseIfOwned()
+    throw error
+  } finally {
+    detachCancelSignals()
+  }
 }
 
 async function defaultIsPortOccupied(port) {
@@ -177,32 +221,13 @@ async function defaultIsPortOccupied(port) {
   return result.ok
 }
 
-async function assertAllocatedPortsFree(target, isPortOccupiedFn) {
-  const ports = [
-    ['backend', target.backendPort],
-    ['frontend vite', target.vitePort],
-    ['local LB', target.lbListenPort],
-  ]
-  const occupied = []
-  for (const [service, port] of ports) {
-    if (await isPortOccupiedFn(port)) {
-      occupied.push(`${service} ${port}`)
-    }
-  }
-  if (occupied.length === 0) return
-  throw new Error(
-    `Isolated SUT ports are already occupied (${occupied.join(', ')}). ` +
-      'Refusing to start; the listener was not terminated.'
-  )
-}
-
 const isMain = process.argv[1]
   ? fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
   : false
 
 if (isMain) {
   try {
-    const code = await runSutStart()
+    const code = await runSutStart({ attachCancelSignals: true })
     process.exit(code)
   } catch (e) {
     process.stderr.write(`${e instanceof Error ? e.message : String(e)}\n`)

@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto'
-import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, unlink, writeFile } from 'node:fs/promises'
 import { unlinkSync } from 'node:fs'
 import http from 'node:http'
 import path from 'node:path'
@@ -163,4 +163,8 @@ export async function claimSutOwnership(checkoutRoot) {
     JSON.stringify({ token, controlPath })
   )
   return { token, controlPath, lockDir }
+}
+
+export async function releaseSutOwnership(checkoutRoot) {
+  await rm(sutOwnerLockDir(checkoutRoot), { recursive: true, force: true })
 }

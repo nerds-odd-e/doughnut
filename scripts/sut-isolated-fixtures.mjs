@@ -1,3 +1,5 @@
+import { spawn } from 'node:child_process'
+import { readFile } from 'node:fs/promises'
 import http from 'node:http'
 import net from 'node:net'
 import { writeFileSync } from 'node:fs'
@@ -73,6 +75,16 @@ export function closeServer(server) {
   return new Promise((resolve) => server.close(() => resolve()))
 }
 
+export function isTcpListening(port) {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ host: '127.0.0.1', port }, () => {
+      socket.end()
+      resolve(true)
+    })
+    socket.on('error', () => resolve(false))
+  })
+}
+
 export async function startLiveOwner(checkoutRoot) {
   const owner = await claimSutOwnership(checkoutRoot)
   const server = await startSutOwnerControl(owner)
@@ -85,16 +97,74 @@ export async function runConfiguredStart(checkoutRoot, spawn, extra = {}) {
     spawnFn: spawn.spawnFn,
     logFile: path.join(checkoutRoot, 'sut.log'),
     pidFile: path.join(checkoutRoot, 'sut.pid'),
-    timeoutMs: 5_000,
-    pollMs: 50,
+    timeoutMs: extra.timeoutMs ?? 5_000,
+    pollMs: extra.pollMs ?? 50,
     log: extra.log ?? (() => undefined),
-    errLog: () => undefined,
+    errLog: extra.errLog ?? (() => undefined),
     healthcheckFn: extra.healthcheckFn ?? healthyOnce,
     databaseExistsFn: extra.databaseExistsFn ?? (() => true),
+    signal: extra.signal,
     ...(extra.isPortOccupiedFn
       ? { isPortOccupiedFn: extra.isPortOccupiedFn }
       : extra.checkRealPorts
         ? {}
         : { isPortOccupiedFn: async () => false }),
   })
+}
+
+export function isPidAlive(pid) {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch (error) {
+    if (error.code === 'ESRCH') return false
+    throw error
+  }
+}
+
+export function spawnForeignProcess() {
+  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], {
+    stdio: 'ignore',
+  })
+  child.unref()
+  return child
+}
+
+export function spawnOwnedTreeStandIn(checkoutRoot, extraEnv = {}) {
+  const pidsFile = path.join(checkoutRoot, 'owned-pids.json')
+  const script = path.join(checkoutRoot, 'owned-tree-stand-in.mjs')
+  writeFileSync(
+    script,
+    `import { spawn } from 'node:child_process'
+import { writeFileSync } from 'node:fs'
+const grandchild = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' })
+writeFileSync(${JSON.stringify(pidsFile)}, JSON.stringify({ leader: process.pid, grandchild: grandchild.pid }))
+if (process.env.SUT_STANDIN_EXIT === '1') process.exit(1)
+setInterval(() => {}, 1000)
+`
+  )
+  return {
+    pidsFile,
+    spawnFn: (cmd, _args, opts) =>
+      spawn(cmd, [script], {
+        ...opts,
+        env: { ...opts.env, ...extraEnv },
+      }),
+  }
+}
+
+export async function waitForOwnedPids(pidsFile, timeoutMs = 3_000) {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    try {
+      const pids = JSON.parse(await readFile(pidsFile, 'utf8'))
+      if (Number.isInteger(pids.leader) && Number.isInteger(pids.grandchild)) {
+        return pids
+      }
+    } catch {
+      // not written yet
+    }
+    await new Promise((resolve) => setTimeout(resolve, 20))
+  }
+  throw new Error(`timed out waiting for owned pids at ${pidsFile}`)
 }

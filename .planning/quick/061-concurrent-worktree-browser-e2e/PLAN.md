@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–3 done, slices 4–13 planned.
+Status: in progress; slices 1–4 done, slices 5–13 planned.
 
 ## Goal and scope
 
@@ -235,10 +235,12 @@ ownership requires a separate framework, stop and refine instead.
 ### 4. Release a startup that is cancelled or cannot become ready
 
 Type: Behavior
-Status: planned
-Proof: Start the real launcher with disposable service child processes. Trigger
-timeout/cancellation while waiting for readiness and observe owned children
-exit and the ownership claim release; an unrelated process remains alive.
+Status: done
+Proof: `pnpm test:sut-start` (including
+`scripts/sut-isolated-start-release.test.mjs`) — disposable owned process
+trees: timeout, early exit, and AbortController cancellation kill the leader
+and grandchild, remove `.sut.local.lock`, fail owning health, and leave a
+foreign process plus a foreign TCP listener alive. No port-based kill.
 
 Behavior: An owning SUT startup has spawned children but is not ready →
 cancellation or readiness failure → the startup exits with diagnostics and
@@ -501,6 +503,10 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   leave the claim in place — leaf 4 must release it. Invalid migration is
   observed as never-healthy boot, not a pre-spawn probe. Manual workflow:
   `docs/worktree-browser-tests.md`.
+- Slice 4: failed isolated start signals the spawned process group (not ports),
+  waits for the tree to die, then `releaseSutOwnership`. Shared helper:
+  `scripts/sut-owned-process-tree.mjs`. Leaf 5 should reuse it for
+  post-readiness child exit.
 - Planning inspection found fixed origins in both Cypress and service commands,
   unconditional Mountebank startup/readiness, and restart by listener port rather
   than owner. These explain why a database-only change cannot deliver this story.

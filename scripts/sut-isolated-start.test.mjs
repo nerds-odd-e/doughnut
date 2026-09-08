@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict'
-import net from 'node:net'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
 import {
   closeServer,
   completeIsolatedConfig,
+  isTcpListening,
   listenHttpReady,
   listenTcp,
   runConfiguredStart,
@@ -92,14 +92,7 @@ test('occupied isolated ports refuse without terminating the foreign listener', 
     /already occupied/
   )
   assert.equal(spawn.calls.length, 0)
-  const stillOpen = await new Promise((resolve) => {
-    const socket = net.createConnection({ host: '127.0.0.1', port }, () => {
-      socket.end()
-      resolve(true)
-    })
-    socket.on('error', () => resolve(false))
-  })
-  assert.equal(stillOpen, true)
+  assert.equal(await isTcpListening(port), true)
 })
 
 test('missing recorded E2E database refuses before spawn', async (t) => {

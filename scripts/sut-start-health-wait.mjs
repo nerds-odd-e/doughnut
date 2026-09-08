@@ -9,8 +9,29 @@ const POLL_MS = Number(process.env.SUT_POLL_MS ?? 3_000)
 /** Number of log tail lines to include in failure output. */
 const TAIL_LINES = 40
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+function sleep(ms, signal) {
+  return new Promise((resolve) => {
+    if (signal?.aborted) {
+      resolve()
+      return
+    }
+    let onAbort
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort)
+      resolve()
+    }, ms)
+    onAbort = () => {
+      clearTimeout(timer)
+      resolve()
+    }
+    signal?.addEventListener('abort', onAbort, { once: true })
+  })
+}
+
+function reportStartCancelled(errLog, logFile) {
+  errLog('SUT start was cancelled.')
+  errLog(`Log: ${logFile}`)
+  return { ok: false, exitCode: 1 }
 }
 
 /** Read last N lines of a file. Returns empty string if the file cannot be read. */
@@ -25,7 +46,7 @@ async function tailFile(filePath, lines) {
 }
 
 /**
- * Poll the healthcheck until success, timeout, or early child exit.
+ * Poll the healthcheck until success, timeout, cancellation, or early child exit.
  *
  * @param {{
  *   child: import('node:child_process').ChildProcess,
@@ -37,6 +58,7 @@ async function tailFile(filePath, lines) {
  *   healthcheckFn?: typeof runSutHealthcheck,
  *   runtimeTarget?: object,
  *   checkoutRoot?: string,
+ *   signal?: AbortSignal,
  * }} opts
  * @returns {Promise<{ ok: boolean, exitCode: number }>}
  */
@@ -50,19 +72,32 @@ export async function waitForSutHealthy({
   healthcheckFn = runSutHealthcheck,
   runtimeTarget,
   checkoutRoot,
+  signal,
 } = {}) {
   let childExitCode = null
   let childSignal = null
 
-  child.once('exit', (code, signal) => {
-    childExitCode = code ?? 1
-    childSignal = signal
-  })
+  if (
+    typeof child.kill === 'function' &&
+    (child.exitCode != null || child.signalCode)
+  ) {
+    childExitCode = child.exitCode ?? 1
+    childSignal = child.signalCode
+  } else {
+    child.once('exit', (code, exitSignal) => {
+      childExitCode = code ?? 1
+      childSignal = exitSignal
+    })
+  }
 
   const deadline = Date.now() + timeoutMs
   let attempt = 0
 
   while (Date.now() < deadline) {
+    if (signal?.aborted) {
+      return reportStartCancelled(errLog, logFile)
+    }
+
     // Check if the child exited prematurely
     if (childExitCode !== null || childSignal !== null) {
       const reason = childSignal
@@ -102,7 +137,11 @@ export async function waitForSutHealthy({
 
     const remaining = deadline - Date.now()
     if (remaining <= 0) break
-    await sleep(Math.min(pollMs, remaining))
+    await sleep(Math.min(pollMs, remaining), signal)
+  }
+
+  if (signal?.aborted) {
+    return reportStartCancelled(errLog, logFile)
   }
 
   // Timed out — run one final healthcheck with full logging to show what failed
