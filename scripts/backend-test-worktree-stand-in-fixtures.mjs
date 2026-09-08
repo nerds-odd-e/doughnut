@@ -19,6 +19,7 @@ const checkoutScriptNames = [
   'backend-test-worktree.sh',
   'backend-test-worktree-owner.sh',
   'backend-worktree-gradle-route.sh',
+  'worktree-identity.mjs',
 ]
 
 const jdbcParams =

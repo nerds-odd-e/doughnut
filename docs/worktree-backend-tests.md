@@ -32,7 +32,8 @@ When this checkout has no `.worktree.local.json` yet, the command:
 3. Persists `{"id":"<id>"}` to gitignored `.worktree.local.json` (ignore entry
    `/.worktree.local.json`) only after provisioning succeeds, printing
    `Allocated new worktree environment: <id>`. Git also ignores the leftover
-   checkout lock with `/.worktree.local.lock`.
+   checkout lock with `/.worktree.local.lock` and the brief identity
+   initialization lock with `/.worktree.identity.lock`.
 
 The command then prints `Selected database: doughnut_<id>_test`, migrates it,
 and runs the requested tests (the full form runs the complete suite; the

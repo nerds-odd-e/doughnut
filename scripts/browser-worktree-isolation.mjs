@@ -1,12 +1,10 @@
 import { spawnSync } from 'node:child_process'
 import { readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
-
-const WORKTREE_LOCAL_CONFIG_NAME = '.worktree.local.json'
-
-function worktreeLocalConfigPath(checkoutRoot) {
-  return path.join(checkoutRoot, WORKTREE_LOCAL_CONFIG_NAME)
-}
+import {
+  assertValidWorktreeId,
+  worktreeLocalConfigPath,
+} from './worktree-identity.mjs'
 
 function isRegularFile(filePath) {
   try {
@@ -91,12 +89,7 @@ export function loadCompleteIsolatedE2eAllocation(checkoutRoot) {
     ])
   }
   const config = readWorktreeLocalConfig(checkoutRoot)
-  if (
-    typeof config.id !== 'string' ||
-    !/^wt_[a-z0-9_]{1,32}$/.test(config.id)
-  ) {
-    throw new Error(`Worktree id must match wt_[a-z0-9_]{1,32}: ${config.id}`)
-  }
+  assertValidWorktreeId(config.id)
   const e2e = config.e2e
   const missing = []
   if (!e2e || typeof e2e !== 'object') {

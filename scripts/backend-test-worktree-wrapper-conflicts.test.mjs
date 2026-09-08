@@ -60,6 +60,15 @@ test('configured wrapper conflicting SPRING_FLYWAY_URL refuses before gradle', (
   assert.match(outputOf(result), /SPRING_FLYWAY_URL/)
 })
 
+test('configured wrapper ignores SUT INPUT_DB_URL rather than treating it as a backend-test override', (t) => {
+  const checkout = configuredCheckout(t)
+  const result = runIsolatedMigrate(checkout, {
+    env: { INPUT_DB_URL: otherUrl },
+  })
+  assert.equal(result.status, 0, outputOf(result))
+  assert.equal(readGradleInvocation(checkout).url, assignedUrl)
+})
+
 test('configured wrapper matching URL env still execs against the assigned database', (t) => {
   const checkout = configuredCheckout(t)
   const result = runIsolatedMigrate(checkout, {

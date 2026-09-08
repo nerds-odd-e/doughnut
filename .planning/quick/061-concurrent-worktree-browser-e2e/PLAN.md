@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–8 done, slices 9–13 planned.
+Status: in progress; slices 1–9 done, slices 10–13 planned.
 
 ## Goal and scope
 
@@ -376,10 +376,10 @@ process fixtures and paired stack; JVM startup is a runtime exception.
 ### 9. Separate identity initialization from backend-test lifetime ownership
 
 Type: Structure
-Status: planned
-Proof: Existing `pnpm test:backend-test-worktree` command-boundary coverage
-remains green: original and configured identities, provisioning failure, stale
-lock reclaim, concurrent first use, and ordinary-command compatibility.
+Status: done
+Proof: `pnpm test:backend-test-worktree` (original and configured identities,
+provisioning failure, stale lock reclaim, concurrent first use, ordinary-command
+compatibility, initializer without backend run lock).
 
 Internal change: Extract only canonical identity/config initialization needed
 by leaf 10, with a brief shared initialization lock. Preserve backend-test run
@@ -550,6 +550,11 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   Busy Cypress lease and unverifiable/stale owner refuse before signals/lsof.
   Unconfigured primary still uses `SUT_RESTART_PORTS` lsof. Control server and
   start spawn were split under the 250-line limit.
+- Slice 9: identity init lives in `scripts/worktree-identity.mjs` with a brief
+  `.worktree.identity.lock`. Backend-test still holds `.worktree.local.lock` for
+  the gradle run, provisions the unit DB, then publishes identity-only JSON.
+  `INPUT_DB_URL` is not a backend-test override. First-use still publishes only
+  after unit-DB provisioning succeeds.
 - Main CI run 34176547886 (SHA `4c604a88`, Frontend Unit Tests 2/2 failed in
   `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
   an ancestor of HEAD; concurrent main work. `origin/main` later moved to
