@@ -74,7 +74,7 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 |------|-----------|--------------|
 | Story shaping | `.planning/seeds/SEED-NNN-slug.md` containing ordered candidate stories | **story-decomposition** |
 | Story refinement | Goal, scope, and key examples in each story's home seed | **story-refinement** |
-| Product backlog | `.planning/PRODUCT-BACKLOG.md` — ordered unfinished story titles only | **product-backlog** |
+| Product backlog | `.planning/PRODUCT-BACKLOG.md` — ordered unfinished story titles only | **dough-product-backlog** |
 | Formal milestone | `.planning/phases/NN-slug/*-PLAN.md`, STATE, ROADMAP | `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-ship` (+ local wrap-up) |
 | Ad-hoc | `.planning/quick/NNN-slug/PLAN.md` | **slice-planning** + **execute-plan** |
 | Optional refinement | Existing phase/quick PLAN; no new artifact | **slice-plan-refinement** |

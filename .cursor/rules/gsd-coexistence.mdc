@@ -51,7 +51,7 @@ These are **hard** in this repo even when GSD workflows omit them:
 | Scenario | Prefer |
 |----------|--------|
 | Broad problem, unclear value/outcome, or several candidate stories | Local `story-decomposition` → one enriched `.planning/seeds/SEED-NNN-*.md`; select a story before planning execution |
-| Queue or reprioritize unfinished stories | Local `product-backlog` → `.planning/PRODUCT-BACKLOG.md`; details stay in home seeds |
+| Queue or reprioritize unfinished stories | `dough-product-backlog` → `.planning/PRODUCT-BACKLOG.md`; details stay in home seeds |
 | Clarify selected stories before planning | Local `story-refinement` → goal, scope, and examples in their home seeds |
 | New or ongoing **milestone / roadmap** | GSD: `/gsd-onboard` or `/gsd-new-milestone`, then discuss → plan → execute |
 | One clear story-sized ad-hoc outcome | Local `slice-planning` → `.planning/quick/NNN-slug/` (or a new `phases/` entry), then `execute-plan` when straightforward |
