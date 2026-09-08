@@ -107,6 +107,10 @@ export async function startOwnedSutSupervisor(opts = {}) {
       state.retain = true
       await stopOwnedSutProcessTree(state.child)
     },
+    getApplicationGroupId: () => {
+      const pid = state.child?.pid
+      return Number.isInteger(pid) && pid > 0 ? pid : undefined
+    },
   })
   state.child = runSutServices({
     ...opts,

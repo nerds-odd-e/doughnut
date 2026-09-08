@@ -103,18 +103,15 @@ refuse visibly; do not repair or fall back.
 ### 1. Expose the live application group to owning health
 
 Type: Structure
-Status: in-progress
+Status: done
 Change: Extend the existing owner-control response with the application group
 identity from the supervisor's current child, without changing health decisions,
 lease semantics, shutdown, or process ownership. Supply no group before the
 child exists. Enables immediately following Behavior 2.
-Proof: Through the existing supervisor/control boundary, observe the actual
-spawned child's group identity. Keep existing supervisor child-exit and shutdown
-observations green; no helper-only mock of ownership establishes this contract.
-Focused command:
-`CURSOR_DEV=true nix develop -c node --test scripts/sut-services.test.mjs scripts/sut-services-child-exit.test.mjs scripts/sut-isolated-restart.test.mjs`
-Sizing: about 5 minutes, medium confidence; one additive control-response path,
-including regression proof and cleanup. No lifecycle redesign is permitted.
+Proof: Authenticated GET /owner publishes `applicationGroupId` from the live
+detached child; omitted for control-only owners. Focused:
+`CURSOR_DEV=true nix develop -c node --test scripts/sut-services.test.mjs scripts/sut-services-child-exit.test.mjs scripts/sut-isolated-restart.test.mjs scripts/sut-owner-application-group.test.mjs`
+(pass).
 
 ### 2. Report foreign application listeners as unhealthy
 

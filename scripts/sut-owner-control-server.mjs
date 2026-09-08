@@ -15,7 +15,12 @@ function handleOwnerControlRequest(req, res, state) {
   }
   const urlPath = (req.url ?? '').split('?')[0]
   if (req.method === 'GET' && urlPath === '/owner') {
-    sendJson(res, 200, { ok: true, pid: process.pid })
+    const body = { ok: true, pid: process.pid }
+    const applicationGroupId = state.getApplicationGroupId?.()
+    if (Number.isInteger(applicationGroupId) && applicationGroupId > 0) {
+      body.applicationGroupId = applicationGroupId
+    }
+    sendJson(res, 200, body)
     return
   }
   if (req.method === 'POST' && urlPath === '/runner-lease') {
@@ -86,7 +91,12 @@ function handleOwnerControlRequest(req, res, state) {
   res.end()
 }
 
-export function startSutOwnerControl({ token, controlPath, onShutdown } = {}) {
+export function startSutOwnerControl({
+  token,
+  controlPath,
+  onShutdown,
+  getApplicationGroupId,
+} = {}) {
   try {
     unlinkSync(controlPath)
   } catch {
@@ -97,6 +107,7 @@ export function startSutOwnerControl({ token, controlPath, onShutdown } = {}) {
     runnerLeaseToken: null,
     shuttingDown: false,
     onShutdown,
+    getApplicationGroupId,
   }
   const server = http.createServer((req, res) => {
     handleOwnerControlRequest(req, res, state)
@@ -109,10 +120,15 @@ export function startSutOwnerControl({ token, controlPath, onShutdown } = {}) {
 
 export function startSutOwnerControlFromEnv(
   env = process.env,
-  { onShutdown } = {}
+  { onShutdown, getApplicationGroupId } = {}
 ) {
   const token = env.SUT_OWNER_TOKEN
   const controlPath = env.SUT_OWNER_CONTROL_PATH
   if (!(token && controlPath)) return Promise.resolve(null)
-  return startSutOwnerControl({ token, controlPath, onShutdown })
+  return startSutOwnerControl({
+    token,
+    controlPath,
+    onShutdown,
+    getApplicationGroupId,
+  })
 }
