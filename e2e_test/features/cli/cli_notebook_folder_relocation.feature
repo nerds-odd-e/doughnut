@@ -51,14 +51,10 @@ Feature: CLI notebook folder relocation
       | Kitchen/Recipes/Pasta.md      |
     And the second cloned checkout retains its original head as an ancestor
 
-  Scenario: Publishing a Pasta edit after receiving an accepted folder relocation updates the same Donut note
+  Scenario: Publishing a Pasta edit committed before an accepted folder relocation updates the same Donut note
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
-    And I commit a rename of "Recipes" to "Kitchen/Recipes" in the cloned checkout
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    When I pull the second cloned checkout using the installed CLI
-    And I commit the following edit to "Kitchen/Recipes/Pasta.md" in the second cloned checkout:
+    And I commit the following edit to "Recipes/Pasta.md" in the second cloned checkout:
       """
       ---
       type: Note
@@ -66,6 +62,10 @@ Feature: CLI notebook folder relocation
       ---
       Simmer until al dente
       """
-    And I publish the second cloned checkout using the installed CLI
+    And I commit a rename of "Recipes" to "Kitchen/Recipes" in the cloned checkout
+    And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
+    When I pull the second cloned checkout using the installed CLI
+    And I publish the second cloned checkout using the installed CLI
+    Then the installed CLI reports the rebased local head as the accepted head
     And I should see note "CLI Clone Notebook/Kitchen/Recipes/Pasta" has content "Simmer until al dente"

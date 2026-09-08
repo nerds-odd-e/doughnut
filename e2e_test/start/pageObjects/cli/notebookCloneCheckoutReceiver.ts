@@ -118,7 +118,9 @@ function notebookCloneCheckoutReceiver() {
     },
     /**
      * Pulls accepted history onto `@cliCloneReceiverDestination` without
-     * publishing. Captures the pre-pull head for the ancestor assertion.
+     * publishing. Captures the pre-pull head for the ancestor assertion and
+     * the post-pull tip as `@cliNotebookRebasedCheckout` (same alias as the
+     * primary-checkout pull path) for publish acceptance.
      */
     pullReceiver(): Cypress.Chainable<null> {
       return cy
@@ -135,6 +137,16 @@ function notebookCloneCheckoutReceiver() {
                 'cliCloneReceiverDestination',
                 'pull',
                 'runInstalledCli'
+              ).then(() =>
+                cy
+                  .task<CliNotebookCheckoutState>(
+                    'readCliNotebookCheckoutState',
+                    checkoutDir
+                  )
+                  .then((rebased) => {
+                    cy.wrap(rebased).as('cliNotebookRebasedCheckout')
+                    return cy.wrap(null)
+                  })
               )
             })
         )

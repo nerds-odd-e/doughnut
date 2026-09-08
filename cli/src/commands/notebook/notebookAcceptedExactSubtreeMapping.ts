@@ -9,6 +9,19 @@ export interface ExactAcceptedSubtreeMapping {
   destPrefix: string
 }
 
+/**
+ * Maps a path under the source prefix to its counterpart under the destination
+ * prefix by relative-path replacement. Returns undefined when the path is not
+ * under the source.
+ */
+export function mapPathUnderExactSubtree(
+  path: string,
+  mapping: ExactAcceptedSubtreeMapping
+): string | undefined {
+  if (!under(path, mapping.sourcePrefix)) return undefined
+  return join(mapping.destPrefix, relative(path, mapping.sourcePrefix))
+}
+
 interface InspectedRegularFile {
   path: string
   baseBlobId: string | null

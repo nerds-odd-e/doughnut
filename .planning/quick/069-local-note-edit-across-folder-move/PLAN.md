@@ -1,7 +1,7 @@
 # Keep a local note edit across an accepted folder move
 
 Source: [SEED-009 Story 15](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-15).
-Status: in progress (slice 1 done).
+Status: in progress (slices 1–2 done).
 
 ## Goal and scope
 
@@ -76,40 +76,21 @@ Internal change: `ExactAcceptedSubtreeMapping` / `exact-subtree-move` inspection
 
 ### 2. Keep and publish the descendant edit after the move
 Type: Behavior
-Status: planned
-Proof: One folder-move editing journey, driven through CLI `run` with real Git
-and the installed CLI; backend controller evidence verifies retained identity.
-The variants below share that same mapped-edit outcome and proof loop.
+Status: done
+Proof: CLI vitest pull/publish green; controller
+`NotebookGitProposalFolderRelocationPrivateAssociationControllerTest` green;
+`cli_notebook_folder_relocation.feature` green (edit-before-move → pull →
+publish; assert rebased local head). Timing exceptions: CLI suite ~130s,
+backend focused ~26s, E2E ~12–22s.
 
 Behavior: One local descendant content edit and one accepted exact folder move
 → pull, inspect, explicitly publish → the original learned note receives the
 local edit at the mapped path, with all other accepted content preserved.
 
-Consume slice 1's correspondence only for one local descendant content edit.
-Build the accepted tree plus the one local blob at its mapped path in the
-existing temporary repository, create one child, then import/install that
-result after existing readiness checks. Keep local main recoverable through
-Git and retain author/message. No content merge is required for this branch.
-Use the existing content-publication flow without changing its validation.
-
-Outside-in cases: direct descendant; represented nested descendant and move
-to root; identical-content descendants distinguished by relative path. Check
-one canonical full resulting tree and parent, with variant-only assertions.
-Unsupported shape/history counterexamples must still refuse before checkout
-mutation. Initial refusal may retain the existing structural message; slice 3
-replaces it with actionable recovery wording. Accepted history is never changed
-by pull. Reuse fixtures; add no internal-helper tests.
-
-Close the identity promise with the existing folder-relocation controller test
-extended through content publication, and the existing installed-CLI feature
-with the local edit committed before the move. These observe the same journey,
-not additional product outcomes. Keep a developing multi-beat E2E scenario
-`@wip` until green; do not commit red tests or claim completion from CLI alone.
-Sizing hypothesis: about 5 minutes of implementation and slice-local cleanup
-plus focused verification, medium confidence after correspondence is separated.
-Backend-suite and E2E runtime can exceed the target; record actual runtime as
-an exception when it does. If replay/install work itself reaches 10 minutes,
-stop and refine; do not exempt implementation time as testing time.
+Delivered via `exact-subtree-move-replay` / `notebookExactSubtreeMoveReplay.ts`
+in the temp repo, then install; ordinary content rebase extracted to
+`notebookPullRebase.ts`. Receiver pull captures post-pull tip for publish
+acceptance.
 
 ### 3. Discover the bounded move workflow and safe refusal recovery
 Type: Behavior
@@ -165,5 +146,9 @@ No permanent sizing exception is granted; the runtime policy below applies.
 
 ## Current questions and learnings
 
-No open product questions. Slice 1 delivered internal mapping only; pull still
-refuses exact moves until slice 2. Do not add a general identity mechanism.
+No open product questions. Slice 2 enables exact-move replay + publish; slice 3
+owns discovery/refusal wording. Worktree isolated Cypress still allowlists only
+`worktree_note_editing.feature` and worktree SUT health failed after DevTools
+restart (listener outside application group); E2E proof ran against primary SUT
+with worktree CLI sources, then primary was restored. Do not add a general
+identity mechanism.

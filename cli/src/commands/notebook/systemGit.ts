@@ -21,7 +21,7 @@ export function runSystemGitOrThrow(
     detail: string | undefined,
     status: number | null
   ) => string,
-  options?: Pick<SpawnSyncOptions, 'env'>
+  options?: Pick<SpawnSyncOptions, 'env' | 'input'>
 ): string {
   const result = spawnSync('git', args, { encoding: 'utf8', ...options })
   if (result.error) {

@@ -20,8 +20,8 @@ export type { ExactAcceptedSubtreeMapping }
 
 /**
  * Accepted history since the local parent, classified for pull eligibility.
- * Exact subtree moves are classified; callers may still refuse them as
- * unsupported structural history.
+ * Exact subtree moves carry correspondence for one local descendant content
+ * edit to replay onto the mapped path.
  */
 export type AcceptedIntervalInspection =
   | { kind: 'rebaseable' }

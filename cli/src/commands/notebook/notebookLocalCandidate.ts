@@ -5,7 +5,9 @@ import {
   isOrdinaryNoteContentChange,
   listCommitChanges,
   listCommits,
+  type ExactAcceptedSubtreeMapping,
 } from './notebookAcceptedInterval.js'
+import { mapPathUnderExactSubtree } from './notebookAcceptedExactSubtreeMapping.js'
 
 const LOCAL_UNRELATED =
   'Local main cannot receive the accepted history because it does not share Git history with the accepted notebook. ' +
@@ -38,6 +40,11 @@ export type UnpublishedLocalHistoryDecision =
   | { kind: 'fast-forward' }
   | { kind: 'already-based' }
   | { kind: 'rebase'; localParent: string }
+  | {
+      kind: 'exact-subtree-move-replay'
+      mapping: ExactAcceptedSubtreeMapping
+      localPath: string
+    }
   | { kind: 'reject'; message: string }
 
 /**
@@ -47,6 +54,8 @@ export type UnpublishedLocalHistoryDecision =
  * including same-note content edits, and over one accepted ordinary-note
  * addition at the root or an already represented folder, optionally followed
  * by one content save of that same newly added note.
+ * Eligible one-note content edits of a descendant under one accepted exact
+ * same-name subtree relocation replay onto the mapped path.
  * Eligible two-note content edits rebase only over exactly one accepted
  * content save of a third different existing ordinary note whose sole parent
  * is the local parent.
@@ -102,13 +111,29 @@ export function inspectUnpublishedLocalHistory(
     parent,
     acceptedHead
   )
-  // Exact subtree moves are classified but not yet eligible to rebase.
+  if (acceptedInterval.kind === 'exact-subtree-move') {
+    const [localPath] = localPaths
+    if (
+      localPath === undefined ||
+      mapPathUnderExactSubtree(localPath, acceptedInterval.mapping) ===
+        undefined
+    ) {
+      return {
+        kind: 'reject',
+        message: structuralChangeError(acceptedInterval.structuralPath),
+      }
+    }
+    return {
+      kind: 'exact-subtree-move-replay',
+      mapping: acceptedInterval.mapping,
+      localPath,
+    }
+  }
   if (acceptedInterval.kind !== 'rebaseable') {
-    const structuralPath =
-      acceptedInterval.kind === 'exact-subtree-move'
-        ? acceptedInterval.structuralPath
-        : acceptedInterval.path
-    return { kind: 'reject', message: structuralChangeError(structuralPath) }
+    return {
+      kind: 'reject',
+      message: structuralChangeError(acceptedInterval.path),
+    }
   }
   if (parent === acceptedHead) {
     return { kind: 'already-based' }
