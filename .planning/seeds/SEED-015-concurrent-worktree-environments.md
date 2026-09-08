@@ -337,40 +337,77 @@ replacement.
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
-**Status:** Queued. Refine the supported external-service scope before slice
-planning; stories 2 and 2a supply the required browser environment.
+**Status:** Refined, 2026-09-08. Ready for the
+[slice plan](../quick/069-isolated-openai-browser-mocks/PLAN.md).
 
-- **For / why:** Developers and AI tasks can verify browser behavior involving
-  mocked external services without another task changing their responses.
-- **Evaluation:** Two worktrees run browser scenarios with deliberately
-  different mocked responses; configuring, recording requests, or resetting
-  mocks in one leaves the other's scenario correct.
-- **Value / learning:** Extends concurrent browser verification to the existing
-  mocked-service workflows and tests isolation of mock state as well as data.
-  Remains useful if CLI/MCP support is deferred.
-- **Safety boundary:** Includes mock management and serving endpoints plus the
-  application connections using them. Spawned CLI/MCP scenarios remain outside
-  this boundary.
-- **Reminder from 1c / story 2:** Mountebank on 2525 stays shared through
-  backend-test isolation and through story 2's no-mock browser path. Do not
-  assume either isolated mock state. Reuse the same worktree identity; isolate
-  ordinary mock-using Cypress commands rather than a second opt-in.
-- **Effort hypothesis:** L — low confidence; assumes the existing browser mock
-  workflows can share the environment identity. Refine around one external
-  service first if the category is likely larger than L.
-- **Depends on:** The concurrent browser environment from story 2.
-- **Execution learning:** Isolated SUT omits Mountebank entirely. Trace both
-  management and imposter serving ports, backend destinations, reset, and
-  request recording for the selected service. Prove resetting/reconfiguring
-  one worktree's mocks while its peer uses different responses, both ways.
-  Extend story 2a's ownership check to the selected mock endpoints: a ready
-  foreign mock must refuse before mock configuration/reset or fixture reset,
-  leaving that listener and peer responses intact. A control socket or HTTP
-  success alone is insufficient. Validate new recorded allocation fields
-  before provisioning; only omitted fields may trigger first-use allocation.
-  Keep no-mock startup independent of mock availability. Widen the allowlist
-  only for proven workflows; multi-spec support must replace the current
-  `after:spec` lease release so ownership protects the whole run.
+**Goal**
+
+Developers and AI tasks can verify accepting an OpenAI note-content suggestion
+in two local worktrees concurrently, with each browser receiving its own
+configured response. Another task's mock reset must not change that result or
+its recorded requests. This makes one useful mocked browser workflow available
+without waiting for CLI/MCP isolation.
+
+**Scope**
+
+- Start each owning application with ordinary `pnpm sut`, then run ordinary
+  `pnpm cypress run --spec` for
+  `e2e_test/features/ai_generated_content/note_content_completion.feature`.
+  Support the existing success and unavailable-service scenarios. Continue
+  supporting the delivered no-mock note-editing feature. Exactly one explicitly
+  selected supported spec per run; reject mixed selections and other workflows
+  before fixture reset or mock setup.
+- Two local linked worktrees, installed dependencies, existing Nix/shared
+  MySQL setup, one SUT and one Cypress runner per checkout. Reuse stories 2/2a
+  application identity, health checks, and exclusive runner lease.
+- Isolate OpenAI mock management, serving, configuration/reset, recorded
+  requests, and the backend destination together. Use a private Mountebank
+  process during the mock-using Cypress run. Its temporary endpoints belong
+  to that runner; keep the existing persistent application allocation.
+  No manual mock startup, port selection, URL overrides, or new opt-in command.
+- Verify mock listener ownership before destructive mock operations and
+  fixture reset. A ready foreign management or serving listener is a visible
+  refusal, never adoption or port-based termination. Startup failure, ordinary
+  completion, cancellation, or mock-process failure releases only this run's
+  mock process and runner lease. A background mock failure must terminate the
+  affected run visibly rather than leave it waiting indefinitely.
+- Keep no-mock SUT startup and note-editing independent of Mountebank, even
+  after a mocked run. Primary checkouts without local configuration and CI
+  retain their shared defaults. No change to persistent allocation validation;
+  no new recorded mock fields are needed.
+
+**Key examples**
+
+1. A and B run note completion with different suggestions. Each accepts and
+   sees its own suggested content; each mock records only its own requests.
+2. B has a configured suggestion and recorded request. A resets/reconfigures
+   its mock and completes another request. B still returns its own suggestion
+   and retains its recording. Repeat with A and B reversed.
+3. The selected mock endpoint is occupied by a foreign ready process. Starting
+   the mocked run refuses before fixture reset or mock mutation; the foreign
+   process and the peer's response remain intact.
+4. A finishes or is cancelled while B remains active. B continues successfully;
+   A can start a later run. If A's mock exits unexpectedly, A reports failure
+   and cleans up its owned resources while B stays usable.
+5. Mountebank is unavailable. The supported no-mock startup/editing workflow
+   still works; the mocked workflow fails visibly without shared fallback.
+
+**Exclusions:** Other OpenAI features, Google/Wikidata mocks, live external
+calls, multi-spec/glob/open-mode support, CLI/MCP, persistent mock ports or state,
+database retirement, automatic repair/reallocation of recorded application
+ports, lifecycle redesign for the SUT, worktree hooks, Cloud VM/CI changes,
+multiple runners in one checkout, and protection against malicious listener
+replacement after verification. Further mocked workflows remain future
+candidates, not implicitly part of this delivery.
+
+**Current understanding:** The first workflow and runner-scoped mock lifetime
+are conservative planning choices from existing code, not new developer
+decisions. Existing testability setup already redirects the backend to a mock
+URL; no backend API or production configuration change is expected.
+
+**Effort hypothesis:** M–L, medium confidence; endpoint routing is already
+supported, while ownership and paired-run proof dominate the remaining work.
+Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 <a id="story-4"></a>
 
@@ -464,7 +501,8 @@ planning; stories 2 and 2a supply the required browser environment.
 **Backlog review, 2026-09-08:** Quick/067 delivered story 2a; no new story is
 needed. Preserve 3 → 6 → 4 → 5: mocks, reclamation, CLI, MCP. CLI-before-MCP
 is value ordering, not a dependency. The [product backlog](../PRODUCT-BACKLOG.md)
-owns global order. Stories 3–6 still need refinement; retirement is undecided.
+owns global order. Story 3 is refined to OpenAI note completion; stories 4–6
+still need refinement and retirement is undecided.
 
 Do not claim general parallel E2E support from the focused no-mock workflow.
 First-to-drop order among expansions is 5, 4, 6, then 3. Persistent development
@@ -473,7 +511,6 @@ Cloud VM, separate MySQL instances, and a second identity remain deferred.
 
 ## Open Decisions
 
-- Select the first external-service workflow when refining story 3.
 - Resolve retirement identification, dropping versus reuse, and port-claim
   retirement in story 6; do not infer an implementation from database naming.
 - Revisit shared-server capacity or development profiles only when a selected

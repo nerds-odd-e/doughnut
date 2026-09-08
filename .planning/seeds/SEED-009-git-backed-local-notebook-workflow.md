@@ -55,23 +55,23 @@ The product constraints established in the discussion are:
 
 ## Alternatives and Decision
 
-1. **Defer:** leave broader batch rebase, folder-move divergence, and web
-   autosave batching unqueued until evidence ranks them.
+1. **Defer broader reconciliation:** keep broader batch rebase unqueued.
+   On 2026-09-08 the owner selected folder-move divergence and web autosave
+   batching for the backlog; refine and plan only Story 15 now.
 2. **Smaller behavior change:** keep a two-note local revision across one web
    save of a third existing note (Story 18) — now delivered. Creation followed
    by one save is already supported for one local edit; extending batches across
    structural history is not required for that outcome.
 3. **Edits-only multi-note publish:** delivered as Story 14, independent of
    receiving additions. Story 11 already publishes mixed additions and edits.
-4. **Complete synchronization or web-commit batching:** defer the broad contract
-   and readability polish. Neither is the smallest way to remove the next
-   concrete interruption; batching already-accepted saves risks conflicting
-   with immutable history unless its publication boundary is clarified.
+4. **Complete synchronization:** defer the broad contract. The owner also
+   values readable history, so Story 10 is queued separately after Story 15.
+   Batching already-accepted saves risks conflicting with immutable history;
+   its publication boundary must be clarified before planning it.
 
-**Priority hypothesis:** Stories 13, 16, 14, 17, 18, and 18a are delivered. Remaining
-unqueued candidates in this seed are folder-move divergence (15) and web
-autosave batching (10). Concurrent worktree isolation remains the global
-backlog lead. This is not a claim that usage data proves these are the most
+**Priority:** Stories 13, 16, 14, 17, 18, and 18a are delivered. The owner
+queued folder-move divergence (15), then web autosave batching (10), on
+2026-09-08. Concurrent worktree isolation remains the global backlog lead. This is not a claim that usage data proves these are the most
 frequent failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
@@ -212,7 +212,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 10. See one stable commit for one continuous web edit
 
-**Status:** deferred; not queued.
+**Status:** queued; refinement deferred until selection.
 
 - **For / why:** An owner reading Git history wants a meaningful editing unit
   rather than one commit per durable autosave.
@@ -231,7 +231,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 - **Safe stopping point:** All synchronization remains useful without this;
   keep extra immutable commits if batching would rewrite accepted history.
 - **Boundary:** History granularity only; no structural sync or broader rebase.
-  Define when a batch ends and becomes available before selecting this story.
+  Define when a batch ends and becomes available before planning this story.
   Story 13 now appends one accepted commit at ordinary web creation and another
   for each later durable save, so sequential-loop history is noisier; that is
   not by itself a reason to select this story.
@@ -317,37 +317,54 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 15. Keep a local note edit across an accepted folder move
 
-**Status:** candidate; not queued.
+**Status:** queued; refined. Selected for slice planning on 2026-09-08.
 
-- **For / why:** An owner with one committed local content refinement wants to
-  retain it when accepted history relocates the folder containing that note.
-- **Evaluation:** Accepted history contains one supported exact folder move;
-  pull reconciles one unpublished content edit to a descendant at its new path,
-  then explicit publication updates the same learned note. An ambiguous
-  correspondence stops with recoverable local work.
-- **Value / learning:** Tests the first interaction between delivered folder
-  reorganization and local content divergence. A clean fast-forward already
-  works; this story is specifically for work committed before the move.
-- **Effort hypothesis:** L — low confidence; assumes a single exact accepted
-  relocation supplies sufficient correspondence. Revisit size and selection if
-  preserving identity needs broader structural conflict policy.
-- **Depends on:** delivered Stories 7–9; no dependency on Stories 13–14.
-- **Safe stopping point:** This narrow reconciliation remains useful without
-  arbitrary structural merges. Preserve accepted commit IDs and private identity;
-  never discard local work or infer identity from content similarity alone.
-- **Boundary:** One local note/content commit and one accepted README-backed
-  folder relocation with unchanged bytes. No concurrent content change on the
-  remote side, rename-with-edit, deletion, multiple moves, README authoring,
-  unrepresented descendants, or general structural conflict resolution.
-  A plain accepted addition is delivered in Story 16; do not fold that receipt
-  into this folder-move story. Creation followed by another web save is a
-  different multi-commit interval (Story 17).
-- **Refinement reminder:** For an ambiguous move, preserve local work and
-  explain what reconciliation is required before publication. Do not recommend
-  publishing the divergent commit as an escape from refusal: publication still
-  requires one supported commit directly on accepted history (Story 18a).
-  Successful reconciliation must be evaluated through explicit publication
-  onto the same learned note, not only through a successful Git rebase.
+- **Goal:** A notebook owner keeps one committed local note refinement when
+  another checkout publishes a move of its containing folder, then publishes
+  the refinement onto the same learned note at its new path.
+- **Scope:** Clean bound `main`; exactly one unpublished single-parent commit
+  changing the valid body/frontmatter of one existing ordinary note. Accepted
+  history since that commit's parent is exactly one supported, same-name,
+  README-backed folder relocation. Its complete subtree retains every relative
+  path, byte, and file mode; nothing else changes. The edited note is inside
+  that subtree, including a represented nested folder. Destination is the root
+  or an existing represented parent, as in Story 7. Pull retains the edit at
+  the uniquely mapped new path as one unpublished child of accepted history.
+  Explicit publication uses the existing content-publication contract and keeps
+  the same note identity and private learning data. Accepted commits remain
+  immutable; authored links remain unchanged. No new command, UI, API, stored
+  identity metadata, or general structural merge policy.
+- **Correspondence and refusal:** Require one exact whole-subtree mapping;
+  map the edited note by its relative path within it. Identical note contents
+  do not establish identity and do not invalidate an otherwise unique mapping.
+  Refuse unsupported or ambiguous correspondence before changing local HEAD,
+  index, or tracked files. Explain that work is preserved and must be reconciled
+  or recreated as one supported commit on accepted history before publication;
+  do not suggest publishing the divergent commit directly.
+- **Exclusions:** Multiple local commits/notes or accepted commits/moves,
+  accompanying remote content changes, edits outside the moved subtree, folder
+  rename, note-only relocation, README edits, new parents, unrepresented
+  descendants, collisions, deletion, dirty trees, drift repair, link rewriting,
+  automatic publication, and autosave batching (Story 10).
+- **Key examples:**
+  1. Commit an edit of `Recipes/Pasta.md`; another checkout publishes the exact
+     move `Recipes` → `Kitchen/Recipes`. Pull retains the edit at
+     `Kitchen/Recipes/Pasta.md`; explicit publication updates the original
+     learned note. Other moved files retain their accepted bytes.
+  2. The edited note is in `Recipes/Sauces/`, with that folder represented in
+     the accepted subtree. The same relative-path mapping preserves its edit.
+     Moving the subtree back to the notebook root uses the same rule.
+  3. Two descendants have identical starting text. Editing one keeps that
+     edit on its relative-path counterpart; the other note stays unchanged.
+  4. The accepted interval also edits a file or contains a second move, or
+     fails to supply one unique exact subtree mapping. Pull refuses, preserves
+     local work, and gives accurate reconciliation guidance.
+- **Effort hypothesis:** L — low confidence, retained from decomposition;
+  exact mapping and bounded replay must stay small. Revisit the story if
+  implementation requires a broader identity or conflict policy.
+- **Depends on:** delivered Stories 7–9. No dependence on Story 10.
+- **Open questions:** None for this bounded contract. The exact mapping rule
+  follows the delivered Story 7 contract; similarity-based inference is excluded.
 
 <a id="story-16"></a>
 
@@ -425,9 +442,9 @@ existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
 Within this seed, **13**, **16**, **14**, **17**, **18**, and **18a** are delivered.
-Keep **15 → 10** as unqueued candidates: folder-move divergence is
-consequential but narrower and has unresolved identity-policy risk; batching
-changes readability without unlocking synchronization.
+Queue **15 → 10** after the existing worktree priorities. Story 15 uses exact
+subtree correspondence; Story 10 remains separately valuable to the owner for
+history readability, with its publication boundary still to refine.
 
 First-to-drop order among remaining items: **10, 15**. Delivered batch
 publication and batch reconciliation across one disjoint web save stay useful
@@ -450,10 +467,7 @@ Preserve these boundaries in future refinement:
 - **Priority assumption open to revision:** no real-user frequency evidence
   ranks folder divergence or history readability. Do not displace the
   developer's concurrent-worktree priority.
-- **Story 15, before selection:** confirm same-identity correspondence and the
-  refusal boundary for ambiguity; do not assume ordinary Git rename detection
-  alone establishes Donut identity.
-- **Story 10, before selection:** define the end-of-edit/publication boundary
+- **Story 10, before planning:** define the end-of-edit/publication boundary
   and acceptable delay without losing durable saves or rewriting visible history.
 - **Batch follow-ons:** Repeated pull, three-or-more-note rebase, and multiple
   accepted saves are distinct excluded outcomes, not delivered by Story 18.
@@ -464,8 +478,8 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Reconsider 15 when folder relocation blocks unpublished work, and 10 when
-history readability is an observed problem. This seed is non-executable; queue
+Story 15 is selected for refinement and planning. Refine Story 10 separately
+when it reaches selection for planning. This seed is non-executable; queue
 selection does not authorize implementation.
 
 ## Breadcrumbs

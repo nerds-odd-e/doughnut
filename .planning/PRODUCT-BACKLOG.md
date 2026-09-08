@@ -9,8 +9,8 @@ across creation-then-save of a different note, publishing related edits to
 several existing notes in one local commit, and keeping a related local edit
 batch across one disjoint web save of a different note are delivered. Content
 rebase and bounded local note/folder reorganization are delivered.
-Reconciliation across folder moves and web autosave batching remain unqueued
-candidates in SEED-009. This advances
+Reconciliation across one exact folder move and web autosave batching are
+queued next in SEED-009, in that order. This advances
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
 without claiming its complete synchronization contract.
 Enable developers and AI tasks to verify changes concurrently in local
@@ -26,6 +26,8 @@ MCP isolation. Cloud VM and development-profile isolation remain deferred.
 2. [Reclaim databases from retired worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-6) — SEED-015
 3. [Run CLI E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
 4. [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
+5. [Keep a local note edit across an accepted folder move](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-15) — SEED-009
+6. [See one stable commit for one continuous web edit](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-10) — SEED-009
 
 ## Recently done
 
