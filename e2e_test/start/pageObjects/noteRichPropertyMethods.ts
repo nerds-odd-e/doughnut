@@ -156,6 +156,7 @@ export const noteRichPropertyMethods = () => ({
         })
         .find('[data-testid="rich-note-property-external-link"]')
         .should('be.visible')
+        .scrollIntoView()
         .then(($btn) => {
           cy.window().then((win) => {
             const popupWindowStub = {
@@ -163,7 +164,9 @@ export const noteRichPropertyMethods = () => ({
               focus: cy.stub(),
             }
             cy.stub(win, 'open').as('open').returns(popupWindowStub)
-            cy.wrap($btn).click()
+            // Overflow on `.note-content-wrapper` can report the scroll parent as
+            // covering this control; same force pattern as other property-row clicks.
+            cy.wrap($btn).click({ force: true })
             cy.get('@open').should('have.been.called')
             cy.wrap(() => popupWindowStub.location.href)
               .should((cb) => {
