@@ -1,18 +1,17 @@
 # Agent Map
 
-Short navigation index — start here before generated API files or long docs. Skill contracts: `.agents/skills/`.
+Repository navigation and non-obvious tooling notes. Consult this map when the
+location or command you need is unclear. Skills are discovered automatically
+and are intentionally not cataloged here.
 
 ## Work Areas
 
-- Backend HTTP/API behavior: start in `backend/src/main/java/com/odde/donut/controllers/`, then follow services in `backend/src/main/java/com/odde/donut/services/` and entities/repositories in `backend/src/main/java/com/odde/donut/entities/`. Stack: `backend.mdc` (Cursor auto-attaches `backend-code.mdc` / `backend-testing.mdc`).
-- Backend tests: prefer controller-level unit tests under `backend/src/test/java/com/odde/donut/controllers/`; use `makeMe` fixtures and real database transactions ("small test" style: `unit-testing.mdc`). Stack: `backend.mdc`.
-- Frontend pages and components: start in `frontend/src/pages/`, `frontend/src/components/`, `frontend/src/composables/`, and `frontend/src/store/`. Stack: `frontend.mdc` (Cursor auto-attaches `frontend-component.mdc` / `frontend-api.mdc` / `frontend-testing.mdc`).
-- Frontend tests: use `frontend/tests/`; drive mounted components; mock only the backend API via `mockSdkService()` and build payloads with `donut-test-fixtures/makeMe` (`unit-testing.mdc`). Stack: `frontend.mdc`.
-- E2E behavior: start with `e2e_test/features/`, then the matching step definitions in `e2e_test/step_definitions/`, then page objects in `e2e_test/start/`. After UI actions that leave the app busy (`data-app-busy`), wait with `waitUntilAppIsNotBusy()` (paired in `frontend.mdc` / `e2e-authoring.mdc`).
-- CLI behavior: start in `cli/src/`; run focused CLI unit tests from `cli/` rather than broad workspace verification. Style: `unit-testing.mdc`; stack details: `cli.mdc`.
-- MCP server behavior: start in `mcp-server/`; use `.cursor/rules/mcp-server.mdc` only for MCP-specific build/test details. Style: `unit-testing.mdc`.
+- Backend HTTP/API behavior: start in `backend/src/main/java/com/odde/donut/controllers/`, then follow `services/` and `entities/`; backend tests start in `backend/src/test/java/com/odde/donut/controllers/`.
+- Frontend pages and components: start in `frontend/src/pages/`, `frontend/src/components/`, `frontend/src/composables/`, and `frontend/src/store/`; frontend tests live in `frontend/tests/`.
+- E2E behavior: start with `e2e_test/features/`, then matching step definitions in `e2e_test/step_definitions/` and page objects in `e2e_test/start/`.
+- CLI behavior: start in `cli/src/`.
+- MCP server behavior: start in `mcp-server/`.
 - Database schema changes: add a new migration in `backend/src/main/resources/db/migration/`; never edit committed migrations.
-- Application releases or deployment status: use `.agents/skills/release-application/SKILL.md`; it routes to the canonical application runbook and distinguishes `cli-*` releases and `gsd-ship` PR delivery.
 
 ## Generated API
 
@@ -61,41 +60,8 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 
 - Human propose / discuss / approve: `docs/adrs/README.md`
 - Current recommendations: `docs/adrs/*-accepted.md` (read explicitly — under `docs/`)
-- Agent use / cite / conflict / maintain: `.agents/skills/dough-adr-awareness/SKILL.md`
 - Rule pointer: `.cursor/rules/architecture-decisions.mdc`
 
 ## Ignored Reference Material
 
 `docs/` and leftover `ongoing/` files are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD `phases/`, `quick/`, `STATE`, … — see `gsd-coexistence.mdc`). Test-optimization candidates: `.planning/test-optimization-blacklist.md`. Read `docs/` explicitly when the user asks for docs, a rule points to a document, or an ADR check is required (`docs/adrs/`).
-
-## Planning modes (GSD vs local)
-
-| Mode | Artifacts | Orchestrator |
-|------|-----------|--------------|
-| Story shaping | `.planning/seeds/SEED-NNN-slug.md` containing ordered candidate stories | **story-decomposition** |
-| Story refinement | Goal, scope, and key examples in each story's home seed | **story-refinement** |
-| Product backlog | `.planning/PRODUCT-BACKLOG.md` — ordered unfinished story titles only | **dough-product-backlog** |
-| Formal milestone | `.planning/phases/NN-slug/*-PLAN.md`, STATE, ROADMAP | `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-ship` (+ local wrap-up) |
-| Ad-hoc | `.planning/quick/NNN-slug/PLAN.md` | **slice-planning** + **execute-plan** |
-| Optional refinement | Existing phase/quick PLAN; no new artifact | **slice-plan-refinement** |
-| Completed-plan audit | Git history plus optional follow-up PLAN | **execution-retrospective**; never executes the follow-up |
-| Legacy | `ongoing/*.md` | **execute-plan** only; do not migrate |
-
-Story-decomposition seeds are not executable: select a story, clarify its goal,
-scope, and examples with story-refinement as needed, then use slice-planning.
-Run slice-plan-refinement only when the resulting PLAN is complex, sizing
-confidence is low, or execution overruns; straightforward plans
-may execute directly. **Hard decomposition quality:** one evaluable outcome at the
-current resolution; 3V stories; Behavior/Structure execution leaves —
-`problem-decomposition.mdc`. Plan artifact and lifecycle rules: `planning.mdc`.
-Use execution-retrospective after completion when the plan's aggregate diff,
-goal conformance, or execution process needs review; it reconstructs cleaned-up
-plans from Git history and stops after generating any follow-up PLAN.
-Do not write new flat `.planning/<name>.md` plans when `phases/` or `quick/`
-fits. `.planning/PRODUCT-BACKLOG.md` is the ordered story queue, not a plan.
-**Per-slice wrap-up:** Jidoka → fresh post-change-refactor agent → API generation
-when needed → coordinator runs `./scripts/run.sh pnpm format:changed` once →
-update plan without a second routine formatting pass → commit → push
-(**execute-plan**). The pre-commit hook independently lints staged components
-without mutation. `format-changed` remains an on-demand skill; implementers and
-refactorers run neither that command nor standalone `lint:changed`.

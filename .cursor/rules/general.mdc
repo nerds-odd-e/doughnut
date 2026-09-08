@@ -5,7 +5,7 @@ alwaysApply: true
 
 # General Development Rules
 
-- Start with `.cursor/agent-map.md` for navigation, focused commands, service assumptions, generated API guidance, ADRs, and log inspection.
+- Consult `.cursor/agent-map.md` when navigation, focused commands, service assumptions, generated API guidance, ADR locations, or log inspection is unclear.
 - Architectural decisions: humans approve via `docs/adrs/`; agents use `dough-adr-awareness` (see `architecture-decisions.mdc`).
 - Run repo tooling through Nix (`CURSOR_DEV=true nix develop -c …`) unless documented otherwise (e.g. Cloud VM). **Git commands do not need the Nix prefix** — run `git` directly.
 - For Cursor Cloud VM without Nix, use the `cloud-vm-setup` skill.

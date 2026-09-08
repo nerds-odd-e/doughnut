@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-Index for Claude Code and other AI coding agents. Skill contracts: `.agents/skills/`; rules: `.cursor/rules/`.
+Repository instructions for Claude Code and other AI coding agents.
 
 Donut is a Personal Knowledge Management tool combining zettelkasten-style note capture, spaced repetition, and knowledge sharing.
 
-Start with `.cursor/agent-map.md` for repo navigation, generated API guidance, focused commands, service assumptions, and default indexing notes.
+Consult `.cursor/agent-map.md` when you need repository entry points, generated API guidance, focused commands, service assumptions, or default indexing notes.
 
 Run repo tooling with `CURSOR_DEV=true nix develop -c …` unless documented otherwise (e.g. Cloud VM). **Git commands do not need the Nix prefix** — run `git` directly.
 
