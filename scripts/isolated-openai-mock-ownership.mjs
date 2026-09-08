@@ -23,6 +23,13 @@ export function childStillRunning(child) {
   return child.exitCode === null && child.signalCode === null
 }
 
+function refuseForeignListenerMessage(port, label, pid, pgid, detail = '') {
+  return (
+    `Private OpenAI mock refuses foreign ${label} listener on port ${port} ` +
+    `(pid ${pid} pgid ${pgid}${detail}).`
+  )
+}
+
 export async function assertOwnedMockListener(port, ownedPgid, label) {
   const pids = await getListenerPids(port)
   if (pids.length === 0) {
@@ -34,11 +41,31 @@ export async function assertOwnedMockListener(port, ownedPgid, label) {
     const pgid = await processGroupId(pid)
     if (pgid !== ownedPgid) {
       throw new Error(
-        `Private OpenAI mock refuses foreign ${label} listener on port ${port} ` +
-          `(pid ${pid} pgid ${pgid}; owned pgid ${ownedPgid}).`
+        refuseForeignListenerMessage(
+          port,
+          label,
+          pid,
+          pgid,
+          `; owned pgid ${ownedPgid}`
+        )
       )
     }
   }
+}
+
+/**
+ * Serving must be free before the first management mutation creates an imposter.
+ * A ready foreign listener is refusal, never adoption.
+ */
+export async function assertPortFreeBeforeMockMutation(port, label) {
+  const pids = await getListenerPids(port)
+  if (pids.length === 0) return
+  const pid = pids[0]
+  const pgid = await processGroupId(pid)
+  throw new Error(
+    `${refuseForeignListenerMessage(port, label, pid, pgid)} ` +
+      'Refusing before mock mutation.'
+  )
 }
 
 export async function waitForOwnedManagementListener(child, managementPort) {

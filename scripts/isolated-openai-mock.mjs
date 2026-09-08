@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url'
 import { allocatePrivateOpenAiMockPorts } from './isolated-openai-mock-ports.mjs'
 import {
   assertOwnedMockListener,
+  assertPortFreeBeforeMockMutation,
   ownedProcessGroupId,
   waitForOwnedManagementListener,
 } from './isolated-openai-mock-ownership.mjs'
@@ -97,9 +98,9 @@ export async function startPrivateOpenAiMock({
   checkoutRoot = repoRoot,
   allocation,
   spawnFn = spawn,
+  allocatePortsFn = allocatePrivateOpenAiMockPorts,
 } = {}) {
-  const { managementPort, servingPort } =
-    await allocatePrivateOpenAiMockPorts(allocation)
+  const { managementPort, servingPort } = await allocatePortsFn(allocation)
   const managementUrl = `http://127.0.0.1:${managementPort}`
   const pidfile = path.join(
     checkoutRoot,
@@ -148,6 +149,13 @@ export async function startPrivateOpenAiMock({
 
   try {
     await waitForOwnedManagementListener(child, managementPort)
+    throwIfMockFailed()
+    await assertOwnedMockListener(
+      managementPort,
+      ownedProcessGroupId(child),
+      'management'
+    )
+    await assertPortFreeBeforeMockMutation(servingPort, 'serving')
     throwIfMockFailed()
     await createEmptyRecordingImposter(managementUrl, servingPort)
     throwIfMockFailed()

@@ -1,7 +1,7 @@
 # Isolated OpenAI browser mocks
 
 Source: [SEED-015 story 3](../../seeds/SEED-015-concurrent-worktree-environments.md#story-3).
-Status: in-progress. Slices 1–2 done.
+Status: in-progress. Slices 1–3 done.
 
 ## Goal and scope
 
@@ -111,19 +111,17 @@ updates. Prerequisite SUT fix: Gradle-forked backend ownership via `--no-daemon`
 
 ### 3. Refuse a foreign mock before changing test state
 Type: Behavior
-Status: planned
-Proof: At the Cypress setup boundary, parameterize management versus serving
-port occupied by a real foreign ready listener. Assert visible refusal and
-zero fixture-reset/mock-mutation calls; the foreign listener and peer mock
-response remain intact. Reuse the real-listener test style from story 2a.
+Status: done
+Proof: `node --test scripts/isolated-cypress-openai-mock.test.mjs scripts/isolated-openai-mock.test.mjs`
+— foreign management and foreign serving refuse before mutation; zero mutations;
+foreign listeners and peer responses intact.
 
 Behavior: Owning application is healthy but a selected mock listener is foreign
 or unverified → start/setup the mocked scenario → refuse before test state is
-changed. Pin the already-required ownership checks from leaf 2 with this
-adversarial regression and correct any gaps without adopting or killing ports.
+changed.
 
-Sizing: About 5 minutes. One table of ownership preconditions at the guard;
-no adversarial continuous-listener monitoring or unrelated allocation tests.
+Serving free-check runs before empty recording imposter create; management
+ownership rechecked immediately before that.
 
 ### 4. Stop the affected runner when its mock fails
 Type: Behavior
