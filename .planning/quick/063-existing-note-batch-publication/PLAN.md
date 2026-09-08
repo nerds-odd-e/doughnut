@@ -1,7 +1,7 @@
 # Publish a related batch of edits to existing notes
 
 Source: [SEED-009, Story 14](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-14), product backlog item 6.
-Status: in progress; slices 1–2 delivered.
+Status: in progress; slices 1–3 delivered.
 
 ## Goal and scope
 
@@ -83,22 +83,16 @@ show both original note contents/identities and unchanged accepted head/bundle.
 
 ### 3. Keep a stale local batch available after remote advancement
 Type: Behavior
-Status: planned
-Proof: One real-Git CLI `run(['notebook', 'publish', directory])` regression in
-the suites loaded by `cli/tests/notebookPublish.test.ts`.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPublish.test.ts` — pass.
+A two-note edit commit stale after a later accepted web save is refused with
+an ancestry error, POST count 0, and original local head plus both edited
+files intact.
 
 Behavior: A clean bound checkout holds one two-note edit commit, while accepted
 history contains a later web content save from the shared base → publish → an
 ancestry refusal is reported without POST; the local commit and both edited
 files remain intact. No remote mutation is requested.
-
-Reuse existing ancestry/submission fixtures, mocking only the HTTP boundary.
-Existing `NotebookGitProposalAncestryControllerTest` stale-expected-head and
-`NotebookGitPublicationConcurrencyControllerTest` web-save-first cases own the
-server race safeguard; do not add a second concurrency harness. This leaf
-characterizes the new batch shape, not a new reconciliation policy.
-Sizing hypothesis: about 5 minutes including the focused CLI run and cleanup;
-existing real-Git fixtures avoid a new integration boundary.
 
 ### 4. Publish and receive the related revision through the installed CLI
 Type: Behavior
@@ -142,7 +136,9 @@ existing receiver and multi-file helpers make this one cohesive proof loop.
 - Invalid-content refusal of an edits-only batch needed no production change;
   existing typed-Markdown validation already rejects the whole proposal.
 - Slices 3–4 still need no production change from these leaves.
+- CLI ancestry already refuses a stale two-note batch without POST; Slice 4
+  can reuse existing related-note commit and second-clone helpers.
 
 ## Readiness
 
-Slice 2 delivered. Remaining slices 3–4 are ready; no open story question.
+Slice 3 delivered. Remaining slice 4 is ready; no open story question.
