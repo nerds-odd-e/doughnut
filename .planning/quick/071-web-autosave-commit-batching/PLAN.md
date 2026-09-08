@@ -139,22 +139,15 @@ candidate-head equality (slice 5).
 
 ### 4. Make snapshot parent choice explicit without changing saves
 Type: Structure
-Status: planned
-Proof: Existing snapshot builder and controller append tests remain green;
-the domain-stable JGit builder proof constructs a replacement with the old
-parent, bundles it, and reads back the selected tip and unchanged ancestor.
+Status: done
+Proof: `pnpm backend:test_only` green — existing append tests plus
+`NotebookGitBundleBuilderTest.replacesTipKeepingParentAndAuthorThenRoundTripsThroughBundle`
+(selected tip, unchanged ancestor, retained author, new committer, latest content).
 
-Structure: Extend the concrete snapshot-building operation to support replacing
-one current tip with the same parent, retaining original author metadata and
-using current committer time. Explicitly permit non-fast-forward movement only
-inside that in-memory replacement operation; retain ordinary append behavior
-for existing callers. Share tree/bundle construction rather than duplicating it.
-Do not activate replacement in WebNoteContentSaveService yet.
+Structure: `NotebookGitBundleBuilder.replaceTip` same-parent replacement with
+forceUpdate only on that path; ordinary append callers unchanged. Saves not
+wired yet.
 Enables immediately: slice 5 can choose append versus replace under its lock.
-Sizing: about 5 minutes plus backend unit runtime; existing tree construction,
-bundle writer and builder tests cover the required path. No filesystem Git
-repository, new transport or generic history-editing abstraction.
-Stop-safe: existing production behavior is unchanged.
 
 ### 5. Keep a continuous same-note edit as one durable commit
 Type: Behavior
