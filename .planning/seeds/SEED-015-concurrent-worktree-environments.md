@@ -16,10 +16,9 @@ shared database resets, schema changes, and service endpoints should change to
 independent test runs against each worktree's own code and state, within the
 capacity of one development machine using the existing Nix environment.
 
-Backend tests and the supported no-mock browser workflow now isolate their
-databases and application endpoints. Remaining mock and client workflows still
-risk shared resets, responses, and local state. The delivered boundaries are
-recorded in stories 1a–2a; general parallel E2E support remains unfinished.
+Backend tests and the two supported browser specs now isolate databases, app
+endpoints, and OpenAI mocks. Other mock and client workflows remain unsupported;
+general parallel E2E support is unfinished. Shutdown correction is queued in 2b.
 
 The developer endorsed unit-test isolation before E2E. Shared-MySQL isolation
 proved useful; it does not promise faster parallel suites on limited hardware.
@@ -46,49 +45,25 @@ shared-server limitations prove material; they are not initial requirements.
 
 ### Captured design direction
 
-These are the ideas discussed with the developer, retained for later story
-refinement rather than an executable design or an approved ADR:
+The developer proposed a persistent gitignored worktree identity, automatic
+first use, shared MySQL, and owning service endpoints. Stories 1a–3 record the
+implemented boundaries; current guides are linked below. No approved ADR or
+creation-hook requirement is implied. Recorded ports are not OS reservations.
 
-- A gitignored local configuration records a persistent unique worktree
-  identity, such as `wt_a7c2`, and its allocated service ports. Database names
-  derive from that identity and purpose: development, unit test, or E2E.
-- An idempotent setup tool owns allocation and configuration. A creation hook
-  or AI skill can invoke it; first use can also initialize a worktree created
-  through another tool. Correctness must not rely on AI remembering setup.
-- One configuration loader supplies consistent settings to commands and
-  processes. Services do not independently invent database or port defaults.
-  Setup tooling finds or creates the required databases and applies that
-  worktree's migrations before use.
-- Identity survives shell restarts and branch changes in the same worktree.
-  Concurrent initialization must not assign conflicting identities or ports.
-  A machine-local allocation registry was suggested; its exact mechanism is
-  unresolved. Recorded ports are not operating-system reservations, so startup
-  still must surface conflicts rather than reuse an unrelated listener.
-- Start, health check, restart, and stop refer to the owning environment.
-  Shared MySQL has a lifecycle independent of any one disposable worktree.
-  Invalid local settings must not silently redirect a task to shared state.
-- The existing checkout may retain legacy defaults for compatibility. Exact
-  fallback policy is open. Retiring an allocation and deleting persistent
-  development data are separate decisions; worktree removal must not imply
-  unrequested data deletion.
-
-The current shared services and finite machine resources are problem facts.
-The file format, naming convention, hook, registry, and launcher are proposed
-means of achieving the outcome. Preserve the fail-loud guidance in ADR 0006.
+Retirement, copied/moved checkout recovery, and persistent development data
+remain separate decisions. Worktree removal must not imply data deletion;
+invalid settings must fail visibly without shared-state fallback (ADR 0006).
 
 ## Story Decomposition
 
-Story group 1 is decomposed below into three candidate stories; it is no
-longer one executable-sized story. The later E2E candidates retain their
-boundaries and anchors. Each candidate must deliver a usable workflow, not
-unused configuration infrastructure. Initial scope is one runner of each
-supported kind per worktree, across two concurrent local worktrees.
+Each story delivers a usable workflow. Scope is one runner of each supported
+kind per worktree, across two concurrent local worktrees.
 
 <a id="story-1"></a>
 
 ### 1. Run backend unit tests concurrently in separate worktrees
 
-**Status:** Children 1a–1c, stories 2, 2a, and 3 delivered. Next queued work is story 6.
+**Status:** Children 1a–1c, stories 2, 2a, and 3 delivered. Correction 2b precedes story 6.
 
 **Parent goal**
 
@@ -333,12 +308,30 @@ recovery, automatic repair/reallocation, lifecycle redesign, Cloud VM/CI
 changes, and continuous protection against malicious post-check listener
 replacement.
 
+<a id="story-2b"></a>
+
+### 2b. Stop an isolated SUT without leaving its forked backend running
+
+**Status:** Queued first; [corrective plan](../quick/072-owned-sut-descendant-shutdown/PLAN.md).
+
+**Goal:** Developers can stop/restart their isolated application and reuse its
+allocation without leaving an owned backend running or disturbing a peer.
+**Scope:** Preserve ownership of descendants in separate process groups during
+shutdown, including parent exit and termination escalation. No listener-based
+adoption, unrelated process termination, database reclamation, or new registry.
+**Key example:** An owned parent forks a backend into another group → stop the
+SUT → both exit, its listener is released, and the peer remains usable. A child
+that outlives its parent must remain part of bounded shutdown verification.
+**Evidence:** `005898f8d4` signals the parent before enumerating descendants;
+the retrospective reproduced an owned detached child surviving completed stop.
+**Effort hypothesis:** S, medium confidence; existing shutdown boundary and fixtures.
+
 <a id="story-3"></a>
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
-**Status:** Delivered, 2026-09-08
-([slice plan](../quick/070-isolated-openai-browser-mocks/PLAN.md)).
+**Status:** Delivered, 2026-09-08. Recover quick/070 from `47c4b24eba`.
+Exclusive-recording proof correction: [quick/073](../quick/073-exclusive-openai-recording-proof/PLAN.md).
 
 **Goal**
 
@@ -388,6 +381,11 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 - **Reminder from 1c:** Ordinary Gradle `test` / `migrateTestDB` isolation
   does not cover CLI processes, `DONUT_CONFIG_DIR`, or clone checkouts. Reuse
   the worktree identity once an isolated application environment exists.
+- **Mock reminder from story 3:** Only OpenAI completion is supported. OAuth /
+  Google mocks need explicit scope and private routing; browser `expose` does
+  not configure spawned clients. Reuse runner ownership, observe background
+  failure, and release children before the runner lease. Preserve peer responses
+  and reject peer request markers in recordings.
 - **Effort hypothesis:** L — low confidence; assumes endpoint and local-state
   selection can reuse the earlier environment behavior. Interactive or OAuth
   cases may need a separate story if refinement shows a larger-than-L scope.
@@ -415,6 +413,10 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   client workflow without requiring broader environment-management features.
 - **Safety boundary:** Server processes, client connections, configuration, and
   any mocks used by the scenario belong to the correct environment.
+- **Mock reminder from story 3:** Scope the chosen MCP workflow's services
+  explicitly; OpenAI completion support does not isolate Google or other mocks.
+  Propagate child failure while the owner runs and complete child cleanup before
+  allowing another run; verify peer state after reset and disconnect.
 - **Effort hypothesis:** M — low confidence; assumes the preceding application
   environment is reusable and MCP adds limited client-specific ownership work.
 - **Depends on:** An isolated running application and any mocks the workflow
@@ -429,7 +431,7 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ### 6. Reclaim databases from retired worktrees
 
-**Status:** Queued after story 3; idea remains unrefined.
+**Status:** Queued after correction 2b; retirement policy remains unrefined.
 
 - **For / why:** Developers and AI tasks creating disposable worktrees need to
   avoid accumulating databases after those worktrees are retired.
@@ -447,14 +449,22 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   Unhealthy does not mean retired: story 2a refuses invalid allocations and
   foreign listeners even with a live owner. Such refusal must not authorize
   dropping databases, replacing allocations, or terminating those listeners.
+- **Reminder from quick/070:** Private mock ports belong to a Cypress run and
+  are not persistent allocation fields or database inventory. A completed mock
+  run leaves the SUT/database allocated. Correction 2b reproduced a child alive
+  after its parent stopped; missing parent/lease alone cannot prove retirement.
+  Example: a surviving backend still using a candidate database → reclaim →
+  refuse; an explicitly retired, verified idle allocation may follow the chosen
+  reclamation policy. Resolve identification and drop-versus-reuse before planning.
 
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08:** Quick/067 delivered story 2a; no new story is
-needed. Preserve 3 → 6 → 4 → 5: mocks, reclamation, CLI, MCP. CLI-before-MCP
-is value ordering, not a dependency. The [product backlog](../PRODUCT-BACKLOG.md)
-owns global order. Story 3 (OpenAI note completion with isolated mocks) is
-delivered; stories 4–6 still need refinement and retirement is undecided.
+**Backlog review, 2026-09-08:** Quick/070 delivered focused OpenAI mocks.
+Queue the reproduced shutdown correction 2b before 6 → 4 → 5; reclaim remains
+the next expansion, followed by CLI and MCP. CLI-before-MCP is value ordering,
+not a dependency. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
+The recording-exclusivity proof correction stays with story 3 in quick/073;
+it does not require a duplicate product story or broader mock support.
 
 Do not claim general parallel E2E support from the focused no-mock workflow.
 First-to-drop order among expansions is 5, 4, 6, then 3. Persistent development
