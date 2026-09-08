@@ -14,11 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit,
- * and permits one modified note, a set containing added ordinary Markdown notes at regular file
- * modes, exactly one isolated ordinary-note deletion, or exactly one equal-content rename (one
- * removed and one added note sharing a blob). Never mixed or multiple pairs, unsafe paths,
- * non-regular modes, or the folder-reserved {@code README.md}. Callers only invoke this once
- * proposal ancestry is confirmed to be a direct single-parent child of the accepted commit.
+ * and permits added or modified ordinary Markdown notes at regular file modes, exactly one isolated
+ * ordinary-note deletion, or exactly one equal-content rename (one removed and one added note
+ * sharing a blob). Never mixed or multiple pairs, unsafe paths, non-regular modes, or the
+ * folder-reserved {@code README.md}. Callers only invoke this once proposal ancestry is confirmed
+ * to be a direct single-parent child of the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -98,6 +98,10 @@ public final class NotebookGitProposalTreeShape {
     return changes;
   }
 
+  /**
+   * Accepts added and/or modified ordinary-note changes, one isolated deletion, or one
+   * equal-content rename. Refuses mixed deletion with other file changes.
+   */
   private static List<NoteChange> requireAllowedNoteChanges(List<NoteChange> changes) {
     for (NoteChange change : changes) {
       assertRegularNotePath(change.path());
@@ -114,13 +118,6 @@ public final class NotebookGitProposalTreeShape {
       throw unsupportedTreeShape(
           "publish each removed note in an isolated deletion commit, or an isolated equal-content"
               + " rename, without other file changes");
-    }
-    if (changes.size() > 1
-        && changes.stream().noneMatch(change -> change.kind() == ChangeKind.ADDED)) {
-      throw unsupportedTreeShape(
-          "multiple changed files: "
-              + String.join(", ", changes.stream().limit(2).map(NoteChange::path).toList())
-              + ". Edits-only proposals require separate commits for each note");
     }
 
     return changes;
