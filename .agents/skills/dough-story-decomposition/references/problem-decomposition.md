@@ -1,5 +1,20 @@
 # Problem decomposition
 
+## Choose the decomposition level
+
+Do not plan a lower level while a higher-level decision remains unresolved.
+
+| Level | Use when | Result |
+| --- | --- | --- |
+| **Problem or capability** | The beneficiary, problem, desired effect, constraint, or direction is unclear | One evaluable decision, assumption, or outcome |
+| **Story** | The problem is understood but several useful outcomes are possible | Ordered Valuable, Visible, Vertical stories |
+| **Slice** | One story's goal, scope, and key examples are understood | Behavior slices and only immediately enabling Structure slices |
+
+The levels are fractal: name the evaluator and observable result, split
+independent outcomes, order by value and learning, and make every stopping point
+safe. When evidence invalidates a parent decision, stop and return to that
+level rather than continuing to subdivide its children.
+
 ## Establish the human-owned decisions
 
 Before writing the seed, use an explicit answer the human already gave or ask
@@ -38,13 +53,15 @@ is insufficient.
 
 ## Select candidate stories
 
-Frame each candidate as one user or stakeholder journey with an observable
-outcome, crossing related features when necessary. Cut around behavior, a
+Frame each candidate story as a possibility worth pursuing for user or learning
+value. Invite imagination and discussion; allow incomplete understanding to
+evolve. Let the journey cross features and system boundaries. When selecting
+stories for planning, clarify an observable outcome. Cut around behavior, a
 product decision, risk, or learning question. Decompose only enough candidates
 to answer the current value or learning question; do not exhaust a feature for
 completeness.
 
-Keep a candidate only when all three answers are yes:
+Select a candidate story for planning when all three answers are yes:
 
 1. **Valuable:** Does it change an outcome for a named user or stakeholder?
    “Needed for later work” is insufficient.
@@ -103,3 +120,47 @@ Use [dough-story-refinement](../../dough-story-refinement/SKILL.md) for changes
 to selected-story goal, scope, or examples. Do not silently cancel remaining
 scope or rewrite siblings. Keep stories as planning input; enduring behavior
 belongs in executable examples and product documentation.
+
+## Decompose slices
+
+Use slices only after one story is understood and executable planning
+is authorized. Every slice is exactly one of:
+
+| Type | Required content | Reject when |
+| --- | --- | --- |
+| **Behavior** | Pre-condition, trigger, one externally observable postcondition, and outside-in proof | It contains independent postconditions or proof loops |
+| **Structure** | Internal change, unchanged external behavior, and the immediate next Behavior it enables | It prepares for anything beyond that Behavior |
+
+Tie every Behavior to included story scope or a key example. Put Structure
+immediately before its Behavior. Use the splitting moves above at this finer
+resolution, but do not split tests from the Behavior they prove or create slices
+around files, layers, components, specialists, or activities.
+
+Refine a slice when it has independent postconditions or proof loops, separable
+implementation beats before a green result, hidden preparation, low confidence
+at an execution or integration boundary, or a plausible path beyond the
+project's hard limit. Keep a multi-beat outside-in scenario explicitly
+unfinished until it is green; never make a CI-breaking state a delivery
+boundary.
+
+## Size and escalate slices
+
+Use the client project's slice target, hard limit, exceptions, and
+repeated-overrun threshold. Include implementation, focused verification, and
+slice-local cleanup in the sizing hypothesis. Resolve missing limits before
+claiming that a plan is ready for direct execution.
+
+At the target, check for independent outcomes or hidden preparation and split
+when found. At the hard limit, stop unless a stated focused-test or external-wait
+exception applies. Preserve the learning and safely park or revert only
+attempt-owned work; preserve developer and unrelated work, and stop for human
+judgment when ownership is unclear. Renaming, retrying, or splitting a slice does
+not erase an overrun.
+
+After a completed slice, update the same plan when evidence changes only its
+remaining slices. When evidence changes the story's goal, examples, scope, or
+sibling order, record the affected story and stop for human review. When the
+project's repeated-overrun threshold is reached, reassess the story boundary
+before another slice-only refinement. Record delivered value, remaining scope,
+and a concrete sizing reason for continuing. Preserve compatible work and proof;
+discard them only for stated incompatibility or safety.
