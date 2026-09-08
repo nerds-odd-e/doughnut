@@ -28,6 +28,8 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
   private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   private static final String PROPOSED_CONTENT = "---\ntype: Note\n---\nproposed content";
   private static final String WEB_CONTENT = "---\ntype: Note\n---\nweb content";
+  private static final String UNSYNCHRONIZED_RELATIONSHIP_CONTENT =
+      "---\ntype: Relationship\nsource: \"[[A]]\"\ntarget: \"[[B]]\"\n---\nweb content";
 
   @Autowired TextContentController textContentController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
@@ -75,7 +77,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
                     .please());
     NoteCreationDTO webCreation = new NoteCreationDTO();
     webCreation.setNewTitle("addition");
-    webCreation.setContent("web content");
+    webCreation.setContent(UNSYNCHRONIZED_RELATIONSHIP_CONTENT);
     Note occupiedDestination =
         noteRepository
             .findById(controller.createNoteAtNotebookRoot(notebook, webCreation).getId())
@@ -94,7 +96,8 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
     Note reloadedOccupiedDestination =
         noteRepository.findById(occupiedDestination.getId()).orElseThrow();
     assertThat(reloadedOccupiedDestination.getTitle(), equalTo("addition"));
-    assertThat(reloadedOccupiedDestination.getContent(), equalTo(WEB_CONTENT));
+    assertThat(
+        reloadedOccupiedDestination.getContent(), equalTo(UNSYNCHRONIZED_RELATIONSHIP_CONTENT));
     assertThat(reloadedOccupiedDestination.getFolder(), nullValue());
     assertThat(
         noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()

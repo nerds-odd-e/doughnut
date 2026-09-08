@@ -121,7 +121,7 @@ Feature: CLI notebook clone
 
   Scenario: Publishing a nested-metadata note preserves metadata through a rich body edit
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    Then I should see "one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, a single edited Markdown note, one isolated equal-content Markdown note remove/add pair that may change folder and/or filename, one isolated Markdown note deletion that leaves existing links authored, or one complete same-name subtree whose source has its own accepted README, every active descendant is represented, the destination parent already exists in accepted history, and bytes, modes, and relative paths stay unchanged; creating a new or unrepresented folder, overwriting an existing note, and relocating or renaming together with a content edit in the same commit, are not supported yet. To preserve note identity, commit and publish the unchanged relocation or rename, wait for it to be accepted, then edit and separately commit and publish the content change. Authored referring links are not rewritten by a relocation or rename, so links to the old path may no longer resolve. Do not delete and recreate the note. Use the notebook root or existing folders represented in accepted history." in the non-interactive output
+    Then I should see "one or more edited existing ordinary Markdown notes at unchanged paths" in the non-interactive output
     When I add and commit the following note at "Recipes/Pantry Staples.md" in the cloned checkout:
       """
       ---
@@ -168,6 +168,7 @@ Feature: CLI notebook clone
       author: Chef Boyardee
       ---
       Simmer until al dente
+
       """
     And note "Pasta" should have content "Boil water"
     When I publish the cloned checkout using the installed CLI
@@ -211,6 +212,7 @@ Feature: CLI notebook clone
       author: Chef Boyardee
       ---
       Finish in the sauce
+
       """
     And note "Pasta" should have content "Salt the water first"
     When I publish the cloned checkout using the installed CLI

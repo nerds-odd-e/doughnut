@@ -149,9 +149,11 @@ function rebaseUnpublishedCommit(
 /**
  * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
  * unchanged, an eligible already-based unpublished commit stays unpublished, eligible
- * content-only divergence rebases (an empty remaining patch leaves local main at the accepted
- * head), and ancestor checkouts fast-forward. Imported objects do not install a remote or a
- * persistent remote ref.
+ * content-only, one ordinary-note addition, that addition plus one content save of the same
+ * note, or one two-note content edit over exactly one disjoint third-note content save
+ * divergence rebases (an empty remaining patch leaves local main at the accepted head), and
+ * ancestor checkouts fast-forward. Imported objects do not install a remote or a persistent
+ * remote ref.
  */
 export async function receiveAcceptedNotebookHead(
   directory: string,

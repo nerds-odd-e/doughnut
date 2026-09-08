@@ -10,6 +10,7 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
@@ -17,12 +18,13 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /**
  * Verifies that a one-child proposal of chosen local content, parented on an accepted web edit, is
- * accepted on the original learned identities — both when the web edit is a different note and when
- * it is the same learned note.
+ * accepted on the original learned identities — both when the web change is a different note and
+ * when it is the same learned note.
  */
 class NotebookGitLocalContentOverWebEditPublicationControllerTest
     extends NotebookGitWebContentControllerTestBase {
@@ -35,6 +37,8 @@ class NotebookGitLocalContentOverWebEditPublicationControllerTest
   private static final String WEB_CONTENT = "---\ntype: Note\n---\nweb edit";
   private static final String CHOSEN_CONTENT =
       "---\ntype: Note\nauthored: chosen\n---\nchosen resolution";
+
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
   void publishesLocalContentOfOneNoteOntoAnAcceptedWebEditOfAnother() throws Exception {

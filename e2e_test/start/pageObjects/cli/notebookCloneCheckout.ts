@@ -7,6 +7,8 @@ import { notebookCloneCheckoutRebaseObservations } from './notebookCloneCheckout
 import {
   commitNoteChangesAt,
   expectCanonicalTreeAt,
+  expectCheckoutFileAt,
+  expectCleanAcceptedHeadAt,
   notebookCloneCheckoutReceiver,
   runInstalledOn,
 } from './notebookCloneCheckoutReceiver'
@@ -56,7 +58,12 @@ function notebookCloneCheckout() {
     commitRelatedNoteChanges(
       files: { relativePath: string; content: string }[]
     ): Cypress.Chainable<null> {
-      return commitNoteChanges(files)
+      return commitNoteChanges(
+        files.map(({ relativePath, content }) => ({
+          relativePath,
+          content: content.replace(/\\n/g, '\n'),
+        }))
+      )
     },
     commitRemoval(relativePath: string): Cypress.Chainable<null> {
       return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
@@ -147,20 +154,13 @@ function notebookCloneCheckout() {
       )
     },
     expectProposalRetained(): Cypress.Chainable<null> {
-      return cy.get<string>('@cliCloneDestination').then((destination) => {
-        cy.get<string>('@cliNotebookPublishHead').then((head) => {
-          readCheckoutState().then((state) => {
-            expect(state.head).to.equal(head)
-            expect(state.status).to.equal('')
-          })
-        })
-        cy.get<{ relativePath: string; content: string }[]>(
-          '@cliNotebookProposalFiles'
-        ).each(({ relativePath, content }) => {
-          cy.readFile(`${destination}/${relativePath}`).should('equal', content)
-        })
-        return cy.wrap(null)
+      expectCleanAcceptedHeadAt('cliCloneDestination')
+      cy.get<{ relativePath: string; content: string }[]>(
+        '@cliNotebookProposalFiles'
+      ).each(({ relativePath, content }) => {
+        expectCheckoutFileAt('cliCloneDestination', relativePath, content)
       })
+      return cy.wrap(null)
     },
     expectCommittedHeadAccepted(): Cypress.Chainable<null> {
       return cy
@@ -181,13 +181,7 @@ function notebookCloneCheckout() {
       relativePath: string,
       content: string
     ): Cypress.Chainable<null> {
-      return cy.get<string>('@cliCloneDestination').then((destination) => {
-        cy.readFile(`${destination}/${relativePath}`).should(
-          'equal',
-          `${content}\n`
-        )
-        return cy.wrap(null)
-      })
+      return expectCheckoutFileAt('cliCloneDestination', relativePath, content)
     },
     /** Uses the system `git` executable (ADR 0002): one branch, one parentless commit, no dirt. */
     expectCleanSingleCommitCheckoutOnBranch(

@@ -1,20 +1,16 @@
 import { runSystemGitOrThrow } from './systemGit.js'
+import {
+  inspectAncestryFailure,
+  isOrdinaryNoteContentChange,
+  listCommitChanges,
+} from './notebookAcceptedCommitChanges.js'
+import { isEligibleBoundedAcceptedAdditionInterval } from './notebookAcceptedAdditionInterval.js'
 
-const REGULAR_FILE_MODE = '100644'
-
-interface CommitChange {
-  srcMode: string
-  dstMode: string
-  status: string
-  path: string
-}
-
-export function inspectAncestryFailure(
-  detail: string | undefined,
-  status: number | null
-): string {
-  return `failed to inspect local main's ancestry${detail ? `: ${detail}` : ` (exit code ${status})`}`
-}
+export {
+  inspectAncestryFailure,
+  isOrdinaryNoteContentChange,
+  listCommitChanges,
+} from './notebookAcceptedCommitChanges.js'
 
 export function listCommits(
   acceptedRepoDir: string,
@@ -34,53 +30,6 @@ export function listCommits(
   })
 }
 
-export function listCommitChanges(
-  acceptedRepoDir: string,
-  parent: string,
-  commit: string
-): CommitChange[] {
-  const raw = runSystemGitOrThrow(
-    [
-      '-C',
-      acceptedRepoDir,
-      '-c',
-      'diff.renames=false',
-      'diff-tree',
-      '-r',
-      '--raw',
-      '-z',
-      '--no-renames',
-      '--no-commit-id',
-      parent,
-      commit,
-    ],
-    inspectAncestryFailure
-  )
-  return parseDiffTreeRawZ(raw)
-}
-
-function isOrdinaryNotePath(changedPath: string): boolean {
-  if (!changedPath.endsWith('.md')) return false
-  const segments = changedPath.split('/')
-  if (
-    segments.some(
-      (segment) => segment === '' || segment === '.' || segment === '..'
-    )
-  ) {
-    return false
-  }
-  return segments[segments.length - 1] !== 'README.md'
-}
-
-export function isOrdinaryNoteContentChange(change: CommitChange): boolean {
-  return (
-    change.status === 'M' &&
-    change.srcMode === REGULAR_FILE_MODE &&
-    change.dstMode === REGULAR_FILE_MODE &&
-    isOrdinaryNotePath(change.path)
-  )
-}
-
 export function firstStructuralPathInAcceptedInterval(
   acceptedRepoDir: string,
   localParent: string,
@@ -93,6 +42,15 @@ export function firstStructuralPathInAcceptedInterval(
     '--not',
     localParent
   )
+  if (
+    isEligibleBoundedAcceptedAdditionInterval(
+      acceptedRepoDir,
+      localParent,
+      interval
+    )
+  ) {
+    return undefined
+  }
   for (const commit of interval) {
     for (const parent of commit.parents) {
       for (const change of listCommitChanges(
@@ -105,34 +63,4 @@ export function firstStructuralPathInAcceptedInterval(
     }
   }
   return undefined
-}
-
-function parseDiffTreeRawZ(output: string): CommitChange[] {
-  if (output === '') return []
-  const parts = output.split('\0')
-  if (parts[parts.length - 1] === '') parts.pop()
-  if (parts.length % 2 !== 0) {
-    throw new Error(
-      "failed to inspect local main's ancestry: malformed diff-tree output"
-    )
-  }
-  const changes: CommitChange[] = []
-  for (let i = 0; i < parts.length; i += 2) {
-    const meta = parts[i]
-    const path = parts[i + 1]
-    const match =
-      /^:(\d{6}) (\d{6}) ([0-9a-f]+) ([0-9a-f]+) ([A-Z][0-9]*)$/.exec(meta)
-    if (!match || path === undefined || path === '') {
-      throw new Error(
-        "failed to inspect local main's ancestry: malformed diff-tree output"
-      )
-    }
-    changes.push({
-      srcMode: match[1],
-      dstMode: match[2],
-      status: match[5],
-      path,
-    })
-  }
-  return changes
 }

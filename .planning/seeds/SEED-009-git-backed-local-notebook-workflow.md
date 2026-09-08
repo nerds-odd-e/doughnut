@@ -15,9 +15,13 @@ For a notebook owner using Obsidian or an AI IDE alongside Donut, supported
 local refinement and web editing should form a continuous workflow without
 manual copying, lost work, or learning history assigned to the wrong note.
 
-Clone, content publish/pull, local additions/deletion/reorganization, and bounded
-content rebase are delivered. The remaining problem is unsupported everyday
-changes interrupting that loop; a cleaner Git log alone does not close it.
+Clone, content publish/pull, local additions/deletion/reorganization, bounded
+content rebase, ordinary web note creation, and receiving one accepted addition
+beside one unpublished local content edit are delivered. The remaining problem
+is unsupported everyday changes interrupting that loop; a cleaner Git log
+alone does not close it. Story 17 now receives creation followed by one save
+beside one unpublished local edit. Pull still refuses a related two-note local
+revision, even though Story 14 can publish that revision on an unchanged base.
 The delivered scope below is planning evidence, not a fresh implementation audit
 or evidence of real-user frequency.
 
@@ -51,29 +55,25 @@ The product constraints established in the discussion are:
 
 ## Alternatives and Decision
 
-1. **Defer:** keep the delivered bounded workflow and tolerate extra immutable
-   autosave commits. Reasonable for history readability; it leaves common
-   notebook changes outside synchronization.
-2. **Smaller behavior change:** synchronize one ordinary web-created note,
-   starting from matching accepted state. Recommended first: it tests whether
-   adding knowledge in Donut can preserve the established local refinement loop
-   without taking on all structural operations or historical drift recovery.
-3. **Manual/existing-tool workflow:** create all new notes locally, synchronize
-   before editing, and publish existing-note edits separately. This is today's
-   strongest smaller alternative. It remains usable, but restricts where the
-   owner captures ideas and fragments a related AI-assisted revision. It does
-   not meet the established goal of working in both Donut and local tools.
+1. **Defer:** coordinate publication of a local batch before further web edits,
+   or reconcile manually when accepted history advances. This leaves the
+   supported batch-publication workflow interrupted by a disjoint web save.
+2. **Smaller behavior change:** keep a two-note local revision across one web
+   save of a third existing note (Story 18). Creation followed by one save is
+   already supported for one local edit; extending batches across structural
+   history is not required for this next outcome.
+3. **Edits-only multi-note publish:** delivered as Story 14, independent of
+   receiving additions. Story 11 already publishes mixed additions and edits.
 4. **Complete synchronization or web-commit batching:** defer the broad contract
    and readability polish. Neither is the smallest way to remove the next
    concrete interruption; batching already-accepted saves risks conflicting
    with immutable history unless its publication boundary is clarified.
 
-**Priority hypothesis:** first keep web note creation inside the synchronization
-loop, then allow one related local edits-only batch. This follows the established
-beneficiary and two-way workflow goal plus the owner's request to select new
-priorities. It is not a claim that usage data proves these are the most frequent
-failures. The first story tests whether owners can capture a new idea on the
-web and continue refining it locally without copying or blocking publication.
+**Priority hypothesis:** Stories 13, 16, 14, and 17 are delivered. Next selected
+remaining story is keeping a related local edit batch when the web changes a
+different note (Story 18). This follows the established beneficiary and two-way
+workflow goal. It is not a claim that usage data proves these are the most
+frequent failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
@@ -115,9 +115,10 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 - **Scope:** Changed durable saves of existing ordinary-note body/frontmatter at
   unchanged paths create immutable commits when the current Portable projection
   matches accepted main. Clean bound main checkouts can fast-forward accepted
-  history, including accepted structural changes. Web
-  creation/deletion/rename/move and notebook/folder README edits are not
-  synchronized; existing projection drift is neither absorbed nor repaired.
+  history, including accepted structural changes. Ordinary web note creation is
+  delivered in Story 13. Web deletion/rename/move and notebook/folder README
+  edits are not synchronized; existing projection drift is neither absorbed nor
+  repaired.
 
 <a id="story-4"></a>
 
@@ -188,7 +189,10 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   every accepted edge must qualify. Pull never publishes. The rebased edit is
   explicitly published onto the same identity. No multiple local commits/notes,
   structural edges, automatic stash, forced update, or drift repair. Story 9
-  extends this to same-note overlap.
+  extends this to same-note overlap. A later accepted addition of a different
+  note is a structural edge; receiving one such commit while unpublished local
+  work exists is delivered in Story 16. Creation followed by another web save
+  remains a multi-commit interval (Story 17), not this content-only rebase.
 
 <a id="story-9"></a>
 
@@ -225,6 +229,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   keep extra immutable commits if batching would rewrite accepted history.
 - **Boundary:** History granularity only; no structural sync or broader rebase.
   Define when a batch ends and becomes available before selecting this story.
+  Story 13 now appends one accepted commit at ordinary web creation and another
+  for each later durable save, so sequential-loop history is noisier; that is
+  not by itself a reason to select this story.
 
 <a id="story-11"></a>
 
@@ -237,8 +244,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 - **Scope:** One direct-child commit containing several additions, optionally
   with existing-note edits at unchanged paths, at root or represented folders.
   Accept all or none; additions get fresh identities and edits retain private
-  data. Edits-only batches, delete/move mixtures, new folders, README changes,
-  multiple unpublished commits, and divergence remain excluded.
+  data. Edits-only batches are delivered separately in Story 14. Delete/move
+  mixtures, new folders, README changes, multiple unpublished commits, and
+  divergence remain excluded.
 
 <a id="story-12"></a>
 
@@ -259,141 +267,48 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 13. Create a note on the web and continue refining it locally
 
-**Status:** queued; refined for slice planning.
+**Status:** delivered. Recover quick/062 from `4976553c20`.
 
-**Goal**
-
-A notebook owner can capture a new idea through Donut's ordinary web note
-creation flow, then refine that same note in Obsidian or an AI IDE and publish
-it back without manual copying or web creation leaving synchronization blocked.
-The new note keeps its Donut identity and any learning data acquired before the
-local refinement. This extends the sequential two-way workflow to web capture;
-it does not promise synchronization of every structural operation.
-
-**Scope**
-
-- Start with an existing Git-backed notebook whose current Portable tree
-  matches accepted `main`. Include an empty notebook whose accepted tree is
-  also empty. Use the existing authorized owner's ordinary web note-creation
-  flow; no synchronization activation or special creation command is required.
-- Create one fresh ordinary note at the notebook root or in an existing folder
-  represented in accepted history, including nested folders. Representation may
-  come from tracked descendants or a folder README; the destination does not
-  need its own README. The notebook root needs none.
-- Include normal title-first creation with an initially empty body. The newly
-  created note must already have a valid Portable representation under
-  [Accepted ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md);
-  do not require the owner to hand-author YAML before pulling it. Existing
-  title/path validation and advisory-name warnings still apply. Creation at
-  an occupied or reserved deleted-note destination is not a fresh creation.
-- Successful eligible creation adds the new note's canonical Markdown file in
-  one immutable commit after the current accepted head. Existing Portable
-  files remain unchanged. The web note and accepted history succeed together
-  or neither succeeds; a Git acceptance failure must not leave a visible new
-  note absent from accepted history. Earlier commit IDs remain unchanged.
-- Subsequent ordinary web body/frontmatter saves on that note use the delivered
-  content-save behavior. The owner may finish writing before pulling; receiving
-  creation plus later accepted content commits must work. No autosave batching
-  or new save/finalize interaction is part of this story.
-- From an authenticated, bound, clean local checkout on `main`, at or behind
-  the accepted head with no unpublished work or unfinished Git operation,
-  `donut notebook pull <directory>` receives the new file and accepted content.
-  Repeating pull against the same head is an unchanged success. Existing
-  readiness refusals continue to preserve dirty or divergent local work.
-- The owner edits the received note's body or valid authored frontmatter at
-  its unchanged path, makes one local commit, and explicitly uses
-  `donut notebook publish <directory>`. With no intervening remote advance or
-  projection drift, Donut displays the refinement on the same web-created
-  identity, retaining learning schedules/history and other private associations.
-  Existing notes and their private data are unaffected; no IDs or sync metadata
-  enter the Portable tree. Pull itself never publishes.
-- Reuse ordinary publication validation and safe stale-head/drift rejection;
-  a later remote change does not authorize overwrite or automatic retries.
-  Creation of a new path is a structural accepted edge: existing content-only
-  rebase does not thereby gain support for unpublished work across that edge.
-- This prevents drift from the included creation flow when starting state
-  matches. It does not reconcile earlier unsynchronized web content, reset
-  history, or silently absorb other projection differences. Outside the
-  eligible starting state, retain existing web behavior without claiming
-  synchronization or advancing accepted history to include unrelated drift.
-
-Excluded: new notebooks or folders, creation inside an unrepresented empty
-folder, notebook/folder README authoring, web delete/rename/move, restoring a
-deleted note or reusing its reserved path, relationship-note creation, bulk
-import, AI extraction and external-data-assisted creation, attachments, multiple
-unpublished commits, divergent receipt across additions, earlier drift repair,
-direct standard-Git remote access, and history batching. These are conservative
-scope boundaries for this refinement, not claims that those existing web
-features should be removed or disabled.
-
-**Key examples**
-
-1. **Capture, finish writing, refine locally.** A matching notebook has a clean
-   bound checkout. The owner creates `Ideas.md` on the web with a title and empty
-   body, then writes a paragraph through the normal editor. Pull receives valid
-   Markdown containing the paragraph. The owner revises it locally, commits,
-   and publishes; the same Donut note displays the revision and keeps a learning
-   tracker acquired before publication.
-2. **First note and nested placement.** In a matching empty notebook, create
-   `First.md` at the root and complete the same round trip. In a populated
-   notebook, creation under an existing represented `Topics/Science` folder
-   produces `Topics/Science/Gravity.md`; it neither creates parents nor changes
-   their identities or READMEs. These are destination variations of one outcome.
-3. **Creation cannot become an unsynchronized success.** Eligible creation
-   cannot accept its Git revision. The operation fails and neither a new note
-   nor a new accepted head remains. Existing notes/history stay intact. An
-   invalid or occupied title likewise does not advance accepted history.
-4. **Local work is not overwritten by receipt.** After web creation, the local
-   checkout has dirty files or an unpublished content commit. Pull retains that
-   work and follows the existing refusal/guidance; this story does not rebase
-   it across the new-note addition. A clean checkout can receive the addition.
-5. **Earlier drift is not repaired accidentally.** An unrelated unsupported web
-   change already makes the notebook differ from accepted history. Creating
-   another note does not bundle that earlier change into an accepted commit or
-   make pull/publication claim the notebook is synchronized. The round-trip
-   promise applies only from the matching starting state.
-
-**Effort hypothesis:** L — low confidence; assumes ordinary creation can join
-the established accepted-content workflow without redesigning the Portable
-profile. The limited inspection confirmed the existing creation entry point and
-restore branch; it did not establish implementation cost.
-
-**Depends on:** delivered Stories 1–4; no unfinished product prerequisite.
-
-**Safe stopping point:** Web capture participates in the sequential local/web
-loop even if all later synchronization stories are cancelled.
-
-**Open decisions:** None blocks this bounded ordinary-note journey. Supporting
-external-data-assisted creation, restore, unrepresented folders, or pre-existing
-drift would require revisiting scope; they are not implicit requirements here.
+- **Goal:** Capture a new ordinary note through Donut's web creation flow, then
+  refine that same identity locally and publish it without copying or blocking
+  synchronization.
+- **Scope:** Matching accepted Portable tree; one ordinary note at the root or
+  an existing represented folder (nested/README-only allowed). Title-only or
+  valid initial Markdown; creation and Git acceptance are atomic. Later ordinary
+  web saves, clean-main pull, one local content commit, and explicit publish
+  retain identity and private learning data. Unrepresented destinations,
+  Wikidata/relationship/assisted creation, earlier drift, and divergent receipt
+  across a creation followed by another web save stay unsynchronized. One
+  accepted addition beside one unpublished local content edit is Story 16.
+  No new UI or API shape.
 
 <a id="story-14"></a>
 
 ### 14. Publish a related batch of edits to existing notes
 
-**Status:** queued.
+**Status:** delivered.
 
-- **For / why:** An owner using an AI IDE revises several related notes and
-  wants to publish the coherent revision without manufacturing a new note or
-  splitting the work into separate publications.
-- **Evaluation:** With no remote advance, commit content edits to two or more
-  existing ordinary notes at unchanged paths in one local commit. Publish and
-  see the complete revision in Donut on the original identities; another clean
-  checkout receives it through pull.
-- **Value / learning:** Makes existing-note refinement usable as one related
-  change. Tests the value of multi-note authoring before multiple-commit history
-  or concurrent multi-note conflict policies.
-- **Effort hypothesis:** M — low confidence; assumes the delivered mixed
-  additions/edits behavior can extend to edits-only batches without new identity
-  policy. No code audit was used to estimate this.
-- **Depends on:** delivered Stories 2 and 11; independent of Story 13.
-- **Safe stopping point:** A sequential multi-note revision is useful on its
-  own. Accept all edits or none; invalid input or a stale head retains local
-  work, accepted history, and all remote note identities/private data.
-- **Boundary:** One direct-child commit, matching starting projection, valid
-  body/frontmatter edits at existing root or nested note paths. No structural
-  edits, README changes, multiple unpublished commits, or divergent batch rebase.
-  Existing additions-and-edits behavior remains separate delivered scope.
+- **Goal:** A notebook owner refining related notes in Obsidian or an AI IDE
+  can publish the revision together, without creating a dummy note or splitting
+  the edits into separate publications, while keeping each note's learning
+  history.
+- **Scope:** Use the existing CLI publication flow for exactly one unpublished
+  single-parent commit directly on accepted `main`, editing two or more existing
+  ordinary Markdown notes in one notebook. Paths stay unchanged, at the root or
+  in existing represented folders; edits use the already-supported valid body
+  and frontmatter. Clone success next-steps describe that one such commit may
+  edit one or more existing ordinary notes at unchanged paths, with the current
+  structural and pull limits. The starting Donut projection must match accepted
+  history, and remote `main` must not have advanced. Accept the authored commit
+  and all note edits together, preserving each identity and private learning
+  data. Another clean checkout can receive the accepted batch through ordinary
+  pull. Invalid input or a stale head refuses the whole publication, preserving
+  local work and leaving remote history and notes unchanged by the attempt.
+  Excludes additions, deletions, renames, moves, folder/README changes,
+  multiple unpublished commits, divergent batch rebase, or drift repair. No new
+  UI, commands, or identity policy. Delivered additions-and-edits publication
+  remains Story 11; receiving web additions beside unpublished work remains
+  Stories 16–17. A previously web-created note is simply an existing note here.
 
 <a id="story-15"></a>
 
@@ -421,6 +336,96 @@ drift would require revisiting scope; they are not implicit requirements here.
   folder relocation with unchanged bytes. No concurrent content change on the
   remote side, rename-with-edit, deletion, multiple moves, README authoring,
   unrepresented descendants, or general structural conflict resolution.
+  A plain accepted addition is delivered in Story 16; do not fold that receipt
+  into this folder-move story. Creation followed by another web save is a
+  different multi-commit interval (Story 17).
+
+<a id="story-16"></a>
+
+### 16. Keep a local note edit when accepted history adds a different note
+
+**Status:** delivered.
+
+- **Goal:** A notebook owner can receive a new web-created note while keeping one
+  committed, unpublished local refinement, then publish that refinement without
+  losing either note's identity or learning history.
+- **Scope:** Bound clean `main` with exactly one unpublished single-parent
+  content edit of one existing ordinary note; accepted history since the shared
+  base is exactly one single-parent commit adding one different ordinary note at
+  root or an already represented folder. Pull receives the addition and retains
+  the unpublished edit; explicit publish updates the original edited note and
+  preserves both identities and private learning data. Excludes dirty trees,
+  multiple local/remote commits or additions, accompanying remote edits,
+  collisions, moves, renames, deletes, README/new-folder changes, drift repair,
+  and creation followed by another web save.
+
+<a id="story-17"></a>
+
+### 17. Keep a local note edit when a web-created note is then saved
+
+**Status:** delivered. Recover quick/065 from `1675d58cb9`.
+
+- **Goal:** An owner with one committed local content refinement wants to
+  receive a note they captured on the web and immediately continued writing
+  before pulling, then publish the local refinement onto the same learned note.
+- **Scope:** One unpublished local existing-note content commit. Accepted
+  interval is exactly one ordinary-note addition of a different note (root or
+  already represented folder) plus one content save of that same new note at
+  its unchanged path. Pull retains the local edit and receives the saved note;
+  explicit publish updates the original edited note and preserves both
+  identities and private learning data. Excludes additional remote commits,
+  accompanying edits to other notes, two independent additions, new folders,
+  collisions, moves, deletes, README changes, dirty trees, multiple local
+  commits, and drift repair.
+
+<a id="story-18"></a>
+
+### 18. Keep a related local edit batch when the web changes a different note
+
+**Status:** refined; planned in [quick/066](../quick/066-local-edit-batch-rebase/PLAN.md).
+
+- **Goal:** An owner can retain one related local revision when a web edit to
+  a different note arrives, then publish the revision without splitting it.
+- **Scope:** One unpublished single-parent commit edits two existing ordinary
+  notes at unchanged root/nested paths; accepted history advances by exactly
+  one content-only save of a third existing note. Pull retains both local edits
+  over the accepted commit; explicit publish keeps all three note identities
+  and learning data. No overlap, additions, moves, README changes, multiple
+  local/remote commits, dirty trees, or drift repair.
+- **Key examples:** Commit edits to A and B locally; save C on the web; pull,
+  inspect all three contents, and explicitly publish the retained batch.
+  Preserve the accepted web commit ID; pull makes no publication request.
+- **Reminders from Story 17:** Local commit shape and accepted interval shape
+  are separate boundaries. Supporting two local edits here must not also admit
+  that batch across an addition, creation-then-save, or a move. Preserve the
+  delivered one-note receipt cases. Judge accepted edges, not only the final
+  tree; an extra remote commit remains outside this story even if its net
+  content looks equivalent to one save.
+- **Key boundary examples:** After pull, A and B remain together in one
+  unpublished child of the unchanged accepted C commit, with the original
+  local commit recoverable and server A/B unchanged. Explicit publish then
+  accepts the whole revision and retains all three identities and learning
+  data. A web save of A or B, an extra accepted commit, or a structural edge
+  is refused with local HEAD/files and accepted history unchanged.
+- **Boundary assumptions:** Exactly two locally edited notes and exactly one
+  accepted single-parent commit editing only C. Use a bound, clean `main`, valid
+  supported body/frontmatter, and a matching server projection. Three or more
+  locally edited notes and an already-based batch pull remain outside this
+  increment; existing batch publication on an unchanged base still works.
+  Repeat pull after the successful rebase is not added here. Keep the current
+  commands and update their existing guidance to describe this narrow case.
+- **Open questions:** None for this bounded story. Broader batch receipt and
+  conflict policy remain excluded rather than prerequisites.
+- **Value / learning:** Story 14 proves stale publication preserves the batch,
+  but current pull still rejects multi-note local work. Test the smallest
+  reconciliation of that newly supported revision, independently of structural
+  history. Publishing before web work avoids divergence only with advance
+  coordination; manually splitting the batch loses the related revision unit.
+- **Effort hypothesis:** M — low confidence; one disjoint web save bounds the
+  reconciliation. Revisit the boundary if conflict policy becomes necessary.
+- **Depends on:** Delivered Stories 8 and 14. Story 17 supplies regression
+  boundaries, not a structural-reconciliation prerequisite. Useful even if
+  broader batch rebase is deferred.
 
 ## Ordering and Scope Reduction
 
@@ -428,16 +433,14 @@ The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, select **13 → 14**: prevent web capture from interrupting the
-round trip, then support related local revisions. These are independent vertical
-outcomes, not technical prerequisites for each other. Keep **15 → 10** as
-unqueued candidates: folder-move divergence is consequential but narrower and
-has unresolved identity-policy risk; batching changes readability without
-unlocking synchronization. All four have a named owner and a result observable
-through ordinary tools and Donut, and include their complete user journey.
+Within this seed, **13**, **16**, **14**, and **17** are delivered. Remaining
+selected story is **18** (retain a local batch across a disjoint web save).
+Keep **15 → 10** as unqueued candidates: folder-move divergence is
+consequential but narrower and has unresolved identity-policy risk; batching
+changes readability without unlocking synchronization.
 
-First-to-drop order: **10, 15, 14, 13**. Stopping after either selected story
-leaves a useful supported workflow, with no preparation for another story.
+First-to-drop order among remaining items: **10, 15, 18**. Delivered batch
+publication stays useful even if batch reconciliation is deferred.
 
 Preserve these boundaries in future refinement:
 
@@ -454,9 +457,9 @@ Preserve these boundaries in future refinement:
 ## Open Decisions
 
 - **Priority assumption open to revision:** no real-user frequency evidence
-  ranks web capture, batch refinement, folder divergence, or history readability.
-  The recommended queue follows the established product goal; revise if the
-  owner's current workflow makes a different interruption dominant.
+  ranks batch reconciliation, folder divergence, or history readability.
+  Keep selected Story 18 next after Story 17 delivery, without displacing the
+  developer's concurrent-worktree priority.
 - **Story 15, before selection:** confirm same-identity correspondence and the
   refusal boundary for ambiguity; do not assume ordinary Git rename detection
   alone establishes Donut identity.
@@ -467,7 +470,7 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Refine queued Stories 13 and 14 in this seed before slice planning. Reconsider
+Refine queued Story 18 in this seed before slice planning. Reconsider
 15 when folder relocation blocks unpublished work, and 10 when history
 readability is an observed problem. This seed is non-executable; queue selection
 does not authorize implementation.

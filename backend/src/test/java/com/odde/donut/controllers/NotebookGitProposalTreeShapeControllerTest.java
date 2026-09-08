@@ -18,42 +18,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Verifies {@code publishNotebookGitProposal}'s tree-shape gating: a proposal that is not an
- * identical-heads no-op must change one regular Markdown note, include an addition among several
- * added or modified notes, delete exactly one ordinary note in isolation, or rename exactly one
- * ordinary note with unchanged content. Equal-content rename acceptance is covered in {@link
- * NotebookGitProposalRenameControllerTest}; filename-preserving relocation in {@link
- * NotebookGitProposalRelocationControllerTest}; combined parent-and-filename acceptance in {@link
- * NotebookGitProposalRelocateAndRenameControllerTest}.
+ * identical-heads no-op must change one or more ordinary Markdown notes (added and/or modified),
+ * delete exactly one ordinary note in isolation, or rename exactly one ordinary note with unchanged
+ * content. Edits-only acceptance of several existing notes is covered in {@link
+ * NotebookGitExistingNoteBatchPublicationControllerTest}. Equal-content rename acceptance is
+ * covered in {@link NotebookGitProposalRenameControllerTest}; filename-preserving relocation in
+ * {@link NotebookGitProposalRelocationControllerTest}; combined parent-and-filename acceptance in
+ * {@link NotebookGitProposalRelocateAndRenameControllerTest}.
  */
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
-
-  @Test
-  void rejectsSeveralExistingNoteEditsWithoutMutatingTheAcceptedBinding() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    makeMe.aNote().notebook(notebook).title("First").content(TYPED_NOTE_CONTENT).please();
-    makeMe.aNote().notebook(notebook).title("Second").content(TYPED_NOTE_CONTENT).please();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    String changed = "---\ntype: Note\n---\nchanged content";
-    byte[] proposal =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile("First.md", changed),
-                new NotebookGitProposalFile("Second.md", changed)));
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString("multiple changed files"));
-    assertThat(
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-            .map(note -> note.getContent())
-            .toList(),
-        equalTo(List.of(TYPED_NOTE_CONTENT, TYPED_NOTE_CONTENT)));
-  }
 
   @Test
   void acceptsAChangeToIndexMdJustLikeAnyOtherNote() throws Exception {

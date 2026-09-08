@@ -73,6 +73,32 @@ class NotebookRootNoteCreationWithWikidataTests extends NotebookControllerTestBa
       assertThat(response.getNote().getContent(), containsString("wikidata_id: Q12345"));
     }
 
+    @Test
+    void wikidataAssistedRootCreateDoesNotAdvanceAcceptedHead()
+        throws UnexpectedNoAccessRightException, InterruptedException, IOException {
+      NotebookCreationRequest request = new NotebookCreationRequest();
+      request.setNewTitle("Wikidata Git Notebook");
+      Notebook gitNotebook =
+          notebookRepository
+              .findById(controller.createNotebook(request).notebook().getId())
+              .orElseThrow();
+      NotebookGitBinding accepted =
+          notebookGitBindingRepository.findByNotebook_Id(gitNotebook.getId()).orElseThrow();
+      Mockito.when(httpClientAdapter.getResponseString(any()))
+          .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
+      NoteCreationDTO creation = new NoteCreationDTO();
+      creation.setNewTitle("Wikidata Root");
+      creation.setContent("---\nwikidata_id: Q12345\n---\n");
+
+      NoteRealm response = controller.createNoteAtNotebookRoot(gitNotebook, creation);
+
+      assertThat(response.getNote().getContent(), containsString("wikidata_id: Q12345"));
+      NotebookGitBinding after =
+          notebookGitBindingRepository.findByNotebook_Id(gitNotebook.getId()).orElseThrow();
+      assertThat(after.getAcceptedGitObjectId(), is(accepted.getAcceptedGitObjectId()));
+      assertThat(after.getBundleBytes(), equalTo(accepted.getBundleBytes()));
+    }
+
     @Nested
     class AddingNoteWithLocationWikidataId {
       String wikidataIdOfALocation = "Q334";

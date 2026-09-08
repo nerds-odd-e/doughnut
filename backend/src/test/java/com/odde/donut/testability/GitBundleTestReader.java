@@ -52,6 +52,18 @@ public final class GitBundleTestReader {
 
   public record SingleParentGitCommit(ObjectId head, ObjectId tree, ObjectId parent) {}
 
+  public static ObjectId blobIdAt(Repository repository, ObjectId commitId, String path)
+      throws IOException {
+    try (RevWalk revWalk = new RevWalk(repository);
+        TreeWalk treeWalk =
+            TreeWalk.forPath(repository, path, revWalk.parseCommit(commitId).getTree())) {
+      if (treeWalk == null) {
+        throw new IOException("missing path: " + path);
+      }
+      return treeWalk.getObjectId(0);
+    }
+  }
+
   public static List<String> pathsIn(Repository repository, ObjectId commitId) throws IOException {
     try (RevWalk revWalk = new RevWalk(repository);
         TreeWalk treeWalk = new TreeWalk(repository)) {
