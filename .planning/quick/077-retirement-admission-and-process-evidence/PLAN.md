@@ -88,35 +88,18 @@ invocation's gate on refusal. `allowRetired` unchanged.
 
 ### 2. Refuse retirement when a supported JVM cannot be located
 Type: Behavior
-Status: planned
+Status: done
 Proof: Public check and mutation commands given a supported JVM with relative
 classpath, no sessions/listeners, and unavailable cwd refuse visibly before
 marker/DROP. A positive peer cwd remains eligible; existing real disconnected
-orphan proof still refuses without killing the child. All uncertain-process
-and peer-preservation promises above map to this leaf.
+orphan proof still refuses without killing the child.
 
 Behavior: Supported backend JVM appears in process inspection but its relation
 to the checkout cannot be resolved → inspect or retire → refuse cleanup.
 
-Preserve the distinction between positively unrelated and unknown cwd evidence.
-Exercise the external lsof failure/partial-output path as well as the resulting
-public refusal, without exporting internal parsers for tests. Do not add polling
-or a supervisor; uncertain evidence may simply refuse and be retried manually.
-Keep genuine inspection failures visible. Update the current retirement guide
-only as necessary to explain this refusal.
-
-Focused verification: `CURSOR_DEV=true nix develop -c node --test
-scripts/worktree-retirement-checkout-processes.test.mjs
-scripts/worktree-retirement-evidence.test.mjs` plus the new public mutation
-refusal test in its owning suite. Use MySQL stand-ins for refusal proof; no
-real DROP is needed for an unchanged SQL path.
-
-Sizing: ~5–8 minutes, medium confidence; one evidence-classification loop.
-Focused real-JVM test runtime may exceed the coding estimate; record it
-separately. Apply the ten-minute decomposition gate to implementation work.
-
-Both leaves preserve independently useful corrections if subsequent work is
-cancelled.
+Learning: Supported JVM with neither command-line checkout path nor cwd map
+entry is uncertain evidence (refuse), not idle. Positively unrelated peer cwd
+stays eligible.
 
 ### 3. Describe the delivered database reclamation scope consistently
 Type: Behavior

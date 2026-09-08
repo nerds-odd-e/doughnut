@@ -85,7 +85,12 @@ async function listProcessTable({ execFileFn = execFileAsync } = {}) {
   return parseProcessTable(stdout)
 }
 
-async function listJavaWorkingDirectories(
+/**
+ * Working directories for Java PIDs via `lsof`. Exit code 1 is treated as a
+ * partial listing (common when some PIDs cannot be inspected); missing PIDs
+ * are absent from the map. Callers must treat absence as unknown, not idle.
+ */
+export async function listJavaWorkingDirectories(
   javaPids,
   { execFileFn = execFileAsync } = {}
 ) {
@@ -142,7 +147,10 @@ function inspectionFailure(kind, error) {
 /**
  * Bounded checkout-process vetoes for surviving supported backend JVMs.
  * Uses command-line and working-directory evidence. Empty ancestry walks are
- * not treated as clearance. Excludes the retirement process and its ancestors.
+ * not treated as clearance. A supported JVM whose checkout relation cannot be
+ * resolved (no command-line path and unavailable cwd) is uncertain evidence,
+ * not idle. Positively unrelated peer cwds remain eligible. Excludes the
+ * retirement process and its ancestors.
  */
 export async function inspectCheckoutBackendProcesses(
   checkoutRoot,
@@ -194,19 +202,27 @@ export async function inspectCheckoutBackendProcesses(
       checkoutRoot
     )
     const cwd = cwdByPid.get(row.pid)
-    const relatedByCwd =
-      typeof cwd === 'string' && cwd !== '' && isSameOrUnder(cwd, checkoutRoot)
-    if (!(relatedByCommand || relatedByCwd)) continue
+    const hasCwd = typeof cwd === 'string' && cwd !== ''
+    const relatedByCwd = hasCwd && isSameOrUnder(cwd, checkoutRoot)
 
-    if (isSupportedBackendJvmCommand(row.command)) {
-      vetoes.push(`surviving checkout backend JVM (pid ${row.pid})`)
+    if (relatedByCommand || relatedByCwd) {
+      if (isSupportedBackendJvmCommand(row.command)) {
+        vetoes.push(`surviving checkout backend JVM (pid ${row.pid})`)
+        continue
+      }
+      vetoes.push(
+        `ambiguous checkout JVM evidence (pid ${row.pid}; related by ${
+          relatedByCommand ? 'command-line' : 'working-directory'
+        })`
+      )
       continue
     }
-    vetoes.push(
-      `ambiguous checkout JVM evidence (pid ${row.pid}; related by ${
-        relatedByCommand ? 'command-line' : 'working-directory'
-      })`
-    )
+
+    if (isSupportedBackendJvmCommand(row.command) && !hasCwd) {
+      vetoes.push(
+        `uncertain checkout backend JVM evidence (pid ${row.pid}; working directory unavailable)`
+      )
+    }
   }
   return vetoes
 }
