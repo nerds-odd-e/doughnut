@@ -74,25 +74,44 @@ and single-spec allowlist still serve the supported workflow.
 
 ## Ordered slices and promise ownership
 
-### 1. Refuse health from unrelated application listeners
+Learnings (pre-execution refinement): Leaf 1 ownership seam has no health-time
+listener→owned-tree probe today (`getListenerPids` / owned pgid exist but are
+unused for health; control `/owner` is supervisor pid only). Split into
+Structure then Behavior so Cypress refusal reuses the same unhealthy result.
+
+### 1. Fail health when recorded endpoints are foreign listeners
+
+Type: Structure
+Status: planned
+Change: After a live control owner, `runSutHealthcheck` must reject when a
+recorded application endpoint's listener is not in the owned service process
+tree (reuse `getListenerPids` + owned pgid / published child identity; do not
+treat ordinary HTTP 200 as ownership). Preserve timely child-failure
+observation and owned cleanup; no second manager.
+Enables: Behavior 2 (Cypress / start readiness refuse before fixture reset).
+Proof: Extend `sut-isolated-start.test.mjs` (and health-focused cases as
+needed) with live owner + separately owned TCP/HTTP listeners on recorded
+ports → `ok: false`, foreign listener remains; owned listening stand-in still
+healthy. Focused:
+`CURSOR_DEV=true nix develop -c node --test scripts/sut-isolated-start.test.mjs`
+(and `scripts/sut-healthcheck.test.mjs` / `scripts/sut-services-child-exit.test.mjs`
+only if the owner/launch contract changes).
+Sizing: ~5–8 minutes.
+
+### 2. Cypress refuses before fixture reset on foreign endpoints
 
 Type: Behavior
 Status: planned
-Behavior: The control owner is live but an allocated endpoint belongs to an
-unrelated listener → health/start readiness or Cypress setup checks the stack
-→ it remains unhealthy and browser setup refuses before fixture reset.
-Proof: Extend command-boundary cases in `sut-isolated-start.test.mjs` with
-real separately owned listeners and a live supervisor; use actual endpoint
-ownership evidence, not another successful HTTP response. Observe unhealthy
-result, no Cypress reset, and the foreign listener remaining alive. A healthy
-owned stack must still pass. Focused `node --test` for affected SUT/Cypress
-cases; one real SUT smoke if ownership wiring changes the launch contract.
-Scope: Reuse the existing supervisor and runtime target. Preserve timely
-child-failure observation and owned cleanup; do not add a second manager.
-Sizing: ~5–10 minutes, low confidence on the ownership proof seam; refinement
-recommended before execution if that seam requires several implementation beats.
+Behavior: Live owner + foreign listeners on recorded ports → isolated Cypress
+`guardCypressNodeSetup` with real `runSutHealthcheck` → throws before fixture
+reset; foreign listener remains; healthy owned stack still passes. Start
+readiness inherits the same health result via `waitForSutHealthy`.
+Proof: Extend `isolated-cypress.test.mjs` using real health (not a stubbed
+`{ok:true}`); assert refuse-before-reset and listener alive.
+`CURSOR_DEV=true nix develop -c node --test scripts/isolated-cypress.test.mjs`
+Sizing: ~5 minutes.
 
-### 2. Refuse a present invalid database allocation
+### 3. Refuse a present invalid database allocation
 
 Type: Behavior
 Status: planned
@@ -105,7 +124,7 @@ Scope: Distinguish absent from invalid in the shared allocation validation
 before provisioning. No automatic database repair or fallback.
 Sizing: ~5 minutes, medium confidence; one command-boundary proof loop.
 
-### 3. Refuse a present invalid application-port allocation
+### 4. Refuse a present invalid application-port allocation
 
 Type: Behavior
 Status: planned
@@ -121,5 +140,5 @@ across start/health/Cypress. No renumbering or new service-port categories.
 Sizing: ~5 minutes, medium confidence; one validation/refusal proof loop.
 
 All commands use `CURSOR_DEV=true nix develop -c`. Execution includes normal
-local wrap-up per leaf. No implementation, commit, or push is authorized by
-this retrospective. Refinement recommended for leaf 1; not performed here.
+local wrap-up per leaf. Leaf 1 refined in place before execution (Structure →
+Behavior); leaves 3–4 unchanged from original 2–3.
