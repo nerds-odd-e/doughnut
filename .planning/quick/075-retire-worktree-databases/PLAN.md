@@ -145,10 +145,8 @@ at 10 if it fails to converge. No timing guarantee.
 
 ### 3. Coordinate runner admission with retirement
 Type: Structure
-Status: planned
-Proof: Existing public backend launch, SUT start/restart, and Cypress lease
-tests stay green; barrier fixtures show runner admission and a retirement gate
-cannot overlap. A seeded marker refuses before provisioning or launch.
+Status: done
+Proof: Admission suites `node --test scripts/worktree-retirement-admission.test.mjs scripts/backend-test-worktree-admission.test.mjs scripts/sut-retirement-admission.test.mjs scripts/worktree-retirement*.test.mjs scripts/sut-owner-application-group.test.mjs` (32/32); `pnpm test:backend-test-worktree` (74/74); `pnpm test:sut-start` (56/56); `pnpm test:sut-restart` (8/8). Gate/marker refuse before provision/launch; restart with retainOwnership skips gate; gate/marker gitignored.
 
 Internal change: add one small checkout admission/marker contract shared by
 the existing shell and Node entry points. Keep their existing lifetime ownership;

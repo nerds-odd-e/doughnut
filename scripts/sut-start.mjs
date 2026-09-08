@@ -47,6 +47,7 @@ import {
   writePidFile,
 } from './sut-start-spawn.mjs'
 import { initializeWorktreeIdentity } from './worktree-identity.mjs'
+import { holdRetirementAdmission } from './worktree-retirement-admission.mjs'
 
 export { LOG_FILE, PID_FILE, spawnSutServices, writePidFile }
 
@@ -105,101 +106,114 @@ export async function runSutStart({
   signal,
   attachCancelSignals = false,
 } = {}) {
-  if (
-    worktreeIsolationApplies(checkoutRoot) &&
-    readPresentWorktreeLocalConfig(checkoutRoot) === null
-  ) {
-    initializeWorktreeIdentity(checkoutRoot)
-  }
-  refuseUnsupportedIsolatedBrowserCommand({
-    checkoutRoot,
-    command: 'pnpm sut',
-  })
-  if (worktreeIsolationApplies(checkoutRoot)) {
-    ensureIsolatedE2eDatabase(checkoutRoot, {
-      mysqlExecFn,
-      schemaExistsFn,
-      log,
-    })
-    await ensureIsolatedE2ePorts(checkoutRoot, { claimRoot: portClaimRoot })
-  }
-  const { isolated, target } = resolveSutCheckoutTarget({
-    checkoutRoot,
-    runtimeTarget,
-  })
-  let owner
-  let child
-  let effectiveSignal = signal
-  let detachCancelSignals = () => undefined
-  if (isolated) {
-    refuseConflictingSutOverrides(process.env, target)
-    assertE2eDatabaseExists(target.database, { existsFn: databaseExistsFn })
-    if (retainOwnership) {
-      owner = await readHeldSutOwner(checkoutRoot)
-    } else {
-      await assertNoLiveSutOwner(checkoutRoot)
-      await assertAllocatedPortsFree(
-        target,
-        isPortOccupiedFn ?? defaultIsPortOccupied
-      )
-      owner = await claimSutOwnership(checkoutRoot)
-    }
-    log(`Selected database: ${target.database}`)
-    log(`Browser origin: ${isolatedBrowserOrigin(target)}`)
-    if (!effectiveSignal && attachCancelSignals) {
-      const controller = new AbortController()
-      effectiveSignal = controller.signal
-      const onCancel = () => controller.abort()
-      process.once('SIGINT', onCancel)
-      process.once('SIGTERM', onCancel)
-      detachCancelSignals = () => {
-        process.off('SIGINT', onCancel)
-        process.off('SIGTERM', onCancel)
-      }
-    }
-  }
-  const releaseIfOwned = async () => {
-    if (!owner) return
-    await releaseFailedIsolatedStart({ child, checkoutRoot })
-    owner = undefined
-  }
+  // Retained-owner restart already holds SUT ownership; do not take the gate again.
+  const releaseAdmissionIfHeld =
+    worktreeIsolationApplies(checkoutRoot) && !retainOwnership
+      ? holdRetirementAdmission(checkoutRoot)
+      : () => undefined
   try {
-    if (isolated && retainOwnership) {
-      await assertAllocatedPortsFree(
-        target,
-        isPortOccupiedFn ?? defaultIsPortOccupied
-      )
+    if (
+      worktreeIsolationApplies(checkoutRoot) &&
+      readPresentWorktreeLocalConfig(checkoutRoot) === null
+    ) {
+      initializeWorktreeIdentity(checkoutRoot)
     }
-    log(`Starting SUT services... (log: ${logFile})`)
-    const spawned = spawnSutServices({
-      spawnFn,
-      logFile,
-      runtimeTarget: target,
-      owner,
+    refuseUnsupportedIsolatedBrowserCommand({
       checkoutRoot,
+      command: 'pnpm sut',
     })
-    child = spawned.child
-    await writePidFile(child.pid, { pidFile })
+    if (worktreeIsolationApplies(checkoutRoot)) {
+      ensureIsolatedE2eDatabase(checkoutRoot, {
+        mysqlExecFn,
+        schemaExistsFn,
+        log,
+      })
+      await ensureIsolatedE2ePorts(checkoutRoot, { claimRoot: portClaimRoot })
+    }
+    const { isolated, target } = resolveSutCheckoutTarget({
+      checkoutRoot,
+      runtimeTarget,
+    })
+    let owner
+    let child
+    let effectiveSignal = signal
+    let detachCancelSignals = () => undefined
+    if (isolated) {
+      refuseConflictingSutOverrides(process.env, target)
+      assertE2eDatabaseExists(target.database, { existsFn: databaseExistsFn })
+      if (retainOwnership) {
+        owner = await readHeldSutOwner(checkoutRoot)
+      } else {
+        await assertNoLiveSutOwner(checkoutRoot)
+        await assertAllocatedPortsFree(
+          target,
+          isPortOccupiedFn ?? defaultIsPortOccupied
+        )
+        owner = await claimSutOwnership(checkoutRoot)
+      }
+      releaseAdmissionIfHeld()
+      log(`Selected database: ${target.database}`)
+      log(`Browser origin: ${isolatedBrowserOrigin(target)}`)
+      if (!effectiveSignal && attachCancelSignals) {
+        const controller = new AbortController()
+        effectiveSignal = controller.signal
+        const onCancel = () => controller.abort()
+        process.once('SIGINT', onCancel)
+        process.once('SIGTERM', onCancel)
+        detachCancelSignals = () => {
+          process.off('SIGINT', onCancel)
+          process.off('SIGTERM', onCancel)
+        }
+      }
+    } else {
+      releaseAdmissionIfHeld()
+    }
+    const releaseIfOwned = async () => {
+      if (!owner) return
+      await releaseFailedIsolatedStart({ child, checkoutRoot })
+      owner = undefined
+    }
+    try {
+      if (isolated && retainOwnership) {
+        await assertAllocatedPortsFree(
+          target,
+          isPortOccupiedFn ?? defaultIsPortOccupied
+        )
+      }
+      log(`Starting SUT services... (log: ${logFile})`)
+      const spawned = spawnSutServices({
+        spawnFn,
+        logFile,
+        runtimeTarget: target,
+        owner,
+        checkoutRoot,
+      })
+      child = spawned.child
+      await writePidFile(child.pid, { pidFile })
 
-    const { exitCode } = await waitForSutHealthy({
-      child,
-      timeoutMs,
-      pollMs,
-      logFile,
-      log,
-      errLog,
-      healthcheckFn,
-      runtimeTarget: target,
-      checkoutRoot,
-      signal: effectiveSignal,
-    })
-    if (exitCode !== 0) await releaseIfOwned()
-    return exitCode
+      const { exitCode } = await waitForSutHealthy({
+        child,
+        timeoutMs,
+        pollMs,
+        logFile,
+        log,
+        errLog,
+        healthcheckFn,
+        runtimeTarget: target,
+        checkoutRoot,
+        signal: effectiveSignal,
+      })
+      if (exitCode !== 0) await releaseIfOwned()
+      return exitCode
+    } catch (error) {
+      await releaseIfOwned()
+      throw error
+    } finally {
+      detachCancelSignals()
+    }
   } catch (error) {
-    await releaseIfOwned()
+    releaseAdmissionIfHeld()
     throw error
-  } finally {
-    detachCancelSignals()
   }
 }
 
