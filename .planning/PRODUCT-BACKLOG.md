@@ -29,6 +29,7 @@ remain deferred.
 4. [Run CLI E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
 5. [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
 6. [Keep a local note edit when a web-created note is then saved](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-17) — SEED-009
+7. [Keep a related local edit batch when the web changes a different note](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-18) — SEED-009
 
 ## Recently done
 
