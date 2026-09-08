@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–9 done, slices 10–13 planned.
+Status: in progress; slices 1–10 done, slices 11–13 planned.
 
 ## Goal and scope
 
@@ -396,11 +396,13 @@ Move only the identity initialization seam, not the complete backend launcher.
 ### 10. Prepare the E2E database on first SUT use of an existing identity
 
 Type: Behavior
-Status: planned
-Proof: Ordinary SUT start with an existing identity and selected ports but no
-E2E database allocates its new DB, migrates and serves its marker. Boundary
-cases observe collision/preparation failure without adopting existing data;
-two same-checkout starts publish one complete allocation.
+Status: done
+Proof: `pnpm test:sut-start` (first-use provision, collision, prep failure, one
+allocation from two starts, identity-only refusal, missing recorded DB).
+`pnpm test:browser-worktree-isolation` (identity+ports without DB is start
+first-use; health/restart/Cypress still need complete allocation). Ordinary
+start served inject_notes marker on `doughnut_e2e_wt_s107f0f1008`; unit
+sentinels on `doughnut_test` / `doughnut_e2e_test` unchanged.
 
 Behavior: A configured identity has no recorded completed E2E database setup →
 `pnpm sut` → a new identity-derived database is prepared and the app starts.
@@ -555,6 +557,11 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   the gradle run, provisions the unit DB, then publishes identity-only JSON.
   `INPUT_DB_URL` is not a backend-test override. First-use still publishes only
   after unit-DB provisioning succeeds.
+- Slice 10: first `pnpm sut` with identity + ports and no recorded E2E database
+  CREATE/GRANTs `doughnut_e2e_<id>` (no IF NOT EXISTS) and records it only after
+  success. Collision and missing recorded DB refuse without adoption. Manual
+  CREATE DATABASE steps were removed from the browser-tests guide; ports stay
+  manual until leaf 12.
 - Main CI run 34176547886 (SHA `4c604a88`, Frontend Unit Tests 2/2 failed in
   `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
   an ancestor of HEAD; concurrent main work. `origin/main` later moved to

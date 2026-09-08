@@ -64,51 +64,85 @@ const SUPPORTED_ISOLATED_SUT_COMMANDS = new Set([
   'pnpm sut:restart',
 ])
 
+const E2E_PORT_FIELDS = ['backendPort', 'vitePort', 'lbListenPort']
 const E2E_ALLOCATION_FIELDS = [
   'e2e.database',
-  'e2e.backendPort',
-  'e2e.vitePort',
-  'e2e.lbListenPort',
+  ...E2E_PORT_FIELDS.map((field) => `e2e.${field}`),
 ]
 
-function missingAllocationError(checkoutRoot, missing) {
+export function isRecordedE2eDatabase(database) {
+  return typeof database === 'string' && /^[A-Za-z0-9_]+$/.test(database)
+}
+
+function collectMissingE2ePorts(e2e) {
+  if (!e2e || typeof e2e !== 'object') {
+    return E2E_PORT_FIELDS.map((field) => `e2e.${field}`)
+  }
+  const missing = []
+  for (const field of E2E_PORT_FIELDS) {
+    if (!Number.isInteger(e2e[field]) || e2e[field] <= 0) {
+      missing.push(`e2e.${field}`)
+    }
+  }
+  return missing
+}
+
+function allocationError(checkoutRoot, missing, { start } = {}) {
   const configPath = worktreeLocalConfigPath(checkoutRoot)
+  const needed = start
+    ? 'identity and application ports in'
+    : 'a complete E2E allocation in'
+  const fields = start
+    ? '(id, e2e.backendPort, e2e.vitePort, e2e.lbListenPort)'
+    : '(id, e2e.database, e2e.backendPort, e2e.vitePort, e2e.lbListenPort)'
   return new Error(
-    `Isolated worktree SUT needs a complete E2E allocation in ${configPath} ` +
-      '(id, e2e.database, e2e.backendPort, e2e.vitePort, e2e.lbListenPort). ' +
+    `Isolated worktree SUT needs ${needed} ${configPath} ${fields}. ` +
       `Missing or invalid: ${missing.join(', ')}. See docs/worktree-browser-tests.md.`
   )
 }
 
-export function loadCompleteIsolatedE2eAllocation(checkoutRoot) {
+function readRequiredWorktreeConfig(
+  checkoutRoot,
+  missingWhenAbsent,
+  errorOpts
+) {
   const configPath = worktreeLocalConfigPath(checkoutRoot)
   if (!isRegularFile(configPath)) {
-    throw missingAllocationError(checkoutRoot, [
-      'identity (.worktree.local.json)',
-      ...E2E_ALLOCATION_FIELDS,
-    ])
+    throw allocationError(checkoutRoot, missingWhenAbsent, errorOpts)
   }
   const config = readWorktreeLocalConfig(checkoutRoot)
   assertValidWorktreeId(config.id)
-  const e2e = config.e2e
-  const missing = []
-  if (!e2e || typeof e2e !== 'object') {
-    missing.push(...E2E_ALLOCATION_FIELDS)
-  } else {
-    if (
-      typeof e2e.database !== 'string' ||
-      !/^[A-Za-z0-9_]+$/.test(e2e.database)
-    ) {
-      missing.push('e2e.database')
-    }
-    for (const field of ['backendPort', 'vitePort', 'lbListenPort']) {
-      if (!Number.isInteger(e2e[field]) || e2e[field] <= 0) {
-        missing.push(`e2e.${field}`)
-      }
-    }
-  }
+  return config
+}
+
+export function loadIsolatedE2eStartAllocation(checkoutRoot) {
+  const config = readRequiredWorktreeConfig(
+    checkoutRoot,
+    [
+      'identity (.worktree.local.json)',
+      ...E2E_PORT_FIELDS.map((field) => `e2e.${field}`),
+    ],
+    { start: true }
+  )
+  const missing = collectMissingE2ePorts(config.e2e)
   if (missing.length > 0) {
-    throw missingAllocationError(checkoutRoot, missing)
+    throw allocationError(checkoutRoot, missing, { start: true })
+  }
+  return config
+}
+
+export function loadCompleteIsolatedE2eAllocation(checkoutRoot) {
+  const config = readRequiredWorktreeConfig(checkoutRoot, [
+    'identity (.worktree.local.json)',
+    ...E2E_ALLOCATION_FIELDS,
+  ])
+  const missing = []
+  if (!isRecordedE2eDatabase(config.e2e?.database)) {
+    missing.push('e2e.database')
+  }
+  missing.push(...collectMissingE2ePorts(config.e2e))
+  if (missing.length > 0) {
+    throw allocationError(checkoutRoot, missing)
   }
   return config
 }
@@ -119,6 +153,10 @@ export function refuseUnsupportedIsolatedBrowserCommand({
 }) {
   readPresentWorktreeLocalConfig(checkoutRoot)
   if (!worktreeIsolationApplies(checkoutRoot)) {
+    return
+  }
+  if (command === 'pnpm sut') {
+    loadIsolatedE2eStartAllocation(checkoutRoot)
     return
   }
   if (SUPPORTED_ISOLATED_SUT_COMMANDS.has(command)) {

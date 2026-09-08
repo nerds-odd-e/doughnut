@@ -2,11 +2,20 @@ import { spawn } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import http from 'node:http'
 import net from 'node:net'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { claimSutOwnership, startSutOwnerControl } from './sut-owner.mjs'
 import { healthyOnce } from './sut-start-fixtures.mjs'
 import { runSutStart } from './sut-start.mjs'
+
+export const identityAndPortsConfig = {
+  id: 'wt_a7c2',
+  e2e: {
+    backendPort: 19081,
+    vitePort: 15174,
+    lbListenPort: 15173,
+  },
+}
 
 export const completeIsolatedConfig = {
   id: 'wt_a7c2',
@@ -25,6 +34,12 @@ export function writeIsolatedConfig(
   writeFileSync(
     path.join(checkoutRoot, '.worktree.local.json'),
     JSON.stringify(config)
+  )
+}
+
+export function readIsolatedConfig(checkoutRoot) {
+  return JSON.parse(
+    readFileSync(path.join(checkoutRoot, '.worktree.local.json'), 'utf8')
   )
 }
 
@@ -103,6 +118,8 @@ export async function runConfiguredStart(checkoutRoot, spawn, extra = {}) {
     errLog: extra.errLog ?? (() => undefined),
     healthcheckFn: extra.healthcheckFn ?? healthyOnce,
     databaseExistsFn: extra.databaseExistsFn ?? (() => true),
+    mysqlExecFn: extra.mysqlExecFn,
+    schemaExistsFn: extra.schemaExistsFn,
     signal: extra.signal,
     ...(extra.isPortOccupiedFn
       ? { isPortOccupiedFn: extra.isPortOccupiedFn }

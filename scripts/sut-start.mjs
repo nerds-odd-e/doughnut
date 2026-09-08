@@ -17,7 +17,11 @@
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
+import {
+  refuseUnsupportedIsolatedBrowserCommand,
+  worktreeIsolationApplies,
+} from './browser-worktree-isolation.mjs'
+import { ensureIsolatedE2eDatabase } from './sut-e2e-database.mjs'
 import { checkTcpPort } from './sut-healthcheck.mjs'
 import {
   assertAllocatedPortsFree,
@@ -68,6 +72,8 @@ async function releaseFailedIsolatedStart({ child, checkoutRoot }) {
  *   checkoutRoot?: string,
  *   runtimeTarget?: object,
  *   databaseExistsFn?: (database: string) => boolean,
+ *   mysqlExecFn?: typeof import('node:child_process').execFileSync,
+ *   schemaExistsFn?: (database: string) => boolean,
  *   isPortOccupiedFn?: (port: number) => Promise<boolean>,
  *   retainOwnership?: boolean,
  *   signal?: AbortSignal,
@@ -87,6 +93,8 @@ export async function runSutStart({
   checkoutRoot = repoRoot,
   runtimeTarget,
   databaseExistsFn,
+  mysqlExecFn,
+  schemaExistsFn,
   isPortOccupiedFn,
   retainOwnership = false,
   signal,
@@ -96,6 +104,13 @@ export async function runSutStart({
     checkoutRoot,
     command: 'pnpm sut',
   })
+  if (worktreeIsolationApplies(checkoutRoot)) {
+    ensureIsolatedE2eDatabase(checkoutRoot, {
+      mysqlExecFn,
+      schemaExistsFn,
+      log,
+    })
+  }
   const { isolated, target } = resolveSutCheckoutTarget({
     checkoutRoot,
     runtimeTarget,

@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import { EventEmitter } from 'node:events'
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
@@ -7,82 +6,26 @@ import {
   makeLinkedWorktreeCheckout,
   makePrimaryCheckout,
 } from './backend-test-worktree-linked-fixtures.mjs'
-import { guardCypressNodeSetup } from './isolated-cypress.mjs'
-import { runSutHealthcheck } from './sut-healthcheck.mjs'
-import { completeIsolatedConfig } from './sut-isolated-fixtures.mjs'
+import {
+  incompleteAllocation,
+  isolatedCypressSpec,
+  makeRestartSpies,
+  malformedJson,
+  runHealth,
+  runStart,
+  withCiEnv,
+} from './browser-worktree-isolation-fixtures.mjs'
+import { loadIsolatedE2eStartAllocation } from './browser-worktree-isolation.mjs'
+import {
+  guardCypressNodeSetup,
+  SUPPORTED_ISOLATED_CYPRESS_SPEC,
+} from './isolated-cypress.mjs'
+import {
+  completeIsolatedConfig,
+  identityAndPortsConfig,
+} from './sut-isolated-fixtures.mjs'
 import { runSutRestart } from './sut-restart.mjs'
-import { healthyOnce, makeStartSpy } from './sut-start-fixtures.mjs'
-import { runSutStart } from './sut-start.mjs'
-
-const isolatedCypressSpec = /only supports|spec selection/i
-const malformedJson = /not valid JSON/i
-const incompleteAllocation = /complete E2E allocation|Missing or invalid/i
-
-function makeRestartSpies() {
-  const lsofCalls = []
-  const spawnCalls = []
-  return {
-    lsofCalls,
-    spawnCalls,
-    execFileFn: (cmd, args, cb) => {
-      lsofCalls.push({ cmd, args })
-      cb({ code: 1 }, '')
-    },
-    spawnFn: (...args) => {
-      spawnCalls.push(args)
-      const child = new EventEmitter()
-      queueMicrotask(() => child.emit('close', 0))
-      return child
-    },
-  }
-}
-
-function trackingHealthChecks(accessed) {
-  return [
-    {
-      get service() {
-        accessed.push('service')
-        return 'mountebank'
-      },
-      host: '127.0.0.1',
-      port: 1,
-    },
-  ]
-}
-
-async function runStart(checkoutRoot, spawn) {
-  return runSutStart({
-    checkoutRoot,
-    spawnFn: spawn.spawnFn,
-    logFile: path.join(checkoutRoot, 'sut.log'),
-    pidFile: path.join(checkoutRoot, 'sut.pid'),
-    timeoutMs: 5_000,
-    pollMs: 50,
-    log: () => undefined,
-    errLog: () => undefined,
-    healthcheckFn: healthyOnce,
-  })
-}
-
-async function runHealth(checkoutRoot, logs, accessed) {
-  return runSutHealthcheck({
-    checkoutRoot,
-    tcpChecks: trackingHealthChecks(accessed),
-    log: (line) => logs.push(line),
-  })
-}
-
-function withCiEnv(t) {
-  const previous = process.env.CI
-  process.env.CI = 'true'
-  t.after(() => {
-    if (previous === undefined) {
-      delete process.env.CI
-    } else {
-      process.env.CI = previous
-    }
-  })
-}
+import { makeStartSpy } from './sut-start-fixtures.mjs'
 
 test('unconfigured primary and CI keep shared SUT and Cypress defaults', async (t) => {
   withCiEnv(t)
@@ -152,6 +95,57 @@ test('configured primary and linked checkouts refuse before shared-state effects
     }, isolatedCypressSpec)
     assert.equal(hooks.reset, false)
   }
+})
+
+test('identity and ports without E2E database still refuse health, restart, and Cypress', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(identityAndPortsConfig),
+  })
+  assert.deepEqual(
+    loadIsolatedE2eStartAllocation(checkout.root).e2e,
+    identityAndPortsConfig.e2e
+  )
+
+  const healthLogs = []
+  const healthAccessed = []
+  await assert.rejects(
+    runHealth(checkout.root, healthLogs, healthAccessed),
+    incompleteAllocation
+  )
+  assert.equal(healthLogs.length, 0)
+  assert.equal(healthAccessed.length, 0)
+
+  const restart = makeRestartSpies()
+  await assert.rejects(
+    runSutRestart({
+      checkoutRoot: checkout.root,
+      execFileFn: restart.execFileFn,
+      spawnFn: restart.spawnFn,
+      log: () => undefined,
+    }),
+    incompleteAllocation
+  )
+  assert.equal(restart.lsofCalls.length, 0)
+  assert.equal(restart.spawnCalls.length, 0)
+
+  const hooks = { reset: false }
+  await assert.rejects(async () => {
+    await guardCypressNodeSetup(
+      checkout.root,
+      { specPattern: SUPPORTED_ISOLATED_CYPRESS_SPEC },
+      {
+        argv: [
+          'node',
+          'cypress',
+          'run',
+          '--spec',
+          SUPPORTED_ISOLATED_CYPRESS_SPEC,
+        ],
+      }
+    )
+    hooks.reset = true
+  }, incompleteAllocation)
+  assert.equal(hooks.reset, false)
 })
 
 test('malformed isolation JSON refuses clearly before shared-state effects', async (t) => {
