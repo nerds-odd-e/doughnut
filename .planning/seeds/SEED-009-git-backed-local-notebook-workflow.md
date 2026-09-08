@@ -296,12 +296,14 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   single-parent commit directly on accepted `main`, editing two or more existing
   ordinary Markdown notes in one notebook. Paths stay unchanged, at the root or
   in existing represented folders; edits use the already-supported valid body
-  and frontmatter. The starting Donut projection must match accepted history,
-  and remote `main` must not have advanced. Accept the authored commit and all
-  note edits together, preserving each identity and private learning data.
-  Another clean checkout can receive the accepted batch through ordinary pull.
-  Invalid input or a stale head refuses the whole publication, preserving local
-  work and leaving remote history and notes unchanged by the attempt.
+  and frontmatter. Clone success next-steps describe that one such commit may
+  edit one or more existing ordinary notes at unchanged paths, with the current
+  structural and pull limits. The starting Donut projection must match accepted
+  history, and remote `main` must not have advanced. Accept the authored commit
+  and all note edits together, preserving each identity and private learning
+  data. Another clean checkout can receive the accepted batch through ordinary
+  pull. Invalid input or a stale head refuses the whole publication, preserving
+  local work and leaving remote history and notes unchanged by the attempt.
   Excludes additions, deletions, renames, moves, folder/README changes,
   multiple unpublished commits, divergent batch rebase, or drift repair. No new
   UI, commands, or identity policy. Delivered additions-and-edits publication

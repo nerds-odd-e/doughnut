@@ -72,7 +72,12 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
 
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        'one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, a single edited Markdown note, one isolated equal-content Markdown note remove/add pair that may change folder and/or filename, one isolated Markdown note deletion that leaves existing links authored, or one complete same-name subtree whose source has its own accepted README, every active descendant is represented, the destination parent already exists in accepted history, and bytes, modes, and relative paths stay unchanged; creating a new or unrepresented folder, overwriting an existing note, and relocating or renaming together with a content edit in the same commit, are not supported yet. To preserve note identity, commit and publish the unchanged relocation or rename, wait for it to be accepted, then edit and separately commit and publish the content change. Authored referring links are not rewritten by a relocation or rename, so links to the old path may no longer resolve. Do not delete and recreate the note. Use the notebook root or existing folders represented in accepted history.'
+        'one or more edited existing ordinary Markdown notes at unchanged paths'
+      )
+    )
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'creating a new or unrepresented folder, overwriting an existing note, and relocating or renaming together with a content edit in the same commit, are not supported yet'
       )
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
