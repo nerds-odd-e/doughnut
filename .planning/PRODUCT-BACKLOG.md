@@ -4,10 +4,12 @@
 
 Let notebook owners refine notes in Obsidian or an AI IDE and Donut without
 discarding either side's work or losing learning history. Web note creation in
-the sequential loop is delivered. Next selected SEED-009 story is related edits
-to several existing notes in one local commit. Content rebase and bounded local
-note/folder reorganization are delivered. Reconciliation across folder moves and
-web autosave batching remain unqueued candidates in SEED-009. This advances
+the sequential loop is delivered. Next selected SEED-009 story is keeping one
+unpublished local content edit when accepted history adds a different note,
+then related edits to several existing notes in one local commit. Content rebase
+and bounded local note/folder reorganization are delivered. Reconciliation
+across folder moves and web autosave batching remain unqueued candidates in
+SEED-009. This advances
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
 without claiming its complete synchronization contract.
 Enable developers and AI tasks to verify changes concurrently in local
@@ -26,7 +28,8 @@ remain deferred.
 3. [Reclaim databases from retired worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-6) — SEED-015
 4. [Run CLI E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
 5. [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
-6. [Publish a related batch of edits to existing notes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-14) — SEED-009
+6. [Keep a local note edit when accepted history adds a different note](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-16) — SEED-009
+7. [Publish a related batch of edits to existing notes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-14) — SEED-009
 
 ## Recently done
 

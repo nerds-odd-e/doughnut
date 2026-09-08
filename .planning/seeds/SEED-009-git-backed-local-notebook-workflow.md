@@ -18,7 +18,9 @@ manual copying, lost work, or learning history assigned to the wrong note.
 Clone, content publish/pull, local additions/deletion/reorganization, bounded
 content rebase, and ordinary web note creation into the sequential loop are
 delivered. The remaining problem is unsupported everyday changes interrupting
-that loop; a cleaner Git log alone does not close it.
+that loop; a cleaner Git log alone does not close it. Story 13 made one
+interruption live: pull still refuses a plain accepted addition when unpublished
+local work exists.
 The delivered scope below is planning evidence, not a fresh implementation audit
 or evidence of real-user frequency.
 
@@ -52,25 +54,24 @@ The product constraints established in the discussion are:
 
 ## Alternatives and Decision
 
-1. **Defer:** keep the delivered bounded workflow and tolerate extra immutable
-   autosave commits. Reasonable for history readability; it leaves common
-   notebook changes outside synchronization.
-2. **Smaller behavior change:** synchronize one ordinary web-created note,
-   starting from matching accepted state. Recommended first: it tests whether
-   adding knowledge in Donut can preserve the established local refinement loop
-   without taking on all structural operations or historical drift recovery.
-3. **Manual/existing-tool workflow:** create all new notes locally, synchronize
-   before editing, and publish existing-note edits separately. This is today's
-   strongest smaller alternative. It remains usable, but restricts where the
-   owner captures ideas and fragments a related AI-assisted revision. It does
-   not meet the established goal of working in both Donut and local tools.
+1. **Defer:** keep the delivered sequential loop and require a clean checkout
+   before pulling a web-created note. Usable, but it forces the owner to publish
+   or stash local work before receiving a capture made in Donut.
+2. **Smaller behavior change:** keep one unpublished local content edit when
+   accepted history adds a different ordinary note. Recommended next: it removes
+   the interruption Story 13 just enabled, without opening folder-move
+   divergence or commit batching.
+3. **Edits-only multi-note publish:** still valuable for related local
+   revisions, and independent of receiving additions. Story 11 already publishes
+   mixed additions and edits; this is convenience, not the newly live block.
 4. **Complete synchronization or web-commit batching:** defer the broad contract
    and readability polish. Neither is the smallest way to remove the next
    concrete interruption; batching already-accepted saves risks conflicting
    with immutable history unless its publication boundary is clarified.
 
 **Priority hypothesis:** Story 13 (web capture in the sequential loop) is
-delivered. Next selected remaining story is a related local edits-only batch
+delivered. Next selected remaining story is keeping a local content edit across
+one accepted addition (Story 16), then a related local edits-only batch
 (Story 14). This follows the established beneficiary and two-way workflow goal.
 It is not a claim that usage data proves these are the most frequent failures.
 
@@ -114,9 +115,10 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 - **Scope:** Changed durable saves of existing ordinary-note body/frontmatter at
   unchanged paths create immutable commits when the current Portable projection
   matches accepted main. Clean bound main checkouts can fast-forward accepted
-  history, including accepted structural changes. Web
-  creation/deletion/rename/move and notebook/folder README edits are not
-  synchronized; existing projection drift is neither absorbed nor repaired.
+  history, including accepted structural changes. Ordinary web note creation is
+  delivered in Story 13. Web deletion/rename/move and notebook/folder README
+  edits are not synchronized; existing projection drift is neither absorbed nor
+  repaired.
 
 <a id="story-4"></a>
 
@@ -187,7 +189,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   every accepted edge must qualify. Pull never publishes. The rebased edit is
   explicitly published onto the same identity. No multiple local commits/notes,
   structural edges, automatic stash, forced update, or drift repair. Story 9
-  extends this to same-note overlap.
+  extends this to same-note overlap. A later accepted addition of a different
+  note is a structural edge; receiving it while unpublished local work exists
+  remains Story 16, not this delivered content-only rebase.
 
 <a id="story-9"></a>
 
@@ -224,6 +228,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   keep extra immutable commits if batching would rewrite accepted history.
 - **Boundary:** History granularity only; no structural sync or broader rebase.
   Define when a batch ends and becomes available before selecting this story.
+  Story 13 now appends one accepted commit at ordinary web creation and another
+  for each later durable save, so sequential-loop history is noisier; that is
+  not by itself a reason to select this story.
 
 <a id="story-11"></a>
 
@@ -298,6 +305,10 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   body/frontmatter edits at existing root or nested note paths. No structural
   edits, README changes, multiple unpublished commits, or divergent batch rebase.
   Existing additions-and-edits behavior remains separate delivered scope.
+  Reminder from Story 13: publishing a locally refined web-created note uses the
+  ordinary publication path; do not add a special identity route. Receiving an
+  accepted addition while unpublished local work exists is Story 16, not this
+  edits-only batch.
 
 <a id="story-15"></a>
 
@@ -325,6 +336,41 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   folder relocation with unchanged bytes. No concurrent content change on the
   remote side, rename-with-edit, deletion, multiple moves, README authoring,
   unrepresented descendants, or general structural conflict resolution.
+  A plain accepted addition is a different structural edge (Story 16); do not
+  fold that receipt into this folder-move story.
+
+<a id="story-16"></a>
+
+### 16. Keep a local note edit when accepted history adds a different note
+
+**Status:** queued.
+
+- **For / why:** An owner who already has one unpublished local content edit
+  then creates a different ordinary note on the web. Pull currently refuses
+  because a plain accepted addition is a structural edge. That refusal became
+  the next interruption of the sequential loop once Story 13 started producing
+  those additions.
+- **Evaluation:** A bound checkout has one unpublished single-parent commit
+  editing one existing ordinary note. Accepted history then adds a different
+  ordinary note at root or an existing represented folder. Pull rebases the
+  local edit over that addition, leaves recoverable unpublished work, and the
+  new note is present. Explicit publish updates only the edited identity; the
+  added note keeps its identity and private data.
+- **Value / learning:** Makes web capture usable without requiring a clean
+  working tree first. Tests whether one non-overlapping accepted addition can
+  reuse Story 8's content rebase without opening general structural divergence.
+- **Effort hypothesis:** M — low confidence; assumes unique path correspondence
+  is enough to rebase one content edit over one addition. Revisit size if the
+  new note's identity policy needs more than Stories 8 and 13 already prove.
+- **Depends on:** delivered Stories 8 and 13; independent of Story 14.
+- **Safe stopping point:** Owners can still pull additions on a clean checkout
+  and still use Story 8 for content-only remote edits. Refusal remains correct
+  for overlapping paths, multiple local commits, or mixed structural edges.
+- **Boundary:** Exactly one unpublished local content commit and one accepted
+  addition of a different ordinary note. No folder moves, deletes, renames,
+  README changes, same-path overlap, multiple additions, multiple local
+  commits, or general divergent structural receipt. Do not expand Stories 8 or
+  14 into this outcome.
 
 ## Ordering and Scope Reduction
 
@@ -332,15 +378,16 @@ The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, **13** is delivered. Remaining selected story is **14**
-(related local revisions). These are independent vertical outcomes, not
-technical prerequisites for each other. Keep **15 → 10** as unqueued candidates:
+Within this seed, **13** is delivered. Remaining selected stories are **16**
+(keep a local edit across one accepted addition) then **14** (related local
+revisions). These are independent vertical outcomes, not technical
+prerequisites for each other. Keep **15 → 10** as unqueued candidates:
 folder-move divergence is consequential but narrower and has unresolved
 identity-policy risk; batching changes readability without unlocking
 synchronization.
 
-First-to-drop order among remaining candidates: **10, 15, 14**. Stopping after
-Story 14 still leaves a useful supported workflow.
+First-to-drop order among remaining items: **10, 15, 14**. Stopping after
+Story 16 still leaves a useful supported workflow.
 
 Preserve these boundaries in future refinement:
 
@@ -357,9 +404,10 @@ Preserve these boundaries in future refinement:
 ## Open Decisions
 
 - **Priority assumption open to revision:** no real-user frequency evidence
-  ranks web capture, batch refinement, folder divergence, or history readability.
-  The recommended queue follows the established product goal; revise if the
-  owner's current workflow makes a different interruption dominant.
+  ranks receiving an addition beside local work, batch refinement, folder
+  divergence, or history readability. Story 13 execution made the addition
+  refusal observable in the sequential loop; that is why 16 precedes 14. Revise
+  if the owner's current workflow makes a different interruption dominant.
 - **Story 15, before selection:** confirm same-identity correspondence and the
   refusal boundary for ambiguity; do not assume ordinary Git rename detection
   alone establishes Donut identity.
@@ -370,7 +418,7 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Refine queued Stories 13 and 14 in this seed before slice planning. Reconsider
+Refine queued Stories 16 and 14 in this seed before slice planning. Reconsider
 15 when folder relocation blocks unpublished work, and 10 when history
 readability is an observed problem. This seed is non-executable; queue selection
 does not authorize implementation.

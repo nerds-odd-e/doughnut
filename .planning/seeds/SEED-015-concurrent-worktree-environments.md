@@ -411,6 +411,9 @@ before slice planning; story 2 supplies the required browser environment.
   bound clone, `git mv` of a represented folder, a second clone, and pull;
   isolation must own install, config, and checkout directories. Do not treat
   that coverage as a reason to start this story before the browser proof.
+- **Reminder from SEED-009 Story 13:** Isolation must also own
+  `cli_notebook_web_created_note.feature` (install, config, clone checkouts).
+  Do not start this story to cover that feature before the browser proof.
 - **Reminder from 1c:** Ordinary Gradle `test` / `migrateTestDB` isolation
   does not cover CLI processes, `DONUT_CONFIG_DIR`, or clone checkouts. Reuse
   the worktree identity once an isolated application environment exists.
