@@ -571,6 +571,9 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
   an ancestor of HEAD; concurrent main work. `origin/main` later moved to
   `40611a4c84`. Disposition: ignore for this execution.
+- Main CI run 34184334377 (SHA `ac9f4ce0`, Package backend & frontend artifacts
+  for deployment failed) is not an ancestor of this execution HEAD. Concurrent
+  main work. Disposition: ignore.
 - Planning inspection found fixed origins in both Cypress and service commands,
   unconditional Mountebank startup/readiness, and restart by listener port rather
   than owner. These explain why a database-only change cannot deliver this story.
