@@ -19,9 +19,9 @@ Clone, content publish/pull, local additions/deletion/reorganization, bounded
 content rebase, ordinary web note creation, and receiving one accepted addition
 beside one unpublished local content edit are delivered. The remaining problem
 is unsupported everyday changes interrupting that loop; a cleaner Git log
-alone does not close it. Story 16 execution made the next sequential-loop
-refusal observable: pull still refuses when the web-created note is then saved
-before the owner pulls unpublished local work.
+alone does not close it. Story 17 now receives creation followed by one save
+beside one unpublished local edit. Pull still refuses a related two-note local
+revision, even though Story 14 can publish that revision on an unchanged base.
 The delivered scope below is planning evidence, not a fresh implementation audit
 or evidence of real-user frequency.
 
@@ -55,13 +55,13 @@ The product constraints established in the discussion are:
 
 ## Alternatives and Decision
 
-1. **Defer:** keep requiring a clean checkout before pulling a web-created
-   note that was then saved. Usable, but it forces the owner to publish or stash
-   local work before receiving a capture they continued on the web.
-2. **Smaller behavior change:** keep one unpublished local content edit across a
-   web creation followed by that note's first ordinary save. It removes the
-   interruption Stories 13 and 16 just enabled, without opening folder-move
-   divergence or commit batching.
+1. **Defer:** coordinate publication of a local batch before further web edits,
+   or reconcile manually when accepted history advances. This leaves the
+   supported batch-publication workflow interrupted by a disjoint web save.
+2. **Smaller behavior change:** keep a two-note local revision across one web
+   save of a third existing note (Story 18). Creation followed by one save is
+   already supported for one local edit; extending batches across structural
+   history is not required for this next outcome.
 3. **Edits-only multi-note publish:** delivered as Story 14, independent of
    receiving additions. Story 11 already publishes mixed additions and edits.
 4. **Complete synchronization or web-commit batching:** defer the broad contract
@@ -363,7 +363,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 17. Keep a local note edit when a web-created note is then saved
 
-**Status:** complete — [quick/065](../quick/065-local-edit-over-web-creation-save/PLAN.md).
+**Status:** delivered. Recover quick/065 from `1675d58cb9`.
 
 - **Goal:** An owner with one committed local content refinement wants to
   receive a note they captured on the web and immediately continued writing
@@ -395,6 +395,18 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 - **Evaluation:** Commit edits to A and B locally; save C on the web; pull,
   inspect all three contents, and explicitly publish the retained batch.
   Preserve the accepted web commit ID; pull makes no publication request.
+- **Reminders from Story 17:** Local commit shape and accepted interval shape
+  are separate boundaries. Supporting two local edits here must not also admit
+  that batch across an addition, creation-then-save, or a move. Preserve the
+  delivered one-note receipt cases. Judge accepted edges, not only the final
+  tree; an extra remote commit remains outside this story even if its net
+  content looks equivalent to one save.
+- **Key boundary examples:** After pull, A and B remain together in one
+  unpublished child of the unchanged accepted C commit, with the original
+  local commit recoverable and server A/B unchanged. Explicit publish then
+  accepts the whole revision and retains all three identities and learning
+  data. A web save of A or B, an extra accepted commit, or a structural edge
+  is refused with local HEAD/files and accepted history unchanged.
 - **Value / learning:** Story 14 proves stale publication preserves the batch,
   but current pull still rejects multi-note local work. Test the smallest
   reconciliation of that newly supported revision, independently of structural
@@ -402,8 +414,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   coordination; manually splitting the batch loses the related revision unit.
 - **Effort hypothesis:** M — low confidence; one disjoint web save bounds the
   reconciliation. Revisit the boundary if conflict policy becomes necessary.
-- **Depends on:** Delivered Stories 8, 14, and 17. Useful even if broader batch
-  rebase is deferred.
+- **Depends on:** Delivered Stories 8 and 14. Story 17 supplies regression
+  boundaries, not a structural-reconciliation prerequisite. Useful even if
+  broader batch rebase is deferred.
 
 ## Ordering and Scope Reduction
 
