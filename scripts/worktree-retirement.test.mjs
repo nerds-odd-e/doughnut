@@ -12,18 +12,11 @@ import {
   inspectDisposableDatabaseTargets,
   runWorktreeRetire,
 } from './worktree-retirement.mjs'
-
-function makeWritable() {
-  let content = ''
-  return {
-    write(chunk) {
-      content += chunk
-    },
-    content() {
-      return content
-    },
-  }
-}
+import {
+  clearEvidenceDeps,
+  makeWritable,
+  runCheck,
+} from './worktree-retirement-test-helpers.mjs'
 
 function git(cwd, args) {
   const result = spawnSync('git', args, {
@@ -74,27 +67,16 @@ function addPeerLinkedWorktree(t, linkedRoot) {
   return peerRoot
 }
 
-function runCheck(checkoutRoot) {
-  const out = makeWritable()
-  const err = makeWritable()
-  const code = runWorktreeRetire({
-    argv: ['--check'],
-    checkoutRoot,
-    out,
-    err,
-  })
-  return { code, out: out.content(), err: err.content() }
-}
-
-test('linked checkout with identity reports exact unit target', (t) => {
+test('linked checkout with identity reports exact unit target', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
 
-  const result = runCheck(checkout.root)
+  const result = await runCheck(checkout.root)
   assert.equal(result.code, 0, result.err)
   assert.match(result.out, /inspection only/i)
   assert.match(result.out, /Worktree id: wt_a7c2/)
   assert.match(result.out, /Unit database: doughnut_wt_a7c2_test/)
+  assert.match(result.out, /Idleness verification incomplete/)
   assert.equal(result.out.includes('E2E database:'), false)
   assert.deepEqual(inspectDisposableDatabaseTargets(checkout.root), {
     id: 'wt_a7c2',
@@ -103,30 +85,32 @@ test('linked checkout with identity reports exact unit target', (t) => {
   })
 })
 
-test('linked checkout with canonical E2E allocation reports both targets', (t) => {
+test('linked checkout with canonical E2E allocation reports both targets', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, {
     id: 'wt_a7c2',
     e2e: { database: 'doughnut_e2e_wt_a7c2' },
   })
 
-  const result = runCheck(checkout.root)
+  const result = await runCheck(checkout.root)
   assert.equal(result.code, 0, result.err)
   assert.match(result.out, /Unit database: doughnut_wt_a7c2_test/)
   assert.match(result.out, /E2E database: doughnut_e2e_wt_a7c2/)
+  assert.match(result.out, /Idleness verification incomplete/)
 })
 
-test('mutation mode without --check refuses visibly', (t) => {
+test('mutation mode without --check refuses visibly', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
   const out = makeWritable()
   const err = makeWritable()
 
-  const code = runWorktreeRetire({
+  const code = await runWorktreeRetire({
     argv: [],
     checkoutRoot: checkout.root,
     out,
     err,
+    evidenceDeps: clearEvidenceDeps,
   })
 
   assert.equal(code, 1)
@@ -135,47 +119,47 @@ test('mutation mode without --check refuses visibly', (t) => {
   assert.match(err.content(), /Usage: pnpm worktree:retire --check/)
 })
 
-test('primary checkout refuses inspection', (t) => {
+test('primary checkout refuses inspection', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
 
-  const result = runCheck(checkout.root)
+  const result = await runCheck(checkout.root)
   assert.equal(result.code, 1)
   assert.equal(result.out, '')
   assert.match(result.err, /not a Git linked worktree/)
 })
 
-test('linked checkout without identity refuses inspection', (t) => {
+test('linked checkout without identity refuses inspection', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
 
-  const result = runCheck(checkout.root)
+  const result = await runCheck(checkout.root)
   assert.equal(result.code, 1)
   assert.match(result.err, /missing identity file/)
 })
 
-test('invalid identity refuses inspection', (t) => {
+test('invalid identity refuses inspection', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'not_a_worktree_id' })
 
-  const result = runCheck(checkout.root)
+  const result = await runCheck(checkout.root)
   assert.equal(result.code, 1)
   assert.match(result.err, /invalid identity/)
 })
 
-test('custom E2E database target refuses inspection', (t) => {
+test('custom E2E database target refuses inspection', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, {
     id: 'wt_a7c2',
     e2e: { database: 'doughnut_e2e_test' },
   })
 
-  const result = runCheck(checkout.root)
+  const result = await runCheck(checkout.root)
   assert.equal(result.code, 1)
   assert.match(result.err, /not the canonical doughnut_e2e_wt_a7c2/)
   assert.equal(result.err.includes('DROP'), false)
 })
 
-test('duplicate identity in another registered checkout refuses', (t) => {
+test('duplicate identity in another registered checkout refuses', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
   const peerRoot = addPeerLinkedWorktree(t, checkout.root)
@@ -185,7 +169,7 @@ test('duplicate identity in another registered checkout refuses', (t) => {
     JSON.stringify({ id: 'wt_a7c2' })
   )
 
-  const result = runCheck(checkout.root)
+  const result = await runCheck(checkout.root)
   assert.equal(result.code, 1)
   assert.match(result.err, /also recorded in another registered checkout/)
   assert.ok(result.err.includes(realpathSync(peerRoot)))

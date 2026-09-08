@@ -111,11 +111,8 @@ Sizing: ~5 minutes, medium confidence; one command-selection proof loop.
 
 ### 2a. Explain recorded evidence that prevents retirement
 Type: Behavior
-Status: planned
-Proof: Public `--check` with busy ownership, stale/unverifiable records, foreign
-listener, and active database sessions reports refusal. The fixture process
-remains alive and no DROP occurs. Use real owner/listener fixtures; mock only
-external inspections where needed for error/ambiguity cases.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement*.test.mjs` (16/16) — refuses live/stale backend lock, live/stale SUT owner, Cypress lease, foreign listener, active sessions, and session inspection failure; clear path still incomplete; fixtures remain alive; no DROP.
 
 Behavior: Valid targets → inspect recorded ownership/listeners/database sessions
 → report the busy/uncertain evidence preventing retirement.

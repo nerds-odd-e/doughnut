@@ -19,12 +19,17 @@ CURSOR_DEV=true nix develop -c pnpm worktree:retire --check
 
 `--check` prints the unit target `doughnut_<id>_test` and, when recorded, the
 canonical E2E target `doughnut_e2e_<id>`. It validates the linked-worktree
-relationship and recorded identity only. It does **not** authorize deletion,
-verify idleness, drop databases, allocate, or rewrite identity. Mutation mode
-(`pnpm worktree:retire` without `--check`) is refused until retirement is
-enabled. Primary checkouts, missing/invalid identity, a duplicate identity in
-another registered worktree, and non-canonical E2E database names refuse
-visibly.
+relationship and recorded identity, then reports busy or uncertain evidence from
+existing ownership locks (`.worktree.local.lock`, `.sut.local.lock`, startup
+ownership, Cypress leases), recorded application listeners, and MySQL sessions
+against those targets. Stale or unverifiable ownership records refuse without
+using the runners' permissive stale-lock reclamation paths. Listeners and
+sessions are vetoes only — never ownership authorization. A clear recorded
+result is still **not** verified idle until orphan process inspection lands; it
+does **not** authorize deletion. Mutation mode (`pnpm worktree:retire` without
+`--check`) is refused until retirement is enabled. Primary checkouts,
+missing/invalid identity, a duplicate identity in another registered worktree,
+and non-canonical E2E database names refuse visibly.
 
 Custom E2E names refuse rather than guessing ownership. There is no machine-wide
 allocation registry and no recovery from duplicate operator-supplied IDs.

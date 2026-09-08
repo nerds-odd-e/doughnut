@@ -12,6 +12,10 @@ import {
   assertValidWorktreeId,
   worktreeLocalConfigPath,
 } from './worktree-identity.mjs'
+import {
+  collectRecordedRetirementVetoes,
+  formatRecordedEvidenceRefusal,
+} from './worktree-retirement-evidence.mjs'
 
 export function unitDatabaseNameForIdentity(worktreeId) {
   assertValidWorktreeId(worktreeId)
@@ -145,6 +149,10 @@ function formatInspection(targets) {
   if (targets.e2eDatabase) {
     lines.push(`E2E database: ${targets.e2eDatabase}`)
   }
+  lines.push(
+    'Recorded ownership, listeners, and database sessions: no busy evidence found.',
+    'Idleness verification incomplete until orphan process inspection.'
+  )
   return `${lines.join('\n')}\n`
 }
 
@@ -162,11 +170,12 @@ export function defaultCheckoutRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 }
 
-export function runWorktreeRetire({
+export async function runWorktreeRetire({
   argv = process.argv.slice(2),
   checkoutRoot = defaultCheckoutRoot(),
   out = process.stdout,
   err = process.stderr,
+  evidenceDeps = {},
 } = {}) {
   try {
     const { mode } = parseArgs(argv)
@@ -176,6 +185,14 @@ export function runWorktreeRetire({
       )
     }
     const targets = inspectDisposableDatabaseTargets(checkoutRoot)
+    const vetoes = await collectRecordedRetirementVetoes(
+      checkoutRoot,
+      targets,
+      evidenceDeps
+    )
+    if (vetoes.length > 0) {
+      throw new Error(formatRecordedEvidenceRefusal(vetoes))
+    }
     out.write(formatInspection(targets))
     return 0
   } catch (error) {
@@ -191,5 +208,5 @@ const isMain = process.argv[1]
   : false
 
 if (isMain) {
-  process.exit(runWorktreeRetire())
+  runWorktreeRetire().then((code) => process.exit(code))
 }

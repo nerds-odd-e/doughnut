@@ -15,7 +15,11 @@ function handleOwnerControlRequest(req, res, state) {
   }
   const urlPath = (req.url ?? '').split('?')[0]
   if (req.method === 'GET' && urlPath === '/owner') {
-    const body = { ok: true, pid: process.pid }
+    const body = {
+      ok: true,
+      pid: process.pid,
+      runnerLeaseHeld: Boolean(state.runnerLeaseToken),
+    }
     const applicationGroupId = state.getApplicationGroupId?.()
     if (Number.isInteger(applicationGroupId) && applicationGroupId > 0) {
       body.applicationGroupId = applicationGroupId
