@@ -17,9 +17,10 @@ independent test runs against each worktree's own code and state, within the
 capacity of one development machine using the existing Nix environment.
 
 Backend tests and the two supported browser specs now isolate databases, app
-endpoints, and OpenAI mocks. Other mock and client workflows remain unsupported;
-general parallel E2E support is unfinished. Owned SUT descendant shutdown (2b)
-is delivered.
+endpoints, and OpenAI mocks. Disposable worktree databases can be explicitly
+retired before checkout removal. Other mock and client workflows remain
+unsupported; general parallel E2E support is unfinished. Owned SUT descendant
+shutdown (2b) is delivered.
 
 The developer endorsed unit-test isolation before E2E. Shared-MySQL isolation
 proved useful; it does not promise faster parallel suites on limited hardware.
@@ -425,9 +426,8 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ### 6. Reclaim databases from retired worktrees
 
-**Status:** Refined; before-removal scope accepted by the developer, 2026-09-08.
-Plan: [Retire worktree databases](../quick/075-retire-worktree-databases/PLAN.md).
-The product backlog owns ordering.
+**Status:** Delivered 2026-09-08 via `pnpm worktree:retire` /
+`pnpm worktree:retire --check`. Guide: `docs/worktree-retire-databases.md`.
 
 **Goal**
 
@@ -453,50 +453,12 @@ removal hooks, copied/moved checkout recovery, process supervision, port-claim
 cleanup, and Cloud VM/CI changes. Port claims are a separate resource; reclaiming
 them is not required to free database storage.
 
-**Key examples**
-
-1. A disposable linked checkout exists and its allocation is verified idle →
-   explicitly retire it → its test databases are reclaimed while a peer's saved
-   data remains usable.
-2. A test, SUT, Cypress runner, or surviving backend still uses the allocation
-   → request retirement → refuse without dropping databases or interrupting work.
-3. The checkout is absent, ownership is uncertain, or the target is primary or
-   persistent data → request retirement → refuse. A name prefix, dead parent,
-   or failed health check does not establish permission to delete.
-
-**Open questions:** None for the accepted boundary: explicit cleanup before
-checkout removal, dropping rather than reuse, and no port-claim cleanup.
-
-**Execution context for subsequent planning**
-
-- **Execution learning:** One identity can own `doughnut_<id>_test` and
-  `doughnut_e2e_<id>`, plus machine-local temporary port claims. Ownership evidence
-  stays in the existing checkout; port claims remain outside this story.
-  An absent checkout/dead PID alone is insufficient: account
-  for backend runs, live SUTs, and Cypress leases, protecting primary/persistent
-  data. The temporary port registry is not a database inventory.
-  Unhealthy does not mean retired: story 2a refuses invalid allocations and
-  foreign listeners even with a live owner. Such refusal must not authorize
-  dropping databases, replacing allocations, or terminating those listeners.
-- **Reminders from stories 3 and 2b:** Private mock ports belong to a Cypress run and
-  are not persistent allocation fields or database inventory. A completed mock
-  run leaves the SUT/database allocated. Delivered correction 2b showed a child
-  alive after its parent stopped; missing parent/lease alone cannot prove retirement.
-  Example: a surviving backend still using a candidate database → reclaim →
-  refuse; an explicitly retired, verified idle allocation may follow the chosen
-  explicit drop policy.
-  A shutdown acknowledgement, supervisor exit, or failed bounded cleanup is
-  not evidence of retirement. Story 2b retains ancestry captured before shutdown;
-  it cannot identify children already orphaned before that capture. Reclamation
-  must resolve uncertain ownership without inferring permission to drop data.
-
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08, after quick/074:** Stories 2b and SEED-009 10a are
-delivered. Queue remains 6 → 4 → 5; reclaim stays next and is in refinement on
-the checkout-removal boundary. CLI-before-MCP is value ordering, not a
-dependency. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
-The recording-exclusivity proof correction stays with story 3 in quick/073;
+**Backlog review, 2026-09-08, after quick/075:** Story 6 is delivered. Queue is
+4 → 5; CLI-before-MCP is value ordering, not a dependency. The
+[product backlog](../PRODUCT-BACKLOG.md) owns global order. The
+recording-exclusivity proof correction stays with story 3 in quick/073;
 it does not require a duplicate product story or broader mock support.
 
 Do not claim general parallel E2E support from the focused no-mock workflow.
@@ -506,9 +468,9 @@ Cloud VM, separate MySQL instances, and a second identity remain deferred.
 
 ## Open Decisions
 
-- Story 6's explicit before-removal drop boundary is accepted. Recovery after
-  removal, reuse, and port-claim retirement remain deferred; do not infer
-  ownership from database naming.
+- Story 6's before-removal drop is delivered. Recovery after removal, reuse,
+  and port-claim retirement remain deferred; do not infer ownership from
+  database naming.
 - Revisit shared-server capacity or development profiles only when a selected
   workflow supplies new evidence requiring them.
 

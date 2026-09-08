@@ -159,5 +159,7 @@ sut.pid
 /.worktree.local.lock
 /.worktree.identity.lock
 /.sut.local.lock
+/.worktree.retire.gate
+/.worktree.retire.marker
 # CocoIndex Code (ccc)
 /.cocoindex_code/

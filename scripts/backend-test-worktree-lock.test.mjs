@@ -23,7 +23,10 @@ import {
 
 function assertRefusedByActiveOwner(result) {
   assert.notEqual(result.status, 0)
-  assert.match(outputOf(result), /already running/i)
+  assert.match(
+    outputOf(result),
+    /already running|retirement admission gate is already held/i
+  )
   assert.doesNotMatch(outputOf(result), /GRADLE_STDOUT|GRADLE_REACHED/)
 }
 

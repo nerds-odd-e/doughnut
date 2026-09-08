@@ -211,6 +211,10 @@ other non-`test` / non-`migrateTestDB` tasks) never allocate, never set a
 worktree datasource URL, and never take the lock — including in a configured
 primary or a linked worktree.
 
+Before removing a linked checkout, inspect and reclaim its disposable databases
+with `pnpm worktree:retire` — see
+[`docs/worktree-retire-databases.md`](worktree-retire-databases.md).
+
 ## Limits
 
 - An unconfigured primary checkout keeps the established default
@@ -219,10 +223,11 @@ primary or a linked worktree.
   Configured-checkout and fresh linked-worktree `migrateTestDB`, `test`,
   `pnpm backend:test`, and `pnpm backend:test_only` are isolated as described
   above.
-- No automatic cleanup, retirement, or orphan removal: a provisioned database
-  (and an unreferenced one left behind by a failed or interrupted first use)
-  persists until removed manually. There is no machine-wide allocation
-  registry and no recovery from duplicate operator-supplied IDs.
+- No automatic cleanup or orphan removal: a provisioned database (and an
+  unreferenced one left behind by a failed or interrupted first use) persists
+  until reclaimed explicitly with `pnpm worktree:retire` (unit-only today; use
+  `--check` to inspect). There is no machine-wide allocation registry and no
+  recovery from duplicate operator-supplied IDs.
 - Conflicting `SPRING_DATASOURCE_URL` / `DB_URL` / `SPRING_FLYWAY_URL`, or a
   conflicting Gradle `-Dspring.datasource.url=` / `-Dspring.flyway.url=`,
   refuse before launch. Matching URLs remain valid.

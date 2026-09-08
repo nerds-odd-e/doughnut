@@ -32,8 +32,10 @@ backend_test_worktree_prepare() {
   local checkout_root="$1"
   shift
   local config_path="${checkout_root}/.worktree.local.json"
-  local identity_js
-  identity_js="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/worktree-identity.mjs"
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local identity_js="${script_dir}/worktree-identity.mjs"
+  local admission_js="${script_dir}/worktree-retirement-admission.mjs"
   local mysql_host="127.0.0.1"
   local mysql_port="3309"
   local lock_dir="${checkout_root}/.worktree.local.lock"
@@ -48,21 +50,36 @@ backend_test_worktree_prepare() {
   local existing_schema
   local var_name
   local arg
+  local admission_held=0
+
+  release_retirement_admission() {
+    if [[ "${admission_held}" -eq 1 ]]; then
+      node "${admission_js}" release "${checkout_root}" || true
+      admission_held=0
+    fi
+  }
+
+  # Admission before prepare/provision; release after backend ownership exists.
+  node "${admission_js}" acquire "${checkout_root}" || exit 1
+  admission_held=1
 
   if ! mkdir "${lock_dir}" 2>/dev/null; then
     owner_pid="$(cat "${lock_dir}/owner.pid" 2>/dev/null || true)"
     if [[ ! "${owner_pid}" =~ ^[0-9]+$ ]]; then
+      release_retirement_admission
       echo "Backend worktree tests are already running in this checkout (owner lock record is invalid). Refusing to start a second run." >&2
       exit 1
     fi
     # Live owner, or another process already reclaimed this dead owner.
     if kill -0 "${owner_pid}" 2>/dev/null \
       || ! mkdir "${lock_dir}/reclaimed.${owner_pid}" 2>/dev/null; then
+      release_retirement_admission
       echo "Backend worktree tests are already running in this checkout (owner pid ${owner_pid}). Refusing to start a second run." >&2
       exit 1
     fi
   fi
   echo "$$" > "${lock_dir}/owner.pid"
+  release_retirement_admission
 
   if [[ ! -f "${config_path}" ]]; then
     new_worktree_id="$(node "${identity_js}" generate)"
