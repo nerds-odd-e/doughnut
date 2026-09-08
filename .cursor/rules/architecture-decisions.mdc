@@ -6,7 +6,8 @@ alwaysApply: true
 # Architecture Decisions (ADRs)
 
 - **Human playbook** (propose / discuss / approve): `docs/adrs/README.md`
-- **Accepted ADRs** (current recommendations): `docs/adrs/*-accepted.md` — read explicitly; `docs/` is outside default indexing
-- **Agent skill** (use / cite / conflict / maintain): `adr-awareness` in `.agents/skills/adr-awareness/`
+- **Accepted ADRs** (current recommendations): enumerate the index in `docs/adrs/README.md` and confirm each record's Status — read explicitly; `docs/` is outside default indexing. Filenames normally use `*-accepted.md`, but do not exclude Accepted records without that suffix.
+- **Agent skill** (use / cite / conflict / maintain): `dough-adr-awareness` in `.agents/skills/dough-adr-awareness/` (Codex/Cursor) and `.claude/skills/dough-adr-awareness/` (Claude Code).
+- **Architecture-shaped work:** cross-cutting stack, persistence, API contracts, authentication, packaging/monorepo layout, and shared conventions across backend/frontend/cli/mcp/e2e; explicit ADR work; or changes that reverse or bypass an Accepted ADR.
 - On architecture-shaped work, load relevant Accepted ADRs and follow them. Do not silently conflict. Do not approve ADRs; humans own the advice process.
-- Deviations require an explicit human-owned exception (trail it) or a human superseding ADR.
+- Deviations require an explicit human-owned exception (record it in a PR/commit message or note pointing at the ADR) or a human superseding ADR. These constraints also apply to planning and delivery workflows.
