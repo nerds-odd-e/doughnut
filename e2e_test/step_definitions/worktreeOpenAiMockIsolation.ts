@@ -1,12 +1,12 @@
 /// <reference types="cypress" />
 // @ts-check
 
-import { WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY } from '../../scripts/browser-worktree-isolation.mjs'
 import {
+  WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY,
   WORKTREE_RESET_ISOLATION_BARRIER_AT,
   WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
   WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS,
-} from '../../scripts/worktree-reset-isolation-barrier.mjs'
+} from '../../scripts/worktree-isolation-constants.mjs'
 import {
   ISOLATED_OPEN_AI_MOCK_ENV_KEY,
   VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK,

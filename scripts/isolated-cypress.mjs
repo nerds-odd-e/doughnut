@@ -1,9 +1,9 @@
 import {
   loadCompleteIsolatedE2eAllocation,
   readPresentWorktreeLocalConfig,
-  WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY,
   worktreeIsolationApplies,
 } from './browser-worktree-isolation.mjs'
+import { WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY } from './worktree-isolation-constants.mjs'
 import {
   GET_ISOLATED_OPEN_AI_MOCK_ENDPOINT_TASK,
   ISOLATED_OPEN_AI_MOCK_ENV_KEY,
