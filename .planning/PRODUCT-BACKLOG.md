@@ -39,4 +39,3 @@ MCP isolation. Cloud VM and development-profile isolation remain deferred.
 8. [Create a note on the web and continue refining it locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13) — SEED-009
 9. [Move a folder while preserving descendant identities](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7) — SEED-009
 10. [Use ordinary backend test and migration commands in isolated worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-1c) — SEED-015
-11. [Resolve an overlapping edit with ordinary Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9) — SEED-009

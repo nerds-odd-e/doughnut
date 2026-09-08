@@ -16,19 +16,13 @@ shared database resets, schema changes, and service endpoints should change to
 independent test runs against each worktree's own code and state, within the
 capacity of one development machine using the existing Nix environment.
 
-Code isolation currently does not isolate the running environment. The shared
-MySQL server exposes fixed development, unit-test, and E2E database names.
-E2E scenarios truncate mapped tables before seeding, so concurrent runners can
-erase each other's fixtures or wait on locks. Fixed application, proxy, and
-mock-service endpoints also allow tasks to reach or restart another worktree's
-services. Waiting for exclusive use of the environment reduces the benefit of
-running multiple coding tasks now.
+Backend tests and the supported no-mock browser workflow now isolate their
+databases and application endpoints. Remaining mock and client workflows still
+risk shared resets, responses, and local state. The delivered boundaries are
+recorded in stories 1a–2a; general parallel E2E support remains unfinished.
 
-The developer endorsed starting with unit-test isolation before tackling E2E
-services. The first learning question is whether separate databases on the
-existing MySQL server make concurrent backend test runs independent without
-requiring a separate server per task. This is an isolation outcome, not a
-promise that parallel suites finish faster on limited hardware.
+The developer endorsed unit-test isolation before E2E. Shared-MySQL isolation
+proved useful; it does not promise faster parallel suites on limited hardware.
 
 ## Alternatives and Decision
 
@@ -314,8 +308,7 @@ mocks and CLI/MCP are not prerequisites.
 
 ### 2a. Refuse isolated browser verification against an unverified allocation
 
-**Status:** Delivered.
-[Slice plan](../quick/067-isolated-browser-allocation-safeguards/PLAN.md).
+**Status:** Delivered. Recover quick/067 at `3a892fba28`.
 
 **Goal**
 
@@ -370,6 +363,11 @@ planning; stories 2 and 2a supply the required browser environment.
   management and imposter serving ports, backend destinations, reset, and
   request recording for the selected service. Prove resetting/reconfiguring
   one worktree's mocks while its peer uses different responses, both ways.
+  Extend story 2a's ownership check to the selected mock endpoints: a ready
+  foreign mock must refuse before mock configuration/reset or fixture reset,
+  leaving that listener and peer responses intact. A control socket or HTTP
+  success alone is insufficient. Validate new recorded allocation fields
+  before provisioning; only omitted fields may trigger first-use allocation.
   Keep no-mock startup independent of mock availability. Widen the allowlist
   only for proven workflows; multi-spec support must replace the current
   `after:spec` lease release so ownership protects the whole run.
@@ -410,7 +408,8 @@ planning; stories 2 and 2a supply the required browser environment.
   own backend URL and config/install/clone paths before admitting CLI specs.
   Include or explicitly bound `cli_notebook_existing_note_edits.feature`
   (SEED-009 story 18). Prove reset, cancellation, and teardown preserve peer
-  files/processes; the current no-mock allowlist rejects these workflows.
+  files/processes. Require owning application health before client setup/reset;
+  a live owner with a foreign ready endpoint must refuse without touching peers.
 
 <a id="story-5"></a>
 
@@ -434,6 +433,8 @@ planning; stories 2 and 2a supply the required browser environment.
 - **Execution learning:** Reuse SUT identity and ownership; Cypress `baseUrl`
   does not establish MCP endpoint/process ownership. Prove peer usability
   after disconnect and failed-client cleanup before admitting the chosen spec.
+  Require owning application health before MCP setup/reset, including refusal
+  of a foreign ready endpoint despite a live control owner (story 2a).
 
 <a id="story-6"></a>
 
@@ -454,15 +455,16 @@ planning; stories 2 and 2a supply the required browser environment.
   with databases. An absent checkout/dead PID alone is insufficient: account
   for backend runs, live SUTs, and Cypress leases, protecting primary/persistent
   data. The temporary port registry is not a database inventory.
+  Unhealthy does not mean retired: story 2a refuses invalid allocations and
+  foreign listeners even with a live owner. Such refusal must not authorize
+  dropping databases, replacing allocations, or terminating those listeners.
 
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08:** Stories 1a–1c, 2, and 2a are delivered. Preserve
-the existing 3 → 6 → 4 → 5 order for remaining work. Trustworthy allocation and
-owning health precede broader browser support; database reclamation follows
-mocks before expanding to clients. CLI-before-MCP is value ordering, not a
-technical dependency. The [product backlog](../PRODUCT-BACKLOG.md) owns global
-order. Stories 3–6 need refinement, and story 6's approach remains undecided.
+**Backlog review, 2026-09-08:** Quick/067 delivered story 2a; no new story is
+needed. Preserve 3 → 6 → 4 → 5: mocks, reclamation, CLI, MCP. CLI-before-MCP
+is value ordering, not a dependency. The [product backlog](../PRODUCT-BACKLOG.md)
+owns global order. Stories 3–6 still need refinement; retirement is undecided.
 
 Do not claim general parallel E2E support from the focused no-mock workflow.
 First-to-drop order among expansions is 5, 4, 6, then 3. Persistent development
@@ -479,9 +481,8 @@ Cloud VM, separate MySQL instances, and a second identity remain deferred.
 
 ## When to Surface
 
-When concurrent local worktree tasks need database-dependent verification, or
-shared resets, migrations, ports, and process restarts cause interference.
-Select and refine one story before creating an executable plan.
+When concurrent tasks encounter shared data, mock, or process interference,
+select and refine one story before creating an executable plan.
 
 ## Breadcrumbs
 
