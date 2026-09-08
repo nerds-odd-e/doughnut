@@ -75,9 +75,11 @@ crossing the ten-minute limit. Commit only green behavior and boundary coverage.
 ### 2. Publish the retained revision through the existing CLI flow
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Installed CLI/web E2E receives and explicitly publishes the retained A/B
 revision, leaving all three authored edits visible in Donut.
+Verified: `pnpm cypress run --spec e2e_test/features/cli/cli_notebook_existing_note_edits.feature`
+(2/2; wall ~17s).
 
 Behavior: A/B retained after C's web save → explicit publish → accepted history
 and Donut contain all three edits together.
@@ -138,8 +140,6 @@ contract proof; it is not backend preparation for later work.
 
 ## Current status
 
-Slice 1 done. Next: slice 2 (E2E publish of the retained A/B revision).
-Learning: two-note eligibility lives in `notebookLocalCandidate` with parent-edge
-checks; pull reuses the existing native rebase path. Refactor collapsed accepted
-change inspection onto `ordinaryNoteContentEditPaths` and split retention vs
-refusal suites.
+Slices 1–2 done. Next: slice 3 (controller learning retention on publish onto C).
+Learning: E2E reused existing batch-commit, web-save, rebased-child, and publish
+steps; Background gained Overview body text and a third note for the disjoint save.
