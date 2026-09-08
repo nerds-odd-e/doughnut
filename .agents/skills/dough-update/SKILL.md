@@ -34,7 +34,7 @@ Ordinary Open Dough release updates remain available from the recorded source.
    | Cursor | `cursor` | `.agents/skills/` (shared with Codex) |
    | Claude Code | `claude` | `.claude/skills/` |
 
-   The public payload is the set of `dough-*/SKILL.md` paths declared by the
+   The public payload includes skill entrypoints and supporting files declared by the
    pinned release's installer and baseline-comparison helper. Treat that
    release as authoritative: payload skills may be added between releases, so
    a path absent from the installed release is not by itself a reason to stop.
