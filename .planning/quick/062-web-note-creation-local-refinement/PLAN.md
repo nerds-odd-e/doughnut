@@ -5,7 +5,7 @@
 [SEED-009, story 13](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13)
 — Create a note on the web and continue refining it locally.
 
-Status: in progress. Slice 1 done; next is slice 2.
+Status: in progress. Slices 1–2 done; next is slice 3.
 Sizing remains a hypothesis, not a time guarantee.
 
 ## Goal and scope
@@ -146,7 +146,7 @@ production, and its only planned new consumer is the next Behavior.
 
 ### 2. Accept the first title-only root note atomically
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: Authorized owner, matching empty accepted Portable tree,
 root destination, available title, absent initial content/external-data mode.
 Trigger: Submit the normal web creation request.
@@ -415,3 +415,13 @@ remove spent plan history only when the full outcome and proof are complete.
 - Existing web-content save, folder save, projection-drift, late-binding-save
   rollback, and TextContentController update tests plus `pnpm backend:test_only`
   remained green through the real save endpoint. No helper-only tests.
+- Slice 2 added `WebNoteCreationService` at `createNoteAtNotebookRoot` with
+  controller-owned `SERIALIZABLE` / `rollbackFor = Exception`. Title-only root
+  plus empty matching accepted tree is the only acceptance gate; folder,
+  initial content, drift, and missing binding keep the existing web path.
+  `NoteFactory` is unchanged. Lock/import overlap with web content save was
+  left in place (not a generic mutation coordinator).
+- Atomic proof: `NotebookGitNoteCreationAtomicControllerTest` (canonical
+  `type: Note` child of old head; late binding-save rolls back note/creator/
+  binding). Guard proof: `NotebookGitNoteCreationControllerTest`. Full
+  `pnpm backend:test_only` green.

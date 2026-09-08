@@ -26,7 +26,6 @@ import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.BazaarService;
 import com.odde.donut.services.FolderConstructionService;
 import com.odde.donut.services.FolderRelocationService;
-import com.odde.donut.services.NoteConstructionService;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.services.NotebookCatalogService;
 import com.odde.donut.services.NotebookExportService;
@@ -36,6 +35,7 @@ import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
+import com.odde.donut.services.notebookGit.WebNoteCreationService;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,6 +47,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -70,7 +71,7 @@ class NotebookController {
   private final FolderRepository folderRepository;
   private final NotebookCatalogService notebookCatalogService;
   private final NoteService noteService;
-  private final NoteConstructionService noteConstructionService;
+  private final WebNoteCreationService webNoteCreationService;
   private final WikidataService wikidataService;
   private final FolderConstructionService folderConstructionService;
   private final FolderRelocationService folderRelocationService;
@@ -91,7 +92,7 @@ class NotebookController {
       FolderRepository folderRepository,
       NotebookCatalogService notebookCatalogService,
       NoteService noteService,
-      NoteConstructionService noteConstructionService,
+      WebNoteCreationService webNoteCreationService,
       WikidataService wikidataService,
       FolderConstructionService folderConstructionService,
       FolderRelocationService folderRelocationService,
@@ -110,7 +111,7 @@ class NotebookController {
     this.folderRepository = folderRepository;
     this.notebookCatalogService = notebookCatalogService;
     this.noteService = noteService;
-    this.noteConstructionService = noteConstructionService;
+    this.webNoteCreationService = webNoteCreationService;
     this.wikidataService = wikidataService;
     this.folderConstructionService = folderConstructionService;
     this.folderRelocationService = folderRelocationService;
@@ -151,14 +152,14 @@ class NotebookController {
   }
 
   @PostMapping(value = "/{notebook}/create-note")
-  @Transactional
+  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public NoteRealm createNoteAtNotebookRoot(
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException {
     authorizationService.assertAuthorization(notebook);
     User user = authorizationService.getCurrentUser();
-    return noteConstructionService.createRootNoteWithWikidataService(
+    return webNoteCreationService.createRootNote(
         notebook,
         noteCreation,
         user,
