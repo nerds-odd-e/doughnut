@@ -50,9 +50,11 @@ adoption. A recorded missing database, occupied port, or migration failure is
 not permission to adopt, delete, rebuild, or renumber.
 
 `pnpm sut:healthcheck` and `pnpm sut:restart` need the complete recorded
-allocation after that first start. Health verifies the live owner first. A
-foreign process that happens to answer on the recorded ports is not a healthy
-owning stack.
+allocation after that first start. Health verifies the live owner first, then
+that each recorded listener is in the published application process group or
+reachable from it by parent-process ancestry (Gradle may fork the backend JVM
+into its own group). A foreign process that happens to answer on the recorded
+ports is not a healthy owning stack.
 
 ## Restart
 
