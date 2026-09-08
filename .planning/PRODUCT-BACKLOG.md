@@ -17,14 +17,17 @@ ordinary backend-test isolation on a persistent worktree identity; that does
 not isolate `pnpm sut`, Cypress, E2E data, or ports. Next is the smallest
 usable concurrent browser workflow without external-service mocks, then
 independent mocks. Reuse the 1c identity; prove ordinary SUT/Cypress commands
-in linked worktrees before broadening to CLI or MCP. Do not insert cleanup,
-Cloud VM, or development-profile isolation until a selected workflow needs
-them.
+in linked worktrees, then reclaim retired databases to limit accumulation,
+followed by CLI and MCP isolation. Cloud VM and development-profile isolation
+remain deferred.
 
 1. [Run browser E2E scenarios concurrently without external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-2) — SEED-015
 2. [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
-3. [Create a note on the web and continue refining it locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13) — SEED-009
-4. [Publish a related batch of edits to existing notes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-14) — SEED-009
+3. [Reclaim databases from retired worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-6) — SEED-015
+4. [Run CLI E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
+5. [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
+6. [Create a note on the web and continue refining it locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13) — SEED-009
+7. [Publish a related batch of edits to existing notes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-14) — SEED-009
 
 ## Recently done
 

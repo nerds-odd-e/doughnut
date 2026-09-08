@@ -394,6 +394,8 @@ before slice planning; story 2 supplies the required browser environment.
 
 ### 4. Run CLI E2E workflows against the owning worktree's environment
 
+**Status:** Queued after story 6; needs refinement before slice planning.
+
 - **For / why:** Developers and AI tasks changing CLI behavior can verify it
   concurrently with another worktree's CLI or browser tests.
 - **Evaluation:** Concurrent CLI E2E workflows, including interactive and mocked
@@ -422,6 +424,8 @@ before slice planning; story 2 supplies the required browser environment.
 
 ### 5. Run MCP E2E workflows against the owning worktree's environment
 
+**Status:** Queued after story 4; needs refinement before slice planning.
+
 - **For / why:** Developers and AI tasks changing MCP behavior can verify it
   concurrently without another runner replacing its state or stopping its
   server.
@@ -440,7 +444,7 @@ before slice planning; story 2 supplies the required browser environment.
 
 ### 6. Reclaim databases from retired worktrees
 
-**Status:** Idea captured; unrefined and unqueued.
+**Status:** Queued after story 3; idea remains unrefined.
 
 - **For / why:** Developers and AI tasks creating disposable worktrees need to
   avoid accumulating databases after those worktrees are retired.
@@ -452,15 +456,16 @@ before slice planning; story 2 supplies the required browser environment.
 
 ## Ordering and Scope Reduction
 
-**Backlog selection, 2026-09-08:** After 1c, keep stories 2 then 3 ahead of
-remaining notebook-sync stories. 1c proved shared-MySQL unit-test isolation
+**Backlog selection, 2026-09-08:** After 1c, queue stories 2, 3, 6, 4, then 5
+ahead of remaining notebook-sync stories. 1c proved shared-MySQL unit-test isolation
 and ordinary-command reuse; it did not isolate the running application, Cypress,
 fixture reset, or ports. Story 2 is still the highest next learning value.
-Story 3 then covers mock-using browser workflows. Do not queue cleanup, Cloud
-VM, development-profile isolation, or a second worktree identity. Keep CLI and
-MCP stories 4–5 unqueued until the browser environment provides evidence;
-neither is cancelled. The [product backlog](../PRODUCT-BACKLOG.md) owns global
-order. Story 2 is refined and has a slice plan; story 3 still needs refinement.
+Story 3 then covers mock-using browser workflows. Story 6 addresses database
+accumulation before stories 4–5 extend isolation to CLI and MCP. The developer
+requested queuing all remaining stories; story 6 stays unrefined. Cloud VM,
+development-profile isolation, and a second worktree identity remain unqueued.
+The [product backlog](../PRODUCT-BACKLOG.md) owns global order. Story 2 is
+refined and has a slice plan; stories 3–6 still need refinement.
 
 Start with child 1a: it tests the central shared-MySQL assumption with manual
 provisioning and one supported workflow. Follow with 1b and 1c to remove setup
@@ -471,13 +476,13 @@ provisional value ordering, not a technical dependency.
 
 Each delivered story is a safe stopping point with an explicitly supported
 workflow. Do not claim general parallel E2E support after only story 2.
-First-to-drop order is 5, 4, 3, 2, then 1c; retain 1a–1b. Estimates are rough
+First-to-drop order is 5, 4, 6, 3, 2, then 1c; retain 1a–1b. Estimates are rough
 hypotheses without a new implementation audit: 1c is M; existing stories 2–4
 are L and 5 is M. These are low-confidence bands, not a delivery commitment.
 
 Worktree creation integration and safe process ownership belong within the
-first story that needs them. Database reclamation is captured in story 6 and
-remains unrefined and unqueued. A dedicated retirement/cleanup command, persistent
+first story that needs them. Database reclamation is queued in story 6 and
+remains unrefined; a dedicated command is only a possible approach. Persistent
 development-profile isolation, automatic capacity scheduling, multiple E2E
 workers inside one worktree, Cloud VM support, and separate MySQL instances are
 deferred scope. Reconsider them only when an actual workflow requires them.
