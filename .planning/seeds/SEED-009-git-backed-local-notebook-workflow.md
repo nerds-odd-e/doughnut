@@ -221,8 +221,10 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   client, a commit ID never changes. Structural changes also end the batch.
 - **Value / learning:** Tests whether more readable history materially helps
   owners and AI tools. One-note content pull handles several accepted saves;
-  two-note batch pull accepts exactly one disjoint save. Do not use autosave
-  batching to hide that eligibility limit or rewrite already accepted commits.
+  two-note batch pull accepts exactly one disjoint save. Story 18a corrects
+  refusal guidance without broadening that limit. Evaluate readability
+  separately from receiving multiple accepted saves beside a local batch;
+  do not use batching to hide the limit or rewrite already accepted commits.
 - **Effort hypothesis:** M — low confidence; assumes an explicit end-of-edit
   and publication boundary can preserve durable saves and timely synchronization.
 - **Depends on:** delivered Story 3.
@@ -340,6 +342,12 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   A plain accepted addition is delivered in Story 16; do not fold that receipt
   into this folder-move story. Creation followed by another web save is a
   different multi-commit interval (Story 17).
+- **Refinement reminder:** For an ambiguous move, preserve local work and
+  explain what reconciliation is required before publication. Do not recommend
+  publishing the divergent commit as an escape from refusal: publication still
+  requires one supported commit directly on accepted history (Story 18a).
+  Successful reconciliation must be evaluated through explicit publication
+  onto the same learned note, not only through a successful Git rebase.
 
 <a id="story-16"></a>
 
@@ -400,8 +408,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 18a. Understand how to proceed when batch pull refuses divergent history
 
-**Status:** delivered.
-[Slice plan](../quick/068-batch-pull-refusal-guidance/PLAN.md).
+**Status:** delivered. Recover quick/068 from `1945a62286`.
 
 - **Goal:** A notebook owner whose two-note batch cannot receive accepted history
   gets accurate next-step guidance rather than a suggestion to publish a stale
