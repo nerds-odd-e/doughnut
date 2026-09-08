@@ -31,7 +31,7 @@ function resolveGitPath(checkoutRoot, revParseArg) {
 }
 
 // Linked worktrees have a distinct git-dir under the shared common dir.
-function isLinkedGitWorktree(checkoutRoot) {
+export function isLinkedGitWorktree(checkoutRoot) {
   const gitDir = resolveGitPath(checkoutRoot, '--git-dir')
   const commonDir = resolveGitPath(checkoutRoot, '--git-common-dir')
   if (!(gitDir && commonDir)) return false

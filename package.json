@@ -38,6 +38,7 @@
     "backend:lint": "backend/gradlew -p backend lint",
     "backend:test_only": "backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel",
     "backend:test:worktree": "scripts/backend-test-worktree.sh",
+    "worktree:retire": "node scripts/worktree-retirement.mjs",
     "backend:test": "scripts/backend-test.sh",
     "backend:verify": "pnpm backend:test",
     "backend:generateOpenAPIDocs": "backend/gradlew -p backend generateOpenAPIDocs -Dspring.profiles.active=test --build-cache",

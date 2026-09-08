@@ -1,7 +1,7 @@
 # Retire worktree databases before removing the checkout
 
 Source: [SEED-015 story 6](../../seeds/SEED-015-concurrent-worktree-environments.md#story-6).
-Status: planned; story scope accepted 2026-09-08. Planning only.
+Status: in progress; story scope accepted 2026-09-08.
 
 ## Goal and scope
 
@@ -95,9 +95,8 @@ alone do not prove reclamation.
 
 ### 1. Inspect the disposable database targets for this checkout
 Type: Behavior
-Status: planned
-Proof: Command tests for exact target output and invalid target refusals; no
-database mutation, allocation, or identity rewrite.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement*.test.mjs` (8/8) — exact unit/E2E targets for linked identity; refusals for primary, absent/invalid identity, duplicate registered id, custom E2E, and mutation without `--check`. No DB mutation.
 
 Behavior: Existing linked checkout with recorded identity → run `--check` →
 see its exact disposable targets, or a visible ownership/configuration refusal.
