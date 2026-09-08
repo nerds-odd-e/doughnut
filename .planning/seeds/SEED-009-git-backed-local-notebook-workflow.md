@@ -16,11 +16,12 @@ local refinement and web editing should form a continuous workflow without
 manual copying, lost work, or learning history assigned to the wrong note.
 
 Clone, content publish/pull, local additions/deletion/reorganization, bounded
-content rebase, and ordinary web note creation into the sequential loop are
-delivered. The remaining problem is unsupported everyday changes interrupting
-that loop; a cleaner Git log alone does not close it. Story 13 made one
-interruption live: pull still refuses a plain accepted addition when unpublished
-local work exists.
+content rebase, ordinary web note creation, and receiving one accepted addition
+beside one unpublished local content edit are delivered. The remaining problem
+is unsupported everyday changes interrupting that loop; a cleaner Git log
+alone does not close it. Story 16 execution made the next sequential-loop
+refusal observable: pull still refuses when the web-created note is then saved
+before the owner pulls unpublished local work.
 The delivered scope below is planning evidence, not a fresh implementation audit
 or evidence of real-user frequency.
 
@@ -54,15 +55,15 @@ The product constraints established in the discussion are:
 
 ## Alternatives and Decision
 
-1. **Defer:** keep the delivered sequential loop and require a clean checkout
-   before pulling a web-created note. Usable, but it forces the owner to publish
-   or stash local work before receiving a capture made in Donut.
-2. **Smaller behavior change:** keep one unpublished local content edit when
-   accepted history adds a different ordinary note. Recommended next: it removes
-   the interruption Story 13 just enabled, without opening folder-move
+1. **Defer:** keep requiring a clean checkout before pulling a web-created
+   note that was then saved. Usable, but it forces the owner to publish or stash
+   local work before receiving a capture they continued on the web.
+2. **Smaller behavior change:** keep one unpublished local content edit across a
+   web creation followed by that note's first ordinary save. It removes the
+   interruption Stories 13 and 16 just enabled, without opening folder-move
    divergence or commit batching.
-3. **Edits-only multi-note publish:** still valuable for related local
-   revisions, and independent of receiving additions. Story 11 already publishes
+3. **Edits-only multi-note publish:** still the next selected SEED-009 story
+   (Story 14), independent of receiving additions. Story 11 already publishes
    mixed additions and edits; this is convenience, not the newly live block.
 4. **Complete synchronization or web-commit batching:** defer the broad contract
    and readability polish. Neither is the smallest way to remove the next
@@ -190,8 +191,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   explicitly published onto the same identity. No multiple local commits/notes,
   structural edges, automatic stash, forced update, or drift repair. Story 9
   extends this to same-note overlap. A later accepted addition of a different
-  note is a structural edge; receiving it while unpublished local work exists
-  remains Story 16, not this delivered content-only rebase.
+  note is a structural edge; receiving one such commit while unpublished local
+  work exists is delivered in Story 16. Creation followed by another web save
+  remains a multi-commit interval (Story 17), not this content-only rebase.
 
 <a id="story-9"></a>
 
@@ -276,7 +278,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   web saves, clean-main pull, one local content commit, and explicit publish
   retain identity and private learning data. Unrepresented destinations,
   Wikidata/relationship/assisted creation, earlier drift, and divergent receipt
-  across additions stay unsynchronized. No new UI or API shape.
+  across a creation followed by another web save stay unsynchronized. One
+  accepted addition beside one unpublished local content edit is Story 16.
+  No new UI or API shape.
 
 <a id="story-14"></a>
 
@@ -305,10 +309,12 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   body/frontmatter edits at existing root or nested note paths. No structural
   edits, README changes, multiple unpublished commits, or divergent batch rebase.
   Existing additions-and-edits behavior remains separate delivered scope.
-  Reminder from Story 13: publishing a locally refined web-created note uses the
-  ordinary publication path; do not add a special identity route. Receiving an
-  accepted addition while unpublished local work exists is Story 16, not this
-  edits-only batch.
+  Reminder from Stories 13 and 16: publishing a locally refined web-created note
+  uses the ordinary publication path; do not add a special identity route. Pull
+  already receives exactly one accepted ordinary-note addition at root or an
+  already represented folder. Do not fold that receipt, creation-then-save,
+  two additions, addition-plus-edit, or new-folder intervals into this edits-only
+  batch.
 
 <a id="story-15"></a>
 
@@ -336,8 +342,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   folder relocation with unchanged bytes. No concurrent content change on the
   remote side, rename-with-edit, deletion, multiple moves, README authoring,
   unrepresented descendants, or general structural conflict resolution.
-  A plain accepted addition is a different structural edge (Story 16); do not
-  fold that receipt into this folder-move story.
+  A plain accepted addition is delivered in Story 16; do not fold that receipt
+  into this folder-move story. Creation followed by another web save is a
+  different multi-commit interval (Story 17).
 
 <a id="story-16"></a>
 
@@ -358,19 +365,50 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   collisions, moves, renames, deletes, README/new-folder changes, drift repair,
   and creation followed by another web save.
 
+<a id="story-17"></a>
+
+### 17. Keep a local note edit when a web-created note is then saved
+
+**Status:** queued.
+
+- **For / why:** An owner with one committed local content refinement wants to
+  receive a note they captured on the web and immediately continued writing
+  before pulling.
+- **Evaluation:** Accepted history since the shared base is one ordinary-note
+  creation of a different note, then one ordinary save of that same new note.
+  Pull rebases the unpublished local edit over both commits; explicit publish
+  updates the original edited note. Both identities and private learning data
+  remain.
+- **Value / learning:** Tests whether Stories 8 and 16 compose for the
+  sequential capture-then-write path without a new identity policy. Clean-main
+  pull of creation-then-save is already delivered in Story 13.
+- **Effort hypothesis:** M — medium confidence after Story 16; assumes the
+  accepted interval can stay one addition plus following content-only commits
+  on existing notes, including the new note.
+- **Depends on:** delivered Stories 8, 13, and 16; independent of Story 14.
+- **Safe stopping point:** This receipt remains useful without arbitrary
+  structural merges. Preserve accepted commit IDs; never discard local work.
+- **Boundary:** One unpublished local existing-note content commit. Accepted
+  interval is exactly those two commits, addition destination root or already
+  represented folder, save at the new note's unchanged path. No additional
+  remote commits, accompanying edits to other notes, new folders, collisions,
+  moves, deletes, README changes, or drift repair. Do not broaden to two
+  independent additions.
+
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, **13** and **16** are delivered. Remaining selected story is
-**14** (related local revisions). Keep **15 → 10** as unqueued candidates:
+Within this seed, **13** and **16** are delivered. Remaining selected stories
+are **14** (related local revisions) then **17** (creation then first save
+beside unpublished local work). Keep **15 → 10** as unqueued candidates:
 folder-move divergence is consequential but narrower and has unresolved
 identity-policy risk; batching changes readability without unlocking
 synchronization.
 
-First-to-drop order among remaining items: **10, 15, 14**. Stopping after
+First-to-drop order among remaining items: **10, 15, 17, 14**. Stopping after
 Story 16 still leaves a useful supported workflow.
 
 Preserve these boundaries in future refinement:
@@ -388,10 +426,11 @@ Preserve these boundaries in future refinement:
 ## Open Decisions
 
 - **Priority assumption open to revision:** no real-user frequency evidence
-  ranks receiving an addition beside local work, batch refinement, folder
-  divergence, or history readability. Story 13 execution made the addition
-  refusal observable in the sequential loop; that is why 16 precedes 14. Revise
-  if the owner's current workflow makes a different interruption dominant.
+  ranks creation-then-save beside local work, batch refinement, folder
+  divergence, or history readability. Story 16 execution made creation-then-save
+  the next sequential-loop refusal; Near-future direction still selects 14
+  next, with 17 queued after it. Revise if the owner's current workflow makes a
+  different interruption dominant.
 - **Story 15, before selection:** confirm same-identity correspondence and the
   refusal boundary for ambiguity; do not assume ordinary Git rename detection
   alone establishes Donut identity.
@@ -402,7 +441,7 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Refine queued Stories 16 and 14 in this seed before slice planning. Reconsider
+Refine queued Stories 14 and 17 in this seed before slice planning. Reconsider
 15 when folder relocation blocks unpublished work, and 10 when history
 readability is an observed problem. This seed is non-executable; queue selection
 does not authorize implementation.
