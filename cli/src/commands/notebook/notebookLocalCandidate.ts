@@ -25,7 +25,7 @@ const LOCAL_NOT_CONTENT_EDIT =
 
 const LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED =
   'Local main cannot receive the accepted history because the two-note unpublished commit can only rebase over exactly one accepted content save of a different existing ordinary Markdown note. ' +
-  'Reduce or publish the local work, then try again.'
+  'Local work is preserved; reconcile or recreate it as one supported commit directly on accepted history before publication.'
 
 function structuralChangeError(changedPath: string): string {
   return (

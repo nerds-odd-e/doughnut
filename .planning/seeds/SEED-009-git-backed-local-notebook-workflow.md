@@ -68,7 +68,7 @@ The product constraints established in the discussion are:
    concrete interruption; batching already-accepted saves risks conflicting
    with immutable history unless its publication boundary is clarified.
 
-**Priority hypothesis:** Stories 13, 16, 14, 17, and 18 are delivered. Remaining
+**Priority hypothesis:** Stories 13, 16, 14, 17, 18, and 18a are delivered. Remaining
 unqueued candidates in this seed are folder-move divergence (15) and web
 autosave batching (10). Concurrent worktree isolation remains the global
 backlog lead. This is not a claim that usage data proves these are the most
@@ -400,27 +400,16 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 18a. Understand how to proceed when batch pull refuses divergent history
 
-**Status:** Refined; queued after the concurrent-worktree stories.
+**Status:** delivered.
 [Slice plan](../quick/068-batch-pull-refusal-guidance/PLAN.md).
 
-**Goal:** A notebook owner whose two-note batch cannot receive accepted history
-gets accurate next-step guidance rather than a suggestion to publish a stale
-commit that publication will reject.
-
-**Scope:** Correct the batch-specific refusal guidance. Explain that the local
-work is preserved and must be reconciled or recreated as one supported commit
-directly on accepted history before publication. No automatic recovery, broader
-pull eligibility, new commands, or change to publication validation.
-
-**Key example:** One unpublished A/B commit and two accepted C saves → pull
-refuses without changing the checkout and explains the prerequisite for later
-publication. It does not offer immediate publication as a way around divergence.
-The supported one-C-save case still rebases and recommends explicit publication.
-
-**Evidence:** Quick 066 retrospective: `565e0acde7` introduced “Reduce or publish
-the local work” in `LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED`, but
-`assertLocalMainFollowsAcceptedHistory` rejects that divergent commit.
-**Effort hypothesis:** S, high confidence; one existing message and CLI proof loop.
+- **Goal:** A notebook owner whose two-note batch cannot receive accepted history
+  gets accurate next-step guidance rather than a suggestion to publish a stale
+  commit that publication will reject.
+- **Scope:** Correct the batch-specific refusal guidance. Explain that the local
+  work is preserved and must be reconciled or recreated as one supported commit
+  directly on accepted history before publication. No automatic recovery, broader
+  pull eligibility, new commands, or change to publication validation.
 
 ## Ordering and Scope Reduction
 
@@ -428,9 +417,7 @@ The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, **13**, **16**, **14**, **17**, and **18** are delivered.
-Queue the bounded **18a** guidance correction after the existing SEED-015 queue;
-it removes a demonstrated dead end without displacing environment isolation.
+Within this seed, **13**, **16**, **14**, **17**, **18**, and **18a** are delivered.
 Keep **15 → 10** as unqueued candidates: folder-move divergence is
 consequential but narrower and has unresolved identity-policy risk; batching
 changes readability without unlocking synchronization.
