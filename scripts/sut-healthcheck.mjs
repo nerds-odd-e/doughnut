@@ -10,7 +10,10 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
 import { resolveSutCheckoutTarget } from './sut-isolated-target.mjs'
-import { getListenerPids, processGroupId } from './sut-listener-pids.mjs'
+import {
+  getListenerPids,
+  isOwnedByApplicationTree,
+} from './sut-listener-pids.mjs'
 import { verifyLiveSutOwner } from './sut-owner.mjs'
 import { sutHealthEndpoints } from './sut-runtime-target.mjs'
 
@@ -109,10 +112,9 @@ async function verifyOwnedApplicationListeners({
   for (const check of checks) {
     const pids = await getListenerPids(check.port)
     for (const pid of pids) {
-      const pgid = await processGroupId(pid)
-      if (pgid !== applicationGroupId) {
+      if (!(await isOwnedByApplicationTree(pid, applicationGroupId))) {
         log(
-          `FAIL owned listeners — ${check.service} (${check.host}:${check.port}) listener PID ${pid} is outside application group ${applicationGroupId}`
+          `FAIL owned listeners — ${check.service} (${check.host}:${check.port}) listener PID ${pid} is not owned by application tree ${applicationGroupId}`
         )
         return false
       }

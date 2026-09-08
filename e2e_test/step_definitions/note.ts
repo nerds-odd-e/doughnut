@@ -15,6 +15,7 @@ import {
   expectNoteAppearsAsRecentAs,
   expectNoteAppearsNewerThan,
 } from '../start/pageObjects/noteRecentUpdate'
+import { fetchOpenAiMockIsolationProof } from './worktreeOpenAiMockIsolation'
 
 defineParameterType({
   name: 'notepath',
@@ -60,12 +61,15 @@ Then(
 When(
   'I request to complete the content for the note {string}',
   (noteTopology: string) => {
-    start
-      .jumpToNotePage(noteTopology)
-      .startAConversationAboutNote()
-      .replyToConversationAndInviteAiToReply(
-        'Please complete the note content.'
-      )
+    fetchOpenAiMockIsolationProof().then((proof) => {
+      const message = proof
+        ? `Please complete the note content. ${proof.requestMarker}`
+        : 'Please complete the note content.'
+      start
+        .jumpToNotePage(noteTopology)
+        .startAConversationAboutNote()
+        .replyToConversationAndInviteAiToReply(message)
+    })
   }
 )
 

@@ -1,6 +1,5 @@
-import { Mountebank } from '@anev/ts-mountebank'
-
-export const OPEN_AI_IMPOSTER_PORT = 5001
+import type { OpenAiMockEndpointContext } from './openAiMockEndpointContext'
+import { openAiImposterRequestsUrl } from './openAiMockEndpointContext'
 
 export type RecordedImposterRequest = {
   method?: string
@@ -8,27 +7,36 @@ export type RecordedImposterRequest = {
   body?: string | object
 }
 
-const openAiImposterRequestsUrl = () =>
-  `${new Mountebank().mountebankUrl}/imposters/${OPEN_AI_IMPOSTER_PORT}`
+const recordedRequestsFromImposterBody = (
+  body: unknown
+): RecordedImposterRequest[] => {
+  const imposter = body as { requests?: RecordedImposterRequest[] }
+  return imposter.requests ?? []
+}
 
-export const cyFetchOpenAiImposterRequests = (): Cypress.Chainable<
-  RecordedImposterRequest[]
-> =>
-  cy.request('GET', openAiImposterRequestsUrl()).then((res) => {
+export const fetchOpenAiImposterRequests = async (
+  endpoint: OpenAiMockEndpointContext,
+  getJson: (url: string) => Promise<{ status: number; body: unknown }>
+): Promise<RecordedImposterRequest[]> => {
+  const res = await getJson(openAiImposterRequestsUrl(endpoint))
+  if (res.status !== 200) {
+    throw new Error(
+      `OpenAI imposter recorded-request fetch failed: status ${res.status}`
+    )
+  }
+  return recordedRequestsFromImposterBody(res.body)
+}
+
+export const cyFetchOpenAiImposterRequests = (
+  endpoint: OpenAiMockEndpointContext
+): Cypress.Chainable<RecordedImposterRequest[]> =>
+  cy.request('GET', openAiImposterRequestsUrl(endpoint)).then((res) => {
     expect(res.status).to.eq(200)
-    const imposter = res.body as { requests?: RecordedImposterRequest[] }
-    return imposter.requests ?? []
+    return recordedRequestsFromImposterBody(res.body)
   })
 
 const requestBodyAsString = (body: string | object | undefined): string =>
   typeof body === 'string' ? body : JSON.stringify(body)
-
-export const postRequestBodies = (
-  requests: RecordedImposterRequest[]
-): string[] =>
-  requests
-    .filter((r) => r.method === 'POST')
-    .map((r) => requestBodyAsString(r.body))
 
 export const responsesPostBodies = (
   requests: RecordedImposterRequest[]

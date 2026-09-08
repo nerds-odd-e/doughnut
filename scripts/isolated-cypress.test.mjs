@@ -4,6 +4,7 @@ import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs
 import {
   guardCypressNodeSetup,
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
+  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress.mjs'
 import {
   assertRefusesBeforeReset,
@@ -34,6 +35,13 @@ test('unsupported or mixed isolated Cypress specs refuse before reset', async (t
       'run',
       '--spec',
       `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${unsupported}`,
+    ],
+    [
+      'node',
+      'cypress',
+      'run',
+      '--spec',
+      `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC}`,
     ],
     ['node', 'cypress', 'run'],
   ]) {

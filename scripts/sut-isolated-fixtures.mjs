@@ -88,11 +88,11 @@ export function listenTcp() {
   return listenEphemeralPort(() => net.createServer((socket) => socket.end()))
 }
 
-export function listenHttpReady() {
+export function listenHttpReady(body = 'ready') {
   return listenEphemeralPort(() =>
     http.createServer((_req, res) => {
       res.statusCode = 200
-      res.end('ready')
+      res.end(body)
     })
   )
 }

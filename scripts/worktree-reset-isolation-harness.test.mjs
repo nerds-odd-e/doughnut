@@ -1,8 +1,5 @@
 import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
-import { mkdtemp, rm } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
-import path from 'node:path'
 import { test } from 'node:test'
 import { SUPPORTED_ISOLATED_CYPRESS_SPEC } from './isolated-cypress.mjs'
 import {
@@ -20,15 +17,7 @@ import {
   runPairedWorktreeResetIsolation,
   spawnIsolatedCypress,
 } from './worktree-reset-isolation-harness.mjs'
-
-async function withBarrierDir(fn) {
-  const dir = await mkdtemp(path.join(tmpdir(), 'worktree-reset-isolation-'))
-  try {
-    return await fn(dir)
-  } finally {
-    await rm(dir, { recursive: true, force: true })
-  }
-}
+import { withWorktreeResetIsolationBarrierDir } from './worktree-reset-isolation-test-helpers.mjs'
 
 test('barrier steps are no-ops without a paired-run role', async () => {
   const order = ['start']
@@ -40,7 +29,7 @@ test('barrier steps are no-ops without a paired-run role', async () => {
 })
 
 test('resetter waits until the peer seeds, then the peer continues', async () => {
-  await withBarrierDir(async (dir) => {
+  await withWorktreeResetIsolationBarrierDir(async (dir) => {
     const peerEnv = worktreeResetIsolationEnv(
       dir,
       WORKTREE_RESET_ISOLATION_PEER_ROLE
@@ -72,7 +61,7 @@ test('resetter waits until the peer seeds, then the peer continues', async () =>
 })
 
 test('resetter times out loudly when the peer never seeds', async () => {
-  await withBarrierDir(async (dir) => {
+  await withWorktreeResetIsolationBarrierDir(async (dir) => {
     await assert.rejects(
       () =>
         waitBeforeReset({
@@ -115,7 +104,7 @@ test('role without a barrier directory fails loudly', async () => {
 })
 
 test('paired harness starts both runners against one barrier', async () => {
-  await withBarrierDir(async (dir) => {
+  await withWorktreeResetIsolationBarrierDir(async (dir) => {
     const spawned = []
     const result = await runPairedWorktreeResetIsolation({
       peerRoot: '/peer',
@@ -163,7 +152,7 @@ test('paired harness starts both runners against one barrier', async () => {
 })
 
 test('paired harness fails when a Cypress runner exits non-zero', async () => {
-  await withBarrierDir(async (dir) => {
+  await withWorktreeResetIsolationBarrierDir(async (dir) => {
     await assert.rejects(
       () =>
         runPairedWorktreeResetIsolation({

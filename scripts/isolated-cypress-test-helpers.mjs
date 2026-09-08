@@ -19,6 +19,7 @@ export function isolatedCypressOpts(extra = {}) {
     argv: extra.argv ?? cypressArgv(),
     env,
     on: extra.on,
+    startPrivateOpenAiMockFn: extra.startPrivateOpenAiMockFn,
   }
   if (extra.realHealthcheck) {
     return opts

@@ -15,21 +15,24 @@ delivered. This advances
 without claiming its complete synchronization contract.
 Enable developers and AI tasks to verify changes concurrently in local
 worktrees without interfering with each other's data or running services.
-This development priority still leads the queue. 1a–1c, story 2, and story 2a
-delivered ordinary backend-test isolation, the no-mock concurrent browser
-workflow, and refusal of unverified browser allocations on a persistent
-worktree identity. Next is independent external-service mocks,
-then reclaim retired databases to limit accumulation, followed by CLI and
-MCP isolation. Cloud VM and development-profile isolation remain deferred.
+This development priority still leads the queue. 1a–1c, stories 2, 2a, and 3
+delivered ordinary backend-test isolation, concurrent browser workflows, and
+independent OpenAI browser mocks. Next is reclaiming retired databases to limit
+accumulation, followed by CLI and MCP isolation. Cloud VM and development-profile
+isolation remain deferred.
 
-1. [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
+1. [Stop an isolated SUT without leaving its forked backend running](seeds/SEED-015-concurrent-worktree-environments.md#story-2b) — SEED-015
 2. [Reclaim databases from retired worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-6) — SEED-015
 3. [Run CLI E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
 4. [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
 
 ## Recently done
 
+<<<<<<< HEAD
 1. [See one stable commit for one continuous web edit](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-10) — SEED-009
+=======
+1. [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
+>>>>>>> origin/main
 2. [Keep a local note edit across an accepted folder move](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-15) — SEED-009
 3. [Refuse isolated browser verification against an unverified allocation](seeds/SEED-015-concurrent-worktree-environments.md#story-2a) — SEED-015
 4. [Understand how to proceed when batch pull refuses divergent history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-18a) — SEED-009
@@ -39,4 +42,7 @@ MCP isolation. Cloud VM and development-profile isolation remain deferred.
 8. [Publish a related batch of edits to existing notes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-14) — SEED-009
 9. [Keep a local note edit when accepted history adds a different note](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-16) — SEED-009
 10. [Create a note on the web and continue refining it locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13) — SEED-009
+<<<<<<< HEAD
 11. [Move a folder while preserving descendant identities](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7) — SEED-009
+=======
+>>>>>>> origin/main

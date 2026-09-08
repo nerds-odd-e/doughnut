@@ -11,13 +11,20 @@ import MountebankStubBuilder from './MountebankStubBuilder'
 import MountebankWrapper from './MountebankWrapper'
 import { NotPredicate } from './NotPredicate'
 
+/** Shared Mountebank management for Google/Wikidata (unchanged primary/CI). */
+const SHARED_MOUNTEBANK_MANAGEMENT_URL = 'http://localhost:2525'
+
 class ServiceMocker {
   private readonly mountebank: MountebankWrapper
   private readonly mountebankStubBuilder: MountebankStubBuilder
   readonly serviceName: string
 
-  constructor(serviceName: string, port: number) {
-    this.mountebank = new MountebankWrapper(port)
+  constructor(
+    serviceName: string,
+    port: number,
+    managementUrl: string = SHARED_MOUNTEBANK_MANAGEMENT_URL
+  ) {
+    this.mountebank = new MountebankWrapper(port, managementUrl)
     this.mountebankStubBuilder = new MountebankStubBuilder()
     this.serviceName = serviceName
   }

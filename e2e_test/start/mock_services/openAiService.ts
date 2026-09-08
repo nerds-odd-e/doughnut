@@ -4,13 +4,22 @@ import testability from '../testability'
 import createOpenAiResponsesMock from './createOpenAiResponsesMock'
 import {
   cyFetchOpenAiImposterRequests,
-  OPEN_AI_IMPOSTER_PORT,
   responsesPostBodies,
 } from './openAiImposterRecordedRequests'
 import { buildResponsesStreamEvent } from './openAiMessageComposer'
+import {
+  type OpenAiMockEndpointContext,
+  resolveOpenAiMockEndpointContext,
+} from './openAiMockEndpointContext'
 
-const openAiService = () => {
-  const serviceMocker = new ServiceMocker('openAi', OPEN_AI_IMPOSTER_PORT)
+const openAiService = (
+  endpoint: OpenAiMockEndpointContext = resolveOpenAiMockEndpointContext()
+) => {
+  const serviceMocker = new ServiceMocker(
+    'openAi',
+    endpoint.servingPort,
+    endpoint.managementUrl
+  )
   const MOCK_TOKEN = 'mock-token-for-e2e-testing'
   return {
     mock() {
@@ -113,7 +122,7 @@ const openAiService = () => {
     },
 
     expectLastResponsesPostBodyContains(marker: string) {
-      cyFetchOpenAiImposterRequests().then((requests) => {
+      cyFetchOpenAiImposterRequests(endpoint).then((requests) => {
         const postBodies = responsesPostBodies(requests)
         expect(
           postBodies.length,

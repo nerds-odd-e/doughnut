@@ -38,6 +38,10 @@ function isLinkedGitWorktree(checkoutRoot) {
   return gitDir !== commonDir
 }
 
+/** Cypress.expose flag set when this checkout runs under worktree browser isolation. */
+export const WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY =
+  'WORKTREE_BROWSER_ISOLATION'
+
 // Isolation applies when the identity file exists or this checkout is a linked git worktree.
 export function worktreeIsolationApplies(checkoutRoot) {
   return (
