@@ -1,5 +1,6 @@
 import { existsSync, rm } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { guardCypressNodeSetup } from '../../scripts/browser-worktree-isolation.mjs'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
@@ -31,11 +32,11 @@ const commonConfig = {
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
-      await addCucumberPreprocessorPlugin(on, config)
-
       // Cypress 10+ changes process.cwd() to the config file's directory when using --config-file,
       // so resolve from __dirname to get the repo root regardless of cwd.
       const repoRoot = resolve(__dirname, '..', '..')
+      guardCypressNodeSetup(repoRoot)
+      await addCucumberPreprocessorPlugin(on, config)
       const generatedBackendPath = join(
         repoRoot,
         'packages',

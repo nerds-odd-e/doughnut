@@ -5,8 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: planned; refined into 13 ordered leaves, ready for execution.
-This plan authorizes no implementation by itself.
+Status: in progress; slice 1 done, slices 2–13 planned.
 
 ## Goal and scope
 
@@ -150,10 +149,13 @@ Numbers below replace the original leaves; no completed evidence is discarded.
 ### 1. Refuse unsupported isolated commands before shared-state effects
 
 Type: Behavior
-Status: planned
-Proof: Command-boundary cases for linked, configured-primary, unconfigured-
-primary and CI contexts. Observe refusal before service spawn, listener signals,
-or Cypress reset; existing primary/CI commands retain their defaults.
+Status: done
+Proof: `pnpm test:browser-worktree-isolation` — unconfigured primary (with
+`CI=true`) still spawns/health-checks/signals/proceeds through Cypress node
+setup; configured primary and linked checkouts refuse before spawn, TCP
+access, lsof, and reset/mock stand-ins; malformed `.worktree.local.json`
+fails with a JSON error first. Existing `pnpm test:sut-start`,
+`test:sut-healthcheck`, and `test:sut-restart` remain green.
 
 Behavior: A local isolated checkout has no supported browser environment yet →
 start, health, restart or ordinary Cypress run → actionable refusal instead of
@@ -469,10 +471,15 @@ refusal until enabled. Final scope and proof promises remain unchanged.
 
 ## Learnings
 
-Planning inspection found fixed origins in both Cypress and service commands,
-unconditional Mountebank startup/readiness, and restart by listener port rather
-than owner. These explain why a database-only change cannot deliver this story.
-Refinement also found reusable Cypress origin handling and a supervisor that
-already delegates service-tree handling to run-p. Use real-process evidence to
-check its failure propagation; do not assume EventEmitter-only tests prove it.
-No implementation or runtime verification has been performed for this plan.
+- Slice 1: isolation applicability matches backend tests (identity file or
+  linked worktree). Gate lives in `scripts/browser-worktree-isolation.mjs` and
+  is injected at start/health/restart plus Cypress `setupNodeEvents` before the
+  cucumber plugin. Checkout root is injectable so tests run from this linked
+  execution worktree do not refuse themselves. `process.env.CI` is not an
+  escape. Leaves 3, 6, and 8 still replace the blanket refusal.
+- Planning inspection found fixed origins in both Cypress and service commands,
+  unconditional Mountebank startup/readiness, and restart by listener port rather
+  than owner. These explain why a database-only change cannot deliver this story.
+  Refinement also found reusable Cypress origin handling and a supervisor that
+  already delegates service-tree handling to run-p. Use real-process evidence to
+  check its failure propagation; do not assume EventEmitter-only tests prove it.

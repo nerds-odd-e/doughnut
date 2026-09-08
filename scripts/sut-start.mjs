@@ -18,6 +18,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
 import { LOG_TARGETS } from './log-utils.mjs'
 
@@ -182,6 +183,7 @@ export async function waitForSutHealthy({
  *   log?: (s: string) => void,
  *   errLog?: (s: string) => void,
  *   healthcheckFn?: typeof runSutHealthcheck,
+ *   checkoutRoot?: string,
  * }} [opts]
  * @returns {Promise<number>} exit code (0 = healthy, 1 = failed)
  */
@@ -194,7 +196,12 @@ export async function runSutStart({
   log = (s) => process.stdout.write(`${s}\n`),
   errLog = (s) => process.stderr.write(`${s}\n`),
   healthcheckFn = runSutHealthcheck,
+  checkoutRoot = repoRoot,
 } = {}) {
+  refuseUnsupportedIsolatedBrowserCommand({
+    checkoutRoot,
+    command: 'pnpm sut',
+  })
   log(`Starting SUT services... (log: ${logFile})`)
   const { child } = spawnSutServices({ spawnFn, logFile })
   await writePidFile(child.pid, { pidFile })

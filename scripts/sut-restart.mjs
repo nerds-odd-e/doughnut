@@ -6,6 +6,7 @@
 import { execFile, spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
 
 /** Ports used by `pnpm sut` except mountebank (2525). See docs/gcp/prod_env.md */
 export const SUT_RESTART_PORTS = [5173, 5174, 9081]
@@ -131,6 +132,10 @@ export function startPnpmSut({ cwd = repoRoot, spawnFn = spawn } = {}) {
 }
 
 export async function runSutRestart(opts = {}) {
+  refuseUnsupportedIsolatedBrowserCommand({
+    checkoutRoot: opts.checkoutRoot ?? repoRoot,
+    command: 'pnpm sut:restart',
+  })
   await stopSutPorts(opts)
   return startPnpmSut({ cwd: opts.cwd ?? repoRoot, spawnFn: opts.spawnFn })
 }

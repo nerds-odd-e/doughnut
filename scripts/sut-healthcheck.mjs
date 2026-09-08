@@ -8,6 +8,12 @@ import http from 'node:http'
 import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
+
+const repoRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+)
 
 export const DEFAULT_TCP_CHECKS = [
   { service: 'mountebank', host: '127.0.0.1', port: 2525 },
@@ -82,7 +88,12 @@ export async function runSutHealthcheck({
   tcpChecks = DEFAULT_TCP_CHECKS,
   readinessUrl = DEFAULT_READYNESS_URL,
   log = console.log,
+  checkoutRoot = repoRoot,
 } = {}) {
+  refuseUnsupportedIsolatedBrowserCommand({
+    checkoutRoot,
+    command: 'pnpm sut:healthcheck',
+  })
   const tcpResults = []
   for (const check of tcpChecks) {
     const result = await checkTcpPort(check)
@@ -128,6 +139,11 @@ const isMain = process.argv[1]
   : false
 
 if (isMain) {
-  const result = await runSutHealthcheck()
-  process.exit(result.exitCode)
+  try {
+    const result = await runSutHealthcheck()
+    process.exit(result.exitCode)
+  } catch (e) {
+    process.stderr.write(`${e instanceof Error ? e.message : String(e)}\n`)
+    process.exit(1)
+  }
 }
