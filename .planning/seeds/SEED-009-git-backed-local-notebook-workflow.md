@@ -382,7 +382,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 18. Keep a related local edit batch when the web changes a different note
 
-**Status:** queued; refine before slice planning.
+**Status:** refined; planned in [quick/066](../quick/066-local-edit-batch-rebase/PLAN.md).
 
 - **Goal:** An owner can retain one related local revision when a web edit to
   a different note arrives, then publish the revision without splitting it.
@@ -392,7 +392,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   over the accepted commit; explicit publish keeps all three note identities
   and learning data. No overlap, additions, moves, README changes, multiple
   local/remote commits, dirty trees, or drift repair.
-- **Evaluation:** Commit edits to A and B locally; save C on the web; pull,
+- **Key examples:** Commit edits to A and B locally; save C on the web; pull,
   inspect all three contents, and explicitly publish the retained batch.
   Preserve the accepted web commit ID; pull makes no publication request.
 - **Reminders from Story 17:** Local commit shape and accepted interval shape
@@ -407,6 +407,15 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   accepts the whole revision and retains all three identities and learning
   data. A web save of A or B, an extra accepted commit, or a structural edge
   is refused with local HEAD/files and accepted history unchanged.
+- **Boundary assumptions:** Exactly two locally edited notes and exactly one
+  accepted single-parent commit editing only C. Use a bound, clean `main`, valid
+  supported body/frontmatter, and a matching server projection. Three or more
+  locally edited notes and an already-based batch pull remain outside this
+  increment; existing batch publication on an unchanged base still works.
+  Repeat pull after the successful rebase is not added here. Keep the current
+  commands and update their existing guidance to describe this narrow case.
+- **Open questions:** None for this bounded story. Broader batch receipt and
+  conflict policy remain excluded rather than prerequisites.
 - **Value / learning:** Story 14 proves stale publication preserves the batch,
   but current pull still rejects multi-note local work. Test the smallest
   reconciliation of that newly supported revision, independently of structural
