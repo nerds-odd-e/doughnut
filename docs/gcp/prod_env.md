@@ -105,8 +105,8 @@ The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/d
 **Local dev / Cypress (ports and LB — source of truth):**
 
 Primary unconfigured checkouts and CI use the shared ports below. Cypress
-**`baseUrl`** in those contexts remains **`http://localhost:5173`**. A configured
-worktree or primary with `.worktree.local.json` isolates instead — see
+**`baseUrl`** in those contexts remains **`http://localhost:5173`**. A linked
+worktree, or a primary with `.worktree.local.json`, isolates instead — see
 [`worktree-browser-tests.md`](../worktree-browser-tests.md). Isolated start does
 not use Mountebank. Isolated Cypress uses **`http://127.0.0.1:<lbListenPort>`**
 from that checkout's allocation, not 5173.

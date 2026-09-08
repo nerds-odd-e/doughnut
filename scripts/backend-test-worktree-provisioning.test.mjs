@@ -6,6 +6,7 @@ import {
   makeCheckout,
   readGradleInvocation,
   readMysqlInvocation,
+  readMysqlInvocations,
 } from './backend-test-worktree-stand-in-fixtures.mjs'
 import {
   assertRefusedBeforeGradle,
@@ -155,14 +156,17 @@ test('an identity published by another actor during provisioning is preserved, a
   assert.equal(readFileSync(configPath, 'utf8'), winningConfig)
 })
 
-test('existing configuration skips provisioning entirely', (t) => {
+test('existing configuration skips CREATE when the unit database already exists', (t) => {
   const checkout = makeCheckout(t, {
     config: JSON.stringify({ id: 'wt_a7c2' }),
   })
   const result = runLauncher(checkout)
   assert.equal(result.status, 0, outputOf(result))
   assert.doesNotMatch(outputOf(result), /Allocated new worktree environment/)
-  assert.equal(existsSync(checkout.mysqlInvocation), false)
+  const sql = readMysqlInvocation(checkout).args.at(-1)
+  assert.match(sql, /information_schema\.SCHEMATA/)
+  assert.equal(sql.includes('CREATE DATABASE'), false)
+  assert.equal(sql.includes('GRANT'), false)
   assert.equal(
     JSON.parse(readFileSync(`${checkout.root}/.worktree.local.json`, 'utf8'))
       .id,
@@ -170,14 +174,13 @@ test('existing configuration skips provisioning entirely', (t) => {
   )
 })
 
-test('a later invocation reuses the config a first-use provisioning run produced, without provisioning again', (t) => {
+test('a later invocation reuses the config a first-use run produced and skips CREATE', (t) => {
   const checkout = makeCheckout(t)
   const first = runLauncher(checkout)
   assert.equal(first.status, 0, outputOf(first))
 
   const configPath = `${checkout.root}/.worktree.local.json`
   const provisionedConfig = readFileSync(configPath, 'utf8')
-  const mysqlAfterFirstRun = readMysqlInvocation(checkout)
   const database = `doughnut_${JSON.parse(provisionedConfig).id}_test`
 
   // Clear the leftover checkout lock so a later command can acquire a fresh
@@ -190,9 +193,14 @@ test('a later invocation reuses the config a first-use provisioning run produced
   assert.doesNotMatch(outputOf(second), /Allocated new worktree environment/)
   assert.match(outputOf(second), new RegExp(`Selected database: ${database}`))
 
-  // No new mysql call: the invocation record is exactly what the first run
-  // left behind.
-  assert.deepEqual(readMysqlInvocation(checkout), mysqlAfterFirstRun)
+  const mysqlCalls = readMysqlInvocations(checkout)
+  assert.equal(mysqlCalls.length, 2)
+  assert.match(
+    mysqlCalls[0].args.at(-1),
+    new RegExp(`CREATE DATABASE ${database} `)
+  )
+  assert.match(mysqlCalls[1].args.at(-1), /information_schema\.SCHEMATA/)
+  assert.equal(mysqlCalls[1].args.at(-1).includes('CREATE DATABASE'), false)
 
   // The config is unchanged, field-for-field.
   assert.equal(readFileSync(configPath, 'utf8'), provisionedConfig)

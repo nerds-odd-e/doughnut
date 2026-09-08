@@ -13,6 +13,7 @@ function sanitizedChildEnv(env) {
   delete childEnv.FAKE_GRADLE_EXIT
   delete childEnv.FAKE_GRADLE_FAIL_INVOCATION
   delete childEnv.FAKE_MYSQL_EXIT
+  delete childEnv.FAKE_SCHEMA_MISSING
   Object.assign(childEnv, env)
   return childEnv
 }

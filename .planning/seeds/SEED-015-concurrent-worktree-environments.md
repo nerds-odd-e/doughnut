@@ -94,7 +94,7 @@ supported kind per worktree, across two concurrent local worktrees.
 
 ### 1. Run backend unit tests concurrently in separate worktrees
 
-**Status:** Children 1a–1c delivered. Next queued work is story 2
+**Status:** Children 1a–1c and story 2 delivered. Next queued work is story 3.
 (browser E2E without external-service mocks).
 
 **Parent goal**
@@ -262,8 +262,8 @@ simultaneous runners in one checkout, and changes to unrelated Gradle tasks.
 
 ### 2. Run browser E2E scenarios concurrently without external-service mocks
 
-**Status:** Refined, 2026-09-08. No open product questions within the scope
-below. [Slice plan](../quick/061-concurrent-worktree-browser-e2e/PLAN.md).
+**Status:** Delivered. Guide: `docs/worktree-browser-tests.md`.
+[Slice plan](../quick/061-concurrent-worktree-browser-e2e/PLAN.md).
 
 **Goal**
 
@@ -303,62 +303,11 @@ mocks or spawned clients are supported.
   ports, or migration failure stop the supported operation without shared-state
   fallback. Output identifies the selected E2E database and browser origin.
 
-**Boundary assumptions chosen in refinement**
-
-- Preserve unconfigured primary-checkout E2E defaults, consistent with 1c.
-  A primary with local identity uses isolation. CI and Cloud VM behavior stay
-  unchanged. These are conservative refinement choices, not new developer
-  decisions attributed to the prior discussion.
-- SUT lifetime and Cypress-run ownership are separate from the backend-test
-  lock. Share only brief identity initialization coordination; do not hold the
-  backend-test lock for the SUT lifetime. This avoids blocking backend tests
-  merely because the application is running; concurrent compilation within
-  one checkout is not an additional supported workflow.
-- The first E2E allocation may create its new identity-derived E2E database
-  for an existing 1c identity. Once recorded, a missing database is an error,
-  not permission to rebuild it. Leftover resources after interrupted first
-  use are acceptable; destructive recovery remains excluded.
-
-**Key examples**
-
-1. Two fresh worktrees → each runs `pnpm sut`, then the focused Cypress spec
-   concurrently → each logs its own database/origin, creates a note, edits its
-   content, and sees the saved content after reload through its own app.
-2. Both environments contain distinct marker notes → A's ordinary scenario
-   reset runs while B reads/edits its note → B retains its note and completes
-   the edit. Repeat with A and B exchanged; shared E2E/unit-test data remain.
-3. B is healthy with a saved note and A has no active Cypress run → restart A
-   → A becomes healthy on its persisted allocation while B remains usable
-   with its saved note and original processes.
-4. An isolated runner selects a mock/CLI/MCP or other unapproved spec → run
-   refuses before resetting fixtures or contacting shared mocks/clients.
-5. A recorded port belongs to an unrelated listener, or configuration targets
-   another database → start/restart/run refuses with the conflict identified;
-   the unrelated listener and database remain unchanged.
-6. Open a fresh shell in a configured worktree → start and run again → reuse
-   its identity and E2E allocation. An unconfigured primary still follows its
-   existing defaults.
-
-**Architecture**
-
-Keep the local proxy route contract and named browser navigation from
-[ADR 0005](../../docs/adrs/0005-web-routes-accepted.md); vary environment
-origins, not route semantics. Follow
-[ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md): report a target
-or ownership conflict clearly rather than silently falling back. Port records
-are allocation metadata, not operating-system reservations.
-
 **Exclusions:** General parallel E2E support, external-service mocks or live
 external API calls, CLI/MCP (including installed-CLI folder relocation), direct
 `bootRun` entry points, every Cypress alias/open mode, persistent development
 profiles, cleanup/retirement, schema rollback/rebuild, copied-ID recovery,
 worktree hooks, Cloud VM/CI changes, and concurrency scheduling.
-
-**Effort hypothesis:** L (2–4 hours), low confidence. One focused feature and
-four ordinary commands bound the workflow; automatic setup reuses 1c. No
-separate storage engine is assumed. Startup integration is the sizing risk;
-refine execution leaves before attempting a large implementation beat. If
-evidence makes the story larger than L, revisit this story boundary.
 
 **Depends on:** Reuse delivered 1a–1c identity/provisioning behavior. Independent
 mocks and CLI/MCP are not prerequisites.

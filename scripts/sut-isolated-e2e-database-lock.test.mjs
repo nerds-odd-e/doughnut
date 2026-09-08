@@ -13,6 +13,7 @@ import {
 import {
   identityAndPortsConfig,
   readIsolatedConfig,
+  waitForFile,
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
 
@@ -62,16 +63,6 @@ function waitForClose(child) {
       resolve({ status, stdout, stderr })
     })
   })
-}
-
-async function waitForFile(filePath, timeoutMs = 3000) {
-  const deadline = Date.now() + timeoutMs
-  while (!existsSync(filePath)) {
-    if (Date.now() >= deadline) {
-      throw new Error(`timed out waiting for ${filePath}`)
-    }
-    await delay(20)
-  }
 }
 
 test('two same-checkout first-use starts publish one complete allocation', async (t) => {

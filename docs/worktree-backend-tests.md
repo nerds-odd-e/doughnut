@@ -43,10 +43,11 @@ and runs the requested tests (the full form runs the complete suite; the
 way (see Ordinary commands in a fresh linked worktree).
 
 Later invocations in the same checkout find `.worktree.local.json` already
-present, skip provisioning entirely (no database administration call, no
-identity change), and reuse the same database — from a fresh shell, after a
-restart, or from a different terminal, as long as it is the same checkout on
-disk.
+present and reuse that identity. When `doughnut_<id>_test` already exists,
+they query SCHEMATA and skip CREATE. After a SUT-first identity that already
+has an E2E allocation, the first backend-test invocation CREATE/GRANTs that
+unit database only if it is missing (no `IF NOT EXISTS`) and does not rewrite
+E2E fields.
 
 ## Explicit configuration (compatibility path)
 

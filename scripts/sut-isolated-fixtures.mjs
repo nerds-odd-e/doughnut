@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import http from 'node:http'
 import net from 'node:net'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import {
   closeListeningServer,
@@ -49,6 +49,17 @@ export function readIsolatedConfig(checkoutRoot) {
   return JSON.parse(
     readFileSync(path.join(checkoutRoot, '.worktree.local.json'), 'utf8')
   )
+}
+
+export function recordingMysql() {
+  const calls = []
+  return {
+    calls,
+    mysqlExecFn(_file, args) {
+      calls.push(args)
+      return ''
+    },
+  }
 }
 
 export function withEnv(t, overrides) {
@@ -161,6 +172,16 @@ setInterval(() => {}, 1000)
         ...opts,
         env: { ...opts.env, ...extraEnv },
       }),
+  }
+}
+
+export async function waitForFile(filePath, timeoutMs = 5000) {
+  const deadline = Date.now() + timeoutMs
+  while (!existsSync(filePath)) {
+    if (Date.now() >= deadline) {
+      throw new Error(`timed out waiting for ${filePath}`)
+    }
+    await new Promise((resolve) => setTimeout(resolve, 20))
   }
 }
 

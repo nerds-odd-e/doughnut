@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–12 done, slice 13 planned.
+Status: complete.
 
 ## Goal and scope
 
@@ -28,43 +28,8 @@ open/alias coverage, direct Gradle boot entry points, development profiles,
 worktree hooks, cleanup, copied-ID recovery, schema rollback, Cloud VM, and
 capacity scheduling. No second worktree identity or separate MySQL server.
 
-## Execution context
-
-- `scripts/backend-test-worktree-owner.sh` combines identity allocation,
-  database provisioning, and backend-test lifetime locking. Preserve 1a–1c
-  behavior while extracting only identity initialization needed by the next
-  Behavior. Its current config is `{ "id": "wt_..." }`; preserve old files.
-- `scripts/sut-start.mjs` detaches `sut-services.mjs`, records only a PID, and
-  polls fixed endpoints. `sut-services.mjs` starts Mountebank unconditionally.
-  `sut-restart.mjs` signals listeners on fixed ports; isolated mode must never
-  use that ownership assumption.
-- `scripts/local-lb.mjs` already accepts listen/backend/Vite environment
-  settings. `package.json`'s `local:lb:vite` hardcodes the Vite URL;
-  `frontend/vite.config.ts` fixes Vite and proxy ports. Change their environment
-  selection together while preserving ADR 0005 routes.
-- Backend `bootRunE2E` selects the e2e profile; `application.yml` accepts
-  `INPUT_DB_URL`, and ordinary Spring environment properties can supply server
-  and datasource settings. Do not extend the backend-test task parser merely
-  to launch the SUT. Flyway must finish against the selected E2E database
-  before readiness succeeds.
-- `e2e_test/config/common.ts` owns Cypress node setup; both root config and
-  `ci.ts` use it. `config/constants.ts` fixes browser/backend origins. Supply
-  browser-safe settings from node configuration; do not read local files in
-  browser code. `support/e2eAppUrl.ts` already reads Cypress baseUrl and
-  `start/clientConfig.ts` uses relative generated-client requests. Verify
-  pre-navigation reset resolution; leave unused CLI/MCP constants alone.
-- `step_definitions/hook.ts` resets through testability at Before order 0;
-  mock and client hooks follow. Guard supported scope before that reset.
-- Reuse note creation/editing page objects and named navigation from
-  `features/note_creation_and_update/{note_creation,note_edit}.feature` in one
-  focused `worktree_note_editing.feature`. Existing full features contain more
-  behavior than this story promises; do not widen the allowlist implicitly.
-- Redis settings exist in the profile, but no Redis/session integration was
-  found in the searched Java code. Verify the selected login/reset/save path's
-  actual mutable storage before declaring isolation; configuration alone is
-  not evidence that Redis requires allocation. Do not introduce speculative
-  Redis management. Revisit scope if an actual additional shared store blocks
-  the promised path.
+Guide: `docs/worktree-browser-tests.md`. Isolation, ownership, and
+ordinary commands are implemented; this file is the completed execution record.
 
 ## Current decisions
 
@@ -95,24 +60,6 @@ Relevant accepted ADRs: [0005](../../../docs/adrs/0005-web-routes-accepted.md)
 (route semantics unchanged) and
 [0006](../../../docs/adrs/0006-failure-handling-accepted.md)
 (visible failures, no silent fallback). No ADR change is proposed.
-
-## Refinement assessment
-
-All five original leaves are unstarted; no runtime evidence or execution overrun
-exists to preserve. Original leaves 1–5 are **Refine**: identity extraction is
-premature before the configured workflow, startup and Cypress contain several
-beats, restart mixes ownership checks with real-stack verification, and failure
-handling mixes startup cancellation with post-readiness failure.
-
-Keep the same story. Deliver a temporarily operator-configured environment
-first, then remove database/port/identity setup in leaves 10–13. This is an
-interim usable workflow, not a new requirement or a reduced final promise.
-Until a command is supported, isolated mode refuses it before side effects.
-Primary defaults and CI continue to work throughout.
-
-No story escalation is indicated by inspection: the original L hypothesis
-remains plausible for these bounded leaves. Execution must reassess it if the
-actual integration work invalidates that hypothesis.
 
 ## Outside-in proof and promise ownership
 
@@ -463,11 +410,14 @@ dual-stack boot time is an explicit runtime exception.
 ### 13. Start a fresh worktree before any backend-test invocation
 
 Type: Behavior
-Status: planned
-Proof: Ordinary SUT start in a fresh linked worktree creates one canonical ID
-and completes the same focused browser edit. A subsequent ordinary backend-test
-invocation uses that ID. A synchronized SUT/backend first-use boundary case
-shows one complete identity, with distinct purpose databases.
+Status: done
+Proof: `pnpm test:sut-start` (linked missing-config start; unconfigured primary
+writes no identity). `pnpm test:backend-test-worktree` (backend-first;
+SUT-first unit-DB CREATE; later backend-test reuses existing unit DB without
+rewriting E2E). `pnpm test:browser-worktree-isolation` (allowlist unchanged).
+Ordinary disposable linked start + focused Cypress `worktree_note_editing`
++ later `backend:test` reused the same id. Paired harness both directions
+passed through automatic setup.
 
 Behavior: A linked worktree has no local configuration → `pnpm sut` →
 the identity and E2E allocation are prepared without operator setup.
@@ -481,41 +431,6 @@ from the guide and rerun the paired browser workflow through automatic setup.
 Sizing: ~5 minutes, medium confidence; one fresh-first-use composition loop.
 Existing backend regression suite and real stack runtime may dominate elapsed
 time; record those focused-test exceptions, not an implementation exemption.
-
-## Readiness and stopping points
-
-Ready for execution as a sizing hypothesis. Leaves 3 and 6 target 5–8 minutes
-because they connect existing seams; all other leaves target about five minutes.
-At five minutes inspect for hidden work; at ten minutes of implementation
-stop/refine unless a concrete exception was recorded. Do not count this estimate
-as an execution-time guarantee.
-
-The safe interim states are explicit: leaf 1 refuses isolated use; leaf 3
-supports manually configured startup; leaf 6 supports the focused browser run;
-leaf 8 supports owned restart; leaves 10, 12 and 13 remove manual database,
-ports and identity setup respectively. Unsupported commands keep their earlier
-refusal until enabled. Final scope and proof promises remain unchanged.
-
-## Verification and delivery
-
-- Use focused existing SUT start/service/health/restart Node tests as each area
-  changes, and add command-boundary tests for configuration/ownership outcomes.
-  Run tools via `CURSOR_DEV=true nix develop -c ...`.
-- The real two-worktree browser proof is required; no broad E2E suite or manual
-  browser testing is requested. Use temporary linked worktrees and isolated
-  data. Never reset the shared database as part of proof; read-only sentinels
-  can establish preservation. Record exact commands and observed postconditions
-  during execution, not invented pass claims here.
-- No novel SQL/transaction assumption is introduced: reuse proven MySQL
-  database provisioning and standard startup Flyway migration. The two-app
-  capacity/reset proof remains pending, not established by earlier backend
-  suites. No new migration or destructive DDL experiment is planned.
-- Each leaf follows execute-plan's Jidoka, fresh refactor agent, API generation
-  if needed, one coordinator `./scripts/run.sh pnpm format:changed`, plan update,
-  commit and push. No product/API change is currently anticipated.
-- Enforce ~5-minute scrutiny and >10-minute decomposition; focused real startup
-  duration may be recorded as an exception, implementation complexity may not.
-  On changed story scope or a larger-than-L finding, return to the home story.
 
 ## Learnings
 
@@ -572,17 +487,9 @@ refusal until enabled. Final scope and proof promises remain unchanged.
 - Slice 12: identity-only start allocates three distinct ports (never 5173,
   5174, 9081, 2525), records them with the E2E database, and reuses the claim.
   Concurrent checkouts get different claims. Manual port steps were removed
-  from the browser-tests guide. Missing identity file still refuses (leaf 13).
-- Main CI run 34176547886 (SHA `4c604a88`, Frontend Unit Tests 2/2 failed in
-  `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
-  an ancestor of HEAD; concurrent main work. `origin/main` later moved to
-  `40611a4c84`. Disposition: ignore for this execution.
-- Main CI run 34184334377 (SHA `ac9f4ce0`, Package backend & frontend artifacts
-  for deployment failed) is not an ancestor of this execution HEAD. Concurrent
-  main work. Disposition: ignore.
-- Planning inspection found fixed origins in both Cypress and service commands,
-  unconditional Mountebank startup/readiness, and restart by listener port rather
-  than owner. These explain why a database-only change cannot deliver this story.
-  Refinement also found reusable Cypress origin handling and a supervisor that
-  already delegates service-tree handling to run-p. Use real-process evidence to
-  check its failure propagation; do not assume EventEmitter-only tests prove it.
+  from the browser-tests guide.
+- Slice 13: a linked worktree with no config gets a canonical `wt_…` identity
+  on `pnpm sut`, then E2E DB and ports. Later backend-test reuses that id and
+  CREATE/GRANTs `doughnut_<id>_test` only when missing; an existing unit DB is
+  reused without rewriting E2E fields. Concurrent compile in two brand-new
+  worktrees is still unsupported. Guide: `docs/worktree-browser-tests.md`.

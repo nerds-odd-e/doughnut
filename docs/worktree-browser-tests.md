@@ -4,42 +4,28 @@ Use ordinary `pnpm sut` in a local checkout (including a Git worktree) when you
 want the application to run against its own E2E database and ports instead of
 the shared `doughnut_e2e_test` / 5173 / 5174 / 9081 defaults.
 
-This is a **temporary manual identity**. Later work will initialize identity
-automatically. Do not treat this file as the final workflow. Already recorded
-E2E databases and application ports are preserved.
+A Git linked worktree, or a primary checkout that already has
+`.worktree.local.json`, isolates automatically. On first `pnpm sut` in a linked
+worktree with no local configuration, Donut creates a canonical identity
+(`wt_...`), prepares `doughnut_e2e_<id>`, and allocates three application ports.
+Reuse an existing checkout identity when backend tests already created one; do
+not change that identity or repair its unit-test database (`doughnut_<id>_test`).
+Unconfigured primary checkouts (no identity file and not a linked worktree) keep
+the shared local defaults.
 
 MySQL must already be listening on `127.0.0.1:3309` with the established
 passwordless local root administration and the existing `doughnut` test user.
 Isolated start does not start MySQL and does not start Mountebank. On first
-`pnpm sut` with an existing identity, it prepares `doughnut_e2e_<id>` (CREATE +
-GRANT, no `IF NOT EXISTS`) and allocates three distinct application ports.
-Allocated ports are never 5173, 5174, 9081, or 2525. It does not create or
-repair a database that is already recorded, adopt a name that already exists
-in MySQL, or modify `doughnut_test` / `doughnut_e2e_test`.
+`pnpm sut` it prepares `doughnut_e2e_<id>` (CREATE + GRANT, no `IF NOT EXISTS`)
+and allocates three distinct application ports. Allocated ports are never 5173,
+5174, 9081, or 2525. It does not create or repair a database that is already
+recorded, adopt a name that already exists in MySQL, or modify `doughnut_test` /
+`doughnut_e2e_test`. Confirm the identity file is ignored with
+`git check-ignore -v .worktree.local.json`.
 
 `pnpm sut:restart` replaces the idle live owner on this checkout's recorded
 allocation. Ordinary Cypress is supported only for the focused note-editing
 spec below.
-
-## Temporary manual identity
-
-1. Choose an identity matching `wt_[a-z0-9_]{1,32}` (for example `wt_a7c2`).
-   Reuse this checkout's existing `.worktree.local.json` `id` when backend
-   tests already created one. Do not change that identity or repair its
-   unit-test database (`doughnut_<id>_test`).
-2. At this checkout's root, write gitignored `.worktree.local.json` if it is
-   missing. Identity-only `{ "id": "wt_a7c2" }` is enough for `pnpm sut` and
-   remains valid for backend tests. Omit `e2e.database` and the three ports on
-   first use; start records `doughnut_e2e_<id>` and the allocated ports after
-   they succeed. If ports are already recorded, first use keeps them.
-
-```json
-{
-  "id": "wt_a7c2"
-}
-```
-
-Confirm the ignore with `git check-ignore -v .worktree.local.json`.
 
 ## Start and health
 

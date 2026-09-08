@@ -11,6 +11,12 @@ import {
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { mysqlStandInScriptLines } from './backend-test-worktree-mysql-stand-in.mjs'
+
+export {
+  readMysqlInvocation,
+  readMysqlInvocations,
+} from './backend-test-worktree-mysql-stand-in.mjs'
 
 const scriptsSrc = fileURLToPath(new URL('.', import.meta.url))
 const repoRoot = fileURLToPath(new URL('..', import.meta.url))
@@ -145,21 +151,7 @@ export function makeCheckout(t, { config } = {}) {
   const mysqlInvocation = path.join(root, 'mysql-invocation')
   const mysqlReached = path.join(root, 'mysql-reached')
   const mysqlRelease = path.join(root, 'mysql-release')
-  writeStandIn(mysqlStandIn, [
-    '#!/bin/sh',
-    'root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"',
-    'record="$root/mysql-invocation"',
-    '{',
-    '  for arg in "$@"; do',
-    '    printf \'arg:%s\\n\' "$arg"',
-    '  done',
-    '  if [ ! -t 0 ]; then',
-    '    printf \'stdin:%s\\n\' "$(cat)"',
-    '  fi',
-    '} > "$record"',
-    ...holdReleaseLines('MYSQL_HOLD', 'mysql-reached', 'mysql-release'),
-    'exit "${FAKE_MYSQL_EXIT:-0}"',
-  ])
+  writeStandIn(mysqlStandIn, mysqlStandInScriptLines(holdReleaseLines))
 
   return {
     root,
@@ -215,15 +207,4 @@ export function readGradleInvocations(checkout) {
     )
   }
   return invocations
-}
-
-export function readMysqlInvocation(checkout) {
-  const text = readFileSync(checkout.mysqlInvocation, 'utf8')
-  const args = []
-  let stdin
-  for (const line of text.split('\n')) {
-    if (line.startsWith('arg:')) args.push(line.slice('arg:'.length))
-    else if (line.startsWith('stdin:')) stdin = line.slice('stdin:'.length)
-  }
-  return { args, stdin }
 }

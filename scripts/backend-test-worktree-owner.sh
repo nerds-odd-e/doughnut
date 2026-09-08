@@ -6,6 +6,10 @@ database_for_worktree() {
   echo "doughnut_${1}_test"
 }
 
+unit_database_provisioning_sql() {
+  echo "CREATE DATABASE ${1} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON ${1}.* TO 'doughnut'@'localhost'; GRANT ALL PRIVILEGES ON ${1}.* TO 'doughnut'@'127.0.0.1'; FLUSH PRIVILEGES;"
+}
+
 # Linked worktrees have a distinct git-dir under the shared common dir.
 # Unconfigured primary checkouts keep pass-through (no allocation here).
 is_linked_git_worktree() {
@@ -37,9 +41,11 @@ backend_test_worktree_prepare() {
   local new_worktree_id
   local new_database
   local provisioning_sql
+  local allocated_identity=0
   local worktree_id
   local database
   local expected_url
+  local existing_schema
   local var_name
   local arg
 
@@ -62,13 +68,14 @@ backend_test_worktree_prepare() {
     new_worktree_id="$(node "${identity_js}" generate)"
     new_database="$(database_for_worktree "${new_worktree_id}")"
 
-    provisioning_sql="CREATE DATABASE ${new_database} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON ${new_database}.* TO 'doughnut'@'localhost'; GRANT ALL PRIVILEGES ON ${new_database}.* TO 'doughnut'@'127.0.0.1'; FLUSH PRIVILEGES;"
+    provisioning_sql="$(unit_database_provisioning_sql "${new_database}")"
     echo "Provisioning database administration: creating ${new_database} (worktree id ${new_worktree_id})..." >&2
     mysql -u root -h "${mysql_host}" -P "${mysql_port}" -e "${provisioning_sql}"
 
     node "${identity_js}" publish "${checkout_root}" "${new_worktree_id}"
 
     echo "Allocated new worktree environment: ${new_worktree_id}"
+    allocated_identity=1
   fi
 
   worktree_id="$(node "${identity_js}" read "${checkout_root}")"
@@ -96,6 +103,15 @@ backend_test_worktree_prepare() {
         ;;
     esac
   done
+
+  if [[ "${allocated_identity}" -eq 0 ]]; then
+    existing_schema="$(mysql -u root -h "${mysql_host}" -P "${mysql_port}" -N -e "SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='${database}'" | tr -d '[:space:]')"
+    if [[ "${existing_schema}" != "${database}" ]]; then
+      provisioning_sql="$(unit_database_provisioning_sql "${database}")"
+      echo "Provisioning database administration: creating ${database} (worktree id ${worktree_id})..." >&2
+      mysql -u root -h "${mysql_host}" -P "${mysql_port}" -e "${provisioning_sql}"
+    fi
+  fi
 
   echo "Selected database: ${database}"
   export SPRING_DATASOURCE_URL="${expected_url}"

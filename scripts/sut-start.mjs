@@ -18,6 +18,7 @@ import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import {
+  readPresentWorktreeLocalConfig,
   refuseUnsupportedIsolatedBrowserCommand,
   worktreeIsolationApplies,
 } from './browser-worktree-isolation.mjs'
@@ -45,6 +46,7 @@ import {
   spawnSutServices,
   writePidFile,
 } from './sut-start-spawn.mjs'
+import { initializeWorktreeIdentity } from './worktree-identity.mjs'
 
 export { LOG_FILE, PID_FILE, spawnSutServices, writePidFile }
 
@@ -103,6 +105,12 @@ export async function runSutStart({
   signal,
   attachCancelSignals = false,
 } = {}) {
+  if (
+    worktreeIsolationApplies(checkoutRoot) &&
+    readPresentWorktreeLocalConfig(checkoutRoot) === null
+  ) {
+    initializeWorktreeIdentity(checkoutRoot)
+  }
   refuseUnsupportedIsolatedBrowserCommand({
     checkoutRoot,
     command: 'pnpm sut',

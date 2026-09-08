@@ -55,7 +55,7 @@ test('unconfigured primary and CI keep shared SUT and Cypress defaults', async (
   await guardCypressNodeSetup(checkout.root)
 })
 
-test('configured primary identity-only can start; linked checkouts without identity refuse', async (t) => {
+test('configured primary identity-only can start; linked checkouts without identity refuse health, restart, and Cypress', async (t) => {
   withCiEnv(t)
   const configured = makePrimaryCheckout(t, {
     config: JSON.stringify(identityOnlyConfig),
@@ -63,10 +63,6 @@ test('configured primary identity-only can start; linked checkouts without ident
   const linked = makeLinkedWorktreeCheckout(t)
 
   assert.equal(loadIsolatedE2eStartAllocation(configured.root).id, 'wt_a7c2')
-
-  const linkedStart = makeStartSpy()
-  await assert.rejects(runStart(linked.root, linkedStart), incompleteAllocation)
-  assert.equal(linkedStart.calls.length, 0)
 
   for (const checkout of [configured, linked]) {
     const healthLogs = []

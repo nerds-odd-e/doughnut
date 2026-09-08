@@ -11,6 +11,7 @@ import {
   identityAndPortsConfig,
   identityOnlyConfig,
   readIsolatedConfig,
+  recordingMysql,
   runConfiguredStart,
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
@@ -18,17 +19,6 @@ import { isolatedRuntimeTargetFromConfig } from './sut-isolated-target.mjs'
 import { makeStartSpy } from './sut-start-fixtures.mjs'
 
 const expectedDatabase = e2eDatabaseNameForIdentity(identityAndPortsConfig.id)
-
-function recordingMysql() {
-  const calls = []
-  return {
-    calls,
-    mysqlExecFn(_file, args) {
-      calls.push(args)
-      return ''
-    },
-  }
-}
 
 function firstUseOpts(extra = {}) {
   const mysql = extra.mysql ?? recordingMysql()

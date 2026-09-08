@@ -7,6 +7,7 @@ import {
   readGradleInvocation,
   readGradleInvocations,
   readMysqlInvocation,
+  readMysqlInvocations,
 } from './backend-test-worktree-stand-in-fixtures.mjs'
 import {
   outputOf,
@@ -80,7 +81,6 @@ test('later ordinary command in the same linked worktree reuses the allocated id
 
   const configPath = `${checkout.root}/.worktree.local.json`
   const provisionedConfig = readFileSync(configPath, 'utf8')
-  const mysqlAfterFirstRun = readMysqlInvocation(checkout)
   const database = `doughnut_${JSON.parse(provisionedConfig).id}_test`
   rmSync(lockPaths(checkout).dir, { recursive: true, force: true })
 
@@ -90,7 +90,10 @@ test('later ordinary command in the same linked worktree reuses the allocated id
   })
   assert.equal(second.status, 0, outputOf(second))
   assert.doesNotMatch(outputOf(second), /Allocated new worktree environment/)
-  assert.deepEqual(readMysqlInvocation(checkout), mysqlAfterFirstRun)
+  const mysqlCalls = readMysqlInvocations(checkout)
+  assert.equal(mysqlCalls.length, 2)
+  assert.match(mysqlCalls[1].args.at(-1), /information_schema\.SCHEMATA/)
+  assert.equal(mysqlCalls[1].args.at(-1).includes('CREATE DATABASE'), false)
   assert.equal(readFileSync(configPath, 'utf8'), provisionedConfig)
   assert.equal(readGradleInvocations(checkout).at(-1).url, jdbcUrl(database))
 })
