@@ -1,7 +1,7 @@
 # Keep a local note edit across an accepted folder move
 
 Source: [SEED-009 Story 15](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-15).
-Status: planned; planning only, implementation not authorized by this request.
+Status: in progress (slice 1 done).
 
 ## Goal and scope
 
@@ -69,23 +69,10 @@ No new API, command, UI, identity metadata, or general structural merge engine.
 
 ### 1. Separate exact move correspondence from checkout mutation
 Type: Structure
-Status: planned
-Proof: Existing real-Git pull boundary regressions remain green; structural
-intervals are still refused and checkout snapshots remain unchanged.
+Status: done
+Proof: `pnpm --dir cli exec vitest run tests/notebookPull.test.ts tests/notebookPublish.test.ts` green; structural intervals still refused; checkout unchanged.
 
-Internal change: Give the existing history inspector a cohesive internal
-representation of one exact accepted subtree mapping, derived from full tree
-entries and the single accepted edge. Keep move acceptance disabled until
-slice 2. Reuse current ancestry and no-rename Git reads; isolate only the
-mapping calculation needed by that next Behavior. No public testing exports,
-new wire format, generic diff framework, or database mapping.
-
-Immediate next Behavior: slice 2 uses this mapping to retain the local edit.
-The structure commit alone intentionally changes no external behavior.
-Sizing hypothesis: about 5 minutes for tree correspondence and existing focused
-CLI verification, medium confidence. Blob/mode equality and prefix mapping are
-already the server's bounded contract. If this demands additional identity
-policy, stop for story review. Do not add replay machinery in this leaf.
+Internal change: `ExactAcceptedSubtreeMapping` / `exact-subtree-move` inspection from full `ls-tree` entries on the single accepted edge (server FolderShape contract). Move acceptance still disabled until slice 2.
 
 ### 2. Keep and publish the descendant edit after the move
 Type: Behavior
@@ -178,11 +165,5 @@ No permanent sizing exception is granted; the runtime policy below applies.
 
 ## Current questions and learnings
 
-No open product questions. Exact subtree correspondence is supported by the
-existing folder-publication contract. Do not add a general identity mechanism.
-
-Sizing is a hypothesis: scrutinize at 5 minutes; stop and refine at 10 minutes
-unless one focused verification run explains the excess. Backend-suite or
-installed-CLI test runtime may warrant a recorded exception at execution;
-implementation complexity does not. Follow Learning escalation on repeated
-non-exempt overruns. No tests have been run for this planning-only change.
+No open product questions. Slice 1 delivered internal mapping only; pull still
+refuses exact moves until slice 2. Do not add a general identity mechanism.

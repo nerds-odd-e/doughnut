@@ -1,6 +1,6 @@
 import { runSystemGitOrThrow } from './systemGit.js'
 import {
-  firstStructuralPathInAcceptedInterval,
+  inspectAcceptedInterval,
   inspectAncestryFailure,
   isOrdinaryNoteContentChange,
   listCommitChanges,
@@ -97,12 +97,17 @@ export function inspectUnpublishedLocalHistory(
     return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
   }
 
-  const structuralPath = firstStructuralPathInAcceptedInterval(
+  const acceptedInterval = inspectAcceptedInterval(
     acceptedRepoDir,
     parent,
     acceptedHead
   )
-  if (structuralPath !== undefined) {
+  // Exact subtree moves are classified but not yet eligible to rebase.
+  if (acceptedInterval.kind !== 'rebaseable') {
+    const structuralPath =
+      acceptedInterval.kind === 'exact-subtree-move'
+        ? acceptedInterval.structuralPath
+        : acceptedInterval.path
     return { kind: 'reject', message: structuralChangeError(structuralPath) }
   }
   if (parent === acceptedHead) {
