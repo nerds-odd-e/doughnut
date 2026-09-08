@@ -421,12 +421,12 @@ correction delivered as Story 10a.
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
-existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
-selects notebook-workflow priorities and does not displace that direction.
+SEED-015 worktree queue (reclaim, then CLI and MCP) ahead of further SEED-009
+selection; this reassessment does not displace that direction.
 
-Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, **15**, and
-**10** are delivered. Remaining SEED-009 work follows the product backlog after
-worktree priorities.
+Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, **15**,
+**10**, and **10a** are delivered. Remaining SEED-009 work follows the product
+backlog after worktree priorities.
 
 First-to-drop order among remaining unselected items follows the backlog.
 Delivered batch publication and batch reconciliation across one disjoint web
@@ -464,9 +464,9 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Story 10 is delivered. Remaining SEED-009 stories stay non-executable until
-selected from the product backlog; queue selection does not authorize
-implementation.
+Stories 10 and 10a are delivered. Remaining SEED-009 stories stay
+non-executable until selected from the product backlog; queue selection does
+not authorize implementation.
 
 ## Breadcrumbs
 

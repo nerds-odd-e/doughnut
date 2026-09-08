@@ -425,19 +425,54 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ### 6. Reclaim databases from retired worktrees
 
-**Status:** Next environment expansion after queued corrections; retirement policy remains unrefined.
+**Status:** Refined; before-removal scope accepted by the developer, 2026-09-08.
+Plan: [Retire worktree databases](../quick/075-retire-worktree-databases/PLAN.md).
+The product backlog owns ordering.
 
-- **For / why:** Developers and AI tasks creating disposable worktrees need to
-  avoid accumulating databases after those worktrees are retired.
-- **Desired outcome:** Previously created databases can be dropped or reused
-  for later worktrees, keeping unused databases from accumulating while
-  protecting active worktrees and persistent development data.
-- **Open for later refinement:** Dropping versus reuse, when reclamation
-  happens, and how retired databases are identified. No approach selected yet.
+**Goal**
+
+Developers and AI tasks retiring disposable local worktrees can reclaim unused
+test databases without disturbing active worktrees or persistent development
+data.
+
+**Scope**
+
+- Explicitly retire one idle linked worktree while its checkout and recorded
+  identity still exist, before removing that checkout. Drop its disposable
+  unit-test and allocated E2E databases on the existing local MySQL server.
+- Refuse active backend tests, SUTs, Cypress runs, surviving database-using
+  children, and uncertain ownership. Do not stop processes as part of cleanup.
+  Prevent supported workflows from starting against an allocation being retired.
+- Report the selected allocation and reclamation result. Protect peer,
+  primary-checkout, and persistent development databases. Retirement ends use
+  of this allocation; it is not a database reset for continuing tests.
+
+**Exclusions:** Automatic cleanup, recovery
+after checkout deletion, database reuse, a machine-wide inventory, worktree
+removal hooks, copied/moved checkout recovery, process supervision, port-claim
+cleanup, and Cloud VM/CI changes. Port claims are a separate resource; reclaiming
+them is not required to free database storage.
+
+**Key examples**
+
+1. A disposable linked checkout exists and its allocation is verified idle →
+   explicitly retire it → its test databases are reclaimed while a peer's saved
+   data remains usable.
+2. A test, SUT, Cypress runner, or surviving backend still uses the allocation
+   → request retirement → refuse without dropping databases or interrupting work.
+3. The checkout is absent, ownership is uncertain, or the target is primary or
+   persistent data → request retirement → refuse. A name prefix, dead parent,
+   or failed health check does not establish permission to delete.
+
+**Open questions:** None for the accepted boundary: explicit cleanup before
+checkout removal, dropping rather than reuse, and no port-claim cleanup.
+
+**Execution context for subsequent planning**
+
 - **Execution learning:** One identity can own `doughnut_<id>_test` and
-  `doughnut_e2e_<id>`, plus machine-local temporary port claims. Decide how
-  ownership evidence survives checkout removal and whether port claims retire
-  with databases. An absent checkout/dead PID alone is insufficient: account
+  `doughnut_e2e_<id>`, plus machine-local temporary port claims. Ownership evidence
+  stays in the existing checkout; port claims remain outside this story.
+  An absent checkout/dead PID alone is insufficient: account
   for backend runs, live SUTs, and Cypress leases, protecting primary/persistent
   data. The temporary port registry is not a database inventory.
   Unhealthy does not mean retired: story 2a refuses invalid allocations and
@@ -449,7 +484,7 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   alive after its parent stopped; missing parent/lease alone cannot prove retirement.
   Example: a surviving backend still using a candidate database → reclaim →
   refuse; an explicitly retired, verified idle allocation may follow the chosen
-  reclamation policy. Resolve identification and drop-versus-reuse before planning.
+  explicit drop policy.
   A shutdown acknowledgement, supervisor exit, or failed bounded cleanup is
   not evidence of retirement. Story 2b retains ancestry captured before shutdown;
   it cannot identify children already orphaned before that capture. Reclamation
@@ -457,11 +492,10 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08, after quick/072:** Both owned-descendant shutdown
-cases are delivered; no further correction or new product story was identified.
-Queue remains 6 → 4 → 5; reclaim remains
-the next expansion, followed by CLI and MCP. CLI-before-MCP is value ordering,
-not a dependency. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
+**Backlog review, 2026-09-08, after quick/074:** Stories 2b and SEED-009 10a are
+delivered. Queue remains 6 → 4 → 5; reclaim stays next and is in refinement on
+the checkout-removal boundary. CLI-before-MCP is value ordering, not a
+dependency. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 The recording-exclusivity proof correction stays with story 3 in quick/073;
 it does not require a duplicate product story or broader mock support.
 
@@ -472,8 +506,9 @@ Cloud VM, separate MySQL instances, and a second identity remain deferred.
 
 ## Open Decisions
 
-- Resolve retirement identification, dropping versus reuse, and port-claim
-  retirement in story 6; do not infer an implementation from database naming.
+- Story 6's explicit before-removal drop boundary is accepted. Recovery after
+  removal, reuse, and port-claim retirement remain deferred; do not infer
+  ownership from database naming.
 - Revisit shared-server capacity or development profiles only when a selected
   workflow supplies new evidence requiring them.
 

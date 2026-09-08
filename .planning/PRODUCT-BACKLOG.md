@@ -2,24 +2,24 @@
 
 ## Near-future direction
 
-Let notebook owners refine notes in Obsidian or an AI IDE and Donut without
-discarding either side's work or losing learning history. Web note creation,
-keeping one unpublished local content edit across one accepted addition or
-across creation-then-save of a different note, publishing related edits to
-several existing notes in one local commit, keeping a related local edit batch
-across one disjoint web save of a different note, and keeping a local note edit
-across one accepted folder move are delivered. Content rebase and bounded local
-note/folder reorganization are delivered. Web autosave batching (Story 10) and its durable
-fractional-second clock correction (Story 10a) are delivered. This advances
+Developers and AI tasks can verify changes concurrently in local worktrees
+without interfering with each other's data or running services. That remains
+the leading product direction. Backend-test isolation (1a–1c), concurrent
+browser workflows (2, 2a), owned SUT descendant shutdown (2b), and independent
+OpenAI browser mocks (3) are delivered. Next is reclaiming disposable worktree
+databases (story 6; in refinement — decide cleanup before vs after checkout
+removal), then CLI and MCP isolation. Cloud VM and development-profile
+isolation remain deferred. Quick/073 is an outstanding proof correction for
+delivered story 3, not a separate queue story.
+
+Notebook owners can refine notes in Obsidian or an AI IDE and Donut without
+discarding either side's work or losing learning history for the selected
+SEED-009 v1 stories through 18a, including web autosave batching (10) and its
+durable fractional-second clock correction (10a). That advances
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
-without claiming its complete synchronization contract.
-Enable developers and AI tasks to verify changes concurrently in local
-worktrees without interfering with each other's data or running services.
-This development priority still leads the queue. 1a–1c, stories 2, 2a, 2b, and 3
-delivered ordinary backend-test isolation, concurrent browser workflows,
-independent OpenAI browser mocks, and owned SUT descendant shutdown. Next is
-reclaiming retired databases to limit accumulation, followed by CLI and MCP
-isolation. Cloud VM and development-profile isolation remain deferred.
+without claiming its complete synchronization contract. Further SEED-009
+candidates stay unselected until after the worktree queue unless priority
+changes.
 
 1. [Reclaim databases from retired worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-6) — SEED-015
 2. [Run CLI E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
