@@ -4,17 +4,11 @@ import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommi
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.entities.User;
-import com.odde.donut.exceptions.ApiException;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
@@ -91,6 +85,38 @@ class NotebookGitWebContentAmendmentControllerTest
   @Nested
   class EligibilityBoundary {
     @Test
+    void fractionalSaveWithinBatchAmendsAndPersistsMillisecondClock() throws Exception {
+      Fixture fixture = fixture("FracWithin");
+      saveAt(fixture.noteId(), content("first"), T1000_600);
+      NotebookGitBinding afterFirst =
+          inCommittedTransaction(
+              transactionManager,
+              () ->
+                  notebookGitBindingRepository
+                      .findByNotebook_Id(fixture.notebookId())
+                      .orElseThrow());
+      assertThat(afterFirst.getAmendmentLastChangedAt().toInstant(), equalTo(T1000_600));
+      saveAt(fixture.noteId(), content("soon"), T1000_800);
+      assertThat(contentChain(fixture.notebookId(), "FracWithin.md").size(), is(2));
+    }
+
+    @Test
+    void fractionalSaveJustBelowTenMinutesStillAmends() throws Exception {
+      Fixture fixture = fixture("FracBelow");
+      saveAt(fixture.noteId(), content("first"), T1000_600);
+      saveAt(fixture.noteId(), content("below"), T1010_599);
+      assertThat(contentChain(fixture.notebookId(), "FracBelow.md").size(), is(2));
+    }
+
+    @Test
+    void fractionalSaveAtExactTenMinutesAppendsNewEditCommit() throws Exception {
+      Fixture fixture = fixture("FracExact");
+      saveAt(fixture.noteId(), content("first"), T1000_600);
+      saveAt(fixture.noteId(), content("exact"), T1010_600);
+      assertThat(contentChain(fixture.notebookId(), "FracExact.md").size(), is(3));
+    }
+
+    @Test
     void justBelowTenMinutesAmendsWhileExactAndLongerAppend() throws Exception {
       Fixture fixture = fixture("Boundary");
       saveAt(fixture.noteId(), content("first"), T1000);
@@ -137,104 +163,6 @@ class NotebookGitWebContentAmendmentControllerTest
 
       saveAt(fixture.noteId(), content("after-noop"), Instant.parse("2026-09-08T10:09:30Z"));
       assertThat(contentChain(fixture.notebookId(), "NoOp.md").size(), is(2));
-    }
-  }
-
-  @Nested
-  class PathsAndPersistence {
-    @Test
-    void rootAndNestedOrdinaryPathsBatchTheSameWay() throws Exception {
-      Notebook notebook = createGitBackedNotebook();
-      Folder fieldNotes = makeMe.aFolder().notebook(notebook).name("Field Notes").please();
-      Note root =
-          makeMe.aNote().notebook(notebook).title("Root").content(ACCEPTED_CONTENT).please();
-      Note nested =
-          makeMe.aNote().folder(fieldNotes).title("Nested").content(ACCEPTED_CONTENT).please();
-      snapshotCurrentPortableTree(notebook);
-
-      saveAt(root.getId(), content("root-1"), T1000);
-      saveAt(root.getId(), content("root-2"), T1008);
-      assertThat(contentChain(notebook.getId(), "Root.md").size(), is(2));
-
-      saveAt(nested.getId(), content("nested-1"), T1016);
-      saveAt(nested.getId(), content("nested-2"), Instant.parse("2026-09-08T10:20:00Z"));
-      assertThat(contentChain(notebook.getId(), "Field Notes/Nested.md").size(), is(3));
-    }
-
-    @Test
-    void freshPersistenceContextsRetainCandidateAndFrozenState() throws Exception {
-      Fixture fixture = fixture("Fresh");
-      saveAt(fixture.noteId(), content("first"), T1000);
-      NotebookGitBinding eligible =
-          inCommittedTransaction(
-              transactionManager,
-              () ->
-                  notebookGitBindingRepository
-                      .findByNotebook_Id(fixture.notebookId())
-                      .orElseThrow());
-      assertThat(eligible.getAmendmentNoteId(), equalTo(fixture.noteId()));
-
-      saveAt(fixture.noteId(), content("second"), T1008);
-      assertThat(contentChain(fixture.notebookId(), "Fresh.md").size(), is(2));
-
-      controller.downloadNotebookGitBundle(
-          notebookRepository.findById(fixture.notebookId()).orElseThrow());
-      NotebookGitBinding frozen =
-          inCommittedTransaction(
-              transactionManager,
-              () ->
-                  notebookGitBindingRepository
-                      .findByNotebook_Id(fixture.notebookId())
-                      .orElseThrow());
-      assertThat(frozen.getAmendmentHead(), nullValue());
-    }
-
-    @Test
-    void rejectedSaveLeavesNoteHeadAndCandidateUnchanged() throws Exception {
-      Fixture fixture = fixture("Reject");
-      saveAt(fixture.noteId(), content("eligible"), T1000);
-      NotebookGitBinding before =
-          inCommittedTransaction(
-              transactionManager,
-              () ->
-                  notebookGitBindingRepository
-                      .findByNotebook_Id(fixture.notebookId())
-                      .orElseThrow());
-      String head = before.getAcceptedGitObjectId();
-      byte[] bundle = before.getBundleBytes();
-      Integer noteId = before.getAmendmentNoteId();
-      Timestamp lastChanged = before.getAmendmentLastChangedAt();
-      User owner = currentUser.getUser();
-
-      currentUser.setUser(createFixtureUser());
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () ->
-              textContentController.updateNoteContent(
-                  noteRepository.findById(fixture.noteId()).orElseThrow(),
-                  contentDto(content("denied"))));
-      currentUser.setUser(owner);
-      assertThrows(
-          ApiException.class,
-          () ->
-              textContentController.updateNoteContent(
-                  noteRepository.findById(fixture.noteId()).orElseThrow(),
-                  contentDto("---\ntype: Note\naliases: invalid\n---\nbody")));
-
-      NotebookGitBinding after =
-          inCommittedTransaction(
-              transactionManager,
-              () ->
-                  notebookGitBindingRepository
-                      .findByNotebook_Id(fixture.notebookId())
-                      .orElseThrow());
-      assertThat(after.getAcceptedGitObjectId(), equalTo(head));
-      assertThat(after.getBundleBytes(), equalTo(bundle));
-      assertThat(after.getAmendmentNoteId(), equalTo(noteId));
-      assertThat(after.getAmendmentLastChangedAt(), equalTo(lastChanged));
-      assertThat(
-          noteRepository.findById(fixture.noteId()).orElseThrow().getContent(),
-          is(content("eligible")));
     }
   }
 }

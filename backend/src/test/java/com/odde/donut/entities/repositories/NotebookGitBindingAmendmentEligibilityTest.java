@@ -74,7 +74,7 @@ class NotebookGitBindingAmendmentEligibilityTest {
 
   @Test
   void persistsAndReloadsEligibleAmendmentMetadata() throws IOException {
-    Instant lastChanged = Instant.parse("2026-09-08T10:00:00Z");
+    Instant lastChanged = Instant.parse("2026-09-08T10:00:00.600Z");
     Integer noteId = 42;
     BundleWriteResult built = buildBundle();
 
