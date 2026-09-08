@@ -381,7 +381,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 18. Keep a related local edit batch when the web changes a different note
 
-**Status:** delivered ([quick/066](../quick/066-local-edit-batch-rebase/PLAN.md)).
+**Status:** delivered.
 
 - **Goal:** An owner can retain one related local revision when a web edit to
   a different note arrives, then publish the revision without splitting it.

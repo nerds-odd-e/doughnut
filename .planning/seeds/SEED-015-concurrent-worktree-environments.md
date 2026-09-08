@@ -262,7 +262,6 @@ simultaneous runners in one checkout, and changes to unrelated Gradle tasks.
 ### 2. Run browser E2E scenarios concurrently without external-service mocks
 
 **Status:** Delivered. Guide: `docs/worktree-browser-tests.md`.
-[Slice plan](../quick/061-concurrent-worktree-browser-e2e/PLAN.md).
 
 **Goal**
 
@@ -311,11 +310,38 @@ worktree hooks, Cloud VM/CI changes, and concurrency scheduling.
 **Depends on:** Reuse delivered 1a–1c identity/provisioning behavior. Independent
 mocks and CLI/MCP are not prerequisites.
 
+<a id="story-2a"></a>
+
+### 2a. Refuse isolated browser verification against an unverified allocation
+
+**Status:** Refined; corrective follow-up to delivered story 2, queued first.
+[Slice plan](../quick/067-isolated-browser-allocation-safeguards/PLAN.md).
+
+**Goal:** Developers and AI tasks can trust that an isolated browser check
+verifies the owning application on its recorded allocation.
+
+**Scope:** Restore story 2's promised refusal of foreign listeners and invalid
+configuration. A live control socket alone does not establish ownership of
+application listeners. Distinguish absent first-use fields from present invalid
+values; refuse the latter without provisioning or rewriting. Keep valid setup,
+recorded allocations, and primary defaults usable. Exclude mocks, new clients,
+retirement, and automatic repair/reallocation.
+
+**Key examples:** A live owner with unrelated ready listeners remains unhealthy
+and Cypress refuses before reset. A recorded invalid database or port makes
+start refuse without changing configuration or creating resources. An absent
+allocation still initializes normally.
+
+**Evidence:** Quick 061 retrospective, 2026-09-08: real unrelated listeners plus
+a control socket returned healthy without app children; malformed allocation
+values were replaced and a fake launch succeeded (fake MySQL, no real DB writes).
+**Effort hypothesis:** M, medium confidence; retain the existing owner lifecycle.
+
 <a id="story-3"></a>
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
-**Status:** Queued after story 2. Refine the supported external-service scope
+**Status:** Queued after story 2a. Refine the supported external-service scope
 before slice planning; story 2 supplies the required browser environment.
 
 - **For / why:** Developers and AI tasks can verify browser behavior involving
@@ -337,6 +363,13 @@ before slice planning; story 2 supplies the required browser environment.
   workflows can share the environment identity. Refine around one external
   service first if the category is likely larger than L.
 - **Depends on:** The concurrent browser environment from story 2.
+- **Execution learning:** Isolated SUT omits Mountebank entirely. Trace both
+  management and imposter serving ports, backend destinations, reset, and
+  request recording for the selected service. Prove resetting/reconfiguring
+  one worktree's mocks while its peer uses different responses, both ways.
+  Keep no-mock startup independent of mock availability. Widen the allowlist
+  only for proven workflows; multi-spec support must replace the current
+  `after:spec` lease release so ownership protects the whole run.
 
 <a id="story-4"></a>
 
@@ -370,6 +403,11 @@ before slice planning; story 2 supplies the required browser environment.
   cases may need a separate story if refinement shows a larger-than-L scope.
 - **Depends on:** An isolated running application; independent mocks for CLI
   workflows that use them. Browser support itself is not a product prerequisite.
+- **Execution learning:** Cypress origin does not redirect spawned clients;
+  own backend URL and config/install/clone paths before admitting CLI specs.
+  Include or explicitly bound `cli_notebook_existing_note_edits.feature`
+  (SEED-009 story 18). Prove reset, cancellation, and teardown preserve peer
+  files/processes; the current no-mock allowlist rejects these workflows.
 
 <a id="story-5"></a>
 
@@ -390,6 +428,9 @@ before slice planning; story 2 supplies the required browser environment.
   environment is reusable and MCP adds limited client-specific ownership work.
 - **Depends on:** An isolated running application and any mocks the workflow
   uses; CLI support is not a product prerequisite.
+- **Execution learning:** Reuse SUT identity and ownership; Cypress `baseUrl`
+  does not establish MCP endpoint/process ownership. Prove peer usability
+  after disconnect and failed-client cleanup before admitting the chosen spec.
 
 <a id="story-6"></a>
 
@@ -404,59 +445,35 @@ before slice planning; story 2 supplies the required browser environment.
   protecting active worktrees and persistent development data.
 - **Open for later refinement:** Dropping versus reuse, when reclamation
   happens, and how retired databases are identified. No approach selected yet.
+- **Execution learning:** One identity can own `doughnut_<id>_test` and
+  `doughnut_e2e_<id>`, plus machine-local temporary port claims. Decide how
+  ownership evidence survives checkout removal and whether port claims retire
+  with databases. An absent checkout/dead PID alone is insufficient: account
+  for backend runs, live SUTs, and Cypress leases, protecting primary/persistent
+  data. The temporary port registry is not a database inventory.
 
 ## Ordering and Scope Reduction
 
-**Backlog selection, 2026-09-08:** After 1c, queue stories 2, 3, 6, 4, then 5
-ahead of remaining notebook-sync stories. 1c proved shared-MySQL unit-test isolation
-and ordinary-command reuse; it did not isolate the running application, Cypress,
-fixture reset, or ports. Story 2 is still the highest next learning value.
-Story 3 then covers mock-using browser workflows. Story 6 addresses database
-accumulation before stories 4–5 extend isolation to CLI and MCP. The developer
-requested queuing all remaining stories; story 6 stays unrefined. Cloud VM,
-development-profile isolation, and a second worktree identity remain unqueued.
-The [product backlog](../PRODUCT-BACKLOG.md) owns global order. Story 2 is
-refined and has a slice plan; stories 3–6 still need refinement.
+**Backlog review, 2026-09-08:** Stories 1a–1c and 2 are delivered. Put verified
+story 2a safeguards first, then preserve the existing 3 → 6 → 4 → 5 order.
+Trustworthy allocation and owning health precede broader browser support;
+database reclamation follows mocks before expanding to clients. CLI-before-MCP
+is value ordering, not a technical dependency. The
+[product backlog](../PRODUCT-BACKLOG.md) owns global order. Story 2a has a plan;
+stories 3–6 need refinement, and story 6's approach remains undecided.
 
-Start with child 1a: it tests the central shared-MySQL assumption with manual
-provisioning and one supported workflow. Follow with 1b and 1c to remove setup
-and command-selection friction. 1a–1c are delivered. Story 2 then
-delivers a concrete browser workflow. Story 3 broadens browser coverage before
-stories 4 and 5 extend verification to other clients. CLI-before-MCP is a
-provisional value ordering, not a technical dependency.
-
-Each delivered story is a safe stopping point with an explicitly supported
-workflow. Do not claim general parallel E2E support after only story 2.
-First-to-drop order is 5, 4, 6, 3, 2, then 1c; retain 1a–1b. Estimates are rough
-hypotheses without a new implementation audit: 1c is M; existing stories 2–4
-are L and 5 is M. These are low-confidence bands, not a delivery commitment.
-
-Worktree creation integration and safe process ownership belong within the
-first story that needs them. Database reclamation is queued in story 6 and
-remains unrefined; a dedicated command is only a possible approach. Persistent
-development-profile isolation, automatic capacity scheduling, multiple E2E
-workers inside one worktree, Cloud VM support, and separate MySQL instances are
-deferred scope. Reconsider them only when an actual workflow requires them.
+Do not claim general parallel E2E support from the focused no-mock workflow.
+First-to-drop order among expansions is 5, 4, 6, then 3. Persistent development
+profiles, capacity scheduling, multiple E2E workers inside one worktree,
+Cloud VM, separate MySQL instances, and a second identity remain deferred.
 
 ## Open Decisions
 
-- Confirm the provisional browser → CLI → MCP value order when selecting work;
-  current agreement establishes unit-test-first, not priorities among clients.
-- Decide whether persistent development-profile use is needed before the later
-  E2E categories. Its database naming is captured above, but its user workflow
-  is not promised by these initial candidates.
-- Story 1c's compatibility policies are accepted and delivered: unconfigured
-  primary keeps shared unit-test defaults; linked worktrees and configured
-  checkouts isolate ordinary `pnpm backend:test` / wrapper `test` and
-  `migrateTestDB`. First-use automation in 1b is delivered without a particular
-  AI tool or worktree-creation hook; keep that.
-- Concurrent unit tests on shared MySQL 8.4 did not require a separate server;
-  local nix mysqld already starts with `max_connections=1000` after 1a. Revisit
-  the parent direction only if a later workflow (full-suite overlap, E2E, or
-  application stacks) hits a new capacity or lifecycle limit.
-- Story 2 refinement preserves unconfigured primary E2E defaults and separates
-  SUT/Cypress ownership from the backend-test lock; see its boundary assumptions.
-  These no longer block planning story 2.
+- Select the first external-service workflow when refining story 3.
+- Resolve retirement identification, dropping versus reuse, and port-claim
+  retirement in story 6; do not infer an implementation from database naming.
+- Revisit shared-server capacity or development profiles only when a selected
+  workflow supplies new evidence requiring them.
 
 ## When to Surface
 
@@ -469,17 +486,12 @@ Select and refine one story before creating an executable plan.
 - Developer discussion, 2026-09-07: shared MySQL across worktrees; endorse
   unit-test-first delivery; propose a gitignored worktree identity/database
   suffix and allocated service ports initialized by a hook or skill.
-- Discussion improvements: deterministic idempotent setup, first-use fallback,
-  one configuration loader, coordinated allocation, explicit process ownership,
-  and independent shared-service lifecycle. These remain design hypotheses.
-- Existing evidence discussed earlier: `scripts/nix_shell_hook.sh`,
-  `scripts/shell_setup.sh`, `backend/src/main/resources/application.yml`,
-  `backend/src/main/java/com/odde/donut/testability/DBCleanerWorker.java`,
-  `e2e_test/step_definitions/hook.ts`, and `scripts/sut-restart.mjs`.
 - [ADR 0006: Failure handling](../../docs/adrs/0006-failure-handling-accepted.md).
 - [Problem decomposition](../../.cursor/rules/problem-decomposition.mdc).
 - Stories 1a–1c: concurrent suites on shared MySQL 8.4.11 work; automatic
   first-use and ordinary `pnpm backend:test` / wrapper migrate and test
   isolate in linked worktrees, including exclusive stale-lock reclaim.
-  Recover 1c (quick/060) from `c96676002f`. Story 2 must still isolate SUT,
-  Cypress, E2E data, and ports.
+  Recover 1c (quick/060) from `c96676002f`; story 2 (quick/061) from
+  `ef7044e07c`. Current guides: `docs/worktree-backend-tests.md` and
+  `docs/worktree-browser-tests.md`. SUT/Cypress ownership is separate from
+  backend-test ownership; no worktree-creation hook is required.
