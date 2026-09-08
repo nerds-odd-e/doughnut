@@ -343,34 +343,53 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 16. Keep a local note edit when accepted history adds a different note
 
-**Status:** queued.
+**Status:** queued; refined.
 
-- **For / why:** An owner who already has one unpublished local content edit
-  then creates a different ordinary note on the web. Pull currently refuses
-  because a plain accepted addition is a structural edge. That refusal became
-  the next interruption of the sequential loop once Story 13 started producing
-  those additions.
-- **Evaluation:** A bound checkout has one unpublished single-parent commit
-  editing one existing ordinary note. Accepted history then adds a different
-  ordinary note at root or an existing represented folder. Pull rebases the
-  local edit over that addition, leaves recoverable unpublished work, and the
-  new note is present. Explicit publish updates only the edited identity; the
-  added note keeps its identity and private data.
-- **Value / learning:** Makes web capture usable without requiring a clean
-  working tree first. Tests whether one non-overlapping accepted addition can
-  reuse Story 8's content rebase without opening general structural divergence.
+**Goal:** A notebook owner can receive a new web-created note while keeping one
+committed, unpublished local refinement, then publish that refinement without
+losing either note's identity or learning history.
+
+**Scope:**
+
+- Start from a bound `main` checkout with a clean working tree and exactly one
+  unpublished single-parent commit editing the body/frontmatter of one existing
+  ordinary note at its unchanged path. The remote projection matches accepted
+  history.
+- Since the shared base, accepted history contains exactly one new commit,
+  adding exactly one different ordinary note at the root or an existing
+  represented folder, with no accompanying edits.
+- Pull receives the added note and rebases the local edit, keeping it
+  unpublished. Accepted commit IDs remain unchanged. A later explicit publish
+  updates the original edited note; both notes retain their own identities and
+  private learning data.
+- Exclude uncommitted edits/automatic stash, multiple local commits or edited
+  notes, multiple remote commits or additions, accompanying remote content
+  edits, same-path collisions, moves, deletes, renames, README changes, new
+  folders, and projection-drift repair. Existing supported content-only rebase
+  remains as delivered; this adds no general structural reconciliation.
+
+**Key examples:**
+
+1. From a shared base containing `Alpha.md`, commit a local body edit to Alpha;
+   create `Beta.md` on the web in one accepted commit → pull → Beta appears
+   locally and Alpha retains its local edit in an unpublished commit. Donut's
+   Alpha is still unchanged. The same receipt works when Beta is created in an
+   existing represented folder.
+2. After that pull → explicitly publish → Donut's original Alpha contains the
+   refinement and keeps its learning history; Beta's content, identity, and
+   private data are unchanged.
+3. With the same local edit, accepted history adds Beta and also renames another
+   note → pull → refuse this unsupported divergence, retaining local work and
+   leaving accepted history unchanged. Likewise, uncommitted local edits still
+   require the owner to clean the working tree; pull does not stash them.
+
 - **Effort hypothesis:** M — low confidence; assumes unique path correspondence
   is enough to rebase one content edit over one addition. Revisit size if the
   new note's identity policy needs more than Stories 8 and 13 already prove.
 - **Depends on:** delivered Stories 8 and 13; independent of Story 14.
-- **Safe stopping point:** Owners can still pull additions on a clean checkout
-  and still use Story 8 for content-only remote edits. Refusal remains correct
-  for overlapping paths, multiple local commits, or mixed structural edges.
-- **Boundary:** Exactly one unpublished local content commit and one accepted
-  addition of a different ordinary note. No folder moves, deletes, renames,
-  README changes, same-path overlap, multiple additions, multiple local
-  commits, or general divergent structural receipt. Do not expand Stories 8 or
-  14 into this outcome.
+
+No unresolved decisions within this narrow scope. Broader receipt across a
+creation followed by web edits is excluded from this story.
 
 ## Ordering and Scope Reduction
 
