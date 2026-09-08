@@ -114,25 +114,15 @@ Enables immediately: slice 2 can durably freeze a candidate on download.
 
 ### 2. Freeze the exact history returned by a download
 Type: Behavior
-Status: planned
-Proof: Through NotebookController, download a seeded eligible tip; the returned
-bundle has that head, and eligibility is absent in a fresh committed transaction.
-Use the existing queued-writer harness to prove selection waits on the shared
-binding lock, then returns the committed current head. Denied access leaves
-eligibility untouched; retain existing missing-binding behavior.
+Status: done
+Proof: `pnpm backend:test_only` green —
+`NotebookGitBundleDownloadFreezeControllerTest` freezes seeded eligible tip,
+queued save-then-download waits on binding lock then returns committed head,
+denied access leaves eligibility, missing binding unchanged.
 
-Behavior: An owner downloads a notebook's Git bundle → lock the binding, freeze
-its current tip, select its bytes and commit → return that exact frozen bundle.
-Keep the HTTP signature and authorization. Replace the read-only transaction
-with a write transaction that completes before response delivery; avoid an outer
-read-only scope suppressing the update. No browser acknowledgement or unfreeze
-on download failure. All cloning/pulling clients already use this endpoint.
-Implementation focus: NotebookController and a small transactional operation
-in services/notebookGit, using the existing repository lock directly; no need
-to load the full Portable projection just to download it.
-Sizing: about 5–8 minutes plus full backend unit runtime. Scrutinized: one
-response path and one reused locking proof loop; no new concurrency harness.
-Stop-safe: no production amendment yet; downloads continue returning history.
+Behavior: Owner downloads Git bundle → `NotebookGitBundleDownloadService.selectAndFreeze`
+locks binding, clears amendment fields, returns bytes in a write transaction
+before response delivery. HTTP signature/auth unchanged.
 
 ### 3. Freeze a head returned by idempotent publication
 Type: Behavior
