@@ -86,5 +86,8 @@ export async function stopOwnedSutProcessTree(
   signalOwnedTree(child, pgid, descendants, 'SIGTERM')
   if (await waitUntilOwnedTreeStops(child, pgid, descendants, timeoutMs)) return
   signalOwnedTree(child, pgid, descendants, 'SIGKILL')
-  await waitUntilOwnedTreeStops(child, pgid, descendants, 1_000)
+  if (await waitUntilOwnedTreeStops(child, pgid, descendants, 1_000)) return
+  throw new Error(
+    'Owned SUT process tree did not exit after SIGKILL within the bounded wait'
+  )
 }

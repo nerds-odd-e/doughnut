@@ -56,6 +56,8 @@ if (name === 'backend' && process.env.SUT_FIXTURE_BACKEND_PORT) {
   const port = Number(process.env.SUT_FIXTURE_BACKEND_PORT)
   const readyFile = path.join(here, 'backend-listener.ready')
   const listenerPidFile = path.join(here, 'backend-listener.pid')
+  const termAckFile = path.join(here, 'backend-listener.term')
+  const ignoreTerm = process.env.SUT_FIXTURE_BACKEND_IGNORE_TERM === '1'
   const listener = spawn(
     process.execPath,
     [
@@ -65,7 +67,14 @@ import net from 'node:net'
 net.createServer((s) => s.end()).listen(\${port}, '127.0.0.1', () => {
   writeFileSync(\${JSON.stringify(readyFile)}, 'ready')
 })
-setInterval(() => {}, 1000)
+\${
+  ignoreTerm
+    ? \`process.on('SIGTERM', () => {
+  writeFileSync(\${JSON.stringify(termAckFile)}, 'term')
+})
+\`
+    : ''
+}setInterval(() => {}, 1000)
 \`,
     ],
     { detached: true, stdio: 'ignore' }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
@@ -75,7 +75,10 @@ setTimeout(() => process.exit(1), 1000)
   )
 }
 
-test('idle live owner restart stops owned children, holds the claim, and starts on the same allocation', async (t) => {
+async function readyOwnedDetachedBackendRestart(
+  t,
+  { ignoreTerm = false } = {}
+) {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
   writeOwnedSupervisorRunPPeers(checkout.root)
@@ -83,11 +86,13 @@ test('idle live owner restart stops owned children, holds the claim, and starts 
   const foreign = spawnForeignProcess()
   const foreignListener = await listenTcp()
   const backendPort = await allocateFreePort()
+  const env = { SUT_FIXTURE_BACKEND_PORT: String(backendPort) }
+  if (ignoreTerm) env.SUT_FIXTURE_BACKEND_IGNORE_TERM = '1'
   const { supervisor, state } = spawnDetachedOwnedSupervisor(t, {
     checkoutRoot: checkout.root,
     owner,
     logFile: path.join(checkout.root, 'sut.log'),
-    env: { SUT_FIXTURE_BACKEND_PORT: String(backendPort) },
+    env,
     afterCleanup: () => {
       try {
         foreign.kill('SIGKILL')
@@ -108,27 +113,41 @@ test('idle live owner restart stops owned children, holds the claim, and starts 
     checkout.root,
     backendPort
   )
-  const backendParentPgid = await processGroupId(state.pids.backend)
-  const backendListenerPgid = await processGroupId(state.pids.backendListener)
   assert.notEqual(
-    backendListenerPgid,
-    backendParentPgid,
+    await processGroupId(state.pids.backendListener),
+    await processGroupId(state.pids.backend),
     'detached backend listener must be in a separate process group'
   )
   assert.equal(await isTcpListening(backendPort), true)
 
-  const supervisorPid = supervisor.pid
-  const ownedParentPid = state.pids.backend
-  const ownedBackendPid = state.pids.backendListener
+  return {
+    checkout,
+    owner,
+    foreign,
+    foreignListener,
+    backendPort,
+    supervisorPid: supervisor.pid,
+    state,
+    ownedParentPid: state.pids.backend,
+    ownedBackendPid: state.pids.backendListener,
+    termAckPath: path.join(checkout.root, 'backend-listener.term'),
+  }
+}
+
+function assertOwnedBackendClearedBeforeStart(ctx) {
+  assert.equal(isPidAlive(ctx.ownedParentPid), false)
+  assert.equal(isPidAlive(ctx.ownedBackendPid), false)
+  assertPortBindable(ctx.backendPort)
+  assertTcpResponding(ctx.foreignListener.port)
+}
+
+async function restartAfterOwnedStop(ctx, { ownerStopTimeoutMs, beforeStart }) {
   const start = makeStartSpy()
   const code = await runSutRestart({
-    checkoutRoot: checkout.root,
+    checkoutRoot: ctx.checkout.root,
     execFileFn: lsofMustNotRun(),
     spawnFn: (...args) => {
-      assert.equal(isPidAlive(ownedParentPid), false)
-      assert.equal(isPidAlive(ownedBackendPid), false)
-      assertPortBindable(backendPort)
-      assertTcpResponding(foreignListener.port)
+      beforeStart()
       return start.spawnFn(...args)
     },
     log: () => undefined,
@@ -136,30 +155,52 @@ test('idle live owner restart stops owned children, holds the claim, and starts 
     healthcheckFn: healthyOnce,
     databaseExistsFn: () => true,
     isPortOccupiedFn: async () => false,
-    logFile: path.join(checkout.root, 'restart.log'),
-    pidFile: path.join(checkout.root, 'restart.pid'),
-    ownerStopTimeoutMs: 8_000,
+    logFile: path.join(ctx.checkout.root, 'restart.log'),
+    pidFile: path.join(ctx.checkout.root, 'restart.pid'),
+    ownerStopTimeoutMs,
   })
-
   assert.equal(code, 0)
   await waitUntil(
     () =>
       !(
-        isPidAlive(state.pids.backend) ||
-        isPidAlive(state.pids.backendListener) ||
-        isPidAlive(state.pids.lb) ||
-        isPidAlive(state.pids.frontend) ||
-        isPidAlive(supervisorPid)
+        isPidAlive(ctx.state.pids.backend) ||
+        isPidAlive(ctx.state.pids.backendListener) ||
+        isPidAlive(ctx.state.pids.lb) ||
+        isPidAlive(ctx.state.pids.frontend) ||
+        isPidAlive(ctx.supervisorPid)
       ),
     5_000,
     'timed out waiting for owned peers and supervisor to exit'
   )
-  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), true)
+  assert.equal(existsSync(sutOwnerLockDir(ctx.checkout.root)), true)
   assert.equal(start.calls.length, 1)
-  assert.equal(start.calls[0][2].env.SUT_OWNER_TOKEN, owner.token)
-  assert.equal(start.calls[0][2].env.SUT_OWNER_CONTROL_PATH, owner.controlPath)
-  assert.equal(isPidAlive(foreign.pid), true)
-  assert.equal(await isTcpListening(foreignListener.port), true)
+  assert.equal(isPidAlive(ctx.foreign.pid), true)
+  assert.equal(await isTcpListening(ctx.foreignListener.port), true)
+  return start
+}
+
+test('idle live owner restart stops owned children, holds the claim, and starts on the same allocation', async (t) => {
+  const ctx = await readyOwnedDetachedBackendRestart(t)
+  const start = await restartAfterOwnedStop(ctx, {
+    ownerStopTimeoutMs: 8_000,
+    beforeStart: () => assertOwnedBackendClearedBeforeStart(ctx),
+  })
+  assert.equal(start.calls[0][2].env.SUT_OWNER_TOKEN, ctx.owner.token)
+  assert.equal(
+    start.calls[0][2].env.SUT_OWNER_CONTROL_PATH,
+    ctx.owner.controlPath
+  )
+})
+
+test('restart escalates past a TERM-ignoring owned backend before start', async (t) => {
+  const ctx = await readyOwnedDetachedBackendRestart(t, { ignoreTerm: true })
+  await restartAfterOwnedStop(ctx, {
+    ownerStopTimeoutMs: 15_000,
+    beforeStart: () => {
+      assertOwnedBackendClearedBeforeStart(ctx)
+      assert.equal(readFileSync(ctx.termAckPath, 'utf8'), 'term')
+    },
+  })
 })
 
 test('busy Cypress lease refuses isolated restart before signals', async (t) => {
