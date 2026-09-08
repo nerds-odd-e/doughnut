@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–10 done, slices 11–13 planned.
+Status: in progress; slices 1–11 done, slices 12–13 planned.
 
 ## Goal and scope
 
@@ -420,9 +420,10 @@ Reuse proven MySQL CREATE/GRANT behavior, not a new storage experiment.
 ### 11. Centralize port claims for the immediately following first-use path
 
 Type: Structure
-Status: planned
-Proof: Existing configured start/conflict command cases from leaf 3 remain
-green through the same launcher. No automatic port selection is exposed yet.
+Status: done
+Proof: `pnpm test:sut-start` (configured start/conflict plus explicit claim
+publication, cross-checkout serialization, occupied TCP not terminated).
+`pnpm test:browser-worktree-isolation` (start vs complete allocation).
 
 Internal change: Put recorded port validation and claim publication behind one
 bounded allocator seam, with machine-local serialization for cooperating
@@ -562,6 +563,10 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   success. Collision and missing recorded DB refuse without adoption. Manual
   CREATE DATABASE steps were removed from the browser-tests guide; ports stay
   manual until leaf 12.
+- Slice 11: `ensureIsolatedE2ePorts` publishes the three application ports as
+  one machine-local claim (`os.tmpdir()/doughnut-worktree-e2e-port-claims`).
+  Claiming metadata does not own listeners; occupied TCP still refuses. No
+  auto-selection yet.
 - Main CI run 34176547886 (SHA `4c604a88`, Frontend Unit Tests 2/2 failed in
   `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
   an ancestor of HEAD; concurrent main work. `origin/main` later moved to

@@ -1,8 +1,6 @@
 import { EventEmitter } from 'node:events'
-import path from 'node:path'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
-import { healthyOnce } from './sut-start-fixtures.mjs'
-import { runSutStart } from './sut-start.mjs'
+import { runConfiguredStart } from './sut-isolated-fixtures.mjs'
 
 export const isolatedCypressSpec = /only supports|spec selection/i
 export const malformedJson = /not valid JSON/i
@@ -41,18 +39,8 @@ function trackingHealthChecks(accessed) {
   ]
 }
 
-export async function runStart(checkoutRoot, spawn) {
-  return runSutStart({
-    checkoutRoot,
-    spawnFn: spawn.spawnFn,
-    logFile: path.join(checkoutRoot, 'sut.log'),
-    pidFile: path.join(checkoutRoot, 'sut.pid'),
-    timeoutMs: 5_000,
-    pollMs: 50,
-    log: () => undefined,
-    errLog: () => undefined,
-    healthcheckFn: healthyOnce,
-  })
+export function runStart(checkoutRoot, spawn) {
+  return runConfiguredStart(checkoutRoot, spawn)
 }
 
 export async function runHealth(checkoutRoot, logs, accessed) {

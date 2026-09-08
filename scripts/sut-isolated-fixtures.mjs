@@ -120,6 +120,9 @@ export async function runConfiguredStart(checkoutRoot, spawn, extra = {}) {
     databaseExistsFn: extra.databaseExistsFn ?? (() => true),
     mysqlExecFn: extra.mysqlExecFn,
     schemaExistsFn: extra.schemaExistsFn,
+    portClaimRoot:
+      extra.portClaimRoot ??
+      path.join(checkoutRoot, '.doughnut-e2e-port-claims'),
     signal: extra.signal,
     ...(extra.isPortOccupiedFn
       ? { isPortOccupiedFn: extra.isPortOccupiedFn }

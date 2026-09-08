@@ -22,6 +22,7 @@ import {
   worktreeIsolationApplies,
 } from './browser-worktree-isolation.mjs'
 import { ensureIsolatedE2eDatabase } from './sut-e2e-database.mjs'
+import { ensureIsolatedE2ePorts } from './sut-e2e-ports.mjs'
 import { checkTcpPort } from './sut-healthcheck.mjs'
 import {
   assertAllocatedPortsFree,
@@ -75,6 +76,7 @@ async function releaseFailedIsolatedStart({ child, checkoutRoot }) {
  *   mysqlExecFn?: typeof import('node:child_process').execFileSync,
  *   schemaExistsFn?: (database: string) => boolean,
  *   isPortOccupiedFn?: (port: number) => Promise<boolean>,
+ *   portClaimRoot?: string,
  *   retainOwnership?: boolean,
  *   signal?: AbortSignal,
  *   attachCancelSignals?: boolean,
@@ -96,6 +98,7 @@ export async function runSutStart({
   mysqlExecFn,
   schemaExistsFn,
   isPortOccupiedFn,
+  portClaimRoot,
   retainOwnership = false,
   signal,
   attachCancelSignals = false,
@@ -110,6 +113,7 @@ export async function runSutStart({
       schemaExistsFn,
       log,
     })
+    ensureIsolatedE2ePorts(checkoutRoot, { claimRoot: portClaimRoot })
   }
   const { isolated, target } = resolveSutCheckoutTarget({
     checkoutRoot,

@@ -2,6 +2,11 @@ import { spawnSync } from 'node:child_process'
 import { readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 import {
+  E2E_PORT_CONFIG_FIELDS,
+  collectMissingE2ePorts,
+  isolatedE2ePortsRequiredError,
+} from './sut-e2e-ports.mjs'
+import {
   assertValidWorktreeId,
   worktreeLocalConfigPath,
 } from './worktree-identity.mjs'
@@ -64,39 +69,20 @@ const SUPPORTED_ISOLATED_SUT_COMMANDS = new Set([
   'pnpm sut:restart',
 ])
 
-const E2E_PORT_FIELDS = ['backendPort', 'vitePort', 'lbListenPort']
-const E2E_ALLOCATION_FIELDS = [
-  'e2e.database',
-  ...E2E_PORT_FIELDS.map((field) => `e2e.${field}`),
-]
+const E2E_ALLOCATION_FIELDS = ['e2e.database', ...E2E_PORT_CONFIG_FIELDS]
 
 export function isRecordedE2eDatabase(database) {
   return typeof database === 'string' && /^[A-Za-z0-9_]+$/.test(database)
 }
 
-function collectMissingE2ePorts(e2e) {
-  if (!e2e || typeof e2e !== 'object') {
-    return E2E_PORT_FIELDS.map((field) => `e2e.${field}`)
-  }
-  const missing = []
-  for (const field of E2E_PORT_FIELDS) {
-    if (!Number.isInteger(e2e[field]) || e2e[field] <= 0) {
-      missing.push(`e2e.${field}`)
-    }
-  }
-  return missing
-}
-
 function allocationError(checkoutRoot, missing, { start } = {}) {
-  const configPath = worktreeLocalConfigPath(checkoutRoot)
-  const needed = start
-    ? 'identity and application ports in'
-    : 'a complete E2E allocation in'
-  const fields = start
-    ? '(id, e2e.backendPort, e2e.vitePort, e2e.lbListenPort)'
-    : '(id, e2e.database, e2e.backendPort, e2e.vitePort, e2e.lbListenPort)'
+  if (start) {
+    return isolatedE2ePortsRequiredError(checkoutRoot, missing)
+  }
   return new Error(
-    `Isolated worktree SUT needs ${needed} ${configPath} ${fields}. ` +
+    `Isolated worktree SUT needs a complete E2E allocation in ${worktreeLocalConfigPath(
+      checkoutRoot
+    )} (id, ${E2E_ALLOCATION_FIELDS.join(', ')}). ` +
       `Missing or invalid: ${missing.join(', ')}. See docs/worktree-browser-tests.md.`
   )
 }
@@ -118,10 +104,7 @@ function readRequiredWorktreeConfig(
 export function loadIsolatedE2eStartAllocation(checkoutRoot) {
   const config = readRequiredWorktreeConfig(
     checkoutRoot,
-    [
-      'identity (.worktree.local.json)',
-      ...E2E_PORT_FIELDS.map((field) => `e2e.${field}`),
-    ],
+    ['identity (.worktree.local.json)', ...E2E_PORT_CONFIG_FIELDS],
     { start: true }
   )
   const missing = collectMissingE2ePorts(config.e2e)
