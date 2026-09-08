@@ -48,7 +48,7 @@ Feature: CLI notebook web-created note
 
       """
 
-  Scenario: Pulling completed web text after title-only creation into a clean checkout
+  Scenario: Publishing a local refinement of received web-created note text updates Donut
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I create a title-only root note titled "Shopping list" in the notebook "CLI Clone Notebook"
     And I view the note content as rich content
@@ -68,3 +68,13 @@ Feature: CLI notebook web-created note
       ---
       Milk and eggs
       """
+    When I commit the following edit to "Shopping list.md" in the cloned checkout:
+      """
+      ---
+      type: Note
+      ---
+      Milk, eggs, and bread
+      """
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I should see note "CLI Clone Notebook/Shopping list" has content "Milk, eggs, and bread"
