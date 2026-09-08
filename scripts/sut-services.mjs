@@ -3,6 +3,10 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRotatingLogWriter, LOG_TARGETS } from './log-utils.mjs'
+import {
+  resolveSutRuntimeTarget,
+  withSutRuntimeTargetEnv,
+} from './sut-runtime-target.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -23,10 +27,14 @@ export function runSutServices({
   spawnFn = spawn,
   logFile = process.env.SUT_LOG_FILE ?? LOG_TARGETS.sut,
   logWriter = createRotatingLogWriter(logFile),
+  runtimeTarget,
+  env = process.env,
 } = {}) {
+  const target = resolveSutRuntimeTarget({ runtimeTarget, env })
   const child = spawnFn('pnpm', SUT_SERVICE_ARGS, {
     cwd: repoRoot,
     stdio: ['ignore', 'pipe', 'pipe'],
+    env: withSutRuntimeTargetEnv(env, target),
     shell: false,
   })
 

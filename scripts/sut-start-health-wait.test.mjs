@@ -9,7 +9,7 @@ import {
   makeMockChild,
   neverHealthy,
 } from './sut-start-fixtures.mjs'
-import { waitForSutHealthy } from './sut-start.mjs'
+import { waitForSutHealthy } from './sut-start-health-wait.mjs'
 
 test('waitForSutHealthy returns ok=true when healthcheck passes immediately', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'sut-start-test-'))

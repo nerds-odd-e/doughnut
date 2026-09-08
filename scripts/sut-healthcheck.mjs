@@ -9,20 +9,16 @@ import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
+import {
+  resolveSutRuntimeTarget,
+  sutHealthEndpoints,
+} from './sut-runtime-target.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 )
 
-export const DEFAULT_TCP_CHECKS = [
-  { service: 'mountebank', host: '127.0.0.1', port: 2525 },
-  { service: 'backend', host: '127.0.0.1', port: 9081 },
-  { service: 'local LB', host: '127.0.0.1', port: 5173 },
-  { service: 'frontend vite', host: '127.0.0.1', port: 5174 },
-]
-
-export const DEFAULT_READYNESS_URL = 'http://127.0.0.1:5173/__lb__/ready'
 const TCP_TIMEOUT_MS = 1_500
 const HTTP_TIMEOUT_MS = 10_000
 
@@ -85,8 +81,9 @@ function formatReadyLine(result) {
 }
 
 export async function runSutHealthcheck({
-  tcpChecks = DEFAULT_TCP_CHECKS,
-  readinessUrl = DEFAULT_READYNESS_URL,
+  runtimeTarget,
+  tcpChecks,
+  readinessUrl,
   log = console.log,
   checkoutRoot = repoRoot,
 } = {}) {
@@ -94,8 +91,12 @@ export async function runSutHealthcheck({
     checkoutRoot,
     command: 'pnpm sut:healthcheck',
   })
+  const target = resolveSutRuntimeTarget({ runtimeTarget })
+  const endpoints = sutHealthEndpoints(target)
+  const checks = tcpChecks ?? endpoints.tcpChecks
+  const readyUrl = readinessUrl ?? endpoints.readinessUrl
   const tcpResults = []
-  for (const check of tcpChecks) {
+  for (const check of checks) {
     const result = await checkTcpPort(check)
     const line = { ...check, ...result }
     tcpResults.push(line)
@@ -110,13 +111,13 @@ export async function runSutHealthcheck({
   if (!lbUp) {
     readinessResult = {
       skipped: true,
-      url: readinessUrl,
-      reason: 'local LB not listening on 127.0.0.1:5173',
+      url: readyUrl,
+      reason: `local LB not listening on ${new URL(readyUrl).host}`,
     }
   } else {
     readinessResult = {
-      url: readinessUrl,
-      ...(await checkHttpReady({ url: readinessUrl })),
+      url: readyUrl,
+      ...(await checkHttpReady({ url: readyUrl })),
     }
   }
   log(formatReadyLine(readinessResult))

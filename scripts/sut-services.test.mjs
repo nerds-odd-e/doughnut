@@ -38,5 +38,15 @@ test('runSutServices starts run-p and writes stdout/stderr to the rotating write
   assert.strictEqual(spawnCalls[0].cmd, 'pnpm')
   assert.deepStrictEqual(spawnCalls[0].args, SUT_SERVICE_ARGS)
   assert.strictEqual(spawnCalls[0].opts.shell, false)
+  assert.strictEqual(
+    spawnCalls[0].opts.env.LOCAL_LB_VITE_UPSTREAM,
+    'http://127.0.0.1:5174'
+  )
+  assert.strictEqual(spawnCalls[0].opts.env.SERVER_PORT, '9081')
+  assert.strictEqual(spawnCalls[0].opts.env.LOCAL_LB_LISTEN_PORT, '5173')
+  assert.strictEqual(
+    spawnCalls[0].opts.env.LOCAL_LB_BACKEND,
+    'http://127.0.0.1:9081'
+  )
   assert.deepStrictEqual(writes, ['stdout line\n', 'stderr line\n'])
 })

@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slice 1 done, slices 2–13 planned.
+Status: in progress; slices 1–2 done, slices 3–13 planned.
 
 ## Goal and scope
 
@@ -172,10 +172,13 @@ Sizing: ~5 minutes, medium confidence; one command-selection matrix.
 ### 2. Feed one runtime target through the existing application launcher
 
 Type: Structure
-Status: planned
-Proof: Existing SUT service/start/health and proxy routing tests remain green
-with legacy settings. Exercise the launcher boundary with one explicit target
-fixture; no test-only exports of individual configuration helpers.
+Status: done
+Proof: `pnpm test:sut-start` — legacy launcher still injects
+`LOCAL_LB_VITE_UPSTREAM=http://127.0.0.1:5174` and ports 9081/5173; one
+explicit target fixture flows through `runSutServices`, `runSutStart`, and
+`runSutHealthcheck` (env + TCP/readiness endpoints). `pnpm test:sut-healthcheck`
+and `pnpm test:path-routing` remain green. Isolation gate stays closed
+(`pnpm test:browser-worktree-isolation`).
 
 Internal change: Pass one resolved runtime target through backend environment,
 Vite port/proxy, local-LB upstream/listen settings, and readiness. Remove the
@@ -477,6 +480,12 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   cucumber plugin. Checkout root is injectable so tests run from this linked
   execution worktree do not refuse themselves. `process.env.CI` is not an
   escape. Leaves 3, 6, and 8 still replace the blanket refusal.
+- Slice 2: one `scripts/sut-runtime-target.mjs` object is applied as process
+  env (`SERVER_PORT`, `INPUT_DB_URL`, `LOCAL_LB_*`, `FRONTEND_DEV_PORT`,
+  `FRONTEND_BACKEND_ORIGIN`) and health endpoints. `local:lb:vite` no longer
+  hardcodes the Vite URL; `pnpm sut` supplies it. Bare `local:lb:vite` without
+  that env has no Vite upstream — CI/`pnpm test` still use `local:lb`. Update
+  `docs/gcp/prod_env.md` when leaf 3 documents isolated start.
 - Planning inspection found fixed origins in both Cypress and service commands,
   unconditional Mountebank startup/readiness, and restart by listener port rather
   than owner. These explain why a database-only change cannot deliver this story.

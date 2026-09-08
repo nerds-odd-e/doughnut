@@ -15,6 +15,8 @@ import checker from 'vite-plugin-checker'
 // Check if we're running tests - Vitest sets process.env.VITEST
 // This is the official and most reliable way to detect test mode
 const isTest = process.env.VITEST !== undefined
+const backendOrigin =
+  process.env.FRONTEND_BACKEND_ORIGIN ?? 'http://localhost:9081'
 
 const config = defineConfig({
   // pdf.js uses `new Worker(src, { type: 'module' })`; match that in dev and build.
@@ -68,13 +70,13 @@ const config = defineConfig({
     ]),
   ],
   server: {
-    port: 5174,
+    port: Number(process.env.FRONTEND_DEV_PORT || 5174),
     strictPort: true,
     proxy: {
-      '/api': 'http://localhost:9081',
-      '/attachments': 'http://localhost:9081',
-      '/logout': 'http://localhost:9081',
-      '/testability': 'http://localhost:9081',
+      '/api': backendOrigin,
+      '/attachments': backendOrigin,
+      '/logout': backendOrigin,
+      '/testability': backendOrigin,
     },
   },
   optimizeDeps: {
