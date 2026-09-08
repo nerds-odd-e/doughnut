@@ -24,8 +24,8 @@ recorded, adopt a name that already exists in MySQL, or modify `doughnut_test` /
 `git check-ignore -v .worktree.local.json`.
 
 `pnpm sut:restart` replaces the idle live owner on this checkout's recorded
-allocation. Ordinary Cypress is supported only for the focused note-editing
-spec below.
+allocation. Ordinary Cypress is supported only for the two focused specs
+below.
 
 ## Start and health
 
@@ -74,22 +74,33 @@ claim can be reclaimed.
 
 ## Focused Cypress run
 
-With that owning SUT healthy, run only this spec — mixed or other features are
-refused before reset:
+With that owning SUT healthy, run exactly one of these specs — mixed or other
+features are refused before reset:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_content/note_content_completion.feature
 ```
+
+The note-editing spec does not start Mountebank. The note-content completion
+spec starts a runner-owned private Mountebank after the Cypress lease, with
+temporary management and OpenAI serving ports that exclude shared defaults
+(2525/5001) and this checkout's application ports. Ownership of both listeners
+is verified before fixture reset and again before mock install. Endpoints are
+passed through Cypress `expose` config; isolated mode never falls back to
+2525/5001.
+Normal completion or cancellation stops that owned mock before releasing the
+runner lease so a later run can start. The identity file and application
+allocation are not modified for mock ports.
 
 Cypress node configuration sets `baseUrl` to this checkout's browser origin
 (`http://127.0.0.1:<lbListenPort>`). The browser uses that origin for named
 navigation and for the Before-order-0 testability reset; it does not read local
 files. A second Cypress runner, or `CYPRESS_baseUrl` / `baseUrl` that does not
-match the allocated origin, is refused before reset. Completion or cancellation
-releases the runner so a later run can start. Restart while that runner is
-held is refused.
+match the allocated origin, is refused before reset. Restart while that runner
+is held is refused.
 
 Primary checkouts without `.worktree.local.json` keep the shared local defaults
 documented in `docs/gcp/prod_env.md`, including Cypress origin
-`http://localhost:5173`. A primary checkout that has local identity uses
-isolation.
+`http://localhost:5173` and shared Mountebank 2525/5001 for OpenAI mocks.
+A primary checkout that has local identity uses isolation.

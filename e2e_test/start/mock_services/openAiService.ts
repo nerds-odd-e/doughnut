@@ -9,11 +9,11 @@ import {
 import { buildResponsesStreamEvent } from './openAiMessageComposer'
 import {
   type OpenAiMockEndpointContext,
-  SHARED_OPEN_AI_MOCK_ENDPOINT_CONTEXT,
+  resolveOpenAiMockEndpointContext,
 } from './openAiMockEndpointContext'
 
 const openAiService = (
-  endpoint: OpenAiMockEndpointContext = SHARED_OPEN_AI_MOCK_ENDPOINT_CONTEXT
+  endpoint: OpenAiMockEndpointContext = resolveOpenAiMockEndpointContext()
 ) => {
   const serviceMocker = new ServiceMocker(
     'openAi',

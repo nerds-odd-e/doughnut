@@ -10,6 +10,10 @@ import {
   GMAIL_E2E_OAUTH_ADD_CONFIG,
 } from '../config/cliGmailE2eConfig'
 import start, { mock_services } from '../start'
+import {
+  ISOLATED_OPEN_AI_MOCK_ENV_KEY,
+  VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK,
+} from '../start/mock_services/openAiMockEndpointContext'
 import { cli } from '../start/pageObjects/cli'
 
 const WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS = 180_000
@@ -17,6 +21,23 @@ const WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS = 180_000
 function worktreeResetIsolationTask(name: string) {
   cy.task(name, null, { timeout: WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS })
 }
+
+function isolatedOpenAiMockActive() {
+  return Boolean(Cypress.expose(ISOLATED_OPEN_AI_MOCK_ENV_KEY))
+}
+
+function verifyIsolatedOpenAiMockOwnershipBeforeMutation() {
+  if (!isolatedOpenAiMockActive()) {
+    return
+  }
+  cy.task(VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK)
+}
+
+// Ownership preflight for private OpenAI mocks must precede Before-order-0
+// fixture reset. Recheck again before OpenAI install/recreate below.
+Before({ order: -1 }, () => {
+  verifyIsolatedOpenAiMockOwnershipBeforeMutation()
+})
 
 // order 0: before tagged setup (e.g. @interactiveCLI order 2). Default hook
 // order is 10000 — without this, CLI PTY would start before DB reset and can
@@ -77,6 +98,7 @@ After({ tags: '@usingMockedWikidataService' }, () => {
 })
 
 Before({ tags: '@usingMockedOpenAiService' }, () => {
+  verifyIsolatedOpenAiMockOwnershipBeforeMutation()
   mock_services.openAi().mock()
 })
 

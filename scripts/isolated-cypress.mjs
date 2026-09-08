@@ -1,9 +1,21 @@
-import path from 'node:path'
 import {
   loadCompleteIsolatedE2eAllocation,
   readPresentWorktreeLocalConfig,
   worktreeIsolationApplies,
 } from './browser-worktree-isolation.mjs'
+import {
+  ISOLATED_OPEN_AI_MOCK_ENV_KEY,
+  OPEN_AI_MOCK_ENDPOINT_ENV_KEY,
+  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+  VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK,
+  startPrivateOpenAiMock,
+} from './isolated-openai-mock.mjs'
+import {
+  assertSupportedIsolatedCypressSpecs,
+  hasExplicitCypressSpecSelection,
+  selectedCypressSpecs,
+  specsFromBeforeRun,
+} from './isolated-cypress-spec-selection.mjs'
 import { isolatedBrowserOrigin } from './sut-runtime-target.mjs'
 import {
   acquireSutRunnerLease,
@@ -12,89 +24,13 @@ import {
   verifyLiveSutOwner,
 } from './sut-owner.mjs'
 
-export const SUPPORTED_ISOLATED_CYPRESS_SPEC =
-  'e2e_test/features/note_creation_and_update/worktree_note_editing.feature'
+export {
+  SUPPORTED_ISOLATED_CYPRESS_SPEC,
+  SUPPORTED_ISOLATED_CYPRESS_SPECS,
+  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+} from './isolated-cypress-spec-selection.mjs'
 
 const PRIMARY_CYPRESS_ORIGIN = 'http://localhost:5173'
-
-function specArgsFromArgv(argv) {
-  const specs = []
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i]
-    if (arg === '--spec' && argv[i + 1]) {
-      specs.push(argv[i + 1])
-      i += 1
-    } else if (typeof arg === 'string' && arg.startsWith('--spec=')) {
-      specs.push(arg.slice('--spec='.length))
-    }
-  }
-  return specs.flatMap((value) =>
-    value
-      .split(',')
-      .map((part) => part.trim())
-      .filter(Boolean)
-  )
-}
-
-function specPatterns(specPattern) {
-  if (Array.isArray(specPattern)) return specPattern
-  return specPattern ? [specPattern] : []
-}
-
-function normalizeSelectedSpec(spec, checkoutRoot) {
-  const trimmed = spec.trim().replace(/\\/g, '/')
-  const withoutFile = trimmed.startsWith('file:')
-    ? trimmed.slice('file:'.length)
-    : trimmed
-  const absolute = path.isAbsolute(withoutFile)
-    ? withoutFile
-    : path.resolve(checkoutRoot, withoutFile)
-  const relative = path.relative(checkoutRoot, absolute).replace(/\\/g, '/')
-  if (!relative.startsWith('..')) {
-    return relative.replace(/^\.\//, '')
-  }
-  return withoutFile.replace(/^\.\//, '')
-}
-
-function selectedCypressSpecs({ argv, specPattern, checkoutRoot }) {
-  const fromArgv = specArgsFromArgv(argv)
-  const raw = fromArgv.length > 0 ? fromArgv : specPatterns(specPattern)
-  return raw.map((spec) => normalizeSelectedSpec(spec, checkoutRoot))
-}
-
-function isGlobSpecPattern(spec) {
-  return spec.includes('*') || spec.includes('?')
-}
-
-function hasExplicitCypressSpecSelection(argv, specPattern) {
-  if (specArgsFromArgv(argv).length > 0) return true
-  const patterns = specPatterns(specPattern)
-  return (
-    patterns.length > 0 &&
-    patterns.every((pattern) => !isGlobSpecPattern(pattern))
-  )
-}
-
-function specsFromBeforeRun(details, checkoutRoot) {
-  const specs = details?.specs ?? []
-  return specs.map((spec) =>
-    normalizeSelectedSpec(
-      spec.relative ?? spec.absolute ?? spec.name ?? String(spec),
-      checkoutRoot
-    )
-  )
-}
-
-function assertSupportedIsolatedCypressSpecs(specs) {
-  if (specs.length === 1 && specs[0] === SUPPORTED_ISOLATED_CYPRESS_SPEC) {
-    return
-  }
-  throw new Error(
-    'Isolated Cypress only supports ' +
-      `${SUPPORTED_ISOLATED_CYPRESS_SPEC}. ` +
-      'Refusing this spec selection so it does not reset, mock, or use shared defaults.'
-  )
-}
 
 function refuseConflictingCypressOrigin(env, config, isolatedOrigin) {
   const envOrigin = env.CYPRESS_baseUrl
@@ -143,12 +79,12 @@ function failLoudly(error) {
   process.exit(1)
 }
 
-function registerRunnerLeaseRelease(release) {
+function registerRunnerCleanup(cleanup) {
   let released = false
   const releaseOnce = async () => {
     if (released) return
     released = true
-    await release()
+    await cleanup()
   }
   process.once('SIGINT', () => {
     releaseOnce().catch(failLoudly)
@@ -157,6 +93,20 @@ function registerRunnerLeaseRelease(release) {
     releaseOnce().catch(failLoudly)
   })
   return releaseOnce
+}
+
+function injectOpenAiMockEndpoint(config, endpoint) {
+  if (!config.expose || typeof config.expose !== 'object') {
+    config.expose = {}
+  }
+  config.expose[OPEN_AI_MOCK_ENDPOINT_ENV_KEY] = endpoint
+  config.expose[ISOLATED_OPEN_AI_MOCK_ENV_KEY] = true
+}
+
+function clearOpenAiMockEndpoint(config) {
+  if (!config.expose || typeof config.expose !== 'object') return
+  delete config.expose[OPEN_AI_MOCK_ENDPOINT_ENV_KEY]
+  delete config.expose[ISOLATED_OPEN_AI_MOCK_ENV_KEY]
 }
 
 export async function guardCypressNodeSetup(
@@ -174,14 +124,15 @@ export async function guardCypressNodeSetup(
     argv,
     config.specPattern
   )
-  if (explicitSpecs) {
-    assertSupportedIsolatedCypressSpecs(
-      selectedCypressSpecs({
+  const selectedWhenKnown = explicitSpecs
+    ? selectedCypressSpecs({
         argv,
         specPattern: config.specPattern,
         checkoutRoot,
       })
-    )
+    : null
+  if (explicitSpecs) {
+    assertSupportedIsolatedCypressSpecs(selectedWhenKnown)
   } else if (typeof options.on !== 'function') {
     assertSupportedIsolatedCypressSpecs(
       selectedCypressSpecs({
@@ -196,26 +147,102 @@ export async function guardCypressNodeSetup(
   refuseConflictingCypressOrigin(env, config, origin)
   await requireHealthyOwningSut(checkoutRoot, options.healthcheckFn)
   const leaseToken = await acquireSutRunnerLease(checkoutRoot)
-  const releaseOnce = registerRunnerLeaseRelease(() =>
-    releaseSutRunnerLease(checkoutRoot, leaseToken)
-  )
+
+  let privateMock = null
+  let cleanupOnce = async () => {
+    /* replaced after lease + mock are ready */
+  }
+
+  const observeMockFailure = (mock) => {
+    mock.child?.once('exit', () => {
+      const failure = mock.getFailure?.()
+      if (!failure) return
+      cleanupOnce()
+        .catch(() => {
+          /* cleanup best-effort before failLoudly */
+        })
+        .finally(() => failLoudly(failure))
+    })
+  }
+
+  const startMockIfNeeded = async (specs) => {
+    if (specs.length !== 1) {
+      assertSupportedIsolatedCypressSpecs(specs)
+    }
+    if (specs[0] !== SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC) {
+      clearOpenAiMockEndpoint(config)
+      return
+    }
+    if (privateMock) return
+    privateMock = await (
+      options.startPrivateOpenAiMockFn ?? startPrivateOpenAiMock
+    )({
+      checkoutRoot,
+      allocation,
+    })
+    injectOpenAiMockEndpoint(config, privateMock.endpoint)
+    observeMockFailure(privateMock)
+  }
+
+  cleanupOnce = registerRunnerCleanup(async () => {
+    if (privateMock) {
+      await privateMock.stop()
+      privateMock = null
+    }
+    await releaseSutRunnerLease(checkoutRoot, leaseToken)
+  })
   process.once('exit', () => {
+    privateMock?.killSync()
     releaseSutRunnerLeaseSync(checkoutRoot, leaseToken)
   })
+
+  try {
+    if (selectedWhenKnown) {
+      await startMockIfNeeded(selectedWhenKnown)
+    }
+  } catch (error) {
+    await cleanupOnce()
+    throw error
+  }
+
   if (typeof options.on === 'function') {
+    options.on('task', {
+      async [VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK]() {
+        if (!privateMock) {
+          throw new Error(
+            'Isolated OpenAI mock ownership check requires a private mock for this run.'
+          )
+        }
+        return privateMock.verifyOwnership()
+      },
+    })
     options.on('before:run', async (details) => {
       try {
-        assertSupportedIsolatedCypressSpecs(
-          specsFromBeforeRun(details, checkoutRoot)
-        )
+        const specs = specsFromBeforeRun(details, checkoutRoot)
+        assertSupportedIsolatedCypressSpecs(specs)
+        await startMockIfNeeded(specs)
+        if (privateMock) {
+          await privateMock.verifyOwnership()
+        }
       } catch (error) {
-        await releaseOnce()
+        await cleanupOnce()
         throw error
       }
     })
-    options.on('after:spec', releaseOnce)
-    options.on('after:run', releaseOnce)
+    options.on('after:spec', cleanupOnce)
+    options.on('after:run', cleanupOnce)
   }
+
   config.baseUrl = origin
-  return { release: releaseOnce, origin }
+  return {
+    release: cleanupOnce,
+    origin,
+    privateMock: privateMock
+      ? {
+          endpoint: privateMock.endpoint,
+          child: privateMock.child,
+          verifyOwnership: privateMock.verifyOwnership,
+        }
+      : null,
+  }
 }

@@ -1,7 +1,7 @@
 # Isolated OpenAI browser mocks
 
 Source: [SEED-015 story 3](../../seeds/SEED-015-concurrent-worktree-environments.md#story-3).
-Status: in-progress. Slice 1 done.
+Status: in-progress. Slices 1–2 done.
 
 ## Goal and scope
 
@@ -95,28 +95,19 @@ No isolated allowlist expansion yet. Enables leaf 2 to pass a private context.
 
 ### 2. Accept a content suggestion through a private mock run
 Type: Behavior
-Status: planned
-Proof: Ordinary isolated Cypress runs the existing note-content completion
-feature; accepting the suggestion changes note content and its own mock records
-the request. A later run can start after normal completion.
+Status: done
+Proof: `pnpm cypress run --spec e2e_test/features/ai_generated_content/note_content_completion.feature`
+(2/2 including unavailable-service); follow-up
+`worktree_note_editing.feature` acquired the lease after mock cleanup;
+unit proofs for private mock ownership, allowlist, and endpoint expose.
 
 Behavior: A healthy owning SUT and the explicitly selected completion spec →
 ordinary Cypress run → the browser accepts its own private mock suggestion.
 
-Implement the runner-owned mock startup/context and normal cleanup at the node
-guard, integrating the existing listener/process helpers. Verify both listeners
-before reset, reject bind/start failures, and send the context through the
-existing testability URL route. Admit the named feature only in the same green
-commit as complete routing and preflight. Keep unsupported selections refused.
-Include a focused guard regression for no mock process on the no-mock path and
-unchanged identity file; update `docs/worktree-browser-tests.md` and the exact
-allowlist statement in `.cursor/rules/e2e-authoring.mdc`.
-
-Sizing: Target 5 minutes of implementation/focused checks, with a named
-exception for real SUT/Cypress startup runtime. Reuse the existing child-group,
-port reservation and lease routines. If these require a separate supervisor,
-new persistent protocol, or more than one implementation attempt, refine this
-leaf before continuing; do not stretch the story into environment management.
+Delivered via runner-owned private Mountebank after lease, ownership preflight
+before fixture reset, Cypress `expose` endpoint injection, and docs/allowlist
+updates. Prerequisite SUT fix: Gradle-forked backend ownership via `--no-daemon`
++ PPID ancestry (separate commit on this branch).
 
 ### 3. Refuse a foreign mock before changing test state
 Type: Behavior
@@ -225,6 +216,8 @@ Backend mock destination injection already exists. Runner-scoped temporary
 mock endpoints avoid new persistent port fields and preserve no-mock startup.
 The existing paired reset harness supplies a focused coordination pattern;
 its database-reset success is not evidence of independent mock state.
-Slice 1: `OpenAiMockEndpointContext` unifies management URL + serving port for
-OpenAI helpers; Google/Wikidata unchanged. Linked worktree cannot yet run the
-note-content Cypress feature under the current allowlist (leaf 2).
+Slice 1: `OpenAiMockEndpointContext` unifies management/serving for OpenAI helpers.
+Slice 2: private MB + Cypress `expose` injection; Cypress 16 dropped `Cypress.env`
+writes in setup. Unblocked by authorized SUT fix: `bootRunE2E --no-daemon` plus
+listener ownership via PGID or PPID ancestry (Gradle forks its own group).
+Cypress `expose` carries the private mock context into the browser.

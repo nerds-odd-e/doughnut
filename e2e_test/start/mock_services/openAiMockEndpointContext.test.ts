@@ -6,8 +6,11 @@ import ServiceMocker from '../../support/ServiceMocker'
 import { fetchOpenAiImposterRequests } from './openAiImposterRecordedRequests'
 import {
   type OpenAiMockEndpointContext,
+  ISOLATED_OPEN_AI_MOCK_ENV_KEY,
+  OPEN_AI_MOCK_ENDPOINT_ENV_KEY,
   SHARED_OPEN_AI_MOCK_ENDPOINT_CONTEXT,
   openAiImposterRequestsUrl,
+  resolveOpenAiMockEndpointContext,
 } from './openAiMockEndpointContext'
 
 type RecordedHttpCall = {
@@ -139,6 +142,38 @@ describe('OpenAI mock endpoint context', () => {
     assert.equal(
       openAiImposterRequestsUrl(SHARED_OPEN_AI_MOCK_ENDPOINT_CONTEXT),
       'http://localhost:2525/imposters/5001'
+    )
+  })
+
+  test('resolveOpenAiMockEndpointContext keeps shared defaults without injection', () => {
+    assert.deepEqual(
+      resolveOpenAiMockEndpointContext(() => undefined),
+      SHARED_OPEN_AI_MOCK_ENDPOINT_CONTEXT
+    )
+  })
+
+  test('isolated flag refuses incomplete context instead of shared fallback', () => {
+    assert.throws(
+      () =>
+        resolveOpenAiMockEndpointContext((key) =>
+          key === ISOLATED_OPEN_AI_MOCK_ENV_KEY ? true : undefined
+        ),
+      /refusing shared 2525\/5001 fallback/
+    )
+  })
+
+  test('resolveOpenAiMockEndpointContext requires a complete injected context when isolated', () => {
+    const endpoint = {
+      managementUrl: 'http://127.0.0.1:18025',
+      servingPort: 18001,
+    }
+    assert.deepEqual(
+      resolveOpenAiMockEndpointContext((key) => {
+        if (key === ISOLATED_OPEN_AI_MOCK_ENV_KEY) return true
+        if (key === OPEN_AI_MOCK_ENDPOINT_ENV_KEY) return endpoint
+        return
+      }),
+      endpoint
     )
   })
 })
