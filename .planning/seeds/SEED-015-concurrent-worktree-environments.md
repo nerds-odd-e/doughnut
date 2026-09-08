@@ -436,6 +436,20 @@ before slice planning; story 2 supplies the required browser environment.
 - **Depends on:** An isolated running application and any mocks the workflow
   uses; CLI support is not a product prerequisite.
 
+<a id="story-6"></a>
+
+### 6. Reclaim databases from retired worktrees
+
+**Status:** Idea captured; unrefined and unqueued.
+
+- **For / why:** Developers and AI tasks creating disposable worktrees need to
+  avoid accumulating databases after those worktrees are retired.
+- **Desired outcome:** Previously created databases can be dropped or reused
+  for later worktrees, keeping unused databases from accumulating while
+  protecting active worktrees and persistent development data.
+- **Open for later refinement:** Dropping versus reuse, when reclamation
+  happens, and how retired databases are identified. No approach selected yet.
+
 ## Ordering and Scope Reduction
 
 **Backlog selection, 2026-09-08:** After 1c, keep stories 2 then 3 ahead of
@@ -462,7 +476,8 @@ hypotheses without a new implementation audit: 1c is M; existing stories 2–4
 are L and 5 is M. These are low-confidence bands, not a delivery commitment.
 
 Worktree creation integration and safe process ownership belong within the
-first story that needs them. A dedicated retirement/cleanup command, persistent
+first story that needs them. Database reclamation is captured in story 6 and
+remains unrefined and unqueued. A dedicated retirement/cleanup command, persistent
 development-profile isolation, automatic capacity scheduling, multiple E2E
 workers inside one worktree, Cloud VM support, and separate MySQL instances are
 deferred scope. Reconsider them only when an actual workflow requires them.
