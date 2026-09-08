@@ -182,10 +182,7 @@ function notebookCloneCheckout() {
       content: string
     ): Cypress.Chainable<null> {
       return cy.get<string>('@cliCloneDestination').then((destination) => {
-        cy.readFile(`${destination}/${relativePath}`).should(
-          'equal',
-          `${content}\n`
-        )
+        cy.readFile(`${destination}/${relativePath}`).should('equal', content)
         return cy.wrap(null)
       })
     },

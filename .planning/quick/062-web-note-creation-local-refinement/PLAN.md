@@ -5,7 +5,7 @@
 [SEED-009, story 13](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13)
 — Create a note on the web and continue refining it locally.
 
-Status: in progress. Slices 1–8 done; next is slice 9.
+Status: in progress. Slices 1–9 done; next is slice 10.
 Sizing remains a hypothesis, not a time guarantee.
 
 ## Goal and scope
@@ -291,7 +291,7 @@ Safe stop: Web capture can be consumed in local tools independently of publicati
 
 ### 9. Receive the completed web text after creation
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: Normal web title-only creation is accepted after the checkout's
 base revision, followed by an ordinary web body edit before any pull.
 Trigger: Pull through the installed CLI.
@@ -364,9 +364,9 @@ No tests were run while writing this plan. During execution:
   at `run` with real local Git and mocked HTTP only.
   Preserve already-green tests; do not add a separate CLI test harness.
 - Browser checkpoint:
-  `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`.
-  The feature is not @ignore in the inspected file despite older generic CLI
-  rule prose. Its tags build/install the CLI locally. Use an environment that
+  `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature,e2e_test/features/cli/cli_notebook_web_created_note.feature`.
+  Web-created receipt scenarios live in `cli_notebook_web_created_note.feature`.
+  Tags build/install the CLI locally. Use an environment that
   supports installed CLI E2E; SEED-015's bounded no-external-service worktree
   workflow does not itself promise this CLI scenario is supported there.
 - If backend controller signatures/DTOs change unexpectedly, run
@@ -461,3 +461,8 @@ remove spent plan history only when the full outcome and proof are complete.
   `type: Note` fence. Step:
   `I create a title-only root note titled {string} in the notebook {string}`.
   Cypress `cli_notebook_clone.feature` 12 passing.
+- Slice 9: after title-only create, rich-body edit to "Milk and eggs", then
+  pull. Finished text is in `Shopping list.md`. Title-only empty-body scenario
+  kept. Web-created receipt scenarios live in
+  `e2e_test/features/cli/cli_notebook_web_created_note.feature` after a 250-line
+  split from clone. File equality no longer appends an extra newline.
