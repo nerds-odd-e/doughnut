@@ -23,13 +23,16 @@ relationship and recorded identity, then reports busy or uncertain evidence from
 existing ownership locks (`.worktree.local.lock`, `.sut.local.lock`, startup
 ownership, Cypress leases), recorded application listeners, MySQL sessions
 against those targets, and surviving supported backend JVMs tied to the checkout
-by working directory or command line. Stale or unverifiable ownership records
-refuse without using the runners' permissive stale-lock reclamation paths.
-Listeners, sessions, and checkout-process evidence are vetoes only — never
-ownership authorization. A clear result is an **idle snapshot**, not a deletion
-reservation. Primary checkouts, missing/invalid identity, a duplicate identity
-in another registered worktree, and non-canonical E2E database names refuse
-visibly.
+by working directory or command line. A supported backend JVM whose relation to
+the checkout cannot be resolved (for example relative classpath with an
+unavailable working directory) is uncertain evidence and refuses; a positively
+identified peer working directory does not. Stale or unverifiable ownership
+records refuse without using the runners' permissive stale-lock reclamation
+paths. Listeners, sessions, and checkout-process evidence are vetoes only —
+never ownership authorization. A clear result is an **idle snapshot**, not a
+deletion reservation. Primary checkouts, missing/invalid identity, a duplicate
+identity in another registered worktree, and non-canonical E2E database names
+refuse visibly.
 
 Custom E2E names refuse rather than guessing ownership. There is no machine-wide
 allocation registry and no recovery from duplicate operator-supplied IDs.

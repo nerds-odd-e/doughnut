@@ -184,3 +184,34 @@ test('DROP failure after marker reports partial progress and retains marker', as
     new RegExp(RETIREMENT_MARKER_NAME)
   )
 })
+
+test('uncertain supported JVM cwd refuses mutation before marker and DROP', async (t) => {
+  const checkout = makeLinkedWorktreeCheckout(t)
+  writeIsolatedConfig(checkout.root, { id: 'wt_e1a6' })
+  let mysqlCalled = false
+  const result = await runRetire(checkout.root, {
+    evidenceDeps: {
+      listDatabaseSessionsFn: async () => [],
+      listProcessTableFn: async () => [
+        {
+          pid: 7171,
+          ppid: 1,
+          command: `/usr/bin/java -cp . Hold com.odde.donut.DonutApplication`,
+        },
+      ],
+      listJavaWorkingDirectoriesFn: async () => new Map(),
+    },
+    mysqlExecFn() {
+      mysqlCalled = true
+      return ''
+    },
+  })
+  assert.equal(result.code, 1)
+  assert.match(result.err, /recorded evidence prevents cleanup/)
+  assert.match(result.err, /uncertain checkout backend JVM evidence/)
+  assert.match(result.err, /pid 7171/)
+  assert.equal(result.err.includes('DROP'), false)
+  assert.equal(existsSync(retirementMarkerPath(checkout.root)), false)
+  assert.equal(existsSync(retirementAdmissionGatePath(checkout.root)), false)
+  assert.equal(mysqlCalled, false)
+})

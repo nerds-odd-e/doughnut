@@ -52,7 +52,7 @@ export function outputOf(result) {
   return `${result.stdout}${result.stderr}`
 }
 
-async function waitForFile(
+export async function waitForFile(
   filePath,
   { timeoutMs = 5000, intervalMs = 20 } = {}
 ) {
