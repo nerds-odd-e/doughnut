@@ -312,16 +312,49 @@ replacement.
 
 ### 2b. Stop an isolated SUT without leaving its forked backend running
 
-**Status:** Queued first; [corrective plan](../quick/072-owned-sut-descendant-shutdown/PLAN.md).
+**Status:** Refined; first in backlog. [Corrective plan](../quick/072-owned-sut-descendant-shutdown/PLAN.md)
+is ready for execution; implementation has not started.
 
-**Goal:** Developers can stop/restart their isolated application and reuse its
-allocation without leaving an owned backend running or disturbing a peer.
-**Scope:** Preserve ownership of descendants in separate process groups during
-shutdown, including parent exit and termination escalation. No listener-based
-adoption, unrelated process termination, database reclamation, or new registry.
-**Key example:** An owned parent forks a backend into another group → stop the
-SUT → both exit, its listener is released, and the peer remains usable. A child
-that outlives its parent must remain part of bounded shutdown verification.
+**Goal**
+
+Developers and AI tasks can stop their isolated application during restart and
+reuse its allocation without leaving an owned backend running or disturbing a
+peer worktree.
+
+**Scope**
+
+- Correct the existing verified-owner shutdown used by `pnpm sut:restart` in
+  local Nix worktrees. Start with a live owner and an owned forked backend whose
+  ancestry is still observable when shutdown begins.
+- Retain ownership of that backend even when it belongs to a separate process
+  group and its parent exits during shutdown. Finish bounded termination,
+  including existing escalation, before treating cleanup as complete.
+- Preserve the peer's running processes and responding endpoint. Reuse the
+  existing allocation and owner-control mechanism; no new stop command or UI.
+- Preserve current same-group cleanup, restart refusals, and private mock
+  cleanup using the shared routine. This is a shutdown correction, not a new
+  lifecycle owner or background-monitoring feature.
+
+**Exclusions:** Database reclamation, new registries, listener-based adoption,
+unrelated process termination, recovery of children already orphaned before
+shutdown starts, supervisor hard-kill recovery, processes newly forked during
+shutdown, PID-reuse hardening, general process supervision, CLI/MCP expansion,
+and Cloud VM/CI changes. No continuous ancestry tracking is implied.
+
+**Key examples**
+
+1. A live owned parent has a backend in another process group → request owned
+   shutdown for restart → the parent and backend exit, the backend port can be
+   rebound for restart, and a peer endpoint still responds.
+2. The same backend ignores SIGTERM while its parent exits → bounded shutdown
+   escalates → the backend exits before cleanup completes; the peer stays usable.
+3. A Cypress runner holds the existing lease, or the owner is unverifiable →
+   request restart → existing refusal leaves processes untouched. No new
+   allocation or stale-process recovery is introduced.
+
+**Open questions:** None for this bounded correction. The exclusions above
+are conservative planning assumptions, not additional developer decisions.
+
 **Evidence:** `005898f8d4` signals the parent before enumerating descendants;
 the retrospective reproduced an owned detached child surviving completed stop.
 **Effort hypothesis:** S, medium confidence; existing shutdown boundary and fixtures.
