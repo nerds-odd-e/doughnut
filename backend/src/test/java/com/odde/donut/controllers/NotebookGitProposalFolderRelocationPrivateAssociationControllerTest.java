@@ -16,7 +16,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Verifies a learned note inside a published folder relocation keeps its private associations,
- * while an untouched identical-content note outside the source keeps its own. Accepted tree and
+ * while an untouched identical-content note outside the source keeps its own. A later content
+ * publication at the moved path updates the same learned note and schedule. Accepted tree and
  * folder identities are covered in {@link NotebookGitProposalFolderRelocationControllerTest}. Note
  * relocation associations are covered in {@link
  * NotebookGitProposalRelocationPrivateAssociationControllerTest}.
@@ -27,6 +28,7 @@ class NotebookGitProposalFolderRelocationPrivateAssociationControllerTest
   private static final String README_BODY = "readme";
   private static final String README = ExportReadmeMarkdown.assemble(README_BODY);
   private static final String MATCHING_CONTENT = "---\ntype: Note\n---\nmatching learned content";
+  private static final String EDITED_CONTENT = "---\ntype: Note\n---\nedited after folder move";
 
   @Test
   void preservesPrivateAssociationsOnMovedFolderNotesAndLeavesTheIdenticalOutsideNoteUntouched()
@@ -92,5 +94,51 @@ class NotebookGitProposalFolderRelocationPrivateAssociationControllerTest
     assertThat(
         noteRepository.findById(deletedNote.getId()).orElseThrow().getDeletedAt(),
         not(nullValue()));
+
+    NotebookGitBinding afterMove =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        afterMove.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            afterMove,
+            List.of(
+                new NotebookGitProposalFile("Archive/README.md", README),
+                new NotebookGitProposalFile("Archive/Topics/README.md", README),
+                new NotebookGitProposalFile("Archive/Topics/Original.md", EDITED_CONTENT),
+                new NotebookGitProposalFile("Untouched.md", MATCHING_CONTENT))));
+
+    Note reloadedRelocated = noteRepository.findById(relocatedNote.getId()).orElseThrow();
+    assertThat(reloadedRelocated.getContent(), equalTo(EDITED_CONTENT));
+    MemoryTracker trackerAfterEdit =
+        memoryTrackerRepository.findById(associations.relocatedTracker().getId()).orElseThrow();
+    assertThat(trackerAfterEdit.getNote().getId(), equalTo(relocatedNote.getId()));
+    assertThat(
+        trackerAfterEdit.getRemovedFromTracking(),
+        equalTo(associations.relocatedTracker().getRemovedFromTracking()));
+    assertThat(
+        trackerAfterEdit.getNextRecallAt(),
+        equalTo(associations.relocatedTracker().getNextRecallAt()));
+    assertThat(
+        noteRepository.findById(untouchedNote.getId()).orElseThrow().getContent(),
+        equalTo(MATCHING_CONTENT));
+    assertThat(
+        memoryTrackerRepository
+            .findById(associations.untouchedTracker().getId())
+            .orElseThrow()
+            .getNote()
+            .getId(),
+        equalTo(untouchedNote.getId()));
+    assertThat(
+        mcqRepository.findById(associations.mcqId()).orElseThrow().getNote().getId(),
+        equalTo(relocatedNote.getId()));
+    assertThat(
+        conversationRepository
+            .findById(associations.conversationId())
+            .orElseThrow()
+            .getSubject()
+            .getNote()
+            .getId(),
+        equalTo(relocatedNote.getId()));
   }
 }

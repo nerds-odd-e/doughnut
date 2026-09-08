@@ -61,7 +61,7 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 
 - Human propose / discuss / approve: `docs/adrs/README.md`
 - Current recommendations: `docs/adrs/*-accepted.md` (read explicitly — under `docs/`)
-- Agent use / cite / conflict / maintain: `.agents/skills/adr-awareness/SKILL.md`
+- Agent use / cite / conflict / maintain: `.agents/skills/dough-adr-awareness/SKILL.md`
 - Rule pointer: `.cursor/rules/architecture-decisions.mdc`
 
 ## Ignored Reference Material

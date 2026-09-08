@@ -35,7 +35,7 @@ For each story, establish:
 
 Add **UI** descriptions or sketches only when interaction or presentation needs
 agreement. Add **Architecture** only for a new consequential concern; consult
-`adr-awareness` and relevant Accepted ADRs. Inspect existing behavior or code
+`dough-adr-awareness` and relevant Accepted ADRs. Inspect existing behavior or code
 only to resolve a concrete question, without turning refinement into technical
 planning. Omit unused optional sections.
 

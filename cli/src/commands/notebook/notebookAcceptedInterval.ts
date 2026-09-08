@@ -5,12 +5,32 @@ import {
   listCommitChanges,
 } from './notebookAcceptedCommitChanges.js'
 import { isEligibleBoundedAcceptedAdditionInterval } from './notebookAcceptedAdditionInterval.js'
+import {
+  exactAcceptedSubtreeMapping,
+  type ExactAcceptedSubtreeMapping,
+} from './notebookAcceptedExactSubtreeMapping.js'
 
 export {
   inspectAncestryFailure,
   isOrdinaryNoteContentChange,
   listCommitChanges,
 } from './notebookAcceptedCommitChanges.js'
+
+export type { ExactAcceptedSubtreeMapping }
+
+/**
+ * Accepted history since the local parent, classified for pull eligibility.
+ * Exact subtree moves carry correspondence for one local descendant content
+ * edit to replay onto the mapped path.
+ */
+export type AcceptedIntervalInspection =
+  | { kind: 'rebaseable' }
+  | {
+      kind: 'exact-subtree-move'
+      mapping: ExactAcceptedSubtreeMapping
+      structuralPath: string
+    }
+  | { kind: 'structural'; path: string }
 
 export function listCommits(
   acceptedRepoDir: string,
@@ -30,11 +50,11 @@ export function listCommits(
   })
 }
 
-export function firstStructuralPathInAcceptedInterval(
+export function inspectAcceptedInterval(
   acceptedRepoDir: string,
   localParent: string,
   acceptedHead: string
-): string | undefined {
+): AcceptedIntervalInspection {
   const interval = listCommits(
     acceptedRepoDir,
     '--reverse',
@@ -49,8 +69,50 @@ export function firstStructuralPathInAcceptedInterval(
       interval
     )
   ) {
+    return { kind: 'rebaseable' }
+  }
+
+  const structuralPath = firstNonContentChangePath(acceptedRepoDir, interval)
+  if (structuralPath === undefined) {
+    return { kind: 'rebaseable' }
+  }
+
+  const mapping = exactSubtreeMappingForSingleEdge(
+    acceptedRepoDir,
+    localParent,
+    interval
+  )
+  if (mapping !== undefined) {
+    return {
+      kind: 'exact-subtree-move',
+      mapping,
+      structuralPath,
+    }
+  }
+  return { kind: 'structural', path: structuralPath }
+}
+
+function exactSubtreeMappingForSingleEdge(
+  acceptedRepoDir: string,
+  localParent: string,
+  interval: { sha: string; parents: string[] }[]
+): ExactAcceptedSubtreeMapping | undefined {
+  if (interval.length !== 1) return undefined
+  const [commit] = interval
+  if (
+    commit === undefined ||
+    commit.parents.length !== 1 ||
+    commit.parents[0] !== localParent
+  ) {
     return undefined
   }
+  return exactAcceptedSubtreeMapping(acceptedRepoDir, localParent, commit.sha)
+}
+
+function firstNonContentChangePath(
+  acceptedRepoDir: string,
+  interval: { sha: string; parents: string[] }[]
+): string | undefined {
   for (const commit of interval) {
     for (const parent of commit.parents) {
       for (const change of listCommitChanges(

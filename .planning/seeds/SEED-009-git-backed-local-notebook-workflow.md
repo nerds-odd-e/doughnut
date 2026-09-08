@@ -57,7 +57,7 @@ The product constraints established in the discussion are:
 
 1. **Defer broader reconciliation:** keep broader batch rebase unqueued.
    On 2026-09-08 the owner selected folder-move divergence and web autosave
-   batching for the backlog; refine and plan only Story 15 now.
+   batching for the backlog; Story 15 is now delivered.
 2. **Smaller behavior change:** keep a two-note local revision across one web
    save of a third existing note (Story 18) — now delivered. Creation followed
    by one save is already supported for one local edit; extending batches across
@@ -65,13 +65,14 @@ The product constraints established in the discussion are:
 3. **Edits-only multi-note publish:** delivered as Story 14, independent of
    receiving additions. Story 11 already publishes mixed additions and edits.
 4. **Complete synchronization:** defer the broad contract. The owner also
-   values readable history, so Story 10 is queued separately after Story 15.
-   Batching already-accepted saves risks conflicting with immutable history;
-   its publication boundary must be clarified before planning it.
+   values readable history, so Story 10 remains queued after delivered Story 15.
+   The owner selected a rolling ten-minute amendment window for Story 10:
+   durable web commits may change until exposed to a client or followed by
+   another accepted change. Published history remains immutable.
 
-**Priority:** Stories 13, 16, 14, 17, 18, and 18a are delivered. The owner
-queued folder-move divergence (15), then web autosave batching (10), on
-2026-09-08. Concurrent worktree isolation remains the global backlog lead. This is not a claim that usage data proves these are the most
+**Priority:** Stories 13, 16, 14, 17, 18, 18a, and 15 are delivered. Web autosave
+batching (10) remains queued after concurrent worktree isolation as the global
+backlog lead. This is not a claim that usage data proves these are the most
 frequent failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
@@ -212,29 +213,51 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 10. See one stable commit for one continuous web edit
 
-**Status:** queued; refinement deferred until selection.
+**Status:** refined; selected for slice planning.
 
-- **For / why:** An owner reading Git history wants a meaningful editing unit
-  rather than one commit per durable autosave.
-- **Evaluation:** Continuous same-note saves before publication form one
-  stable commit; another accepted commit ends the batch. Once visible to any
-  client, a commit ID never changes. Structural changes also end the batch.
-- **Value / learning:** Tests whether more readable history materially helps
-  owners and AI tools. One-note content pull handles several accepted saves;
-  two-note batch pull accepts exactly one disjoint save. Story 18a corrects
-  refusal guidance without broadening that limit. Evaluate readability
-  separately from receiving multiple accepted saves beside a local batch;
-  do not use batching to hide the limit or rewrite already accepted commits.
-- **Effort hypothesis:** M — low confidence; assumes an explicit end-of-edit
-  and publication boundary can preserve durable saves and timely synchronization.
-- **Depends on:** delivered Story 3.
-- **Safe stopping point:** All synchronization remains useful without this;
-  keep extra immutable commits if batching would rewrite accepted history.
-- **Boundary:** History granularity only; no structural sync or broader rebase.
-  Define when a batch ends and becomes available before planning this story.
-  Story 13 now appends one accepted commit at ordinary web creation and another
-  for each later durable save, so sequential-loop history is noisier; that is
-  not by itself a reason to select this story.
+- **Goal:** A notebook owner reading Git history sees one editing unit for
+  consecutive web content edits to the same ordinary note, including thinking
+  pauses, while every save remains durable and clients retain stable history.
+- **Scope:** The first changed autosave creates a commit immediately. A later
+  changed save amends that tip when it edits the same note at the same path,
+  no intervening accepted change or client exposure has occurred, and the gap
+  since the previous changed save is less than ten minutes. Each amendment
+  resets that interval; ten minutes or more starts a new commit. Amendment
+  replaces the tip with the same parent and latest content, preserving note
+  identity and learning data. Only the current unexposed web-content tip is
+  eligible; existing history, cutover, creation and client-authored commits
+  are immutable.
+- **Publication boundary:** Downloading the Git bundle (clone/acquisition or
+  pull, regardless of client) freezes the current tip before returning bytes.
+  Returning the current head from an idempotent publish freezes it too.
+  Subsequent saves start a fresh amendable batch. Another accepted notebook
+  change ends the old batch, including another note's save, creation, and
+  supported local publication/structural changes. A failed client operation
+  after download does not undo freezing.
+- **Key examples:** Saves at 10:00, 10:08 and 10:16 leave one edit commit;
+  another at 10:27 leaves two. A save exactly ten minutes after the previous
+  changed save starts a second commit. Pull between two saves preserves the
+  pulled commit as the next commit's parent. Save A, save B, save A produces
+  three commits even within ten minutes. Creation remains a separate commit
+  before the newly created note's content-edit batch. Reloading server state
+  does not lose eligibility or unfreeze a downloaded commit. Concurrent save
+  and download serialize so every downloaded head remains in later history.
+- **Conservative details:** Canonical no-op saves retain existing behavior:
+  no Git commit and no extension of the changed-save interval. Reading note
+  content or exporting Markdown is not Git-history exposure. Eligibility is
+  durable and decided on the server; no browser-session tracking or timer job.
+- **Exclusions:** No new editor UI, explicit publish button, configurable
+  timeout, native Git transport, structural web synchronization, historical
+  rewriting of exposed commits, broader rebase support, or projection-drift
+  repair. Existing drift, validation and authorization policies remain.
+- **Architecture:** The owner explicitly agreed in this discussion to amend
+  durable but unexposed web tips, replacing this seed's previous blanket
+  accepted-commit immutability rule for this case. ADR 0002 remains Proposed;
+  its accepted-versus-advertised wording is not silently changed or approved.
+  Accepted ADR 0004's Portable format is unchanged. Persist the amendment state
+  with the binding and serialize exposure with existing Git writers.
+- **Open decisions:** None blocking the selected scope.
+- **Plan:** [Web autosave commit batching](../quick/071-web-autosave-commit-batching/PLAN.md).
 
 <a id="story-11"></a>
 
@@ -317,7 +340,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 15. Keep a local note edit across an accepted folder move
 
-**Status:** queued; refined. Selected for slice planning on 2026-09-08.
+**Status:** delivered.
 
 - **Goal:** A notebook owner keeps one committed local note refinement when
   another checkout publishes a move of its containing folder, then publishes
@@ -333,38 +356,14 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   Explicit publication uses the existing content-publication contract and keeps
   the same note identity and private learning data. Accepted commits remain
   immutable; authored links remain unchanged. No new command, UI, API, stored
-  identity metadata, or general structural merge policy.
-- **Correspondence and refusal:** Require one exact whole-subtree mapping;
-  map the edited note by its relative path within it. Identical note contents
-  do not establish identity and do not invalidate an otherwise unique mapping.
-  Refuse unsupported or ambiguous correspondence before changing local HEAD,
-  index, or tracked files. Explain that work is preserved and must be reconciled
-  or recreated as one supported commit on accepted history before publication;
-  do not suggest publishing the divergent commit directly.
-- **Exclusions:** Multiple local commits/notes or accepted commits/moves,
-  accompanying remote content changes, edits outside the moved subtree, folder
-  rename, note-only relocation, README edits, new parents, unrepresented
-  descendants, collisions, deletion, dirty trees, drift repair, link rewriting,
-  automatic publication, and autosave batching (Story 10).
-- **Key examples:**
-  1. Commit an edit of `Recipes/Pasta.md`; another checkout publishes the exact
-     move `Recipes` → `Kitchen/Recipes`. Pull retains the edit at
-     `Kitchen/Recipes/Pasta.md`; explicit publication updates the original
-     learned note. Other moved files retain their accepted bytes.
-  2. The edited note is in `Recipes/Sauces/`, with that folder represented in
-     the accepted subtree. The same relative-path mapping preserves its edit.
-     Moving the subtree back to the notebook root uses the same rule.
-  3. Two descendants have identical starting text. Editing one keeps that
-     edit on its relative-path counterpart; the other note stays unchanged.
-  4. The accepted interval also edits a file or contains a second move, or
-     fails to supply one unique exact subtree mapping. Pull refuses, preserves
-     local work, and gives accurate reconciliation guidance.
-- **Effort hypothesis:** L — low confidence, retained from decomposition;
-  exact mapping and bounded replay must stay small. Revisit the story if
-  implementation requires a broader identity or conflict policy.
-- **Depends on:** delivered Stories 7–9. No dependence on Story 10.
-- **Open questions:** None for this bounded contract. The exact mapping rule
-  follows the delivered Story 7 contract; similarity-based inference is excluded.
+  identity metadata, or general structural merge policy. Refuse unsupported or
+  ambiguous correspondence before changing the checkout; work is preserved and
+  must be reconciled or recreated as one supported commit on accepted history
+  before publication. Excludes multiple local commits/notes or accepted
+  commits/moves, accompanying remote content changes, edits outside the moved
+  subtree, folder rename, note-only relocation, README edits, new parents,
+  unrepresented descendants, collisions, deletion, dirty trees, drift repair,
+  link rewriting, automatic publication, and autosave batching (Story 10).
 
 <a id="story-16"></a>
 
@@ -441,12 +440,12 @@ The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, **13**, **16**, **14**, **17**, **18**, and **18a** are delivered.
-Queue **15 → 10** after the existing worktree priorities. Story 15 uses exact
-subtree correspondence; Story 10 remains separately valuable to the owner for
-history readability, with its publication boundary still to refine.
+Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, and **15**
+are delivered. Queue **10** after the existing worktree priorities. Story 10
+remains separately valuable to the owner for history readability, with its
+publication boundary still to refine.
 
-First-to-drop order among remaining items: **10, 15**. Delivered batch
+First-to-drop order among remaining items: **10**. Delivered batch
 publication and batch reconciliation across one disjoint web save stay useful
 even if broader reconciliation is deferred.
 
@@ -478,9 +477,8 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Story 15 is selected for refinement and planning. Refine Story 10 separately
-when it reaches selection for planning. This seed is non-executable; queue
-selection does not authorize implementation.
+Story 15 is delivered. Refine Story 10 when it reaches selection for planning.
+This seed is non-executable; queue selection does not authorize implementation.
 
 ## Breadcrumbs
 

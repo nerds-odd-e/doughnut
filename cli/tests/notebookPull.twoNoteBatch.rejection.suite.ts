@@ -9,6 +9,7 @@ import {
   commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
+  structuralChangeRefusal,
 } from './notebookPull.testHelpers.js'
 import {
   ACCEPTED_THIRD_NOTE,
@@ -98,8 +99,7 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
               runGit(['commit', '--quiet', '-m', 'accepted mode'], source)
             },
           }),
-        message:
-          'Local main cannot receive the accepted history because accepted history includes a structural change at "gamma.md". Divergent structural history is not supported yet.',
+        message: structuralChangeRefusal('gamma.md'),
       },
       {
         shape: 'three-local-edits',
@@ -141,8 +141,7 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
               )
             },
           }),
-        message:
-          'Local main cannot receive the accepted history because accepted history includes a structural change at "added.md". Divergent structural history is not supported yet.',
+        message: structuralChangeRefusal('added.md'),
       },
       {
         shape: 'creation-then-save',

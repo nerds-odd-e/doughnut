@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
+import { notebookPullNextSteps } from '../src/nonInteractiveCli.js'
 import { run } from '../src/run.js'
 import {
   ProcessExitForTest,
@@ -35,7 +36,8 @@ export function describeNotebookPullReadiness(): void {
       )
 
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        'donut: usage: donut notebook pull <directory>\nReceives accepted notebook history onto a clean local main. When one unpublished commit edits one existing note at an unchanged path and accepted history advanced through ordinary-note content changes at unchanged paths, through one added ordinary note at the root or an already represented folder, or through that addition followed by one content save of the same note, pull rebases that unpublished commit. When one unpublished commit edits exactly two existing ordinary notes at unchanged paths and accepted history advanced by exactly one content save of a third different existing ordinary note at an unchanged path, pull rebases that unpublished commit. Git auto-merges overlapping same-note content when it can; otherwise it pauses with a native conflict so you can edit, stage, and run git rebase --continue, or git rebase --abort. Pull does not publish. Inspect the result, then run "donut notebook publish <directory>" if unpublished work remains. Accepted history may not include all current web content.'
+        'donut: usage: donut notebook pull <directory>\nReceives accepted notebook history onto a clean local main. ' +
+          notebookPullNextSteps('<directory>')
       )
       expect(fetchMock).not.toHaveBeenCalled()
     })
