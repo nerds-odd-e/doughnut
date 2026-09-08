@@ -43,3 +43,12 @@ test('release does not clear a retirement marker', (t) => {
   releaseRetirementAdmission(checkout.root)
   assert.equal(existsSync(retirementMarkerPath(checkout.root)), true)
 })
+
+test('mutation admission may acquire the gate when a retirement marker already exists', (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeRetirementMarker(checkout.root)
+  acquireRetirementAdmission(checkout.root, { allowRetired: true })
+  assert.equal(existsSync(retirementAdmissionGatePath(checkout.root)), true)
+  releaseRetirementAdmission(checkout.root)
+  assert.equal(existsSync(retirementMarkerPath(checkout.root)), true)
+})

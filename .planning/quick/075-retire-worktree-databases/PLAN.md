@@ -165,11 +165,8 @@ and split at 10 if integration needs additional independent preparation.
 
 ### 4. Retire an idle unit-test-only worktree allocation
 Type: Behavior
-Status: planned
-Proof: Invoke mutation mode with one actual disposable schema and a peer sentinel;
-target is absent, peer remains usable, and later backend/SUT starts refuse.
-Barrier-test a competing runner. Inject interruption after marker publication:
-retry completes the same retirement while starts remain blocked.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement*.test.mjs` (31/31) on disposable MySQL **8.4.11** — unit schema dropped, peer sentinel preserved, marker blocks starts, interrupt→retry completes, competing runner barred; recorded E2E still refused.
 
 Behavior: Verified idle linked allocation without recorded E2E database →
 explicitly retire → unit schema is reclaimed and the allocation stays retired.

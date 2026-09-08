@@ -99,11 +99,12 @@ test('linked checkout with canonical E2E allocation reports both targets', async
   assert.match(result.out, /idle snapshot/i)
 })
 
-test('mutation mode without --check refuses visibly', async (t) => {
+test('mutation mode retires idle unit-only allocation with mocked DROP', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
   const out = makeWritable()
   const err = makeWritable()
+  const sqlCalls = []
 
   const code = await runWorktreeRetire({
     argv: [],
@@ -111,12 +112,20 @@ test('mutation mode without --check refuses visibly', async (t) => {
     out,
     err,
     evidenceDeps: clearEvidenceDeps,
+    mysqlExecFn(_file, args) {
+      sqlCalls.push(args.at(-1))
+      if (String(args.at(-1)).includes('SCHEMATA')) {
+        return 'doughnut_wt_a7c2_test\n'
+      }
+      return ''
+    },
   })
 
-  assert.equal(code, 1)
-  assert.equal(out.content(), '')
-  assert.match(err.content(), /mutation mode is not available yet/)
-  assert.match(err.content(), /Usage: pnpm worktree:retire --check/)
+  assert.equal(code, 0, err.content())
+  assert.match(out.content(), /doughnut_wt_a7c2_test — dropped/)
+  assert.match(out.content(), /Retirement marker retained/)
+  assert.equal(err.content(), '')
+  assert.ok(sqlCalls.some((sql) => /DROP DATABASE IF EXISTS/.test(String(sql))))
 })
 
 test('primary checkout refuses inspection', async (t) => {

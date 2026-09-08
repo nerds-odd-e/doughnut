@@ -1,4 +1,3 @@
-import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { readPresentWorktreeLocalConfig } from './browser-worktree-isolation.mjs'
@@ -9,10 +8,9 @@ import {
 } from './sut-listener-pids.mjs'
 import { sutOwnerLockDir, verifyLiveSutOwner } from './sut-owner-control.mjs'
 import { inspectCheckoutBackendProcesses } from './worktree-retirement-checkout-processes.mjs'
+import { runRetirementMysqlAdmin } from './worktree-retirement-mysql.mjs'
 
 const WORKTREE_BACKEND_LOCK_DIR_NAME = '.worktree.local.lock'
-
-const MYSQL_ADMIN_ARGS = ['-u', 'root', '-h', '127.0.0.1', '-P', '3309']
 
 function isLivePid(pid) {
   if (!Number.isInteger(pid) || pid <= 0) return false
@@ -146,24 +144,14 @@ async function inspectRecordedListeners(
   return vetoes
 }
 
-export function defaultListDatabaseSessions(
-  databases,
-  { mysqlExecFn = execFileSync } = {}
-) {
+export function defaultListDatabaseSessions(databases, { mysqlExecFn } = {}) {
   const names = [...new Set(databases.filter(Boolean))]
   if (names.length === 0) return []
   const inList = names
     .map((name) => `'${String(name).replace(/'/g, "''")}'`)
     .join(',')
   const sql = `SELECT ID, USER, HOST, DB, COMMAND, TIME FROM information_schema.PROCESSLIST WHERE DB IN (${inList})`
-  const stdout = mysqlExecFn(
-    'mysql',
-    [...MYSQL_ADMIN_ARGS, '-N', '-B', '-e', sql],
-    {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    }
-  )
+  const stdout = runRetirementMysqlAdmin(sql, { mysqlExecFn })
   const sessions = []
   for (const line of String(stdout).split(/\r?\n/)) {
     const trimmed = line.trim()

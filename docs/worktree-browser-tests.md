@@ -105,6 +105,6 @@ documented in `docs/gcp/prod_env.md`, including Cypress origin
 `http://localhost:5173` and shared Mountebank 2525/5001 for OpenAI mocks.
 A primary checkout that has local identity uses isolation.
 
-Before removing a linked checkout, inspect its disposable databases with
-`pnpm worktree:retire --check` — see
+Before removing a linked checkout, inspect and reclaim its disposable databases
+with `pnpm worktree:retire` — see
 [`docs/worktree-retire-databases.md`](worktree-retire-databases.md).

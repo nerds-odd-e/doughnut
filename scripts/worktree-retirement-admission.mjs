@@ -32,8 +32,18 @@ export function assertCheckoutNotRetired(checkoutRoot) {
   )
 }
 
-export function acquireRetirementAdmission(checkoutRoot) {
-  assertCheckoutNotRetired(checkoutRoot)
+/**
+ * Acquire the checkout admission gate.
+ * Runners must leave allowRetired false (default) so a marker refuses start.
+ * Retirement mutation passes allowRetired: true so retry can finish drops.
+ */
+export function acquireRetirementAdmission(
+  checkoutRoot,
+  { allowRetired = false } = {}
+) {
+  if (!allowRetired) {
+    assertCheckoutNotRetired(checkoutRoot)
+  }
   const gateDir = retirementAdmissionGatePath(checkoutRoot)
   try {
     mkdirSync(gateDir)
@@ -56,8 +66,8 @@ export function releaseRetirementAdmission(checkoutRoot) {
 }
 
 /** Acquire the gate and return a one-shot release callback. */
-export function holdRetirementAdmission(checkoutRoot) {
-  acquireRetirementAdmission(checkoutRoot)
+export function holdRetirementAdmission(checkoutRoot, options = {}) {
+  acquireRetirementAdmission(checkoutRoot, options)
   let held = true
   return () => {
     if (!held) return
