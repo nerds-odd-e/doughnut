@@ -5,7 +5,7 @@
 [SEED-009, story 13](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13)
 — Create a note on the web and continue refining it locally.
 
-Status: in progress. Slices 1–5 done; next is slice 6.
+Status: in progress. Slices 1–6 done; next is slice 7.
 Sizing remains a hypothesis, not a time guarantee.
 
 ## Goal and scope
@@ -237,7 +237,7 @@ Safe stop: All story creation destinations work; no new folder/README capability
 
 ### 6. Publish onto the web-created identity after a web content save
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: Real accepted web creation, a later ordinary web body save, and
 learning tracker/history associated with that identity.
 Trigger: Publish a valid direct-child local content proposal at the same path.
@@ -440,3 +440,9 @@ remove spent plan history only when the full outcome and proof are complete.
   `NotebookGitProjection.isRepresentedFolder` is the non-throwing query;
   publication `requireRepresented*` still throws. Folder destination proofs
   live in `NotebookGitNoteCreationFolderControllerTest`.
+- Slice 6 needed no product change. The ordinary publication path already
+  publishes a local content child onto a real web-created note after a later
+  web save, keeping the same id, tracker/schedule, sibling notes, and two
+  distinct accepted ancestors (creation then save). Proof:
+  `NotebookGitWebCreatedNotePublicationControllerTest`. Compatibility gate:
+  existing `NotebookGitProposalAncestryControllerTest` refusals.
