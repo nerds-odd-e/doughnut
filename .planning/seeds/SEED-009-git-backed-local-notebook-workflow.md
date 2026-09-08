@@ -16,14 +16,14 @@ local refinement and web editing should form a continuous workflow without
 manual copying, lost work, or learning history assigned to the wrong note.
 
 Clone, content publish/pull, local additions/deletion/reorganization, bounded
-content rebase, ordinary web note creation, and receiving one accepted addition
-beside one unpublished local content edit are delivered. The remaining problem
-is unsupported everyday changes interrupting that loop; a cleaner Git log
-alone does not close it. Story 17 now receives creation followed by one save
-beside one unpublished local edit. Pull still refuses a related two-note local
-revision, even though Story 14 can publish that revision on an unchanged base.
-The delivered scope below is planning evidence, not a fresh implementation audit
-or evidence of real-user frequency.
+content rebase, ordinary web note creation, receiving one accepted addition
+beside one unpublished local content edit, keeping that edit across
+creation-then-save, publishing related edits to several existing notes, and
+keeping a related two-note local revision across one disjoint web save of a
+third note are delivered. The remaining problem is unsupported everyday changes
+interrupting that loop; a cleaner Git log alone does not close it. The delivered
+scope below is planning evidence, not a fresh implementation audit or evidence
+of real-user frequency.
 
 The product constraints established in the discussion are:
 
@@ -55,13 +55,12 @@ The product constraints established in the discussion are:
 
 ## Alternatives and Decision
 
-1. **Defer:** coordinate publication of a local batch before further web edits,
-   or reconcile manually when accepted history advances. This leaves the
-   supported batch-publication workflow interrupted by a disjoint web save.
+1. **Defer:** leave broader batch rebase, folder-move divergence, and web
+   autosave batching unqueued until evidence ranks them.
 2. **Smaller behavior change:** keep a two-note local revision across one web
-   save of a third existing note (Story 18). Creation followed by one save is
-   already supported for one local edit; extending batches across structural
-   history is not required for this next outcome.
+   save of a third existing note (Story 18) — now delivered. Creation followed
+   by one save is already supported for one local edit; extending batches across
+   structural history is not required for that outcome.
 3. **Edits-only multi-note publish:** delivered as Story 14, independent of
    receiving additions. Story 11 already publishes mixed additions and edits.
 4. **Complete synchronization or web-commit batching:** defer the broad contract
@@ -69,10 +68,10 @@ The product constraints established in the discussion are:
    concrete interruption; batching already-accepted saves risks conflicting
    with immutable history unless its publication boundary is clarified.
 
-**Priority hypothesis:** Stories 13, 16, 14, and 17 are delivered. Next selected
-remaining story is keeping a related local edit batch when the web changes a
-different note (Story 18). This follows the established beneficiary and two-way
-workflow goal. It is not a claim that usage data proves these are the most
+**Priority hypothesis:** Stories 13, 16, 14, 17, and 18 are delivered. Remaining
+unqueued candidates in this seed are folder-move divergence (15) and web
+autosave batching (10). Concurrent worktree isolation remains the global
+backlog lead. This is not a claim that usage data proves these are the most
 frequent failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
