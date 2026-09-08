@@ -13,8 +13,9 @@ passwordless local root administration and the existing `doughnut` test user.
 Isolated start does not start MySQL, does not create or repair a recorded
 database, and does not start Mountebank.
 
-`pnpm sut:restart` and ordinary Cypress runs remain refused in isolated
-checkouts until later work enables them.
+`pnpm sut:restart` remains refused in isolated checkouts until later work
+enables it. Ordinary Cypress is supported only for the focused note-editing
+spec below.
 
 ## Temporary manual allocation
 
@@ -82,6 +83,23 @@ adopt, delete, rebuild, or renumber.
 `pnpm sut:healthcheck` verifies the live owner first. A foreign process that
 happens to answer on the recorded ports is not a healthy owning stack.
 
+## Focused Cypress run
+
+With that owning SUT healthy, run only this spec — mixed or other features are
+refused before reset:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
+```
+
+Cypress node configuration sets `baseUrl` to this checkout's browser origin
+(`http://127.0.0.1:<lbListenPort>`). The browser uses that origin for named
+navigation and for the Before-order-0 testability reset; it does not read local
+files. A second Cypress runner, or `CYPRESS_baseUrl` / `baseUrl` that does not
+match the allocated origin, is refused before reset. Completion or cancellation
+releases the runner so a later run can start. Isolated restart stays refused.
+
 Primary checkouts without `.worktree.local.json` keep the shared local defaults
-documented in `docs/gcp/prod_env.md`. A primary checkout that has local
-identity uses isolation.
+documented in `docs/gcp/prod_env.md`, including Cypress origin
+`http://localhost:5173`. A primary checkout that has local identity uses
+isolation.

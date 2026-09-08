@@ -161,11 +161,12 @@ const isMain = process.argv[1]
   : false
 
 if (isMain) {
-  try {
-    const result = await runSutHealthcheck()
-    process.exit(result.exitCode)
-  } catch (e) {
-    process.stderr.write(`${e instanceof Error ? e.message : String(e)}\n`)
-    process.exit(1)
-  }
+  runSutHealthcheck()
+    .then((result) => {
+      process.exit(result.exitCode)
+    })
+    .catch((e) => {
+      process.stderr.write(`${e instanceof Error ? e.message : String(e)}\n`)
+      process.exit(1)
+    })
 }

@@ -7,7 +7,7 @@ import {
   makeLinkedWorktreeCheckout,
   makePrimaryCheckout,
 } from './backend-test-worktree-linked-fixtures.mjs'
-import { guardCypressNodeSetup } from './browser-worktree-isolation.mjs'
+import { guardCypressNodeSetup } from './isolated-cypress.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
 import { completeIsolatedConfig } from './sut-isolated-fixtures.mjs'
 import { runSutRestart } from './sut-restart.mjs'
@@ -15,6 +15,7 @@ import { healthyOnce, makeStartSpy } from './sut-start-fixtures.mjs'
 import { runSutStart } from './sut-start.mjs'
 
 const isolatedRefusal = /not supported yet/i
+const isolatedCypressSpec = /only supports|spec selection/i
 const malformedJson = /not valid JSON/i
 const incompleteAllocation = /complete E2E allocation|Missing or invalid/i
 
@@ -72,14 +73,6 @@ async function runHealth(checkoutRoot, logs, accessed) {
   })
 }
 
-function runCypressNodeSetup(checkoutRoot) {
-  const hooks = { reset: false, mocks: false }
-  guardCypressNodeSetup(checkoutRoot)
-  hooks.reset = true
-  hooks.mocks = true
-  return hooks
-}
-
 function withCiEnv(t) {
   const previous = process.env.CI
   process.env.CI = 'true'
@@ -116,8 +109,7 @@ test('unconfigured primary and CI keep shared SUT and Cypress defaults', async (
   assert.ok(restart.lsofCalls.length > 0)
   assert.equal(restart.spawnCalls.length, 1)
 
-  const cypressHooks = runCypressNodeSetup(checkout.root)
-  assert.equal(cypressHooks.reset, true)
+  await guardCypressNodeSetup(checkout.root)
 })
 
 test('configured primary and linked checkouts refuse before shared-state effects', async (t) => {
@@ -154,14 +146,12 @@ test('configured primary and linked checkouts refuse before shared-state effects
     assert.equal(restart.lsofCalls.length, 0)
     assert.equal(restart.spawnCalls.length, 0)
 
-    const hooks = { reset: false, mocks: false }
-    assert.throws(() => {
-      guardCypressNodeSetup(checkout.root)
+    const hooks = { reset: false }
+    await assert.rejects(async () => {
+      await guardCypressNodeSetup(checkout.root)
       hooks.reset = true
-      hooks.mocks = true
-    }, isolatedRefusal)
+    }, isolatedCypressSpec)
     assert.equal(hooks.reset, false)
-    assert.equal(hooks.mocks, false)
   }
 })
 
@@ -195,16 +185,15 @@ test('malformed isolation JSON refuses clearly before shared-state effects', asy
   assert.equal(restart.lsofCalls.length, 0)
   assert.equal(restart.spawnCalls.length, 0)
 
-  const hooks = { reset: false, mocks: false }
-  assert.throws(() => {
-    guardCypressNodeSetup(checkout.root)
+  const hooks = { reset: false }
+  await assert.rejects(async () => {
+    await guardCypressNodeSetup(checkout.root)
     hooks.reset = true
-    hooks.mocks = true
   }, malformedJson)
   assert.equal(hooks.reset, false)
 })
 
-test('complete isolated allocation still refuses restart and Cypress', async (t) => {
+test('complete isolated allocation still refuses restart', async (t) => {
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
@@ -220,12 +209,4 @@ test('complete isolated allocation still refuses restart and Cypress', async (t)
   )
   assert.equal(restart.lsofCalls.length, 0)
   assert.equal(restart.spawnCalls.length, 0)
-
-  const hooks = { reset: false, mocks: false }
-  assert.throws(() => {
-    guardCypressNodeSetup(checkout.root)
-    hooks.reset = true
-    hooks.mocks = true
-  }, isolatedRefusal)
-  assert.equal(hooks.reset, false)
 })

@@ -15,7 +15,14 @@ If services are not running, suggest starting `pnpm sut` in a separate terminal.
 
 ## Cypress Origin
 
-`http://localhost:5173` is always the Cypress app origin through the local load balancer. CI vs `pnpm sut`, `wait-on`, `NO_PROXY`, and env vars are documented in `docs/gcp/prod_env.md`, Local dev / Cypress under section 6.
+Primary unconfigured checkouts and CI use `http://localhost:5173` as the Cypress
+app origin through the local load balancer. A configured worktree (or primary
+with `.worktree.local.json`) uses that checkout's isolated origin
+`http://127.0.0.1:<lbListenPort>` — see `docs/worktree-browser-tests.md`. Isolated
+Cypress is allowlisted to
+`e2e_test/features/note_creation_and_update/worktree_note_editing.feature` only.
+CI vs `pnpm sut`, `wait-on`, `NO_PROXY`, and env vars are documented in
+`docs/gcp/prod_env.md`, Local dev / Cypress under section 6.
 
 ## Run E2E Tests
 

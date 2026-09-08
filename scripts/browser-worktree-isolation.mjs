@@ -55,6 +55,11 @@ function readWorktreeLocalConfig(checkoutRoot) {
   }
 }
 
+export function readPresentWorktreeLocalConfig(checkoutRoot) {
+  if (!isRegularFile(worktreeLocalConfigPath(checkoutRoot))) return null
+  return readWorktreeLocalConfig(checkoutRoot)
+}
+
 const SUPPORTED_ISOLATED_SUT_COMMANDS = new Set([
   'pnpm sut',
   'pnpm sut:healthcheck',
@@ -118,10 +123,7 @@ export function refuseUnsupportedIsolatedBrowserCommand({
   checkoutRoot,
   command,
 }) {
-  const configPath = worktreeLocalConfigPath(checkoutRoot)
-  if (isRegularFile(configPath)) {
-    readWorktreeLocalConfig(checkoutRoot)
-  }
+  readPresentWorktreeLocalConfig(checkoutRoot)
   if (!worktreeIsolationApplies(checkoutRoot)) {
     return
   }
@@ -134,11 +136,4 @@ export function refuseUnsupportedIsolatedBrowserCommand({
       `Refusing ${command} so it does not use shared local defaults ` +
       '(ports 5173/5174/9081, mountebank 2525, or the shared E2E database).'
   )
-}
-
-export function guardCypressNodeSetup(checkoutRoot) {
-  refuseUnsupportedIsolatedBrowserCommand({
-    checkoutRoot,
-    command: 'pnpm cypress run --spec',
-  })
 }

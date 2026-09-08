@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–5 done, slices 6–13 planned.
+Status: in progress; slices 1–6 done, slices 7–13 planned.
 
 ## Goal and scope
 
@@ -278,12 +278,15 @@ Sizing: ~5 minutes, medium confidence; one supervisor failure loop.
 ### 6. Run the supported note edit through the owning Cypress environment
 
 Type: Behavior
-Status: planned
-Proof: Ordinary `pnpm cypress run --spec
+Status: done
+Proof: `pnpm test:browser-worktree-isolation` — unsupported/mixed specs,
+duplicate runner, conflicting origin, missing/unhealthy owner, and shutdown
+lease refuse before reset; supported spec sets `baseUrl` to
+`http://127.0.0.1:<lbListenPort>` and serializes the runner lease.
+Ordinary `CURSOR_DEV=true nix develop -c pnpm cypress run --spec
 e2e_test/features/note_creation_and_update/worktree_note_editing.feature`
-creates a note, edits it, and observes saved content after reload. Command
-boundary variations establish rejection before reset for a conflicting origin,
-unsupported/mixed spec selection, or a duplicate runner.
+against isolated SUT `http://127.0.0.1:59153` passed; after reload the note
+content included `Saved in this worktree`. Cypress ~10s, JVM ~17s.
 
 Behavior: An owning SUT is healthy → the focused ordinary Cypress command →
 the browser completes a saved note edit against that same environment.
@@ -513,6 +516,14 @@ refusal until enabled. Final scope and proof promises remain unchanged.
 - Slice 5: `run-p -clnr` does not kill peers on non-zero child exit (`-c`).
   Supervisor now uses `-lnr` and, on close, logs the forced exit, stops the
   owned tree, and releases the lock so health fails without another command.
+- Slice 6: isolated Cypress allowlist is
+  `worktree_note_editing.feature` only. Origin is set in node setup from the
+  allocation; runner lease lives on the owner control socket and is refused
+  during shutdown. Cypress ~10s / JVM ~17s (focused-test exception).
+- Main CI run 34176547886 (SHA `4c604a88`, Frontend Unit Tests 2/2 failed in
+  `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
+  an ancestor of HEAD; concurrent main work. `origin/main` later moved to
+  `40611a4c84`. Disposition: ignore for this execution.
 - Planning inspection found fixed origins in both Cypress and service commands,
   unconditional Mountebank startup/readiness, and restart by listener port rather
   than owner. These explain why a database-only change cannot deliver this story.

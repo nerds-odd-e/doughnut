@@ -1,6 +1,7 @@
 import { existsSync, rm } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { guardCypressNodeSetup } from '../../scripts/browser-worktree-isolation.mjs'
+import { guardCypressNodeSetup } from '../../scripts/isolated-cypress.mjs'
+import { runSutHealthcheck } from '../../scripts/sut-healthcheck.mjs'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
@@ -35,7 +36,20 @@ const commonConfig = {
       // Cypress 10+ changes process.cwd() to the config file's directory when using --config-file,
       // so resolve from __dirname to get the repo root regardless of cwd.
       const repoRoot = resolve(__dirname, '..', '..')
-      guardCypressNodeSetup(repoRoot)
+      await guardCypressNodeSetup(repoRoot, config, {
+        on,
+        healthcheckFn: async (checkoutRoot) => {
+          const lines: string[] = []
+          const result = await runSutHealthcheck({
+            checkoutRoot,
+            log: (line: string) => lines.push(line),
+          })
+          if (!result.ok) {
+            console.error(lines.join('\n'))
+          }
+          return result
+        },
+      })
       await addCucumberPreprocessorPlugin(on, config)
       const generatedBackendPath = join(
         repoRoot,

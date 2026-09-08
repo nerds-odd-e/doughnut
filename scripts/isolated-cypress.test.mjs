@@ -1,0 +1,230 @@
+import assert from 'node:assert/strict'
+import { test } from 'node:test'
+import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
+import {
+  guardCypressNodeSetup,
+  SUPPORTED_ISOLATED_CYPRESS_SPEC,
+} from './isolated-cypress.mjs'
+import {
+  completeIsolatedConfig,
+  startLiveOwner,
+} from './sut-isolated-fixtures.mjs'
+import { isolatedBrowserOrigin } from './sut-runtime-target.mjs'
+import { beginSutOwnerShutdown } from './sut-owner.mjs'
+
+const isolatedCypressSpec = /only supports|spec selection/i
+const isolatedOrigin = isolatedBrowserOrigin(completeIsolatedConfig.e2e)
+
+function cypressArgv(spec = SUPPORTED_ISOLATED_CYPRESS_SPEC) {
+  return ['node', 'cypress', 'run', '--spec', spec]
+}
+
+function isolatedCypressOpts(extra = {}) {
+  const env = { ...process.env, ...(extra.env ?? {}) }
+  if (!(extra.env && Object.hasOwn(extra.env, 'CYPRESS_baseUrl'))) {
+    delete env.CYPRESS_baseUrl
+  }
+  return {
+    argv: extra.argv ?? cypressArgv(),
+    healthcheckFn: extra.healthcheckFn ?? (async () => ({ ok: true })),
+    env,
+    on: extra.on,
+  }
+}
+
+function supportedConfig(baseUrl = 'http://localhost:5173') {
+  return { specPattern: SUPPORTED_ISOLATED_CYPRESS_SPEC, baseUrl }
+}
+
+async function assertRefusesBeforeReset(run, pattern) {
+  const hooks = { reset: false }
+  await assert.rejects(async () => {
+    await run()
+    hooks.reset = true
+  }, pattern)
+  assert.equal(hooks.reset, false)
+}
+
+test('unsupported or mixed isolated Cypress specs refuse before reset', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(completeIsolatedConfig),
+  })
+  const unsupported =
+    'e2e_test/features/note_creation_and_update/note_creation.feature'
+
+  for (const argv of [
+    cypressArgv(unsupported),
+    [
+      'node',
+      'cypress',
+      'run',
+      '--spec',
+      `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${unsupported}`,
+    ],
+    ['node', 'cypress', 'run'],
+  ]) {
+    await assertRefusesBeforeReset(
+      () =>
+        guardCypressNodeSetup(
+          checkout.root,
+          { specPattern: 'e2e_test/features/**/*.feature' },
+          { argv }
+        ),
+      isolatedCypressSpec
+    )
+  }
+})
+
+test('CLI glob spec selection is refused in before:run before reset', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(completeIsolatedConfig),
+  })
+  const live = await startLiveOwner(checkout.root)
+  t.after(() => live.server.close())
+  const listeners = {}
+  const config = {
+    specPattern: 'e2e_test/features/**/*.feature',
+    baseUrl: 'http://localhost:5173',
+  }
+  const isolated = await guardCypressNodeSetup(
+    checkout.root,
+    config,
+    isolatedCypressOpts({
+      argv: ['node', 'cypress', 'run'],
+      on: (event, fn) => {
+        listeners[event] = fn
+      },
+    })
+  )
+  t.after(() => isolated.release())
+  assert.equal(config.baseUrl, isolatedOrigin)
+  await assertRefusesBeforeReset(
+    () =>
+      listeners['before:run']({
+        specs: [
+          { relative: SUPPORTED_ISOLATED_CYPRESS_SPEC },
+          {
+            relative:
+              'e2e_test/features/note_creation_and_update/note_creation.feature',
+          },
+        ],
+      }),
+    isolatedCypressSpec
+  )
+})
+
+test('supported isolated Cypress sets origin before reset and serializes the runner lease', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(completeIsolatedConfig),
+  })
+  const live = await startLiveOwner(checkout.root)
+  t.after(() => live.server.close())
+  const config = supportedConfig()
+  const listeners = {}
+  const isolated = await guardCypressNodeSetup(
+    checkout.root,
+    config,
+    isolatedCypressOpts({
+      on: (event, fn) => {
+        listeners[event] = fn
+      },
+    })
+  )
+  t.after(() => isolated.release())
+  assert.equal(config.baseUrl, isolatedOrigin)
+
+  await assertRefusesBeforeReset(
+    () =>
+      guardCypressNodeSetup(
+        checkout.root,
+        supportedConfig(),
+        isolatedCypressOpts()
+      ),
+    /duplicate runner|already using this checkout/i
+  )
+
+  await listeners['after:run']()
+  const config2 = supportedConfig()
+  const again = await guardCypressNodeSetup(
+    checkout.root,
+    config2,
+    isolatedCypressOpts()
+  )
+  t.after(() => again.release())
+  assert.equal(config2.baseUrl, isolatedOrigin)
+})
+
+test('conflicting Cypress origin refuses before reset; matching origin remains usable', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(completeIsolatedConfig),
+  })
+  const live = await startLiveOwner(checkout.root)
+  t.after(() => live.server.close())
+  await assertRefusesBeforeReset(
+    () =>
+      guardCypressNodeSetup(
+        checkout.root,
+        supportedConfig(),
+        isolatedCypressOpts({
+          env: { CYPRESS_baseUrl: 'http://localhost:5173' },
+        })
+      ),
+    /Conflicting CYPRESS_baseUrl/
+  )
+
+  const config = supportedConfig(isolatedOrigin)
+  const isolated = await guardCypressNodeSetup(
+    checkout.root,
+    config,
+    isolatedCypressOpts({ env: { CYPRESS_baseUrl: isolatedOrigin } })
+  )
+  t.after(() => isolated.release())
+  assert.equal(config.baseUrl, isolatedOrigin)
+})
+
+test('isolated Cypress without a live owner or healthy SUT refuses before reset', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(completeIsolatedConfig),
+  })
+  await assertRefusesBeforeReset(
+    () =>
+      guardCypressNodeSetup(
+        checkout.root,
+        supportedConfig(),
+        isolatedCypressOpts()
+      ),
+    /verified live SUT owner/
+  )
+
+  const live = await startLiveOwner(checkout.root)
+  t.after(() => live.server.close())
+  await assertRefusesBeforeReset(
+    () =>
+      guardCypressNodeSetup(
+        checkout.root,
+        supportedConfig(),
+        isolatedCypressOpts({
+          healthcheckFn: async () => ({ ok: false }),
+        })
+      ),
+    /healthy owning SUT/
+  )
+})
+
+test('owner shutdown refuses a new Cypress runner lease before reset', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(completeIsolatedConfig),
+  })
+  const live = await startLiveOwner(checkout.root)
+  t.after(() => live.server.close())
+  await beginSutOwnerShutdown(checkout.root)
+  await assertRefusesBeforeReset(
+    () =>
+      guardCypressNodeSetup(
+        checkout.root,
+        supportedConfig(),
+        isolatedCypressOpts()
+      ),
+    /shutting down/
+  )
+})

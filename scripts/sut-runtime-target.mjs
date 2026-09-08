@@ -40,6 +40,10 @@ export function withSutRuntimeTargetEnv(env, target) {
   return { ...env, ...sutRuntimeTargetProcessEnv(target) }
 }
 
+export function isolatedBrowserOrigin(target) {
+  return `http://${HOST}:${target.lbListenPort}`
+}
+
 export function sutHealthEndpoints(target) {
   const tcpChecks = []
   if (target.mountebankPort != null) {

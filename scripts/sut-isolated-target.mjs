@@ -8,6 +8,8 @@ import {
   sutRuntimeTargetProcessEnv,
 } from './sut-runtime-target.mjs'
 
+export { isolatedBrowserOrigin } from './sut-runtime-target.mjs'
+
 const E2E_JDBC_PARAMS =
   'connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true'
 
@@ -42,10 +44,6 @@ export function resolveSutCheckoutTarget({ checkoutRoot, runtimeTarget } = {}) {
     isolated: false,
     target: resolveSutRuntimeTarget({ runtimeTarget }),
   }
-}
-
-export function isolatedBrowserOrigin(target) {
-  return `http://127.0.0.1:${target.lbListenPort}`
 }
 
 export function refuseConflictingSutOverrides(env, target) {
