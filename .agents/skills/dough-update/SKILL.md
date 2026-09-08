@@ -34,8 +34,11 @@ Ordinary Open Dough release updates remain available from the recorded source.
    | Cursor | `cursor` | `.agents/skills/` (shared with Codex) |
    | Claude Code | `claude` | `.claude/skills/` |
 
-   The complete public payload is `dough-update/SKILL.md` and
-   `dough-adr-awareness/SKILL.md`. The numeric `VERSION` record and the
+   The public payload is the set of `dough-*/SKILL.md` paths declared by the
+   pinned release's installer and baseline-comparison helper. Treat that
+   release as authoritative: payload skills may be added between releases, so
+   a path absent from the installed release is not by itself a reason to stop.
+   The numeric `VERSION` record and the
    recorded `SOURCE` live beside each `dough-update/SKILL.md`. Installation
    writes the same `SOURCE` from the supplied repository URL or local path,
    then `VERSION`, in both physical roots. Ordinary no-URL updates reuse the
@@ -66,8 +69,8 @@ Ordinary Open Dough release updates remain available from the recorded source.
       <commit>`, and check out that commit detached. Confirm
       `git rev-parse HEAD` equals the peeled commit.
    c. Inspect that snapshot's `src/install/open-dough-release.sh`,
-      `src/install/open-dough-release-apply.sh`, `install.sh`, and both
-      public payload sources under `src/skills/`.
+      `src/install/open-dough-release-apply.sh`, `install.sh`, the helpers they
+      source, and every public payload source they declare under `src/skills/`.
    d. Run the inspected helper, quoting paths. Codex may omit `--platform`.
       For an ordinary update of a recorded installation, run
       `bash <snapshot>/src/install/open-dough-release.sh apply --target
@@ -78,14 +81,17 @@ Ordinary Open Dough release updates remain available from the recorded source.
       SOURCE, omit `--url`; otherwise include `--url <source-url>`.
       If apply reports that HEAD is not the pinned latest, stop. Do not fetch
       or check out replacement files after inspection. Proceed only if the
-      inspected files write solely to the two declared public payload paths
+      inspected files write solely to the release-declared public payload paths
       under both native skill roots and each updater's `SOURCE` and
       `VERSION` records in the captured target project, preserving
       distributable source, unrelated project files, and home guidance.
 6. Trust the helper's comparison. An ordinary update without a supplied URL
-   fetches the recorded VERSION tag as data and compares the two managed files
-   before any skip or replacement. Equal recorded versions that still match
-   that baseline must not invoke `install.sh` or write the selected files;
+   fetches the recorded VERSION tag as data and compares the installation with
+   the payload declared by that recorded release before any skip or
+   replacement. Candidate-only payload paths must be absent before the helper
+   may add them; a pre-existing collision refuses without writes. Equal
+   recorded versions that still match that baseline must not invoke
+   `install.sh` or write the selected files;
    untagged source changes alone do not require writes. Changed or missing
    managed files, or an unavailable recorded tag, refuse without writing even
    when the recorded version equals latest. An older recorded installation is
@@ -105,7 +111,7 @@ Ordinary Open Dough release updates remain available from the recorded source.
    may be incomplete, that the last successful record was left unchanged, and
    that explicit `--force` reinstall is the recovery path.
 7. Report the helper's source URL, release tag and commit, running tool and
-   native skill root, both installed payload paths, previous version or
+   native skill root, all installed payload paths, previous version or
    unknown, and actual outcome. After a replacement,
    tell the user to start a fresh session in the same tool, then invoke
    `/dough-update` in Cursor or Claude Code, or `$dough-update` in Codex, to
