@@ -23,8 +23,8 @@ selected story outcome.
 Require an existing PLAN under `.planning/phases/` or `.planning/quick/`.
 
 - No PLAN yet → use **slice-planning**.
-- Story understanding must change → use **story-refinement**; use
-  **story-decomposition** for parent-problem or candidate-ordering changes.
+- Story understanding must change → use **dough-story-refinement**; use
+  **dough-story-decomposition** for parent-problem or candidate-ordering changes.
 - Existing slices are already clear, cohesive, single-proof-loop, meet the
   target, and have no unexplained hard-limit path → execute directly;
   refinement is optional.

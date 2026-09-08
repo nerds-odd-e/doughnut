@@ -14,8 +14,8 @@ Resolve obvious multiple outcomes and unsafe stopping points now.
 
 <input_gate>
 Require one user or stakeholder outcome, its value, evaluable key examples, and
-boundaries from later stories. Use **story-refinement** for unresolved selected-story
-detail; **story-decomposition** for unclear parent problems or candidate selection.
+boundaries from later stories. Use **dough-story-refinement** for unresolved selected-story
+detail; **dough-story-decomposition** for unclear parent problems or candidate selection.
 Never execute a decomposition seed directly.
 </input_gate>
 
@@ -30,7 +30,7 @@ Never execute a decomposition seed directly.
 <step name="record_the_story_understanding">
 Read the home seed's refined story when present; record source, goal, scope, and
 key examples without enlargement. Apply `planning.mdc` scope discipline: report
-excluded uncertain additions; clarify necessary decisions through **story-refinement**.
+excluded uncertain additions; clarify necessary decisions through **dough-story-refinement**.
 </step>
 
 <step name="inspect_execution_context">
@@ -96,5 +96,5 @@ End with `## SLICE PLAN WRITTEN`.
 <out_of_scope>
 - Broad requirement exploration.
 - Feature implementation.
-- Direct execution of a story-decomposition seed.
+- Direct execution of a decomposition seed.
 </out_of_scope>
