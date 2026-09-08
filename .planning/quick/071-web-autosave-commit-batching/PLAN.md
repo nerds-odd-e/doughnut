@@ -126,20 +126,16 @@ before response delivery. HTTP signature/auth unchanged.
 
 ### 3. Freeze a head returned by idempotent publication
 Type: Behavior
-Status: planned
-Proof: Submit the current bundle through publishNotebookGitProposal using a
-persisted eligible fixture; returned head is unchanged and freshly loaded
-eligibility is cleared. Rejected publication retains its prior state.
+Status: done
+Proof: `pnpm backend:test_only` green —
+`NotebookGitIdempotentPublishFreezeControllerTest` freezes eligible tip on
+idempotent publish (unchanged head) and leaves eligibility on rejected publish.
+Shared `NotebookGitBinding.clearAmendmentEligibility()` used by download and
+publish.
 
-Behavior: An authorized proposal is already the accepted tip → existing
-projection validation succeeds → freeze that tip before returning its ID.
-Use the existing locked publish transaction and early return. New proposal
-heads stay frozen: candidate-head equality prevents stale eligibility from
-matching them, including the separate folder-acceptance path. Do not introduce
-an independent commit solely to freeze a rejected request.
-Sizing: about 5 minutes plus backend unit runtime; one existing return branch.
-Stop-safe: publication remains append-only and no candidate is yet registered
-by production saves.
+Behavior: Idempotent early-return path freezes tip after projection match,
+before returning ID. New proposal heads remain non-candidates via later
+candidate-head equality (slice 5).
 
 ### 4. Make snapshot parent choice explicit without changing saves
 Type: Structure
