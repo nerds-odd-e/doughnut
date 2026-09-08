@@ -8,6 +8,7 @@ Feature: Note content completion
       | Title  | Content |
       | Taipei | It is a |
 
+  @openaiUnavailableWhenPaired
   Scenario: Content completion fails when OpenAI is unavailable
     Given the OpenAI service is unavailable due to invalid system token
     When I request to complete the content for the note "Taipei"
@@ -19,5 +20,8 @@ Feature: Note content completion
       | Please complete the note content. | requires action | {"content": "It is a vigorous city."} |
     When I request to complete the content for the note "Taipei"
     Then I should see the suggested completion
+    And my OpenAI mock still records only my request marker
+    And I keep my OpenAI mock configured across the other worktree's mock reset
+    Then my OpenAI mock still records only my request marker
     When I accept the suggested completion
-    Then the note content on the current page should be "It is a vigorous city."
+    Then the note content on the current page should be this run's OpenAI mock suggestion

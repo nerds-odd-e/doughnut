@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process'
 import path from 'node:path'
 import { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC } from './isolated-openai-mock.mjs'
 
@@ -31,6 +32,26 @@ function specArgsFromArgv(argv) {
   )
 }
 
+/**
+ * Cypress 16 strips `--spec` from the config Node process argv. The parent
+ * Cypress.app command line still carries it — use that for setup-time mock
+ * injection into `expose` (before:run is too late for expose).
+ */
+export function specArgsFromParentProcess(
+  ppid = process.ppid,
+  exec = execSync
+) {
+  if (!Number.isInteger(ppid) || ppid <= 0) return []
+  try {
+    const command = exec(`ps -p ${ppid} -o command=`, {
+      encoding: 'utf8',
+    }).trim()
+    return specArgsFromArgv(command.split(/\s+/))
+  } catch {
+    return []
+  }
+}
+
 function specPatterns(specPattern) {
   if (Array.isArray(specPattern)) return specPattern
   return specPattern ? [specPattern] : []
@@ -51,9 +72,21 @@ function normalizeSelectedSpec(spec, checkoutRoot) {
   return withoutFile.replace(/^\.\//, '')
 }
 
-export function selectedCypressSpecs({ argv, specPattern, checkoutRoot }) {
+export function selectedCypressSpecs({
+  argv,
+  specPattern,
+  checkoutRoot,
+  parentSpecArgs,
+}) {
   const fromArgv = specArgsFromArgv(argv)
-  const raw = fromArgv.length > 0 ? fromArgv : specPatterns(specPattern)
+  const fromParent =
+    parentSpecArgs ?? (fromArgv.length === 0 ? specArgsFromParentProcess() : [])
+  const raw =
+    fromArgv.length > 0
+      ? fromArgv
+      : fromParent.length > 0
+        ? fromParent
+        : specPatterns(specPattern)
   return raw.map((spec) => normalizeSelectedSpec(spec, checkoutRoot))
 }
 
@@ -61,8 +94,14 @@ function isGlobSpecPattern(spec) {
   return spec.includes('*') || spec.includes('?')
 }
 
-export function hasExplicitCypressSpecSelection(argv, specPattern) {
+export function hasExplicitCypressSpecSelection(
+  argv,
+  specPattern,
+  parentSpecArgs
+) {
   if (specArgsFromArgv(argv).length > 0) return true
+  const fromParent = parentSpecArgs ?? specArgsFromParentProcess()
+  if (fromParent.length > 0) return true
   const patterns = specPatterns(specPattern)
   return (
     patterns.length > 0 &&

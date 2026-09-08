@@ -2,7 +2,12 @@ import { existsSync, rm } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { guardCypressNodeSetup } from '../../scripts/isolated-cypress.mjs'
 import { runSutHealthcheck } from '../../scripts/sut-healthcheck.mjs'
-import { worktreeResetIsolationCypressTasks } from '../../scripts/worktree-reset-isolation-barrier.mjs'
+import {
+  isolationBarrierAt,
+  WORKTREE_RESET_ISOLATION_BARRIER_AT,
+  WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
+  worktreeResetIsolationCypressTasks,
+} from '../../scripts/worktree-reset-isolation-barrier.mjs'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
@@ -51,6 +56,19 @@ const commonConfig = {
           return result
         },
       })
+      if (!config.expose || typeof config.expose !== 'object') {
+        config.expose = {}
+      }
+      const barrierAt = isolationBarrierAt()
+      config.expose[WORKTREE_RESET_ISOLATION_BARRIER_AT] = barrierAt
+      if (barrierAt === WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK) {
+        const existingTags =
+          typeof config.expose.tags === 'string' &&
+          config.expose.tags.length > 0
+            ? config.expose.tags
+            : 'not @ignore'
+        config.expose.tags = `(${existingTags}) and not @openaiUnavailableWhenPaired`
+      }
       await addCucumberPreprocessorPlugin(on, config)
       const generatedBackendPath = join(
         repoRoot,

@@ -88,7 +88,7 @@ supported kind per worktree, across two concurrent local worktrees.
 
 ### 1. Run backend unit tests concurrently in separate worktrees
 
-**Status:** Children 1a–1c and story 2 delivered. Next queued work is story 3.
+**Status:** Children 1a–1c, stories 2, 2a, and 3 delivered. Next queued work is story 6.
 
 **Parent goal**
 
@@ -337,76 +337,28 @@ replacement.
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
-**Status:** Refined, 2026-09-08. Ready for the
-[slice plan](../quick/070-isolated-openai-browser-mocks/PLAN.md).
+**Status:** Delivered, 2026-09-08
+([slice plan](../quick/070-isolated-openai-browser-mocks/PLAN.md)).
 
 **Goal**
 
 Developers and AI tasks can verify accepting an OpenAI note-content suggestion
 in two local worktrees concurrently, with each browser receiving its own
 configured response. Another task's mock reset must not change that result or
-its recorded requests. This makes one useful mocked browser workflow available
-without waiting for CLI/MCP isolation.
+its recorded requests.
 
 **Scope**
 
-- Start each owning application with ordinary `pnpm sut`, then run ordinary
-  `pnpm cypress run --spec` for
-  `e2e_test/features/ai_generated_content/note_content_completion.feature`.
-  Support the existing success and unavailable-service scenarios. Continue
-  supporting the delivered no-mock note-editing feature. Exactly one explicitly
-  selected supported spec per run; reject mixed selections and other workflows
-  before fixture reset or mock setup.
-- Two local linked worktrees, installed dependencies, existing Nix/shared
-  MySQL setup, one SUT and one Cypress runner per checkout. Reuse stories 2/2a
-  application identity, health checks, and exclusive runner lease.
-- Isolate OpenAI mock management, serving, configuration/reset, recorded
-  requests, and the backend destination together. Use a private Mountebank
-  process during the mock-using Cypress run. Its temporary endpoints belong
-  to that runner; keep the existing persistent application allocation.
-  No manual mock startup, port selection, URL overrides, or new opt-in command.
-- Verify mock listener ownership before destructive mock operations and
-  fixture reset. A ready foreign management or serving listener is a visible
-  refusal, never adoption or port-based termination. Startup failure, ordinary
-  completion, cancellation, or mock-process failure releases only this run's
-  mock process and runner lease. A background mock failure must terminate the
-  affected run visibly rather than leave it waiting indefinitely.
-- Keep no-mock SUT startup and note-editing independent of Mountebank, even
-  after a mocked run. Primary checkouts without local configuration and CI
-  retain their shared defaults. No change to persistent allocation validation;
-  no new recorded mock fields are needed.
-
-**Key examples**
-
-1. A and B run note completion with different suggestions. Each accepts and
-   sees its own suggested content; each mock records only its own requests.
-2. B has a configured suggestion and recorded request. A resets/reconfigures
-   its mock and completes another request. B still returns its own suggestion
-   and retains its recording. Repeat with A and B reversed.
-3. The selected mock endpoint is occupied by a foreign ready process. Starting
-   the mocked run refuses before fixture reset or mock mutation; the foreign
-   process and the peer's response remain intact.
-4. A finishes or is cancelled while B remains active. B continues successfully;
-   A can start a later run. If A's mock exits unexpectedly, A reports failure
-   and cleans up its owned resources while B stays usable.
-5. Mountebank is unavailable. The supported no-mock startup/editing workflow
-   still works; the mocked workflow fails visibly without shared fallback.
+- Ordinary `pnpm sut` then one of
+  `note_content_completion.feature` or `worktree_note_editing.feature`.
+- Runner-owned private Mountebank for the completion spec; no-mock path stays
+  independent of Mountebank.
+- Ownership refusal for foreign mock listeners; cleanup on completion,
+  cancellation, and mock failure; one runner lease per checkout.
 
 **Exclusions:** Other OpenAI features, Google/Wikidata mocks, live external
-calls, multi-spec/glob/open-mode support, CLI/MCP, persistent mock ports or state,
-database retirement, automatic repair/reallocation of recorded application
-ports, lifecycle redesign for the SUT, worktree hooks, Cloud VM/CI changes,
-multiple runners in one checkout, and protection against malicious listener
-replacement after verification. Further mocked workflows remain future
-candidates, not implicitly part of this delivery.
-
-**Current understanding:** The first workflow and runner-scoped mock lifetime
-are conservative planning choices from existing code, not new developer
-decisions. Existing testability setup already redirects the backend to a mock
-URL; no backend API or production configuration change is expected.
-
-**Effort hypothesis:** M–L, medium confidence; endpoint routing is already
-supported, while ownership and paired-run proof dominate the remaining work.
+calls, multi-spec/glob/open-mode, CLI/MCP, persistent mock ports, Cloud VM/CI
+changes, and malicious post-verification listener replacement.
 Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 <a id="story-4"></a>
@@ -501,8 +453,8 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 **Backlog review, 2026-09-08:** Quick/067 delivered story 2a; no new story is
 needed. Preserve 3 → 6 → 4 → 5: mocks, reclamation, CLI, MCP. CLI-before-MCP
 is value ordering, not a dependency. The [product backlog](../PRODUCT-BACKLOG.md)
-owns global order. Story 3 is refined to OpenAI note completion; stories 4–6
-still need refinement and retirement is undecided.
+owns global order. Story 3 (OpenAI note completion with isolated mocks) is
+delivered; stories 4–6 still need refinement and retirement is undecided.
 
 Do not claim general parallel E2E support from the focused no-mock workflow.
 First-to-drop order among expansions is 5, 4, 6, then 3. Persistent development

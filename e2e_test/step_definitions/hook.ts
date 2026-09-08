@@ -10,33 +10,18 @@ import {
   GMAIL_E2E_OAUTH_ADD_CONFIG,
 } from '../config/cliGmailE2eConfig'
 import start, { mock_services } from '../start'
-import {
-  ISOLATED_OPEN_AI_MOCK_ENV_KEY,
-  VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK,
-} from '../start/mock_services/openAiMockEndpointContext'
+import { clearBrowserOpenAiMockEndpointOverride } from '../start/mock_services/openAiMockEndpointContext'
 import { cli } from '../start/pageObjects/cli'
-
-const WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS = 180_000
-
-function worktreeResetIsolationTask(name: string) {
-  cy.task(name, null, { timeout: WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS })
-}
-
-function isolatedOpenAiMockActive() {
-  return Boolean(Cypress.expose(ISOLATED_OPEN_AI_MOCK_ENV_KEY))
-}
-
-function verifyIsolatedOpenAiMockOwnershipBeforeMutation() {
-  if (!isolatedOpenAiMockActive()) {
-    return
-  }
-  cy.task(VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK)
-}
+import {
+  ensurePrivateOpenAiMockReady,
+  openAiMockIsolationBarrierActive,
+  worktreeResetIsolationTask,
+} from './worktreeOpenAiMockIsolation'
 
 // Ownership preflight for private OpenAI mocks must precede Before-order-0
 // fixture reset. Recheck again before OpenAI install/recreate below.
 Before({ order: -1 }, () => {
-  verifyIsolatedOpenAiMockOwnershipBeforeMutation()
+  ensurePrivateOpenAiMockReady()
 })
 
 // order 0: before tagged setup (e.g. @interactiveCLI order 2). Default hook
@@ -44,9 +29,13 @@ Before({ order: -1 }, () => {
 // hold MySQL locks that make truncate hang past Cypress's wrap timeout.
 Before({ order: 0 }, () => {
   cy.task('clearTestState')
-  worktreeResetIsolationTask('worktreeResetIsolationWaitBeforeReset')
+  if (!openAiMockIsolationBarrierActive()) {
+    worktreeResetIsolationTask('worktreeResetIsolationWaitBeforeReset')
+  }
   start.testability().cleanDBAndResetTestabilitySettings()
-  worktreeResetIsolationTask('worktreeResetIsolationAfterReset')
+  if (!openAiMockIsolationBarrierActive()) {
+    worktreeResetIsolationTask('worktreeResetIsolationAfterReset')
+  }
   cy.wrap('no').as('firstVisited')
 })
 
@@ -98,12 +87,19 @@ After({ tags: '@usingMockedWikidataService' }, () => {
 })
 
 Before({ tags: '@usingMockedOpenAiService' }, () => {
-  verifyIsolatedOpenAiMockOwnershipBeforeMutation()
+  ensurePrivateOpenAiMockReady()
+  if (openAiMockIsolationBarrierActive()) {
+    worktreeResetIsolationTask('worktreeResetIsolationWaitBeforeReset')
+  }
   mock_services.openAi().mock()
+  if (openAiMockIsolationBarrierActive()) {
+    worktreeResetIsolationTask('worktreeResetIsolationAfterReset')
+  }
 })
 
 After({ tags: '@usingMockedOpenAiService' }, () => {
   mock_services.openAi().restore()
+  clearBrowserOpenAiMockEndpointOverride()
 })
 
 Before({ tags: '@usingMockedGoogleService' }, () => {

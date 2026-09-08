@@ -1,9 +1,11 @@
 import {
   loadCompleteIsolatedE2eAllocation,
   readPresentWorktreeLocalConfig,
+  WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY,
   worktreeIsolationApplies,
 } from './browser-worktree-isolation.mjs'
 import {
+  GET_ISOLATED_OPEN_AI_MOCK_ENDPOINT_TASK,
   ISOLATED_OPEN_AI_MOCK_ENV_KEY,
   OPEN_AI_MOCK_ENDPOINT_ENV_KEY,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
@@ -58,6 +60,10 @@ export async function guardCypressNodeSetup(
   if (!worktreeIsolationApplies(checkoutRoot)) {
     return
   }
+  if (!config.expose || typeof config.expose !== 'object') {
+    config.expose = {}
+  }
+  config.expose[WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY] = true
   const argv = options.argv ?? process.argv
   const env = options.env ?? process.env
   const explicitSpecs = hasExplicitCypressSpecSelection(
@@ -142,6 +148,9 @@ export async function guardCypressNodeSetup(
           )
         }
         return privateMock.verifyOwnership()
+      },
+      [GET_ISOLATED_OPEN_AI_MOCK_ENDPOINT_TASK]() {
+        return privateMock?.endpoint ?? null
       },
     })
     options.on('before:run', async (details) => {

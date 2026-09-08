@@ -2,6 +2,10 @@
 /**
  * Temporary paired Cypress runner for isolated reset isolation.
  * Uses the harness-local file barrier; not a reusable scheduler.
+ *
+ * Default (fixture): note-editing DB reset isolation.
+ * OpenAI mock mode: note-content completion with distinct suggestions /
+ * request markers and barrier around private mock install/reset.
  */
 import { spawn } from 'node:child_process'
 import { mkdtemp } from 'node:fs/promises'
@@ -9,9 +13,15 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
-import { SUPPORTED_ISOLATED_CYPRESS_SPEC } from './isolated-cypress.mjs'
 import {
+  SUPPORTED_ISOLATED_CYPRESS_SPEC,
+  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+} from './isolated-cypress.mjs'
+import {
+  OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
+  OPENAI_MOCK_ISOLATION_SUGGESTION,
   readBarrierEvents,
+  WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
   WORKTREE_RESET_ISOLATION_PEER_ROLE,
   WORKTREE_RESET_ISOLATION_RESETTER_ROLE,
   worktreeResetIsolationEnv,
@@ -26,16 +36,27 @@ function waitForChildExit(child) {
   })
 }
 
-export function spawnIsolatedCypress(cwd, extraEnv, spawnFn = spawn) {
-  return spawnFn(
-    'pnpm',
-    ['cypress', 'run', '--spec', SUPPORTED_ISOLATED_CYPRESS_SPEC],
-    {
-      cwd,
-      env: { ...process.env, ...extraEnv },
-      stdio: 'inherit',
-    }
-  )
+export function spawnIsolatedCypress(
+  cwd,
+  extraEnv,
+  spawnFn = spawn,
+  spec = SUPPORTED_ISOLATED_CYPRESS_SPEC
+) {
+  return spawnFn('pnpm', ['cypress', 'run', '--spec', spec], {
+    cwd,
+    env: { ...process.env, ...extraEnv },
+    stdio: 'inherit',
+  })
+}
+
+const DEFAULT_PEER_PROOF = {
+  suggestion: 'It is a peer isolation city.',
+  requestMarker: 'PEER_OPENAI_REQ_MARKER',
+}
+
+const DEFAULT_RESETTER_PROOF = {
+  suggestion: 'It is a resetter isolation city.',
+  requestMarker: 'RESETTER_OPENAI_REQ_MARKER',
 }
 
 export async function runPairedWorktreeResetIsolation(options) {
@@ -47,22 +68,54 @@ export async function runPairedWorktreeResetIsolation(options) {
   const barrierDir =
     options.barrierDir ??
     (await mkdtemp(path.join(tmpdir(), 'worktree-reset-isolation-')))
-  const spawnCypress = options.spawnCypress ?? spawnIsolatedCypress
+  const mode = options.mode ?? 'fixture'
+  const openaiMock = mode === 'openai-mock'
+  const spec = openaiMock
+    ? SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC
+    : SUPPORTED_ISOLATED_CYPRESS_SPEC
+  const peerProof = options.peerProof ?? DEFAULT_PEER_PROOF
+  const resetterProof = options.resetterProof ?? DEFAULT_RESETTER_PROOF
+  const spawnCypress =
+    options.spawnCypress ??
+    ((cwd, env) => spawnIsolatedCypress(cwd, env, spawn, spec))
   const log = options.log ?? ((line) => process.stdout.write(`${line}\n`))
   log(`Reset isolation barrier: ${barrierDir}`)
+  log(`Mode: ${mode}`)
+  log(`Spec: ${spec}`)
   log(`Peer checkout: ${peerRoot}`)
   log(`Resetter checkout: ${resetterRoot}`)
-  const peer = spawnCypress(
-    peerRoot,
-    worktreeResetIsolationEnv(barrierDir, WORKTREE_RESET_ISOLATION_PEER_ROLE)
-  )
-  const resetter = spawnCypress(
-    resetterRoot,
-    worktreeResetIsolationEnv(
-      barrierDir,
-      WORKTREE_RESET_ISOLATION_RESETTER_ROLE
+  if (openaiMock) {
+    log(
+      `Peer suggestion/marker: ${peerProof.suggestion} / ${peerProof.requestMarker}`
     )
+    log(
+      `Resetter suggestion/marker: ${resetterProof.suggestion} / ${resetterProof.requestMarker}`
+    )
+  }
+  const peerEnv = worktreeResetIsolationEnv(
+    barrierDir,
+    WORKTREE_RESET_ISOLATION_PEER_ROLE,
+    openaiMock
+      ? {
+          barrierAt: WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
+          suggestion: peerProof.suggestion,
+          requestMarker: peerProof.requestMarker,
+        }
+      : {}
   )
+  const resetterEnv = worktreeResetIsolationEnv(
+    barrierDir,
+    WORKTREE_RESET_ISOLATION_RESETTER_ROLE,
+    openaiMock
+      ? {
+          barrierAt: WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
+          suggestion: resetterProof.suggestion,
+          requestMarker: resetterProof.requestMarker,
+        }
+      : {}
+  )
+  const peer = spawnCypress(peerRoot, peerEnv)
+  const resetter = spawnCypress(resetterRoot, resetterEnv)
   const [peerExit, resetterExit] = await Promise.all([
     waitForChildExit(peer),
     waitForChildExit(resetter),
@@ -81,7 +134,18 @@ export async function runPairedWorktreeResetIsolation(options) {
       'Resetter reset happened before the peer seeded; the barrier did not hold.'
     )
   }
-  return { barrierDir, peerExit, resetterExit, events }
+  return {
+    barrierDir,
+    peerExit,
+    resetterExit,
+    events,
+    mode,
+    spec,
+    peerProof: openaiMock ? peerProof : null,
+    resetterProof: openaiMock ? resetterProof : null,
+    peerEnv,
+    resetterEnv,
+  }
 }
 
 function failLoudly(error) {
@@ -100,10 +164,41 @@ if (isMain) {
     options: {
       peer: { type: 'string' },
       resetter: { type: 'string' },
+      mode: { type: 'string', default: 'fixture' },
+      'peer-suggestion': { type: 'string' },
+      'peer-marker': { type: 'string' },
+      'resetter-suggestion': { type: 'string' },
+      'resetter-marker': { type: 'string' },
     },
   })
+  const peerProof = {
+    suggestion: values['peer-suggestion'] ?? DEFAULT_PEER_PROOF.suggestion,
+    requestMarker: values['peer-marker'] ?? DEFAULT_PEER_PROOF.requestMarker,
+  }
+  const resetterProof = {
+    suggestion:
+      values['resetter-suggestion'] ?? DEFAULT_RESETTER_PROOF.suggestion,
+    requestMarker:
+      values['resetter-marker'] ?? DEFAULT_RESETTER_PROOF.requestMarker,
+  }
   runPairedWorktreeResetIsolation({
     peerRoot: values.peer,
     resetterRoot: values.resetter,
-  }).catch(failLoudly)
+    mode: values.mode,
+    peerProof,
+    resetterProof,
+  })
+    .then((result) => {
+      if (result.mode === 'openai-mock') {
+        process.stdout.write(
+          `OpenAI mock isolation OK. Peer env marker=${result.peerEnv[OPENAI_MOCK_ISOLATION_REQUEST_MARKER]} ` +
+            `suggestion=${result.peerEnv[OPENAI_MOCK_ISOLATION_SUGGESTION]}\n`
+        )
+        process.stdout.write(
+          `Resetter env marker=${result.resetterEnv[OPENAI_MOCK_ISOLATION_REQUEST_MARKER]} ` +
+            `suggestion=${result.resetterEnv[OPENAI_MOCK_ISOLATION_SUGGESTION]}\n`
+        )
+      }
+    })
+    .catch(failLoudly)
 }

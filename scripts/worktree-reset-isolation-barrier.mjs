@@ -1,6 +1,10 @@
 /**
  * Temporary paired-run barrier for isolated Cypress reset isolation.
  * Not a reusable scheduler: one file handshake for this proof only.
+ *
+ * Barrier placement (`WORKTREE_RESET_ISOLATION_BARRIER_AT`):
+ * - `fixture` (default): wait/signal around DB fixture reset
+ * - `openai-mock`: wait/signal around private OpenAI mock install/reset
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -8,9 +12,17 @@ import path from 'node:path'
 export const WORKTREE_RESET_ISOLATION_BARRIER_DIR =
   'WORKTREE_RESET_ISOLATION_BARRIER_DIR'
 export const WORKTREE_RESET_ISOLATION_ROLE = 'WORKTREE_RESET_ISOLATION_ROLE'
+export const WORKTREE_RESET_ISOLATION_BARRIER_AT =
+  'WORKTREE_RESET_ISOLATION_BARRIER_AT'
 export const WORKTREE_RESET_ISOLATION_PEER_ROLE = 'peer'
 export const WORKTREE_RESET_ISOLATION_RESETTER_ROLE = 'resetter'
+export const WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE = 'fixture'
+export const WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK = 'openai-mock'
 export const WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS = 180_000
+export const OPENAI_MOCK_ISOLATION_SUGGESTION =
+  'OPENAI_MOCK_ISOLATION_SUGGESTION'
+export const OPENAI_MOCK_ISOLATION_REQUEST_MARKER =
+  'OPENAI_MOCK_ISOLATION_REQUEST_MARKER'
 
 const PEER_SEEDED_FILE = 'peer-seeded'
 const RESETTER_RESET_FILE = 'resetter-reset'
@@ -36,6 +48,36 @@ function isolationRole(env) {
     )
   }
   return { role, dir }
+}
+
+export function isolationBarrierAt(env = process.env) {
+  const at =
+    env[WORKTREE_RESET_ISOLATION_BARRIER_AT] ??
+    WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE
+  if (
+    at !== WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE &&
+    at !== WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK
+  ) {
+    throw new Error(
+      `Unknown ${WORKTREE_RESET_ISOLATION_BARRIER_AT}=${at}. ` +
+        `Use ${WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE} or ` +
+        `${WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK}.`
+    )
+  }
+  return at
+}
+
+export function openAiMockIsolationProofParams(env = process.env) {
+  const suggestion = env[OPENAI_MOCK_ISOLATION_SUGGESTION]
+  const requestMarker = env[OPENAI_MOCK_ISOLATION_REQUEST_MARKER]
+  if (!(suggestion || requestMarker)) return null
+  if (!(suggestion && requestMarker)) {
+    throw new Error(
+      `${OPENAI_MOCK_ISOLATION_SUGGESTION} and ` +
+        `${OPENAI_MOCK_ISOLATION_REQUEST_MARKER} must be set together.`
+    )
+  }
+  return { suggestion, requestMarker }
 }
 
 function barrierPath(dir, name) {
@@ -109,6 +151,9 @@ export function worktreeResetIsolationCypressTasks(env = process.env) {
     worktreeResetIsolationAfterSeed() {
       return afterSeed({ env }).then(() => null)
     },
+    openAiMockIsolationProofParams() {
+      return openAiMockIsolationProofParams(env)
+    },
   }
 }
 
@@ -125,9 +170,19 @@ export function readBarrierEvents(dir) {
   }
 }
 
-export function worktreeResetIsolationEnv(dir, role) {
-  return {
+export function worktreeResetIsolationEnv(dir, role, options = {}) {
+  const env = {
     [WORKTREE_RESET_ISOLATION_BARRIER_DIR]: dir,
     [WORKTREE_RESET_ISOLATION_ROLE]: role,
   }
+  if (options.barrierAt) {
+    env[WORKTREE_RESET_ISOLATION_BARRIER_AT] = options.barrierAt
+  }
+  if (options.suggestion) {
+    env[OPENAI_MOCK_ISOLATION_SUGGESTION] = options.suggestion
+  }
+  if (options.requestMarker) {
+    env[OPENAI_MOCK_ISOLATION_REQUEST_MARKER] = options.requestMarker
+  }
+  return env
 }

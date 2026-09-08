@@ -10,6 +10,7 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import '../support/string_util'
 import start, { mock_services } from '../start'
+import { fetchOpenAiMockIsolationProof } from './worktreeOpenAiMockIsolation'
 
 function parseSingleRowQuestion(questionTable: DataTable) {
   const hashes = questionTable.hashes()
@@ -96,7 +97,19 @@ When('I contest the MCQ', () => {
 })
 
 Given('OpenAI will reply below for user messages:', (data: DataTable) => {
-  mock_services.openAi().stubConversationAiReplyStream(data.hashes())
+  fetchOpenAiMockIsolationProof().then((proof) => {
+    const rows = data.hashes().map((row) => {
+      if (!proof) {
+        return row
+      }
+      return {
+        ...row,
+        'user message': `${row['user message']} ${proof.requestMarker}`,
+        'assistant reply': JSON.stringify({ content: proof.suggestion }),
+      }
+    })
+    mock_services.openAi().stubConversationAiReplyStream(rows)
+  })
 })
 
 Given(
@@ -129,3 +142,13 @@ Then('I should see the suggested completion', () => {
 When('I accept the suggested completion', () => {
   start.assumeConversationAboutNotePage().acceptCompletion()
 })
+
+Then(
+  "the note content on the current page should be this run's OpenAI mock suggestion",
+  () => {
+    fetchOpenAiMockIsolationProof().then((proof) => {
+      const content = proof?.suggestion ?? 'It is a vigorous city.'
+      start.assumeNotePage().findNoteContent(content)
+    })
+  }
+)
