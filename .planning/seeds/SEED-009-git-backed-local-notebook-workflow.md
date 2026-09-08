@@ -220,7 +220,9 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   stable commit; another accepted commit ends the batch. Once visible to any
   client, a commit ID never changes. Structural changes also end the batch.
 - **Value / learning:** Tests whether more readable history materially helps
-  owners and AI tools. Existing pull already handles several accepted saves.
+  owners and AI tools. One-note content pull handles several accepted saves;
+  two-note batch pull accepts exactly one disjoint save. Do not use autosave
+  batching to hide that eligibility limit or rewrite already accepted commits.
 - **Effort hypothesis:** M — low confidence; assumes an explicit end-of-edit
   and publication boundary can preserve durable saves and timely synchronization.
 - **Depends on:** delivered Story 3.
@@ -381,7 +383,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 18. Keep a related local edit batch when the web changes a different note
 
-**Status:** delivered.
+**Status:** delivered. Recover quick/066 from `fc9bc7a477`.
 
 - **Goal:** An owner can retain one related local revision when a web edit to
   a different note arrives, then publish the revision without splitting it.
@@ -390,7 +392,35 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   one content-only save of a third existing note. Pull retains both local edits
   over the accepted commit; explicit publish keeps all three note identities
   and learning data. No overlap, additions, moves, README changes, multiple
-  local/remote commits, dirty trees, or drift repair.
+  local/remote commits, dirty trees, or drift repair. Already-based batch pull,
+  including repeating pull after a successful rebase, remains excluded;
+  direct-child batch publication is supported independently by Story 14.
+
+<a id="story-18a"></a>
+
+### 18a. Understand how to proceed when batch pull refuses divergent history
+
+**Status:** Refined; queued after the concurrent-worktree stories.
+[Slice plan](../quick/068-batch-pull-refusal-guidance/PLAN.md).
+
+**Goal:** A notebook owner whose two-note batch cannot receive accepted history
+gets accurate next-step guidance rather than a suggestion to publish a stale
+commit that publication will reject.
+
+**Scope:** Correct the batch-specific refusal guidance. Explain that the local
+work is preserved and must be reconciled or recreated as one supported commit
+directly on accepted history before publication. No automatic recovery, broader
+pull eligibility, new commands, or change to publication validation.
+
+**Key example:** One unpublished A/B commit and two accepted C saves → pull
+refuses without changing the checkout and explains the prerequisite for later
+publication. It does not offer immediate publication as a way around divergence.
+The supported one-C-save case still rebases and recommends explicit publication.
+
+**Evidence:** Quick 066 retrospective: `565e0acde7` introduced “Reduce or publish
+the local work” in `LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED`, but
+`assertLocalMainFollowsAcceptedHistory` rejects that divergent commit.
+**Effort hypothesis:** S, high confidence; one existing message and CLI proof loop.
 
 ## Ordering and Scope Reduction
 
@@ -399,6 +429,8 @@ existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
 Within this seed, **13**, **16**, **14**, **17**, and **18** are delivered.
+Queue the bounded **18a** guidance correction after the existing SEED-015 queue;
+it removes a demonstrated dead end without displacing environment isolation.
 Keep **15 → 10** as unqueued candidates: folder-move divergence is
 consequential but narrower and has unresolved identity-policy risk; batching
 changes readability without unlocking synchronization.
@@ -429,6 +461,10 @@ Preserve these boundaries in future refinement:
   alone establishes Donut identity.
 - **Story 10, before selection:** define the end-of-edit/publication boundary
   and acceptable delay without losing durable saves or rewriting visible history.
+- **Batch follow-ons:** Repeated pull, three-or-more-note rebase, and multiple
+  accepted saves are distinct excluded outcomes, not delivered by Story 18.
+  Capture the blocking owner journey before selecting a broader batch story;
+  passing batch publication alone does not prove divergent pull support.
 - **Earlier drift:** Story 13 prevents a new source of drift only from matching
   state. Recovery for notebooks already out of sync remains an unselected need.
 
