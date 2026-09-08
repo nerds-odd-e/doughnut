@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–11 done, slices 12–13 planned.
+Status: in progress; slices 1–12 done, slice 13 planned.
 
 ## Goal and scope
 
@@ -440,10 +440,12 @@ Sizing: ~5 minutes, medium confidence; one configured-start regression loop.
 ### 12. Start an existing identity without choosing ports
 
 Type: Behavior
-Status: planned
-Proof: Two identity-only worktrees invoke ordinary SUT start concurrently;
-their persisted port claims differ, both bind those endpoints, and both serve
-their own markers. A later shell invocation reuses its claim.
+Status: done
+Proof: `pnpm test:sut-start` (concurrent distinct claims, reuse, occupied TCP
+left alive). `pnpm test:browser-worktree-isolation` (identity-only start
+allowed; health/restart/Cypress still need complete allocation). Dual
+disposable stacks bound distinct ports and served their own markers; later
+start reused A's claim.
 
 Behavior: The identity exists but has no E2E endpoint allocation →
 `pnpm sut` → application ports are allocated automatically and the app starts.
@@ -567,6 +569,10 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   one machine-local claim (`os.tmpdir()/doughnut-worktree-e2e-port-claims`).
   Claiming metadata does not own listeners; occupied TCP still refuses. No
   auto-selection yet.
+- Slice 12: identity-only start allocates three distinct ports (never 5173,
+  5174, 9081, 2525), records them with the E2E database, and reuses the claim.
+  Concurrent checkouts get different claims. Manual port steps were removed
+  from the browser-tests guide. Missing identity file still refuses (leaf 13).
 - Main CI run 34176547886 (SHA `4c604a88`, Frontend Unit Tests 2/2 failed in
   `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
   an ancestor of HEAD; concurrent main work. `origin/main` later moved to

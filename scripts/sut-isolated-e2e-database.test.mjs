@@ -6,8 +6,10 @@ import {
   e2eDatabaseNameForIdentity,
   e2eDatabaseProvisioningSql,
 } from './sut-e2e-database.mjs'
+import { assertAllocatedIsolatedPorts } from './sut-e2e-port-test-helpers.mjs'
 import {
   identityAndPortsConfig,
+  identityOnlyConfig,
   readIsolatedConfig,
   runConfiguredStart,
   writeIsolatedConfig,
@@ -122,22 +124,31 @@ test('failed E2E database preparation leaves no recorded database and does not s
   assert.equal(spawn.calls.length, 0)
 })
 
-test('identity-only start still refuses before provisioning', async (t) => {
+test('identity-only start allocates ports and provisions E2E database', async (t) => {
   const checkout = makePrimaryCheckout(t, {
-    config: JSON.stringify({ id: 'wt_a7c2' }),
+    config: JSON.stringify(identityOnlyConfig),
   })
   const spawn = makeStartSpy()
   const mysql = recordingMysql()
-  await assert.rejects(
-    runConfiguredStart(checkout.root, spawn, {
-      schemaExistsFn: () => false,
-      mysqlExecFn: mysql.mysqlExecFn,
-    }),
-    /Missing or invalid/
+  const code = await runConfiguredStart(checkout.root, spawn, {
+    schemaExistsFn: () => false,
+    mysqlExecFn: mysql.mysqlExecFn,
+  })
+  assert.equal(code, 0)
+  assert.equal(mysql.calls.length, 1)
+  assert.equal(
+    mysql.calls[0].at(-1),
+    e2eDatabaseProvisioningSql(expectedDatabase)
   )
-  assert.equal(mysql.calls.length, 0)
-  assert.equal(spawn.calls.length, 0)
-  assert.deepEqual(readIsolatedConfig(checkout.root), { id: 'wt_a7c2' })
+  const config = readIsolatedConfig(checkout.root)
+  assert.equal(config.id, 'wt_a7c2')
+  assert.equal(config.e2e.database, expectedDatabase)
+  assertAllocatedIsolatedPorts(config.e2e)
+  assert.equal(spawn.calls.length, 1)
+  assert.equal(
+    spawn.calls[0][2].env.SERVER_PORT,
+    String(config.e2e.backendPort)
+  )
 })
 
 test('already recorded E2E database skips provisioning', async (t) => {

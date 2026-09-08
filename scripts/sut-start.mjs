@@ -113,7 +113,7 @@ export async function runSutStart({
       schemaExistsFn,
       log,
     })
-    ensureIsolatedE2ePorts(checkoutRoot, { claimRoot: portClaimRoot })
+    await ensureIsolatedE2ePorts(checkoutRoot, { claimRoot: portClaimRoot })
   }
   const { isolated, target } = resolveSutCheckoutTarget({
     checkoutRoot,

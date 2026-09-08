@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { existsSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { setTimeout as delay } from 'node:timers/promises'
@@ -20,31 +19,13 @@ import {
   ensureIsolatedE2ePorts,
   readPublishedE2ePortClaims,
 } from './sut-e2e-ports.mjs'
+import {
+  makeClaimRoot,
+  portsModuleHref,
+  spawnEnsurePorts,
+  waitForClose,
+} from './sut-e2e-port-test-helpers.mjs'
 import { makeStartSpy } from './sut-start-fixtures.mjs'
-
-const portsModuleHref = new URL('./sut-e2e-ports.mjs', import.meta.url).href
-
-function makeClaimRoot(t) {
-  const root = mkdtempSync(path.join(tmpdir(), 'doughnut-e2e-port-claims-'))
-  t.after(() => rmSync(root, { recursive: true, force: true }))
-  return root
-}
-
-function waitForClose(child) {
-  return new Promise((resolve) => {
-    let stdout = ''
-    let stderr = ''
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk
-    })
-    child.stderr.on('data', (chunk) => {
-      stderr += chunk
-    })
-    child.on('close', (status) => {
-      resolve({ status, stdout, stderr })
-    })
-  })
-}
 
 async function waitForFile(filePath, timeoutMs = 3000) {
   const deadline = Date.now() + timeoutMs
@@ -56,7 +37,7 @@ async function waitForFile(filePath, timeoutMs = 3000) {
   }
 }
 
-test('explicit recorded ports are published as one claim', (t) => {
+test('explicit recorded ports are published as one claim', async (t) => {
   const checkout = makePrimaryCheckout(t)
   const claimRoot = makeClaimRoot(t)
   writeIsolatedConfig(checkout.root, {
@@ -64,7 +45,7 @@ test('explicit recorded ports are published as one claim', (t) => {
     extra: 'keep-me',
   })
 
-  const ports = ensureIsolatedE2ePorts(checkout.root, { claimRoot })
+  const ports = await ensureIsolatedE2ePorts(checkout.root, { claimRoot })
   assert.deepEqual(ports, {
     backendPort: 19081,
     vitePort: 15174,
@@ -103,7 +84,7 @@ test('port claims serialize across cooperating checkout roots', async (t) => {
       '-e',
       `import { writeFileSync, existsSync } from 'node:fs'
 import { withE2ePortClaimLock } from ${JSON.stringify(portsModuleHref)}
-withE2ePortClaimLock(${JSON.stringify(claimRoot)}, () => {
+await withE2ePortClaimLock(${JSON.stringify(claimRoot)}, () => {
   writeFileSync(${JSON.stringify(reached)}, 'held')
   while (!existsSync(${JSON.stringify(release)})) {
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20)
@@ -116,19 +97,7 @@ withE2ePortClaimLock(${JSON.stringify(claimRoot)}, () => {
   const holderDone = waitForClose(holder)
   await waitForFile(reached)
 
-  const waiter = spawn(
-    process.execPath,
-    [
-      '--input-type=module',
-      '-e',
-      `import { ensureIsolatedE2ePorts } from ${JSON.stringify(portsModuleHref)}
-ensureIsolatedE2ePorts(${JSON.stringify(secondCheckout.root)}, {
-  claimRoot: ${JSON.stringify(claimRoot)},
-})
-`,
-    ],
-    { encoding: 'utf8' }
-  )
+  const waiter = spawnEnsurePorts(secondCheckout.root, claimRoot)
   const waiterDone = waitForClose(waiter)
   await delay(80)
   assert.equal(waiter.exitCode, null)
@@ -142,7 +111,7 @@ ensureIsolatedE2ePorts(${JSON.stringify(secondCheckout.root)}, {
   assert.equal(holderResult.status, 0, holderResult.stderr)
   assert.equal(waiterResult.status, 0, waiterResult.stderr)
 
-  ensureIsolatedE2ePorts(firstCheckout.root, { claimRoot })
+  await ensureIsolatedE2ePorts(firstCheckout.root, { claimRoot })
   assert.deepEqual(readPublishedE2ePortClaims(claimRoot), {
     wt_a7c2: {
       backendPort: 19081,

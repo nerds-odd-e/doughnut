@@ -4,7 +4,7 @@ import path from 'node:path'
 import {
   E2E_PORT_CONFIG_FIELDS,
   collectMissingE2ePorts,
-  isolatedE2ePortsRequiredError,
+  refusePartialIsolatedE2ePorts,
 } from './sut-e2e-ports.mjs'
 import {
   assertValidWorktreeId,
@@ -77,7 +77,11 @@ export function isRecordedE2eDatabase(database) {
 
 function allocationError(checkoutRoot, missing, { start } = {}) {
   if (start) {
-    return isolatedE2ePortsRequiredError(checkoutRoot, missing)
+    return new Error(
+      `Isolated worktree SUT needs identity in ${worktreeLocalConfigPath(
+        checkoutRoot
+      )} (id). Missing or invalid: ${missing.join(', ')}. See docs/worktree-browser-tests.md.`
+    )
   }
   return new Error(
     `Isolated worktree SUT needs a complete E2E allocation in ${worktreeLocalConfigPath(
@@ -104,13 +108,10 @@ function readRequiredWorktreeConfig(
 export function loadIsolatedE2eStartAllocation(checkoutRoot) {
   const config = readRequiredWorktreeConfig(
     checkoutRoot,
-    ['identity (.worktree.local.json)', ...E2E_PORT_CONFIG_FIELDS],
+    ['identity (.worktree.local.json)'],
     { start: true }
   )
-  const missing = collectMissingE2ePorts(config.e2e)
-  if (missing.length > 0) {
-    throw allocationError(checkoutRoot, missing, { start: true })
-  }
+  refusePartialIsolatedE2ePorts(checkoutRoot, config.e2e)
   return config
 }
 

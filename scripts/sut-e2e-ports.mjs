@@ -1,30 +1,30 @@
+import { readFileSync, writeFileSync } from 'node:fs'
 import {
-  mkdirSync,
-  readFileSync,
-  renameSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs'
-import { tmpdir } from 'node:os'
-import path from 'node:path'
+  defaultE2ePortClaimRoot,
+  readPublishedE2ePortClaims,
+  withE2ePortClaimLock,
+  writePublishedE2ePortClaims,
+} from './sut-e2e-port-claims.mjs'
+import {
+  closeListeningServer,
+  listenEphemeralPort,
+} from './sut-e2e-port-listen.mjs'
 import {
   assertValidWorktreeId,
   worktreeLocalConfigPath,
 } from './worktree-identity.mjs'
 
+export {
+  readPublishedE2ePortClaims,
+  withE2ePortClaimLock,
+} from './sut-e2e-port-claims.mjs'
+
 export const E2E_PORT_FIELDS = ['backendPort', 'vitePort', 'lbListenPort']
 export const E2E_PORT_CONFIG_FIELDS = E2E_PORT_FIELDS.map(
   (field) => `e2e.${field}`
 )
-
-const CLAIM_LOCK_DIR_NAME = 'lock'
-const CLAIMS_FILE_NAME = 'claims.json'
-const CLAIM_LOCK_WAIT_MS = 5000
-const CLAIM_LOCK_POLL_MS = 20
-
-function defaultE2ePortClaimRoot() {
-  return path.join(tmpdir(), 'doughnut-worktree-e2e-port-claims')
-}
+export const RESERVED_ISOLATED_E2E_PORTS = [5173, 5174, 9081, 2525]
+const ALLOCATE_ATTEMPTS = 24
 
 export function collectMissingE2ePorts(e2e) {
   if (!e2e || typeof e2e !== 'object') {
@@ -52,108 +52,12 @@ export function isolatedE2ePortsRequiredError(checkoutRoot, missing) {
   )
 }
 
-function sleepSync(ms) {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
-}
-
-function claimLockDir(claimRoot) {
-  return path.join(claimRoot, CLAIM_LOCK_DIR_NAME)
-}
-
-function claimsFilePath(claimRoot) {
-  return path.join(claimRoot, CLAIMS_FILE_NAME)
-}
-
-function readLockOwnerPid(lockDir) {
-  try {
-    const raw = readFileSync(path.join(lockDir, 'owner.pid'), 'utf8').trim()
-    if (raw === '') return null
-    if (!/^[0-9]+$/.test(raw)) {
-      throw new Error('E2E port claim lock record is invalid.')
-    }
-    return Number(raw)
-  } catch (error) {
-    if (error.code === 'ENOENT') return null
-    throw error
+export function refusePartialIsolatedE2ePorts(checkoutRoot, e2e) {
+  const missing = collectMissingE2ePorts(e2e)
+  if (missing.length > 0 && missing.length < E2E_PORT_FIELDS.length) {
+    throw isolatedE2ePortsRequiredError(checkoutRoot, missing)
   }
-}
-
-function isLivePid(pid) {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch {
-    return false
-  }
-}
-
-function tryReclaimStaleClaimLock(lockDir) {
-  const pid = readLockOwnerPid(lockDir)
-  if (pid === null) return false
-  if (isLivePid(pid)) return false
-  try {
-    mkdirSync(path.join(lockDir, `reclaimed.${pid}`))
-  } catch {
-    return false
-  }
-  rmSync(lockDir, { recursive: true, force: true })
-  return true
-}
-
-function acquireE2ePortClaimLock(claimRoot) {
-  mkdirSync(claimRoot, { recursive: true })
-  const lockDir = claimLockDir(claimRoot)
-  const deadline = Date.now() + CLAIM_LOCK_WAIT_MS
-  while (Date.now() < deadline) {
-    try {
-      mkdirSync(lockDir)
-      writeFileSync(path.join(lockDir, 'owner.pid'), String(process.pid))
-      return
-    } catch (error) {
-      if (error.code !== 'EEXIST') throw error
-      if (!tryReclaimStaleClaimLock(lockDir)) {
-        sleepSync(CLAIM_LOCK_POLL_MS)
-      }
-    }
-  }
-  throw new Error(
-    'Timed out waiting for the machine-local E2E port claim lock.'
-  )
-}
-
-function releaseE2ePortClaimLock(claimRoot) {
-  rmSync(claimLockDir(claimRoot), { recursive: true, force: true })
-}
-
-export function withE2ePortClaimLock(claimRoot, fn) {
-  const root = claimRoot ?? defaultE2ePortClaimRoot()
-  acquireE2ePortClaimLock(root)
-  try {
-    return fn()
-  } finally {
-    releaseE2ePortClaimLock(root)
-  }
-}
-
-export function readPublishedE2ePortClaims(claimRoot) {
-  try {
-    const raw = readFileSync(claimsFilePath(claimRoot), 'utf8')
-    const parsed = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      throw new Error('E2E port claim registry is invalid.')
-    }
-    return parsed
-  } catch (error) {
-    if (error.code === 'ENOENT') return {}
-    throw error
-  }
-}
-
-function writePublishedE2ePortClaims(claimRoot, claims) {
-  const filePath = claimsFilePath(claimRoot)
-  const tempPath = `${filePath}.${process.pid}.tmp`
-  writeFileSync(tempPath, JSON.stringify(claims))
-  renameSync(tempPath, filePath)
+  return missing
 }
 
 function readCheckoutConfig(checkoutRoot) {
@@ -178,23 +82,82 @@ function recordCheckoutPorts(checkoutRoot, config, ports) {
   return next
 }
 
-function publishRecordedPorts(claimRoot, checkoutRoot) {
-  const config = readCheckoutConfig(checkoutRoot)
-  const missing = collectMissingE2ePorts(config.e2e)
-  if (missing.length > 0) {
-    throw isolatedE2ePortsRequiredError(checkoutRoot, missing)
+function claimedPortSet(claims) {
+  const used = new Set(RESERVED_ISOLATED_E2E_PORTS)
+  for (const ports of Object.values(claims)) {
+    if (!ports || typeof ports !== 'object') continue
+    for (const field of E2E_PORT_FIELDS) {
+      if (Number.isInteger(ports[field])) used.add(ports[field])
+    }
   }
-  const ports = recordedE2eApplicationPorts(config.e2e)
+  return used
+}
+
+async function closeHeldServers(held) {
+  for (const item of held) {
+    await closeListeningServer(item.server)
+  }
+}
+
+async function reserveUnclaimedApplicationPorts(used) {
+  const held = []
+  try {
+    let attempts = 0
+    while (held.length < E2E_PORT_FIELDS.length) {
+      attempts += 1
+      if (attempts > ALLOCATE_ATTEMPTS) {
+        throw new Error(
+          'Unable to allocate three free isolated E2E application ports.'
+        )
+      }
+      const reserved = await listenEphemeralPort()
+      if (used.has(reserved.port)) {
+        await closeListeningServer(reserved.server)
+        continue
+      }
+      used.add(reserved.port)
+      held.push(reserved)
+    }
+    return held
+  } catch (error) {
+    await closeHeldServers(held)
+    throw error
+  }
+}
+
+function publishClaim(claimRoot, worktreeId, ports) {
   const claims = readPublishedE2ePortClaims(claimRoot)
-  claims[config.id] = ports
+  claims[worktreeId] = ports
   writePublishedE2ePortClaims(claimRoot, claims)
-  recordCheckoutPorts(checkoutRoot, config, ports)
-  return ports
+}
+
+async function publishOrAllocatePorts(claimRoot, checkoutRoot) {
+  const config = readCheckoutConfig(checkoutRoot)
+  const missing = refusePartialIsolatedE2ePorts(checkoutRoot, config.e2e)
+  if (missing.length === 0) {
+    const ports = recordedE2eApplicationPorts(config.e2e)
+    publishClaim(claimRoot, config.id, ports)
+    recordCheckoutPorts(checkoutRoot, config, ports)
+    return ports
+  }
+  const held = await reserveUnclaimedApplicationPorts(
+    claimedPortSet(readPublishedE2ePortClaims(claimRoot))
+  )
+  const ports = Object.fromEntries(
+    E2E_PORT_FIELDS.map((field, index) => [field, held[index].port])
+  )
+  try {
+    publishClaim(claimRoot, config.id, ports)
+    recordCheckoutPorts(checkoutRoot, config, ports)
+    return ports
+  } finally {
+    await closeHeldServers(held)
+  }
 }
 
 export function ensureIsolatedE2ePorts(checkoutRoot, { claimRoot } = {}) {
   const root = claimRoot ?? defaultE2ePortClaimRoot()
   return withE2ePortClaimLock(root, () =>
-    publishRecordedPorts(root, checkoutRoot)
+    publishOrAllocatePorts(root, checkoutRoot)
   )
 }

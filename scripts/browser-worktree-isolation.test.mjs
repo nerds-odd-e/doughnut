@@ -23,6 +23,7 @@ import {
 import {
   completeIsolatedConfig,
   identityAndPortsConfig,
+  identityOnlyConfig,
 } from './sut-isolated-fixtures.mjs'
 import { runSutRestart } from './sut-restart.mjs'
 import { makeStartSpy } from './sut-start-fixtures.mjs'
@@ -54,18 +55,20 @@ test('unconfigured primary and CI keep shared SUT and Cypress defaults', async (
   await guardCypressNodeSetup(checkout.root)
 })
 
-test('configured primary and linked checkouts refuse before shared-state effects', async (t) => {
+test('configured primary identity-only can start; linked checkouts without identity refuse', async (t) => {
   withCiEnv(t)
   const configured = makePrimaryCheckout(t, {
-    config: JSON.stringify({ id: 'wt_a7c2' }),
+    config: JSON.stringify(identityOnlyConfig),
   })
   const linked = makeLinkedWorktreeCheckout(t)
 
-  for (const checkout of [configured, linked]) {
-    const start = makeStartSpy()
-    await assert.rejects(runStart(checkout.root, start), incompleteAllocation)
-    assert.equal(start.calls.length, 0)
+  assert.equal(loadIsolatedE2eStartAllocation(configured.root).id, 'wt_a7c2')
 
+  const linkedStart = makeStartSpy()
+  await assert.rejects(runStart(linked.root, linkedStart), incompleteAllocation)
+  assert.equal(linkedStart.calls.length, 0)
+
+  for (const checkout of [configured, linked]) {
     const healthLogs = []
     const healthAccessed = []
     await assert.rejects(

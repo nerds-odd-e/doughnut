@@ -4,49 +4,42 @@ Use ordinary `pnpm sut` in a local checkout (including a Git worktree) when you
 want the application to run against its own E2E database and ports instead of
 the shared `doughnut_e2e_test` / 5173 / 5174 / 9081 defaults.
 
-This is a **temporary manual allocation** of identity and application ports.
-Later work will choose ports and initialize identity automatically. Do not
-treat this file as the final workflow.
+This is a **temporary manual identity**. Later work will initialize identity
+automatically. Do not treat this file as the final workflow. Already recorded
+E2E databases and application ports are preserved.
 
 MySQL must already be listening on `127.0.0.1:3309` with the established
 passwordless local root administration and the existing `doughnut` test user.
 Isolated start does not start MySQL and does not start Mountebank. On first
-`pnpm sut` with an existing identity and recorded ports, it prepares
-`doughnut_e2e_<id>` (CREATE + GRANT, no `IF NOT EXISTS`). It does not create
-or repair a database that is already recorded, adopt a name that already
-exists in MySQL, or modify `doughnut_test` / `doughnut_e2e_test`.
+`pnpm sut` with an existing identity, it prepares `doughnut_e2e_<id>` (CREATE +
+GRANT, no `IF NOT EXISTS`) and allocates three distinct application ports.
+Allocated ports are never 5173, 5174, 9081, or 2525. It does not create or
+repair a database that is already recorded, adopt a name that already exists
+in MySQL, or modify `doughnut_test` / `doughnut_e2e_test`.
 
 `pnpm sut:restart` replaces the idle live owner on this checkout's recorded
 allocation. Ordinary Cypress is supported only for the focused note-editing
 spec below.
 
-## Temporary manual allocation
+## Temporary manual identity
 
 1. Choose an identity matching `wt_[a-z0-9_]{1,32}` (for example `wt_a7c2`).
    Reuse this checkout's existing `.worktree.local.json` `id` when backend
    tests already created one. Do not change that identity or repair its
    unit-test database (`doughnut_<id>_test`).
-2. Pick three free application ports (backend, Vite, local load balancer). Do
-   not reuse 5173 / 5174 / 9081 if the primary checkout's SUT is running. Port
-   2525 (Mountebank) is not part of isolated start.
-3. At this checkout's root, write gitignored `.worktree.local.json`. Identity-only
-   `{ "id": "wt_a7c2" }` files stay valid for backend tests but refuse `pnpm sut`
-   until the three ports are present. Omit `e2e.database` on first use; start
-   records `doughnut_e2e_<id>` after provisioning succeeds:
+2. At this checkout's root, write gitignored `.worktree.local.json` if it is
+   missing. Identity-only `{ "id": "wt_a7c2" }` is enough for `pnpm sut` and
+   remains valid for backend tests. Omit `e2e.database` and the three ports on
+   first use; start records `doughnut_e2e_<id>` and the allocated ports after
+   they succeed. If ports are already recorded, first use keeps them.
 
 ```json
 {
-  "id": "wt_a7c2",
-  "e2e": {
-    "backendPort": 19081,
-    "vitePort": 15174,
-    "lbListenPort": 15173
-  }
+  "id": "wt_a7c2"
 }
 ```
 
-Replace the identity and ports with the values you allocated. Confirm the
-ignore with `git check-ignore -v .worktree.local.json`.
+Confirm the ignore with `git check-ignore -v .worktree.local.json`.
 
 ## Start and health
 
@@ -70,8 +63,10 @@ already exists in MySQL before this checkout records it is a collision, not
 adoption. A recorded missing database, occupied port, or migration failure is
 not permission to adopt, delete, rebuild, or renumber.
 
-`pnpm sut:healthcheck` verifies the live owner first. A foreign process that
-happens to answer on the recorded ports is not a healthy owning stack.
+`pnpm sut:healthcheck` and `pnpm sut:restart` need the complete recorded
+allocation after that first start. Health verifies the live owner first. A
+foreign process that happens to answer on the recorded ports is not a healthy
+owning stack.
 
 ## Restart
 

@@ -4,9 +4,17 @@ import http from 'node:http'
 import net from 'node:net'
 import { readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import {
+  closeListeningServer,
+  listenEphemeralPort,
+} from './sut-e2e-port-listen.mjs'
 import { claimSutOwnership, startSutOwnerControl } from './sut-owner.mjs'
 import { healthyOnce } from './sut-start-fixtures.mjs'
 import { runSutStart } from './sut-start.mjs'
+
+export const identityOnlyConfig = {
+  id: 'wt_a7c2',
+}
 
 export const identityAndPortsConfig = {
   id: 'wt_a7c2',
@@ -58,27 +66,12 @@ export function withEnv(t, overrides) {
   })
 }
 
-function listenOnRandomPort(createServer) {
-  return new Promise((resolve, reject) => {
-    const server = createServer()
-    server.once('error', reject)
-    server.listen(0, '127.0.0.1', () => {
-      const address = server.address()
-      if (!address || typeof address === 'string') {
-        reject(new Error('failed to get listen address'))
-        return
-      }
-      resolve({ server, port: address.port })
-    })
-  })
-}
-
 export function listenTcp() {
-  return listenOnRandomPort(() => net.createServer((socket) => socket.end()))
+  return listenEphemeralPort(() => net.createServer((socket) => socket.end()))
 }
 
 export function listenHttpReady() {
-  return listenOnRandomPort(() =>
+  return listenEphemeralPort(() =>
     http.createServer((_req, res) => {
       res.statusCode = 200
       res.end('ready')
@@ -86,9 +79,7 @@ export function listenHttpReady() {
   )
 }
 
-export function closeServer(server) {
-  return new Promise((resolve) => server.close(() => resolve()))
-}
+export { closeListeningServer as closeServer }
 
 export function isTcpListening(port) {
   return new Promise((resolve) => {
