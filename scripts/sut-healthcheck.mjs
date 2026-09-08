@@ -10,6 +10,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
 import { resolveSutCheckoutTarget } from './sut-isolated-target.mjs'
+import { getListenerPids, processGroupId } from './sut-listener-pids.mjs'
 import { verifyLiveSutOwner } from './sut-owner.mjs'
 import { sutHealthEndpoints } from './sut-runtime-target.mjs'
 
@@ -85,6 +86,41 @@ function logUnhealthyHints(log) {
   log('If services are down, start with `pnpm sut`.')
 }
 
+function unhealthyWithoutChecks(reason) {
+  return {
+    ok: false,
+    tcpResults: [],
+    readinessResult: { ok: false, reason },
+    exitCode: 1,
+  }
+}
+
+async function verifyOwnedApplicationListeners({
+  applicationGroupId,
+  checks,
+  log,
+}) {
+  if (!Number.isInteger(applicationGroupId) || applicationGroupId <= 0) {
+    log(
+      'FAIL owned listeners — live owner did not publish an application process group'
+    )
+    return false
+  }
+  for (const check of checks) {
+    const pids = await getListenerPids(check.port)
+    for (const pid of pids) {
+      const pgid = await processGroupId(pid)
+      if (pgid !== applicationGroupId) {
+        log(
+          `FAIL owned listeners — ${check.service} (${check.host}:${check.port}) listener PID ${pid} is outside application group ${applicationGroupId}`
+        )
+        return false
+      }
+    }
+  }
+  return true
+}
+
 export async function runSutHealthcheck({
   runtimeTarget,
   tcpChecks,
@@ -100,6 +136,9 @@ export async function runSutHealthcheck({
     checkoutRoot,
     runtimeTarget,
   })
+  const endpoints = sutHealthEndpoints(target)
+  const checks = tcpChecks ?? endpoints.tcpChecks
+  const readyUrl = readinessUrl ?? endpoints.readinessUrl
   if (isolated) {
     const live = await verifyLiveSutOwner(checkoutRoot)
     if (!live.ok) {
@@ -107,17 +146,18 @@ export async function runSutHealthcheck({
         "FAIL live SUT owner — control endpoint did not verify this checkout's owner"
       )
       logUnhealthyHints(log)
-      return {
-        ok: false,
-        tcpResults: [],
-        readinessResult: { ok: false, reason: 'no live owner' },
-        exitCode: 1,
-      }
+      return unhealthyWithoutChecks('no live owner')
+    }
+    const owned = await verifyOwnedApplicationListeners({
+      applicationGroupId: live.applicationGroupId,
+      checks,
+      log,
+    })
+    if (!owned) {
+      logUnhealthyHints(log)
+      return unhealthyWithoutChecks('unowned application listeners')
     }
   }
-  const endpoints = sutHealthEndpoints(target)
-  const checks = tcpChecks ?? endpoints.tcpChecks
-  const readyUrl = readinessUrl ?? endpoints.readinessUrl
   const tcpResults = []
   for (const check of checks) {
     const result = await checkTcpPort(check)

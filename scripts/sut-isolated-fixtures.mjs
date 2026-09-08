@@ -1,8 +1,8 @@
 import { spawn } from 'node:child_process'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import http from 'node:http'
 import net from 'node:net'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import {
   closeListeningServer,

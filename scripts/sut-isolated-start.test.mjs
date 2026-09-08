@@ -1,12 +1,10 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
-import { runSutHealthcheck } from './sut-healthcheck.mjs'
 import {
   closeServer,
   completeIsolatedConfig,
   isTcpListening,
-  listenHttpReady,
   listenTcp,
   runConfiguredStart,
   startLiveOwner,
@@ -136,46 +134,4 @@ test('matching overrides remain usable for the assigned isolated target', async 
   assert.equal(code, 0)
   assert.equal(spawn.calls.length, 1)
   assert.equal(spawn.calls[0][2].env.INPUT_DB_URL, target.databaseUrl)
-})
-
-test('isolated health requires the live owner even when a foreign ready listener exists', async (t) => {
-  const checkout = makePrimaryCheckout(t)
-  const ready = await listenHttpReady()
-  t.after(() => closeServer(ready.server))
-  writeIsolatedConfig(checkout.root, {
-    ...completeIsolatedConfig,
-    e2e: { ...completeIsolatedConfig.e2e, lbListenPort: ready.port },
-  })
-  const logs = []
-  const health = await runSutHealthcheck({
-    checkoutRoot: checkout.root,
-    log: (line) => logs.push(line),
-  })
-  assert.equal(health.ok, false)
-  assert.match(logs.join('\n'), /live SUT owner/)
-  assert.equal(health.readinessResult.ok, false)
-})
-
-test('isolated health uses recorded ports after a live owner is present', async (t) => {
-  const checkout = makePrimaryCheckout(t)
-  writeIsolatedConfig(checkout.root)
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
-  const health = await runSutHealthcheck({
-    checkoutRoot: checkout.root,
-    log: () => undefined,
-  })
-  assert.equal(health.ok, false)
-  assert.deepEqual(
-    health.tcpResults.map((result) => [result.service, result.port]),
-    [
-      ['backend', 19081],
-      ['local LB', 15173],
-      ['frontend vite', 15174],
-    ]
-  )
-  assert.equal(
-    health.readinessResult.url,
-    'http://127.0.0.1:15173/__lb__/ready'
-  )
 })

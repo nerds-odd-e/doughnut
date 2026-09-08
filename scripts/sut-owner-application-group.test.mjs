@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
@@ -7,6 +6,7 @@ import {
   startLiveOwner,
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
+import { processGroupId } from './sut-listener-pids.mjs'
 import {
   spawnDetachedOwnedSupervisor,
   sutPeerNames,
@@ -15,13 +15,6 @@ import {
   writeOwnedSupervisorRunPPeers,
 } from './sut-owned-supervisor-fixtures.mjs'
 import { claimSutOwnership, verifyLiveSutOwner } from './sut-owner.mjs'
-
-function processGroupId(pid) {
-  const raw = execFileSync('ps', ['-o', 'pgid=', '-p', String(pid)], {
-    encoding: 'utf8',
-  }).trim()
-  return Number(raw)
-}
 
 test('live owner control exposes the spawned application process group', async (t) => {
   const checkout = makePrimaryCheckout(t)
@@ -45,8 +38,8 @@ test('live owner control exposes the spawned application process group', async (
   state.pids = await waitForPeerPids(checkout.root)
 
   const owned = await verifyLiveSutOwner(checkout.root)
-  const peerGroupIds = sutPeerNames.map((name) =>
-    processGroupId(state.pids[name])
+  const peerGroupIds = await Promise.all(
+    sutPeerNames.map((name) => processGroupId(state.pids[name]))
   )
   assert.equal(owned.ok, true)
   assert.equal(

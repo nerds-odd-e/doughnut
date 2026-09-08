@@ -116,23 +116,14 @@ detached child; omitted for control-only owners. Focused:
 ### 2. Report foreign application listeners as unhealthy
 
 Type: Behavior
-Status: planned
+Status: done
 Behavior: A live control owner exists but a recorded application listener is
 outside its application group or ownership cannot be established → ordinary
 `runSutHealthcheck` → unhealthy, regardless of TCP/HTTP readiness.
-Proof: Extend `sut-isolated-start.test.mjs` with real disposable child listeners
-and the live owner/control boundary: separately owned ready listeners fail;
-listeners in the actual application group pass when ready. Exercise each of the
-three recorded endpoints as the foreign endpoint through one parameterized
-behavior test. A control-only owner fails; foreign listeners remain alive.
-Replace health fixtures that equate live control with application ownership.
-Focused command:
-`CURSOR_DEV=true nix develop -c node --test scripts/sut-isolated-start.test.mjs scripts/sut-healthcheck.test.mjs`
-Scope: Consume slice 1's identity and existing listener discovery, checking the
-recorded endpoints before reporting success. Keep primary defaults unchanged.
-Sizing: about 5 minutes, medium confidence; one health-result proof loop using
-real process groups. If platform PID/group lookup does not converge, record the
-specific issue and refine this leaf at the time limit instead of adding a manager.
+Proof: Control-only owner fails; parameterized foreign backend/vite/LB fails
+with listeners left alive; owned application-group listeners pass.
+`CURSOR_DEV=true nix develop -c node --test scripts/sut-isolated-start.test.mjs scripts/sut-isolated-health.test.mjs scripts/sut-healthcheck.test.mjs scripts/sut-restart.test.mjs scripts/sut-owner-application-group.test.mjs`
+(pass).
 
 ### 3. Refuse browser verification before reset on foreign endpoints
 

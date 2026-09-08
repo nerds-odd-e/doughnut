@@ -17,6 +17,7 @@ import {
   holdSutOwnershipAcrossRestart,
   verifyLiveSutOwner,
 } from './sut-owner.mjs'
+import { getListenerPids } from './sut-listener-pids.mjs'
 import { runSutStart } from './sut-start.mjs'
 
 /** Ports used by `pnpm sut` except mountebank (2525). See docs/gcp/prod_env.md */
@@ -26,49 +27,6 @@ const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 )
-
-export function parsePidsFromLsofStdout(stdout) {
-  const lines = String(stdout)
-    .split(/\r?\n/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-  return [
-    ...new Set(lines.map(Number).filter((n) => Number.isInteger(n) && n > 0)),
-  ]
-}
-
-/**
- * @param {number} port
- * @param {{ execFileFn?: typeof execFile }} [deps]
- * @returns {Promise<number[]>}
- */
-export function getListenerPids(port, { execFileFn = execFile } = {}) {
-  return new Promise((resolve, reject) => {
-    execFileFn(
-      'lsof',
-      ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t'],
-      (err, stdout) => {
-        if (err) {
-          if (err.code === 1) {
-            resolve(parsePidsFromLsofStdout(stdout || ''))
-            return
-          }
-          if (err.code === 'ENOENT') {
-            reject(
-              new Error(
-                'lsof not found; use `CURSOR_DEV=true nix develop` or install lsof.'
-              )
-            )
-            return
-          }
-          reject(err)
-          return
-        }
-        resolve(parsePidsFromLsofStdout(stdout || ''))
-      }
-    )
-  })
-}
 
 /**
  * @param {number} port

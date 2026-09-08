@@ -4,10 +4,8 @@ import { once } from 'node:events'
 import { createInterface } from 'node:readline'
 import net from 'node:net'
 import { test } from 'node:test'
-import {
-  parsePidsFromLsofStdout,
-  terminateTcpListenersOnPort,
-} from './sut-restart.mjs'
+import { parsePidsFromLsofStdout } from './sut-listener-pids.mjs'
+import { terminateTcpListenersOnPort } from './sut-restart.mjs'
 
 test('parsePidsFromLsofStdout empty', () => {
   assert.deepStrictEqual(parsePidsFromLsofStdout(''), [])
