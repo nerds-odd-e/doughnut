@@ -29,6 +29,8 @@ import { describeNotebookPullAddition } from './notebookPull.addition.suite.js'
 import { describeNotebookPullConflict } from './notebookPull.conflict.suite.js'
 import { describeNotebookPullResolvedContinuation } from './notebookPull.resolvedContinuation.suite.js'
 import { describeNotebookPullAbort } from './notebookPull.abort.suite.js'
+import { describeNotebookPullTwoNoteBatch } from './notebookPull.twoNoteBatch.suite.js'
+import { describeNotebookPullTwoNoteBatchRejection } from './notebookPull.twoNoteBatch.rejection.suite.js'
 
 export function describeNotebookPullAcceptedHistory(): void {
   describe('notebook pull (downloaded accepted history)', () => {
@@ -124,6 +126,8 @@ export function describeNotebookPullAcceptedHistory(): void {
   describeNotebookPullStructuralHistory()
   describeNotebookPullCreationFollowOnRefusal()
   describeNotebookPullRebase()
+  describeNotebookPullTwoNoteBatch()
+  describeNotebookPullTwoNoteBatchRejection()
   describeNotebookPullAddition()
   describeNotebookPullConflict()
   describeNotebookPullResolvedContinuation()

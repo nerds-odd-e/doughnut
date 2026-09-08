@@ -44,10 +44,11 @@ outside this increment. Existing unchanged-base batch publication still works.
 ### 1. Receive the two-note batch across one disjoint save
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run(['notebook', 'pull', directory])` over real Git history retains
 A/B together in one clean unpublished child of accepted C, with original local
 commit recoverable, C bytes present, accepted SHA unchanged, and no publish call.
+Verified: `pnpm -C cli exec vitest run tests/notebookPull.test.ts tests/notebookClone.test.ts` (90 passed).
 
 Behavior: Eligible A/B local commit and one accepted C save → pull → both local
 edits remain together over C without publication. Unsupported shapes refuse
@@ -137,13 +138,8 @@ contract proof; it is not backend preparation for later work.
 
 ## Current status
 
-Story refinement has no unresolved question. Requested slice-plan refinement
-completed in place: slice 1 is Ready; the initial publication slice was Refine
-because it bundled E2E and controller proof loops, and is now slices 2–3, both
-Ready. No Structure leaf is needed. Each leaf has one focused proof loop and a
-green stopping point. Promise ownership is reconciled above.
-
-Ready for direct execution; sizing remains a hypothesis, with only the named
-test/runtime exceptions. Use execute-plan's normal Jidoka, fresh refactor-agent,
-coordinator formatting, plan update, commit/push wrap-up when execution is
-authorized. No implementation or product verification has run.
+Slice 1 done. Next: slice 2 (E2E publish of the retained A/B revision).
+Learning: two-note eligibility lives in `notebookLocalCandidate` with parent-edge
+checks; pull reuses the existing native rebase path. Refactor collapsed accepted
+change inspection onto `ordinaryNoteContentEditPaths` and split retention vs
+refusal suites.
