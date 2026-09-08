@@ -61,4 +61,11 @@ public class NotebookGitBinding extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Timestamp amendmentLastChangedAt;
+
+  /** Null eligibility fields mean the current accepted tip is frozen for amendment. */
+  public void clearAmendmentEligibility() {
+    amendmentHead = null;
+    amendmentNoteId = null;
+    amendmentLastChangedAt = null;
+  }
 }

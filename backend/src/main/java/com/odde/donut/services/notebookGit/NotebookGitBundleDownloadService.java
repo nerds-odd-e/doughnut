@@ -28,9 +28,7 @@ public class NotebookGitBundleDownloadService {
                 () ->
                     new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
-    binding.setAmendmentHead(null);
-    binding.setAmendmentNoteId(null);
-    binding.setAmendmentLastChangedAt(null);
+    binding.clearAmendmentEligibility();
     return binding.getBundleBytes();
   }
 }
