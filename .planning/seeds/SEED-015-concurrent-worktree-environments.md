@@ -95,7 +95,6 @@ supported kind per worktree, across two concurrent local worktrees.
 ### 1. Run backend unit tests concurrently in separate worktrees
 
 **Status:** Children 1a–1c and story 2 delivered. Next queued work is story 3.
-(browser E2E without external-service mocks).
 
 **Parent goal**
 
