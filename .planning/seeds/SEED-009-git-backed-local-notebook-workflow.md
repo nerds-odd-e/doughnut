@@ -265,7 +265,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 13. Create a note on the web and continue refining it locally
 
-**Status:** delivered.
+**Status:** delivered. Recover quick/062 from `4976553c20`.
 
 - **Goal:** Capture a new ordinary note through Donut's web creation flow, then
   refine that same identity locally and publish it without copying or blocking

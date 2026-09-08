@@ -216,8 +216,8 @@ makes isolated verification practical even if ordinary command integration in
 
 #### 1c. Use ordinary backend test and migration commands in isolated worktrees
 
-**Status:** Delivered. Guide: `docs/worktree-backend-tests.md`.
-Plan: [quick/060](../quick/060-ordinary-worktree-backend-commands/PLAN.md).
+**Status:** Delivered. Guide: `docs/worktree-backend-tests.md`. Recover
+quick/060 from `c96676002f`.
 
 **Goal**
 
