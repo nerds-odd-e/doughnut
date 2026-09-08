@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
+import { readFileSync, unlinkSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { unlinkSync } from 'node:fs'
 import http from 'node:http'
 import path from 'node:path'
 
@@ -198,6 +199,39 @@ export async function releaseSutRunnerLease(checkoutRoot, leaseToken) {
     throw new Error(
       result.error ?? 'Failed to release the Cypress runner lease.'
     )
+  }
+}
+
+export function releaseSutRunnerLeaseSync(checkoutRoot, leaseToken) {
+  let owner
+  try {
+    owner = JSON.parse(readFileSync(ownerRecordPath(checkoutRoot), 'utf8'))
+  } catch {
+    return
+  }
+  if (!(owner?.token && owner?.controlPath && leaseToken)) return
+  const script = `
+const http = require('http');
+const req = http.request({
+  socketPath: ${JSON.stringify(owner.controlPath)},
+  path: '/runner-lease',
+  method: 'DELETE',
+  headers: {
+    Authorization: ${JSON.stringify(`Bearer ${owner.token}`)},
+    'X-Sut-Runner-Lease': ${JSON.stringify(leaseToken)},
+  },
+}, (res) => { res.resume(); res.on('end', () => process.exit(0)); });
+req.on('error', () => process.exit(0));
+req.setTimeout(2000, () => { req.destroy(); process.exit(0); });
+req.end();
+`
+  try {
+    execFileSync(process.execPath, ['-e', script], {
+      timeout: 3000,
+      stdio: 'ignore',
+    })
+  } catch {
+    // owner already gone
   }
 }
 

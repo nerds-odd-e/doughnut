@@ -8,6 +8,7 @@ import { isolatedBrowserOrigin } from './sut-runtime-target.mjs'
 import {
   acquireSutRunnerLease,
   releaseSutRunnerLease,
+  releaseSutRunnerLeaseSync,
   verifyLiveSutOwner,
 } from './sut-owner.mjs'
 
@@ -198,6 +199,9 @@ export async function guardCypressNodeSetup(
   const releaseOnce = registerRunnerLeaseRelease(() =>
     releaseSutRunnerLease(checkoutRoot, leaseToken)
   )
+  process.once('exit', () => {
+    releaseSutRunnerLeaseSync(checkoutRoot, leaseToken)
+  })
   if (typeof options.on === 'function') {
     options.on('before:run', async (details) => {
       try {
@@ -209,6 +213,7 @@ export async function guardCypressNodeSetup(
         throw error
       }
     })
+    options.on('after:spec', releaseOnce)
     options.on('after:run', releaseOnce)
   }
   config.baseUrl = origin

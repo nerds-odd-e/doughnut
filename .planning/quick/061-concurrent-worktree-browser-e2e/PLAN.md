@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–6 done, slices 7–13 planned.
+Status: in progress; slices 1–7 done, slices 8–13 planned.
 
 ## Goal and scope
 
@@ -310,11 +310,31 @@ runtime alone may exceed ten minutes and must be recorded separately.
 ### 7. Keep the peer's note when the other browser resets fixtures
 
 Type: Behavior
-Status: planned
-Proof: Run the focused browser scenario in two configured real worktrees with
-a barrier at reset. B seeds its marker before A resets; B reads and edits it
-afterwards. Repeat with roles exchanged. Both browsers reload saved content.
-Record read-only before/after values for existing shared/unit-test sentinels.
+Status: done
+Proof: `pnpm test:browser-worktree-isolation` — barrier no-op without role;
+resetter waits for peer seed. Dual real runs (JVM/Cypress exception):
+
+```
+CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs \
+  --peer /tmp/doughnut-061-slice7-b --resetter /tmp/doughnut-061-slice7-a
+CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs \
+  --peer /tmp/doughnut-061-slice7-a --resetter /tmp/doughnut-061-slice7-b
+```
+
+A: `wt_s7a` DB `doughnut_e2e_wt_s7a` ports 26181/26174/26173 origin
+`http://127.0.0.1:26173`. B: `wt_s7b` DB `doughnut_e2e_wt_s7b` ports
+26281/26274/26273 origin `http://127.0.0.1:26273`. Marker title
+`Re-quirement`; seed `Saved in this worktree`; after-reset edit
+`Edited after the other worktree reset`. Pair 1 seed 1788833498539 then
+reset 1788833498578; pair 2 seed 1788833641685 then reset 1788833641725.
+After both pairs each isolated DB still had the edited content. No
+Mountebank. Login/reset/save used owning MySQL only.
+
+Sentinels (read-only): `doughnut_test.note` 4/max 123010 and
+`doughnut_test.user` 113 unchanged. `doughnut_e2e_test.user` 5 unchanged.
+`doughnut_e2e_test.note` 3→4 (`UAT local refinement 2026-09-08` added on
+primary 5173, not the isolated markers). Original shared E2E titles
+remained.
 
 Behavior: Both worktrees have independently saved notes → one runner resets
 its scenario fixtures during the other's run → the peer retains and edits its
@@ -520,6 +540,9 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   `worktree_note_editing.feature` only. Origin is set in node setup from the
   allocation; runner lease lives on the owner control socket and is refused
   during shutdown. Cypress ~10s / JVM ~17s (focused-test exception).
+- Slice 7: file barrier (`WORKTREE_RESET_ISOLATION_*`) is a no-op unless a
+  paired role is set. Login/reset/save on this path use the owning MySQL
+  datasource, not Redis. Dual JVM ~13–25s, Cypress pairs ~17s/~24s.
 - Main CI run 34176547886 (SHA `4c604a88`, Frontend Unit Tests 2/2 failed in
   `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
   an ancestor of HEAD; concurrent main work. `origin/main` later moved to

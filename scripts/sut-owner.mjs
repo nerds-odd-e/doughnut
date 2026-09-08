@@ -12,6 +12,7 @@ export {
   acquireSutRunnerLease,
   beginSutOwnerShutdown,
   releaseSutRunnerLease,
+  releaseSutRunnerLeaseSync,
   startSutOwnerControl,
   startSutOwnerControlFromEnv,
   sutOwnerLockDir,

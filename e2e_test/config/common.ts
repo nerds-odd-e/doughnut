@@ -2,6 +2,7 @@ import { existsSync, rm } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { guardCypressNodeSetup } from '../../scripts/isolated-cypress.mjs'
 import { runSutHealthcheck } from '../../scripts/sut-healthcheck.mjs'
+import { worktreeResetIsolationCypressTasks } from '../../scripts/worktree-reset-isolation-barrier.mjs'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
@@ -91,6 +92,7 @@ const commonConfig = {
       )
 
       on('task', {
+        ...worktreeResetIsolationCypressTasks(),
         ...createCliE2ePluginTasks(repoRoot, {
           saveBufferToCurrentSpecFolder:
             specScreenshotSink.saveBufferToCurrentSpecFolder.bind(

@@ -12,12 +12,20 @@ import {
 import start, { mock_services } from '../start'
 import { cli } from '../start/pageObjects/cli'
 
+const WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS = 180_000
+
+function worktreeResetIsolationTask(name: string) {
+  cy.task(name, null, { timeout: WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS })
+}
+
 // order 0: before tagged setup (e.g. @interactiveCLI order 2). Default hook
 // order is 10000 — without this, CLI PTY would start before DB reset and can
 // hold MySQL locks that make truncate hang past Cypress's wrap timeout.
 Before({ order: 0 }, () => {
   cy.task('clearTestState')
+  worktreeResetIsolationTask('worktreeResetIsolationWaitBeforeReset')
   start.testability().cleanDBAndResetTestabilitySettings()
+  worktreeResetIsolationTask('worktreeResetIsolationAfterReset')
   cy.wrap('no').as('firstVisited')
 })
 

@@ -12,5 +12,7 @@ Feature: Isolated worktree note editing
   Scenario: Created note content remains after edit and reload
     When I create a note with title "Re-quirement" under the folder "LeSS in Action" in the notebook "LeSS training"
     And I update note "Re-quirement" with content "Saved in this worktree"
+    And I keep the saved note across the other worktree's fixture reset
+    And I update note "Re-quirement" with content "Edited after the other worktree reset"
     And I reload the current page for note "Re-quirement"
-    Then the note content should include "Saved in this worktree"
+    Then the note content should include "Edited after the other worktree reset"
