@@ -216,3 +216,21 @@ Feature: CLI notebook clone
     When I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the resolved local head as the accepted head
     And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Finish in the sauce"
+
+  Scenario: Pulling a title-only web-created root note into a clean checkout
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I create a title-only root note titled "Shopping list" in the notebook "CLI Clone Notebook"
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout contains exactly:
+      | README.md          |
+      | Overview.md        |
+      | Shopping list.md   |
+      | Kitchen/README.md  |
+      | Recipes/README.md  |
+      | Recipes/Pasta.md   |
+    And the cloned checkout file "Shopping list.md" is:
+      """
+      ---
+      type: Note
+      ---
+      """

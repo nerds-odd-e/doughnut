@@ -64,6 +64,17 @@ When('I am creating a note in the notebook {string}', (notebook: string) => {
   start.jumpToNotebookPage(notebook).addingNewNoteFromToolbar()
 })
 
+When(
+  'I create a title-only root note titled {string} in the notebook {string}',
+  (title: string, notebook: string) => {
+    start
+      .jumpToNotebookPage(notebook)
+      .addingNewNoteFromToolbar()
+      .createNoteWithTitle(title)
+    start.assumeNotePage(title)
+  }
+)
+
 Then('I should see that the note creation is not successful', () => {
   start.form.getField('Title').expectError('must not be blank')
   dismissValidationToast()

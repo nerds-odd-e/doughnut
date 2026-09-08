@@ -5,7 +5,7 @@
 [SEED-009, story 13](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13)
 — Create a note on the web and continue refining it locally.
 
-Status: in progress. Slices 1–7 done; next is slice 8.
+Status: in progress. Slices 1–8 done; next is slice 9.
 Sizing remains a hypothesis, not a time guarantee.
 
 ## Goal and scope
@@ -274,7 +274,7 @@ Safe stop: Receiving new web notes cannot silently expand divergent pull support
 
 ### 8. Receive a title-only web-created note with the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: Installed CLI and clean bound checkout of a matching notebook.
 Trigger: Create a title-only root note through the normal web UI, then pull.
 Post-condition: The checkout contains that note as valid canonical Markdown.
@@ -456,3 +456,8 @@ remove spent plan history only when the full outcome and proof are complete.
   tests on the same SHA succeeded. Disposition: CI install race, not a slice-6
   assertion defect. Tests never ran on that shard. Continue without a repair
   commit.
+- Slice 8: clone first, title-only root create without `rememberUiCreatedNote`,
+  then installed pull. Exact `Shopping list.md` bytes are the canonical
+  `type: Note` fence. Step:
+  `I create a title-only root note titled {string} in the notebook {string}`.
+  Cypress `cli_notebook_clone.feature` 12 passing.

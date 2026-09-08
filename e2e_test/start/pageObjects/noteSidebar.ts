@@ -135,6 +135,7 @@ export const noteSidebar = () => {
 
     addingNewNoteFromToolbar() {
       newNoteSidebarButton().click()
+      waitUntilAppIsNotBusy()
       return noteCreationForm
     },
 
