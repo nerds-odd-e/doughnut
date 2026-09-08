@@ -288,33 +288,44 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 **Status:** queued.
 
-- **For / why:** An owner using an AI IDE revises several related notes and
-  wants to publish the coherent revision without manufacturing a new note or
-  splitting the work into separate publications.
-- **Evaluation:** With no remote advance, commit content edits to two or more
-  existing ordinary notes at unchanged paths in one local commit. Publish and
-  see the complete revision in Donut on the original identities; another clean
-  checkout receives it through pull.
-- **Value / learning:** Makes existing-note refinement usable as one related
-  change. Tests the value of multi-note authoring before multiple-commit history
-  or concurrent multi-note conflict policies.
+- **Goal:** A notebook owner refining related notes in Obsidian or an AI IDE
+  can publish the revision together, without creating a dummy note or splitting
+  the edits into separate publications, while keeping each note's learning
+  history.
+- **Scope:** Use the existing CLI publication flow for exactly one unpublished
+  single-parent commit directly on accepted `main`, editing two or more existing
+  ordinary Markdown notes in one notebook. Paths stay unchanged, at the root or
+  in existing represented folders; edits use the already-supported valid body
+  and frontmatter. The starting Donut projection must match accepted history,
+  and remote `main` must not have advanced. Accept the authored commit and all
+  note edits together, preserving each identity and private learning data.
+  Another clean checkout can receive the accepted batch through ordinary pull.
+  Invalid input or a stale head refuses the whole publication, preserving local
+  work and leaving remote history and notes unchanged by the attempt.
+- **Exclusions:** No additions, deletions, renames, moves, folder/README changes,
+  multiple unpublished commits, divergent batch rebase, or drift repair. No new
+  UI, commands, or identity policy. Delivered additions-and-edits publication
+  remains Story 11; receiving web additions beside unpublished work remains
+  Stories 16–17. A previously web-created note is simply an existing note here.
+- **Key examples:**
+  1. A clean bound checkout has one commit revising the body of `Topic.md` and
+     valid frontmatter in `Reading/Example.md`; remote `main` has not advanced
+     and its projection matches. Publish → both revisions appear in Donut on
+     their original notes, with their learning history intact. A second clean
+     checkout pulls → it receives both edits in that same accepted commit.
+  2. The same batch contains one valid edit and one invalid Portable note.
+     Publish → neither edit is accepted; remote notes and history stay as they
+     were, and the local commit remains available to correct.
+  3. Both edits are valid, but a web save advances remote `main` after the local
+     commit's base. Publish → the whole batch is refused; the accepted web save
+     and local commit remain intact. Reconciling that batch is outside scope.
 - **Effort hypothesis:** M — low confidence; assumes the delivered mixed
   additions/edits behavior can extend to edits-only batches without new identity
   policy. No code audit was used to estimate this.
 - **Depends on:** delivered Stories 2 and 11; independent of Story 13.
-- **Safe stopping point:** A sequential multi-note revision is useful on its
-  own. Accept all edits or none; invalid input or a stale head retains local
-  work, accepted history, and all remote note identities/private data.
-- **Boundary:** One direct-child commit, matching starting projection, valid
-  body/frontmatter edits at existing root or nested note paths. No structural
-  edits, README changes, multiple unpublished commits, or divergent batch rebase.
-  Existing additions-and-edits behavior remains separate delivered scope.
-  Reminder from Stories 13 and 16: publishing a locally refined web-created note
-  uses the ordinary publication path; do not add a special identity route. Pull
-  already receives exactly one accepted ordinary-note addition at root or an
-  already represented folder. Do not fold that receipt, creation-then-save,
-  two additions, addition-plus-edit, or new-folder intervals into this edits-only
-  batch.
+- **Safe stopping point:** A sequential multi-note revision is useful without
+  expanding concurrent synchronization. No unresolved product decision is
+  needed within this boundary.
 
 <a id="story-15"></a>
 
