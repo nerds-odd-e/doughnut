@@ -1,9 +1,13 @@
-import { randomBytes } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { readFileSync, unlinkSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import http from 'node:http'
 import path from 'node:path'
+
+export {
+  startSutOwnerControl,
+  startSutOwnerControlFromEnv,
+} from './sut-owner-control-server.mjs'
 
 export const SUT_OWNER_LOCK_DIR_NAME = '.sut.local.lock'
 
@@ -13,91 +17,6 @@ export function sutOwnerLockDir(checkoutRoot) {
 
 export function ownerRecordPath(checkoutRoot) {
   return path.join(sutOwnerLockDir(checkoutRoot), 'owner.json')
-}
-
-function sendJson(res, status, body) {
-  res.writeHead(status, { 'Content-Type': 'application/json' })
-  res.end(JSON.stringify(body))
-}
-
-function handleOwnerControlRequest(req, res, state) {
-  if (req.headers.authorization !== `Bearer ${state.token}`) {
-    res.writeHead(403)
-    res.end()
-    return
-  }
-  const urlPath = (req.url ?? '').split('?')[0]
-  if (req.method === 'GET' && urlPath === '/owner') {
-    sendJson(res, 200, { ok: true, pid: process.pid })
-    return
-  }
-  if (req.method === 'POST' && urlPath === '/runner-lease') {
-    if (state.shuttingDown) {
-      sendJson(res, 409, {
-        error: 'SUT owner is shutting down; refusing a new Cypress runner.',
-      })
-      return
-    }
-    if (state.runnerLeaseToken) {
-      sendJson(res, 409, {
-        error:
-          'A Cypress runner is already using this checkout. Refusing a duplicate runner.',
-      })
-      return
-    }
-    state.runnerLeaseToken = randomBytes(16).toString('hex')
-    sendJson(res, 200, { ok: true, token: state.runnerLeaseToken })
-    return
-  }
-  if (req.method === 'DELETE' && urlPath === '/runner-lease') {
-    const presented = req.headers['x-sut-runner-lease']
-    if (!state.runnerLeaseToken) {
-      sendJson(res, 200, { ok: true })
-      return
-    }
-    if (presented !== state.runnerLeaseToken) {
-      sendJson(res, 409, {
-        error: 'Cypress runner lease token does not match the held lease.',
-      })
-      return
-    }
-    state.runnerLeaseToken = null
-    sendJson(res, 200, { ok: true })
-    return
-  }
-  if (req.method === 'POST' && urlPath === '/shutdown') {
-    state.shuttingDown = true
-    sendJson(res, 200, {
-      ok: true,
-      runnerLeaseHeld: Boolean(state.runnerLeaseToken),
-    })
-    return
-  }
-  res.writeHead(404)
-  res.end()
-}
-
-export function startSutOwnerControl({ token, controlPath }) {
-  try {
-    unlinkSync(controlPath)
-  } catch {
-    // absent leftover socket
-  }
-  const state = { token, runnerLeaseToken: null, shuttingDown: false }
-  const server = http.createServer((req, res) => {
-    handleOwnerControlRequest(req, res, state)
-  })
-  return new Promise((resolve, reject) => {
-    server.once('error', reject)
-    server.listen(controlPath, () => resolve(server))
-  })
-}
-
-export function startSutOwnerControlFromEnv(env = process.env) {
-  const token = env.SUT_OWNER_TOKEN
-  const controlPath = env.SUT_OWNER_CONTROL_PATH
-  if (!(token && controlPath)) return Promise.resolve(null)
-  return startSutOwnerControl({ token, controlPath })
 }
 
 function requestOwnerControl(
@@ -148,7 +67,7 @@ function requestOwnerControl(
   })
 }
 
-async function readOwnerRecord(checkoutRoot) {
+export async function readOwnerRecord(checkoutRoot) {
   try {
     return JSON.parse(await readFile(ownerRecordPath(checkoutRoot), 'utf8'))
   } catch {

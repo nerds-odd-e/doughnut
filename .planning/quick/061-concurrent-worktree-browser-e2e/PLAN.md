@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–7 done, slices 8–13 planned.
+Status: in progress; slices 1–8 done, slices 9–13 planned.
 
 ## Goal and scope
 
@@ -354,10 +354,12 @@ A new shared-store dependency changes the story assumption: stop for review.
 ### 8. Restart only the idle live owner
 
 Type: Behavior
-Status: planned
-Proof: Drive restart against disposable live owners: idle A restarts, busy A or
-an unverifiable owner refuses before signals. Reuse the paired fixture to
-observe B retain its original processes and marker while A returns healthy.
+Status: done
+Proof: `pnpm test:sut-restart` (idle restart, busy/stale refusal, primary lsof
+path; isolated restart must not run lsof). `pnpm test:browser-worktree-isolation`
+(incomplete allocation and no-live-owner restart refusals). `pnpm test:sut-start`
+(start/release/child-exit remain green). Paired real stack: B pid and marker
+unchanged while A owner pid replaced and returned healthy.
 
 Behavior: A has a verified live owner and no Cypress lease → ordinary restart
 in A → only A's app is replaced on its existing allocation.
@@ -543,6 +545,11 @@ refusal until enabled. Final scope and proof promises remain unchanged.
 - Slice 7: file barrier (`WORKTREE_RESET_ISOLATION_*`) is a no-op unless a
   paired role is set. Login/reset/save on this path use the owning MySQL
   datasource, not Redis. Dual JVM ~13–25s, Cypress pairs ~17s/~24s.
+- Slice 8: isolated restart asks the verified idle live owner to stop its own
+  children, holds the lifecycle claim, and starts again on the same allocation.
+  Busy Cypress lease and unverifiable/stale owner refuse before signals/lsof.
+  Unconfigured primary still uses `SUT_RESTART_PORTS` lsof. Control server and
+  start spawn were split under the 250-line limit.
 - Main CI run 34176547886 (SHA `4c604a88`, Frontend Unit Tests 2/2 failed in
   `setup_nodejs_with_cache`, tests skipped) is not this execution's SHA — not
   an ancestor of HEAD; concurrent main work. `origin/main` later moved to

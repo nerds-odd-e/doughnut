@@ -13,8 +13,8 @@ passwordless local root administration and the existing `doughnut` test user.
 Isolated start does not start MySQL, does not create or repair a recorded
 database, and does not start Mountebank.
 
-`pnpm sut:restart` remains refused in isolated checkouts until later work
-enables it. Ordinary Cypress is supported only for the focused note-editing
+`pnpm sut:restart` replaces the idle live owner on this checkout's recorded
+allocation. Ordinary Cypress is supported only for the focused note-editing
 spec below.
 
 ## Temporary manual allocation
@@ -83,6 +83,22 @@ adopt, delete, rebuild, or renumber.
 `pnpm sut:healthcheck` verifies the live owner first. A foreign process that
 happens to answer on the recorded ports is not a healthy owning stack.
 
+## Restart
+
+With that owning SUT idle (no Cypress runner lease), restart it in place.
+The recorded identity, database, and ports stay the same:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm sut:restart
+```
+
+Restart asks the verified live owner to stop its own children, holds the
+lifecycle claim across stop/start, and starts again on the same allocation.
+It does not discover or signal listeners by port. A second restart, a Cypress
+run in progress, or a stale/unverifiable owner record is refused before any
+process is signalled. After a refused stale owner, use `pnpm sut` once the
+claim can be reclaimed.
+
 ## Focused Cypress run
 
 With that owning SUT healthy, run only this spec — mixed or other features are
@@ -97,7 +113,8 @@ Cypress node configuration sets `baseUrl` to this checkout's browser origin
 navigation and for the Before-order-0 testability reset; it does not read local
 files. A second Cypress runner, or `CYPRESS_baseUrl` / `baseUrl` that does not
 match the allocated origin, is refused before reset. Completion or cancellation
-releases the runner so a later run can start. Isolated restart stays refused.
+releases the runner so a later run can start. Restart while that runner is
+held is refused.
 
 Primary checkouts without `.worktree.local.json` keep the shared local defaults
 documented in `docs/gcp/prod_env.md`, including Cypress origin

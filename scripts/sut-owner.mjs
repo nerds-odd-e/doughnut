@@ -3,6 +3,7 @@ import { mkdir, readFile, rm, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import {
   ownerRecordPath,
+  readOwnerRecord,
   sutOwnerLockDir,
   verifyLiveSutOwner,
 } from './sut-owner-control.mjs'
@@ -18,6 +19,20 @@ export {
   sutOwnerLockDir,
   verifyLiveSutOwner,
 } from './sut-owner-control.mjs'
+
+async function writeStartingPid(checkoutRoot) {
+  await writeFile(startingPidPath(checkoutRoot), String(process.pid))
+}
+
+export async function holdSutOwnershipAcrossRestart(checkoutRoot) {
+  await writeStartingPid(checkoutRoot)
+}
+
+export async function readHeldSutOwner(checkoutRoot) {
+  const owner = await readOwnerRecord(checkoutRoot)
+  if (owner?.token && owner?.controlPath) return owner
+  throw new Error('Isolated restart could not read the held SUT owner record.')
+}
 
 function duplicateStartError() {
   return new Error(
@@ -84,7 +99,7 @@ export async function claimSutOwnership(checkoutRoot) {
   }
   const token = randomBytes(16).toString('hex')
   const controlPath = path.join(lockDir, 'owner.sock')
-  await writeFile(startingPidPath(checkoutRoot), String(process.pid))
+  await writeStartingPid(checkoutRoot)
   await writeFile(
     ownerRecordPath(checkoutRoot),
     JSON.stringify({ token, controlPath })

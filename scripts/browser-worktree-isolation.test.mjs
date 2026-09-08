@@ -14,7 +14,6 @@ import { runSutRestart } from './sut-restart.mjs'
 import { healthyOnce, makeStartSpy } from './sut-start-fixtures.mjs'
 import { runSutStart } from './sut-start.mjs'
 
-const isolatedRefusal = /not supported yet/i
 const isolatedCypressSpec = /only supports|spec selection/i
 const malformedJson = /not valid JSON/i
 const incompleteAllocation = /complete E2E allocation|Missing or invalid/i
@@ -141,7 +140,7 @@ test('configured primary and linked checkouts refuse before shared-state effects
         spawnFn: restart.spawnFn,
         log: () => undefined,
       }),
-      isolatedRefusal
+      incompleteAllocation
     )
     assert.equal(restart.lsofCalls.length, 0)
     assert.equal(restart.spawnCalls.length, 0)
@@ -193,7 +192,7 @@ test('malformed isolation JSON refuses clearly before shared-state effects', asy
   assert.equal(hooks.reset, false)
 })
 
-test('complete isolated allocation still refuses restart', async (t) => {
+test('complete isolated allocation without a live owner refuses restart before signals', async (t) => {
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
@@ -205,7 +204,7 @@ test('complete isolated allocation still refuses restart', async (t) => {
       spawnFn: restart.spawnFn,
       log: () => undefined,
     }),
-    isolatedRefusal
+    /verified live SUT owner|stale or unverifiable/i
   )
   assert.equal(restart.lsofCalls.length, 0)
   assert.equal(restart.spawnCalls.length, 0)

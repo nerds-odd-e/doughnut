@@ -14,12 +14,10 @@
  *   SUT_TIMEOUT_MS  – max ms to wait for healthy (default: 120000)
  *   SUT_POLL_MS     – ms between healthcheck polls (default: 3000)
  */
-import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
-import { LOG_TARGETS } from './log-utils.mjs'
 import { checkTcpPort } from './sut-healthcheck.mjs'
 import {
   assertAllocatedPortsFree,
@@ -31,75 +29,24 @@ import {
 import {
   assertNoLiveSutOwner,
   claimSutOwnership,
+  readHeldSutOwner,
   releaseSutOwnership,
 } from './sut-owner.mjs'
 import { stopOwnedSutProcessTree } from './sut-owned-process-tree.mjs'
 import { waitForSutHealthy } from './sut-start-health-wait.mjs'
 import {
-  resolveSutRuntimeTarget,
-  withSutRuntimeTargetEnv,
-} from './sut-runtime-target.mjs'
+  LOG_FILE,
+  PID_FILE,
+  spawnSutServices,
+  writePidFile,
+} from './sut-start-spawn.mjs'
+
+export { LOG_FILE, PID_FILE, spawnSutServices, writePidFile }
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 )
-
-export const LOG_FILE = LOG_TARGETS.sut
-export const PID_FILE = path.join(repoRoot, 'sut.pid')
-
-/**
- * Spawn the SUT service group detached. The wrapper keeps running after this
- * startup helper exits and writes stdout+stderr through a rotating log.
- *
- * @param {{ spawnFn?: typeof spawn, logFile?: string, runtimeTarget?: object }} [opts]
- * @returns {{ child: import('node:child_process').ChildProcess, logFile: string }}
- */
-export function spawnSutServices({
-  spawnFn = spawn,
-  logFile = LOG_FILE,
-  runtimeTarget,
-  owner,
-  checkoutRoot = repoRoot,
-} = {}) {
-  const target = resolveSutRuntimeTarget({ runtimeTarget })
-  const ownerEnv = {
-    SUT_CHECKOUT_ROOT: checkoutRoot,
-    ...(owner
-      ? {
-          SUT_OWNER_TOKEN: owner.token,
-          SUT_OWNER_CONTROL_PATH: owner.controlPath,
-        }
-      : {}),
-  }
-  const child = spawnFn(
-    process.execPath,
-    [path.join(repoRoot, 'scripts/sut-services.mjs')],
-    {
-      cwd: repoRoot,
-      detached: true,
-      env: withSutRuntimeTargetEnv(
-        { ...process.env, SUT_LOG_FILE: logFile, ...ownerEnv },
-        target
-      ),
-      stdio: 'ignore',
-      shell: false,
-    }
-  )
-  child.unref()
-  return { child, logFile }
-}
-
-/**
- * Write the process group id (negative of PID) to the PID file so external
- * tools can kill the whole group with `process.kill(-pgid, 'SIGTERM')`.
- *
- * @param {number} pid
- * @param {{ pidFile?: string }} [opts]
- */
-export async function writePidFile(pid, { pidFile = PID_FILE } = {}) {
-  await writeFile(pidFile, String(pid), 'utf8')
-}
 
 async function releaseFailedIsolatedStart({ child, checkoutRoot }) {
   await stopOwnedSutProcessTree(child)
@@ -122,6 +69,7 @@ async function releaseFailedIsolatedStart({ child, checkoutRoot }) {
  *   runtimeTarget?: object,
  *   databaseExistsFn?: (database: string) => boolean,
  *   isPortOccupiedFn?: (port: number) => Promise<boolean>,
+ *   retainOwnership?: boolean,
  *   signal?: AbortSignal,
  *   attachCancelSignals?: boolean,
  * }} [opts]
@@ -140,6 +88,7 @@ export async function runSutStart({
   runtimeTarget,
   databaseExistsFn,
   isPortOccupiedFn,
+  retainOwnership = false,
   signal,
   attachCancelSignals = false,
 } = {}) {
@@ -158,12 +107,16 @@ export async function runSutStart({
   if (isolated) {
     refuseConflictingSutOverrides(process.env, target)
     assertE2eDatabaseExists(target.database, { existsFn: databaseExistsFn })
-    await assertNoLiveSutOwner(checkoutRoot)
-    await assertAllocatedPortsFree(
-      target,
-      isPortOccupiedFn ?? defaultIsPortOccupied
-    )
-    owner = await claimSutOwnership(checkoutRoot)
+    if (retainOwnership) {
+      owner = await readHeldSutOwner(checkoutRoot)
+    } else {
+      await assertNoLiveSutOwner(checkoutRoot)
+      await assertAllocatedPortsFree(
+        target,
+        isPortOccupiedFn ?? defaultIsPortOccupied
+      )
+      owner = await claimSutOwnership(checkoutRoot)
+    }
     log(`Selected database: ${target.database}`)
     log(`Browser origin: ${isolatedBrowserOrigin(target)}`)
     if (!effectiveSignal && attachCancelSignals) {
@@ -184,6 +137,12 @@ export async function runSutStart({
     owner = undefined
   }
   try {
+    if (isolated && retainOwnership) {
+      await assertAllocatedPortsFree(
+        target,
+        isPortOccupiedFn ?? defaultIsPortOccupied
+      )
+    }
     log(`Starting SUT services... (log: ${logFile})`)
     const spawned = spawnSutServices({
       spawnFn,

@@ -1,12 +1,23 @@
 #!/usr/bin/env node
 /**
- * Stop SUT listeners on 5173 / 5174 / 9081 (not mountebank), then run `pnpm sut`.
+ * Stop the unconfigured primary SUT listeners on 5173 / 5174 / 9081
+ * (not mountebank), then run `pnpm sut`. Isolated checkouts ask the live
+ * owner to stop its children and start again on the recorded allocation.
  * Run: `CURSOR_DEV=true nix develop -c pnpm sut:restart`
  */
 import { execFile, spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
+import {
+  refuseUnsupportedIsolatedBrowserCommand,
+  worktreeIsolationApplies,
+} from './browser-worktree-isolation.mjs'
+import {
+  beginSutOwnerShutdown,
+  holdSutOwnershipAcrossRestart,
+  verifyLiveSutOwner,
+} from './sut-owner.mjs'
+import { runSutStart } from './sut-start.mjs'
 
 /** Ports used by `pnpm sut` except mountebank (2525). See docs/gcp/prod_env.md */
 export const SUT_RESTART_PORTS = [5173, 5174, 9081]
@@ -131,11 +142,52 @@ export function startPnpmSut({ cwd = repoRoot, spawnFn = spawn } = {}) {
   })
 }
 
+function pause(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function waitUntilLiveOwnerStops(checkoutRoot, timeoutMs) {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    if (!(await verifyLiveSutOwner(checkoutRoot)).ok) return
+    await pause(40)
+  }
+  throw new Error(
+    'Timed out waiting for the isolated SUT owner to stop its children. Listeners were not discovered by port.'
+  )
+}
+
+async function restartIsolatedSutOwner({
+  checkoutRoot,
+  ownerStopTimeoutMs = 15_000,
+  ...startOpts
+}) {
+  const live = await verifyLiveSutOwner(checkoutRoot)
+  if (!live.ok) {
+    throw new Error(
+      'Isolated restart requires a verified live SUT owner in this checkout. ' +
+        'A stale or unverifiable owner was left unchanged; listeners were not signalled.'
+    )
+  }
+  await holdSutOwnershipAcrossRestart(checkoutRoot)
+  await beginSutOwnerShutdown(checkoutRoot)
+  await waitUntilLiveOwnerStops(checkoutRoot, ownerStopTimeoutMs)
+  return runSutStart({
+    ...startOpts,
+    checkoutRoot,
+    retainOwnership: true,
+  })
+}
+
 export async function runSutRestart(opts = {}) {
+  const checkoutRoot = opts.checkoutRoot ?? repoRoot
   refuseUnsupportedIsolatedBrowserCommand({
-    checkoutRoot: opts.checkoutRoot ?? repoRoot,
+    checkoutRoot,
     command: 'pnpm sut:restart',
   })
+  if (worktreeIsolationApplies(checkoutRoot)) {
+    return restartIsolatedSutOwner({ ...opts, checkoutRoot })
+  }
   await stopSutPorts(opts)
   return startPnpmSut({ cwd: opts.cwd ?? repoRoot, spawnFn: opts.spawnFn })
 }

@@ -3,11 +3,15 @@
  * (a detached group leader); do not discover listeners by port.
  */
 
+function ignoreMissingProcess(error) {
+  if (error.code !== 'ESRCH' && error.code !== 'EPERM') throw error
+}
+
 function signalProcessGroup(pgid, signal) {
   try {
     process.kill(-pgid, signal)
   } catch (error) {
-    if (error.code !== 'ESRCH' && error.code !== 'EPERM') throw error
+    ignoreMissingProcess(error)
   }
 }
 
@@ -39,6 +43,14 @@ async function waitUntilOwnedTreeStops(child, pgid, timeoutMs) {
   return !(childStillRunning(child) || processGroupExists(pgid))
 }
 
+function signalChild(child, signal) {
+  try {
+    child.kill(signal)
+  } catch (error) {
+    ignoreMissingProcess(error)
+  }
+}
+
 export async function stopOwnedSutProcessTree(
   child,
   { timeoutMs = 5_000 } = {}
@@ -46,8 +58,10 @@ export async function stopOwnedSutProcessTree(
   if (typeof child?.kill !== 'function') return
   const pgid = child.pid
   if (!Number.isInteger(pgid) || pgid <= 0) return
+  signalChild(child, 'SIGTERM')
   signalProcessGroup(pgid, 'SIGTERM')
   if (await waitUntilOwnedTreeStops(child, pgid, timeoutMs)) return
+  signalChild(child, 'SIGKILL')
   signalProcessGroup(pgid, 'SIGKILL')
   await waitUntilOwnedTreeStops(child, pgid, 1_000)
 }

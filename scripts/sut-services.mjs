@@ -40,6 +40,7 @@ export function runSutServices({
   env = process.env,
   checkoutRoot = env.SUT_CHECKOUT_ROOT ?? repoRoot,
   serviceArgs,
+  retainOwnershipOnExit,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget, env })
   const child = spawnFn('pnpm', serviceArgs ?? sutServiceArgs(target), {
@@ -47,6 +48,7 @@ export function runSutServices({
     stdio: ['ignore', 'pipe', 'pipe'],
     env: withSutRuntimeTargetEnv(env, target),
     shell: false,
+    detached: true,
   })
 
   child.stdout?.on('data', (chunk) => logWriter.write(chunk))
@@ -65,7 +67,9 @@ export function runSutServices({
     finished = true
     logWriter.write(message)
     await stopOwnedSutProcessTree(child)
-    if (env.SUT_OWNER_TOKEN) await releaseSutOwnership(checkoutRoot)
+    if (env.SUT_OWNER_TOKEN && !retainOwnershipOnExit?.()) {
+      await releaseSutOwnership(checkoutRoot)
+    }
     logWriter.close()
     process.exit(signal ? 1 : (code ?? 1))
   }
@@ -95,11 +99,27 @@ export function runSutServices({
   return child
 }
 
+export async function startOwnedSutSupervisor(opts = {}) {
+  const env = opts.env ?? process.env
+  const state = { child: undefined, retain: false }
+  await startSutOwnerControlFromEnv(env, {
+    onShutdown: async () => {
+      state.retain = true
+      await stopOwnedSutProcessTree(state.child)
+    },
+  })
+  state.child = runSutServices({
+    ...opts,
+    env,
+    retainOwnershipOnExit: () => state.retain,
+  })
+  return state.child
+}
+
 const isMain = process.argv[1]
   ? fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
   : false
 
 if (isMain) {
-  await startSutOwnerControlFromEnv()
-  runSutServices()
+  await startOwnedSutSupervisor()
 }
