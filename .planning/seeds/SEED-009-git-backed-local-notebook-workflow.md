@@ -69,11 +69,11 @@ The product constraints established in the discussion are:
    concrete interruption; batching already-accepted saves risks conflicting
    with immutable history unless its publication boundary is clarified.
 
-**Priority hypothesis:** Stories 13, 16, and 14 are delivered. Next selected
-remaining story is keeping a local content edit when a web-created note is then
-saved (Story 17). This follows the established beneficiary and two-way workflow
-goal. It is not a claim that usage data proves these are the most frequent
-failures.
+**Priority hypothesis:** Stories 13, 16, 14, and 17 are delivered. Next selected
+remaining story is keeping a related local edit batch when the web changes a
+different note (Story 18). This follows the established beneficiary and two-way
+workflow goal. It is not a claim that usage data proves these are the most
+frequent failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
@@ -402,8 +402,8 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   coordination; manually splitting the batch loses the related revision unit.
 - **Effort hypothesis:** M — low confidence; one disjoint web save bounds the
   reconciliation. Revisit the boundary if conflict policy becomes necessary.
-- **Depends on:** Delivered Stories 8 and 14; Story 17 leads by selected value,
-  not technical dependency. Useful even if broader batch rebase is deferred.
+- **Depends on:** Delivered Stories 8, 14, and 17. Useful even if broader batch
+  rebase is deferred.
 
 ## Ordering and Scope Reduction
 
@@ -411,15 +411,13 @@ The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
 existing SEED-015 browser-workflow stories ahead of this seed; this reassessment
 selects notebook-workflow priorities and does not displace that direction.
 
-Within this seed, **13**, **16**, and **14** are delivered. Remaining selected
-stories are **17** (creation then first save beside one local edit), then
-**18** (retain a local batch across a disjoint web save). Keep **15 → 10** as
-unqueued candidates:
-folder-move divergence is consequential but narrower and has unresolved
-identity-policy risk; batching changes readability without unlocking
-synchronization.
+Within this seed, **13**, **16**, **14**, and **17** are delivered. Remaining
+selected story is **18** (retain a local batch across a disjoint web save).
+Keep **15 → 10** as unqueued candidates: folder-move divergence is
+consequential but narrower and has unresolved identity-policy risk; batching
+changes readability without unlocking synchronization.
 
-First-to-drop order among remaining items: **10, 15, 18, 17**. Delivered batch
+First-to-drop order among remaining items: **10, 15, 18**. Delivered batch
 publication stays useful even if batch reconciliation is deferred.
 
 Preserve these boundaries in future refinement:
@@ -437,10 +435,9 @@ Preserve these boundaries in future refinement:
 ## Open Decisions
 
 - **Priority assumption open to revision:** no real-user frequency evidence
-  ranks creation-then-save beside local work, batch reconciliation, folder
-  divergence, or history readability. Keep selected Story 17 first after
-  Story 14 delivery; add Story 18 behind it based on the stale-batch boundary,
-  without displacing the developer's concurrent-worktree priority.
+  ranks batch reconciliation, folder divergence, or history readability.
+  Keep selected Story 18 next after Story 17 delivery, without displacing the
+  developer's concurrent-worktree priority.
 - **Story 15, before selection:** confirm same-identity correspondence and the
   refusal boundary for ambiguity; do not assume ordinary Git rename detection
   alone establishes Donut identity.
@@ -451,7 +448,7 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Refine queued Stories 17 and 18 in this seed before slice planning. Reconsider
+Refine queued Story 18 in this seed before slice planning. Reconsider
 15 when folder relocation blocks unpublished work, and 10 when history
 readability is an observed problem. This seed is non-executable; queue selection
 does not authorize implementation.
