@@ -36,6 +36,7 @@ async function tailFile(filePath, lines) {
  *   errLog?: (s: string) => void,
  *   healthcheckFn?: typeof runSutHealthcheck,
  *   runtimeTarget?: object,
+ *   checkoutRoot?: string,
  * }} opts
  * @returns {Promise<{ ok: boolean, exitCode: number }>}
  */
@@ -48,6 +49,7 @@ export async function waitForSutHealthy({
   errLog = (s) => process.stderr.write(`${s}\n`),
   healthcheckFn = runSutHealthcheck,
   runtimeTarget,
+  checkoutRoot,
 } = {}) {
   let childExitCode = null
   let childSignal = null
@@ -82,6 +84,7 @@ export async function waitForSutHealthy({
     const result = await healthcheckFn({
       log: () => undefined,
       runtimeTarget,
+      checkoutRoot,
     })
     if (result.ok) {
       log(
@@ -104,7 +107,7 @@ export async function waitForSutHealthy({
 
   // Timed out — run one final healthcheck with full logging to show what failed
   errLog('SUT did not become healthy within the timeout.')
-  await healthcheckFn({ log: errLog, runtimeTarget })
+  await healthcheckFn({ log: errLog, runtimeTarget, checkoutRoot })
   errLog(`Log: ${logFile}`)
   const tail = await tailFile(logFile, TAIL_LINES)
   if (tail) {

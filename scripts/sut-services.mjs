@@ -3,7 +3,9 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRotatingLogWriter, LOG_TARGETS } from './log-utils.mjs'
+import { startSutOwnerControlFromEnv } from './sut-owner.mjs'
 import {
+  LEGACY_SUT_RUNTIME_TARGET,
   resolveSutRuntimeTarget,
   withSutRuntimeTargetEnv,
 } from './sut-runtime-target.mjs'
@@ -13,15 +15,14 @@ const repoRoot = path.resolve(
   '..'
 )
 
-export const SUT_SERVICE_ARGS = [
-  'exec',
-  'run-p',
-  '-clnr',
-  'backend:sut',
-  'start:mb',
-  'local:lb:vite',
-  'frontend:sut',
-]
+export function sutServiceArgs(target) {
+  const args = ['exec', 'run-p', '-clnr', 'backend:sut']
+  if (target.mountebankPort != null) args.push('start:mb')
+  args.push('local:lb:vite', 'frontend:sut')
+  return args
+}
+
+export const SUT_SERVICE_ARGS = sutServiceArgs(LEGACY_SUT_RUNTIME_TARGET)
 
 export function runSutServices({
   spawnFn = spawn,
@@ -31,7 +32,7 @@ export function runSutServices({
   env = process.env,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget, env })
-  const child = spawnFn('pnpm', SUT_SERVICE_ARGS, {
+  const child = spawnFn('pnpm', sutServiceArgs(target), {
     cwd: repoRoot,
     stdio: ['ignore', 'pipe', 'pipe'],
     env: withSutRuntimeTargetEnv(env, target),
@@ -67,5 +68,6 @@ const isMain = process.argv[1]
   : false
 
 if (isMain) {
+  await startSutOwnerControlFromEnv()
   runSutServices()
 }

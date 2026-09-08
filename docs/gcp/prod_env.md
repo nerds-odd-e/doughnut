@@ -104,20 +104,25 @@ The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/d
 
 **Local dev / Cypress (ports and LB — source of truth):**
 
+Primary unconfigured checkouts and CI use the shared ports below. A configured
+worktree or primary with `.worktree.local.json` isolates instead — see
+[`worktree-browser-tests.md`](../worktree-browser-tests.md). Isolated start does
+not use Mountebank.
+
 | Port | Role |
 |------|------|
-| **2525** | Mountebank |
-| **9081** | Spring (sut / E2E profile) |
-| **5173** | Local LB (`scripts/local-lb.mjs`) — browser and Cypress **`baseUrl`** **`http://localhost:5173`** |
-| **5174** | Vite dev server — only when using **`pnpm sut`** / **`pnpm local:lb:vite`** |
+| **2525** | Mountebank (primary / CI `pnpm sut` and `pnpm test` only) |
+| **9081** | Spring (primary sut / E2E profile default) |
+| **5173** | Local LB (`scripts/local-lb.mjs`) — primary browser and Cypress **`baseUrl`** **`http://localhost:5173`** |
+| **5174** | Vite dev server default — only when using **`pnpm sut`** / **`pnpm local:lb:vite`** in an unconfigured primary checkout |
 
-**Readiness:** **`GET http://127.0.0.1:5173/__lb__/ready`** → **200** (Spring health probed from the LB; use for **`wait-on`** / automation; set **`NO_PROXY=127.0.0.1,localhost`** in CI to avoid proxy issues on loopback).
+**Readiness:** **`GET http://127.0.0.1:5173/__lb__/ready`** on the primary LB (or the isolated checkout's recorded LB port) → **200** (Spring health probed from the LB; use for **`wait-on`** / automation; set **`NO_PROXY=127.0.0.1,localhost`** in CI to avoid proxy issues on loopback).
 
-**Scripts:** **`pnpm local:lb`** — static from **`frontend/dist`** + Spring **9081** (no Vite). **`pnpm local:lb:vite`** — same LB with **`LOCAL_LB_VITE_UPSTREAM=http://127.0.0.1:5174`** for UI + HMR (**`frontend/vite.config.ts`** `server.port`). **CI** and **`pnpm test`** use **`local:lb`**; **`pnpm sut`** uses **`local:lb:vite`** + **`frontend:sut`**. Build static first when needed: **`pnpm frontend:build`** or **`pnpm bundle:all`**. **`/doughnut-cli-latest/doughnut`** is served from **`cli/dist/donut-cli.bundle.mjs`** (**`pnpm cli:bundle`** — **`pnpm sut`** / **`pnpm test`** run this after install). Full env list: header on **`scripts/local-lb.mjs`** (`LOCAL_LB_STATIC_ROOT`, `LOCAL_LB_BACKEND`, `LOCAL_LB_VITE_UPSTREAM`, `LOCAL_LB_LISTEN_PORT`, `LOCAL_LB_ROUTING_JSON`).
+**Scripts:** **`pnpm local:lb`** — static from **`frontend/dist`** + Spring **9081** (no Vite). **`pnpm local:lb:vite`** — same LB, Vite upstream from **`LOCAL_LB_VITE_UPSTREAM`** (primary `pnpm sut` supplies `http://127.0.0.1:5174`; isolated start supplies the checkout's recorded Vite port). **CI** and **`pnpm test`** use **`local:lb`**; **`pnpm sut`** uses **`local:lb:vite`** + **`frontend:sut`**. Isolated `pnpm sut` omits **`start:mb`**. Build static first when needed: **`pnpm frontend:build`** or **`pnpm bundle:all`**. **`/doughnut-cli-latest/doughnut`** is served from **`cli/dist/donut-cli.bundle.mjs`** (**`pnpm cli:bundle`** — **`pnpm sut`** / **`pnpm test`** run this after install). Full env list: header on **`scripts/local-lb.mjs`** (`LOCAL_LB_STATIC_ROOT`, `LOCAL_LB_BACKEND`, `LOCAL_LB_VITE_UPSTREAM`, `LOCAL_LB_LISTEN_PORT`, `LOCAL_LB_ROUTING_JSON`).
 
-**Starting the stack:** **`pnpm sut`** starts all services in the background, waits until healthy (up to 120 s, configurable via `SUT_TIMEOUT_MS`), then exits 0. On failure it exits 1 with diagnostics and a tail of **`sut.log`** (repo root, gitignored). **`pnpm sut:restart`** kills listeners on 5173/5174/9081, then runs **`pnpm sut`**.
+**Starting the stack:** **`pnpm sut`** starts all services in the background, waits until healthy (up to 120 s, configurable via `SUT_TIMEOUT_MS`), then exits 0. On failure it exits 1 with diagnostics and a tail of **`sut.log`** (repo root, gitignored). In an unconfigured primary checkout, **`pnpm sut:restart`** kills listeners on 5173/5174/9081, then runs **`pnpm sut`**. Isolated checkouts refuse **`pnpm sut:restart`** for now.
 
-**Verify the stack:** **`pnpm sut:healthcheck`**. With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** / **`… sut:restart`** — see **`CLAUDE.md`**.
+**Verify the stack:** **`pnpm sut:healthcheck`**. With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** / **`… sut:restart`** — see **`CLAUDE.md`**. Isolated health checks the live owning stack on the recorded ports, not a foreign listener.
 
 ## 7. Book PDF storage (GCS, prod)
 

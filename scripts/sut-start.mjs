@@ -20,6 +20,14 @@ import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
 import { LOG_TARGETS } from './log-utils.mjs'
+import { checkTcpPort } from './sut-healthcheck.mjs'
+import {
+  assertE2eDatabaseExists,
+  isolatedBrowserOrigin,
+  refuseConflictingSutOverrides,
+  resolveSutCheckoutTarget,
+} from './sut-isolated-target.mjs'
+import { assertNoLiveSutOwner, claimSutOwnership } from './sut-owner.mjs'
 import { waitForSutHealthy } from './sut-start-health-wait.mjs'
 import {
   resolveSutRuntimeTarget,
@@ -45,8 +53,15 @@ export function spawnSutServices({
   spawnFn = spawn,
   logFile = LOG_FILE,
   runtimeTarget,
+  owner,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget })
+  const ownerEnv = owner
+    ? {
+        SUT_OWNER_TOKEN: owner.token,
+        SUT_OWNER_CONTROL_PATH: owner.controlPath,
+      }
+    : {}
   const child = spawnFn(
     process.execPath,
     [path.join(repoRoot, 'scripts/sut-services.mjs')],
@@ -54,7 +69,7 @@ export function spawnSutServices({
       cwd: repoRoot,
       detached: true,
       env: withSutRuntimeTargetEnv(
-        { ...process.env, SUT_LOG_FILE: logFile },
+        { ...process.env, SUT_LOG_FILE: logFile, ...ownerEnv },
         target
       ),
       stdio: 'ignore',
@@ -90,6 +105,8 @@ export async function writePidFile(pid, { pidFile = PID_FILE } = {}) {
  *   healthcheckFn?: Function,
  *   checkoutRoot?: string,
  *   runtimeTarget?: object,
+ *   databaseExistsFn?: (database: string) => boolean,
+ *   isPortOccupiedFn?: (port: number) => Promise<boolean>,
  * }} [opts]
  * @returns {Promise<number>} exit code (0 = healthy, 1 = failed)
  */
@@ -104,17 +121,36 @@ export async function runSutStart({
   healthcheckFn,
   checkoutRoot = repoRoot,
   runtimeTarget,
+  databaseExistsFn,
+  isPortOccupiedFn,
 } = {}) {
   refuseUnsupportedIsolatedBrowserCommand({
     checkoutRoot,
     command: 'pnpm sut',
   })
-  const target = resolveSutRuntimeTarget({ runtimeTarget })
+  const { isolated, target } = resolveSutCheckoutTarget({
+    checkoutRoot,
+    runtimeTarget,
+  })
+  let owner
+  if (isolated) {
+    refuseConflictingSutOverrides(process.env, target)
+    assertE2eDatabaseExists(target.database, { existsFn: databaseExistsFn })
+    await assertNoLiveSutOwner(checkoutRoot)
+    await assertAllocatedPortsFree(
+      target,
+      isPortOccupiedFn ?? defaultIsPortOccupied
+    )
+    owner = await claimSutOwnership(checkoutRoot)
+    log(`Selected database: ${target.database}`)
+    log(`Browser origin: ${isolatedBrowserOrigin(target)}`)
+  }
   log(`Starting SUT services... (log: ${logFile})`)
   const { child } = spawnSutServices({
     spawnFn,
     logFile,
     runtimeTarget: target,
+    owner,
   })
   await writePidFile(child.pid, { pidFile })
 
@@ -127,8 +163,37 @@ export async function runSutStart({
     errLog,
     healthcheckFn,
     runtimeTarget: target,
+    checkoutRoot,
   })
   return exitCode
+}
+
+async function defaultIsPortOccupied(port) {
+  const result = await checkTcpPort({
+    host: '127.0.0.1',
+    port,
+    timeoutMs: 400,
+  })
+  return result.ok
+}
+
+async function assertAllocatedPortsFree(target, isPortOccupiedFn) {
+  const ports = [
+    ['backend', target.backendPort],
+    ['frontend vite', target.vitePort],
+    ['local LB', target.lbListenPort],
+  ]
+  const occupied = []
+  for (const [service, port] of ports) {
+    if (await isPortOccupiedFn(port)) {
+      occupied.push(`${service} ${port}`)
+    }
+  }
+  if (occupied.length === 0) return
+  throw new Error(
+    `Isolated SUT ports are already occupied (${occupied.join(', ')}). ` +
+      'Refusing to start; the listener was not terminated.'
+  )
 }
 
 const isMain = process.argv[1]

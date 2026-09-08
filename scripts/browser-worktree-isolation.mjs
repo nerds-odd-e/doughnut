@@ -35,7 +35,7 @@ function isLinkedGitWorktree(checkoutRoot) {
 }
 
 // Isolation applies when the identity file exists or this checkout is a linked git worktree.
-function worktreeIsolationApplies(checkoutRoot) {
+export function worktreeIsolationApplies(checkoutRoot) {
   return (
     isRegularFile(worktreeLocalConfigPath(checkoutRoot)) ||
     isLinkedGitWorktree(checkoutRoot)
@@ -55,6 +55,65 @@ function readWorktreeLocalConfig(checkoutRoot) {
   }
 }
 
+const SUPPORTED_ISOLATED_SUT_COMMANDS = new Set([
+  'pnpm sut',
+  'pnpm sut:healthcheck',
+])
+
+const E2E_ALLOCATION_FIELDS = [
+  'e2e.database',
+  'e2e.backendPort',
+  'e2e.vitePort',
+  'e2e.lbListenPort',
+]
+
+function missingAllocationError(checkoutRoot, missing) {
+  const configPath = worktreeLocalConfigPath(checkoutRoot)
+  return new Error(
+    `Isolated worktree SUT needs a complete E2E allocation in ${configPath} ` +
+      '(id, e2e.database, e2e.backendPort, e2e.vitePort, e2e.lbListenPort). ' +
+      `Missing or invalid: ${missing.join(', ')}. See docs/worktree-browser-tests.md.`
+  )
+}
+
+export function loadCompleteIsolatedE2eAllocation(checkoutRoot) {
+  const configPath = worktreeLocalConfigPath(checkoutRoot)
+  if (!isRegularFile(configPath)) {
+    throw missingAllocationError(checkoutRoot, [
+      'identity (.worktree.local.json)',
+      ...E2E_ALLOCATION_FIELDS,
+    ])
+  }
+  const config = readWorktreeLocalConfig(checkoutRoot)
+  if (
+    typeof config.id !== 'string' ||
+    !/^wt_[a-z0-9_]{1,32}$/.test(config.id)
+  ) {
+    throw new Error(`Worktree id must match wt_[a-z0-9_]{1,32}: ${config.id}`)
+  }
+  const e2e = config.e2e
+  const missing = []
+  if (!e2e || typeof e2e !== 'object') {
+    missing.push(...E2E_ALLOCATION_FIELDS)
+  } else {
+    if (
+      typeof e2e.database !== 'string' ||
+      !/^[A-Za-z0-9_]+$/.test(e2e.database)
+    ) {
+      missing.push('e2e.database')
+    }
+    for (const field of ['backendPort', 'vitePort', 'lbListenPort']) {
+      if (!Number.isInteger(e2e[field]) || e2e[field] <= 0) {
+        missing.push(`e2e.${field}`)
+      }
+    }
+  }
+  if (missing.length > 0) {
+    throw missingAllocationError(checkoutRoot, missing)
+  }
+  return config
+}
+
 export function refuseUnsupportedIsolatedBrowserCommand({
   checkoutRoot,
   command,
@@ -64,6 +123,10 @@ export function refuseUnsupportedIsolatedBrowserCommand({
     readWorktreeLocalConfig(checkoutRoot)
   }
   if (!worktreeIsolationApplies(checkoutRoot)) {
+    return
+  }
+  if (SUPPORTED_ISOLATED_SUT_COMMANDS.has(command)) {
+    loadCompleteIsolatedE2eAllocation(checkoutRoot)
     return
   }
   throw new Error(

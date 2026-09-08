@@ -19,7 +19,7 @@ export function resolveSutRuntimeTarget({
   return LEGACY_SUT_RUNTIME_TARGET
 }
 
-function sutRuntimeTargetProcessEnv(target) {
+export function sutRuntimeTargetProcessEnv(target) {
   const backendOrigin = `http://${HOST}:${target.backendPort}`
   const env = {
     SERVER_PORT: String(target.backendPort),
@@ -41,13 +41,21 @@ export function withSutRuntimeTargetEnv(env, target) {
 }
 
 export function sutHealthEndpoints(target) {
+  const tcpChecks = []
+  if (target.mountebankPort != null) {
+    tcpChecks.push({
+      service: 'mountebank',
+      host: HOST,
+      port: target.mountebankPort,
+    })
+  }
+  tcpChecks.push(
+    { service: 'backend', host: HOST, port: target.backendPort },
+    { service: 'local LB', host: HOST, port: target.lbListenPort },
+    { service: 'frontend vite', host: HOST, port: target.vitePort }
+  )
   return {
-    tcpChecks: [
-      { service: 'mountebank', host: HOST, port: target.mountebankPort },
-      { service: 'backend', host: HOST, port: target.backendPort },
-      { service: 'local LB', host: HOST, port: target.lbListenPort },
-      { service: 'frontend vite', host: HOST, port: target.vitePort },
-    ],
+    tcpChecks,
     readinessUrl: `http://${HOST}:${target.lbListenPort}/__lb__/ready`,
   }
 }

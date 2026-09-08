@@ -9,10 +9,9 @@ import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { refuseUnsupportedIsolatedBrowserCommand } from './browser-worktree-isolation.mjs'
-import {
-  resolveSutRuntimeTarget,
-  sutHealthEndpoints,
-} from './sut-runtime-target.mjs'
+import { resolveSutCheckoutTarget } from './sut-isolated-target.mjs'
+import { verifyLiveSutOwner } from './sut-owner.mjs'
+import { sutHealthEndpoints } from './sut-runtime-target.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -80,6 +79,12 @@ function formatReadyLine(result) {
   return `FAIL HTTP readiness ${result.url} - ${result.reason}`
 }
 
+function logUnhealthyHints(log) {
+  log('SUT unhealthy or still starting.')
+  log('If you just started `pnpm sut`, wait a few seconds and run again.')
+  log('If services are down, start with `pnpm sut`.')
+}
+
 export async function runSutHealthcheck({
   runtimeTarget,
   tcpChecks,
@@ -91,7 +96,25 @@ export async function runSutHealthcheck({
     checkoutRoot,
     command: 'pnpm sut:healthcheck',
   })
-  const target = resolveSutRuntimeTarget({ runtimeTarget })
+  const { isolated, target } = resolveSutCheckoutTarget({
+    checkoutRoot,
+    runtimeTarget,
+  })
+  if (isolated) {
+    const live = await verifyLiveSutOwner(checkoutRoot)
+    if (!live.ok) {
+      log(
+        "FAIL live SUT owner — control endpoint did not verify this checkout's owner"
+      )
+      logUnhealthyHints(log)
+      return {
+        ok: false,
+        tcpResults: [],
+        readinessResult: { ok: false, reason: 'no live owner' },
+        exitCode: 1,
+      }
+    }
+  }
   const endpoints = sutHealthEndpoints(target)
   const checks = tcpChecks ?? endpoints.tcpChecks
   const readyUrl = readinessUrl ?? endpoints.readinessUrl
@@ -125,9 +148,7 @@ export async function runSutHealthcheck({
   const hasTcpFailure = tcpResults.some((result) => !result.ok)
   const failed = hasTcpFailure || !readinessResult.ok
   if (failed) {
-    log('SUT unhealthy or still starting.')
-    log('If you just started `pnpm sut`, wait a few seconds and run again.')
-    log('If services are down, start with `pnpm sut`.')
+    logUnhealthyHints(log)
     return { ok: false, tcpResults, readinessResult, exitCode: 1 }
   }
 

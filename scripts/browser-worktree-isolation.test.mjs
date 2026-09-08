@@ -9,24 +9,14 @@ import {
 } from './backend-test-worktree-linked-fixtures.mjs'
 import { guardCypressNodeSetup } from './browser-worktree-isolation.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
+import { completeIsolatedConfig } from './sut-isolated-fixtures.mjs'
 import { runSutRestart } from './sut-restart.mjs'
-import { healthyOnce, makeMockChild } from './sut-start-fixtures.mjs'
+import { healthyOnce, makeStartSpy } from './sut-start-fixtures.mjs'
 import { runSutStart } from './sut-start.mjs'
 
 const isolatedRefusal = /not supported yet/i
 const malformedJson = /not valid JSON/i
-
-function makeStartSpy() {
-  const calls = []
-  const child = makeMockChild(4242)
-  return {
-    calls,
-    spawnFn: (...args) => {
-      calls.push(args)
-      return child
-    },
-  }
-}
+const incompleteAllocation = /complete E2E allocation|Missing or invalid/i
 
 function makeRestartSpies() {
   const lsofCalls = []
@@ -139,14 +129,14 @@ test('configured primary and linked checkouts refuse before shared-state effects
 
   for (const checkout of [configured, linked]) {
     const start = makeStartSpy()
-    await assert.rejects(runStart(checkout.root, start), isolatedRefusal)
+    await assert.rejects(runStart(checkout.root, start), incompleteAllocation)
     assert.equal(start.calls.length, 0)
 
     const healthLogs = []
     const healthAccessed = []
     await assert.rejects(
       runHealth(checkout.root, healthLogs, healthAccessed),
-      isolatedRefusal
+      incompleteAllocation
     )
     assert.equal(healthLogs.length, 0)
     assert.equal(healthAccessed.length, 0)
@@ -211,5 +201,31 @@ test('malformed isolation JSON refuses clearly before shared-state effects', asy
     hooks.reset = true
     hooks.mocks = true
   }, malformedJson)
+  assert.equal(hooks.reset, false)
+})
+
+test('complete isolated allocation still refuses restart and Cypress', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(completeIsolatedConfig),
+  })
+  const restart = makeRestartSpies()
+  await assert.rejects(
+    runSutRestart({
+      checkoutRoot: checkout.root,
+      execFileFn: restart.execFileFn,
+      spawnFn: restart.spawnFn,
+      log: () => undefined,
+    }),
+    isolatedRefusal
+  )
+  assert.equal(restart.lsofCalls.length, 0)
+  assert.equal(restart.spawnCalls.length, 0)
+
+  const hooks = { reset: false, mocks: false }
+  assert.throws(() => {
+    guardCypressNodeSetup(checkout.root)
+    hooks.reset = true
+    hooks.mocks = true
+  }, isolatedRefusal)
   assert.equal(hooks.reset, false)
 })

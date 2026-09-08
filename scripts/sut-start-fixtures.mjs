@@ -8,6 +8,19 @@ export function makeMockChild(pid = 99999) {
   return child
 }
 
+/** Spy that records spawn arguments and returns one mock child. */
+export function makeStartSpy(pid = 4242) {
+  const calls = []
+  const child = makeMockChild(pid)
+  return {
+    calls,
+    spawnFn: (...args) => {
+      calls.push(args)
+      return child
+    },
+  }
+}
+
 /** Spy that captures calls to log / errLog. */
 export function makeLogs() {
   const out = []

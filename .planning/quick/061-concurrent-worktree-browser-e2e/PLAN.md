@@ -5,7 +5,7 @@
 [SEED-015, story 2](../../seeds/SEED-015-concurrent-worktree-environments.md#story-2)
 — Run browser E2E scenarios concurrently without external-service mocks.
 
-Status: in progress; slices 1–2 done, slices 3–13 planned.
+Status: in progress; slices 1–3 done, slices 4–13 planned.
 
 ## Goal and scope
 
@@ -196,10 +196,19 @@ changes to target propagation; do not absorb leaf 3.
 ### 3. Start an already configured isolated application
 
 Type: Behavior
-Status: planned
-Proof: Start/health command-boundary tests and one real configured SUT smoke
-case: inject/read a unique marker through its proxy, observe selected database
-and origin, then start again from a fresh shell using the same allocation.
+Status: done
+Proof: `pnpm test:sut-start` + `pnpm test:browser-worktree-isolation` —
+configured start omits `start:mb`, prints DB/origin, refuses duplicate live
+owner / occupied ports / missing DB / incomplete allocation / conflicting
+overrides; matching overrides work; isolated health requires the live owner
+(foreign ready is not success). Existing health/restart helpers stay green.
+Real smoke in disposable worktree `/tmp/doughnut-061-slice3-smoke.xZgQjL`
+(`id=wt_e4ddccf7`, DB `doughnut_e2e_wt_e4ddccf7`, ports 64745/64746/64747):
+`SUT_TIMEOUT_MS=360000 node scripts/sut-start.mjs` printed the selected
+database and `Browser origin: http://127.0.0.1:64747`; inject_notes + GET
+`/api/notes/1` through that proxy returned marker
+`slice3-marker-wt_e4ddccf7-1788827898`; fresh-process healthcheck passed
+without mountebank; duplicate start left the owner running. JVM wait ~15s.
 
 Behavior: A checkout has a valid identity, deliberately provisioned E2E database
 and recorded free application ports → ordinary `pnpm sut` → its own healthy
@@ -484,8 +493,14 @@ refusal until enabled. Final scope and proof promises remain unchanged.
   env (`SERVER_PORT`, `INPUT_DB_URL`, `LOCAL_LB_*`, `FRONTEND_DEV_PORT`,
   `FRONTEND_BACKEND_ORIGIN`) and health endpoints. `local:lb:vite` no longer
   hardcodes the Vite URL; `pnpm sut` supplies it. Bare `local:lb:vite` without
-  that env has no Vite upstream — CI/`pnpm test` still use `local:lb`. Update
-  `docs/gcp/prod_env.md` when leaf 3 documents isolated start.
+  that env has no Vite upstream — CI/`pnpm test` still use `local:lb`.
+- Slice 3: complete isolated allocation is additive `e2e.{database,backendPort,
+  vitePort,lbListenPort}` on `.worktree.local.json`. Live owner is a Unix
+  socket + per-run token under gitignored `.sut.local.lock` on the existing
+  run-p supervisor. Identity-only files still refuse start. Failed start can
+  leave the claim in place — leaf 4 must release it. Invalid migration is
+  observed as never-healthy boot, not a pre-spawn probe. Manual workflow:
+  `docs/worktree-browser-tests.md`.
 - Planning inspection found fixed origins in both Cypress and service commands,
   unconditional Mountebank startup/readiness, and restart by listener port rather
   than owner. These explain why a database-only change cannot deliver this story.
