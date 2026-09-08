@@ -363,60 +363,26 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 17. Keep a local note edit when a web-created note is then saved
 
-**Status:** refined; planned in [quick/065](../quick/065-local-edit-over-web-creation-save/PLAN.md).
+**Status:** complete — [quick/065](../quick/065-local-edit-over-web-creation-save/PLAN.md).
 
 - **Goal:** An owner with one committed local content refinement wants to
   receive a note they captured on the web and immediately continued writing
-  before pulling.
-- **Evaluation:** Accepted history since the shared base is one ordinary-note
-  creation of a different note, then one ordinary save of that same new note.
-  Pull rebases the unpublished local edit over both commits; explicit publish
-  updates the original edited note. Both identities and private learning data
-  remain.
-- **Value / learning:** Tests whether Stories 8 and 16 compose for the
-  sequential capture-then-write path without a new identity policy. Clean-main
-  pull of creation-then-save is already delivered in Story 13.
-- **Effort hypothesis:** M — medium confidence after Story 16; assumes the
-  accepted interval stays exactly one addition plus one content save of that
-  same new note, without generalizing to arbitrary mixed intervals.
-- **Depends on:** delivered Stories 8, 13, and 16; independent of Story 14.
-- **Safe stopping point:** This receipt remains useful without arbitrary
-  structural merges. Preserve accepted commit IDs; never discard local work.
+  before pulling, then publish the local refinement onto the same learned note.
 - **Scope:** One unpublished local existing-note content commit. Accepted
-  interval is exactly those two commits, addition destination root or already
-  represented folder, save at the new note's unchanged path. No additional
-  remote commits, accompanying edits to other notes, new folders, collisions,
-  moves, deletes, README changes, or drift repair. Do not broaden to two
-  independent additions.
-- **Boundary assumptions:** The bound checkout is on clean `main`; the local
-  commit is single-parent and edits exactly one ordinary note at an unchanged
-  path. Both remote commits are single-parent: creation directly follows the
-  shared base, and the save directly follows creation. The save changes only
-  the new note's body/frontmatter at its unchanged path. A no-op web save that
-  creates no commit remains the delivered one-addition case. Existing
-  content-only pull behavior stays supported. No new command, UI, storage,
-  metadata, or conflict policy is needed.
-- **Key examples:** A local edit of A waits while the web creates B and saves
-  B once → pull retains A and receives B's saved bytes at root or an existing
-  represented folder → explicit publish updates A and retains both identities
-  and learning data. Accepted creation/save commit IDs remain unchanged.
-- **Reminder from Story 14:** Publication of several edited notes is delivered;
-  divergent receipt of a local batch is not. Keep this story to one local note.
-  A two-note local batch or a third remote commit must refuse without changing
-  local head/files or accepted history. Pull itself must never publish.
-- **Boundary examples:** Creation of B followed by an edit to C, a second
-  addition, or two saves of B is refused with local work intact. Creation and
-  one save of B beneath an already represented folder is supported just as at
-  root. Dirty checkouts and multiple unpublished commits retain their current
-  refusal behavior.
-- **Open questions:** None for this bounded story. Broader interval support
-  remains excluded; Story 18 keeps its separate local-batch outcome.
+  interval is exactly one ordinary-note addition of a different note (root or
+  already represented folder) plus one content save of that same new note at
+  its unchanged path. Pull retains the local edit and receives the saved note;
+  explicit publish updates the original edited note and preserves both
+  identities and private learning data. Excludes additional remote commits,
+  accompanying edits to other notes, two independent additions, new folders,
+  collisions, moves, deletes, README changes, dirty trees, multiple local
+  commits, and drift repair.
 
 <a id="story-18"></a>
 
 ### 18. Keep a related local edit batch when the web changes a different note
 
-**Status:** queued after Story 17; refine before slice planning.
+**Status:** queued; refine before slice planning.
 
 - **Goal:** An owner can retain one related local revision when a web edit to
   a different note arrives, then publish the revision without splitting it.
