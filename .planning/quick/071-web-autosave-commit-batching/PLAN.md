@@ -100,22 +100,17 @@ format once, update plan, commit and push. Current task only writes the plan.
 
 ### 1. Represent durable eligibility for exposure freezing
 Type: Structure
-Status: planned
-Proof: Existing bundle/save controller tests remain green; persist and reload
-an eligible binding fixture using the repository's real committed-transaction
-fixture convention. Existing bindings load with absent eligibility.
+Status: done
+Proof: `pnpm backend:verify` green — `NotebookGitBindingAmendmentEligibilityTest`
+persists/reloads amendment_head / amendment_note_id / amendment_last_changed_at
+and asserts existing bindings load with null eligibility; production writers
+unchanged. ERD export ran (no Mermaid diff: exporter omits non-key columns).
 
-Structure: Add nullable amendment-head, note-id (scalar, no FK) and last-changed
-save timestamp fields to NotebookGitBinding in one new additive Flyway migration.
-Put candidate clearing/eligibility state with the binding; don't create a second
-history store. Add a concise fixture only where required by the immediately
-following download-freezing proof. Production writers still append and do not
-register candidates. Regenerate the ERD with the migration.
+Structure: Nullable eligibility columns on NotebookGitBinding via
+`V300000321__add_amendment_eligibility_to_notebook_git_binding.sql` (V320 was
+already the Java cutover migration). Fixture
+`NotebookGitBindingAmendmentFixture` for slice 2.
 Enables immediately: slice 2 can durably freeze a candidate on download.
-Sizing: about 5 minutes implementation/checks plus required backend:verify and
-ERD runtime. Routine additive nullable columns only; use the next available
-migration version at execution, not a version reserved in this plan.
-Stop-safe: old histories stay frozen and all saves still append.
 
 ### 2. Freeze the exact history returned by a download
 Type: Behavior
@@ -272,3 +267,7 @@ read-only, so freezing must move it into a write transaction. Shared binding
 locking and controller test infrastructure already exist. Amendment must only
 be activated after all exposure paths are guarded. No new storage experiment
 is required for the routine additive-column and existing transaction pattern.
+
+Slice 1: next SQL migration is V300000321 (V320 already taken by Java cutover).
+ERD Mermaid omits non-key columns so nullable eligibility fields do not change
+`docs/database-erd.md`.

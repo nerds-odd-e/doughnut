@@ -46,4 +46,19 @@ public class NotebookGitBinding extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Timestamp updatedAt;
+
+  @Column(name = "amendment_head", length = 40)
+  @Getter
+  @Setter
+  private String amendmentHead;
+
+  @Column(name = "amendment_note_id")
+  @Getter
+  @Setter
+  private Integer amendmentNoteId;
+
+  @Column(name = "amendment_last_changed_at")
+  @Getter
+  @Setter
+  private Timestamp amendmentLastChangedAt;
 }
