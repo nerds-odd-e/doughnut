@@ -87,7 +87,7 @@ guidance updated.
 ### 2. Publish the retained edit without changing either learned identity
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 
 Behavior: Accepted creation of Beta follows the shared base; both Alpha and
@@ -95,18 +95,11 @@ Beta have private learning state; a direct-child proposal changes only Alpha →
 publish through the controller → original Alpha receives the edit and both
 notes retain their identities and learning state.
 
-Add one focused characterization scenario beside the existing local-content
-publication tests. Create Beta through the ordinary creation controller, attach
-trackers through the existing committed-fixture helper without another Portable
-save, and publish using the creation head. Assert Alpha's content and both
-original note/tracker associations and learning values; Beta's content remains
-unchanged. This proves the existing publication behavior for the newly reachable
-case; no new backend production behavior is expected. A failure calls for
-diagnosis within the story, not a speculative identity redesign.
-
-Sizing hypothesis: about five minutes of fixture adaptation and cleanup, medium
-confidence. Backend rules require all backend unit tests; their runtime is an
-explicit sizing exception, not a reason to split this single proof loop.
+Characterization in
+`NotebookGitLocalContentOverWebEditPublicationControllerTest`: create Beta via
+the ordinary creation controller, attach trackers without another Portable save,
+publish a one-child Alpha content proposal on the creation head. No production
+code change.
 
 ### 3. Complete the web-capture and local-refinement journey
 
@@ -131,11 +124,11 @@ exceeds the target. No new PTY/browser harness or manual testing is planned.
 
 ## Delivery and current evidence
 
-Slice 1 delivered: pull rebases one unpublished ordinary-note edit over one
-eligible accepted addition; other structural intervals still refuse. Next:
-slice 2 publication characterization. Do not change the unrelated
-browser-worktree plan or backlog order. After all slices, reduce story
-refinement to goal/scope and remove spent execution history.
+Slices 1–2 delivered: pull receives one accepted addition under a retained
+unpublished edit; explicit publish updates original Alpha and preserves Beta
+and both learning histories. Next: slice 3 E2E journey. Do not change the
+unrelated browser-worktree plan or backlog order. After all slices, reduce
+story refinement to goal/scope and remove spent execution history.
 
 ## In-place refinement review
 
