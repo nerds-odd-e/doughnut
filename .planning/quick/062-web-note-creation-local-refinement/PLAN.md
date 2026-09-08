@@ -5,7 +5,7 @@
 [SEED-009, story 13](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-13)
 — Create a note on the web and continue refining it locally.
 
-Status: in progress. Slices 1–6 done; next is slice 7.
+Status: in progress. Slices 1–7 done; next is slice 8.
 Sizing remains a hypothesis, not a time guarantee.
 
 ## Goal and scope
@@ -256,7 +256,7 @@ Safe stop: Full server-side round trip and private identity are established.
 
 ### 7. Preserve unpublished work when accepted history adds a note
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: Clean bound main has one unpublished existing-note content edit;
 accepted main advances through a plain addition of a different ordinary note.
 Trigger: Run `donut notebook pull`.
@@ -446,3 +446,13 @@ remove spent plan history only when the full outcome and proof are complete.
   distinct accepted ancestors (creation then save). Proof:
   `NotebookGitWebCreatedNotePublicationControllerTest`. Compatibility gate:
   existing `NotebookGitProposalAncestryControllerTest` refusals.
+- Slice 7 is tests-only: pull already refuses a plain accepted addition
+  (`added.md`) while unpublished local work exists. New row in
+  `notebookPull.structuralHistory.suite.ts`. Gate:
+  `pnpm -C cli exec vitest run tests/notebookPull.test.ts tests/notebookPublish.test.ts`.
+- CI run 34176547886 on SHA `4c604a880c` (slice 6): Frontend Unit Tests (2/2)
+  failed in `setup_nodejs_with_cache` before tests ran — `cli postinstall`
+  `syncpack: Permission denied`. Frontend 1/2, backend, lint, and other unit
+  tests on the same SHA succeeded. Disposition: CI install race, not a slice-6
+  assertion defect. Tests never ran on that shard. Continue without a repair
+  commit.

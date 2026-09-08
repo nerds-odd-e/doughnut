@@ -94,6 +94,18 @@ export function describeNotebookPullStructuralHistory(): void {
         },
         path: 'Renamed.md',
       },
+      {
+        shape: 'addition',
+        apply: (source: string) => {
+          commitPortableFile(
+            source,
+            'added.md',
+            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n',
+            'accepted addition'
+          )
+        },
+        path: 'added.md',
+      },
     ] as const)(
       'names the structural path for remote $shape and leaves the checkout unchanged',
       async ({ shape, apply, path, ...rest }) => {
