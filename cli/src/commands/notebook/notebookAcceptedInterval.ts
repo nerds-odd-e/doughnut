@@ -93,6 +93,11 @@ export function firstStructuralPathInAcceptedInterval(
     '--not',
     localParent
   )
+  if (
+    isEligibleOneOrdinaryNoteAddition(acceptedRepoDir, localParent, interval)
+  ) {
+    return undefined
+  }
   for (const commit of interval) {
     for (const parent of commit.parents) {
       for (const change of listCommitChanges(
@@ -105,6 +110,77 @@ export function firstStructuralPathInAcceptedInterval(
     }
   }
   return undefined
+}
+
+function isOrdinaryNoteAddition(change: CommitChange): boolean {
+  return (
+    change.status === 'A' &&
+    change.srcMode === '000000' &&
+    change.dstMode === REGULAR_FILE_MODE &&
+    isOrdinaryNotePath(change.path)
+  )
+}
+
+function isRepresentedFolder(
+  acceptedRepoDir: string,
+  commit: string,
+  folderPath: string
+): boolean {
+  const listed = runSystemGitOrThrow(
+    [
+      '-C',
+      acceptedRepoDir,
+      'ls-tree',
+      '-d',
+      '--name-only',
+      commit,
+      '--',
+      folderPath,
+    ],
+    inspectAncestryFailure
+  ).trim()
+  return listed === folderPath
+}
+
+function destinationParentIsRootOrRepresented(
+  acceptedRepoDir: string,
+  baseCommit: string,
+  notePath: string
+): boolean {
+  const slash = notePath.lastIndexOf('/')
+  if (slash === -1) return true
+  return isRepresentedFolder(
+    acceptedRepoDir,
+    baseCommit,
+    notePath.slice(0, slash)
+  )
+}
+
+function isEligibleOneOrdinaryNoteAddition(
+  acceptedRepoDir: string,
+  localParent: string,
+  interval: { sha: string; parents: string[] }[]
+): boolean {
+  if (interval.length !== 1) return false
+  const [commit] = interval
+  if (commit === undefined) return false
+  const parent = commit.parents[0]
+  if (parent === undefined || commit.parents.length !== 1) {
+    return false
+  }
+  if (parent !== localParent) return false
+  const changes = listCommitChanges(acceptedRepoDir, parent, commit.sha)
+  if (changes.length !== 1) return false
+  const [change] = changes
+  return (
+    change !== undefined &&
+    isOrdinaryNoteAddition(change) &&
+    destinationParentIsRootOrRepresented(
+      acceptedRepoDir,
+      localParent,
+      change.path
+    )
+  )
 }
 
 function parseDiffTreeRawZ(output: string): CommitChange[] {

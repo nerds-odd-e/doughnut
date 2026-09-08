@@ -24,6 +24,7 @@ import { describeNotebookPullAbsorbed } from './notebookPull.absorbed.suite.js'
 import { describeNotebookPullPathOverlap } from './notebookPull.pathOverlap.suite.js'
 import { describeNotebookPullStructuralHistory } from './notebookPull.structuralHistory.suite.js'
 import { describeNotebookPullRebase } from './notebookPull.rebase.suite.js'
+import { describeNotebookPullAddition } from './notebookPull.addition.suite.js'
 import { describeNotebookPullConflict } from './notebookPull.conflict.suite.js'
 import { describeNotebookPullResolvedContinuation } from './notebookPull.resolvedContinuation.suite.js'
 import { describeNotebookPullAbort } from './notebookPull.abort.suite.js'
@@ -121,6 +122,7 @@ export function describeNotebookPullAcceptedHistory(): void {
   describeNotebookPullAbsorbed()
   describeNotebookPullStructuralHistory()
   describeNotebookPullRebase()
+  describeNotebookPullAddition()
   describeNotebookPullConflict()
   describeNotebookPullResolvedContinuation()
   describeNotebookPullAbort()

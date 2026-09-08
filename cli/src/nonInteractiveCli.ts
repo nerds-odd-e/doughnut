@@ -52,7 +52,7 @@ export async function completeNonInteractiveCliIfHandled(
 
 function notebookPullNextSteps(directory: string): string {
   return (
-    'When one unpublished commit edits one existing note at an unchanged path and accepted history advanced through ordinary-note content changes at unchanged paths, pull rebases that unpublished commit. ' +
+    'When one unpublished commit edits one existing note at an unchanged path and accepted history advanced through ordinary-note content changes at unchanged paths, or through one added ordinary note at the root or an already represented folder, pull rebases that unpublished commit. ' +
     'Git auto-merges overlapping same-note content when it can; otherwise it pauses with a native conflict so you can edit, stage, and run git rebase --continue, or git rebase --abort. ' +
     `Pull does not publish. Inspect the result, then run "donut notebook publish ${directory}" if unpublished work remains. ` +
     'Accepted history may not include all current web content.'

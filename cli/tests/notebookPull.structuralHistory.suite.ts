@@ -95,7 +95,42 @@ export function describeNotebookPullStructuralHistory(): void {
         path: 'Renamed.md',
       },
       {
-        shape: 'addition',
+        shape: 'addition-with-edit',
+        apply: (source: string) => {
+          fs.writeFileSync(
+            join(source, 'added.md'),
+            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n'
+          )
+          fs.writeFileSync(
+            join(source, 'other.md'),
+            '---\ntype: Note\n---\n# Other\n\nAccepted edit too.\n'
+          )
+          runGit(['add', 'added.md', 'other.md'], source)
+          runGit(
+            ['commit', '--quiet', '-m', 'accepted addition and edit'],
+            source
+          )
+        },
+        path: 'added.md',
+      },
+      {
+        shape: 'two-additions',
+        apply: (source: string) => {
+          fs.writeFileSync(
+            join(source, 'added.md'),
+            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n'
+          )
+          fs.writeFileSync(
+            join(source, 'also.md'),
+            '---\ntype: Note\n---\n# Also\n\nSecond addition.\n'
+          )
+          runGit(['add', 'added.md', 'also.md'], source)
+          runGit(['commit', '--quiet', '-m', 'accepted two additions'], source)
+        },
+        path: 'added.md',
+      },
+      {
+        shape: 'creation-then-save',
         apply: (source: string) => {
           commitPortableFile(
             source,
@@ -103,8 +138,26 @@ export function describeNotebookPullStructuralHistory(): void {
             '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n',
             'accepted addition'
           )
+          commitPortableFile(
+            source,
+            'added.md',
+            '---\ntype: Note\n---\n# Added\n\nAccepted save.\n',
+            'accepted save'
+          )
         },
         path: 'added.md',
+      },
+      {
+        shape: 'new-folder',
+        apply: (source: string) => {
+          commitPortableFile(
+            source,
+            'NewFolder/added.md',
+            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n',
+            'accepted nested addition'
+          )
+        },
+        path: 'NewFolder/added.md',
       },
     ] as const)(
       'names the structural path for remote $shape and leaves the checkout unchanged',

@@ -39,8 +39,9 @@ export type UnpublishedLocalHistoryDecision =
 /**
  * Returns fast-forward when local main is already an ancestor of accepted.
  * Eligible one-note content edits already based on accepted main stay as-is.
- * Eligible one-note content edits over content-only accepted history rebase,
- * including same-note content edits.
+ * Eligible one-note content edits rebase over content-only accepted history,
+ * including same-note content edits, and over one accepted ordinary-note
+ * addition at the root or an already represented folder.
  */
 export function inspectUnpublishedLocalHistory(
   acceptedRepoDir: string,
