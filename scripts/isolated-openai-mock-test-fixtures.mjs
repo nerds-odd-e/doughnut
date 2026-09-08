@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process'
 import http from 'node:http'
+import { observePrivateMockChild } from './isolated-openai-mock.mjs'
 import { listenEphemeralPort } from './sut-e2e-port-listen.mjs'
 
 export function spawnDetachedNode(source) {
@@ -14,6 +15,27 @@ export function spawnDetachedNode(source) {
 
 export function spawnIdleMockChild() {
   return spawnDetachedNode('setInterval(() => {}, 1000)')
+}
+
+/** Idle child wrapped with the same failure/stop surface as a private mock. */
+export function spawnIdlePrivateMockHandle(
+  endpoint = {
+    managementUrl: 'http://127.0.0.1:18025',
+    servingPort: 18001,
+  }
+) {
+  const child = spawnIdleMockChild()
+  const lifecycle = observePrivateMockChild(child)
+  return {
+    endpoint,
+    child,
+    getFailure: lifecycle.getFailure,
+    async verifyOwnership() {
+      return true
+    },
+    stop: lifecycle.stop,
+    killSync: lifecycle.killSync,
+  }
 }
 
 export function spawnOwnedManagementListener(managementPort) {

@@ -1,7 +1,7 @@
 # Isolated OpenAI browser mocks
 
 Source: [SEED-015 story 3](../../seeds/SEED-015-concurrent-worktree-environments.md#story-3).
-Status: in-progress. Slices 1–3 done.
+Status: in-progress. Slices 1–4 done.
 
 ## Goal and scope
 
@@ -125,22 +125,17 @@ ownership rechecked immediately before that.
 
 ### 4. Stop the affected runner when its mock fails
 Type: Behavior
-Status: planned
-Proof: Through a spawned runner boundary, fail the owned mock while Cypress is
-active. Observe nonzero runner completion,
-owned child disappearance and lease reacquisition, while a peer still responds.
+Status: done
+Proof: `node --test scripts/isolated-cypress-openai-mock-failure.test.mjs` (plus related
+isolated-cypress/openai-mock unit suite) — kill owned mock after startup; nonzero
+runner; mock gone; lease reacquired; peer still responds.
 
 Behavior: A private mocked run is active → its mock exits unexpectedly → the
 affected run fails visibly and releases only its owned resources.
 
-Attach cleanup to existing runner termination/release paths; mock failure must
-reach the active runner promptly from the child exit event, without waiting for
-the next browser request or the usual Cypress timeout. Keep a single cleanup
-owner and ensure lease release follows mock shutdown.
+Race-safe child-exit observation into the single cleanup owner (mock stop then
+lease release); does not wait for the next browser request.
 
-Sizing: About 5 minutes with the existing spawned-process fixtures and normal
-cleanup from leaf 2. One child-exit observation loop; do not add a polling
-supervisor. The proof must fail if only the startup promise notices the exit.
 
 ### 5. Cancel a mocked run without blocking its next run
 Type: Behavior

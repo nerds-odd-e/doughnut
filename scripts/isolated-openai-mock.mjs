@@ -86,6 +86,54 @@ export async function createEmptyRecordingImposter(managementUrl, servingPort) {
 }
 
 /**
+ * Failure observation + stop/kill for one owned private-mock child.
+ * Used by the real starter and by the spawned mock-failure proof runner.
+ */
+export function observePrivateMockChild(child) {
+  const failState = { error: null }
+  const onChildGone = (code, signal) => {
+    if (failState.error) return
+    failState.error = new Error(
+      `Private OpenAI mock process exited unexpectedly ` +
+        `(code ${code ?? 'unknown'}, signal ${signal ?? 'none'}).`
+    )
+  }
+  child.once('exit', onChildGone)
+  child.once('error', (error) => {
+    failState.error = new Error(
+      `Private OpenAI mock failed to start: ${error.message}`
+    )
+  })
+
+  let stopped = false
+  const disarm = () => child.removeListener('exit', onChildGone)
+
+  return {
+    getFailure() {
+      return failState.error
+    },
+    async stop() {
+      if (stopped) return
+      stopped = true
+      disarm()
+      await stopOwnedSutProcessTree(child)
+    },
+    killSync() {
+      if (stopped) return
+      stopped = true
+      disarm()
+      const pgid = child.pid
+      if (!Number.isInteger(pgid) || pgid <= 0) return
+      try {
+        process.kill(-pgid, 'SIGKILL')
+      } catch (error) {
+        if (error.code !== 'ESRCH' && error.code !== 'EPERM') throw error
+      }
+    },
+  }
+}
+
+/**
  * @returns {Promise<{
  *   endpoint: { managementUrl: string, servingPort: number },
  *   child: import('node:child_process').ChildProcess,
@@ -128,23 +176,11 @@ export async function startPrivateOpenAiMock({
   )
   child.unref()
 
-  const failState = { error: null }
-  const onChildGone = (code, signal) => {
-    if (failState.error) return
-    failState.error = new Error(
-      `Private OpenAI mock process exited unexpectedly ` +
-        `(code ${code ?? 'unknown'}, signal ${signal ?? 'none'}).`
-    )
-  }
-  child.once('exit', onChildGone)
-  child.once('error', (error) => {
-    failState.error = new Error(
-      `Private OpenAI mock failed to start: ${error.message}`
-    )
-  })
+  const lifecycle = observePrivateMockChild(child)
 
   const throwIfMockFailed = () => {
-    if (failState.error) throw failState.error
+    const failure = lifecycle.getFailure()
+    if (failure) throw failure
   }
 
   try {
@@ -166,8 +202,7 @@ export async function startPrivateOpenAiMock({
     )
     throwIfMockFailed()
   } catch (error) {
-    child.removeListener('exit', onChildGone)
-    await stopOwnedSutProcessTree(child)
+    await lifecycle.stop()
     throw error
   }
 
@@ -180,36 +215,12 @@ export async function startPrivateOpenAiMock({
     return true
   }
 
-  let stopped = false
-  const stop = async () => {
-    if (stopped) return
-    stopped = true
-    child.removeListener('exit', onChildGone)
-    await stopOwnedSutProcessTree(child)
-  }
-
-  const killSync = () => {
-    if (stopped) return
-    stopped = true
-    child.removeListener('exit', onChildGone)
-    const pgid = child.pid
-    if (!Number.isInteger(pgid) || pgid <= 0) return
-    try {
-      process.kill(-pgid, 'SIGKILL')
-    } catch (error) {
-      if (error.code !== 'ESRCH' && error.code !== 'EPERM') throw error
-    }
-  }
-
   return {
     endpoint: { managementUrl, servingPort },
     child,
     verifyOwnership,
-    stop,
-    killSync,
-    /** Current failure observed from the owned mock child, if any. */
-    getFailure() {
-      return failState.error
-    },
+    stop: lifecycle.stop,
+    killSync: lifecycle.killSync,
+    getFailure: lifecycle.getFailure,
   }
 }

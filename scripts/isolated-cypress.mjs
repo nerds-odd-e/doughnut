@@ -16,12 +16,17 @@ import {
   selectedCypressSpecs,
   specsFromBeforeRun,
 } from './isolated-cypress-spec-selection.mjs'
+import {
+  observePrivateMockFailure,
+  refuseConflictingCypressOrigin,
+  registerRunnerCleanup,
+  requireHealthyOwningSut,
+} from './isolated-cypress-runner-lifecycle.mjs'
 import { isolatedBrowserOrigin } from './sut-runtime-target.mjs'
 import {
   acquireSutRunnerLease,
   releaseSutRunnerLease,
   releaseSutRunnerLeaseSync,
-  verifyLiveSutOwner,
 } from './sut-owner.mjs'
 
 export {
@@ -29,71 +34,6 @@ export {
   SUPPORTED_ISOLATED_CYPRESS_SPECS,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress-spec-selection.mjs'
-
-const PRIMARY_CYPRESS_ORIGIN = 'http://localhost:5173'
-
-function refuseConflictingCypressOrigin(env, config, isolatedOrigin) {
-  const envOrigin = env.CYPRESS_baseUrl
-  if (envOrigin && envOrigin !== isolatedOrigin) {
-    throw new Error(
-      `Conflicting CYPRESS_baseUrl=${envOrigin} does not match the configured isolated Cypress origin (${isolatedOrigin}).`
-    )
-  }
-  const configOrigin = config.baseUrl
-  if (
-    configOrigin &&
-    configOrigin !== isolatedOrigin &&
-    configOrigin !== PRIMARY_CYPRESS_ORIGIN
-  ) {
-    throw new Error(
-      `Conflicting Cypress baseUrl=${configOrigin} does not match the configured isolated Cypress origin (${isolatedOrigin}).`
-    )
-  }
-}
-
-async function requireHealthyOwningSut(checkoutRoot, healthcheckFn) {
-  const live = await verifyLiveSutOwner(checkoutRoot)
-  if (!live.ok) {
-    throw new Error(
-      'Isolated Cypress requires a verified live SUT owner in this checkout.'
-    )
-  }
-  const runHealth =
-    healthcheckFn ??
-    (async (root) => {
-      const { runSutHealthcheck } = await import('./sut-healthcheck.mjs')
-      return runSutHealthcheck({ checkoutRoot: root })
-    })
-  const health = await runHealth(checkoutRoot)
-  if (!health?.ok) {
-    throw new Error(
-      'Isolated Cypress requires a healthy owning SUT in this checkout.'
-    )
-  }
-}
-
-function failLoudly(error) {
-  process.stderr.write(
-    `${error instanceof Error ? error.message : String(error)}\n`
-  )
-  process.exit(1)
-}
-
-function registerRunnerCleanup(cleanup) {
-  let released = false
-  const releaseOnce = async () => {
-    if (released) return
-    released = true
-    await cleanup()
-  }
-  process.once('SIGINT', () => {
-    releaseOnce().catch(failLoudly)
-  })
-  process.once('SIGTERM', () => {
-    releaseOnce().catch(failLoudly)
-  })
-  return releaseOnce
-}
 
 function injectOpenAiMockEndpoint(config, endpoint) {
   if (!config.expose || typeof config.expose !== 'object') {
@@ -153,18 +93,6 @@ export async function guardCypressNodeSetup(
     /* replaced after lease + mock are ready */
   }
 
-  const observeMockFailure = (mock) => {
-    mock.child?.once('exit', () => {
-      const failure = mock.getFailure?.()
-      if (!failure) return
-      cleanupOnce()
-        .catch(() => {
-          /* cleanup best-effort before failLoudly */
-        })
-        .finally(() => failLoudly(failure))
-    })
-  }
-
   const startMockIfNeeded = async (specs) => {
     if (specs.length !== 1) {
       assertSupportedIsolatedCypressSpecs(specs)
@@ -181,7 +109,7 @@ export async function guardCypressNodeSetup(
       allocation,
     })
     injectOpenAiMockEndpoint(config, privateMock.endpoint)
-    observeMockFailure(privateMock)
+    observePrivateMockFailure(privateMock, cleanupOnce)
   }
 
   cleanupOnce = registerRunnerCleanup(async () => {
