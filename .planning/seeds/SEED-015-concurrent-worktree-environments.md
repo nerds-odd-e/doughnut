@@ -26,30 +26,14 @@ proved useful; it does not promise faster parallel suites on limited hardware.
 
 ## Alternatives and Decision
 
-1. **Defer:** keep existing commands and shared state. No setup cost, but
-   concurrent database-dependent runs remain unreliable.
-2. **Smaller behavior change:** serialize the complete database-dependent run,
-   including migration and reset. This prevents overlapping cooperating runs
-   but leaves a queue and still requires the correct worktree's application.
-3. **Manual or existing-tool workflow:** developers assign databases and ports
-   themselves, or use separate VMs. Manual assignment can prove the approach,
-   but repeated setup and endpoint coordination are a poor fit for frequent AI
-   tasks; separate VMs cost more resources and setup.
-4. **Requested direction — recommended:** retain shared MySQL and give each
-   worktree a persistent local identity, isolated databases, and the service
-   endpoints needed for its supported workflows.
+The developer selected shared MySQL, a persistent gitignored worktree identity,
+automatic first use, isolated databases, and owning service endpoints.
+Stories 1a–3 record delivered boundaries; guides are linked below. This implies
+no approved ADR or creation hook. Recorded ports are not OS reservations.
 
-Serialization is the strongest smaller alternative. It remains a temporary
-operating practice, but does not deliver the requested concurrent test runs.
-Separate MySQL processes or complete VM environments remain alternatives if
-shared-server limitations prove material; they are not initial requirements.
-
-### Captured design direction
-
-The developer proposed a persistent gitignored worktree identity, automatic
-first use, shared MySQL, and owning service endpoints. Stories 1a–3 record the
-implemented boundaries; current guides are linked below. No approved ADR or
-creation-hook requirement is implied. Recorded ports are not OS reservations.
+Serializing complete runs remains a fallback but cannot deliver concurrency.
+Manual database/port assignment adds repeated setup; separate MySQL instances
+or VMs remain alternatives if shared-server limitations prove material.
 
 Retirement, copied/moved checkout recovery, and persistent development data
 remain separate decisions. Worktree removal must not imply data deletion;
@@ -66,24 +50,13 @@ kind per worktree, across two concurrent local worktrees.
 
 **Status:** Children 1a–1c, stories 2, 2a, 2b, and 3 delivered. Next queued story is 6.
 
-**Parent goal**
+**Goal**
 
 Developers and AI tasks can verify their own backend code and schema
-concurrently in local worktrees, eventually without manual environment setup
-and through the usual test commands. Separate databases on the existing MySQL
-server are the central assumption to test first.
+concurrently through ordinary commands using automatically provisioned separate
+databases on shared MySQL. Children 1a–1c delivered this outcome.
 
-**Why split here**
-
-The previous story bundled reliable concurrent tests, automatic environment
-provisioning, and coverage of every command entry point. The strongest smaller
-alternative is one-time manual database setup plus one supported test workflow.
-It is sufficient to deliver the first concurrent runs and learn whether database
-isolation works. Adopt it as an interim increment; the later children remove
-its setup and command-selection burdens. Deferring leaves today's interference;
-serializing tests avoids overlap but does not test or deliver concurrency.
-
-**Shared boundaries**
+**Scope**
 
 - Local Nix development with MySQL already running; at most one backend test
   runner per worktree. No promise of faster execution on constrained hardware.
@@ -313,7 +286,7 @@ replacement.
 
 ### 2b. Stop an isolated SUT without leaving its forked backend running
 
-**Status:** Delivered, 2026-09-08. [Corrective plan](../quick/072-owned-sut-descendant-shutdown/PLAN.md).
+**Status:** Delivered, 2026-09-08. Recover quick/072 from `d191a6b33d`.
 
 **Goal**
 
@@ -385,6 +358,9 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   whether MCP verification is added later.
 - **Safety boundary:** Own all client processes and mutable local artifacts
   involved in the supported workflows; do not redirect to shared defaults.
+- **Shutdown example from 2b:** An owned forked client outlives its parent and
+  ignores TERM → cancellation → bounded cleanup finishes before lease/path
+  reuse, or fails visibly. Prove peer usability at reuse, not only parent exit.
 - **Reminder from SEED-009 Story 7:** When this story is selected, include or
   explicitly bound the installed-CLI folder-relocation feature. It uses a
   bound clone, `git mv` of a represented folder, a second clone, and pull;
@@ -428,6 +404,9 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   client workflow without requiring broader environment-management features.
 - **Safety boundary:** Server processes, client connections, configuration, and
   any mocks used by the scenario belong to the correct environment.
+- **Shutdown example from 2b:** Disconnect with an owned server child still
+  running → teardown → await bounded child cleanup before another run can
+  reuse its resources; a shutdown acknowledgement alone is insufficient.
 - **Mock reminder from story 3:** Scope the chosen MCP workflow's services
   explicitly; OpenAI completion support does not isolate Google or other mocks.
   Propagate child failure while the owner runs and complete child cleanup before
@@ -446,7 +425,7 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ### 6. Reclaim databases from retired worktrees
 
-**Status:** First in backlog; retirement policy remains unrefined.
+**Status:** Next environment expansion after queued corrections; retirement policy remains unrefined.
 
 - **For / why:** Developers and AI tasks creating disposable worktrees need to
   avoid accumulating databases after those worktrees are retired.
@@ -464,18 +443,23 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
   Unhealthy does not mean retired: story 2a refuses invalid allocations and
   foreign listeners even with a live owner. Such refusal must not authorize
   dropping databases, replacing allocations, or terminating those listeners.
-- **Reminder from quick/070:** Private mock ports belong to a Cypress run and
+- **Reminders from stories 3 and 2b:** Private mock ports belong to a Cypress run and
   are not persistent allocation fields or database inventory. A completed mock
   run leaves the SUT/database allocated. Delivered correction 2b showed a child
   alive after its parent stopped; missing parent/lease alone cannot prove retirement.
   Example: a surviving backend still using a candidate database → reclaim →
   refuse; an explicitly retired, verified idle allocation may follow the chosen
   reclamation policy. Resolve identification and drop-versus-reuse before planning.
+  A shutdown acknowledgement, supervisor exit, or failed bounded cleanup is
+  not evidence of retirement. Story 2b retains ancestry captured before shutdown;
+  it cannot identify children already orphaned before that capture. Reclamation
+  must resolve uncertain ownership without inferring permission to drop data.
 
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08:** Quick/070 delivered focused OpenAI mocks.
-Correction 2b is delivered. Queue remains 6 → 4 → 5; reclaim remains
+**Backlog review, 2026-09-08, after quick/072:** Both owned-descendant shutdown
+cases are delivered; no further correction or new product story was identified.
+Queue remains 6 → 4 → 5; reclaim remains
 the next expansion, followed by CLI and MCP. CLI-before-MCP is value ordering,
 not a dependency. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 The recording-exclusivity proof correction stays with story 3 in quick/073;
