@@ -1,6 +1,7 @@
 import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { getApiConfig } from 'donut-api'
+import { LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION } from '../src/commands/notebook/notebookLocalCandidate.js'
 import { runGit } from './notebookClone.testHelpers.js'
 import {
   buildSourceRepo,
@@ -16,7 +17,8 @@ export const ACCEPTED_THIRD_NOTE =
   '---\ntype: Note\nauthored: remote-yaml\n---\n# Gamma\n\nAccepted third-note body.\n'
 
 export const TWO_NOTE_UNSUPPORTED_ACCEPTED =
-  'Local main cannot receive the accepted history because the two-note unpublished commit can only rebase over exactly one accepted content save of a different existing ordinary Markdown note. Local work is preserved; reconcile or recreate it as one supported commit directly on accepted history before publication.'
+  'Local main cannot receive the accepted history because the two-note unpublished commit can only rebase over exactly one accepted content save of a different existing ordinary Markdown note. ' +
+  LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION
 
 export const NOT_EXISTING_NOTE_CONTENT_EDIT =
   'Local main cannot receive the accepted history because the unpublished commit is not one existing-note content edit. Recreate it as one unpublished commit that edits one existing ordinary Markdown note at an unchanged path, then try again.'

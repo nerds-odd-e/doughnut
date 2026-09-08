@@ -9,10 +9,10 @@ import {
   commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
+  STRUCTURAL_CHANGE_REFUSAL,
 } from './notebookPull.testHelpers.js'
 import {
   PASTA_LOCAL,
-  STRUCTURAL_CHANGE_REFUSAL,
   commitExactFolderMove,
   prepareExactSubtreeMoveWithLocalDescendantEdit,
   seedRecipesKitchenTree,

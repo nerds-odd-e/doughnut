@@ -25,14 +25,17 @@ const LOCAL_NOT_CONTENT_EDIT =
   'Local main cannot receive the accepted history because the unpublished commit is not one existing-note content edit. ' +
   'Recreate it as one unpublished commit that edits one existing ordinary Markdown note at an unchanged path, then try again.'
 
+export const LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION =
+  'Local work is preserved; reconcile or recreate it as one supported commit directly on accepted history before publication.'
+
 const LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED =
   'Local main cannot receive the accepted history because the two-note unpublished commit can only rebase over exactly one accepted content save of a different existing ordinary Markdown note. ' +
-  'Local work is preserved; reconcile or recreate it as one supported commit directly on accepted history before publication.'
+  LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION
 
 function structuralChangeError(changedPath: string): string {
   return (
     `Local main cannot receive the accepted history because accepted history includes a structural change at "${changedPath}". ` +
-    'Divergent structural history is not supported yet.'
+    LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION
   )
 }
 

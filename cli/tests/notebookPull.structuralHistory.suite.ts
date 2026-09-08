@@ -9,6 +9,7 @@ import {
   commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
+  structuralChangeRefusal,
 } from './notebookPull.testHelpers.js'
 import { cloneWithLocalNoteAndRemoteOther } from './notebookPull.structuralHistory.testHelpers.js'
 
@@ -154,7 +155,7 @@ export function describeNotebookPullStructuralHistory(): void {
         )
 
         expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-          `donut: Local main cannot receive the accepted history because accepted history includes a structural change at "${path}". Divergent structural history is not supported yet.`
+          `donut: ${structuralChangeRefusal(path)}`
         )
         expect(checkoutState(directory)).toEqual(before)
         expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)

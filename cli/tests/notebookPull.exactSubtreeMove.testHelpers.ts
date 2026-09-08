@@ -16,9 +16,6 @@ export const SAUCE_BYTES =
   '---\ntype: Note\n---\n# Sauce\n\nIdentical twin body.\n'
 export const OUTSIDE_NOTE = '---\ntype: Note\n---\n# Outside\n\nUnmoved note.\n'
 
-export const STRUCTURAL_CHANGE_REFUSAL =
-  /^donut: Local main cannot receive the accepted history because accepted history includes a structural change at ".+"\. Divergent structural history is not supported yet\.$/
-
 export function seedRecipesKitchenTree(source: string): void {
   commitPortableFile(
     source,
