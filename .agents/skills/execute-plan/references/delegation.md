@@ -19,7 +19,7 @@ The implementer prompt must include:
    post-change-refactor, run `format:changed`, or run standalone `lint:changed`.
    Leave relevant tests green and the tree uncommitted.
 5. `revert_and_refine` when the slice is too big; the coordinator will invoke
-   **slice-plan-refinement** on the existing PLAN.
+   **dough-slice-plan-refinement** on the existing PLAN.
 6. `CURSOR_DEV=true nix develop -c <command>` except on Cloud VM; Git needs no
    Nix prefix.
 7. A short return: ready for wrap-up with one or more compact proof blocks,

@@ -104,7 +104,7 @@ other P1s remain separate.
 ### 3. Escalate repeated overruns to story review — P1
 
 **Status:** Installed 2026-09-06 in `problem-decomposition.mdc` Learning
-escalation, with entry points in `execute-plan` and `slice-plan-refinement`.
+escalation, with entry points in `execute-plan` and `dough-slice-plan-refinement`.
 Instruction replay: counted a 12- then 13-minute replacement as two attempts and
 sent unresolved scope to story review with parked proof kept (A); presented a
 demonstrated daily-only outcome and remaining archives at story review without
@@ -258,7 +258,7 @@ No database experiment or live effectiveness claim.
 **Goal:** Avoid implementation based on unproved storage behavior without charging
 routine migrations for generic research.
 
-**Scope:** `slice-planning` checks concrete unresolved storage assumptions, reuses
+**Scope:** `dough-slice-planning` checks concrete unresolved storage assumptions, reuses
 matching evidence, or requires isolated representative proof before affected work
 is ready. DDL covers the exact sequence and a later parent update; fixture proof
 covers actual transaction ownership/visibility. The existing PLAN records assumption,

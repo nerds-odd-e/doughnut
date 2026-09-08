@@ -11,5 +11,5 @@ for scope discipline, story-home ownership, refinement lifecycle, and cleanup.
 
 Use `dough-story-decomposition` when the parent problem or candidate selection
 is unresolved, `dough-story-refinement` for selected-story understanding,
-`slice-planning` for an executable PLAN, and `slice-plan-refinement` for complex
+`dough-slice-planning` for an executable PLAN, and `dough-slice-plan-refinement` for complex
 or overrun execution leaves.

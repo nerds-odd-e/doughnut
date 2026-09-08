@@ -20,7 +20,7 @@ Resolve each Candidate exactly once:
 | Option | When | Action |
 |--------|------|--------|
 | **Tag** | The cost is inherent and no cheaper test preserves its protection and user-value clarity. | Add `@skipOptimizationDueToKnownNecessarySlowness` to the narrowest slow Scenario, Outline, or Feature. |
-| **Plan** | A cheaper test can preserve the same protection and clarity. | Use **slice-planning** to add replacement/removal work to one `.planning/quick/NNN-slug/` plan. |
+| **Plan** | A cheaper test can preserve the same protection and clarity. | Use **dough-slice-planning** to add replacement/removal work to one `.planning/quick/NNN-slug/` plan. |
 | **Ask** | The choice requires a product, network, or value trade-off. | Ask the developer, then apply the choice. |
 
 Create zero or one replacement plan for the whole pass. Although tagging

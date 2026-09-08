@@ -25,7 +25,7 @@ the thread for process improvements and overlooked developer decisions.
 Read `.cursor/agent-map.md`, `.cursor/rules/problem-decomposition.mdc`, and
 `.cursor/rules/planning.mdc`. Read **post-change-refactor** in full and reuse its
 smell definitions against the aggregate execution diff; do not run its editing
-workflow. Read **slice-planning** before adding or updating planned work; apply
+workflow. Read **dough-slice-planning** before adding or updating planned work; apply
 its story and slice gates to both an in-place update and a new follow-up PLAN.
 
 The PLAN may have been removed by normal completed-plan cleanup. A partial
@@ -33,7 +33,7 @@ capability name, conversation context, old path, commit message, or distinct
 story phrase is enough; do not require the deleted file's exact name.
 
 The review is read-only except for amending the unfinished PLAN or creating a
-follow-up PLAN through **slice-planning**. Preserve existing working-tree changes
+follow-up PLAN through **dough-slice-planning**. Preserve existing working-tree changes
 when making those planning edits. Do not create a separate retrospective
 artifact unless the user asks. When the task assignment names two authorized
 reviews of the same seed or PLAN, one writer/reconciler incorporates both sets
@@ -144,11 +144,11 @@ correction of the original story. If none remain, leave planning unchanged.
 Keep every added or revised slice within the original story and apply the
 Behavior/Structure, proof, ordering, and sizing gates. If the findings require
 changing the story outcome or boundaries, or cannot form one bounded outcome,
-stop at slice-planning's input gate and report the required developer choice.
+stop at dough-slice-planning's input gate and report the required developer choice.
 Do not create a separate plan to bypass an unfinished plan's scope boundary.
 
 If findings remain, a non-writer returns read-only evidence. The writer applies
-**slice-planning** according to the reviewed plan's current completion state:
+**dough-slice-planning** according to the reviewed plan's current completion state:
 
 - **Unfinished PLAN:** edit that same file in place; create no new PLAN or
   directory. Preserve completed slices, their identifiers, statuses, proof, and
@@ -159,12 +159,12 @@ If findings remain, a non-writer returns read-only evidence. The writer applies
   and avoid duplicating work already covered by a remaining slice. Adjust
   remaining numbering and references as needed without renumbering completed
   slices. Record a brief learning citing the findings and reviewed commit set.
-- **Completed execution:** invoke **slice-planning** to write a new PLAN under
+- **Completed execution:** invoke **dough-slice-planning** to write a new PLAN under
   its normal `.planning/phases/` or `.planning/quick/` location. Cite the original
   story and reviewed commit set as its source.
 
 After writing or updating the PLAN, stop planning and report the result. Do not
-invoke **slice-plan-refinement** unless the developer separately requests it.
+invoke **dough-slice-plan-refinement** unless the developer separately requests it.
 Never invoke **execute-plan**, implement a slice, commit, or push. State whether
 the PLAN was updated in place or newly generated, and that the planned changes
 were not executed.
@@ -221,7 +221,7 @@ evidence.
   smells, and consequential improvements.
 - Superseded code and redundant or historical-only tests/docs received explicit
   scrutiny.
-- Meaningful unresolved repository findings passed slice-planning's gates and
+- Meaningful unresolved repository findings passed dough-slice-planning's gates and
   were incorporated into the unfinished PLAN in place, or into a new follow-up
   PLAN only for a completed execution. No findings means no planning changes.
 - In-place updates preserved completed slices, inserted new corrective slices
