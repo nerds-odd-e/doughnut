@@ -22,6 +22,7 @@ import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -90,6 +91,33 @@ class NotebookGitExistingNoteBatchPublicationControllerTest
               readBack, downloadedCommit.head(), "Research/Refined Note.md"),
           equalTo(PUBLISHED_CONTENT));
     }
+  }
+
+  @Test
+  void refusesTheCompleteBatchWhenOneEditedNoteIsInvalid() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note root = makeMe.aNote().notebook(notebook).title("First").content(ORIGINAL_CONTENT).please();
+    Folder folder = makeMe.aFolder().notebook(notebook).name("Research").please();
+    Note nested =
+        makeMe.aNote().folder(folder).title("Refined Note").content(ORIGINAL_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("First.md", PUBLISHED_CONTENT),
+                new NotebookGitProposalFile(
+                    "Research/Refined Note.md", "---\ncustom: value\n---\nChanged body.\n")));
+
+    assertProposalRejectedWithoutMutatingBinding(
+        notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
+
+    NoteRealm rootView = noteController.showNote(root);
+    assertThat(rootView.getId(), equalTo(root.getId()));
+    assertThat(rootView.getNote().getContent(), equalTo(ORIGINAL_CONTENT));
+    NoteRealm nestedView = noteController.showNote(nested);
+    assertThat(nestedView.getId(), equalTo(nested.getId()));
+    assertThat(nestedView.getNote().getContent(), equalTo(ORIGINAL_CONTENT));
   }
 
   private MemoryTracker learnedTracker(Note note, float difficulty) {

@@ -1,7 +1,7 @@
 # Publish a related batch of edits to existing notes
 
 Source: [SEED-009, Story 14](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-14), product backlog item 6.
-Status: in progress; slice 1 delivered.
+Status: in progress; slices 1–2 delivered.
 
 ## Goal and scope
 
@@ -71,21 +71,15 @@ commit is accepted and downloadable.
 
 ### 2. Refuse the complete batch when one edited note is invalid
 Type: Behavior
-Status: planned
-Proof: One controller invalid-input regression; backend verification below.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — pass.
+`refusesTheCompleteBatchWhenOneEditedNoteIsInvalid` publishes one valid root
+edit plus a nested note missing YAML `type`; neither note identity/content nor
+accepted head/bundle mutates.
 
 Behavior: A matching notebook receives one direct-child commit with a valid edit
 and an invalid Portable note → publish → neither edit is accepted; fresh reads
 show both original note contents/identities and unchanged accepted head/bundle.
-
-Reuse committed controller fixtures and existing validators (the Slice 1
-batch class is the nearest fixture home). This may be green without production
-changes; characterize the batch boundary without inventing new validation.
-Existing CLI submission rejection coverage owns unchanged local refs/status
-because transport does not depend on file count. The existing mixed
-late-failure rollback test remains the shared transaction-failure proof.
-Sizing hypothesis: about 5 minutes of fixture/assertion work and cleanup plus
-required backend run; no new failure-injection infrastructure.
 
 ### 3. Keep a stale local batch available after remote advancement
 Type: Behavior
@@ -145,10 +139,10 @@ existing receiver and multi-file helpers make this one cohesive proof loop.
 ## Learnings
 
 - No publisher, storage, or API change was needed for edits-only acceptance.
-- Slice 2 should keep characterizing invalid-content refusal without adding a
-  new tree-shape rule. The Slice 1 batch test class is the nearest fixture home.
-- Slices 3–4 still need no production change from this leaf.
+- Invalid-content refusal of an edits-only batch needed no production change;
+  existing typed-Markdown validation already rejects the whole proposal.
+- Slices 3–4 still need no production change from these leaves.
 
 ## Readiness
 
-Slice 1 delivered. Remaining slices 2–4 are ready; no open story question.
+Slice 2 delivered. Remaining slices 3–4 are ready; no open story question.
