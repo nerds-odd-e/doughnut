@@ -159,3 +159,58 @@ test('already recorded E2E database skips provisioning', async (t) => {
   assert.deepEqual(schemaCalls, [])
   assert.equal(spawn.calls.length, 1)
 })
+
+const presentInvalidDatabaseValues = [
+  ['null', null],
+  ['number', 42],
+  ['empty string', ''],
+  ['malformed name', 'invalid-name'],
+]
+
+const presentInvalidE2eShapes = [
+  ['null', null],
+  ['array', []],
+  ['string', 'not-an-object'],
+]
+
+async function assertStartRefusesWithoutSideEffects(checkoutRoot, config) {
+  writeIsolatedConfig(checkoutRoot, config)
+  const spawn = makeStartSpy()
+  const mysql = recordingMysql()
+  const claimRoot = `${checkoutRoot}/.doughnut-e2e-port-claims`
+  await assert.rejects(
+    runConfiguredStart(checkoutRoot, spawn, {
+      schemaExistsFn: () => false,
+      mysqlExecFn: mysql.mysqlExecFn,
+      portClaimRoot: claimRoot,
+    }),
+    /Missing or invalid/
+  )
+  assert.deepEqual(readIsolatedConfig(checkoutRoot), config)
+  assert.equal(mysql.calls.length, 0)
+  assert.equal(spawn.calls.length, 0)
+  assert.equal(existsSync(claimRoot), false)
+}
+
+for (const [label, database] of presentInvalidDatabaseValues) {
+  test(`present ${label} E2E database refuses before provisioning`, async (t) => {
+    const checkout = makePrimaryCheckout(t)
+    await assertStartRefusesWithoutSideEffects(checkout.root, {
+      id: 'wt_a7c2',
+      e2e: {
+        ...identityAndPortsConfig.e2e,
+        database,
+      },
+    })
+  })
+}
+
+for (const [label, e2e] of presentInvalidE2eShapes) {
+  test(`present ${label} e2e container refuses before provisioning`, async (t) => {
+    const checkout = makePrimaryCheckout(t)
+    await assertStartRefusesWithoutSideEffects(checkout.root, {
+      id: 'wt_a7c2',
+      e2e,
+    })
+  })
+}

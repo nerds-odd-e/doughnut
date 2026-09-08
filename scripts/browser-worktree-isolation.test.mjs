@@ -7,6 +7,7 @@ import {
   makePrimaryCheckout,
 } from './backend-test-worktree-linked-fixtures.mjs'
 import {
+  assertReadersRefuseIncompleteAllocation,
   incompleteAllocation,
   isolatedCypressSpec,
   makeRestartSpies,
@@ -16,10 +17,7 @@ import {
   withCiEnv,
 } from './browser-worktree-isolation-fixtures.mjs'
 import { loadIsolatedE2eStartAllocation } from './browser-worktree-isolation.mjs'
-import {
-  guardCypressNodeSetup,
-  SUPPORTED_ISOLATED_CYPRESS_SPEC,
-} from './isolated-cypress.mjs'
+import { guardCypressNodeSetup } from './isolated-cypress.mjs'
 import {
   completeIsolatedConfig,
   identityAndPortsConfig,
@@ -104,47 +102,34 @@ test('identity and ports without E2E database still refuse health, restart, and 
     loadIsolatedE2eStartAllocation(checkout.root).e2e,
     identityAndPortsConfig.e2e
   )
+  await assertReadersRefuseIncompleteAllocation(checkout.root)
+})
 
-  const healthLogs = []
-  const healthAccessed = []
-  await assert.rejects(
-    runHealth(checkout.root, healthLogs, healthAccessed),
-    incompleteAllocation
-  )
-  assert.equal(healthLogs.length, 0)
-  assert.equal(healthAccessed.length, 0)
-
-  const restart = makeRestartSpies()
-  await assert.rejects(
-    runSutRestart({
-      checkoutRoot: checkout.root,
-      execFileFn: restart.execFileFn,
-      spawnFn: restart.spawnFn,
-      log: () => undefined,
+test('present invalid E2E database refuses start, health, restart, and Cypress readers', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify({
+      id: 'wt_a7c2',
+      e2e: {
+        ...identityAndPortsConfig.e2e,
+        database: 'invalid-name',
+      },
     }),
-    incompleteAllocation
-  )
-  assert.equal(restart.lsofCalls.length, 0)
-  assert.equal(restart.spawnCalls.length, 0)
+  })
+  await assertReadersRefuseIncompleteAllocation(checkout.root, {
+    refuseStartAllocation: true,
+  })
+})
 
-  const hooks = { reset: false }
-  await assert.rejects(async () => {
-    await guardCypressNodeSetup(
-      checkout.root,
-      { specPattern: SUPPORTED_ISOLATED_CYPRESS_SPEC },
-      {
-        argv: [
-          'node',
-          'cypress',
-          'run',
-          '--spec',
-          SUPPORTED_ISOLATED_CYPRESS_SPEC,
-        ],
-      }
-    )
-    hooks.reset = true
-  }, incompleteAllocation)
-  assert.equal(hooks.reset, false)
+test('present invalid e2e container refuses start, health, restart, and Cypress readers', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify({
+      id: 'wt_a7c2',
+      e2e: null,
+    }),
+  })
+  await assertReadersRefuseIncompleteAllocation(checkout.root, {
+    refuseStartAllocation: true,
+  })
 })
 
 test('malformed isolation JSON refuses clearly before shared-state effects', async (t) => {

@@ -3,6 +3,7 @@ import { writeFileSync } from 'node:fs'
 import {
   isRecordedE2eDatabase,
   readPresentWorktreeLocalConfig,
+  refusePresentInvalidIsolatedE2eAllocation,
 } from './browser-worktree-isolation.mjs'
 import {
   assertValidWorktreeId,
@@ -80,6 +81,9 @@ export function ensureIsolatedE2eDatabase(
       )
     }
     assertValidWorktreeId(config.id)
+    refusePresentInvalidIsolatedE2eAllocation(checkoutRoot, config, {
+      start: true,
+    })
     if (isRecordedE2eDatabase(config.e2e?.database)) {
       return config
     }

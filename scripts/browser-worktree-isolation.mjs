@@ -75,6 +75,10 @@ export function isRecordedE2eDatabase(database) {
   return typeof database === 'string' && /^[A-Za-z0-9_]+$/.test(database)
 }
 
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
 function allocationError(checkoutRoot, missing, { start } = {}) {
   if (start) {
     return new Error(
@@ -89,6 +93,29 @@ function allocationError(checkoutRoot, missing, { start } = {}) {
     )} (id, ${E2E_ALLOCATION_FIELDS.join(', ')}). ` +
       `Missing or invalid: ${missing.join(', ')}. See docs/worktree-browser-tests.md.`
   )
+}
+
+function collectPresentInvalidE2eFields(config) {
+  if (!Object.hasOwn(config, 'e2e')) return []
+  if (!isPlainObject(config.e2e)) return ['e2e']
+  if (
+    Object.hasOwn(config.e2e, 'database') &&
+    !isRecordedE2eDatabase(config.e2e.database)
+  ) {
+    return ['e2e.database']
+  }
+  return []
+}
+
+export function refusePresentInvalidIsolatedE2eAllocation(
+  checkoutRoot,
+  config,
+  errorOpts
+) {
+  const missing = collectPresentInvalidE2eFields(config)
+  if (missing.length > 0) {
+    throw allocationError(checkoutRoot, missing, errorOpts)
+  }
 }
 
 function readRequiredWorktreeConfig(
@@ -111,6 +138,9 @@ export function loadIsolatedE2eStartAllocation(checkoutRoot) {
     ['identity (.worktree.local.json)'],
     { start: true }
   )
+  refusePresentInvalidIsolatedE2eAllocation(checkoutRoot, config, {
+    start: true,
+  })
   refusePartialIsolatedE2ePorts(checkoutRoot, config.e2e)
   return config
 }
@@ -120,6 +150,7 @@ export function loadCompleteIsolatedE2eAllocation(checkoutRoot) {
     'identity (.worktree.local.json)',
     ...E2E_ALLOCATION_FIELDS,
   ])
+  refusePresentInvalidIsolatedE2eAllocation(checkoutRoot, config)
   const missing = []
   if (!isRecordedE2eDatabase(config.e2e?.database)) {
     missing.push('e2e.database')

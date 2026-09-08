@@ -140,21 +140,14 @@ allocation leases; health-wait still refuses unhealthy.
 ### 4. Refuse present invalid database allocation
 
 Type: Behavior
-Status: planned
+Status: done
 Behavior: The saved `e2e` container or database value is present but invalid →
 ordinary SUT start → visible refusal before provisioning or configuration changes.
-Proof: Extend `sut-isolated-e2e-database.test.mjs` through `runSutStart` with null,
-wrongly typed, empty, and malformed database values, plus invalid `e2e` shapes.
-Observe unchanged config and no MySQL, port-claim, or launch side effects.
-Use temporary config/claim directories and the existing fake external MySQL
-boundary. Retain absent-field first use, valid reuse, and recorded-missing-DB
-refusal. Shared allocation-reader cases verify invalid values also refuse in
-health/restart/Cypress without requiring application launch.
-Focused command:
+Proof: null/wrong-type/empty/malformed database and invalid `e2e` shapes refuse
+with unchanged config and no MySQL/claims/spawn; readers refuse without launch;
+absent-field first use and valid reuse retained.
 `CURSOR_DEV=true nix develop -c node --test scripts/sut-isolated-e2e-database.test.mjs scripts/browser-worktree-isolation.test.mjs`
-Scope: Presence validation at the shared pre-provisioning boundary; no name
-policy change, repair, or storage experiment.
-Sizing: about 5 minutes, medium confidence; one early validation/refusal path.
+(pass).
 
 ### 5. Refuse present invalid application-port allocation
 
