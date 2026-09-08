@@ -225,9 +225,11 @@ with `pnpm worktree:retire` — see
   above.
 - No automatic cleanup or orphan removal: a provisioned database (and an
   unreferenced one left behind by a failed or interrupted first use) persists
-  until reclaimed explicitly with `pnpm worktree:retire` (unit-only today; use
-  `--check` to inspect). There is no machine-wide allocation registry and no
-  recovery from duplicate operator-supplied IDs.
+  until reclaimed explicitly with `pnpm worktree:retire` (unit-test and recorded
+  E2E targets; use `--check` to inspect — see
+  [`docs/worktree-retire-databases.md`](worktree-retire-databases.md)). There is
+  no machine-wide allocation registry and no recovery from duplicate
+  operator-supplied IDs.
 - Conflicting `SPRING_DATASOURCE_URL` / `DB_URL` / `SPRING_FLYWAY_URL`, or a
   conflicting Gradle `-Dspring.datasource.url=` / `-Dspring.flyway.url=`,
   refuse before launch. Matching URLs remain valid.

@@ -2,7 +2,7 @@
 
 Source: [SEED-015 story 6a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-6a),
 a bounded correction of delivered story 6 / quick/075.
-Status: in progress; slice 1 done.
+Status: done; all slices complete.
 
 ## Goal and scope
 
@@ -103,18 +103,10 @@ stays eligible.
 
 ### 3. Describe the delivered database reclamation scope consistently
 Type: Behavior
-Status: planned
-Proof: Read the backend guide's retirement link and Limits paragraph alongside
-the canonical retirement guide: both describe unit-test and recorded E2E
-reclamation; no “unit-only today” limitation remains.
+Status: done
+Proof: Backend guide Limits and the retirement guide both describe unit-test
+and recorded E2E reclamation; no “unit-only today” limitation remains.
 
 Behavior: Developer consults backend isolation limits before removing a
 checkout → follows retirement guidance → understands that recorded E2E
 databases are supported too.
-
-Replace the obsolete qualifier in `docs/worktree-backend-tests.md` with the
-current scope or a concise link to the canonical guide. No new guide or runtime
-behavior. This leaf owns finding 3; documentation inspection is sufficient.
-Sizing: ~2 minutes, high confidence; one obsolete scope statement.
-
-Ready for direct execution; no implementation, commit, or push.
