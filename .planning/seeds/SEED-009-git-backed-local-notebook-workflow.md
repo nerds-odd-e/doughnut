@@ -363,7 +363,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 ### 17. Keep a local note edit when a web-created note is then saved
 
-**Status:** queued.
+**Status:** refined; planned in [quick/065](../quick/065-local-edit-over-web-creation-save/PLAN.md).
 
 - **Goal:** An owner with one committed local content refinement wants to
   receive a note they captured on the web and immediately continued writing
@@ -388,6 +388,14 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   remote commits, accompanying edits to other notes, new folders, collisions,
   moves, deletes, README changes, or drift repair. Do not broaden to two
   independent additions.
+- **Boundary assumptions:** The bound checkout is on clean `main`; the local
+  commit is single-parent and edits exactly one ordinary note at an unchanged
+  path. Both remote commits are single-parent: creation directly follows the
+  shared base, and the save directly follows creation. The save changes only
+  the new note's body/frontmatter at its unchanged path. A no-op web save that
+  creates no commit remains the delivered one-addition case. Existing
+  content-only pull behavior stays supported. No new command, UI, storage,
+  metadata, or conflict policy is needed.
 - **Key examples:** A local edit of A waits while the web creates B and saves
   B once → pull retains A and receives B's saved bytes at root or an existing
   represented folder → explicit publish updates A and retains both identities
@@ -396,6 +404,13 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
   divergent receipt of a local batch is not. Keep this story to one local note.
   A two-note local batch or a third remote commit must refuse without changing
   local head/files or accepted history. Pull itself must never publish.
+- **Boundary examples:** Creation of B followed by an edit to C, a second
+  addition, or two saves of B is refused with local work intact. Creation and
+  one save of B beneath an already represented folder is supported just as at
+  root. Dirty checkouts and multiple unpublished commits retain their current
+  refusal behavior.
+- **Open questions:** None for this bounded story. Broader interval support
+  remains excluded; Story 18 keeps its separate local-batch outcome.
 
 <a id="story-18"></a>
 
