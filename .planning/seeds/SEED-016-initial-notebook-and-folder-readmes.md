@@ -1,6 +1,6 @@
 ---
 id: SEED-016
-status: active
+status: completed
 planted: 2026-09-09
 planted_during: README-only folder publication verification
 trigger_when: selected now as the top product-backlog story
@@ -50,8 +50,7 @@ expand this into bulk import and is explicitly deferred.
 
 ### 2. Publish one initial note inside the new README-backed folder
 
-**Status:** Planned in
-[quick/081](../quick/081-initial-folder-with-one-note/PLAN.md); not executed.
+**Status:** delivered. Recover quick/081 from its merge onto main.
 
 - **Goal:** A notebook owner can publish the smallest useful initial notebook
   that contains knowledge: the notebook Readme, one new root Folder with its
@@ -67,11 +66,6 @@ expand this into bulk import and is explicitly deferred.
   path, root notes, more notes or folders, nested folders, existing notebook
   content (including empty folders), relationships, attachments, multiple
   unpublished commits, stale/divergent history, and bulk import.
-- **Key example:** Empty accepted notebook → commit exactly the three paths →
-  Donut shows `First note` inside `New Folder`, preserves all three authored
-  contents, and accepted/downloaded Git equals the authored commit.
-- **Boundary example:** A second ordinary note remains an unsupported tree
-  shape.
 
 ## Ordering and Scope Reduction
 
@@ -86,8 +80,8 @@ None.
 
 ## When to Surface
 
-Story 1 is delivered. Story 2 is selected for slice planning; planning does not
-authorize execution.
+Story 1 and Story 2 are delivered. Stop after this three-path case;
+additional content and bulk initial import remain separate problems.
 
 ## Breadcrumbs
 
