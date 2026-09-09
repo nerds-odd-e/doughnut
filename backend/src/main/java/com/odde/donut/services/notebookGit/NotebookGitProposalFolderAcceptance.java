@@ -1,6 +1,5 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -11,7 +10,6 @@ import com.odde.donut.services.FolderConstructionService;
 import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
-import com.odde.donut.validators.AuthoredNoteContent;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.sql.Timestamp;
@@ -65,7 +63,7 @@ class NotebookGitProposalFolderAcceptance {
     projection.requireMatchingAcceptedTree(
         state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
 
-    String readme = requireReadmeBlob(proposal, readmePath);
+    String readme = NotebookGitProposalTypedPath.requireReadme(proposal, readmePath);
     createRootFolderWithReadme(state.notebook(), readmePath, readme);
 
     projection.requireMatchingAcceptedTree(
@@ -99,6 +97,7 @@ class NotebookGitProposalFolderAcceptance {
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndNoteCreation creation) {
+    NotebookGitProposalTypedPath.requireOrdinaryNote(proposal, creation.notePath());
     List<ExportFolderRow> folders =
         createInitialNotebookAndRootFolder(
             state,
@@ -134,8 +133,9 @@ class NotebookGitProposalFolderAcceptance {
           HttpStatus.BAD_REQUEST, "Initial notebook and folder Readmes require an empty notebook.");
     }
 
-    String notebookReadme = requireReadmeBlob(proposal, notebookReadmePath);
-    String folderReadme = requireReadmeBlob(proposal, folderReadmePath);
+    String notebookReadme =
+        NotebookGitProposalTypedPath.requireReadme(proposal, notebookReadmePath);
+    String folderReadme = NotebookGitProposalTypedPath.requireReadme(proposal, folderReadmePath);
     state.notebook().setReadmeContent(notebookReadme);
     entityPersister.save(state.notebook());
     createRootFolderWithReadme(state.notebook(), folderReadmePath, folderReadme);
@@ -149,24 +149,6 @@ class NotebookGitProposalFolderAcceptance {
     folder.setReadmeContent(readme);
     entityPersister.save(folder);
     entityPersister.flush();
-  }
-
-  private static String requireReadmeBlob(
-      NotebookGitProposalImporter.ImportedProposal proposal, String readmePath) {
-    String readme =
-        NotebookGitProposalBlobText.readUtf8(
-            proposal.repository(), proposal.mainHead(), readmePath);
-    AuthoredNoteContent.assertValidForSave(readme);
-    String type =
-        NoteLeadingFrontmatter.split(readme)
-            .flatMap(split -> split.frontmatter().getString("type"))
-            .orElseThrow();
-    if (!"Readme".equals(type)) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST,
-          "Invalid Markdown: path \"" + readmePath + "\" must have type: Readme");
-    }
-    return readme;
   }
 
   String accept(
