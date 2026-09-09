@@ -16,6 +16,7 @@ overrides:
   brace-expansion: '>=5.0.5'
   browserslist: '>=4.28.7'
   canvas: '>=3.2.3'
+  csv-parse: '>=7.0.2'
   defu: '>=6.1.5'
   diff: '>=8.0.3'
   dompurify: '>=3.4.0'
@@ -2736,8 +2737,8 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
-  csv-parse@5.6.0:
-    resolution: {integrity: sha512-l3nz3euub2QMg5ouu5U09Ew9Wf6/wQ8I++ch1loQ0ljmzhmfZYrH9fflS22i/PQEvsPvxCwxgz5q7UB8K1JO4Q==}
+  csv-parse@7.0.2:
+    resolution: {integrity: sha512-uKZghv9UmPkMVLYy//KZ9HFAIJsl7wkhoEdIL0+rhuSY9pZQlhaeGEDPIe+/w7eh81MOql8Q/9+inAGWG6ZHYA==}
 
   cypress-file-upload@5.0.8:
     resolution: {integrity: sha512-+8VzNabRk3zG6x8f8BWArF/xA/W0VK4IZNx3MV0jFWrJS/qKn8eHfa5nU73P9fOQAgwHFJx7zjg4lwOnljMO8g==}
@@ -7022,7 +7023,7 @@ snapshots:
     dependencies:
       '@xmldom/xmldom': 0.9.12
       cors: 2.8.5
-      csv-parse: 5.6.0
+      csv-parse: 7.0.2
       ejs: 6.0.1
       errorhandler: 1.5.1
       escape-html: 1.0.3
@@ -8560,7 +8561,7 @@ snapshots:
 
   csstype@3.2.3: {}
 
-  csv-parse@5.6.0: {}
+  csv-parse@7.0.2: {}
 
   cypress-file-upload@5.0.8(cypress@16.0.0):
     dependencies:
