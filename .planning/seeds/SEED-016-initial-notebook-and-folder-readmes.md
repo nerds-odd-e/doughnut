@@ -1,6 +1,6 @@
 ---
 id: SEED-016
-status: completed
+status: active
 planted: 2026-09-09
 planted_during: README-only folder publication verification
 trigger_when: selected now as the top product-backlog story
@@ -68,12 +68,29 @@ ordinary-Note third-path eligibility via quick/082.
   content (including empty folders), relationships, attachments, multiple
   unpublished commits, stale/divergent history, and bulk import.
 
+<a id="story-3"></a>
+
+### 3. Publish the initial notebook README by itself
+
+**Status:** planned in quick/083.
+
+- **Goal:** A notebook owner can publish the smallest currently unsupported
+  local tree: the notebook's root Readme as the first and only file.
+- **Scope:** The notebook has no folders or live notes and its accepted
+  Portable tree is empty. Exactly one direct-child commit adds regular-file
+  `README.md` containing valid, nonblank `type: Readme` Markdown. Publication
+  stores that authored notebook Readme and accepts the exact commit atomically.
+  Excluded: every second path, folders, ordinary notes, existing notebook
+  content, README edits, blank Readmes, attachments, multiple unpublished
+  commits, stale/divergent history, and bulk import.
+
 ## Ordering and Scope Reduction
 
 Story 1 was the smallest verified follow-up to the local README-only folder
 workflow. Story 2 adds exactly one ordinary Note to that delivered initial
-tree. Stop after this three-path case; additional content and bulk initial
-import remain separate problems.
+tree. Story 3 isolates the smaller unsupported one-file boundary discovered
+after those stories: adding only the initial notebook Readme. Additional
+content and bulk initial import remain separate problems.
 
 ## Open Decisions
 
@@ -81,8 +98,8 @@ None.
 
 ## When to Surface
 
-Story 1 and Story 2 are delivered. Stop after this three-path case;
-additional content and bulk initial import remain separate problems.
+Story 1 and Story 2 are delivered. Story 3 is selected for execution planning.
+Additional content and bulk initial import remain separate problems.
 
 ## Breadcrumbs
 
