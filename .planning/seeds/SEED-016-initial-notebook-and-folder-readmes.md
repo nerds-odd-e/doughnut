@@ -88,7 +88,7 @@ ordinary-Note third-path eligibility via quick/082.
 
 ### 4. Publish a minimal initial container with one note
 
-**Status:** planned in quick/085.
+**Status:** delivered. Recover quick/085 from its merge onto main.
 
 - **Goal:** A notebook owner can publish either smallest two-file initial
   container-and-note tree without splitting the authored commit, while a
@@ -109,12 +109,6 @@ ordinary-Note third-path eligibility via quick/082.
   their deliberate outcomes. Excluded: accepting any third path, nested
   folders, relationships, attachments, existing notebook content or README
   edits, multiple unpublished commits, and bulk import.
-- **Key examples:** Empty accepted tree + `README.md` + `First note.md` stores
-  the notebook Readme and root Note. Empty accepted tree + `New
-  Folder/README.md` + `New Folder/First note.md` creates that Folder and Note
-  while leaving the notebook Readme absent. Adding `README.md` plus two root
-  Notes is still unimplemented and surfaces as an uncaught failure without
-  advancing the binding.
 
 ## Ordering and Scope Reduction
 
@@ -131,8 +125,8 @@ None.
 
 ## When to Surface
 
-Stories 1–3 are delivered. Story 4 is selected for execution planning.
-Additional content and bulk initial import remain separate problems.
+Stories 1–4 are delivered. Additional content and bulk initial import remain
+separate problems.
 
 ## Breadcrumbs
 
