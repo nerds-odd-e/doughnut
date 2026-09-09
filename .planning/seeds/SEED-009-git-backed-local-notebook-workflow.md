@@ -432,8 +432,7 @@ correction delivered as Story 10a.
 
 ### 19. Create a README-only folder locally
 
-**Status:** Planned in
-[quick/078](../quick/078-create-readme-only-folder/PLAN.md); not executed.
+**Status:** delivered. Recover quick/078 from `76b092ceaf`.
 
 - **Goal:** A notebook owner can create a folder with README content in a local
   checkout and publish it to the same Donut notebook even when the folder
@@ -445,19 +444,6 @@ correction delivered as Story 10a.
   to infer the folder. Nested placement, multiple new folders, accompanying
   note or content changes, README edits to existing containers, bulk import,
   stale/divergent history, and multiple unpublished commits remain excluded.
-- **Key example:** Given a clean bound checkout whose accepted tree already
-  matches Donut, the owner adds and commits `New Folder/README.md` with valid
-  Readme content, then publishes → Donut shows `New Folder` with that content
-  and accepted `main` advances to the authored commit.
-- **Boundary example:** The owner creates a filesystem directory with no
-  tracked file → Git has no folder change to publish, so this story does not
-  promise creation of a truly empty directory.
-- **Effort hypothesis:** M — medium confidence; the exact one-folder,
-  README-only shape avoids note identity matching and broader tree import.
-- **Depends on:** Delivered clone and direct-child publication plus the
-  existing Portable README convention; no new product prerequisite.
-- **Safe stopping point:** README-only local folder creation works atomically
-  while broader local tree creation remains explicitly refused.
 
 ## Ordering and Scope Reduction
 
@@ -466,9 +452,8 @@ SEED-015 worktree queue (reclaim, then CLI and MCP) ahead of further SEED-009
 selection; this reassessment does not displace that direction.
 
 Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, **15**,
-**10**, and **10a** are delivered. **19** is queued after the worktree-isolation
-stories because it directly unblocks an observed owner workflow but does not
-displace the current near-future direction.
+**10**, **10a**, and **19** are delivered. Remaining SEED-009 work follows the
+product backlog after worktree priorities.
 
 First-to-drop order among remaining unselected items follows the backlog.
 Delivered batch publication and batch reconciliation across one disjoint web
@@ -506,9 +491,9 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Stories 10 and 10a are delivered. Story 19 is queued after the current
-worktree-isolation backlog and is planned but not executed. Queue selection and
-planning do not authorize implementation.
+Stories 10, 10a, and 19 are delivered. Remaining SEED-009 stories stay
+non-executable until selected from the product backlog; queue selection does
+not authorize implementation.
 
 ## Breadcrumbs
 
