@@ -131,8 +131,8 @@ public class NotebookGitProposalPublisher {
         initialNotebookReadme =
             NotebookGitProposalFolderCreationShape.findInitialNotebookReadmeCreation(files);
     if (initialNotebookReadme.isPresent()) {
-      throw NotebookGitProposalTreeShape.unsupportedTreeShape(
-          "sole initial notebook README is not yet accepted");
+      return folderAcceptance.acceptInitialNotebookReadme(
+          state, proposal, acceptedHead, initialNotebookReadme.get());
     }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);

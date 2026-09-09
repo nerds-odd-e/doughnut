@@ -1,6 +1,6 @@
 ---
 id: SEED-016
-status: active
+status: delivered
 planted: 2026-09-09
 planted_during: README-only folder publication verification
 trigger_when: selected now as the top product-backlog story
@@ -72,7 +72,7 @@ ordinary-Note third-path eligibility via quick/082.
 
 ### 3. Publish the initial notebook README by itself
 
-**Status:** planned in quick/083.
+**Status:** delivered. Recover quick/083 from its merge onto main.
 
 - **Goal:** A notebook owner can publish the smallest currently unsupported
   local tree: the notebook's root Readme as the first and only file.
@@ -98,8 +98,8 @@ None.
 
 ## When to Surface
 
-Story 1 and Story 2 are delivered. Story 3 is selected for execution planning.
-Additional content and bulk initial import remain separate problems.
+Stories 1–3 are delivered. Additional content and bulk initial import remain
+separate problems.
 
 ## Breadcrumbs
 

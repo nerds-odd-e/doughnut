@@ -134,25 +134,6 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   }
 
   @Test
-  void recognizesSoleAddedRootReadmeThenRefusesUntilAcceptanceExists() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] bundleBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\ninitial notebook readme")));
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString("Unsupported tree shape"));
-    assertThat(exception.getReason(), containsString("sole initial notebook README"));
-  }
-
-  @Test
   void doesNotRecognizeAcceptedRootReadmeChangeAsSoleInitialNotebookReadme() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding =
