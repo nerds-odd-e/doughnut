@@ -37,7 +37,7 @@ Read the user's instructions and repository guidance to identify:
 - The canonical backlog path, only when queueing or reprioritizing is requested.
 - The execution-planning workflow, only when that handoff is requested.
 
-Resolve project paths from the client project, not this skill's location.
+Resolve project paths from this project, not this skill's location.
 If context or a linked dependency needed for the current action is unavailable,
 name it, ask only for the missing information, and stop the affected activity
 before writing.

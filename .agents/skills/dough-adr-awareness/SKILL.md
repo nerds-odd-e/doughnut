@@ -1,19 +1,19 @@
 ---
 name: dough-adr-awareness
 description: >-
-  Use and cite a client project's current Accepted Architectural Decision Records
+  Use and cite this project's current Accepted Architectural Decision Records
   for architecture-shaped work, follow supersession, surface conflicts instead
   of silently drifting, and preserve human ownership of decisions and
   exceptions. Use when a task mentions ADRs or architectural constraints, may
-  reverse an existing decision, or crosses architecture areas defined by the client project.
+  reverse an existing decision, or crosses architecture areas defined by this project.
 ---
 
 # ADR awareness
 
-Keep architecture-shaped work consistent with the client project's current
+Keep architecture-shaped work consistent with this project's current
 Accepted ADRs without taking decision authority from humans.
 
-## Required client project context
+## Required project context
 
 Resolve the following context from the repository's own guidance as needed for
 the current request; ask the human only for a missing value that affects it:
@@ -48,7 +48,7 @@ dependent work as described below.
 
 Apply this skill when the human explicitly asks to check, cite, contradict,
 supersede, or otherwise work with ADRs. Also apply it to architecture-shaped
-work according to the client project's definition, typically cross-cutting choices
+work according to this project's definition, typically cross-cutting choices
 about technology stacks, persistence, API contracts, authentication, packaging,
 repository layout, or shared conventions.
 
@@ -60,15 +60,15 @@ Proposal drafting is allowed only when the human explicitly asks for draft help.
 
 ### 1. Load and classify the current records
 
-Read the client project's ADR index or catalog explicitly, even if it is outside the
-host tool's default file index. Enumerate records classified as Accepted by the
-client project's authoritative status fields.
+Read this project's ADR index or catalog explicitly, even if it is outside the
+host tool's default file index. Enumerate records classified as Accepted by
+this project's authoritative status fields.
 
-Use the client project's authority rule when metadata disagrees. A filename is
+Use this project's authority rule when metadata disagrees. A filename is
 not sufficient authority on its own: when the authoritative index and in-file
 status agree, a conflicting filename convention is a hygiene mismatch to
 surface, not a reason to reclassify the record. When authoritative signals
-conflict and the client project's rule does not resolve them, report the ambiguity and
+conflict and this project's rule does not resolve them, report the ambiguity and
 stop work that depends on the record's status until a human resolves it.
 
 Treat Proposed records as non-binding drafts. Treat Rejected and Superseded
@@ -83,7 +83,7 @@ unavailable decision.
 
 ### 2. Select only relevant decisions
 
-Use the task, expected touched areas, and the client project's architecture scope to
+Use the task, expected touched areas, and this project's architecture scope to
 select records that might constrain the work. Inspect titles, status, scope, and
 supersession metadata first. Read the full Decision and Consequences only for
 plausibly relevant records. Ignore Proposed records unless the human is actively
@@ -113,7 +113,7 @@ ADR:
    human-owned update or supersession process, or explicitly own an exception
    for this context; and
 4. continue with a deviation only after explicit human approval, then record
-   the ADR and exception in the client project's durable trail.
+   the ADR and exception in this project's durable trail.
 
 Disagreement with a decision is not permission to ignore it. If the responsible
 human is unavailable, leave the conflict unresolved and do not proceed along the
@@ -122,7 +122,7 @@ conflicting path.
 ### 5. Help with mechanical hygiene only after direction
 
 After a human has made a status or supersession decision, help align the index,
-in-file status, filename, and supersession links with the client project's conventions.
+in-file status, filename, and supersession links with this project's conventions.
 Do not change an ADR to Accepted, Rejected, or Superseded without clear human
 direction, and do not rewrite superseded history.
 
@@ -138,8 +138,8 @@ unavailable rather than inventing a process or format.
   superseding, and approving exceptions.
 - This skill consumes, cites, conflict-checks, and performs directed mechanical
   maintenance; it creates no new approval gate or architecture authority.
-- Client project-specific paths, status rules, architecture scope, and workflow
-  precedence remain client project context, not defaults supplied by this skill.
+- Project-specific paths, status rules, architecture scope, and workflow
+  precedence remain project context, not defaults supplied by this skill.
 - Never copy another project's ADR decisions, domain terminology, credentials,
   secrets, personal data, or machine-specific paths into output.
 

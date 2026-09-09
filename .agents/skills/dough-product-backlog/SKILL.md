@@ -57,7 +57,7 @@ done entries as described below.
   documents; do not duplicate story details or list the same story twice.
 - Preserve stable anchors when renaming or moving stories. Update incoming links.
 - Add only stories with a named beneficiary and evaluable outcome. If either
-  is unresolved, use the client project's decomposition workflow. Route selected-story
+  is unresolved, use this project's decomposition workflow. Route selected-story
   detail to refinement, then slice planning. Carry the direction into these
   workflows as the primary input for scope decisions.
 - Place unfinished prerequisites before dependent stories. If this conflicts

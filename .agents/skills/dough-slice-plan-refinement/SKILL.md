@@ -14,7 +14,7 @@ implement product code, or change the selected story outcome.
 
 ## Require a refinable plan
 
-Require an existing executable plan and the client project context required by
+Require an existing executable plan and this project's context required by
 [dough-slice-planning](../dough-slice-planning/SKILL.md), especially its target,
 hard limit, exceptions, overrun policy, and plan lifecycle.
 
@@ -27,8 +27,9 @@ hard limit, exceptions, overrun policy, and plan lifecycle.
 - If the parent problem, candidate selection, or sibling ordering must change,
   use [dough-story-decomposition](../dough-story-decomposition/SKILL.md).
 - If all remaining slices are already cohesive, single-proof-loop,
-  target-sized, and free of unexplained hard-limit paths, execute directly;
-  refinement is optional.
+  target-sized, and free of unexplained hard-limit paths, report
+  `ready for direct execution`; no further refinement is required. Execution
+  still requires separate authorization from the invoking workflow.
 
 ## Refine the plan
 

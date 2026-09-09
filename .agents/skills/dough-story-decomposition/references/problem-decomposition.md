@@ -145,7 +145,7 @@ boundary.
 
 ## Size and escalate slices
 
-Use the client project's slice target, hard limit, exceptions, and
+Use this project's slice target, hard limit, exceptions, and
 repeated-overrun threshold. Include implementation, focused verification, and
 slice-local cleanup in the sizing hypothesis. Resolve missing limits before
 claiming that a plan is ready for direct execution.

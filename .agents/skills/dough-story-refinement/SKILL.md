@@ -27,7 +27,7 @@ project's planning workflow and continue without repeating answered questions.
 
 ## Resolve required context
 
-Identify the client project root, selected story links and seeds,
+Identify this project's root, selected story links and seeds,
 and relevant prior decisions. When a seed is missing, resolve the canonical
 seed directory, ID and filename conventions, required metadata, and stable
 story-anchor convention. Resolve project paths from that repository, not this

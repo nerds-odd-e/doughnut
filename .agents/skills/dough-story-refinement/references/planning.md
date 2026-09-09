@@ -60,7 +60,7 @@ planning-only numbering out of product code, tests, and permanent documentation.
 
 ## Write an executable plan
 
-Resolve the client project's executable-plan location, format additions,
+Resolve this project's executable-plan location, format additions,
 status vocabulary, and lifecycle. Do not infer a deprecated location or create a
 second plan for the same work.
 
@@ -76,7 +76,7 @@ Keep only information needed for execution, proof, review, or resume:
 5. **Current decisions** — only choices constraining remaining work.
 6. **Learnings** — only discoveries changing assumptions or remaining slices.
 
-Use the client project's equivalent slice format when supplied; otherwise use:
+Use this project's equivalent slice format when supplied; otherwise use:
 
 ```markdown
 ### N. Capability outcome
@@ -115,7 +115,7 @@ Choose proof at the stable boundary of the promise:
 | Interim behavior | Name the later slice that removes or replaces it |
 
 Run focused relevant checks at slice boundaries. Require broader suites only when
-the client project's workflow or user requires them. When asynchronous ownership
+this project's workflow or user requires them. When asynchronous ownership
 changes, prove that the named lifecycle owner observes background failure in
 time and performs applicable cleanup after failure or shutdown; an awaited
 exception alone proves neither. Derive timing from the selected lifecycle
@@ -145,5 +145,5 @@ completion status, and unfinished siblings. Retain still-needed detail until
 the enduring knowledge has a home.
 
 When the executable plan completes, remove spent diary and obsolete summary
-detail according to the client project's lifecycle. Preserve unfinished scope and any
+detail according to this project's lifecycle. Preserve unfinished scope and any
 evidence still needed for resume or review.

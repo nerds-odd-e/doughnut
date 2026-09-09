@@ -25,7 +25,7 @@ turn a decomposition seed directly into an execution plan.
 
 ## Resolve execution context
 
-Before writing, identify from the user's instructions and client project:
+Before writing, identify from the user's instructions and this project's guidance:
 
 - the selected story and its seed, when one exists;
 - the executable-plan path, format additions, status vocabulary, and lifecycle;
@@ -35,7 +35,7 @@ Before writing, identify from the user's instructions and client project:
 - relevant code, tests, stack rules, and Accepted ADRs; and
 - any phase or quick-task conventions that own the plan.
 
-Resolve these from the client project, not this skill's location. If the
+Resolve these from this project, not this skill's location. If the
 plan destination or slice budget is unavailable, name the missing
 context and stop before writing or claiming sizing readiness. Do not create a
 new plan under a deprecated or merely inferred location.
@@ -63,7 +63,7 @@ broad implementation. Keep experiments off shared and production systems.
 Use [dough-slice-plan-refinement](../dough-slice-plan-refinement/SKILL.md) only
 when the reference's refinement conditions apply:
 
-- If all slices are cohesive, have one proof loop, meet the client project's target,
+- If all slices are cohesive, have one proof loop, meet this project's target,
   and have no unexplained hard-limit path, report `ready for direct execution`.
 - If any trigger remains, report
   `refinement recommended: <affected slices>`. Do not claim an execution-time
