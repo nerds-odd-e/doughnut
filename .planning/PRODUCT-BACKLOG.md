@@ -28,6 +28,7 @@ changes.
 
 ## Recently done
 
+- [Publish the next small initial Readme-and-Note trees](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5) — SEED-016
 - [Publish a minimal initial container with one note](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-4) — SEED-016
 - [Publish the initial notebook README by itself](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-3) — SEED-016
 - [Publish one initial note inside the new README-backed folder](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-2) — SEED-016

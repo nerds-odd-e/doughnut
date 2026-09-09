@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: planned.
+Status: done. All nine slices delivered.
 
 ## Goal and scope
 
@@ -72,110 +72,65 @@ deliberate client outcome. No CLI or API contract changes are included.
 
 ### 1. Recognize one Note in one implied root Folder
 Type: Structure
-Status: planned
+Status: done
 
-Internal change: Extend the current initial-composition seam only far enough to
-represent the exact added `New Folder/First note.md` layout as one ordinary
-Note path plus its one implied root Folder, while preserving every current
-publish/refusal outcome. Do not yet model nested paths, multiple Folders, or
-multiple Notes. This immediately enables Slice 2; later Structure slices extend
-the same representation only when their next Behavior requires it.
-
-Proof: The complete backend unit-test suite remains green, including every
-existing initial publication shape, malformed/wrong-type rejection, and loud
-valid-unmatched behavior. No production class newly exceeds 250 lines.
+Learning: `OneNoteInImpliedRootFolder` on `NotebookGitProposalInitialComposition`
+describes the single-depth layout; publisher consults it before ValidUnmatched
+without accepting yet. Direct-child Note helpers live on
+`NotebookGitProposalFolderCreationShape` (package-visible) to avoid duplication.
 
 ### 2. Publish one Note in an implied root Folder
 Type: Behavior
-Status: planned
+Status: done
 
-Behavior: Given an empty accepted notebook, when the exact proposed tree is one
-valid `New Folder/First note.md`, publication creates `New Folder` with no
-Readme, stores `First note` inside it with authored bytes, and accepts the exact
-head and tree atomically.
-
-Proof: A controller test observes the Folder hierarchy and absent Readme, Note
-title/content/destination, and downloaded head/tree equality. Existing typed
-Markdown and publication-atomicity tests retain invalid-input and rollback
-ownership. Run the complete backend unit-test suite.
+Learning: `NotebookGitProposalInitialCompositionPublication` accepts the
+layout; `NotebookGitProposalFolderMaterialization` owns validated root Folder
+create (with/without Readme) shared with FolderAcceptance. Controller proof:
+`NotebookGitProposalInitialImpliedRootFolderNoteControllerTest`.
 
 ### 3. Materialize a bounded initial Folder hierarchy
 Type: Structure
-Status: planned
+Status: done
 
-Internal change: Extend the initial-composition representation from one implied
-root Folder to the exact `Parent/Child/README.md` hierarchy, and extract or
-introduce one materializer that creates those validated Folder prefixes
-parent-first, attaches the authored Readme to the child, and returns refreshed
-projection rows. Preserve delivered root-Folder and Slice 2 behavior. This
-immediately enables Slice 4 without yet admitting arbitrary depth or multiple
-sibling Readmes.
-
-Proof: The complete backend unit-test suite remains green, including root
-Folder-only, Folder-with-Note, and initial notebook/Folder scenarios. No touched
-production class exceeds 250 lines.
+Learning: `OneNestedFolderReadme` recognizes `Parent/Child/README.md`;
+`FolderMaterialization.createNestedFolderWithChildReadme` builds parent-then-child
+with child Readme and refreshed projection. Publisher still loud-refuses until Slice 4.
 
 ### 4. Publish one nested Folder Readme
 Type: Behavior
-Status: planned
+Status: done
 
-Behavior: Given an empty accepted notebook, when the exact proposed tree is
-valid `Parent/Child/README.md`, publication creates `Parent` then `Child`,
-stores the authored Readme on `Child`, leaves `Parent` without a Readme, and
-accepts the exact head and tree atomically.
-
-Proof: A controller test observes both Folder identities and parentage, their
-respective Readme contents, absence of Notes, and downloaded head/tree equality.
-Existing typed Markdown and publication-atomicity tests retain invalid-input
-and rollback ownership. Run the complete backend unit-test suite.
+Learning: `acceptOneNestedFolderReadme` on InitialCompositionPublication uses
+`createNestedFolderWithChildReadme`; controller proof
+`NotebookGitProposalInitialNestedFolderReadmeControllerTest`.
 
 ### 5. Publish two sibling Folder Readmes
 Type: Behavior
-Status: planned
+Status: done
 
-Behavior: Given an empty accepted notebook, when the exact proposed tree is
-valid `Folder A/README.md` and `Folder B/README.md`, publication creates both
-root Folders with their authored Readmes and accepts the exact head and tree
-atomically.
-
-Proof: A controller test observes exactly two root Folders, each correct
-Readme, no Notes, and downloaded head/tree equality. Existing shared validation
-and transaction tests retain invalid-input and rollback ownership. Run the
-complete backend unit-test suite.
+Learning: `TwoSiblingRootFolderReadmes` + `tryAccept` on InitialCompositionPublication;
+controller proof `NotebookGitProposalInitialSiblingFolderReadmesControllerTest`.
+Publisher dispatches via `tryAccept` only.
 
 ### 6. Apply a bounded batch of initial Notes
 Type: Structure
-Status: planned
+Status: done
 
-Internal change: Extend the initial composition only from one Note to the exact
-two-root-Note list required next, then give initial-tree publication one
-operation that applies that already-classified list through
-`NotebookGitProposalNoteAddition`, accumulates the created Notes for final
-projection proof, and performs no binding acceptance itself. Preserve all
-one-Note publication behavior. This immediately enables Slice 7; Folder
-placement remains a later Behavior use of the same operation.
-
-Proof: The complete backend unit-test suite remains green, including root and
-Folder one-Note publication and late-validation rollback. No touched production
-class exceeds 250 lines.
+Learning: `applyNotes` on InitialCompositionPublication batches NoteAddition without
+binding accept; `NotebookReadmeWithRootNotes` (1–2 paths) replaced
+`CreationWithRootNote`. Existing one-Note acceptors use `applyNotes`.
 
 ### 7. Publish a notebook Readme with two root Notes
 Type: Behavior
-Status: planned
+Status: done
 
-Behavior: Given an empty accepted notebook, when the exact proposed tree is a
-valid root `README.md` plus two valid root Notes, publication stores the
-notebook Readme and both authored Notes and accepts the exact head and tree
-atomically.
-
-Proof: A controller test observes the notebook Readme, exactly two root Notes
-with authored titles/content, no Folders, and downloaded head/tree equality.
-Existing shared validation and transaction tests retain invalid-input and
-rollback ownership. Run the complete backend unit-test suite.
+Learning: `findWithRootNotes` / `acceptWithRootNotes` accept README + 1–2 root
+Notes via `applyNotes`. Controller proof added on
+`NotebookGitProposalInitialNotebookReadmeControllerTest`.
 
 ### 8. Publish a Folder Readme with two contained Notes
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given an empty accepted notebook, when the exact proposed tree is one
 valid root Folder README plus two valid Notes directly inside that Folder,
@@ -188,9 +143,17 @@ Readme, and downloaded head/tree equality. Existing shared validation and
 transaction tests retain invalid-input and rollback ownership. Run the complete
 backend unit-test suite.
 
+Learning: `RootFolderAndContainedNoteCreation.notePath` widened to
+`notePaths: List<String>` (1–2 entries). The shared private
+`collectInitialAddedPaths` classifier (already used by the notebook-Readme
+shapes) was generalized to accumulate 0..N note paths instead of rejecting a
+second one, so all four `find*` shape-recognizers in
+`NotebookGitProposalFolderCreationShape` now share one classification loop,
+each applying only its own cardinality/prefix filter. No API/DTO changes.
+
 ### 9. Publish both container Readmes with one root Note
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given an empty accepted notebook, when the exact proposed tree is a
 valid notebook `README.md`, one valid root Folder `README.md`, and one valid
@@ -201,6 +164,16 @@ Proof: A controller test observes notebook and Folder Readmes, the Folder's
 root placement, the Note's root placement and authored content, and downloaded
 head/tree equality. Existing shared validation and transaction tests retain
 invalid-input and rollback ownership. Run the complete backend unit-test suite.
+
+Learning: Added `InitialNotebookRootFolderAndRootNoteCreation` alongside the
+existing `InitialNotebookRootFolderAndNoteCreation`, distinguished by whether
+the Note path starts with the Folder's prefix (in-folder) or not (root
+sibling); the shared `collectInitialAddedPaths` classifier now collects both
+placements. `NotebookGitProposalFolderAcceptance` deduplicated the two
+near-identical accept methods into one private
+`acceptInitialCreationWithSingleNote` helper. Root-vs-folder Note placement
+was already generic in `NotebookGitProposalNoteAddition`, so no new placement
+logic was needed. No API/DTO changes.
 
 ## Contract map
 

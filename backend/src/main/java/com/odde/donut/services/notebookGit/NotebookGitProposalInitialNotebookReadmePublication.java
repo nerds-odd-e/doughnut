@@ -4,16 +4,15 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
 import com.odde.donut.testability.TestabilitySettings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jgit.lib.ObjectId;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Recognizes and accepts the sole-added-root-{@code README.md} initial notebook Readme proposal
- * shape, and that shape plus one added root ordinary Note, on an otherwise empty notebook.
+ * shape, and that shape plus one or two added root ordinary Notes, on an otherwise empty notebook.
  */
 @Service
 class NotebookGitProposalInitialNotebookReadmePublication {
@@ -24,29 +23,23 @@ class NotebookGitProposalInitialNotebookReadmePublication {
    */
   record Creation(String notebookReadmePath) {}
 
-  /**
-   * Exactly one added root {@code README.md} plus exactly one added root ordinary Note on an
-   * otherwise empty tree: no accepted blobs on those paths and no other path present.
-   */
-  record CreationWithRootNote(String notebookReadmePath, String notePath) {}
-
   private final NotebookGitProjection projection;
   private final NotebookGitProposalBindingPersistence bindingPersistence;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final NotebookGitProposalNoteAddition noteAddition;
+  private final NotebookGitProposalInitialCompositionPublication initialCompositionPublication;
 
   NotebookGitProposalInitialNotebookReadmePublication(
       NotebookGitProjection projection,
       NotebookGitProposalBindingPersistence bindingPersistence,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      NotebookGitProposalNoteAddition noteAddition) {
+      NotebookGitProposalInitialCompositionPublication initialCompositionPublication) {
     this.projection = projection;
     this.bindingPersistence = bindingPersistence;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
-    this.noteAddition = noteAddition;
+    this.initialCompositionPublication = initialCompositionPublication;
   }
 
   static Optional<Creation> find(List<InspectedRegularFile> files) {
@@ -60,12 +53,13 @@ class NotebookGitProposalInitialNotebookReadmePublication {
     return Optional.of(new Creation(file.path()));
   }
 
-  static Optional<CreationWithRootNote> findWithRootNote(List<InspectedRegularFile> files) {
-    if (files.size() != 2) {
+  static Optional<NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes>
+      findWithRootNotes(List<InspectedRegularFile> files) {
+    if (files.size() < 2 || files.size() > 3) {
       return Optional.empty();
     }
     String notebookReadmePath = null;
-    String notePath = null;
+    List<String> notePaths = new ArrayList<>(2);
     for (InspectedRegularFile file : files) {
       if (isAddedRootNotebookReadme(file)) {
         if (notebookReadmePath != null) {
@@ -73,18 +67,17 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         }
         notebookReadmePath = file.path();
       } else if (isAddedRootOrdinaryNote(file)) {
-        if (notePath != null) {
-          return Optional.empty();
-        }
-        notePath = file.path();
+        notePaths.add(file.path());
       } else {
         return Optional.empty();
       }
     }
-    if (notebookReadmePath == null || notePath == null) {
+    if (notebookReadmePath == null || notePaths.isEmpty()) {
       return Optional.empty();
     }
-    return Optional.of(new CreationWithRootNote(notebookReadmePath, notePath));
+    return Optional.of(
+        new NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes(
+            notebookReadmePath, notePaths));
   }
 
   static boolean isAddedRootNotebookReadme(InspectedRegularFile file) {
@@ -93,7 +86,7 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         && "README.md".equals(file.path());
   }
 
-  private static boolean isAddedRootOrdinaryNote(InspectedRegularFile file) {
+  static boolean isAddedRootOrdinaryNote(InspectedRegularFile file) {
     String path = file.path();
     return file.acceptedBlobId() == null
         && file.proposedBlobId() != null
@@ -124,48 +117,24 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  String acceptWithRootNote(
+  String acceptWithRootNotes(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
-      CreationWithRootNote creation) {
-    NotebookGitProposalTypedPath.requireOrdinaryNote(proposal, creation.notePath());
+      NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes creation) {
     storeOnEmptyNotebook(
         state,
         proposal,
         acceptedHead,
         creation.notebookReadmePath(),
-        "Initial notebook Readme and root Note require an empty notebook.");
-    Note added =
-        noteAddition.apply(
-            state.notebook(),
-            state.folders(),
-            proposal,
-            proposal.mainHead(),
-            creation.notePath(),
-            testabilitySettings.getCurrentUTCTimestamp());
+        "Initial notebook Readme and root Notes require an empty notebook.");
+    List<Note> added =
+        initialCompositionPublication.applyNotes(
+            state.notebook(), state.folders(), proposal, creation.notePaths());
     projection.requireMatchingAcceptedTree(
-        state.notebook(),
-        state.folders(),
-        List.of(added),
-        proposal.repository(),
-        proposal.mainHead());
+        state.notebook(), state.folders(), added, proposal.repository(), proposal.mainHead());
     return bindingPersistence.accept(
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  void assertReadyEmptyNotebook(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      String emptyNotebookMessage) {
-    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-        proposal.repository(), proposal.mainHead());
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
-    if (!state.folders().isEmpty() || !state.liveNotes().isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, emptyNotebookMessage);
-    }
   }
 
   void storeOnEmptyNotebook(
@@ -174,7 +143,8 @@ class NotebookGitProposalInitialNotebookReadmePublication {
       ObjectId acceptedHead,
       String notebookReadmePath,
       String emptyNotebookMessage) {
-    assertReadyEmptyNotebook(state, proposal, acceptedHead, emptyNotebookMessage);
+    initialCompositionPublication.assertReadyEmptyNotebook(
+        state, proposal, acceptedHead, emptyNotebookMessage);
     state
         .notebook()
         .setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, notebookReadmePath));

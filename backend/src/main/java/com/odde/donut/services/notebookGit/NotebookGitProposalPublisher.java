@@ -44,6 +44,7 @@ public class NotebookGitProposalPublisher {
   private final NotebookGitProposalFolderAcceptance folderAcceptance;
   private final NotebookGitProposalInitialNotebookReadmePublication
       initialNotebookReadmePublication;
+  private final NotebookGitProposalInitialCompositionPublication initialCompositionPublication;
   private final NotebookGitProposalNoteAddition noteAddition;
 
   public NotebookGitProposalPublisher(
@@ -59,6 +60,7 @@ public class NotebookGitProposalPublisher {
       NoteTitlePlacementRules noteTitlePlacementRules,
       NotebookGitProposalFolderAcceptance folderAcceptance,
       NotebookGitProposalInitialNotebookReadmePublication initialNotebookReadmePublication,
+      NotebookGitProposalInitialCompositionPublication initialCompositionPublication,
       NotebookGitProposalNoteAddition noteAddition) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
@@ -72,6 +74,7 @@ public class NotebookGitProposalPublisher {
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.folderAcceptance = folderAcceptance;
     this.initialNotebookReadmePublication = initialNotebookReadmePublication;
+    this.initialCompositionPublication = initialCompositionPublication;
     this.noteAddition = noteAddition;
   }
 
@@ -141,18 +144,31 @@ public class NotebookGitProposalPublisher {
       return folderAcceptance.acceptInitialCreationWithNote(
           state, proposal, acceptedHead, initialNoteCreation.get());
     }
-    Optional<NotebookGitProposalInitialNotebookReadmePublication.CreationWithRootNote>
-        initialNotebookReadmeAndNote =
-            NotebookGitProposalInitialNotebookReadmePublication.findWithRootNote(files);
-    if (initialNotebookReadmeAndNote.isPresent()) {
-      return initialNotebookReadmePublication.acceptWithRootNote(
-          state, proposal, acceptedHead, initialNotebookReadmeAndNote.get());
+    Optional<NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndRootNoteCreation>
+        initialRootNoteCreation =
+            NotebookGitProposalFolderCreationShape.findInitialNotebookRootFolderAndRootNoteCreation(
+                files);
+    if (initialRootNoteCreation.isPresent()) {
+      return folderAcceptance.acceptInitialCreationWithRootNote(
+          state, proposal, acceptedHead, initialRootNoteCreation.get());
+    }
+    Optional<NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes>
+        notebookReadmeWithRootNotes =
+            NotebookGitProposalInitialNotebookReadmePublication.findWithRootNotes(files);
+    if (notebookReadmeWithRootNotes.isPresent()) {
+      return initialNotebookReadmePublication.acceptWithRootNotes(
+          state, proposal, acceptedHead, notebookReadmeWithRootNotes.get());
     }
     Optional<NotebookGitProposalInitialNotebookReadmePublication.Creation> initialNotebookReadme =
         NotebookGitProposalInitialNotebookReadmePublication.find(files);
     if (initialNotebookReadme.isPresent()) {
       return initialNotebookReadmePublication.accept(
           state, proposal, acceptedHead, initialNotebookReadme.get());
+    }
+    Optional<String> initialCompositionAccepted =
+        initialCompositionPublication.tryAccept(state, proposal, acceptedHead, files);
+    if (initialCompositionAccepted.isPresent()) {
+      return initialCompositionAccepted.get();
     }
     Optional<NotebookGitProposalInitialComposition.ValidUnmatched> validUnmatchedInitial =
         NotebookGitProposalInitialComposition.findValidUnmatched(files, proposal);

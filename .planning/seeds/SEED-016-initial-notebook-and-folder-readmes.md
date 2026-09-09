@@ -1,6 +1,6 @@
 ---
 id: SEED-016
-status: active
+status: completed
 planted: 2026-09-09
 planted_during: README-only folder publication verification
 trigger_when: selected now as the top product-backlog story
@@ -114,7 +114,7 @@ ordinary-Note third-path eligibility via quick/082.
 
 ### 5. Publish the next small initial Readme-and-Note trees
 
-**Status:** planned in quick/087.
+**Status:** delivered. Recover quick/087 from its merge onto main.
 
 - **Goal:** A notebook owner can publish the next six small, valid initial
   Readme-and-Note tree shapes as one authored commit instead of restructuring
@@ -157,8 +157,8 @@ None.
 
 ## When to Surface
 
-Stories 1–4 are delivered. Story 5 is selected for execution planning.
-Additional content and bulk initial import remain separate problems.
+Stories 1–5 are delivered. Additional content and bulk initial import remain
+separate problems.
 
 ## Breadcrumbs
 
