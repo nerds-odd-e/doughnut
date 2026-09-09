@@ -41,6 +41,8 @@ public class NotebookGitProposalPublisher {
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final NotebookGitProposalFolderAcceptance folderAcceptance;
+  private final NotebookGitProposalInitialNotebookReadmePublication
+      initialNotebookReadmePublication;
   private final NotebookGitProposalNoteAddition noteAddition;
 
   public NotebookGitProposalPublisher(
@@ -54,6 +56,7 @@ public class NotebookGitProposalPublisher {
       NoteService noteService,
       NoteTitlePlacementRules noteTitlePlacementRules,
       NotebookGitProposalFolderAcceptance folderAcceptance,
+      NotebookGitProposalInitialNotebookReadmePublication initialNotebookReadmePublication,
       NotebookGitProposalNoteAddition noteAddition) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
@@ -65,6 +68,7 @@ public class NotebookGitProposalPublisher {
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.folderAcceptance = folderAcceptance;
+    this.initialNotebookReadmePublication = initialNotebookReadmePublication;
     this.noteAddition = noteAddition;
   }
 
@@ -127,11 +131,10 @@ public class NotebookGitProposalPublisher {
       return folderAcceptance.acceptInitialCreationWithNote(
           state, proposal, acceptedHead, initialNoteCreation.get());
     }
-    Optional<NotebookGitProposalFolderCreationShape.InitialNotebookReadmeCreation>
-        initialNotebookReadme =
-            NotebookGitProposalFolderCreationShape.findInitialNotebookReadmeCreation(files);
+    Optional<NotebookGitProposalInitialNotebookReadmePublication.Creation> initialNotebookReadme =
+        NotebookGitProposalInitialNotebookReadmePublication.find(files);
     if (initialNotebookReadme.isPresent()) {
-      return folderAcceptance.acceptInitialNotebookReadme(
+      return initialNotebookReadmePublication.accept(
           state, proposal, acceptedHead, initialNotebookReadme.get());
     }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =

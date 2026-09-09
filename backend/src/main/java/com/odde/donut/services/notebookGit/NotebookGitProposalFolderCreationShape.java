@@ -5,22 +5,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Recognizes exact root Folder-creation and initial-notebook-Readme proposal shapes from inspected
- * regular-file diffs: one added root {@code README.md}; one added root-level {@code
- * Folder/README.md}; that plus one added root {@code README.md}; or those two plus one added
- * ordinary note directly inside that same Folder.
+ * Recognizes exact root Folder-creation proposal shapes from inspected regular-file diffs: one
+ * added root-level {@code Folder/README.md}; that plus one added root {@code README.md}; or those
+ * two plus one added ordinary note directly inside that same Folder.
  */
 final class NotebookGitProposalFolderCreationShape {
 
   private NotebookGitProposalFolderCreationShape() {}
 
   record RootFolderCreation(String readmePath) {}
-
-  /**
-   * Exactly one added root {@code README.md} on an otherwise empty tree: no accepted blob on that
-   * path and no other path present (changed or unchanged).
-   */
-  record InitialNotebookReadmeCreation(String notebookReadmePath) {}
 
   /**
    * Exactly one added root {@code README.md} plus exactly one added root-level {@code
@@ -49,18 +42,6 @@ final class NotebookGitProposalFolderCreationShape {
       candidate = new RootFolderCreation(file.path());
     }
     return Optional.ofNullable(candidate);
-  }
-
-  static Optional<InitialNotebookReadmeCreation> findInitialNotebookReadmeCreation(
-      List<InspectedRegularFile> files) {
-    if (files.size() != 1) {
-      return Optional.empty();
-    }
-    InspectedRegularFile file = files.getFirst();
-    if (!isAddedRootNotebookReadme(file)) {
-      return Optional.empty();
-    }
-    return Optional.of(new InitialNotebookReadmeCreation(file.path()));
   }
 
   static Optional<InitialNotebookAndRootFolderCreation> findInitialNotebookAndRootFolderCreation(
@@ -93,7 +74,7 @@ final class NotebookGitProposalFolderCreationShape {
     String folderReadmePath = null;
     String notePath = null;
     for (InspectedRegularFile file : files) {
-      if (isAddedRootNotebookReadme(file)) {
+      if (NotebookGitProposalInitialNotebookReadmePublication.isAddedRootNotebookReadme(file)) {
         if (notebookReadmePath != null) {
           return Optional.empty();
         }
@@ -126,12 +107,6 @@ final class NotebookGitProposalFolderCreationShape {
     return file.acceptedBlobId() != null
         && file.proposedBlobId() != null
         && file.acceptedBlobId().equals(file.proposedBlobId());
-  }
-
-  private static boolean isAddedRootNotebookReadme(InspectedRegularFile file) {
-    return file.acceptedBlobId() == null
-        && file.proposedBlobId() != null
-        && "README.md".equals(file.path());
   }
 
   private static boolean isAddedRootFolderReadme(InspectedRegularFile file) {
