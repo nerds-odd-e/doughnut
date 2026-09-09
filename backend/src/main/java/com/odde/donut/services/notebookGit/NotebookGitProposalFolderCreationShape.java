@@ -111,7 +111,7 @@ final class NotebookGitProposalFolderCreationShape {
       findInitialNotebookRootFolderAndRootNoteCreation(List<InspectedRegularFile> files) {
     return collectInitialAddedPaths(files)
         .filter(paths -> paths.notebookReadmePath() != null && paths.notePaths().size() == 1)
-        .filter(paths -> !allStartWithFolderPrefix(paths))
+        .filter(paths -> paths.notePaths().getFirst().indexOf('/') < 0)
         .map(
             paths ->
                 new InitialNotebookRootFolderAndRootNoteCreation(
