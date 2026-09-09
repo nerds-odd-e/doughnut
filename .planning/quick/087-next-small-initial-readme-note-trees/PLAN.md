@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: in progress (slices 1–5 done).
+Status: in progress (slices 1–6 done).
 
 ## Goal and scope
 
@@ -114,19 +114,11 @@ Publisher dispatches via `tryAccept` only.
 
 ### 6. Apply a bounded batch of initial Notes
 Type: Structure
-Status: planned
+Status: done
 
-Internal change: Extend the initial composition only from one Note to the exact
-two-root-Note list required next, then give initial-tree publication one
-operation that applies that already-classified list through
-`NotebookGitProposalNoteAddition`, accumulates the created Notes for final
-projection proof, and performs no binding acceptance itself. Preserve all
-one-Note publication behavior. This immediately enables Slice 7; Folder
-placement remains a later Behavior use of the same operation.
-
-Proof: The complete backend unit-test suite remains green, including root and
-Folder one-Note publication and late-validation rollback. No touched production
-class exceeds 250 lines.
+Learning: `applyNotes` on InitialCompositionPublication batches NoteAddition without
+binding accept; `NotebookReadmeWithRootNotes` (1–2 paths) replaced
+`CreationWithRootNote`. Existing one-Note acceptors use `applyNotes`.
 
 ### 7. Publish a notebook Readme with two root Notes
 Type: Behavior

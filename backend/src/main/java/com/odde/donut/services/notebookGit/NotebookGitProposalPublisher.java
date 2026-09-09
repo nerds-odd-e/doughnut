@@ -144,7 +144,7 @@ public class NotebookGitProposalPublisher {
       return folderAcceptance.acceptInitialCreationWithNote(
           state, proposal, acceptedHead, initialNoteCreation.get());
     }
-    Optional<NotebookGitProposalInitialNotebookReadmePublication.CreationWithRootNote>
+    Optional<NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes>
         initialNotebookReadmeAndNote =
             NotebookGitProposalInitialNotebookReadmePublication.findWithRootNote(files);
     if (initialNotebookReadmeAndNote.isPresent()) {

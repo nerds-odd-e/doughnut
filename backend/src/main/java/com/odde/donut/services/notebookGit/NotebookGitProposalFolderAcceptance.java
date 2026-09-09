@@ -21,7 +21,7 @@ class NotebookGitProposalFolderAcceptance {
   private final TestabilitySettings testabilitySettings;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final NotebookGitProposalFolderMaterialization folderMaterialization;
-  private final NotebookGitProposalNoteAddition noteAddition;
+  private final NotebookGitProposalInitialCompositionPublication initialCompositionPublication;
   private final NotebookGitProposalInitialNotebookReadmePublication
       initialNotebookReadmePublication;
 
@@ -33,7 +33,7 @@ class NotebookGitProposalFolderAcceptance {
       TestabilitySettings testabilitySettings,
       FolderSiblingNameValidation folderSiblingNameValidation,
       NotebookGitProposalFolderMaterialization folderMaterialization,
-      NotebookGitProposalNoteAddition noteAddition,
+      NotebookGitProposalInitialCompositionPublication initialCompositionPublication,
       NotebookGitProposalInitialNotebookReadmePublication initialNotebookReadmePublication) {
     this.projection = projection;
     this.bindingPersistence = bindingPersistence;
@@ -42,7 +42,7 @@ class NotebookGitProposalFolderAcceptance {
     this.testabilitySettings = testabilitySettings;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.folderMaterialization = folderMaterialization;
-    this.noteAddition = noteAddition;
+    this.initialCompositionPublication = initialCompositionPublication;
     this.initialNotebookReadmePublication = initialNotebookReadmePublication;
   }
 
@@ -75,8 +75,7 @@ class NotebookGitProposalFolderAcceptance {
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       NotebookGitProposalFolderCreationShape.RootFolderAndContainedNoteCreation creation) {
-    NotebookGitProposalTypedPath.requireOrdinaryNote(proposal, creation.notePath());
-    initialNotebookReadmePublication.assertReadyEmptyNotebook(
+    initialCompositionPublication.assertReadyEmptyNotebook(
         state,
         proposal,
         acceptedHead,
@@ -87,16 +86,11 @@ class NotebookGitProposalFolderAcceptance {
     folderMaterialization.createRootFolderWithReadme(
         state.notebook(), creation.folderReadmePath(), folderReadme);
     List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(state.notebook());
-    Note added =
-        noteAddition.apply(
-            state.notebook(),
-            folders,
-            proposal,
-            proposal.mainHead(),
-            creation.notePath(),
-            testabilitySettings.getCurrentUTCTimestamp());
+    List<Note> added =
+        initialCompositionPublication.applyNotes(
+            state.notebook(), folders, proposal, List.of(creation.notePath()));
     projection.requireMatchingAcceptedTree(
-        state.notebook(), folders, List.of(added), proposal.repository(), proposal.mainHead());
+        state.notebook(), folders, added, proposal.repository(), proposal.mainHead());
     return bindingPersistence.accept(
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
@@ -124,7 +118,6 @@ class NotebookGitProposalFolderAcceptance {
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndNoteCreation creation) {
-    NotebookGitProposalTypedPath.requireOrdinaryNote(proposal, creation.notePath());
     List<ExportFolderRow> folders =
         createInitialNotebookAndRootFolder(
             state,
@@ -132,16 +125,11 @@ class NotebookGitProposalFolderAcceptance {
             acceptedHead,
             creation.notebookReadmePath(),
             creation.folderReadmePath());
-    Note added =
-        noteAddition.apply(
-            state.notebook(),
-            folders,
-            proposal,
-            proposal.mainHead(),
-            creation.notePath(),
-            testabilitySettings.getCurrentUTCTimestamp());
+    List<Note> added =
+        initialCompositionPublication.applyNotes(
+            state.notebook(), folders, proposal, List.of(creation.notePath()));
     projection.requireMatchingAcceptedTree(
-        state.notebook(), folders, List.of(added), proposal.repository(), proposal.mainHead());
+        state.notebook(), folders, added, proposal.repository(), proposal.mainHead());
     return bindingPersistence.accept(
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
