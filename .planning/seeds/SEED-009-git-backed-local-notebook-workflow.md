@@ -25,6 +25,12 @@ interrupting that loop; a cleaner Git log alone does not close it. The delivered
 scope below is planning evidence, not a fresh implementation audit or evidence
 of real-user frequency.
 
+A concrete blocked workflow now sharpens that gap: an owner creates a folder in
+a local checkout with no ordinary note inside it. Its README is the folder's
+only Portable representation, but publication rejects that locally created
+folder because the destination does not already exist in accepted remote
+history.
+
 The product constraints established in the discussion are:
 
 - The working tree follows Accepted ADR 0004 and contains no Donut IDs,
@@ -68,11 +74,15 @@ The product constraints established in the discussion are:
    values readable history; Story 10 (rolling ten-minute web autosave batching)
    is delivered. Durable web commits may change until exposed to a client or
    followed by another accepted change. Published history remains immutable.
+5. **Create the folder in Donut first:** reject this as the normal workflow for
+   a locally authored README-only folder. It interrupts local authorship and
+   still leaves folder/README synchronization outside the Git workflow.
 
 **Priority:** Stories 13, 16, 14, 17, 18, 18a, 15, and 10 are delivered.
 Remaining SEED-009 work follows the product backlog after concurrent worktree
-isolation as the global backlog lead. This is not a claim that usage data
-proves these are the most frequent failures.
+isolation as the global backlog lead. Story 19 records the local README-only
+folder creation gap. This is not a claim that usage data proves these are the
+most frequent failures.
 
 The estimates are comparative story hypotheses without implementation inspection:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
@@ -418,6 +428,37 @@ correction delivered as Story 10a.
   directly on accepted history before publication. No automatic recovery, broader
   pull eligibility, new commands, or change to publication validation.
 
+<a id="story-19"></a>
+
+### 19. Create a README-only folder locally
+
+**Status:** Planned in
+[quick/078](../quick/078-create-readme-only-folder/PLAN.md); not executed.
+
+- **Goal:** A notebook owner can create a folder with README content in a local
+  checkout and publish it to the same Donut notebook even when the folder
+  contains no ordinary notes.
+- **Scope:** One direct-child commit adds exactly one new root folder,
+  represented only by its valid nonblank `README.md`. Publication creates one
+  fresh Donut folder identity, preserves the authored README content, and
+  accepts that exact commit atomically. No ordinary-note addition is required
+  to infer the folder. Nested placement, multiple new folders, accompanying
+  note or content changes, README edits to existing containers, bulk import,
+  stale/divergent history, and multiple unpublished commits remain excluded.
+- **Key example:** Given a clean bound checkout whose accepted tree already
+  matches Donut, the owner adds and commits `New Folder/README.md` with valid
+  Readme content, then publishes → Donut shows `New Folder` with that content
+  and accepted `main` advances to the authored commit.
+- **Boundary example:** The owner creates a filesystem directory with no
+  tracked file → Git has no folder change to publish, so this story does not
+  promise creation of a truly empty directory.
+- **Effort hypothesis:** M — medium confidence; the exact one-folder,
+  README-only shape avoids note identity matching and broader tree import.
+- **Depends on:** Delivered clone and direct-child publication plus the
+  existing Portable README convention; no new product prerequisite.
+- **Safe stopping point:** README-only local folder creation works atomically
+  while broader local tree creation remains explicitly refused.
+
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
@@ -425,8 +466,9 @@ SEED-015 worktree queue (reclaim, then CLI and MCP) ahead of further SEED-009
 selection; this reassessment does not displace that direction.
 
 Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, **15**,
-**10**, and **10a** are delivered. Remaining SEED-009 work follows the product
-backlog after worktree priorities.
+**10**, and **10a** are delivered. **19** is queued after the worktree-isolation
+stories because it directly unblocks an observed owner workflow but does not
+displace the current near-future direction.
 
 First-to-drop order among remaining unselected items follows the backlog.
 Delivered batch publication and batch reconciliation across one disjoint web
@@ -464,9 +506,9 @@ Preserve these boundaries in future refinement:
 
 ## When to Surface
 
-Stories 10 and 10a are delivered. Remaining SEED-009 stories stay
-non-executable until selected from the product backlog; queue selection does
-not authorize implementation.
+Stories 10 and 10a are delivered. Story 19 is queued after the current
+worktree-isolation backlog and is planned but not executed. Queue selection and
+planning do not authorize implementation.
 
 ## Breadcrumbs
 

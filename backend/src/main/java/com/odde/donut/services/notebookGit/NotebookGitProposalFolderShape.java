@@ -19,6 +19,23 @@ final class NotebookGitProposalFolderShape {
 
   record FolderRelocation(String sourcePrefix, String destPrefix) {}
 
+  record RootFolderCreation(String readmePath) {}
+
+  static Optional<RootFolderCreation> findSingleRootFolderCreation(
+      List<InspectedRegularFile> files) {
+    RootFolderCreation candidate = null;
+    for (InspectedRegularFile file : files) {
+      if (unchanged(file)) {
+        continue;
+      }
+      if (candidate != null || !isAddedRootFolderReadme(file)) {
+        return Optional.empty();
+      }
+      candidate = new RootFolderCreation(file.path());
+    }
+    return Optional.ofNullable(candidate);
+  }
+
   /**
    * @return the unique exact mapping when the proposal is one complete same-name README relocation
    *     with no other changes; empty when no README is both removed and added
@@ -132,6 +149,16 @@ final class NotebookGitProposalFolderShape {
     return file.acceptedBlobId() != null
         && file.proposedBlobId() != null
         && file.acceptedBlobId().equals(file.proposedBlobId());
+  }
+
+  private static boolean isAddedRootFolderReadme(InspectedRegularFile file) {
+    String path = file.path();
+    int firstSlash = path.indexOf('/');
+    return file.acceptedBlobId() == null
+        && file.proposedBlobId() != null
+        && firstSlash > 0
+        && firstSlash == path.lastIndexOf('/')
+        && "README.md".equals(path.substring(firstSlash + 1));
   }
 
   private static List<String> prefixesOf(List<String> readmePaths) {

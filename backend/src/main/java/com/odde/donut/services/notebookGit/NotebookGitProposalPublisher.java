@@ -113,6 +113,14 @@ public class NotebookGitProposalPublisher {
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
         NotebookGitProposalTreeShape.inspectRegularFiles(
             proposal.repository(), acceptedHead, proposal.mainHead());
+    Optional<NotebookGitProposalFolderShape.RootFolderCreation> folderCreation =
+        NotebookGitProposalFolderShape.findSingleRootFolderCreation(files);
+    if (folderCreation.isPresent()) {
+      throw NotebookGitProposalTreeShape.unsupportedTreeShape(
+          "path \""
+              + folderCreation.get().readmePath()
+              + "\" is a folder README, which is reserved");
+    }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);
     if (relocation.isPresent()) {
