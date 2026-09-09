@@ -275,7 +275,8 @@ and Cloud VM/CI changes. No continuous ancestry tracking is implied.
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
 **Status:** Delivered, 2026-09-09. Runtime isolation came from quick/070
-(`47c4b24eba`); exclusive-recording proof was completed by quick/073.
+(`47c4b24eba`); exclusive-recording proof from quick/073; successful-completion
+mock release from quick/093.
 
 **Goal**
 
@@ -421,8 +422,9 @@ Cloud VM/CI changes, and broader database management.
 ## Ordering and Scope Reduction
 
 **Backlog review, 2026-09-09:** Stories 3, 4 and 5 are delivered, completing the
-selected browser/CLI/MCP queue. Story 3's recording-exclusivity correction added
-proof, not a separate product story or broader mock support. The
+selected browser/CLI/MCP queue. Story 3's recording-exclusivity and
+successful-completion mock-release corrections added proof, not a separate
+product story or broader mock support. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 
 The delivered four-spec allowlist does not establish general parallel E2E support.
