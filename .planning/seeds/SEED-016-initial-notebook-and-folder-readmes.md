@@ -46,11 +46,39 @@ expand this into bulk import and is explicitly deferred.
   history, attachments, and bulk import.
   Empty-notebook eligibility correction: quick/080.
 
+<a id="story-2"></a>
+
+### 2. Publish one initial note inside the new README-backed folder
+
+**Status:** Planned in
+[quick/081](../quick/081-initial-folder-with-one-note/PLAN.md); not executed.
+
+- **Goal:** A notebook owner can publish the smallest useful initial notebook
+  that contains knowledge: the notebook Readme, one new root Folder with its
+  Readme, and one ordinary Note inside that Folder, kept as one authored
+  commit.
+- **Scope:** The notebook has no folders or live notes and its accepted
+  Portable tree is empty. Exactly one direct-child commit adds regular-file
+  `README.md`, `New Folder/README.md`, and `New Folder/First note.md`. Both
+  Readmes are valid nonblank `type: Readme` Markdown; the note is valid
+  `type: Note` Markdown with a valid filename-derived title. Publication stores
+  both Readmes, creates one fresh root Folder and one fresh ordinary Note in
+  that Folder, and accepts the exact commit atomically. Excluded: any fourth
+  path, root notes, more notes or folders, nested folders, existing notebook
+  content (including empty folders), relationships, attachments, multiple
+  unpublished commits, stale/divergent history, and bulk import.
+- **Key example:** Empty accepted notebook → commit exactly the three paths →
+  Donut shows `First note` inside `New Folder`, preserves all three authored
+  contents, and accepted/downloaded Git equals the authored commit.
+- **Boundary example:** A second ordinary note remains an unsupported tree
+  shape.
+
 ## Ordering and Scope Reduction
 
-This was the smallest verified follow-up to the local README-only folder
-workflow. Stop after this exact two-path initial tree; bulk initial import
-remains a separate problem.
+Story 1 was the smallest verified follow-up to the local README-only folder
+workflow. Story 2 adds exactly one ordinary Note to that delivered initial
+tree. Stop after this three-path case; additional content and bulk initial
+import remain separate problems.
 
 ## Open Decisions
 
@@ -58,7 +86,8 @@ None.
 
 ## When to Surface
 
-Story 1 is delivered. Further SEED-016 work is unselected.
+Story 1 is delivered. Story 2 is selected for slice planning; planning does not
+authorize execution.
 
 ## Breadcrumbs
 
