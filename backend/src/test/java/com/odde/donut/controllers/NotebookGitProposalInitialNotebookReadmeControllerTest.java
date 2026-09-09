@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -9,6 +10,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -40,6 +42,16 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
       "---\ntype: Note\n---\nPrecisely preserved second note.\n";
   private static final String THIRD_NOTE =
       "---\ntype: Note\n---\nPrecisely preserved third note.\n";
+  private static final String ROOT_RELATIONSHIP =
+      """
+      ---
+      type: Relationship
+      relation: related-to
+      source: "[[A]]"
+      target: "[[B]]"
+      ---
+      Precisely preserved relationship body.
+      """;
 
   @Autowired FolderRepository folderRepository;
 
@@ -133,8 +145,55 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
     assertThat(createdNote.getContent(), equalTo(FIRST_NOTE));
   }
 
+  @Test
+  void publishesInitialNotebookReadmeAndRootRelationshipAsTheExactAuthoredCommit()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("A-related-to-B.md", ROOT_RELATIONSHIP)));
+
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+    }
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
+    assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
+    assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(notes, hasSize(1));
+    Note relationship = notes.getFirst();
+    assertThat(relationship.getTitle(), equalTo("A-related-to-B"));
+    assertThat(relationship.getContent(), equalTo(ROOT_RELATIONSHIP));
+    assertThat(relationship.getFolder(), nullValue());
+    List<String> authoredLinks =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                rowsFor(entityManager, relationship).stream()
+                    .map(AuthoredNoteReferenceRow::getAuthoredLink)
+                    .toList());
+    assertThat(authoredLinks, containsInAnyOrder("A", "B"));
+
+    ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
+      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
+      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
+    }
+  }
+
   @ParameterizedTest
-  @ValueSource(strings = {"Relationship", "Readme", "CustomType"})
+  @ValueSource(strings = {"Readme", "CustomType"})
   void refusesInitialNotebookReadmeAndRootNoteWhenNoteIsNotAnOrdinaryNote(String documentType)
       throws Exception {
     Notebook notebook = createGitBackedNotebook();

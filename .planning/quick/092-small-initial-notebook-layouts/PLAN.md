@@ -30,8 +30,10 @@ head/tree and atomicity. No complete jap1 import or combinatorial layout support
   paths, or other types. Do not generalize nested folders or multiple prefixes.
 - Relationship persistence already uses `AuthoredNoteDocument.fromContent` and
   `AuthoredNoteDocumentPersistence.persist`, including source-owned references.
-  Add only the exact root README + one Relationship eligibility. Do not widen
-  shared `requireOrdinaryNote` or `applyNotes` to admit Relationships everywhere.
+  The exact two-file root README + one Relationship layout is accepted via
+  `NotebookGitProposalInitialNotebookReadmePublication.tryAccept` before
+  ordinary-Note README layouts. Do not widen shared `requireOrdinaryNote` or
+  `applyNotes`.
 - [ADR 0004 — OKF-compatible notebook Markdown profile](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md):
   preserve typed concepts, author YAML, README container storage and unresolved
   authored wiki references. [ADR 0006 — Failure handling](../../../docs/adrs/0006-failure-handling-accepted.md):
@@ -98,22 +100,14 @@ publisher transaction already rolls back.
 
 ### 4. Publish a notebook README with one root Relationship
 Type: Behavior
-Status: planned
-Proof: Controller publication/download preserves the exact head/tree and
-Relationship Markdown (type, relation, source, target and body). The persisted
-document exposes both authored references; no endpoint Notes are manufactured.
-
-Behavior: Empty notebook + README and one root Relationship with absent A/B
-endpoints → owner publishes → the relationship is accepted under existing
-unresolved-reference semantics.
-
-Update the root README controller test: replace only the now-obsolete single-root
-Relationship rejection with success. Keep Readme/CustomType rejection and
-Relationship rejection in other ordinary-Note layouts. Recognize the exact
-two-file Relationship case and reuse existing root readme storage, note addition,
-reference persistence, projection and binding acceptance. Avoid a global type
-relaxation or endpoint resolver. Estimated active work: ~5 min, medium confidence;
-if this needs new domain behavior, stop and revisit the assumption before editing.
+Status: done
+Proof: `NotebookGitProposalInitialNotebookReadmeControllerTest#publishesInitialNotebookReadmeAndRootRelationshipAsTheExactAuthoredCommit`
+plus `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only`. Canonical two-file
+round-trip: README bytes, one Relationship Note with preserved Markdown, both
+unresolved `[[A]]`/`[[B]]` references, no endpoint Notes or folders, exact
+download head/tree. `Readme`/`CustomType` still rejected; other ordinary-Note
+layouts still refuse Relationship.
 
 ## Promise ownership and readiness
 
@@ -140,3 +134,7 @@ Ready for direct execution; no additional slice-plan refinement required.
   Implementation ~8 min (suite wait excluded). Remaining slices unchanged.
 - Slice 3: no production gap; publisher `REQUIRES_NEW` already rolls back Folder,
   first Note, and authored references. Implementation ~8 min.
+- Slice 4: exact two-file README + Relationship is its own recognizer, dispatched
+  from `tryAccept` before ordinary-Note README layouts. Implementation ~8 min;
+  refactor collapsed README dispatch and moved authored-type recognition onto
+  `TypedPath`.

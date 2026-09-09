@@ -145,7 +145,7 @@ final class NotebookGitProposalFolderCreationShape {
         }
         folderReadmePath = file.path();
       } else if (isAddedDirectChildOrdinaryNote(file)
-          || NotebookGitProposalInitialNotebookReadmePublication.isAddedRootOrdinaryNote(file)) {
+          || NotebookGitProposalInitialNotebookReadmePublication.isAddedRootMarkdownFile(file)) {
         notePaths.add(file.path());
       } else {
         return Optional.empty();

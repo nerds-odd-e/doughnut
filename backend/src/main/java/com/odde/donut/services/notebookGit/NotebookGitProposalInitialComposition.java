@@ -1,11 +1,9 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.yaml.snakeyaml.error.YAMLException;
 
 /**
  * Distinguishes bounded initial Readme/Note compositions after every supported exact initial shape
@@ -89,9 +87,7 @@ final class NotebookGitProposalInitialComposition {
       } else if (!impliedPrefix.equals(prefix)) {
         return Optional.empty();
       }
-      String content =
-          NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), path);
-      if (!authoredTypeEquals(content, "Note")) {
+      if (!NotebookGitProposalTypedPath.authoredTypeEquals(proposal, path, "Note")) {
         return Optional.empty();
       }
       notePaths.add(path);
@@ -109,9 +105,7 @@ final class NotebookGitProposalInitialComposition {
       return Optional.empty();
     }
     String path = file.path();
-    String content =
-        NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), path);
-    if (!authoredTypeEquals(content, "Readme")) {
+    if (!NotebookGitProposalTypedPath.authoredTypeEquals(proposal, path, "Readme")) {
       return Optional.empty();
     }
     int firstSlash = path.indexOf('/');
@@ -130,10 +124,7 @@ final class NotebookGitProposalInitialComposition {
       if (!NotebookGitProposalFolderCreationShape.isAddedRootFolderReadme(file)) {
         return Optional.empty();
       }
-      String content =
-          NotebookGitProposalBlobText.readUtf8(
-              proposal.repository(), proposal.mainHead(), file.path());
-      if (!authoredTypeEquals(content, "Readme")) {
+      if (!NotebookGitProposalTypedPath.authoredTypeEquals(proposal, file.path(), "Readme")) {
         return Optional.empty();
       }
     }
@@ -156,9 +147,7 @@ final class NotebookGitProposalInitialComposition {
         return Optional.empty();
       }
       String expectedType = expectedTypeForBasename(basename(path));
-      String content =
-          NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), path);
-      if (!authoredTypeEquals(content, expectedType)) {
+      if (!NotebookGitProposalTypedPath.authoredTypeEquals(proposal, path, expectedType)) {
         return Optional.empty();
       }
       if ("Readme".equals(expectedType)) {
@@ -173,17 +162,6 @@ final class NotebookGitProposalInitialComposition {
 
   private static String expectedTypeForBasename(String basename) {
     return "README.md".equals(basename) ? "Readme" : "Note";
-  }
-
-  private static boolean authoredTypeEquals(String content, String expectedType) {
-    try {
-      return NoteLeadingFrontmatter.split(content)
-          .flatMap(split -> split.frontmatter().getString("type"))
-          .filter(expectedType::equals)
-          .isPresent();
-    } catch (YAMLException e) {
-      return false;
-    }
   }
 
   private static boolean isAddedNestedFolderReadme(InspectedRegularFile file) {

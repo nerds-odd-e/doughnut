@@ -106,6 +106,21 @@ class NotebookGitProposalInitialCompositionPublication {
     return added;
   }
 
+  /** Applies one authored Relationship path through {@link NotebookGitProposalNoteAddition}. */
+  Note applyRelationship(
+      Notebook notebook,
+      List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      String relationshipPath) {
+    return noteAddition.apply(
+        notebook,
+        folders,
+        proposal,
+        proposal.mainHead(),
+        relationshipPath,
+        testabilitySettings.getCurrentUTCTimestamp());
+  }
+
   void assertReadyEmptyNotebook(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
