@@ -131,6 +131,13 @@ public class NotebookGitProposalPublisher {
       return folderAcceptance.acceptInitialCreationWithNote(
           state, proposal, acceptedHead, initialNoteCreation.get());
     }
+    Optional<NotebookGitProposalInitialNotebookReadmePublication.CreationWithRootNote>
+        initialNotebookReadmeAndNote =
+            NotebookGitProposalInitialNotebookReadmePublication.findWithRootNote(files);
+    if (initialNotebookReadmeAndNote.isPresent()) {
+      return initialNotebookReadmePublication.acceptWithRootNote(
+          state, proposal, acceptedHead, initialNotebookReadmeAndNote.get());
+    }
     Optional<NotebookGitProposalInitialNotebookReadmePublication.Creation> initialNotebookReadme =
         NotebookGitProposalInitialNotebookReadmePublication.find(files);
     if (initialNotebookReadme.isPresent()) {

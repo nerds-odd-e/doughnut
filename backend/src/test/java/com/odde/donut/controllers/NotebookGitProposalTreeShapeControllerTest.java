@@ -151,26 +151,6 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     assertThat(exception.getReason(), containsString("folder README, which is reserved"));
   }
 
-  @Test
-  void doesNotRecognizeASecondPathAsSoleInitialNotebookReadme() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] bundleBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\ninitial notebook readme"),
-                new NotebookGitProposalFile("note.md", "---\ntype: Note\n---\nextra")));
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString("README.md"));
-    assertThat(exception.getReason(), containsString("folder README, which is reserved"));
-  }
-
   /** The baseline accepted tree shared by the tree-shape rejection tests: one note, one README. */
   private static List<PortableTreeEntry> baselineEntries() {
     return List.of(

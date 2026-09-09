@@ -1,7 +1,13 @@
 # Publish a minimal initial container with one note
 
 Source: [SEED-016 Story 4](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-4).
-Status: planned.
+Status: in progress.
+
+## Learnings
+- Slice 1: exact notebook-Readme+root-Note recognition lives on
+  `NotebookGitProposalInitialNotebookReadmePublication` (`findWithRootNote` /
+  `acceptWithRootNote`); controller proof split into
+  `NotebookGitProposalInitialNotebookReadmeControllerTest`.
 
 ## Goal and scope
 
@@ -65,18 +71,18 @@ included.
 
 ### 1. Publish an initial notebook Readme with one root Note
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given an empty accepted notebook, when its direct-child proposal
 contains exactly valid root `README.md` and one valid root ordinary Note,
 publication stores both authored documents, creates the root Note, and accepts
 the proposal's exact head and tree atomically.
 
-Proof: Replace the existing controller rejection for a second path beside the
-sole initial notebook Readme with a positive controller scenario. Observe the
-stored notebook Readme, Note title and authored content, absence of Folders,
-and downloaded head/tree equality. Retain a nearby wrong-type boundary that
-proves rollback. Run the complete backend unit-test suite.
+Proof: Positive controller scenario in
+`NotebookGitProposalInitialNotebookReadmeControllerTest` observes stored
+notebook Readme, Note title and authored content, absence of Folders, and
+downloaded head/tree equality; wrong-type boundary proves rollback. Complete
+backend unit-test suite green.
 
 ### 2. Publish an initial Folder Readme with one contained Note
 Type: Behavior
