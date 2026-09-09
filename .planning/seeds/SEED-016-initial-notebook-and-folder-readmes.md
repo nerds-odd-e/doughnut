@@ -1,6 +1,6 @@
 ---
 id: SEED-016
-status: delivered
+status: active
 planted: 2026-09-09
 planted_during: README-only folder publication verification
 trigger_when: selected now as the top product-backlog story
@@ -84,13 +84,46 @@ ordinary-Note third-path eligibility via quick/082.
   content, README edits, blank Readmes, attachments, multiple unpublished
   commits, stale/divergent history, and bulk import.
 
+<a id="story-4"></a>
+
+### 4. Publish a minimal initial container with one note
+
+**Status:** planned in quick/085.
+
+- **Goal:** A notebook owner can publish either smallest two-file initial
+  container-and-note tree without splitting the authored commit, while a
+  larger valid initial composition that remains unimplemented surfaces loudly
+  to developers instead of being misreported as reserved-README misuse.
+- **Scope:** The notebook has no folders or live notes and its accepted
+  Portable tree is empty. One direct-child commit adds exactly either (a)
+  root `README.md` plus one root ordinary Note, or (b) one root Folder's
+  `README.md` plus one ordinary Note directly inside that Folder, with no
+  notebook Readme. Readmes are valid nonblank `type: Readme` Markdown and the
+  note is valid `type: Note` Markdown with a valid filename-derived title.
+  Publication stores the authored content, creates the required Note and
+  Folder projection, and accepts the exact commit atomically. After all
+  supported shapes are considered, another safe and valid initial Readme/Note
+  composition is allowed to fail loudly under ADR 0006 rather than becoming a
+  handled reserved-README client error. Invalid Markdown, unsafe paths,
+  non-regular files, stale/divergent history, and authorization failures retain
+  their deliberate outcomes. Excluded: accepting any third path, nested
+  folders, relationships, attachments, existing notebook content or README
+  edits, multiple unpublished commits, and bulk import.
+- **Key examples:** Empty accepted tree + `README.md` + `First note.md` stores
+  the notebook Readme and root Note. Empty accepted tree + `New
+  Folder/README.md` + `New Folder/First note.md` creates that Folder and Note
+  while leaving the notebook Readme absent. Adding `README.md` plus two root
+  Notes is still unimplemented and surfaces as an uncaught failure without
+  advancing the binding.
+
 ## Ordering and Scope Reduction
 
 Story 1 was the smallest verified follow-up to the local README-only folder
 workflow. Story 2 adds exactly one ordinary Note to that delivered initial
-tree. Story 3 isolates the smaller unsupported one-file boundary discovered
-after those stories: adding only the initial notebook Readme. Additional
-content and bulk initial import remain separate problems.
+tree. Story 3 isolates adding only the initial notebook Readme. Story 4 joins
+each kind of initial container with one Note while keeping the next valid
+unimplemented composition visible to developers. Additional content and bulk
+initial import remain separate problems.
 
 ## Open Decisions
 
@@ -98,8 +131,8 @@ None.
 
 ## When to Surface
 
-Stories 1–3 are delivered. Additional content and bulk initial import remain
-separate problems.
+Stories 1–3 are delivered. Story 4 is selected for execution planning.
+Additional content and bulk initial import remain separate problems.
 
 ## Breadcrumbs
 
@@ -107,3 +140,5 @@ separate problems.
   delivers the sole-changed-path folder case.
 - Accepted ADR 0004 defines root and folder README Portable paths and their
   `type: Readme` contract.
+- Accepted ADR 0006 permits unimplemented behavior to fail loudly so it creates
+  a Failure report instead of requiring a handled client outcome.
