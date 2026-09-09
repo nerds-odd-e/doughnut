@@ -8,8 +8,9 @@ import java.util.Optional;
 /**
  * Recognizes exact root Folder-creation proposal shapes from inspected regular-file diffs: one
  * added root-level {@code Folder/README.md}; that plus one or two ordinary notes inside the same
- * Folder; that Folder Readme plus one added root {@code README.md}; or those two Readmes plus one
- * added ordinary note directly inside that same Folder.
+ * Folder; that Folder Readme plus one added root {@code README.md}; those two Readmes plus one
+ * added ordinary note directly inside that same Folder; or those two Readmes plus one added
+ * ordinary note directly at the notebook root, a sibling of the Folder rather than inside it.
  */
 final class NotebookGitProposalFolderCreationShape {
 
@@ -44,6 +45,13 @@ final class NotebookGitProposalFolderCreationShape {
    * is that same new root Folder.
    */
   record InitialNotebookRootFolderAndNoteCreation(
+      String notebookReadmePath, String folderReadmePath, String notePath) {}
+
+  /**
+   * Exactly the two-README initial tree plus one added ordinary {@code .md} note directly at the
+   * notebook root: a sibling of the new root Folder, not inside it.
+   */
+  record InitialNotebookRootFolderAndRootNoteCreation(
       String notebookReadmePath, String folderReadmePath, String notePath) {}
 
   static Optional<RootFolderCreation> findSingleRootFolderCreation(
@@ -99,6 +107,19 @@ final class NotebookGitProposalFolderCreationShape {
                     paths.notePaths().getFirst()));
   }
 
+  static Optional<InitialNotebookRootFolderAndRootNoteCreation>
+      findInitialNotebookRootFolderAndRootNoteCreation(List<InspectedRegularFile> files) {
+    return collectInitialAddedPaths(files)
+        .filter(paths -> paths.notebookReadmePath() != null && paths.notePaths().size() == 1)
+        .filter(paths -> !allStartWithFolderPrefix(paths))
+        .map(
+            paths ->
+                new InitialNotebookRootFolderAndRootNoteCreation(
+                    paths.notebookReadmePath(),
+                    paths.folderReadmePath(),
+                    paths.notePaths().getFirst()));
+  }
+
   private static boolean allStartWithFolderPrefix(InitialAddedPaths paths) {
     String prefix = folderPrefix(paths.folderReadmePath());
     return paths.notePaths().stream().allMatch(notePath -> notePath.startsWith(prefix));
@@ -123,7 +144,8 @@ final class NotebookGitProposalFolderCreationShape {
           return Optional.empty();
         }
         folderReadmePath = file.path();
-      } else if (isAddedDirectChildOrdinaryNote(file)) {
+      } else if (isAddedDirectChildOrdinaryNote(file)
+          || NotebookGitProposalInitialNotebookReadmePublication.isAddedRootOrdinaryNote(file)) {
         notePaths.add(file.path());
       } else {
         return Optional.empty();

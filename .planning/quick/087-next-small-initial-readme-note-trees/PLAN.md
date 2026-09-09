@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: resumed and completed through slice 8. Next: Slice 9.
+Status: done. All nine slices delivered.
 
 ## Goal and scope
 
@@ -153,7 +153,7 @@ each applying only its own cardinality/prefix filter. No API/DTO changes.
 
 ### 9. Publish both container Readmes with one root Note
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given an empty accepted notebook, when the exact proposed tree is a
 valid notebook `README.md`, one valid root Folder `README.md`, and one valid
@@ -164,6 +164,16 @@ Proof: A controller test observes notebook and Folder Readmes, the Folder's
 root placement, the Note's root placement and authored content, and downloaded
 head/tree equality. Existing shared validation and transaction tests retain
 invalid-input and rollback ownership. Run the complete backend unit-test suite.
+
+Learning: Added `InitialNotebookRootFolderAndRootNoteCreation` alongside the
+existing `InitialNotebookRootFolderAndNoteCreation`, distinguished by whether
+the Note path starts with the Folder's prefix (in-folder) or not (root
+sibling); the shared `collectInitialAddedPaths` classifier now collects both
+placements. `NotebookGitProposalFolderAcceptance` deduplicated the two
+near-identical accept methods into one private
+`acceptInitialCreationWithSingleNote` helper. Root-vs-folder Note placement
+was already generic in `NotebookGitProposalNoteAddition`, so no new placement
+logic was needed. No API/DTO changes.
 
 ## Contract map
 

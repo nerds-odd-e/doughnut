@@ -118,16 +118,43 @@ class NotebookGitProposalFolderAcceptance {
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndNoteCreation creation) {
+    return acceptInitialCreationWithSingleNote(
+        state,
+        proposal,
+        acceptedHead,
+        creation.notebookReadmePath(),
+        creation.folderReadmePath(),
+        creation.notePath());
+  }
+
+  String acceptInitialCreationWithRootNote(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndRootNoteCreation
+          creation) {
+    return acceptInitialCreationWithSingleNote(
+        state,
+        proposal,
+        acceptedHead,
+        creation.notebookReadmePath(),
+        creation.folderReadmePath(),
+        creation.notePath());
+  }
+
+  private String acceptInitialCreationWithSingleNote(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      String notebookReadmePath,
+      String folderReadmePath,
+      String notePath) {
     List<ExportFolderRow> folders =
         createInitialNotebookAndRootFolder(
-            state,
-            proposal,
-            acceptedHead,
-            creation.notebookReadmePath(),
-            creation.folderReadmePath());
+            state, proposal, acceptedHead, notebookReadmePath, folderReadmePath);
     List<Note> added =
         initialCompositionPublication.applyNotes(
-            state.notebook(), folders, proposal, List.of(creation.notePath()));
+            state.notebook(), folders, proposal, List.of(notePath));
     projection.requireMatchingAcceptedTree(
         state.notebook(), folders, added, proposal.repository(), proposal.mainHead());
     return bindingPersistence.accept(

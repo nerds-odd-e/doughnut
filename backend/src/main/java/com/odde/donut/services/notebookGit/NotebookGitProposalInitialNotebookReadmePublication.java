@@ -86,7 +86,7 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         && "README.md".equals(file.path());
   }
 
-  private static boolean isAddedRootOrdinaryNote(InspectedRegularFile file) {
+  static boolean isAddedRootOrdinaryNote(InspectedRegularFile file) {
     String path = file.path();
     return file.acceptedBlobId() == null
         && file.proposedBlobId() != null

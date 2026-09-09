@@ -125,6 +125,52 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
   }
 
   @Test
+  void publishesInitialNotebookFolderAndRootNoteAsTheExactAuthoredCommit() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("New Folder/README.md", FOLDER_README),
+                new NotebookGitProposalFile("First note.md", FIRST_NOTE)));
+
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+    }
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
+    assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
+    List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(folders, hasSize(1));
+    Folder created = folders.getFirst();
+    assertThat(created.getName(), equalTo("New Folder"));
+    assertThat(created.getParentFolderId(), nullValue());
+    assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(notes, hasSize(1));
+    Note createdNote = notes.getFirst();
+    assertThat(createdNote.getTitle(), equalTo("First note"));
+    assertThat(createdNote.getContent(), equalTo(FIRST_NOTE));
+    assertThat(createdNote.getFolder(), nullValue());
+    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
+
+    ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
+      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
+      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
+    }
+  }
+
+  @Test
   void refusesInitialNotebookAndRootFolderReadmesWhenAnEmptyFolderAlreadyExists() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aFolder().notebook(notebook).name("Existing").please();
