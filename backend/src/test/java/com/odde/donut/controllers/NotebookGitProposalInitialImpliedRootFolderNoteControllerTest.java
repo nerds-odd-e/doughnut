@@ -1,16 +1,23 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsForNotebook;
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.algorithms.FrontmatterNoteLevel;
+import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
 import java.util.Map;
@@ -98,5 +105,57 @@ class NotebookGitProposalInitialImpliedRootFolderNoteControllerTest
     Note createdNote = notes.getFirst();
     assertThat(createdNote.getTitle(), equalTo("First note"));
     assertThat(createdNote.getContent(), equalTo(FIRST_NOTE));
+  }
+
+  @Test
+  void rejectsALaterInvalidContainedNoteWithoutPartialImpliedFolderPublication() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    List<Folder> foldersBefore =
+        inCommittedTransaction(
+            transactionManager,
+            () -> folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()));
+    List<Note> notesBefore =
+        inCommittedTransaction(
+            transactionManager,
+            () -> noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()));
+    List<AuthoredNoteReferenceRow> referencesBefore =
+        inCommittedTransaction(
+            transactionManager, () -> rowsForNotebook(entityManager, notebook.getId()));
+    assertThat(foldersBefore, empty());
+    assertThat(notesBefore, empty());
+    assertThat(referencesBefore, empty());
+    String laterPath = "New Folder/Second note.md";
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile(
+                    "New Folder/First note.md", "---\ntype: Note\n---\nSee [[rollback target]].\n"),
+                new NotebookGitProposalFile(
+                    laterPath, "---\ntype: Note\nnote_level: 7\n---\ninvalid content")));
+
+    ApiException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, ApiException.class);
+
+    assertThat(exception.getErrorBody().getMessage(), containsString(laterPath));
+    assertThat(
+        exception.getErrorBody().getMessage(),
+        containsString(FrontmatterNoteLevel.AUTHORED_NOTE_LEVEL_MESSAGE));
+    assertThat(
+        exception.getErrorBody().getErrors().get("note_level"),
+        equalTo(FrontmatterNoteLevel.AUTHORED_NOTE_LEVEL_MESSAGE));
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          assertThat(
+              folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()),
+              equalTo(foldersBefore));
+          assertThat(
+              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()),
+              equalTo(notesBefore));
+          assertThat(rowsForNotebook(entityManager, notebook.getId()), equalTo(referencesBefore));
+        });
   }
 }

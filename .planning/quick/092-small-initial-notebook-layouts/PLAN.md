@@ -88,20 +88,13 @@ exact download head/tree. One-note sibling keeps count/content coverage.
 
 ### 3. Reject an invalid contained Note without partial publication
 Type: Behavior
-Status: planned
-Proof: Through a committed-transaction controller test, a two-note implied-folder
-proposal whose later Note has invalid `note_level` is rejected with property
-context; accepted head, Folder/Note rows and source-owned reference rows match the
-pre-call state. Use the earlier valid Note's wiki reference to exercise index rollback.
-
-Behavior: The second layout contains an invalid authored property
-→ owner publishes → rejection leaves the notebook unchanged.
-
-Reuse `NotebookGitPublicationAtomicControllerTest` / committed transaction helpers;
-cover the actual publication boundary, not a test-owned outer rollback. Existing
-publisher transaction should provide the outcome; fix only a demonstrated gap.
-Estimated active work: ~5 min, medium confidence. This is an explicit handled
-validation outcome, not a test of the ADR 0006 unimplemented-layout failure.
+Status: done
+Proof: `NotebookGitProposalInitialImpliedRootFolderNoteControllerTest#rejectsALaterInvalidContainedNoteWithoutPartialImpliedFolderPublication`
+plus `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only`. Later `note_level: 7`
+rejected with path and property context; Folder/Note/wiki-reference rows and
+accepted binding match the empty pre-call state. No production change: existing
+publisher transaction already rolls back.
 
 ### 4. Publish a notebook README with one root Relationship
 Type: Behavior
@@ -145,3 +138,5 @@ Ready for direct execution; no additional slice-plan refinement required.
   Implementation ~6 min (suite wait excluded). Remaining slices unchanged.
 - Slice 2: renamed `OneNoteInImpliedRootFolder` to `NotesInImpliedRootFolder`.
   Implementation ~8 min (suite wait excluded). Remaining slices unchanged.
+- Slice 3: no production gap; publisher `REQUIRES_NEW` already rolls back Folder,
+  first Note, and authored references. Implementation ~8 min.
