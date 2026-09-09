@@ -54,7 +54,16 @@ export const noteContentEditingMethods = () => ({
   },
   updateContentAsMarkdown(markdown: string) {
     toolbarButton('Edit as markdown').click()
-    cy.get('textarea').clear().invoke('val', markdown).trigger('input')
+    // Overflow on `.note-content-wrapper` can report the scroll parent as
+    // covering this textarea; same force pattern as rich-property edits.
+    findNoteContentRegion()
+      .find('textarea')
+      .filter(':visible')
+      .first()
+      .scrollIntoView()
+      .clear({ force: true })
+      .invoke('val', markdown)
+      .trigger('input', { force: true })
     this.flushPendingContentSave()
     return this.switchToRichContent()
   },
