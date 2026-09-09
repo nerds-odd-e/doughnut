@@ -44,6 +44,8 @@ export type CliE2ePluginTasksOptions = {
     extensionWithDot: string,
     data: Buffer
   ) => string
+  /** Backend origin for spawned CLI processes; defaults to `E2E_APP_BASE_URL` when omitted. */
+  appBaseUrl?: string | null
 }
 
 async function bundleCliE2eInstallOrThrow(
@@ -66,6 +68,7 @@ export function createCliE2ePluginTasks(
   const pty = createCliE2eManagedPty({
     repoRoot,
     saveBufferToCurrentSpecFolder: options.saveBufferToCurrentSpecFolder,
+    appBaseUrl: options.appBaseUrl,
   })
 
   return {
@@ -130,10 +133,10 @@ export function createCliE2ePluginTasks(
       return donutPath
     },
     runInstalledCli(task: RunInstalledCliTask) {
-      return runInstalledCliExpectingExit(pty, task, 0)
+      return runInstalledCliExpectingExit(pty, task, 0, options.appBaseUrl)
     },
     runInstalledCliExpectingRejection(task: RunInstalledCliTask) {
-      return runInstalledCliExpectingExit(pty, task, 1)
+      return runInstalledCliExpectingExit(pty, task, 1, options.appBaseUrl)
     },
     async runInstalledCliInteractive({
       donutPath,

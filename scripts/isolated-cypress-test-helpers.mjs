@@ -28,8 +28,11 @@ export function isolatedCypressOpts(extra = {}) {
   return opts
 }
 
-export function supportedConfig(baseUrl = 'http://localhost:5173') {
-  return { specPattern: SUPPORTED_ISOLATED_CYPRESS_SPEC, baseUrl }
+export function supportedConfig(
+  baseUrl = 'http://localhost:5173',
+  specPattern = SUPPORTED_ISOLATED_CYPRESS_SPEC
+) {
+  return { specPattern, baseUrl }
 }
 
 export async function assertRefusesBeforeReset(run, pattern) {

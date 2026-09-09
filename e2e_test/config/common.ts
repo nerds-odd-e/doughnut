@@ -116,6 +116,7 @@ const commonConfig = {
             specScreenshotSink.saveBufferToCurrentSpecFolder.bind(
               specScreenshotSink
             ),
+          appBaseUrl: config.baseUrl,
         }),
         setTestState({ key, value }: { key: string; value: unknown }) {
           testState[key] = value

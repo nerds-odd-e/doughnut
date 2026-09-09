@@ -6,10 +6,16 @@ import { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC } from './isolated-openai-mock.mjs
 export const SUPPORTED_ISOLATED_CYPRESS_SPEC =
   'e2e_test/features/note_creation_and_update/worktree_note_editing.feature'
 
+/** Web-created-note CLI workflow — clones, creates, pulls, and publishes
+ * against the owning worktree's own isolated backend and notebook data. */
+export const SUPPORTED_ISOLATED_CLI_SPEC =
+  'e2e_test/features/cli/cli_notebook_web_created_note.feature'
+
 export { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC }
 
 export const SUPPORTED_ISOLATED_CYPRESS_SPECS = [
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
+  SUPPORTED_ISOLATED_CLI_SPEC,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 ]
 

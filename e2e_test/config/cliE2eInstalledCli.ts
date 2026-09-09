@@ -18,7 +18,8 @@ export type RunInstalledCliTask = {
 export async function runInstalledCliExpectingExit(
   pty: CliE2eManagedPty,
   { donutPath, args, env }: RunInstalledCliTask,
-  expectedExitCode: 0 | 1
+  expectedExitCode: 0 | 1,
+  appBaseUrl?: string | null
 ) {
   if (!donutPath) {
     throw new Error(
@@ -39,7 +40,7 @@ export async function runInstalledCliExpectingExit(
         command: process.execPath,
         args: [donutPath, ...(args ?? [])],
         cwd,
-        env: { ...process.env, ...cliEnv(env) },
+        env: { ...process.env, ...cliEnv(env, appBaseUrl) },
       },
       CLI_E2E_MANAGED_PTY_GEOMETRY
     )

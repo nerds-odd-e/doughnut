@@ -2,9 +2,12 @@
 import { CLI_E2E_PNPM_SPAWN_ENV } from './cliE2eRepo'
 import { E2E_APP_BASE_URL } from './constants'
 
-export function cliEnv(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+export function cliEnv(
+  overrides?: NodeJS.ProcessEnv,
+  appBaseUrl?: string | null
+): NodeJS.ProcessEnv {
   return {
-    DONUT_API_BASE_URL: E2E_APP_BASE_URL,
+    DONUT_API_BASE_URL: appBaseUrl ?? E2E_APP_BASE_URL,
     ...CLI_E2E_PNPM_SPAWN_ENV,
     // Override CI=1 (set by nix dev env) so Ink uses non-CI rendering mode,
     // which writes interactive UI output to stdout for E2E assertions.
