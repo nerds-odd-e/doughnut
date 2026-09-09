@@ -172,6 +172,10 @@ corrected by quick/091 (`5d2c5b3d9d`).
   These are delivery exclusions, not new global format restrictions.
 - **Assumption:** Existing authored-document persistence and reference indexing
   provide Relationship behavior. No schema, API or CLI contract change is needed.
+- **Verification reminder:** CLI isolation certifies only
+  `cli_notebook_web_created_note.feature`; it does not admit the other CLI specs
+  or prove these initial layouts. Keep quick/092's controller publication/download
+  proof as the acceptance boundary; no additional CLI isolation work is a prerequisite.
 - **Safe stopping point:** Each completed layout is independently usable and
   transactionally safe. All three are required to complete this one story.
 
@@ -179,8 +183,10 @@ corrected by quick/091 (`5d2c5b3d9d`).
 
 Stories 1–5 and their eligibility corrections are delivered. Story 6 is selected
 for refinement and planning by the developer on 2026-09-09 following the jap1
-publication investigation. This selection does not reorder the product backlog.
-Full initial import remains deferred.
+publication investigation. The 2026-09-09 backlog review queues this existing
+story after completion of the selected CLI/MCP stories. The remaining worktree
+proof correction (quick/073, SEED-015 story 3) stays ahead of this expansion;
+that is priority, not a technical dependency. Full initial import remains deferred.
 
 ## Open Decisions
 

@@ -23,11 +23,13 @@ changes.
 
 ## Backlog
 
-- [Run one non-interactive CLI E2E workflow against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
-- [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
+- [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
+- [Publish three small initial layouts exposed by the jap1 failure](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-6) — SEED-016
 
 ## Recently done
 
+- [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
+- [Run one non-interactive CLI E2E workflow against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
 - [Publish the next small initial Readme-and-Note trees](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5) — SEED-016
 - [Publish a minimal initial container with one note](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-4) — SEED-016
 - [Publish the initial notebook README by itself](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-3) — SEED-016
@@ -36,5 +38,3 @@ changes.
 - [Create a README-only folder locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-19) — SEED-009
 - [Retire worktree databases without admitting late runners or overlooking uncertain JVMs](seeds/SEED-015-concurrent-worktree-environments.md#story-6a) — SEED-015
 - [Reclaim databases from retired worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-6) — SEED-015
-- [Apply the web edit batching interval accurately across durable saves](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-10a) — SEED-009
-- [Stop an isolated SUT without leaving its forked backend running](seeds/SEED-015-concurrent-worktree-environments.md#story-2b) — SEED-015

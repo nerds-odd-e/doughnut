@@ -16,8 +16,9 @@ shared database resets, schema changes, and service endpoints should change to
 independent test runs against each worktree's own code and state, within the
 capacity of one development machine using the existing Nix environment.
 
-Backend tests and the two supported browser specs now isolate databases, app
-endpoints, and OpenAI mocks. Disposable worktree databases can be explicitly
+Backend tests, two focused browser specs, one CLI clone/pull/publish spec, and
+one MCP search/graph spec now use isolated worktree environments. The OpenAI
+completion spec has private mocks. Disposable worktree databases can be explicitly
 retired before checkout removal. Other mock and client workflows remain
 unsupported; general parallel E2E support is unfinished. Owned SUT descendant
 shutdown (2b) is delivered.
@@ -273,7 +274,8 @@ and Cloud VM/CI changes. No continuous ancestry tracking is implied.
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
-**Status:** Delivered, 2026-09-08. Recover quick/070 from `47c4b24eba`.
+**Status:** Runtime behavior delivered 2026-09-08 (`47c4b24eba`); remaining
+recording-exclusivity proof re-refined and requeued first on 2026-09-09.
 Exclusive-recording proof correction: [quick/073](../quick/073-exclusive-openai-recording-proof/PLAN.md).
 
 **Goal**
@@ -297,169 +299,99 @@ calls, multi-spec/glob/open-mode, CLI/MCP, persistent mock ports, Cloud VM/CI
 changes, and malicious post-verification listener replacement.
 Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
+**Remaining correction — refined 2026-09-09**
+
+- **Goal/value:** Developers and AI tasks can trust that a passing paired
+  completion check proves exclusive recorded requests as well as each worktree's
+  own response. The existing presence-only assertion can accept mixed recordings;
+  this is an evidence gap, not a demonstrated routing leak.
+- **Scope:** Strengthen the existing recording assertion at the actual browser
+  boundary. Supply both owner and peer markers from the paired proof context;
+  inspect all recorded POST /responses bodies, preserving the owner's marker and
+  rejecting the peer's marker. Preserve current completion and unavailable-service
+  behavior, mock ownership/cleanup and the single-spec allowlist. The only
+  adjacent cleanup is removal of the unused test-only fetch adapter and its
+  dedicated test; retain the browser recording reader. No transport abstraction,
+  new runner, mock service or parallel-job capability.
+- **Key examples:** An owner-only recording passes; a recording containing both
+  markers fails even when the owner's request is last; a recording missing the
+  owner marker fails. With two separate worktrees, the peer's recording remains
+  exclusive before and after the resetter resets its mock. Reverse the roles to
+  prove preservation for the other allocation. Both suggestions remain correct.
+- **Proof reminders:** Use distinct non-overlapping markers and a fresh barrier
+  directory per paired run. URL-only checks, identical fixtures, or harness
+  spawn-argument tests do not establish uncrossed recordings. MCP's seeded
+  rendezvous covers a different boundary and does not complete this correction.
+  Ordinary unpaired completion and the existing conversation assertion retain
+  presence-only behavior without a peer marker. Run ordinary completion separately
+  to retain unavailable-service coverage.
+- **Boundary:** One Cypress runner in each of two worktrees. Multiple independent
+  test jobs sharing one worktree remain postponed. Quick/073 owns execution;
+  retain this story's delivered behavior and do not create another correction plan.
+  If the stronger proof exposes a runtime isolation defect, stop with its evidence
+  and revisit scope before changing routing, ownership or process lifecycle.
+
 <a id="story-4"></a>
 
 ### 4. Run one non-interactive CLI E2E workflow against the owning worktree's environment
 
-**Status:** Implementation delivered in quick/088 (`c3c2a5d3a9`); paired
-data-isolation proof and usage guidance remain open. Close these in
-[quick/089, slice 1](../quick/089-isolated-mcp-services-e2e/PLAN.md) before
-removing this story from the backlog. Do not repeat the delivered origin fix.
+**Status:** Delivered 2026-09-09. Origin routing and admission: quick/088
+(`c3c2a5d3a9`); paired reset proof and usage guidance: quick/089 slice 1
+(`636583c931`, merged by `b0bdb8e76d`). Guide: `docs/worktree-browser-tests.md`.
 
 **Goal**
 
-Developers and AI tasks can run the `cli_notebook_web_created_note.feature`
-clone/pull/publish workflow through the installed CLI in an isolated linked
-worktree, against that worktree's own backend and local client state, while
-another worktree runs the same or a browser workflow concurrently without
-either resetting or reading the other's data.
+Developers and AI tasks can run the installed CLI clone/pull/publish workflow
+against their own backend and local client state while another worktree runs
+concurrently, without reading or resetting each other's notebook data.
 
 **Scope**
 
-- One local Nix worktree with an existing isolated application allocation
-  (1a–1c, 2, 2a identity/provisioning), run as `pnpm sut` then
+- Local Nix, one healthy isolated SUT and one Cypress runner per worktree;
   `pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature`.
-  This is the one CLI spec this story admits into the isolated-run allowlist
-  (`scripts/isolated-cypress-spec-selection.mjs`); no other CLI spec becomes
-  runnable in an isolated worktree as a result of this story.
-- `cliEnv()` (`e2e_test/config/cliEnv.ts`) now ensures the `DONUT_API_BASE_URL`
-  given to every spawned CLI process resolves the same isolated origin
-  `guardCypressNodeSetup` already assigns to `config.baseUrl`
-  (`scripts/isolated-cypress.mjs`). An unconfigured/primary checkout keeps
-  today's default origin.
-- Config, access-token, and clone-checkout directories already come from
-  per-run `mkdtempSync(tmpdir(), …)` calls
-  (`cliE2ePluginConfigDirTasks.ts`, `cliE2eNotebookCloneTasks.ts`) and need
-  no new isolation code; the key example below is a check that this already
-  holds, not new behavior.
-- Concurrency safety (runner lease, health-verified owning application,
-  retirement veto on an active run) is inherited unchanged from the existing
-  Cypress runner-lease mechanism (1a–1c, 2a, 6/6a) once the spec is
-  admitted; this story adds no second identity, lease, or process-ownership
-  mechanism. CLI subprocesses are already synchronously spawned and awaited
-  to exit (`runInstalledCliExpectingExit`/`waitForPtyExit`), so no
-  outlives-its-parent shutdown case applies here.
+  Only this CLI spec is admitted. Spawned CLI calls use the owning origin;
+  config, tokens and clone directories are private to the run.
+- The installed CLI notebook survives an ordered peer browser fixture reset.
+  Primary-checkout defaults, health checks, runner lease, active-run retirement
+  veto and synchronous CLI subprocess cleanup retain their existing behavior.
+- Reuse delivered identity/provisioning and runner ownership (1a–1c, 2/2a).
+  Independent mocks and MCP support are not prerequisites.
 
-**Exclusions:** Every other CLI feature file, including
-`cli_notebook_existing_note_edits.feature`, `cli_notebook_folder_relocation.feature`,
-`cli_notebook_clone.feature`, and `cli_install_and_run.feature` — the
-DONUT_API_BASE_URL fix applies to them too, but this story certifies isolated
-concurrency for one representative spec only and does not add the others to
-the allowlist. Interactive mode, access tokens obtained through the CLI itself,
-and Gmail/OAuth (`cli_interactive_mode.feature`, `cli_access_token.feature`,
-`cli_gmail.feature`, `cli_recall.feature`) stay excluded; all four already
-carry `@ignore` and are not part of the active suite today. MCP, Cloud VM/CI
-changes, and any change to the runner-lease or retirement mechanisms
-themselves are also excluded. A future story can extend the allowlist to
-further non-interactive CLI specs, or take on interactive/OAuth cases, once
-this narrower slice is proven.
-
-**Key examples**
-
-- Two linked worktrees each run `pnpm sut` then the allowlisted CLI spec
-  concurrently: each installed CLI clones, edits, and publishes against its
-  own worktree's notebook data; neither run's fixtures, published note
-  content, or process teardown affects the other.
-  Remaining proof must observe distinct notebook content surviving an actual
-  peer fixture reset during the run; two different URL values or one successful
-  isolated run do not establish this. Quick/089 owns that proof and the guide.
-- The same spec run in the unconfigured primary checkout keeps using
-  `doughnut_test`/the primary origin, unchanged from today.
-- Selecting any CLI spec other than the one allowlisted spec in an isolated
-  worktree still refuses before fixture/client setup, exactly as any
-  currently-unsupported spec does today.
-- `pnpm worktree:retire --check` still reports a busy Cypress runner lease,
-  and refuses reclamation, while the allowlisted CLI spec is actively running
-  in that worktree — unchanged existing behavior, exercised against a CLI run
-  instead of a browser run.
-
-**Depends on:** Delivered 1a–1c and 2/2a identity, provisioning, and runner
-ownership. No independent mock is required — the selected spec does not use
-OpenAI, Google, or other mocked services. MCP support is not a prerequisite.
+**Exclusions:** Other CLI specs (including existing-note edits, folder relocation,
+clone and installation), interactive and CLI-issued-token/OAuth workflows,
+MCP, new ownership mechanisms, Cloud VM/CI changes, and general parallel E2E.
+The shared origin fix does not certify additional specs for isolated concurrency.
 
 <a id="story-5"></a>
 
 ### 5. Run MCP E2E workflows against the owning worktree's environment
 
-**Status:** Planned in [quick/089, slices 2–3](../quick/089-isolated-mcp-services-e2e/PLAN.md),
-after the CLI proof correction. Do not create a competing execution plan.
+**Status:** Delivered 2026-09-09 via quick/089 slices 2–3 (`bed1654502`,
+`25d16928bf`, merged by `b0bdb8e76d`). Guide: `docs/worktree-browser-tests.md`.
 
 **Goal**
 
-Developers and AI tasks can run the `mcp_services.feature` MCP client workflow
-(note search and note-graph tools) through the real MCP server in an isolated
-linked worktree, against that worktree's own backend and data, while another
-worktree runs the same or a browser/CLI workflow concurrently without either
-resetting or reading the other's data or leaving a spawned MCP server process
-behind.
+Developers and AI tasks can run real MCP note-search and note-graph tools against
+an isolated worktree while another worktree runs concurrently, without crossed
+notebook data or a spawned MCP server surviving client disconnect.
 
 **Scope**
 
-- One local Nix worktree with an existing isolated application allocation
-  (1a–1c, 2, 2a identity/provisioning), run as `pnpm sut` then
-  `pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature`. This is the
-  one MCP spec this story admits into the isolated-run allowlist
-  (`scripts/isolated-cypress-spec-selection.mjs`); there is currently only this
-  one MCP feature file, and no other MCP scenario becomes runnable in an
-  isolated worktree as a result of this story.
-- The MCP client already resolves its target origin from
-  `Cypress.config('baseUrl')` (`e2e_test/start/pageObjects/mcpAgentActions.ts`
-  → `e2eAppBaseUrl()`), the same isolated origin `guardCypressNodeSetup`
-  already assigns for the owning worktree (`scripts/isolated-cypress.mjs`) —
-  unlike CLI story 4, there is no hardcoded-origin bug to fix here. The first
-  key example below is a check that this already holds, not new behavior.
-- Fix `disconnectMcpServer()` (`e2e_test/support/mcp_client.ts`) so it actually
-  terminates the spawned MCP server child process: call `this.client.close()`
-  (which the SDK cascades into the transport's own bounded SIGTERM-then-SIGKILL
-  shutdown) instead of the current dead code, which checks for a
-  `transport.child` property and a `client.disconnect` method that do not
-  exist on the SDK's `StdioClientTransport`/`Client` and so never terminate the
-  process today. This closes the shutdown gap the story anticipated: teardown
-  must await bounded child cleanup before another run can reuse the
-  allocation, not just record that a call was made.
-- The bundled `mcp-server/dist/mcp-server.bundle.mjs` and the child process it
-  spawns already belong to the invoking worktree's own checkout and Cypress
-  process; no new build, registry, or lease mechanism is introduced.
-- Concurrency safety (runner lease, health-verified owning application,
-  retirement veto on an active run) is inherited unchanged from the existing
-  Cypress runner-lease mechanism (1a–1c, 2a, 6/6a) once the spec is admitted;
-  this story adds no second identity, lease, or process-ownership mechanism.
-- `mcp_services.feature` calls only Donut's own backend tools (note search and
-  graph); it needs no OpenAI, Google, or other external-service mock, so no
-  independent mock work is required for this story.
+- Local Nix, one healthy isolated SUT and one Cypress runner per worktree;
+  `pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature`.
+  Only this MCP spec is admitted. The real server bundle belongs to the invoking
+  checkout and receives its owning backend origin and access token.
+- Concurrent MCP runs use distinct notes, find their own marker, and exclude
+  the peer's marker after both worktrees have seeded. Disconnect awaits the
+  SDK's bounded child shutdown before returning, including reconnect teardown.
+- Primary-checkout defaults remain supported. Mixed and unsupported selections
+  refuse before setup; an active MCP run vetoes retirement through the existing
+  runner lease. Reuse identity/provisioning and runner ownership (1a–1c, 2/2a);
+  this spec needs no external-service mocks or CLI prerequisite.
 
-**Exclusions:** Any future MCP tool or feature file beyond the one existing
-spec, CLI (story 4), every other browser spec, changes to `mcp-server`'s tools
-or bundling beyond what isolated selection needs, a new MCP-specific lease or
-process registry, general process supervision, Cloud VM/CI changes, and any
-change to the runner-lease or retirement mechanisms themselves.
-
-**Key examples**
-
-- The MCP spec run in the unconfigured primary checkout keeps using
-  `doughnut_test`/the primary origin, unchanged from today, and in a configured
-  isolated worktree targets that worktree's own origin without further change.
-- Two linked worktrees each run `pnpm sut` then the allowlisted MCP spec
-  concurrently: each spawned MCP server searches and reads the note graph from
-  its own worktree's notebook data; neither run's MCP server process or
-  backend data affects the other.
-- Disconnecting an MCP client — including the automatic reconnect between
-  scenarios within one run — leaves no MCP server process still running once
-  `disconnectMcpServer` resolves, confirmed by observing the spawned process
-  actually exit rather than only that the call returned.
-- A spec outside all explicitly supported isolated workflows still refuses
-  before fixture/client setup. Admitting this MCP spec preserves already
-  admitted browser and CLI workflows; being outside the MCP spec is not by
-  itself a reason to refuse a supported workflow.
-- `pnpm worktree:retire --check` still reports a busy Cypress runner lease,
-  and refuses reclamation, while the allowlisted MCP spec is actively running
-  in that worktree — unchanged existing behavior, exercised against an MCP run
-  instead of a browser or CLI run.
-
-**Depends on:** Delivered 1a–1c and 2/2a identity, provisioning, and runner
-ownership. No independent mock is required — the existing MCP spec does not
-use OpenAI, Google, or other mocked services. CLI support (story 4) is not a
-product prerequisite.
+**Exclusions:** Future MCP tools/specs, additional browser or CLI workflows,
+changes to MCP tools/bundling, new leases or process registries, general process
+supervision, runner/retirement redesign, and Cloud VM/CI changes.
 
 <a id="story-6"></a>
 
@@ -521,16 +453,20 @@ Cloud VM/CI changes, and broader database management.
 
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-08:** Stories 6 and 6a are delivered. Queue is
-4 → 5; CLI-before-MCP is value ordering, not a dependency. The
-[product backlog](../PRODUCT-BACKLOG.md) owns global order. The
-recording-exclusivity proof correction stays with story 3 in quick/073;
-it does not require a duplicate product story or broader mock support.
+**Backlog review, 2026-09-09:** Stories 4 and 5 are delivered, completing the
+selected CLI/MCP queue. The remaining isolation work is the existing
+[quick/073](../quick/073-exclusive-openai-recording-proof/PLAN.md) proof correction
+for story 3, now explicitly requeued first by the developer; keep it ahead of
+further capability expansion. This reopens its proof work, not its delivered
+runtime behavior, and creates no separate product story. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 
-Do not claim general parallel E2E support from the focused no-mock workflow.
-First-to-drop order among remaining expansions is 5, then 4. Persistent development
-profiles, capacity scheduling, multiple E2E workers inside one worktree,
-Cloud VM, separate MySQL instances, and a second identity remain deferred.
+The delivered four-spec allowlist does not establish general parallel E2E support.
+Select another concrete blocked workflow before broadening it; no new expansion
+is justified by this execution alone. Persistent development profiles, capacity
+scheduling, Cloud VM, separate MySQL instances, and a second identity remain
+deferred. Multiple independent unit-test or E2E jobs sharing one worktree are
+explicitly postponed by the developer (2026-09-09). This does not disable
+parallelism already used internally by a supported test command.
 
 ## Open Decisions
 
