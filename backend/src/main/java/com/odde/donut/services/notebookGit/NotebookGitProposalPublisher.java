@@ -34,6 +34,7 @@ public class NotebookGitProposalPublisher {
   private final NotebookGitStateLoader notebookGitStateLoader;
   private final AuthorizationService authorizationService;
   private final NotebookGitProjection projection;
+  private final NotebookGitProposalBindingPersistence bindingPersistence;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
@@ -49,6 +50,7 @@ public class NotebookGitProposalPublisher {
       NotebookGitStateLoader notebookGitStateLoader,
       AuthorizationService authorizationService,
       NotebookGitProjection projection,
+      NotebookGitProposalBindingPersistence bindingPersistence,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
@@ -61,6 +63,7 @@ public class NotebookGitProposalPublisher {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
+    this.bindingPersistence = bindingPersistence;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
@@ -197,13 +200,7 @@ public class NotebookGitProposalPublisher {
     projection.requireMatchingAcceptedTree(
         notebook, folders, proposedLiveNotes, proposal.repository(), proposal.mainHead());
 
-    NotebookGitBundleWriter.BundleWriteResult written =
-        NotebookGitBundleWriter.write(proposal.repository());
-    binding.setAcceptedGitObjectId(written.headObjectId());
-    binding.setBundleBytes(written.bundleBytes());
-    binding.setUpdatedAt(publishedAt);
-    entityPersister.save(binding);
-    return written.headObjectId();
+    return bindingPersistence.accept(binding, proposal, publishedAt);
   }
 
   private void applyRename(

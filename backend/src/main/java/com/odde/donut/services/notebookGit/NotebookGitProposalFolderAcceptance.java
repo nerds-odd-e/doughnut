@@ -4,7 +4,6 @@ import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.FolderConstructionService;
 import com.odde.donut.services.FolderSiblingNameValidation;
@@ -12,7 +11,6 @@ import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
@@ -25,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookGitProposalFolderAcceptance {
 
   private final NotebookGitProjection projection;
+  private final NotebookGitProposalBindingPersistence bindingPersistence;
   private final EntityPersister entityPersister;
   private final NotebookGitStateLoader notebookGitStateLoader;
   private final TestabilitySettings testabilitySettings;
@@ -37,6 +36,7 @@ class NotebookGitProposalFolderAcceptance {
 
   NotebookGitProposalFolderAcceptance(
       NotebookGitProjection projection,
+      NotebookGitProposalBindingPersistence bindingPersistence,
       EntityPersister entityPersister,
       NotebookGitStateLoader notebookGitStateLoader,
       TestabilitySettings testabilitySettings,
@@ -46,6 +46,7 @@ class NotebookGitProposalFolderAcceptance {
       NotebookGitProposalNoteAddition noteAddition,
       NotebookGitProposalInitialNotebookReadmePublication initialNotebookReadmePublication) {
     this.projection = projection;
+    this.bindingPersistence = bindingPersistence;
     this.entityPersister = entityPersister;
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.testabilitySettings = testabilitySettings;
@@ -76,7 +77,8 @@ class NotebookGitProposalFolderAcceptance {
         state.liveNotes(),
         proposal.repository(),
         proposal.mainHead());
-    return acceptBinding(state.binding(), proposal);
+    return bindingPersistence.accept(
+        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   String acceptRootFolderAndContainedNote(
@@ -105,7 +107,8 @@ class NotebookGitProposalFolderAcceptance {
             testabilitySettings.getCurrentUTCTimestamp());
     projection.requireMatchingAcceptedTree(
         state.notebook(), folders, List.of(added), proposal.repository(), proposal.mainHead());
-    return acceptBinding(state.binding(), proposal);
+    return bindingPersistence.accept(
+        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   String acceptInitialCreation(
@@ -122,7 +125,8 @@ class NotebookGitProposalFolderAcceptance {
             creation.folderReadmePath());
     projection.requireMatchingAcceptedTree(
         state.notebook(), folders, state.liveNotes(), proposal.repository(), proposal.mainHead());
-    return acceptBinding(state.binding(), proposal);
+    return bindingPersistence.accept(
+        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   String acceptInitialCreationWithNote(
@@ -148,7 +152,8 @@ class NotebookGitProposalFolderAcceptance {
             testabilitySettings.getCurrentUTCTimestamp());
     projection.requireMatchingAcceptedTree(
         state.notebook(), folders, List.of(added), proposal.repository(), proposal.mainHead());
-    return acceptBinding(state.binding(), proposal);
+    return bindingPersistence.accept(
+        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   private List<ExportFolderRow> createInitialNotebookAndRootFolder(
@@ -207,7 +212,8 @@ class NotebookGitProposalFolderAcceptance {
         state.liveNotes(),
         proposal.repository(),
         proposal.mainHead());
-    return acceptBinding(state.binding(), proposal);
+    return bindingPersistence.accept(
+        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   private FolderCreationRequest validRootFolderRequest(String path, String folderName) {
@@ -225,17 +231,5 @@ class NotebookGitProposalFolderAcceptance {
           HttpStatus.BAD_REQUEST, "Invalid folder name at path \"" + path + "\": " + reason);
     }
     return request;
-  }
-
-  private String acceptBinding(
-      NotebookGitBinding binding, NotebookGitProposalImporter.ImportedProposal proposal) {
-    Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
-    NotebookGitBundleWriter.BundleWriteResult written =
-        NotebookGitBundleWriter.write(proposal.repository());
-    binding.setAcceptedGitObjectId(written.headObjectId());
-    binding.setBundleBytes(written.bundleBytes());
-    binding.setUpdatedAt(publishedAt);
-    entityPersister.save(binding);
-    return written.headObjectId();
   }
 }

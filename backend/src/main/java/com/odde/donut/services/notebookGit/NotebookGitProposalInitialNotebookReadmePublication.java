@@ -1,11 +1,9 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
 import com.odde.donut.testability.TestabilitySettings;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jgit.lib.ObjectId;
@@ -33,16 +31,19 @@ class NotebookGitProposalInitialNotebookReadmePublication {
   record CreationWithRootNote(String notebookReadmePath, String notePath) {}
 
   private final NotebookGitProjection projection;
+  private final NotebookGitProposalBindingPersistence bindingPersistence;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NotebookGitProposalNoteAddition noteAddition;
 
   NotebookGitProposalInitialNotebookReadmePublication(
       NotebookGitProjection projection,
+      NotebookGitProposalBindingPersistence bindingPersistence,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NotebookGitProposalNoteAddition noteAddition) {
     this.projection = projection;
+    this.bindingPersistence = bindingPersistence;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteAddition = noteAddition;
@@ -119,7 +120,8 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         state.liveNotes(),
         proposal.repository(),
         proposal.mainHead());
-    return acceptBinding(state.binding(), proposal);
+    return bindingPersistence.accept(
+        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   String acceptWithRootNote(
@@ -148,7 +150,8 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         List.of(added),
         proposal.repository(),
         proposal.mainHead());
-    return acceptBinding(state.binding(), proposal);
+    return bindingPersistence.accept(
+        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   void assertReadyEmptyNotebook(
@@ -176,17 +179,5 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         .notebook()
         .setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, notebookReadmePath));
     entityPersister.save(state.notebook());
-  }
-
-  private String acceptBinding(
-      NotebookGitBinding binding, NotebookGitProposalImporter.ImportedProposal proposal) {
-    Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
-    NotebookGitBundleWriter.BundleWriteResult written =
-        NotebookGitBundleWriter.write(proposal.repository());
-    binding.setAcceptedGitObjectId(written.headObjectId());
-    binding.setBundleBytes(written.bundleBytes());
-    binding.setUpdatedAt(publishedAt);
-    entityPersister.save(binding);
-    return written.headObjectId();
   }
 }
