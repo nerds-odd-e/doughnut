@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -16,15 +15,15 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Verifies publication of one locally authored root folder represented by its README. */
 class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleControllerTestBase {
 
-  private static final String README =
+  private static final String FOLDER_README =
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved folder readme.\n";
+  private static final String NOTEBOOK_README =
+      "---\ntype: Readme\nsource: local\n---\nPrecisely preserved notebook readme.\n";
 
   @Autowired FolderRepository folderRepository;
 
@@ -34,7 +33,7 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
         proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("Field Notes/README.md", README)));
+            binding, List.of(new NotebookGitProposalFile("Field Notes/README.md", FOLDER_README)));
 
     GitBundleTestReader.SingleParentGitCommit proposedCommit;
     try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -50,7 +49,7 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
     Folder created = folders.getFirst();
     assertThat(created.getName(), equalTo("Field Notes"));
     assertThat(created.getParentFolderId(), nullValue());
-    assertThat(created.getReadmeContent(), equalTo(README));
+    assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
     assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
 
@@ -65,21 +64,42 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
   }
 
   @Test
-  void stillRefusesInitialNotebookAndRootFolderReadmesAsReservedFolderReadme() throws Exception {
+  void publishesInitialNotebookAndRootFolderReadmesAsTheExactAuthoredCommit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
         proposalBundleBytes(
             binding,
             List.of(
-                new NotebookGitProposalFile("README.md", README),
-                new NotebookGitProposalFile("Folder/README.md", README)));
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("Field Notes/README.md", FOLDER_README)));
 
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+    }
 
-    assertThat(exception.getReason(), containsString("Folder/README.md"));
-    assertThat(exception.getReason(), containsString("folder README, which is reserved"));
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
+    assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
+    List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(folders, hasSize(1));
+    Folder created = folders.getFirst();
+    assertThat(created.getName(), equalTo("Field Notes"));
+    assertThat(created.getParentFolderId(), nullValue());
+    assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
+    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
+    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
+
+    ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
+      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
+      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
+    }
   }
 }

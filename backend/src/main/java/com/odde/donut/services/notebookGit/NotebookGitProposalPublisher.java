@@ -122,10 +122,8 @@ public class NotebookGitProposalPublisher {
         initialCreation =
             NotebookGitProposalFolderCreationShape.findInitialNotebookAndRootFolderCreation(files);
     if (initialCreation.isPresent()) {
-      throw NotebookGitProposalTreeShape.unsupportedTreeShape(
-          "path \""
-              + initialCreation.get().folderReadmePath()
-              + "\" is a folder README, which is reserved");
+      return folderAcceptance.acceptInitialCreation(
+          state, proposal, acceptedHead, initialCreation.get());
     }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);

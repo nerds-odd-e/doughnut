@@ -16,7 +16,8 @@ final class NotebookGitProposalFolderCreationShape {
 
   /**
    * Exactly one added root {@code README.md} plus exactly one added root-level {@code
-   * Folder/README.md}, with no accepted blobs on those paths and no other changed path.
+   * Folder/README.md} on an otherwise empty tree: no accepted blobs on those paths and no other
+   * path present (changed or unchanged).
    */
   record InitialNotebookAndRootFolderCreation(String notebookReadmePath, String folderReadmePath) {}
 
@@ -40,9 +41,6 @@ final class NotebookGitProposalFolderCreationShape {
     String notebookReadmePath = null;
     String folderReadmePath = null;
     for (InspectedRegularFile file : files) {
-      if (unchanged(file)) {
-        continue;
-      }
       if (isAddedRootNotebookReadme(file)) {
         if (notebookReadmePath != null) {
           return Optional.empty();

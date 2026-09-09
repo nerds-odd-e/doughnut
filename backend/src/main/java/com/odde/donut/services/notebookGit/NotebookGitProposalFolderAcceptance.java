@@ -3,6 +3,7 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.FolderConstructionService;
@@ -20,7 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Applies one eligible Folder-only proposal and accepts that exact authored commit. */
+/** Applies one eligible Folder-creation or Folder-relocation proposal and accepts that commit. */
 @Service
 class NotebookGitProposalFolderAcceptance {
 
@@ -60,6 +61,54 @@ class NotebookGitProposalFolderAcceptance {
     projection.requireMatchingAcceptedTree(
         state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
 
+    String readme = requireReadmeBlob(proposal, readmePath);
+    createRootFolderWithReadme(state.notebook(), readmePath, readme);
+
+    projection.requireMatchingAcceptedTree(
+        state.notebook(),
+        notebookGitStateLoader.foldersOf(state.notebook()),
+        state.liveNotes(),
+        proposal.repository(),
+        proposal.mainHead());
+    return acceptBinding(state.binding(), proposal);
+  }
+
+  String acceptInitialCreation(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      NotebookGitProposalFolderCreationShape.InitialNotebookAndRootFolderCreation creation) {
+    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
+        proposal.repository(), proposal.mainHead());
+    projection.requireMatchingAcceptedTree(
+        state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
+
+    String notebookReadme = requireReadmeBlob(proposal, creation.notebookReadmePath());
+    String folderReadme = requireReadmeBlob(proposal, creation.folderReadmePath());
+    state.notebook().setReadmeContent(notebookReadme);
+    entityPersister.save(state.notebook());
+    createRootFolderWithReadme(state.notebook(), creation.folderReadmePath(), folderReadme);
+
+    projection.requireMatchingAcceptedTree(
+        state.notebook(),
+        notebookGitStateLoader.foldersOf(state.notebook()),
+        state.liveNotes(),
+        proposal.repository(),
+        proposal.mainHead());
+    return acceptBinding(state.binding(), proposal);
+  }
+
+  private void createRootFolderWithReadme(Notebook notebook, String readmePath, String readme) {
+    String folderName = readmePath.substring(0, readmePath.indexOf('/'));
+    FolderCreationRequest request = validRootFolderRequest(readmePath, folderName);
+    Folder folder = folderConstructionService.createFolder(notebook, request);
+    folder.setReadmeContent(readme);
+    entityPersister.save(folder);
+    entityPersister.flush();
+  }
+
+  private static String requireReadmeBlob(
+      NotebookGitProposalImporter.ImportedProposal proposal, String readmePath) {
     String readme =
         NotebookGitProposalBlobText.readUtf8(
             proposal.repository(), proposal.mainHead(), readmePath);
@@ -73,21 +122,7 @@ class NotebookGitProposalFolderAcceptance {
           HttpStatus.BAD_REQUEST,
           "Invalid Markdown: path \"" + readmePath + "\" must have type: Readme");
     }
-
-    String folderName = readmePath.substring(0, readmePath.indexOf('/'));
-    FolderCreationRequest request = validRootFolderRequest(readmePath, folderName);
-    Folder folder = folderConstructionService.createFolder(state.notebook(), request);
-    folder.setReadmeContent(readme);
-    entityPersister.save(folder);
-    entityPersister.flush();
-
-    projection.requireMatchingAcceptedTree(
-        state.notebook(),
-        notebookGitStateLoader.foldersOf(state.notebook()),
-        state.liveNotes(),
-        proposal.repository(),
-        proposal.mainHead());
-    return acceptBinding(state.binding(), proposal);
+    return readme;
   }
 
   String accept(
