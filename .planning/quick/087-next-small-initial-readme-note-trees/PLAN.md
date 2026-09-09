@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: planned.
+Status: in progress (slice 1 done).
 
 ## Goal and scope
 
@@ -72,18 +72,12 @@ deliberate client outcome. No CLI or API contract changes are included.
 
 ### 1. Recognize one Note in one implied root Folder
 Type: Structure
-Status: planned
+Status: done
 
-Internal change: Extend the current initial-composition seam only far enough to
-represent the exact added `New Folder/First note.md` layout as one ordinary
-Note path plus its one implied root Folder, while preserving every current
-publish/refusal outcome. Do not yet model nested paths, multiple Folders, or
-multiple Notes. This immediately enables Slice 2; later Structure slices extend
-the same representation only when their next Behavior requires it.
-
-Proof: The complete backend unit-test suite remains green, including every
-existing initial publication shape, malformed/wrong-type rejection, and loud
-valid-unmatched behavior. No production class newly exceeds 250 lines.
+Learning: `OneNoteInImpliedRootFolder` on `NotebookGitProposalInitialComposition`
+describes the single-depth layout; publisher consults it before ValidUnmatched
+without accepting yet. Direct-child Note helpers live on
+`NotebookGitProposalFolderCreationShape` (package-visible) to avoid duplication.
 
 ### 2. Publish one Note in an implied root Folder
 Type: Behavior

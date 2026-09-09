@@ -117,8 +117,8 @@ final class NotebookGitProposalFolderCreationShape {
     return Optional.of(new InitialAddedPaths(notebookReadmePath, folderReadmePath, notePath));
   }
 
-  private static String folderPrefix(String folderReadmePath) {
-    return folderReadmePath.substring(0, folderReadmePath.indexOf('/') + 1);
+  static String folderPrefix(String pathWithRootFolder) {
+    return pathWithRootFolder.substring(0, pathWithRootFolder.indexOf('/') + 1);
   }
 
   private static boolean unchanged(InspectedRegularFile file) {
@@ -131,7 +131,7 @@ final class NotebookGitProposalFolderCreationShape {
     return isAddedDirectChildPath(file) && "README.md".equals(directChildBasename(file.path()));
   }
 
-  private static boolean isAddedDirectChildOrdinaryNote(InspectedRegularFile file) {
+  static boolean isAddedDirectChildOrdinaryNote(InspectedRegularFile file) {
     String path = file.path();
     return isAddedDirectChildPath(file)
         && path.endsWith(".md")
