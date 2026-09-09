@@ -157,18 +157,10 @@ public class NotebookGitProposalPublisher {
       return initialNotebookReadmePublication.accept(
           state, proposal, acceptedHead, initialNotebookReadme.get());
     }
-    Optional<NotebookGitProposalInitialComposition.OneNoteInImpliedRootFolder>
-        oneNoteInImpliedRootFolder =
-            NotebookGitProposalInitialComposition.findOneNoteInImpliedRootFolder(files, proposal);
-    if (oneNoteInImpliedRootFolder.isPresent() && folders.isEmpty() && liveNotes.isEmpty()) {
-      return initialCompositionPublication.acceptOneNoteInImpliedRootFolder(
-          state, proposal, acceptedHead, oneNoteInImpliedRootFolder.get());
-    }
-    Optional<NotebookGitProposalInitialComposition.OneNestedFolderReadme> oneNestedFolderReadme =
-        NotebookGitProposalInitialComposition.findOneNestedFolderReadme(files, proposal);
-    if (oneNestedFolderReadme.isPresent() && folders.isEmpty() && liveNotes.isEmpty()) {
-      return initialCompositionPublication.acceptOneNestedFolderReadme(
-          state, proposal, acceptedHead, oneNestedFolderReadme.get());
+    Optional<String> initialCompositionAccepted =
+        initialCompositionPublication.tryAccept(state, proposal, acceptedHead, files);
+    if (initialCompositionAccepted.isPresent()) {
+      return initialCompositionAccepted.get();
     }
     Optional<NotebookGitProposalInitialComposition.ValidUnmatched> validUnmatchedInitial =
         NotebookGitProposalInitialComposition.findValidUnmatched(files, proposal);

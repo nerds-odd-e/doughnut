@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: in progress (slices 1–4 done).
+Status: in progress (slices 1–5 done).
 
 ## Goal and scope
 
@@ -106,17 +106,11 @@ Learning: `acceptOneNestedFolderReadme` on InitialCompositionPublication uses
 
 ### 5. Publish two sibling Folder Readmes
 Type: Behavior
-Status: planned
+Status: done
 
-Behavior: Given an empty accepted notebook, when the exact proposed tree is
-valid `Folder A/README.md` and `Folder B/README.md`, publication creates both
-root Folders with their authored Readmes and accepts the exact head and tree
-atomically.
-
-Proof: A controller test observes exactly two root Folders, each correct
-Readme, no Notes, and downloaded head/tree equality. Existing shared validation
-and transaction tests retain invalid-input and rollback ownership. Run the
-complete backend unit-test suite.
+Learning: `TwoSiblingRootFolderReadmes` + `tryAccept` on InitialCompositionPublication;
+controller proof `NotebookGitProposalInitialSiblingFolderReadmesControllerTest`.
+Publisher dispatches via `tryAccept` only.
 
 ### 6. Apply a bounded batch of initial Notes
 Type: Structure

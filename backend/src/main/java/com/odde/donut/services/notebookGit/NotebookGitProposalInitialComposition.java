@@ -10,9 +10,10 @@ import org.yaml.snakeyaml.error.YAMLException;
  * Distinguishes bounded initial Readme/Note compositions after every supported exact initial shape
  * has already declined them. Recognizes one ordinary Note whose path implies one root Folder
  * ({@link OneNoteInImpliedRootFolder}), one nested Folder Readme ({@link OneNestedFolderReadme}),
- * and otherwise a {@link ValidUnmatched} marker for added-only Markdown trees with role-correct
- * authored types that include at least one README. Recognition does not throw: invalid Markdown,
- * wrong types, non-Markdown paths, and non-initial diffs simply do not match. {@link
+ * exactly two sibling root Folder Readmes ({@link TwoSiblingRootFolderReadmes}), and otherwise a
+ * {@link ValidUnmatched} marker for added-only Markdown trees with role-correct authored types that
+ * include at least one README. Recognition does not throw: invalid Markdown, wrong types,
+ * non-Markdown paths, and non-initial diffs simply do not match. {@link
  * NotebookGitProposalInitialCompositionPublication} accepts layouts that are wired for publication.
  */
 final class NotebookGitProposalInitialComposition {
@@ -32,6 +33,12 @@ final class NotebookGitProposalInitialComposition {
    */
   record OneNestedFolderReadme(
       String readmePath, String parentFolderName, String childFolderName) {}
+
+  /**
+   * Exactly two added root-level Folder Readmes ({@code Folder A/README.md} and {@code Folder
+   * B/README.md}) on an otherwise empty tree. No Notes, notebook README, or nesting.
+   */
+  record TwoSiblingRootFolderReadmes(String firstReadmePath, String secondReadmePath) {}
 
   /**
    * Marker that every inspected path is an added Markdown file with a role-correct authored type
@@ -79,6 +86,26 @@ final class NotebookGitProposalInitialComposition {
     return Optional.of(
         new OneNestedFolderReadme(
             path, path.substring(0, firstSlash), path.substring(firstSlash + 1, secondSlash)));
+  }
+
+  static Optional<TwoSiblingRootFolderReadmes> findTwoSiblingRootFolderReadmes(
+      List<InspectedRegularFile> files, NotebookGitProposalImporter.ImportedProposal proposal) {
+    if (files.size() != 2) {
+      return Optional.empty();
+    }
+    for (InspectedRegularFile file : files) {
+      if (!NotebookGitProposalFolderCreationShape.isAddedRootFolderReadme(file)) {
+        return Optional.empty();
+      }
+      String content =
+          NotebookGitProposalBlobText.readUtf8(
+              proposal.repository(), proposal.mainHead(), file.path());
+      if (!authoredTypeEquals(content, "Readme")) {
+        return Optional.empty();
+      }
+    }
+    return Optional.of(
+        new TwoSiblingRootFolderReadmes(files.getFirst().path(), files.get(1).path()));
   }
 
   static Optional<ValidUnmatched> findValidUnmatched(

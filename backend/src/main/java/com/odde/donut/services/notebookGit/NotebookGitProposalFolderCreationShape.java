@@ -127,7 +127,7 @@ final class NotebookGitProposalFolderCreationShape {
         && file.acceptedBlobId().equals(file.proposedBlobId());
   }
 
-  private static boolean isAddedRootFolderReadme(InspectedRegularFile file) {
+  static boolean isAddedRootFolderReadme(InspectedRegularFile file) {
     return isAddedDirectChildPath(file) && "README.md".equals(directChildBasename(file.path()));
   }
 
