@@ -1,6 +1,6 @@
 ---
 id: SEED-016
-status: active
+status: completed
 planted: 2026-09-09
 planted_during: README-only folder publication verification
 trigger_when: selected now as the top product-backlog story
