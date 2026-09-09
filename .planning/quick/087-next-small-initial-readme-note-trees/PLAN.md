@@ -1,7 +1,14 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: in progress (slices 1–7 done).
+Status: paused after slices 1–7 (developer stop). Next: Slice 8.
+Slice 8 WIP stashed at OID `c25d85c3de7bf2117a93fc4a0ca6ae45887d015f`
+(`execute-plan pause: slice 8 Folder README + two contained Notes WIP`).
+Restore in worktree
+`/Users/terryyin/.cursor/worktrees/doughnut/087-initial-readme-note-trees`
+on branch `quick/087-next-small-initial-readme-note-trees` via
+`git stash pop` (or `git stash apply c25d85c3de7bf2117a93fc4a0ca6ae45887d015f`).
+Do not merge to main until slices 8–9 complete.
 
 ## Goal and scope
 
