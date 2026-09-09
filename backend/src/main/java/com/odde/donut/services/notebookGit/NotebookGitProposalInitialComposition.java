@@ -12,7 +12,8 @@ import org.yaml.snakeyaml.error.YAMLException;
  * ({@link OneNoteInImpliedRootFolder}), and otherwise a {@link ValidUnmatched} marker for
  * added-only Markdown trees with role-correct authored types that include at least one README.
  * Recognition does not throw: invalid Markdown, wrong types, non-Markdown paths, and non-initial
- * diffs simply do not match. Publication of recognized layouts is wired separately.
+ * diffs simply do not match. {@link NotebookGitProposalInitialCompositionPublication} accepts
+ * recognized layouts.
  */
 final class NotebookGitProposalInitialComposition {
 

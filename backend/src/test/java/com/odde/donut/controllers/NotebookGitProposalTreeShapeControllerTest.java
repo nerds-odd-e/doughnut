@@ -50,11 +50,13 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   @Test
   void rejectsProposalWhoseParentFolderIsMissingFromAcceptedPortableContent() throws Exception {
     Notebook notebook = createGitBackedNotebook();
+    makeMe.aNote().notebook(notebook).title("anchor").content(TYPED_NOTE_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
+                new NotebookGitProposalFile("anchor.md", TYPED_NOTE_CONTENT),
                 new NotebookGitProposalFile(
                     "Folder/extra.md", "---\ntype: Note\n---\nextra content")));
 
@@ -65,7 +67,6 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     assertThat(exception.getReason(), containsString("Folder/extra.md"));
     assertThat(
         exception.getReason(), containsString("not represented in accepted Portable content"));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
   }
 
   @Test

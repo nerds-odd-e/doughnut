@@ -1,22 +1,14 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.Notebook;
 import com.odde.donut.factoryServices.EntityPersister;
-import com.odde.donut.services.FolderConstructionService;
 import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import java.util.List;
-import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Applies eligible Folder-creation or Folder-relocation proposals. */
 @Service
@@ -28,8 +20,7 @@ class NotebookGitProposalFolderAcceptance {
   private final NotebookGitStateLoader notebookGitStateLoader;
   private final TestabilitySettings testabilitySettings;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
-  private final FolderConstructionService folderConstructionService;
-  private final Validator validator;
+  private final NotebookGitProposalFolderMaterialization folderMaterialization;
   private final NotebookGitProposalNoteAddition noteAddition;
   private final NotebookGitProposalInitialNotebookReadmePublication
       initialNotebookReadmePublication;
@@ -41,8 +32,7 @@ class NotebookGitProposalFolderAcceptance {
       NotebookGitStateLoader notebookGitStateLoader,
       TestabilitySettings testabilitySettings,
       FolderSiblingNameValidation folderSiblingNameValidation,
-      FolderConstructionService folderConstructionService,
-      Validator validator,
+      NotebookGitProposalFolderMaterialization folderMaterialization,
       NotebookGitProposalNoteAddition noteAddition,
       NotebookGitProposalInitialNotebookReadmePublication initialNotebookReadmePublication) {
     this.projection = projection;
@@ -51,8 +41,7 @@ class NotebookGitProposalFolderAcceptance {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.testabilitySettings = testabilitySettings;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
-    this.folderConstructionService = folderConstructionService;
-    this.validator = validator;
+    this.folderMaterialization = folderMaterialization;
     this.noteAddition = noteAddition;
     this.initialNotebookReadmePublication = initialNotebookReadmePublication;
   }
@@ -69,7 +58,7 @@ class NotebookGitProposalFolderAcceptance {
         state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
 
     String readme = NotebookGitProposalTypedPath.requireReadme(proposal, readmePath);
-    createRootFolderWithReadme(state.notebook(), readmePath, readme);
+    folderMaterialization.createRootFolderWithReadme(state.notebook(), readmePath, readme);
 
     projection.requireMatchingAcceptedTree(
         state.notebook(),
@@ -95,7 +84,8 @@ class NotebookGitProposalFolderAcceptance {
 
     String folderReadme =
         NotebookGitProposalTypedPath.requireReadme(proposal, creation.folderReadmePath());
-    createRootFolderWithReadme(state.notebook(), creation.folderReadmePath(), folderReadme);
+    folderMaterialization.createRootFolderWithReadme(
+        state.notebook(), creation.folderReadmePath(), folderReadme);
     List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(state.notebook());
     Note added =
         noteAddition.apply(
@@ -169,17 +159,9 @@ class NotebookGitProposalFolderAcceptance {
         notebookReadmePath,
         "Initial notebook and folder Readmes require an empty notebook.");
     String folderReadme = NotebookGitProposalTypedPath.requireReadme(proposal, folderReadmePath);
-    createRootFolderWithReadme(state.notebook(), folderReadmePath, folderReadme);
+    folderMaterialization.createRootFolderWithReadme(
+        state.notebook(), folderReadmePath, folderReadme);
     return notebookGitStateLoader.foldersOf(state.notebook());
-  }
-
-  private void createRootFolderWithReadme(Notebook notebook, String readmePath, String readme) {
-    String folderName = readmePath.substring(0, readmePath.indexOf('/'));
-    FolderCreationRequest request = validRootFolderRequest(readmePath, folderName);
-    Folder folder = folderConstructionService.createFolder(notebook, request);
-    folder.setReadmeContent(readme);
-    entityPersister.save(folder);
-    entityPersister.flush();
   }
 
   String accept(
@@ -214,22 +196,5 @@ class NotebookGitProposalFolderAcceptance {
         proposal.mainHead());
     return bindingPersistence.accept(
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  private FolderCreationRequest validRootFolderRequest(String path, String folderName) {
-    FolderCreationRequest request = new FolderCreationRequest();
-    request.setName(folderName);
-    Set<ConstraintViolation<FolderCreationRequest>> violations = validator.validate(request);
-    if (!violations.isEmpty()) {
-      String reason =
-          violations.stream()
-              .map(ConstraintViolation::getMessage)
-              .sorted()
-              .findFirst()
-              .orElseThrow();
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Invalid folder name at path \"" + path + "\": " + reason);
-    }
-    return request;
   }
 }

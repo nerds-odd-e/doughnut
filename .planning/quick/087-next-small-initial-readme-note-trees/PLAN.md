@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: in progress (slice 1 done).
+Status: in progress (slices 1–2 done).
 
 ## Goal and scope
 
@@ -81,17 +81,12 @@ without accepting yet. Direct-child Note helpers live on
 
 ### 2. Publish one Note in an implied root Folder
 Type: Behavior
-Status: planned
+Status: done
 
-Behavior: Given an empty accepted notebook, when the exact proposed tree is one
-valid `New Folder/First note.md`, publication creates `New Folder` with no
-Readme, stores `First note` inside it with authored bytes, and accepts the exact
-head and tree atomically.
-
-Proof: A controller test observes the Folder hierarchy and absent Readme, Note
-title/content/destination, and downloaded head/tree equality. Existing typed
-Markdown and publication-atomicity tests retain invalid-input and rollback
-ownership. Run the complete backend unit-test suite.
+Learning: `NotebookGitProposalInitialCompositionPublication` accepts the
+layout; `NotebookGitProposalFolderMaterialization` owns validated root Folder
+create (with/without Readme) shared with FolderAcceptance. Controller proof:
+`NotebookGitProposalInitialImpliedRootFolderNoteControllerTest`.
 
 ### 3. Materialize a bounded initial Folder hierarchy
 Type: Structure

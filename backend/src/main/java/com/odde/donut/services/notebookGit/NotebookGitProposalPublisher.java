@@ -44,6 +44,7 @@ public class NotebookGitProposalPublisher {
   private final NotebookGitProposalFolderAcceptance folderAcceptance;
   private final NotebookGitProposalInitialNotebookReadmePublication
       initialNotebookReadmePublication;
+  private final NotebookGitProposalInitialCompositionPublication initialCompositionPublication;
   private final NotebookGitProposalNoteAddition noteAddition;
 
   public NotebookGitProposalPublisher(
@@ -59,6 +60,7 @@ public class NotebookGitProposalPublisher {
       NoteTitlePlacementRules noteTitlePlacementRules,
       NotebookGitProposalFolderAcceptance folderAcceptance,
       NotebookGitProposalInitialNotebookReadmePublication initialNotebookReadmePublication,
+      NotebookGitProposalInitialCompositionPublication initialCompositionPublication,
       NotebookGitProposalNoteAddition noteAddition) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
@@ -72,6 +74,7 @@ public class NotebookGitProposalPublisher {
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.folderAcceptance = folderAcceptance;
     this.initialNotebookReadmePublication = initialNotebookReadmePublication;
+    this.initialCompositionPublication = initialCompositionPublication;
     this.noteAddition = noteAddition;
   }
 
@@ -157,13 +160,15 @@ public class NotebookGitProposalPublisher {
     Optional<NotebookGitProposalInitialComposition.OneNoteInImpliedRootFolder>
         oneNoteInImpliedRootFolder =
             NotebookGitProposalInitialComposition.findOneNoteInImpliedRootFolder(files, proposal);
-    if (oneNoteInImpliedRootFolder.isEmpty()) {
-      Optional<NotebookGitProposalInitialComposition.ValidUnmatched> validUnmatchedInitial =
-          NotebookGitProposalInitialComposition.findValidUnmatched(files, proposal);
-      if (validUnmatchedInitial.isPresent()) {
-        throw new IllegalStateException(
-            "Initial Readme/Note composition is not a supported exact shape.");
-      }
+    if (oneNoteInImpliedRootFolder.isPresent() && folders.isEmpty() && liveNotes.isEmpty()) {
+      return initialCompositionPublication.acceptOneNoteInImpliedRootFolder(
+          state, proposal, acceptedHead, oneNoteInImpliedRootFolder.get());
+    }
+    Optional<NotebookGitProposalInitialComposition.ValidUnmatched> validUnmatchedInitial =
+        NotebookGitProposalInitialComposition.findValidUnmatched(files, proposal);
+    if (validUnmatchedInitial.isPresent()) {
+      throw new IllegalStateException(
+          "Initial Readme/Note composition is not a supported exact shape.");
     }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);
