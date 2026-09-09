@@ -151,10 +151,16 @@ public class NotebookGitProposalPublisher {
       return initialNotebookReadmePublication.accept(
           state, proposal, acceptedHead, initialNotebookReadme.get());
     }
-    Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
-        NotebookGitProposalFolderShape.requireExactOrEmpty(files);
-    if (relocation.isPresent()) {
-      return folderAcceptance.accept(state, proposal, acceptedHead, relocation.get());
+    Optional<NotebookGitProposalInitialComposition.ValidUnmatched> validUnmatchedInitial =
+        NotebookGitProposalInitialComposition.findValidUnmatched(files, proposal);
+    // Valid unmatched initial Readme/Note compositions skip Folder relocation and still use the
+    // ordinary-note classifier's reserved-README rejection.
+    if (validUnmatchedInitial.isEmpty()) {
+      Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
+          NotebookGitProposalFolderShape.requireExactOrEmpty(files);
+      if (relocation.isPresent()) {
+        return folderAcceptance.accept(state, proposal, acceptedHead, relocation.get());
+      }
     }
     List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
         NotebookGitProposalTreeShape.requireAllowedNoteChangesFromInspectedFiles(files);

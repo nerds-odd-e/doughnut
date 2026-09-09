@@ -13,6 +13,9 @@ Status: in progress.
   `FolderAcceptance` then `NoteAddition`. Shared
   `collectInitialAddedPaths` / `assertReadyEmptyNotebook`. Controller proof in
   `NotebookGitProposalInitialFolderAndContainedNoteControllerTest`.
+- Slice 3: `NotebookGitProposalInitialComposition.findValidUnmatched` classifies
+  valid unmatched initial compositions after exact shapes decline; publisher
+  still falls through to reserved-README rejection until Slice 4.
 
 ## Goal and scope
 
@@ -108,7 +111,7 @@ unit-test suite green.
 
 ### 3. Identify valid unmatched initial Readme-and-Note compositions
 Type: Structure
-Status: planned
+Status: done
 
 Internal change: Give the publisher one cohesive way to distinguish an
 added-only, empty-base initial composition made of safe regular Markdown paths
@@ -117,9 +120,10 @@ shape has declined it. Preserve the existing external rejection temporarily.
 This immediately enables Slice 4 to choose propagation without weakening
 validation or teaching the ordinary-note classifier about container Readmes.
 
-Proof: The complete backend unit-test suite remains green. Existing unsafe
-path, file-mode, Markdown-format, wrong-type, projection-drift, and supported
-publication tests continue to own their current outcomes.
+Proof: `NotebookGitProposalInitialComposition.findValidUnmatched` wired in the
+publisher with reserved-README fall-through preserved. Complete backend
+unit-test suite green; existing unsafe path, file-mode, Markdown-format,
+wrong-type, projection-drift, and supported publication outcomes unchanged.
 
 ### 4. Let the next valid initial composition fail loudly
 Type: Behavior
