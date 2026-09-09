@@ -24,10 +24,10 @@ head/tree and atomicity. No complete jap1 import or combinatorial layout support
 - `NotebookGitProposalInitialNotebookReadmePublication.findWithRootNotes` and
   `NotebookReadmeWithRootNotes` now accept one, two, or three root Notes. Do not
   loosen ordinary type or root-path eligibility further.
-- `NotebookGitProposalInitialComposition.findOneNoteInImpliedRootFolder` and its
-  publication method already materialize one implied Folder. Extend coherently
-  to one or two ordinary Notes under the same single root prefix; reject a match
-  for sibling prefixes, deeper paths or other types.
+- `NotebookGitProposalInitialComposition.findNotesInImpliedRootFolder` and its
+  publication method materialize one implied Folder for one or two ordinary
+  Notes with the same single root prefix; they reject sibling prefixes, deeper
+  paths, or other types. Do not generalize nested folders or multiple prefixes.
 - Relationship persistence already uses `AuthoredNoteDocument.fromContent` and
   `AuthoredNoteDocumentPersistence.persist`, including source-owned references.
   Add only the exact root README + one Relationship eligibility. Do not widen
@@ -79,18 +79,12 @@ head/tree. One- and two-note siblings keep count/content coverage only.
 
 ### 2. Publish two Notes in one implied root Folder
 Type: Behavior
-Status: planned
-Proof: Controller publication produces one Folder with both authored Notes;
-download preserves the exact proposed tree/head and contains no synthetic README.
-
-Behavior: Empty notebook + `Folder/A.md` and `Folder/B.md` only
-→ owner publishes → one implied Folder and its two Notes are accepted together.
-
-Extend `NotebookGitProposalInitialImpliedRootFolderNoteControllerTest` and the
-existing one-note recognition/materialization path to a cohesive list of one/two
-Notes with identical direct-parent prefix. Rename singular internal concepts where
-needed; reuse folder creation, `applyNotes`, and projection checks. No nested-folder
-or multiple-prefix generalization. Estimated active work: ~5 min, medium confidence.
+Status: done
+Proof: `NotebookGitProposalInitialImpliedRootFolderNoteControllerTest#publishesTwoNotesInImpliedRootFolderAsTheExactAuthoredCommit`
+plus `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only`. Canonical two-note
+round-trip: one Folder, both authored Notes inside, no notebook/folder README,
+exact download head/tree. One-note sibling keeps count/content coverage.
 
 ### 3. Reject an invalid contained Note without partial publication
 Type: Behavior
@@ -149,3 +143,5 @@ Ready for direct execution; no additional slice-plan refinement required.
 - Slice 1: three-note controller test is the canonical README+root-Notes
   round-trip; one/two-note siblings assert count and authored content only.
   Implementation ~6 min (suite wait excluded). Remaining slices unchanged.
+- Slice 2: renamed `OneNoteInImpliedRootFolder` to `NotesInImpliedRootFolder`.
+  Implementation ~8 min (suite wait excluded). Remaining slices unchanged.
