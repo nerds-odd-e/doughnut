@@ -4,7 +4,7 @@ Sources: [SEED-015 Story 4](../../seeds/SEED-015-concurrent-worktree-environment
 and [Story 5](../../seeds/SEED-015-concurrent-worktree-environments.md#story-5),
 plus completed quick/088 (recover its plan at `419135973b`;
 merged by `c3c2a5d3a9`).
-Status: planned.
+Status: in progress (slice 1 done).
 
 ## Goal and scope
 
@@ -116,41 +116,23 @@ runner-lease or retirement mechanisms themselves.
 
 ### 1. CLI notebook state survives a peer worktree reset
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given two healthy isolated worktrees with separate allocations,
 when the installed CLI workflow runs in one while the browser workflow
 resets and edits the other's data, both complete with their own expected
 notebook contents.
 
-- Reuse `scripts/worktree-reset-isolation-barrier.mjs` and
-  `scripts/worktree-reset-isolation-harness.mjs` for an explicit `cli` mode:
-  CLI peer and browser resetter. Preserve existing modes; introduce no new
-  scheduler or ownership mechanism.
-- Signal the peer-seeded barrier after the selected CLI scenario's
-  notebook/token setup and before clone/pull/publish. Without the paired
-  environment, the task remains a no-op. Use distinct browser-peer data and
-  require its reset after CLI fixtures exist. Synchronize one representative
-  scenario so stale barrier files cannot substitute for reset-order proof.
-- Observe both real workflows completing, reset ordering, and each side's
-  contents. Real installed CLI calls must exercise `config.baseUrl` through
-  the CLI task factory and subprocess; URL-only assertions are insufficient.
-- Update `docs/worktree-browser-tests.md` and the Cypress-origin section of
-  `.cursor/rules/e2e-authoring.mdc` with the supported CLI command, scope,
-  paired proof command, and separate healthy allocation prerequisites.
+Harness `cli` mode spawns the allowlisted CLI spec on the peer and
+note-editing on the resetter. The first CLI scenario signals the existing
+peer-seeded barrier after notebook/token setup and before clone. Docs and
+the Cypress-origin rule now include the CLI command and paired proof.
 
-Proof: After implementing the mode, run
-`CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>`.
-Record the resolved command, both exit results, reset ordering, and uncrossed
-notebook assertions. Run
-`CURSOR_DEV=true nix develop -c pnpm test:browser-worktree-isolation`, extending
-the existing harness test only for the new CLI-mode contract.
-
-Sizing: approximately 5–10 minutes active work, medium confidence, one paired
-proof loop. Dual-SUT startup and Cypress runtime are external-wait exceptions.
-If coordination requires additional independent implementation beats or
-exceeds the active-work hard limit, refine this slice in place. A failed
-paired check keeps the slice unfinished.
+Proof: `CURSOR_DEV=true nix develop -c pnpm test:browser-worktree-isolation`
+passed (26/26). Live:
+`CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer /Users/terryyin/git/doughnut-089-isolated-mcp-e2e --resetter /Users/terryyin/git/doughnut-089-browser-resetter`
+— peer 4/4, resetter 1/1, `resetterResetAt` after `peerSeededAt`, uncrossed
+notebooks (CLI Clone Notebook vs LeSS training).
 
 Stop-safe result: the existing CLI contract has repeatable concurrent proof
 and accurate guidance; MCP support is still excluded at this boundary.
@@ -229,12 +211,21 @@ retirement-check waits. Reuse the existing concurrent proof mechanisms where
 applicable; refine in place if the data/overlap proof needs independent beats.
 Do not replace live data isolation proof with guard-only assertions.
 
+## Learnings
+
+- CLI harness mode needs per-role specs (`peerSpec` / `resetterSpec`), not one
+  shared spec. Fixture and openai-mock still use the same spec on both roles.
+- Resetter leftover at `/Users/terryyin/git/doughnut-089-browser-resetter`
+  (detached, own SUT). Refresh it to the slice-2/3 commit before MCP proof.
+- awaiting story review: [SEED-015 Story 4](../../seeds/SEED-015-concurrent-worktree-environments.md#story-4)
+  status still says ready-for-planning; the remaining CLI proof/docs gap this
+  slice closed may now be delivered.
+
 ## Execution constraints
 
-All slices remain planned; this merge executes no work. The developer
-explicitly authorized the combined plan and corrections-first ordering.
-Do not recreate quick/090 or retain competing slice ownership there.
-Preserve unrelated working-tree changes and the source seed's story anchors.
+Slice 1 is done; slices 2–3 remain. The developer authorized the combined
+plan and corrections-first ordering. Do not recreate quick/090. Preserve
+unrelated working-tree changes and the source seed's story anchors.
 
 Use `CURSOR_DEV=true nix develop -c` for repository tooling; Git runs directly.
 Each slice includes required Jidoka, fresh post-change-refactor agent,

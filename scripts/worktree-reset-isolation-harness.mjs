@@ -3,9 +3,10 @@
  * Temporary paired Cypress runner for isolated reset isolation.
  * Uses the harness-local file barrier; not a reusable scheduler.
  *
- * Default (fixture): note-editing DB reset isolation.
+ * Default (fixture): note-editing DB reset isolation (same spec both roles).
  * OpenAI mock mode: note-content completion with distinct suggestions /
  * request markers and barrier around private mock install/reset.
+ * CLI mode: CLI peer spec + browser note-editing resetter.
  */
 import { spawn } from 'node:child_process'
 import { mkdtemp } from 'node:fs/promises'
@@ -14,6 +15,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import {
+  SUPPORTED_ISOLATED_CLI_SPEC,
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress.mjs'
@@ -70,18 +72,29 @@ export async function runPairedWorktreeResetIsolation(options) {
     (await mkdtemp(path.join(tmpdir(), 'worktree-reset-isolation-')))
   const mode = options.mode ?? 'fixture'
   const openaiMock = mode === 'openai-mock'
-  const spec = openaiMock
+  const peerSpec =
+    mode === 'cli'
+      ? SUPPORTED_ISOLATED_CLI_SPEC
+      : openaiMock
+        ? SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC
+        : SUPPORTED_ISOLATED_CYPRESS_SPEC
+  const resetterSpec = openaiMock
     ? SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC
     : SUPPORTED_ISOLATED_CYPRESS_SPEC
   const peerProof = options.peerProof ?? DEFAULT_PEER_PROOF
   const resetterProof = options.resetterProof ?? DEFAULT_RESETTER_PROOF
   const spawnCypress =
     options.spawnCypress ??
-    ((cwd, env) => spawnIsolatedCypress(cwd, env, spawn, spec))
+    ((cwd, env, spec) => spawnIsolatedCypress(cwd, env, spawn, spec))
   const log = options.log ?? ((line) => process.stdout.write(`${line}\n`))
   log(`Reset isolation barrier: ${barrierDir}`)
   log(`Mode: ${mode}`)
-  log(`Spec: ${spec}`)
+  if (peerSpec === resetterSpec) {
+    log(`Spec: ${peerSpec}`)
+  } else {
+    log(`Peer spec: ${peerSpec}`)
+    log(`Resetter spec: ${resetterSpec}`)
+  }
   log(`Peer checkout: ${peerRoot}`)
   log(`Resetter checkout: ${resetterRoot}`)
   if (openaiMock) {
@@ -114,8 +127,8 @@ export async function runPairedWorktreeResetIsolation(options) {
         }
       : {}
   )
-  const peer = spawnCypress(peerRoot, peerEnv)
-  const resetter = spawnCypress(resetterRoot, resetterEnv)
+  const peer = spawnCypress(peerRoot, peerEnv, peerSpec)
+  const resetter = spawnCypress(resetterRoot, resetterEnv, resetterSpec)
   const [peerExit, resetterExit] = await Promise.all([
     waitForChildExit(peer),
     waitForChildExit(resetter),
@@ -140,7 +153,8 @@ export async function runPairedWorktreeResetIsolation(options) {
     resetterExit,
     events,
     mode,
-    spec,
+    peerSpec,
+    resetterSpec,
     peerProof: openaiMock ? peerProof : null,
     resetterProof: openaiMock ? resetterProof : null,
     peerEnv,

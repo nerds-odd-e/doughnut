@@ -43,7 +43,8 @@ test('openai-mock mode uses the OpenAI completion spec and proof env', async () 
         return child
       },
     })
-    assert.equal(result.spec, SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC)
+    assert.equal(result.peerSpec, SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC)
+    assert.equal(result.resetterSpec, SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC)
     assert.equal(result.mode, 'openai-mock')
     assert.equal(
       spawned[0].env[WORKTREE_RESET_ISOLATION_BARRIER_AT],
