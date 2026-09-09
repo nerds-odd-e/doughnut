@@ -9,8 +9,6 @@ browser workflows (2, 2a), owned SUT descendant shutdown (2b), independent
 OpenAI browser mocks (3), reclaiming disposable worktree databases (6), and
 the retirement eligibility correction (6a) are delivered. Next is CLI and MCP
 isolation. Cloud VM and development-profile isolation remain deferred.
-Quick/073 is an outstanding proof correction for delivered story 3, not a
-separate queue story.
 
 Notebook owners can refine notes in Obsidian or an AI IDE and Donut without
 discarding either side's work or losing learning history for the selected

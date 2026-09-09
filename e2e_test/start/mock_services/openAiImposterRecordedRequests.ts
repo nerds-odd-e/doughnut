@@ -1,5 +1,5 @@
-import type { OpenAiMockEndpointContext } from './openAiMockEndpointContext'
 import { openAiImposterRequestsUrl } from './openAiMockEndpointContext'
+import type { OpenAiMockEndpointContext } from './openAiMockEndpointContext'
 
 export type RecordedImposterRequest = {
   method?: string
@@ -12,19 +12,6 @@ const recordedRequestsFromImposterBody = (
 ): RecordedImposterRequest[] => {
   const imposter = body as { requests?: RecordedImposterRequest[] }
   return imposter.requests ?? []
-}
-
-export const fetchOpenAiImposterRequests = async (
-  endpoint: OpenAiMockEndpointContext,
-  getJson: (url: string) => Promise<{ status: number; body: unknown }>
-): Promise<RecordedImposterRequest[]> => {
-  const res = await getJson(openAiImposterRequestsUrl(endpoint))
-  if (res.status !== 200) {
-    throw new Error(
-      `OpenAI imposter recorded-request fetch failed: status ${res.status}`
-    )
-  }
-  return recordedRequestsFromImposterBody(res.body)
 }
 
 export const cyFetchOpenAiImposterRequests = (
@@ -46,3 +33,15 @@ export const responsesPostBodies = (
       (r) => r.method === 'POST' && (r.path?.includes('/responses') ?? false)
     )
     .map((r) => requestBodyAsString(r.body))
+
+export const recordedResponsesPostsMatchMarkers = (
+  requests: RecordedImposterRequest[],
+  requiredMarker: string,
+  forbiddenMarker?: string
+): boolean => {
+  const joinedBodies = responsesPostBodies(requests).join('\n')
+  return (
+    joinedBodies.includes(requiredMarker) &&
+    (forbiddenMarker === undefined || !joinedBodies.includes(forbiddenMarker))
+  )
+}

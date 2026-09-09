@@ -17,6 +17,7 @@ import {
 export type OpenAiMockIsolationProof = {
   suggestion: string
   requestMarker: string
+  foreignRequestMarker?: string
 }
 
 export function fetchOpenAiMockIsolationProof() {

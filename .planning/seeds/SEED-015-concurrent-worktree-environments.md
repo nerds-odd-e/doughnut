@@ -273,8 +273,8 @@ and Cloud VM/CI changes. No continuous ancestry tracking is implied.
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
-**Status:** Delivered, 2026-09-08. Recover quick/070 from `47c4b24eba`.
-Exclusive-recording proof correction: [quick/073](../quick/073-exclusive-openai-recording-proof/PLAN.md).
+**Status:** Delivered, 2026-09-09. Runtime isolation came from quick/070
+(`47c4b24eba`); exclusive-recording proof was completed by quick/073.
 
 **Goal**
 
@@ -524,8 +524,8 @@ Cloud VM/CI changes, and broader database management.
 **Backlog review, 2026-09-08:** Stories 6 and 6a are delivered. Queue is
 4 → 5; CLI-before-MCP is value ordering, not a dependency. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order. The
-recording-exclusivity proof correction stays with story 3 in quick/073;
-it does not require a duplicate product story or broader mock support.
+Story 3's recording-exclusivity proof correction is complete; it did not add a
+duplicate product story or broader mock support.
 
 Do not claim general parallel E2E support from the focused no-mock workflow.
 First-to-drop order among remaining expansions is 5, then 4. Persistent development

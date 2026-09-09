@@ -46,6 +46,11 @@ Then('my OpenAI mock still records only my request marker', () => {
     cy.log(
       `Recording check via ${endpoint.managementUrl} port ${endpoint.servingPort}`
     )
-    mock_services.openAi().expectLastResponsesPostBodyContains(marker)
+    mock_services
+      .openAi()
+      .expectResponsesPostBodiesMatchMarkers(
+        marker,
+        params?.foreignRequestMarker
+      )
   })
 })
