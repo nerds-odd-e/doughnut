@@ -19,6 +19,7 @@ const {
 } = require('@badeball/cypress-cucumber-preprocessor')
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
+import { composeCypressPluginEvents } from './composeCypressPluginEvents.mjs'
 import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
@@ -44,6 +45,7 @@ const commonConfig = {
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
+      on = composeCypressPluginEvents(on) as Cypress.PluginEvents
       // Cypress 10+ changes process.cwd() to the config file's directory when using --config-file,
       // so resolve from __dirname to get the repo root regardless of cwd.
       const repoRoot = resolve(__dirname, '..', '..')
