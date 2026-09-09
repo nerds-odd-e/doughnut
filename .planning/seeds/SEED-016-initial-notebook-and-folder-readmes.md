@@ -30,9 +30,7 @@ expand this into bulk import and is explicitly deferred.
 
 ### 1. Publish the initial notebook README with one README-only folder
 
-**Status:** Planned in
-[quick/079](../quick/079-initial-notebook-and-folder-readmes/PLAN.md); not
-executed.
+**Status:** delivered. Recover quick/079 from `034be9f99d`.
 
 - **Goal:** A notebook owner can publish one useful initial container tree from
   a local checkout: the notebook Readme and one README-only root Folder, kept
@@ -45,16 +43,12 @@ executed.
   nested folders, more changed paths, an already non-empty accepted notebook,
   README edits to existing containers, multiple unpublished commits,
   stale/divergent history, attachments, and bulk import.
-- **Key example:** Empty accepted notebook → commit the two README paths →
-  Donut shows the notebook Readme and `New Folder` with its Readme, no ordinary
-  Notes, and accepted/downloaded Git equals the authored commit.
-- **Boundary example:** Adding any third path remains an unsupported tree shape.
 
 ## Ordering and Scope Reduction
 
-This is the top backlog story because it is the smallest verified follow-up to
-the just-delivered local README-only folder workflow. Stop after this exact
-two-path initial tree; bulk initial import remains a separate problem.
+This was the smallest verified follow-up to the local README-only folder
+workflow. Stop after this exact two-path initial tree; bulk initial import
+remains a separate problem.
 
 ## Open Decisions
 
@@ -62,15 +56,11 @@ None.
 
 ## When to Surface
 
-Selected now for slice planning. Planning does not authorize execution.
+Story 1 is delivered. Further SEED-016 work is unselected.
 
 ## Breadcrumbs
 
 - [SEED-009 Story 19](SEED-009-git-backed-local-notebook-workflow.md#story-19)
   delivers the sole-changed-path folder case.
-- A temporary controller-boundary reproduction on 2026-09-09 added only the
-  two README paths to an empty accepted tree; the backend suite ran 2,330 tests
-  and failed only that example with the reserved folder-README refusal. The
-  temporary test was removed after confirming the gap.
 - Accepted ADR 0004 defines root and folder README Portable paths and their
   `type: Readme` contract.
