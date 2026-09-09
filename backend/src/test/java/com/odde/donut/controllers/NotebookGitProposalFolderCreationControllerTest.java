@@ -15,7 +15,9 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 
 /** Verifies publication of one locally authored root folder represented by its README. */
 class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleControllerTestBase {
@@ -101,5 +103,34 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
       assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
       assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
     }
+  }
+
+  @Test
+  void refusesInitialNotebookAndRootFolderReadmesWhenAnEmptyFolderAlreadyExists() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    makeMe.aFolder().notebook(notebook).name("Existing").please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    String readmeBefore =
+        notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent();
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("Field Notes/README.md", FOLDER_README)));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
+
+    assertThat(
+        exception.getReason(),
+        equalTo("Initial notebook and folder Readmes require an empty notebook."));
+    Notebook after = notebookRepository.findById(notebook.getId()).orElseThrow();
+    assertThat(after.getReadmeContent(), equalTo(readmeBefore));
+    List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(folders, hasSize(1));
+    assertThat(folders.getFirst().getName(), equalTo("Existing"));
+    assertThat(folders.getFirst().getReadmeContent(), nullValue());
   }
 }

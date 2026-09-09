@@ -35,14 +35,16 @@ expand this into bulk import and is explicitly deferred.
 - **Goal:** A notebook owner can publish one useful initial container tree from
   a local checkout: the notebook Readme and one README-only root Folder, kept
   together as the authored commit.
-- **Scope:** The accepted notebook and Portable tree are empty. Exactly one
-  direct-child commit adds regular-file `README.md` and
-  `New Folder/README.md`, both valid, nonblank `type: Readme` Markdown.
-  Publication creates one fresh root Folder, stores both authored Readmes, and
-  accepts the exact commit atomically. Excluded: ordinary notes, additional or
-  nested folders, more changed paths, an already non-empty accepted notebook,
-  README edits to existing containers, multiple unpublished commits,
-  stale/divergent history, attachments, and bulk import.
+- **Scope:** The notebook is empty of folders and the accepted Portable tree is
+  empty (empty folders alone do not qualify). Exactly one direct-child commit
+  adds regular-file `README.md` and `New Folder/README.md`, both valid,
+  nonblank `type: Readme` Markdown. Publication creates one fresh root Folder,
+  stores both authored Readmes, and accepts the exact commit atomically.
+  Excluded: ordinary notes, additional or nested folders, more changed paths,
+  an already non-empty notebook (including existing empty folders), README
+  edits to existing containers, multiple unpublished commits, stale/divergent
+  history, attachments, and bulk import.
+  Empty-notebook eligibility correction: quick/080.
 
 ## Ordering and Scope Reduction
 

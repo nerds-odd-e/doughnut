@@ -82,6 +82,10 @@ class NotebookGitProposalFolderAcceptance {
         proposal.repository(), proposal.mainHead());
     projection.requireMatchingAcceptedTree(
         state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
+    if (!state.folders().isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Initial notebook and folder Readmes require an empty notebook.");
+    }
 
     String notebookReadme = requireReadmeBlob(proposal, creation.notebookReadmePath());
     String folderReadme = requireReadmeBlob(proposal, creation.folderReadmePath());
