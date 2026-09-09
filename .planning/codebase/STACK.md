@@ -43,7 +43,6 @@
 - Vitest 4.1.10 + Playwright browser mode — frontend, CLI, MCP
 - Cypress 15.18.1 + Cucumber (`@badeball/cypress-cucumber-preprocessor`) — E2E in `e2e_test/`
 - Mountebank (`@mbtest/mountebank`, `@anev/ts-mountebank`) — external API stubs for E2E
-- Stryker — CLI mutation testing (`cli/`)
 - Storybook 10.5.0 — frontend component stories
 
 **Build/Dev:**
