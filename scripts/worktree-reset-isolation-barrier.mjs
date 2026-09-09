@@ -90,6 +90,14 @@ export function openAiMockIsolationProofParams(env = process.env) {
   return { suggestion, requestMarker }
 }
 
+export function appendCucumberExposeTag(config, extraTag) {
+  const existingTags =
+    typeof config.expose.tags === 'string' && config.expose.tags.length > 0
+      ? config.expose.tags
+      : 'not @ignore'
+  config.expose.tags = `(${existingTags}) and ${extraTag}`
+}
+
 function barrierPath(dir, name) {
   return path.join(dir, name)
 }

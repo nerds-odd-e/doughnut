@@ -30,7 +30,8 @@ Feature: CLI notebook web-created note
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
   Scenario: Pulling a title-only web-created root note into a clean checkout
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    When I keep the CLI notebook across the other worktree's fixture reset
+    And I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I create a title-only root note titled "Shopping list" in the notebook "CLI Clone Notebook"
     And I pull the cloned checkout using the installed CLI
     Then the cloned checkout contains exactly:
