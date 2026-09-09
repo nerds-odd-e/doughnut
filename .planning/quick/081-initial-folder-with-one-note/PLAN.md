@@ -1,7 +1,7 @@
 # Publish one initial note inside the new README-backed folder
 
 Source: [SEED-016 Story 2](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-2).
-Status: planned; not executed.
+Status: in progress.
 
 ## Goal and scope
 
@@ -59,20 +59,17 @@ The two delivered smaller shapes remain green.
 
 ### 1. Share ordinary-note addition with initial-tree acceptance
 Type: Structure
-Status: planned
-Proof: Existing ordinary-note addition and initial README publication
-controller tests remain green. Run
-`CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+Status: done
 
-Structure: Extract the existing ordinary-note addition behavior from the
-near-limit `NotebookGitProposalPublisher` into one cohesive backend acceptance
-seam reusable by the immediate next Behavior. Preserve its authored-document,
-filename-title, represented-destination, fresh-identity, persistence, and error
-semantics exactly. Keep orchestration and the publication transaction in the
-publisher; do not create a general import framework or expose a test-only API.
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` stayed green on
+the worktree backend suite, including ordinary-note addition and initial
+README publication (sole-folder, two-README, empty-folder refusal).
 
-Sizing hypothesis: about five minutes for one behavior-preserving extraction
-and one existing-suite proof loop.
+Learnings: Addition lives in package-private `NotebookGitProposalNoteAddition`.
+`apply` is the reusable entry; destination and document helpers stay on that
+class so rename/modify do not fork those rules. Publisher still owns
+orchestration and the SERIALIZABLE `REQUIRES_NEW` transaction. Folder
+acceptance is not wired yet. Publisher is 194 lines.
 
 ### 2. Accept the exact three-path initial notebook tree
 Type: Behavior
@@ -109,16 +106,12 @@ loop; full backend-suite runtime is an external-wait exception.
 
 ## Planning assessment
 
-Both slices are cohesive, own one proof loop, and have plausible target-sized
-hypotheses. Slice 1 is immediately justified by Slice 2 and prevents duplicated
-note-addition rules while keeping the 242-line publisher below the 250-line
-limit. Slice 2 owns one externally observable outcome. No unexplained
-hard-limit path remains; backend-suite runtime is the stated external-wait
-exception.
-
-Resulting slice count: 2. Refinement is not needed. The plan is ready for direct
-execution when separately authorized.
+Slice 1 delivered the reusable addition seam. Slice 2 still owns the
+three-path observable outcome. Backend-suite runtime remains the stated
+external-wait exception.
 
 ## Learnings
 
-None yet; implementation and tests have not started.
+Call `NotebookGitProposalNoteAddition.apply` from initial-tree acceptance
+after the Folder exists, using the refreshed Folder projection for destination
+resolution. Do not copy addition rules into folder acceptance.
