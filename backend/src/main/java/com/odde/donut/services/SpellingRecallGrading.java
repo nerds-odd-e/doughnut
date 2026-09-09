@@ -95,9 +95,8 @@ final class SpellingRecallGrading {
     recallPrompt.setAnswer(answer);
     recallPrompt = entityPersister.save(recallPrompt);
 
-    if (Boolean.TRUE.equals(correct) && isNonDistinguishingOverlap(note, spellingAnswer, user)) {
+    if (!correct && matchesOverlap(note, spellingAnswer, user)) {
       Answer gradedAnswer = recallPrompt.getAnswer();
-      gradedAnswer.setCorrect(false);
       gradedAnswer.setOutcome(AnswerOutcome.OVERLAP);
       entityPersister.save(recallPrompt);
       return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, List.of());
@@ -142,7 +141,7 @@ final class SpellingRecallGrading {
     answer.setIdleMs(answerSpellingDTO.getIdleMs());
   }
 
-  private boolean isNonDistinguishingOverlap(Note reviewedNote, String spellingAnswer, User user) {
+  private boolean matchesOverlap(Note reviewedNote, String spellingAnswer, User user) {
     for (String token :
         FrontmatterOverlaps.overlapWikiLinkTokensFromNoteContent(reviewedNote.getContent())) {
       Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(token);

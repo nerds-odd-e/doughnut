@@ -12,6 +12,8 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
 
@@ -21,12 +23,17 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   @BeforeEach
   void setup() {
     partnerNote =
-        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Shared Title").please();
+        makeMe
+            .aNote()
+            .notebookOwnedBy(currentUser.getUser())
+            .title("Partner")
+            .aliases("colour", "color", "hue")
+            .please();
     Note reviewedNote =
         makeMe
             .aNote()
             .notebookOwnedBy(currentUser.getUser())
-            .title("Shared Title")
+            .title("colour")
             .aliases("color")
             .overlapPartner(partnerNote)
             .please();
@@ -38,25 +45,15 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     return controller.answerSpelling(spellingPrompt(tracker), spellingAnswer(answer));
   }
 
-  private void assertCorrectWithRecallCredit(Note reviewed)
-      throws UnexpectedNoAccessRightException {
-    MemoryTracker tracker = ownedSpellingTracker(reviewed);
-    Integer recallCountBefore = tracker.getRecallCount();
-
-    AnsweredQuestion result = answerSpelling(tracker, reviewed.getTitle());
-
-    assertTrue(result.getAnswer().getCorrect());
-    assertThat(tracker.getRecallCount(), equalTo(recallCountBefore + 1));
-  }
-
-  @Test
-  void shouldGradeAsOverlapWhenAnswerMatchesReviewedAndResolvedOverlapTarget()
+  @ParameterizedTest
+  @ValueSource(strings = {"Partner", "hue"})
+  void overlapTitleOrAliasPreservesReviewSchedule(String answer)
       throws UnexpectedNoAccessRightException {
     Float stabilityBefore = memoryTracker.getStability();
     Timestamp nextRecallAtBefore = memoryTracker.getNextRecallAt();
     Timestamp lastRecalledAtBefore = memoryTracker.getLastRecalledAt();
 
-    AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
+    AnsweredQuestion result = answerSpelling(memoryTracker, answer);
 
     assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
     assertThat(memoryTracker.getStability(), equalTo(stabilityBefore));
@@ -65,22 +62,21 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   }
 
   @Test
-  void overlapAnswerDoesNotWriteARecallLog() throws UnexpectedNoAccessRightException {
-    AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
+  void overlapAnswerPreservesRecallLogs() throws UnexpectedNoAccessRightException {
+    answerSpelling(memoryTracker, "Partner");
 
-    assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
     assertThat(memoryTrackerController.getRecallLogs(memoryTracker), empty());
   }
 
   @Test
-  void shouldLeaveOverlapPartnerTrackerUnchanged() throws UnexpectedNoAccessRightException {
+  void overlapAnswerPreservesPartnerReviewState() throws UnexpectedNoAccessRightException {
     MemoryTracker partnerTracker = ownedSpellingTracker(partnerNote);
     float partnerStabilityBefore = partnerTracker.getStability();
     Timestamp partnerDueBefore = partnerTracker.getNextRecallAt();
     int partnerWrongCountBefore =
         memoryTrackerController.getThresholdExceeded(partnerTracker).wrongCount();
 
-    answerSpelling(memoryTracker, "Shared Title");
+    answerSpelling(memoryTracker, "Partner");
 
     assertThat(memoryTrackerController.getRecallLogs(partnerTracker), empty());
     assertThat(partnerTracker.getStability(), equalTo(partnerStabilityBefore));
@@ -90,83 +86,23 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
         equalTo(partnerWrongCountBefore));
   }
 
-  @Test
-  void shouldNotGradeAsOverlapWhenWikiLinkOnlyUnderAliases()
-      throws UnexpectedNoAccessRightException {
-    Note partner =
-        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Shared Legacy").please();
-    Note reviewed =
-        makeMe
-            .aNote()
-            .notebookOwnedBy(currentUser.getUser())
-            .title("Shared Legacy")
-            .wikiLinkUnderAliasesPartner(partner)
-            .please();
-
-    AnsweredQuestion result = answerSpelling(ownedSpellingTracker(reviewed), "Shared Legacy");
-
-    assertThat(result.getAnswer().getOutcome(), is(not(AnswerOutcome.OVERLAP)));
-  }
-
-  @Test
-  void shouldGradeCorrectWithCreditWhenDistinguishingPlainAlias()
+  @ParameterizedTest
+  @ValueSource(strings = {"colour", "color"})
+  void titleOrAliasReceivesCreditWhenSharedWithOverlap(String answer)
       throws UnexpectedNoAccessRightException {
     Integer recallCountBefore = memoryTracker.getRecallCount();
 
-    AnsweredQuestion result = answerSpelling(memoryTracker, "color");
+    AnsweredQuestion result = answerSpelling(memoryTracker, answer);
 
     assertTrue(result.getAnswer().getCorrect());
     assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore + 1));
   }
 
   @Test
-  void shouldNotCountOverlapTowardFrequentFailureThreshold()
-      throws UnexpectedNoAccessRightException {
+  void overlapAnswersPreserveFailureCount() throws UnexpectedNoAccessRightException {
     for (int i = 0; i < 5; i++) {
-      answerSpelling(memoryTracker, "Shared Title");
+      answerSpelling(memoryTracker, "Partner");
     }
-    assertThat(
-        memoryTrackerController.getThresholdExceeded(memoryTracker).thresholdExceeded(), is(false));
-  }
-
-  @Test
-  void shouldGradeCorrectWithCreditWhenOverlapTargetDoesNotExist()
-      throws UnexpectedNoAccessRightException {
-    Note reviewed =
-        makeMe
-            .aNote()
-            .notebookOwnedBy(currentUser.getUser())
-            .title("Reviewed Alone")
-            .overlapWikiLink("No Such Notebook:Missing Partner Title")
-            .please();
-    assertCorrectWithRecallCredit(reviewed);
-  }
-
-  @Test
-  void shouldGradeCorrectWithCreditWhenOverlapPartnerIsUnreadable()
-      throws UnexpectedNoAccessRightException {
-    Note partner =
-        makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).title("Shared Unreadable").please();
-    Note reviewed =
-        makeMe
-            .aNote()
-            .notebookOwnedBy(currentUser.getUser())
-            .title("Shared Unreadable")
-            .overlapPartner(partner)
-            .please();
-    assertCorrectWithRecallCredit(reviewed);
-  }
-
-  @Test
-  void shouldGradeCorrectWithCreditWhenOverlapTokenIsSelfReferential()
-      throws UnexpectedNoAccessRightException {
-    Note reviewed =
-        makeMe
-            .aNote()
-            .notebookOwnedBy(currentUser.getUser())
-            .title("Self Referential Title")
-            .overlapWikiLink("Self Referential Title")
-            .please();
-    assertCorrectWithRecallCredit(reviewed);
+    assertThat(memoryTrackerController.getThresholdExceeded(memoryTracker).wrongCount(), is(0));
   }
 }

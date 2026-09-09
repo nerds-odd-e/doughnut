@@ -27,12 +27,6 @@ final class NoteFrontmatterLists {
   }
 
   /** Wiki-link item under {@code aliases} (invalid for save; used for read-path fixtures). */
-  void addWikiLinkUnderAliasesPartner(Note partner) {
-    Notebook notebook = partner.getNotebook();
-    wikiLinkUnderAliasesInners.add(notebook.getName() + ":" + partner.getTitle());
-  }
-
-  /** Wiki-link item under {@code aliases} (invalid for save; used for read-path fixtures). */
   void addWikiLinkUnderAliases(String wikiLinkInner) {
     wikiLinkUnderAliasesInners.add(wikiLinkInner);
     refreshAliasIndex = true;

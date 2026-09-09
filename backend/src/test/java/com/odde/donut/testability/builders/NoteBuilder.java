@@ -170,15 +170,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   /**
-   * Puts a wiki-link item under frontmatter {@code aliases} targeting {@code partner}. Invalid for
-   * authored save; used only for read-path fixtures.
-   */
-  public NoteBuilder wikiLinkUnderAliasesPartner(Note partner) {
-    frontmatterLists.addWikiLinkUnderAliasesPartner(partner);
-    return this;
-  }
-
-  /**
    * Puts a wiki-link item under frontmatter {@code aliases}. Invalid for authored save; used only
    * for read-path fixtures.
    */
