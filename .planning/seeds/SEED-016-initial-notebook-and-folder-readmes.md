@@ -3,7 +3,7 @@ id: SEED-016
 status: completed
 planted: 2026-09-09
 planted_during: README-only folder publication verification
-trigger_when: selected now as the top product-backlog story
+trigger_when: a concrete unsupported initial tree warrants story selection
 scope: small
 ---
 
@@ -11,18 +11,10 @@ scope: small
 
 ## Why This Matters
 
-A notebook owner starting from an empty accepted notebook can publish one
-README-only folder only when it is the sole changed path. If the same initial
-commit also authors the notebook's root README, publication refuses the folder
-README. The owner should be able to publish that smallest useful initial
-container tree without splitting the commit or adding an ordinary note.
-
-## Alternatives and Decision
-
-Keep the existing one-folder-only path and add only the verified adjacent case.
-Requiring separate commits would interrupt the owner's initial authored unit;
-supporting arbitrary initial trees or the observed 10,406-file commit would
-expand this into bulk import and is explicitly deferred.
+Notebook owners can publish the bounded initial Readme/Note layouts below
+without splitting their authored commit. These delivered stories preserve
+authored bytes and accept the exact commit atomically. Arbitrary initial
+trees and bulk import remain deferred.
 
 ## Story Decomposition
 
@@ -74,7 +66,7 @@ ordinary-Note third-path eligibility via quick/082.
 
 **Status:** delivered. Recover quick/083 from its merge onto main.
 
-- **Goal:** A notebook owner can publish the smallest currently unsupported
+- **Goal:** A notebook owner can publish the smallest
   local tree: the notebook's root Readme as the first and only file.
 - **Scope:** The notebook has no folders or live notes and its accepted
   Portable tree is empty. Exactly one direct-child commit adds regular-file
@@ -114,7 +106,8 @@ ordinary-Note third-path eligibility via quick/082.
 
 ### 5. Publish the next small initial Readme-and-Note trees
 
-**Status:** delivered. Recover quick/087 from its merge onto main.
+**Status:** delivered via quick/087 (`33b2b34ebc`); exact root-Note eligibility
+corrected by quick/091 (`5d2c5b3d9d`).
 
 - **Goal:** A notebook owner can publish the next six small, valid initial
   Readme-and-Note tree shapes as one authored commit instead of restructuring
@@ -125,7 +118,8 @@ ordinary-Note third-path eligibility via quick/082.
   one nested Folder Readme; (3) two sibling root Folder Readmes; (4) notebook
   Readme plus two root Notes; (5) one root Folder Readme plus two Notes directly
   inside it; or (6) notebook Readme plus one root Folder Readme plus one root
-  Note. Files are regular, authored Markdown with role-correct `type: Readme`
+  Note. Root means no Folder prefix; a Note under a different Folder is not
+  a root Note. Files are regular, authored Markdown with role-correct `type: Readme`
   or `type: Note`; Note filenames produce valid titles. Publication creates
   every required Folder and Note, preserves authored bytes, and accepts the
   exact commit atomically. Valid unmatched Readme/Note trees continue to fail
@@ -134,22 +128,13 @@ ordinary-Note third-path eligibility via quick/082.
   nested-Folder example, Relationship or unknown document types, attachments,
   existing notebook content or README edits, multiple unpublished commits,
   and bulk import.
-- **Key examples:** `New Folder/First note.md`;
-  `Parent/Child/README.md`; `Folder A/README.md` plus `Folder B/README.md`;
-  `README.md` plus two root Notes; `New Folder/README.md` plus two contained
-  Notes; and `README.md` plus `New Folder/README.md` plus one root Note all
-  publish as their exact authored commit.
 
 ## Ordering and Scope Reduction
 
-Story 1 was the smallest verified follow-up to the local README-only folder
-workflow. Story 2 adds exactly one ordinary Note to that delivered initial
-tree. Story 3 isolates adding only the initial notebook Readme. Story 4 joins
-each kind of initial container with one Note while keeping the next valid
-unimplemented composition visible to developers. Story 5 admits the next six
-bounded Readme/Note compositions without turning the work into arbitrary or
-bulk initial import. Additional content and bulk initial import remain separate
-problems.
+Stories 1–5 and their eligibility corrections are delivered. No additional
+initial-tree story is selected. Keep CLI/MCP worktree isolation ahead of further
+notebook-import expansion, as ordered in the product backlog. Additional
+content and bulk initial import remain separate problems.
 
 ## Open Decisions
 

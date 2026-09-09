@@ -301,7 +301,10 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 ### 4. Run one non-interactive CLI E2E workflow against the owning worktree's environment
 
-**Status:** Refined 2026-09-09; ready for slice planning.
+**Status:** Implementation delivered in quick/088 (`c3c2a5d3a9`); paired
+data-isolation proof and usage guidance remain open. Close these in
+[quick/089, slice 1](../quick/089-isolated-mcp-services-e2e/PLAN.md) before
+removing this story from the backlog. Do not repeat the delivered origin fix.
 
 **Goal**
 
@@ -319,11 +322,10 @@ either resetting or reading the other's data.
   This is the one CLI spec this story admits into the isolated-run allowlist
   (`scripts/isolated-cypress-spec-selection.mjs`); no other CLI spec becomes
   runnable in an isolated worktree as a result of this story.
-- Fix `cliEnv()` (`e2e_test/config/cliEnv.ts`) so the `DONUT_API_BASE_URL`
+- `cliEnv()` (`e2e_test/config/cliEnv.ts`) now ensures the `DONUT_API_BASE_URL`
   given to every spawned CLI process resolves the same isolated origin
   `guardCypressNodeSetup` already assigns to `config.baseUrl`
-  (`scripts/isolated-cypress.mjs`), instead of the hardcoded
-  `E2E_APP_BASE_URL` constant. An unconfigured/primary checkout keeps
+  (`scripts/isolated-cypress.mjs`). An unconfigured/primary checkout keeps
   today's default origin.
 - Config, access-token, and clone-checkout directories already come from
   per-run `mkdtempSync(tmpdir(), …)` calls
@@ -358,6 +360,9 @@ this narrower slice is proven.
   concurrently: each installed CLI clones, edits, and publishes against its
   own worktree's notebook data; neither run's fixtures, published note
   content, or process teardown affects the other.
+  Remaining proof must observe distinct notebook content surviving an actual
+  peer fixture reset during the run; two different URL values or one successful
+  isolated run do not establish this. Quick/089 owns that proof and the guide.
 - The same spec run in the unconfigured primary checkout keeps using
   `doughnut_test`/the primary origin, unchanged from today.
 - Selecting any CLI spec other than the one allowlisted spec in an isolated
@@ -376,7 +381,8 @@ OpenAI, Google, or other mocked services. MCP support is not a prerequisite.
 
 ### 5. Run MCP E2E workflows against the owning worktree's environment
 
-**Status:** Refined 2026-09-09; ready for slice planning.
+**Status:** Planned in [quick/089, slices 2–3](../quick/089-isolated-mcp-services-e2e/PLAN.md),
+after the CLI proof correction. Do not create a competing execution plan.
 
 **Goal**
 
@@ -441,9 +447,10 @@ change to the runner-lease or retirement mechanisms themselves.
   scenarios within one run — leaves no MCP server process still running once
   `disconnectMcpServer` resolves, confirmed by observing the spawned process
   actually exit rather than only that the call returned.
-- Selecting any spec other than the one allowlisted MCP spec in an isolated
-  worktree still refuses before fixture/client setup, exactly as any
-  currently-unsupported spec does today.
+- A spec outside all explicitly supported isolated workflows still refuses
+  before fixture/client setup. Admitting this MCP spec preserves already
+  admitted browser and CLI workflows; being outside the MCP spec is not by
+  itself a reason to refuse a supported workflow.
 - `pnpm worktree:retire --check` still reports a busy Cypress runner lease,
   and refuses reclamation, while the allowlisted MCP spec is actively running
   in that worktree — unchanged existing behavior, exercised against an MCP run

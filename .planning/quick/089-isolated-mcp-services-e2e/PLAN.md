@@ -2,7 +2,8 @@
 
 Sources: [SEED-015 Story 4](../../seeds/SEED-015-concurrent-worktree-environments.md#story-4)
 and [Story 5](../../seeds/SEED-015-concurrent-worktree-environments.md#story-5),
-plus the completed [quick/088 plan](../088-isolated-cli-web-note-e2e/PLAN.md).
+plus completed quick/088 (recover its plan at `419135973b`;
+merged by `c3c2a5d3a9`).
 Status: planned.
 
 ## Goal and scope
