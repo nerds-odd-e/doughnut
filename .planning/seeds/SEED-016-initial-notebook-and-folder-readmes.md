@@ -50,7 +50,8 @@ expand this into bulk import and is explicitly deferred.
 
 ### 2. Publish one initial note inside the new README-backed folder
 
-**Status:** delivered. Recover quick/081 from its merge onto main.
+**Status:** delivered. Recover quick/081 from its merge onto main;
+ordinary-Note third-path eligibility via quick/082.
 
 - **Goal:** A notebook owner can publish the smallest useful initial notebook
   that contains knowledge: the notebook Readme, one new root Folder with its
