@@ -7,8 +7,8 @@ without interfering with each other's data or running services. That remains
 the leading product direction. Backend-test isolation (1a–1c), concurrent
 browser workflows (2, 2a), owned SUT descendant shutdown (2b), independent
 OpenAI browser mocks (3), reclaiming disposable worktree databases (6), and
-the retirement eligibility correction (6a) are delivered. Next is CLI and MCP
-isolation. Cloud VM and development-profile isolation remain deferred.
+the retirement eligibility correction (6a) are delivered. CLI and MCP isolation
+are also delivered. Cloud VM and development-profile isolation remain deferred.
 Quick/073 is an outstanding proof correction for delivered story 3, not a
 separate queue story.
 
@@ -24,10 +24,10 @@ changes.
 ## Backlog
 
 - [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
-- [Publish three small initial layouts exposed by the jap1 failure](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-6) — SEED-016
 
 ## Recently done
 
+- [Publish three small initial layouts exposed by the jap1 failure](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-6) — SEED-016
 - [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
 - [Run one non-interactive CLI E2E workflow against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
 - [Publish the next small initial Readme-and-Note trees](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5) — SEED-016
@@ -37,4 +37,3 @@ changes.
 - [Publish the initial notebook README with one README-only folder](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-1) — SEED-016
 - [Create a README-only folder locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-19) — SEED-009
 - [Retire worktree databases without admitting late runners or overlooking uncertain JVMs](seeds/SEED-015-concurrent-worktree-environments.md#story-6a) — SEED-015
-- [Reclaim databases from retired worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-6) — SEED-015

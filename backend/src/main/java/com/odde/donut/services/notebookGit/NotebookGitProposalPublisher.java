@@ -152,18 +152,10 @@ public class NotebookGitProposalPublisher {
       return folderAcceptance.acceptInitialCreationWithRootNote(
           state, proposal, acceptedHead, initialRootNoteCreation.get());
     }
-    Optional<NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes>
-        notebookReadmeWithRootNotes =
-            NotebookGitProposalInitialNotebookReadmePublication.findWithRootNotes(files);
-    if (notebookReadmeWithRootNotes.isPresent()) {
-      return initialNotebookReadmePublication.acceptWithRootNotes(
-          state, proposal, acceptedHead, notebookReadmeWithRootNotes.get());
-    }
-    Optional<NotebookGitProposalInitialNotebookReadmePublication.Creation> initialNotebookReadme =
-        NotebookGitProposalInitialNotebookReadmePublication.find(files);
-    if (initialNotebookReadme.isPresent()) {
-      return initialNotebookReadmePublication.accept(
-          state, proposal, acceptedHead, initialNotebookReadme.get());
+    Optional<String> initialNotebookReadmeAccepted =
+        initialNotebookReadmePublication.tryAccept(state, proposal, acceptedHead, files);
+    if (initialNotebookReadmeAccepted.isPresent()) {
+      return initialNotebookReadmeAccepted.get();
     }
     Optional<String> initialCompositionAccepted =
         initialCompositionPublication.tryAccept(state, proposal, acceptedHead, files);
