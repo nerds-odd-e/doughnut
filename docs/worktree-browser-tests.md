@@ -81,12 +81,14 @@ features are refused before reset:
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_content/note_content_completion.feature
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/mcp/mcp_services.feature
 ```
 
-The CLI command is scoped to that one web-created-note feature. Each
-checkout must already have its own healthy `pnpm sut` allocation; do not
-share the unconfigured primary checkout. To prove the CLI notebook survives
-a peer worktree's fixture reset, start both allocations first, then:
+The CLI command is scoped to that one web-created-note feature. The MCP
+command is scoped to that one search/graph feature. Each checkout must
+already have its own healthy `pnpm sut` allocation; do not share the
+unconfigured primary checkout. To prove the CLI notebook survives a peer
+worktree's fixture reset, start both allocations first, then:
 
 ```bash
 CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>

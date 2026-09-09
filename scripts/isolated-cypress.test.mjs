@@ -4,6 +4,8 @@ import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs
 import {
   guardCypressNodeSetup,
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
+  SUPPORTED_ISOLATED_CYPRESS_SPECS,
+  SUPPORTED_ISOLATED_MCP_SPEC,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress.mjs'
 import {
@@ -42,6 +44,13 @@ test('unsupported or mixed isolated Cypress specs refuse before reset', async (t
       'run',
       '--spec',
       `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC}`,
+    ],
+    [
+      'node',
+      'cypress',
+      'run',
+      '--spec',
+      `${SUPPORTED_ISOLATED_MCP_SPEC},${SUPPORTED_ISOLATED_CYPRESS_SPEC}`,
     ],
     ['node', 'cypress', 'run'],
   ]) {
@@ -93,6 +102,29 @@ test('CLI glob spec selection is refused in before:run before reset', async (t) 
       }),
     isolatedCypressSpec
   )
+})
+
+test('MCP spec is allowlisted as a single isolated spec', async (t) => {
+  assert.equal(
+    SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(SUPPORTED_ISOLATED_MCP_SPEC),
+    true
+  )
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(completeIsolatedConfig),
+  })
+  const live = await startLiveOwner(checkout.root)
+  t.after(() => live.server.close())
+  const config = supportedConfig(
+    'http://localhost:5173',
+    SUPPORTED_ISOLATED_MCP_SPEC
+  )
+  const isolated = await guardCypressNodeSetup(
+    checkout.root,
+    config,
+    isolatedCypressOpts({ argv: cypressArgv(SUPPORTED_ISOLATED_MCP_SPEC) })
+  )
+  t.after(() => isolated.release())
+  assert.equal(config.baseUrl, isolatedOrigin)
 })
 
 test('supported isolated Cypress sets origin before reset and serializes the runner lease', async (t) => {

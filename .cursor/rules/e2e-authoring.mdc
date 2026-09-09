@@ -21,11 +21,13 @@ with `.worktree.local.json`) uses that checkout's isolated origin
 `http://127.0.0.1:<lbListenPort>` — see `docs/worktree-browser-tests.md`. Isolated
 Cypress is allowlisted to exactly one of
 `e2e_test/features/note_creation_and_update/worktree_note_editing.feature`,
-`e2e_test/features/ai_generated_content/note_content_completion.feature`, or
-`e2e_test/features/cli/cli_notebook_web_created_note.feature` per run. The
-CLI command is scoped to that one web-created-note feature. The completion
-spec starts a runner-owned private OpenAI Mountebank; the note-editing and
-CLI specs do not require Mountebank. Each isolated checkout needs its own
+`e2e_test/features/ai_generated_content/note_content_completion.feature`,
+`e2e_test/features/cli/cli_notebook_web_created_note.feature`, or
+`e2e_test/features/mcp/mcp_services.feature` per run. The
+CLI command is scoped to that one web-created-note feature. The MCP command
+is scoped to that one search/graph feature. The completion
+spec starts a runner-owned private OpenAI Mountebank; the note-editing, CLI,
+and MCP specs do not require Mountebank. Each isolated checkout needs its own
 healthy `pnpm sut` allocation. Paired CLI-vs-browser reset proof:
 
 ```bash

@@ -4,9 +4,20 @@ import path from 'path'
 import fs from 'fs'
 import { E2E_APP_BASE_URL } from '../config/constants'
 
+function processExists(pid: number) {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch {
+    return false
+  }
+}
+
 class McpClient {
   client: Client | null = null
   transport: StdioClientTransport | null = null
+  lastPid: number | null = null
+  lastBaseUrl: string | null = null
 
   async spawnAndConnectMcpServer({
     baseUrl,
@@ -69,7 +80,9 @@ class McpClient {
     })
     await this.client.connect(this.transport)
     ;(this.client as { _connected?: boolean })._connected = true
-    return true
+    this.lastPid = this.transport.pid ?? null
+    this.lastBaseUrl = apiBaseUrl
+    return { pid: this.lastPid, baseUrl: this.lastBaseUrl }
   }
 
   async callMcpToolWithParams({
@@ -87,11 +100,18 @@ class McpClient {
     return result
   }
 
+  connectionInfo() {
+    return { pid: this.lastPid, baseUrl: this.lastBaseUrl }
+  }
+
   async disconnectMcpServer() {
+    const pid = this.transport?.pid ?? this.lastPid
     await this.client?.close()
     this.client = null
     this.transport = null
-    return true
+    const exited =
+      pid === null || pid === undefined ? true : !processExists(pid)
+    return { pid: pid ?? null, exited }
   }
 }
 
