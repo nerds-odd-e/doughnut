@@ -3,7 +3,7 @@ id: SEED-011
 status: active
 planted: 2026-09-05
 planted_during: retrospective of SEED-009 Story 2 publication execution, on developer request
-trigger_when: before another long execute-plan run or when revising CI observation and repair coordination
+trigger_when: before another long dough-execute-plan run or when revising CI observation and repair coordination
 scope: medium
 ---
 
@@ -41,7 +41,7 @@ Host delivery was demonstrated on Codex, Cursor, and Claude Code. Durable repair
 ownership and resumption after context resets belong to Story 2; they are not
 prerequisites for Story 1's completion or its lifecycle corrections. Current
 observer behavior and recovery instructions live in
-[ci-monitor.md](../../.agents/skills/execute-plan/references/ci-monitor.md) and
+[ci-monitor.md](../../.agents/skills/dough-execute-plan/references/ci-monitor.md) and
 its linked host adapters.
 
 <a id="story-2"></a>

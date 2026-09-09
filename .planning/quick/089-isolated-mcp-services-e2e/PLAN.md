@@ -237,7 +237,7 @@ Do not recreate quick/090 or retain competing slice ownership there.
 Preserve unrelated working-tree changes and the source seed's story anchors.
 
 Use `CURSOR_DEV=true nix develop -c` for repository tooling; Git runs directly.
-Each slice includes required Jidoka, fresh post-change-refactor agent,
+Each slice includes required Jidoka, fresh dough-post-change-refactor agent,
 coordinator selective formatting once, plan update, commit, and push when
 execution is separately authorized. Target roughly 5 minutes per leaf;
 scrutinize above 5 and finer-decompose above 10 active minutes. External

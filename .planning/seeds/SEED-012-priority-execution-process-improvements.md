@@ -25,7 +25,7 @@ triggers. Each item records the minimum evidence, response, and success signal.
 
 ### 1. Reject evidence that contradicts the promised behavior — P1
 
-**Status:** Installed 2026-09-06 in `execute-plan/references/wrap-up.md`.
+**Status:** Installed 2026-09-06 in `dough-execute-plan/references/wrap-up.md`.
 Instruction replay: rejected a raw-provider expected value (A) and a
 hidden exception-chain observation (B); reused already-inspected HTTP
 safe-text evidence (C). Live product effectiveness is not claimed.
@@ -44,7 +44,7 @@ promise and observation gap and return it to implementation before acceptance.
 Adequate proof continues through the existing workflow without a rerun.
 
 Keep the addition at the existing acceptance instruction owner
-(`execute-plan/references/wrap-up.md`), referring to `planning.mdc` rather than
+(`dough-execute-plan/references/wrap-up.md`), referring to `planning.mdc` rather than
 duplicating its promise-mapping or lifecycle rules. This refinement replaces the
 earlier proposal for a separate pre-cleanup aggregate scan.
 
@@ -59,7 +59,7 @@ requirement or prevent every behavioral omission.
 
 ### 2. Diagnose failures before accepting a baseline exception — P1
 
-**Status:** Installed 2026-09-06 in `execute-plan/SKILL.md` Jidoka/failure
+**Status:** Installed 2026-09-06 in `dough-execute-plan/SKILL.md` Jidoka/failure
 classification. Instruction replay: rejected an unexplained retry as unrelated
 (A); reused leftover-user diagnosis while retaining the isolation defect (B);
 accepted a proven runner-disconnect incident without reconfirmation (C). Live
@@ -89,7 +89,7 @@ retries or cleanup. A note or an unrelated-failure label does not authorize
 bypassing required proof. Proven infrastructure incidents retain the existing CI
 disposition; concurrent test defects still require attention.
 
-Keep the change at the existing `execute-plan` Jidoka/failure classification.
+Keep the change at the existing `dough-execute-plan` Jidoka/failure classification.
 Reuse `ci-monitor.md`'s current policy; do not create competing local and CI
 checklists or a new acceptance stage.
 
@@ -104,7 +104,7 @@ other P1s remain separate.
 ### 3. Escalate repeated overruns to story review — P1
 
 **Status:** Installed 2026-09-06 in `problem-decomposition.mdc` Learning
-escalation, with entry points in `execute-plan` and `dough-slice-plan-refinement`.
+escalation, with entry points in `dough-execute-plan` and `dough-slice-plan-refinement`.
 Instruction replay: counted a 12- then 13-minute replacement as two attempts and
 sent unresolved scope to story review with parked proof kept (A); presented a
 demonstrated daily-only outcome and remaining archives at story review without
@@ -155,7 +155,7 @@ waiting. Initial instruction rollout is Doughnut only.
 
 ### 4. Preserve artifact ownership through staging — P1
 
-**Status:** Installed 2026-09-06 in `execute-plan/references/wrap-up.md` and
+**Status:** Installed 2026-09-06 in `dough-execute-plan/references/wrap-up.md` and
 `execution-retrospective/SKILL.md`. Instruction replay: owned product edit A
 with unstaged skill edit B → stage A only, leave B, no extra approval; separable
 owned/unrelated hunks → stage the owned hunk; unrelated already staged or
@@ -212,7 +212,7 @@ decide-first/no-test defect; that efficiency finding remains in SEED-010.
 **Goal:** Avoid unnecessary test runs caused by coordinator-generated refactor
 instructions while retaining independent review and proof for refactor edits.
 
-**Scope:** The existing `execute-plan/references/wrap-up.md` delegation and return
+**Scope:** The existing `dough-execute-plan/references/wrap-up.md` delegation and return
 steps enforce decide-first proof, correct contradictory additions, and inspect
 handoff consistency. No edits means no tests; edits rerun only invalidated focused
 proof, explaining replacements. Prior unnecessary runs are reported as deviations

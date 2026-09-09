@@ -23,7 +23,7 @@ the thread for process improvements and overlooked developer decisions.
 
 <context>
 Read `.cursor/agent-map.md`, `.cursor/rules/problem-decomposition.mdc`, and
-`.cursor/rules/planning.mdc`. Read **post-change-refactor** in full and reuse its
+`.cursor/rules/planning.mdc`. Read **dough-post-change-refactor** in full and reuse its
 smell definitions against the aggregate execution diff; do not run its editing
 workflow. Read **dough-slice-planning** before adding or updating planned work; apply
 its story and slice gates to both an in-place update and a new follow-up PLAN.
@@ -110,7 +110,7 @@ with evidence and impact:
 2. **Story drift or dispute** — a promised outcome is missing, an unapproved
    outcome was added or removed, or the implementation contradicts the original
    boundary. Do not flag an explicit developer decision as drift.
-3. **Missed refactoring smells** — apply the post-change-refactor checks to the
+3. **Missed refactoring smells** — apply the dough-post-change-refactor checks to the
    whole plan result, not one incremental commit.
 4. **General improvement** — another specific, consequential improvement tied
    to this execution that is not already covered above.
@@ -165,7 +165,7 @@ If findings remain, a non-writer returns read-only evidence. The writer applies
 
 After writing or updating the PLAN, stop planning and report the result. Do not
 invoke **dough-slice-plan-refinement** unless the developer separately requests it.
-Never invoke **execute-plan**, implement a slice, commit, or push. State whether
+Never invoke **dough-execute-plan**, implement a slice, commit, or push. State whether
 the PLAN was updated in place or newly generated, and that the planned changes
 were not executed.
 </step>
@@ -217,7 +217,7 @@ evidence.
 - One original plan/story was recovered or an explicit ambiguity was surfaced,
   with its completion state and delivered review boundary established.
 - Every included execution commit has a reason; unrelated commits are excluded.
-- The aggregate result was reviewed for bugs, story drift, post-change-refactor
+- The aggregate result was reviewed for bugs, story drift, dough-post-change-refactor
   smells, and consequential improvements.
 - Superseded code and redundant or historical-only tests/docs received explicit
   scrutiny.
@@ -252,7 +252,7 @@ gate passes.
 
 <out_of_scope>
 - Implementing or fixing findings; editing rules or skills from process
-  proposals; invoking **execute-plan**, committing, or pushing.
+  proposals; invoking **dough-execute-plan**, committing, or pushing.
 - Executing the added or revised planned work; do not run a separate refinement
   pass unless the developer requests it.
 - Reviewing unrelated repository quality.

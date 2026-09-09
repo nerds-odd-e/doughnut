@@ -23,7 +23,7 @@ This repo uses **GSD** (global Cursor install: `/gsd-*`) for milestone scaffoldi
 |------|----------------|
 | **Folder layout** | Use GSD paths: `.planning/{PROJECT,REQUIREMENTS,ROADMAP,STATE,PRODUCT-BACKLOG}.md`, `config.json`, `.planning/seeds/`, `.planning/phases/NN-slug/`, `.planning/codebase/`, `.planning/quick/`. |
 | **Discuss / plan / verify artifacts** | GSD CONTEXT, PLAN, SUMMARY, VERIFICATION are fine **while the plan is active** (resume across sessions). |
-| **Execution engine** | Prefer `/gsd-execute-phase` **or** local `execute-plan` on the same PLAN — both must run the **local wrap-up per slice** (Jidoka, fresh refactor agent, one coordinator-run selective formatting command, plan update, commit+push). |
+| **Execution engine** | Prefer `/gsd-execute-phase` **or** `dough-execute-plan` on the same PLAN — both must run the **local wrap-up per slice** (Jidoka, fresh refactor agent, one coordinator-run selective formatting command, plan update, commit+push). |
 | **Parallel waves** | OK when file sets / mutable state do not overlap; otherwise sequential. |
 | **Observable verification** | GSD goal-backward verify + local TDD/E2E/`@wip` — same intent; run relevant local tests as the evidence. |
 | **Codebase maps** | `.planning/codebase/*` shared. |
@@ -39,9 +39,9 @@ These are **hard** in this repo even when GSD workflows omit them:
 | **Resolution-specific sizing (story: ~30 min–few hours; leaf: ~5 min fuzzy, >10 min hard finer-decompose)** | Story shaping and agents making a test pass / solving one execution leaf | Keeps stories comparable and execution loops bounded without pretending estimates are precise — see `problem-decomposition.mdc` |
 | **Before- and after-slice Jidoka** | Every slice start/end | Stops autonomous runs on value/design/credential forks |
 | **After-slice plan update** | Every completed slice | Keeps remaining work accurate for resume |
-| **After-slice post-change-refactor** | Every slice before commit | Cohesion / dead code / 250-line discipline |
+| **After-slice dough-post-change-refactor** | Every slice before commit | Cohesion / dead code / 250-line discipline |
 | **After-slice selective formatting** | Every slice after refactor/API generation and before the PLAN update/staging | The coordinator runs `./scripts/run.sh pnpm format:changed` once and lets it select affected components (including a planning-only no-op); routine wrap-up does not spawn `format-changed`, and the pre-commit hook remains the independent check-only lint pass |
-| **After-slice commit + push; asynchronous CI observation** | Every closed slice before the next | Push completes routine wrap-up. `execute-plan` handles CI failures via pause/stash/repair/resume without waiting for CI or CD |
+| **After-slice commit + push; asynchronous CI observation** | Every closed slice before the next | Push completes routine wrap-up. `dough-execute-plan` handles CI failures via pause/stash/repair/resume without waiting for CI or CD |
 | **Active history cleanup when the plan is done** | When the last slice is done and outcomes are in code/permanent docs | GSD tends to keep SUMMARYs; we prune spent planning diary |
 | **Nix prefix (`CURSOR_DEV=true nix develop -c`); assume `pnpm sut` running; no restart nag** | All tooling | Env contract GSD does not know |
 | **Stack/domain rules** (backend, frontend, e2e, cli, mcp, db-migration, …) | Matching globs / skills | Product architecture |
@@ -54,16 +54,16 @@ These are **hard** in this repo even when GSD workflows omit them:
 | Queue or reprioritize unfinished stories | `dough-product-backlog` → `.planning/PRODUCT-BACKLOG.md`; details stay in home seeds |
 | Clarify selected stories before planning | `dough-story-refinement` → goal, scope, and examples in their home seeds |
 | New or ongoing **milestone / roadmap** | GSD: `/gsd-onboard` or `/gsd-new-milestone`, then discuss → plan → execute |
-| One clear story-sized ad-hoc outcome | Local `dough-slice-planning` → `.planning/quick/NNN-slug/` (or a new `phases/` entry), then `execute-plan` when straightforward |
-| Existing PLAN has complex, low-confidence, or overrun leaves | Local `dough-slice-plan-refinement` edits the same PLAN, then `execute-plan` |
+| One clear story-sized ad-hoc outcome | Local `dough-slice-planning` → `.planning/quick/NNN-slug/` (or a new `phases/` entry), then `dough-execute-plan` when straightforward |
+| Existing PLAN has complex, low-confidence, or overrun leaves | Local `dough-slice-plan-refinement` edits the same PLAN, then `dough-execute-plan` |
 | Completed plan needs aggregate code/process review | Local `execution-retrospective` reconstructs plan + commits and may generate, but never execute, a follow-up PLAN |
 | **Test optimization / domain tools** (API client, ERD, …) | Local skills; plans still under `.planning/phases/` or `quick/` |
-| Resuming after a break | GSD progress/resume uses `STATE.md` as the project index. `execute-plan` resumes from the PLAN file (next undone slice) and must not write `STATE.md`. |
+| Resuming after a break | GSD progress/resume uses `STATE.md` as the project index. `dough-execute-plan` resumes from the PLAN file (next undone slice) and must not write `STATE.md`. |
 
 ## Anti-patterns
 
 - Flat new plans at `.planning/random.md` when a `phases/` or `quick/` dir would do.
-- Passing a decomposition seed directly to execute-plan without selecting
+- Passing a decomposition seed directly to dough-execute-plan without selecting
   one story and producing a slice plan.
 - Creating a second PLAN for refinement instead of editing the existing PLAN.
 - Leaving completed plan diaries forever under `.planning/`.
@@ -72,4 +72,4 @@ These are **hard** in this repo even when GSD workflows omit them:
 - Encoding GSD phase numbers in product file/test/feature names.
 - Parallel agents on the same files or the same PLAN without coordination.
 - Enabling GSD `generate-claude-md` **workflow-enforcement** that forbids work outside GSD — conflicts with local domain skills and ad-hoc planning.
-- Updating `.planning/STATE.md` from `execute-plan` — slice status and learnings live in the PLAN being executed.
+- Updating `.planning/STATE.md` from `dough-execute-plan` — slice status and learnings live in the PLAN being executed.

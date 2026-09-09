@@ -5,7 +5,7 @@
 ## Tech Debt
 
 **Oversized modules (past the 250-line cohesion guideline):**
-- Issue: Many production files far exceed the post-change-refactor 250-line split guideline, concentrating shotgun-surgery risk and slowing navigation.
+- Issue: Many production files far exceed the dough-post-change-refactor 250-line split guideline, concentrating shotgun-surgery risk and slowing navigation.
 - Files:
   - `backend/src/main/java/com/odde/donut/services/book/EpubStructureExtractor.java` (~890 lines)
   - `backend/src/main/java/com/odde/donut/services/book/BookService.java` (~703 lines)

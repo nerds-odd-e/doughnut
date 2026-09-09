@@ -28,8 +28,8 @@ Output: Passing focused tests + short summary ending with `## BUG FIX COMPLETE`.
   component, CLI `run`/`runInteractive`), cover lower layers with crafted data/`makeMe`,
   mock only externals.
 
-**Before commit:** run **post-change-refactor**
-(`.agents/skills/post-change-refactor/SKILL.md`) on the full uncommitted change.
+**Before commit:** run **dough-post-change-refactor**
+(`.agents/skills/dough-post-change-refactor/SKILL.md`) on the full uncommitted change.
 </context>
 
 <process>
@@ -80,7 +80,7 @@ No dead code — remove anything left over from debugging.
 
 <step name="refactor_cleanup">
 The new test might overlap with existing ones. Simplify them.
-Before commit, run **post-change-refactor** on the full uncommitted change.
+Before commit, run **dough-post-change-refactor** on the full uncommitted change.
 </step>
 
 </process>
@@ -89,7 +89,7 @@ Before commit, run **post-change-refactor** on the full uncommitted change.
 - Failing test reproduced the bug for the right reason before the fix
 - Smallest fix makes the new test and related tests pass
 - No dead/debug code left in the change
-- post-change-refactor run before commit (or delegated to caller wrap-up)
+- dough-post-change-refactor run before commit (or delegated to caller wrap-up)
 - Final output includes `## BUG FIX COMPLETE`
 </success_criteria>
 

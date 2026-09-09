@@ -23,7 +23,7 @@ Output: Optimized tests with per-slice commits + summary ending with
 <modes>
 | Invocation | Mode | What runs |
 |------------|------|-----------|
-| `/test-optimization` (default) | **Optimize** | Full `<process>`: profile → select top 10% → plan → execute-plan → re-profile. |
+| `/test-optimization` (default) | **Optimize** | Full `<process>`: profile → select top 10% → plan → dough-execute-plan → re-profile. |
 | `/test-optimization --resolve` | **Resolve-only** | Run **only** the `resolve_candidates` step against `.planning/test-optimization-blacklist.md`. **No profiling, no top-10% selection, no optimization.** |
 
 When `--resolve` is given, skip every other step and go straight to
@@ -47,9 +47,9 @@ When `--resolve` is given, skip every other step and go straight to
 3. **Flaky is failure** — re-run touched tests until stable; fix root cause, do
    not mask with retries.
 
-**Execution model:** After writing the plan, **always** use **execute-plan**
-(`.agents/skills/execute-plan/SKILL.md`). Coordinator delegates each group to a
-fresh sub-agent and applies execute-plan's coordinator-owned wrap-up. Do not
+**Execution model:** After writing the plan, **always** use **dough-execute-plan**
+(`.agents/skills/dough-execute-plan/SKILL.md`). Coordinator delegates each group to a
+fresh sub-agent and applies dough-execute-plan's coordinator-owned wrap-up. Do not
 accumulate context across slices in one agent.
 
 **E2E skip tag:** `@skipOptimizationDueToKnownNecessarySlowness` on a Scenario
@@ -135,13 +135,13 @@ Read sub-project rules when editing tests: `frontend.mdc` / `frontend-testing.md
 </step>
 
 <step name="execute_via_execute_plan">
-Hand plan to **execute-plan**. Do not optimize groups in the coordinator agent.
+Hand plan to **dough-execute-plan**. Do not optimize groups in the coordinator agent.
 
 Each group slice (sub-agent):
 
 1. Optimize only tests in that group (see `optimize_tactics`).
 2. Verify with focused commands (see `verify`).
-3. Return control for execute-plan's required refactor, formatting, plan update,
+3. Return control for dough-execute-plan's required refactor, formatting, plan update,
    `perf(<scope>): …` commit, and push sequence.
 
 **Hard-to-improve → Candidates / skip tag:** If no meaningful speedup after serious
@@ -166,7 +166,7 @@ Read and follow [optimization-tactics.md](references/optimization-tactics.md).
 </step>
 
 <step name="reprofile_and_close">
-After all group slices (via execute-plan):
+After all group slices (via dough-execute-plan):
 
 - Re-run same profile command as baseline (same `--expose tags=…` for E2E).
 - Record: test count, suite wall, top-10 table, top-10% **total CPU** (Vitest) or
@@ -203,7 +203,7 @@ For E2E, follow [e2e-profile-parsing.md](references/e2e-profile-parsing.md).
 **Optimize mode:**
 - Full-suite profile captured with E2E skip tag excluded via `--expose tags`
 - Top 10% selected from eligible (profiled) tests
-- Plan written and executed via execute-plan (commit + push per group)
+- Plan written and executed via dough-execute-plan (commit + push per group)
 - Non-negotiable rules applied (no redundant tests left, no fixed waits, no flaky)
 - Re-profile recorded; plan marked done; spent history cleaned
 - Final output includes `## TEST OPTIMIZATION COMPLETE`

@@ -2,7 +2,7 @@
 
 Status: in-progress
 
-**Execution:** run via **execute-plan** (commit + push per slice).
+**Execution:** run via **dough-execute-plan** (commit + push per slice).
 
 ## Profiling baseline (YYYY-MM-DD)
 
