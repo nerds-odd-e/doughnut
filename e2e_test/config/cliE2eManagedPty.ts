@@ -36,6 +36,7 @@ export type CliE2eManagedPtyOptions = {
     extensionWithDot: string,
     data: Buffer
   ) => string
+  appBaseUrl?: string | null
 }
 
 async function waitForInteractiveCliTranscriptIdle(
@@ -109,7 +110,7 @@ export function waitForPtyExit(
 }
 
 export function createCliE2eManagedPty(options: CliE2eManagedPtyOptions) {
-  const { repoRoot, saveBufferToCurrentSpecFolder } = options
+  const { repoRoot, saveBufferToCurrentSpecFolder, appBaseUrl } = options
   let interactiveCliPtyHandle: ManagedTtySession | null = null
 
   function dispose(): void {
@@ -184,7 +185,7 @@ export function createCliE2eManagedPty(options: CliE2eManagedPtyOptions) {
         command: opts.command,
         args: opts.args,
         cwd: opts.cwd,
-        env: { ...process.env, ...cliEnv(opts.env) },
+        env: { ...process.env, ...cliEnv(opts.env, appBaseUrl) },
       },
       CLI_E2E_MANAGED_PTY_GEOMETRY
     )

@@ -72,7 +72,7 @@ retirement mechanisms themselves.
 
 ### 1. Thread the isolated backend origin into spawned CLI processes
 Type: Structure
-Status: planned
+Status: done
 
 Internal change: Give `cliEnv()` an optional base-URL override parameter,
 defaulting to today's `E2E_APP_BASE_URL` when omitted. In
@@ -87,6 +87,26 @@ Proof: The ordinary (non-isolated) `e2e_test/features/cli/**` CI shard stays
 green (`pnpm cy:run --spec 'e2e_test/features/cli/**'`), and
 `pnpm test:browser-worktree-isolation` stays green. No behavior change is
 observable outside CLI env resolution.
+
+Learning: `pnpm cy:run --spec 'e2e_test/features/cli/**'` cannot be executed
+from inside *any* linked git worktree, isolated allocation or not —
+`worktreeIsolationApplies()` (`scripts/browser-worktree-isolation.mjs`)
+unconditionally treats a linked worktree as isolated, and isolated mode
+refuses any spec outside `SUPPORTED_ISOLATED_CYPRESS_SPEC(S)` (only
+`worktree_note_editing.feature` + the OpenAI-mock spec) before any of this
+slice's touched code runs. This is a pre-existing, diff-independent property,
+reproducible unmodified on `main` inside a worktree; CI runs this shard via a
+plain `actions/checkout`, not a linked worktree. Verified equivalence instead
+by inspection: `guardCypressNodeSetup` returns immediately, before touching
+`config.baseUrl`, whenever `worktreeIsolationApplies()` is false, so the
+"ordinary/unconfigured checkout" path this diff threads through is
+byte-for-byte unchanged; `cliEnv()`'s new second parameter also defaults
+(`?? E2E_APP_BASE_URL`) to the exact prior hardcoded value. Ran
+`pnpm test:browser-worktree-isolation` (the other named proof, unaffected by
+this concern) green instead; CI's plain-checkout run of the CLI shard on the
+eventual push to `main` stands as the authoritative confirmation this note
+anticipates. Slice 2's proof is designed to run inside an isolated worktree
+like this one, so this boundary does not recur there.
 
 ### 2. Admit the web-created-note CLI workflow into isolated concurrent runs
 Type: Behavior
