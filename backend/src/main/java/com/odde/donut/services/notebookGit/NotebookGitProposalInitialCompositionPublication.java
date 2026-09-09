@@ -56,13 +56,13 @@ class NotebookGitProposalInitialCompositionPublication {
     if (!state.folders().isEmpty() || !state.liveNotes().isEmpty()) {
       return Optional.empty();
     }
-    Optional<NotebookGitProposalInitialComposition.OneNoteInImpliedRootFolder>
-        oneNoteInImpliedRootFolder =
-            NotebookGitProposalInitialComposition.findOneNoteInImpliedRootFolder(files, proposal);
-    if (oneNoteInImpliedRootFolder.isPresent()) {
+    Optional<NotebookGitProposalInitialComposition.NotesInImpliedRootFolder>
+        notesInImpliedRootFolder =
+            NotebookGitProposalInitialComposition.findNotesInImpliedRootFolder(files, proposal);
+    if (notesInImpliedRootFolder.isPresent()) {
       return Optional.of(
-          acceptOneNoteInImpliedRootFolder(
-              state, proposal, acceptedHead, oneNoteInImpliedRootFolder.get()));
+          acceptNotesInImpliedRootFolder(
+              state, proposal, acceptedHead, notesInImpliedRootFolder.get()));
     }
     Optional<NotebookGitProposalInitialComposition.OneNestedFolderReadme> oneNestedFolderReadme =
         NotebookGitProposalInitialComposition.findOneNestedFolderReadme(files, proposal);
@@ -106,6 +106,21 @@ class NotebookGitProposalInitialCompositionPublication {
     return added;
   }
 
+  /** Applies one authored Relationship path through {@link NotebookGitProposalNoteAddition}. */
+  Note applyRelationship(
+      Notebook notebook,
+      List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      String relationshipPath) {
+    return noteAddition.apply(
+        notebook,
+        folders,
+        proposal,
+        proposal.mainHead(),
+        relationshipPath,
+        testabilitySettings.getCurrentUTCTimestamp());
+  }
+
   void assertReadyEmptyNotebook(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
@@ -120,26 +135,25 @@ class NotebookGitProposalInitialCompositionPublication {
     }
   }
 
-  private String acceptOneNoteInImpliedRootFolder(
+  private String acceptNotesInImpliedRootFolder(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
-      NotebookGitProposalInitialComposition.OneNoteInImpliedRootFolder creation) {
+      NotebookGitProposalInitialComposition.NotesInImpliedRootFolder creation) {
     assertReadyEmptyNotebook(
         state,
         proposal,
         acceptedHead,
-        "Initial Note in an implied root Folder requires an empty notebook.");
+        "Initial Notes in an implied root Folder require an empty notebook.");
 
     String folderName =
         creation
             .impliedRootFolderPrefix()
             .substring(0, creation.impliedRootFolderPrefix().length() - 1);
     folderMaterialization.createRootFolderWithoutReadme(
-        state.notebook(), creation.notePath(), folderName);
+        state.notebook(), creation.notePaths().getFirst(), folderName);
     List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(state.notebook());
-    List<Note> added =
-        applyNotes(state.notebook(), folders, proposal, List.of(creation.notePath()));
+    List<Note> added = applyNotes(state.notebook(), folders, proposal, creation.notePaths());
     projection.requireMatchingAcceptedTree(
         state.notebook(), folders, added, proposal.repository(), proposal.mainHead());
     return bindingPersistence.accept(
