@@ -12,11 +12,10 @@ import org.yaml.snakeyaml.error.YAMLException;
  * ({@link OneNoteInImpliedRootFolder}), one nested Folder Readme ({@link OneNestedFolderReadme}),
  * exactly two sibling root Folder Readmes ({@link TwoSiblingRootFolderReadmes}), and otherwise a
  * {@link ValidUnmatched} marker for added-only Markdown trees with role-correct authored types that
- * include at least one README. {@link NotebookReadmeWithRootNotes} is the notebook README plus
- * one-or-two root Notes layout (one-Note path already accepted; two-Note recognition later).
- * Recognition does not throw: invalid Markdown, wrong types, non-Markdown paths, and non-initial
- * diffs simply do not match. {@link NotebookGitProposalInitialCompositionPublication} accepts
- * layouts that are wired for publication.
+ * include at least one README. {@link NotebookReadmeWithRootNotes} is the notebook README plus one
+ * or two root Notes layout. Recognition does not throw: invalid Markdown, wrong types, non-Markdown
+ * paths, and non-initial diffs simply do not match. {@link
+ * NotebookGitProposalInitialCompositionPublication} accepts layouts that are wired for publication.
  */
 final class NotebookGitProposalInitialComposition {
 
@@ -42,10 +41,7 @@ final class NotebookGitProposalInitialComposition {
    */
   record TwoSiblingRootFolderReadmes(String firstReadmePath, String secondReadmePath) {}
 
-  /**
-   * Root {@code README.md} plus one or two root ordinary Note paths. One-Note recognition and
-   * acceptance already use this shape; the two-Note layout is a later Behavior.
-   */
+  /** Root {@code README.md} plus one or two root ordinary Note paths on an otherwise empty tree. */
   record NotebookReadmeWithRootNotes(String notebookReadmePath, List<String> notePaths) {
     NotebookReadmeWithRootNotes {
       notePaths = List.copyOf(notePaths);

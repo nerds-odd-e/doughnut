@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: in progress (slices 1–6 done).
+Status: in progress (slices 1–7 done).
 
 ## Goal and scope
 
@@ -122,17 +122,11 @@ binding accept; `NotebookReadmeWithRootNotes` (1–2 paths) replaced
 
 ### 7. Publish a notebook Readme with two root Notes
 Type: Behavior
-Status: planned
+Status: done
 
-Behavior: Given an empty accepted notebook, when the exact proposed tree is a
-valid root `README.md` plus two valid root Notes, publication stores the
-notebook Readme and both authored Notes and accepts the exact head and tree
-atomically.
-
-Proof: A controller test observes the notebook Readme, exactly two root Notes
-with authored titles/content, no Folders, and downloaded head/tree equality.
-Existing shared validation and transaction tests retain invalid-input and
-rollback ownership. Run the complete backend unit-test suite.
+Learning: `findWithRootNotes` / `acceptWithRootNotes` accept README + 1–2 root
+Notes via `applyNotes`. Controller proof added on
+`NotebookGitProposalInitialNotebookReadmeControllerTest`.
 
 ### 8. Publish a Folder Readme with two contained Notes
 Type: Behavior

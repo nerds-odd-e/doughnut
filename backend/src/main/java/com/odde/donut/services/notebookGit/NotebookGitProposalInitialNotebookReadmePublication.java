@@ -4,6 +4,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
 import com.odde.donut.testability.TestabilitySettings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jgit.lib.ObjectId;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Recognizes and accepts the sole-added-root-{@code README.md} initial notebook Readme proposal
- * shape, and that shape plus one added root ordinary Note, on an otherwise empty notebook.
+ * shape, and that shape plus one or two added root ordinary Notes, on an otherwise empty notebook.
  */
 @Service
 class NotebookGitProposalInitialNotebookReadmePublication {
@@ -53,12 +54,12 @@ class NotebookGitProposalInitialNotebookReadmePublication {
   }
 
   static Optional<NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes>
-      findWithRootNote(List<InspectedRegularFile> files) {
-    if (files.size() != 2) {
+      findWithRootNotes(List<InspectedRegularFile> files) {
+    if (files.size() < 2 || files.size() > 3) {
       return Optional.empty();
     }
     String notebookReadmePath = null;
-    String notePath = null;
+    List<String> notePaths = new ArrayList<>(2);
     for (InspectedRegularFile file : files) {
       if (isAddedRootNotebookReadme(file)) {
         if (notebookReadmePath != null) {
@@ -66,20 +67,17 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         }
         notebookReadmePath = file.path();
       } else if (isAddedRootOrdinaryNote(file)) {
-        if (notePath != null) {
-          return Optional.empty();
-        }
-        notePath = file.path();
+        notePaths.add(file.path());
       } else {
         return Optional.empty();
       }
     }
-    if (notebookReadmePath == null || notePath == null) {
+    if (notebookReadmePath == null || notePaths.isEmpty()) {
       return Optional.empty();
     }
     return Optional.of(
         new NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes(
-            notebookReadmePath, List.of(notePath)));
+            notebookReadmePath, notePaths));
   }
 
   static boolean isAddedRootNotebookReadme(InspectedRegularFile file) {
@@ -119,7 +117,7 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  String acceptWithRootNote(
+  String acceptWithRootNotes(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
@@ -129,7 +127,7 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         proposal,
         acceptedHead,
         creation.notebookReadmePath(),
-        "Initial notebook Readme and root Note require an empty notebook.");
+        "Initial notebook Readme and root Notes require an empty notebook.");
     List<Note> added =
         initialCompositionPublication.applyNotes(
             state.notebook(), state.folders(), proposal, creation.notePaths());

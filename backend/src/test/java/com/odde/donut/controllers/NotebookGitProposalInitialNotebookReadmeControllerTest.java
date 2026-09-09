@@ -14,6 +14,9 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.junit.jupiter.api.Test;
@@ -32,8 +35,55 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved notebook readme.\n";
   private static final String FIRST_NOTE =
       "---\ntype: Note\n---\nPrecisely preserved first note.\n";
+  private static final String SECOND_NOTE =
+      "---\ntype: Note\n---\nPrecisely preserved second note.\n";
 
   @Autowired FolderRepository folderRepository;
+
+  @Test
+  void publishesInitialNotebookReadmeAndTwoRootNotesAsTheExactAuthoredCommit() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("First note.md", FIRST_NOTE),
+                new NotebookGitProposalFile("Second note.md", SECOND_NOTE)));
+
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+    }
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
+    assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
+    assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(notes, hasSize(2));
+    Map<String, Note> byTitle =
+        notes.stream().collect(Collectors.toMap(Note::getTitle, Function.identity()));
+    Note first = byTitle.get("First note");
+    Note second = byTitle.get("Second note");
+    assertThat(first.getContent(), equalTo(FIRST_NOTE));
+    assertThat(first.getFolder(), nullValue());
+    assertThat(second.getContent(), equalTo(SECOND_NOTE));
+    assertThat(second.getFolder(), nullValue());
+    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
+
+    ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
+      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
+      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
+    }
+  }
 
   @Test
   void publishesInitialNotebookReadmeAndRootNoteAsTheExactAuthoredCommit() throws Exception {
