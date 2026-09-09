@@ -9,8 +9,6 @@ browser workflows (2, 2a), owned SUT descendant shutdown (2b), independent
 OpenAI browser mocks (3), reclaiming disposable worktree databases (6), and
 the retirement eligibility correction (6a) are delivered. CLI and MCP isolation
 are also delivered. Cloud VM and development-profile isolation remain deferred.
-Quick/073 is an outstanding proof correction for delivered story 3, not a
-separate queue story.
 
 Notebook owners can refine notes in Obsidian or an AI IDE and Donut without
 discarding either side's work or losing learning history for the selected
@@ -22,8 +20,6 @@ candidates stay unselected until after the worktree queue unless priority
 changes.
 
 ## Backlog
-
-- [Run browser E2E scenarios with independent external-service mocks](seeds/SEED-015-concurrent-worktree-environments.md#story-3) — SEED-015
 
 ## Recently done
 

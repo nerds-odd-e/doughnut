@@ -274,9 +274,8 @@ and Cloud VM/CI changes. No continuous ancestry tracking is implied.
 
 ### 3. Run browser E2E scenarios with independent external-service mocks
 
-**Status:** Runtime behavior delivered 2026-09-08 (`47c4b24eba`); remaining
-recording-exclusivity proof re-refined and requeued first on 2026-09-09.
-Exclusive-recording proof correction: [quick/073](../quick/073-exclusive-openai-recording-proof/PLAN.md).
+**Status:** Delivered, 2026-09-09. Runtime isolation came from quick/070
+(`47c4b24eba`); exclusive-recording proof was completed by quick/073.
 
 **Goal**
 
@@ -298,38 +297,6 @@ its recorded requests.
 calls, multi-spec/glob/open-mode, CLI/MCP, persistent mock ports, Cloud VM/CI
 changes, and malicious post-verification listener replacement.
 Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
-
-**Remaining correction — refined 2026-09-09**
-
-- **Goal/value:** Developers and AI tasks can trust that a passing paired
-  completion check proves exclusive recorded requests as well as each worktree's
-  own response. The existing presence-only assertion can accept mixed recordings;
-  this is an evidence gap, not a demonstrated routing leak.
-- **Scope:** Strengthen the existing recording assertion at the actual browser
-  boundary. Supply both owner and peer markers from the paired proof context;
-  inspect all recorded POST /responses bodies, preserving the owner's marker and
-  rejecting the peer's marker. Preserve current completion and unavailable-service
-  behavior, mock ownership/cleanup and the single-spec allowlist. The only
-  adjacent cleanup is removal of the unused test-only fetch adapter and its
-  dedicated test; retain the browser recording reader. No transport abstraction,
-  new runner, mock service or parallel-job capability.
-- **Key examples:** An owner-only recording passes; a recording containing both
-  markers fails even when the owner's request is last; a recording missing the
-  owner marker fails. With two separate worktrees, the peer's recording remains
-  exclusive before and after the resetter resets its mock. Reverse the roles to
-  prove preservation for the other allocation. Both suggestions remain correct.
-- **Proof reminders:** Use distinct non-overlapping markers and a fresh barrier
-  directory per paired run. URL-only checks, identical fixtures, or harness
-  spawn-argument tests do not establish uncrossed recordings. MCP's seeded
-  rendezvous covers a different boundary and does not complete this correction.
-  Ordinary unpaired completion and the existing conversation assertion retain
-  presence-only behavior without a peer marker. Run ordinary completion separately
-  to retain unavailable-service coverage.
-- **Boundary:** One Cypress runner in each of two worktrees. Multiple independent
-  test jobs sharing one worktree remain postponed. Quick/073 owns execution;
-  retain this story's delivered behavior and do not create another correction plan.
-  If the stronger proof exposes a runtime isolation defect, stop with its evidence
-  and revisit scope before changing routing, ownership or process lifecycle.
 
 <a id="story-4"></a>
 
@@ -453,12 +420,10 @@ Cloud VM/CI changes, and broader database management.
 
 ## Ordering and Scope Reduction
 
-**Backlog review, 2026-09-09:** Stories 4 and 5 are delivered, completing the
-selected CLI/MCP queue. The remaining isolation work is the existing
-[quick/073](../quick/073-exclusive-openai-recording-proof/PLAN.md) proof correction
-for story 3, now explicitly requeued first by the developer; keep it ahead of
-further capability expansion. This reopens its proof work, not its delivered
-runtime behavior, and creates no separate product story. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
+**Backlog review, 2026-09-09:** Stories 3, 4 and 5 are delivered, completing the
+selected browser/CLI/MCP queue. Story 3's recording-exclusivity correction added
+proof, not a separate product story or broader mock support. The
+[product backlog](../PRODUCT-BACKLOG.md) owns global order.
 
 The delivered four-spec allowlist does not establish general parallel E2E support.
 Select another concrete blocked workflow before broadening it; no new expansion

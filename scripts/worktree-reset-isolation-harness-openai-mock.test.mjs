@@ -5,11 +5,13 @@ import { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC } from './isolated-openai-mock.mjs
 import {
   afterReset,
   afterSeed,
+  openAiMockIsolationProofParams,
   waitBeforeReset,
   WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
   WORKTREE_RESET_ISOLATION_PEER_ROLE,
   WORKTREE_RESET_ISOLATION_ROLE,
   OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
+  OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_SUGGESTION,
   WORKTREE_RESET_ISOLATION_BARRIER_AT,
 } from './worktree-reset-isolation-barrier.mjs'
@@ -24,9 +26,21 @@ test('openai-mock mode uses the OpenAI completion spec and proof env', async () 
       resetterRoot: '/resetter',
       barrierDir: dir,
       mode: 'openai-mock',
+      peerProof: {
+        suggestion: 'A custom peer suggestion.',
+        requestMarker: 'CUSTOM_PEER_MARKER',
+      },
+      resetterProof: {
+        suggestion: 'A custom resetter suggestion.',
+        requestMarker: 'CUSTOM_RESETTER_MARKER',
+      },
       log: () => undefined,
       spawnCypress: (cwd, env) => {
-        spawned.push({ cwd, env })
+        spawned.push({
+          cwd,
+          env,
+          proofParams: openAiMockIsolationProofParams(env),
+        })
         const child = new EventEmitter()
         queueMicrotask(async () => {
           if (
@@ -52,12 +66,30 @@ test('openai-mock mode uses the OpenAI completion spec and proof env', async () 
     )
     assert.equal(
       spawned[0].env[OPENAI_MOCK_ISOLATION_REQUEST_MARKER],
-      'PEER_OPENAI_REQ_MARKER'
+      'CUSTOM_PEER_MARKER'
     )
     assert.equal(
       spawned[1].env[OPENAI_MOCK_ISOLATION_REQUEST_MARKER],
-      'RESETTER_OPENAI_REQ_MARKER'
+      'CUSTOM_RESETTER_MARKER'
     )
+    assert.equal(
+      spawned[0].env[OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER],
+      'CUSTOM_RESETTER_MARKER'
+    )
+    assert.equal(
+      spawned[1].env[OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER],
+      'CUSTOM_PEER_MARKER'
+    )
+    assert.deepEqual(spawned[0].proofParams, {
+      suggestion: 'A custom peer suggestion.',
+      requestMarker: 'CUSTOM_PEER_MARKER',
+      foreignRequestMarker: 'CUSTOM_RESETTER_MARKER',
+    })
+    assert.deepEqual(spawned[1].proofParams, {
+      suggestion: 'A custom resetter suggestion.',
+      requestMarker: 'CUSTOM_RESETTER_MARKER',
+      foreignRequestMarker: 'CUSTOM_PEER_MARKER',
+    })
     assert.notEqual(
       spawned[0].env[OPENAI_MOCK_ISOLATION_SUGGESTION],
       spawned[1].env[OPENAI_MOCK_ISOLATION_SUGGESTION]

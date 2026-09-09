@@ -9,6 +9,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import {
+  OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_SUGGESTION,
   WORKTREE_RESET_ISOLATION_BARRIER_AT,
@@ -22,6 +23,7 @@ import {
 } from './worktree-isolation-constants.mjs'
 
 export {
+  OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_SUGGESTION,
   WORKTREE_RESET_ISOLATION_BARRIER_AT,
@@ -80,14 +82,17 @@ export function isolationBarrierAt(env = process.env) {
 export function openAiMockIsolationProofParams(env = process.env) {
   const suggestion = env[OPENAI_MOCK_ISOLATION_SUGGESTION]
   const requestMarker = env[OPENAI_MOCK_ISOLATION_REQUEST_MARKER]
-  if (!(suggestion || requestMarker)) return null
+  const foreignRequestMarker = env[OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER]
+  if (!(suggestion || requestMarker || foreignRequestMarker)) return null
   if (!(suggestion && requestMarker)) {
     throw new Error(
       `${OPENAI_MOCK_ISOLATION_SUGGESTION} and ` +
         `${OPENAI_MOCK_ISOLATION_REQUEST_MARKER} must be set together.`
     )
   }
-  return { suggestion, requestMarker }
+  return foreignRequestMarker
+    ? { suggestion, requestMarker, foreignRequestMarker }
+    : { suggestion, requestMarker }
 }
 
 export function appendCucumberExposeTag(config, extraTag) {
@@ -201,6 +206,10 @@ export function worktreeResetIsolationEnv(dir, role, options = {}) {
   }
   if (options.requestMarker) {
     env[OPENAI_MOCK_ISOLATION_REQUEST_MARKER] = options.requestMarker
+  }
+  if (options.foreignRequestMarker) {
+    env[OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER] =
+      options.foreignRequestMarker
   }
   return env
 }

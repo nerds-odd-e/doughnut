@@ -3,7 +3,6 @@ import http from 'node:http'
 import { after, before, describe, test } from 'node:test'
 import MountebankWrapper from '../../support/MountebankWrapper'
 import ServiceMocker from '../../support/ServiceMocker'
-import { fetchOpenAiImposterRequests } from './openAiImposterRecordedRequests'
 import {
   type OpenAiMockEndpointContext,
   ISOLATED_OPEN_AI_MOCK_ENV_KEY,
@@ -51,17 +50,6 @@ describe('OpenAI mock endpoint context', () => {
         res.end('{}')
         return
       }
-      if (method === 'GET' && url === `/imposters/${servingPort}`) {
-        res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(
-          JSON.stringify({
-            requests: [
-              { method: 'POST', path: '/responses', body: '{"marker":"own"}' },
-            ],
-          })
-        )
-        return
-      }
       res.writeHead(404)
       res.end('not found')
     })
@@ -104,28 +92,6 @@ describe('OpenAI mock endpoint context', () => {
       endpoint.managementUrl
     )
     assert.equal(mocker.serviceUrl, `http://localhost:${servingPort}`)
-  })
-
-  test('recorded-request fetch reads through the same management and serving endpoint', async () => {
-    recorded.length = 0
-    const requests = await fetchOpenAiImposterRequests(
-      endpoint,
-      async (url) => {
-        assert.equal(url, openAiImposterRequestsUrl(endpoint))
-        const res = await fetch(url)
-        return { status: res.status, body: await res.json() }
-      }
-    )
-
-    assert.deepEqual(requests, [
-      { method: 'POST', path: '/responses', body: '{"marker":"own"}' },
-    ])
-    assert.ok(
-      recorded.some(
-        (call) =>
-          call.method === 'GET' && call.url === `/imposters/${servingPort}`
-      )
-    )
   })
 
   test('shared primary/CI defaults remain selectable at the OpenAI boundary', () => {

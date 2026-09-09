@@ -20,6 +20,7 @@ import {
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress.mjs'
 import {
+  OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_SUGGESTION,
   readBarrierEvents,
@@ -59,6 +60,15 @@ const DEFAULT_PEER_PROOF = {
 const DEFAULT_RESETTER_PROOF = {
   suggestion: 'It is a resetter isolation city.',
   requestMarker: 'RESETTER_OPENAI_REQ_MARKER',
+}
+
+function openAiMockProofEnvOptions(proof, oppositeProof) {
+  return {
+    barrierAt: WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
+    suggestion: proof.suggestion,
+    requestMarker: proof.requestMarker,
+    foreignRequestMarker: oppositeProof.requestMarker,
+  }
 }
 
 export async function runPairedWorktreeResetIsolation(options) {
@@ -108,24 +118,12 @@ export async function runPairedWorktreeResetIsolation(options) {
   const peerEnv = worktreeResetIsolationEnv(
     barrierDir,
     WORKTREE_RESET_ISOLATION_PEER_ROLE,
-    openaiMock
-      ? {
-          barrierAt: WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
-          suggestion: peerProof.suggestion,
-          requestMarker: peerProof.requestMarker,
-        }
-      : {}
+    openaiMock ? openAiMockProofEnvOptions(peerProof, resetterProof) : {}
   )
   const resetterEnv = worktreeResetIsolationEnv(
     barrierDir,
     WORKTREE_RESET_ISOLATION_RESETTER_ROLE,
-    openaiMock
-      ? {
-          barrierAt: WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
-          suggestion: resetterProof.suggestion,
-          requestMarker: resetterProof.requestMarker,
-        }
-      : {}
+    openaiMock ? openAiMockProofEnvOptions(resetterProof, peerProof) : {}
   )
   const peer = spawnCypress(peerRoot, peerEnv, peerSpec)
   const resetter = spawnCypress(resetterRoot, resetterEnv, resetterSpec)
@@ -206,10 +204,12 @@ if (isMain) {
       if (result.mode === 'openai-mock') {
         process.stdout.write(
           `OpenAI mock isolation OK. Peer env marker=${result.peerEnv[OPENAI_MOCK_ISOLATION_REQUEST_MARKER]} ` +
+            `foreign marker=${result.peerEnv[OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER]} ` +
             `suggestion=${result.peerEnv[OPENAI_MOCK_ISOLATION_SUGGESTION]}\n`
         )
         process.stdout.write(
           `Resetter env marker=${result.resetterEnv[OPENAI_MOCK_ISOLATION_REQUEST_MARKER]} ` +
+            `foreign marker=${result.resetterEnv[OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER]} ` +
             `suggestion=${result.resetterEnv[OPENAI_MOCK_ISOLATION_SUGGESTION]}\n`
         )
       }

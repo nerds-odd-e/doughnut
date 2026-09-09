@@ -4,7 +4,7 @@ import testability from '../testability'
 import createOpenAiResponsesMock from './createOpenAiResponsesMock'
 import {
   cyFetchOpenAiImposterRequests,
-  responsesPostBodies,
+  recordedResponsesPostsMatchMarkers,
 } from './openAiImposterRecordedRequests'
 import { buildResponsesStreamEvent } from './openAiMessageComposer'
 import {
@@ -121,14 +121,17 @@ const openAiService = (
       })
     },
 
-    expectLastResponsesPostBodyContains(marker: string) {
+    expectResponsesPostBodiesMatchMarkers(
+      marker: string,
+      foreignMarker?: string
+    ) {
       cyFetchOpenAiImposterRequests(endpoint).then((requests) => {
-        const postBodies = responsesPostBodies(requests)
         expect(
-          postBodies.length,
-          'OpenAI POST /responses requests recorded'
-        ).to.be.greaterThan(0)
-        expect(postBodies.join('\n')).to.include(marker)
+          recordedResponsesPostsMatchMarkers(requests, marker, foreignMarker),
+          foreignMarker === undefined
+            ? `OpenAI POST /responses contains ${marker}`
+            : `OpenAI POST /responses contains ${marker} and excludes ${foreignMarker}`
+        ).to.equal(true)
       })
     },
 
