@@ -1,6 +1,6 @@
 ---
 id: SEED-016
-status: completed
+status: active
 planted: 2026-09-09
 planted_during: README-only folder publication verification
 trigger_when: selected now as the top product-backlog story
@@ -110,14 +110,46 @@ ordinary-Note third-path eligibility via quick/082.
   folders, relationships, attachments, existing notebook content or README
   edits, multiple unpublished commits, and bulk import.
 
+<a id="story-5"></a>
+
+### 5. Publish the next small initial Readme-and-Note trees
+
+**Status:** planned in quick/087.
+
+- **Goal:** A notebook owner can publish the next six small, valid initial
+  Readme-and-Note tree shapes as one authored commit instead of restructuring
+  the checkout to fit one previously hard-coded shape.
+- **Scope:** The notebook has no folders or live notes and its accepted
+  Portable tree is empty. One direct-child commit contains one of exactly these
+  layouts: (1) one Note inside one new root Folder without a Folder Readme; (2)
+  one nested Folder Readme; (3) two sibling root Folder Readmes; (4) notebook
+  Readme plus two root Notes; (5) one root Folder Readme plus two Notes directly
+  inside it; or (6) notebook Readme plus one root Folder Readme plus one root
+  Note. Files are regular, authored Markdown with role-correct `type: Readme`
+  or `type: Note`; Note filenames produce valid titles. Publication creates
+  every required Folder and Note, preserves authored bytes, and accepts the
+  exact commit atomically. Valid unmatched Readme/Note trees continue to fail
+  loudly under ADR 0006. Excluded: every other layout, more than three files,
+  more than two new Folders or Notes, folder depth beyond the single
+  nested-Folder example, Relationship or unknown document types, attachments,
+  existing notebook content or README edits, multiple unpublished commits,
+  and bulk import.
+- **Key examples:** `New Folder/First note.md`;
+  `Parent/Child/README.md`; `Folder A/README.md` plus `Folder B/README.md`;
+  `README.md` plus two root Notes; `New Folder/README.md` plus two contained
+  Notes; and `README.md` plus `New Folder/README.md` plus one root Note all
+  publish as their exact authored commit.
+
 ## Ordering and Scope Reduction
 
 Story 1 was the smallest verified follow-up to the local README-only folder
 workflow. Story 2 adds exactly one ordinary Note to that delivered initial
 tree. Story 3 isolates adding only the initial notebook Readme. Story 4 joins
 each kind of initial container with one Note while keeping the next valid
-unimplemented composition visible to developers. Additional content and bulk
-initial import remain separate problems.
+unimplemented composition visible to developers. Story 5 admits the next six
+bounded Readme/Note compositions without turning the work into arbitrary or
+bulk initial import. Additional content and bulk initial import remain separate
+problems.
 
 ## Open Decisions
 
@@ -125,8 +157,8 @@ None.
 
 ## When to Surface
 
-Stories 1–4 are delivered. Additional content and bulk initial import remain
-separate problems.
+Stories 1–4 are delivered. Story 5 is selected for execution planning.
+Additional content and bulk initial import remain separate problems.
 
 ## Breadcrumbs
 
