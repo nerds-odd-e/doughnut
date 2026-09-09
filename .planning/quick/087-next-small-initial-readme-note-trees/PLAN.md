@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: in progress (slices 1–3 done).
+Status: in progress (slices 1–4 done).
 
 ## Goal and scope
 
@@ -98,17 +98,11 @@ with child Readme and refreshed projection. Publisher still loud-refuses until S
 
 ### 4. Publish one nested Folder Readme
 Type: Behavior
-Status: planned
+Status: done
 
-Behavior: Given an empty accepted notebook, when the exact proposed tree is
-valid `Parent/Child/README.md`, publication creates `Parent` then `Child`,
-stores the authored Readme on `Child`, leaves `Parent` without a Readme, and
-accepts the exact head and tree atomically.
-
-Proof: A controller test observes both Folder identities and parentage, their
-respective Readme contents, absence of Notes, and downloaded head/tree equality.
-Existing typed Markdown and publication-atomicity tests retain invalid-input
-and rollback ownership. Run the complete backend unit-test suite.
+Learning: `acceptOneNestedFolderReadme` on InitialCompositionPublication uses
+`createNestedFolderWithChildReadme`; controller proof
+`NotebookGitProposalInitialNestedFolderReadmeControllerTest`.
 
 ### 5. Publish two sibling Folder Readmes
 Type: Behavior
