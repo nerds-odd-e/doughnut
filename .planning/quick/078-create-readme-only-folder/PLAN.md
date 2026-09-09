@@ -1,7 +1,7 @@
 # Create one README-only folder locally
 
 Source: [SEED-009 Story 19](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-19).
-Status: executing; slice 1 complete.
+Status: complete.
 
 ## Goal and scope
 
@@ -91,7 +91,7 @@ existing-suite proof loop.
 
 ### 2. Accept the README-only folder as the authored commit
 Type: Behavior
-Status: planned
+Status: complete
 Proof: A focused controller test observes the new root Folder, its Readme, no
 ordinary Note, and the exact accepted/downloaded proposal head and tree. Then
 run the full backend unit suite with
@@ -128,3 +128,10 @@ backend suite runtime is an external-wait exception, not implementation scope.
   README refusal preserves every observable until the behavior slice consumes
   it. Full backend proof passed with `pnpm backend:test_only`; the fresh
   refactor review found no worthwhile change.
+- Slice 2: the existing folder construction and sibling-name validation rules
+  can be reused after validating the authored Markdown is specifically a
+  `Readme`. Reloading the folder projection after creation makes the existing
+  exact-tree gate prove the authored proposal before the shared binding write.
+  The controller-first test initially failed with the reserved folder-README
+  refusal, then the full 2,329-test backend suite passed; the fresh refactor
+  review found no worthwhile change.
