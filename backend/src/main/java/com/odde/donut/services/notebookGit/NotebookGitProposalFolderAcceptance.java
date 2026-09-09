@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Applies one eligible Folder-creation or Folder-relocation proposal and accepts that commit. */
+/** Applies eligible Folder-creation, initial-Readme, or Folder-relocation proposals. */
 @Service
 class NotebookGitProposalFolderAcceptance {
 
@@ -75,6 +75,27 @@ class NotebookGitProposalFolderAcceptance {
     return acceptBinding(state.binding(), proposal);
   }
 
+  String acceptInitialNotebookReadme(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      NotebookGitProposalFolderCreationShape.InitialNotebookReadmeCreation creation) {
+    storeInitialNotebookReadmeOnEmptyNotebook(
+        state,
+        proposal,
+        acceptedHead,
+        creation.notebookReadmePath(),
+        "Initial notebook Readme requires an empty notebook.");
+    entityPersister.flush();
+    projection.requireMatchingAcceptedTree(
+        state.notebook(),
+        state.folders(),
+        state.liveNotes(),
+        proposal.repository(),
+        proposal.mainHead());
+    return acceptBinding(state.binding(), proposal);
+  }
+
   String acceptInitialCreation(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
@@ -118,26 +139,39 @@ class NotebookGitProposalFolderAcceptance {
     return acceptBinding(state.binding(), proposal);
   }
 
+  private void storeInitialNotebookReadmeOnEmptyNotebook(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      String notebookReadmePath,
+      String emptyNotebookMessage) {
+    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
+        proposal.repository(), proposal.mainHead());
+    projection.requireMatchingAcceptedTree(
+        state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
+    if (!state.folders().isEmpty() || !state.liveNotes().isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, emptyNotebookMessage);
+    }
+
+    state
+        .notebook()
+        .setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, notebookReadmePath));
+    entityPersister.save(state.notebook());
+  }
+
   private List<ExportFolderRow> createInitialNotebookAndRootFolder(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       String notebookReadmePath,
       String folderReadmePath) {
-    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-        proposal.repository(), proposal.mainHead());
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
-    if (!state.folders().isEmpty() || !state.liveNotes().isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Initial notebook and folder Readmes require an empty notebook.");
-    }
-
-    String notebookReadme =
-        NotebookGitProposalTypedPath.requireReadme(proposal, notebookReadmePath);
+    storeInitialNotebookReadmeOnEmptyNotebook(
+        state,
+        proposal,
+        acceptedHead,
+        notebookReadmePath,
+        "Initial notebook and folder Readmes require an empty notebook.");
     String folderReadme = NotebookGitProposalTypedPath.requireReadme(proposal, folderReadmePath);
-    state.notebook().setReadmeContent(notebookReadme);
-    entityPersister.save(state.notebook());
     createRootFolderWithReadme(state.notebook(), folderReadmePath, folderReadme);
     return notebookGitStateLoader.foldersOf(state.notebook());
   }
