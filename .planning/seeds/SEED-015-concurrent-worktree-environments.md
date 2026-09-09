@@ -299,58 +299,78 @@ Depends on delivered stories 2/2a. **Open questions:** None for this boundary.
 
 <a id="story-4"></a>
 
-### 4. Run CLI E2E workflows against the owning worktree's environment
+### 4. Run one non-interactive CLI E2E workflow against the owning worktree's environment
 
-**Status:** Queued; needs refinement before slice planning.
+**Status:** Refined 2026-09-09; ready for slice planning.
 
-- **For / why:** Developers and AI tasks changing CLI behavior can verify it
-  concurrently with another worktree's CLI or browser tests.
-- **Evaluation:** Concurrent CLI E2E workflows, including interactive and mocked
-  authentication cases where applicable, use their own backend, local client
-  state, and mock responses; one runner's reset or teardown leaves the other
-  intact.
-- **Value / learning:** Delivers concurrent CLI verification independently of
-  whether MCP verification is added later.
-- **Safety boundary:** Own all client processes and mutable local artifacts
-  involved in the supported workflows; do not redirect to shared defaults.
-- **Shutdown example from 2b:** An owned forked client outlives its parent and
-  ignores TERM → cancellation → bounded cleanup finishes before lease/path
-  reuse, or fails visibly. Prove peer usability at reuse, not only parent exit.
-- **Reminder from SEED-009 Story 7:** When this story is selected, include or
-  explicitly bound the installed-CLI folder-relocation feature. It uses a
-  bound clone, `git mv` of a represented folder, a second clone, and pull;
-  isolation must own install, config, and checkout directories. Do not treat
-  that coverage as a reason to start this story before the browser proof.
-- **Reminder from SEED-009 Story 13:** Isolation must also own
-  `cli_notebook_web_created_note.feature` (install, config, clone checkouts).
-  Do not start this story to cover that feature before the browser proof.
-- **Reminder from 1c:** Ordinary Gradle `test` / `migrateTestDB` isolation
-  does not cover CLI processes, `DONUT_CONFIG_DIR`, or clone checkouts. Reuse
-  the worktree identity once an isolated application environment exists.
-- **Mock reminder from story 3:** Only OpenAI completion is supported. OAuth /
-  Google mocks need explicit scope and private routing; browser `expose` does
-  not configure spawned clients. Reuse runner ownership, observe background
-  failure, and release children before the runner lease. Preserve peer responses
-  and reject peer request markers in recordings.
-- **Effort hypothesis:** L — low confidence; assumes endpoint and local-state
-  selection can reuse the earlier environment behavior. Interactive or OAuth
-  cases may need a separate story if refinement shows a larger-than-L scope.
-- **Depends on:** An isolated running application; independent mocks for CLI
-  workflows that use them. Browser support itself is not a product prerequisite.
-- **Execution learning:** Cypress origin does not redirect spawned clients;
-  own backend URL and config/install/clone paths before admitting CLI specs.
-  Include or explicitly bound `cli_notebook_existing_note_edits.feature`
-  (SEED-009 story 18). Prove reset, cancellation, and teardown preserve peer
-  files/processes. Require owning application health before client setup/reset;
-  a live owner with a foreign ready endpoint must refuse without touching peers.
-- **Retirement reminder from story 6:** Establish owning application/runner
-  protection before client setup or reset and keep it through child cleanup.
-  A retired allocation, including a partial retirement, must refuse before
-  install/config/clone mutation or database recreation. Prove that retirement
-  refuses while a supported CLI run is active and that a late start after
-  retirement cannot resume using stale eligibility. Reuse the existing
-  admission and lifetime ownership contracts; do not add a second identity or
-  assume every CLI descendant is covered by backend-JVM inspection.
+**Goal**
+
+Developers and AI tasks can run the `cli_notebook_web_created_note.feature`
+clone/pull/publish workflow through the installed CLI in an isolated linked
+worktree, against that worktree's own backend and local client state, while
+another worktree runs the same or a browser workflow concurrently without
+either resetting or reading the other's data.
+
+**Scope**
+
+- One local Nix worktree with an existing isolated application allocation
+  (1a–1c, 2, 2a identity/provisioning), run as `pnpm sut` then
+  `pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature`.
+  This is the one CLI spec this story admits into the isolated-run allowlist
+  (`scripts/isolated-cypress-spec-selection.mjs`); no other CLI spec becomes
+  runnable in an isolated worktree as a result of this story.
+- Fix `cliEnv()` (`e2e_test/config/cliEnv.ts`) so the `DONUT_API_BASE_URL`
+  given to every spawned CLI process resolves the same isolated origin
+  `guardCypressNodeSetup` already assigns to `config.baseUrl`
+  (`scripts/isolated-cypress.mjs`), instead of the hardcoded
+  `E2E_APP_BASE_URL` constant. An unconfigured/primary checkout keeps
+  today's default origin.
+- Config, access-token, and clone-checkout directories already come from
+  per-run `mkdtempSync(tmpdir(), …)` calls
+  (`cliE2ePluginConfigDirTasks.ts`, `cliE2eNotebookCloneTasks.ts`) and need
+  no new isolation code; the key example below is a check that this already
+  holds, not new behavior.
+- Concurrency safety (runner lease, health-verified owning application,
+  retirement veto on an active run) is inherited unchanged from the existing
+  Cypress runner-lease mechanism (1a–1c, 2a, 6/6a) once the spec is
+  admitted; this story adds no second identity, lease, or process-ownership
+  mechanism. CLI subprocesses are already synchronously spawned and awaited
+  to exit (`runInstalledCliExpectingExit`/`waitForPtyExit`), so no
+  outlives-its-parent shutdown case applies here.
+
+**Exclusions:** Every other CLI feature file, including
+`cli_notebook_existing_note_edits.feature`, `cli_notebook_folder_relocation.feature`,
+`cli_notebook_clone.feature`, and `cli_install_and_run.feature` — the
+DONUT_API_BASE_URL fix applies to them too, but this story certifies isolated
+concurrency for one representative spec only and does not add the others to
+the allowlist. Interactive mode, access tokens obtained through the CLI itself,
+and Gmail/OAuth (`cli_interactive_mode.feature`, `cli_access_token.feature`,
+`cli_gmail.feature`, `cli_recall.feature`) stay excluded; all four already
+carry `@ignore` and are not part of the active suite today. MCP, Cloud VM/CI
+changes, and any change to the runner-lease or retirement mechanisms
+themselves are also excluded. A future story can extend the allowlist to
+further non-interactive CLI specs, or take on interactive/OAuth cases, once
+this narrower slice is proven.
+
+**Key examples**
+
+- Two linked worktrees each run `pnpm sut` then the allowlisted CLI spec
+  concurrently: each installed CLI clones, edits, and publishes against its
+  own worktree's notebook data; neither run's fixtures, published note
+  content, or process teardown affects the other.
+- The same spec run in the unconfigured primary checkout keeps using
+  `doughnut_test`/the primary origin, unchanged from today.
+- Selecting any CLI spec other than the one allowlisted spec in an isolated
+  worktree still refuses before fixture/client setup, exactly as any
+  currently-unsupported spec does today.
+- `pnpm worktree:retire --check` still reports a busy Cypress runner lease,
+  and refuses reclamation, while the allowlisted CLI spec is actively running
+  in that worktree — unchanged existing behavior, exercised against a CLI run
+  instead of a browser run.
+
+**Depends on:** Delivered 1a–1c and 2/2a identity, provisioning, and runner
+ownership. No independent mock is required — the selected spec does not use
+OpenAI, Google, or other mocked services. MCP support is not a prerequisite.
 
 <a id="story-5"></a>
 
