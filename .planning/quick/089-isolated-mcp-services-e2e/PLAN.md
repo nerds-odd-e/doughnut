@@ -4,7 +4,7 @@ Sources: [SEED-015 Story 4](../../seeds/SEED-015-concurrent-worktree-environment
 and [Story 5](../../seeds/SEED-015-concurrent-worktree-environments.md#story-5),
 plus completed quick/088 (recover its plan at `419135973b`;
 merged by `c3c2a5d3a9`).
-Status: in progress (slice 1 done).
+Status: in progress (slices 1–2 done).
 
 ## Goal and scope
 
@@ -139,35 +139,21 @@ and accurate guidance; MCP support is still excluded at this boundary.
 
 ### 2. Await bounded MCP server child cleanup on disconnect
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given a connected MCP client with a live spawned server, when the
 client disconnects, that server exits before disconnect resolves.
 
-In `e2e_test/support/mcp_client.ts`, replace
-`disconnectMcpServer()`'s dead `transport.child`/`client.disconnect` checks
-with `await this.client?.close()` (falling through when no client is
-connected), then null out `this.client` and `this.transport`. No MCP spec is
-admitted to isolated runs until slice 3.
+`disconnectMcpServer()` now `await`s `this.client?.close()` then nulls the
+client and transport. Optional spawn `args` default to the Donut bundle so
+the focused test can use `e2e_test/support/mcp_stdio_fixture.mjs`. Isolated
+allowlist is unchanged.
 
-Proof: New focused test in `e2e_test/support/mcp_client.test.ts` (`node:test`,
-run via `cli/node_modules/.bin/tsx --test
-e2e_test/support/mcp_client.test.ts`, through Nix) that connects through the
-MCP client's public entry point using the real SDK transport and a minimal
-local MCP server fixture, then disconnects and observes that the spawned
-process has exited before the call resolves. A `close()` spy and nulled
-fields alone do not prove child cleanup. Keep the fixture's process cleanup
-bounded even when the assertion fails. Regression: the existing
-(non-isolated) `mcp_services.feature`
-spec (`pnpm cy:run-on-sut --spec e2e_test/features/mcp/mcp_services.feature`
-against a running `pnpm sut`, through Nix) still passes across all three
-scenarios. Run this pre-admission regression in an unconfigured primary
-checkout; an isolated worktree cannot run this spec until slice 3.
-
-Sizing: target approximately 5 minutes active work plus focused subprocess
-and Cypress waits. Inspect the public connection seam before implementation;
-if a real-child fixture needs substantial preparation, refine this slice in
-place rather than substituting spy-only proof.
+Proof:
+`CURSOR_DEV=true nix develop -c cli/node_modules/.bin/tsx --test e2e_test/support/mcp_client.test.ts`
+passed (child pid gone before disconnect returned). Primary (unconfigured)
+`CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --spec e2e_test/features/mcp/mcp_services.feature`
+passed 5/5; primary `mcp_client.ts` restored to `main` HEAD.
 
 ### 3. Admit the MCP services workflow into isolated concurrent runs
 Type: Behavior
@@ -216,14 +202,16 @@ Do not replace live data isolation proof with guard-only assertions.
 - CLI harness mode needs per-role specs (`peerSpec` / `resetterSpec`), not one
   shared spec. Fixture and openai-mock still use the same spec on both roles.
 - Resetter leftover at `/Users/terryyin/git/doughnut-089-browser-resetter`
-  (detached, own SUT). Refresh it to the slice-2/3 commit before MCP proof.
+  (detached, own SUT). Refresh it to the slice-3 commit before MCP proof.
+- A tiny newline-JSON stdio fixture is enough for `Client.connect`; do not
+  spawn the Donut MCP bundle to prove child exit.
 - awaiting story review: [SEED-015 Story 4](../../seeds/SEED-015-concurrent-worktree-environments.md#story-4)
   status still says ready-for-planning; the remaining CLI proof/docs gap this
   slice closed may now be delivered.
 
 ## Execution constraints
 
-Slice 1 is done; slices 2–3 remain. The developer authorized the combined
+Slices 1–2 are done; slice 3 remains. The developer authorized the combined
 plan and corrections-first ordering. Do not recreate quick/090. Preserve
 unrelated working-tree changes and the source seed's story anchors.
 

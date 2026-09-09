@@ -4,13 +4,6 @@ import path from 'path'
 import fs from 'fs'
 import { E2E_APP_BASE_URL } from '../config/constants'
 
-interface MaybeChildProcess {
-  child?: { kill: () => void }
-}
-interface MaybeDisconnect {
-  disconnect?: () => Promise<void>
-}
-
 class McpClient {
   client: Client | null = null
   transport: StdioClientTransport | null = null
@@ -18,9 +11,11 @@ class McpClient {
   async spawnAndConnectMcpServer({
     baseUrl,
     accessToken,
+    args,
   }: {
     baseUrl: string
     accessToken: string
+    args?: string[]
   }) {
     if (this.client !== null) {
       throw new Error(
@@ -50,12 +45,12 @@ class McpClient {
       'mcp-server',
       'node_modules'
     )
-    if (!fs.existsSync(bundlePath)) {
+    const serverArgs = args ?? [bundlePath]
+    if (args === undefined && !fs.existsSync(bundlePath)) {
       throw new Error(
         `MCP server bundle not found at ${bundlePath}. Please build it first: \n  CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle`
       )
     }
-    // Let the SDK spawn the process: pass command as array ['node', bundlePath]
     // Set NODE_PATH so external packages (like @modelcontextprotocol/sdk and express) can be resolved
     const nodePath = process.env.NODE_PATH
       ? `${process.env.NODE_PATH}:${mcpServerNodeModules}`
@@ -64,7 +59,7 @@ class McpClient {
       baseUrl && baseUrl !== 'undefined' ? baseUrl : E2E_APP_BASE_URL
     this.transport = new StdioClientTransport({
       command: process.execPath,
-      args: [bundlePath],
+      args: serverArgs,
       env: {
         ...process.env,
         NODE_PATH: nodePath,
@@ -93,22 +88,9 @@ class McpClient {
   }
 
   async disconnectMcpServer() {
-    if (
-      this.transport &&
-      (this.transport as MaybeChildProcess).child &&
-      typeof (this.transport as MaybeChildProcess).child!.kill === 'function'
-    ) {
-      ;(this.transport as MaybeChildProcess).child!.kill()
-    }
-    this.transport = null
-
-    if (
-      this.client &&
-      typeof (this.client as MaybeDisconnect).disconnect === 'function'
-    ) {
-      await (this.client as MaybeDisconnect).disconnect!()
-    }
+    await this.client?.close()
     this.client = null
+    this.transport = null
     return true
   }
 }
