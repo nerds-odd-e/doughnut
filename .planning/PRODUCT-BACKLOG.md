@@ -28,6 +28,7 @@ changes.
 
 ## Recently done
 
+- [Publish one initial note inside the new README-backed folder](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-2) — SEED-016
 - [Publish the initial notebook README with one README-only folder](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-1) — SEED-016
 - [Create a README-only folder locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-19) — SEED-009
 - [Retire worktree databases without admitting late runners or overlooking uncertain JVMs](seeds/SEED-015-concurrent-worktree-environments.md#story-6a) — SEED-015

@@ -1,7 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
-import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
@@ -13,12 +12,10 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.NoteFactory;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.services.NoteTitlePlacementRules;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
-import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,40 +35,37 @@ public class NotebookGitProposalPublisher {
   private final AuthorizationService authorizationService;
   private final NotebookGitProjection projection;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
-  private final CanonicalDonutOrigin canonicalDonutOrigin;
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
   private final NotebookGitProposalFilenameTitle filenameTitle;
-  private final NoteFactory noteFactory;
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final NotebookGitProposalFolderAcceptance folderAcceptance;
+  private final NotebookGitProposalNoteAddition noteAddition;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
       AuthorizationService authorizationService,
       NotebookGitProjection projection,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
-      CanonicalDonutOrigin canonicalDonutOrigin,
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
       NotebookGitProposalFilenameTitle filenameTitle,
-      NoteFactory noteFactory,
       NoteService noteService,
       NoteTitlePlacementRules noteTitlePlacementRules,
-      NotebookGitProposalFolderAcceptance folderAcceptance) {
+      NotebookGitProposalFolderAcceptance folderAcceptance,
+      NotebookGitProposalNoteAddition noteAddition) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
-    this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
     this.filenameTitle = filenameTitle;
-    this.noteFactory = noteFactory;
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.folderAcceptance = folderAcceptance;
+    this.noteAddition = noteAddition;
   }
 
   @Transactional(
@@ -125,6 +119,14 @@ public class NotebookGitProposalPublisher {
       return folderAcceptance.acceptInitialCreation(
           state, proposal, acceptedHead, initialCreation.get());
     }
+    Optional<NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndNoteCreation>
+        initialNoteCreation =
+            NotebookGitProposalFolderCreationShape.findInitialNotebookRootFolderAndNoteCreation(
+                files);
+    if (initialNoteCreation.isPresent()) {
+      return folderAcceptance.acceptInitialCreationWithNote(
+          state, proposal, acceptedHead, initialNoteCreation.get());
+    }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);
     if (relocation.isPresent()) {
@@ -141,10 +143,11 @@ public class NotebookGitProposalPublisher {
     for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
         proposedLiveNotes.add(
-            applyAddition(
+            noteAddition.apply(
                 notebook, folders, proposal, acceptedHead, noteChange.path(), publishedAt));
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
-        AuthoredNoteDocument document = readValidatedDocument(proposal, noteChange.path());
+        AuthoredNoteDocument document =
+            noteAddition.readValidatedDocument(proposal, noteChange.path());
         Note changedNote =
             projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());
         authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
@@ -173,26 +176,6 @@ public class NotebookGitProposalPublisher {
     return written.headObjectId();
   }
 
-  private Note applyAddition(
-      Notebook notebook,
-      List<ExportFolderRow> folders,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      String path,
-      Timestamp publishedAt) {
-    AuthoredNoteDocument document = readValidatedDocument(proposal, path);
-    String title = filenameTitle.requireValid(path);
-    Folder destinationFolder = representedDestinationFolder(folders, proposal, acceptedHead, path);
-    Note addedNote;
-    try {
-      addedNote = noteFactory.create(notebook, destinationFolder, title);
-    } catch (ApiException exception) {
-      throw exception.withContext("Cannot add note at path \"" + path + "\"");
-    }
-    authoredNoteDocumentPersistence.persist(addedNote, document, publishedAt);
-    return addedNote;
-  }
-
   private void applyRename(
       Notebook notebook,
       List<ExportFolderRow> folders,
@@ -204,7 +187,8 @@ public class NotebookGitProposalPublisher {
     Note note = projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.fromPath());
     String newTitle = filenameTitle.requireValid(noteChange.path());
     Folder destinationFolder =
-        representedDestinationFolder(folders, proposal, acceptedHead, noteChange.path());
+        noteAddition.representedDestinationFolder(
+            folders, proposal, acceptedHead, noteChange.path());
     try {
       noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, destinationFolder, newTitle);
     } catch (ApiException exception) {
@@ -214,29 +198,5 @@ public class NotebookGitProposalPublisher {
     note.setFolder(destinationFolder);
     note.setUpdatedAt(publishedAt);
     entityPersister.save(note);
-  }
-
-  private Folder representedDestinationFolder(
-      List<ExportFolderRow> folders,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      String path) {
-    Integer destinationFolderId =
-        projection.requireRepresentedFolderId(folders, proposal.repository(), acceptedHead, path);
-    return destinationFolderId == null
-        ? null
-        : entityPersister.find(Folder.class, destinationFolderId);
-  }
-
-  private AuthoredNoteDocument readValidatedDocument(
-      NotebookGitProposalImporter.ImportedProposal proposal, String path) {
-    String content =
-        NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), path);
-    try {
-      AuthoredNoteContent.assertValidForSave(content);
-    } catch (ApiException exception) {
-      throw exception.withContext("Invalid authored property at path \"" + path + "\"");
-    }
-    return AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin);
   }
 }
