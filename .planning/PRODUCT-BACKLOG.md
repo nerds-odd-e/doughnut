@@ -28,6 +28,7 @@ changes.
 
 ## Recently done
 
+- [Publish three small initial layouts exposed by the jap1 failure](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-6) — SEED-016
 - [Publish the next small initial Readme-and-Note trees](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5) — SEED-016
 - [Publish a minimal initial container with one note](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-4) — SEED-016
 - [Publish the initial notebook README by itself](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-3) — SEED-016
@@ -37,4 +38,3 @@ changes.
 - [Retire worktree databases without admitting late runners or overlooking uncertain JVMs](seeds/SEED-015-concurrent-worktree-environments.md#story-6a) — SEED-015
 - [Reclaim databases from retired worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-6) — SEED-015
 - [Apply the web edit batching interval accurately across durable saves](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-10a) — SEED-009
-- [Stop an isolated SUT without leaving its forked backend running](seeds/SEED-015-concurrent-worktree-environments.md#story-2b) — SEED-015
