@@ -1,7 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: in progress (slices 1–2 done).
+Status: in progress (slices 1–3 done).
 
 ## Goal and scope
 
@@ -90,19 +90,11 @@ create (with/without Readme) shared with FolderAcceptance. Controller proof:
 
 ### 3. Materialize a bounded initial Folder hierarchy
 Type: Structure
-Status: planned
+Status: done
 
-Internal change: Extend the initial-composition representation from one implied
-root Folder to the exact `Parent/Child/README.md` hierarchy, and extract or
-introduce one materializer that creates those validated Folder prefixes
-parent-first, attaches the authored Readme to the child, and returns refreshed
-projection rows. Preserve delivered root-Folder and Slice 2 behavior. This
-immediately enables Slice 4 without yet admitting arbitrary depth or multiple
-sibling Readmes.
-
-Proof: The complete backend unit-test suite remains green, including root
-Folder-only, Folder-with-Note, and initial notebook/Folder scenarios. No touched
-production class exceeds 250 lines.
+Learning: `OneNestedFolderReadme` recognizes `Parent/Child/README.md`;
+`FolderMaterialization.createNestedFolderWithChildReadme` builds parent-then-child
+with child Readme and refreshed projection. Publisher still loud-refuses until Slice 4.
 
 ### 4. Publish one nested Folder Readme
 Type: Behavior

@@ -164,6 +164,12 @@ public class NotebookGitProposalPublisher {
       return initialCompositionPublication.acceptOneNoteInImpliedRootFolder(
           state, proposal, acceptedHead, oneNoteInImpliedRootFolder.get());
     }
+    Optional<NotebookGitProposalInitialComposition.OneNestedFolderReadme> oneNestedFolderReadme =
+        NotebookGitProposalInitialComposition.findOneNestedFolderReadme(files, proposal);
+    if (oneNestedFolderReadme.isPresent()) {
+      throw new IllegalStateException(
+          "Initial Readme/Note composition is not a supported exact shape.");
+    }
     Optional<NotebookGitProposalInitialComposition.ValidUnmatched> validUnmatchedInitial =
         NotebookGitProposalInitialComposition.findValidUnmatched(files, proposal);
     if (validUnmatchedInitial.isPresent()) {
