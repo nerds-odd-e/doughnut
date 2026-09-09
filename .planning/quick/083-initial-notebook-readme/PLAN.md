@@ -1,7 +1,7 @@
 # Publish the initial notebook README by itself
 
 Source: [SEED-016 Story 3](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-3).
-Status: planned.
+Status: in progress.
 
 ## Goal and scope
 
@@ -34,17 +34,17 @@ initial case. No CLI or API contract changes are required.
 
 ### 1. Recognize the sole initial notebook README
 Type: Structure
-Status: pending
+Status: done
 
-Introduce an exact one-file initial-notebook-Readme shape alongside the
-existing initial folder shapes and route it before ordinary-note validation.
-The classifier must reject any accepted root README, any second path, and any
-non-root README. Keep this slice behavior-preserving by routing to a refusal
-until the acceptance operation exists.
+Classifier recognizes one added root `README.md` with no other path; publisher
+routes it before ordinary-note validation and refuses until acceptance exists.
+Excluded: accepted root README, second path, non-root README.
 
-Proof: focused shape tests cover the one added root `README.md` match and the
-nearest excluded boundaries: an accepted root README and one additional path.
-The existing backend suite remains green.
+Proof: `NotebookGitProposalTreeShapeControllerTest` (match + nearest exclusions);
+folder-creation and rename-rejection suites remain green; full backend suite green.
+
+Learnings: temporary refusal message is justified by slice 2; shape lives with
+sibling initial shapes in `NotebookGitProposalFolderCreationShape`.
 
 ### 2. Accept the sole initial notebook README
 Type: Behavior

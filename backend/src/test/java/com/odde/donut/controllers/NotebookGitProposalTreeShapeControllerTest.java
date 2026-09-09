@@ -133,6 +133,63 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
         notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
   }
 
+  @Test
+  void recognizesSoleAddedRootReadmeThenRefusesUntilAcceptanceExists() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] bundleBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\ninitial notebook readme")));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("Unsupported tree shape"));
+    assertThat(exception.getReason(), containsString("sole initial notebook README"));
+  }
+
+  @Test
+  void doesNotRecognizeAcceptedRootReadmeChangeAsSoleInitialNotebookReadme() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding =
+        seedAcceptedBinding(
+            notebook, List.of(new PortableTreeEntry("README.md", "readme original")));
+    byte[] bundleBytes =
+        proposalBundleBytes(
+            binding, List.of(new NotebookGitProposalFile("README.md", "readme changed")));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("README.md"));
+    assertThat(exception.getReason(), containsString("folder README, which is reserved"));
+  }
+
+  @Test
+  void doesNotRecognizeASecondPathAsSoleInitialNotebookReadme() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] bundleBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\ninitial notebook readme"),
+                new NotebookGitProposalFile("note.md", "---\ntype: Note\n---\nextra")));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("README.md"));
+    assertThat(exception.getReason(), containsString("folder README, which is reserved"));
+  }
+
   /** The baseline accepted tree shared by the tree-shape rejection tests: one note, one README. */
   private static List<PortableTreeEntry> baselineEntries() {
     return List.of(
