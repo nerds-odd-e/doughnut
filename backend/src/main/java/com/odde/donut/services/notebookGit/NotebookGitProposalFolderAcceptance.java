@@ -53,7 +53,7 @@ class NotebookGitProposalFolderAcceptance {
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
-      NotebookGitProposalFolderShape.RootFolderCreation creation) {
+      NotebookGitProposalFolderCreationShape.RootFolderCreation creation) {
     String readmePath = creation.readmePath();
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());

@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -15,7 +16,9 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 
 /** Verifies publication of one locally authored root folder represented by its README. */
 class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleControllerTestBase {
@@ -59,5 +62,24 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
       assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
       assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
     }
+  }
+
+  @Test
+  void stillRefusesInitialNotebookAndRootFolderReadmesAsReservedFolderReadme() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("README.md", README),
+                new NotebookGitProposalFile("Folder/README.md", README)));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("Folder/README.md"));
+    assertThat(exception.getReason(), containsString("folder README, which is reserved"));
   }
 }

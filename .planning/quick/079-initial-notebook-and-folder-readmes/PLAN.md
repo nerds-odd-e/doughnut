@@ -1,7 +1,7 @@
 # Publish the initial notebook README with one README-only folder
 
 Source: [SEED-016 Story 1](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-1).
-Status: planned; not executed.
+Status: in progress (slice 1 done).
 
 ## Goal and scope
 
@@ -18,21 +18,16 @@ multiple unpublished commits, stale/divergent history, and bulk import.
 ## Current decisions and evidence
 
 - Keep `NotebookController.publishNotebookGitProposal` as the stable proof
-  boundary and the existing publication transaction as the atomicity owner. No
-  endpoint, CLI, API schema, migration, or transport change.
-- Extend only the existing root-folder-creation route. The already delivered
-  sole `Folder/README.md` case must remain unchanged.
-- Treat the two authored Readmes as one exact initial container-tree outcome;
-  do not generalize root README edits or multi-path folder publication.
+  boundary and the existing publication transaction as the atomicity owner.
+- Extend only the existing root-folder-creation route. Sole `Folder/README.md`
+  remains unchanged until slice 2 accepts the two-README shape.
+- Root-folder creation recognition lives in
+  `NotebookGitProposalFolderCreationShape`; relocation stays in
+  `NotebookGitProposalFolderShape`.
 - Reuse strict typed-Markdown, authored-content, folder-name, sibling-collision,
   Portable-projection, ancestry, ownership, and exact bundle acceptance gates.
-- Verified failure: a temporary controller test against an empty accepted tree
-  added only these two README paths. `CURSOR_DEV=true nix develop -c pnpm
-  backend:test_only` ran 2,330 tests and failed only that example with `400 BAD_REQUEST`
-  for the reserved `New Folder/README.md`; the diagnostic test was then removed.
-- Accepted ADR 0001 supplies Notebook, Folder, Note, and Readme terminology.
-  Accepted ADR 0004 defines `README.md` and `Folder/README.md` as the Portable
-  container representations with `type: Readme`. No ADR change is needed.
+- Accepted ADR 0001 / ADR 0004 terminology and Portable README representations;
+  no ADR change.
 
 ## Outside-in proof
 
@@ -46,20 +41,10 @@ accepted/downloaded head and tree exactly equal to the proposal.
 
 ### 1. Recognize the exact initial two-README shape
 Type: Structure
-Status: planned
-Proof: Existing backend controller tests remain green and the verified two-path
-example retains its current reserved folder-README refusal. Run
-`CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
-
-Structure: Extend the existing root-folder-creation classification to identify
-exactly one added root `README.md` plus exactly one added root-level
-`Folder/README.md`, with no accepted files and no other changed path. Preserve
-the existing one-folder-only candidate, relocation recognition, and all wider
-refusals. Route the new candidate through the current refusal until slice 2
-consumes it. Do not introduce a general container-change hierarchy.
-
-Sizing hypothesis: about five minutes for one classifier branch and one
-existing-suite proof loop.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (pass), including
+controller refusal for empty tree adding only `README.md` + `Folder/README.md`
+as reserved folder README.
 
 ### 2. Accept both authored Readmes as the exact initial tree
 Type: Behavior
@@ -78,9 +63,8 @@ as nonblank `type: Readme`, apply the root Readme to the Notebook and the folder
 Readme to one freshly constructed root Folder, refresh the projection, and
 require exact proposed-tree equality before the shared binding write. Keep the
 sole-folder case working and do not admit any third path or non-empty baseline.
-
-Sizing hypothesis: about five minutes for one controller-first behavior loop;
-the full backend-suite runtime is an external-wait exception.
+Consume `InitialNotebookAndRootFolderCreation` instead of the temporary reserved
+refusal.
 
 ## Contract-to-proof map
 
@@ -92,18 +76,9 @@ the full backend-suite runtime is an external-wait exception.
 | Exact authored commit is accepted atomically | Slice 2 downloaded head/tree plus existing transaction |
 | Third paths and broader initial trees remain excluded | Slice 1 refusal suite and slice 2 full backend suite |
 
-## Slice-plan refinement
-
-Both slices are Ready. Slice 1 has one internal classification gate and one
-unchanged-behavior proof loop; Slice 2 has one externally observable outcome
-and one controller-first proof loop. No slice was replaced or split. Neither
-has an unexplained path beyond the ten-minute hard limit; backend-suite runtime
-is the stated external-wait exception.
-
-Resulting slice count: 2. Story resplit is not recommended. The refined plan is
-ready for direct execution when separately authorized.
-
 ## Learnings
 
-None beyond the verified two-path failure recorded above; implementation has
-not started.
+- Creation-shape recognition extracted to `NotebookGitProposalFolderCreationShape`
+  so relocation stays cohesive after the initial two-README classifier landed.
+- Slice 1 still refuses the recognized two-path candidate with the reserved
+  folder-README message until slice 2 wires acceptance.
