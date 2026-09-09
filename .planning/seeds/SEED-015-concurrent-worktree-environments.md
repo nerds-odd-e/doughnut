@@ -376,40 +376,83 @@ OpenAI, Google, or other mocked services. MCP support is not a prerequisite.
 
 ### 5. Run MCP E2E workflows against the owning worktree's environment
 
-**Status:** Queued after story 4; needs refinement before slice planning.
+**Status:** Refined 2026-09-09; ready for slice planning.
 
-- **For / why:** Developers and AI tasks changing MCP behavior can verify it
-  concurrently without another runner replacing its state or stopping its
-  server.
-- **Evaluation:** MCP clients in two worktrees exercise their own application
-  data concurrently; disconnecting or tearing down one leaves the other usable.
-- **Value / learning:** Completes concurrent verification for another existing
-  client workflow without requiring broader environment-management features.
-- **Safety boundary:** Server processes, client connections, configuration, and
-  any mocks used by the scenario belong to the correct environment.
-- **Shutdown example from 2b:** Disconnect with an owned server child still
-  running → teardown → await bounded child cleanup before another run can
-  reuse its resources; a shutdown acknowledgement alone is insufficient.
-- **Mock reminder from story 3:** Scope the chosen MCP workflow's services
-  explicitly; OpenAI completion support does not isolate Google or other mocks.
-  Propagate child failure while the owner runs and complete child cleanup before
-  allowing another run; verify peer state after reset and disconnect.
-- **Effort hypothesis:** M — low confidence; assumes the preceding application
-  environment is reusable and MCP adds limited client-specific ownership work.
-- **Depends on:** An isolated running application and any mocks the workflow
-  uses; CLI support is not a product prerequisite.
-- **Execution learning:** Reuse SUT identity and ownership; Cypress `baseUrl`
-  does not establish MCP endpoint/process ownership. Prove peer usability
-  after disconnect and failed-client cleanup before admitting the chosen spec.
-  Require owning application health before MCP setup/reset, including refusal
-  of a foreign ready endpoint despite a live control owner (story 2a).
-- **Retirement reminder from story 6:** Keep owning application/runner
-  protection through MCP disconnect and child cleanup, including periods with
-  no database session. Refuse setup/reset against a retired or partially retired
-  allocation before changing client state. Prove retirement refuses during an
-  active supported MCP run and that late starts cannot recreate retired data.
-  Reuse existing admission/ownership; backend-JVM inspection alone does not
-  establish ownership or cleanup of an MCP server process.
+**Goal**
+
+Developers and AI tasks can run the `mcp_services.feature` MCP client workflow
+(note search and note-graph tools) through the real MCP server in an isolated
+linked worktree, against that worktree's own backend and data, while another
+worktree runs the same or a browser/CLI workflow concurrently without either
+resetting or reading the other's data or leaving a spawned MCP server process
+behind.
+
+**Scope**
+
+- One local Nix worktree with an existing isolated application allocation
+  (1a–1c, 2, 2a identity/provisioning), run as `pnpm sut` then
+  `pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature`. This is the
+  one MCP spec this story admits into the isolated-run allowlist
+  (`scripts/isolated-cypress-spec-selection.mjs`); there is currently only this
+  one MCP feature file, and no other MCP scenario becomes runnable in an
+  isolated worktree as a result of this story.
+- The MCP client already resolves its target origin from
+  `Cypress.config('baseUrl')` (`e2e_test/start/pageObjects/mcpAgentActions.ts`
+  → `e2eAppBaseUrl()`), the same isolated origin `guardCypressNodeSetup`
+  already assigns for the owning worktree (`scripts/isolated-cypress.mjs`) —
+  unlike CLI story 4, there is no hardcoded-origin bug to fix here. The first
+  key example below is a check that this already holds, not new behavior.
+- Fix `disconnectMcpServer()` (`e2e_test/support/mcp_client.ts`) so it actually
+  terminates the spawned MCP server child process: call `this.client.close()`
+  (which the SDK cascades into the transport's own bounded SIGTERM-then-SIGKILL
+  shutdown) instead of the current dead code, which checks for a
+  `transport.child` property and a `client.disconnect` method that do not
+  exist on the SDK's `StdioClientTransport`/`Client` and so never terminate the
+  process today. This closes the shutdown gap the story anticipated: teardown
+  must await bounded child cleanup before another run can reuse the
+  allocation, not just record that a call was made.
+- The bundled `mcp-server/dist/mcp-server.bundle.mjs` and the child process it
+  spawns already belong to the invoking worktree's own checkout and Cypress
+  process; no new build, registry, or lease mechanism is introduced.
+- Concurrency safety (runner lease, health-verified owning application,
+  retirement veto on an active run) is inherited unchanged from the existing
+  Cypress runner-lease mechanism (1a–1c, 2a, 6/6a) once the spec is admitted;
+  this story adds no second identity, lease, or process-ownership mechanism.
+- `mcp_services.feature` calls only Donut's own backend tools (note search and
+  graph); it needs no OpenAI, Google, or other external-service mock, so no
+  independent mock work is required for this story.
+
+**Exclusions:** Any future MCP tool or feature file beyond the one existing
+spec, CLI (story 4), every other browser spec, changes to `mcp-server`'s tools
+or bundling beyond what isolated selection needs, a new MCP-specific lease or
+process registry, general process supervision, Cloud VM/CI changes, and any
+change to the runner-lease or retirement mechanisms themselves.
+
+**Key examples**
+
+- The MCP spec run in the unconfigured primary checkout keeps using
+  `doughnut_test`/the primary origin, unchanged from today, and in a configured
+  isolated worktree targets that worktree's own origin without further change.
+- Two linked worktrees each run `pnpm sut` then the allowlisted MCP spec
+  concurrently: each spawned MCP server searches and reads the note graph from
+  its own worktree's notebook data; neither run's MCP server process or
+  backend data affects the other.
+- Disconnecting an MCP client — including the automatic reconnect between
+  scenarios within one run — leaves no MCP server process still running once
+  `disconnectMcpServer` resolves, confirmed by observing the spawned process
+  actually exit rather than only that the call returned.
+- Selecting any spec other than the one allowlisted MCP spec in an isolated
+  worktree still refuses before fixture/client setup, exactly as any
+  currently-unsupported spec does today.
+- `pnpm worktree:retire --check` still reports a busy Cypress runner lease,
+  and refuses reclamation, while the allowlisted MCP spec is actively running
+  in that worktree — unchanged existing behavior, exercised against an MCP run
+  instead of a browser or CLI run.
+
+**Depends on:** Delivered 1a–1c and 2/2a identity, provisioning, and runner
+ownership. No independent mock is required — the existing MCP spec does not
+use OpenAI, Google, or other mocked services. CLI support (story 4) is not a
+product prerequisite.
 
 <a id="story-6"></a>
 
