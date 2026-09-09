@@ -1,14 +1,7 @@
 # Publish the next small initial Readme-and-Note trees
 
 Source: [SEED-016 Story 5](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5).
-Status: paused after slices 1–7 (developer stop). Next: Slice 8.
-Slice 8 WIP stashed at OID `c25d85c3de7bf2117a93fc4a0ca6ae45887d015f`
-(`execute-plan pause: slice 8 Folder README + two contained Notes WIP`).
-Restore in worktree
-`/Users/terryyin/.cursor/worktrees/doughnut/087-initial-readme-note-trees`
-on branch `quick/087-next-small-initial-readme-note-trees` via
-`git stash pop` (or `git stash apply c25d85c3de7bf2117a93fc4a0ca6ae45887d015f`).
-Do not merge to main until slices 8–9 complete.
+Status: resumed and completed through slice 8. Next: Slice 9.
 
 ## Goal and scope
 
@@ -137,7 +130,7 @@ Notes via `applyNotes`. Controller proof added on
 
 ### 8. Publish a Folder Readme with two contained Notes
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given an empty accepted notebook, when the exact proposed tree is one
 valid root Folder README plus two valid Notes directly inside that Folder,
@@ -149,6 +142,14 @@ two correctly placed Notes with authored titles/content, absent notebook
 Readme, and downloaded head/tree equality. Existing shared validation and
 transaction tests retain invalid-input and rollback ownership. Run the complete
 backend unit-test suite.
+
+Learning: `RootFolderAndContainedNoteCreation.notePath` widened to
+`notePaths: List<String>` (1–2 entries). The shared private
+`collectInitialAddedPaths` classifier (already used by the notebook-Readme
+shapes) was generalized to accumulate 0..N note paths instead of rejecting a
+second one, so all four `find*` shape-recognizers in
+`NotebookGitProposalFolderCreationShape` now share one classification loop,
+each applying only its own cardinality/prefix filter. No API/DTO changes.
 
 ### 9. Publish both container Readmes with one root Note
 Type: Behavior

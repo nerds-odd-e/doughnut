@@ -88,7 +88,7 @@ class NotebookGitProposalFolderAcceptance {
     List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(state.notebook());
     List<Note> added =
         initialCompositionPublication.applyNotes(
-            state.notebook(), folders, proposal, List.of(creation.notePath()));
+            state.notebook(), folders, proposal, creation.notePaths());
     projection.requireMatchingAcceptedTree(
         state.notebook(), folders, added, proposal.repository(), proposal.mainHead());
     return bindingPersistence.accept(

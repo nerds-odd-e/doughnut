@@ -1,14 +1,15 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Recognizes exact root Folder-creation proposal shapes from inspected regular-file diffs: one
- * added root-level {@code Folder/README.md}; that plus one ordinary note inside the same Folder;
- * that Folder Readme plus one added root {@code README.md}; or those two Readmes plus one added
- * ordinary note directly inside that same Folder.
+ * added root-level {@code Folder/README.md}; that plus one or two ordinary notes inside the same
+ * Folder; that Folder Readme plus one added root {@code README.md}; or those two Readmes plus one
+ * added ordinary note directly inside that same Folder.
  */
 final class NotebookGitProposalFolderCreationShape {
 
@@ -17,11 +18,19 @@ final class NotebookGitProposalFolderCreationShape {
   record RootFolderCreation(String readmePath) {}
 
   /**
-   * Exactly one added root-level {@code Folder/README.md} plus exactly one added ordinary Note
+   * Exactly one added root-level {@code Folder/README.md} plus one or two added ordinary Notes
    * directly inside that same Folder on an otherwise empty tree: no accepted blobs on those paths
    * and no other path present.
    */
-  record RootFolderAndContainedNoteCreation(String folderReadmePath, String notePath) {}
+  record RootFolderAndContainedNoteCreation(String folderReadmePath, List<String> notePaths) {
+    RootFolderAndContainedNoteCreation {
+      notePaths = List.copyOf(notePaths);
+      if (notePaths.isEmpty() || notePaths.size() > 2) {
+        throw new IllegalArgumentException(
+            "RootFolderAndContainedNoteCreation requires one or two Note paths.");
+      }
+    }
+  }
 
   /**
    * Exactly one added root {@code README.md} plus exactly one added root-level {@code
@@ -55,17 +64,22 @@ final class NotebookGitProposalFolderCreationShape {
   static Optional<RootFolderAndContainedNoteCreation> findRootFolderAndContainedNoteCreation(
       List<InspectedRegularFile> files) {
     return collectInitialAddedPaths(files)
-        .filter(paths -> paths.notebookReadmePath() == null && paths.notePath() != null)
-        .filter(paths -> paths.notePath().startsWith(folderPrefix(paths.folderReadmePath())))
+        .filter(
+            paths ->
+                paths.notebookReadmePath() == null
+                    && !paths.notePaths().isEmpty()
+                    && paths.notePaths().size() <= 2)
+        .filter(NotebookGitProposalFolderCreationShape::allStartWithFolderPrefix)
         .map(
             paths ->
-                new RootFolderAndContainedNoteCreation(paths.folderReadmePath(), paths.notePath()));
+                new RootFolderAndContainedNoteCreation(
+                    paths.folderReadmePath(), paths.notePaths()));
   }
 
   static Optional<InitialNotebookAndRootFolderCreation> findInitialNotebookAndRootFolderCreation(
       List<InspectedRegularFile> files) {
     return collectInitialAddedPaths(files)
-        .filter(paths -> paths.notebookReadmePath() != null && paths.notePath() == null)
+        .filter(paths -> paths.notebookReadmePath() != null && paths.notePaths().isEmpty())
         .map(
             paths ->
                 new InitialNotebookAndRootFolderCreation(
@@ -75,22 +89,29 @@ final class NotebookGitProposalFolderCreationShape {
   static Optional<InitialNotebookRootFolderAndNoteCreation>
       findInitialNotebookRootFolderAndNoteCreation(List<InspectedRegularFile> files) {
     return collectInitialAddedPaths(files)
-        .filter(paths -> paths.notebookReadmePath() != null && paths.notePath() != null)
-        .filter(paths -> paths.notePath().startsWith(folderPrefix(paths.folderReadmePath())))
+        .filter(paths -> paths.notebookReadmePath() != null && paths.notePaths().size() == 1)
+        .filter(NotebookGitProposalFolderCreationShape::allStartWithFolderPrefix)
         .map(
             paths ->
                 new InitialNotebookRootFolderAndNoteCreation(
-                    paths.notebookReadmePath(), paths.folderReadmePath(), paths.notePath()));
+                    paths.notebookReadmePath(),
+                    paths.folderReadmePath(),
+                    paths.notePaths().getFirst()));
+  }
+
+  private static boolean allStartWithFolderPrefix(InitialAddedPaths paths) {
+    String prefix = folderPrefix(paths.folderReadmePath());
+    return paths.notePaths().stream().allMatch(notePath -> notePath.startsWith(prefix));
   }
 
   private record InitialAddedPaths(
-      String notebookReadmePath, String folderReadmePath, String notePath) {}
+      String notebookReadmePath, String folderReadmePath, List<String> notePaths) {}
 
   private static Optional<InitialAddedPaths> collectInitialAddedPaths(
       List<InspectedRegularFile> files) {
     String notebookReadmePath = null;
     String folderReadmePath = null;
-    String notePath = null;
+    List<String> notePaths = new ArrayList<>();
     for (InspectedRegularFile file : files) {
       if (NotebookGitProposalInitialNotebookReadmePublication.isAddedRootNotebookReadme(file)) {
         if (notebookReadmePath != null) {
@@ -103,10 +124,7 @@ final class NotebookGitProposalFolderCreationShape {
         }
         folderReadmePath = file.path();
       } else if (isAddedDirectChildOrdinaryNote(file)) {
-        if (notePath != null) {
-          return Optional.empty();
-        }
-        notePath = file.path();
+        notePaths.add(file.path());
       } else {
         return Optional.empty();
       }
@@ -114,7 +132,7 @@ final class NotebookGitProposalFolderCreationShape {
     if (folderReadmePath == null) {
       return Optional.empty();
     }
-    return Optional.of(new InitialAddedPaths(notebookReadmePath, folderReadmePath, notePath));
+    return Optional.of(new InitialAddedPaths(notebookReadmePath, folderReadmePath, notePaths));
   }
 
   static String folderPrefix(String pathWithRootFolder) {
