@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 
 /**
  * Recognizes and accepts the sole-added-root-{@code README.md} initial notebook Readme proposal
- * shape, and that shape plus one or two added root ordinary Notes, on an otherwise empty notebook.
+ * shape, and that shape plus one, two, or three added root ordinary Notes, on an otherwise empty
+ * notebook.
  */
 @Service
 class NotebookGitProposalInitialNotebookReadmePublication {
@@ -55,11 +56,11 @@ class NotebookGitProposalInitialNotebookReadmePublication {
 
   static Optional<NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes>
       findWithRootNotes(List<InspectedRegularFile> files) {
-    if (files.size() < 2 || files.size() > 3) {
+    if (files.size() < 2 || files.size() > 4) {
       return Optional.empty();
     }
     String notebookReadmePath = null;
-    List<String> notePaths = new ArrayList<>(2);
+    List<String> notePaths = new ArrayList<>(3);
     for (InspectedRegularFile file : files) {
       if (isAddedRootNotebookReadme(file)) {
         if (notebookReadmePath != null) {

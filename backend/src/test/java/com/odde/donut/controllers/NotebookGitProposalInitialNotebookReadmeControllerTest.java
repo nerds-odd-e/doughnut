@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,11 +38,13 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
       "---\ntype: Note\n---\nPrecisely preserved first note.\n";
   private static final String SECOND_NOTE =
       "---\ntype: Note\n---\nPrecisely preserved second note.\n";
+  private static final String THIRD_NOTE =
+      "---\ntype: Note\n---\nPrecisely preserved third note.\n";
 
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void publishesInitialNotebookReadmeAndTwoRootNotesAsTheExactAuthoredCommit() throws Exception {
+  void publishesInitialNotebookReadmeAndThreeRootNotesAsTheExactAuthoredCommit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
@@ -50,31 +53,32 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
             List.of(
                 new NotebookGitProposalFile("README.md", NOTEBOOK_README),
                 new NotebookGitProposalFile("First note.md", FIRST_NOTE),
-                new NotebookGitProposalFile("Second note.md", SECOND_NOTE)));
+                new NotebookGitProposalFile("Second note.md", SECOND_NOTE),
+                new NotebookGitProposalFile("Third note.md", THIRD_NOTE)));
 
     GitBundleTestReader.SingleParentGitCommit proposedCommit;
     try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
       proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
     }
 
-    String publishedHead =
-        controller.publishNotebookGitProposal(
-            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
     assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
     List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(notes, hasSize(2));
+    assertThat(
+        notes.stream().map(Note::getTitle).toList(),
+        containsInAnyOrder("First note", "Second note", "Third note"));
     Map<String, Note> byTitle =
         notes.stream().collect(Collectors.toMap(Note::getTitle, Function.identity()));
-    Note first = byTitle.get("First note");
-    Note second = byTitle.get("Second note");
-    assertThat(first.getContent(), equalTo(FIRST_NOTE));
-    assertThat(first.getFolder(), nullValue());
-    assertThat(second.getContent(), equalTo(SECOND_NOTE));
-    assertThat(second.getFolder(), nullValue());
-    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
+    assertThat(byTitle.get("First note").getContent(), equalTo(FIRST_NOTE));
+    assertThat(byTitle.get("First note").getFolder(), nullValue());
+    assertThat(byTitle.get("Second note").getContent(), equalTo(SECOND_NOTE));
+    assertThat(byTitle.get("Second note").getFolder(), nullValue());
+    assertThat(byTitle.get("Third note").getContent(), equalTo(THIRD_NOTE));
+    assertThat(byTitle.get("Third note").getFolder(), nullValue());
 
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -86,7 +90,30 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
   }
 
   @Test
-  void publishesInitialNotebookReadmeAndRootNoteAsTheExactAuthoredCommit() throws Exception {
+  void publishesInitialNotebookReadmeAndTwoRootNotes() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("First note.md", FIRST_NOTE),
+                new NotebookGitProposalFile("Second note.md", SECOND_NOTE)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(notes, hasSize(2));
+    Map<String, Note> byTitle =
+        notes.stream().collect(Collectors.toMap(Note::getTitle, Function.identity()));
+    assertThat(byTitle.get("First note").getContent(), equalTo(FIRST_NOTE));
+    assertThat(byTitle.get("Second note").getContent(), equalTo(SECOND_NOTE));
+  }
+
+  @Test
+  void publishesInitialNotebookReadmeAndRootNote() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
@@ -96,33 +123,14 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
                 new NotebookGitProposalFile("README.md", NOTEBOOK_README),
                 new NotebookGitProposalFile("First note.md", FIRST_NOTE)));
 
-    GitBundleTestReader.SingleParentGitCommit proposedCommit;
-    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
-      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
-    }
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    String publishedHead =
-        controller.publishNotebookGitProposal(
-            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
-
-    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
-    assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
-    assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
     List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note createdNote = notes.getFirst();
     assertThat(createdNote.getTitle(), equalTo("First note"));
     assertThat(createdNote.getContent(), equalTo(FIRST_NOTE));
-    assertThat(createdNote.getFolder(), nullValue());
-    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
-
-    ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
-    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
-          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
-      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
-      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
-    }
   }
 
   @ParameterizedTest

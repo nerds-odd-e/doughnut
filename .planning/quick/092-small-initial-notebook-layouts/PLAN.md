@@ -1,7 +1,9 @@
 # Publish three small initial notebook layouts
 
 Source: [SEED-016 Story 6](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-6).
-Status: planned. Planning authorized 2026-09-09; implementation not yet requested.
+Status: in progress on `quick/092-small-initial-notebook-layouts`.
+Checkout: `/Users/terryyin/git/doughnut-092-small-initial-notebook-layouts`.
+CI: `donut CI` (`ci.yml`) is push-triggered on `main` only; feature-branch pushes have no workflow, so slice pushes are unobserved. Attach the mailbox observer to `main` before the merge push.
 
 ## Goal and scope
 
@@ -20,8 +22,8 @@ head/tree and atomicity. No complete jap1 import or combinatorial layout support
 - Extend existing initial-composition handlers; retain one representation for
   each concept. Do not add a generic import engine or another handler per count.
 - `NotebookGitProposalInitialNotebookReadmePublication.findWithRootNotes` and
-  `NotebookReadmeWithRootNotes` currently cap root Notes at two. Extend that
-  ordinary-Note range to three, preserving the root-path requirement.
+  `NotebookReadmeWithRootNotes` now accept one, two, or three root Notes. Do not
+  loosen ordinary type or root-path eligibility further.
 - `NotebookGitProposalInitialComposition.findOneNoteInImpliedRootFolder` and its
   publication method already materialize one implied Folder. Extend coherently
   to one or two ordinary Notes under the same single root prefix; reject a match
@@ -68,18 +70,12 @@ assumption is asserted.
 
 ### 1. Publish a notebook README with three root Notes
 Type: Behavior
-Status: planned
-Proof: Controller publication succeeds, three titled Notes are at root, authored
-README/content survive, and a downloaded bundle has the exact proposed head/tree.
-
-Behavior: Empty notebook + README and three root Notes in one direct-child commit
-→ owner publishes → the complete authored root layout is accepted.
-
-Extend the existing root-Note count contract coherently (recognition and record
-invariant) without loosening ordinary type or root-path eligibility. Extend the
-existing count-success test in `NotebookGitProposalInitialNotebookReadmeControllerTest`
-using concise fixtures; retain one/two-note coverage without repeating canonical
-round-trip assertions in every sibling. Estimated active work: ~5 min, medium confidence.
+Status: done
+Proof: `NotebookGitProposalInitialNotebookReadmeControllerTest#publishesInitialNotebookReadmeAndThreeRootNotesAsTheExactAuthoredCommit`
+plus `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only`. Canonical three-note
+round-trip: README bytes, three titled root Notes, no folders, exact download
+head/tree. One- and two-note siblings keep count/content coverage only.
 
 ### 2. Publish two Notes in one implied root Folder
 Type: Behavior
@@ -150,5 +146,6 @@ Ready for direct execution; no additional slice-plan refinement required.
 
 ## Learnings
 
-None from execution. On completion, reduce Story 6 to delivered Goal/Scope and
-remove spent plan history under the repository lifecycle; preserve siblings.
+- Slice 1: three-note controller test is the canonical README+root-Notes
+  round-trip; one/two-note siblings assert count and authored content only.
+  Implementation ~6 min (suite wait excluded). Remaining slices unchanged.
