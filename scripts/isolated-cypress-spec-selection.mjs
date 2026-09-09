@@ -11,11 +11,17 @@ export const SUPPORTED_ISOLATED_CYPRESS_SPEC =
 export const SUPPORTED_ISOLATED_CLI_SPEC =
   'e2e_test/features/cli/cli_notebook_web_created_note.feature'
 
+/** MCP search/graph workflow — tool calls reach the owning worktree's
+ * isolated backend and notebook data. */
+export const SUPPORTED_ISOLATED_MCP_SPEC =
+  'e2e_test/features/mcp/mcp_services.feature'
+
 export { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC }
 
 export const SUPPORTED_ISOLATED_CYPRESS_SPECS = [
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
   SUPPORTED_ISOLATED_CLI_SPEC,
+  SUPPORTED_ISOLATED_MCP_SPEC,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 ]
 

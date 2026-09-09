@@ -16,6 +16,13 @@ When("I keep the saved note across the other worktree's fixture reset", () => {
 })
 
 When(
+  "I keep the CLI notebook across the other worktree's fixture reset",
+  () => {
+    signalPeerSeededForWorktreeResetIsolation()
+  }
+)
+
+When(
   "I keep my OpenAI mock configured across the other worktree's mock reset",
   () => {
     signalPeerSeededForWorktreeResetIsolation()

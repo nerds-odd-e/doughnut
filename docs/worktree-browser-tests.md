@@ -24,7 +24,7 @@ recorded, adopt a name that already exists in MySQL, or modify `doughnut_test` /
 `git check-ignore -v .worktree.local.json`.
 
 `pnpm sut:restart` replaces the idle live owner on this checkout's recorded
-allocation. Ordinary Cypress is supported only for the two focused specs
+allocation. Ordinary Cypress is supported only for the focused specs
 below.
 
 ## Start and health
@@ -80,6 +80,18 @@ features are refused before reset:
 ```bash
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_content/note_content_completion.feature
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/mcp/mcp_services.feature
+```
+
+The CLI command is scoped to that one web-created-note feature. The MCP
+command is scoped to that one search/graph feature. Each checkout must
+already have its own healthy `pnpm sut` allocation; do not share the
+unconfigured primary checkout. To prove the CLI notebook survives a peer
+worktree's fixture reset, start both allocations first, then:
+
+```bash
+CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>
 ```
 
 The note-editing spec does not start Mountebank. The note-content completion

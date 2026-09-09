@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
 import { test } from 'node:test'
-import { SUPPORTED_ISOLATED_CYPRESS_SPEC } from './isolated-cypress.mjs'
+import {
+  SUPPORTED_ISOLATED_CLI_SPEC,
+  SUPPORTED_ISOLATED_CYPRESS_SPEC,
+} from './isolated-cypress.mjs'
 import {
   afterReset,
   afterSeed,
@@ -188,4 +191,39 @@ test('ordinary isolated Cypress spawn uses the allowlisted spec', () => {
   ])
   assert.equal(calls[0].opts.cwd, '/checkout')
   assert.equal(calls[0].opts.env.MARK, '1')
+})
+
+test('cli mode spawns the CLI spec on the peer and note-editing on the resetter', async () => {
+  await withWorktreeResetIsolationBarrierDir(async (dir) => {
+    const spawned = []
+    const result = await runPairedWorktreeResetIsolation({
+      peerRoot: '/peer',
+      resetterRoot: '/resetter',
+      barrierDir: dir,
+      mode: 'cli',
+      log: () => undefined,
+      spawnCypress: (cwd, env, spec) => {
+        spawned.push({ cwd, env, spec })
+        const child = new EventEmitter()
+        queueMicrotask(async () => {
+          if (
+            env[WORKTREE_RESET_ISOLATION_ROLE] ===
+            WORKTREE_RESET_ISOLATION_PEER_ROLE
+          ) {
+            await afterSeed({ env, timeoutMs: 2_000, pollMs: 10 })
+          } else {
+            await waitBeforeReset({ env, timeoutMs: 2_000, pollMs: 10 })
+            afterReset({ env })
+          }
+          child.emit('close', 0)
+        })
+        return child
+      },
+    })
+    assert.equal(result.mode, 'cli')
+    assert.equal(result.peerSpec, SUPPORTED_ISOLATED_CLI_SPEC)
+    assert.equal(result.resetterSpec, SUPPORTED_ISOLATED_CYPRESS_SPEC)
+    assert.equal(spawned[0].spec, SUPPORTED_ISOLATED_CLI_SPEC)
+    assert.equal(spawned[1].spec, SUPPORTED_ISOLATED_CYPRESS_SPEC)
+  })
 })
