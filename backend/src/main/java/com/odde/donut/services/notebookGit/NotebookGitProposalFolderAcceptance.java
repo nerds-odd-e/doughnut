@@ -79,6 +79,35 @@ class NotebookGitProposalFolderAcceptance {
     return acceptBinding(state.binding(), proposal);
   }
 
+  String acceptRootFolderAndContainedNote(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      NotebookGitProposalFolderCreationShape.RootFolderAndContainedNoteCreation creation) {
+    NotebookGitProposalTypedPath.requireOrdinaryNote(proposal, creation.notePath());
+    initialNotebookReadmePublication.assertReadyEmptyNotebook(
+        state,
+        proposal,
+        acceptedHead,
+        "Initial folder Readme and contained Note require an empty notebook.");
+
+    String folderReadme =
+        NotebookGitProposalTypedPath.requireReadme(proposal, creation.folderReadmePath());
+    createRootFolderWithReadme(state.notebook(), creation.folderReadmePath(), folderReadme);
+    List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(state.notebook());
+    Note added =
+        noteAddition.apply(
+            state.notebook(),
+            folders,
+            proposal,
+            proposal.mainHead(),
+            creation.notePath(),
+            testabilitySettings.getCurrentUTCTimestamp());
+    projection.requireMatchingAcceptedTree(
+        state.notebook(), folders, List.of(added), proposal.repository(), proposal.mainHead());
+    return acceptBinding(state.binding(), proposal);
+  }
+
   String acceptInitialCreation(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,

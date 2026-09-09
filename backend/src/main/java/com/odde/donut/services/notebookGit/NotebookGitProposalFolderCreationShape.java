@@ -6,14 +6,22 @@ import java.util.Optional;
 
 /**
  * Recognizes exact root Folder-creation proposal shapes from inspected regular-file diffs: one
- * added root-level {@code Folder/README.md}; that plus one added root {@code README.md}; or those
- * two plus one added ordinary note directly inside that same Folder.
+ * added root-level {@code Folder/README.md}; that plus one ordinary note inside the same Folder;
+ * that Folder Readme plus one added root {@code README.md}; or those two Readmes plus one added
+ * ordinary note directly inside that same Folder.
  */
 final class NotebookGitProposalFolderCreationShape {
 
   private NotebookGitProposalFolderCreationShape() {}
 
   record RootFolderCreation(String readmePath) {}
+
+  /**
+   * Exactly one added root-level {@code Folder/README.md} plus exactly one added ordinary Note
+   * directly inside that same Folder on an otherwise empty tree: no accepted blobs on those paths
+   * and no other path present.
+   */
+  record RootFolderAndContainedNoteCreation(String folderReadmePath, String notePath) {}
 
   /**
    * Exactly one added root {@code README.md} plus exactly one added root-level {@code
@@ -44,10 +52,20 @@ final class NotebookGitProposalFolderCreationShape {
     return Optional.ofNullable(candidate);
   }
 
+  static Optional<RootFolderAndContainedNoteCreation> findRootFolderAndContainedNoteCreation(
+      List<InspectedRegularFile> files) {
+    return collectInitialAddedPaths(files)
+        .filter(paths -> paths.notebookReadmePath() == null && paths.notePath() != null)
+        .filter(paths -> paths.notePath().startsWith(folderPrefix(paths.folderReadmePath())))
+        .map(
+            paths ->
+                new RootFolderAndContainedNoteCreation(paths.folderReadmePath(), paths.notePath()));
+  }
+
   static Optional<InitialNotebookAndRootFolderCreation> findInitialNotebookAndRootFolderCreation(
       List<InspectedRegularFile> files) {
     return collectInitialAddedPaths(files)
-        .filter(paths -> paths.notePath() == null)
+        .filter(paths -> paths.notebookReadmePath() != null && paths.notePath() == null)
         .map(
             paths ->
                 new InitialNotebookAndRootFolderCreation(
@@ -57,7 +75,7 @@ final class NotebookGitProposalFolderCreationShape {
   static Optional<InitialNotebookRootFolderAndNoteCreation>
       findInitialNotebookRootFolderAndNoteCreation(List<InspectedRegularFile> files) {
     return collectInitialAddedPaths(files)
-        .filter(paths -> paths.notePath() != null)
+        .filter(paths -> paths.notebookReadmePath() != null && paths.notePath() != null)
         .filter(paths -> paths.notePath().startsWith(folderPrefix(paths.folderReadmePath())))
         .map(
             paths ->
@@ -93,7 +111,7 @@ final class NotebookGitProposalFolderCreationShape {
         return Optional.empty();
       }
     }
-    if (notebookReadmePath == null || folderReadmePath == null) {
+    if (folderReadmePath == null) {
       return Optional.empty();
     }
     return Optional.of(new InitialAddedPaths(notebookReadmePath, folderReadmePath, notePath));

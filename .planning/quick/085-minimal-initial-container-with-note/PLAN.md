@@ -8,6 +8,11 @@ Status: in progress.
   `NotebookGitProposalInitialNotebookReadmePublication` (`findWithRootNote` /
   `acceptWithRootNote`); controller proof split into
   `NotebookGitProposalInitialNotebookReadmeControllerTest`.
+- Slice 2: Folder-Readme+contained-Note recognition lives on
+  `NotebookGitProposalFolderCreationShape`; acceptance via
+  `FolderAcceptance` then `NoteAddition`. Shared
+  `collectInitialAddedPaths` / `assertReadyEmptyNotebook`. Controller proof in
+  `NotebookGitProposalInitialFolderAndContainedNoteControllerTest`.
 
 ## Goal and scope
 
@@ -86,7 +91,7 @@ backend unit-test suite green.
 
 ### 2. Publish an initial Folder Readme with one contained Note
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given an empty accepted notebook with no notebook Readme, when its
 direct-child proposal contains exactly one root Folder Readme and one ordinary
@@ -94,11 +99,12 @@ Note directly inside that same Folder, publication creates the Folder and
 Note, preserves both authored documents, leaves the notebook Readme absent,
 and accepts the exact head and tree atomically.
 
-Proof: Add a controller scenario observing the Folder name and Readme, the
-contained Note title and authored content, absent notebook Readme, and
-downloaded head/tree equality. Retain a wrong-type boundary and the existing
-Folder-only and three-path initial scenarios. Run the complete backend
-unit-test suite.
+Proof: Controller scenario in
+`NotebookGitProposalInitialFolderAndContainedNoteControllerTest` observes
+Folder name and Readme, contained Note title and authored content, absent
+notebook Readme, and downloaded head/tree equality; wrong-type boundary and
+existing Folder-only / three-path scenarios retained. Complete backend
+unit-test suite green.
 
 ### 3. Identify valid unmatched initial Readme-and-Note compositions
 Type: Structure

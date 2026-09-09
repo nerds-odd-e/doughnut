@@ -151,11 +151,10 @@ class NotebookGitProposalInitialNotebookReadmePublication {
     return acceptBinding(state.binding(), proposal);
   }
 
-  void storeOnEmptyNotebook(
+  void assertReadyEmptyNotebook(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
-      String notebookReadmePath,
       String emptyNotebookMessage) {
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
@@ -164,7 +163,15 @@ class NotebookGitProposalInitialNotebookReadmePublication {
     if (!state.folders().isEmpty() || !state.liveNotes().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, emptyNotebookMessage);
     }
+  }
 
+  void storeOnEmptyNotebook(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      String notebookReadmePath,
+      String emptyNotebookMessage) {
+    assertReadyEmptyNotebook(state, proposal, acceptedHead, emptyNotebookMessage);
     state
         .notebook()
         .setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, notebookReadmePath));
