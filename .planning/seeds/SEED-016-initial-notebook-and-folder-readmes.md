@@ -1,6 +1,6 @@
 ---
 id: SEED-016
-status: completed
+status: dormant
 planted: 2026-09-09
 planted_during: README-only folder publication verification
 trigger_when: a concrete unsupported initial tree warrants story selection
@@ -11,10 +11,11 @@ scope: small
 
 ## Why This Matters
 
-Notebook owners can publish the bounded initial Readme/Note layouts below
-without splitting their authored commit. These delivered stories preserve
-authored bytes and accept the exact commit atomically. Arbitrary initial
-trees and bulk import remain deferred.
+Notebook owners can publish the delivered initial Readme/Note layouts below
+without splitting their authored commit. Story 6 extends this capability to
+three more small layouts exposed by the jap1 investigation. Preserve authored
+bytes and accept the exact commit atomically. Arbitrary initial trees and bulk
+import remain deferred.
 
 ## Story Decomposition
 
@@ -129,12 +130,57 @@ corrected by quick/091 (`5d2c5b3d9d`).
   existing notebook content or README edits, multiple unpublished commits,
   and bulk import.
 
+<a id="story-6"></a>
+
+### 6. Publish three small initial layouts exposed by the jap1 failure
+
+**Status:** refined; planned in [quick/092](../quick/092-small-initial-notebook-layouts/PLAN.md).
+
+- **Goal:** A notebook owner can publish a small initial notebook as one authored
+  commit in each of the three layouts identified during the jap1 investigation,
+  without manually splitting the commit to fit the current publication handlers.
+- **Value:** Remove three concrete composition barriers and learn whether the
+  existing publication pipeline can support them without a bulk-import redesign.
+- **Scope:** An owner-authorized checkout bound to an empty notebook (no folders
+  or live notes; empty accepted Git tree) publishes one direct single-parent
+  child of current accepted main. Add exactly one of the layouts below. Preserve
+  authored Markdown, filename-derived titles and placements, and accept the exact
+  commit atomically. Existing supported layouts remain supported.
+- **Key examples:**
+  1. `README.md` with `type: Readme`, plus `A.md`, `B.md`, `C.md` with `type: Note`
+     → publish succeeds; notebook Readme and three root Notes appear.
+  2. `Folder/A.md` and `Folder/B.md`, both `type: Note`, with no README anywhere
+     → publish succeeds; one root Folder contains both Notes, with no generated README.
+  3. `README.md` with `type: Readme`, plus `A-related-to-B.md` with
+     `type: Relationship`, `relation: related-to`, `source: "[[A]]"`, and
+     `target: "[[B]]"` → publish succeeds and preserves the relationship content
+     and authored references. A and B are absent: existing unresolved-reference
+     semantics apply; publishing does not create endpoint Notes.
+  4. In example 2, a Note with an invalid authored property (such as an invalid
+     `note_level`) causes deliberate rejection and leaves no new Folder, Note,
+     reference index rows, or accepted-head change.
+- **Boundaries:** Valid typed Markdown, regular safe paths and existing title /
+  authored-property validation remain required. The relationship case is exactly
+  one root Relationship alongside the notebook README. It does not admit a
+  Relationship in every previously supported ordinary-Note position.
+- **Excluded:** Combining the three layouts; arbitrary note counts or folder
+  depths; four root Notes with README; mixed Note/Relationship batches; relationship
+  endpoint creation or new resolution rules; unknown types in these newly admitted
+  positions; existing-notebook changes; README editing; stale/divergent history;
+  multiple unpublished commits; attachments; import tooling or error-reporting
+  redesign; performance/volume guarantees; publishing the actual jap1 checkout.
+  These are delivery exclusions, not new global format restrictions.
+- **Assumption:** Existing authored-document persistence and reference indexing
+  provide Relationship behavior. No schema, API or CLI contract change is needed.
+- **Safe stopping point:** Each completed layout is independently usable and
+  transactionally safe. All three are required to complete this one story.
+
 ## Ordering and Scope Reduction
 
-Stories 1–5 and their eligibility corrections are delivered. No additional
-initial-tree story is selected. Keep CLI/MCP worktree isolation ahead of further
-notebook-import expansion, as ordered in the product backlog. Additional
-content and bulk initial import remain separate problems.
+Stories 1–5 and their eligibility corrections are delivered. Story 6 is selected
+for refinement and planning by the developer on 2026-09-09 following the jap1
+publication investigation. This selection does not reorder the product backlog.
+Full initial import remains deferred.
 
 ## Open Decisions
 
@@ -142,7 +188,8 @@ None.
 
 ## When to Surface
 
-Stories 1–5 are delivered. Additional content and bulk initial import remain
+Stories 1–5 are delivered. Story 6 is selected for planning; execute only upon
+separate authorization. Additional content and bulk initial import remain
 separate problems.
 
 ## Breadcrumbs
