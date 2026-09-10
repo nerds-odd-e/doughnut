@@ -304,8 +304,8 @@ importers:
         specifier: 2.5.0
         version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@6.0.3))
       daisyui:
-        specifier: 5.7.28
-        version: 5.7.28
+        specifier: 5.7.32
+        version: 5.7.32
       donut-test-fixtures:
         specifier: workspace:*
         version: link:../packages/donut-test-fixtures
@@ -2756,8 +2756,8 @@ packages:
     resolution: {integrity: sha512-MOqHvMWF9/9MX6nza0KgvFH4HpMU0EF5uUDXqX/BtxtU8NfB0QzRtJ8Oe/6SuS4kbhyzVJwjd97EA4PKrzJ8bw==}
     engines: {node: '>=0.12'}
 
-  daisyui@5.7.28:
-    resolution: {integrity: sha512-BxQap2QOj7NQy5nEsjTHRmybmUZP3t+O5G6vfdidZuptBsh/QyKN9wbdrGDZk198fMI3UyYnA/rCWlggZIhGnw==}
+  daisyui@5.7.32:
+    resolution: {integrity: sha512-8JQFneb+okHxzPimTGvRKX+5XF03GyAwGw7BaV6+6XpzW0klGuzc4rdfUpLQxIYPKEziwwlrsYfcxoltF2Rowg==}
 
   dashdash@1.14.1:
     resolution: {integrity: sha512-jRFi8UDGo6j+odZiEpjazZaWqEal3w/basFjQHQEwVtZJGDpxbH1MeYluwCS8Xq5wmLJooDlMgvVarmWfGM44g==}
@@ -8618,7 +8618,7 @@ snapshots:
       es5-ext: 0.10.64
       type: 2.7.3
 
-  daisyui@5.7.28: {}
+  daisyui@5.7.32: {}
 
   dashdash@1.14.1:
     dependencies:
