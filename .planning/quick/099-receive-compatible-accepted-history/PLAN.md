@@ -327,3 +327,22 @@ completes the story: the six original F1 probes, already-based batches,
 content-only batches, and composed additions/saves all have their required
 outcomes; exact-subtree replay and existing structural/ancestry refusals stay
 intact and bounded.
+
+## Retrospective
+
+Reviewed commit manifest: `5ed11cd8e0` (slice 1), `5b1051612a` (slice 2),
+`a2d7844dcf` (slice 3), `0e329c48e8` (slice 4), `5d497da654` (slice 5),
+`5db1017abe` (merge into main). Full CLI suite (448/448) and the merged
+working tree both verified directly.
+
+One low-impact finding: `notebookPull.ts`'s `receiveAcceptedNotebookHead` doc
+comment still describes the superseded one-addition/one-save bound instead of
+slice 5's per-edge composed contract (`notebookLocalCandidate.ts`'s parallel
+comment was correctly updated; this one file's was missed). No behavior,
+test, or user-facing text is affected. Left as a trivial optional fix rather
+than a formal correction plan; not yet applied.
+
+No other implementation, test-coverage, or architecture findings. Process
+findings recorded in `DearDough.md` (DD-001, DD-002). No product
+recommendation beyond the existing backlog order; Story 2 is already
+in progress in a separate worktree.
