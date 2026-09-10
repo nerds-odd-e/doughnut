@@ -1,8 +1,10 @@
 # Cohesive initial notebook publication
 
 Source: [SEED-017 Story 9](../../seeds/SEED-017-cohesive-design-corrections.md#story-9).
-Status: planned — refined; ready for direct execution when separately authorized.
-No product implementation or tests have been run for this plan.
+Status: in-progress — executing in `codex/quick-097-initial-publication`.
+Execution uses linked worktree `/Users/terryyin/git/doughnut-quick-097`.
+CI observation is unavailable for this branch: `ci.yml` (`donut CI`) runs only
+on main. Observe main after the authorized merge. No observer is running.
 
 ## Goal and scope
 
@@ -105,7 +107,10 @@ No new exact-layout production branch is permitted in any slice.
 
 ### 1. Use one application loop for currently supported root trees
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed the
+full backend suite. Independent refactor completed without edits; coordinator
+formatting passed. Existing controller proof retains exact content/head/tree.
 Proof: Existing root Readme, root Note and root Relationship publication tests
 remain green through the controller, including exact content/head readback.
 

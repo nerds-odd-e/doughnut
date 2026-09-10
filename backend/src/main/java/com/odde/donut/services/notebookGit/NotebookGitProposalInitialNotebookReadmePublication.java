@@ -67,17 +67,45 @@ class NotebookGitProposalInitialNotebookReadmePublication {
     Optional<NotebookReadmeWithRootRelationship> withRootRelationship =
         findWithRootRelationship(files, proposal);
     if (withRootRelationship.isPresent()) {
+      NotebookReadmeWithRootRelationship creation = withRootRelationship.get();
+      List<String> conceptPaths = new ArrayList<>(creation.notePaths());
+      conceptPaths.add(creation.relationshipPath());
       return Optional.of(
-          acceptWithRootRelationship(state, proposal, acceptedHead, withRootRelationship.get()));
+          acceptRootTree(
+              state,
+              proposal,
+              acceptedHead,
+              creation.notebookReadmePath(),
+              conceptPaths,
+              creation.relationshipPath(),
+              "Initial notebook Readme and root Relationship require an empty notebook."));
     }
     Optional<NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes> withRootNotes =
         findWithRootNotes(files);
     if (withRootNotes.isPresent()) {
-      return Optional.of(acceptWithRootNotes(state, proposal, acceptedHead, withRootNotes.get()));
+      NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes creation =
+          withRootNotes.get();
+      return Optional.of(
+          acceptRootTree(
+              state,
+              proposal,
+              acceptedHead,
+              creation.notebookReadmePath(),
+              creation.notePaths(),
+              null,
+              "Initial notebook Readme and root Notes require an empty notebook."));
     }
     Optional<Creation> creation = find(files);
     if (creation.isPresent()) {
-      return Optional.of(accept(state, proposal, acceptedHead, creation.get()));
+      return Optional.of(
+          acceptRootTree(
+              state,
+              proposal,
+              acceptedHead,
+              creation.get().notebookReadmePath(),
+              List.of(),
+              null,
+              "Initial notebook Readme requires an empty notebook."));
     }
     return Optional.empty();
   }
@@ -174,57 +202,28 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         && !"README.md".equals(path);
   }
 
-  private String accept(
+  private String acceptRootTree(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
-      Creation creation) {
-    storeOnEmptyNotebook(
-        state,
-        proposal,
-        acceptedHead,
-        creation.notebookReadmePath(),
-        "Initial notebook Readme requires an empty notebook.");
-    entityPersister.flush();
-    return acceptMatchingProposedTree(state, proposal, state.liveNotes());
-  }
-
-  private String acceptWithRootNotes(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookGitProposalInitialComposition.NotebookReadmeWithRootNotes creation) {
-    storeOnEmptyNotebook(
-        state,
-        proposal,
-        acceptedHead,
-        creation.notebookReadmePath(),
-        "Initial notebook Readme and root Notes require an empty notebook.");
-    return acceptMatchingProposedTree(
-        state,
-        proposal,
-        initialCompositionPublication.applyNotes(
-            state.notebook(), state.folders(), proposal, creation.notePaths()));
-  }
-
-  private String acceptWithRootRelationship(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookReadmeWithRootRelationship creation) {
-    storeOnEmptyNotebook(
-        state,
-        proposal,
-        acceptedHead,
-        creation.notebookReadmePath(),
-        "Initial notebook Readme and root Relationship require an empty notebook.");
-    List<Note> notes =
-        new ArrayList<>(
+      String notebookReadmePath,
+      List<String> conceptPaths,
+      String relationshipPath,
+      String emptyNotebookMessage) {
+    storeOnEmptyNotebook(state, proposal, acceptedHead, notebookReadmePath, emptyNotebookMessage);
+    List<Note> notes = new ArrayList<>(conceptPaths.size());
+    for (String path : conceptPaths) {
+      if (path.equals(relationshipPath)) {
+        notes.add(
+            initialCompositionPublication.applyRelationship(
+                state.notebook(), state.folders(), proposal, path));
+      } else {
+        notes.addAll(
             initialCompositionPublication.applyNotes(
-                state.notebook(), state.folders(), proposal, creation.notePaths()));
-    notes.add(
-        initialCompositionPublication.applyRelationship(
-            state.notebook(), state.folders(), proposal, creation.relationshipPath()));
+                state.notebook(), state.folders(), proposal, List.of(path)));
+      }
+    }
+    entityPersister.flush();
     return acceptMatchingProposedTree(state, proposal, notes);
   }
 
