@@ -3,6 +3,7 @@ import {
   loadCompleteIsolatedE2eAllocation,
   worktreeIsolationApplies,
 } from './browser-worktree-isolation.mjs'
+import { listOccupiedApplicationPorts } from './local-runtime-target.mjs'
 import {
   resolveSutRuntimeTarget,
   sutRuntimeTargetProcessEnv,
@@ -119,17 +120,7 @@ export function assertE2eDatabaseExists(database, { existsFn } = {}) {
 }
 
 export async function assertAllocatedPortsFree(target, isPortOccupiedFn) {
-  const ports = [
-    ['backend', target.backendPort],
-    ['frontend vite', target.vitePort],
-    ['local LB', target.lbListenPort],
-  ]
-  const occupied = []
-  for (const [service, port] of ports) {
-    if (await isPortOccupiedFn(port)) {
-      occupied.push(`${service} ${port}`)
-    }
-  }
+  const occupied = await listOccupiedApplicationPorts(target, isPortOccupiedFn)
   if (occupied.length === 0) return
   throw new Error(
     `Isolated SUT ports are already occupied (${occupied.join(', ')}). ` +

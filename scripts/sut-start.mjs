@@ -24,7 +24,7 @@ import {
 } from './browser-worktree-isolation.mjs'
 import { ensureIsolatedE2eDatabase } from './sut-e2e-database.mjs'
 import { ensureIsolatedE2ePorts } from './sut-e2e-ports.mjs'
-import { checkTcpPort } from './sut-healthcheck.mjs'
+import { isTcpPortOccupied } from './sut-healthcheck.mjs'
 import {
   assertAllocatedPortsFree,
   assertE2eDatabaseExists,
@@ -147,7 +147,7 @@ export async function runSutStart({
         await assertNoLiveSutOwner(checkoutRoot)
         await assertAllocatedPortsFree(
           target,
-          isPortOccupiedFn ?? defaultIsPortOccupied
+          isPortOccupiedFn ?? isTcpPortOccupied
         )
         owner = await claimSutOwnership(checkoutRoot)
       }
@@ -177,7 +177,7 @@ export async function runSutStart({
       if (isolated && retainOwnership) {
         await assertAllocatedPortsFree(
           target,
-          isPortOccupiedFn ?? defaultIsPortOccupied
+          isPortOccupiedFn ?? isTcpPortOccupied
         )
       }
       log(`Starting SUT services... (log: ${logFile})`)
@@ -215,15 +215,6 @@ export async function runSutStart({
     releaseAdmissionIfHeld()
     throw error
   }
-}
-
-async function defaultIsPortOccupied(port) {
-  const result = await checkTcpPort({
-    host: '127.0.0.1',
-    port,
-    timeoutMs: 400,
-  })
-  return result.ok
 }
 
 const isMain = process.argv[1]

@@ -1,7 +1,7 @@
 # Use a persistent Development environment for manual feedback
 
 Source: [SEED-015 story 7](../../seeds/SEED-015-concurrent-worktree-environments.md#story-7).
-Status: in progress (slices 1–3 delivered).
+Status: in progress (slices 1–4 delivered).
 CI observer: feature-branch pushes are not observed — `donut CI` is push-to-`main` only; observe after merge.
 
 ## Goal and scope
@@ -97,11 +97,10 @@ ownership control.
 ### 4. Refuse an unsafe Development start before spawning
 
 Type: Behavior
-Status: planned
-Proof: focused `scripts/dev-start.test.mjs` cases run against temporary checkout
-fixtures and occupied test sockets; they prove configured/linked worktrees,
-duplicate starts, and occupied Development ports fail without spawning or
-signalling a process. The free unconfigured-primary case reaches the spawn seam.
+Status: done
+Proof: `node --test scripts/dev-start.test.mjs` (pass) — linked/configured
+worktree, live `dev.pid`, and occupied Development ports refuse without spawn;
+free unconfigured primary reaches the spawn seam.
 
 Behavior: A developer invokes `pnpm dev` outside an unconfigured primary
 checkout, or while any canonical Development port has an unverified listener ->

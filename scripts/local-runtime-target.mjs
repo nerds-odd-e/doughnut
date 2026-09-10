@@ -24,6 +24,25 @@ export function browserOrigin(target) {
   return `http://${HOST}:${target.lbListenPort}`
 }
 
+/** Application stack ports only — excludes optional Mountebank. */
+function applicationPortEntries(target) {
+  return [
+    ['backend', target.backendPort],
+    ['frontend vite', target.vitePort],
+    ['local LB', target.lbListenPort],
+  ]
+}
+
+export async function listOccupiedApplicationPorts(target, isPortOccupiedFn) {
+  const occupied = []
+  for (const [service, port] of applicationPortEntries(target)) {
+    if (await isPortOccupiedFn(port)) {
+      occupied.push(`${service} ${port}`)
+    }
+  }
+  return occupied
+}
+
 export function healthEndpoints(target) {
   const tcpChecks = []
   if (target.mountebankPort != null) {

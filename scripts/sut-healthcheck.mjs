@@ -48,6 +48,16 @@ export function checkTcpPort({ host, port, timeoutMs = TCP_TIMEOUT_MS }) {
   })
 }
 
+/** Fast localhost probe for start-time port refusal (not health polling). */
+export async function isTcpPortOccupied(port) {
+  const result = await checkTcpPort({
+    host: '127.0.0.1',
+    port,
+    timeoutMs: 400,
+  })
+  return result.ok
+}
+
 export function checkHttpReady({ url, timeoutMs = HTTP_TIMEOUT_MS }) {
   return new Promise((resolve) => {
     const req = http.get(url, { timeout: timeoutMs }, (res) => {
