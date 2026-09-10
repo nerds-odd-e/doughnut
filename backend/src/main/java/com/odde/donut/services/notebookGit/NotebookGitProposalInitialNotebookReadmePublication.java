@@ -12,8 +12,9 @@ import org.springframework.stereotype.Service;
 
 /**
  * Recognizes and accepts the sole-added-root-{@code README.md} initial notebook Readme proposal
- * shape, that shape plus one, two, or three added root ordinary Notes, and the exact two-file
- * notebook README plus one root Relationship, on an otherwise empty notebook.
+ * shape, that shape plus one, two, or three added root ordinary Notes, the exact two-file notebook
+ * README plus one root Relationship, and that Relationship plus exactly two root ordinary Notes, on
+ * an otherwise empty notebook.
  */
 @Service
 class NotebookGitProposalInitialNotebookReadmePublication {
@@ -24,9 +25,20 @@ class NotebookGitProposalInitialNotebookReadmePublication {
    */
   private record Creation(String notebookReadmePath) {}
 
-  /** Exactly one added root {@code README.md} plus one added root Relationship Markdown file. */
+  /**
+   * Exactly one added root {@code README.md} plus one added root Relationship Markdown file,
+   * optionally with exactly two added root ordinary Notes.
+   */
   private record NotebookReadmeWithRootRelationship(
-      String notebookReadmePath, String relationshipPath) {}
+      String notebookReadmePath, String relationshipPath, List<String> notePaths) {
+    NotebookReadmeWithRootRelationship {
+      notePaths = List.copyOf(notePaths);
+      if (!notePaths.isEmpty() && notePaths.size() != 2) {
+        throw new IllegalArgumentException(
+            "NotebookReadmeWithRootRelationship requires zero or two root Note paths.");
+      }
+    }
+  }
 
   private final NotebookGitProjection projection;
   private final NotebookGitProposalBindingPersistence bindingPersistence;
@@ -110,33 +122,41 @@ class NotebookGitProposalInitialNotebookReadmePublication {
 
   private static Optional<NotebookReadmeWithRootRelationship> findWithRootRelationship(
       List<InspectedRegularFile> files, NotebookGitProposalImporter.ImportedProposal proposal) {
-    if (files.size() != 2) {
+    if (files.size() != 2 && files.size() != 4) {
       return Optional.empty();
     }
     String notebookReadmePath = null;
     String relationshipPath = null;
+    List<String> notePaths = new ArrayList<>(2);
     for (InspectedRegularFile file : files) {
       if (isAddedRootNotebookReadme(file)) {
         if (notebookReadmePath != null) {
           return Optional.empty();
         }
         notebookReadmePath = file.path();
-      } else if (isAddedRootMarkdownFile(file)
-          && NotebookGitProposalTypedPath.authoredTypeEquals(
-              proposal, file.path(), "Relationship")) {
-        if (relationshipPath != null) {
+      } else if (isAddedRootMarkdownFile(file)) {
+        if (NotebookGitProposalTypedPath.authoredTypeEquals(
+            proposal, file.path(), "Relationship")) {
+          if (relationshipPath != null) {
+            return Optional.empty();
+          }
+          relationshipPath = file.path();
+        } else if (NotebookGitProposalTypedPath.authoredTypeEquals(proposal, file.path(), "Note")) {
+          notePaths.add(file.path());
+        } else {
           return Optional.empty();
         }
-        relationshipPath = file.path();
       } else {
         return Optional.empty();
       }
     }
-    if (notebookReadmePath == null || relationshipPath == null) {
+    if (notebookReadmePath == null
+        || relationshipPath == null
+        || notePaths.size() != files.size() - 2) {
       return Optional.empty();
     }
     return Optional.of(
-        new NotebookReadmeWithRootRelationship(notebookReadmePath, relationshipPath));
+        new NotebookReadmeWithRootRelationship(notebookReadmePath, relationshipPath, notePaths));
   }
 
   static boolean isAddedRootNotebookReadme(InspectedRegularFile file) {
@@ -198,12 +218,14 @@ class NotebookGitProposalInitialNotebookReadmePublication {
         acceptedHead,
         creation.notebookReadmePath(),
         "Initial notebook Readme and root Relationship require an empty notebook.");
-    return acceptMatchingProposedTree(
-        state,
-        proposal,
-        List.of(
-            initialCompositionPublication.applyRelationship(
-                state.notebook(), state.folders(), proposal, creation.relationshipPath())));
+    List<Note> notes =
+        new ArrayList<>(
+            initialCompositionPublication.applyNotes(
+                state.notebook(), state.folders(), proposal, creation.notePaths()));
+    notes.add(
+        initialCompositionPublication.applyRelationship(
+            state.notebook(), state.folders(), proposal, creation.relationshipPath()));
+    return acceptMatchingProposedTree(state, proposal, notes);
   }
 
   private String acceptMatchingProposedTree(

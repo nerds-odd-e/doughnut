@@ -1,7 +1,7 @@
 # Publish two notes and their relationship together
 
 Source: [SEED-016 Story 7](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-7).
-Status: planned. Refinement and planning requested 2026-09-10; implementation not requested.
+Status: in progress (slice 1 delivered). Isolated worktree `/Users/terryyin/.cursor/worktrees/doughnut/quick-094` on branch `quick/094-initial-notes-with-relationship`. CI observation: `ci.yml` is push-triggered only on `main`; this feature branch has no push-triggered workflow coverage.
 
 ## Goal and scope
 
@@ -76,10 +76,15 @@ overruns require story reassessment. Estimates are hypotheses, not guarantees.
 
 ### 1. Accept the initial mixed root composition
 Type: Behavior
-Status: planned
-Proof: Publish the four-file fixture through the controller, observe the Readme
-and exactly three titled root concepts with authored content, and download the
-exact proposed Git head/tree.
+Status: done
+Proof: `NotebookGitProposalInitialRootRelationshipControllerTest.publishesInitialNotebookReadmeTwoRootNotesAndRootRelationshipAsTheExactAuthoredCommit` publishes README + `A.md` + `B.md` + `A-related-to-B.md` (Relationship first in the fixture) through the controller; Readme bytes, three root titles/bytes/placement, and exact Git head/tree match. Existing isolated-Relationship and ordinary-Note layouts remain in the backend suite.
+
+Focused verification (pass):
+```text
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+```
+Worktree Unit Test DB: `doughnut_wt_de794f5bde5e486fb687c72e52eb667a_test`.
 
 Behavior: Empty notebook + README/two Notes/one Relationship in one direct child
 → publish → the authored mixed composition is accepted atomically.
@@ -144,6 +149,9 @@ slice-plan refinement required. Full-suite timing exception applies as above.
 
 ## Learnings and completion
 
-No execution evidence yet. Record only discoveries that constrain remaining work.
+- Slice 1 active work ~8 minutes (scrutinize band, under the 10-minute hard stop). The four-file layout failed first as `requireOrdinaryNote` on `A-related-to-B.md`. Recognition by authored type before `findWithRootNotes` is enough; `applyNotes` stays strict for other layouts.
+- Relationship proofs now live in `NotebookGitProposalInitialRootRelationshipControllerTest` after the ~250-line guideline. Slice 2 should add show-note observation there rather than re-growing the Readme-only class.
+- Feature-branch pushes do not start `donut CI`; do not claim CI observation until work lands on `main`.
+
 When all slices are delivered, reduce Story 7 to delivered Goal/Scope and clean
 spent plan history under the repository lifecycle, preserving sibling stories.
