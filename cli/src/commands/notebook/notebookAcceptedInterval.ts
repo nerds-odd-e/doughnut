@@ -1,10 +1,11 @@
 import { runSystemGitOrThrow } from './systemGit.js'
 import {
+  hasSingleParent,
   inspectAncestryFailure,
   isOrdinaryNoteContentChange,
   listCommitChanges,
 } from './notebookAcceptedCommitChanges.js'
-import { isEligibleBoundedAcceptedAdditionInterval } from './notebookAcceptedAdditionInterval.js'
+import { isEligibleAcceptedAdditionInterval } from './notebookAcceptedAdditionInterval.js'
 import {
   exactAcceptedSubtreeMapping,
   type ExactAcceptedSubtreeMapping,
@@ -64,11 +65,7 @@ export function inspectAcceptedInterval(
     localParent
   )
   if (
-    isEligibleBoundedAcceptedAdditionInterval(
-      acceptedRepoDir,
-      localParent,
-      interval
-    )
+    isEligibleAcceptedAdditionInterval(acceptedRepoDir, localParent, interval)
   ) {
     return { kind: 'rebaseable' }
   }
@@ -103,11 +100,7 @@ function exactSubtreeMappingForSingleEdge(
 ): ExactAcceptedSubtreeMapping | undefined {
   if (interval.length !== 1) return undefined
   const [commit] = interval
-  if (
-    commit === undefined ||
-    commit.parents.length !== 1 ||
-    commit.parents[0] !== localParent
-  ) {
+  if (commit === undefined || !hasSingleParent(commit, localParent)) {
     return undefined
   }
   return exactAcceptedSubtreeMapping(acceptedRepoDir, localParent, commit.sha)
@@ -129,7 +122,7 @@ function isContiguousSingleParentChain(
 ): boolean {
   let expectedParent = localParent
   for (const commit of interval) {
-    if (commit.parents.length !== 1 || commit.parents[0] !== expectedParent) {
+    if (!hasSingleParent(commit, expectedParent)) {
       return false
     }
     expectedParent = commit.sha

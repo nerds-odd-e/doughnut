@@ -72,6 +72,17 @@ export function isOrdinaryNoteAddition(change: CommitChange): boolean {
   )
 }
 
+/**
+ * True when `commit` has exactly one parent and it is `expectedParent` — one
+ * edge of a contiguous single-parent chain.
+ */
+export function hasSingleParent(
+  commit: { parents: string[] },
+  expectedParent: string
+): boolean {
+  return commit.parents.length === 1 && commit.parents[0] === expectedParent
+}
+
 function parseDiffTreeRawZ(output: string): CommitChange[] {
   if (output === '') return []
   const parts = output.split('\0')

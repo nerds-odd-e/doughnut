@@ -57,9 +57,11 @@ export type UnpublishedLocalHistoryDecision =
  * Any nonempty ordinary-content-edit unpublished commit rebases over a
  * contiguous single-parent chain of accepted content-only edits, independent
  * of local path count, accepted commit count, or accepted path count per
- * commit; and over one accepted ordinary-note addition at the root or an
- * already represented folder, optionally followed by one content save of
- * that same newly added note.
+ * commit; and over a contiguous chain in which each accepted commit contains
+ * only ordinary-note content saves and/or ordinary note additions at the
+ * root or a folder already represented in that commit's preceding accepted
+ * tree, independent of how many additions or saves each commit carries or
+ * how they are grouped across commits.
  * Eligible one-note content edits of a descendant under one accepted exact
  * same-name subtree relocation replay onto the mapped path; batches of more
  * than one local path do not use that replay.

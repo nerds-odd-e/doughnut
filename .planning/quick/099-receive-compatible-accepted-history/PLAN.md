@@ -183,7 +183,7 @@ Accepted additions remain a required unfinished promise until slice 5.
 
 ### 5. Receive composed ordinary additions and saves
 Type: Behavior
-Status: planned
+Status: done
 Sizing hypothesis: 6–8 minutes, medium confidence, including focused proof and cleanup.
 Above-target scrutiny: one additional eligible operation kind uses slice 4's
 chain and replay model; existing addition fixtures already construct real bundles.
@@ -307,3 +307,23 @@ edit, and fully-redundant batches. Environmental note: concurrent vitest
 processes on this machine caused spurious timeouts twice during this slice's
 execution and wrap-up; a clean solo re-run always passed 95/95 — treat any
 single-run failure as suspect until reproduced without contention.
+
+Slice 5 (final): `isEligibleBoundedAcceptedAdditionInterval` was rewritten as
+a per-edge walk (renamed `isEligibleAcceptedAdditionInterval` since it is no
+longer bounded) classifying every changed path in each commit against that
+edge's own preceding tree as an addition (destination must already be
+represented) or a content save, requiring at least one addition or deferring
+to the content-only path. The single-parent-chain check duplicated across
+this file, `isContiguousSingleParentChain`, and
+`exactSubtreeMappingForSingleEdge` was consolidated into a shared
+`hasSingleParent` predicate in `notebookAcceptedCommitChanges.ts`. Two
+structural-history refusal shapes (`two-additions`, `addition-with-edit`)
+converted to success once compatible; `creationFollowOnComposition` rewritten
+from refusal to success suite; new
+`notebookPull.additionComposition.suite.ts` proves multi-commit/multi-op
+composition (two orderings) and a late-unsupported-member refusal. All 103
+notebookPull+index tests pass cleanly (solo run, no contention). This
+completes the story: the six original F1 probes, already-based batches,
+content-only batches, and composed additions/saves all have their required
+outcomes; exact-subtree replay and existing structural/ancestry refusals stay
+intact and bounded.
