@@ -1,7 +1,7 @@
 # Use a persistent Development environment for manual feedback
 
 Source: [SEED-015 story 7](../../seeds/SEED-015-concurrent-worktree-environments.md#story-7).
-Status: in progress (slices 1–4 delivered).
+Status: in progress (slices 1–5 delivered).
 CI observer: feature-branch pushes are not observed — `donut CI` is push-to-`main` only; observe after merge.
 
 ## Goal and scope
@@ -110,11 +110,11 @@ database provisioning, reset, or worktree allocation function is called.
 ### 5. Start one healthy Development stack with `pnpm dev`
 
 Type: Behavior
-Status: planned
-Proof: focused launcher tests drive the detached child, dedicated PID/log files,
-and health polling through their high-level entry points; the returned health
-body must identify active profile `dev`. Run the new Node tests plus
-`pnpm test:sut-start` and `pnpm test:sut-healthcheck`.
+Status: done
+Proof: `node --test scripts/dev-start.test.mjs scripts/dev-healthcheck.test.mjs`,
+`pnpm test:sut-start`, and `pnpm test:sut-healthcheck` (pass) — detached
+supervisor, `dev.pid`/`dev.log`, health body Active Profile `dev`, browser
+origin printed; SUT suites unchanged.
 
 Behavior: A developer runs `pnpm dev` from the unconfigured primary checkout
 with the Development ports free -> the reload-capable backend, frontend, and LB

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { writeFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { test } from 'node:test'
 import {
@@ -15,7 +16,12 @@ import {
   isTcpListening,
   listenTcp,
 } from './sut-isolated-fixtures.mjs'
-import { makeStartSpy } from './sut-start-fixtures.mjs'
+import {
+  healthyOnce,
+  makeLogs,
+  makeStartSpy,
+  neverHealthy,
+} from './sut-start-fixtures.mjs'
 
 function targetFor(checkoutRoot, ports = {}) {
   return {
@@ -103,16 +109,21 @@ test('occupied Development port refuses without terminating the listener', async
   assert.equal(await isTcpListening(port), true)
 })
 
-test('free unconfigured primary reaches the Development spawn seam', async (t) => {
+test('free unconfigured primary starts Development, writes pid, prints browser origin when healthy', async (t) => {
   const checkout = makePrimaryCheckout(t)
-  const spawn = makeStartSpy()
-  const logs = []
+  const runtimeTarget = targetFor(checkout.root, { lbListenPort: 5175 })
+  const spawn = makeStartSpy(9090)
+  const logs = makeLogs()
   const code = await runDevStart({
     checkoutRoot: checkout.root,
-    runtimeTarget: targetFor(checkout.root),
+    runtimeTarget,
     spawnFn: spawn.spawnFn,
     isPortOccupiedFn: async () => false,
-    log: (line) => logs.push(line),
+    healthcheckFn: healthyOnce,
+    timeoutMs: 5_000,
+    pollMs: 50,
+    log: logs.log,
+    errLog: logs.errLog,
   })
   assert.equal(code, 0)
   assert.equal(spawn.calls.length, 1)
@@ -120,5 +131,35 @@ test('free unconfigured primary reaches the Development spawn seam', async (t) =
   assert.match(spawn.calls[0][1][0], /development-services\.mjs$/)
   assert.equal(spawn.calls[0][2].cwd, checkout.root)
   assert.equal(spawn.calls[0][2].detached, true)
-  assert.ok(logs.some((line) => /spawn seam reached/.test(line)))
+  assert.equal(await readFile(runtimeTarget.pidFile, 'utf8'), '9090')
+  assert.ok(logs.out.some((line) => /Development healthy/.test(line)))
+  assert.ok(
+    logs.out.some((line) => line === 'Browser origin: http://127.0.0.1:5175')
+  )
+})
+
+test('Development start exits 1 when healthcheck never passes', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const runtimeTarget = targetFor(checkout.root)
+  const spawn = makeStartSpy(7070)
+  const logs = makeLogs()
+  const code = await runDevStart({
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    spawnFn: spawn.spawnFn,
+    isPortOccupiedFn: async () => false,
+    healthcheckFn: neverHealthy,
+    timeoutMs: 100,
+    pollMs: 40,
+    log: logs.log,
+    errLog: logs.errLog,
+  })
+  assert.equal(code, 1)
+  assert.equal(spawn.calls.length, 1)
+  assert.equal(await readFile(runtimeTarget.pidFile, 'utf8'), '7070')
+  assert.ok(
+    logs.err.some((line) =>
+      /Development did not become healthy within the timeout/.test(line)
+    )
+  )
 })

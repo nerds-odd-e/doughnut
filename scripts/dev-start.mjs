@@ -1,18 +1,23 @@
 #!/usr/bin/env node
 /**
  * Start the Development stack after refusing unsafe checkouts and occupied targets.
+ * Spawns services, writes `dev.pid`, waits until healthy `dev`, prints browser origin.
  */
 import { spawn } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { worktreeIsolationApplies } from './browser-worktree-isolation.mjs'
+import { runDevelopmentHealthcheck } from './dev-healthcheck.mjs'
 import { DEVELOPMENT_RUNTIME_TARGET } from './development-runtime.mjs'
 import {
+  browserOrigin,
   listOccupiedApplicationPorts,
   withRuntimeTargetEnv,
 } from './local-runtime-target.mjs'
 import { isTcpPortOccupied } from './sut-healthcheck.mjs'
+import { waitForSutHealthy } from './sut-start-health-wait.mjs'
+import { writePidFile } from './sut-start-spawn.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -68,9 +73,9 @@ export function spawnDevelopmentServices({
 }
 
 /**
- * Refuse unsafe Development starts, then reach the spawn seam.
+ * Refuse unsafe Development starts, spawn services, wait until healthy.
  *
- * @returns {Promise<number>} exit code (0 = spawn seam reached)
+ * @returns {Promise<number>} exit code (0 = healthy)
  */
 export async function runDevStart({
   checkoutRoot = repoRoot,
@@ -78,7 +83,11 @@ export async function runDevStart({
   spawnFn = spawn,
   isPortOccupiedFn,
   isProcessAliveFn = defaultIsProcessAlive,
+  healthcheckFn = runDevelopmentHealthcheck,
+  timeoutMs,
+  pollMs,
   log = (s) => process.stdout.write(`${s}\n`),
+  errLog = (s) => process.stderr.write(`${s}\n`),
 } = {}) {
   if (worktreeIsolationApplies(checkoutRoot)) {
     throw new Error(
@@ -106,16 +115,32 @@ export async function runDevStart({
     )
   }
 
-  spawnDevelopmentServices({
+  const logFile = runtimeTarget.logFile
+  log(`Starting Development services... (log: ${logFile})`)
+  const { child } = spawnDevelopmentServices({
     spawnFn,
     checkoutRoot,
     runtimeTarget,
-    logFile: runtimeTarget.logFile,
+    logFile,
   })
-  log(
-    `Development spawn seam reached for ${runtimeTarget.profile} on LB ${runtimeTarget.lbListenPort}`
-  )
-  return 0
+  await writePidFile(child.pid, { pidFile: runtimeTarget.pidFile })
+
+  const { exitCode } = await waitForSutHealthy({
+    child,
+    timeoutMs,
+    pollMs,
+    logFile,
+    log,
+    errLog,
+    healthcheckFn,
+    runtimeTarget,
+    checkoutRoot,
+    stackLabel: 'Development',
+  })
+  if (exitCode === 0) {
+    log(`Browser origin: ${browserOrigin(runtimeTarget)}`)
+  }
+  return exitCode
 }
 
 const isMain = process.argv[1]

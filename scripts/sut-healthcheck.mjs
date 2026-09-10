@@ -77,13 +77,13 @@ export function checkHttpReady({ url, timeoutMs = HTTP_TIMEOUT_MS }) {
   })
 }
 
-function formatTcpLine(result) {
+export function formatTcpLine(result) {
   const endpoint = `${result.host}:${result.port}`
   if (result.ok) return `PASS TCP ${result.service} (${endpoint})`
   return `FAIL TCP ${result.service} (${endpoint}) - ${result.reason}`
 }
 
-function formatReadyLine(result) {
+export function formatReadyLine(result) {
   if (result.skipped)
     return `SKIP HTTP readiness ${result.url} - ${result.reason}`
   if (result.ok) return `PASS HTTP readiness ${result.url} - ${result.status}`

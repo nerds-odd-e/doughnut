@@ -26,7 +26,7 @@ export const DEVELOPMENT_SERVICE_ARGS = [
 
 export function runDevelopmentServices({
   spawnFn,
-  logFile = DEVELOPMENT_RUNTIME_TARGET.logFile,
+  logFile = process.env.DEV_LOG_FILE ?? DEVELOPMENT_RUNTIME_TARGET.logFile,
   logWriter = createRotatingLogWriter(logFile),
   runtimeTarget = DEVELOPMENT_RUNTIME_TARGET,
   env = process.env,

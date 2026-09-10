@@ -28,8 +28,8 @@ function sleep(ms, signal) {
   })
 }
 
-function reportStartCancelled(errLog, logFile) {
-  errLog('SUT start was cancelled.')
+function reportStartCancelled(errLog, logFile, stackLabel) {
+  errLog(`${stackLabel} start was cancelled.`)
   errLog(`Log: ${logFile}`)
   return { ok: false, exitCode: 1 }
 }
@@ -59,6 +59,7 @@ async function tailFile(filePath, lines) {
  *   runtimeTarget?: object,
  *   checkoutRoot?: string,
  *   signal?: AbortSignal,
+ *   stackLabel?: string,
  * }} opts
  * @returns {Promise<{ ok: boolean, exitCode: number }>}
  */
@@ -73,6 +74,7 @@ export async function waitForSutHealthy({
   runtimeTarget,
   checkoutRoot,
   signal,
+  stackLabel = 'SUT',
 } = {}) {
   let childExitCode = null
   let childSignal = null
@@ -95,7 +97,7 @@ export async function waitForSutHealthy({
 
   while (Date.now() < deadline) {
     if (signal?.aborted) {
-      return reportStartCancelled(errLog, logFile)
+      return reportStartCancelled(errLog, logFile, stackLabel)
     }
 
     // Check if the child exited prematurely
@@ -103,7 +105,7 @@ export async function waitForSutHealthy({
       const reason = childSignal
         ? `killed by signal ${childSignal}`
         : `exited with code ${childExitCode}`
-      errLog(`SUT service process ${reason} before becoming healthy.`)
+      errLog(`${stackLabel} service process ${reason} before becoming healthy.`)
       errLog(`Log: ${logFile}`)
       const tail = await tailFile(logFile, TAIL_LINES)
       if (tail) {
@@ -123,7 +125,7 @@ export async function waitForSutHealthy({
     })
     if (result.ok) {
       log(
-        `SUT healthy after ${attempt} poll(s). Services running in background.`
+        `${stackLabel} healthy after ${attempt} poll(s). Services running in background.`
       )
       log(`Log: ${logFile}`)
       return { ok: true, exitCode: 0 }
@@ -131,7 +133,7 @@ export async function waitForSutHealthy({
 
     if (attempt === 1) {
       log(
-        `Waiting for SUT to become healthy (timeout: ${timeoutMs / 1000}s)...`
+        `Waiting for ${stackLabel} to become healthy (timeout: ${timeoutMs / 1000}s)...`
       )
     }
 
@@ -141,11 +143,11 @@ export async function waitForSutHealthy({
   }
 
   if (signal?.aborted) {
-    return reportStartCancelled(errLog, logFile)
+    return reportStartCancelled(errLog, logFile, stackLabel)
   }
 
   // Timed out — run one final healthcheck with full logging to show what failed
-  errLog('SUT did not become healthy within the timeout.')
+  errLog(`${stackLabel} did not become healthy within the timeout.`)
   await healthcheckFn({ log: errLog, runtimeTarget, checkoutRoot })
   errLog(`Log: ${logFile}`)
   const tail = await tailFile(logFile, TAIL_LINES)
