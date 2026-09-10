@@ -1,8 +1,7 @@
 # Publish a new folder and its notes together
 
 Source: [SEED-017 Story 2](../../seeds/SEED-017-cohesive-design-corrections.md#story-2).
-Status: in progress. Execution authorized 2026-09-10 in linked worktree
-`.worktrees/quick-100-publish-folder-and-notes` on branch
+Status: executed. Worktree `.worktrees/quick-100-publish-folder-and-notes` on branch
 `quick-100-publish-folder-and-notes`. Feature-branch pushes have no
 push-triggered CI (`ci.yml` runs only on `main`); CI observation starts
 when this branch is merged to `main`. Do not reuse Story 1's checkout
@@ -266,11 +265,14 @@ destinations so implied folders are not created. Relocation lives in
 
 ### 5. Publish folder documents and notes as one changeset
 Type: Behavior
-Status: planned
+Status: done
 Sizing hypothesis: 8–10 minutes active work after the structural slices, plus
-backend-suite and installed-CLI E2E waits. The complete publication/receive
-proof is inseparable from the delivered behavior; do not split off its tests
-or declare this slice complete before the real round trip is green.
+backend-suite and installed-CLI E2E waits.
+Actual: ~25 minutes active (over hypothesis and 10-minute hard limit; admission
+pre-check vs implied-folder initial trees, then obsolete-restriction test).
+Converged with both proofs green — did not revert. Backend suite wait ~3.2 min
+across runs; SUT ~17s; Cypress ~38s. Refactor unified destination pre-check
+callers; backend suite rerun green; E2E not invalidated.
 
 Behavior: given a bound notebook with existing learned notes, publish a direct
 child commit adding the authored folder README and notes; receive the exact
@@ -305,6 +307,29 @@ Proof owned here:
   commit in the first clone; publish; pull the receiver. Assert accepted commit,
   clean receiver, preserved base ancestry and exact authored added file content.
   Existing controller assertions own server identity/learning checks.
+
+```text
+proof:
+  command: unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+  covers: complete backend unit suite on doughnut_wt_05087b88f4ea4adabada26656b61f244_test (composed folder+notes success/retry/rollback, README-only, initial tree, ordinary addition, reserved README on mixed changesets)
+  result: pass
+```
+
+```text
+proof:
+  command: unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL INPUT_DB_URL SERVER_PORT \
+  LOCAL_LB_BACKEND LOCAL_LB_VITE_UPSTREAM LOCAL_LB_LISTEN_PORT \
+  FRONTEND_DEV_PORT FRONTEND_BACKEND_ORIGIN SUT_RUNTIME_TARGET
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature
+  covers: installed CLI publish of folder README + notes after a web-created note; second clone pulls the exact accepted commit
+  result: pass
+```
+
+`NotebookGitProposalFolderCreationShape` is gone. Addition-only changesets
+(CONTAINER and/or CONCEPT) use `documentApplication`. Represented-destination
+pre-check is skipped for added-container parents and empty accepted notebooks
+(implied-folder initial trees).
 
 ## Promise ownership
 
@@ -341,7 +366,7 @@ prepares the same publication outcome and removes a source of duplicated rules.
 | 2 | Done | One folder materialization mechanism; existing creation proof plus identity/collision regressions |
 | 3 | Done | One document classification representation; unchanged behavior |
 | 4 | Done | One addition application flow; unchanged admission |
-| 5 | Ready with stated sizing exception | One integrated publication/receive outcome; complete backend and E2E verification stay with it |
+| 5 | Done | One integrated publication/receive outcome; backend suite and CLI E2E green |
 
 Slice 5's longer active-work estimate is scrutinized: structural work and existing
 CLI helpers remove setup/design work; the remaining assertions prove one
@@ -365,6 +390,9 @@ new constraint condition.
 - Slice 4 active work ~12 minutes vs 4–5 hypothesis (over 10). Converged on one
   document-application owner; remaining README-only recognizer is slice 5.
   Ordinary additions still require represented destinations before materialize.
+- Slice 5 active work ~25 minutes vs 8–10 hypothesis. Converged with controller
+  and installed-CLI proofs; `FolderCreationShape` removed. Empty-notebook skip
+  of represented-destination pre-check preserves implied-folder initial trees.
 - Feature-branch pushes have no push-triggered CI (`ci.yml` only on `main`).
   Missing CI observation coverage until merge to `main`. Keep one plan writer;
   do not modify Story 1's plan or execution state.

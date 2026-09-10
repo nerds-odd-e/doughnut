@@ -100,6 +100,14 @@ When(
 )
 
 When(
+  'I commit the following document changes together in the cloned checkout:',
+  (data: DataTable) =>
+    cli
+      .notebookCloneCheckout()
+      .commitRelatedNoteChanges(relatedNoteChanges(data))
+)
+
+When(
   'I commit a removal of {string} in the cloned checkout',
   (relativePath: string) =>
     cli.notebookCloneCheckout().commitRemoval(relativePath)

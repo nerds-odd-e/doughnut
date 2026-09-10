@@ -30,6 +30,11 @@ public final class NotebookGitProposalTreeShape {
     return admitOrdinaryNoteChanges(noteChangesFrom(documents));
   }
 
+  static boolean isAdditionOnly(List<ChangedDocument> documents) {
+    return !documents.isEmpty()
+        && documents.stream().allMatch(document -> document.kind() == ChangeKind.ADDED);
+  }
+
   /**
    * Changed documents only: equal accepted/proposed blobs stay on {@link InspectedRegularFile} as
    * context and are omitted here.

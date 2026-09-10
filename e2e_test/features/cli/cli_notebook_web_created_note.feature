@@ -169,3 +169,53 @@ Feature: CLI notebook web-created note
     Then the installed CLI reports the rebased local head as the accepted head
     And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
     And I should see note "CLI Clone Notebook/Shopping list" has content "Milk and eggs"
+
+  Scenario: Publishing a folder README and notes together is received by a clean clone
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I create a title-only root note titled "Shopping list" in the notebook "CLI Clone Notebook"
+    And I pull the cloned checkout using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I commit the following document changes together in the cloned checkout:
+      | path           | content                                      |
+      | 例文/README.md | ---\ntype: Readme\n---\nExample sentences     |
+      | 例文/A.md      | ---\ntype: Note\n---\nFirst example             |
+      | 例文/B.md      | ---\ntype: Note\n---\nSecond example            |
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout contains exactly:
+      | README.md          |
+      | Overview.md        |
+      | Shopping list.md   |
+      | Kitchen/README.md  |
+      | Recipes/README.md  |
+      | Recipes/Pasta.md   |
+      | 例文/README.md      |
+      | 例文/A.md           |
+      | 例文/B.md           |
+    And the second cloned checkout retains its original head as an ancestor
+    And the second cloned checkout is a clean checkout of the accepted head
+    And the second cloned checkout file "例文/README.md" is:
+      """
+      ---
+      type: Readme
+      ---
+      Example sentences
+
+      """
+    And the second cloned checkout file "例文/A.md" is:
+      """
+      ---
+      type: Note
+      ---
+      First example
+
+      """
+    And the second cloned checkout file "例文/B.md" is:
+      """
+      ---
+      type: Note
+      ---
+      Second example
+
+      """

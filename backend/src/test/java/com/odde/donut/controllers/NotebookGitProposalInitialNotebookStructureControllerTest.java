@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -19,9 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Verifies publication of initial empty-notebook structures that introduce Folders. */
 class NotebookGitProposalInitialNotebookStructureControllerTest
@@ -129,12 +126,11 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
   }
 
   @Test
-  void refusesInitialNotebookAndRootFolderReadmesWhenAnEmptyFolderAlreadyExists() throws Exception {
+  void publishesNotebookAndFolderReadmesWithoutAdoptingAnUnrelatedEmptyLiveFolder()
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    makeMe.aFolder().notebook(notebook).name("Existing").please();
+    Folder existing = makeMe.aFolder().notebook(notebook).name("Existing").please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    String readmeBefore =
-        notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent();
     byte[] proposalBytes =
         proposalBundleBytes(
             binding,
@@ -142,17 +138,22 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
                 new NotebookGitProposalFile("README.md", NOTEBOOK_README),
                 new NotebookGitProposalFile("Field Notes/README.md", FOLDER_README)));
 
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    assertThat(exception.getReason(), containsString("README.md"));
     Notebook after = notebookRepository.findById(notebook.getId()).orElseThrow();
-    assertThat(after.getReadmeContent(), equalTo(readmeBefore));
+    assertThat(after.getReadmeContent(), equalTo(NOTEBOOK_README));
     List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(folders, hasSize(1));
-    assertThat(folders.getFirst().getName(), equalTo("Existing"));
-    assertThat(folders.getFirst().getReadmeContent(), nullValue());
+    assertThat(folders, hasSize(2));
+    Folder reloadedExisting = folderRepository.findById(existing.getId()).orElseThrow();
+    assertThat(reloadedExisting.getName(), equalTo("Existing"));
+    assertThat(reloadedExisting.getReadmeContent(), nullValue());
+    Folder created =
+        folders.stream()
+            .filter(folder -> folder.getName().equals("Field Notes"))
+            .findFirst()
+            .orElseThrow();
+    assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
   }
 
   @ParameterizedTest
