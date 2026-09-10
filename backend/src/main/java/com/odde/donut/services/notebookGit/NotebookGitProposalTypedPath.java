@@ -4,7 +4,6 @@ import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.validators.AuthoredNoteContent;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import org.yaml.snakeyaml.error.YAMLException;
 
 /** Reads and requires expected frontmatter {@code type} on proposal Markdown paths. */
 final class NotebookGitProposalTypedPath {
@@ -23,40 +22,6 @@ final class NotebookGitProposalTypedPath {
           "Invalid Markdown: path \"" + readmePath + "\" must have type: Readme");
     }
     return readme;
-  }
-
-  static void requireOrdinaryNote(
-      NotebookGitProposalImporter.ImportedProposal proposal, String notePath) {
-    String content =
-        NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), notePath);
-    String type = frontmatterType(content);
-    if (!"Note".equals(type)) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST,
-          "Invalid Markdown: path \""
-              + notePath
-              + "\" has type: "
-              + type
-              + "; must have type: Note");
-    }
-  }
-
-  static boolean authoredTypeEquals(
-      NotebookGitProposalImporter.ImportedProposal proposal, String path, String expectedType) {
-    return authoredTypeEquals(
-        NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), path),
-        expectedType);
-  }
-
-  private static boolean authoredTypeEquals(String content, String expectedType) {
-    try {
-      return NoteLeadingFrontmatter.split(content)
-          .flatMap(split -> split.frontmatter().getString("type"))
-          .filter(expectedType::equals)
-          .isPresent();
-    } catch (YAMLException e) {
-      return false;
-    }
   }
 
   private static String frontmatterType(String content) {

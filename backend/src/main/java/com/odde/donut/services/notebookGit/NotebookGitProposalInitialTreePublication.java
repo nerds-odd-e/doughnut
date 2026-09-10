@@ -9,9 +9,7 @@ import com.odde.donut.testability.TestabilitySettings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
-import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,71 +43,25 @@ class NotebookGitProposalInitialTreePublication {
     this.noteAddition = noteAddition;
   }
 
-  Optional<String> tryAccept(
+  String accept(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
       List<InspectedRegularFile> files) {
-    if ((!state.folders().isEmpty() || !state.liveNotes().isEmpty())
-        && files.stream()
-            .anyMatch(NotebookGitProposalInitialTreePublication::isAddedRootNotebookReadme)
-        && files.stream().allMatch(NotebookGitProposalInitialTreePublication::isAddedReadme)) {
-      assertReadyEmptyNotebook(
-          state,
-          proposal,
-          acceptedHead,
-          "Initial container publication requires an empty notebook.");
+    if (files.isEmpty() || files.stream().anyMatch(file -> !file.path().endsWith(".md"))) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Initial publication requires a nonempty Markdown tree.");
     }
-    if (!state.folders().isEmpty()
-        || !state.liveNotes().isEmpty()
-        || files.isEmpty()
-        || !(files.stream().allMatch(NotebookGitProposalInitialTreePublication::isAddedReadme)
-            || files.stream()
-                .allMatch(
-                    file -> isAddedRootNotebookReadme(file) || isAddedRootMarkdownFile(file)))) {
-      return Optional.empty();
-    }
-    assertReadyEmptyNotebook(
-        state, proposal, acceptedHead, "Initial root publication requires an empty notebook.");
-    String notebookReadmePath =
-        files.stream()
-            .filter(NotebookGitProposalInitialTreePublication::isAddedRootNotebookReadme)
-            .map(InspectedRegularFile::path)
-            .findFirst()
-            .orElse(null);
-    List<String> conceptPaths =
-        files.stream()
-            .filter(NotebookGitProposalInitialTreePublication::isAddedRootMarkdownFile)
-            .map(InspectedRegularFile::path)
-            .toList();
-    List<String> folderReadmePaths =
-        files.stream()
-            .filter(file -> isAddedReadme(file) && !isAddedRootNotebookReadme(file))
-            .map(InspectedRegularFile::path)
-            .toList();
-    return Optional.of(
-        acceptTree(state, proposal, notebookReadmePath, folderReadmePaths, conceptPaths));
-  }
-
-  private static boolean isAddedReadme(InspectedRegularFile file) {
-    return file.acceptedBlobId() == null
-        && file.proposedBlobId() != null
-        && ("README.md".equals(file.path()) || file.path().endsWith("/README.md"));
-  }
-
-  static boolean isAddedRootNotebookReadme(InspectedRegularFile file) {
-    return file.acceptedBlobId() == null
-        && file.proposedBlobId() != null
-        && "README.md".equals(file.path());
-  }
-
-  static boolean isAddedRootMarkdownFile(InspectedRegularFile file) {
-    String path = file.path();
-    return file.acceptedBlobId() == null
-        && file.proposedBlobId() != null
-        && path.indexOf('/') < 0
-        && path.endsWith(".md")
-        && !"README.md".equals(path);
+    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
+        proposal.repository(), proposal.mainHead());
+    List<String> paths = files.stream().map(InspectedRegularFile::path).toList();
+    return acceptTree(
+        state,
+        proposal,
+        paths.contains("README.md") ? "README.md" : null,
+        paths.stream().filter(path -> path.endsWith("/README.md")).toList(),
+        paths.stream()
+            .filter(path -> !path.equals("README.md") && !path.endsWith("/README.md"))
+            .toList());
   }
 
   private String acceptTree(
@@ -135,11 +87,10 @@ class NotebookGitProposalInitialTreePublication {
     List<Note> notes = new ArrayList<>(conceptPaths.size());
     for (String path : conceptPaths) {
       notes.add(
-          noteAddition.apply(
+          noteAddition.applyAtProposedPlacement(
               state.notebook(),
               folders,
               proposal,
-              proposal.mainHead(),
               path,
               testabilitySettings.getCurrentUTCTimestamp()));
     }
@@ -156,35 +107,6 @@ class NotebookGitProposalInitialTreePublication {
         state.notebook(), folders, notes, proposal.repository(), proposal.mainHead());
     return bindingPersistence.accept(
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  String acceptNotesTree(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      String notebookReadmePath,
-      List<String> folderReadmePaths,
-      List<String> notePaths,
-      String emptyNotebookMessage) {
-    assertReadyEmptyNotebook(state, proposal, acceptedHead, emptyNotebookMessage);
-    for (String path : notePaths) {
-      NotebookGitProposalTypedPath.requireOrdinaryNote(proposal, path);
-    }
-    return acceptTree(state, proposal, notebookReadmePath, folderReadmePaths, notePaths);
-  }
-
-  private void assertReadyEmptyNotebook(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      String emptyNotebookMessage) {
-    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-        proposal.repository(), proposal.mainHead());
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
-    if (!state.folders().isEmpty() || !state.liveNotes().isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, emptyNotebookMessage);
-    }
   }
 
   private void storeReadme(

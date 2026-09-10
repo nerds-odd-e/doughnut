@@ -219,7 +219,14 @@ slice rather than hiding that work in its migration.
 
 ### 6. Publish all initial concept placements through one tree interpretation
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+Mixed-tree controller proof covers grouped Story 8 and deeper root/nested/sibling
+placements with exact content/head/tree/path set. Final source review found no
+initial count/depth/exact-shape gate or fallback. Accepted/proposed placement
+entry points preserve destination checks. One prior refusal fixture was actually
+initial; an accepted README now makes it exercise its intended noninitial rule.
+Independent refactor completed without edits; format passed.
 Proof: Controller publication of root and nested concepts, multiple Folders,
 optional Readmes and mixed types yields the authored placements and exact tree.
 Include the grouped SEED-016 Story 8 example and a different depth/count in the

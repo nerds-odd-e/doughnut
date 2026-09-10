@@ -45,16 +45,43 @@ class NotebookGitProposalNoteAddition {
     this.projection = projection;
   }
 
-  Note apply(
+  Note applyAtAcceptedPlacement(
       Notebook notebook,
       List<ExportFolderRow> folders,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       String path,
       Timestamp publishedAt) {
+    return apply(
+        notebook,
+        proposal,
+        path,
+        publishedAt,
+        representedDestinationFolder(folders, proposal, acceptedHead, path));
+  }
+
+  Note applyAtProposedPlacement(
+      Notebook notebook,
+      List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      String path,
+      Timestamp publishedAt) {
+    return apply(
+        notebook,
+        proposal,
+        path,
+        publishedAt,
+        representedDestinationFolder(folders, proposal, proposal.mainHead(), path));
+  }
+
+  private Note apply(
+      Notebook notebook,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      String path,
+      Timestamp publishedAt,
+      Folder destinationFolder) {
     AuthoredNoteDocument document = readValidatedDocument(proposal, path);
     String title = filenameTitle.requireValid(path);
-    Folder destinationFolder = representedDestinationFolder(folders, proposal, acceptedHead, path);
     Note addedNote;
     try {
       addedNote = noteFactory.create(notebook, destinationFolder, title);
@@ -68,10 +95,10 @@ class NotebookGitProposalNoteAddition {
   Folder representedDestinationFolder(
       List<ExportFolderRow> folders,
       NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
+      ObjectId placementHead,
       String path) {
     Integer destinationFolderId =
-        projection.requireRepresentedFolderId(folders, proposal.repository(), acceptedHead, path);
+        projection.requireRepresentedFolderId(folders, proposal.repository(), placementHead, path);
     return destinationFolderId == null
         ? null
         : entityPersister.find(Folder.class, destinationFolderId);

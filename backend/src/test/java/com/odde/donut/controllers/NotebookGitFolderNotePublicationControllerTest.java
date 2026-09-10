@@ -134,11 +134,14 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleCo
   @Test
   void rejectsTheWholeProposalWhenALaterAdditionNeedsAnUnrepresentedParent() throws Exception {
     Notebook notebook = createGitBackedNotebook();
+    notebook.setReadmeContent("---\ntype: Readme\n---\nExisting notebook.\n");
+    notebookRepository.save(notebook);
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposal =
         proposalBundleBytes(
             binding,
             List.of(
+                new NotebookGitProposalFile("README.md", notebook.getReadmeContent()),
                 new NotebookGitProposalFile("Added.md", CREATED_CONTENT),
                 new NotebookGitProposalFile("New Folder/Idea.md", SECOND_CONTENT)));
 

@@ -1,9 +1,7 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -188,9 +186,7 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
         assertProposalRejectedWithoutMutatingBinding(
             notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
 
-    assertThat(
-        exception.getReason(),
-        equalTo("Initial container publication requires an empty notebook."));
+    assertThat(exception.getReason(), containsString("README.md"));
     Notebook after = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(after.getReadmeContent(), equalTo(readmeBefore));
     List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
@@ -201,12 +197,9 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
 
   @ParameterizedTest
   @ValueSource(strings = {"Relationship", "Readme", "CustomType"})
-  void refusesInitialThreePathWhenThirdDocumentIsNotAnOrdinaryNote(String documentType)
-      throws Exception {
+  void publishesInitialNestedConceptWithAnyValidType(String documentType) throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    String readmeBefore =
-        notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent();
     String notePath = "New Folder/First note.md";
     byte[] proposalBytes =
         proposalBundleBytes(
@@ -217,21 +210,11 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
                 new NotebookGitProposalFile(
                     notePath, "---\ntype: " + documentType + "\n---\nBody.\n")));
 
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString(notePath));
-    assertThat(exception.getReason(), containsString(documentType));
-    assertThat(exception.getReason(), containsString("must have type: Note"));
-    Notebook after = notebookRepository.findById(notebook.getId()).orElseThrow();
-    assertThat(after.getReadmeContent(), equalTo(readmeBefore));
-    inCommittedTransaction(
-        transactionManager,
-        () -> {
-          assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-          assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-        });
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(notes, hasSize(1));
+    assertThat(
+        notes.getFirst().getContent(), equalTo("---\ntype: " + documentType + "\n---\nBody.\n"));
   }
 }
