@@ -6,7 +6,6 @@ import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
   checkoutState,
-  commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
   structuralChangeRefusal,
@@ -15,6 +14,7 @@ import {
   ACCEPTED_THIRD_NOTE,
   NOT_EXISTING_NOTE_CONTENT_EDIT,
   prepareTwoNoteBatchDivergence,
+  THREE_NOTE_LOCAL_CHANGES,
   TWO_NOTE_UNSUPPORTED_ACCEPTED,
 } from './notebookPull.twoNoteBatch.testHelpers.js'
 
@@ -29,7 +29,15 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
         shape: 'overlap-root',
         prepare: () =>
           prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-            localPaths: 'overlap-root',
+            acceptedChangeSets: [
+              [
+                {
+                  path: 'note.md',
+                  content:
+                    '---\ntype: Note\n---\n# Alpha\n\nAccepted overlapping root.\n',
+                },
+              ],
+            ],
           }),
         message: TWO_NOTE_UNSUPPORTED_ACCEPTED,
       },
@@ -37,7 +45,15 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
         shape: 'overlap-nested',
         prepare: () =>
           prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-            localPaths: 'overlap-nested',
+            acceptedChangeSets: [
+              [
+                {
+                  path: 'Nested/Cell.md',
+                  content:
+                    '---\ntype: Note\n---\n# Nested\n\nAccepted overlapping nested.\n',
+                },
+              ],
+            ],
           }),
         message: TWO_NOTE_UNSUPPORTED_ACCEPTED,
       },
@@ -45,20 +61,15 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
         shape: 'extra-accepted-edge',
         prepare: () =>
           prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-            remote: (source) => {
-              commitPortableFile(
-                source,
-                'gamma.md',
-                '---\ntype: Note\n---\n# Gamma\n\nFirst accepted.\n',
-                'accepted first save'
-              )
-              commitPortableFile(
-                source,
-                'gamma.md',
-                ACCEPTED_THIRD_NOTE,
-                'accepted second save'
-              )
-            },
+            acceptedChangeSets: [
+              [
+                {
+                  path: 'gamma.md',
+                  content: '---\ntype: Note\n---\n# Gamma\n\nFirst accepted.\n',
+                },
+              ],
+              [{ path: 'gamma.md', content: ACCEPTED_THIRD_NOTE }],
+            ],
           }),
         message: TWO_NOTE_UNSUPPORTED_ACCEPTED,
       },
@@ -66,26 +77,16 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
         shape: 'net-equivalent-interval',
         prepare: () =>
           prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-            remote: (source) => {
-              commitPortableFile(
-                source,
-                'gamma.md',
-                ACCEPTED_THIRD_NOTE,
-                'accepted save'
-              )
-              commitPortableFile(
-                source,
-                'gamma.md',
-                '---\ntype: Note\n---\n# Gamma\n\nIntermediate.\n',
-                'accepted intermediate'
-              )
-              commitPortableFile(
-                source,
-                'gamma.md',
-                ACCEPTED_THIRD_NOTE,
-                'accepted restore to same bytes'
-              )
-            },
+            acceptedChangeSets: [
+              [{ path: 'gamma.md', content: ACCEPTED_THIRD_NOTE }],
+              [
+                {
+                  path: 'gamma.md',
+                  content: '---\ntype: Note\n---\n# Gamma\n\nIntermediate.\n',
+                },
+              ],
+              [{ path: 'gamma.md', content: ACCEPTED_THIRD_NOTE }],
+            ],
           }),
         message: TWO_NOTE_UNSUPPORTED_ACCEPTED,
       },
@@ -105,7 +106,7 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
         shape: 'three-local-edits',
         prepare: () =>
           prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-            localPaths: 'three-notes',
+            localChanges: THREE_NOTE_LOCAL_CHANGES,
           }),
         message: NOT_EXISTING_NOTE_CONTENT_EDIT,
       },
@@ -113,18 +114,15 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
         shape: 'accepted-multi-path-save',
         prepare: () =>
           prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-            remote: (source) => {
-              fs.writeFileSync(join(source, 'gamma.md'), ACCEPTED_THIRD_NOTE)
-              fs.writeFileSync(
-                join(source, 'note.md'),
-                '---\ntype: Note\n---\n# Alpha\n\nAlso accepted.\n'
-              )
-              runGit(['add', 'gamma.md', 'note.md'], source)
-              runGit(
-                ['commit', '--quiet', '-m', 'accepted multi-path save'],
-                source
-              )
-            },
+            acceptedChangeSets: [
+              [
+                { path: 'gamma.md', content: ACCEPTED_THIRD_NOTE },
+                {
+                  path: 'note.md',
+                  content: '---\ntype: Note\n---\n# Alpha\n\nAlso accepted.\n',
+                },
+              ],
+            ],
           }),
         message: TWO_NOTE_UNSUPPORTED_ACCEPTED,
       },
@@ -132,14 +130,14 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
         shape: 'accepted-addition',
         prepare: () =>
           prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-            remote: (source) => {
-              commitPortableFile(
-                source,
-                'added.md',
-                '---\ntype: Note\n---\n# Added\n\nNew note.\n',
-                'accepted addition'
-              )
-            },
+            acceptedChangeSets: [
+              [
+                {
+                  path: 'added.md',
+                  content: '---\ntype: Note\n---\n# Added\n\nNew note.\n',
+                },
+              ],
+            ],
           }),
         message: structuralChangeRefusal('added.md'),
       },
@@ -147,20 +145,20 @@ export function describeNotebookPullTwoNoteBatchRejection(): void {
         shape: 'creation-then-save',
         prepare: () =>
           prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-            remote: (source) => {
-              commitPortableFile(
-                source,
-                'added.md',
-                '---\ntype: Note\n---\n# Added\n\nNew note.\n',
-                'accepted addition'
-              )
-              commitPortableFile(
-                source,
-                'added.md',
-                '---\ntype: Note\n---\n# Added\n\nSaved.\n',
-                'accepted creation follow-on save'
-              )
-            },
+            acceptedChangeSets: [
+              [
+                {
+                  path: 'added.md',
+                  content: '---\ntype: Note\n---\n# Added\n\nNew note.\n',
+                },
+              ],
+              [
+                {
+                  path: 'added.md',
+                  content: '---\ntype: Note\n---\n# Added\n\nSaved.\n',
+                },
+              ],
+            ],
           }),
         message: TWO_NOTE_UNSUPPORTED_ACCEPTED,
       },

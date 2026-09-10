@@ -46,11 +46,10 @@ export function describeNotebookPublishResolvedContinuation(): void {
       expect(postCount(ctx.getFetchMock())).toBe(0)
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
 
-      continuePausedRebaseWithChosenBytes(
-        setup.directory,
-        SPACED_NOTE_PATH,
-        BODY_CHOSEN
-      )
+      continuePausedRebaseWithChosenBytes(setup.directory, {
+        path: SPACED_NOTE_PATH,
+        content: BODY_CHOSEN,
+      })
       const resolvedHead = runGit(['rev-parse', 'HEAD'], setup.directory)
       const acceptedBundle = join(ctx.getWorkDir(), 'accepted-B.bundle')
       bundleMain(setup.source, acceptedBundle)

@@ -20,6 +20,7 @@ import {
   LOCAL_NESTED_NOTE,
   LOCAL_ROOT_NOTE,
   prepareTwoNoteBatchDivergence,
+  THREE_NOTE_LOCAL_CHANGES,
 } from './notebookPull.twoNoteBatch.testHelpers.js'
 
 function alreadyBasedMessage(
@@ -97,8 +98,8 @@ export function describeNotebookPullAlreadyBased(): void {
 
     test('accepts an already-based content batch spanning more than two paths without rewriting it', async () => {
       const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
-        localPaths: 'three-notes',
-        remote: () => undefined,
+        localChanges: THREE_NOTE_LOCAL_CHANGES,
+        acceptedChangeSets: [],
       })
       serveAcceptedBundle(ctx, setup.source, 'already-based-three-note-batch')
       const before = checkoutState(setup.directory)

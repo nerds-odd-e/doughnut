@@ -54,11 +54,10 @@ export function describeNotebookPullResolvedContinuation(): void {
       )
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
 
-      continuePausedRebaseWithChosenBytes(
-        setup.directory,
-        SPACED_NOTE_PATH,
-        BODY_CHOSEN
-      )
+      continuePausedRebaseWithChosenBytes(setup.directory, {
+        path: SPACED_NOTE_PATH,
+        content: BODY_CHOSEN,
+      })
 
       const resolvedHead = runGit(['rev-parse', 'HEAD'], setup.directory)
       expect(
@@ -116,11 +115,10 @@ export function describeNotebookPullResolvedContinuation(): void {
       await expect(run(['notebook', 'pull', setup.directory])).rejects.toThrow(
         ProcessExitForTest
       )
-      continuePausedRebaseWithChosenBytes(
-        setup.directory,
-        NESTED_YAML_PATH,
-        YAML_CHOSEN
-      )
+      continuePausedRebaseWithChosenBytes(setup.directory, {
+        path: NESTED_YAML_PATH,
+        content: YAML_CHOSEN,
+      })
 
       expect(
         fs.readFileSync(join(setup.directory, NESTED_YAML_PATH), 'utf8')
@@ -140,11 +138,10 @@ export function describeNotebookPullResolvedContinuation(): void {
       await expect(run(['notebook', 'pull', setup.directory])).rejects.toThrow(
         ProcessExitForTest
       )
-      skipPausedRebaseWithChosenBytes(
-        setup.directory,
-        SPACED_NOTE_PATH,
-        BODY_ACCEPTED
-      )
+      skipPausedRebaseWithChosenBytes(setup.directory, {
+        path: SPACED_NOTE_PATH,
+        content: BODY_ACCEPTED,
+      })
 
       expect(runGit(['rev-parse', 'HEAD'], setup.directory)).toBe(
         setup.acceptedHead

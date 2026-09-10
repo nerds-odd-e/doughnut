@@ -125,7 +125,7 @@ Safe stop: all currently eligible pulls retain their existing outcomes.
 
 ### 3. Express existing pull fixtures as authored file changes
 Type: Structure
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes, medium confidence, including focused proof and cleanup.
 
 Internal change: replace scenario-name switches in
@@ -281,3 +281,12 @@ Slice 2: per-path LF absorption plus `git diff --cached --quiet` against HEAD
 replayed) replaces the old single-conflict-path special case for deciding
 continue vs. skip. No behavioral change for currently eligible cases; this
 unblocks slice 4's multi-path batches without any path-count branch.
+
+Slice 3: `notebookPull.twoNoteBatch.testHelpers.ts` now takes `{ baseFiles?,
+localChanges?, acceptedChangeSets? }` (an ordered list of accepted commits,
+each a file-change collection) instead of a scenario-name switch; the
+conflict-resolution helper stages a collection before one continue/skip
+command. The shared `{ path, content }` shape and the multi-file commit helper
+were consolidated into `notebookPull.testHelpers.ts` (`commitPortableFile` now
+delegates to `commitFileChangeSet`) rather than duplicated across files. No
+behavior change; this supplies slice 4's fixture shape.

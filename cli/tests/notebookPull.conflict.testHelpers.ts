@@ -5,6 +5,7 @@ import { runGit } from './notebookClone.testHelpers.js'
 import {
   cloneWithLocalNoteEdit,
   commitPortableFile,
+  type FileChange,
 } from './notebookPull.testHelpers.js'
 
 export const SPACED_NOTE_PATH = 'Topic Folder/My Note.md'
@@ -69,30 +70,30 @@ function runTestOwnedRebase(
   }
 }
 
-function stageChosenBytes(
+function stageChosenFiles(
   directory: string,
-  relativePath: string,
-  chosenBytes: string
+  changes: FileChange | readonly FileChange[]
 ): void {
-  fs.writeFileSync(join(directory, relativePath), chosenBytes)
-  runGit(['add', '--', relativePath], directory)
+  const collection = Array.isArray(changes) ? changes : [changes]
+  for (const { path, content } of collection) {
+    fs.writeFileSync(join(directory, path), content)
+    runGit(['add', '--', path], directory)
+  }
 }
 
 export function continuePausedRebaseWithChosenBytes(
   directory: string,
-  relativePath: string,
-  chosenBytes: string
+  changes: FileChange | readonly FileChange[]
 ): void {
-  stageChosenBytes(directory, relativePath, chosenBytes)
+  stageChosenFiles(directory, changes)
   runTestOwnedRebase(directory, 'continue')
 }
 
 export function skipPausedRebaseWithChosenBytes(
   directory: string,
-  relativePath: string,
-  chosenBytes: string
+  changes: FileChange | readonly FileChange[]
 ): void {
-  stageChosenBytes(directory, relativePath, chosenBytes)
+  stageChosenFiles(directory, changes)
   runTestOwnedRebase(directory, 'skip')
 }
 

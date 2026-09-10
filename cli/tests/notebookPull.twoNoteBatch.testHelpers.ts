@@ -1,5 +1,3 @@
-import * as fs from 'node:fs'
-import { join } from 'node:path'
 import { getApiConfig } from 'donut-api'
 import { LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION } from '../src/commands/notebook/notebookLocalCandidate.js'
 import { runGit } from './notebookClone.testHelpers.js'
@@ -7,7 +5,11 @@ import {
   buildSourceRepo,
   cloneAsBoundCheckout,
 } from './notebookPublish.testHelpers.js'
-import { commitPortableFile } from './notebookPull.testHelpers.js'
+import {
+  commitFileChangeSet,
+  commitPortableFile,
+  type FileChange,
+} from './notebookPull.testHelpers.js'
 
 export const LOCAL_ROOT_NOTE =
   '---\ntype: Note\nauthored: root-local\n---\n# Alpha\n\nLocal root body.\n'
@@ -23,11 +25,44 @@ export const TWO_NOTE_UNSUPPORTED_ACCEPTED =
 export const NOT_EXISTING_NOTE_CONTENT_EDIT =
   'Local main cannot receive the accepted history because the unpublished commit is not one existing-note content edit. Recreate it as one unpublished commit that edits one existing ordinary Markdown note at an unchanged path, then try again.'
 
+// The base repo files present on the accepted side before either the local checkout diverges
+// or any further accepted commits are applied.
+const DEFAULT_BASE_FILES: FileChange[] = [
+  {
+    path: 'Nested/Cell.md',
+    content: '---\ntype: Note\n---\n# Nested\n\nOriginal nested.\n',
+  },
+  {
+    path: 'gamma.md',
+    content: '---\ntype: Note\n---\n# Gamma\n\nOriginal third.\n',
+  },
+]
+
+// The one unpublished local commit's file changes for the canonical root-and-nested batch.
+export const CANONICAL_LOCAL_CHANGES: FileChange[] = [
+  { path: 'note.md', content: LOCAL_ROOT_NOTE },
+  { path: 'Nested/Cell.md', content: LOCAL_NESTED_NOTE },
+]
+
+// A three-path local batch: the canonical two edits plus a third path that already carries the
+// accepted third-note's bytes (used both for the batch-size refusal and the already-based case).
+export const THREE_NOTE_LOCAL_CHANGES: FileChange[] = [
+  ...CANONICAL_LOCAL_CHANGES,
+  { path: 'gamma.md', content: ACCEPTED_THIRD_NOTE },
+]
+
+// The default single-commit accepted interval: one disjoint third-note save.
+const DEFAULT_ACCEPTED_CHANGE_SETS: FileChange[][] = [
+  [{ path: 'gamma.md', content: ACCEPTED_THIRD_NOTE }],
+]
+
 export function prepareTwoNoteBatchDivergence(
   workDir: string,
   options?: {
+    baseFiles?: FileChange[]
+    localChanges?: FileChange[]
+    acceptedChangeSets?: FileChange[][]
     remote?: (source: string) => void
-    localPaths?: 'canonical' | 'three-notes' | 'overlap-root' | 'overlap-nested'
   }
 ): {
   directory: string
@@ -36,19 +71,9 @@ export function prepareTwoNoteBatchDivergence(
   acceptedHead: string
 } {
   const source = buildSourceRepo(workDir)
-  fs.mkdirSync(join(source, 'Nested'))
-  commitPortableFile(
-    source,
-    'Nested/Cell.md',
-    '---\ntype: Note\n---\n# Nested\n\nOriginal nested.\n',
-    'add nested note'
-  )
-  commitPortableFile(
-    source,
-    'gamma.md',
-    '---\ntype: Note\n---\n# Gamma\n\nOriginal third.\n',
-    'add third note'
-  )
+  for (const file of options?.baseFiles ?? DEFAULT_BASE_FILES) {
+    commitPortableFile(source, file.path, file.content, `add ${file.path}`)
+  }
   const directory = cloneAsBoundCheckout(
     workDir,
     source,
@@ -56,43 +81,20 @@ export function prepareTwoNoteBatchDivergence(
     'checkout'
   )
 
-  const localShape = options?.localPaths ?? 'canonical'
-  if (localShape === 'three-notes') {
-    fs.writeFileSync(join(directory, 'note.md'), LOCAL_ROOT_NOTE)
-    fs.writeFileSync(join(directory, 'Nested/Cell.md'), LOCAL_NESTED_NOTE)
-    fs.writeFileSync(join(directory, 'gamma.md'), ACCEPTED_THIRD_NOTE)
-    runGit(['add', 'note.md', 'Nested/Cell.md', 'gamma.md'], directory)
-  } else {
-    fs.writeFileSync(join(directory, 'note.md'), LOCAL_ROOT_NOTE)
-    fs.writeFileSync(join(directory, 'Nested/Cell.md'), LOCAL_NESTED_NOTE)
-    runGit(['add', 'note.md', 'Nested/Cell.md'], directory)
-  }
-  runGit(['commit', '--quiet', '-m', 'unpublished two-note batch'], directory)
+  commitFileChangeSet(
+    directory,
+    options?.localChanges ?? CANONICAL_LOCAL_CHANGES,
+    'unpublished two-note batch'
+  )
   const localTip = runGit(['rev-parse', 'HEAD'], directory)
 
   if (options?.remote !== undefined) {
     options.remote(source)
-  } else if (localShape === 'overlap-root') {
-    commitPortableFile(
-      source,
-      'note.md',
-      '---\ntype: Note\n---\n# Alpha\n\nAccepted overlapping root.\n',
-      'accepted overlapping root save'
-    )
-  } else if (localShape === 'overlap-nested') {
-    commitPortableFile(
-      source,
-      'Nested/Cell.md',
-      '---\ntype: Note\n---\n# Nested\n\nAccepted overlapping nested.\n',
-      'accepted overlapping nested save'
-    )
   } else {
-    commitPortableFile(
-      source,
-      'gamma.md',
-      ACCEPTED_THIRD_NOTE,
-      'accepted third-note save'
-    )
+    for (const changeSet of options?.acceptedChangeSets ??
+      DEFAULT_ACCEPTED_CHANGE_SETS) {
+      commitFileChangeSet(source, changeSet, 'accepted save')
+    }
   }
 
   return {
