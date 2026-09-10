@@ -111,17 +111,44 @@ export function startPausedSameLineRebase(directory: string): void {
   }
 }
 
+/** A file path and the content it should hold, for staging or committing. */
+export interface FileChange {
+  path: string
+  content: string
+}
+
+function writeAndStageFileChanges(
+  directory: string,
+  changes: readonly FileChange[]
+): void {
+  for (const { path, content } of changes) {
+    const absolutePath = join(directory, path)
+    fs.mkdirSync(dirname(absolutePath), { recursive: true })
+    fs.writeFileSync(absolutePath, content)
+  }
+  runGit(['add', ...changes.map((change) => change.path)], directory)
+}
+
+export function commitFileChangeSet(
+  directory: string,
+  changes: readonly FileChange[],
+  message: string
+): void {
+  writeAndStageFileChanges(directory, changes)
+  runGit(['commit', '--quiet', '-m', message], directory)
+}
+
 export function commitPortableFile(
   directory: string,
   relativePath: string,
   bytes: string,
   message: string
 ): void {
-  const absolutePath = join(directory, relativePath)
-  fs.mkdirSync(dirname(absolutePath), { recursive: true })
-  fs.writeFileSync(absolutePath, bytes)
-  runGit(['add', relativePath], directory)
-  runGit(['commit', '--quiet', '-m', message], directory)
+  commitFileChangeSet(
+    directory,
+    [{ path: relativePath, content: bytes }],
+    message
+  )
 }
 
 export function serveAcceptedBundle(

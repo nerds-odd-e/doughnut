@@ -23,14 +23,16 @@ import { describeNotebookPullLocalCandidate } from './notebookPull.localCandidat
 import { describeNotebookPullAbsorbed } from './notebookPull.absorbed.suite.js'
 import { describeNotebookPullPathOverlap } from './notebookPull.pathOverlap.suite.js'
 import { describeNotebookPullStructuralHistory } from './notebookPull.structuralHistory.suite.js'
-import { describeNotebookPullCreationFollowOnRefusal } from './notebookPull.structuralHistory.creationFollowOn.suite.js'
+import { describeNotebookPullCreationFollowOnComposition } from './notebookPull.structuralHistory.creationFollowOn.suite.js'
 import { describeNotebookPullRebase } from './notebookPull.rebase.suite.js'
 import { describeNotebookPullAddition } from './notebookPull.addition.suite.js'
+import { describeNotebookPullAdditionComposition } from './notebookPull.additionComposition.suite.js'
 import { describeNotebookPullConflict } from './notebookPull.conflict.suite.js'
 import { describeNotebookPullResolvedContinuation } from './notebookPull.resolvedContinuation.suite.js'
 import { describeNotebookPullAbort } from './notebookPull.abort.suite.js'
 import { describeNotebookPullTwoNoteBatch } from './notebookPull.twoNoteBatch.suite.js'
 import { describeNotebookPullTwoNoteBatchRejection } from './notebookPull.twoNoteBatch.rejection.suite.js'
+import { describeNotebookPullContentBatch } from './notebookPull.contentBatch.suite.js'
 import { describeNotebookPullExactSubtreeMove } from './notebookPull.exactSubtreeMove.suite.js'
 import { describeNotebookPullExactSubtreeMoveRefusal } from './notebookPull.exactSubtreeMove.refusal.suite.js'
 
@@ -126,13 +128,15 @@ export function describeNotebookPullAcceptedHistory(): void {
   describeNotebookPullPathOverlap()
   describeNotebookPullAbsorbed()
   describeNotebookPullStructuralHistory()
-  describeNotebookPullCreationFollowOnRefusal()
+  describeNotebookPullCreationFollowOnComposition()
   describeNotebookPullExactSubtreeMove()
   describeNotebookPullExactSubtreeMoveRefusal()
   describeNotebookPullRebase()
   describeNotebookPullTwoNoteBatch()
   describeNotebookPullTwoNoteBatchRejection()
+  describeNotebookPullContentBatch()
   describeNotebookPullAddition()
+  describeNotebookPullAdditionComposition()
   describeNotebookPullConflict()
   describeNotebookPullResolvedContinuation()
   describeNotebookPullAbort()

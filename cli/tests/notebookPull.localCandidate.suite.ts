@@ -51,10 +51,6 @@ export function describeNotebookPullLocalCandidate(): void {
         shape: 'mode',
         message: NOT_EXISTING_NOTE_CONTENT_EDIT,
       },
-      {
-        shape: 'two-note-batch',
-        message: NOT_EXISTING_NOTE_CONTENT_EDIT,
-      },
     ] as const)(
       'explains unsupported $shape local history without changing the checkout',
       async ({ shape, message }) => {

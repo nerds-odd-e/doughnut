@@ -59,10 +59,10 @@ function quoteForGitCommand(relativePath: string): string {
 
 function describePausedRebaseConflict(
   directory: string,
-  conflictPaths: string[]
+  remainingConflictPaths: string[]
 ): string {
-  const named = conflictPaths.map((p) => `"${p}"`).join(', ')
-  const addExamples = conflictPaths
+  const named = remainingConflictPaths.map((p) => `"${p}"`).join(', ')
+  const addExamples = remainingConflictPaths
     .map((p) => `git add -- ${quoteForGitCommand(p)}`)
     .join(', then ')
   return (
@@ -99,13 +99,11 @@ function isFinalLfOnlyEquivalent(accepted: string, local: string): boolean {
   return accepted === `${local}\n` || local === `${accepted}\n`
 }
 
-function tryAbsorbFinalLfOnlyConflict(
+function tryAbsorbFinalLfOnlyConflictPath(
   directory: string,
-  conflictPaths: string[]
+  relativePath: string
 ): boolean {
-  if (conflictPaths.length !== 1) return false
-  const relativePath = conflictPaths[0]
-  if (relativePath === undefined || !relativePath.endsWith('.md')) return false
+  if (!relativePath.endsWith('.md')) return false
   const accepted = stageBlobBytes(directory, 2, relativePath)
   const local = stageBlobBytes(directory, 3, relativePath)
   if (accepted === undefined || local === undefined) return false
@@ -121,13 +119,16 @@ function tryAbsorbFinalLfOnlyConflict(
     (detail, status) =>
       `failed to stage the accepted note while absorbing a final-LF-only conflict${detail ? `: ${detail}` : ` (exit code ${status})`}`
   )
-  runSystemGitOrThrow(
-    ['-C', directory, 'rebase', '--skip'],
-    (detail, status) =>
-      `failed to discard the redundant local replay after a final-LF-only conflict${detail ? `: ${detail}` : ` (exit code ${status})`}`,
-    { env: { ...process.env, ...REBASE_EDITOR_ENV } }
-  )
   return true
+}
+
+function stagedChangeSurvivesOntoPoint(directory: string): boolean {
+  const result = spawnSync(
+    'git',
+    ['-C', directory, 'diff', '--cached', '--quiet'],
+    { encoding: 'utf8' }
+  )
+  return result.status !== 0
 }
 
 /**
@@ -167,10 +168,25 @@ export function rebaseUnpublishedCommit(
   } catch (e) {
     const conflictPaths = pausedRebaseConflictPaths(directory)
     if (conflictPaths === undefined) throw e
-    if (tryAbsorbFinalLfOnlyConflict(directory, conflictPaths)) return
-    const cause = e instanceof Error ? e.message : String(e)
-    throw new Error(
-      `${describePausedRebaseConflict(directory, conflictPaths)}\n${cause}`
+    const remainingConflictPaths = conflictPaths.filter(
+      (relativePath) =>
+        !tryAbsorbFinalLfOnlyConflictPath(directory, relativePath)
     )
+    if (remainingConflictPaths.length > 0) {
+      const cause = e instanceof Error ? e.message : String(e)
+      throw new Error(
+        `${describePausedRebaseConflict(directory, remainingConflictPaths)}\n${cause}`
+      )
+    }
+    const action = stagedChangeSurvivesOntoPoint(directory)
+      ? 'continue'
+      : 'skip'
+    runSystemGitOrThrow(
+      ['-C', directory, 'rebase', `--${action}`],
+      (detail, status) =>
+        `failed to ${action === 'continue' ? 'continue the rebase after absorbing a final-LF-only conflict' : 'discard the redundant local replay after absorbing a final-LF-only conflict'}${detail ? `: ${detail}` : ` (exit code ${status})`}`,
+      { env: { ...process.env, ...REBASE_EDITOR_ENV } }
+    )
+    return
   }
 }

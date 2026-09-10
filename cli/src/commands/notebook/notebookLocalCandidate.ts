@@ -28,8 +28,8 @@ const LOCAL_NOT_CONTENT_EDIT =
 export const LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION =
   'Local work is preserved; reconcile or recreate it as one supported commit directly on accepted history before publication.'
 
-const LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED =
-  'Local main cannot receive the accepted history because the two-note unpublished commit can only rebase over exactly one accepted content save of a different existing ordinary Markdown note. ' +
+const LOCAL_NON_LINEAR_ACCEPTED =
+  'Local main cannot receive the accepted history because the accepted history since the local parent is not one contiguous chain of saves. ' +
   LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION
 
 function structuralChangeError(changedPath: string): string {
@@ -52,16 +52,19 @@ export type UnpublishedLocalHistoryDecision =
 
 /**
  * Returns fast-forward when local main is already an ancestor of accepted.
- * Eligible one-note content edits already based on accepted main stay as-is.
- * Eligible one-note content edits rebase over content-only accepted history,
- * including same-note content edits, and over one accepted ordinary-note
- * addition at the root or an already represented folder, optionally followed
- * by one content save of that same newly added note.
+ * Any nonempty ordinary-content-edit unpublished commit already based on
+ * accepted main stays as-is, independent of its path count.
+ * Any nonempty ordinary-content-edit unpublished commit rebases over a
+ * contiguous single-parent chain of accepted content-only edits, independent
+ * of local path count, accepted commit count, or accepted path count per
+ * commit; and over a contiguous chain in which each accepted commit contains
+ * only ordinary-note content saves and/or ordinary note additions at the
+ * root or a folder already represented in that commit's preceding accepted
+ * tree, independent of how many additions or saves each commit carries or
+ * how they are grouped across commits.
  * Eligible one-note content edits of a descendant under one accepted exact
- * same-name subtree relocation replay onto the mapped path.
- * Eligible two-note content edits rebase only over exactly one accepted
- * content save of a third different existing ordinary note whose sole parent
- * is the local parent.
+ * same-name subtree relocation replay onto the mapped path; batches of more
+ * than one local path do not use that replay.
  */
 export function inspectUnpublishedLocalHistory(
   acceptedRepoDir: string,
@@ -97,16 +100,8 @@ export function inspectUnpublishedLocalHistory(
   if (localPaths === undefined) {
     return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
   }
-  if (localPaths.length === 2) {
-    return decideTwoNoteBatchRebase(
-      acceptedRepoDir,
-      parent,
-      acceptedHead,
-      localPaths
-    )
-  }
-  if (localPaths.length !== 1) {
-    return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
+  if (parent === acceptedHead) {
+    return { kind: 'already-based' }
   }
 
   const acceptedInterval = inspectAcceptedInterval(
@@ -114,9 +109,13 @@ export function inspectUnpublishedLocalHistory(
     parent,
     acceptedHead
   )
+  if (acceptedInterval.kind === 'non-linear') {
+    return { kind: 'reject', message: LOCAL_NON_LINEAR_ACCEPTED }
+  }
   if (acceptedInterval.kind === 'exact-subtree-move') {
     const [localPath] = localPaths
     if (
+      localPaths.length !== 1 ||
       localPath === undefined ||
       mapPathUnderExactSubtree(localPath, acceptedInterval.mapping) ===
         undefined
@@ -138,70 +137,7 @@ export function inspectUnpublishedLocalHistory(
       message: structuralChangeError(acceptedInterval.path),
     }
   }
-  if (parent === acceptedHead) {
-    return { kind: 'already-based' }
-  }
   return { kind: 'rebase', localParent: parent }
-}
-
-function decideTwoNoteBatchRebase(
-  acceptedRepoDir: string,
-  localParent: string,
-  acceptedHead: string,
-  localPaths: string[]
-): UnpublishedLocalHistoryDecision {
-  if (localParent === acceptedHead) {
-    return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
-  }
-
-  const interval = listCommits(
-    acceptedRepoDir,
-    '--reverse',
-    acceptedHead,
-    '--not',
-    localParent
-  )
-  if (interval.length !== 1) {
-    return { kind: 'reject', message: LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED }
-  }
-
-  const [accepted] = interval
-  if (
-    accepted === undefined ||
-    accepted.parents.length !== 1 ||
-    accepted.parents[0] !== localParent
-  ) {
-    return { kind: 'reject', message: LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED }
-  }
-
-  const acceptedPaths = ordinaryNoteContentEditPaths(
-    acceptedRepoDir,
-    localParent,
-    accepted.sha
-  )
-  if (acceptedPaths === undefined) {
-    const structural = listCommitChanges(
-      acceptedRepoDir,
-      localParent,
-      accepted.sha
-    ).find((change) => !isOrdinaryNoteContentChange(change))
-    return {
-      kind: 'reject',
-      message:
-        structural !== undefined
-          ? structuralChangeError(structural.path)
-          : LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED,
-    }
-  }
-  const [acceptedPath] = acceptedPaths
-  if (
-    acceptedPaths.length !== 1 ||
-    acceptedPath === undefined ||
-    localPaths.includes(acceptedPath)
-  ) {
-    return { kind: 'reject', message: LOCAL_TWO_NOTE_UNSUPPORTED_ACCEPTED }
-  }
-  return { kind: 'rebase', localParent }
 }
 
 function ordinaryNoteContentEditPaths(

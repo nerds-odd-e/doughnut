@@ -85,7 +85,7 @@ product tests have been run for this planning-only task.
 
 ### 1. Keep an already-based content batch unchanged
 Type: Behavior
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes, medium confidence, including focused proof and cleanup.
 
 Behavior: a clean bound checkout has one ordinary content-edit commit on the
@@ -106,7 +106,7 @@ Safe stop: already-based work is usable; divergent behavior is unchanged.
 
 ### 2. Make the common replay lifecycle preserve the complete commit
 Type: Structure
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes, medium confidence, including focused proof and cleanup.
 
 Internal change: replace whole-commit skipping based on one equivalent conflict
@@ -125,7 +125,7 @@ Safe stop: all currently eligible pulls retain their existing outcomes.
 
 ### 3. Express existing pull fixtures as authored file changes
 Type: Structure
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes, medium confidence, including focused proof and cleanup.
 
 Internal change: replace scenario-name switches in
@@ -143,7 +143,7 @@ Safe stop: current product behavior is unchanged.
 
 ### 4. Reconcile content batches over a linear content history
 Type: Behavior
-Status: planned
+Status: done
 Sizing hypothesis: 6–8 minutes, medium confidence; scrutinized above the
 5-minute target. This is one batch-reconciliation outcome and one pull proof loop.
 Slices 2–3 remove replay and fixture preparation from this leaf; safety
@@ -183,7 +183,7 @@ Accepted additions remain a required unfinished promise until slice 5.
 
 ### 5. Receive composed ordinary additions and saves
 Type: Behavior
-Status: planned
+Status: done
 Sizing hypothesis: 6–8 minutes, medium confidence, including focused proof and cleanup.
 Above-target scrutiny: one additional eligible operation kind uses slice 4's
 chain and replay model; existing addition fixtures already construct real bundles.
@@ -270,4 +270,60 @@ implemented or tested.
 
 ## Learnings
 
-None from execution yet.
+Slice 1: the already-based check moved earlier (before the two-note dispatch)
+made `decideTwoNoteBatchRebase`'s own `localParent === acceptedHead` guard
+dead code; removed it during the refactor pass and documented the invariant
+its caller now guarantees. No other help/comment text claimed an already-based
+cardinality limit, so no diagnostic text needed correcting.
+
+Slice 2: per-path LF absorption plus `git diff --cached --quiet` against HEAD
+(the rebase onto-point, verified empirically since only one commit is ever
+replayed) replaces the old single-conflict-path special case for deciding
+continue vs. skip. No behavioral change for currently eligible cases; this
+unblocks slice 4's multi-path batches without any path-count branch.
+
+Slice 3: `notebookPull.twoNoteBatch.testHelpers.ts` now takes `{ baseFiles?,
+localChanges?, acceptedChangeSets? }` (an ordered list of accepted commits,
+each a file-change collection) instead of a scenario-name switch; the
+conflict-resolution helper stages a collection before one continue/skip
+command. The shared `{ path, content }` shape and the multi-file commit helper
+were consolidated into `notebookPull.testHelpers.ts` (`commitPortableFile` now
+delegates to `commitFileChangeSet`) rather than duplicated across files. No
+behavior change; this supplies slice 4's fixture shape.
+
+Slice 4: removed `decideTwoNoteBatchRebase` and the local-path-count dispatch;
+any nonempty ordinary-content-edit batch now goes through the shared
+`inspectAcceptedInterval` classifier. Added an explicit
+`isContiguousSingleParentChain` check (a merge or other non-linear shape
+reachable from acceptedHead was not previously caught when every individual
+edge was content-only) and a `localPaths.length !== 1` guard on the
+exact-subtree-move branch (that replay must stay single-path-only now that the
+cardinality dispatch no longer implies it). Converted 7 rejection cases that
+were refused only by the old dispatcher into success/behavioral proof, added a
+real `git merge --no-ff` fixture for the new non-linear refusal, and added
+`notebookPull.contentBatch.suite.ts` covering batch success, non-overlap
+combine, two-file conflict pause/continue/abort, LF-absorption plus valuable
+edit, and fully-redundant batches. Environmental note: concurrent vitest
+processes on this machine caused spurious timeouts twice during this slice's
+execution and wrap-up; a clean solo re-run always passed 95/95 — treat any
+single-run failure as suspect until reproduced without contention.
+
+Slice 5 (final): `isEligibleBoundedAcceptedAdditionInterval` was rewritten as
+a per-edge walk (renamed `isEligibleAcceptedAdditionInterval` since it is no
+longer bounded) classifying every changed path in each commit against that
+edge's own preceding tree as an addition (destination must already be
+represented) or a content save, requiring at least one addition or deferring
+to the content-only path. The single-parent-chain check duplicated across
+this file, `isContiguousSingleParentChain`, and
+`exactSubtreeMappingForSingleEdge` was consolidated into a shared
+`hasSingleParent` predicate in `notebookAcceptedCommitChanges.ts`. Two
+structural-history refusal shapes (`two-additions`, `addition-with-edit`)
+converted to success once compatible; `creationFollowOnComposition` rewritten
+from refusal to success suite; new
+`notebookPull.additionComposition.suite.ts` proves multi-commit/multi-op
+composition (two orderings) and a late-unsupported-member refusal. All 103
+notebookPull+index tests pass cleanly (solo run, no contention). This
+completes the story: the six original F1 probes, already-based batches,
+content-only batches, and composed additions/saves all have their required
+outcomes; exact-subtree replay and existing structural/ancestry refusals stay
+intact and bounded.

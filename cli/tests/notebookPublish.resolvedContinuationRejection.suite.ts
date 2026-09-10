@@ -72,11 +72,10 @@ async function pullConflictThenContinue(
   await expect(run(['notebook', 'pull', setup.directory])).rejects.toThrow(
     ProcessExitForTest
   )
-  continuePausedRebaseWithChosenBytes(
-    setup.directory,
-    SPACED_NOTE_PATH,
-    chosenBytes
-  )
+  continuePausedRebaseWithChosenBytes(setup.directory, {
+    path: SPACED_NOTE_PATH,
+    content: chosenBytes,
+  })
   return {
     directory: setup.directory,
     source: setup.source,

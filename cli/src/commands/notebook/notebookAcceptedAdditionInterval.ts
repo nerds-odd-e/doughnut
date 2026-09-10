@@ -1,5 +1,6 @@
 import { runSystemGitOrThrow } from './systemGit.js'
 import {
+  hasSingleParent,
   inspectAncestryFailure,
   isOrdinaryNoteAddition,
   isOrdinaryNoteContentChange,
@@ -41,92 +42,53 @@ function destinationParentIsRootOrRepresented(
   )
 }
 
-export function isEligibleBoundedAcceptedAdditionInterval(
+/**
+ * An accepted interval is eligible through this addition path when every edge
+ * (each commit against the accepted tree immediately before it in this same
+ * interval, starting from `localParent`) contains only ordinary note
+ * additions at a destination already represented at that point, and ordinary
+ * content-only saves. A destination folder created by an earlier addition in
+ * this same interval counts as represented, since it is already committed to
+ * the accepted tree by that point; a folder first created within the same
+ * commit as an addition into it does not count (new-folder receipt is a
+ * separate, deferred capability). A save's target already existing at that
+ * point is guaranteed by its diff status ('M' only occurs when the path was
+ * present in the preceding tree). At least one addition must be present,
+ * otherwise a purely content-only interval defers to the content-only
+ * contiguity path in `notebookAcceptedInterval.ts`.
+ */
+export function isEligibleAcceptedAdditionInterval(
   acceptedRepoDir: string,
   localParent: string,
   interval: { sha: string; parents: string[] }[]
 ): boolean {
-  return (
-    isEligibleOneOrdinaryNoteAddition(acceptedRepoDir, localParent, interval) ||
-    isEligibleOneOrdinaryNoteAdditionThenSave(
+  let precedingTree = localParent
+  let hasAddition = false
+  for (const commit of interval) {
+    if (!hasSingleParent(commit, precedingTree)) {
+      return false
+    }
+    for (const change of listCommitChanges(
       acceptedRepoDir,
-      localParent,
-      interval
-    )
-  )
-}
-
-function isEligibleOneOrdinaryNoteAddition(
-  acceptedRepoDir: string,
-  localParent: string,
-  interval: { sha: string; parents: string[] }[]
-): boolean {
-  if (interval.length !== 1) return false
-  const [commit] = interval
-  if (commit === undefined) return false
-  const addedPath = singleOrdinaryNoteAdditionPath(
-    acceptedRepoDir,
-    localParent,
-    commit
-  )
-  return (
-    addedPath !== undefined &&
-    destinationParentIsRootOrRepresented(
-      acceptedRepoDir,
-      localParent,
-      addedPath
-    )
-  )
-}
-
-/** Exactly one addition of B on the shared base, then one content-only save of B. */
-function isEligibleOneOrdinaryNoteAdditionThenSave(
-  acceptedRepoDir: string,
-  localParent: string,
-  interval: { sha: string; parents: string[] }[]
-): boolean {
-  if (interval.length !== 2) return false
-  const [creation, save] = interval
-  if (creation === undefined || save === undefined) return false
-  const addedPath = singleOrdinaryNoteAdditionPath(
-    acceptedRepoDir,
-    localParent,
-    creation
-  )
-  if (
-    addedPath === undefined ||
-    !destinationParentIsRootOrRepresented(
-      acceptedRepoDir,
-      localParent,
-      addedPath
-    )
-  ) {
-    return false
+      precedingTree,
+      commit.sha
+    )) {
+      if (isOrdinaryNoteAddition(change)) {
+        if (
+          !destinationParentIsRootOrRepresented(
+            acceptedRepoDir,
+            precedingTree,
+            change.path
+          )
+        ) {
+          return false
+        }
+        hasAddition = true
+      } else if (!isOrdinaryNoteContentChange(change)) {
+        return false
+      }
+    }
+    precedingTree = commit.sha
   }
-  const saveParent = save.parents[0]
-  if (saveParent === undefined || save.parents.length !== 1) return false
-  if (saveParent !== creation.sha) return false
-  const saveChanges = listCommitChanges(acceptedRepoDir, saveParent, save.sha)
-  if (saveChanges.length !== 1) return false
-  const [saveChange] = saveChanges
-  return (
-    saveChange !== undefined &&
-    isOrdinaryNoteContentChange(saveChange) &&
-    saveChange.path === addedPath
-  )
-}
-
-function singleOrdinaryNoteAdditionPath(
-  acceptedRepoDir: string,
-  expectedParent: string,
-  commit: { sha: string; parents: string[] }
-): string | undefined {
-  const parent = commit.parents[0]
-  if (parent === undefined || commit.parents.length !== 1) return undefined
-  if (parent !== expectedParent) return undefined
-  const changes = listCommitChanges(acceptedRepoDir, parent, commit.sha)
-  if (changes.length !== 1) return undefined
-  const [change] = changes
-  if (change === undefined || !isOrdinaryNoteAddition(change)) return undefined
-  return change.path
+  return hasAddition
 }

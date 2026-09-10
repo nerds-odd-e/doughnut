@@ -15,6 +15,13 @@ import {
   LOCAL_NOTE,
   prepareEligibleDivergence,
 } from './notebookPull.rebase.testHelpers.js'
+import {
+  ACCEPTED_THIRD_NOTE,
+  LOCAL_NESTED_NOTE,
+  LOCAL_ROOT_NOTE,
+  prepareTwoNoteBatchDivergence,
+  THREE_NOTE_LOCAL_CHANGES,
+} from './notebookPull.twoNoteBatch.testHelpers.js'
 
 function alreadyBasedMessage(
   directory: string,
@@ -87,6 +94,33 @@ export function describeNotebookPullAlreadyBased(): void {
         GIT_BUNDLE_GET,
         GIT_BUNDLE_GET,
       ])
+    })
+
+    test('accepts an already-based content batch spanning more than two paths without rewriting it', async () => {
+      const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
+        localChanges: THREE_NOTE_LOCAL_CHANGES,
+        acceptedChangeSets: [],
+      })
+      serveAcceptedBundle(ctx, setup.source, 'already-based-three-note-batch')
+      const before = checkoutState(setup.directory)
+      const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
+
+      await run(['notebook', 'pull', setup.directory])
+
+      expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+        alreadyBasedMessage(setup.directory, setup.localTip, setup.acceptedHead)
+      )
+      expect(checkoutState(setup.directory)).toEqual(before)
+      expect(fs.readFileSync(join(setup.directory, 'note.md'), 'utf8')).toBe(
+        LOCAL_ROOT_NOTE
+      )
+      expect(
+        fs.readFileSync(join(setup.directory, 'Nested/Cell.md'), 'utf8')
+      ).toBe(LOCAL_NESTED_NOTE)
+      expect(fs.readFileSync(join(setup.directory, 'gamma.md'), 'utf8')).toBe(
+        ACCEPTED_THIRD_NOTE
+      )
+      expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
     })
 
     test('later eligible other-note advance rebases the same local patch once more', async () => {

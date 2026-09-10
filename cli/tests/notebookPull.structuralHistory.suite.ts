@@ -92,41 +92,6 @@ export function describeNotebookPullStructuralHistory(): void {
         path: 'Renamed.md',
       },
       {
-        shape: 'addition-with-edit',
-        apply: (source: string) => {
-          fs.writeFileSync(
-            join(source, 'added.md'),
-            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n'
-          )
-          fs.writeFileSync(
-            join(source, 'other.md'),
-            '---\ntype: Note\n---\n# Other\n\nAccepted edit too.\n'
-          )
-          runGit(['add', 'added.md', 'other.md'], source)
-          runGit(
-            ['commit', '--quiet', '-m', 'accepted addition and edit'],
-            source
-          )
-        },
-        path: 'added.md',
-      },
-      {
-        shape: 'two-additions',
-        apply: (source: string) => {
-          fs.writeFileSync(
-            join(source, 'added.md'),
-            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n'
-          )
-          fs.writeFileSync(
-            join(source, 'also.md'),
-            '---\ntype: Note\n---\n# Also\n\nSecond addition.\n'
-          )
-          runGit(['add', 'added.md', 'also.md'], source)
-          runGit(['commit', '--quiet', '-m', 'accepted two additions'], source)
-        },
-        path: 'added.md',
-      },
-      {
         shape: 'new-folder',
         apply: (source: string) => {
           commitPortableFile(
@@ -159,6 +124,70 @@ export function describeNotebookPullStructuralHistory(): void {
         )
         expect(checkoutState(directory)).toEqual(before)
         expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
+      }
+    )
+
+    // These two shapes compose only compatible per-edge operations (an addition at an
+    // already-represented root plus a save of a different pre-existing note; two root
+    // additions in one commit) so they are received, not refused.
+    test.each([
+      {
+        shape: 'addition-with-edit',
+        apply: (source: string) => {
+          fs.writeFileSync(
+            join(source, 'added.md'),
+            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n'
+          )
+          fs.writeFileSync(
+            join(source, 'other.md'),
+            '---\ntype: Note\n---\n# Other\n\nAccepted edit too.\n'
+          )
+          runGit(['add', 'added.md', 'other.md'], source)
+          runGit(
+            ['commit', '--quiet', '-m', 'accepted addition and edit'],
+            source
+          )
+        },
+        expectedFiles: {
+          'added.md': '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n',
+          'other.md': '---\ntype: Note\n---\n# Other\n\nAccepted edit too.\n',
+        },
+      },
+      {
+        shape: 'two-additions',
+        apply: (source: string) => {
+          fs.writeFileSync(
+            join(source, 'added.md'),
+            '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n'
+          )
+          fs.writeFileSync(
+            join(source, 'also.md'),
+            '---\ntype: Note\n---\n# Also\n\nSecond addition.\n'
+          )
+          runGit(['add', 'added.md', 'also.md'], source)
+          runGit(['commit', '--quiet', '-m', 'accepted two additions'], source)
+        },
+        expectedFiles: {
+          'added.md': '---\ntype: Note\n---\n# Added\n\nAccepted addition.\n',
+          'also.md': '---\ntype: Note\n---\n# Also\n\nSecond addition.\n',
+        },
+      },
+    ] as const)(
+      'receives compatible remote $shape',
+      async ({ apply, expectedFiles, shape }) => {
+        const { directory, source } = cloneWithLocalNoteAndRemoteOther(
+          ctx.getWorkDir()
+        )
+        apply(source)
+        const acceptedHead = runGit(['rev-parse', 'main'], source)
+        serveAcceptedBundle(ctx, source, `compatible-${shape}`)
+
+        await run(['notebook', 'pull', directory])
+
+        expect(runGit(['rev-parse', 'HEAD^'], directory)).toBe(acceptedHead)
+        for (const [path, content] of Object.entries(expectedFiles)) {
+          expect(fs.readFileSync(join(directory, path), 'utf8')).toBe(content)
+        }
       }
     )
   })
