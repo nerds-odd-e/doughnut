@@ -268,7 +268,12 @@ existing initial Relationship controller proof.
 
 ### 8. Reject invalid authored content without partial publication
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after
+proof extension and refactor. `NotebookGitProposalInitialPublicationRejectionControllerTest`
+owns committed mixed-tree rollback footprint and contextual nested note_level
+rejection; binding helper observes unchanged bytes/head/timestamp outside an
+outer test transaction. No production fix; refactor renamed the test; format passed.
 Proof: Adapt committed-transaction rejection support to a mixed nested tree with
 an invalid Relationship `note_level`. An earlier valid concept carries a wiki
 reference. After rejection, Readme, Folders, Notes, reference rows and bundle/head

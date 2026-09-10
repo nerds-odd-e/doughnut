@@ -19,12 +19,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Verifies that an invalid authored property on the root Relationship in the initial mixed
- * composition rejects without partial publication. Successful publication and wiki-link navigation
- * of that layout are covered in {@link NotebookGitProposalInitialRootRelationshipControllerTest}.
- */
-class NotebookGitProposalInitialRootRelationshipRejectionControllerTest
+class NotebookGitProposalInitialPublicationRejectionControllerTest
     extends NotebookGitBundleControllerTestBase {
 
   private static final String NOTEBOOK_README =
@@ -35,37 +30,25 @@ class NotebookGitProposalInitialRootRelationshipRejectionControllerTest
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void rejectsInvalidRelationshipContentWithoutPartialPublication() throws Exception {
+  void rejectsInvalidNestedRelationshipContentWithoutPartialPublication() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    String readmeBefore =
-        notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent();
-    List<Folder> foldersBefore =
-        inCommittedTransaction(
-            transactionManager,
-            () -> folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()));
-    List<Note> notesBefore =
-        inCommittedTransaction(
-            transactionManager,
-            () -> noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()));
-    List<AuthoredNoteReferenceRow> referencesBefore =
-        inCommittedTransaction(
-            transactionManager, () -> rowsForNotebook(entityManager, notebook.getId()));
-    assertThat(foldersBefore, empty());
-    assertThat(notesBefore, empty());
-    assertThat(referencesBefore, empty());
-    String relationshipPath = "A-related-to-B.md";
+    PublicationFootprint before = committedFootprint(notebook);
+    assertThat(before.folders(), empty());
+    assertThat(before.notes(), empty());
+    assertThat(before.references(), empty());
+    String relationshipPath = "Topic/Nested/Z-related-to-B.md";
     byte[] proposal =
         proposalBundleBytes(
             binding,
             List.of(
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("Topic/README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("Sibling/B.md", SECOND_NOTE),
+                new NotebookGitProposalFile("A.md", "---\ntype: Note\n---\nSee [[Sibling/B]].\n"),
                 new NotebookGitProposalFile(
                     relationshipPath,
-                    "---\ntype: Relationship\nnote_level: 7\n---\ninvalid content"),
-                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
-                new NotebookGitProposalFile("B.md", SECOND_NOTE),
-                new NotebookGitProposalFile(
-                    "A.md", "---\ntype: Note\n---\nSee [[rollback target]].\n")));
+                    "---\ntype: Relationship\nnote_level: 7\n---\ninvalid content")));
 
     ApiException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -78,19 +61,23 @@ class NotebookGitProposalInitialRootRelationshipRejectionControllerTest
     assertThat(
         exception.getErrorBody().getErrors().get("note_level"),
         equalTo(FrontmatterNoteLevel.AUTHORED_NOTE_LEVEL_MESSAGE));
-    assertThat(
-        notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent(),
-        equalTo(readmeBefore));
-    inCommittedTransaction(
-        transactionManager,
-        () -> {
-          assertThat(
-              folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()),
-              equalTo(foldersBefore));
-          assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()),
-              equalTo(notesBefore));
-          assertThat(rowsForNotebook(entityManager, notebook.getId()), equalTo(referencesBefore));
-        });
+    assertThat(committedFootprint(notebook), equalTo(before));
   }
+
+  private PublicationFootprint committedFootprint(Notebook notebook) {
+    return inCommittedTransaction(
+        transactionManager,
+        () ->
+            new PublicationFootprint(
+                notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent(),
+                folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()),
+                noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()),
+                rowsForNotebook(entityManager, notebook.getId())));
+  }
+
+  private record PublicationFootprint(
+      String readme,
+      List<Folder> folders,
+      List<Note> notes,
+      List<AuthoredNoteReferenceRow> references) {}
 }
