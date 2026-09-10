@@ -127,7 +127,11 @@ owned by slice 5. No independent abstraction or preparation is included.
 
 ### 2. Publish root concepts by document role
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after
+implementation and refactoring. Four-Note canonical proof retains bytes, titles,
+head/tree; role/README-omission variants preserve custom properties. Live empty
+Folders continue through existing noninitial eligibility. Refactor and format passed.
 Proof: Controller publication/download accepts four root Notes with README;
 focused variations omit README and include Relationships/valid unknown types.
 One canonical case owns byte/head/tree/title assertions; variants own only their

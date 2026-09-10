@@ -1,10 +1,7 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -24,9 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Verifies publication of initial root notebook Readme proposal shapes. */
 class NotebookGitProposalInitialNotebookReadmeControllerTest
@@ -44,7 +39,7 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void publishesInitialNotebookReadmeAndThreeRootNotesAsTheExactAuthoredCommit() throws Exception {
+  void publishesInitialNotebookReadmeAndFourRootNotesAsTheExactAuthoredCommit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
@@ -54,7 +49,8 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
                 new NotebookGitProposalFile("README.md", NOTEBOOK_README),
                 new NotebookGitProposalFile("First note.md", FIRST_NOTE),
                 new NotebookGitProposalFile("Second note.md", SECOND_NOTE),
-                new NotebookGitProposalFile("Third note.md", THIRD_NOTE)));
+                new NotebookGitProposalFile("Third note.md", THIRD_NOTE),
+                new NotebookGitProposalFile("Fourth note.md", FIRST_NOTE)));
 
     GitBundleTestReader.SingleParentGitCommit proposedCommit;
     try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -70,7 +66,7 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
     List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(
         notes.stream().map(Note::getTitle).toList(),
-        containsInAnyOrder("First note", "Second note", "Third note"));
+        containsInAnyOrder("First note", "Second note", "Third note", "Fourth note"));
     Map<String, Note> byTitle =
         notes.stream().collect(Collectors.toMap(Note::getTitle, Function.identity()));
     assertThat(byTitle.get("First note").getContent(), equalTo(FIRST_NOTE));
@@ -79,6 +75,9 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
     assertThat(byTitle.get("Second note").getFolder(), nullValue());
     assertThat(byTitle.get("Third note").getContent(), equalTo(THIRD_NOTE));
     assertThat(byTitle.get("Third note").getFolder(), nullValue());
+
+    assertThat(byTitle.get("Fourth note").getContent(), equalTo(FIRST_NOTE));
+    assertThat(byTitle.get("Fourth note").getFolder(), nullValue());
 
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -134,38 +133,27 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"Readme", "CustomType"})
-  void refusesInitialNotebookReadmeAndRootNoteWhenNoteIsNotAnOrdinaryNote(String documentType)
-      throws Exception {
+  @ValueSource(strings = {"Note", "Relationship", "CustomType", "Readme"})
+  void publishesRootConceptRolesWithoutNotebookReadme(String documentType) throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    String readmeBefore =
-        notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent();
-    String notePath = "First note.md";
+    String content = "---\ntype: " + documentType + "\ncustom_property: preserved\n---\nBody.\n";
     byte[] proposalBytes =
         proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
-                new NotebookGitProposalFile(
-                    notePath, "---\ntype: " + documentType + "\n---\nBody.\n")));
+            binding, List.of(new NotebookGitProposalFile("First note.md", content)));
 
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    assertThat(exception.getReason(), containsString(notePath));
-    assertThat(exception.getReason(), containsString(documentType));
-    assertThat(exception.getReason(), containsString("must have type: Note"));
-    Notebook after = notebookRepository.findById(notebook.getId()).orElseThrow();
-    assertThat(after.getReadmeContent(), equalTo(readmeBefore));
-    inCommittedTransaction(
-        transactionManager,
-        () -> {
-          assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-          assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-        });
+    assertThat(
+        noteRepository
+            .findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId())
+            .getFirst()
+            .getContent(),
+        equalTo(content));
+    assertThat(
+        notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent(),
+        nullValue());
   }
 
   @Test

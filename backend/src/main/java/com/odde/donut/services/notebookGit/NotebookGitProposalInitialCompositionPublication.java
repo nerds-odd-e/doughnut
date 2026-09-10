@@ -94,30 +94,23 @@ class NotebookGitProposalInitialCompositionPublication {
     List<Note> added = new ArrayList<>(notePaths.size());
     for (String notePath : notePaths) {
       NotebookGitProposalTypedPath.requireOrdinaryNote(proposal, notePath);
-      added.add(
-          noteAddition.apply(
-              notebook,
-              folders,
-              proposal,
-              proposal.mainHead(),
-              notePath,
-              testabilitySettings.getCurrentUTCTimestamp()));
+      added.add(applyConcept(notebook, folders, proposal, notePath));
     }
     return added;
   }
 
-  /** Applies one authored Relationship path through {@link NotebookGitProposalNoteAddition}. */
-  Note applyRelationship(
+  /** Applies one authored concept path through {@link NotebookGitProposalNoteAddition}. */
+  Note applyConcept(
       Notebook notebook,
       List<ExportFolderRow> folders,
       NotebookGitProposalImporter.ImportedProposal proposal,
-      String relationshipPath) {
+      String conceptPath) {
     return noteAddition.apply(
         notebook,
         folders,
         proposal,
         proposal.mainHead(),
-        relationshipPath,
+        conceptPath,
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
