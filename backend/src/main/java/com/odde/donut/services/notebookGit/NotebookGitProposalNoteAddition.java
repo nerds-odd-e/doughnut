@@ -13,12 +13,13 @@ import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
 
 /**
  * Applies one ordinary-note addition from a Git proposal: validated authored document, filename
- * title, represented destination Folder, fresh Note identity, and persistence.
+ * title, destination Folder, fresh Note identity, and persistence.
  */
 @Service
 class NotebookGitProposalNoteAddition {
@@ -45,33 +46,14 @@ class NotebookGitProposalNoteAddition {
     this.projection = projection;
   }
 
-  Note applyAtAcceptedPlacement(
+  Note apply(
       Notebook notebook,
-      List<ExportFolderRow> folders,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      String path,
-      Timestamp publishedAt) {
-    return apply(
-        notebook,
-        proposal,
-        path,
-        publishedAt,
-        representedDestinationFolder(folders, proposal, acceptedHead, path));
-  }
-
-  Note applyAtProposedPlacement(
-      Notebook notebook,
-      List<ExportFolderRow> folders,
+      Map<String, Folder> materializedFolders,
       NotebookGitProposalImporter.ImportedProposal proposal,
       String path,
       Timestamp publishedAt) {
     return apply(
-        notebook,
-        proposal,
-        path,
-        publishedAt,
-        representedDestinationFolder(folders, proposal, proposal.mainHead(), path));
+        notebook, proposal, path, publishedAt, destinationFolder(materializedFolders, path));
   }
 
   private Note apply(
@@ -90,6 +72,18 @@ class NotebookGitProposalNoteAddition {
     }
     authoredNoteDocumentPersistence.persist(addedNote, document, publishedAt);
     return addedNote;
+  }
+
+  private Folder destinationFolder(Map<String, Folder> materializedFolders, String path) {
+    int folderPathEnd = path.lastIndexOf('/');
+    if (folderPathEnd < 0) {
+      return null;
+    }
+    Folder destination = materializedFolders.get(path.substring(0, folderPathEnd));
+    if (destination == null) {
+      throw NotebookGitProjection.unrepresentedParentFolder(path);
+    }
+    return destination;
   }
 
   Folder representedDestinationFolder(

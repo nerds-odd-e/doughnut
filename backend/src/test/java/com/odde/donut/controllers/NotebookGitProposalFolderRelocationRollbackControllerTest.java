@@ -23,7 +23,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Proves {@code NotebookGitProposalFolderAcceptance} rolls back source parent with the rest of the
+ * Proves {@code NotebookGitProposalFolderRelocation} rolls back source parent with the rest of the
  * publish transaction when late binding acceptance fails, reusing {@link
  * NotebookGitPublicationAtomicTestSupport}'s exact failure injection and reset hook.
  */

@@ -230,8 +230,11 @@ and ordinary-note admission consume it. Unchanged blobs stay inspected-file cont
 
 ### 4. Apply admitted additions through one flow
 Type: Structure
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes active work, plus the required backend-suite wait.
+Actual: ~12 minutes active (over 10-minute hard limit; converged as one
+shared application owner — did not revert). Suite wait ~1.1 minutes; refactor
+rename + addition selection ~10 minutes plus suite rerun.
 
 Generalize the initial-tree application to consume the common document roles
 with existing notebook/folder/note context. Route initial,
@@ -247,6 +250,19 @@ Proof: existing initial container/Relationship, ordinary additions/modifications
 README-only creation and refusal evidence stays green through the controller.
 Classification and materialization must not have alternative representations
 or applications selected by sample counts or an empty/not-empty notebook.
+
+```text
+proof:
+  command: unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+  covers: complete backend unit suite on doughnut_wt_05087b88f4ea4adabada26656b61f244_test (initial container/Relationship, ordinary additions/modifications, README-only creation and refusal)
+  result: pass
+```
+
+`NotebookGitProposalDocumentApplication` is the shared apply. Initial-only
+publication class is gone. Ordinary ADDED still pre-checks represented
+destinations so implied folders are not created. Relocation lives in
+`NotebookGitProposalFolderRelocation`.
 
 ### 5. Publish folder documents and notes as one changeset
 Type: Behavior
@@ -324,7 +340,7 @@ prepares the same publication outcome and removes a source of duplicated rules.
 | 1 | Done | One publisher completion owner; complete backend suite green |
 | 2 | Done | One folder materialization mechanism; existing creation proof plus identity/collision regressions |
 | 3 | Done | One document classification representation; unchanged behavior |
-| 4 | Ready | One addition application flow; unchanged behavior |
+| 4 | Done | One addition application flow; unchanged admission |
 | 5 | Ready with stated sizing exception | One integrated publication/receive outcome; complete backend and E2E verification stay with it |
 
 Slice 5's longer active-work estimate is scrutinized: structural work and existing
@@ -346,6 +362,9 @@ new constraint condition.
 - Slice 3 active work ~7 minutes vs 4–5 hypothesis; converged without refinement.
   Unchanged files are omitted from `ChangedDocument`; callers no longer split
   README roles from raw path strings.
+- Slice 4 active work ~12 minutes vs 4–5 hypothesis (over 10). Converged on one
+  document-application owner; remaining README-only recognizer is slice 5.
+  Ordinary additions still require represented destinations before materialize.
 - Feature-branch pushes have no push-triggered CI (`ci.yml` only on `main`).
   Missing CI observation coverage until merge to `main`. Keep one plan writer;
   do not modify Story 1's plan or execution state.

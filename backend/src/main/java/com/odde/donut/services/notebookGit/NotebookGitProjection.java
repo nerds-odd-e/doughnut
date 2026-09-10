@@ -201,7 +201,7 @@ public class NotebookGitProjection {
             + " have tracked content before the folder can be moved.");
   }
 
-  private static ResponseStatusException unrepresentedParentFolder(String notePath) {
+  static ResponseStatusException unrepresentedParentFolder(String notePath) {
     return new ResponseStatusException(
         HttpStatus.BAD_REQUEST,
         "Parent folder for path \""

@@ -41,8 +41,8 @@ public class NotebookGitProposalPublisher {
   private final NotebookGitProposalFilenameTitle filenameTitle;
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
-  private final NotebookGitProposalFolderAcceptance folderAcceptance;
-  private final NotebookGitProposalInitialTreePublication initialTreePublication;
+  private final NotebookGitProposalFolderRelocation folderRelocation;
+  private final NotebookGitProposalDocumentApplication documentApplication;
   private final NotebookGitProposalNoteAddition noteAddition;
 
   public NotebookGitProposalPublisher(
@@ -56,8 +56,8 @@ public class NotebookGitProposalPublisher {
       NotebookGitProposalFilenameTitle filenameTitle,
       NoteService noteService,
       NoteTitlePlacementRules noteTitlePlacementRules,
-      NotebookGitProposalFolderAcceptance folderAcceptance,
-      NotebookGitProposalInitialTreePublication initialTreePublication,
+      NotebookGitProposalFolderRelocation folderRelocation,
+      NotebookGitProposalDocumentApplication documentApplication,
       NotebookGitProposalNoteAddition noteAddition) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
@@ -69,8 +69,8 @@ public class NotebookGitProposalPublisher {
     this.filenameTitle = filenameTitle;
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
-    this.folderAcceptance = folderAcceptance;
-    this.initialTreePublication = initialTreePublication;
+    this.folderRelocation = folderRelocation;
+    this.documentApplication = documentApplication;
     this.noteAddition = noteAddition;
   }
 
@@ -115,26 +115,37 @@ public class NotebookGitProposalPublisher {
             proposal.repository(), acceptedHead, proposal.mainHead());
     List<NotebookGitProposalTreeShape.ChangedDocument> documents =
         NotebookGitProposalTreeShape.classifyChangedDocuments(files);
+    Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
     if (folders.isEmpty()
         && liveNotes.isEmpty()
         && files.stream().allMatch(file -> file.acceptedBlobId() == null)) {
+      if (documents.isEmpty()
+          || documents.stream().anyMatch(document -> !document.path().endsWith(".md"))) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "Initial publication requires a nonempty Markdown tree.");
+      }
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
       return acceptMatchingProposedTree(
-          initialTreePublication.apply(state, proposal, documents), proposal);
+          documentApplication.apply(state, proposal, documents, publishedAt),
+          proposal,
+          publishedAt);
     }
     Optional<NotebookGitProposalFolderCreationShape.RootFolderCreation> folderCreation =
         NotebookGitProposalFolderCreationShape.findSingleRootFolderCreation(documents);
     if (folderCreation.isPresent()) {
+      projection.requireMatchingAcceptedTree(
+          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
       return acceptMatchingProposedTree(
-          folderAcceptance.applyCreation(state, proposal, acceptedHead, folderCreation.get()),
-          proposal);
+          documentApplication.apply(state, proposal, documents, publishedAt),
+          proposal,
+          publishedAt);
     }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);
     if (relocation.isPresent()) {
       return acceptMatchingProposedTree(
-          folderAcceptance.apply(state, proposal, acceptedHead, relocation.get()), proposal);
+          folderRelocation.apply(state, proposal, acceptedHead, relocation.get()), proposal);
     }
     List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
         NotebookGitProposalTreeShape.requireAllowedNoteChanges(documents);
@@ -142,14 +153,23 @@ public class NotebookGitProposalPublisher {
         proposal.repository(), proposal.mainHead());
     projection.requireMatchingAcceptedTree(
         notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-    Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
     List<Note> proposedLiveNotes = new ArrayList<>(liveNotes);
+    List<String> addedPaths = new ArrayList<>();
     for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
-        proposedLiveNotes.add(
-            noteAddition.applyAtAcceptedPlacement(
-                notebook, folders, proposal, acceptedHead, noteChange.path(), publishedAt));
-      } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
+        addedPaths.add(noteChange.path());
+      }
+    }
+    List<NotebookGitProposalTreeShape.ChangedDocument> additions = new ArrayList<>();
+    for (NotebookGitProposalTreeShape.ChangedDocument document : documents) {
+      if (!addedPaths.contains(document.path())) {
+        continue;
+      }
+      noteAddition.representedDestinationFolder(folders, proposal, acceptedHead, document.path());
+      additions.add(document);
+    }
+    for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
+      if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document =
             noteAddition.readValidatedDocument(proposal, noteChange.path());
         Note changedNote =
@@ -167,12 +187,13 @@ public class NotebookGitProposalPublisher {
         applyRename(notebook, folders, proposal, acceptedHead, liveNotes, noteChange, publishedAt);
       }
     }
-
-    return acceptMatchingProposedTree(
+    NotebookGitStateLoader.LockedNotebookState published =
         new NotebookGitStateLoader.LockedNotebookState(
-            binding, notebook, folders, proposedLiveNotes),
-        proposal,
-        publishedAt);
+            binding, notebook, folders, proposedLiveNotes);
+    if (!additions.isEmpty()) {
+      published = documentApplication.apply(published, proposal, additions, publishedAt);
+    }
+    return acceptMatchingProposedTree(published, proposal, publishedAt);
   }
 
   private String acceptMatchingProposedTree(

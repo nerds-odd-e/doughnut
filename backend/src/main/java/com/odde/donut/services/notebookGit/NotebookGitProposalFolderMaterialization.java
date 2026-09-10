@@ -38,7 +38,7 @@ class NotebookGitProposalFolderMaterialization {
     this.validator = validator;
   }
 
-  void materialize(
+  Map<String, Folder> materialize(
       Notebook notebook,
       List<ExportFolderRow> liveFolders,
       Repository repository,
@@ -74,6 +74,7 @@ class NotebookGitProposalFolderMaterialization {
       }
     }
     entityPersister.flush();
+    return folders;
   }
 
   private Map<String, Folder> representedFolders(

@@ -1,51 +1,44 @@
 package com.odde.donut.services.notebookGit;
 
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangedDocument;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.DocumentRole;
-import com.odde.donut.testability.TestabilitySettings;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.eclipse.jgit.lib.ObjectId;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-/** Applies initial Markdown trees by container and concept role. */
+/** Applies admitted folder, README and concept additions from classified proposal documents. */
 @Service
-class NotebookGitProposalInitialTreePublication {
+class NotebookGitProposalDocumentApplication {
 
   private final NotebookGitProposalFolderMaterialization folderMaterialization;
   private final NotebookGitStateLoader stateLoader;
   private final EntityPersister entityPersister;
-  private final TestabilitySettings testabilitySettings;
   private final NotebookGitProposalNoteAddition noteAddition;
 
-  NotebookGitProposalInitialTreePublication(
+  NotebookGitProposalDocumentApplication(
       NotebookGitProposalFolderMaterialization folderMaterialization,
       NotebookGitStateLoader stateLoader,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings,
       NotebookGitProposalNoteAddition noteAddition) {
     this.folderMaterialization = folderMaterialization;
     this.stateLoader = stateLoader;
     this.entityPersister = entityPersister;
-    this.testabilitySettings = testabilitySettings;
     this.noteAddition = noteAddition;
   }
 
   NotebookGitStateLoader.LockedNotebookState apply(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
-      List<ChangedDocument> documents) {
-    if (documents.isEmpty()
-        || documents.stream().anyMatch(document -> !document.path().endsWith(".md"))) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Initial publication requires a nonempty Markdown tree.");
-    }
+      List<ChangedDocument> documents,
+      Timestamp publishedAt) {
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
     String notebookReadmePath = null;
@@ -60,35 +53,22 @@ class NotebookGitProposalInitialTreePublication {
         folderReadmePaths.add(document.path());
       }
     }
-    return applyTree(state, proposal, notebookReadmePath, folderReadmePaths, conceptPaths);
-  }
-
-  private NotebookGitStateLoader.LockedNotebookState applyTree(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      String notebookReadmePath,
-      List<String> folderReadmePaths,
-      List<String> conceptPaths) {
     if (notebookReadmePath != null) {
       storeReadme(state, proposal, notebookReadmePath);
     }
-    folderMaterialization.materialize(
-        state.notebook(),
-        state.folders(),
-        proposal.repository(),
-        ObjectId.fromString(state.binding().getAcceptedGitObjectId()),
-        Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()).toList(),
-        proposal);
+    Map<String, Folder> materializedFolders =
+        folderMaterialization.materialize(
+            state.notebook(),
+            state.folders(),
+            proposal.repository(),
+            ObjectId.fromString(state.binding().getAcceptedGitObjectId()),
+            Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()).toList(),
+            proposal);
     List<ExportFolderRow> folders = stateLoader.foldersOf(state.notebook());
-    List<Note> notes = new ArrayList<>(conceptPaths.size());
+    List<Note> notes = new ArrayList<>(state.liveNotes());
     for (String path : conceptPaths) {
       notes.add(
-          noteAddition.applyAtProposedPlacement(
-              state.notebook(),
-              folders,
-              proposal,
-              path,
-              testabilitySettings.getCurrentUTCTimestamp()));
+          noteAddition.apply(state.notebook(), materializedFolders, proposal, path, publishedAt));
     }
     entityPersister.flush();
     return new NotebookGitStateLoader.LockedNotebookState(

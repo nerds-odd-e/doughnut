@@ -8,53 +8,24 @@ import java.util.List;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
 
-/** Applies eligible Folder-creation or Folder-relocation proposals. */
+/** Applies eligible Folder-relocation proposals. */
 @Service
-class NotebookGitProposalFolderAcceptance {
+class NotebookGitProposalFolderRelocation {
 
   private final NotebookGitProjection projection;
   private final EntityPersister entityPersister;
   private final NotebookGitStateLoader notebookGitStateLoader;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
-  private final NotebookGitProposalFolderMaterialization folderMaterialization;
 
-  NotebookGitProposalFolderAcceptance(
+  NotebookGitProposalFolderRelocation(
       NotebookGitProjection projection,
       EntityPersister entityPersister,
       NotebookGitStateLoader notebookGitStateLoader,
-      FolderSiblingNameValidation folderSiblingNameValidation,
-      NotebookGitProposalFolderMaterialization folderMaterialization) {
+      FolderSiblingNameValidation folderSiblingNameValidation) {
     this.projection = projection;
     this.entityPersister = entityPersister;
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
-    this.folderMaterialization = folderMaterialization;
-  }
-
-  NotebookGitStateLoader.LockedNotebookState applyCreation(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookGitProposalFolderCreationShape.RootFolderCreation creation) {
-    String readmePath = creation.readmePath();
-    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-        proposal.repository(), proposal.mainHead());
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
-
-    folderMaterialization.materialize(
-        state.notebook(),
-        state.folders(),
-        proposal.repository(),
-        acceptedHead,
-        List.of(readmePath),
-        proposal);
-
-    return new NotebookGitStateLoader.LockedNotebookState(
-        state.binding(),
-        state.notebook(),
-        notebookGitStateLoader.foldersOf(state.notebook()),
-        state.liveNotes());
   }
 
   NotebookGitStateLoader.LockedNotebookState apply(
