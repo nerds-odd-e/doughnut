@@ -22,7 +22,7 @@ changes.
 
 ## Backlog
 
-- [Develop manually without automated-test interference](seeds/SEED-015-concurrent-worktree-environments.md#story-7) — SEED-015
+- [Use a persistent Development environment for manual feedback](seeds/SEED-015-concurrent-worktree-environments.md#story-7) — SEED-015
 
 ## Recently done
 

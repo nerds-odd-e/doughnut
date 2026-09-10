@@ -13,7 +13,8 @@ scope: small
 
 Notebook owners can publish the delivered initial Readme/Note layouts below
 without splitting their authored commit. Story 6 extends this to three more
-small layouts exposed by the jap1 investigation. Preserve authored bytes and
+small layouts exposed by the jap1 investigation. Story 7 joins two endpoint
+Notes and their Relationship in one initial publication. Preserve authored bytes and
 accept the exact commit atomically. Arbitrary initial trees and bulk import
 remain deferred.
 
@@ -157,10 +158,62 @@ corrected by quick/091 (`5d2c5b3d9d`).
   unpublished commits; attachments; import tooling or error-reporting redesign;
   performance/volume guarantees; publishing the actual jap1 checkout.
 
+<a id="story-7"></a>
+
+### 7. Publish two notes and their relationship together
+
+**Status:** refined; planned in [quick/094](../quick/094-initial-notes-with-relationship/PLAN.md).
+
+- **Goal:** A notebook owner can publish a minimal connected set of knowledge
+  from a local checkout in one commit: two Notes and their Relationship,
+  alongside the notebook Readme. After publication, the relationship's links
+  lead to the newly published Notes.
+- **Value:** Story 6 accepted an isolated Relationship with missing endpoints.
+  This story makes that relationship useful together with its locally authored
+  endpoints, without manually splitting publication into several commits.
+- **Scope:** An owner-authorized checkout bound to a notebook with no folders or
+  live notes and an empty accepted tree publishes one direct single-parent child
+  of current accepted main. Exactly four regular Markdown files at notebook
+  root: `README.md` with `type: Readme`, two files with `type: Note`, and one with
+  `type: Relationship`. Titles come from filenames; authored Markdown, including
+  unknown properties, is preserved. Accept the exact commit atomically. Existing
+  validation, reference resolution and supported layouts remain unchanged.
+- **Key examples:**
+  1. `README.md`, `A.md`, `B.md`, and `A-related-to-B.md` (Relationship with
+     `relation: related-to`, `source: "[[A]]"`, `target: "[[B]]"`) are added in one
+     commit → publication succeeds; the Readme and all three concepts are stored
+     at root and downloading returns the exact authored Git head/tree.
+  2. Open the published Relationship → its A and B wiki links resolve to the two
+     newly published Notes. Do not rely on Git path order: the Relationship may
+     sort before its endpoints. A relationship that names an absent endpoint
+     still follows existing unresolved-reference semantics; endpoint existence
+     is not an additional publication eligibility rule.
+  3. The same four-file layout has an invalid authored `note_level` on the
+     Relationship → publication rejects with property context and leaves the
+     Readme, Notes, reference rows and accepted head unchanged.
+- **Excluded:** Additional Notes or Relationships; README plus just one Note and
+  a Relationship; folders or nested paths; existing-notebook edits; attachments;
+  multiple unpublished commits or history reconciliation; new relationship
+  resolution rules or endpoint creation; unknown document types in the newly
+  admitted positions; generic initial-tree import; error-reporting redesign;
+  performance guarantees or publishing the actual jap1 checkout.
+- **Assumptions:** The existing source-owned reference index and current-state
+  resolver handle same-commit endpoints without a new import/linking pass. Scope
+  is the four-file composition, not a new validity rule requiring exact A/B names
+  or a particular relationship kind.
+- **Alternative considered:** Publish root Notes first, then publish the
+  Relationship separately. It requires splitting the author's commit and loses
+  the single atomic initial-publication outcome. Extending only another note
+  count would not test mixed Note/Relationship composition.
+- **Safe stopping point:** The completed story publishes a useful connected
+  notebook even if bulk import is never implemented. No other jap1 gaps are
+  prerequisites or implicit follow-up scope.
+
 ## Ordering and Scope Reduction
 
-Stories 1–6 and their eligibility corrections are delivered. Full initial import
-remains deferred.
+Stories 1–6 and their eligibility corrections are delivered. Story 7 is the next
+bounded continuation selected for refinement/planning on 2026-09-10. No product
+backlog reorder is implied. Full initial import remains deferred.
 
 ## Open Decisions
 
@@ -168,8 +221,8 @@ None.
 
 ## When to Surface
 
-Stories 1–6 are delivered. Additional content and bulk initial import remain
-separate problems.
+Stories 1–6 are delivered. Story 7 is ready for execution upon authorization.
+Additional content and bulk initial import remain separate problems.
 
 ## Breadcrumbs
 

@@ -422,36 +422,47 @@ Cloud VM/CI changes, and broader database management.
 
 <a id="story-7"></a>
 
-### 7. Develop manually without automated-test interference
+### 7. Use a persistent Development environment for manual feedback
 
 **Status:** Selected; first priority in the product backlog.
 
 **Goal**
 
-Developers can use Donut manually while unit tests and E2E tests run against
-their own disposable environments, without data, processes, or service endpoints
-interfering across environments.
+A developer can start Donut in the Development environment, sign in, and use the
+browser with data that survives restarts. This provides feedback on real product
+behavior without putting manual work in the disposable E2E environment.
 
 **Scope**
 
-- Development and manual use operate on developer-owned data and service
-  endpoints that remain available during automated test activity.
-- Unit tests and E2E tests operate on separate test-runner-owned data and service
-  endpoints and refuse before mutation when environment ownership is inconsistent.
-- The selected environment is visible enough for a developer or agent to verify
-  which ownership boundary applies.
-- Preserve existing automated-test behavior and worktree isolation.
+- Support one Development stack from the unconfigured primary checkout, using
+  the `dev` profile, `doughnut_development`, and application ports distinct from
+  E2E.
+- `pnpm dev` starts the Development stack with frontend and backend reload
+  behavior suitable for development.
+- `pnpm dev:restart` restarts only that Development stack on the same endpoints
+  without deleting its data.
+- Provide local sign-in so a developer can create and revisit product data
+  without production credentials.
+- Identify the running stack as Development and keep E2E reset and testability
+  controls unavailable there.
+- Keep `pnpm sut` and `pnpm sut:restart` as E2E commands and preserve the existing
+  Unit Test and E2E workflows. Prove the Development stack and one
+  already-supported isolated worktree E2E scenario can run concurrently without
+  changing each other's data or endpoints.
 
 **Key examples**
 
-- Given Development is running with a saved note, when unit tests and E2E run
-  concurrently, then each environment remains reachable through its own service
-  endpoints and the developer's note remains unchanged.
-- Given an automated test is directed at a development environment, when it
-  attempts setup, then it refuses before changing development data.
+- Given a developer starts Development with `pnpm dev`, signs in, and creates a
+  note, when they run `pnpm dev:restart`, then they can sign in again and see the
+  note.
+- Given Development contains that note, when one supported E2E scenario runs in
+  an isolated worktree, then both stacks remain reachable and the Development
+  note remains unchanged.
 
-**Exclusions:** Production environment changes, broader external-service policy,
-and general environment orchestration beyond separating development from tests.
+**Exclusions:** Development environments in linked worktrees, multiple concurrent
+Development environments, migration of data previously entered in E2E, new E2E
+scenario support, production/CI/Cloud VM changes, external-service policy,
+Development data backup or retirement, and general environment orchestration.
 
 **Architecture:** Follow
 [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md).
@@ -464,13 +475,13 @@ successful-completion mock-release corrections added proof, not a separate
 product story or broader mock support. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 
-Story 7 is selected first because it protects developer-owned work from the
-destructive lifecycle that automated tests require. The delivered four-spec
-allowlist does not establish general parallel E2E support. Capacity scheduling,
-Cloud VM, separate MySQL instances, and a second identity remain deferred.
-Multiple independent unit-test or E2E jobs sharing one worktree are explicitly
-postponed by the developer (2026-09-09). This does not disable parallelism
-already used internally by a supported test command.
+Story 7 is selected first because it enables manual product feedback without
+putting developer-owned work in the destructive E2E lifecycle. The delivered
+four-spec allowlist does not establish general parallel E2E support. Capacity
+scheduling, Cloud VM, separate MySQL instances, and a second identity remain
+deferred. Multiple independent unit-test or E2E jobs sharing one worktree are
+explicitly postponed by the developer (2026-09-09). This does not disable
+parallelism already used internally by a supported test command.
 
 ## Open Decisions
 
