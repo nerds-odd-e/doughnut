@@ -246,7 +246,13 @@ of this slice: no exact-layout fallback may remain in the final initial path.
 
 ### 7. Resolve references against the complete published notebook
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+Proof-only extension covers nested Relationship before endpoints, resolved IDs,
+preserved authored targets, absent/ambiguous targets and no synthesized Notes.
+Existing show-note API omits absent wiki links; ambiguity has no destination.
+An initial test assumption was corrected against existing controller evidence.
+Independent refactor completed without edits; format passed.
 Proof: Publish a nested Relationship sorting before its endpoints and open it
 through `NoteController.showNote`: both path-qualified targets resolve to the
 new Notes. Focused absent/ambiguous target data remains unresolved with no

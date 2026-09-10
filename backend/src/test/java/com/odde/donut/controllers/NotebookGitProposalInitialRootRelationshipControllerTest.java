@@ -23,15 +23,11 @@ import java.util.stream.Collectors;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
-/**
- * Verifies publication of initial notebook Readme plus one root Relationship, with or without
- * exactly two root ordinary Notes, and that same-commit wiki links resolve to those Notes. Invalid
- * Relationship properties in the mixed layout are covered in {@link
- * NotebookGitProposalInitialRootRelationshipRejectionControllerTest}.
- */
 class NotebookGitProposalInitialRootRelationshipControllerTest
     extends NotebookGitBundleControllerTestBase {
 
@@ -156,11 +152,20 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
   }
 
   @Test
-  void publishedRootRelationshipWikiLinksResolveToNewlyPublishedNotes() throws Exception {
+  void publishedNestedRelationshipResolvesPathQualifiedNotesCreatedLater() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
-        proposalBundleBytes(binding, initialReadmeTwoRootNotesAndRootRelationshipFiles());
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile(
+                    "A/Relationships/Related.md",
+                    ROOT_RELATIONSHIP
+                        .replace("[[A]]", "[[Z/First]]")
+                        .replace("[[B]]", "[[Z/Nested/Second]]")),
+                new NotebookGitProposalFile("Z/First.md", FIRST_NOTE),
+                new NotebookGitProposalFile("Z/Nested/Second.md", SECOND_NOTE)));
 
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
@@ -168,13 +173,51 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
     Map<String, Note> byTitle =
         noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .collect(Collectors.toMap(Note::getTitle, Function.identity()));
-    NoteRealm shown = noteController.showNote(byTitle.get("A-related-to-B"));
-    WikiLink source = wikiLink(shown, "A");
-    WikiLink target = wikiLink(shown, "B");
+    NoteRealm shown = noteController.showNote(byTitle.get("Related"));
+    WikiLink source = wikiLink(shown, "Z/First");
+    WikiLink target = wikiLink(shown, "Z/Nested/Second");
+    assertThat(source.getTarget(), equalTo("Z/First"));
+    assertThat(target.getTarget(), equalTo("Z/Nested/Second"));
     assertThat(source.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
-    assertThat(source.getDestinationNoteId(), equalTo(byTitle.get("A").getId()));
+    assertThat(source.getDestinationNoteId(), equalTo(byTitle.get("First").getId()));
     assertThat(target.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
-    assertThat(target.getDestinationNoteId(), equalTo(byTitle.get("B").getId()));
+    assertThat(target.getDestinationNoteId(), equalTo(byTitle.get("Second").getId()));
+  }
+
+  @ParameterizedTest
+  @CsvSource({"Missing, UNRESOLVED", "Endpoint, AMBIGUOUS"})
+  void leavesMissingOrAmbiguousPublishedTargetsUnresolvedWithoutCreatingEndpoints(
+      String authoredTarget, WikiLink.Resolution resolution) throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    String relationshipContent = ROOT_RELATIONSHIP.replace("[[B]]", "[[" + authoredTarget + "]]");
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("A/Relationships/Related.md", relationshipContent),
+                new NotebookGitProposalFile("Z/Endpoint.md", FIRST_NOTE),
+                new NotebookGitProposalFile("Z/Nested/Endpoint.md", SECOND_NOTE)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    Note relationship =
+        notes.stream().filter(note -> "Related".equals(note.getTitle())).findFirst().orElseThrow();
+    NoteRealm shown = noteController.showNote(relationship);
+    if (resolution == WikiLink.Resolution.UNRESOLVED) {
+      assertThat(shown.getWikiLinks(), hasSize(0));
+    } else {
+      WikiLink target = wikiLink(shown, authoredTarget);
+      assertThat(target.getResolution(), equalTo(resolution));
+      assertThat(target.getDestinationNoteId(), nullValue());
+      assertThat(target.getTarget(), equalTo(authoredTarget));
+    }
+    assertThat(relationship.getContent(), equalTo(relationshipContent));
+    assertThat(
+        notes.stream().map(Note::getTitle).toList(),
+        containsInAnyOrder("Related", "Endpoint", "Endpoint"));
   }
 
   private static List<NotebookGitProposalFile> initialReadmeTwoRootNotesAndRootRelationshipFiles() {
