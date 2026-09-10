@@ -84,5 +84,6 @@ Number sequentially from `0000`. Prefer capability-named titles, not phase numbe
 | [0004](./0004-okf-compatible-notebook-markdown-accepted.md) | Accepted | OKF-compatible notebook Markdown profile |
 | [0005](./0005-web-routes-accepted.md) | Accepted | Web routes (SPA, API boundary, wiki-link destinations) |
 | [0006](./0006-failure-handling-accepted.md) | Accepted | Failure handling |
+| [0007](./0007-environments-and-isolation-accepted.md) | Accepted | Environments and isolation |
 
 Keep this table current when you accept, reject, or supersede an ADR.

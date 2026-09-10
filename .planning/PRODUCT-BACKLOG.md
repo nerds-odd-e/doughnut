@@ -8,7 +8,8 @@ the leading product direction. Backend-test isolation (1a–1c), concurrent
 browser workflows (2, 2a), owned SUT descendant shutdown (2b), independent
 OpenAI browser mocks (3), reclaiming disposable worktree databases (6), and
 the retirement eligibility correction (6a) are delivered. CLI and MCP isolation
-are also delivered. Cloud VM and development-profile isolation remain deferred.
+are also delivered. Development-profile isolation is now selected first; Cloud
+VM isolation remains deferred.
 
 Notebook owners can refine notes in Obsidian or an AI IDE and Donut without
 discarding either side's work or losing learning history for the selected
@@ -20,6 +21,8 @@ candidates stay unselected until after the worktree queue unless priority
 changes.
 
 ## Backlog
+
+- [Develop manually without automated-test interference](seeds/SEED-015-concurrent-worktree-environments.md#story-7) — SEED-015
 
 ## Recently done
 

@@ -37,9 +37,10 @@ Serializing complete runs remains a fallback but cannot deliver concurrency.
 Manual database/port assignment adds repeated setup; separate MySQL instances
 or VMs remain alternatives if shared-server limitations prove material.
 
-Retirement, copied/moved checkout recovery, and persistent development data
-remain separate decisions. Worktree removal must not imply data deletion;
-invalid settings must fail visibly without shared-state fallback (ADR 0006).
+Retirement and copied/moved checkout recovery remain separate decisions.
+Persistent development data is selected as [Story 7](#story-7). Worktree removal
+must not imply data deletion; invalid settings must fail visibly without
+shared-state fallback (ADR 0006).
 
 ## Story Decomposition
 
@@ -419,6 +420,42 @@ with [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md).
 unretirement, copied/moved checkout recovery, CLI/MCP implementation, port cleanup,
 Cloud VM/CI changes, and broader database management.
 
+<a id="story-7"></a>
+
+### 7. Develop manually without automated-test interference
+
+**Status:** Selected; first priority in the product backlog.
+
+**Goal**
+
+Developers can use Donut manually while unit tests and E2E tests run against
+their own disposable environments, without data, processes, or service endpoints
+interfering across environments.
+
+**Scope**
+
+- Development and manual use operate on developer-owned data and service
+  endpoints that remain available during automated test activity.
+- Unit tests and E2E tests operate on separate test-runner-owned data and service
+  endpoints and refuse before mutation when environment ownership is inconsistent.
+- The selected environment is visible enough for a developer or agent to verify
+  which ownership boundary applies.
+- Preserve existing automated-test behavior and worktree isolation.
+
+**Key examples**
+
+- Given Development is running with a saved note, when unit tests and E2E run
+  concurrently, then each environment remains reachable through its own service
+  endpoints and the developer's note remains unchanged.
+- Given an automated test is directed at a development environment, when it
+  attempts setup, then it refuses before changing development data.
+
+**Exclusions:** Production environment changes, broader external-service policy,
+and general environment orchestration beyond separating development from tests.
+
+**Architecture:** Follow
+[ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md).
+
 ## Ordering and Scope Reduction
 
 **Backlog review, 2026-09-09:** Stories 3, 4 and 5 are delivered, completing the
@@ -427,21 +464,19 @@ successful-completion mock-release corrections added proof, not a separate
 product story or broader mock support. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 
-The delivered four-spec allowlist does not establish general parallel E2E support.
-Select another concrete blocked workflow before broadening it; no new expansion
-is justified by this execution alone. Persistent development profiles, capacity
-scheduling, Cloud VM, separate MySQL instances, and a second identity remain
-deferred. Multiple independent unit-test or E2E jobs sharing one worktree are
-explicitly postponed by the developer (2026-09-09). This does not disable
-parallelism already used internally by a supported test command.
+Story 7 is selected first because it protects developer-owned work from the
+destructive lifecycle that automated tests require. The delivered four-spec
+allowlist does not establish general parallel E2E support. Capacity scheduling,
+Cloud VM, separate MySQL instances, and a second identity remain deferred.
+Multiple independent unit-test or E2E jobs sharing one worktree are explicitly
+postponed by the developer (2026-09-09). This does not disable parallelism
+already used internally by a supported test command.
 
 ## Open Decisions
 
 - Story 6's before-removal drop is delivered. Recovery after removal, reuse,
   and port-claim retirement remain deferred; do not infer ownership from
   database naming.
-- Revisit shared-server capacity or development profiles only when a selected
-  workflow supplies new evidence requiring them.
 
 ## When to Surface
 
@@ -451,5 +486,6 @@ select and refine one story before creating an executable plan.
 ## Breadcrumbs
 
 - [ADR 0006: Failure handling](../../docs/adrs/0006-failure-handling-accepted.md).
+- [ADR 0007: Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md).
 - [Problem decomposition](../../.cursor/rules/problem-decomposition.mdc).
 - Guides: `docs/worktree-backend-tests.md`, `docs/worktree-browser-tests.md`.
