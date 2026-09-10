@@ -1,7 +1,8 @@
 # Use a persistent Development environment for manual feedback
 
 Source: [SEED-015 story 7](../../seeds/SEED-015-concurrent-worktree-environments.md#story-7).
-Status: planned and refined; implementation not requested.
+Status: in progress (slice 1 delivered).
+CI observer: feature-branch pushes are not observed — `donut CI` is push-to-`main` only; observe after merge.
 
 ## Goal and scope
 
@@ -47,16 +48,19 @@ wait for real services.
 ### 1. Sign in locally without Development testability controls
 
 Type: Behavior
-Status: planned
-Proof: focused Spring configuration tests select local authentication under
-`dev`, authenticate the documented local user, and prove E2E testability
-controllers are absent. Run the focused backend test through
+Status: done
+Proof: `DevelopmentAuthenticationConfigurationTest` under `@ActiveProfiles("dev")`
+proves Basic auth for `manual`/`password` and absent testability controller
+beans. Command:
 `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests
-'com.odde.donut.configs.*Development*' -Dspring.profiles.active=test`.
+'com.odde.donut.configs.*Development*' -Dspring.profiles.active=test` (pass).
 
 Behavior: A Development backend starts with profile `dev` -> a developer can
 authenticate with a documented local account -> product APIs are available,
 while `/api/testability/**` is unavailable.
+
+Learning: `NonProductConfiguration` uses `@Profile("!prod")` (same non-prod
+seam as other filters) rather than enumerating `e2e`/`test`/`dev`.
 
 ### 2. Separate the reusable local runtime plumbing from SUT defaults
 
