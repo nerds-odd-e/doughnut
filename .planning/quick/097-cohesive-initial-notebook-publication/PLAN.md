@@ -150,7 +150,10 @@ admission rule change; existing persistence owns unknown-type round-trip behavio
 
 ### 3. Materialize Folder ancestry through one path operation
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed;
+existing nested-controller proof preserves parent/child hierarchy, omitted
+parent Readme and exact head/tree. Refactor completed without edits; format passed.
 Proof: Existing nested Folder Readme controller test still produces the exact
 parent/child hierarchy with no parent Readme; existing root/sibling tests remain
 green in the required backend suite.

@@ -8,18 +8,15 @@ import com.odde.donut.services.FolderConstructionService;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Creates validated Folders from proposal paths. Root Folders may be materialised with an authored
- * Readme or with absent Readme content. Nested {@code Parent/Child/README.md} hierarchies create
- * the parent without a Readme, then the child with the authored Readme, and return refreshed
- * projection rows.
- */
+/** Creates validated Folders and their ancestry from proposal paths. */
 @Service
 class NotebookGitProposalFolderMaterialization {
 
@@ -69,14 +66,40 @@ class NotebookGitProposalFolderMaterialization {
       String parentFolderName,
       String childFolderName,
       String readme) {
-    Folder parent = createRootFolderWithoutReadme(notebook, pathForError, parentFolderName);
-    Folder child =
-        folderConstructionService.createFolder(
-            notebook, validFolderRequest(pathForError, childFolderName, parent.getId()));
+    Map<String, Folder> folders = createFolderAncestry(notebook, List.of(pathForError));
+    Folder child = folders.get(parentFolderName + "/" + childFolderName);
     child.setReadmeContent(readme);
     entityPersister.save(child);
     entityPersister.flush();
     return notebookGitStateLoader.foldersOf(notebook);
+  }
+
+  Map<String, Folder> createFolderAncestry(Notebook notebook, List<String> documentPaths) {
+    Map<String, Folder> folders = new LinkedHashMap<>();
+    for (String documentPath : documentPaths) {
+      Folder parent = null;
+      int componentStart = 0;
+      int separator = documentPath.indexOf('/');
+      while (separator >= 0) {
+        String folderPath = documentPath.substring(0, separator);
+        Folder folder = folders.get(folderPath);
+        if (folder == null) {
+          folder =
+              folderConstructionService.createFolder(
+                  notebook,
+                  validFolderRequest(
+                      documentPath,
+                      documentPath.substring(componentStart, separator),
+                      parent == null ? null : parent.getId()));
+          folders.put(folderPath, folder);
+        }
+        parent = folder;
+        componentStart = separator + 1;
+        separator = documentPath.indexOf('/', componentStart);
+      }
+    }
+    entityPersister.flush();
+    return folders;
   }
 
   private FolderCreationRequest validFolderRequest(
