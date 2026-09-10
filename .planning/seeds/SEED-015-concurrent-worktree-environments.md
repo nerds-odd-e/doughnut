@@ -424,7 +424,9 @@ Cloud VM/CI changes, and broader database management.
 
 ### 7. Use a persistent Development environment for manual feedback
 
-**Status:** Selected; first priority in the product backlog.
+**Status:** Selected; planned and refined in
+[quick/095](../quick/095-persistent-development-environment/PLAN.md); first
+priority in the product backlog.
 
 **Goal**
 
