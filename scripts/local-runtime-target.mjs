@@ -33,6 +33,11 @@ function applicationPortEntries(target) {
   ]
 }
 
+/** Application stack port numbers only — excludes optional Mountebank. */
+export function applicationPorts(target) {
+  return applicationPortEntries(target).map(([, port]) => port)
+}
+
 export async function listOccupiedApplicationPorts(target, isPortOccupiedFn) {
   const occupied = []
   for (const [service, port] of applicationPortEntries(target)) {

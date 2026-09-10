@@ -1,7 +1,7 @@
 # Use a persistent Development environment for manual feedback
 
 Source: [SEED-015 story 7](../../seeds/SEED-015-concurrent-worktree-environments.md#story-7).
-Status: in progress (slices 1–5 delivered).
+Status: in progress (slices 1–7 delivered).
 CI observer: feature-branch pushes are not observed — `donut CI` is push-to-`main` only; observe after merge.
 
 ## Goal and scope
@@ -127,10 +127,10 @@ Mountebank or select an E2E database.
 ### 6. Refuse to restart an unowned Development target
 
 Type: Behavior
-Status: planned
-Proof: focused `scripts/dev-restart.test.mjs` cases prove an occupied target with
-missing, stale, mismatched, or incomplete Development PID/process-tree evidence
-is not signalled and does not launch a replacement.
+Status: done
+Proof: `node --test scripts/dev-restart.test.mjs` (pass) — missing, stale,
+mismatched, or incomplete `dev.pid`/process-tree evidence refuses without
+signalling or launching a replacement.
 
 Behavior: A developer invokes `pnpm dev:restart` while a canonical Development
 port belongs to a process group that cannot be proven as the recorded
@@ -139,11 +139,11 @@ Development group -> the command fails loudly and leaves that process running.
 ### 7. Restart the owned Development process group on the same target
 
 Type: Behavior
-Status: planned
-Proof: focused restart tests prove the verified group receives termination, the
-command waits for its ports to become free, and `pnpm dev` is then invoked. A
-free target with no live Development group starts normally. No database command
-or cleanup seam is invoked.
+Status: done
+Proof: `node --test scripts/dev-restart.test.mjs
+scripts/dev-restart-owned.test.mjs` and `pnpm test:sut-restart` (pass) —
+owned group is signalled, ports wait free, then `runDevStart`; idle free
+target starts normally; no DB cleanup.
 
 Behavior: A developer runs `pnpm dev:restart` -> a verified Development process
 group is stopped and `pnpm dev` starts on the same target; if no Development

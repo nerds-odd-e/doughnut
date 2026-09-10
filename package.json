@@ -67,6 +67,7 @@
     "sut:healthcheck": "node scripts/sut-healthcheck.mjs",
     "sut:restart": "node scripts/sut-restart.mjs",
     "dev": "pnpm --frozen-lockfile --silent recursive install && node scripts/dev-start.mjs",
+    "dev:restart": "node scripts/dev-restart.mjs",
     "logs:tail": "node scripts/logs-tail.mjs",
     "test:api-summary": "node --test scripts/generate-api-summary.test.mjs",
     "test:workspace-syncpack-lifecycle": "node --test scripts/workspace-syncpack-lifecycle.test.mjs",

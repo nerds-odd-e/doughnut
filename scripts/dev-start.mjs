@@ -4,11 +4,11 @@
  * Spawns services, writes `dev.pid`, waits until healthy `dev`, prints browser origin.
  */
 import { spawn } from 'node:child_process'
-import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { worktreeIsolationApplies } from './browser-worktree-isolation.mjs'
 import { runDevelopmentHealthcheck } from './dev-healthcheck.mjs'
+import { isProcessAlive, readLiveDevelopmentPid } from './development-pid.mjs'
 import { DEVELOPMENT_RUNTIME_TARGET } from './development-runtime.mjs'
 import {
   browserOrigin,
@@ -28,29 +28,6 @@ const DEVELOPMENT_SERVICES_SCRIPT = path.join(
   repoRoot,
   'scripts/development-services.mjs'
 )
-
-function readLivePid(pidFile, isProcessAliveFn) {
-  let raw
-  try {
-    raw = readFileSync(pidFile, 'utf8').trim()
-  } catch (error) {
-    if (error.code === 'ENOENT') return null
-    throw error
-  }
-  if (raw === '' || !/^[0-9]+$/.test(raw)) return null
-  const pid = Number(raw)
-  return isProcessAliveFn(pid) ? pid : null
-}
-
-function defaultIsProcessAlive(pid) {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch (error) {
-    if (error.code === 'ESRCH') return false
-    throw error
-  }
-}
 
 export function spawnDevelopmentServices({
   spawnFn = spawn,
@@ -82,7 +59,7 @@ export async function runDevStart({
   runtimeTarget = DEVELOPMENT_RUNTIME_TARGET,
   spawnFn = spawn,
   isPortOccupiedFn,
-  isProcessAliveFn = defaultIsProcessAlive,
+  isProcessAliveFn = isProcessAlive,
   healthcheckFn = runDevelopmentHealthcheck,
   timeoutMs,
   pollMs,
@@ -96,7 +73,10 @@ export async function runDevStart({
     )
   }
 
-  const livePid = readLivePid(runtimeTarget.pidFile, isProcessAliveFn)
+  const livePid = readLiveDevelopmentPid(
+    runtimeTarget.pidFile,
+    isProcessAliveFn
+  )
   if (livePid !== null) {
     throw new Error(
       `Development is already running (live process ${livePid} in ${runtimeTarget.pidFile}). ` +
