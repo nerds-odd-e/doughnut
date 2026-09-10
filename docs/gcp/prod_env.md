@@ -102,17 +102,27 @@ The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/d
 
 **Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/attachments`, `/logout`, `/install`, etc. stay on the MIG. Full runbook (including a one-page release checklist): [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
 
-**Local dev / Cypress (ports and LB — source of truth):**
+**Local Development vs E2E / Cypress (ports and LB — source of truth):**
 
-Primary unconfigured checkouts and CI use the shared ports below. Cypress
-**`baseUrl`** in those contexts remains **`http://localhost:5173`**. A linked
-worktree, or a primary with `.worktree.local.json`, isolates instead — see
+**Development** (`pnpm dev` / `pnpm dev:restart`) runs only from an unconfigured
+primary checkout: Spring profile **`dev`**, database **`doughnut_development`**,
+backend **8081**, browser/LB **5175**, Vite **5176**, log **`dev.log`**. Local
+sign-in (e.g. `manual` / `password`). No Mountebank; no E2E testability/reset.
+Isolated E2E allocation never selects those Development ports.
+
+**E2E** (`pnpm sut`) is disposable. Primary unconfigured checkouts and CI use
+the shared ports below. Cypress **`baseUrl`** in those contexts remains
+**`http://localhost:5173`**. A linked worktree, or a primary with
+`.worktree.local.json`, isolates instead — see
 [`worktree-browser-tests.md`](../worktree-browser-tests.md). Isolated start does
 not use Mountebank. Isolated Cypress uses **`http://127.0.0.1:<lbListenPort>`**
 from that checkout's allocation, not 5173.
 
 | Port | Role |
 |------|------|
+| **8081** | Spring Development (`pnpm dev`) |
+| **5175** | Development browser / local LB |
+| **5176** | Development Vite |
 | **2525** | Mountebank (primary / CI `pnpm sut` and `pnpm test` only) |
 | **9081** | Spring (primary sut / E2E profile default) |
 | **5173** | Local LB (`scripts/local-lb.mjs`) — primary / CI browser and Cypress **`baseUrl`** **`http://localhost:5173`** |

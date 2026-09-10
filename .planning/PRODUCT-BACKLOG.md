@@ -8,8 +8,8 @@ the leading product direction. Backend-test isolation (1a–1c), concurrent
 browser workflows (2, 2a), owned SUT descendant shutdown (2b), independent
 OpenAI browser mocks (3), reclaiming disposable worktree databases (6), and
 the retirement eligibility correction (6a) are delivered. CLI and MCP isolation
-are also delivered. Development-profile isolation is now selected first; Cloud
-VM isolation remains deferred.
+are also delivered. Persistent Development for manual feedback (7) is delivered.
+Cloud VM isolation remains deferred.
 
 Notebook owners can refine notes in Obsidian or an AI IDE and Donut without
 discarding either side's work or losing learning history for the selected
@@ -22,10 +22,11 @@ changes.
 
 ## Backlog
 
-- [Use a persistent Development environment for manual feedback](seeds/SEED-015-concurrent-worktree-environments.md#story-7) — SEED-015
+_(empty — next selection pending)_
 
 ## Recently done
 
+- [Use a persistent Development environment for manual feedback](seeds/SEED-015-concurrent-worktree-environments.md#story-7) — SEED-015
 - [Publish two notes and their relationship together](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-7) — SEED-016
 - [Publish three small initial layouts exposed by the jap1 failure](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-6) — SEED-016
 - [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015

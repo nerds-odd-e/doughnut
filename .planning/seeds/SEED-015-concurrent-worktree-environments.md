@@ -424,9 +424,9 @@ Cloud VM/CI changes, and broader database management.
 
 ### 7. Use a persistent Development environment for manual feedback
 
-**Status:** Selected; planned and refined in
-[quick/095](../quick/095-persistent-development-environment/PLAN.md); first
-priority in the product backlog.
+**Status:** Delivered. Recover quick/095 from the commits that introduced
+`pnpm dev` / `pnpm dev:restart`, Development ports 8081/5175/5176, and the
+docs distinguishing Development from `pnpm sut` E2E.
 
 **Goal**
 
@@ -477,7 +477,7 @@ successful-completion mock-release corrections added proof, not a separate
 product story or broader mock support. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 
-Story 7 is selected first because it enables manual product feedback without
+Story 7 is delivered: persistent Development for manual feedback without
 putting developer-owned work in the destructive E2E lifecycle. The delivered
 four-spec allowlist does not establish general parallel E2E support. Capacity
 scheduling, Cloud VM, separate MySQL instances, and a second identity remain

@@ -25,6 +25,7 @@ export const LOG_TARGETS = {
   sut: path.join(repoRoot, 'sut.log'),
   'backend-e2e': path.join(repoRoot, 'backend/logs/donut-e2e.log'),
   mountebank: path.join(repoRoot, 'sut.log'),
+  dev: path.join(repoRoot, 'dev.log'),
 }
 
 export function backupLogPath(logFile, index) {
