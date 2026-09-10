@@ -1,13 +1,19 @@
 # Cohesive initial notebook publication
 
 Source: [SEED-017 Story 9](../../seeds/SEED-017-cohesive-design-corrections.md#story-9).
-Status: done — all 11 slices verified; final merge and worktree retirement pending.
-Execution used linked worktree `/Users/terryyin/git/doughnut-quick-097`.
-Branch pushes have no CI trigger. Main observation is running for `ci.yml`
-(`donut CI`) in primary `/Users/terryyin/git/doughnut`: coordinator quick097,
-cell 103, session 24678, PID 60732, mailbox `/tmp/dough-ci-501/watch-Ay2Dop`.
-Observer request matches repository/branch/checkout and its creation time matches
-the exact stream process launch. Close this observer after final merge delivery.
+Status: done — all 11 slices verified and delivered to main at `dc4bcfdb0a`.
+Execution worktree `/Users/terryyin/git/doughnut-quick-097` and local/remote branch
+`codex/quick-097-initial-publication` are removed. Main's concurrent documentation
+changes were merged and preserved.
+The disposable database `doughnut_wt_be51eec7d00c42ab854dfc343a377448_test` was
+retired after the tool confirmed no ownership, listeners, sessions or checkout JVMs.
+Retirement initially refused the exited test PID 44970's stale lock; its metadata
+was preserved at `/tmp/quick097-backend-lock-44970` before repeating the idle checks.
+Branch pushes have no CI trigger. Main observation for `ci.yml` (`donut CI`) in
+primary `/Users/terryyin/git/doughnut` is stopped: coordinator quick097, cell 103,
+session 24678, PID 60732, mailbox `/tmp/dough-ci-501/watch-Ay2Dop`. Stop receipt,
+stream terminal and process completion agree: no recorded/unread failure events,
+`pendingCi: unobserved`. CI completion was not awaited.
 
 ## Goal and scope
 
@@ -430,5 +436,5 @@ proofs; plan 096 is superseded rather than executable. Its input is retained
 alongside this completed plan under the updated main-branch guidance for
 retrospective and story wrap-up. No retrospective is claimed by this execution.
 Fulfilled items are removed from the active backlog; unrelated queued stories
-and near-future direction are preserved. Final main merge and worktree/database
-retirement remain delivery operations, not unfinished product slices.
+and near-future direction are preserved. Main merge, worktree/database retirement,
+branch removal and observer shutdown are complete.
