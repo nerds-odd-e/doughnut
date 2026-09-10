@@ -4,9 +4,15 @@
  */
 
 import { execFileSync, spawnSync } from 'node:child_process'
-import { existsSync, mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join, relative } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 
 export interface CliNotebookCheckoutState {
   head: string
@@ -194,7 +200,9 @@ export function createCliE2eNotebookCloneTasks() {
       files: { relativePath: string; content: string }[]
     }): string {
       for (const { relativePath, content } of files) {
-        writeFileSync(join(checkoutDir, relativePath), `${content}\n`)
+        const filePath = join(checkoutDir, relativePath)
+        mkdirSync(dirname(filePath), { recursive: true })
+        writeFileSync(filePath, `${content}\n`)
       }
       git(
         checkoutDir,

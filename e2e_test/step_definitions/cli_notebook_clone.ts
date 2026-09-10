@@ -76,6 +76,14 @@ function relatedNoteChanges(data: DataTable) {
 }
 
 When(
+  'I author and commit the following initial tree in the cloned checkout:',
+  (data: DataTable) =>
+    cli
+      .notebookCloneCheckout()
+      .commitRelatedNoteChanges(relatedNoteChanges(data))
+)
+
+When(
   'I commit the following related additions and edit together in the cloned checkout:',
   (data: DataTable) =>
     cli

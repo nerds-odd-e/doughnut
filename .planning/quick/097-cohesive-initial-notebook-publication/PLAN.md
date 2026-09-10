@@ -1,7 +1,7 @@
 # Cohesive initial notebook publication
 
 Source: [SEED-017 Story 9](../../seeds/SEED-017-cohesive-design-corrections.md#story-9).
-Status: in-progress — executing in `codex/quick-097-initial-publication`.
+Status: done — all 11 slices verified; final merge and worktree retirement pending.
 Execution uses linked worktree `/Users/terryyin/git/doughnut-quick-097`.
 CI observation is unavailable for this branch: `ci.yml` (`donut CI`) runs only
 on main. Observe main after the authorized merge. No observer is running.
@@ -328,7 +328,15 @@ retry lifecycle and requires no CLI harness extension.
 
 ### 11. Round-trip an initial tree through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`
+passed all 12 scenarios on the authorized unconfigured primary E2E stack (34s).
+The new scenario checks clean submitted head, exact authored paths and every file's
+bytes after fresh clone. Temporary product/test overlay was reversed; primary was
+clean afterward. Initial healthcheck overlapped normal backend auto-reload; logs
+confirmed E2E-profile restart and the next healthcheck passed before Cypress.
+Review corrected missing Readme frontmatter before the run. Independent refactor
+completed without edits; coordinator formatting passed. Log: `/tmp/quick097-cli-e2e.log`.
 Proof: In `cli_notebook_clone.feature`, clone an empty notebook, commit a mixed
 nested tree, publish, and clone again to the existing second-destination alias.
 The receiver is clean at the submitted head, lists exactly the authored paths

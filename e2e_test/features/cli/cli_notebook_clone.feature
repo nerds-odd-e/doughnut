@@ -47,6 +47,62 @@ Feature: CLI notebook clone
     When I open the notebook "CLI Clone Notebook" from the notebook catalog
     Then the notebook readme body includes "Notebook landing"
 
+  Scenario: Publishing an initial nested tree round-trips the authored checkout
+    Given I have a notebook "CLI Initial Tree Notebook"
+    And the notebook "CLI Initial Tree Notebook"'s Git binding reflects its current content
+    When I clone the notebook "CLI Initial Tree Notebook" into a temporary destination using the installed CLI
+    And I author and commit the following initial tree in the cloned checkout:
+      | path                    | content                                                                                                                |
+      | Overview.md             | ---\ntype: Note\n---\nWeekly meal plan                                                                                  |
+      | Recipes/README.md       | ---\ntype: Readme\n---\nRecipes from my kitchen                                                                          |
+      | Recipes/Details/Pasta.md | ---\ntype: Note\nauthor: Chef Boyardee\n---\nSimmer until al dente                                                        |
+      | Links.md                | ---\ntype: Relationship\nrelation: related-to\nsource: "[[Overview]]"\ntarget: "[[Recipes/Details/Pasta]]"\n---\nDinner plan |
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I clone the notebook "CLI Initial Tree Notebook" into a second temporary destination using the installed CLI
+    Then the second cloned checkout is a clean checkout of the accepted head
+    And the second cloned checkout contains exactly:
+      | Overview.md             |
+      | Recipes/README.md       |
+      | Recipes/Details/Pasta.md |
+      | Links.md                |
+    And the second cloned checkout file "Overview.md" is:
+      """
+      ---
+      type: Note
+      ---
+      Weekly meal plan
+
+      """
+    And the second cloned checkout file "Recipes/README.md" is:
+      """
+      ---
+      type: Readme
+      ---
+      Recipes from my kitchen
+
+      """
+    And the second cloned checkout file "Recipes/Details/Pasta.md" is:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Simmer until al dente
+
+      """
+    And the second cloned checkout file "Links.md" is:
+      """
+      ---
+      type: Relationship
+      relation: related-to
+      source: "[[Overview]]"
+      target: "[[Recipes/Details/Pasta]]"
+      ---
+      Dinner plan
+
+      """
+
   Scenario: Publishing a committed note edit updates the same Donut note
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I commit the following edit to "Recipes/Pasta.md" in the cloned checkout:
