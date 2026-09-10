@@ -164,9 +164,9 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 
 The active stories below cover independent correction outcomes. Each retains
 its own scope and proof; this seed is not a cross-subsystem executable plan.
-The product backlog owns priority. The former combined Story 2 now leads with
-folder-and-note publication, followed by deletion composition (2a) and move
-composition (2b), before the existing infrastructure corrections (3–4).
+The remaining stories start with deletion composition (2a) and move
+composition (2b), then the existing infrastructure corrections (3–4).
+The product backlog owns priority.
 
 ## Open product decision
 
@@ -175,128 +175,6 @@ should the product deliberately expose a partial synchronization boundary?
 Normal web authoring participation needs separate user outcomes; do not silently
 rebuild accepted history from live state. This question does not block the
 queued corrections.
-
-<a id="story-2"></a>
-
-### Story 2: Publish a new folder and its notes together
-
-#### Goal
-
-A notebook owner can publish a locally authored new folder and its ordinary
-notes into an existing notebook in one commit, preserving the folder README
-and existing learning history. The owner need not first publish an empty folder
-or create it separately in the web application.
-
-#### Scope
-
-**Selected small delivery:** publish a new root folder and its ordinary notes
-into an existing notebook. Deletion and move composition are separate Stories
-2a and 2b; the product backlog owns their priority.
-
-**Planning clarification from the user:** narrow examples describe the current
-delivery commitment, not constraint conditions. Generalize the current cohesive
-publication solution; do not add root-only, count-based, ordinary-type-only or
-unchanged-companion checks to enforce these examples. Existing format, identity
-and transaction safeguards still apply through their current domain owners.
-
-- **Required workflow:** a bound notebook already has accepted ordinary notes.
-  One proposal commit directly descends from its current accepted head and
-  adds a new root folder with a valid nonblank `README.md` and ordinary
-  `type: Note` files directly inside it. Existing accepted files are unchanged.
-  Publish the folder and notes together as the exact authored commit.
-- **Placement and representation:** root means directly under the notebook.
-  The proposed folder is new in both the accepted tree and live notebook;
-  normal folder-name and sibling-destination rules apply, including collisions
-  with live folders absent from the Portable tree. Do not adopt or overwrite
-  such a folder. `例文/README.md` supplies container content, not an ordinary
-  note named README. The notebook's own README remains unchanged.
-- **Result:** the folder and added notes receive fresh server identities;
-  authored README and note content, including author-owned YAML, survive the
-  Portable round trip. Existing notes retain content, identity and learning
-  data. A receiving clone with no unpublished work can pull the complete tree.
-- **Atomicity:** either all additions and the accepted head are persisted, or
-  none are. While this proposal is still the accepted head and live state
-  matches it, retrying the same proposal returns that head without duplicate
-  folders or notes, including when the first response was lost. An intervening
-  accepted change retains the existing stale-head behavior; this story does
-  not introduce replay of old requests. Invalid content or destinations, stale
-  accepted head and live-state drift retain their existing safe refusals;
-  report the actual condition and preserve local work.
-- **Preserved behavior:** the delivered README-only root-folder workflow
-  ([SEED-009 Story 19](SEED-009-git-backed-local-notebook-workflow.md#story-19)), ordinary
-  note publication, initial-tree publication and exact folder-subtree
-  publication keep their current behavior.
-- **Deferred promises:** deletion collections; moves/renames alongside other
-  operations and their identity-ambiguity policy; accompanying edits to
-  existing notes; nested or multiple new folders; folders implied only by
-  descendants; new Relationship publication into an existing notebook;
-  existing-container README edits; bulk performance and timeout recovery.
-  These remain future refinement input. Their absence from this delivery is
-  not a new requirement to reject otherwise valid compositions. Example counts
-  must not become eligibility gates or separate scenario handlers.
-
-The existing Portable format contract applies: [Accepted ADR 0004 —
-OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-keeps folder README content on the container, preserves authored YAML and
-requires format-valid durable writes. [Accepted ADR 0006 — Failure
-handling](../../docs/adrs/0006-failure-handling-accepted.md) governs failure
-propagation and useful diagnostics. No new architecture decision is proposed.
-
-#### Key examples
-
-| Precondition | Trigger | Required result |
-| --- | --- | --- |
-| An existing bound notebook contains a learned note; a direct-child commit adds `例文/README.md`, `例文/A.md` and `例文/B.md`, with valid types and authored YAML/body content | Publish | Create the folder and both notes atomically; preserve their authored content and the existing note's identity and learning data; accept the exact proposed head. |
-| The same workflow contains one ordinary note or several, with independent entries presented in a different order | Publish | Apply the same folder-and-note rule; note count and traversal order do not determine eligibility. |
-| That proposal remains the accepted head and live state matches it; the first response may have been lost | Retry the same publication | Return the same accepted head without duplicating the folder or notes. |
-| A second clean clone is at the preceding accepted head with no unpublished work | Pull after publication | Fast-forward to the complete accepted tree, including the authored folder README and all added notes. |
-| A live root folder already has the proposed folder's name, including an empty folder absent from the accepted tree | Publish the folder-and-notes proposal | Refuse the destination conflict; do not adopt the existing folder, create notes or advance the accepted head. |
-| One of the proposed notes has invalid Portable content, even if other members have already been processed | Publish | Reject the whole proposal with a useful reason; create no folder or notes and leave the accepted head unchanged. |
-| The accepted head has advanced, or live state no longer matches its accepted projection | Publish | Preserve the existing refusal and leave the attempted changes unapplied. |
-
-The installed CLI publication/receive boundary owns the visible round trip;
-focused proposal/controller examples establish preservation and atomic refusal.
-These are story outcomes, not an executable slice plan.
-
-The small example is an acceptance commitment, not a maximum supported layout.
-Required proof varies the number of ordinary notes without broadening the
-delivery to nested folders or Relationships. Preserve existing behavior for
-other layouts; do not add rejection tests merely to enforce this story's size.
-
-#### Reported checkout evidence
-
-Read-only inspection on 2026-09-10 of `/Users/terryyin/git/notebooks/jap3`,
-commit `d9ce5fb0506e49cc69f3531fea193176189fb17b` against parent
-`4708ad65fe9a7bcdcb3216f9816b1f9b757d7f2c`, found **1,043 added files**:
-972 with `type: Note`, 70 with `type: Relationship`, and one with
-`type: Readme` at `例文/README.md`. The parent contains 86 files. Additions
-include nested paths without their own README files. These counts classify
-the diff; they do not establish full format validity or current server
-acceptance. The checkout was clean and was not modified.
-
-The small example above isolates its new-folder-and-ordinary-notes obstacle.
-**Successful publication of the complete jap3 commit is not promised by this
-story**: Relationships, implied nested folders and bulk behavior need separate
-consideration. Do not use that entire checkout as this story's completion gate.
-
-#### Refinement status
-
-- **Status:** goal, scope and key examples established for the selected small
-  outcome; no open product question blocks slice planning. The user authorized
-  slice planning and any needed plan refinement, explicitly excluding execution.
-  Active plan: [Publish a new folder and its notes together](../quick/100-publish-folder-and-notes/PLAN.md).
-- **Planning handoff:** use the existing publication and clean-clone pull
-  workflow. No new CLI options, web interaction or identity-inference policy
-  is required. Carry the success, retry, destination-conflict and all-or-nothing
-  examples into outside-in proof. Folder creation plus note creation is one
-  user outcome; separate publication steps do not satisfy it.
-- **Effort hypothesis:** M, medium confidence for the reduced folder-and-note
-  outcome; preserve the existing publication transaction and format contract.
-- **Depends on:** no functional dependency on Story 1. Do not broaden its
-  reconciliation promise: receiving new folders here uses a clean clone with
-  no unpublished work.
-- **Safe stopping point:** owners can publish new folders with their notes
-  even if the deferred deletion/rename work is never selected.
 
 <a id="story-2a"></a>
 
@@ -370,10 +248,8 @@ consideration. Do not use that entire checkout as this story's completion gate.
 
 ## Execution readiness and design checks
 
-Story 1's plan is executed; no new execution is planned. Story 2 is refined
-and ready for executable slice planning. Stories 2a, 2b and 3–4 remain
-refinement input. The product backlog records the selected order; only
-Story 2's small folder-and-note outcome is promised by its refinement.
+Stories 2a, 2b and 3–4 remain refinement input. The product backlog records
+the selected order.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
 
