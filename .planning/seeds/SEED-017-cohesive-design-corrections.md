@@ -273,13 +273,98 @@ queued corrections.
 
 ### Story 3: Declare isolated test capabilities in one place
 
-- **For / why:** maintainers can see and change an approved test's resource requirements without editing resource lifecycle code for that example.
-- **Scope/design:** a small approved-spec descriptor registry drives common acquisition/cleanup; retain the same admitted specs and safety rules. Resource modules accept capabilities/configuration, not feature identities.
-- **Delivery sequence:** consolidate existing spec-to-capability policy; route runner/mock selection through it; remove filename exports/comparisons from resource lifecycle modules and update callers/tests.
-- **Evaluation:** existing no-mock and private-OpenAI runs use their respective owned resources; unknown and multiple specs still refuse. At runner/Cypress lifecycle boundaries, prove success, failure and cancellation release the correct resources and preserve peer ownership. Reuse 073/093 proofs; add only missing observable coverage.
-- **Stop-safe outcome:** the same four verified workflows continue to work with one policy owner. Adding more spec admissions is a later decision.
-- **Effort hypothesis:** M, medium confidence. Needs one representative isolated-run proof; do not rerun every unrelated E2E scenario.
-- **Depends on:** none.
+- **Kind:** bounded architectural correction preserving the existing isolated
+  test capability. This is not a new test-admission feature. Keep this section
+  as its canonical refinement input for later slice planning.
+- **Goal:** maintainers can understand and change an approved spec's resource
+  requirements in one place; developers retain safe, independent test runs.
+  Incremental workflow delivery should accumulate one coherent resource model,
+  rather than require lifecycle branches for each delivered story.
+- **Evidence:** the current `scripts/isolated-openai-mock.mjs` exports the
+  completion feature filename; `isolated-cypress-spec-selection.mjs` imports it
+  to build the allowlist; `isolated-cypress.mjs` compares the selected filename
+  against it to start a private mock. This reverses the dependency between
+  resource lifecycle and spec policy. The audit's F3 records its incremental
+  provenance. Unclear instructions are a plausible contributing explanation,
+  not an established sole cause. Specific feature names in an admission
+  registry or test fixture are appropriate; the resource mechanism owning
+  those names is the evidenced defect.
+- **Scope:** consolidate approval and spec-to-resource requirements into one
+  small authoritative registry. Preserve the same four approved workflows:
+  note editing, web-created-note CLI, MCP search/graph, and OpenAI completion.
+  All continue to use the owning SUT/allocation and runner lease. Only completion
+  currently requires the private OpenAI mock. Selection resolves the approved
+  spec and its requirements; orchestration uses those requirements to acquire
+  existing resources. Resource lifecycle modules know ownership/configuration,
+  not feature paths. Derived lists and diagnostics must not become a second
+  independently maintained admission or capability table.
+- **Architecture boundary:** spec policy owns which resources an approved
+  workflow needs; selection owns normalization and admission; orchestration
+  owns acquisition, endpoint exposure and cleanup; existing resource modules
+  own resource lifecycle and ownership checks. These are responsibilities, not
+  prescribed new classes/files. Setup-time selection and `before:run` selection
+  must consult the same policy, retaining current normalization and discovery
+  behavior and making mock endpoints available when Cypress needs them.
+  Reuse the existing runner and lifecycle machinery rather than cloning it.
+- **Preserved constraints:** one approved spec per isolated run; unknown or
+  multiple selected specs refuse before test reset/execution. Unknown specs
+  must not default to a no-mock capability. Preserve owning-SUT health checks,
+  runner exclusivity, private endpoints, foreign-resource refusal and isolation
+  from shared defaults. Failures remain observable by the runner; cleanup
+  releases acquired owned resources and the lease on completion, failure and
+  cancellation. Retain composed Cypress completion handlers and current timing
+  of setup-time endpoint exposure.
+- **Key examples:**
+  - An owner selects an approved no-mock workflow → starts its isolated run →
+    it uses the owning SUT and lease without starting a private OpenAI mock.
+  - An owner selects completion → starts its isolated run → its declared
+    requirement supplies the owned private mock and endpoint; completion,
+    failure or cancellation releases that run's resources while a peer remains
+    unaffected. Existing failure observation remains effective after startup.
+  - An unknown spec or several specs are selected → admission is evaluated →
+    the run refuses before test reset/execution, without shared-service fallback.
+  - A maintainer inspects an approved spec's requirements → finds one policy
+    entry → no resource module or orchestration filename comparison must be
+    kept in sync with it. Future new admission still needs its own safety proof.
+- **Evaluation:** use existing runner/Cypress boundary tests for selection,
+  resource acquisition, endpoint exposure, ownership refusal and cleanup;
+  reuse existing completion, mock-failure and cancellation proofs, including
+  the 073/093 lifecycle evidence, adding only missing observable coverage.
+  One representative live isolated run must confirm owned-resource release
+  and lease reuse. Structural review establishes that production feature-path
+  policy has one owner and lifecycle modules no longer depend on it; green
+  workflow tests alone do not prove this architectural correction. Do not
+  create tests per new internal helper or rerun unrelated E2E scenarios.
+- **Planning and execution handoff — explicit user intent (2026-09-11):**
+  generalize the existing solution into a cohesive, consistent system, not a
+  mirror of story decomposition. Plan the shared policy/dependency correction,
+  not separate implementations for note editing, CLI, MCP and completion.
+  Identify obsolete filename exports/comparisons and their affected consumers
+  to migrate, including harnesses and fixtures; remove superseded production
+  rules rather than retaining competing compatibility paths. Review the
+  cumulative final design and implicated unchanged code for duplication.
+  Structure slices may directly own this evidenced correction with preserved
+  public behavior; do not invent new user behavior to justify refactoring.
+- **Deferred/excluded:** new spec admissions, multiple-spec runs, new mock
+  providers, a generic plugin/resource framework, changed process termination
+  mechanics (Story 4), environment allocation redesign, and notebook publication.
+  Do not add capabilities merely to fill a speculative future abstraction.
+- **Accepted ADRs:** [0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md)
+  preserves environment and ownership boundaries;
+  [0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md)
+  preserves visible failures and purposeful handling. No conflicting decision
+  or new ADR approval is needed for this bounded dependency correction.
+- **Safe stopping point:** the same four workflows run with one policy owner
+  and unchanged safety/lifecycle guarantees even if no further specs are added.
+- **Effort hypothesis:** M, medium confidence; setup-time versus `before:run`
+  resource timing is the main integration consideration for slice planning.
+- **Dependencies and parallelism:** no functional dependency on Story 2a/2b.
+  Can execute alongside notebook publication in a separate owning worktree
+  after planning. Coordinate shared seed/backlog edits and do not overlap
+  mutable test resources. Avoid concurrent edits to the lifecycle mechanism
+  selected for Story 4.
+- **Refinement status:** refined; no unresolved product-scope decisions.
+  Executable plan: [Declare isolated test capabilities in one place](../quick/100-declare-isolated-test-capabilities/PLAN.md).
 
 <a id="story-4"></a>
 
@@ -296,7 +381,8 @@ queued corrections.
 ## Execution readiness and design checks
 
 Story 2a has refined behavior and an executable plan using the conservative
-mixed-addition boundary. Stories 2b and 3–4 remain refinement input.
+mixed-addition boundary. Story 3 has an executable plan for its bounded
+architectural correction. Stories 2b and 4 remain refinement input.
 The product backlog records the selected order.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
