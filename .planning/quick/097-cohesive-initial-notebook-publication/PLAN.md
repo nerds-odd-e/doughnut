@@ -308,7 +308,11 @@ Folder-name policy is introduced.
 
 ### 10. Correct and retry an initial publication safely
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+Proof-only lifecycle rejects invalid content, corrects on the original accepted
+parent and repeats successful publication with the same head and Folder/Note IDs.
+Independent refactor completed without edits; format passed.
 Proof: Reject invalid authored content, correct it on the original accepted base,
 publish successfully, then repeat the accepted proposal. Observe one accepted
 head and the same Folder/Note IDs with no duplicates. Reuse existing controller
