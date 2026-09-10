@@ -26,6 +26,7 @@ changes.
 
 ## Recently done
 
+- [Publish two notes and their relationship together](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-7) — SEED-016
 - [Publish three small initial layouts exposed by the jap1 failure](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-6) — SEED-016
 - [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
 - [Run one non-interactive CLI E2E workflow against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
