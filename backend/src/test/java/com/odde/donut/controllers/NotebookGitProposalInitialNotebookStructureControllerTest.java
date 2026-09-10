@@ -37,46 +37,6 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void publishesInitialNotebookAndRootFolderReadmesAsTheExactAuthoredCommit() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] proposalBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
-                new NotebookGitProposalFile("Field Notes/README.md", FOLDER_README)));
-
-    GitBundleTestReader.SingleParentGitCommit proposedCommit;
-    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
-      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
-    }
-
-    String publishedHead =
-        controller.publishNotebookGitProposal(
-            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
-
-    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
-    assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
-    List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(folders, hasSize(1));
-    Folder created = folders.getFirst();
-    assertThat(created.getName(), equalTo("Field Notes"));
-    assertThat(created.getParentFolderId(), nullValue());
-    assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
-    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
-
-    ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
-    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
-          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
-      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
-      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
-    }
-  }
-
-  @Test
   void publishesInitialNotebookFolderAndOneNoteAsTheExactAuthoredCommit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);

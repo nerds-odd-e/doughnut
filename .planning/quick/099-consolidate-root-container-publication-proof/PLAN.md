@@ -1,6 +1,6 @@
 # Consolidate root container publication proof
 
-Status: planned — retrospective correction; not executed.
+Status: executed — retrospective correction complete.
 Source: [SEED-017 Story 11](../../seeds/SEED-017-cohesive-design-corrections.md#story-11).
 
 ## Finding and bounded outcome
@@ -42,7 +42,7 @@ are untouched. The backend suite exercises the retained controller boundaries.
 ## 1. Remove the remaining duplicate root-container round trip
 
 Type: Structure
-Status: planned
+Status: done
 Proof: the retained container-tree controller proof continues to cover notebook
 and root Folder Readmes, exact accepted and downloaded Git state and content,
 root ancestry, and zero Notes; the full backend unit suite passes after the
@@ -87,3 +87,22 @@ empty-root boundaries keep their existing owners.
 
 No slice-specific concern was found in this assessment. No product code was
 changed and no tests were run during planning. Execution remains unstarted.
+
+## Execution
+
+Removed `publishesInitialNotebookAndRootFolderReadmesAsTheExactAuthoredCommit`
+from `NotebookGitProposalInitialNotebookStructureControllerTest`. No other
+production, API, schema, CLI, E2E or backlog changes. Post-change refactor
+review found no residue: no stale references to the removed method, all
+imports and constants in the file remain used by the four remaining test
+methods, and no duplication of the removed scenario exists elsewhere.
+
+```
+proof:
+  command: CURSOR_DEV=true nix develop -c pnpm backend:test_only
+  covers: full backend unit test suite, including the remaining
+    NotebookGitProposalInitialNotebookStructureControllerTest scenarios,
+    NotebookGitProposalInitialContainerTreeControllerTest, and
+    NotebookGitProposalInitialNotebookReadmeControllerTest
+  result: pass
+```
