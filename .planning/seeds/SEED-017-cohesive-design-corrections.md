@@ -176,108 +176,6 @@ Normal web authoring participation needs separate user outcomes; do not silently
 rebuild accepted history from live state. This question does not block the
 queued corrections.
 
-<a id="story-1"></a>
-
-### Story 1: Receive compatible accepted history without example-count restrictions
-
-#### Goal
-
-Notebook owners keep their local content edits while receiving accepted ordinary
-note edits and additions with `donut notebook pull`. Adding another independently
-edited path or another accepted save must not arbitrarily change eligibility.
-An eligible pull may pause for a real text conflict; eligibility does not promise
-automatic conflict resolution.
-
-#### Scope
-
-- **Required local behavior:** receive history with one unpublished, non-merge
-  commit editing a nonempty set of existing ordinary Markdown notes at unchanged
-  paths. No eligibility limit on the number of those paths. If that commit is
-  already based on the accepted head, pull succeeds without rewriting it. Retain
-  existing fast-forward behavior when no unpublished work remains.
-- **Compatible accepted interval:** a linear chain from the local commit's
-  parent to the accepted head, including an empty chain. Each change is an
-  ordinary-note content edit or addition. Each addition targets the notebook
-  root or a valid folder represented in the preceding accepted tree. Commits
-  may contain multiple compatible operations; additions, saves of newly added
-  notes, and saves of existing notes may compose across the interval without
-  path-count or save-count limits. Assess every edge, not only the net diff.
-  Reordering independent operations does not change eligibility; a save still
-  requires its note to exist at that point in history.
-- **Overlaps and preservation:** accepted edits may affect any locally edited
-  note. Non-overlapping text changes combine; genuine conflicts use the existing
-  Git resolution, continue and abort workflow, including conflicts in several
-  files. Preserve all companion changes throughout. Final-LF equivalence retains
-  its existing narrow meaning (otherwise identical text differing by one final
-  LF); it must not erase unrelated edits or conceal a genuine conflict. Discard
-  a replayed commit only when its complete remaining change is redundant.
-- **Safety constraints:** a dirty checkout must not be overwritten; unrelated
-  history must not be grafted onto the notebook; an accepted interval must have
-  the stated ancestry; unknown structural or identity correspondence must not be
-  guessed. Refusal preserves local work and explains the actual condition.
-  Counts within the required operations are not safety constraints.
-- **Deferred capabilities:** multiple unpublished commits, merge reconciliation,
-  local additions/deletions/moves, and broader accepted structural operations
-  are outside this delivery commitment. Preserve their existing safe refusals
-  where encountered; these are current support boundaries, not newly asserted
-  permanent product prohibitions. In particular, one unpublished commit is a
-  bounded delivery assumption, not a domain rule that users should always
-  squash their work. Preserve delivered exact-subtree replay without promising
-  additional move combinations. New-folder receipt and wider web-mutation
-  participation in accepted history are not added by this story.
-- **Guidance:** remove instructions and negative expectations that prescribe
-  reducing eligible work to one/two notes or a particular accepted-save sequence.
-  Describe remaining support boundaries honestly without calling ordinary
-  additions structural merely because they occur more often.
-
-#### Key examples
-
-All divergent examples start with a clean checkout, one unpublished ordinary
-content-edit commit, and accepted history descending linearly from its parent.
-The named notes and counts illustrate the rules; they do not cap support.
-
-| Precondition | Trigger | Required result |
-| --- | --- | --- |
-| Local edits A and B; accepted saves C once or repeatedly | Pull | Receive the latest C and retain both local edits on top of accepted history. Both save counts are eligible. |
-| Local edits A, B and C; accepted head is already their commit's parent | Pull | Succeed with the local commit and files unchanged. |
-| Local edits A; accepted adds D and E, together or separately, then repeatedly saves D and saves an existing note | Pull | Receive all accepted content and retain A. Independent save ordering and operation grouping do not create a refusal. |
-| Local edits A and B; accepted edits a different region of A | Pull | Combine A's non-overlapping edits and retain B without requiring manual resolution. |
-| Local edits A, B and C; accepted overlaps the authored text in A and B | Pull, resolve both files, then continue | Report the actual conflicts; retain the chosen resolutions and C, with the resulting local work based on the accepted head. |
-| The same real-conflict case is paused | Abort the rebase | Restore the original local commit and checkout content, including every companion edit. |
-| Local edits A and B; A's conflict is only final-LF equivalence and B still contains valuable work | Pull | Keep the equivalent accepted A and retain B's local change; do not skip B with the whole commit. If another file has a genuine conflict, keep it resolvable. |
-| Every local change is already represented in accepted content, including the narrow LF-equivalence case | Pull | Finish without an unnecessary unpublished commit; discard nothing beyond redundant work. |
-| Dirty checkout, unrelated history, or an operation outside the supported reconciliation boundary | Pull | Refuse before destructive reconciliation, preserve local work, and identify the actual condition rather than suggest an example-sized edit. |
-
-The original six F1 probes remain required outcomes: the five divergent cases
-reconcile, and the no-new-accepted-commit case succeeds unchanged. Prove these
-rules through the real `notebook pull` boundary with content, local/accepted
-ancestry, conflict continuation and abort observations. Preserve the existing
-exact-subtree replay evidence.
-
-#### Planning handoff
-
-One local change-set representation, accepted commits inspected against their
-preceding trees, and a common rebase/conflict lifecycle should replace the
-one/two-note and addition-then-save recognizers. Remove obsolete handlers,
-count-based negative tests and conflicting guidance together with their
-replacement. This is the existing correction direction, not a new architecture
-decision.
-
-Make complete-commit conflict preservation safe before broadening eligibility;
-then cover content-only histories and already-based batches, followed by
-composed additions/saves and aligned diagnostics. Keep successful-case and safety
-proofs with each behavioral change. Content-only reconciliation is an independently
-useful stopping point, but completion still includes accepted additions.
-
-- **Effort hypothesis:** M–L, medium confidence; conflict state and complete-commit
-  preservation need executable slice sizing. No database experiment is required
-  for the CLI classifier itself.
-- **Depends on:** no functional dependency on initial publication or Story 2.
-- **Refinement status:** goal, scope and key examples established. No unresolved
-  product decision blocks slice planning. The broader web-history participation
-  question above remains separate. Execution planning and implementation have
-  not been requested by this refinement.
-
 <a id="story-2"></a>
 
 ### Story 2: Publish a new folder and its notes together
@@ -472,9 +370,10 @@ consideration. Do not use that entire checkout as this story's completion gate.
 
 ## Execution readiness and design checks
 
-Stories 1 and 2 are refined and ready for executable slice planning. Stories
-2a, 2b and 3–4 remain refinement input. The product backlog records the selected
-order; only Story 2's small folder-and-note outcome is promised by its refinement.
+Story 1's plan is executed; no new execution is planned. Story 2 is refined
+and ready for executable slice planning. Stories 2a, 2b and 3–4 remain
+refinement input. The product backlog records the selected order; only
+Story 2's small folder-and-note outcome is promised by its refinement.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
 

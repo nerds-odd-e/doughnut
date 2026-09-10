@@ -22,7 +22,6 @@ changes.
 
 ## Backlog
 
-- [Receive compatible accepted history without example-count restrictions](seeds/SEED-017-cohesive-design-corrections.md#story-1) — SEED-017
 - [Publish a new folder and its notes together](seeds/SEED-017-cohesive-design-corrections.md#story-2) — SEED-017
 - [Publish note deletions alongside compatible note changes](seeds/SEED-017-cohesive-design-corrections.md#story-2a) — SEED-017
 - [Publish unambiguous note moves alongside compatible note changes](seeds/SEED-017-cohesive-design-corrections.md#story-2b) — SEED-017
