@@ -164,47 +164,7 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 
 The active stories below cover independent correction outcomes. Each retains
 its own scope and proof; this seed is not a cross-subsystem executable plan.
-The container-publication proof correction is first in the queue, followed by
-Stories 1–4 in their developer-selected order.
-
-<a id="story-11"></a>
-
-### Story 11: Consolidate root container publication proof
-
-- **For / why:** developers need one maintained controller proof for
-  container-only root publication, avoiding duplicate database and Git-bundle
-  round trips for the same behavior.
-- **Goal:** retain proof that notebook and root Folder Readmes publish as the
-  exact authored Git state with zero Note rows in one container-tree owner.
-- **Scope:** remove the overlapping successful root-Readme method from the
-  notebook-structure controller test. Preserve that class's mixed-content,
-  rejection and document-role scenarios, plus the notebook-Readme-only proof
-  and installed CLI journey. Product behavior remains unchanged.
-- **Evaluation:** the retained container-tree controller test owns the exact
-  authored head, tree, paths, content, root ancestry and zero-Note observations,
-  and the required backend suite passes after consolidation.
-- **Key example:** given an empty Git-backed notebook, when a proposal contains
-  a notebook Readme and root Folder Readmes, publication preserves the authored
-  content and Git state, creates the root Folders and no Notes, without a second
-  controller scenario owning the same observations.
-- **Exclusions:** production changes, rejection or mixed-content cleanup, API,
-  schema, CLI, E2E and broader test-suite changes.
-- **Boundary example:** a proposal containing a Note, or a notebook Readme
-  without any Folder, retains its distinct existing proof. Folder counts alone
-  do not establish distinct publication contracts or require a new count case.
-- **Refinement:** current source confirms the retained `A|B|C, true`
-  container-tree scenario covers the overlapping method's observations and
-  additionally checks downloaded paths and document bytes. No open question
-  affects this story; the broader synchronization decision below is deferred.
-- **Execution plan:** [quick/099](../quick/099-consolidate-root-container-publication-proof/PLAN.md).
-- **Current-state refinement (2026-09-10):** implemented in `ab911b4b88`.
-  The duplicate method is absent and the retained `A|B|C, true` scenario
-  still owns the promised observations. Quick/099 records the backend suite
-  passing. No remaining implementation slice or story-specific open question
-  was identified; the backlog entry awaits lifecycle closure. Neither linked
-  worktree (`lwq6`, `oug`) has changes associated with this correction.
-- **Safe stopping point:** the remaining successful container-only proof has one
-  owner independently of later Git workflow corrections.
+Stories 1–4 proceed in their developer-selected order.
 
 ## Open product decision
 
@@ -266,7 +226,7 @@ queued corrections.
 
 ## Execution readiness and design checks
 
-Story 11's plan is executed; no new execution is planned. Stories 1–4 remain refinement input; Story 2
+Stories 1–4 remain refinement input; Story 2
 needs particular attention to identity ambiguity before execution.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
