@@ -85,8 +85,10 @@ Folders independently of fixture count, so the cumulative design introduces no
 new case recognizer or parallel representation. Mixed-concept, rejection and
 empty-root boundaries keep their existing owners.
 
-No slice-specific concern was found in this assessment. No product code was
-changed and no tests were run during planning. Execution remains unstarted.
+No slice-specific concern was found in the planning assessment. No product code
+was changed and no tests were run during planning. Execution subsequently
+completed as recorded below. Current-state refinement on 2026-09-10 confirmed
+the removal in `ab911b4b88` and the retained proof; no remaining slice was found.
 
 ## Execution
 
