@@ -8,8 +8,9 @@ even when tests pass.
 Stop when an unresolved decision concerns user value, a structural choice
 constraining later slices or architecture, credentials or permissions, or
 ambiguity that could waste a commit. Also stop when evidence changes the selected
-story's beneficiary, outcome, evaluation, scope, or order relative to other
-stories. Record the affected story and field; follow
+feature story's beneficiary, outcome, evaluation, scope, or order relative to
+other stories, or changes a bounded correction's beneficiary, outcome, proof,
+or scope. Record the affected source and field; follow
 [learning escalation](../../dough-story-decomposition/references/problem-decomposition.md#size-and-escalate-slices)
 before refining more slices.
 

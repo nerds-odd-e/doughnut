@@ -44,11 +44,13 @@ unfinished proof. Do not run full CI before commit unless explicitly required.
 5. Update the active plan and any project-required summary with learnings, slice
    status, and revised remaining slices under
    [plan refinement](../../dough-story-refinement/references/planning.md#refine-the-active-plan).
-   For stale story understanding, record `awaiting story review`, identify the
-   selected story in its seed and the affected field, and stop at the safe
-   delivery boundary without changing other stories. This plan update alone
-   does not trigger another formatting pass. A CI repair records its result
-   without marking the interrupted slice done.
+   For stale feature-story understanding, record `awaiting story review` and
+   identify the selected story in its seed and the affected field. For stale
+   correction understanding, record `awaiting correction review` and identify
+   the correction plan and affected field. Stop at the safe delivery boundary
+   without changing other stories or the correction outcome. This plan update
+   alone does not trigger another formatting pass. A CI repair records its
+   result without marking the interrupted slice done.
 6. Stage only owned files or separable owned changes and inspect the staged diff.
    Stage all content only when all of it is owned. Unrelated unstaged work does
    not block delivery. Resolve unrelated staged content or ambiguous ownership

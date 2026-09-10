@@ -1,8 +1,9 @@
 ---
 name: dough-execution-retrospective
 description: >-
-  Reviews one completed or in-progress plan execution against its original story,
-  aggregate commit set, current whole-product architecture, and test suite. Use for an execution
+  Reviews one completed or in-progress plan execution against its original
+  feature story or bounded-correction contract, aggregate commit set, current
+  whole-product architecture, and test suite. Use for an execution
   retrospective, product review, or backlog recommendation even when cleanup
   removed the plan or the user supplies only a partial reference. `--skip-process`
   and `--skip-product` omit those reviews independently. May plan unresolved
@@ -37,8 +38,9 @@ focus or write its destination.
 
 ## Work from these principles
 
-- **Original intent is the contract.** Recover the story, boundaries, approved
-  changes, and promised proof before judging implementation.
+- **Original intent is the contract.** Recover the feature story or bounded
+  correction input, boundaries, approved changes, and promised proof before
+  judging implementation.
 - **Commit membership needs evidence.** A nearby commit is not part of the
   execution merely because it is in the same range.
 - **Judge the aggregate result and current architecture.** Review the combined
@@ -50,8 +52,8 @@ focus or write its destination.
 - **Plan state decides the destination.** Amend an unfinished plan; create a
   follow-up plan only for a completed execution.
 - **The user owns disputed scope and constraints.** Stop when evidence cannot
-  distinguish two plans or when a finding would change the story rather than
-  correct it. Use the shared
+  distinguish two plans or when a finding would change the source outcome rather
+  than correct it. Use the shared
   [plan-conflict handoff](../dough-execute-plan/references/execution-decisions.md#resolve-a-disputed-plan-restriction)
   for apparently accidental contractual restrictions; plan compliance does not
   settle their justification.
@@ -63,14 +65,17 @@ focus or write its destination.
 
 ## Resolve this project's context
 
-Require one useful clue: a capability or story phrase, plan path, commit, or the
-current execution conversation. Resolve this project's plan and story locations,
-status vocabulary, cleanup lifecycle, repository navigation, and focused test
-commands. Preserve existing working-tree changes.
+Require one useful clue: a capability or story phrase, correction plan, commit,
+or the current execution conversation. Resolve this project's plan and
+feature-story locations when applicable, status vocabulary, cleanup lifecycle,
+repository navigation, and focused test commands. Preserve existing working-tree
+changes. A complete bounded correction plan is its source contract; do not
+require or create a seed for its retrospective.
 
 Resolve this project's established near-future direction when present. When
 product review is enabled, resolve backlog and canonical-story conventions when
-that review needs them. Do not invent a direction, backlog, or seed location.
+that review needs them. Do not invent a direction, backlog, or feature-story
+seed location.
 
 If context needed for a review decision is missing, name it and stop that path.
 Do not invent a plan location, completion rule, or project convention.
@@ -83,7 +88,7 @@ refactor checks before assessing refactoring residue; apply its smell definition
 to the aggregate result without running its editing workflow. Read
 [dough-slice-planning](../dough-slice-planning/SKILL.md) only when unresolved
 findings need planning, then follow its
-[bounded-correction entry](../dough-slice-planning/SKILL.md#require-an-understood-story),
+[bounded-correction entry](../dough-slice-planning/SKILL.md#require-understood-planning-input),
 proof, sizing, and destination gates. Read [dough-product-backlog](../dough-product-backlog/SKILL.md) only when
 product review is enabled and recommendations depend on those conventions.
 
@@ -91,9 +96,9 @@ product review is enabled and recommendations depend on those conventions.
 
 Search the current conversation, current planning material, and Git history in
 that order. A partial reference or a plan removed by normal cleanup is sufficient
-when history identifies it. Recover the earliest execution-ready plan, its story
-and intended outcome, and any later changes supported by user approval or new
-evidence.
+when history identifies it. Recover the earliest execution-ready plan, its
+feature story or bounded-correction input and intended outcome, and any later
+changes supported by user approval or new evidence.
 
 Determine completion from the latest plan state and execution evidence, not file
 presence. Any planned or in-progress slice makes the plan unfinished. A deleted
@@ -138,9 +143,10 @@ Never propose or apply a replacement or revision of the direction itself.
 
 ## Review the outcome
 
-Apply the shared direction consideration. Then compare the story contract and
-approved changes with the aggregate code, tests, documentation, and proof at
-the execution boundary. For the historical assessment of an unfinished plan,
+Apply the shared direction consideration. Then compare the feature-story or
+bounded-correction contract and approved changes with the aggregate code, tests,
+documentation, and proof at the execution boundary. For the historical
+assessment of an unfinished plan,
 judge only the completed slices;
 do not call unexecuted planned behavior missing or its explicitly temporary
 predecessor obsolete.
@@ -148,7 +154,7 @@ predecessor obsolete.
 Keep only findings with concrete evidence and plausible impact:
 
 1. bugs or regressions;
-2. story drift or an unresolved scope dispute;
+2. source-outcome drift or an unresolved scope dispute;
 3. refactoring residue in complete implicated concepts;
 4. consequential weaknesses in the current whole-product architecture; and
 5. test coverage or execution-cost findings under the shared behavioral test guidance.
@@ -300,6 +306,7 @@ the order of supported findings:
 - Execution: <stable execution identity>
   - Tool: <Codex, Cursor, Claude Code, or another identified tool>
   - Model: <model identifier, when available>
+  - Open Dough release: <version | unknown | unreleased | modified>
   - Evidence: <decisive compact references or locators>
   - Observed effect: <what the record shows>
   - Inference: <qualified cause, cost, or uncertainty, only when needed>
@@ -318,18 +325,43 @@ omit the Model line instead of guessing or performing a separate lookup. If the
 executing tool cannot be identified, report the finding without adding a
 countable occurrence. Do not backfill older rows without supporting evidence.
 
+On every new occurrence, record `Open Dough release:` as a released version,
+`unknown`, `unreleased`, or `modified`. This is the Open Dough guidance used
+while the work ran — not this project's product version, and not the release
+installed when the retrospective later runs. Resolve it from execution or
+installation provenance tied to the reviewed work. Do not use a current
+checkout `VERSION`, or today's `.agents/skills/dough-update/VERSION` or
+`.claude/skills/dough-update/VERSION`, unless that installation is tied to the
+work. If the release cannot be established, write `unknown`. For unreleased or
+modified guidance, mark that state and attach an available revision and, when
+known, the base released version — for example
+`modified; revision <rev>; base <version>` — rather than a clean released
+version. Do not guess or backfill a release on older rows; an identical
+rereview still makes no edit.
+
 When the canonical log exists, maintain it only when its issue headings,
 descriptions, and occurrence rows are interpretable enough to identify the
-affected issue, execution, and next unused local ID. Preserve existing IDs,
-human notes, prior evidence, unrelated entries, and all content outside the
+affected issue, execution, and next unused local ID. Existing headings may use
+`DD-NNN` or a previously adopted code such as `ODF-001`; both are local issue
+IDs in this project's log. Identify issue IDs only from this project's log. Do
+not mint `ODF-NNN`. Preserve existing IDs, human notes, prior evidence,
+unrelated entries, release-bearing occurrence rows, and all content outside the
 smallest supported edit. Do not migrate, normalize, reorder, delete, or
 automatically merge existing content.
 
 Match an existing issue only when decisive evidence supports the same concrete
 process problem or useful practice; similar wording or symptoms do not establish
-that match. If the relationship is uncertain but the log itself is interpretable,
-create a separate issue with the next unused `DD-NNN` ID and briefly state the
-matching uncertainty. Never change another issue's ID to fill a gap.
+that match. Reuse that issue's existing heading code, including a previously
+adopted code such as `ODF-001`. If the relationship is uncertain, or
+the finding has no supported match, and the log itself is interpretable, create
+a separate issue with the next unused local `DD-NNN` and briefly state matching
+uncertainty when that is the reason. Never change another issue's ID to fill a
+gap.
+
+The next unused `DD-NNN` is one greater than the highest number already used on
+any issue heading, counting both `DD-NNN` and adopted `ODF-NNN` numbers. Do
+not allocate a `DD-NNN` that collides with an existing heading number. If
+`ODF-001` is present, do not allocate `DD-001`.
 
 Within a matched issue, treat equal execution identities as one occurrence. An
 identical rereview makes no edit. Add only newly available decisive evidence or
@@ -389,8 +421,9 @@ implementation findings.
 
 ## Report
 
-Report the resolved story and completion state, provenance, included commit
-manifest and review boundary, findings ordered by impact or `none`, planning
+Report the resolved feature story or bounded correction and completion state,
+provenance, included commit manifest and review boundary, findings ordered by
+impact or `none`, planning
 result, and evidence limitations. Include supported process proposals only for
 enabled process review. Include product recommendations or a reasoned no-change
 result only for enabled product review; do not report backlog writes from this

@@ -7,8 +7,11 @@ only for a single interactive slice. The coordinator retains
 
 Give the agent:
 
-- The plan path, current slice, and mapped promises and observations, including
-  replacement and lifecycle obligations. Omit unrelated plan history.
+- The plan path, its selected-story or bounded-correction source, current slice,
+  and mapped promises and observations, including replacement and lifecycle
+  obligations. For a correction, pass its complete plan-owned
+  [correction input](../../dough-story-refinement/references/planning.md#choose-the-planning-level)
+  rather than requiring a seed. Omit unrelated plan history.
 - [Execution decisions](execution-decisions.md), this project's slice budget and
   exceptions, workflow precedence, and literal focused commands with the runtime
   wrapper. Require relevant proof; broaden testing only when the slice, project

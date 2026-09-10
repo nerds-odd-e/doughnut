@@ -5,9 +5,22 @@
 Refine an unresolved selected story in its seed. Once its goal, scope, and key
 examples are understood and executable planning is authorized, write or refine
 one active executable plan. Do not use an execution plan to decide story scope,
-and do not turn a story seed directly into executable work. An evidenced
-[bounded retrospective correction](../../dough-slice-planning/SKILL.md#require-an-understood-story)
-may supply the understood outcome and proof without a new feature story.
+and do not turn a story seed directly into executable work.
+
+An evidenced bounded retrospective correction may instead use its active plan
+as the authoritative input when the plan contains its source and provenance,
+beneficiary and bounded outcome, current findings and scope, preserved promises
+and genuine constraints, observable proof ownership, current decisions, and
+executable slices. An existing seed can add context but is not required. Name
+whichever required correction field is missing and stop that path; do not create
+or recover a seed to fill the gap. Resolve disputed product constraints through
+the shared
+[plan-conflict handoff](../../dough-execute-plan/references/execution-decisions.md#resolve-a-disputed-plan-restriction),
+leaving the decision with the human.
+
+Planning and refinement never supply execution authority. Execute only when the
+current human or invoking workflow instruction authorizes execution; a
+planning-only handoff stops before implementation even when the plan is complete.
 
 ## Refine story understanding
 
@@ -60,7 +73,11 @@ boundaries. Implementation may change any product parts needed for the promised
 outcome while respecting genuine product constraints and architectural decisions.
 Story membership alone does not justify a structural boundary.
 
-## Update the story in its seed
+## Update a feature story in its seed
+
+This section applies to a selected feature story. For a bounded retrospective
+correction, keep its understood outcome, scope, proof, and decisions in the same
+active plan under the correction-input contract above.
 
 Follow the shared
 [seed format](../../dough-story-decomposition/references/seed-format.md) for
@@ -166,10 +183,13 @@ external-wait exception that decomposition cannot reduce.
 
 Keep enduring behavior in tests and product documentation, and enduring design
 in code and ADRs. Once that knowledge is captured, reduce each implemented
-story's refinement detail to Goal and Scope, including exclusions, while the
-plan and review evidence still exist. Retain unfinished siblings.
+feature story's refinement detail to Goal and Scope, including exclusions,
+while the plan and review evidence still exist. A bounded correction remains in
+its plan; do not create a seed as cleanup ceremony. Retain unfinished siblings
+and correction plans.
 
-When the executable plan completes, keep the plan and review inputs for
-retrospective and [dough-story-wrap-up](../../dough-story-wrap-up/SKILL.md).
-Do not delete spent story or plan history, create a completion record, or
-trim review inputs here. Wrap-up owns that closure.
+When the executable plan completes, keep the plan, its feature-story source when
+applicable, and review inputs for retrospective and
+[dough-story-wrap-up](../../dough-story-wrap-up/SKILL.md). Do not delete spent
+source or plan history, create a completion record, or trim review inputs here.
+Wrap-up owns that closure.

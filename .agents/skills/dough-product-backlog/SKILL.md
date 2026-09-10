@@ -1,6 +1,6 @@
 ---
 name: dough-product-backlog
-description: Maintains and reprioritizes a product backlog list of story references. Use to add, reorder, or complete backlog items. Excludes classroom and workshop exercise backlogs.
+description: Maintains and reprioritizes a product backlog list of canonical story or bounded-correction references. Use to add, reorder, or complete backlog items. Excludes classroom and workshop exercise backlogs.
 ---
 
 # Product backlog
@@ -10,23 +10,33 @@ description: Maintains and reprioritizes a product backlog list of story referen
 Before editing, identify from human instructions or repository guidance:
 
 - Repository root and canonical backlog path.
-- Canonical seed locations, seed IDs, and heading or stable-anchor conventions.
+- Canonical seed locations, seed IDs, and heading or stable-anchor conventions
+  when feature-story entries are affected.
+- Canonical executable-plan locations and plan identity conventions for
+  bounded-correction entries when they are affected.
 - Decomposition, refinement, and slice-planning workflows, when needed.
 - Commit conventions, if a commit is authorized.
 
-If the backlog or required seeds cannot be identified, ask for the missing
-context and stop before editing. If a required workflow is unavailable, stop
-that activity and ask for its guidance.
+If the backlog or the canonical home required by an affected entry cannot be
+identified, ask for the missing context and stop before editing. Do not require
+seed conventions when every affected entry is a bounded correction plan. If a
+required workflow is unavailable, stop that activity and ask for its guidance.
 
 ## File layout
 
-- Place **Near-future direction** immediately after the title and the **Backlog
-  list** next. Do not add a finished-list or recently-done section.
-- Use bullet lists. Do not number items. Put the highest-priority backlog item first.
-- In the backlog list, include only each exact story title linked to its heading
-  or stable anchor, plus its seed ID. Keep story details, estimates, dependencies,
-  and status in the story's section within its seed.
-- Select stories for the backlog list; do not inventory every candidate or turn
+- Place **Near-future direction** immediately after the title when it exists,
+  then **Taken** immediately before **Backlog list**. Retain **Taken** when it is
+  empty. Do not add a finished-list or recently-done section.
+- Use bullet lists. Do not number items. Put the highest-priority queued item
+  first. Preserve the order of entries already in **Taken** and append each
+  newly taken entry.
+- In **Taken** and **Backlog list**, include only each exact work title linked to
+  its canonical active home and its established identity. A feature story uses
+  its heading or stable anchor plus seed ID. A bounded correction without a
+  supplied story links directly to its existing plan and uses the plan identity;
+  the linked path is sufficient when that is this project's identity convention.
+  Keep details, estimates, dependencies, and status in that canonical home.
+- Select work for the backlog list; do not inventory every candidate or turn
   the list into a roadmap or execution plan.
 
 ## Near-future direction
@@ -41,38 +51,74 @@ that activity and ask for its guidance.
 - Use the direction to guide ordering. Most items should align with it; urgent
   fixes and urgent architecture changes may take priority.
 
+## Canonical active homes
+
+- Keep a feature story in one canonical section within its seed.
+- Keep a bounded retrospective correction in its existing plan when no
+  canonical story is supplied. Do not create or recover a seed solely to queue
+  it. Require the plan to satisfy the correction-input contract in
+  [planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level).
+- When a canonical story is supplied for planned work, queue that story and link
+  its plan there. Do not also queue the plan. Treat references to either home as
+  the same work when checking repetition and duplicates.
+
 ## Maintain the backlog list
 
-- Read the backlog, its direction if present, and referenced story sections
+- Read the backlog, its direction if present, and referenced canonical homes
   before changing order.
 - Follow human priority instructions. Otherwise rank by direction alignment,
   user value, learning value, and genuine product prerequisites. Preserve
   unrelated order. Do not derive priority from seed IDs or order within a seed.
-- Keep each story in one canonical section within a seed. Link from related
-  documents; do not duplicate story details or list the same story twice.
+- Link from related documents; do not duplicate work details or list the same
+  story or correction twice within or across **Taken** and **Backlog list**.
 - Preserve stable anchors when renaming or moving stories. Update incoming links.
-- Add only stories with a named beneficiary and evaluable outcome. If either
-  is unresolved, use this project's decomposition workflow. Route selected-story
-  detail to refinement, then slice planning. Carry the direction into these
-  workflows as the primary input for scope decisions.
-- Place unfinished prerequisites before dependent stories. If this conflicts
-  with explicit human ordering, cite the stories and ask the human to resolve
+- Add a feature story only with a named beneficiary and evaluable outcome. If
+  either is unresolved, use this project's decomposition workflow and route
+  selected-story detail to refinement, then slice planning. Add a bounded
+  correction only when its plan satisfies the correction-input contract above;
+  otherwise name the missing field and leave the plan and queue unchanged. Do
+  not use decomposition to fabricate a story. Carry the direction into
+  applicable workflows as the primary input for scope decisions.
+- Place unfinished prerequisites before dependent work. If this conflicts with
+  explicit human ordering, cite the affected entries and ask the human to resolve
   the conflict before changing their order. Do not invent technical preparation
   stories.
 - Reprioritizing does not authorize execution or cancel other candidates.
 
+## Take queued work for execution
+
+Move an entry from **Backlog list** to **Taken** only when execution of its
+authorized plan is starting. Resolving and refining a story, initial slice
+planning, slice-plan refinement, and an intention to execute leave it in the
+queue. If execution context or authorization fails before execution starts,
+leave the entry unchanged.
+
+Preserve the entry text, canonical link, and identity exactly. Remove it from
+the queue, append it after existing **Taken** entries, and perform both changes
+as one backlog update. If the entry is already in **Taken**, resume without
+duplicating or reordering it. If the executed work is in neither active list,
+do not fabricate an entry. Stop before execution when an entry expected from
+the queue cannot be moved unambiguously.
+
+Once execution starts, leave the entry in **Taken** across pauses, failures,
+resumption, successful plan completion, and retrospective. Returning cancelled
+work to the queue requires an explicit backlog-maintenance decision. Story
+wrap-up removes completed work under its existing closure contract.
+
 ## Complete items
 
-- Completed-story closure belongs to
+- Completed story or correction closure belongs to
   [dough-story-wrap-up](../dough-story-wrap-up/SKILL.md). Do not record a
-  completion chronicle in the seed or move the item onto a finished list.
-- Standalone maintenance may remove a completed item from the active queue when
-  the human asks only for queue maintenance. Leave plan, seed, and proof
-  deletion to wrap-up. Do not create a recently-done or tombstone entry.
+  completion chronicle in the canonical home or move the item onto a finished
+  list.
+- Standalone maintenance may remove a completed item from either active list
+  when the human asks only for backlog maintenance. Leave plan, applicable seed,
+  and proof deletion to wrap-up. Do not create a recently-done or tombstone entry.
 
 ## Check and report
 
-- Check exact titles, links, duplicate outcomes, and prerequisite order.
+- Check exact titles, links, duplicates across both active lists, and
+  prerequisite order in the queue.
 - Check section order, bullet formatting, and direction alignment when present.
   Confirm the direction is unchanged unless explicitly instructed by a human.
 - Do not require a recently-done section. If one exists from earlier guidance,

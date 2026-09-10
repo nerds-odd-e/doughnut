@@ -1,12 +1,13 @@
 ---
 name: dough-slice-planning
 description: >-
-  Plans one understood, bounded story as an executable sequence of
-  Behavior/Structure slices with outside-in proof and safe stopping points. Use
-  when a selected story is ready for implementation planning or an execution
-  retrospective has one bounded correction to plan. Stays within the
-  triggering instruction's execution authority: finish after writing and
-  reporting the plan unless that instruction explicitly also requests execution.
+  Plans one understood, bounded story or retrospective correction as an
+  executable sequence of Behavior/Structure slices with outside-in proof and
+  safe stopping points. Use when a selected story is ready for implementation
+  planning or an execution retrospective has one bounded correction to plan.
+  Stays within the triggering instruction's execution authority: finish after
+  writing and reporting the plan unless that instruction explicitly also
+  requests execution.
   Reports remaining slice-specific concerns or a limited no-concerns finding;
   does not prescribe the next workflow action or certify execution readiness.
   Concern evidence does not authorize execution.
@@ -20,7 +21,7 @@ triggering human or parent-agent instruction's explicit execution authority.
 Do not implement product code or invoke execution unless that instruction
 explicitly also requests execution after planning.
 
-## Require an understood story
+## Require understood planning input
 
 Require one user or stakeholder outcome, its value, evaluable key examples, and
 boundaries from later stories. Use
@@ -39,6 +40,11 @@ do not invent a new feature story or require the correction to fit the old
 story's implementation footprint. The retrospective owns current-truth checks,
 constraint disputes, and whether to amend an unfinished plan or create a
 follow-up. Missing correction scope or proof stops this planning path.
+
+Write the resulting correction plan with the authoritative correction input
+defined by
+[planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level)
+so later refinement and execution do not need a seed.
 
 ## Resolve execution context
 

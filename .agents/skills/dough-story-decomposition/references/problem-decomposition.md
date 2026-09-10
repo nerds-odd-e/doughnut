@@ -124,7 +124,7 @@ belongs in executable examples and product documentation.
 ## Decompose slices
 
 Use slices only after one story or a
-[bounded retrospective correction](../../dough-slice-planning/SKILL.md#require-an-understood-story)
+[bounded retrospective correction](../../dough-slice-planning/SKILL.md#require-understood-planning-input)
 is understood and executable planning is authorized. Every slice is exactly one of:
 
 | Type | Required content | Reject when |
