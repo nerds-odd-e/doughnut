@@ -31,6 +31,7 @@ import { describeNotebookPullResolvedContinuation } from './notebookPull.resolve
 import { describeNotebookPullAbort } from './notebookPull.abort.suite.js'
 import { describeNotebookPullTwoNoteBatch } from './notebookPull.twoNoteBatch.suite.js'
 import { describeNotebookPullTwoNoteBatchRejection } from './notebookPull.twoNoteBatch.rejection.suite.js'
+import { describeNotebookPullContentBatch } from './notebookPull.contentBatch.suite.js'
 import { describeNotebookPullExactSubtreeMove } from './notebookPull.exactSubtreeMove.suite.js'
 import { describeNotebookPullExactSubtreeMoveRefusal } from './notebookPull.exactSubtreeMove.refusal.suite.js'
 
@@ -132,6 +133,7 @@ export function describeNotebookPullAcceptedHistory(): void {
   describeNotebookPullRebase()
   describeNotebookPullTwoNoteBatch()
   describeNotebookPullTwoNoteBatchRejection()
+  describeNotebookPullContentBatch()
   describeNotebookPullAddition()
   describeNotebookPullConflict()
   describeNotebookPullResolvedContinuation()

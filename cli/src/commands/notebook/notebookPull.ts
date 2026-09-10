@@ -36,12 +36,12 @@ function assertCheckoutStillReady(
 /**
  * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
  * unchanged, an eligible already-based unpublished commit stays unpublished, eligible
- * content-only, one ordinary-note addition, that addition plus one content save of the same
- * note, or one two-note content edit over exactly one disjoint third-note content save
- * divergence rebases (an empty remaining patch leaves local main at the accepted head), one
- * local descendant content edit across one accepted exact same-name subtree relocation
- * replays onto the mapped path, and ancestor checkouts fast-forward. Imported objects do
- * not install a remote or a persistent remote ref.
+ * content-only divergence over a contiguous single-parent chain of accepted content saves,
+ * one ordinary-note addition, or that addition plus one content save of the same note
+ * rebases (an empty remaining patch leaves local main at the accepted head), one local
+ * descendant content edit across one accepted exact same-name subtree relocation replays
+ * onto the mapped path, and ancestor checkouts fast-forward. Imported objects do not
+ * install a remote or a persistent remote ref.
  */
 export async function receiveAcceptedNotebookHead(
   directory: string,

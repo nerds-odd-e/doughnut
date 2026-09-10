@@ -143,7 +143,7 @@ Safe stop: current product behavior is unchanged.
 
 ### 4. Reconcile content batches over a linear content history
 Type: Behavior
-Status: planned
+Status: done
 Sizing hypothesis: 6–8 minutes, medium confidence; scrutinized above the
 5-minute target. This is one batch-reconciliation outcome and one pull proof loop.
 Slices 2–3 remove replay and fixture preparation from this leaf; safety
@@ -290,3 +290,20 @@ command. The shared `{ path, content }` shape and the multi-file commit helper
 were consolidated into `notebookPull.testHelpers.ts` (`commitPortableFile` now
 delegates to `commitFileChangeSet`) rather than duplicated across files. No
 behavior change; this supplies slice 4's fixture shape.
+
+Slice 4: removed `decideTwoNoteBatchRebase` and the local-path-count dispatch;
+any nonempty ordinary-content-edit batch now goes through the shared
+`inspectAcceptedInterval` classifier. Added an explicit
+`isContiguousSingleParentChain` check (a merge or other non-linear shape
+reachable from acceptedHead was not previously caught when every individual
+edge was content-only) and a `localPaths.length !== 1` guard on the
+exact-subtree-move branch (that replay must stay single-path-only now that the
+cardinality dispatch no longer implies it). Converted 7 rejection cases that
+were refused only by the old dispatcher into success/behavioral proof, added a
+real `git merge --no-ff` fixture for the new non-linear refusal, and added
+`notebookPull.contentBatch.suite.ts` covering batch success, non-overlap
+combine, two-file conflict pause/continue/abort, LF-absorption plus valuable
+edit, and fully-redundant batches. Environmental note: concurrent vitest
+processes on this machine caused spurious timeouts twice during this slice's
+execution and wrap-up; a clean solo re-run always passed 95/95 — treat any
+single-run failure as suspect until reproduced without contention.
