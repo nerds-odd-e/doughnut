@@ -16,8 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Accepts bounded initial Readme/Note compositions recognized by {@link
  * NotebookGitProposalInitialComposition}. Materializes implied Folders without synthetic Readmes,
- * nested Folder Readmes via {@link NotebookGitProposalFolderMaterialization}, then adds Notes
- * through {@link #applyNotes} and {@link NotebookGitProposalNoteAddition}.
+ * using {@link NotebookGitProposalFolderMaterialization}, then adds Notes through {@link
+ * #applyNotes} and {@link NotebookGitProposalNoteAddition}.
  */
 @Service
 class NotebookGitProposalInitialCompositionPublication {
@@ -63,20 +63,6 @@ class NotebookGitProposalInitialCompositionPublication {
       return Optional.of(
           acceptNotesInImpliedRootFolder(
               state, proposal, acceptedHead, notesInImpliedRootFolder.get()));
-    }
-    Optional<NotebookGitProposalInitialComposition.OneNestedFolderReadme> oneNestedFolderReadme =
-        NotebookGitProposalInitialComposition.findOneNestedFolderReadme(files, proposal);
-    if (oneNestedFolderReadme.isPresent()) {
-      return Optional.of(
-          acceptOneNestedFolderReadme(state, proposal, acceptedHead, oneNestedFolderReadme.get()));
-    }
-    Optional<NotebookGitProposalInitialComposition.TwoSiblingRootFolderReadmes>
-        twoSiblingRootFolderReadmes =
-            NotebookGitProposalInitialComposition.findTwoSiblingRootFolderReadmes(files, proposal);
-    if (twoSiblingRootFolderReadmes.isPresent()) {
-      return Optional.of(
-          acceptTwoSiblingRootFolderReadmes(
-              state, proposal, acceptedHead, twoSiblingRootFolderReadmes.get()));
     }
     return Optional.empty();
   }
@@ -149,51 +135,6 @@ class NotebookGitProposalInitialCompositionPublication {
     List<Note> added = applyNotes(state.notebook(), folders, proposal, creation.notePaths());
     projection.requireMatchingAcceptedTree(
         state.notebook(), folders, added, proposal.repository(), proposal.mainHead());
-    return bindingPersistence.accept(
-        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  private String acceptOneNestedFolderReadme(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookGitProposalInitialComposition.OneNestedFolderReadme creation) {
-    String readme = NotebookGitProposalTypedPath.requireReadme(proposal, creation.readmePath());
-    assertReadyEmptyNotebook(
-        state, proposal, acceptedHead, "Initial nested Folder Readme requires an empty notebook.");
-
-    List<ExportFolderRow> folders =
-        folderMaterialization.createNestedFolderWithChildReadme(
-            state.notebook(),
-            creation.readmePath(),
-            creation.parentFolderName(),
-            creation.childFolderName(),
-            readme);
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), folders, List.of(), proposal.repository(), proposal.mainHead());
-    return bindingPersistence.accept(
-        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  private String acceptTwoSiblingRootFolderReadmes(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookGitProposalInitialComposition.TwoSiblingRootFolderReadmes creation) {
-    String firstReadme =
-        NotebookGitProposalTypedPath.requireReadme(proposal, creation.firstReadmePath());
-    String secondReadme =
-        NotebookGitProposalTypedPath.requireReadme(proposal, creation.secondReadmePath());
-    assertReadyEmptyNotebook(
-        state, proposal, acceptedHead, "Initial sibling Folder Readmes require an empty notebook.");
-
-    folderMaterialization.createRootFolderWithReadme(
-        state.notebook(), creation.firstReadmePath(), firstReadme);
-    folderMaterialization.createRootFolderWithReadme(
-        state.notebook(), creation.secondReadmePath(), secondReadme);
-    List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(state.notebook());
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), folders, List.of(), proposal.repository(), proposal.mainHead());
     return bindingPersistence.accept(
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }

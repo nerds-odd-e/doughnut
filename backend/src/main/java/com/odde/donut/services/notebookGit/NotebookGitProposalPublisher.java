@@ -42,8 +42,7 @@ public class NotebookGitProposalPublisher {
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final NotebookGitProposalFolderAcceptance folderAcceptance;
-  private final NotebookGitProposalInitialNotebookReadmePublication
-      initialNotebookReadmePublication;
+  private final NotebookGitProposalInitialTreePublication initialTreePublication;
   private final NotebookGitProposalInitialCompositionPublication initialCompositionPublication;
   private final NotebookGitProposalNoteAddition noteAddition;
 
@@ -59,7 +58,7 @@ public class NotebookGitProposalPublisher {
       NoteService noteService,
       NoteTitlePlacementRules noteTitlePlacementRules,
       NotebookGitProposalFolderAcceptance folderAcceptance,
-      NotebookGitProposalInitialNotebookReadmePublication initialNotebookReadmePublication,
+      NotebookGitProposalInitialTreePublication initialTreePublication,
       NotebookGitProposalInitialCompositionPublication initialCompositionPublication,
       NotebookGitProposalNoteAddition noteAddition) {
     this.notebookGitStateLoader = notebookGitStateLoader;
@@ -73,7 +72,7 @@ public class NotebookGitProposalPublisher {
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.folderAcceptance = folderAcceptance;
-    this.initialNotebookReadmePublication = initialNotebookReadmePublication;
+    this.initialTreePublication = initialTreePublication;
     this.initialCompositionPublication = initialCompositionPublication;
     this.noteAddition = noteAddition;
   }
@@ -117,6 +116,11 @@ public class NotebookGitProposalPublisher {
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
         NotebookGitProposalTreeShape.inspectRegularFiles(
             proposal.repository(), acceptedHead, proposal.mainHead());
+    Optional<String> initialNotebookReadmeAccepted =
+        initialTreePublication.tryAccept(state, proposal, acceptedHead, files);
+    if (initialNotebookReadmeAccepted.isPresent()) {
+      return initialNotebookReadmeAccepted.get();
+    }
     Optional<NotebookGitProposalFolderCreationShape.RootFolderCreation> folderCreation =
         NotebookGitProposalFolderCreationShape.findSingleRootFolderCreation(files);
     if (folderCreation.isPresent()) {
@@ -128,13 +132,6 @@ public class NotebookGitProposalPublisher {
     if (folderAndContainedNote.isPresent()) {
       return folderAcceptance.acceptRootFolderAndContainedNote(
           state, proposal, acceptedHead, folderAndContainedNote.get());
-    }
-    Optional<NotebookGitProposalFolderCreationShape.InitialNotebookAndRootFolderCreation>
-        initialCreation =
-            NotebookGitProposalFolderCreationShape.findInitialNotebookAndRootFolderCreation(files);
-    if (initialCreation.isPresent()) {
-      return folderAcceptance.acceptInitialCreation(
-          state, proposal, acceptedHead, initialCreation.get());
     }
     Optional<NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndNoteCreation>
         initialNoteCreation =
@@ -151,11 +148,6 @@ public class NotebookGitProposalPublisher {
     if (initialRootNoteCreation.isPresent()) {
       return folderAcceptance.acceptInitialCreationWithRootNote(
           state, proposal, acceptedHead, initialRootNoteCreation.get());
-    }
-    Optional<String> initialNotebookReadmeAccepted =
-        initialNotebookReadmePublication.tryAccept(state, proposal, acceptedHead, files);
-    if (initialNotebookReadmeAccepted.isPresent()) {
-      return initialNotebookReadmeAccepted.get();
     }
     Optional<String> initialCompositionAccepted =
         initialCompositionPublication.tryAccept(state, proposal, acceptedHead, files);

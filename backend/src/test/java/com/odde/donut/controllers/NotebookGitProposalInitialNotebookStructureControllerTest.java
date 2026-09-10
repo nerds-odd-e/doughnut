@@ -190,7 +190,7 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
 
     assertThat(
         exception.getReason(),
-        equalTo("Initial notebook and folder Readmes require an empty notebook."));
+        equalTo("Initial container publication requires an empty notebook."));
     Notebook after = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(after.getReadmeContent(), equalTo(readmeBefore));
     List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());

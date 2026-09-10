@@ -8,13 +8,11 @@ import java.util.Optional;
 /**
  * Distinguishes bounded initial Readme/Note compositions after every supported exact initial shape
  * has already declined them. Recognizes one or two ordinary Notes that share one implied root
- * Folder prefix ({@link NotesInImpliedRootFolder}), one nested Folder Readme ({@link
- * OneNestedFolderReadme}), exactly two sibling root Folder Readmes ({@link
- * TwoSiblingRootFolderReadmes}), and otherwise a {@link ValidUnmatched} marker for added-only
- * Markdown trees with role-correct authored types that include at least one README. Recognition
- * does not throw: invalid Markdown, wrong types, non-Markdown paths, and non-initial diffs simply
- * do not match. {@link NotebookGitProposalInitialCompositionPublication} accepts layouts that are
- * wired for publication.
+ * Folder prefix ({@link NotesInImpliedRootFolder}), and otherwise a {@link ValidUnmatched} marker
+ * for added-only Markdown trees with role-correct authored types that include at least one README.
+ * Recognition does not throw: invalid Markdown, wrong types, non-Markdown paths, and non-initial
+ * diffs simply do not match. {@link NotebookGitProposalInitialCompositionPublication} accepts
+ * layouts that are wired for publication.
  */
 final class NotebookGitProposalInitialComposition {
 
@@ -34,19 +32,6 @@ final class NotebookGitProposalInitialComposition {
       }
     }
   }
-
-  /**
-   * Exactly one added nested Folder Readme ({@code Parent/Child/README.md}) on an otherwise empty
-   * tree. The parent Folder is implied without a Readme; the child owns the authored Readme.
-   */
-  record OneNestedFolderReadme(
-      String readmePath, String parentFolderName, String childFolderName) {}
-
-  /**
-   * Exactly two added root-level Folder Readmes ({@code Folder A/README.md} and {@code Folder
-   * B/README.md}) on an otherwise empty tree. No Notes, notebook README, or nesting.
-   */
-  record TwoSiblingRootFolderReadmes(String firstReadmePath, String secondReadmePath) {}
 
   /**
    * Marker that every inspected path is an added Markdown file with a role-correct authored type
@@ -80,43 +65,6 @@ final class NotebookGitProposalInitialComposition {
     return Optional.of(new NotesInImpliedRootFolder(notePaths, impliedPrefix));
   }
 
-  static Optional<OneNestedFolderReadme> findOneNestedFolderReadme(
-      List<InspectedRegularFile> files, NotebookGitProposalImporter.ImportedProposal proposal) {
-    if (files.size() != 1) {
-      return Optional.empty();
-    }
-    InspectedRegularFile file = files.getFirst();
-    if (!isAddedNestedFolderReadme(file)) {
-      return Optional.empty();
-    }
-    String path = file.path();
-    if (!NotebookGitProposalTypedPath.authoredTypeEquals(proposal, path, "Readme")) {
-      return Optional.empty();
-    }
-    int firstSlash = path.indexOf('/');
-    int secondSlash = path.indexOf('/', firstSlash + 1);
-    return Optional.of(
-        new OneNestedFolderReadme(
-            path, path.substring(0, firstSlash), path.substring(firstSlash + 1, secondSlash)));
-  }
-
-  static Optional<TwoSiblingRootFolderReadmes> findTwoSiblingRootFolderReadmes(
-      List<InspectedRegularFile> files, NotebookGitProposalImporter.ImportedProposal proposal) {
-    if (files.size() != 2) {
-      return Optional.empty();
-    }
-    for (InspectedRegularFile file : files) {
-      if (!NotebookGitProposalFolderCreationShape.isAddedRootFolderReadme(file)) {
-        return Optional.empty();
-      }
-      if (!NotebookGitProposalTypedPath.authoredTypeEquals(proposal, file.path(), "Readme")) {
-        return Optional.empty();
-      }
-    }
-    return Optional.of(
-        new TwoSiblingRootFolderReadmes(files.getFirst().path(), files.get(1).path()));
-  }
-
   static Optional<ValidUnmatched> findValidUnmatched(
       List<InspectedRegularFile> files, NotebookGitProposalImporter.ImportedProposal proposal) {
     if (files.isEmpty()) {
@@ -147,20 +95,6 @@ final class NotebookGitProposalInitialComposition {
 
   private static String expectedTypeForBasename(String basename) {
     return "README.md".equals(basename) ? "Readme" : "Note";
-  }
-
-  private static boolean isAddedNestedFolderReadme(InspectedRegularFile file) {
-    String path = file.path();
-    int firstSlash = path.indexOf('/');
-    if (firstSlash <= 0) {
-      return false;
-    }
-    int secondSlash = path.indexOf('/', firstSlash + 1);
-    return file.acceptedBlobId() == null
-        && file.proposedBlobId() != null
-        && secondSlash > firstSlash + 1
-        && secondSlash == path.lastIndexOf('/')
-        && "README.md".equals(path.substring(secondSlash + 1));
   }
 
   private static String basename(String path) {

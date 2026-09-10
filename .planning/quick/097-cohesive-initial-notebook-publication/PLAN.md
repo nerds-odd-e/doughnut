@@ -170,7 +170,12 @@ construction algorithm and existing wrapper; no orchestration migration.
 
 ### 4. Publish container Readme trees independently of count and depth
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after
+implementation and refactor. Parameterized container-tree controller proof owns
+sibling/deep ancestry, optional notebook README, exact bytes/path set/head/tree,
+and omitted ancestor Readmes. Shared owner is now `NotebookGitProposalInitialTreePublication`.
+Existing noninitial Folder admission remains; independent refactor and format passed.
 Proof: Publish Readmes in sibling and deeper nested Folders, with/without notebook
 README. Download preserves every authored file and no synthetic ancestor README;
 Folder rows show each required prefix once. Vary paths through one data-driven

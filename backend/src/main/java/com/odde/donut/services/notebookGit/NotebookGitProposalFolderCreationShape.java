@@ -34,13 +34,6 @@ final class NotebookGitProposalFolderCreationShape {
   }
 
   /**
-   * Exactly one added root {@code README.md} plus exactly one added root-level {@code
-   * Folder/README.md} on an otherwise empty tree: no accepted blobs on those paths and no other
-   * path present (changed or unchanged).
-   */
-  record InitialNotebookAndRootFolderCreation(String notebookReadmePath, String folderReadmePath) {}
-
-  /**
    * Exactly the two-README initial tree plus one added ordinary {@code .md} note whose parent path
    * is that same new root Folder.
    */
@@ -84,16 +77,6 @@ final class NotebookGitProposalFolderCreationShape {
                     paths.folderReadmePath(), paths.notePaths()));
   }
 
-  static Optional<InitialNotebookAndRootFolderCreation> findInitialNotebookAndRootFolderCreation(
-      List<InspectedRegularFile> files) {
-    return collectInitialAddedPaths(files)
-        .filter(paths -> paths.notebookReadmePath() != null && paths.notePaths().isEmpty())
-        .map(
-            paths ->
-                new InitialNotebookAndRootFolderCreation(
-                    paths.notebookReadmePath(), paths.folderReadmePath()));
-  }
-
   static Optional<InitialNotebookRootFolderAndNoteCreation>
       findInitialNotebookRootFolderAndNoteCreation(List<InspectedRegularFile> files) {
     return collectInitialAddedPaths(files)
@@ -134,7 +117,7 @@ final class NotebookGitProposalFolderCreationShape {
     String folderReadmePath = null;
     List<String> notePaths = new ArrayList<>();
     for (InspectedRegularFile file : files) {
-      if (NotebookGitProposalInitialNotebookReadmePublication.isAddedRootNotebookReadme(file)) {
+      if (NotebookGitProposalInitialTreePublication.isAddedRootNotebookReadme(file)) {
         if (notebookReadmePath != null) {
           return Optional.empty();
         }
@@ -145,7 +128,7 @@ final class NotebookGitProposalFolderCreationShape {
         }
         folderReadmePath = file.path();
       } else if (isAddedDirectChildOrdinaryNote(file)
-          || NotebookGitProposalInitialNotebookReadmePublication.isAddedRootMarkdownFile(file)) {
+          || NotebookGitProposalInitialTreePublication.isAddedRootMarkdownFile(file)) {
         notePaths.add(file.path());
       } else {
         return Optional.empty();

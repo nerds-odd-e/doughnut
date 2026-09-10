@@ -5,7 +5,6 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.FolderConstructionService;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.LinkedHashMap;
@@ -23,17 +22,14 @@ class NotebookGitProposalFolderMaterialization {
   private final FolderConstructionService folderConstructionService;
   private final EntityPersister entityPersister;
   private final Validator validator;
-  private final NotebookGitStateLoader notebookGitStateLoader;
 
   NotebookGitProposalFolderMaterialization(
       FolderConstructionService folderConstructionService,
       EntityPersister entityPersister,
-      Validator validator,
-      NotebookGitStateLoader notebookGitStateLoader) {
+      Validator validator) {
     this.folderConstructionService = folderConstructionService;
     this.entityPersister = entityPersister;
     this.validator = validator;
-    this.notebookGitStateLoader = notebookGitStateLoader;
   }
 
   Folder createRootFolderWithoutReadme(Notebook notebook, String pathForError, String folderName) {
@@ -53,25 +49,6 @@ class NotebookGitProposalFolderMaterialization {
     entityPersister.save(folder);
     entityPersister.flush();
     return folder;
-  }
-
-  /**
-   * Creates {@code Parent} then {@code Child} for an exact nested Folder Readme path. Parent has
-   * absent Readme content; Child stores the authored Readme. Returns refreshed Folder projection
-   * rows.
-   */
-  List<ExportFolderRow> createNestedFolderWithChildReadme(
-      Notebook notebook,
-      String pathForError,
-      String parentFolderName,
-      String childFolderName,
-      String readme) {
-    Map<String, Folder> folders = createFolderAncestry(notebook, List.of(pathForError));
-    Folder child = folders.get(parentFolderName + "/" + childFolderName);
-    child.setReadmeContent(readme);
-    entityPersister.save(child);
-    entityPersister.flush();
-    return notebookGitStateLoader.foldersOf(notebook);
   }
 
   Map<String, Folder> createFolderAncestry(Notebook notebook, List<String> documentPaths) {
