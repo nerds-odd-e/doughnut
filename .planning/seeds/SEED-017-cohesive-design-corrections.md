@@ -167,34 +167,31 @@ its own scope and proof; this seed is not a cross-subsystem executable plan.
 The container-publication proof correction is first in the queue, followed by
 Stories 1–4 in their developer-selected order.
 
-<a id="story-10"></a>
+<a id="story-11"></a>
 
-### Story 10: Consolidate initial container publication proof
+### Story 11: Consolidate root container publication proof
 
-- **For / why:** developers need one maintained behavioral proof for container-only
-  publication, avoiding duplicate controller/database/bundle orchestration.
-- **Goal:** retain proof of exact authored trees, implied Folder ancestry,
-  optional Readmes and zero Note rows in one container-tree scenario owner.
-- **Scope:** consolidate the older nested-Readme test into the existing
-  data-driven container-tree controller test. Preserve its singleton boundary
-  and explicit zero-Note assertion before removing the duplicate. Product
-  behavior and the installed CLI journey remain unchanged.
-- **Evaluation:** the retained controller proof covers the same observable
-  contract and the required backend suite passes. No runtime saving is promised.
-- **Key examples:**
-  - Given an empty Git-backed notebook, when a proposal contains only
-    `Parent/Child/README.md`, publication creates the implied `Parent` Folder,
-    the authored `Child` Folder Readme, no notebook Readme and zero Note rows,
-    and the downloaded accepted tree exactly matches the proposal.
-  - Given an empty Git-backed notebook, when a proposal contains several
-    sibling and deeply nested Folder Readmes with or without a notebook Readme,
-    publication preserves the exact authored tree and content while creating
-    each implied Folder ancestor once and zero Note rows.
-- **Exclusions:** production changes, broader suite cleanup, E2E admission,
-  populated-notebook publication and reconciliation changes.
-- **Execution plan:** [quick/098](../quick/098-consolidate-initial-container-publication-proof/PLAN.md).
-- **Safe stopping point:** one proof owner preserves the container-only contract
-  independently of later Git workflow corrections.
+- **For / why:** developers need one maintained controller proof for
+  container-only root publication, avoiding duplicate database and Git-bundle
+  round trips for the same behavior.
+- **Goal:** retain proof that notebook and root Folder Readmes publish as the
+  exact authored Git state with zero Note rows in one container-tree owner.
+- **Scope:** remove the overlapping successful root-Readme method from the
+  notebook-structure controller test. Preserve that class's mixed-content,
+  rejection and document-role scenarios, plus the notebook-Readme-only proof
+  and installed CLI journey. Product behavior remains unchanged.
+- **Evaluation:** the retained container-tree controller test owns the exact
+  authored head, tree, paths, content, root ancestry and zero-Note observations,
+  and the required backend suite passes after consolidation.
+- **Key example:** given an empty Git-backed notebook, when a proposal contains
+  a notebook Readme and root Folder Readmes, publication preserves the authored
+  content and Git state, creates the root Folders and no Notes, without a second
+  controller scenario owning the same observations.
+- **Exclusions:** production changes, rejection or mixed-content cleanup, API,
+  schema, CLI, E2E and broader test-suite changes.
+- **Execution plan:** [quick/099](../quick/099-consolidate-root-container-publication-proof/PLAN.md).
+- **Safe stopping point:** the remaining successful container-only proof has one
+  owner independently of later Git workflow corrections.
 
 ## Open product decision
 
@@ -256,7 +253,7 @@ queued corrections.
 
 ## Execution readiness and design checks
 
-Story 10 has an executable plan. Stories 1–4 remain refinement input; Story 2
+Story 11 has an executable plan. Stories 1–4 remain refinement input; Story 2
 needs particular attention to identity ambiguity before execution.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.

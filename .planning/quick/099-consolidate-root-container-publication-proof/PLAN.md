@@ -1,18 +1,11 @@
 # Consolidate root container publication proof
 
 Status: planned — retrospective correction; not executed.
-Source: execution retrospective of
-[quick plan 098](../098-consolidate-initial-container-publication-proof/PLAN.md)
-and [SEED-017 Story 10](../../seeds/SEED-017-cohesive-design-corrections.md#story-10).
-Reviewed implementation commit: `405f5e06518506a7313e8f1449b9d4d41ebfe291`.
-Planning provenance: `15a688d6eceb5d1e0c5a9d974933d977d83d8127`.
+Source: [SEED-017 Story 11](../../seeds/SEED-017-cohesive-design-corrections.md#story-11).
 
 ## Finding and bounded outcome
 
-The completed execution correctly consolidated
-`NotebookGitProposalInitialNestedFolderReadmeControllerTest` into
-`NotebookGitProposalInitialContainerTreeControllerTest`. Current whole-suite
-review found one older overlapping method left outside that correction:
+Current whole-suite review found one overlapping method:
 `publishesInitialNotebookAndRootFolderReadmesAsTheExactAuthoredCommit` in
 `NotebookGitProposalInitialNotebookStructureControllerTest` repeats the same
 controller, database and Git-bundle round trip for a notebook Readme plus root
@@ -21,9 +14,8 @@ Folder Readmes and zero Notes.
 The retained container-tree proof already covers that observable contract more
 strongly through its notebook-Readme-enabled root-folder scenario: exact
 authored head, tree, paths and content; root Folder ancestry and Readme content;
-and zero live Notes. The older method predates plan 098, so this is current
-test-suite residue exposed rather than a regression introduced by commit
-`405f5e0651`.
+and zero live Notes. The overlap is test-suite residue rather than a
+product-behavior defect.
 
 Give container-only initial publication one controller proof owner without
 changing product behavior. Preserve the notebook-structure test class's mixed
