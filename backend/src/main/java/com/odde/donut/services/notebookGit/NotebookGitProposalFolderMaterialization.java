@@ -32,14 +32,6 @@ class NotebookGitProposalFolderMaterialization {
     this.validator = validator;
   }
 
-  Folder createRootFolderWithoutReadme(Notebook notebook, String pathForError, String folderName) {
-    Folder folder =
-        folderConstructionService.createFolder(
-            notebook, validFolderRequest(pathForError, folderName, null));
-    entityPersister.flush();
-    return folder;
-  }
-
   Folder createRootFolderWithReadme(Notebook notebook, String readmePath, String readme) {
     String folderName = readmePath.substring(0, readmePath.indexOf('/'));
     Folder folder =

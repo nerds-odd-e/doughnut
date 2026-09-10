@@ -194,7 +194,11 @@ this slice has one container-tree acceptance loop, with removal of its old paths
 
 ### 5. Apply existing Folder concept layouts through the same initial owner
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed with
+all prior Folder concept and noninitial creation/relocation regressions. Shared
+owner now applies ancestry and concepts; only admission adapters remain for 6.
+Independent refactor completed without edits; formatting passed (publisher 247 lines).
 Proof: Existing implied-Folder Note, Folder Readme plus Notes, and notebook/Folder
 Readme with root-or-contained Note controller examples remain green; populated
 single-Folder creation and relocation tests stay green in the backend suite.

@@ -130,24 +130,42 @@ public class NotebookGitProposalPublisher {
         folderAndContainedNote =
             NotebookGitProposalFolderCreationShape.findRootFolderAndContainedNoteCreation(files);
     if (folderAndContainedNote.isPresent()) {
-      return folderAcceptance.acceptRootFolderAndContainedNote(
-          state, proposal, acceptedHead, folderAndContainedNote.get());
+      return initialTreePublication.acceptNotesTree(
+          state,
+          proposal,
+          acceptedHead,
+          null,
+          List.of(folderAndContainedNote.get().folderReadmePath()),
+          folderAndContainedNote.get().notePaths(),
+          "Initial folder Readme and contained Note require an empty notebook.");
     }
     Optional<NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndNoteCreation>
         initialNoteCreation =
             NotebookGitProposalFolderCreationShape.findInitialNotebookRootFolderAndNoteCreation(
                 files);
     if (initialNoteCreation.isPresent()) {
-      return folderAcceptance.acceptInitialCreationWithNote(
-          state, proposal, acceptedHead, initialNoteCreation.get());
+      return initialTreePublication.acceptNotesTree(
+          state,
+          proposal,
+          acceptedHead,
+          initialNoteCreation.get().notebookReadmePath(),
+          List.of(initialNoteCreation.get().folderReadmePath()),
+          List.of(initialNoteCreation.get().notePath()),
+          "Initial notebook and folder Readmes require an empty notebook.");
     }
     Optional<NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndRootNoteCreation>
         initialRootNoteCreation =
             NotebookGitProposalFolderCreationShape.findInitialNotebookRootFolderAndRootNoteCreation(
                 files);
     if (initialRootNoteCreation.isPresent()) {
-      return folderAcceptance.acceptInitialCreationWithRootNote(
-          state, proposal, acceptedHead, initialRootNoteCreation.get());
+      return initialTreePublication.acceptNotesTree(
+          state,
+          proposal,
+          acceptedHead,
+          initialRootNoteCreation.get().notebookReadmePath(),
+          List.of(initialRootNoteCreation.get().folderReadmePath()),
+          List.of(initialRootNoteCreation.get().notePath()),
+          "Initial notebook and folder Readmes require an empty notebook.");
     }
     Optional<String> initialCompositionAccepted =
         initialCompositionPublication.tryAccept(state, proposal, acceptedHead, files);

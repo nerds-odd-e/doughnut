@@ -10,8 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.eclipse.jgit.lib.ObjectId;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 /** Applies initial Markdown trees by container and concept role. */
 @Service
@@ -23,7 +26,7 @@ class NotebookGitProposalInitialTreePublication {
   private final NotebookGitProposalBindingPersistence bindingPersistence;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final NotebookGitProposalInitialCompositionPublication initialCompositionPublication;
+  private final NotebookGitProposalNoteAddition noteAddition;
 
   NotebookGitProposalInitialTreePublication(
       NotebookGitProposalFolderMaterialization folderMaterialization,
@@ -32,14 +35,14 @@ class NotebookGitProposalInitialTreePublication {
       NotebookGitProposalBindingPersistence bindingPersistence,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      NotebookGitProposalInitialCompositionPublication initialCompositionPublication) {
+      NotebookGitProposalNoteAddition noteAddition) {
     this.folderMaterialization = folderMaterialization;
     this.stateLoader = stateLoader;
     this.projection = projection;
     this.bindingPersistence = bindingPersistence;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
-    this.initialCompositionPublication = initialCompositionPublication;
+    this.noteAddition = noteAddition;
   }
 
   Optional<String> tryAccept(
@@ -51,7 +54,7 @@ class NotebookGitProposalInitialTreePublication {
         && files.stream()
             .anyMatch(NotebookGitProposalInitialTreePublication::isAddedRootNotebookReadme)
         && files.stream().allMatch(NotebookGitProposalInitialTreePublication::isAddedReadme)) {
-      initialCompositionPublication.assertReadyEmptyNotebook(
+      assertReadyEmptyNotebook(
           state,
           proposal,
           acceptedHead,
@@ -66,7 +69,7 @@ class NotebookGitProposalInitialTreePublication {
                     file -> isAddedRootNotebookReadme(file) || isAddedRootMarkdownFile(file)))) {
       return Optional.empty();
     }
-    initialCompositionPublication.assertReadyEmptyNotebook(
+    assertReadyEmptyNotebook(
         state, proposal, acceptedHead, "Initial root publication requires an empty notebook.");
     String notebookReadmePath =
         files.stream()
@@ -119,7 +122,9 @@ class NotebookGitProposalInitialTreePublication {
       storeReadme(state, proposal, notebookReadmePath);
     }
     Map<String, Folder> createdFolders =
-        folderMaterialization.createFolderAncestry(state.notebook(), folderReadmePaths);
+        folderMaterialization.createFolderAncestry(
+            state.notebook(),
+            Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()).toList());
     for (String path : folderReadmePaths) {
       Folder folder = createdFolders.get(path.substring(0, path.lastIndexOf('/')));
       folder.setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, path));
@@ -130,7 +135,13 @@ class NotebookGitProposalInitialTreePublication {
     List<Note> notes = new ArrayList<>(conceptPaths.size());
     for (String path : conceptPaths) {
       notes.add(
-          initialCompositionPublication.applyConcept(state.notebook(), folders, proposal, path));
+          noteAddition.apply(
+              state.notebook(),
+              folders,
+              proposal,
+              proposal.mainHead(),
+              path,
+              testabilitySettings.getCurrentUTCTimestamp()));
     }
     entityPersister.flush();
     return acceptMatchingProposedTree(state, proposal, folders, notes);
@@ -147,15 +158,33 @@ class NotebookGitProposalInitialTreePublication {
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  void storeOnEmptyNotebook(
+  String acceptNotesTree(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       String notebookReadmePath,
+      List<String> folderReadmePaths,
+      List<String> notePaths,
       String emptyNotebookMessage) {
-    initialCompositionPublication.assertReadyEmptyNotebook(
-        state, proposal, acceptedHead, emptyNotebookMessage);
-    storeReadme(state, proposal, notebookReadmePath);
+    assertReadyEmptyNotebook(state, proposal, acceptedHead, emptyNotebookMessage);
+    for (String path : notePaths) {
+      NotebookGitProposalTypedPath.requireOrdinaryNote(proposal, path);
+    }
+    return acceptTree(state, proposal, notebookReadmePath, folderReadmePaths, notePaths);
+  }
+
+  private void assertReadyEmptyNotebook(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      String emptyNotebookMessage) {
+    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
+        proposal.repository(), proposal.mainHead());
+    projection.requireMatchingAcceptedTree(
+        state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
+    if (!state.folders().isEmpty() || !state.liveNotes().isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, emptyNotebookMessage);
+    }
   }
 
   private void storeReadme(

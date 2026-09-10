@@ -1,7 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Folder;
-import com.odde.donut.entities.Note;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
@@ -21,8 +20,6 @@ class NotebookGitProposalFolderAcceptance {
   private final TestabilitySettings testabilitySettings;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final NotebookGitProposalFolderMaterialization folderMaterialization;
-  private final NotebookGitProposalInitialCompositionPublication initialCompositionPublication;
-  private final NotebookGitProposalInitialTreePublication initialTreePublication;
 
   NotebookGitProposalFolderAcceptance(
       NotebookGitProjection projection,
@@ -31,9 +28,7 @@ class NotebookGitProposalFolderAcceptance {
       NotebookGitStateLoader notebookGitStateLoader,
       TestabilitySettings testabilitySettings,
       FolderSiblingNameValidation folderSiblingNameValidation,
-      NotebookGitProposalFolderMaterialization folderMaterialization,
-      NotebookGitProposalInitialCompositionPublication initialCompositionPublication,
-      NotebookGitProposalInitialTreePublication initialTreePublication) {
+      NotebookGitProposalFolderMaterialization folderMaterialization) {
     this.projection = projection;
     this.bindingPersistence = bindingPersistence;
     this.entityPersister = entityPersister;
@@ -41,8 +36,6 @@ class NotebookGitProposalFolderAcceptance {
     this.testabilitySettings = testabilitySettings;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.folderMaterialization = folderMaterialization;
-    this.initialCompositionPublication = initialCompositionPublication;
-    this.initialTreePublication = initialTreePublication;
   }
 
   String acceptCreation(
@@ -67,97 +60,6 @@ class NotebookGitProposalFolderAcceptance {
         proposal.mainHead());
     return bindingPersistence.accept(
         state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  String acceptRootFolderAndContainedNote(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookGitProposalFolderCreationShape.RootFolderAndContainedNoteCreation creation) {
-    initialCompositionPublication.assertReadyEmptyNotebook(
-        state,
-        proposal,
-        acceptedHead,
-        "Initial folder Readme and contained Note require an empty notebook.");
-
-    String folderReadme =
-        NotebookGitProposalTypedPath.requireReadme(proposal, creation.folderReadmePath());
-    folderMaterialization.createRootFolderWithReadme(
-        state.notebook(), creation.folderReadmePath(), folderReadme);
-    List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(state.notebook());
-    List<Note> added =
-        initialCompositionPublication.applyNotes(
-            state.notebook(), folders, proposal, creation.notePaths());
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), folders, added, proposal.repository(), proposal.mainHead());
-    return bindingPersistence.accept(
-        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  String acceptInitialCreationWithNote(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndNoteCreation creation) {
-    return acceptInitialCreationWithSingleNote(
-        state,
-        proposal,
-        acceptedHead,
-        creation.notebookReadmePath(),
-        creation.folderReadmePath(),
-        creation.notePath());
-  }
-
-  String acceptInitialCreationWithRootNote(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      NotebookGitProposalFolderCreationShape.InitialNotebookRootFolderAndRootNoteCreation
-          creation) {
-    return acceptInitialCreationWithSingleNote(
-        state,
-        proposal,
-        acceptedHead,
-        creation.notebookReadmePath(),
-        creation.folderReadmePath(),
-        creation.notePath());
-  }
-
-  private String acceptInitialCreationWithSingleNote(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      String notebookReadmePath,
-      String folderReadmePath,
-      String notePath) {
-    List<ExportFolderRow> folders =
-        createInitialNotebookAndRootFolder(
-            state, proposal, acceptedHead, notebookReadmePath, folderReadmePath);
-    List<Note> added =
-        initialCompositionPublication.applyNotes(
-            state.notebook(), folders, proposal, List.of(notePath));
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), folders, added, proposal.repository(), proposal.mainHead());
-    return bindingPersistence.accept(
-        state.binding(), proposal, testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  private List<ExportFolderRow> createInitialNotebookAndRootFolder(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      String notebookReadmePath,
-      String folderReadmePath) {
-    initialTreePublication.storeOnEmptyNotebook(
-        state,
-        proposal,
-        acceptedHead,
-        notebookReadmePath,
-        "Initial notebook and folder Readmes require an empty notebook.");
-    String folderReadme = NotebookGitProposalTypedPath.requireReadme(proposal, folderReadmePath);
-    folderMaterialization.createRootFolderWithReadme(
-        state.notebook(), folderReadmePath, folderReadme);
-    return notebookGitStateLoader.foldersOf(state.notebook());
   }
 
   String accept(
