@@ -1,18 +1,7 @@
 import assert from 'node:assert'
-import { EventEmitter } from 'node:events'
 import { test } from 'node:test'
 import { runSutServices, SUT_SERVICE_ARGS } from './sut-services.mjs'
-
-function makeMockChild() {
-  const child = new EventEmitter()
-  child.stdout = new EventEmitter()
-  child.stderr = new EventEmitter()
-  child.killed = false
-  child.kill = (signal) => {
-    child.killed = signal
-  }
-  return child
-}
+import { makeMockChild } from './sut-start-fixtures.mjs'
 
 test('runSutServices starts run-p and writes stdout/stderr to the rotating writer', () => {
   const mockChild = makeMockChild()

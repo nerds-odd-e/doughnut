@@ -1,9 +1,15 @@
 import { EventEmitter } from 'node:events'
 
-/** Build a mock child process emitter with controllable exit. */
+/** Build a mock child process emitter with controllable exit and stdio. */
 export function makeMockChild(pid = 99999) {
   const child = new EventEmitter()
   child.pid = pid
+  child.stdout = new EventEmitter()
+  child.stderr = new EventEmitter()
+  child.killed = false
+  child.kill = (signal) => {
+    child.killed = signal
+  }
   child.unref = () => undefined
   return child
 }

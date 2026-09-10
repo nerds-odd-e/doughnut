@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRotatingLogWriter, LOG_TARGETS } from './log-utils.mjs'
@@ -13,6 +12,10 @@ import {
   resolveSutRuntimeTarget,
   withSutRuntimeTargetEnv,
 } from './sut-runtime-target.mjs'
+import {
+  childExitReason,
+  runSupervisedServiceGroup,
+} from './supervised-service-group.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -28,12 +31,8 @@ export function sutServiceArgs(target) {
 
 export const SUT_SERVICE_ARGS = sutServiceArgs(LEGACY_SUT_RUNTIME_TARGET)
 
-function childExitReason(code, signal) {
-  return signal ? `signal ${signal}` : `code ${code ?? 'unknown'}`
-}
-
 export function runSutServices({
-  spawnFn = spawn,
+  spawnFn,
   logFile = process.env.SUT_LOG_FILE ?? LOG_TARGETS.sut,
   logWriter = createRotatingLogWriter(logFile),
   runtimeTarget,
@@ -44,60 +43,24 @@ export function runSutServices({
   stopOwnedTree = stopOwnedSutProcessTree,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget, env })
-  const child = spawnFn('pnpm', serviceArgs ?? sutServiceArgs(target), {
+  return runSupervisedServiceGroup({
+    spawnFn,
+    serviceArgs: serviceArgs ?? sutServiceArgs(target),
     cwd: checkoutRoot,
-    stdio: ['ignore', 'pipe', 'pipe'],
     env: withSutRuntimeTargetEnv(env, target),
-    shell: false,
-    detached: true,
+    logWriter,
+    onBeforeExit: async (child) => {
+      await stopOwnedTree(child)
+      if (env.SUT_OWNER_TOKEN && !retainOwnershipOnExit?.()) {
+        await releaseSutOwnership(checkoutRoot)
+      }
+    },
+    startFailureMessage: (error) =>
+      `Failed to start SUT services: ${error.message}\n`,
+    exitMessage: (code, signal) =>
+      `Forced SUT service child exit (${childExitReason(code, signal)}); releasing owned peers\n`,
+    cleanupFailurePrefix: 'SUT supervisor cleanup failed',
   })
-
-  child.stdout?.on('data', (chunk) => logWriter.write(chunk))
-  child.stderr?.on('data', (chunk) => logWriter.write(chunk))
-
-  const forwardSignal = (signal) => {
-    if (!child.killed) child.kill(signal)
-  }
-
-  process.once('SIGINT', forwardSignal)
-  process.once('SIGTERM', forwardSignal)
-
-  let finished = false
-  const finish = async (code, signal, message) => {
-    if (finished) return
-    finished = true
-    logWriter.write(message)
-    await stopOwnedTree(child)
-    if (env.SUT_OWNER_TOKEN && !retainOwnershipOnExit?.()) {
-      await releaseSutOwnership(checkoutRoot)
-    }
-    logWriter.close()
-    process.exit(signal ? 1 : (code ?? 1))
-  }
-
-  const reportFinishFailure = (error) => {
-    logWriter.write(
-      `SUT supervisor cleanup failed: ${error instanceof Error ? error.message : String(error)}\n`
-    )
-    logWriter.close()
-    process.exit(1)
-  }
-
-  child.on('error', (error) => {
-    finish(1, null, `Failed to start SUT services: ${error.message}\n`).catch(
-      reportFinishFailure
-    )
-  })
-
-  child.on('close', (code, signal) => {
-    finish(
-      code,
-      signal,
-      `Forced SUT service child exit (${childExitReason(code, signal)}); releasing owned peers\n`
-    ).catch(reportFinishFailure)
-  })
-
-  return child
 }
 
 export async function startOwnedSutSupervisor(opts = {}) {

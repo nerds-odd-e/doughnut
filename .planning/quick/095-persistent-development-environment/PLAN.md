@@ -1,7 +1,7 @@
 # Use a persistent Development environment for manual feedback
 
 Source: [SEED-015 story 7](../../seeds/SEED-015-concurrent-worktree-environments.md#story-7).
-Status: in progress (slices 1–2 delivered).
+Status: in progress (slices 1–3 delivered).
 CI observer: feature-branch pushes are not observed — `donut CI` is push-to-`main` only; observe after merge.
 
 ## Goal and scope
@@ -81,11 +81,11 @@ profile, database name, ports, browser origin, service selection, `dev.log`, and
 ### 3. Run only Development services in its supervised group
 
 Type: Behavior
-Status: planned
-Proof: focused Node supervisor tests prove an explicit service specification can
-run the Development backend, Vite, and local LB with one process group and
-Development log, while `pnpm test:sut-start` still proves the SUT group includes
-its unchanged E2E backend and conditional Mountebank behavior.
+Status: done
+Proof: `node --test scripts/development-services.test.mjs
+scripts/sut-services.test.mjs` and `pnpm test:sut-start` (pass) — Development
+spawns `backend:dev`/`frontend:dev`/`local:lb:vite` without Mountebank; SUT
+ownership and conditional MB unchanged.
 
 Behavior: A Development service adapter receives its canonical runtime -> it
 starts reload-capable `backend:dev`, `frontend:dev`, and `local:lb:vite` under

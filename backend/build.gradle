@@ -114,14 +114,27 @@ tasks.named('bootRun') {
   jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
 }
 
-tasks.register("bootRunE2E", BootRun) {
-  group = "application"
-  description = "Runs Donut SpringBoot application with the e2e profile (SUT; DevTools on classpath for live reload with pnpm backend:watch)"
-  classpath = sourceSets.main.runtimeClasspath
-  mainClass = springBoot.mainClass
-  systemProperty("spring.profiles.active", "e2e")
-  jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
+def registerProfileBootRun = { String taskName, String profile, String descriptionText ->
+  tasks.register(taskName, BootRun) {
+    group = "application"
+    description = descriptionText
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = springBoot.mainClass
+    systemProperty("spring.profiles.active", profile)
+    jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
+  }
 }
+
+registerProfileBootRun(
+  "bootRunE2E",
+  "e2e",
+  "Runs Donut SpringBoot application with the e2e profile (SUT; DevTools on classpath for live reload with pnpm backend:watch)"
+)
+registerProfileBootRun(
+  "bootRunDev",
+  "dev",
+  "Runs Donut SpringBoot application with the dev profile (Development; DevTools on classpath for live reload with pnpm backend:watch)"
+)
 
 spotless {
   java {

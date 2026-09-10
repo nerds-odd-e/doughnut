@@ -51,10 +51,7 @@ test('configured isolated start omits mountebank and prints the recorded target'
     runtimeTarget: target,
     spawnFn: (cmd, args, opts) => {
       serviceSpawn.push({ cmd, args, opts })
-      const child = makeMockChild()
-      child.stdout = { on: () => undefined }
-      child.stderr = { on: () => undefined }
-      return child
+      return makeMockChild()
     },
     logWriter: { write: () => undefined, close: () => undefined },
   })
