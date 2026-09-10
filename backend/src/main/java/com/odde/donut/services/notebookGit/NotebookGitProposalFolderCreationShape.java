@@ -1,6 +1,8 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
+import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangeKind;
+import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangedDocument;
+import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.DocumentRole;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,40 +14,25 @@ final class NotebookGitProposalFolderCreationShape {
   record RootFolderCreation(String readmePath) {}
 
   static Optional<RootFolderCreation> findSingleRootFolderCreation(
-      List<InspectedRegularFile> files) {
+      List<ChangedDocument> documents) {
     RootFolderCreation candidate = null;
-    for (InspectedRegularFile file : files) {
-      if (unchanged(file)) {
-        continue;
-      }
-      if (candidate != null || !isAddedRootFolderReadme(file)) {
+    for (ChangedDocument document : documents) {
+      if (candidate != null || !isAddedRootFolderReadme(document)) {
         return Optional.empty();
       }
-      candidate = new RootFolderCreation(file.path());
+      candidate = new RootFolderCreation(document.path());
     }
     return Optional.ofNullable(candidate);
   }
 
-  private static boolean unchanged(InspectedRegularFile file) {
-    return file.acceptedBlobId() != null
-        && file.proposedBlobId() != null
-        && file.acceptedBlobId().equals(file.proposedBlobId());
+  private static boolean isAddedRootFolderReadme(ChangedDocument document) {
+    return document.kind() == ChangeKind.ADDED
+        && document.role() == DocumentRole.CONTAINER
+        && isDirectChildPath(document.path());
   }
 
-  static boolean isAddedRootFolderReadme(InspectedRegularFile file) {
-    return isAddedDirectChildPath(file) && "README.md".equals(directChildBasename(file.path()));
-  }
-
-  private static boolean isAddedDirectChildPath(InspectedRegularFile file) {
-    String path = file.path();
+  private static boolean isDirectChildPath(String path) {
     int firstSlash = path.indexOf('/');
-    return file.acceptedBlobId() == null
-        && file.proposedBlobId() != null
-        && firstSlash > 0
-        && firstSlash == path.lastIndexOf('/');
-  }
-
-  private static String directChildBasename(String path) {
-    return path.substring(path.indexOf('/') + 1);
+    return firstSlash > 0 && firstSlash == path.lastIndexOf('/');
   }
 }

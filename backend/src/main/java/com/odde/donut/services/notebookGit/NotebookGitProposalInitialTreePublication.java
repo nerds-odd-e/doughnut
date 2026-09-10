@@ -3,7 +3,8 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Note;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
+import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangedDocument;
+import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.DocumentRole;
 import com.odde.donut.testability.TestabilitySettings;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,22 +40,27 @@ class NotebookGitProposalInitialTreePublication {
   NotebookGitStateLoader.LockedNotebookState apply(
       NotebookGitStateLoader.LockedNotebookState state,
       NotebookGitProposalImporter.ImportedProposal proposal,
-      List<InspectedRegularFile> files) {
-    if (files.isEmpty() || files.stream().anyMatch(file -> !file.path().endsWith(".md"))) {
+      List<ChangedDocument> documents) {
+    if (documents.isEmpty()
+        || documents.stream().anyMatch(document -> !document.path().endsWith(".md"))) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Initial publication requires a nonempty Markdown tree.");
     }
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
-    List<String> paths = files.stream().map(InspectedRegularFile::path).toList();
-    return applyTree(
-        state,
-        proposal,
-        paths.contains("README.md") ? "README.md" : null,
-        paths.stream().filter(path -> path.endsWith("/README.md")).toList(),
-        paths.stream()
-            .filter(path -> !path.equals("README.md") && !path.endsWith("/README.md"))
-            .toList());
+    String notebookReadmePath = null;
+    List<String> folderReadmePaths = new ArrayList<>();
+    List<String> conceptPaths = new ArrayList<>();
+    for (ChangedDocument document : documents) {
+      if (document.role() == DocumentRole.CONCEPT) {
+        conceptPaths.add(document.path());
+      } else if ("README.md".equals(document.path())) {
+        notebookReadmePath = document.path();
+      } else {
+        folderReadmePaths.add(document.path());
+      }
+    }
+    return applyTree(state, proposal, notebookReadmePath, folderReadmePaths, conceptPaths);
   }
 
   private NotebookGitStateLoader.LockedNotebookState applyTree(

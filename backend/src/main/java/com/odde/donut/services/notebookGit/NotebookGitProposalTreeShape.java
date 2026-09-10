@@ -13,20 +13,37 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit,
- * and permits added or modified ordinary Markdown notes at regular file modes, exactly one isolated
- * ordinary-note deletion, or exactly one equal-content rename (one removed and one added note
- * sharing a blob). Never mixed or multiple pairs, unsafe paths, non-regular modes, or the
- * folder-reserved {@code README.md}. Callers only invoke this once proposal ancestry is confirmed
- * to be a direct single-parent child of the accepted commit.
+ * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit.
+ * Changed documents are classified once by operation and container/concept role; unchanged accepted
+ * files remain context. Ordinary-note admission permits added or modified ordinary Markdown notes
+ * at regular file modes, exactly one isolated ordinary-note deletion, or exactly one equal-content
+ * rename (one removed and one added note sharing a blob). Never mixed or multiple pairs, unsafe
+ * paths, non-regular modes, or a changed folder-reserved {@code README.md}. Callers only invoke
+ * this once proposal ancestry is confirmed to be a direct single-parent child of the accepted
+ * commit.
  */
 public final class NotebookGitProposalTreeShape {
 
   private NotebookGitProposalTreeShape() {}
 
-  static List<NoteChange> requireAllowedNoteChangesFromInspectedFiles(
-      List<InspectedRegularFile> files) {
-    return requireAllowedNoteChanges(noteChangesFrom(files));
+  static List<NoteChange> requireAllowedNoteChanges(List<ChangedDocument> documents) {
+    return admitOrdinaryNoteChanges(noteChangesFrom(documents));
+  }
+
+  /**
+   * Changed documents only: equal accepted/proposed blobs stay on {@link InspectedRegularFile} as
+   * context and are omitted here.
+   */
+  static List<ChangedDocument> classifyChangedDocuments(List<InspectedRegularFile> files) {
+    List<ChangedDocument> documents = new ArrayList<>();
+    for (InspectedRegularFile file : files) {
+      ChangeKind kind = changeKind(file);
+      if (kind == null) {
+        continue;
+      }
+      documents.add(new ChangedDocument(file, kind, documentRole(file.path())));
+    }
+    return documents;
   }
 
   /**
@@ -84,16 +101,17 @@ public final class NotebookGitProposalTreeShape {
     }
   }
 
-  private static List<NoteChange> noteChangesFrom(List<InspectedRegularFile> files) {
+  private static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
-    for (InspectedRegularFile file : files) {
-      if (file.proposedBlobId() == null) {
-        changes.add(new NoteChange(file.path(), ChangeKind.DELETED, file.acceptedBlobId(), null));
-      } else if (file.acceptedBlobId() == null) {
-        changes.add(new NoteChange(file.path(), ChangeKind.ADDED, file.proposedBlobId(), null));
-      } else if (!file.acceptedBlobId().equals(file.proposedBlobId())) {
-        changes.add(new NoteChange(file.path(), ChangeKind.MODIFIED, file.proposedBlobId(), null));
+    for (ChangedDocument document : documents) {
+      if (document.role() == DocumentRole.CONTAINER) {
+        throw unsupportedTreeShape(
+            "path \"" + document.path() + "\" is a folder README, which is reserved");
       }
+      if (!document.path().endsWith(".md")) {
+        throw unsupportedTreeShape("path \"" + document.path() + "\" is not a Markdown note");
+      }
+      changes.add(new NoteChange(document.path(), document.kind(), document.blobId(), null));
     }
     return changes;
   }
@@ -102,10 +120,7 @@ public final class NotebookGitProposalTreeShape {
    * Accepts added and/or modified ordinary-note changes, one isolated deletion, or one
    * equal-content rename. Refuses mixed deletion with other file changes.
    */
-  private static List<NoteChange> requireAllowedNoteChanges(List<NoteChange> changes) {
-    for (NoteChange change : changes) {
-      assertRegularNotePath(change.path());
-    }
+  private static List<NoteChange> admitOrdinaryNoteChanges(List<NoteChange> changes) {
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
@@ -153,14 +168,21 @@ public final class NotebookGitProposalTreeShape {
         new NoteChange(added.path(), ChangeKind.RENAMED, added.blobId(), deleted.path()));
   }
 
-  private static void assertRegularNotePath(String changedPath) {
-    if (!changedPath.endsWith(".md")) {
-      throw unsupportedTreeShape("path \"" + changedPath + "\" is not a Markdown note");
+  private static ChangeKind changeKind(InspectedRegularFile file) {
+    if (file.proposedBlobId() == null) {
+      return ChangeKind.DELETED;
     }
-    if ("README.md".equals(basename(changedPath))) {
-      throw unsupportedTreeShape(
-          "path \"" + changedPath + "\" is a folder README, which is reserved");
+    if (file.acceptedBlobId() == null) {
+      return ChangeKind.ADDED;
     }
+    if (!file.acceptedBlobId().equals(file.proposedBlobId())) {
+      return ChangeKind.MODIFIED;
+    }
+    return null;
+  }
+
+  private static DocumentRole documentRole(String path) {
+    return "README.md".equals(basename(path)) ? DocumentRole.CONTAINER : DocumentRole.CONCEPT;
   }
 
   private static void assertPathIsSafe(String path) {
@@ -195,6 +217,20 @@ public final class NotebookGitProposalTreeShape {
   record InspectedRegularFile(String path, ObjectId acceptedBlobId, ObjectId proposedBlobId) {}
 
   /**
+   * One changed document from the inspected diff, with Git operation and container/concept role.
+   * Unchanged accepted files are not represented here.
+   */
+  record ChangedDocument(InspectedRegularFile file, ChangeKind kind, DocumentRole role) {
+    String path() {
+      return file.path();
+    }
+
+    ObjectId blobId() {
+      return kind == ChangeKind.DELETED ? file.acceptedBlobId() : file.proposedBlobId();
+    }
+  }
+
+  /**
    * @param path the current (proposed-tree) Portable path; for RENAMED this is the new path
    * @param blobId the raw blob object id relevant to this change: the added blob (proposed tree)
    *     for ADDED, the removed blob (accepted tree) for DELETED, the proposed blob for MODIFIED
@@ -209,5 +245,10 @@ public final class NotebookGitProposalTreeShape {
     MODIFIED,
     DELETED,
     RENAMED
+  }
+
+  enum DocumentRole {
+    CONTAINER,
+    CONCEPT
   }
 }

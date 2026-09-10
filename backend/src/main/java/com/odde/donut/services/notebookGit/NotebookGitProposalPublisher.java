@@ -113,16 +113,18 @@ public class NotebookGitProposalPublisher {
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
         NotebookGitProposalTreeShape.inspectRegularFiles(
             proposal.repository(), acceptedHead, proposal.mainHead());
+    List<NotebookGitProposalTreeShape.ChangedDocument> documents =
+        NotebookGitProposalTreeShape.classifyChangedDocuments(files);
     if (folders.isEmpty()
         && liveNotes.isEmpty()
         && files.stream().allMatch(file -> file.acceptedBlobId() == null)) {
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
       return acceptMatchingProposedTree(
-          initialTreePublication.apply(state, proposal, files), proposal);
+          initialTreePublication.apply(state, proposal, documents), proposal);
     }
     Optional<NotebookGitProposalFolderCreationShape.RootFolderCreation> folderCreation =
-        NotebookGitProposalFolderCreationShape.findSingleRootFolderCreation(files);
+        NotebookGitProposalFolderCreationShape.findSingleRootFolderCreation(documents);
     if (folderCreation.isPresent()) {
       return acceptMatchingProposedTree(
           folderAcceptance.applyCreation(state, proposal, acceptedHead, folderCreation.get()),
@@ -135,7 +137,7 @@ public class NotebookGitProposalPublisher {
           folderAcceptance.apply(state, proposal, acceptedHead, relocation.get()), proposal);
     }
     List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
-        NotebookGitProposalTreeShape.requireAllowedNoteChangesFromInspectedFiles(files);
+        NotebookGitProposalTreeShape.requireAllowedNoteChanges(documents);
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
     projection.requireMatchingAcceptedTree(

@@ -198,8 +198,10 @@ Controller regressions live in `NotebookGitProposalFolderCreationControllerTest`
 
 ### 3. Classify changed documents once
 Type: Structure
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes active work, plus the required backend-suite wait.
+Actual: ~7 minutes active (over hypothesis, under 10, converged), ~1.3 minutes suite wait.
+Refactor: initial publication partitions by classified role and notebook path `README.md` instead of `path.contains("/")`. Backend suite rerun green.
 
 Represent changed documents once by operation and container/concept role using
 the full inspected diff. Reuse the existing inspected-file and note-change
@@ -213,6 +215,18 @@ Proof: existing initial container/Relationship and ordinary-note controller
 cases exercise the common classification. Format/reserved-path diagnostics
 remain semantically unchanged. Do not export internals merely to test them or
 introduce a test class for the representation.
+
+```text
+proof:
+  command: unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+  covers: complete backend unit suite on doughnut_wt_05087b88f4ea4adabada26656b61f244_test (initial container/Relationship, ordinary-note, format/reserved-path diagnostics)
+  result: pass
+```
+
+`ChangedDocument` classifies once by `ChangeKind` and `DocumentRole`. Publisher
+classifies the inspected diff once; initial publication, README-only recognition,
+and ordinary-note admission consume it. Unchanged blobs stay inspected-file context.
 
 ### 4. Apply admitted additions through one flow
 Type: Structure
@@ -309,7 +323,7 @@ prepares the same publication outcome and removes a source of duplicated rules.
 | --- | --- | --- |
 | 1 | Done | One publisher completion owner; complete backend suite green |
 | 2 | Done | One folder materialization mechanism; existing creation proof plus identity/collision regressions |
-| 3 | Ready | One document classification representation; unchanged behavior |
+| 3 | Done | One document classification representation; unchanged behavior |
 | 4 | Ready | One addition application flow; unchanged behavior |
 | 5 | Ready with stated sizing exception | One integrated publication/receive outcome; complete backend and E2E verification stay with it |
 
@@ -329,6 +343,9 @@ new constraint condition.
   are pre-mutation drift checks, not a second completion owner.
 - Slice 2 active work ~8 minutes vs 4–5 hypothesis; converged without refinement.
   Represented-folder seeding uses the accepted tree, not all live folders.
+- Slice 3 active work ~7 minutes vs 4–5 hypothesis; converged without refinement.
+  Unchanged files are omitted from `ChangedDocument`; callers no longer split
+  README roles from raw path strings.
 - Feature-branch pushes have no push-triggered CI (`ci.yml` only on `main`).
   Missing CI observation coverage until merge to `main`. Keep one plan writer;
   do not modify Story 1's plan or execution state.
