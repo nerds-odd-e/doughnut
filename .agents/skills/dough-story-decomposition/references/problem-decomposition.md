@@ -8,7 +8,7 @@ Do not plan a lower level while a higher-level decision remains unresolved.
 | --- | --- | --- |
 | **Problem or capability** | The beneficiary, problem, desired effect, constraint, or direction is unclear | One evaluable decision, assumption, or outcome |
 | **Story** | The problem is understood but several useful outcomes are possible | Ordered Valuable, Visible, Vertical stories |
-| **Slice** | One story's goal, scope, and key examples are understood | Behavior slices and only immediately enabling Structure slices |
+| **Slice** | One story or bounded retrospective correction is understood | Behavior/Structure slices under [slice decomposition](#decompose-slices) |
 
 The levels are fractal: name the evaluator and observable result, split
 independent outcomes, order by value and learning, and make every stopping point
@@ -123,18 +123,44 @@ belongs in executable examples and product documentation.
 
 ## Decompose slices
 
-Use slices only after one story is understood and executable planning
-is authorized. Every slice is exactly one of:
+Use slices only after one story or a
+[bounded retrospective correction](../../dough-slice-planning/SKILL.md#require-an-understood-story)
+is understood and executable planning is authorized. Every slice is exactly one of:
 
 | Type | Required content | Reject when |
 | --- | --- | --- |
 | **Behavior** | Pre-condition, trigger, one externally observable postcondition, and outside-in proof | It contains independent postconditions or proof loops |
-| **Structure** | Internal change, unchanged external behavior, and the immediate next Behavior it enables | It prepares for anything beyond that Behavior |
+| **Structure** | Internal change, unchanged external behavior, and the immediate next Behavior it enables, or the retrospective correction below | It prepares beyond that Behavior or evidenced correction |
 
-Tie every Behavior to included story scope or a key example. Put Structure
-immediately before its Behavior. Use the splitting moves above at this finer
+Tie every Behavior to included story or correction scope and an evaluable example.
+Put preparatory Structure immediately before its Behavior. Use the splitting moves above at this finer
 resolution, but do not split tests from the Behavior they prove or create slices
 around files, layers, components, specialists, or activities.
+
+For an evidenced retrospective correction that changes structure while preserving
+product behavior, a Structure slice may instead own that correction directly.
+Name the concrete architectural or test-suite weakness it removes and prove preserved behavior
+at the affected external boundaries in the same slice. Do not invent a new
+Behavior promise merely to justify the correction. Keep one bounded outcome and
+proof loop; this exception does not authorize speculative preparation.
+
+Evolve the simplest common rule supported by the current examples and domain
+constraints. Apply the shared [examples and constraints
+distinction](../../dough-story-refinement/references/planning.md#examples-and-constraints):
+fixture counts and arrangements alone do not justify production gates. A later
+example should exercise or extend the model, not prescribe another recognizer
+or parallel representation. Do not design a generic framework for hypothetical
+cases or expand delivery and verification promises to every naturally handled
+case. Retain independently justified constraints and their rejection proof.
+
+Assess the sequence cumulatively alongside slice size and proof ownership:
+are the examples exercising one coherent model or accumulating special cases?
+Explain the common rule supported by current evidence and any domain reason for
+separate rules. Delivery grouping alone cannot justify implementation structure.
+Revise unsupported design prescriptions within the authorized scope; use the shared
+[plan-conflict handoff](../../dough-execute-plan/references/execution-decisions.md#resolve-a-disputed-plan-restriction)
+for disputed product or plan constraints before conflicting
+changes. Passing each slice's proof does not answer this design question.
 
 Refine a slice when it has independent postconditions or proof loops, separable
 implementation beats before a green result, hidden preparation, low confidence

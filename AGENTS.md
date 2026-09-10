@@ -39,7 +39,7 @@ Portable digest (details live in the cited always-applied rules — keep `AGENTS
 - **Story shaping:** use **dough-story-decomposition** for broad or unclear requirements; one non-executable decomposition seed contains ordered candidate stories. Queue and reprioritize unfinished stories with **dough-product-backlog**; details stay in the home seed.
 - **Story refinement:** use `.agents/skills/dough-story-refinement/SKILL.md` to clarify selected stories' goal, scope, and key examples in their home seeds before slice planning. Apply conservative scope and post-implementation cleanup from `planning.mdc`.
 - **Plan refinement:** use **dough-slice-plan-refinement** in place when an existing PLAN is complex, sizing confidence is low, or execution overruns. Skip the extra pass when dough-slice-planning already produced clear commit-sized leaves.
-- **Execution retrospective:** reconstruct a completed plan and its commits with **execution-retrospective**; audit the aggregate result and process, and stop after generating any follow-up PLAN without executing it.
+- **Execution retrospective:** review a completed or in-progress plan with **dough-execution-retrospective**; it may plan bounded corrections but never executes them. Close completed story history afterward with **dough-story-wrap-up**.
 - **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); for one selected ad-hoc story use **dough-slice-planning** → optional **dough-slice-plan-refinement** → **dough-execute-plan** under `.planning/quick/`.
 - **Test optimization:** `test-optimization` skill — plans under `.planning/phases/` or `quick/`, run via dough-execute-plan.
 - **Non-compatible local overlays** (must keep): documented in `.cursor/rules/gsd-coexistence.mdc`.

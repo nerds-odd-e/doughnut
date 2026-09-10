@@ -196,7 +196,7 @@ doughnut/
 
 **.planning/quick/:**
 - Purpose: Timer / ad-hoc slices not yet on the roadmap
-- Generated: No (local dough-slice-planning / `/gsd-quick`)
+- Generated: No (Open Dough `dough-slice-planning` / `/gsd-quick`)
 - Committed: Yes while active; delete when done
 
 **docs/:**

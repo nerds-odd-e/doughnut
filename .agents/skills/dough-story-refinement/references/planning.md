@@ -5,7 +5,9 @@
 Refine an unresolved selected story in its seed. Once its goal, scope, and key
 examples are understood and executable planning is authorized, write or refine
 one active executable plan. Do not use an execution plan to decide story scope,
-and do not turn a story seed directly into executable work.
+and do not turn a story seed directly into executable work. An evidenced
+[bounded retrospective correction](../../dough-slice-planning/SKILL.md#require-an-understood-story)
+may supply the understood outcome and proof without a new feature story.
 
 ## Refine story understanding
 
@@ -19,7 +21,8 @@ For each story, establish:
 
 - **Goal:** beneficiary, desired change, and contribution to the business goal.
   Keep the story's observable outcome distinct from the broader ambition.
-- **Scope:** included behavior, material exclusions, and boundary assumptions.
+- **Scope:** required behavior, justified rejection constraints, deferred
+  promises, and boundary assumptions, using the distinction below.
 - **Key examples:** concrete pre-condition → trigger → result situations that
   explain the scope. Include boundaries or exceptions when they resolve
   ambiguity; do not enumerate a complete test suite.
@@ -28,13 +31,34 @@ Prefer the smallest useful outcome. Clarify uncertain additions when possible;
 otherwise exclude them and report what was considered. If exclusion prevents
 the stated goal or examples from working, resolve the question before dependent
 planning or implementation. Necessary implementation details are not extra
-product scope; speculative generality is.
+product scope. Naturally general behavior need not add delivery or verification
+commitments; speculative capabilities are extra scope.
 
 Add **UI** descriptions or sketches only when interaction or presentation needs
 agreement. Add **Architecture** only for a new consequential concern; consult
 [dough-adr-awareness](../../dough-adr-awareness/SKILL.md) and relevant Accepted
 ADRs. Inspect existing behavior or code only to resolve a concrete question,
 without turning refinement into technical planning. Omit unused optional sections.
+
+## Examples and constraints
+
+Examples demonstrate required behavior; their counts and arrangements do not
+forbid unlisted cases. Require an independent domain or product requirement to
+justify rejection, and cite it when recording negative acceptance. Do not invent
+that justification when it is missing; record any unresolved constraint decision.
+Deferred promises state what this delivery does not commit to build or verify,
+not what the product must reject.
+
+For example, README plus three Notes and README plus two Notes and one
+Relationship can both be required import examples. Deferring bulk performance
+or promises about future layouts does not require rejecting other mixtures.
+An explicit product limit on attachment count can still justify rejection above
+that limit; the example counts alone cannot.
+
+Story refinement sets delivery commitments, not product implementation
+boundaries. Implementation may change any product parts needed for the promised
+outcome while respecting genuine product constraints and architectural decisions.
+Story membership alone does not justify a structural boundary.
 
 ## Update the story in its seed
 
@@ -66,7 +90,8 @@ second plan for the same work.
 
 Keep only information needed for execution, proof, review, or resume:
 
-1. **Source** — selected story or decision link when applicable.
+1. **Source** — selected story or decision link, or retrospective findings and
+   execution provenance for a correction.
 2. **Goal and scope** — one selected outcome, material exclusions, and
    assumptions.
 3. **Outside-in proof** — key examples and their observable test or
@@ -88,13 +113,14 @@ Behavior: <pre-condition → trigger → externally observable postcondition>
 ```
 
 For Structure, replace `Behavior` with the internal change and the immediate
-next Behavior it enables. Planning numbers stay in planning artifacts; product
+next Behavior it enables, or the directly owned retrospective correction under
+[slice decomposition](../../dough-story-decomposition/references/problem-decomposition.md#decompose-slices). Planning numbers stay in planning artifacts; product
 code, tests, and enduring documentation remain capability-named.
 
 ## Own executable proof
 
-Map every checkable final-state promise in the selected story and current
-decisions to an owning slice and observable proof. Inline links or a compact table
+Map every checkable final-state promise in the selected story or bounded
+retrospective correction and current decisions to an owning slice and observable proof. Inline links or a compact table
 are sufficient. Include applicable promises, not broader aspirations. Passing
 commands without the promised observation does not establish completion.
 
@@ -127,7 +153,8 @@ Edit the same plan in place. Preserve completed slices and resume-useful history
 replace obsolete planned detail rather than appending a competing breakdown,
 and record only learnings that affect remaining work. Apply
 [slice decomposition](../../dough-story-decomposition/references/problem-decomposition.md#decompose-slices)
-and its sizing and escalation rules before declaring execution ready.
+and its cumulative design assessment, sizing, and escalation rules before
+declaring execution ready.
 
 After an execution overrun, record elapsed time, completed evidence, the failure
 or thrash point, and the sizing assumption that proved false. Replace slices
@@ -139,11 +166,10 @@ external-wait exception that decomposition cannot reduce.
 
 Keep enduring behavior in tests and product documentation, and enduring design
 in code and ADRs. Once that knowledge is captured, reduce each implemented
-story's refinement detail to Goal and Scope, including exclusions. Remove spent
-examples, UI sketches, and architectural discussion; preserve its anchor,
-completion status, and unfinished siblings. Retain still-needed detail until
-the enduring knowledge has a home.
+story's refinement detail to Goal and Scope, including exclusions, while the
+plan and review evidence still exist. Retain unfinished siblings.
 
-When the executable plan completes, remove spent diary and obsolete summary
-detail according to this project's lifecycle. Preserve unfinished scope and any
-evidence still needed for resume or review.
+When the executable plan completes, keep the plan and review inputs for
+retrospective and [dough-story-wrap-up](../../dough-story-wrap-up/SKILL.md).
+Do not delete spent story or plan history, create a completion record, or
+trim review inputs here. Wrap-up owns that closure.
