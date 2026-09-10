@@ -170,7 +170,8 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 
 Developer-selected order: Story 9 first, then Story 1 (pull), then Story 2
 (existing-note composition). Story numbers remain stable identifiers, not priority.
-Stories 3 and 4 remain independent candidates; quick/096 stays postponed.
+Stories 1–4 are queued at high priority immediately after Story 9, in that order,
+by developer direction. Stories 3 and 4 remain independent; quick/096 stays postponed.
 
 <a id="story-9"></a>
 
@@ -309,6 +310,8 @@ rebuild accepted history from live state or promise this in the initial-tree pla
 This question does not block the developer-selected first story.
 
 
+<a id="story-1"></a>
+
 ### Story 1: Receive compatible accepted history without example-count restrictions
 
 - **For / why:** notebook owners should keep local content edits while receiving compatible accepted edits and additions; another save should not arbitrarily change eligibility.
@@ -319,6 +322,8 @@ This question does not block the developer-selected first story.
 - **Stop-safe outcome:** ordinary content-only histories work consistently before addition handling is broadened; no interim path-count branch becomes a permanent acceptance rule.
 - **Effort hypothesis:** M–L, medium confidence; conflict state and complete-commit preservation need executable slice sizing. No database experiment is required for the CLI classifier itself.
 - **Depends on:** no functional dependency on initial publication; follows Story 9 by developer-selected priority.
+
+<a id="story-2"></a>
 
 ### Story 2: Publish compatible ordinary-note operations as one atomic changeset
 
@@ -331,6 +336,8 @@ This question does not block the developer-selected first story.
 - **Effort hypothesis:** L, lower confidence because identity ambiguity and atomic effects require refinement before executable slices.
 - **Depends on:** no functional dependence on Story 1. Coordinate edits to shared proposal files with Story 9; source-file overlap is not permission to absorb its scope.
 
+<a id="story-3"></a>
+
 ### Story 3: Declare isolated test capabilities in one place
 
 - **For / why:** maintainers can see and change an approved test's resource requirements without editing resource lifecycle code for that example.
@@ -340,6 +347,8 @@ This question does not block the developer-selected first story.
 - **Stop-safe outcome:** the same four verified workflows continue to work with one policy owner. Adding more spec admissions is a later decision.
 - **Effort hypothesis:** M, medium confidence. Needs one representative isolated-run proof; do not rerun every unrelated E2E scenario.
 - **Depends on:** none.
+
+<a id="story-4"></a>
 
 ### Story 4: Keep one owned-process termination mechanism
 
