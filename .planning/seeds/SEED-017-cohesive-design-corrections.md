@@ -3,7 +3,7 @@ id: SEED-017
 status: dormant
 planted: 2026-09-10
 planted_during: Five-day completed-plan design retrospective
-trigger_when: Delivering cohesive initial publication, then Git workflow corrections
+trigger_when: Improving Git workflows and verification cohesion
 scope: L
 ---
 
@@ -16,12 +16,7 @@ scope: L
 Window: **2026-09-05 11:02 through 2026-09-10 11:02, Asia/Singapore**, a fixed rolling 120 hours. Current code inspected at **`6876f46de098cf6b41dfcae7b2a2a0bebb7c16ec`**. Inventory contains **66 distinct completed/closed plan identities: 54 reviewed and 12 explicitly excluded**. There are 68 historical PLAN paths because two plans were renamed. Reused numeric IDs refer to different plans; the full directory names below disambiguate them.
 
 The original five-day inventory excluded the initial-publication family (plans
-078–087, 092 and 094); preserve that historical audit boundary. The developer has
-now merged the separate initial-publication refinement into [Story 9](#story-9)
-below and kept it highest priority. Its current-code assessment extends the
-correction scope without claiming those historical plans were re-audited.
-Quick/096 is superseded by the verified initial-tree contract; no new action is
-assigned to spent Plan 94.
+078–087, 092 and 094); preserve that historical audit boundary.
 
 ## Method and limits
 
@@ -148,169 +143,57 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 | 075-retire-worktree-databases | 09-08 · `1f723707fb` | No finding: generic disposable identity, admission and database evidence govern retirement. |
 | 076-absorb-equivalent-final-newline-edit | 09-08 · `858835291e` | No independent mapping finding: exact LF equivalence and single-conflict safeguards protect whole-commit skipping. F1 must preserve companion edits when broadening eligibility. |
 | 077-retirement-admission-and-process-evidence | 09-08 · `dbc1bd7039` | No finding: evidence checks fail closed for ambiguous ownership; not per-worktree exceptions. |
-| 078-create-readme-only-folder | 09-09 · `f506502e0b` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 079-initial-notebook-and-folder-readmes | 09-09 · `e9b56195eb` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 080-require-empty-notebook-for-initial-readmes | 09-09 · `cd59ea24af` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 081-initial-folder-with-one-note | 09-09 · `cd59ea24af` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 082-require-ordinary-note-in-initial-tree | 09-09 · `cd59ea24af` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 083-initial-notebook-readme | 09-09 · `cd59ea24af` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 084-cohere-initial-notebook-readme-publication | 09-09 · `cd59ea24af` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 085-minimal-initial-container-with-note | 09-09 · `cd59ea24af` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 086-cohere-proposal-binding-persistence | 09-09 · `cd59ea24af` | Excluded from original audit; current initial-publication correction is Story 9 below. |
-| 087-next-small-initial-readme-note-trees | 09-09 · `cd59ea24af` | Excluded from original audit; current initial-publication correction is Story 9 below. |
+| 078-create-readme-only-folder | 09-09 · `f506502e0b` | Excluded from original audit. |
+| 079-initial-notebook-and-folder-readmes | 09-09 · `e9b56195eb` | Excluded from original audit. |
+| 080-require-empty-notebook-for-initial-readmes | 09-09 · `cd59ea24af` | Excluded from original audit. |
+| 081-initial-folder-with-one-note | 09-09 · `cd59ea24af` | Excluded from original audit. |
+| 082-require-ordinary-note-in-initial-tree | 09-09 · `cd59ea24af` | Excluded from original audit. |
+| 083-initial-notebook-readme | 09-09 · `cd59ea24af` | Excluded from original audit. |
+| 084-cohere-initial-notebook-readme-publication | 09-09 · `cd59ea24af` | Excluded from original audit. |
+| 085-minimal-initial-container-with-note | 09-09 · `cd59ea24af` | Excluded from original audit. |
+| 086-cohere-proposal-binding-persistence | 09-09 · `cd59ea24af` | Excluded from original audit. |
+| 087-next-small-initial-readme-note-trees | 09-09 · `cd59ea24af` | Excluded from original audit. |
 | 088-isolated-cli-web-note-e2e | 09-09 · `cd59ea24af` | F3: another literal spec registration added. CLI uses the owning environment correctly; issue is where resource policy lives. |
 | 089-isolated-mcp-services-e2e | 09-09 · `960c4cc2ba` | F3: another literal spec registration. Awaiting MCP client shutdown is a valid lifecycle fix, not an example-shaped workaround. |
-| 092-small-initial-notebook-layouts | 09-09 · `524017c50a` | Excluded from original audit; current initial-publication correction is Story 9 below. |
+| 092-small-initial-notebook-layouts | 09-09 · `524017c50a` | Excluded from original audit. |
 | 093-release-private-openai-mock-after-cypress | 09-10 · `6adf381f84` | No new finding: common event composition fixes overwritten cleanup callbacks. Current PLAN explicitly records done and live proof. |
-| 094-initial-notes-with-relationship | 09-10 · `cea9985238` | Excluded from original audit; current initial-publication correction is Story 9 below. |
+| 094-initial-notes-with-relationship | 09-10 · `cea9985238` | Excluded from original audit. |
 | 095-persistent-development-environment | 09-10 · `6876f46de0` | F4: separate Development termination state machine duplicates SUT descendant/TERM/wait/KILL logic. Other runtime helpers are already shared. |
 
 ## Correction plan
 
-**Planning status: proposed correction roadmap; implementation not started.** This is one consolidated correction roadmap with five stories, not a single cross-subsystem executable slice plan. Existing delivered plans stay delivered. Their useful behavior and proofs become regression coverage; the corrections receive new work records. No blanket revert, recreation of Plan 94, or rewrite of all affected systems is proposed.
+The active stories below cover independent correction outcomes. Each retains
+its own scope and proof; this seed is not a cross-subsystem executable plan.
+The container-publication proof correction is first in the queue, followed by
+Stories 1–4 in their developer-selected order.
 
-Developer-selected order: Story 9 first, then Story 1 (pull), then Story 2
-(existing-note composition). Story numbers remain stable identifiers, not priority.
-Stories 1–4 are queued at high priority immediately after Story 9, in that order,
-by developer direction. Stories 3 and 4 remain independent; quick/096 is superseded.
+<a id="story-10"></a>
 
-<a id="story-9"></a>
+### Story 10: Consolidate initial container publication proof
 
-### Story 9: Make initial notebook publication design cohesive
+- **For / why:** developers need one maintained behavioral proof for container-only
+  publication, avoiding duplicate controller/database/bundle orchestration.
+- **Goal:** retain proof of exact authored trees, implied Folder ancestry,
+  optional Readmes and zero Note rows in one container-tree scenario owner.
+- **Scope:** consolidate the older nested-Readme test into the existing
+  data-driven container-tree controller test. Preserve its singleton boundary
+  and explicit zero-Note assertion before removing the duplicate. Product
+  behavior and the installed CLI journey remain unchanged.
+- **Evaluation:** the retained controller proof covers the same observable
+  contract and the required backend suite passes. No runtime saving is promised.
+- **Exclusions:** production changes, broader suite cleanup, E2E admission,
+  populated-notebook publication and reconciliation changes.
+- **Execution plan:** [quick/098](../quick/098-consolidate-initial-container-publication-proof/PLAN.md).
+- **Safe stopping point:** one proof owner preserves the container-only contract
+  independently of later Git workflow corrections.
 
-**Status:** implementation verified; completed plan and review inputs retained
-for retrospective. Pull reconciliation and existing-note composition remain
-separate queued work.
-Execution plan: [quick/097](../quick/097-cohesive-initial-notebook-publication/PLAN.md).
+## Open product decision
 
-- **Goal:** A notebook owner can clone an empty notebook, organize valid Portable
-  Markdown locally, publish one authored commit, and clone the same accepted tree
-  again without rearranging content to satisfy example-specific handlers.
-  Developers can explain acceptance through document roles and placement rules.
-- **Scope:** Owner-authorized, bound checkout; current accepted tree empty and
-  live notebook has no Folders or live Notes; one nonempty, direct single-parent
-  child of current accepted main. Accept regular Markdown concept files at root
-  and within nested/sibling Folders. Notebook and Folder Readmes are optional;
-  construct every implied ancestor exactly once. No product gate on file count,
-  Folder count/depth, number of Relationships, or mixture of root/nested concepts.
-  Existing format, title, Folder-name and property validation still applies.
-  This broadens behavior; it is not solely a behavior-preserving refactor.
-- **Content rules:** `README.md` belongs to its container and requires the
-  existing `type: Readme` contract; never turn it into a Note row. Other concept
-  files use the existing typed-Markdown contract, including `Note`,
-  `Relationship`, and valid unknown types. Preserve unknown types/properties
-  without inventing new semantics. Reserved-title rules remain in force.
-  Filenames determine titles. Preserve authored bytes and do not generate missing
-  Readmes or listing files. Empty filesystem directories are not tracked content.
-- **Identity and consistency:** All newly published Notes have fresh server IDs.
-  Preserve the proposed Git commit, tree and content exactly. Resolve authored
-  references against the resulting notebook using existing viewer-aware rules;
-  absent or ambiguous endpoints remain unresolved, with no synthesized Notes.
-  Atomically accept all content, Folders, reference-index effects and the head;
-  rejected proposals leave none of those effects behind. Existing retry,
-  authorization, ancestry, projection-drift and concurrency guarantees remain.
-- **Material exclusions:** Changes to populated notebooks or existing Readmes;
-  deletion/move identity generalization; pull/rebase eligibility changes; additional
-  unpublished commits, merges or history reconciliation; attachments/non-Markdown
-  files; new type-specific behavior; synchronization of all web writes; remote
-  hosting protocols; bulk-import tooling, performance guarantees, or execution
-  against the actual jap1 notebook. General composition is included even though
-  operating a large real-world import remains excluded.
-- **Value / simpler alternative:** Splitting commits or flattening Folders loses
-  the owner's coherent publication. Adding another exact layout perpetuates the
-  defect. Raising numeric limits leaves the same failure at the next count.
-  A wholesale synchronization rewrite discards reusable behavior without solving
-  a necessary additional part of this outcome.
-- **Safe stopping point:** A valid initial tree is usable in Donut and a fresh
-  checkout even if subsequent reconciliation improvements are cancelled.
-  Intermediate slices may leave later capability work pending, but may not weaken
-  atomicity or replace real constraints with new fixture-count gates.
-
-#### Key examples (proof data, not an acceptance whitelist)
-
-1. Empty bound notebook → commit root README and four root Notes → publication
-   succeeds; another clone has the exact submitted head and tree. Repeat with
-   omitted README and a different count without a new production branch.
-2. Empty notebook → publish root Note, `Topic/README.md`, two related Notes in
-   `Topic`, and `Other/Deep/Idea.md` together → all paths have the corresponding
-   titles/placements, implied ancestors exist once, and no extra Readmes appear.
-3. A Relationship sorts before its endpoint files → publish and open it → both
-   path-qualified links resolve to the newly published Notes. An absent endpoint
-   stays unresolved. Omitting the notebook or Folder README changes neither rule.
-4. A regular concept has `type: CustomConcept` and unknown YAML properties →
-   publish and read back → preserve the authored document using existing semantics.
-5. One member has invalid `note_level` or an invalid Folder name → publication
-   rejects with context and a committed-transaction read finds the original
-   notebook, reference rows and accepted head unchanged. Correct and retry works.
-6. Repeat an accepted proposal → same head and same server identities, without
-   duplicate Folders/Notes. A competing stale proposal retains existing conflict
-   handling. A notebook with an existing empty Folder is not an initial notebook.
-
-#### Whole Git workflow cohesion assessment
-
-Refinement source inspection at `6876f46de098cf6b41dfcae7b2a2a0bebb7c16ec`; no runtime test
-claim. This is a workflow assessment covering acquisition, local editing,
-publication, receiving and web-produced history, not an audit of every product
-subsystem. The adjacent audit findings below retain their original evidence; each
-correction has one story below.
-
-| Responsibility | Current evidence and assessment | Improvement boundary |
-| --- | --- | --- |
-| Acquire/bind a checkout | CLI `notebookAcquisition.ts` downloads the accepted bundle, stages a clone and records local notebook/origin config; `notebookBinding.ts` guards server origin. Shared readiness checks protect pull/publish. These are useful boundaries. | Preserve command/binding/transport behavior and prove initial publication through it; no new clone engine. The cross-filesystem copy fallback does not provide the atomic install claimed by its comment; track separately, not as a proven reproduced failure. |
-| Validate Portable content | `NotebookGitProposalMarkdownFormat` already admits valid unknown types; exact initial recognizers narrow types/counts before shared persistence. | Keep format validation distinct from operation eligibility; remove initial example restrictions. Use the existing codec/profile as authority. |
-| Apply initial publication | `NotebookGitProposalPublisher` dispatches multiple initial shapes; `InitialNotebookReadmePublication`, `InitialCompositionPublication` and `FolderAcceptance` repeat validation/application/final acceptance sequences. | One initial-tree interpretation and orchestration, reusing existing construction, document persistence and projection code. Remove obsolete initial dispatch, not merely bypass it. |
-| Produce/freeze accepted history | Web content/creation services share `AcceptedSnapshotPersistence`; download freezes amendment eligibility, while publication accepts an authored commit via `NotebookGitProposalBindingPersistence`. | Keep append/amend of server-authored commits distinct from acceptance of a supplied commit. Small duplicated binding assignments alone do not justify merging these policies. Preserve exposure and transactional ownership. |
-| Web-to-Git coverage | `WebNoteContentSaveService` persists content without advancing Git when the prior projection drifts. `WebNoteCreationService` falls back for non-ordinary concepts, Wikidata creation, and unrepresented destinations. Clone downloads the accepted bundle, not a fresh live export. | A separate product decision is needed about all web writes participating in accepted history versus an explicit partial-sync contract. Initial publication does not close that gap. |
-
-Pull eligibility and complete-commit conflict preservation are assessed once in
-[F1](#f1--high-pull-recognizes-example-sized-histories-instead-of-compatible-changes);
-existing-note composition and identity are assessed once in
-[F2](#f2--high-ordinary-note-operations-cannot-compose-within-one-publication).
-
-#### Cohesive design direction
-
-The common model is a Portable tree plus changes between revisions. Document
-roles, paths and authored bytes describe content; server identity correspondence
-describes updates; Git ancestry and conflict handling describe reconciliation.
-These are related responsibilities, not interchangeable operations. Java and
-TypeScript need consistent contracts, not a forced shared runtime or a universal
-pipeline. The CLI owns safe local Git operations; the server owns authoritative
-validation and atomic acceptance. Web writing remains a distinct producer.
-
-For this story, the publisher retains authorization, locked state, ancestry and
-transaction ownership. One initial path validates/classifies all documents,
-derives Folder ancestry, uses existing construction/persistence, verifies the
-complete resulting projection and accepts the binding once. Initial eligibility
-must include actual empty accepted tree, not just all-added diff or no live Notes.
-Refactor implicated helpers/callers together while preserving noninitial Folder
-creation and relocation behavior. Do not introduce a handler registry, new schema,
-new wire protocol, parallel codec, reference resolver or import framework.
-
-Accepted constraints: [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md)
-(domain vocabulary), [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-(format, unknown types, Readmes, authored references),
-[ADR 0005](../../docs/adrs/0005-web-routes-accepted.md) (resolved navigation),
-[ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md) (deliberate errors versus
-loud failures), and [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
-(test ownership). The ADR index and in-file statuses agree; Accepted 0001's
-filename lacks the usual suffix, a naming hygiene difference only. ADR 0002 is
-Proposed and is not approval to implement its complete synchronization contract.
-No Accepted ADR conflict is identified for this story.
-
-#### Follow-up boundary and remaining product question
-
-The correction order is recorded above. These remain separate deliverable outcomes.
-[SEED-016 Story 8](SEED-016-initial-notebook-and-folder-readmes.md#story-8)'s grouped,
-reference and atomicity examples are covered; plan 096 is superseded. Do not
-resume its old exact-shape implementation or duplicate SEED-017 correction stories.
-
-**Open question for later scope:** Should every web mutation of Portable content
-advance accepted Git history, or should the product deliberately expose a partial
-synchronization boundary? Recommendation: ultimately make normal web authoring
-participate consistently, refined as separate user outcomes; do not silently
-rebuild accepted history from live state or promise this in the initial-tree plan.
-This question does not block the developer-selected first story.
-
+Should every web mutation of Portable content advance accepted Git history, or
+should the product deliberately expose a partial synchronization boundary?
+Normal web authoring participation needs separate user outcomes; do not silently
+rebuild accepted history from live state. This question does not block the
+queued corrections.
 
 <a id="story-1"></a>
 
@@ -323,7 +206,7 @@ This question does not block the developer-selected first story.
 - **Evaluation:** the six probe cases above follow compatibility rather than count; test different path cardinalities and repeated/reordered independent saves. At the real `notebook pull` boundary, confirm content, accepted/main ancestry, continued conflicts, abort and all companion edits. Include an LF-equivalent conflict plus another valuable edit. Dirty checkout, unrelated/merge/multiple-unpublished history and unsupported structural operations remain safe refusals with local work intact.
 - **Stop-safe outcome:** ordinary content-only histories work consistently before addition handling is broadened; no interim path-count branch becomes a permanent acceptance rule.
 - **Effort hypothesis:** M–L, medium confidence; conflict state and complete-commit preservation need executable slice sizing. No database experiment is required for the CLI classifier itself.
-- **Depends on:** no functional dependency on initial publication; follows Story 9 by developer-selected priority.
+- **Depends on:** no functional dependency on initial publication.
 
 <a id="story-2"></a>
 
@@ -336,7 +219,7 @@ This question does not block the developer-selected first story.
 - **Evaluation:** through proposal/controller and installed CLI boundaries, publish multiple independent deletions and a rename plus an unrelated edit; vary counts/order. Assert final content/location, unchanged identities and learning data, single accepted head, retry behavior and a receiving clone's result. Ambiguous equal-blob candidates, reserved destinations, stale head, drift and late invalid members must leave the entire state unchanged.
 - **Stop-safe outcome:** deletion collections are useful independently; uncertain identity remains refused until correspondence has proof. Never silently downgrade a move to deletion/creation to make a fixture pass.
 - **Effort hypothesis:** L, lower confidence because identity ambiguity and atomic effects require refinement before executable slices.
-- **Depends on:** no functional dependence on Story 1. Coordinate edits to shared proposal files with Story 9; source-file overlap is not permission to absorb its scope.
+- **Depends on:** no functional dependence on Story 1; preserve the initial-tree publication contract while changing shared proposal code.
 
 <a id="story-3"></a>
 
@@ -364,10 +247,8 @@ This question does not block the developer-selected first story.
 
 ## Execution readiness and design checks
 
-Story 9's implementation and all 11 execution slices are verified; its plan remains
-available for retrospective. Story 1 follows; Story 2 needs particular attention
-to identity ambiguity before execution. Later story details remain refinement
-input and retain their developer-selected order.
+Story 10 has an executable plan. Stories 1–4 remain refinement input; Story 2
+needs particular attention to identity ambiguity before execution.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
 
