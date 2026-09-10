@@ -166,5 +166,7 @@ dev.pid
 /.sut.local.lock
 /.worktree.retire.gate
 /.worktree.retire.marker
+# nested Git worktrees (must not be recorded as gitlinks)
+/.worktrees/
 # CocoIndex Code (ccc)
 /.cocoindex_code/

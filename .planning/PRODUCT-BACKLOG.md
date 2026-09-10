@@ -23,7 +23,9 @@ changes.
 ## Backlog
 
 - [Receive compatible accepted history without example-count restrictions](seeds/SEED-017-cohesive-design-corrections.md#story-1) — SEED-017
-- [Publish compatible ordinary-note operations as one atomic changeset](seeds/SEED-017-cohesive-design-corrections.md#story-2) — SEED-017
+- [Publish a new folder and its notes together](seeds/SEED-017-cohesive-design-corrections.md#story-2) — SEED-017
+- [Publish note deletions alongside compatible note changes](seeds/SEED-017-cohesive-design-corrections.md#story-2a) — SEED-017
+- [Publish unambiguous note moves alongside compatible note changes](seeds/SEED-017-cohesive-design-corrections.md#story-2b) — SEED-017
 - [Declare isolated test capabilities in one place](seeds/SEED-017-cohesive-design-corrections.md#story-3) — SEED-017
 - [Keep one owned-process termination mechanism](seeds/SEED-017-cohesive-design-corrections.md#story-4) — SEED-017
 

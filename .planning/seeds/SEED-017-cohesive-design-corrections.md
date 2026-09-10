@@ -164,7 +164,9 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 
 The active stories below cover independent correction outcomes. Each retains
 its own scope and proof; this seed is not a cross-subsystem executable plan.
-Stories 1–4 proceed in their developer-selected order.
+The product backlog owns priority. The former combined Story 2 now leads with
+folder-and-note publication, followed by deletion composition (2a) and move
+composition (2b), before the existing infrastructure corrections (3–4).
 
 ## Open product decision
 
@@ -178,27 +180,271 @@ queued corrections.
 
 ### Story 1: Receive compatible accepted history without example-count restrictions
 
-- **For / why:** notebook owners should keep local content edits while receiving compatible accepted edits and additions; another save should not arbitrarily change eligibility.
-- **Scope:** one unpublished ordinary content-edit commit containing a nonempty set of paths; a linear accepted interval of ordinary content edits and additions to valid represented destinations. Eligibility follows operation semantics and ancestry, independently of path count and save count. Preserve existing exact-subtree replay without extending it.
-- **Design:** one local change-set representation; inspect accepted commits in order against the preceding accepted tree; one common rebase/conflict lifecycle. Remove the one/two-note and addition-then-save recognizers after replacement, including redundant negative tests and instructions that prescribe reducing work to an example.
-- **Delivery sequence:** first make whole-commit conflict/skip handling safe for a change set; then unify content-only eligibility, including already-based batches; then apply the same interval model to additions/content saves; finally align diagnostics and user guidance with semantic rejection reasons. Keep safety and successful-case proofs in the same delivery as each behavioral change.
-- **Evaluation:** the six probe cases above follow compatibility rather than count; test different path cardinalities and repeated/reordered independent saves. At the real `notebook pull` boundary, confirm content, accepted/main ancestry, continued conflicts, abort and all companion edits. Include an LF-equivalent conflict plus another valuable edit. Dirty checkout, unrelated/merge/multiple-unpublished history and unsupported structural operations remain safe refusals with local work intact.
-- **Stop-safe outcome:** ordinary content-only histories work consistently before addition handling is broadened; no interim path-count branch becomes a permanent acceptance rule.
-- **Effort hypothesis:** M–L, medium confidence; conflict state and complete-commit preservation need executable slice sizing. No database experiment is required for the CLI classifier itself.
-- **Depends on:** no functional dependency on initial publication.
+#### Goal
+
+Notebook owners keep their local content edits while receiving accepted ordinary
+note edits and additions with `donut notebook pull`. Adding another independently
+edited path or another accepted save must not arbitrarily change eligibility.
+An eligible pull may pause for a real text conflict; eligibility does not promise
+automatic conflict resolution.
+
+#### Scope
+
+- **Required local behavior:** receive history with one unpublished, non-merge
+  commit editing a nonempty set of existing ordinary Markdown notes at unchanged
+  paths. No eligibility limit on the number of those paths. If that commit is
+  already based on the accepted head, pull succeeds without rewriting it. Retain
+  existing fast-forward behavior when no unpublished work remains.
+- **Compatible accepted interval:** a linear chain from the local commit's
+  parent to the accepted head, including an empty chain. Each change is an
+  ordinary-note content edit or addition. Each addition targets the notebook
+  root or a valid folder represented in the preceding accepted tree. Commits
+  may contain multiple compatible operations; additions, saves of newly added
+  notes, and saves of existing notes may compose across the interval without
+  path-count or save-count limits. Assess every edge, not only the net diff.
+  Reordering independent operations does not change eligibility; a save still
+  requires its note to exist at that point in history.
+- **Overlaps and preservation:** accepted edits may affect any locally edited
+  note. Non-overlapping text changes combine; genuine conflicts use the existing
+  Git resolution, continue and abort workflow, including conflicts in several
+  files. Preserve all companion changes throughout. Final-LF equivalence retains
+  its existing narrow meaning (otherwise identical text differing by one final
+  LF); it must not erase unrelated edits or conceal a genuine conflict. Discard
+  a replayed commit only when its complete remaining change is redundant.
+- **Safety constraints:** a dirty checkout must not be overwritten; unrelated
+  history must not be grafted onto the notebook; an accepted interval must have
+  the stated ancestry; unknown structural or identity correspondence must not be
+  guessed. Refusal preserves local work and explains the actual condition.
+  Counts within the required operations are not safety constraints.
+- **Deferred capabilities:** multiple unpublished commits, merge reconciliation,
+  local additions/deletions/moves, and broader accepted structural operations
+  are outside this delivery commitment. Preserve their existing safe refusals
+  where encountered; these are current support boundaries, not newly asserted
+  permanent product prohibitions. In particular, one unpublished commit is a
+  bounded delivery assumption, not a domain rule that users should always
+  squash their work. Preserve delivered exact-subtree replay without promising
+  additional move combinations. New-folder receipt and wider web-mutation
+  participation in accepted history are not added by this story.
+- **Guidance:** remove instructions and negative expectations that prescribe
+  reducing eligible work to one/two notes or a particular accepted-save sequence.
+  Describe remaining support boundaries honestly without calling ordinary
+  additions structural merely because they occur more often.
+
+#### Key examples
+
+All divergent examples start with a clean checkout, one unpublished ordinary
+content-edit commit, and accepted history descending linearly from its parent.
+The named notes and counts illustrate the rules; they do not cap support.
+
+| Precondition | Trigger | Required result |
+| --- | --- | --- |
+| Local edits A and B; accepted saves C once or repeatedly | Pull | Receive the latest C and retain both local edits on top of accepted history. Both save counts are eligible. |
+| Local edits A, B and C; accepted head is already their commit's parent | Pull | Succeed with the local commit and files unchanged. |
+| Local edits A; accepted adds D and E, together or separately, then repeatedly saves D and saves an existing note | Pull | Receive all accepted content and retain A. Independent save ordering and operation grouping do not create a refusal. |
+| Local edits A and B; accepted edits a different region of A | Pull | Combine A's non-overlapping edits and retain B without requiring manual resolution. |
+| Local edits A, B and C; accepted overlaps the authored text in A and B | Pull, resolve both files, then continue | Report the actual conflicts; retain the chosen resolutions and C, with the resulting local work based on the accepted head. |
+| The same real-conflict case is paused | Abort the rebase | Restore the original local commit and checkout content, including every companion edit. |
+| Local edits A and B; A's conflict is only final-LF equivalence and B still contains valuable work | Pull | Keep the equivalent accepted A and retain B's local change; do not skip B with the whole commit. If another file has a genuine conflict, keep it resolvable. |
+| Every local change is already represented in accepted content, including the narrow LF-equivalence case | Pull | Finish without an unnecessary unpublished commit; discard nothing beyond redundant work. |
+| Dirty checkout, unrelated history, or an operation outside the supported reconciliation boundary | Pull | Refuse before destructive reconciliation, preserve local work, and identify the actual condition rather than suggest an example-sized edit. |
+
+The original six F1 probes remain required outcomes: the five divergent cases
+reconcile, and the no-new-accepted-commit case succeeds unchanged. Prove these
+rules through the real `notebook pull` boundary with content, local/accepted
+ancestry, conflict continuation and abort observations. Preserve the existing
+exact-subtree replay evidence.
+
+#### Planning handoff
+
+One local change-set representation, accepted commits inspected against their
+preceding trees, and a common rebase/conflict lifecycle should replace the
+one/two-note and addition-then-save recognizers. Remove obsolete handlers,
+count-based negative tests and conflicting guidance together with their
+replacement. This is the existing correction direction, not a new architecture
+decision.
+
+Make complete-commit conflict preservation safe before broadening eligibility;
+then cover content-only histories and already-based batches, followed by
+composed additions/saves and aligned diagnostics. Keep successful-case and safety
+proofs with each behavioral change. Content-only reconciliation is an independently
+useful stopping point, but completion still includes accepted additions.
+
+- **Effort hypothesis:** M–L, medium confidence; conflict state and complete-commit
+  preservation need executable slice sizing. No database experiment is required
+  for the CLI classifier itself.
+- **Depends on:** no functional dependency on initial publication or Story 2.
+- **Refinement status:** goal, scope and key examples established. No unresolved
+  product decision blocks slice planning. The broader web-history participation
+  question above remains separate. Execution planning and implementation have
+  not been requested by this refinement.
 
 <a id="story-2"></a>
 
-### Story 2: Publish compatible ordinary-note operations as one atomic changeset
+### Story 2: Publish a new folder and its notes together
 
-- **For / why:** notebook owners can make one coherent edit that deletes or relocates notes alongside other compatible changes without artificially splitting Git commits.
-- **Scope:** existing ordinary-note additions/modifications/deletions and unambiguous unchanged-content note relocation/rename, using current represented destination and identity rules. Keep current initial README/Relationship handling and exact folder-subtree publication behavior outside this correction.
-- **Design:** derive typed operations from the full diff; resolve identity correspondence using the complete candidate set, not total entry count; validate final destinations and apply once under existing accepted-head locking/transaction ownership. Retain existing note construction, mutation and binding persistence.
-- **Delivery sequence:** expose one complete ordinary-note changeset through validation/application; support compatible deletion collections; recognize unambiguous equal-content moves within that collection; prove the complete result and align diagnostics. Do not introduce “two deletions” or “one rename plus one edit” dispatchers.
-- **Evaluation:** through proposal/controller and installed CLI boundaries, publish multiple independent deletions and a rename plus an unrelated edit; vary counts/order. Assert final content/location, unchanged identities and learning data, single accepted head, retry behavior and a receiving clone's result. Ambiguous equal-blob candidates, reserved destinations, stale head, drift and late invalid members must leave the entire state unchanged.
-- **Stop-safe outcome:** deletion collections are useful independently; uncertain identity remains refused until correspondence has proof. Never silently downgrade a move to deletion/creation to make a fixture pass.
-- **Effort hypothesis:** L, lower confidence because identity ambiguity and atomic effects require refinement before executable slices.
-- **Depends on:** no functional dependence on Story 1; preserve the initial-tree publication contract while changing shared proposal code.
+#### Goal
+
+A notebook owner can publish a locally authored new folder and its ordinary
+notes into an existing notebook in one commit, preserving the folder README
+and existing learning history. The owner need not first publish an empty folder
+or create it separately in the web application.
+
+#### Scope
+
+**Selected small delivery:** publish a new root folder and its ordinary notes
+into an existing notebook. Deletion and move composition are separate Stories
+2a and 2b; the product backlog owns their priority.
+
+**Planning clarification from the user:** narrow examples describe the current
+delivery commitment, not constraint conditions. Generalize the current cohesive
+publication solution; do not add root-only, count-based, ordinary-type-only or
+unchanged-companion checks to enforce these examples. Existing format, identity
+and transaction safeguards still apply through their current domain owners.
+
+- **Required workflow:** a bound notebook already has accepted ordinary notes.
+  One proposal commit directly descends from its current accepted head and
+  adds a new root folder with a valid nonblank `README.md` and ordinary
+  `type: Note` files directly inside it. Existing accepted files are unchanged.
+  Publish the folder and notes together as the exact authored commit.
+- **Placement and representation:** root means directly under the notebook.
+  The proposed folder is new in both the accepted tree and live notebook;
+  normal folder-name and sibling-destination rules apply, including collisions
+  with live folders absent from the Portable tree. Do not adopt or overwrite
+  such a folder. `例文/README.md` supplies container content, not an ordinary
+  note named README. The notebook's own README remains unchanged.
+- **Result:** the folder and added notes receive fresh server identities;
+  authored README and note content, including author-owned YAML, survive the
+  Portable round trip. Existing notes retain content, identity and learning
+  data. A receiving clone with no unpublished work can pull the complete tree.
+- **Atomicity:** either all additions and the accepted head are persisted, or
+  none are. While this proposal is still the accepted head and live state
+  matches it, retrying the same proposal returns that head without duplicate
+  folders or notes, including when the first response was lost. An intervening
+  accepted change retains the existing stale-head behavior; this story does
+  not introduce replay of old requests. Invalid content or destinations, stale
+  accepted head and live-state drift retain their existing safe refusals;
+  report the actual condition and preserve local work.
+- **Preserved behavior:** the delivered README-only root-folder workflow
+  ([SEED-009 Story 19](SEED-009-git-backed-local-notebook-workflow.md#story-19)), ordinary
+  note publication, initial-tree publication and exact folder-subtree
+  publication keep their current behavior.
+- **Deferred promises:** deletion collections; moves/renames alongside other
+  operations and their identity-ambiguity policy; accompanying edits to
+  existing notes; nested or multiple new folders; folders implied only by
+  descendants; new Relationship publication into an existing notebook;
+  existing-container README edits; bulk performance and timeout recovery.
+  These remain future refinement input. Their absence from this delivery is
+  not a new requirement to reject otherwise valid compositions. Example counts
+  must not become eligibility gates or separate scenario handlers.
+
+The existing Portable format contract applies: [Accepted ADR 0004 —
+OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+keeps folder README content on the container, preserves authored YAML and
+requires format-valid durable writes. [Accepted ADR 0006 — Failure
+handling](../../docs/adrs/0006-failure-handling-accepted.md) governs failure
+propagation and useful diagnostics. No new architecture decision is proposed.
+
+#### Key examples
+
+| Precondition | Trigger | Required result |
+| --- | --- | --- |
+| An existing bound notebook contains a learned note; a direct-child commit adds `例文/README.md`, `例文/A.md` and `例文/B.md`, with valid types and authored YAML/body content | Publish | Create the folder and both notes atomically; preserve their authored content and the existing note's identity and learning data; accept the exact proposed head. |
+| The same workflow contains one ordinary note or several, with independent entries presented in a different order | Publish | Apply the same folder-and-note rule; note count and traversal order do not determine eligibility. |
+| That proposal remains the accepted head and live state matches it; the first response may have been lost | Retry the same publication | Return the same accepted head without duplicating the folder or notes. |
+| A second clean clone is at the preceding accepted head with no unpublished work | Pull after publication | Fast-forward to the complete accepted tree, including the authored folder README and all added notes. |
+| A live root folder already has the proposed folder's name, including an empty folder absent from the accepted tree | Publish the folder-and-notes proposal | Refuse the destination conflict; do not adopt the existing folder, create notes or advance the accepted head. |
+| One of the proposed notes has invalid Portable content, even if other members have already been processed | Publish | Reject the whole proposal with a useful reason; create no folder or notes and leave the accepted head unchanged. |
+| The accepted head has advanced, or live state no longer matches its accepted projection | Publish | Preserve the existing refusal and leave the attempted changes unapplied. |
+
+The installed CLI publication/receive boundary owns the visible round trip;
+focused proposal/controller examples establish preservation and atomic refusal.
+These are story outcomes, not an executable slice plan.
+
+The small example is an acceptance commitment, not a maximum supported layout.
+Required proof varies the number of ordinary notes without broadening the
+delivery to nested folders or Relationships. Preserve existing behavior for
+other layouts; do not add rejection tests merely to enforce this story's size.
+
+#### Reported checkout evidence
+
+Read-only inspection on 2026-09-10 of `/Users/terryyin/git/notebooks/jap3`,
+commit `d9ce5fb0506e49cc69f3531fea193176189fb17b` against parent
+`4708ad65fe9a7bcdcb3216f9816b1f9b757d7f2c`, found **1,043 added files**:
+972 with `type: Note`, 70 with `type: Relationship`, and one with
+`type: Readme` at `例文/README.md`. The parent contains 86 files. Additions
+include nested paths without their own README files. These counts classify
+the diff; they do not establish full format validity or current server
+acceptance. The checkout was clean and was not modified.
+
+The small example above isolates its new-folder-and-ordinary-notes obstacle.
+**Successful publication of the complete jap3 commit is not promised by this
+story**: Relationships, implied nested folders and bulk behavior need separate
+consideration. Do not use that entire checkout as this story's completion gate.
+
+#### Refinement status
+
+- **Status:** goal, scope and key examples established for the selected small
+  outcome; no open product question blocks slice planning. The user authorized
+  slice planning and any needed plan refinement, explicitly excluding execution.
+  Active plan: [Publish a new folder and its notes together](../quick/100-publish-folder-and-notes/PLAN.md).
+- **Planning handoff:** use the existing publication and clean-clone pull
+  workflow. No new CLI options, web interaction or identity-inference policy
+  is required. Carry the success, retry, destination-conflict and all-or-nothing
+  examples into outside-in proof. Folder creation plus note creation is one
+  user outcome; separate publication steps do not satisfy it.
+- **Effort hypothesis:** M, medium confidence for the reduced folder-and-note
+  outcome; preserve the existing publication transaction and format contract.
+- **Depends on:** no functional dependency on Story 1. Do not broaden its
+  reconciliation promise: receiving new folders here uses a clean clone with
+  no unpublished work.
+- **Safe stopping point:** owners can publish new folders with their notes
+  even if the deferred deletion/rename work is never selected.
+
+<a id="story-2a"></a>
+
+### Story 2a: Publish note deletions alongside compatible note changes
+
+- **Goal:** notebook owners can remove obsolete notes in one coherent commit,
+  including alongside ordinary additions or content edits, without splitting
+  each deletion into its own publication.
+- **Scope:** compose ordinary-note deletions with existing ordinary-note
+  additions/modifications at represented destinations. Preserve atomic
+  publication and existing deletion semantics. New folders and identity-preserving
+  moves are not additional delivery promises; ambiguous identity correspondence
+  must not silently become deletion/creation.
+- **Key example:** an accepted notebook contains A, B and C; publish one commit
+  deleting A and B and editing C. Both deletions and C's edit become accepted
+  together. An invalid member leaves the entire state unchanged. These counts
+  illustrate composition and do not cap eligibility.
+- **Evaluation:** owners observe the complete accepted tree through publication
+  and a receiving clone; retained notes keep their identities and learning data.
+- **Safe stopping point:** deletion composition remains useful without move
+  composition. No functional dependency on the folder story is asserted.
+- **Refinement status:** retained from the former combined Story 2; refine
+  mixed addition/deletion identity boundaries before executable planning.
+
+<a id="story-2b"></a>
+
+### Story 2b: Publish unambiguous note moves alongside compatible note changes
+
+- **Goal:** notebook owners can rename or relocate a note while making other
+  compatible note changes in the same commit, retaining its learning history.
+- **Scope:** unambiguous unchanged-content note moves/renames among compatible
+  ordinary-note operations at represented destinations. Determine correspondence
+  from the complete candidate set, independent of total diff entry count.
+  Changed-content moves, folder-subtree expansion and new-folder destinations
+  remain deferred promises.
+- **Key example:** publish A's equal-content rename to D alongside an unrelated
+  edit to B. D retains A's identity and learning data, B retains its identity,
+  and both changes become accepted atomically. Ambiguous equal-blob candidates
+  must not silently lose identity through deletion/creation.
+- **Evaluation:** publication and a receiving clone expose the complete result;
+  ambiguous correspondence or an invalid destination leaves state unchanged.
+- **Safe stopping point:** owners can compose proven note moves without broader
+  folder-move or changed-content identity inference.
+- **Refinement status:** retained from the former combined Story 2; identity
+  ambiguity and composition boundaries need refinement before slice planning.
+  Ordered after 2a to establish ordinary-note composition first.
 
 <a id="story-3"></a>
 
@@ -226,8 +472,9 @@ queued corrections.
 
 ## Execution readiness and design checks
 
-Stories 1–4 remain refinement input; Story 2
-needs particular attention to identity ambiguity before execution.
+Stories 1 and 2 are refined and ready for executable slice planning. Stories
+2a, 2b and 3–4 remain refinement input. The product backlog records the selected
+order; only Story 2's small folder-and-note outcome is promised by its refinement.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
 
