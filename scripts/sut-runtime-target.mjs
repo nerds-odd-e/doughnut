@@ -1,4 +1,8 @@
-const HOST = '127.0.0.1'
+import {
+  browserOrigin,
+  healthEndpoints,
+  runtimeTargetProcessEnv,
+} from './local-runtime-target.mjs'
 
 export const LEGACY_SUT_RUNTIME_TARGET = Object.freeze({
   backendPort: 9081,
@@ -20,46 +24,16 @@ export function resolveSutRuntimeTarget({
 }
 
 export function sutRuntimeTargetProcessEnv(target) {
-  const backendOrigin = `http://${HOST}:${target.backendPort}`
-  const env = {
-    SERVER_PORT: String(target.backendPort),
-    LOCAL_LB_BACKEND: backendOrigin,
-    LOCAL_LB_VITE_UPSTREAM: `http://${HOST}:${target.vitePort}`,
-    LOCAL_LB_LISTEN_PORT: String(target.lbListenPort),
-    FRONTEND_DEV_PORT: String(target.vitePort),
-    FRONTEND_BACKEND_ORIGIN: backendOrigin,
+  return {
+    ...runtimeTargetProcessEnv(target),
     [SUT_RUNTIME_TARGET_ENV]: JSON.stringify(target),
   }
-  if (target.databaseUrl) {
-    env.INPUT_DB_URL = target.databaseUrl
-  }
-  return env
 }
 
 export function withSutRuntimeTargetEnv(env, target) {
   return { ...env, ...sutRuntimeTargetProcessEnv(target) }
 }
 
-export function isolatedBrowserOrigin(target) {
-  return `http://${HOST}:${target.lbListenPort}`
-}
+export const isolatedBrowserOrigin = browserOrigin
 
-export function sutHealthEndpoints(target) {
-  const tcpChecks = []
-  if (target.mountebankPort != null) {
-    tcpChecks.push({
-      service: 'mountebank',
-      host: HOST,
-      port: target.mountebankPort,
-    })
-  }
-  tcpChecks.push(
-    { service: 'backend', host: HOST, port: target.backendPort },
-    { service: 'local LB', host: HOST, port: target.lbListenPort },
-    { service: 'frontend vite', host: HOST, port: target.vitePort }
-  )
-  return {
-    tcpChecks,
-    readinessUrl: `http://${HOST}:${target.lbListenPort}/__lb__/ready`,
-  }
-}
+export const sutHealthEndpoints = healthEndpoints

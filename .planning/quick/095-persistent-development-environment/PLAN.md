@@ -1,7 +1,7 @@
 # Use a persistent Development environment for manual feedback
 
 Source: [SEED-015 story 7](../../seeds/SEED-015-concurrent-worktree-environments.md#story-7).
-Status: in progress (slice 1 delivered).
+Status: in progress (slices 1–2 delivered).
 CI observer: feature-branch pushes are not observed — `donut CI` is push-to-`main` only; observe after merge.
 
 ## Goal and scope
@@ -65,11 +65,12 @@ seam as other filters) rather than enumerating `e2e`/`test`/`dev`.
 ### 2. Separate the reusable local runtime plumbing from SUT defaults
 
 Type: Structure
-Status: planned
-Proof: focused runtime-target tests prove the extracted environment-neutral
-process environment and health-endpoint functions preserve every existing SUT
-value, while a Development runtime test fixes `8081`/`5175`/`5176`, `dev`, and
-the Development-only artifact paths.
+Status: done
+Proof: `node --test scripts/local-runtime-target.test.mjs
+scripts/development-runtime.test.mjs scripts/sut-runtime-target.test.mjs`
+(pass) — shared helpers preserve SUT legacy env/health; Development target
+fixes `8081`/`5175`/`5176`, `dev`, `doughnut_development`, `dev.log`/`dev.pid`,
+no Mountebank; SUT adapter keeps `SUT_RUNTIME_TARGET`.
 
 Structure: Extract only the target-to-process-environment and endpoint helpers
 needed by both stacks from `scripts/sut-runtime-target.mjs`; retain SUT defaults
