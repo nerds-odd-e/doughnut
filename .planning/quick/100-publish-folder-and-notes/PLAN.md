@@ -166,8 +166,10 @@ Collaborators return `LockedNotebookState` and no longer persist accepted head.
 
 ### 2. Use one folder materialization mechanism
 Type: Structure
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes active work, plus the required backend-suite wait.
+Actual: ~8 minutes active (over hypothesis, under 10, converged), ~1.3 minutes suite wait.
+Refactor: none — already clean.
 
 Consolidate root-folder creation and ancestry creation in
 `NotebookGitProposalFolderMaterialization`. Reuse accepted represented folder
@@ -181,6 +183,18 @@ Proof: existing initial nested/implied-folder and README-only cases retain
 content and identities. Existing destination validation still prevents adoption
 of an unrepresented live folder. Add only missing stable-boundary regression
 evidence needed for this changed mechanism, using existing supported proposals.
+
+```text
+proof:
+  command: unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+  covers: complete backend unit suite on doughnut_wt_05087b88f4ea4adabada26656b61f244_test (initial nested/implied-folder, README-only, represented-folder identity, unrepresented live-folder refusal)
+  result: pass
+```
+
+`NotebookGitProposalFolderMaterialization.materialize` is the single mechanism.
+`createRootFolderWithReadme` and the initial-publication README loop are gone.
+Controller regressions live in `NotebookGitProposalFolderCreationControllerTest`.
 
 ### 3. Classify changed documents once
 Type: Structure
@@ -294,7 +308,7 @@ prepares the same publication outcome and removes a source of duplicated rules.
 | Slice | Assessment | Reason |
 | --- | --- | --- |
 | 1 | Done | One publisher completion owner; complete backend suite green |
-| 2 | Ready | One folder materialization mechanism; existing creation proof |
+| 2 | Done | One folder materialization mechanism; existing creation proof plus identity/collision regressions |
 | 3 | Ready | One document classification representation; unchanged behavior |
 | 4 | Ready | One addition application flow; unchanged behavior |
 | 5 | Ready with stated sizing exception | One integrated publication/receive outcome; complete backend and E2E verification stay with it |
@@ -313,6 +327,8 @@ new constraint condition.
 - Slice 1 active work ~6 minutes vs 4–5 hypothesis; converged without refinement.
   Remaining `requireMatchingAcceptedTree` calls against the current accepted head
   are pre-mutation drift checks, not a second completion owner.
+- Slice 2 active work ~8 minutes vs 4–5 hypothesis; converged without refinement.
+  Represented-folder seeding uses the accepted tree, not all live folders.
 - Feature-branch pushes have no push-triggered CI (`ci.yml` only on `main`).
   Missing CI observation coverage until merge to `main`. Keep one plan writer;
   do not modify Story 1's plan or execution state.

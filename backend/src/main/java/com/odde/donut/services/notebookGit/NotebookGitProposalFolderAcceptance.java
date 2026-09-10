@@ -42,8 +42,13 @@ class NotebookGitProposalFolderAcceptance {
     projection.requireMatchingAcceptedTree(
         state.notebook(), state.folders(), state.liveNotes(), proposal.repository(), acceptedHead);
 
-    String readme = NotebookGitProposalTypedPath.requireReadme(proposal, readmePath);
-    folderMaterialization.createRootFolderWithReadme(state.notebook(), readmePath, readme);
+    folderMaterialization.materialize(
+        state.notebook(),
+        state.folders(),
+        proposal.repository(),
+        acceptedHead,
+        List.of(readmePath),
+        proposal);
 
     return new NotebookGitStateLoader.LockedNotebookState(
         state.binding(),

@@ -5,10 +5,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.exceptions.ApiException;
+import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -59,5 +63,65 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
       assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
       assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
     }
+  }
+
+  @Test
+  void preservesExistingRepresentedFolderIdentityWhenPublishingANewRootFolderReadme()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("Physics").please();
+    Note motion =
+        makeMe
+            .aNote()
+            .folder(physics)
+            .title("Motion")
+            .content("---\ntype: Note\n---\nExisting content.\n")
+            .please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile(
+                    "Physics/Motion.md", "---\ntype: Note\n---\nExisting content.\n"),
+                new NotebookGitProposalFile("Field Notes/README.md", FOLDER_README)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(folders, hasSize(2));
+    assertThat(
+        noteRepository.findById(motion.getId()).orElseThrow().getFolder().getId(),
+        equalTo(physics.getId()));
+    Folder created =
+        folders.stream()
+            .filter(folder -> folder.getName().equals("Field Notes"))
+            .findFirst()
+            .orElseThrow();
+    assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
+  }
+
+  @Test
+  void refusesToAdoptAnUnrepresentedLiveFolderAsANewlyCreatedFolder() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    Folder live = makeMe.aFolder().notebook(notebook).name("Field Notes").please();
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding, List.of(new NotebookGitProposalFile("Field Notes/README.md", FOLDER_README)));
+
+    ApiException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposalBytes, ApiException.class);
+
+    assertThat(
+        exception.getErrorBody().getMessage(),
+        equalTo(FolderSiblingNameValidation.DUPLICATE_SIBLING_NAME_HERE));
+    assertThat(
+        exception.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+    assertThat(
+        folderRepository.findById(live.getId()).orElseThrow().getReadmeContent(), nullValue());
+    assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
   }
 }

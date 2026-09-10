@@ -1,6 +1,5 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
@@ -8,8 +7,8 @@ import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.Inspecte
 import com.odde.donut.testability.TestabilitySettings;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
+import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -67,16 +66,13 @@ class NotebookGitProposalInitialTreePublication {
     if (notebookReadmePath != null) {
       storeReadme(state, proposal, notebookReadmePath);
     }
-    Map<String, Folder> createdFolders =
-        folderMaterialization.createFolderAncestry(
-            state.notebook(),
-            Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()).toList());
-    for (String path : folderReadmePaths) {
-      Folder folder = createdFolders.get(path.substring(0, path.lastIndexOf('/')));
-      folder.setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, path));
-      entityPersister.save(folder);
-    }
-    entityPersister.flush();
+    folderMaterialization.materialize(
+        state.notebook(),
+        state.folders(),
+        proposal.repository(),
+        ObjectId.fromString(state.binding().getAcceptedGitObjectId()),
+        Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()).toList(),
+        proposal);
     List<ExportFolderRow> folders = stateLoader.foldersOf(state.notebook());
     List<Note> notes = new ArrayList<>(conceptPaths.size());
     for (String path : conceptPaths) {

@@ -5,17 +5,23 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.FolderConstructionService;
+import com.odde.donut.services.notebookExport.ExportFolderRow;
+import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Creates validated Folders and their ancestry from proposal paths. */
+/**
+ * Materializes proposal folder paths from accepted represented destinations and missing ancestry.
+ */
 @Service
 class NotebookGitProposalFolderMaterialization {
 
@@ -32,19 +38,14 @@ class NotebookGitProposalFolderMaterialization {
     this.validator = validator;
   }
 
-  Folder createRootFolderWithReadme(Notebook notebook, String readmePath, String readme) {
-    String folderName = readmePath.substring(0, readmePath.indexOf('/'));
-    Folder folder =
-        folderConstructionService.createFolder(
-            notebook, validFolderRequest(readmePath, folderName, null));
-    folder.setReadmeContent(readme);
-    entityPersister.save(folder);
-    entityPersister.flush();
-    return folder;
-  }
-
-  Map<String, Folder> createFolderAncestry(Notebook notebook, List<String> documentPaths) {
-    Map<String, Folder> folders = new LinkedHashMap<>();
+  void materialize(
+      Notebook notebook,
+      List<ExportFolderRow> liveFolders,
+      Repository repository,
+      ObjectId acceptedHead,
+      List<String> documentPaths,
+      NotebookGitProposalImporter.ImportedProposal proposal) {
+    Map<String, Folder> folders = representedFolders(liveFolders, repository, acceptedHead);
     for (String documentPath : documentPaths) {
       Folder parent = null;
       int componentStart = 0;
@@ -66,8 +67,30 @@ class NotebookGitProposalFolderMaterialization {
         componentStart = separator + 1;
         separator = documentPath.indexOf('/', componentStart);
       }
+      if (documentPath.endsWith("/README.md")) {
+        Folder folder = folders.get(documentPath.substring(0, documentPath.lastIndexOf('/')));
+        folder.setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, documentPath));
+        entityPersister.save(folder);
+      }
     }
     entityPersister.flush();
+  }
+
+  private Map<String, Folder> representedFolders(
+      List<ExportFolderRow> liveFolders, Repository repository, ObjectId acceptedHead) {
+    Map<Integer, ExportFolderRow> folderById =
+        NotebookGitAcceptedTree.indexFoldersById(liveFolders);
+    List<PortableTreeEntry> accepted =
+        NotebookGitAcceptedTree.readEntries(repository, acceptedHead);
+    Map<String, Folder> folders = new LinkedHashMap<>();
+    for (ExportFolderRow row : liveFolders) {
+      String folderPath = NotebookGitAcceptedTree.folderPath(row, folderById);
+      if (NotebookGitAcceptedTree.representedInAccepted(folderPath, accepted)) {
+        folders.put(
+            folderPath.substring(0, folderPath.length() - 1),
+            entityPersister.find(Folder.class, row.id()));
+      }
+    }
     return folders;
   }
 
