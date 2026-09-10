@@ -1,7 +1,9 @@
 # Publish compatible note deletions
 
 Source: [SEED-017 Story 2a](../../seeds/SEED-017-cohesive-design-corrections.md#story-2a).
-Status: planned. Planning only; product implementation has not started.
+Status: in progress. Execution authorized on branch
+`quick/099-publish-compatible-note-deletions` in worktree
+`/Users/terryyin/git/doughnut-wt-099-publish-compatible-note-deletions`.
 
 ## Goal and scope
 
@@ -22,34 +24,13 @@ Deferral does not authorize new refusals of already-supported workflows.
 
 ## Current evidence and cumulative design
 
-`NotebookGitProposalTreeShape.requireAllowedNoteChanges` already produces a
-collection of classified operations. Its admission rule rejects any deletion
-when the collection has more than one entry. `detectEqualBlobRename` accepts
-one isolated equal-content pair. `NotebookGitProposalPublisher.publish` already
-iterates operations, calls the existing note deletion and authored-document
-persistence services, checks the final projection, and accepts the binding in
-one `REQUIRES_NEW`, serializable transaction with rollback for exceptions.
-There is no evidence that another application pipeline is needed.
-
-Generalize admission in that existing owner: compatible deletion/edit
-collections proceed through the same application and binding acceptance.
-Removed/added candidates must remain identity-safe regardless of companion
-edits. Preserve the supported move path; other uncertain or unsupported mixed
-identity changes refuse before projection mutation. A conservative refusal is
-not a claim that unequal blobs prove a move. Do not add an exact-blob matching
-engine for Story 2b merely to retain existing safe refusals in this story.
-
-**Explicit user handoff:** extend the existing solution cohesively, with one
-owner for each operation/identity/application rule. No parallel batch pipeline,
-duplicate representations, fixture-count recognizers, or one handler per
-example. Subsequent examples exercise the same rule. Review the aggregate
-change and implicated unchanged code, not merely whether individual tests pass.
-
-Replace obsolete isolated-deletion admission comments and rejection-test rows
-for deletion-plus-edit and multiple deletion. Retain real path, mode, Markdown,
-destination, ancestry, projection and identity safeguards. Existing deletion,
-rename, folder relocation, addition and edit application remain their current
-shared mechanisms; no speculative framework or cross-subsystem rewrite.
+`NotebookGitProposalTreeShape.admitOrdinaryNoteChanges` admits any number of
+ordinary-note deletions alone or with same-path edits, after optional isolated
+equal-content rename detection (`detectEqualBlobRename`, size==2). Remaining
+removal+addition mixes refuse before mutation with guidance to separate
+identity-changing work. `NotebookGitProposalPublisher.publish` already iterates
+operations and accepts the binding in one `REQUIRES_NEW`, serializable
+transaction; no parallel batch pipeline was added.
 
 ## Architectural constraints
 
@@ -74,7 +55,7 @@ this plan does not accept or implement its full synchronization contract.
 
 ### 1. Accept a complete compatible deletion revision atomically
 Type: Behavior
-Status: planned
+Status: done
 Sizing: target about 5 minutes; 5–8 minutes active work is plausible, medium
 confidence. See sizing assessment below; mandatory backend-suite runtime is
 the explicit test-wait exception, not permission for unbounded implementation.
@@ -202,5 +183,9 @@ Do not mark the backlog story done or erase its history during planning.
 
 ## Learnings
 
-Planning was read-only for product code. No product tests or engine experiments
-were run, and no product behavior is claimed delivered.
+- Slice 1 delivered: admission generalized in `NotebookGitProposalTreeShape`;
+  full `pnpm backend:test_only` passed in the linked worktree environment.
+- CI workflow `ci.yml` (`donut CI`) is push-to-`main` only; feature-branch
+  pushes have no push-triggered CI observation coverage.
+- Refactor: removed story-leaking javadoc on the refusal helper; no further
+  cohesion edits.

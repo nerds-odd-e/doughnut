@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.FileMode;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,11 +24,90 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleControllerTestBase {
 
   private static final String ORIGINAL = "---\ntype: Note\n---\noriginal content";
+  private static final String OTHER = "---\ntype: Note\n---\nother content";
+  private static final String EDITED = "---\ntype: Note\n---\nedited content";
+  private static final String INVALID_EDIT = "---\ncustom: value\n---\nChanged body.\n";
 
   @ParameterizedTest
-  @MethodSource("mixedDeletionProposals")
-  void requiresAnIsolatedDeletionCommitWithoutChangingAcceptedNotes(
+  @MethodSource("identityUncertainDeletionProposals")
+  void refusesMixingRemovalsWithAdditionsWithoutChangingAcceptedNotes(
       List<NotebookGitProposalFile> proposedFiles) throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    List<Integer> originalIds =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                List.of(
+                    makeMe
+                        .aNote()
+                        .notebook(notebook)
+                        .title("First")
+                        .content(ORIGINAL)
+                        .please()
+                        .getId(),
+                    makeMe
+                        .aNote()
+                        .notebook(notebook)
+                        .title("Second")
+                        .content(ORIGINAL)
+                        .please()
+                        .getId(),
+                    makeMe
+                        .aNote()
+                        .notebook(notebook)
+                        .title("Third")
+                        .content(OTHER)
+                        .please()
+                        .getId()));
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook,
+            binding.getAcceptedGitObjectId(),
+            proposalBundleBytes(binding, proposedFiles),
+            HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("separate identity-changing work"));
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          List<Note> liveNotes =
+              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+          assertThat(liveNotes.stream().map(Note::getId).toList(), equalTo(originalIds));
+          assertThat(
+              liveNotes.stream().map(Note::getContent).toList(),
+              equalTo(List.of(ORIGINAL, ORIGINAL, OTHER)));
+        });
+  }
+
+  static Stream<Arguments> identityUncertainDeletionProposals() {
+    NotebookGitProposalFile second = new NotebookGitProposalFile("Second.md", ORIGINAL);
+    NotebookGitProposalFile third = new NotebookGitProposalFile("Third.md", OTHER);
+    return Stream.of(
+        // unequal-blob removal + addition
+        Arguments.of(
+            List.of(
+                second,
+                third,
+                new NotebookGitProposalFile("Added.md", "---\ntype: Note\n---\nnew"))),
+        // equal-blob removal + addition with companion same-path edit
+        Arguments.of(
+            List.of(
+                second,
+                new NotebookGitProposalFile("Third.md", EDITED),
+                new NotebookGitProposalFile("Renamed.md", ORIGINAL))),
+        // ambiguous multiple equal-blob remove/add candidates
+        Arguments.of(
+            List.of(
+                third,
+                new NotebookGitProposalFile("MovedA.md", ORIGINAL),
+                new NotebookGitProposalFile("MovedB.md", ORIGINAL))));
+  }
+
+  @Test
+  void refusesADeletionBatchWhenACompanionEditIsInvalidWithoutChangingAcceptedNotes()
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
     List<Integer> originalIds =
         inCommittedTransaction(
@@ -50,14 +130,13 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
                         .getId()));
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
 
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook,
-            binding.getAcceptedGitObjectId(),
-            proposalBundleBytes(binding, proposedFiles),
-            HttpStatus.BAD_REQUEST);
+    assertProposalRejectedWithoutMutatingBinding(
+        notebook,
+        binding.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            binding, List.of(new NotebookGitProposalFile("Second.md", INVALID_EDIT))),
+        HttpStatus.BAD_REQUEST);
 
-    assertThat(exception.getReason(), containsString("isolated deletion commit"));
     inCommittedTransaction(
         transactionManager,
         () -> {
@@ -68,20 +147,6 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
               liveNotes.stream().map(Note::getContent).toList(),
               equalTo(List.of(ORIGINAL, ORIGINAL)));
         });
-  }
-
-  static Stream<Arguments> mixedDeletionProposals() {
-    NotebookGitProposalFile second = new NotebookGitProposalFile("Second.md", ORIGINAL);
-    return Stream.of(
-        Arguments.of(
-            List.of(new NotebookGitProposalFile("Second.md", "---\ntype: Note\n---\nedited"))),
-        Arguments.of(
-            List.of(second, new NotebookGitProposalFile("Added.md", "---\ntype: Note\n---\nnew"))),
-        Arguments.of(
-            List.of(
-                second,
-                new NotebookGitProposalFile("Renamed.md", "---\ntype: Note\n---\nrewritten"))),
-        Arguments.of(List.of()));
   }
 
   @ParameterizedTest

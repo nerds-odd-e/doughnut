@@ -20,9 +20,10 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Verifies {@code publishNotebookGitProposal} rejects equal-content rename-shaped proposals whose
  * new filename or raw tree entries violate the existing Portable destination contract: an invalid
- * or normalizable title, the reserved {@code README.md} name, a non-regular file mode on either
- * side, or a destination path already occupied by a different live note's content. Clean rename
- * acceptance is covered separately in {@link NotebookGitProposalRenameControllerTest}.
+ * or normalizable title, the reserved {@code README.md} name, or a non-regular file mode on either
+ * side. Clean rename acceptance is covered separately in {@link
+ * NotebookGitProposalRenameControllerTest}. Compatible deletion-plus-edit batches are covered in
+ * {@link NotebookGitDeletionPublicationControllerTest}.
  */
 class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitBundleControllerTestBase {
 
@@ -106,31 +107,6 @@ class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitBundle
 
     assertThat(exception.getReason(), containsString("renamed.md"));
     assertThat(exception.getReason(), containsString("not a regular file mode"));
-  }
-
-  @Test
-  void rejectsADeletionMixedWithAModifiedNoteOccupyingTheWouldBeDestination() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    String occupiedContent = "---\ntype: Note\n---\noccupied content";
-    Note source =
-        makeMe.aNote().notebook(notebook).title("Source").content(TYPED_NOTE_CONTENT).please();
-    Note occupied =
-        makeMe.aNote().notebook(notebook).title("Occupied").content(occupiedContent).please();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    String changedOccupiedContent = "---\ntype: Note\n---\nchanged occupied content";
-    byte[] proposal =
-        proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("Occupied.md", changedOccupiedContent)));
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString("isolated deletion"));
-    Note reloadedSource = noteRepository.findById(source.getId()).orElseThrow();
-    assertThat(reloadedSource.getContent(), equalTo(TYPED_NOTE_CONTENT));
-    Note reloadedOccupied = noteRepository.findById(occupied.getId()).orElseThrow();
-    assertThat(reloadedOccupied.getContent(), equalTo(occupiedContent));
   }
 
   /**

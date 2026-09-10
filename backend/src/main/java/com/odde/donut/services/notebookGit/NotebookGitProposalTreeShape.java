@@ -15,12 +15,13 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit.
  * Changed documents are classified once by operation and container/concept role; unchanged accepted
- * files remain context. Ordinary-note admission permits added or modified ordinary Markdown notes
- * at regular file modes, exactly one isolated ordinary-note deletion, or exactly one equal-content
- * rename (one removed and one added note sharing a blob). Never mixed or multiple pairs, unsafe
- * paths, non-regular modes, or a changed folder-reserved {@code README.md}. Callers only invoke
- * this once proposal ancestry is confirmed to be a direct single-parent child of the accepted
- * commit.
+ * files remain context. Ordinary-note admission permits added and/or modified ordinary Markdown
+ * notes at regular file modes, any number of ordinary-note deletions alone or with same-path edits,
+ * or exactly one isolated equal-content rename (one removed and one added note sharing a blob).
+ * Mixing removals with additions is refused when identity correspondence is uncertain. Unsafe
+ * paths, non-regular modes, or a changed folder-reserved {@code README.md} are refused. Callers
+ * only invoke this once proposal ancestry is confirmed to be a direct single-parent child of the
+ * accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -122,8 +123,10 @@ public final class NotebookGitProposalTreeShape {
   }
 
   /**
-   * Accepts added and/or modified ordinary-note changes, one isolated deletion, or one
-   * equal-content rename. Refuses mixed deletion with other file changes.
+   * Accepts added and/or modified ordinary-note changes, any number of deletions alone or with
+   * same-path edits, or one isolated equal-content rename. Refuses mixing removals with additions
+   * when identity is uncertain (unequal blobs, equal-blob pairs with companion edits, or ambiguous
+   * multiple equal-blob candidates).
    */
   private static List<NoteChange> admitOrdinaryNoteChanges(List<NoteChange> changes) {
     if (changes.isEmpty()) {
@@ -133,21 +136,15 @@ public final class NotebookGitProposalTreeShape {
     if (renameDetected != null) {
       return renameDetected;
     }
-    if (changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)
-        && changes.size() > 1) {
-      throw unsupportedTreeShape(
-          "publish each removed note in an isolated deletion commit, or an isolated equal-content"
-              + " rename, without other file changes");
-    }
-
+    refuseUncertainRemovalAndAdditionMixtures(changes);
     return changes;
   }
 
   /**
    * Recognizes the one rename shape this proposal type accepts: a proposal containing exactly one
    * removed and one added ordinary note with identical blob content. Returns {@code null} when the
-   * proposal does not match this shape, so callers fall back to the existing removal/addition
-   * eligibility rules.
+   * proposal does not match this shape, so callers fall back to deletion/edit admission and
+   * removal/addition refusal rules.
    */
   private static List<NoteChange> detectEqualBlobRename(List<NoteChange> changes) {
     if (changes.size() != 2) {
@@ -171,6 +168,17 @@ public final class NotebookGitProposalTreeShape {
     }
     return List.of(
         new NoteChange(added.path(), ChangeKind.RENAMED, added.blobId(), deleted.path()));
+  }
+
+  private static void refuseUncertainRemovalAndAdditionMixtures(List<NoteChange> changes) {
+    boolean hasDeleted = changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED);
+    boolean hasAdded = changes.stream().anyMatch(change -> change.kind() == ChangeKind.ADDED);
+    if (!hasDeleted || !hasAdded) {
+      return;
+    }
+    throw unsupportedTreeShape(
+        "separate identity-changing work: publish an equal-content rename alone, or delete and"
+            + " create notes in separate commits rather than mixing removals with additions");
   }
 
   private static ChangeKind changeKind(InspectedRegularFile file) {

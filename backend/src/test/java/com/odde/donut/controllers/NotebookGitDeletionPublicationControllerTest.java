@@ -18,6 +18,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
 import java.util.List;
@@ -28,10 +29,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
-/** Verifies isolated learned-note deletion publication across Note projection and Git history. */
+/**
+ * Verifies learned-note deletion publication — alone or with same-path edits — across Note
+ * projection and Git history.
+ */
 class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
+  private static final String EDITED_CONTENT = "---\ntype: Note\n---\nEdited authored bytes.\n";
   private static final String REFERRER_CONTENT =
       "---\n" + "type: Note\n" + "example of: \"[[Target]]\"\n" + "---\n" + "Body [[Target]]\n";
 
@@ -39,33 +44,22 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
-  void publishesAnIsolatedLearnedNoteDeletionAsTheExactAuthoredCommit() throws Exception {
+  void publishesLearnedNoteDeletionsWithASamePathEditAsTheExactAuthoredCommit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Note target =
-        makeMe.aNote().notebook(notebook).title("Target").content(ORIGINAL_CONTENT).please();
+    Note deletedA =
+        makeMe.aNote().notebook(notebook).title("DeletedA").content(ORIGINAL_CONTENT).please();
+    Note deletedB =
+        makeMe.aNote().notebook(notebook).title("DeletedB").content(ORIGINAL_CONTENT).please();
     Note retained =
         makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
-    MemoryTracker targetTracker =
-        inCommittedTransaction(
-            transactionManager,
-            () ->
-                makeMe
-                    .aMemoryTrackerFor(noteRepository.findById(target.getId()).orElseThrow())
-                    .difficulty(7f)
-                    .please());
-    MemoryTracker retainedTracker =
-        inCommittedTransaction(
-            transactionManager,
-            () ->
-                makeMe
-                    .aMemoryTrackerFor(noteRepository.findById(retained.getId()).orElseThrow())
-                    .difficulty(5f)
-                    .please());
+    MemoryTracker deletedATracker = learnedTracker(deletedA, 7f);
+    MemoryTracker deletedBTracker = learnedTracker(deletedB, 6f);
+    MemoryTracker retainedTracker = learnedTracker(retained, 5f);
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
     byte[] proposalBytes =
         proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("Retained.md", ORIGINAL_CONTENT)));
+            binding, List.of(new NotebookGitProposalFile("Retained.md", EDITED_CONTENT)));
 
     GitBundleTestReader.SingleParentGitCommit proposedCommit;
     try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -81,25 +75,53 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
     List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(liveNotes, hasSize(1));
     assertThat(liveNotes.getFirst().getId(), equalTo(retained.getId()));
-    Note reloadedTarget = noteRepository.findById(target.getId()).orElseThrow();
-    assertThat(reloadedTarget.getDeletedAt(), notNullValue());
-    MemoryTracker deletedTracker =
-        memoryTrackerRepository.findById(targetTracker.getId()).orElseThrow();
-    assertThat(deletedTracker.getDeletedAt(), notNullValue());
-    assertThat(deletedTracker.getDifficulty(), equalTo(targetTracker.getDifficulty()));
-    assertThat(deletedTracker.getStability(), equalTo(targetTracker.getStability()));
+    assertSoftDeletedWithLearning(deletedA, deletedATracker);
+    assertSoftDeletedWithLearning(deletedB, deletedBTracker);
+    Note reloadedRetained = noteRepository.findById(retained.getId()).orElseThrow();
+    assertThat(reloadedRetained.getContent(), equalTo(EDITED_CONTENT));
     MemoryTracker stillLiveTracker =
         memoryTrackerRepository.findById(retainedTracker.getId()).orElseThrow();
     assertThat(stillLiveTracker.getDeletedAt(), nullValue());
-    assertThat(noteController.getNoteInfo(reloadedTarget).getMemoryTrackers(), hasSize(0));
-    NoteRecallInfo retainedRecall =
-        noteController.getNoteInfo(noteRepository.findById(retained.getId()).orElseThrow());
+    NoteRecallInfo retainedRecall = noteController.getNoteInfo(reloadedRetained);
     assertThat(retainedRecall.getMemoryTrackers(), hasSize(1));
     assertThat(
         retainedRecall.getMemoryTrackers().getFirst().getId(), equalTo(retainedTracker.getId()));
 
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
+      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
+      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
+      assertThat(downloadedCommit.parent(), equalTo(acceptedHead));
+    }
+  }
+
+  @Test
+  void publishesADeletionOnlyBatchThatRemovesEveryOrdinaryNote() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    makeMe.aNote().notebook(notebook).title("First").content(ORIGINAL_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("Second").content(ORIGINAL_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
+    byte[] proposalBytes = proposalBundleBytes(binding, List.of());
+
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+      assertThat(proposedCommit.parent(), equalTo(acceptedHead));
+    }
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
+    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+    ResponseEntity<byte[]> downloaded =
+        controller.downloadNotebookGitBundle(
+            notebookRepository.findById(notebook.getId()).orElseThrow());
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.SingleParentGitCommit downloadedCommit =
           GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
@@ -176,6 +198,27 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
         noteController.showNote(noteRepository.findById(referrer.getId()).orElseThrow());
     assertThat(shown.getNote().getContent(), equalTo(REFERRER_CONTENT));
     assertThat(targetResolutions(shown), empty());
+  }
+
+  private MemoryTracker learnedTracker(Note note, float difficulty) {
+    return inCommittedTransaction(
+        transactionManager,
+        () ->
+            makeMe
+                .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
+                .difficulty(difficulty)
+                .please());
+  }
+
+  private void assertSoftDeletedWithLearning(Note note, MemoryTracker tracker)
+      throws UnexpectedNoAccessRightException {
+    Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
+    assertThat(reloaded.getDeletedAt(), notNullValue());
+    MemoryTracker deletedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+    assertThat(deletedTracker.getDeletedAt(), notNullValue());
+    assertThat(deletedTracker.getDifficulty(), equalTo(tracker.getDifficulty()));
+    assertThat(deletedTracker.getStability(), equalTo(tracker.getStability()));
+    assertThat(noteController.getNoteInfo(reloaded).getMemoryTrackers(), hasSize(0));
   }
 
   private static List<WikiLink.Resolution> targetResolutions(NoteRealm shown) {

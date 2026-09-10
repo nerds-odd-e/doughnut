@@ -19,12 +19,13 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Verifies {@code publishNotebookGitProposal}'s tree-shape gating: a proposal that is not an
  * identical-heads no-op must change one or more ordinary Markdown notes (added and/or modified),
- * delete exactly one ordinary note in isolation, or rename exactly one ordinary note with unchanged
- * content. Edits-only acceptance of several existing notes is covered in {@link
- * NotebookGitExistingNoteBatchPublicationControllerTest}. Equal-content rename acceptance is
- * covered in {@link NotebookGitProposalRenameControllerTest}; filename-preserving relocation in
- * {@link NotebookGitProposalRelocationControllerTest}; combined parent-and-filename acceptance in
- * {@link NotebookGitProposalRelocateAndRenameControllerTest}.
+ * delete ordinary notes alone or with same-path edits, or rename exactly one ordinary note with
+ * unchanged content. Compatible deletion batches are covered in {@link
+ * NotebookGitDeletionPublicationControllerTest}. Edits-only acceptance of several existing notes is
+ * covered in {@link NotebookGitExistingNoteBatchPublicationControllerTest}. Equal-content rename
+ * acceptance is covered in {@link NotebookGitProposalRenameControllerTest}; filename-preserving
+ * relocation in {@link NotebookGitProposalRelocationControllerTest}; combined parent-and-filename
+ * acceptance in {@link NotebookGitProposalRelocateAndRenameControllerTest}.
  */
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
 

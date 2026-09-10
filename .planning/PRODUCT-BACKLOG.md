@@ -20,9 +20,12 @@ without claiming its complete synchronization contract. Further SEED-009
 candidates stay unselected until after the worktree queue unless priority
 changes.
 
-## Backlog
+## Taken
 
 - [Publish note deletions alongside compatible note changes](seeds/SEED-017-cohesive-design-corrections.md#story-2a) — SEED-017
+
+## Backlog
+
 - [Publish unambiguous note moves alongside compatible note changes](seeds/SEED-017-cohesive-design-corrections.md#story-2b) — SEED-017
 - [Declare isolated test capabilities in one place](seeds/SEED-017-cohesive-design-corrections.md#story-3) — SEED-017
 - [Keep one owned-process termination mechanism](seeds/SEED-017-cohesive-design-corrections.md#story-4) — SEED-017
