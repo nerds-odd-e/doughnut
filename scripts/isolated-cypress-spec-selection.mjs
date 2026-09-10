@@ -1,6 +1,5 @@
 import { execSync } from 'node:child_process'
 import path from 'node:path'
-import { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC } from './isolated-openai-mock.mjs'
 
 /** No-mock note editing — remains the default allowlisted focused spec. */
 export const SUPPORTED_ISOLATED_CYPRESS_SPEC =
@@ -16,14 +15,27 @@ export const SUPPORTED_ISOLATED_CLI_SPEC =
 export const SUPPORTED_ISOLATED_MCP_SPEC =
   'e2e_test/features/mcp/mcp_services.feature'
 
-export { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC }
+/** OpenAI completion — currently the only approved spec that requires a
+ * runner-owned private OpenAI mock. */
+export const SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC =
+  'e2e_test/features/ai_generated_content/note_content_completion.feature'
 
-export const SUPPORTED_ISOLATED_CYPRESS_SPECS = [
-  SUPPORTED_ISOLATED_CYPRESS_SPEC,
-  SUPPORTED_ISOLATED_CLI_SPEC,
-  SUPPORTED_ISOLATED_MCP_SPEC,
-  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+const APPROVED_ISOLATED_CYPRESS_SPECS = [
+  { spec: SUPPORTED_ISOLATED_CYPRESS_SPEC },
+  { spec: SUPPORTED_ISOLATED_CLI_SPEC },
+  { spec: SUPPORTED_ISOLATED_MCP_SPEC },
+  {
+    spec: SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+    requiresPrivateOpenAiMock: true,
+  },
 ]
+
+export const SUPPORTED_ISOLATED_CYPRESS_SPECS =
+  APPROVED_ISOLATED_CYPRESS_SPECS.map((entry) => entry.spec)
+
+function approvedIsolatedCypressSpec(spec) {
+  return APPROVED_ISOLATED_CYPRESS_SPECS.find((entry) => entry.spec === spec)
+}
 
 function specArgsFromArgv(argv) {
   const specs = []
@@ -132,10 +144,7 @@ export function specsFromBeforeRun(details, checkoutRoot) {
 }
 
 export function assertSupportedIsolatedCypressSpecs(specs) {
-  if (
-    specs.length === 1 &&
-    SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(specs[0])
-  ) {
+  if (specs.length === 1 && approvedIsolatedCypressSpec(specs[0])) {
     return
   }
   throw new Error(

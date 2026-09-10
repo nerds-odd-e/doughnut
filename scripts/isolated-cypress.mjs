@@ -8,7 +8,6 @@ import {
   GET_ISOLATED_OPEN_AI_MOCK_ENDPOINT_TASK,
   ISOLATED_OPEN_AI_MOCK_ENV_KEY,
   OPEN_AI_MOCK_ENDPOINT_ENV_KEY,
-  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
   VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK,
   startPrivateOpenAiMock,
 } from './isolated-openai-mock.mjs'
@@ -17,6 +16,7 @@ import {
   hasExplicitCypressSpecSelection,
   selectedCypressSpecs,
   specsFromBeforeRun,
+  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress-spec-selection.mjs'
 import {
   observePrivateMockFailure,

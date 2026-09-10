@@ -3,7 +3,11 @@
 Source: [SEED-017 Story 3](../../seeds/SEED-017-cohesive-design-corrections.md#story-3),
 including the seed's F3 audit finding and historical plans 061/070/088/089.
 Preserved lifecycle evidence: plans 073/093 and the current runner tests.
-Status: planned. Planning only; no product changes or verification runs yet.
+Status: in progress. Execution authorized 2026-09-11 in worktree
+`/Users/terryyin/git/doughnut-quick-100` on branch
+`plan/100-declare-isolated-test-capabilities`. Push-triggered CI is `ci.yml`
+(`donut CI`) on `main` only; feature-branch pushes have no workflow. Observer
+will bind to `main` before the merge push.
 
 ## Correction contract
 
@@ -63,7 +67,7 @@ agree; no conflicting decision or new ADR approval is needed.
 
 ### 1. Give approved-spec policy one owner
 Type: Structure
-Status: planned
+Status: done
 Sizing: about 5 minutes active implementation, focused tests and cleanup;
 medium confidence because filename imports span fixtures and harnesses.
 
@@ -95,6 +99,13 @@ CURSOR_DEV=true nix develop -c node --test \
   scripts/worktree-reset-isolation-harness.test.mjs \
   scripts/worktree-reset-isolation-harness-openai-mock.test.mjs
 ```
+
+Proof result (2026-09-11): the command above passed (24 tests). Source review:
+`APPROVED_ISOLATED_CYPRESS_SPECS` in `isolated-cypress-spec-selection.mjs` owns
+the four paths and `requiresPrivateOpenAiMock`; allowlist and refusal diagnostics
+are derived from it. `isolated-openai-mock.mjs` no longer exports or imports a
+feature filename. The runner still compares `SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC`
+(slice 2). Post-change refactor: none — already clean.
 
 Safe stop: all existing workflows still behave identically, feature policy
 has one owner, and no lifecycle module depends on a feature filename.
@@ -217,3 +228,10 @@ termination mechanism. Retain source/PLAN through retrospective and wrap-up.
 Planning inspection confirmed existing public-boundary lifecycle proofs and
 the resource-to-spec dependency. No tests were run during planning, and no
 product behavior is claimed delivered.
+
+Slice 1: policy lives in `isolated-cypress-spec-selection.mjs` as
+`APPROVED_ISOLATED_CYPRESS_SPECS`; named spec constants remain identities referenced
+by that registry, not a second filename table. Implementation plus focused proof
+was about 8 minutes (over the 5-minute target, under the 10-minute hard limit);
+the named focused tests were the bulk of remaining time after a small registry
+edit. No finer split. Refactor found no extra cohesion work.

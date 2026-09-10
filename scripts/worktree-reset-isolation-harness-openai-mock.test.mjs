@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
 import { test } from 'node:test'
-import { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC } from './isolated-openai-mock.mjs'
+import { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC } from './isolated-cypress.mjs'
 import {
   afterReset,
   afterSeed,

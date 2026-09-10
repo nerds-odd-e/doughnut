@@ -4,8 +4,10 @@
  * then stays alive until the parent test cancels the runner or kills the mock.
  */
 import { writeFileSync } from 'node:fs'
-import { guardCypressNodeSetup } from './isolated-cypress.mjs'
-import { SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC } from './isolated-openai-mock.mjs'
+import {
+  guardCypressNodeSetup,
+  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+} from './isolated-cypress.mjs'
 import { spawnIdlePrivateMockHandle } from './isolated-openai-mock-test-fixtures.mjs'
 
 const checkoutRoot = process.env.CHECKOUT_ROOT

@@ -27,9 +27,6 @@ export {
 } from './open-ai-mock-endpoint-expose-keys.mjs'
 export { assertOwnedMockListener } from './isolated-openai-mock-ownership.mjs'
 
-export const SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC =
-  'e2e_test/features/ai_generated_content/note_content_completion.feature'
-
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
