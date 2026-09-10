@@ -20,7 +20,8 @@ The original five-day inventory excluded the initial-publication family (plans
 now merged the separate initial-publication refinement into [Story 9](#story-9)
 below and kept it highest priority. Its current-code assessment extends the
 correction scope without claiming those historical plans were re-audited.
-Postponed quick/096 remains held; no new action is assigned to spent Plan 94.
+Quick/096 is superseded by the verified initial-tree contract; no new action is
+assigned to spent Plan 94.
 
 ## Method and limits
 
@@ -171,15 +172,15 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 Developer-selected order: Story 9 first, then Story 1 (pull), then Story 2
 (existing-note composition). Story numbers remain stable identifiers, not priority.
 Stories 1–4 are queued at high priority immediately after Story 9, in that order,
-by developer direction. Stories 3 and 4 remain independent; quick/096 stays postponed.
+by developer direction. Stories 3 and 4 remain independent; quick/096 is superseded.
 
 <a id="story-9"></a>
 
 ### Story 9: Make initial notebook publication design cohesive
 
-**Status:** refined on 2026-09-10; highest priority. The developer selected
-general initial trees first, followed by pull reconciliation and existing-note
-composition. Implementation is not requested by this refinement.
+**Status:** implementation verified; completed plan and review inputs retained
+for retrospective. Pull reconciliation and existing-note composition remain
+separate queued work.
 Execution plan: [quick/097](../quick/097-cohesive-initial-notebook-publication/PLAN.md).
 
 - **Goal:** A notebook owner can clone an empty notebook, organize valid Portable
@@ -298,9 +299,10 @@ No Accepted ADR conflict is identified for this story.
 
 #### Follow-up boundary and remaining product question
 
-The correction order is recorded above. These remain separate deliverable outcomes. After Story 9, verify [SEED-016 Story 8](SEED-016-initial-notebook-and-folder-readmes.md#story-8)'s examples and retire plan 096
-if covered; otherwise revise it around the remaining outcome. Do not resume its
-old exact-shape implementation. Do not duplicate SEED-017 correction stories.
+The correction order is recorded above. These remain separate deliverable outcomes.
+[SEED-016 Story 8](SEED-016-initial-notebook-and-folder-readmes.md#story-8)'s grouped,
+reference and atomicity examples are covered; plan 096 is superseded. Do not
+resume its old exact-shape implementation or duplicate SEED-017 correction stories.
 
 **Open question for later scope:** Should every web mutation of Portable content
 advance accepted Git history, or should the product deliberately expose a partial
@@ -362,7 +364,10 @@ This question does not block the developer-selected first story.
 
 ## Execution readiness and design checks
 
-The roadmap above completes the requested correction planning at story level. It does **not** label four independent subsystem changes as one five-minute executable unit. Story 9 is the selected first delivery and has a linked slice plan; Story 1 follows; Story 2 needs particular attention to identity ambiguity before execution. Proposed scope changes are explicitly proposals, not retrospective claims of previous human approval. The developer selected initial-tree scope and correction order; later story details remain refinement input. No correction has been executed.
+Story 9's implementation and all 11 execution slices are verified; its plan remains
+available for retrospective. Story 1 follows; Story 2 needs particular attention
+to identity ambiguity before execution. Later story details remain refinement
+input and retain their developer-selected order.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
 

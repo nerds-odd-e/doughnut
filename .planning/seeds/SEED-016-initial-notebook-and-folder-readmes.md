@@ -187,8 +187,10 @@ corrected by quick/091 (`5d2c5b3d9d`).
 
 ### 8. Publish two related notes inside one new folder
 
-**Status:** postponed. [quick/096](../quick/096-initial-related-notes-in-folder/PLAN.md)
-is not execution-ready and must be revised after [SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9).
+**Status:** covered by the verified general initial-tree implementation in
+[SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9).
+[quick/096](../quick/096-initial-related-notes-in-folder/PLAN.md) is superseded;
+its prior planning context is retained for retrospective, not execution.
 The existing examples below preserve the intended user outcome; their exact
 counts must not be carried forward as production restrictions by default.
 
@@ -236,15 +238,14 @@ counts must not be carried forward as production restrictions by default.
 
 **Moved:** The canonical story, whole Git workflow assessment, and refinement
 now live in [SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9).
-It remains the highest-priority product backlog item. This anchor is retained
-only for existing references; Story 8 remains postponed behind that work.
+Its execution is verified. This anchor is retained for existing review references;
+Story 8 is covered by the same general initial-tree contract.
 
 ## Ordering and Scope Reduction
 
-Stories 1–7 and their eligibility corrections are delivered. [SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9) has highest
-product-backlog priority by explicit developer direction. Story 8 / plan 096 is
-postponed behind it and requires revision before execution. Full initial import
-remains deferred.
+Stories 1–7 and their eligibility corrections are delivered. Story 8 is covered by
+the verified [SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9)
+implementation. Plan 096 is superseded. Operating a bulk import remains deferred.
 
 ## Open Decisions
 
@@ -253,9 +254,9 @@ product decision concerns web-write synchronization coverage, recorded in [SEED-
 
 ## When to Surface
 
-Review Story 9's executable plan next. Story 8 execution is postponed; its plan
-must be reconsidered after the cohesive initial-tree work. Pull and existing-note
-composition follow in their SEED-017 homes; bulk-import operations remain separate.
+Story 9's completed plan is available for retrospective; Story 8 needs no separate
+execution. Pull and existing-note composition follow in their SEED-017 homes;
+bulk-import operations remain separate.
 
 ## Breadcrumbs
 

@@ -1,15 +1,16 @@
 # Publish two related notes inside one new folder
 
 Source: [SEED-016 Story 8](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-8).
-Status: postponed — not execution-ready. No implementation begun.
+Status: superseded — required outcome covered by [quick/097](../097-cohesive-initial-notebook-publication/PLAN.md).
 
-## Hold: structural design correction first
+## Superseded execution instructions
 
-The developer postponed execution and inserted
-[SEED-017 Story 9](../../seeds/SEED-017-cohesive-design-corrections.md#story-9)
-at highest priority. That story documents example-shaped production restrictions
-and is now refined in its canonical SEED-017 home. Complete that prerequisite, then revisit Story 8 and
-revise or retire this plan before execution. Do not automatically resume it.
+The general initial-tree implementation covers the grouped example in
+`NotebookGitProposalInitialMixedTreeControllerTest`, reference resolution in
+`NotebookGitProposalInitialRootRelationshipControllerTest`, and committed atomic
+rejection in `NotebookGitProposalInitialPublicationRejectionControllerTest`.
+No execution of this old exact-layout plan remains. Retain these review inputs
+until retrospective and story wrap-up under the current repository guidance.
 
 The scope and slices below are retained as prior planning context, not current
 implementation instructions. In particular, exact file-count and layout gates

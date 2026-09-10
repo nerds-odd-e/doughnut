@@ -2,9 +2,12 @@
 
 Source: [SEED-017 Story 9](../../seeds/SEED-017-cohesive-design-corrections.md#story-9).
 Status: done — all 11 slices verified; final merge and worktree retirement pending.
-Execution uses linked worktree `/Users/terryyin/git/doughnut-quick-097`.
-CI observation is unavailable for this branch: `ci.yml` (`donut CI`) runs only
-on main. Observe main after the authorized merge. No observer is running.
+Execution used linked worktree `/Users/terryyin/git/doughnut-quick-097`.
+Branch pushes have no CI trigger. Main observation is running for `ci.yml`
+(`donut CI`) in primary `/Users/terryyin/git/doughnut`: coordinator quick097,
+cell 103, session 24678, PID 60732, mailbox `/tmp/dough-ci-501/watch-Ay2Dop`.
+Observer request matches repository/branch/checkout and its creation time matches
+the exact stream process launch. Close this observer after final merge delivery.
 
 ## Goal and scope
 
@@ -65,7 +68,7 @@ ADR 0002 remains Proposed. No exception or ADR status change is required.
 
 ## Refinement decisions
 
-No slices have executed; there is no attempt-owned implementation to park.
+At refinement, no slices had executed and no attempt-owned implementation needed parking.
 Story scope, priority and Accepted ADR constraints are unchanged.
 
 | Previous slice | Classification | Replacement |
@@ -410,20 +413,22 @@ Repeated overruns require reassessing the story, not resetting the estimate.
 
 ## Readiness and completion
 
-All 11 resulting slices are Ready: each has one Behavior/Structure outcome,
-owned proof and a bounded implementation hypothesis. There are no completed or
-obsolete slices included in that count and no Escalate finding. The former low
-confidence migrations are isolated and their shared caller/harness assumptions
-are recorded above. No story resplit is recommended (11 ≤ 15).
+All 11 slices are done, independently refactored, formatted, committed and pushed.
+Each backend change passed the full backend suite. The installed CLI feature
+passed all 12 scenarios on the authorized primary E2E stack. No schema or API
+contract changed; generation was not triggered.
 
-Ready for direct execution when separately authorized. This refinement does not
-start execution, run product tests, commit or push. Full-suite/E2E runtime and
-external delivery waits remain the stated sizing exceptions; there is no
-exception for implementation overruns. At >5 minutes recheck the hypothesis;
-at >10 active minutes stop and refine, preserving attempt ownership. Readiness
-is an evidence-based sizing judgment, not a duration guarantee.
+The final initial-publication path has one application/acceptance owner and no
+example-count, depth or old-handler fallback. Remaining checks concern actual
+empty state, typed Markdown, paths/modes/titles/properties, represented placement,
+authorization, Git history and projection identity. Noninitial creation and
+relocation retain their own eligibility. The complete change preserves the
+story's workflow boundaries; broader pull and web-write synchronization stay separate.
 
-After delivery, verify SEED-016 Story 8 against the final behavior and revise or
-retire held plan 096. Update the canonical seed/backlog and remove spent plan
-history only after its knowledge is in code/tests/permanent documentation.
-Pull and existing-note composition retain their own SEED-017 stories.
+SEED-016 Story 8 is covered by mixed-tree, reference and committed-rejection
+proofs; plan 096 is superseded rather than executable. Its input is retained
+alongside this completed plan under the updated main-branch guidance for
+retrospective and story wrap-up. No retrospective is claimed by this execution.
+Fulfilled items are removed from the active backlog; unrelated queued stories
+and near-future direction are preserved. Final main merge and worktree/database
+retirement remain delivery operations, not unfinished product slices.
