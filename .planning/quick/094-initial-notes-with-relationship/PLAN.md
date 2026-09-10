@@ -1,7 +1,7 @@
 # Publish two notes and their relationship together
 
 Source: [SEED-016 Story 7](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-7).
-Status: in progress (slices 1–2 delivered). Isolated worktree `/Users/terryyin/.cursor/worktrees/doughnut/quick-094` on branch `quick/094-initial-notes-with-relationship`. CI observation: `ci.yml` is push-triggered only on `main`; this feature branch has no push-triggered workflow coverage.
+Status: done (all slices delivered). Isolated worktree `/Users/terryyin/.cursor/worktrees/doughnut/quick-094` on branch `quick/094-initial-notes-with-relationship`. CI observation: `ci.yml` is push-triggered only on `main`; this feature branch has no push-triggered workflow coverage.
 
 ## Goal and scope
 
@@ -119,12 +119,14 @@ promise; Story 7 remains unfinished after slice 1 until this proof is green.
 
 ### 3. Reject invalid relationship content without partial publication
 Type: Behavior
-Status: planned
-Proof: Use committed-transaction testing around controller publication of the
-four-file shape with invalid Relationship `note_level`. Assert deliberate
-property-context rejection and unchanged notebook Readme, Note/Folder rows,
-source-owned reference rows and accepted binding. Use a valid ordinary Note with
-a wiki reference to exercise rollback of earlier concept/index writes.
+Status: done
+Proof: `NotebookGitProposalInitialRootRelationshipRejectionControllerTest.rejectsInvalidRelationshipContentWithoutPartialPublication` publishes the four-file shape with invalid Relationship `note_level: 7` and a wiki reference on `A.md`; `ApiException` carries the path and `AUTHORED_NOTE_LEVEL_MESSAGE`; Readme, folders, live notes, source-owned reference rows, and accepted binding stay unchanged in a committed transaction.
+
+Focused verification (pass):
+```text
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+```
 
 Behavior: The mixed composition contains an invalid authored property
 → owner publishes → rejection leaves the accepted notebook unchanged.
@@ -155,6 +157,7 @@ slice-plan refinement required. Full-suite timing exception applies as above.
 - Slice 1 active work ~8 minutes (scrutinize band, under the 10-minute hard stop). The four-file layout failed first as `requireOrdinaryNote` on `A-related-to-B.md`. Recognition by authored type before `findWithRootNotes` is enough; `applyNotes` stays strict for other layouts.
 - Relationship proofs now live in `NotebookGitProposalInitialRootRelationshipControllerTest` after the ~250-line guideline. Slice 2 should add show-note observation there rather than re-growing the Readme-only class.
 - Slice 2 needed only proof: existing current-state resolution already maps same-commit `[[A]]`/`[[B]]` after mixed publication. No production change. Active work ~6 minutes.
+- Slice 3 needed only proof: existing publisher transaction already rejects invalid Relationship `note_level` without partial publication. Rejection proof lives in `NotebookGitProposalInitialRootRelationshipRejectionControllerTest`. Active work ~8 minutes.
 - Feature-branch pushes do not start `donut CI`; do not claim CI observation until work lands on `main`.
 
 When all slices are delivered, reduce Story 7 to delivered Goal/Scope and clean

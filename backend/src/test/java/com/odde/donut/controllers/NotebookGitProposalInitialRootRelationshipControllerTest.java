@@ -28,7 +28,9 @@ import org.springframework.http.ResponseEntity;
 
 /**
  * Verifies publication of initial notebook Readme plus one root Relationship, with or without
- * exactly two root ordinary Notes.
+ * exactly two root ordinary Notes, and that same-commit wiki links resolve to those Notes. Invalid
+ * Relationship properties in the mixed layout are covered in {@link
+ * NotebookGitProposalInitialRootRelationshipRejectionControllerTest}.
  */
 class NotebookGitProposalInitialRootRelationshipControllerTest
     extends NotebookGitBundleControllerTestBase {
