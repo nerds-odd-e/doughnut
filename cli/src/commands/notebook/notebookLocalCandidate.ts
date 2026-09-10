@@ -52,7 +52,8 @@ export type UnpublishedLocalHistoryDecision =
 
 /**
  * Returns fast-forward when local main is already an ancestor of accepted.
- * Eligible one-note content edits already based on accepted main stay as-is.
+ * Any nonempty ordinary-content-edit unpublished commit already based on
+ * accepted main stays as-is, independent of its path count.
  * Eligible one-note content edits rebase over content-only accepted history,
  * including same-note content edits, and over one accepted ordinary-note
  * addition at the root or an already represented folder, optionally followed
@@ -97,6 +98,9 @@ export function inspectUnpublishedLocalHistory(
   if (localPaths === undefined) {
     return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
   }
+  if (parent === acceptedHead) {
+    return { kind: 'already-based' }
+  }
   if (localPaths.length === 2) {
     return decideTwoNoteBatchRebase(
       acceptedRepoDir,
@@ -138,22 +142,19 @@ export function inspectUnpublishedLocalHistory(
       message: structuralChangeError(acceptedInterval.path),
     }
   }
-  if (parent === acceptedHead) {
-    return { kind: 'already-based' }
-  }
   return { kind: 'rebase', localParent: parent }
 }
 
+/**
+ * Called only once the caller has ruled out an already-based commit, so
+ * `localParent` is never `acceptedHead` here.
+ */
 function decideTwoNoteBatchRebase(
   acceptedRepoDir: string,
   localParent: string,
   acceptedHead: string,
   localPaths: string[]
 ): UnpublishedLocalHistoryDecision {
-  if (localParent === acceptedHead) {
-    return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
-  }
-
   const interval = listCommits(
     acceptedRepoDir,
     '--reverse',
