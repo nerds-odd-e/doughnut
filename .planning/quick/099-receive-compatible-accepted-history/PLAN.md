@@ -106,7 +106,7 @@ Safe stop: already-based work is usable; divergent behavior is unchanged.
 
 ### 2. Make the common replay lifecycle preserve the complete commit
 Type: Structure
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes, medium confidence, including focused proof and cleanup.
 
 Internal change: replace whole-commit skipping based on one equivalent conflict
@@ -275,3 +275,9 @@ made `decideTwoNoteBatchRebase`'s own `localParent === acceptedHead` guard
 dead code; removed it during the refactor pass and documented the invariant
 its caller now guarantees. No other help/comment text claimed an already-based
 cardinality limit, so no diagnostic text needed correcting.
+
+Slice 2: per-path LF absorption plus `git diff --cached --quiet` against HEAD
+(the rebase onto-point, verified empirically since only one commit is ever
+replayed) replaces the old single-conflict-path special case for deciding
+continue vs. skip. No behavioral change for currently eligible cases; this
+unblocks slice 4's multi-path batches without any path-count branch.
