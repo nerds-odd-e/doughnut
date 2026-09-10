@@ -118,17 +118,21 @@ public class NotebookGitProposalPublisher {
         && files.stream().allMatch(file -> file.acceptedBlobId() == null)) {
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      return initialTreePublication.accept(state, proposal, files);
+      return acceptMatchingProposedTree(
+          initialTreePublication.apply(state, proposal, files), proposal);
     }
     Optional<NotebookGitProposalFolderCreationShape.RootFolderCreation> folderCreation =
         NotebookGitProposalFolderCreationShape.findSingleRootFolderCreation(files);
     if (folderCreation.isPresent()) {
-      return folderAcceptance.acceptCreation(state, proposal, acceptedHead, folderCreation.get());
+      return acceptMatchingProposedTree(
+          folderAcceptance.applyCreation(state, proposal, acceptedHead, folderCreation.get()),
+          proposal);
     }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);
     if (relocation.isPresent()) {
-      return folderAcceptance.accept(state, proposal, acceptedHead, relocation.get());
+      return acceptMatchingProposedTree(
+          folderAcceptance.apply(state, proposal, acceptedHead, relocation.get()), proposal);
     }
     List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
         NotebookGitProposalTreeShape.requireAllowedNoteChangesFromInspectedFiles(files);
@@ -162,10 +166,31 @@ public class NotebookGitProposalPublisher {
       }
     }
 
-    projection.requireMatchingAcceptedTree(
-        notebook, folders, proposedLiveNotes, proposal.repository(), proposal.mainHead());
+    return acceptMatchingProposedTree(
+        new NotebookGitStateLoader.LockedNotebookState(
+            binding, notebook, folders, proposedLiveNotes),
+        proposal,
+        publishedAt);
+  }
 
-    return bindingPersistence.accept(binding, proposal, publishedAt);
+  private String acceptMatchingProposedTree(
+      NotebookGitStateLoader.LockedNotebookState published,
+      NotebookGitProposalImporter.ImportedProposal proposal) {
+    return acceptMatchingProposedTree(
+        published, proposal, testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  private String acceptMatchingProposedTree(
+      NotebookGitStateLoader.LockedNotebookState published,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      Timestamp publishedAt) {
+    projection.requireMatchingAcceptedTree(
+        published.notebook(),
+        published.folders(),
+        published.liveNotes(),
+        proposal.repository(),
+        proposal.mainHead());
+    return bindingPersistence.accept(published.binding(), proposal, publishedAt);
   }
 
   private void applyRename(

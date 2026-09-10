@@ -1,7 +1,12 @@
 # Publish a new folder and its notes together
 
 Source: [SEED-017 Story 2](../../seeds/SEED-017-cohesive-design-corrections.md#story-2).
-Status: planned. Planning only; the user explicitly prohibits execution.
+Status: in progress. Execution authorized 2026-09-10 in linked worktree
+`.worktrees/quick-100-publish-folder-and-notes` on branch
+`quick-100-publish-folder-and-notes`. Feature-branch pushes have no
+push-triggered CI (`ci.yml` runs only on `main`); CI observation starts
+when this branch is merged to `main`. Do not reuse Story 1's checkout
+(`.worktrees/quick-099-receive-compatible-accepted-history`).
 
 ## Goal and scope
 
@@ -131,8 +136,10 @@ the Behavior slice. Do not introduce new temporary refusal rules.
 
 ### 1. Finish accepted publication in one place
 Type: Structure
-Status: planned
+Status: done
 Sizing hypothesis: 4–5 minutes active work, plus the required backend-suite wait.
+Actual: ~6 minutes active (slightly over hypothesis; converged), ~1.5 minutes suite wait.
+Refactor: none — already clean.
 
 Move final live-projection comparison and binding acceptance to one publisher
 completion point. Initial creation, existing folder operations and note changes
@@ -145,6 +152,17 @@ express the needed state.
 Proof: existing initial-tree, README-only creation, note mutation, exact folder
 relocation and idempotent publication controller evidence stays green. This
 enables the shared mutation path in slice 4 and atomic composition in slice 5.
+
+```text
+proof:
+  command: unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+  covers: complete backend unit suite on doughnut_wt_05087b88f4ea4adabada26656b61f244_test (initial-tree, README-only creation, note mutation, exact folder relocation, idempotent publication)
+  result: pass
+```
+
+Completion now lives in `NotebookGitProposalPublisher.acceptMatchingProposedTree`.
+Collaborators return `LockedNotebookState` and no longer persist accepted head.
 
 ### 2. Use one folder materialization mechanism
 Type: Structure
@@ -275,7 +293,7 @@ prepares the same publication outcome and removes a source of duplicated rules.
 
 | Slice | Assessment | Reason |
 | --- | --- | --- |
-| 1 | Ready | One transaction completion owner; existing controller proof |
+| 1 | Done | One publisher completion owner; complete backend suite green |
 | 2 | Ready | One folder materialization mechanism; existing creation proof |
 | 3 | Ready | One document classification representation; unchanged behavior |
 | 4 | Ready | One addition application flow; unchanged behavior |
@@ -288,13 +306,13 @@ completed test slice. Its 8–10 minute active-work hypothesis is the remaining
 timing concern; suite/SUT waits are additional. If helper integration or mutation
 wiring is still unfinished at that point, refine instead of hiding that work in
 the exception. The final plan has no identified example-specific handler or
-new constraint condition. No execution or product verification has occurred.
+new constraint condition.
 
-When execution is separately authorized, follow `dough-execute-plan`: Jidoka,
-fresh `dough-post-change-refactor` agent, API regeneration only if signatures
-actually change, coordinator `./scripts/run.sh pnpm format:changed` once, plan
-update, owned-change commit with check-only lint hook, push and asynchronous CI
-handling. Keep one plan writer; do not modify Story 1's plan or execution state.
-Review the aggregate final design, including affected unchanged callers.
-Keep completed plan/proof for retrospective and wrap-up. This planning request
-does not authorize any of those execution actions.
+## Learnings
+
+- Slice 1 active work ~6 minutes vs 4–5 hypothesis; converged without refinement.
+  Remaining `requireMatchingAcceptedTree` calls against the current accepted head
+  are pre-mutation drift checks, not a second completion owner.
+- Feature-branch pushes have no push-triggered CI (`ci.yml` only on `main`).
+  Missing CI observation coverage until merge to `main`. Keep one plan writer;
+  do not modify Story 1's plan or execution state.
