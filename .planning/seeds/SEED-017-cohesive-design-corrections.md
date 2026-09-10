@@ -197,6 +197,12 @@ Stories 1–4 in their developer-selected order.
   additionally checks downloaded paths and document bytes. No open question
   affects this story; the broader synchronization decision below is deferred.
 - **Execution plan:** [quick/099](../quick/099-consolidate-root-container-publication-proof/PLAN.md).
+- **Current-state refinement (2026-09-10):** implemented in `ab911b4b88`.
+  The duplicate method is absent and the retained `A|B|C, true` scenario
+  still owns the promised observations. Quick/099 records the backend suite
+  passing. No remaining implementation slice or story-specific open question
+  was identified; the backlog entry awaits lifecycle closure. Neither linked
+  worktree (`lwq6`, `oug`) has changes associated with this correction.
 - **Safe stopping point:** the remaining successful container-only proof has one
   owner independently of later Git workflow corrections.
 
@@ -260,7 +266,7 @@ queued corrections.
 
 ## Execution readiness and design checks
 
-Story 11 has an executable plan. Stories 1–4 remain refinement input; Story 2
+Story 11's plan is executed; no new execution is planned. Stories 1–4 remain refinement input; Story 2
 needs particular attention to identity ambiguity before execution.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
