@@ -289,7 +289,11 @@ owned by slice 10; Folder-name validation has its own boundary in slice 9.
 
 ### 9. Reject invalid Folder ancestry without partial publication
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+Existing Folder-name policy rejects a whitespace ancestor with path context;
+committed footprint and binding remain unchanged. Proof-only; independent
+refactor completed without edits; format passed.
 Proof: A nested initial tree contains an invalid Folder-name component, using
 existing Folder validation rules → contextual rejection and the same unchanged
 committed footprint observation as slice 8. Reuse the assertion fixture; the

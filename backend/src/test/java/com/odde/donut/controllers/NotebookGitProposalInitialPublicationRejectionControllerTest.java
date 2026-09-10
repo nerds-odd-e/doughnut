@@ -18,6 +18,8 @@ import com.odde.donut.exceptions.ApiException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 class NotebookGitProposalInitialPublicationRejectionControllerTest
     extends NotebookGitBundleControllerTestBase {
@@ -61,6 +63,32 @@ class NotebookGitProposalInitialPublicationRejectionControllerTest
     assertThat(
         exception.getErrorBody().getErrors().get("note_level"),
         equalTo(FrontmatterNoteLevel.AUTHORED_NOTE_LEVEL_MESSAGE));
+    assertThat(committedFootprint(notebook), equalTo(before));
+  }
+
+  @Test
+  void rejectsInvalidFolderAncestorWithoutPartialPublication() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    PublicationFootprint before = committedFootprint(notebook);
+    String invalidPath = "Topic/ /Nested/B.md";
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("Earlier/README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile(
+                    "Earlier/A.md", "---\ntype: Note\n---\nSee [[Topic/B]].\n"),
+                new NotebookGitProposalFile(invalidPath, SECOND_NOTE)));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
+
+    assertThat(
+        exception.getReason(),
+        equalTo("Invalid folder name at path \"" + invalidPath + "\": must not be blank"));
     assertThat(committedFootprint(notebook), equalTo(before));
   }
 
