@@ -1,7 +1,7 @@
 # Publish two notes and their relationship together
 
 Source: [SEED-016 Story 7](../../seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-7).
-Status: in progress (slice 1 delivered). Isolated worktree `/Users/terryyin/.cursor/worktrees/doughnut/quick-094` on branch `quick/094-initial-notes-with-relationship`. CI observation: `ci.yml` is push-triggered only on `main`; this feature branch has no push-triggered workflow coverage.
+Status: in progress (slices 1–2 delivered). Isolated worktree `/Users/terryyin/.cursor/worktrees/doughnut/quick-094` on branch `quick/094-initial-notes-with-relationship`. CI observation: `ci.yml` is push-triggered only on `main`; this feature branch has no push-triggered workflow coverage.
 
 ## Goal and scope
 
@@ -98,11 +98,14 @@ is justified because existing persistence helpers cover all concept roles.
 
 ### 2. Navigate the relationship to both newly published Notes
 Type: Behavior
-Status: planned
-Proof: After publishing the same shape, use `NoteController.showNote` on the
-Relationship and assert the A/B wiki-link destination IDs are those of the newly
-published Notes. Follow the boundary pattern in `NoteControllerShowWikiLinkTests`;
-do not call an internal resolver directly or assert only reference-row counts.
+Status: done
+Proof: `NotebookGitProposalInitialRootRelationshipControllerTest.publishedRootRelationshipWikiLinksResolveToNewlyPublishedNotes` publishes the same four-file shape (Relationship first) then `NoteController.showNote` on the Relationship; A and B wiki links are RESOLVED to the destination IDs of the newly published Notes.
+
+Focused verification (pass):
+```text
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+```
 
 Behavior: A Relationship and its endpoints arrive in one commit, with the
 Relationship sorting before the endpoints → owner opens the Relationship after
@@ -151,6 +154,7 @@ slice-plan refinement required. Full-suite timing exception applies as above.
 
 - Slice 1 active work ~8 minutes (scrutinize band, under the 10-minute hard stop). The four-file layout failed first as `requireOrdinaryNote` on `A-related-to-B.md`. Recognition by authored type before `findWithRootNotes` is enough; `applyNotes` stays strict for other layouts.
 - Relationship proofs now live in `NotebookGitProposalInitialRootRelationshipControllerTest` after the ~250-line guideline. Slice 2 should add show-note observation there rather than re-growing the Readme-only class.
+- Slice 2 needed only proof: existing current-state resolution already maps same-commit `[[A]]`/`[[B]]` after mixed publication. No production change. Active work ~6 minutes.
 - Feature-branch pushes do not start `donut CI`; do not claim CI observation until work lands on `main`.
 
 When all slices are delivered, reduce Story 7 to delivered Goal/Scope and clean

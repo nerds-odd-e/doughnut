@@ -8,6 +8,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -60,6 +62,7 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
       """;
 
   @Autowired FolderRepository folderRepository;
+  @Autowired NoteController noteController;
 
   @Test
   void publishesInitialNotebookReadmeAndRootRelationshipAsTheExactAuthoredCommit()
@@ -114,14 +117,7 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile(
-                    "A-related-to-B.md", ROOT_RELATIONSHIP_WITH_CUSTOM_PROPERTY),
-                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
-                new NotebookGitProposalFile("B.md", SECOND_NOTE),
-                new NotebookGitProposalFile("A.md", FIRST_NOTE)));
+        proposalBundleBytes(binding, initialReadmeTwoRootNotesAndRootRelationshipFiles());
 
     GitBundleTestReader.SingleParentGitCommit proposedCommit;
     try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -155,5 +151,42 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
       assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
       assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
     }
+  }
+
+  @Test
+  void publishedRootRelationshipWikiLinksResolveToNewlyPublishedNotes() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(binding, initialReadmeTwoRootNotesAndRootRelationshipFiles());
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Map<String, Note> byTitle =
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .collect(Collectors.toMap(Note::getTitle, Function.identity()));
+    NoteRealm shown = noteController.showNote(byTitle.get("A-related-to-B"));
+    WikiLink source = wikiLink(shown, "A");
+    WikiLink target = wikiLink(shown, "B");
+    assertThat(source.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
+    assertThat(source.getDestinationNoteId(), equalTo(byTitle.get("A").getId()));
+    assertThat(target.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
+    assertThat(target.getDestinationNoteId(), equalTo(byTitle.get("B").getId()));
+  }
+
+  private static List<NotebookGitProposalFile> initialReadmeTwoRootNotesAndRootRelationshipFiles() {
+    return List.of(
+        new NotebookGitProposalFile("A-related-to-B.md", ROOT_RELATIONSHIP_WITH_CUSTOM_PROPERTY),
+        new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+        new NotebookGitProposalFile("B.md", SECOND_NOTE),
+        new NotebookGitProposalFile("A.md", FIRST_NOTE));
+  }
+
+  private static WikiLink wikiLink(NoteRealm shown, String authoredLink) {
+    return shown.getWikiLinks().stream()
+        .filter(link -> authoredLink.equals(link.getAuthoredLink()))
+        .findFirst()
+        .orElseThrow();
   }
 }
