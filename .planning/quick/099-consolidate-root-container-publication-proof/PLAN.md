@@ -25,12 +25,19 @@ journey because they own distinct empty-root and end-to-end boundaries.
 
 ## Outside-in proof ownership
 
+All preservation checks below belong to slice 1.
+
 | Preserved promise | Owning proof |
 | --- | --- |
-| Notebook and root Folder Readmes publish with exact authored Git state and content | `NotebookGitProposalInitialContainerTreeControllerTest` with `notebookReadme=true` |
+| Notebook and root Folder Readmes publish with exact authored Git state and content | `NotebookGitProposalInitialContainerTreeControllerTest.publishesContainerTreesAsTheExactAuthoredCommit`, row `A\|B\|C, true` |
 | Container-only publication creates root Folders and zero live Notes | The same retained controller scenario's Folder-path and Note-row assertions |
 | Mixed initial notebook structures and their refusals remain supported | Remaining `NotebookGitProposalInitialNotebookStructureControllerTest` scenarios |
+| Notebook Readme publication without any Folder retains its distinct proof | `NotebookGitProposalInitialNotebookReadmeControllerTest.publishesInitialNotebookReadmeAsTheExactAuthoredCommit` |
 | Installed publication still round-trips through the CLI | Existing `Publishing an initial nested tree round-trips the authored checkout` E2E scenario remains unchanged |
+
+The CLI row is preservation of the existing proof, not a new E2E execution
+promise: inspect the final diff to confirm the feature and its supporting code
+are untouched. The backend suite exercises the retained controller boundaries.
 
 ## 1. Remove the remaining duplicate root-container round trip
 
@@ -57,7 +64,10 @@ generation trigger exists.
 
 Sizing: approximately 5 minutes active work plus the required backend-suite
 runtime, high confidence. The full-suite runtime is the stated exception to the
-active slice target.
+active slice target. If active implementation, focused verification work and
+cleanup exceed 10 minutes, stop and refine before continuing; the exception
+covers suite waiting time only. A failed retained assertion is new evidence to
+investigate, not permission to remove coverage or expand the correction.
 
 ## Current decisions
 
@@ -66,4 +76,14 @@ active slice target.
   rejection, mixed-concept, root-without-Folder and installed-CLI boundaries
   remain distinct.
 
-No slice-specific concern was found in this planning assessment.
+## Refinement assessment
+
+Source inspection reconfirmed the duplicate and retained observations. One
+Structure slice directly owns the evidenced test-suite correction; no preparatory
+Behavior or additional slice is needed. The common collection proof covers root
+Folders independently of fixture count, so the cumulative design introduces no
+new case recognizer or parallel representation. Mixed-concept, rejection and
+empty-root boundaries keep their existing owners.
+
+No slice-specific concern was found in this assessment. No product code was
+changed and no tests were run during planning. Execution remains unstarted.

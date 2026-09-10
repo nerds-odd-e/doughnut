@@ -189,6 +189,13 @@ Stories 1–4 in their developer-selected order.
   controller scenario owning the same observations.
 - **Exclusions:** production changes, rejection or mixed-content cleanup, API,
   schema, CLI, E2E and broader test-suite changes.
+- **Boundary example:** a proposal containing a Note, or a notebook Readme
+  without any Folder, retains its distinct existing proof. Folder counts alone
+  do not establish distinct publication contracts or require a new count case.
+- **Refinement:** current source confirms the retained `A|B|C, true`
+  container-tree scenario covers the overlapping method's observations and
+  additionally checks downloaded paths and document bytes. No open question
+  affects this story; the broader synchronization decision below is deferred.
 - **Execution plan:** [quick/099](../quick/099-consolidate-root-container-publication-proof/PLAN.md).
 - **Safe stopping point:** the remaining successful container-only proof has one
   owner independently of later Git workflow corrections.
