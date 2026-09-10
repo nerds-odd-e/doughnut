@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import { existsSync } from 'node:fs'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
+import { DEVELOPMENT_RUNTIME_TARGET } from './development-runtime.mjs'
+import { applicationPorts } from './local-runtime-target.mjs'
 import {
   closeServer,
   identityAndPortsConfig,
@@ -13,9 +15,11 @@ import {
   runConfiguredStart,
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
+import { listenEphemeralPort } from './sut-e2e-port-listen.mjs'
 import {
   ensureIsolatedE2ePorts,
   readPublishedE2ePortClaims,
+  RESERVED_ISOLATED_E2E_PORTS,
 } from './sut-e2e-ports.mjs'
 import {
   assertAllocatedIsolatedPorts,
@@ -24,6 +28,17 @@ import {
   waitForClose,
 } from './sut-e2e-port-test-helpers.mjs'
 import { makeStartSpy } from './sut-start-fixtures.mjs'
+
+function stubListeningPort(port) {
+  return {
+    port,
+    server: {
+      close(callback) {
+        if (typeof callback === 'function') callback()
+      },
+    },
+  }
+}
 
 test('identity-only allocation records three distinct non-reserved ports', async (t) => {
   const checkout = makePrimaryCheckout(t)
@@ -80,6 +95,35 @@ test('auto-allocation skips claimed ports and occupied TCP listeners', async (t)
     assert.equal(claimedValues.includes(value), false)
   }
   assert.equal(await isTcpListening(port), true)
+})
+
+test('auto-allocation never selects Development ports when offered first', async (t) => {
+  const developmentPorts = applicationPorts(DEVELOPMENT_RUNTIME_TARGET)
+  for (const port of developmentPorts) {
+    assert.equal(RESERVED_ISOLATED_E2E_PORTS.includes(port), true)
+  }
+
+  const checkout = makePrimaryCheckout(t)
+  const claimRoot = makeClaimRoot(t)
+  writeIsolatedConfig(checkout.root, identityOnlyConfig)
+
+  let offered = 0
+  const listenPort = async () => {
+    if (offered < developmentPorts.length) {
+      return stubListeningPort(developmentPorts[offered++])
+    }
+    return listenEphemeralPort()
+  }
+
+  const ports = await ensureIsolatedE2ePorts(checkout.root, {
+    claimRoot,
+    listenPort,
+  })
+  assertAllocatedIsolatedPorts(ports)
+  assert.equal(offered, developmentPorts.length)
+  for (const port of Object.values(ports)) {
+    assert.equal(developmentPorts.includes(port), false)
+  }
 })
 
 test('concurrent identity-only checkouts publish distinct claims', async (t) => {

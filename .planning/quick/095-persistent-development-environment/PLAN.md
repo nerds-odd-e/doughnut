@@ -1,7 +1,7 @@
 # Use a persistent Development environment for manual feedback
 
 Source: [SEED-015 story 7](../../seeds/SEED-015-concurrent-worktree-environments.md#story-7).
-Status: in progress (slices 1–7 delivered).
+Status: in progress (slices 1–8 delivered).
 CI observer: feature-branch pushes are not observed — `donut CI` is push-to-`main` only; observe after merge.
 
 ## Goal and scope
@@ -152,12 +152,12 @@ stack owns the free target, the command starts it -> no database cleanup occurs.
 ### 8. Keep Development ports out of every isolated E2E allocation
 
 Type: Behavior
-Status: planned
-Proof: `scripts/sut-e2e-port-allocation.test.mjs` forces allocation around the
-Development values and proves none can be selected. Run `pnpm test:sut-start`,
-`pnpm test:sut-restart`, `pnpm test:browser-worktree-isolation`, and the focused
-port-allocation tests to prove canonical and isolated E2E behavior is unchanged;
-run `pnpm test:backend-test-worktree` for the existing Unit Test selection.
+Status: done
+Proof: `node --test scripts/sut-e2e-port-allocation.test.mjs` plus
+`pnpm test:sut-start`, `pnpm test:sut-restart`,
+`pnpm test:browser-worktree-isolation`, and `pnpm test:backend-test-worktree`
+(pass) — Development ports never selected; E2E and Unit Test contracts
+unchanged.
 
 Behavior: An isolated worktree allocates an E2E target -> none of the canonical
 Development ports can be selected, while the existing E2E profile/database and

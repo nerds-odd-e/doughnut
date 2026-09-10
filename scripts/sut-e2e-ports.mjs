@@ -1,4 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs'
+import { DEVELOPMENT_RUNTIME_TARGET } from './development-runtime.mjs'
+import { applicationPorts } from './local-runtime-target.mjs'
 import {
   defaultE2ePortClaimRoot,
   readPublishedE2ePortClaims,
@@ -9,6 +11,7 @@ import {
   closeListeningServer,
   listenEphemeralPort,
 } from './sut-e2e-port-listen.mjs'
+import { LEGACY_SUT_RUNTIME_TARGET } from './sut-runtime-target.mjs'
 import {
   assertValidWorktreeId,
   worktreeLocalConfigPath,
@@ -23,7 +26,11 @@ export const E2E_PORT_FIELDS = ['backendPort', 'vitePort', 'lbListenPort']
 export const E2E_PORT_CONFIG_FIELDS = E2E_PORT_FIELDS.map(
   (field) => `e2e.${field}`
 )
-export const RESERVED_ISOLATED_E2E_PORTS = [5173, 5174, 9081, 2525]
+export const RESERVED_ISOLATED_E2E_PORTS = [
+  ...applicationPorts(LEGACY_SUT_RUNTIME_TARGET),
+  LEGACY_SUT_RUNTIME_TARGET.mountebankPort,
+  ...applicationPorts(DEVELOPMENT_RUNTIME_TARGET),
+]
 const ALLOCATE_ATTEMPTS = 24
 
 export function isRecordedE2eApplicationPort(port) {
@@ -124,7 +131,10 @@ async function closeHeldServers(held) {
   }
 }
 
-async function reserveUnclaimedApplicationPorts(used) {
+async function reserveUnclaimedApplicationPorts(
+  used,
+  listenPort = listenEphemeralPort
+) {
   const held = []
   try {
     let attempts = 0
@@ -135,7 +145,7 @@ async function reserveUnclaimedApplicationPorts(used) {
           'Unable to allocate three free isolated E2E application ports.'
         )
       }
-      const reserved = await listenEphemeralPort()
+      const reserved = await listenPort()
       if (used.has(reserved.port)) {
         await closeListeningServer(reserved.server)
         continue
@@ -156,7 +166,7 @@ function publishClaim(claimRoot, worktreeId, ports) {
   writePublishedE2ePortClaims(claimRoot, claims)
 }
 
-async function publishOrAllocatePorts(claimRoot, checkoutRoot) {
+async function publishOrAllocatePorts(claimRoot, checkoutRoot, listenPort) {
   const config = readCheckoutConfig(checkoutRoot)
   refusePresentInvalidIsolatedE2ePorts(checkoutRoot, config.e2e)
   const missing = refusePartialIsolatedE2ePorts(checkoutRoot, config.e2e)
@@ -167,7 +177,8 @@ async function publishOrAllocatePorts(claimRoot, checkoutRoot) {
     return ports
   }
   const held = await reserveUnclaimedApplicationPorts(
-    claimedPortSet(readPublishedE2ePortClaims(claimRoot))
+    claimedPortSet(readPublishedE2ePortClaims(claimRoot)),
+    listenPort
   )
   const ports = Object.fromEntries(
     E2E_PORT_FIELDS.map((field, index) => [field, held[index].port])
@@ -181,9 +192,12 @@ async function publishOrAllocatePorts(claimRoot, checkoutRoot) {
   }
 }
 
-export function ensureIsolatedE2ePorts(checkoutRoot, { claimRoot } = {}) {
+export function ensureIsolatedE2ePorts(
+  checkoutRoot,
+  { claimRoot, listenPort } = {}
+) {
   const root = claimRoot ?? defaultE2ePortClaimRoot()
   return withE2ePortClaimLock(root, () =>
-    publishOrAllocatePorts(root, checkoutRoot)
+    publishOrAllocatePorts(root, checkoutRoot, listenPort)
   )
 }
