@@ -14,7 +14,8 @@ scope: small
 Notebook owners can publish the delivered initial Readme/Note layouts below
 without splitting their authored commit. Story 6 extends this to three more
 small layouts exposed by the jap1 investigation. Story 7 joins two endpoint
-Notes and their Relationship in one initial publication. Preserve authored bytes and
+Notes and their Relationship in one initial publication. Story 8 places that
+connected set in one implied root Folder. Preserve authored bytes and
 accept the exact commit atomically. Arbitrary initial trees and bulk import
 remain deferred.
 
@@ -182,19 +183,79 @@ corrected by quick/091 (`5d2c5b3d9d`).
   admitted positions; generic initial-tree import; error-reporting redesign;
   performance guarantees or publishing the actual jap1 checkout.
 
+<a id="story-8"></a>
+
+### 8. Publish two related notes inside one new folder
+
+**Status:** postponed. [quick/096](../quick/096-initial-related-notes-in-folder/PLAN.md)
+is not execution-ready and must be revised after [SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9).
+The existing examples below preserve the intended user outcome; their exact
+counts must not be carried forward as production restrictions by default.
+
+- **Goal:** A notebook owner can publish a small connected set of locally
+  organized knowledge without flattening its Folder or splitting its commit.
+- **Scope:** An owner-authorized checkout bound to an empty notebook (no folders
+  or live notes; empty accepted tree) publishes one direct single-parent child of
+  current accepted main. Exactly four regular Markdown files: notebook `README.md`
+  with `type: Readme`, plus two `type: Note` files and one `type: Relationship`
+  file directly inside the same new root Folder. The Folder has no README.
+  Create one Folder, preserve all authored content and filename-derived titles,
+  place all three concepts inside it, and accept the exact commit atomically.
+- **Key examples:**
+  1. Add `README.md`, `Topic/A.md`, `Topic/B.md`, and
+     `Topic/A-related-to-B.md` in one commit. The Relationship carries
+     `relation: related-to`, `source: "[[Topic/A]]"`, and `target: "[[Topic/B]]"`.
+     Publish → one Topic Folder contains the three concepts; the notebook Readme
+     is preserved; download returns the exact head/tree, without adding
+     `Topic/README.md`.
+  2. Open the published Relationship → both path-qualified links lead to the
+     newly published Notes, even when the Relationship sorts before them.
+     Existing unresolved-link semantics still apply to absent endpoints; no
+     endpoint Notes are synthesized and endpoint existence is not an eligibility gate.
+  3. The Relationship has invalid authored `note_level` → deliberate rejection
+     with property context leaves no new Folder, Notes, reference rows, notebook
+     Readme or accepted-head change.
+- **Value / alternative:** This addresses the next structural gap after the
+  root-only mixed layout. Flattening into root would lose the author's grouping;
+  multiple publications would lose the single atomic commit. Raising another
+  file-count limit would not address folder placement.
+- **Assumptions:** Existing implied-Folder materialization, authored-document
+  persistence and Portable-path resolution suffice. Names and relationship kind
+  are examples, not hard-coded eligibility rules.
+- **Excluded:** Folder README; omitted notebook README; nested or multiple
+  Folders; concepts split between root and Folder; more Notes or Relationships;
+  existing-notebook updates; other new document types; attachments; history
+  reconciliation; new reference semantics; bulk import or performance guarantees;
+  publishing the actual jap1 checkout. Existing supported layouts remain supported.
+- **Safe stopping point:** A complete small grouped notebook is usable even if
+  later import work is cancelled. No other jap1 gap is required for this story.
+
+<a id="story-9"></a>
+
+### 9. Make initial notebook publication design cohesive
+
+**Moved:** The canonical story, whole Git workflow assessment, and refinement
+now live in [SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9).
+It remains the highest-priority product backlog item. This anchor is retained
+only for existing references; Story 8 remains postponed behind that work.
+
 ## Ordering and Scope Reduction
 
-Stories 1–7 and their eligibility corrections are delivered. Full initial
-import remains deferred.
+Stories 1–7 and their eligibility corrections are delivered. [SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9) has highest
+product-backlog priority by explicit developer direction. Story 8 / plan 096 is
+postponed behind it and requires revision before execution. Full initial import
+remains deferred.
 
 ## Open Decisions
 
-None.
+Story 9's initial-tree scope and correction order are selected. The remaining
+product decision concerns web-write synchronization coverage, recorded in [SEED-017 Story 9](SEED-017-cohesive-design-corrections.md#story-9).
 
 ## When to Surface
 
-Stories 1–7 are delivered. Additional content and bulk initial import remain
-separate problems.
+Review Story 9's executable plan next. Story 8 execution is postponed; its plan
+must be reconsidered after the cohesive initial-tree work. Pull and existing-note
+composition follow in their SEED-017 homes; bulk-import operations remain separate.
 
 ## Breadcrumbs
 
