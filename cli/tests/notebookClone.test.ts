@@ -78,7 +78,17 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
+        'one or more Markdown note deletions alone or together with same-path edits that leave existing links authored'
+      )
+    )
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
         'overwriting an existing note, and relocating or renaming together with a content edit in the same commit, are not supported yet'
+      )
+    )
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Separate identity-uncertain additions or moves from deletions; do not delete and recreate the note'
       )
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(

@@ -1,9 +1,10 @@
 # Publish compatible note deletions
 
 Source: [SEED-017 Story 2a](../../seeds/SEED-017-cohesive-design-corrections.md#story-2a).
-Status: in progress. Execution authorized on branch
+Status: done. All slices delivered on branch
 `quick/099-publish-compatible-note-deletions` in worktree
 `/Users/terryyin/git/doughnut-wt-099-publish-compatible-note-deletions`.
+Retain for retrospective and story wrap-up.
 
 ## Goal and scope
 
@@ -110,7 +111,7 @@ Existing CLI guidance is conservative until slice 2.
 
 ### 2. Explain compatible deletion publication in CLI guidance
 Type: Behavior
-Status: planned
+Status: done
 Depends on: slice 1
 Sizing: about 3–5 minutes including focused verification and cleanup; high confidence.
 
@@ -185,7 +186,8 @@ Do not mark the backlog story done or erase its history during planning.
 
 - Slice 1 delivered: admission generalized in `NotebookGitProposalTreeShape`;
   full `pnpm backend:test_only` passed in the linked worktree environment.
+- Slice 2 delivered: clone guidance documents batched deletions with same-path
+  edits and identity-uncertain separation; focused CLI vitest passed.
 - CI workflow `ci.yml` (`donut CI`) is push-to-`main` only; feature-branch
   pushes have no push-triggered CI observation coverage.
-- Refactor: removed story-leaking javadoc on the refusal helper; no further
-  cohesion edits.
+- Refactor: slice 1 removed story-leaking javadoc; slice 2 already clean.
