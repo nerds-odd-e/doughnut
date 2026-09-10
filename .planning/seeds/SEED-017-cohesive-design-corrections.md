@@ -181,6 +181,15 @@ Stories 1–4 in their developer-selected order.
   behavior and the installed CLI journey remain unchanged.
 - **Evaluation:** the retained controller proof covers the same observable
   contract and the required backend suite passes. No runtime saving is promised.
+- **Key examples:**
+  - Given an empty Git-backed notebook, when a proposal contains only
+    `Parent/Child/README.md`, publication creates the implied `Parent` Folder,
+    the authored `Child` Folder Readme, no notebook Readme and zero Note rows,
+    and the downloaded accepted tree exactly matches the proposal.
+  - Given an empty Git-backed notebook, when a proposal contains several
+    sibling and deeply nested Folder Readmes with or without a notebook Readme,
+    publication preserves the exact authored tree and content while creating
+    each implied Folder ancestor once and zero Note rows.
 - **Exclusions:** production changes, broader suite cleanup, E2E admission,
   populated-notebook publication and reconciliation changes.
 - **Execution plan:** [quick/098](../quick/098-consolidate-initial-container-publication-proof/PLAN.md).

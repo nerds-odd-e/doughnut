@@ -35,6 +35,7 @@ class NotebookGitProposalInitialContainerTreeControllerTest
 
   @ParameterizedTest
   @CsvSource({
+    "Parent/Child, false",
     "A|B|C, false",
     "A|B|C, true",
     "Parent/Child/Deep|Parent/Other|Sibling/Leaf, false",
@@ -84,6 +85,7 @@ class NotebookGitProposalInitialContainerTreeControllerTest
     }
     assertThat(folders, hasSize(expectedFolders.size()));
     assertThat(new TreeSet<>(pathsById.values()), equalTo(expectedFolders));
+    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
