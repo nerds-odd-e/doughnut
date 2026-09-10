@@ -138,24 +138,26 @@ around files, layers, components, specialists, or activities.
 
 Refine a slice when it has independent postconditions or proof loops, separable
 implementation beats before a green result, hidden preparation, low confidence
-at an execution or integration boundary, or a plausible path beyond the
-project's hard limit. Keep a multi-beat outside-in scenario explicitly
+at an execution or integration boundary, or, when a hard limit is supplied, a
+plausible path beyond it. Keep a multi-beat outside-in scenario explicitly
 unfinished until it is green; never make a CI-breaking state a delivery
 boundary.
 
 ## Size and escalate slices
 
 Use this project's slice target, hard limit, exceptions, and
-repeated-overrun threshold. Include implementation, focused verification, and
-slice-local cleanup in the sizing hypothesis. Resolve missing limits before
-claiming that a plan is ready for direct execution.
+repeated-overrun threshold when they are supplied. Include implementation,
+focused verification, and slice-local cleanup in the sizing hypothesis. Without
+a numeric target or hard limit, judge boundedness through the Behavior/Structure
+gate, one proof loop, and concrete execution or integration concerns; do not
+invent a timing policy or treat its absence as a refinement or readiness block.
 
-At the target, check for independent outcomes or hidden preparation and split
-when found. At the hard limit, stop unless a stated focused-test or external-wait
-exception applies. Preserve the learning and safely park or revert only
-attempt-owned work; preserve developer and unrelated work, and stop for human
-judgment when ownership is unclear. Renaming, retrying, or splitting a slice does
-not erase an overrun.
+At a supplied target, check for independent outcomes or hidden preparation and
+split when found. At a supplied hard limit, stop unless a stated focused-test or
+external-wait exception applies. Preserve the learning and safely park or revert
+only attempt-owned work; preserve developer and unrelated work, and stop for
+human judgment when ownership is unclear. Renaming, retrying, or splitting a
+slice does not erase an overrun.
 
 After a completed slice, update the same plan when evidence changes only its
 remaining slices. When evidence changes the story's goal, examples, scope, or

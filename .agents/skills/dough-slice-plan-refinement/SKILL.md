@@ -15,8 +15,8 @@ implement product code, or change the selected story outcome.
 ## Require a refinable plan
 
 Require an existing executable plan and this project's context required by
-[dough-slice-planning](../dough-slice-planning/SKILL.md), especially its target,
-hard limit, exceptions, overrun policy, and plan lifecycle.
+[dough-slice-planning](../dough-slice-planning/SKILL.md), especially any supplied
+target, hard limit, exceptions, overrun policy, and the plan lifecycle.
 
 - If no plan exists, use `dough-slice-planning`.
 - If a plan is marked as awaiting story refinement after resplitting, use
@@ -26,10 +26,10 @@ hard limit, exceptions, overrun policy, and plan lifecycle.
   [dough-story-refinement](../dough-story-refinement/SKILL.md).
 - If the parent problem, candidate selection, or sibling ordering must change,
   use [dough-story-decomposition](../dough-story-decomposition/SKILL.md).
-- If all remaining slices are already cohesive, single-proof-loop,
-  target-sized, and free of unexplained hard-limit paths, report
-  `ready for direct execution`; no further refinement is required. Execution
-  still requires separate authorization from the invoking workflow.
+- If all remaining slices are already cohesive and single-proof-loop, meet any
+  supplied target, and have no unexplained path beyond a supplied hard limit,
+  report `ready for direct execution`; no further refinement is required.
+  Execution still requires separate authorization from the invoking workflow.
 
 ## Refine the plan
 
@@ -48,8 +48,8 @@ Classify each remaining slice:
 
 | Result | Decision |
 | --- | --- |
-| **Ready** | One Behavior/Structure gate, one proof loop, cohesive path, and a plausible target-sized hypothesis |
-| **Refine** | Same story, but the slice has multiple beats, low confidence, or a target or hard-limit concern |
+| **Ready** | One Behavior/Structure gate, one proof loop, cohesive path, and a plausible hypothesis under any supplied target |
+| **Refine** | Same story, but the slice has multiple beats, low confidence, or a supplied target or hard-limit concern |
 | **Escalate** | Learning requires selected-story or parent-story review |
 
 Route Escalate through the input gate. Refine every Refine slice.

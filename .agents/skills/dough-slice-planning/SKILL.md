@@ -28,17 +28,28 @@ turn a decomposition seed directly into an execution plan.
 Before writing, identify from the user's instructions and this project's guidance:
 
 - the selected story and its seed, when one exists;
-- the executable-plan path, format additions, status vocabulary, and lifecycle;
-- the project's slice target and hard limit, including permitted
+- the executable-plan root, filename layout, format additions, status
+  vocabulary, and lifecycle;
+- any supplied slice target and hard limit, including their permitted
   exceptions and overrun escalation;
 - required verification, refactoring, commit, and review gates;
 - relevant code, tests, stack rules, and Accepted ADRs; and
 - any phase or quick-task conventions that own the plan.
 
-Resolve these from this project, not this skill's location. If the
-plan destination or slice budget is unavailable, name the missing
-context and stop before writing or claiming sizing readiness. Do not create a
-new plan under a deprecated or merely inferred location.
+Resolve these from this project, not this skill's location. First reuse a plan
+that is active under this project's status vocabulary and identifies the
+selected story. Otherwise, inspect the established plan entries in the known
+root: use the number after the highest allocated entry, preserving its numeric
+padding and path layout rather than filling an old gap. Immediately before
+writing, recheck the candidate path. If it is occupied, leave it unchanged,
+advance to the next number, and check again. Do not add allocation or locking
+tooling.
+
+If the canonical plan root is unavailable, name that missing context and stop
+before writing; do not ask for a plan number or invent a location. A missing
+numeric limit alone is not missing context: apply the linked sizing guidance
+without inventing a timing policy. Do not create a new plan under a deprecated
+or merely inferred location.
 
 ## Write the plan
 
@@ -63,8 +74,9 @@ broad implementation. Keep experiments off shared and production systems.
 Use [dough-slice-plan-refinement](../dough-slice-plan-refinement/SKILL.md) only
 when the reference's refinement conditions apply:
 
-- If all slices are cohesive, have one proof loop, meet this project's target,
-  and have no unexplained hard-limit path, report `ready for direct execution`.
+- If all slices are cohesive, have one proof loop, meet any supplied target,
+  and have no unexplained path beyond a supplied hard limit, report
+  `ready for direct execution`.
 - If any trigger remains, report
   `refinement recommended: <affected slices>`. Do not claim an execution-time
   guarantee.
