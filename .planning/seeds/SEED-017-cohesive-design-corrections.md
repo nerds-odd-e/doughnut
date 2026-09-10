@@ -181,23 +181,70 @@ queued corrections.
 ### Story 2a: Publish note deletions alongside compatible note changes
 
 - **Goal:** notebook owners can remove obsolete notes in one coherent commit,
-  including alongside ordinary additions or content edits, without splitting
+  including alongside content edits, without splitting
   each deletion into its own publication.
 - **Scope:** compose ordinary-note deletions with existing ordinary-note
-  additions/modifications at represented destinations. Preserve atomic
-  publication and existing deletion semantics. New folders and identity-preserving
-  moves are not additional delivery promises; ambiguous identity correspondence
-  must not silently become deletion/creation.
-- **Key example:** an accepted notebook contains A, B and C; publish one commit
-  deleting A and B and editing C. Both deletions and C's edit become accepted
-  together. An invalid member leaves the entire state unchanged. These counts
-  illustrate composition and do not cap eligibility.
+  modifications at represented destinations, including deletion-only batches.
+  Deletion-plus-addition combinations with uncertain identity are deferred for
+  this increment as described below. Preserve existing deletion semantics, retained
+  note identities and learning data, and atomic publication of the complete
+  candidate tree and accepted head. An invalid member rejects the whole
+  publication without changing accepted content or learning data.
+- **Identity boundary:** same-path edits retain identity. Existing supported
+  identity-preserving moves must continue to work; a removed/added equal-blob
+  correspondence must not be reclassified as independent deletion/creation just
+  because companion changes exist. Multiple possible correspondences must not
+  silently lose identity. Considering all changed notes is necessary even when
+  this increment does not promise to publish composed moves.
+- **Deferred promises:** new folders, broader folder operations, composed
+  identity-preserving moves (Story 2b), and changed-content move inference. These
+  are delivery boundaries, not reasons to introduce new blanket refusals or
+  regress already supported behavior.
+- **Key examples:**
+  - Accepted A, B and C → publish a commit deleting A and B and editing C →
+    both deletions and C's edit are accepted together; C retains its identity
+    and learning data. Multiple deletions without a companion edit work too.
+  - A deletion batch contains an otherwise invalid companion change → publish
+    → the entire publication is rejected and the accepted state stays unchanged.
+  - A removed note and added note have possible identity correspondence, with
+    unrelated edits also present → publication must preserve proven identity
+    through supported move behavior or refuse with an actionable reason; it
+    must not fall back to deleting and recreating that note. Ambiguous multiple
+    exact matches refuse atomically.
+  These examples establish composition and identity safety, not a fixed number
+  of operations or an exhaustive catalogue of eligible commit shapes.
 - **Evaluation:** owners observe the complete accepted tree through publication
-  and a receiving clone; retained notes keep their identities and learning data.
+  and a receiving clone. Proof must establish atomic acceptance/rejection and
+  preserved retained-note identities and learning data through public behavior.
+  Reuse existing proofs; replace obsolete isolated-deletion expectations while
+  retaining independently justified validation and identity safeguards.
+- **Planning and execution handoff — explicit user requirement (2026-09-11):**
+  this is an incremental step toward the complete feature. Generalize the
+  existing publication solution into one cohesive treatment of compatible note
+  operations; do not add a parallel deletion-batch pipeline, duplicate identity
+  or application rules, or dispatch by the exact example's counts/sequence.
+  Examples are evidence for domain rules. Slice planning must carry this
+  requirement explicitly, identify the existing concept that owns each rule
+  and the obsolete branches/tests/guidance to replace, and evaluate the
+  cumulative solution, including implicated unchanged code. Execution and its
+  refactoring/review must verify that the result integrates with existing
+  additions, edits, deletions and move handling. This does not authorize
+  implementing every deferred capability or prescribing a new framework.
 - **Safe stopping point:** deletion composition remains useful without move
   composition. No functional dependency on the folder story is asserted.
-- **Refinement status:** retained from the former combined Story 2; refine
-  mixed addition/deletion identity boundaries before executable planning.
+- **Planning boundary — mixed additions/deletions:** Git trees alone cannot reliably
+  distinguish independent delete/create from a move with rewritten content.
+  [Proposed ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md#infer-private-identity-from-commit-to-commit-changes)
+  calls for conservative refusal; it is proposed, not an Accepted constraint.
+  Following the recommendation and the user's instruction to proceed with
+  planning, use the conservative boundary: defer identity-uncertain
+  deletion-plus-addition combinations for this increment, narrowing the earlier
+  addition promise while delivering deletion batches with edits. This is the
+  working scope for this plan, not approval of ADR 0002. Do not
+  silently decide that unequal blobs prove independent new identity, invent a
+  similarity threshold, or leave "compatible additions" undefined in a PLAN.
+- **Refinement status:** refined for the conservative planning scope above.
+  Executable plan: [Publish compatible note deletions](../quick/099-publish-compatible-note-deletions/PLAN.md).
 
 <a id="story-2b"></a>
 
@@ -248,8 +295,9 @@ queued corrections.
 
 ## Execution readiness and design checks
 
-Stories 2a, 2b and 3–4 remain refinement input. The product backlog records
-the selected order.
+Story 2a has refined behavior and an executable plan using the conservative
+mixed-addition boundary. Stories 2b and 3–4 remain refinement input.
+The product backlog records the selected order.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
 
