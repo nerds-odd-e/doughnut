@@ -73,12 +73,12 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
 
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        'one or more edited existing ordinary Markdown notes at unchanged paths'
+        'a new folder README alone or together with ordinary notes in that folder'
       )
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        'creating a new or unrepresented folder, overwriting an existing note, and relocating or renaming together with a content edit in the same commit, are not supported yet'
+        'overwriting an existing note, and relocating or renaming together with a content edit in the same commit, are not supported yet'
       )
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(

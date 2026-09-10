@@ -44,3 +44,28 @@ clean solo re-run passing all tests.
     solo re-run passed 95/95.
   - Observed effect: two rounds of failure triage (checking for concurrent
     processes, re-running solo) before trusting the test suite's result.
+
+## DD-003 — Coordinator delivered slices past the 10-minute refine-in-place stop when proofs were green
+
+The execute-plan contract required stopping safely and refining the same plan
+when active work exceeded its hypothesis or 10 minutes. The coordinator instead
+recorded the overrun and continued wrap-up because proofs were already green.
+
+### Occurrences
+
+- Execution: SEED-017 Story 2 / quick-100-publish-folder-and-notes / d0e6ae6a2c
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.8
+  - Evidence: PLAN slice 4 Actual "~12 minutes active (over 10-minute hard
+    limit; converged as one shared application owner — did not revert)"; slice 5
+    Actual "~25 minutes active (over hypothesis and 10-minute hard limit; ...
+    Converged with both proofs green — did not revert)"; coordinator turn after
+    slice 4 ("Slice 4 ran long (~12 minutes). I'll inspect the change for
+    coherence, then decide whether to deliver or refine.") followed by
+    status=done wrap-up rather than in-place refinement.
+  - Observed effect: two consecutive slices were committed without splitting or
+    refining the remaining work, despite the plan's own stop rule.
+  - Inference: green proofs were treated as permission to skip refine-in-place.
+    The 4–5 minute structure-slice hypotheses were also systematically low
+    (recorded active times 6, 8, 7, then 12 minutes).
