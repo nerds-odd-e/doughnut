@@ -19,6 +19,24 @@ stop or unresolved proof failure prevents that delivery. Resolve routine naming,
 placement, test choices, minor refactoring, and defects caused by the current
 change within the authorized scope.
 
+## Resolve a disputed plan restriction
+
+Use [examples and constraints](../../dough-story-refinement/references/planning.md#examples-and-constraints)
+when a plan requires rejection that appears supported only by fixture counts or
+arrangements. Cite the exact plan contract and the conflicting story examples,
+deferred promises, or domain evidence. State what behavior the proposed change
+would alter and ask the human to resolve the restriction. Missing independent
+justification is grounds for this question, even when the error seems clear;
+it is not permission to remove the restriction.
+
+Stop the conflicting implementation, refactor, or correction-planning path and
+leave disputed behavior unchanged. Return the evidence and decision needed in
+the existing handoff or active plan. A behavior-preserving refactor cannot remove
+a contractual rejection, and passing tests or plan compliance do not justify it.
+Retain independently supported product constraints; a count limit is not
+accidental merely because examples also have counts. Resume the disputed path
+only under the human's decision, keeping the story and plan aligned.
+
 ## Diagnose failed proof
 
 For CI events, first use [CI observation and repair](ci-monitor.md#handle-a-notification).

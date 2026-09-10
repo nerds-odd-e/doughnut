@@ -4,14 +4,11 @@ status: dormant
 planted: 2026-09-04
 trigger_when: when execution efficiency is selected for improvement
 scope: medium
-consolidated: 2026-09-06
 ---
 
 # SEED-010: Remaining execution-efficiency findings
 
-P1 findings and their evidence now live in
-[SEED-012](SEED-012-priority-execution-process-improvements.md).
-This seed retains lower-priority proposals; none is an executable plan.
+These lower-priority proposals are not an executable plan.
 
 ## Established baseline
 

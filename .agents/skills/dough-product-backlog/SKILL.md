@@ -16,23 +16,18 @@ Before editing, identify from human instructions or repository guidance:
 
 If the backlog or required seeds cannot be identified, ask for the missing
 context and stop before editing. If a required workflow is unavailable, stop
-that activity and ask for its guidance. Allow removed seeds only for Recently
-done entries as described below.
+that activity and ask for its guidance.
 
 ## File layout
 
-- Place **Near-future direction** immediately after the title, the **Backlog
-  list** next, and **Recently done** last.
+- Place **Near-future direction** immediately after the title and the **Backlog
+  list** next. Do not add a finished-list or recently-done section.
 - Use bullet lists. Do not number items. Put the highest-priority backlog item first.
 - In the backlog list, include only each exact story title linked to its heading
   or stable anchor, plus its seed ID. Keep story details, estimates, dependencies,
   and status in the story's section within its seed.
 - Select stories for the backlog list; do not inventory every candidate or turn
   the list into a roadmap or execution plan.
-- Keep the ten most recently completed items in Recently done, newest first;
-  keep all if fewer than ten. Use linked titles and seed IDs while seeds exist.
-  If a completed story's seed has been removed, keep only its exact title as
-  plain text. Use Git history to recover its definition or refinement if needed.
 
 ## Near-future direction
 
@@ -68,21 +63,21 @@ done entries as described below.
 
 ## Complete items
 
-- On completion, verify evidence, record completion in the story's section
-  within its seed, and move the entry to the top of Recently done. If this creates
-  eleven entries, remove only the oldest history entry. Retain the completion
-  record in the story's section within its seed.
-- If a completed story's seed is later removed, retain its title in Recently done
-  without the link or seed ID. Do not remove it before it ages out of the last ten.
+- Completed-story closure belongs to
+  [dough-story-wrap-up](../dough-story-wrap-up/SKILL.md). Do not record a
+  completion chronicle in the seed or move the item onto a finished list.
+- Standalone maintenance may remove a completed item from the active queue when
+  the human asks only for queue maintenance. Leave plan, seed, and proof
+  deletion to wrap-up. Do not create a recently-done or tombstone entry.
 
 ## Check and report
 
-- Check exact titles, links, duplicate outcomes, and prerequisite order. For a
-  removed completed-story seed, check the retained title against Git history
-  when needed; do not leave a broken link.
+- Check exact titles, links, duplicate outcomes, and prerequisite order.
 - Check section order, bullet formatting, and direction alignment when present.
   Confirm the direction is unchanged unless explicitly instructed by a human.
-- Check Recently done contains at most ten completions, newest first.
+- Do not require a recently-done section. If one exists from earlier guidance,
+  leave unrelated entries for wrap-up rather than converting them into a new
+  finished-list requirement.
 - Summarize changes and reasons briefly.
 - Follow commit conventions when authorized. Backlog maintenance alone does not
   authorize a commit or push.

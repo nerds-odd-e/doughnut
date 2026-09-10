@@ -17,7 +17,10 @@ coordinator owns delivery; implementation agents return uncommitted changes.
 Read the plan and the selected story in its seed. Require an understood story
 and executable slices; a seed supplies story context, not execution instructions.
 Use [planning scope and lifecycle](../dough-story-refinement/references/planning.md)
-for story ownership, proof, plan updates, and completion cleanup. Use
+for story ownership, proof, and plan updates. Keep the completed plan and
+review evidence for retrospective and
+[dough-story-wrap-up](../dough-story-wrap-up/SKILL.md); do not delete spent
+story history here. Use
 [slice decomposition](../dough-story-decomposition/references/problem-decomposition.md#decompose-slices)
 for Behavior and Structure slices, sizing, and learning escalation.
 
@@ -69,8 +72,9 @@ On completion, a stop requiring human judgment, or cancellation, close the CI
 observer through the current host adapter. Handle delivered failures, then
 stop observers without waiting for CI. Report pending CI as unobserved.
 
-When all slices are done, apply the planning reference's completion cleanup and
-report completed slices, retained evidence, and observer shutdown. End with
+When all slices are done, leave the completed plan and review evidence in
+place for retrospective and story wrap-up. Report completed slices, retained
+evidence, and observer shutdown. End with
 `## PLAN EXECUTION COMPLETE` only after required delivery and shutdown succeed.
 
 Otherwise report the active plan, next unfinished slice, preserved work and

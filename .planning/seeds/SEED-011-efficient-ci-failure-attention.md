@@ -51,9 +51,9 @@ its linked host adapters.
 **Status:** valid, narrowed, and deferred by developer discussion on 2026-09-06.
 Medium importance; low immediate urgency.
 
-The narrow lost-handle observer-shutdown subset is now selected in
-[SEED-012 Story 6](SEED-012-priority-execution-process-improvements.md#story-6)
-and quick 015. Its bounded scope does not select the remaining repair work here.
+The narrow lost-handle observer-shutdown subset is now provided by the Open Dough
+[Codex CI notification adapter](../../.agents/skills/dough-execute-plan/references/ci-notify-codex.md#codex-ci-notification-adapter).
+Its bounded scope does not select the remaining repair work here.
 
 **Goal:** Keep every reported failure accounted for until it is resolved or
 explicitly handed over, preserving ongoing work across repair and context resets.
