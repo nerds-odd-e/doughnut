@@ -164,8 +164,8 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 
 The active stories below cover independent correction outcomes. Each retains
 its own scope and proof; this seed is not a cross-subsystem executable plan.
-The remaining stories start with move composition (2b), then the existing
-infrastructure corrections (3–4). The product backlog owns priority.
+The remaining stories are infrastructure corrections (3–4). The product
+backlog owns priority.
 
 ## Open product decision
 
@@ -174,99 +174,6 @@ should the product deliberately expose a partial synchronization boundary?
 Normal web authoring participation needs separate user outcomes; do not silently
 rebuild accepted history from live state. This question does not block the
 queued corrections.
-
-<a id="story-2b"></a>
-
-### Story 2b: Publish unambiguous note moves alongside compatible note changes
-
-- **Goal:** notebook owners can rename or relocate a note while making other
-  compatible note changes in the same commit, retaining its learning history.
-- **Scope:** publish unambiguous unchanged-content ordinary-note moves/renames
-  at represented destinations together with compatible ordinary-note changes.
-  A move retains the server-side note identity and learning data while changing
-  its Portable path/title/parent as appropriate. Companion edits retain their
-  identities; companion additions and deletions retain their existing semantics.
-  The whole publication is accepted atomically.
-- **Identity and composition rules:** compare the complete sets of removed and
-  added ordinary-note paths in the accepted-to-proposed tree difference. An
-  unchanged-content move has exactly one removed source and one added destination
-  with the same complete Git blob (including frontmatter). Same-path edits and
-  unchanged notes already have path correspondence and are not move candidates,
-  even when their contents equal a candidate's. Multiple distinct unique pairs
-  can compose; total diff size and ordering do not decide eligibility.
-  Resolve correspondence before treating remaining paths as additions/deletions.
-  Remaining same-path edits, additions alone, or deletions alone can accompany
-  those moves. If unmatched removals and unmatched additions both remain,
-  preserve refusal: the proposal cannot establish whether they are independent
-  delete/create operations or changed-content moves. Do not guess that intent.
-- **Justified rejection constraints:** when a blob occurs on both candidate
-  sides but has multiple removed sources or added destinations, identity is
-  ambiguous. Refuse the complete publication, even if other pairs are unique;
-  never choose by filename similarity, iteration order, or Git rename heuristics,
-  and never silently replace ambiguous identities by deletion/creation.
-  Preserve existing ancestry, ownership, Portable-format and destination
-  validation, including occupied/retained-deleted destination conflicts.
-  Validation considers the whole proposed result before acceptance; ambiguity
-  or an invalid companion change leaves accepted history and notebook state,
-  including identities and learning data, unchanged.
-- **Key examples (precondition → publish → result):**
-  - A and B exist and A has learning history → rename A to D without changing
-    its blob and edit B in the same commit → D keeps A's identity and learning
-    data, B keeps its identity, and a receiving clone sees both accepted changes.
-  - A and C have different blobs and the destination folders already exist →
-    rename A to D, relocate C into an existing folder, and edit B → both moved
-    notes retain their own identities and learning data; all changes succeed
-    together. This demonstrates composition, not a two-move limit.
-  - A's move to D is unique → accompany it with a new unrelated note E, or
-    alternatively deletion of unrelated C → accept the complete result with
-    existing creation/deletion semantics. An unchanged note sharing A's blob
-    does not make A's removed-to-added correspondence ambiguous.
-  - A and C have identical blobs → remove both and add D with that blob →
-    refuse without changing state because D has two possible source identities.
-    Removing A and adding two identical destinations is likewise ambiguous;
-    two sources and two destinations with the same blob do not resolve it.
-  - A to D is unique, but C is removed and E is added with different content →
-    refuse the whole publication because the remaining C/E identity intent is
-    unproven. Likewise, a valid move plus an invalid destination or invalid
-    companion edit accepts nothing.
-- **Evaluation:** one representative publication/receiving-clone workflow proves
-  composition and the complete Portable result. Focused tests at the existing
-  publication boundary prove identity/learning preservation, multiple unique
-  moves, companion operation semantics, complete-candidate ambiguity and atomic
-  refusal. Reuse existing isolated rename/relocation, deletion/edit and
-  destination-validation proofs; add missing observable coverage rather than
-  a test surface per internal helper. Do not require an E2E test per permutation.
-- **Planning and execution handoff — explicit user intent (2026-09-11):**
-  this story incrementally completes the notebook synchronization feature.
-  Generalize the existing publication solution into one cohesive capability;
-  do not add a handler for exactly “rename A plus edit B” or mirror story/example
-  boundaries in production architecture. Keep correspondence rules in one place,
-  reuse existing identity-preserving mutation, validation and atomic application,
-  and remove superseded isolated-rename/count gates and duplicate mechanisms.
-  Slice planning must identify the affected existing callers, tests, diagnostics
-  and documentation to align, and describe the cumulative final design.
-  Execution must review the aggregate change and implicated unchanged code for
-  duplication and competing rules. Examples establish promises, not count limits;
-  retain refusals only for independently justified identity/product constraints.
-  This handoff sets design expectations without prescribing classes or slices.
-- **Deferred promises:** changed-content move inference, folder-subtree expansion,
-  new-folder destinations, path swaps/overwrites, automatic reference rewriting,
-  and broader pull/rebase reconciliation. Preserve existing supported folder-move
-  behavior. Deferral does not introduce new rejection rules for otherwise
-  compatible behavior or promise the complete synchronization contract.
-- **Accepted ADRs:** [0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-  preserves Portable paths, filename titles, authored content and validation;
-  it does not decide identity correspondence. [0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md)
-  preserves visible failures and purposeful rejection handling. ADR 0002 remains
-  Proposed and is context, not authority for extending this story.
-- **Safe stopping point:** owners can compose proven note moves without broader
-  folder-move or changed-content identity inference.
-- **Dependencies:** builds on delivered ordinary-note deletion/edit composition
-  (former Story 2a) and existing isolated identity-preserving rename/relocation.
-- **Refinement status:** refined; no unresolved product-scope decisions for this
-  bounded delivery. Executable plan:
-  [Publish compatible note moves](../quick/101-publish-compatible-note-moves/PLAN.md).
-  Implementation has not been requested.
 
 <a id="story-3"></a>
 
@@ -357,8 +264,7 @@ queued corrections.
   and unchanged safety/lifecycle guarantees even if no further specs are added.
 - **Effort hypothesis:** M, medium confidence; setup-time versus `before:run`
   resource timing is the main integration consideration for slice planning.
-- **Dependencies and parallelism:** no functional dependency on Story 2b.
-  Can execute alongside notebook publication in a separate owning worktree
+- **Dependencies and parallelism:** can execute in a separate owning worktree
   after planning. Coordinate shared seed/backlog edits and do not overlap
   mutable test resources. Avoid concurrent edits to the lifecycle mechanism
   selected for Story 4.
@@ -379,9 +285,8 @@ queued corrections.
 
 ## Execution readiness and design checks
 
-Story 3 has an executable plan for its bounded architectural correction.
-Story 2b has an executable slice plan; Story 4 remains refinement
-input. The product backlog records the selected order.
+Story 3 has an executable plan for its bounded architectural correction. Story
+4 remains refinement input. The product backlog records the selected order.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
 

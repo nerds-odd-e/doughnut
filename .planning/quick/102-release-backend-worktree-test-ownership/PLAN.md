@@ -1,9 +1,10 @@
 # Release backend worktree test ownership after execution
 
-Source: execution retrospective for
-[SEED-017 Story 2b](../../seeds/SEED-017-cohesive-design-corrections.md#story-2b)
-and quick plan 101, reviewed through commits `8983d9db3f`, `65d88f55cc`,
-`be76f0d471`, and `1833e29ead`.
+Source: execution retrospective for quick plan 101 and SEED-017 Story 2b,
+recoverable from before-cleanup commit `056ddef4ba` at
+`.planning/quick/101-publish-compatible-note-moves/PLAN.md` and
+`.planning/seeds/SEED-017-cohesive-design-corrections.md`; reviewed through
+commits `8983d9db3f`, `65d88f55cc`, `be76f0d471`, and `1833e29ead`.
 
 Status: planned. Retrospective correction planning authorized 2026-09-11;
 implementation not requested.
