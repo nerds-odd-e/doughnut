@@ -22,7 +22,6 @@ changes.
 
 ## Taken
 
-- [Publish note deletions alongside compatible note changes](seeds/SEED-017-cohesive-design-corrections.md#story-2a) — SEED-017
 - [Declare isolated test capabilities in one place](seeds/SEED-017-cohesive-design-corrections.md#story-3) — SEED-017
 
 ## Backlog

@@ -44,26 +44,3 @@ clean solo re-run passing all tests.
     solo re-run passed 95/95.
   - Observed effect: two rounds of failure triage (checking for concurrent
     processes, re-running solo) before trusting the test suite's result.
-
-## DD-003 — Feature-branch delivery against main-only push CI leaves the merge push unobserved
-
-This repository's `ci.yml` (`donut CI`) triggers only on push to `main`.
-Executing on a feature branch, pushing that branch, then merging to `main`
-and shutting the CI observer at plan completion means the CI-triggering
-push is never observed for repair.
-
-### Occurrences
-
-- Execution: SEED-017 Story 2a / quick/099-publish-compatible-note-deletions / c5c9f2d990
-  - Tool: Cursor
-  - Model: Composer
-  - Open Dough release: 0.3.8
-  - Evidence: PLAN learnings recorded main-only CI; feature-branch pushes
-    to `quick/099-publish-compatible-note-deletions` had no push-triggered
-    workflow; after fast-forward to `main` and push, observer stop reported
-    `pendingCi: unobserved` with `recordedThrough: 0`.
-  - Observed effect: delivery completed without asynchronous CI failure
-    coverage on either the feature-branch pushes or the main merge push.
-  - Inference: for worktree→merge-to-main workflows here, attach observation
-    to `main` for the merge push (or accept unobserved CI explicitly); do not
-    treat feature-branch observer setup as coverage.
