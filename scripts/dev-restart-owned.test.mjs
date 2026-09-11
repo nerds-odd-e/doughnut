@@ -99,3 +99,153 @@ test('owned Development group is stopped, waits for free ports, then starts', as
   assert.equal(startOpts[0]?.checkoutRoot, checkout.root)
   assert.equal(occupiedUntilSignalled, false)
 })
+
+test('TERM-resistant Development group is killed before replacement starts', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const runtimeTarget = targetFor(checkout.root, {
+    backendPort: await allocateFreePort(),
+    vitePort: await allocateFreePort(),
+    lbListenPort: await allocateFreePort(),
+  })
+  const groupId = 92001
+  writeFileSync(runtimeTarget.pidFile, String(groupId))
+  const kill = trackingKill()
+  const start = makeStartSpy()
+
+  const code = await runDevRestart({
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    isProcessAliveFn: () =>
+      !kill.calls.some(({ signal }) => signal === 'SIGKILL'),
+    getListenerPidsFn: listenersForPorts(
+      new Map([[runtimeTarget.backendPort, [92002]]])
+    ),
+    isOwnedByApplicationTreeFn: async () => true,
+    killFn: kill.killFn,
+    descendantPidsFn: async () => [92002],
+    stopTimeoutMs: 0,
+    isPortOccupiedFn: async () => false,
+    runDevStartFn: async () => {
+      start.calls.push(['runDevStart'])
+      assert.ok(kill.calls.some(({ signal }) => signal === 'SIGKILL'))
+      return 0
+    },
+  })
+
+  assert.equal(code, 0)
+  assert.equal(start.calls.length, 1)
+})
+
+test('Development process disappearing during signalling is tolerated', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const runtimeTarget = targetFor(checkout.root, {
+    backendPort: await allocateFreePort(),
+    vitePort: await allocateFreePort(),
+    lbListenPort: await allocateFreePort(),
+  })
+  const groupId = 93001
+  writeFileSync(runtimeTarget.pidFile, String(groupId))
+  const start = makeStartSpy()
+  let livenessChecks = 0
+
+  const code = await runDevRestart({
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    isProcessAliveFn: () => livenessChecks++ === 0,
+    getListenerPidsFn: listenersForPorts(
+      new Map([[runtimeTarget.backendPort, [93002]]])
+    ),
+    isOwnedByApplicationTreeFn: async () => true,
+    killFn: () => {
+      const error = new Error('already gone')
+      error.code = 'ESRCH'
+      throw error
+    },
+    descendantPidsFn: async () => [93002],
+    isPortOccupiedFn: async () => false,
+    runDevStartFn: async () => {
+      start.calls.push(['runDevStart'])
+      return 0
+    },
+  })
+
+  assert.equal(code, 0)
+  assert.equal(start.calls.length, 1)
+})
+
+test('persistent Development liveness after KILL rejects without starting', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const runtimeTarget = targetFor(checkout.root, {
+    backendPort: await allocateFreePort(),
+    vitePort: await allocateFreePort(),
+    lbListenPort: await allocateFreePort(),
+  })
+  const groupId = 94001
+  writeFileSync(runtimeTarget.pidFile, String(groupId))
+  const kill = trackingKill()
+  const start = makeStartSpy()
+
+  await assert.rejects(
+    runDevRestart({
+      checkoutRoot: checkout.root,
+      runtimeTarget,
+      isProcessAliveFn: () => true,
+      getListenerPidsFn: listenersForPorts(
+        new Map([[runtimeTarget.backendPort, [94002]]])
+      ),
+      isOwnedByApplicationTreeFn: async () => true,
+      killFn: kill.killFn,
+      descendantPidsFn: async () => [94002],
+      stopTimeoutMs: 0,
+      runDevStartFn: async () => {
+        start.calls.push(['runDevStart'])
+        return 0
+      },
+    }),
+    /did not exit after SIGKILL within the bounded wait/
+  )
+
+  assert.ok(kill.calls.some(({ signal }) => signal === 'SIGKILL'))
+  assert.equal(start.calls.length, 0)
+})
+
+test('Development shutdown propagates liveness permission errors', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const runtimeTarget = targetFor(checkout.root, {
+    backendPort: await allocateFreePort(),
+    vitePort: await allocateFreePort(),
+    lbListenPort: await allocateFreePort(),
+  })
+  const groupId = 95001
+  writeFileSync(runtimeTarget.pidFile, String(groupId))
+  const kill = trackingKill()
+  const start = makeStartSpy()
+  const permissionError = Object.assign(new Error('not permitted'), {
+    code: 'EPERM',
+  })
+  let livenessChecks = 0
+
+  await assert.rejects(
+    runDevRestart({
+      checkoutRoot: checkout.root,
+      runtimeTarget,
+      isProcessAliveFn: () => {
+        if (livenessChecks++ === 0) return true
+        throw permissionError
+      },
+      getListenerPidsFn: listenersForPorts(
+        new Map([[runtimeTarget.backendPort, [95002]]])
+      ),
+      isOwnedByApplicationTreeFn: async () => true,
+      killFn: kill.killFn,
+      descendantPidsFn: async () => [95002],
+      runDevStartFn: async () => {
+        start.calls.push(['runDevStart'])
+        return 0
+      },
+    }),
+    (error) => error === permissionError
+  )
+
+  assert.equal(start.calls.length, 0)
+})

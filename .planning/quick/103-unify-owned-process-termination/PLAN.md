@@ -3,7 +3,7 @@
 Source: [SEED-017, Story 4](../../seeds/SEED-017-cohesive-design-corrections.md#story-4), audit finding F4 in the same seed.
 Provenance: SUT descendant shutdown in 072 (`392599bf16`, `d191a6b33d`), Development in 095 (`149809803a`); original audit at `6876f46de098cf6b41dfcae7b2a2a0bebb7c16ec`.
 
-Status: in progress. Slice 1 delivered locally; Slice 2 remains planned.
+Status: complete. Both slices delivered and focused proof passed.
 
 ## Execution identity
 
@@ -121,8 +121,15 @@ stop and refine before expanding implementation.
 
 ### 2. Terminate recorded owned trees through the same mechanism
 Type: Structure
-Status: planned
+Status: done
 Proof: Development restart/refusal examples in the table pass, SUT checks remain green, and source review confirms F4's duplicate progression is gone.
+
+Delivered proof (2026-09-11):
+
+```text
+CURSOR_DEV=true nix develop -c node --test scripts/dev-restart.test.mjs scripts/dev-restart-owned.test.mjs scripts/sut-isolated-start-release.test.mjs scripts/sut-services.test.mjs scripts/sut-services-child-exit.test.mjs scripts/sut-isolated-restart.test.mjs scripts/isolated-cypress-openai-mock-cancel.test.mjs scripts/isolated-cypress-openai-mock-failure.test.mjs
+26 tests passed. This covers Development normal shutdown, TERM-resistant escalation before replacement start, disappeared processes, bounded post-KILL failure without restart, permission-error propagation, ownership refusals, free-port/restart ordering, and the retained SUT/private-mock lifecycle proof.
+```
 
 Complete F4: adapt the recorded PID/group entry to the shared mechanism and
 remove Development's duplicate signal/wait/escalation functions. Keep
@@ -170,6 +177,15 @@ Ready for direct execution when separately authorized. No further refinement
 or story resplit is indicated by this assessment. This is a sizing hypothesis,
 not measured implementation time; apply the stop/refinement rule if disproved.
 
+Final design account: `owned-process-tree-termination.mjs` owns the single
+descendant-capture, TERM/wait, KILL/wait and bounded-failure progression. The
+former parallel loops in the SUT and Development adapters are gone; each adapter
+retains only its genuine root signalling, liveness and diagnostic semantics.
+Ownership proof remains an invariant enforced before either adapter is called,
+so unrelated processes and environment resources remain outside the mechanism.
+The focused SUT lifecycle and Development restart/refusal boundaries above prove
+the adapters compose without bypassing awaited cleanup or failure propagation.
+
 On authorized execution, move only this story to Taken and follow
 `dough-execute-plan`: Jidoka, fresh `dough-post-change-refactor` agent, API
 generation if actually implicated, one coordinator formatting pass via
@@ -181,3 +197,4 @@ CI handling. Retain plan/seed evidence through retrospective and story wrap-up.
 - Slice 1 reused the existing SUT process fixtures. A readiness handshake was needed so the TERM-resistant descendant installs its handler before the test can trigger cleanup; no general process simulator was needed.
 - The disposable supervisor can deterministically exercise the real 5,000 ms TERM plus 1,000 ms KILL failure bound by replacing only the subprocess's OS signal boundary. The production supervisor logs cleanup failure, exits nonzero, and retains ownership as required by ADR 0006 and ADR 0007.
 - The execution worktree initially lacked ignored dependencies; the unchanged focused command passed after a temporary dependency link was supplied and removed. No production or proof boundary changed.
+- Slice 2 needed no new harness: existing `runDevRestart` seams expressed escalation, disappearance, persistent liveness and permission failure directly. Aggregate review confirmed no owned-tree termination progression remains duplicated in the two environment adapters.
