@@ -279,6 +279,8 @@ are execution choices to document; story 3's time target remains deferred.
 
 Executable plan: [Profile large notebook publication](../quick/106-profile-large-notebook-publication/PLAN.md).
 
+Reusable infrastructure and capture data: [Notebook publication profiling](../../docs/notebook-publication-profiling.md#representative-fixture-runner).
+
 <a id="story-3"></a>
 
 ### 3. Publish large notebook commits within a practical measured time

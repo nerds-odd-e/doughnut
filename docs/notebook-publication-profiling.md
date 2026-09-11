@@ -153,3 +153,33 @@ The hook retained `2026-09-11T10-16-58.885Z/incomplete.jfr` and an incomplete re
 `CURSOR_DEV=true nix develop -c jcmd 2406 JFR.check` then reported no recordings.
 The temporary failing assertion was removed. This proves cleanup preserves the
 original failed result rather than converting it to success.
+
+## Representative fixture runner
+
+The same opt-in command now seeds 20 existing concepts, 20 additions and 20
+`group-00` through `group-19` folders by default. Set
+`PUBLICATION_PROFILE_EXISTING`, `PUBLICATION_PROFILE_ADDITIONS` and
+`PUBLICATION_PROFILE_FOLDERS` before the command to scale them. Each group gets
+indices modulo the folder count; every concept has one alias, one meaning,
+three YAML wiki references and two body references, plus 32 repeated prose
+sentences (roughly 1 KiB). Existing concepts link cyclically to existing concepts;
+additions link to existing concepts and the next addition. The background also
+retains Overview, Pasta, Recipes, Kitchen and their Readmes. One existing concept
+has an UNDERSTANDING learning tracker captured in metadata.
+
+Fixture preparation, assimilation and binding resnapshot finish before cloning.
+Proposal author/committer identity is Donut E2E <donut-e2e@example.com>, dates
+2000-01-01 UTC. Backend fixture clock is 1976-06-01 12:00; the server's baseline
+commit can still vary. `baselineFingerprint` and `proposalFingerprint` are SHA-256
+of recursive Git tree listings (paths, modes and content blob IDs), excluding
+volatile database IDs and commit dates. They establish logical content identity.
+`timing.json` measures installed CLI execution, including its bundle preparation;
+it is separate from fixture setup and JFR recording, not HTTP-only timing.
+Metadata includes actual MySQL server version, JVM flags/version, source revision,
+application logging configuration and explicit warm-up policy. The learning
+tracker and its linked existing-note identity are captured in metadata.
+
+Repeat the command to reset the owned database and rebuild this logical fixture.
+No explicit warm-up is performed; the same healthy JVM remains running. This
+synthetic content is not a measurement of jap3's distribution. Large runs and
+rejection/preserved-state proof remain separate execution steps.

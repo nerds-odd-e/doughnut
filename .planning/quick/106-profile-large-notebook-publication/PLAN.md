@@ -126,7 +126,7 @@ and returned `REFACTOR COMPLETE`. No product/API changes.
 
 ### 3. Repeat a representative publication from a fingerprinted baseline
 Type: Behavior
-Status: planned
+Status: done
 Proof: A parameterized small-scale run creates the documented existing-note
 baseline, publishes deterministic additions, verifies accepted content and head,
 and repeats after reset with the same logical fixture fingerprint.
@@ -134,12 +134,32 @@ and repeats after reset with the same logical fixture fingerprint.
 Extend the same fixture/capture workflow to the documented content distribution,
 fixed Git identity/dates, existing learning record and parameterized counts.
 Record exact implemented distribution and representativeness limits. Capture
-request timing separately from setup and JFR interval, result/head, fixture
+CLI execution timing separately from setup and JFR interval, result/head, fixture
 fingerprint, revision, MySQL/JVM versions, logging and warm-up settings.
 Keep scripts/summaries in Git and raw recordings in the documented persistent
 location. Record reset commands and links from story 2.
 Estimate: 5–10 minutes active; fixture setup/request/test runtime exempt.
 Safe stop: reusable representative valid baseline, no 10,000-note measurement yet.
+
+Proof: same focused `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose tags=@publicationProfile`
+passed twice, with reset. Captures `2026-09-11T10-25-25.854Z` and
+`2026-09-11T10-26-02.055Z` have accepted 20-document byte checks, CLI intervals
+591/702 ms, JFR intervals 951/1127 ms, MySQL server 8.4.11, and identical:
+
+- Baseline fingerprint `a5cc67ce633434bdee57221f3b040912b3773d021668c4e96898d2ae4af0b3c8`;
+- Proposal fingerprint `6b977c13512adb8990aa0b1b707acd081584ad8968f412ce9219ede798b244b5`;
+- Baseline head `650445c7f56dde3ed3afbf4f1ca8e94794757b0c`;
+- Accepted head `62940858301bcc5c0f4bc7ab32e16a979bf311bd`.
+
+20 existing + 20 additions across 20 folders, plus original feature background.
+Fixed backend fixture clock and proposal dates, UNDERSTANDING tracker captured.
+Approximately 10 minutes active; test runtime exempt. Diagnosed and corrected
+default import, tracker enum and eager resnapshot SDK invocation (now queued
+after seeding). Failed attempts retained incomplete; repeated successful runs
+prove the corrected ordering. Fresh refactor changed documentation precision
+only, returned `REFACTOR COMPLETE`; original proof remains valid.
+Timing wording clarifies the original planned CLI boundary: HTTP-only timing
+belongs to a longer-wait harness if the existing 60-second CLI E2E wait is exceeded.
 
 ### 4. Measure rejection and verify preserved baseline state
 Type: Behavior

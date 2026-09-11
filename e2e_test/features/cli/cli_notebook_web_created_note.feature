@@ -261,11 +261,12 @@ Feature: CLI notebook web-created note
 
   @publicationProfile
   Scenario: Measuring a small publication on an owned disposable backend
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    When I seed the representative publication baseline
+    And I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
     And I prepare the small deterministic publication profile
     And I start recording the owned publication JVM
-    And I publish the cloned checkout using the installed CLI
+    And I publish and time the profiling proposal
     And I stop recording the owned publication JVM
     Then the installed CLI reports the committed change as the accepted head
     When I pull the second cloned checkout using the installed CLI

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -57,8 +58,73 @@ export function notebookPublicationProfileTasks(
     if (capture?.recordingActive)
       stopRecording(join(capture.directory, 'incomplete.jfr'))
   })
+  const parameters = {
+    existing: Number(process.env.PUBLICATION_PROFILE_EXISTING ?? 20),
+    additions: Number(process.env.PUBLICATION_PROFILE_ADDITIONS ?? 20),
+    folders: Number(process.env.PUBLICATION_PROFILE_FOLDERS ?? 20),
+  }
+  function git(checkoutDir: string, ...args: string[]) {
+    return execFileSync('git', ['-C', checkoutDir, ...args], {
+      encoding: 'utf8',
+    }).trim()
+  }
   return {
-    async startNotebookPublicationProfile() {
+    notebookPublicationProfileParameters() {
+      if (
+        Object.values(parameters).some(
+          (value) => !Number.isInteger(value) || value < 1
+        )
+      )
+        throw new Error('Profile counts must be positive integers')
+      return parameters
+    },
+    normalizeNotebookPublicationProposal(checkoutDir: string) {
+      execFileSync(
+        'git',
+        [
+          '-C',
+          checkoutDir,
+          '-c',
+          'user.name=Donut E2E',
+          '-c',
+          'user.email=donut-e2e@example.com',
+          'commit',
+          '--amend',
+          '--no-edit',
+          '--date=2000-01-01T00:00:00Z',
+        ],
+        {
+          env: { ...process.env, GIT_COMMITTER_DATE: '2000-01-01T00:00:00Z' },
+        }
+      )
+      return git(checkoutDir, 'rev-parse', 'HEAD')
+    },
+    recordNotebookPublicationTiming(timing: {
+      started: string
+      stopped: string
+      boundary: string
+    }) {
+      if (!capture) throw new Error('No publication capture exists')
+      writeFileSync(
+        join(capture.directory, 'timing.json'),
+        JSON.stringify(
+          {
+            ...timing,
+            elapsedMs: Date.parse(timing.stopped) - Date.parse(timing.started),
+          },
+          null,
+          2
+        )
+      )
+      return null
+    },
+    async startNotebookPublicationProfile({
+      checkoutDir,
+      learning,
+    }: {
+      checkoutDir: string
+      learning: unknown
+    }) {
       const { isolated, target } = resolveSutCheckoutTarget({
         checkoutRoot: repoRoot,
       })
@@ -84,6 +150,38 @@ export function notebookPublicationProfileTasks(
       )
       mkdirSync(directory, { recursive: true })
       const metadata = {
+        parameters,
+        learning,
+        baselineHead: git(checkoutDir, 'rev-parse', 'HEAD^'),
+        proposalHead: git(checkoutDir, 'rev-parse', 'HEAD'),
+        baselineFingerprint: createHash('sha256')
+          .update(git(checkoutDir, 'ls-tree', '-r', 'HEAD^'))
+          .digest('hex'),
+        proposalFingerprint: createHash('sha256')
+          .update(git(checkoutDir, 'ls-tree', '-r', 'HEAD'))
+          .digest('hex'),
+        baselineTree: git(checkoutDir, 'rev-parse', 'HEAD^:'),
+        proposalTree: git(checkoutDir, 'rev-parse', 'HEAD:'),
+        mysql: execFileSync(
+          'mysql',
+          [
+            '--protocol=TCP',
+            '-h127.0.0.1',
+            '-P3309',
+            '-uroot',
+            '--batch',
+            '--skip-column-names',
+            '-e',
+            'SELECT VERSION()',
+          ],
+          { encoding: 'utf8' }
+        ),
+        loggingConfiguration: readFileSync(
+          join(repoRoot, 'backend/src/main/resources/application.yml'),
+          'utf8'
+        ),
+        warmup:
+          'No explicit warm-up; reused healthy SUT process, fixture setup precedes capture',
         revision: execFileSync('git', ['-C', repoRoot, 'rev-parse', 'HEAD'], {
           encoding: 'utf8',
         }).trim(),
