@@ -18,10 +18,8 @@ import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -128,8 +126,6 @@ public class NotebookGitProposalPublisher {
     if (NotebookGitProposalTreeShape.isAdditionOnly(documents)) {
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      requireRepresentedDestinationsUnlessParentFolderIsAdded(
-          folders, proposal, acceptedHead, documents, emptyAcceptedNotebook);
       return acceptMatchingProposedTree(
           documentApplication.apply(state, proposal, documents, publishedAt),
           proposal,
@@ -161,8 +157,6 @@ public class NotebookGitProposalPublisher {
       }
       additions.add(document);
     }
-    requireRepresentedDestinationsUnlessParentFolderIsAdded(
-        folders, proposal, acceptedHead, additions, emptyAcceptedNotebook);
     for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document =
@@ -198,42 +192,6 @@ public class NotebookGitProposalPublisher {
     return folders.isEmpty()
         && liveNotes.isEmpty()
         && files.stream().allMatch(file -> file.acceptedBlobId() == null);
-  }
-
-  private void requireRepresentedDestinationsUnlessParentFolderIsAdded(
-      List<ExportFolderRow> folders,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId acceptedHead,
-      List<NotebookGitProposalTreeShape.ChangedDocument> documents,
-      boolean emptyAcceptedNotebook) {
-    if (emptyAcceptedNotebook) {
-      return;
-    }
-    Set<String> addedContainerFolders = new HashSet<>();
-    for (NotebookGitProposalTreeShape.ChangedDocument document : documents) {
-      if (document.role() != NotebookGitProposalTreeShape.DocumentRole.CONTAINER) {
-        continue;
-      }
-      String folderPath = parentFolderPath(document.path());
-      if (folderPath != null) {
-        addedContainerFolders.add(folderPath);
-      }
-    }
-    for (NotebookGitProposalTreeShape.ChangedDocument document : documents) {
-      if (document.role() != NotebookGitProposalTreeShape.DocumentRole.CONCEPT) {
-        continue;
-      }
-      String folderPath = parentFolderPath(document.path());
-      if (folderPath == null || addedContainerFolders.contains(folderPath)) {
-        continue;
-      }
-      noteAddition.representedDestinationFolder(folders, proposal, acceptedHead, document.path());
-    }
-  }
-
-  private static String parentFolderPath(String path) {
-    int folderPathEnd = path.lastIndexOf('/');
-    return folderPathEnd < 0 ? null : path.substring(0, folderPathEnd);
   }
 
   private String acceptMatchingProposedTree(

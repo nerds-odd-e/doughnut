@@ -222,6 +222,56 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
   }
 
   @Test
+  void publishesConceptsBeneathAnImpliedFolderWithoutAFolderReadme() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder examples = makeMe.aFolder().notebook(notebook).name("例文").please();
+    makeMe.aNote().folder(examples).title("Existing").content(EXISTING_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    String ordinary = "---\ntype: Note\n---\nA body.\n";
+    String relationship =
+        "---\ntype: Relationship\nrelation: related-to\nsource: \"[[例文/111/A]]\"\ntarget: \"[[例文/111/B]]\"\n---\nRelation body.\n";
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("例文/Existing.md", EXISTING_CONTENT),
+                new NotebookGitProposalFile("例文/111/A.md", ordinary),
+                new NotebookGitProposalFile("例文/111/A-related-to-B.md", relationship)));
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+    }
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(folders, hasSize(2));
+    Folder created =
+        folders.stream().filter(folder -> folder.getName().equals("111")).findFirst().orElseThrow();
+    assertThat(created.getParentFolderId(), equalTo(examples.getId()));
+    assertThat(created.getReadmeContent(), nullValue());
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    Note noteA = noteByTitle(notes, "A");
+    Note related = noteByTitle(notes, "A-related-to-B");
+    assertThat(noteA.getFolder().getId(), equalTo(created.getId()));
+    assertThat(related.getFolder().getId(), equalTo(created.getId()));
+    assertThat(noteA.getContent(), equalTo(ordinary));
+    assertThat(related.getContent(), equalTo(relationship));
+    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
+
+    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
+    ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
+      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
+      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
+    }
+  }
+
+  @Test
   void publishesAFolderReadmeWithOneOrdinaryNote() throws Exception {
     LearnedNotebook fixture = boundNotebookWithLearnedNote();
     byte[] proposalBytes =

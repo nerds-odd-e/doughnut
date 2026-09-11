@@ -3,8 +3,7 @@
 Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11),
 refined from the rejected `例文/111/` publication observed on 2026-09-11.
 
-Status: planned. Story refinement and slice planning requested 2026-09-11;
-implementation not requested.
+Status: done. Executed 2026-09-11 on `quick/103-publish-concepts-into-implied-folder`.
 
 ## Goal and scope
 
@@ -35,42 +34,28 @@ that contains concepts. No ADR conflict or new architectural decision remains.
 
 | Promise | Observable proof |
 | --- | --- |
-| Concepts under `例文/111/` publish without a Folder Readme | Controller-boundary publication test observes the created `111` Folder, persisted ordinary and Relationship notes, and accepted proposed head/tree |
+| Concepts under `例文/111/` publish without a Folder Readme | `NotebookGitProposalFolderCreationControllerTest.publishesConceptsBeneathAnImpliedFolderWithoutAFolderReadme` observes the created `111` Folder, persisted ordinary and Relationship notes, and accepted proposed head/tree |
 | Folder inference follows one existing model | Existing initial mixed-tree controller examples remain green, including implied nested ancestry and mixed concept types |
-| Publication remains atomic on a real identity collision | Existing controller proof with a same-path live-but-unaccepted Folder observes the established sibling-name conflict and no partial publication |
-| README presence is not an admission gate | Remove the handled missing-parent rejection expectation and the publisher pre-admission rule that produces it; source review finds no replacement shape/count/type guard |
+| Publication remains atomic on a real identity collision | `NotebookGitFolderNotePublicationControllerTest.refusesToAdoptAnUnrepresentedLiveFolderWhenAddingANote` and the existing README-backed live-Folder proof observe `FOLDER_NAME_CONFLICT` with no partial publication |
+| README presence is not an admission gate | Publisher pre-admission rule and missing-parent rejection tests removed; source review finds no replacement shape/count/type guard |
 
 ## Current design evidence
 
-`NotebookGitProposalDocumentApplication` already sends all added concept paths
-to `NotebookGitProposalFolderMaterialization`. That materializer starts with
+`NotebookGitProposalDocumentApplication` sends all added concept paths to
+`NotebookGitProposalFolderMaterialization`. That materializer starts with
 accepted represented Folders and creates missing path segments from the proposed
-documents; initial-publication tests already prove the general mechanism for
-Notes, Relationships, custom types, siblings, and deeper ancestry.
-
-`NotebookGitProposalPublisher.requireRepresentedDestinationsUnlessParentFolderIsAdded`
-prevents that common mechanism from running for a non-empty accepted notebook
-unless an exact Folder README is also added. Its addition-only and
-addition-with-edits call sites are the same accidental policy. Removing that
-pre-admission policy lets both existing publication paths use the already shared
-materialization behavior. Do not replace it with a recognizer for one Folder,
-six files, specific concept types, or the `例文/111/` spelling.
-
-Rename/move placement continues through its existing represented-destination
-path and is not part of this addition behavior. A live-but-unaccepted same-path
-Folder remains excluded from the materializer's accepted Folder index, so normal
-Folder construction reaches the existing sibling identity conflict instead of
-adopting it.
+documents. Initial publication and this existing-notebook case now share that
+rule. Rename/move placement continues through its existing represented-destination
+path. A live-but-unaccepted same-path Folder remains excluded from the
+materializer's accepted Folder index, so Folder construction reaches the
+existing sibling identity conflict instead of adopting it.
 
 ## Ordered slices
 
 ### 1. Publish added concepts through the shared Folder materializer
 Type: Behavior
-Status: planned
-Sizing: about 5 minutes for test-first implementation, the full backend suite,
-and slice-local cleanup; medium-high confidence. Backend-suite runtime is an
-external-wait exception. Stop and refine before 10 minutes of active work if a
-new product or identity decision appears.
+Status: done
+Sizing: about 8 minutes active work excluding backend-suite wait.
 
 Behavior: given a non-empty accepted notebook with `例文/` represented and no
 accepted or live `例文/111` Folder → one direct-child commit adds valid ordinary
@@ -78,70 +63,46 @@ and Relationship concepts beneath `例文/111/` without a Folder README → publ
 creates the `111` Folder, persists every added concept in it, and accepts the
 exact commit atomically.
 
-At the controller boundary, replace the obsolete test that expects a missing
-parent rejection with a positive scenario based on the motivating shape. Assert
-the created Folder ancestry, representative ordinary/Relationship authored
-content, and the accepted proposed head/tree. First run the backend suite and
-confirm this changed proof fails because the current pre-admission rule rejects
-the Folder.
-
-Remove the example-shaped destination pre-admission rule and both of its
-publication call sites so added documents reach the existing shared Folder
-materializer. Remove imports/helpers left dead by that change. Do not add a
-replacement eligibility matrix. Align the independent live-but-unaccepted
-Folder test with the genuine sibling identity-conflict outcome if its old
-missing-parent wording changes.
-
 Proof:
 
 ```bash
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
 CURSOR_DEV=true nix develop -c pnpm backend:test_only
 ```
 
-The first run after changing the outside-in expectation must fail for the
-current README/represented-parent restriction. After the smallest production
-change, the complete backend suite must pass, including initial mixed-tree,
-existing represented Folder, README-backed Folder, exact-tree, rollback, and
-live Folder collision coverage.
+First-red: `publishesConceptsBeneathAnImpliedFolderWithoutAFolderReadme` failed
+with 400 "Parent folder for path \"例文/111/A-related-to-B.md\" is not
+represented in accepted Portable content" from the removed pre-admission rule.
+After removing `requireRepresentedDestinationsUnlessParentFolderIsAdded` and
+both call sites, the complete backend suite passed.
 
 Safe stop: concept additions in the motivating existing-notebook case use the
-same materialization rule as initial publication; no README-, count-, type-, or
-layout-specific admission policy remains in front of that rule.
+same materialization rule as initial publication; no README-, count-, type-,
+or layout-specific admission policy remains in front of that rule.
 
 ## Sizing and cumulative-design assessment
 
 One Behavior slice owns one user-visible publication outcome and one
-controller/full-backend proof loop. Separating test removal, guard removal, or
-cleanup would split one red-to-green behavior and create unsafe stopping points.
-No preparatory Structure slice is justified because the shared Folder
-materializer already exists.
-
-The cumulative design becomes simpler: accepted represented Folders seed one
-materialization map, and all added concept paths extend it. Existing specific
-initial-tree examples support that rule; they do not justify separate production
-branches. The only deliberate exception in this area is a live Folder identity
-that accepted Git does not represent, which existing Folder construction
-detects as a collision rather than another tree-shape policy.
-
-No slice-specific concern remains after inspection. The plan intentionally
-commits to one motivating existing-notebook example while allowing the shared
-algorithm's natural general behavior; it adds no exhaustive verification promise
-for every depth, sibling count, or document mixture.
+controller/full-backend proof loop. The cumulative design is simpler: accepted
+represented Folders seed one materialization map, and all added concept paths
+extend it. The only deliberate exception is a live Folder identity that
+accepted Git does not represent.
 
 ## Delivery
 
-Planning only; execution is not authorized by this request. When authorized,
-use `dough-execute-plan`: move the story from Backlog to Taken at execution
-start, deliver the slice test-first with Jidoka, run a fresh
-`dough-post-change-refactor` pass, run coordinator-owned
-`./scripts/run.sh pnpm format:changed` once, update this plan, commit, push, and
-handle CI asynchronously. No generated API or schema change is expected.
+Executed in worktree `/Users/terryyin/git/doughnut-103-implied-folder`.
+Story moved from Backlog to Taken. Slice delivered test-first with Jidoka.
+Post-change refactor: none — already clean. Coordinator ran
+`./scripts/run.sh pnpm format:changed` once. No generated API or schema change.
 
 Keep this plan and its story through execution retrospective and story wrap-up.
 
 ## Learnings
 
-Planning inspection found that the general Folder materializer already supports
-the desired behavior. The remaining restriction is an earlier publisher guard
-and its handled rejection test, both shaped around README-backed incremental
-examples. No tests were run and no product behavior was changed during planning.
+The README/represented-parent restriction was only the publisher pre-admission
+guard plus its handled rejection tests. Removing that guard was sufficient;
+the shared Folder materializer already created `例文/111` from concept paths.
+The live-unaccepted Folder case changed from missing-parent wording to
+`FOLDER_NAME_CONFLICT` as predicted. Refactor found no remaining duplication of
+the admission rule. Feature-branch push has no GitHub Actions coverage (`ci.yml`
+is push-triggered on `main` only).
