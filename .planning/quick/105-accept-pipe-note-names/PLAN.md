@@ -69,6 +69,13 @@ and large-commit performance (story 2).
   smaller seam: use SnakeYAML scalar-node marks to rewrite only supported
   leading-frontmatter value spans, re-rendering only changed double-quoted
   scalars while preserving untouched frontmatter verbatim.
+- Slice 6 reached 10 active minutes with implementation present but proof
+  incomplete. Four backend tests still used `bad|alias` as their invalid fixture,
+  and the new mounted warning assertion read before Vue flushed. Eight owned
+  changes are parked in stash `d2470e535a294dec78604ba200e10d54c5d08bf1`.
+  The disproved sizing assumption was that alias write/warning and link
+  resolution shared one short proof loop; they are now separate 6a and 6b
+  behaviors.
 
 ## Ordered slices
 
@@ -210,22 +217,35 @@ Estimate: 4–6 minutes, high confidence after slice 5a isolates YAML spelling;
 existing rewrite controller fixtures own the lifecycle, avoiding a separate
 rename mechanism.
 
-### 6. Save and resolve a pipe alias with a warning
+### 6a. Save a pipe alias with a warning
 Type: Behavior
 Status: planned
-Proof: Extend text-content controller alias tests, note-show resolution tests,
-and mounted property-editor tests; backend/frontend suites pass.
+Proof: Text-content alias validation and mounted property-editor tests preserve
+`A|B`, retain rejection of independently invalid shapes, and show the alias-only
+warning after Vue flush; backend/frontend suites pass.
 
 Behavior: Given an ordinary note, saving `aliases: ['A|B']` keeps that alias and
-shows a link-compatibility warning; `[[A\|B|Read this]]` resolves to it. The
-warning does not claim that the note's filename is Windows-incompatible.
-Extend both validators and the existing property editor. Two matching aliases
-remain ambiguous under the existing scope rules; invalid alias shape still
-rejects. Assert body and recognized YAML references at note-show, reusing the
-same parser rather than adding alias-specific interpretation.
+shows a link-compatibility warning. The warning does not claim that the note's
+filename is Windows-incompatible. Extend both validators and the existing
+property editor. Invalid alias shape still rejects; replace obsolete pipe-based
+invalid fixtures with a still-invalid independent shape.
 
-Estimate: 5–8 minutes, medium confidence; both validators and the editor are
-required for one successful alias edit, while grammar is already delivered.
+Estimate: 3–5 minutes, high confidence from the stopped attempt; implementation
+exists and the remaining proof repairs are identified.
+
+### 6b. Resolve pipe aliases without weakening ambiguity
+Type: Behavior
+Status: planned
+Proof: Note-show controller tests resolve escaped pipe aliases in body and
+recognized YAML, while two matches remain ambiguous; backend suite passes.
+
+Behavior: Given one note with alias `A|B`, `[[A\|B|Read this]]` resolves to it
+from body and recognized YAML with the intended label. Given two matching
+aliases, the existing scope rule remains ambiguous. Reuse the shared parser;
+do not add alias-specific interpretation.
+
+Estimate: 2–4 minutes, high confidence; the stopped attempt already created the
+controller examples and 6a owns the shared validator change.
 
 ### 7. Find pipe compatibility warnings in notebook health
 Type: Behavior
@@ -284,11 +304,12 @@ case belongs to this acceptance boundary, not a separate test-only slice.
 | Exact title preservation; fullwidth remains distinct; create/edit warning | 4 |
 | YAML-safe rewrite spelling | 5a |
 | Rename identity/learning history and incoming references | 5b |
-| Alias edit, warning, unique/ambiguous resolution, body/YAML links | 6 |
+| Alias edit and alias-only warning | 6a |
+| Unique/ambiguous alias resolution in body/YAML links | 6b |
 | Persistent warnings, including local publication lint | 7 |
 | Filename-as-title, authored YAML/body round trip and property references | 8, using 2–3's token/property proof |
 | Alias publication, existing learning history, independent atomic rejection | 9 |
-| Existing path/scope/property/navigation and access rules | Relevant existing controller suites throughout; 5b–6 own changed resolution cases |
+| Existing path/scope/property/navigation and access rules | Relevant existing controller suites throughout; 5b–6b own changed resolution cases |
 
 ## Verification and delivery
 
@@ -328,7 +349,9 @@ now isolated in 5a immediately before the rename behavior in 5b. After the
 first 5a approach also reached the limit, story-boundary reassessment retained
 the outcome and bounded research replaced the broad quote-context scan with one
 node-mark source-splice proof loop. No other remaining slice has an unexplained
-path beyond the active-work hard limit. Full
+path beyond the active-work hard limit. Slice 6's stopped attempt separated
+alias saving/warning from alias link resolution, retaining two independently
+evaluable outcomes and their existing shared grammar. Full
 backend-suite elapsed time is the explicit verification exception. Reassess
 slice 8 if durable validation contains a separate name model rather than the
 inspected shared rules; do not introduce parallel escape or normalization rules.
