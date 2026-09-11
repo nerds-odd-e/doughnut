@@ -190,7 +190,7 @@ Approximately 8 minutes active. Independent refactor extracted cohesive
 
 ### 5. Observe complete publication through a longer-wait benchmark request
 Type: Behavior
-Status: planned
+Status: done
 Proof: The same representative small valid/rejected fixtures use the same public
 Git-bundle HTTP operation, record request-only elapsed time and HTTP outcome,
 and pass existing acceptance/preservation observations with readable JFR.
@@ -206,8 +206,36 @@ or authorization. Preserve incomplete outcomes and recording cleanup on failure.
 No independent acceptance implementation: submit the existing public operation
 and reuse its accepted-head/download and preserved-state observations.
 Estimate: 5–10 minutes active, required runtime exempt. Safe stop: longer-wait
-measurement path proven small before expensive runs. This refinements addresses
+measurement path proven small before expensive runs. This refinement addresses
 the observed runner boundary, without changing story outcome or fixture design.
+
+Proof: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=3660000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'`
+passed 2/2. Captures `2026-09-11T10-39-22.583Z` (HTTP 200, 127.517 ms) and
+`2026-09-11T10-39-28.585Z` (HTTP 400, 131.847 ms) verify full response, accepted
+content or complete baseline preservation and 19 preceding additions. Request
+JFR stacks readable. Configurable deadline branch proved with 1 ms: failed,
+retained incomplete timing/JFR (`2026-09-11T10-40-27.983Z`), no active recording.
+Approximately 9 minutes active implementation; runtime exempt.
+
+Optional four-scenario regression did not run: Electron failed its CDP connection
+on port 55320 with ECONNRESET after 62 retries, before scenarios/capture. No
+lingering Cypress process; root cause unestablished, not an application failure.
+Selected installed Chrome 153.0.8010.36 for large runs and proved that runtime:
+`CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=3660000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'`
+passed 2/2 (12 seconds).
+
+Host limitation: fresh coordinator and child agent creation both returned
+`agent thread limit reached`. Reused the prior rejection implementer as an
+independent reviewer of HTTP code written by another agent; no edits or repeated
+runtime tests, `REFACTOR COMPLETE`. This is a fresh-agent workflow deviation;
+independent review was retained. Subsequent delegation must reuse available
+agents while that host limit remains. No observer exists (main-only CI).
+
+Large-run commands must also raise Cypress defaultCommandTimeout for baseline
+injection (ordinary default 6 seconds). Request-only timing excludes that setup.
+JDK 25 JFR.start help confirms default maxage 0 and maxsize 0, so recording
+retention is unlimited until stop. Keep the same JFR profile and JVM flags;
+TieredStopAtLevel=1 is a material local-environment limitation.
 
 ### 6. Establish repeated valid large-publication baseline
 Type: Behavior

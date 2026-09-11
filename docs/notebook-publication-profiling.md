@@ -225,3 +225,44 @@ The combined focused command passed 2/2 (13 seconds), including the unchanged
 valid acceptance proof (`2026-09-11T10-32-30.710Z`, CLI 643 ms). These short
 samples establish capture mechanics; they do not rank large-run bottlenecks.
 No longer-wait HTTP harness was needed for the small request.
+
+## Longer-wait HTTP capture
+
+The installed CLI smoke scenarios retain their existing 60-second runner wait.
+Use the explicit benchmark HTTP scenarios for large requests:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=3660000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
+```
+
+This command proves both outcomes with the default small representative fixture.
+The same `PUBLICATION_PROFILE_EXISTING`, `PUBLICATION_PROFILE_ADDITIONS` and
+`PUBLICATION_PROFILE_FOLDERS` environment variables scale the HTTP scenarios.
+All four profiling tags are excluded from ordinary runs. The HTTP helper sends
+one raw `application/x-git-bundle` POST to the same owner-authorized endpoint as
+CLI publication, using the clone's notebook binding and isolated CLI token.
+It verifies the binding origin against the owned SUT before sending credentials.
+No product timeout or acceptance behavior changes.
+
+The request defaults to a 3,600,000 ms (one hour) total deadline; the literal Cypress
+command allows a further minute for the task to return and retain its artifacts.
+`proposal.bundle` persists beside the recording. Its creation and read, credential
+loading and URL preparation finish before the request-only monotonic timer starts.
+`timing.json` records the method, URL, byte count, HTTP status/body, UTC timestamps
+and elapsed milliseconds through the complete response body. This measures
+transport plus server completion, including commit or rollback, not pure server
+CPU. The JFR interval also includes bundle preparation. HTTP acceptance checks
+its returned head and reuses the clean second-clone byte checks; HTTP rejection
+checks status 400 and the final-path error before the same persisted-state proof.
+
+A transport failure records an incomplete timing outcome and fails the scenario;
+the existing after-run hook preserves the incomplete recording. A deadline does
+not prove server completion: inspect the owned backend before resetting or retrying
+an interrupted request. Neither HTTP capture establishes installed CLI success.
+
+For a longer observation window, set the benchmark-only deadline and matching
+Cypress task allowance explicitly (this example allows four hours plus one minute):
+
+```bash
+PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=14400000 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=14460000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
+```

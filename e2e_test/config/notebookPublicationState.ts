@@ -21,7 +21,7 @@ export function publicationPersistedState(repoRoot: string) {
         '-e',
         sql,
       ],
-      { encoding: 'utf8' }
+      { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
     ).trim()
   return {
     notes: query('SELECT * FROM note ORDER BY id'),

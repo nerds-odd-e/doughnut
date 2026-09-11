@@ -20,7 +20,44 @@ function recordPublicationTiming(started: string) {
   })
 }
 
+function publishHttp() {
+  return cy
+    .get<string>('@cliCloneDestination')
+    .then((checkoutDir) =>
+      cy
+        .get<string>('@cliConfigDir')
+        .then((configDir) =>
+          cy.task<{ status: number; body: string }>(
+            'publishNotebookPublicationHttp',
+            { checkoutDir, configDir }
+          )
+        )
+    )
+}
+
 export const notebookPublicationProfile = {
+  publishHttp() {
+    return publishHttp().then((response) => {
+      expect(response.status, response.body).to.equal(200)
+      return cy
+        .get<string>('@cliNotebookPublishHead')
+        .then((head) =>
+          expect(response.body.trim(), 'HTTP accepted head').to.equal(head)
+        )
+    })
+  },
+  publishHttpRejection() {
+    return publishHttp().then((response) => {
+      expect(response.status, response.body).to.equal(400)
+      return cy
+        .get<string>('@publicationProfileInvalidPath')
+        .then((path) =>
+          expect(JSON.parse(response.body).message).to.contain(
+            `Invalid authored property at path "${path}"`
+          )
+        )
+    })
+  },
   seed() {
     return cy
       .task<{ existing: number; additions: number; folders: number }>(

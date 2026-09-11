@@ -30,3 +30,11 @@ When('I publish and time the rejected profiling proposal', () =>
 Then('the profiling baseline and learning state are preserved', () =>
   notebookPublicationProfile.expectPreserved()
 )
+
+When('I publish and time the profiling proposal through benchmark HTTP', () =>
+  notebookPublicationProfile.publishHttp()
+)
+When(
+  'I publish and time the rejected profiling proposal through benchmark HTTP',
+  () => notebookPublicationProfile.publishHttpRejection()
+)

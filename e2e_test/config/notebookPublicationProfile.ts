@@ -1,3 +1,4 @@
+import { publishNotebookProfileHttp } from './notebookPublicationHttp'
 import assert from 'node:assert/strict'
 import {
   publicationPersistedState,
@@ -71,9 +72,28 @@ export function notebookPublicationProfileTasks(
   function git(checkoutDir: string, ...args: string[]) {
     return execFileSync('git', ['-C', checkoutDir, ...args], {
       encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
     }).trim()
   }
   return {
+    publishNotebookPublicationHttp({
+      checkoutDir,
+      configDir,
+    }: {
+      checkoutDir: string
+      configDir: string
+    }) {
+      assert.ok(
+        capture?.recordingActive,
+        'HTTP publication requires an active owned capture'
+      )
+      return publishNotebookProfileHttp(
+        repoRoot,
+        capture.directory,
+        checkoutDir,
+        configDir
+      )
+    },
     notebookPublicationProfileParameters() {
       if (
         Object.values(parameters).some(
@@ -277,7 +297,7 @@ export function notebookPublicationProfileTasks(
             acceptedHead: metadata.baselineHead,
             preservedState: after,
             rejectionEvidence:
-              'CLI exit 1 and Invalid authored property at the final added path asserted before pull',
+              'Publication rejection and Invalid authored property at the final added path asserted before pull; timing.json identifies transport and response',
           },
           null,
           2
