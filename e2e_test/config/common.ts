@@ -25,6 +25,7 @@ import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
 import { E2E_APP_BASE_URL } from './constants'
 import { readZipEntries } from './readZipEntries'
+import { notebookPublicationProfileTasks } from './notebookPublicationProfile'
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -114,6 +115,7 @@ const commonConfig = {
 
       on('task', {
         ...worktreeResetIsolationCypressTasks(),
+        ...notebookPublicationProfileTasks(repoRoot, on),
         ...mcpIsolationCypressTasks(),
         mcpClientConnectionInfo() {
           return mcpClient.connectionInfo()

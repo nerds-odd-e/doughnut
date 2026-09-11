@@ -89,3 +89,67 @@ the same HTTP operation, labeled as HTTP/server timing; it does not establish CL
 success or authorize changing production timeouts. Verify accepted head/content
 on success and unchanged persisted baseline on rejection. No speed or bottleneck
 claim is supported until completed recordings and their outcomes are available.
+
+## Small capture smoke test
+
+From an owned linked worktree with a healthy `pnpm sut`, run:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose tags=@publicationProfile
+```
+
+Run this command again to repeat. The shared order-0 Before hook resets only the
+owned E2E database before rebuilding the feature's background: one notebook,
+Overview, Recipes/Pasta, and notebook/folder Readmes. The opt-in scenario commits
+20 Recipes/Added-00000.md through Added-00019.md files, each with one alias,
+meaning, a source reference, two related references and repeated authored prose.
+It publishes through the installed CLI, checks its accepted head, pulls a second
+clone, checks that clone's clean accepted head and compares all 20 documents byte
+for byte. The normal tag filter excludes this profiling scenario.
+
+This smoke fixture has no learning records or representative existing-note
+population. Git dates/identities are not normalized yet. Its recordings prove
+capture and acceptance; they do not establish the large-publication baseline.
+
+Captures persist under `~/Library/Application Support/Donut/publication-profiles/`
+in timestamp directories. `capture.json` records source revision, checkout,
+owned backend PID/process identity, isolated target, JVM version/flags and JFR
+start command. `publication.jfr`, `jfr-summary.txt` and `result.json` record the
+capture and verified outcome. Recording interval includes JFR command overhead
+and CLI preparation/submission; it is **not HTTP request duration**. The JFR
+setting is `profile`. A scenario failure stops an active recording through the
+composed `after:run` hook and retains `incomplete.jfr`; outcome remains incomplete
+until every success assertion passes. Abruptly killing Cypress cannot run that
+hook; inspect the recorded PID with `JFR.check` before recovering such a capture.
+
+Two reset runs on 2026-09-11 at revision `cda93cdccc` plus this uncommitted harness
+used the same owned backend PID 2406 (port 50809), Node 26.7.0 and Cypress 16.0.0.
+Both passed 1/1 scenarios (6 and 8 seconds). These are warm-process smoke runs;
+no explicit warm-up was performed and ordinary E2E logging remained enabled.
+
+| Capture directory | Recording interval | Verified accepted head | Authored documents |
+| --- | --- | --- | --- |
+| `2026-09-11T10-15-59.526Z` | 1,027 ms | `438b831400a9c7644509d0954e5faa70b09effd1` | 20 |
+| `2026-09-11T10-16-29.353Z` | 1,279 ms | `99afd3257e319073cec3422e174c5513d6ff0732` | 20 |
+
+Inspect a readable request stack with:
+
+```bash
+CURSOR_DEV=true nix develop -c jfr print --events jdk.ExecutionSample --stack-depth 64 '/Users/terryyin/Library/Application Support/Donut/publication-profiles/2026-09-11T10-16-29.353Z/publication.jfr'
+```
+
+That recording contains seven execution samples on `http-nio-50809-exec-10`
+from 10:16:30.378 to 10:16:30.581 UTC, including
+`NotebookController.publishNotebookGitProposal` and
+`NotebookGitProposalPublisher.publish`. A text copy is retained beside it as
+`execution-samples.txt`. The first recording contains ten execution samples,
+including Hibernate load/flush/dirty checking. These few samples prove readable
+request evidence, not a reliable cost ranking.
+
+Failure cleanup was exercised by temporarily asserting the accepted head
+immediately after starting capture and before publication. The same Cypress
+command exited 1 with the expected missing published-head assertion (0/1 pass).
+The hook retained `2026-09-11T10-16-58.885Z/incomplete.jfr` and an incomplete result;
+`CURSOR_DEV=true nix develop -c jcmd 2406 JFR.check` then reported no recordings.
+The temporary failing assertion was removed. This proves cleanup preserves the
+original failed result rather than converting it to success.

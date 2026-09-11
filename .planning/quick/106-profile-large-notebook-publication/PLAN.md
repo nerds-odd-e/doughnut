@@ -97,7 +97,7 @@ not a publication measurement or a repaired tooling defect.
 
 ### 2. Capture a small accepted publication
 Type: Behavior
-Status: planned
+Status: done
 Proof: The opt-in existing CLI E2E feature publishes 20 deterministic additions,
 produces a readable JFR recording spanning publication, and receives the accepted
 head and every authored document through the existing second-clone helpers.
@@ -111,6 +111,18 @@ Run the same small scenario after reset to establish capture repeatability.
 Document the initial fixture limitations and successful capture commands.
 Estimate: 5 minutes active completion of the parked attempt, test runtime exempt.
 Safe stop: useful small capture mechanism and verified acceptance, no large claim.
+
+Proof: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose tags=@publicationProfile`
+passed twice with reset (1/1, 6s and 8s). Accepted head, second clone's clean
+head and all 20 authored bytes verified. Readable request execution samples and
+accepted results persist in `2026-09-11T10-15-59.526Z` and
+`2026-09-11T10-16-29.353Z` under the documented profile directory.
+Controlled assertion failure before publication saved `incomplete.jfr` through
+composed after:run; `jcmd 2406 JFR.check` confirmed no active recording. Temporary
+assertion removed. Details and commands: [capture evidence](../../../docs/notebook-publication-profiling.md#small-capture-smoke-test).
+Approximately 6 minutes active completion, test runtime excluded. Fresh refactor
+reused `expectCheckoutFileAt`, reran the same focused Cypress command (1/1),
+and returned `REFACTOR COMPLETE`. No product/API changes.
 
 ### 3. Repeat a representative publication from a fingerprinted baseline
 Type: Behavior
@@ -185,8 +197,9 @@ no product scope or architecture changes. Remaining work now follows one capture
 and workload model; later slices extend proven outcomes, not parallel harnesses.
 
 Attempt owned six E2E files, safely parked in stash
-`118c890f201d5773d8a17801f8da512e5e190d0d` before refinement. Restore onto the
-refinement commit to continue slice 2; no passing acceptance proof is claimed.
+`118c890f201d5773d8a17801f8da512e5e190d0d` before refinement. Restored onto
+`cda93cdccc`, verified inventory, and dropped that exact stash before completing
+slice 2. The following failure remains prior-attempt evidence.
 `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose tags=@publicationProfile`
 failed at JFR.stop after publication because jcmd requires embedded quoting for
 paths containing spaces. The quoting fix is parked, unverified. Head/content

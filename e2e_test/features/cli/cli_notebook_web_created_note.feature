@@ -258,3 +258,16 @@ Feature: CLI notebook web-created note
       Composed publication received
 
       """
+
+  @publicationProfile
+  Scenario: Measuring a small publication on an owned disposable backend
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I prepare the small deterministic publication profile
+    And I start recording the owned publication JVM
+    And I publish the cloned checkout using the installed CLI
+    And I stop recording the owned publication JVM
+    Then the installed CLI reports the committed change as the accepted head
+    When I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout is a clean checkout of the accepted head
+    And the received checkout contains every profiling document unchanged
