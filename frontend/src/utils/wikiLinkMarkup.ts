@@ -2,6 +2,7 @@ import type { WikiLink } from "@generated/donut-backend-api"
 import {
   splitWikiLinkInner,
   wikiLinkFromAuthoredToken,
+  wikiLinkTokenFromDecodedParts,
 } from "@/utils/authoredLinkMarkup"
 import {
   WIKI_LINK_DISPLAY_TEXT_ATTR,
@@ -130,27 +131,16 @@ export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
   const innerM = /^\[\[([\s\S]*)\]\]$/.exec(raw)
 
   if (fromDisplayAttr !== null && fromDisplayAttr !== "") {
-    const displayPart = fromDisplayAttr
-    if (displayPart === portablePath) {
-      return `[[${portablePath}]]`
-    }
-    return `[[${portablePath}|${displayPart}]]`
+    return wikiLinkTokenFromDecodedParts(portablePath, fromDisplayAttr)
   }
 
   if (innerM !== null) {
-    const visibleInner = innerM[1]!
-    if (visibleInner === portablePath) {
-      return `[[${portablePath}]]`
-    }
-    return `[[${portablePath}|${visibleInner}]]`
+    return wikiLinkTokenFromDecodedParts(portablePath, innerM[1]!)
   }
 
   if (raw.startsWith("[[") && !raw.endsWith("]]")) {
     return raw
   }
 
-  if (raw === portablePath) {
-    return `[[${portablePath}]]`
-  }
-  return `[[${portablePath}|${raw}]]`
+  return wikiLinkTokenFromDecodedParts(portablePath, raw)
 }

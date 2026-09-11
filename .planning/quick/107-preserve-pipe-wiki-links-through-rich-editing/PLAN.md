@@ -5,7 +5,14 @@ recoverable from before-cleanup commit
 `d2fbd5af6926dfdab8e11927c3784aa9055c089a` at
 `.planning/seeds/SEED-018-publish-large-authored-notebooks.md` and
 `.planning/quick/105-accept-pipe-note-names/PLAN.md`.
-Status: planned.
+Status: completed.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`
+- Execution checkout: `/Users/terryyin/git/doughnut-107-preserve-pipe-wiki-links-through-rich-editing` on `codex/107-preserve-pipe-wiki-links-through-rich-editing`
+- Integration target: `main`
+- CI observation: unavailable because `.github/workflows/ci.yml` triggers only for pushes to `main`, not the execution branch
 
 ## Historical provenance
 
@@ -80,7 +87,7 @@ and property-value serialization.
 
 ### 1. Preserve decoded wiki destinations when rich content is saved
 Type: Behavior
-Status: planned
+Status: done
 Proof: Frontend rich-content serialization examples cover pipe-bearing target,
 property selector, escaped display pipe, body conversion, and property-value
 conversion; `CURSOR_DEV=true nix develop -c pnpm frontend:test` passes.
@@ -97,6 +104,13 @@ fallback branches and existing ordinary-link cases.
 
 Estimate: 4–5 active minutes, high confidence; one shared serializer change and
 one proof loop cover both existing consumers.
+
+## Execution evidence
+
+- Reproduced both rich-body and property-value failures before the serializer change.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/quillHtmlToMarkdown.spec.ts tests/utils/propertyValueField.spec.ts` passed.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed 342 files and 1885 tests.
+- The independent post-change refactor found the change already cohesive; `scripts/check_diff_whitespace.sh` passed.
 
 ## Verification and delivery
 

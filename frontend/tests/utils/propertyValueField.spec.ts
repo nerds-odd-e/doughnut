@@ -25,14 +25,14 @@ describe("propertyValueField utils", () => {
     expect(html).not.toContain("Unknown Topic|friendly label")
   })
 
-  it("round-trips display text wiki link from a field root", () => {
+  it("round-trips pipe-bearing property target and display from a field root", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml(
-      "[[Target Page|alias text]]",
+      String.raw`[[folder/A\|B#prop:meaning|Read \| this]]`,
       []
     )
     expect(serializePropertyValueFieldRoot(root)).toBe(
-      "[[Target Page|alias text]]"
+      String.raw`[[folder/A\|B#prop:meaning|Read \| this]]`
     )
   })
 

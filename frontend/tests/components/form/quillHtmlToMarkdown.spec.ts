@@ -57,6 +57,7 @@ describe("quillHtmlToMarkdown", () => {
     ${"converts plain dead wiki anchors"}       | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
     ${"converts pending wiki anchors"}          | ${'<p><a href="#" class="pending-wiki-link" data-portable-path="Unknown">Unknown</a></p>'}                                                                      | ${"[[Unknown]]"}
     ${"donut-wiki-link with piped wiki attrs"}  | ${'<p><a href="/n1" class="donut-wiki-link" data-portable-path="A" data-display-text="B">B</a></p>'}                                                            | ${"[[A|B]]"}
+    ${"escapes a pipe in the decoded target"}   | ${'<p><a href="/n1" class="donut-wiki-link" data-portable-path="A|B">A|B</a></p>'}                                                                              | ${String.raw`[[A\|B]]`}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
   })
