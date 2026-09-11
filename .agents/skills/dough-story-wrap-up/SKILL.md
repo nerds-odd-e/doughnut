@@ -89,6 +89,11 @@ already stated in maintained documentation, write it into maintained
 documentation before deleting that spent copy. Tests that exercise related
 behavior do not replace that documentation step.
 
+For North Star topics cited, added, or revised by the completed work, apply the
+shared [topic-retirement
+instructions](../dough-slice-planning/references/architectural-thinking.md#retire-temporary-direction-during-ordinary-wrap-up)
+as part of ordinary closure.
+
 ## Queue an existing follow-up plan first
 
 When an existing follow-up plan is present, validate it against the

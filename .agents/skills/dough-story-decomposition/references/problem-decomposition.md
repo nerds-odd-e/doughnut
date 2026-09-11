@@ -144,14 +144,15 @@ at the affected external boundaries in the same slice. Do not invent a new
 Behavior promise merely to justify the correction. Keep one bounded outcome and
 proof loop; this exception does not authorize speculative preparation.
 
-Evolve the simplest common rule supported by the current examples and domain
-constraints. Apply the shared [examples and constraints
+Evolve and implement the simplest common domain rule supported by the current
+examples and constraints. Apply the shared [examples and constraints
 distinction](../../dough-story-refinement/references/planning.md#examples-and-constraints):
 fixture counts and arrangements alone do not justify production gates. A later
 example should exercise or extend the model, not prescribe another recognizer
-or parallel representation. Do not design a generic framework for hypothetical
-cases or expand delivery and verification promises to every naturally handled
-case. Retain independently justified constraints and their rejection proof.
+or parallel representation. Deferred special behavior does not justify machinery
+for it now. Do not design a generic framework for hypothetical cases or expand
+delivery and verification promises to every naturally handled case. Retain
+independently justified constraints and their rejection proof.
 
 Assess the sequence cumulatively alongside slice size and proof ownership:
 are the examples exercising one coherent model or accumulating special cases?

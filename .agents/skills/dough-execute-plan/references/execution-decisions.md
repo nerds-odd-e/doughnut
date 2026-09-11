@@ -20,6 +20,36 @@ stop or unresolved proof failure prevents that delivery. Resolve routine naming,
 placement, test choices, minor refactoring, and defects caused by the current
 change within the authorized scope.
 
+An understood responsibility already authorized by the active plan does not
+become a new consequential choice merely because its necessary domain-coherent
+structure crosses a component or process boundary. Keep that work in the
+remaining plan and preserve the responsibility's meaning and applicable
+decisions. Stop when the meaning, fit, or consequential choice is unresolved;
+do not turn this distinction into permission for unplanned cleanup or a story
+outcome change.
+
+## Resolve conflicting recorded direction
+
+When new evidence contradicts a North Star topic cited by the active plan, the
+executing role stops only the affected path and returns the topic location,
+contrary evidence, affected plan work, and consequences of continuing either
+way. It must not edit the topic or reinterpret it to justify the implementation.
+Independently supported paths may continue when their direction, mutable state,
+and proof do not depend on the conflict.
+
+The coordinator then applies the planner judgment in [architectural
+thinking](../../dough-slice-planning/references/architectural-thinking.md#reconsider-recorded-direction-during-execution)
+and aligns the remaining work through [active-plan
+refinement](../../dough-story-refinement/references/planning.md#refine-the-active-plan).
+Resume the stopped path only after the selected direction and remaining plan
+are consistent. Preserve the active story, completed proof, **Taken** backlog
+entry, recorded execution checkout and branch, and worktree throughout this
+handoff; do not invoke retrospective or story wrap-up or mark partial completion.
+
+The linked planner procedure owns conflicts with an Accepted ADR. Keep the
+affected path stopped; neither the executing role nor coordinator may revise
+North Star direction to work around the ADR.
+
 ## Resolve a disputed plan restriction
 
 Use [examples and constraints](../../dough-story-refinement/references/planning.md#examples-and-constraints)

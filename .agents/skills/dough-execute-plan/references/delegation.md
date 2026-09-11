@@ -14,13 +14,20 @@ Give the agent:
   to run there rather than relying on the agent's inherited working directory.
 - The execution source and current slice with mapped promises and observations,
   including replacement and lifecycle obligations. For planned execution, pass
-  the plan path and its selected-story or bounded-correction source. For a
-  correction, pass its complete plan-owned
+  the plan path and its selected-story or bounded-correction source. Also pass
+  any relevant existing-solution finding and candidate evidence from the plan,
+  plus new evidence that triggered a PFE revisit; a fresh agent does not repeat
+  a still-valid search merely because delegation occurred. For a correction,
+  pass its complete plan-owned
   [correction input](../../dough-story-refinement/references/planning.md#choose-the-planning-level)
   rather than requiring a seed. For quick execution, pass the canonical story,
   the explicit instruction to execute without slice planning, and the relevant
   conversation context; require no plan or substitute execution record. Omit
   unrelated plan or conversation history.
+- Any North Star topic cited by the delegated work and the evidence supporting
+  it. Require the agent to return contrary evidence through [execution
+  decisions](execution-decisions.md#resolve-conflicting-recorded-direction),
+  without changing the topic or continuing the affected path.
 - For planned execution continuing an oversized quick attempt, the remaining-work
   plan plus the preserved completed work and proof and any incomplete-change
   disposition needed to identify the true starting boundary. Require the agent

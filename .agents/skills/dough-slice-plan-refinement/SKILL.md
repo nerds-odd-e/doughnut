@@ -57,6 +57,13 @@ Read and apply:
 - [active-plan refinement](../dough-story-refinement/references/planning.md#refine-the-active-plan),
   including executable proof ownership.
 
+When refinement reconsiders the plan's selected existing solution or the
+architectural direction supporting it, reapply
+[architectural thinking](../dough-slice-planning/references/architectural-thinking.md),
+including its authoritative PFE handoff. Otherwise carry the decision forward;
+do not repeat PFE or create a new direction topic merely because slices are
+being refined.
+
 Preserve completed slices, applicable evidence, and the selected story's goal
 and scope or the correction plan's bounded outcome and scope.
 

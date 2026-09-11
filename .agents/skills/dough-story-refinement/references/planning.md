@@ -62,16 +62,20 @@ that justification when it is missing; record any unresolved constraint decision
 Deferred promises state what this delivery does not commit to build or verify,
 not what the product must reject.
 
-For example, README plus three Notes and README plus two Notes and one
-Relationship can both be required import examples. Deferring bulk performance
-or promises about future layouts does not require rejecting other mixtures.
-An explicit product limit on attachment count can still justify rejection above
-that limit; the example counts alone cannot.
+For example, a basket containing a £10 item and a £20 item has a £30 total. The
+simple domain rule is to sum item prices, so adding an otherwise valid third item
+extends the same rule; its absence from the first example does not justify a
+rejection or a separate handler. An explicit maximum item count remains a real
+constraint and can justify rejection above that limit. Deferring discount
+behavior means this delivery adds no discount machinery; it does not narrow the
+baskets naturally handled by summing prices.
 
 Story refinement sets delivery commitments, not product implementation
 boundaries. Implementation may change any product parts needed for the promised
 outcome while respecting genuine product constraints and architectural decisions.
-Story membership alone does not justify a structural boundary.
+Implement the simplest understood domain rule that satisfies the current
+examples and constraints. Story membership alone does not justify a structural
+boundary or structure for deferred behavior.
 
 ## Update a feature story in its seed
 
