@@ -24,8 +24,6 @@ changes.
 
 - [Accept pipe characters in note names with a compatibility warning](seeds/SEED-018-publish-large-authored-notebooks.md#story-1) — SEED-018
 
-- [Identify large-publication bottlenecks with a reproducible baseline](seeds/SEED-018-publish-large-authored-notebooks.md#story-2) — SEED-018
-
 ## Backlog list
 
 - [Verify publication receiver content without per-file browser overhead](quick/107-verify-publication-receiver-in-bulk/PLAN.md)

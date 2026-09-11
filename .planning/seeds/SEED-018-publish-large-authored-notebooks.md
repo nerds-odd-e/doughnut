@@ -62,7 +62,8 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
 Notebook owners can create, edit, and publish notes whose intended titles or
 aliases contain ASCII `|`, and follow references to those notes in Donut without
 renaming their knowledge. This removes the name-related publication obstacle;
-large-commit completion time remains story 3's outcome, informed by story 2.
+large-commit completion time remains story 3's outcome, informed by the
+[profiling findings](../../docs/notebook-publication-profiling.md).
 
 #### Scope
 
@@ -199,42 +200,6 @@ follow the concise ADR and the examples above.
 
 Executable plan: [Accept pipe note names](../quick/105-accept-pipe-note-names/PLAN.md).
 
-<a id="story-2"></a>
-
-### 2. Identify large-publication bottlenecks with a reproducible baseline
-
-#### Goal
-
-Donut maintainers can choose the first area of publication work to optimize using
-sufficient runtime evidence, with the least necessary measurement cost.
-
-#### Scope
-
-- Preserve the existing static findings, reusable opt-in fixture/capture tools,
-  two valid large profiles, and small late-rejection/preserved-state proof.
-- Hand off supported priorities and uncertainties to story 3, with links to the
-  same infrastructure and data. No executable optimization plan is required.
-- User-directed revision after execution review: roughly 10,000 additions is a
-  motivating workload, not a required discovery size. No further large valid or
-  rejection run is required for this investigation. Large rejection latency is
-  unmeasured, not inferred from small correctness proof.
-- Use small fixtures and short captures for subsequent focused experiments;
-  increase size only when the evidence cannot distinguish candidate costs. Stop
-  discovery once a dominant cost and a concrete next experiment are clear.
-- Keep preparation separate from timing; distinguish completed HTTP outcomes,
-  interrupted test drivers, sampled CPU proportions, and latency. Retain revision,
-  fingerprints, reset commands, environment, profiler and host-sleep limitations.
-- Use only the owned disposable E2E environment; preserve accepted content,
-  identities, learning history and atomic rejection. Do not mutate real jap3 data.
-- Deferred: product optimizations, production transport changes, large-scale
-  confirmation after an improvement, monitoring platforms, story-3 refinement and
-  its executable plan. The completion-time target remains a later product decision.
-
-Executable plan: [Profile large notebook publication](../quick/106-profile-large-notebook-publication/PLAN.md).
-
-Findings, reusable infrastructure and retained evidence:
-[Notebook publication profiling](../../docs/notebook-publication-profiling.md).
-
 <a id="story-3"></a>
 
 ### 3. Publish large notebook commits within a practical measured time
@@ -278,12 +243,12 @@ Findings, reusable infrastructure and retained evidence:
   retain their runner and host-sleep qualifications. The
   [20-addition late-rejection proof](../../docs/notebook-publication-profiling.md#small-late-rejection-capture)
   verifies preceding processing and preserved state. Large rejection latency
-  remains unmeasured and deferred; story 2 requires no further large capture.
+  remains unmeasured; further large captures need a specific unanswered question.
   Use the retained read-only bulk receiver comparison for large byte checks.
 - **Effort hypothesis:** L, low confidence until bounded refinement; if the measured
   work exceeds a few hours, refine the story into independently useful outcomes
   before execution planning rather than committing to a broad optimization rewrite.
-- **Depends on:** Story 2's findings, reusable profiling infrastructure, and
+- **Depends on:** The retained profiling findings, reusable infrastructure, and
   baseline data. Prior related notebook publication work supplies the existing
   functionality, not a new queue item.
 - **Safe stopping point:** The measured workload publishes faster with existing
@@ -292,21 +257,16 @@ Findings, reusable infrastructure and retained evidence:
 
 ## Ordering and Scope Reduction
 
-The user selected name acceptance first, then split the performance work into
-story 2's static inspection and baseline profiling followed by story 3's
-optimization. Preserve that order. Refine story 3 later from story 2's outputs.
-If work must be deferred, defer story 3 first; story 2 retains its measured
-learning and reusable profiling workflow. Do not deliver name acceptance without
-working reference semantics.
+Preserve name acceptance before performance optimization. Refine story 3 from the
+[retained profiling findings](../../docs/notebook-publication-profiling.md).
+If work must be deferred, defer story 3 first. Do not deliver name acceptance
+without working reference semantics.
 
 ## Open Decisions
 
 - Story 1's remaining decisions are recorded in its section above.
-- Story 2: no blocking product questions; fixture distribution and measurement
-  settings are documented execution choices. Approximately 10,000 additions is
-  the motivating workload, not a product size limit.
 - Story 3: acceptable completion-time target and bounded improvement scope remain
-  for later refinement based on story 2's evidence.
+  for later refinement based on the retained profiling evidence.
 
 ## When to Surface
 

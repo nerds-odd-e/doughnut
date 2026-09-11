@@ -1,8 +1,9 @@
 # Verify publication receiver content without per-file browser overhead
 
 Status: planned — retrospective correction only; implementation not authorized.
-Source: [completed plan 106](../106-profile-large-notebook-publication/PLAN.md),
-[SEED-018 story 2](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-2).
+Source: Git revision `e6402aae754201d791fdf18dd2d6e2b6bfc1f65f`, paths
+`.planning/quick/106-profile-large-notebook-publication/PLAN.md` and
+`.planning/seeds/SEED-018-publish-large-authored-notebooks.md` (story 2).
 Review boundary: execution checkout `doughnut-106-profile-large-notebook-publication`,
 branch `codex/106-profile-large-notebook-publication`, HEAD `3651153736`.
 The original nine slices are complete under the user-approved reduced discovery
@@ -124,5 +125,4 @@ provenance, not product defects. No backend/frontend/CLI/MCP product code change
 Use dough-execute-plan from the selected execution location: independent
 post-change refactor, API generation only if a trigger changes, one coordinator
 selective format, check-only commit hook and authorized push. No correction code,
-benchmark, commit or push is performed by this retrospective. Keep plan 106 and
-its evidence for story wrap-up; do not modify backlog priority here.
+benchmark, commit or push is performed by this retrospective. The completed predecessor is recoverable from the source revision above.
