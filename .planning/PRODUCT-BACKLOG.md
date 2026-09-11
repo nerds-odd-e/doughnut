@@ -23,7 +23,6 @@ changes.
 ## Taken
 
 - [Declare isolated test capabilities in one place](seeds/SEED-017-cohesive-design-corrections.md#story-3) — SEED-017
-- [Publish several note changes in one commit, including new folders](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11) — SEED-009
 
 ## Backlog
 
