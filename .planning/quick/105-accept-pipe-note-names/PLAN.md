@@ -52,6 +52,16 @@ and large-commit performance (story 2).
   title filename incompatibility from alias-only link incompatibility. Keep
   copy brief; warning findings are not auto-fixes and do not require consent.
 
+## Learnings
+
+- Slice 5 overran at about 12 active minutes. Its controller proof established
+  note/learning identity and body rewrite behavior, but the double-quoted YAML
+  example failed because writing `\|` directly makes an invalid YAML escape.
+  Attempt-owned tests are parked in stash
+  `e9cb2f9b099138b9b540a0247214a936d05ecfce`. The disproved sizing assumption
+  was that the document rewriter could emit the same wiki spelling in body,
+  single-quoted YAML, and double-quoted YAML; slice 5a now isolates that boundary.
+
 ## Ordered slices
 
 All slices are sequential. Sizing includes implementation, proof, and local
@@ -146,7 +156,23 @@ the exception to other entity names merely because a helper is shared.
 Estimate: 5–8 minutes, medium confidence. Validation plus normalizer plus editor
 are necessary for this single observable save; no export or rename work here.
 
-### 5. Preserve references when renaming to a pipe title
+### 5a. Preserve wiki escapes in YAML rewrites
+Type: Structure
+Status: planned
+Proof: Focused document-rewrite examples preserve existing body and
+single-quoted YAML spelling while double-quoted YAML stores the extra YAML
+escape needed to decode to the same wiki token; backend suite passes.
+
+Make `WikiLinkMarkdownDocumentRewrite` preserve the containing scalar's YAML
+syntax when a rewritten target introduces wiki backslashes. Keep body and
+single-quoted YAML spelling unchanged; in leading-frontmatter double-quoted
+scalars, encode the backslash so SnakeYAML decodes the intended `\|`. Do not
+introduce a second wiki grammar or a general YAML rewriter.
+
+Enables immediately: slice 5b can rename references to a pipe title without
+persisting invalid YAML. Estimate: 3–5 minutes, medium confidence.
+
+### 5b. Preserve references when renaming to a pipe title
 Type: Behavior
 Status: planned
 Proof: Extend `TextContentControllerUpdateNoteTitleTests` and existing rewrite
@@ -159,8 +185,9 @@ recognized YAML references. An unchanged `[[A|B]]` referencing a separate A
 must not be captured by the new title. Preserve existing folder, notebook,
 ambiguity, and property rewrite tests as regression coverage.
 
-Estimate: 4–6 minutes, medium confidence; existing rewrite controller fixtures
-own the lifecycle, avoiding a separate rename mechanism.
+Estimate: 4–6 minutes, high confidence after slice 5a isolates YAML spelling;
+existing rewrite controller fixtures own the lifecycle, avoiding a separate
+rename mechanism.
 
 ### 6. Save and resolve a pipe alias with a warning
 Type: Behavior
@@ -234,12 +261,13 @@ case belongs to this acceptance boundary, not a separate test-only slice.
 | Literal pipe/backslash grammar; preserve ordinary label syntax | 2 |
 | Product-authored links and separate display text | 3 |
 | Exact title preservation; fullwidth remains distinct; create/edit warning | 4 |
-| Rename identity/learning history and incoming references | 5 |
+| YAML-safe rewrite spelling | 5a |
+| Rename identity/learning history and incoming references | 5b |
 | Alias edit, warning, unique/ambiguous resolution, body/YAML links | 6 |
 | Persistent warnings, including local publication lint | 7 |
 | Filename-as-title, authored YAML/body round trip and property references | 8, using 2–3's token/property proof |
 | Alias publication, existing learning history, independent atomic rejection | 9 |
-| Existing path/scope/property/navigation and access rules | Relevant existing controller suites throughout; 5–6 own changed resolution cases |
+| Existing path/scope/property/navigation and access rules | Relevant existing controller suites throughout; 5b–6 own changed resolution cases |
 
 ## Verification and delivery
 
@@ -274,7 +302,9 @@ the story is not complete until both publication cases and all warnings pass.
 
 The longest hypotheses are the cross-runtime reading and web-edit slices;
 their preparation and independent publication outcomes are already separated.
-No unexplained path beyond the active-work hard limit was identified. Full
+Slice 5's overrun exposed YAML scalar spelling as a separate preparation beat,
+now isolated in 5a immediately before the rename behavior in 5b. No other
+remaining slice has an unexplained path beyond the active-work hard limit. Full
 backend-suite elapsed time is the explicit verification exception. Reassess
 slice 8 if durable validation contains a separate name model rather than the
 inspected shared rules; do not introduce parallel escape or normalization rules.
