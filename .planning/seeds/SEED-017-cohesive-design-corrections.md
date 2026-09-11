@@ -179,18 +179,26 @@ queued corrections.
 
 ### Story 4: Keep one owned-process termination mechanism
 
-- **For / why:** maintainers can fix shutdown behavior once while developers retain safe independent Development and SUT lifecycles.
-- **Scope/design:** extract the existing common termination progression behind adapters for ChildProcess and recorded PID/group callers. Ownership proof stays with each environment; no generic service-management framework.
-- **Delivery sequence:** move the common already-owned-tree mechanism to one module; connect both adapters; remove duplicated loops/signalling progression and prove callers receive failures.
-- **Evaluation:** existing public stop/restart tests for both callers cover normal exit, TERM-resistant descendants, disappeared processes and bounded failure. One representative process-level check confirms owned descendants exit while an unrelated peer remains alive. Preserve environment-specific ownership refusal before signalling.
-- **Stop-safe outcome:** both environment entry points still work and use one mechanism. No migration of persistent data or ownership records.
-- **Effort hypothesis:** S–M, medium confidence; the adapter contract is the main uncertainty.
+- **Goal:** maintainers can correct the owned-tree termination lifecycle in one place while developers retain safe, independent Development and SUT shutdown/restart. This removes audit finding F4's maintenance divergence and supports concurrent verification; it does not claim to fix a reproduced process leak.
+- **Scope:** share descendant capture, TERM signalling, bounded polling, KILL escalation and final failure for an already-verified owned tree. Keep thin ChildProcess and recorded-PID adapters, including current liveness semantics and environment-specific diagnostics. Preserve existing public entry points and all their callers, including private OpenAI mock shutdown.
+- **Constraints:** ownership authentication remains with each environment before signalling; capture descendants before signals can reparent them; stop only the owned tree; observe shutdown completion or failure before reporting success, restarting or releasing ownership. Preserve TERM before KILL and current wait defaults. ADR 0007 requires proven ownership and separate environment resources; ADR 0006 requires visible failure rather than a swallowed cleanup error.
+- **Key examples:**
+  - Given a verified owned tree, stopping it removes the root/group and captured descendants; an unrelated process remains alive.
+  - Given a descendant that survives TERM, stopping escalates to KILL after the TERM wait; a process already gone is tolerated according to existing adapter semantics.
+  - Given a tree that remains live after KILL, shutdown fails within its existing bound. Development does not start a replacement; the SUT lifecycle owner observes failure and does not report successful cleanup or release ownership prematurely.
+  - Given missing, stale or conflicting ownership evidence, the environment's existing admission checks refuse signalling; sharing termination does not authorize resource adoption.
+- **Deferred promises:** new environment support, backend-test cancellation changes, new ownership protocols, process identity hardening, timeout-policy changes and a generic service-management framework. No changes to ports, databases or ownership-record formats. Necessary caller changes remain in scope; these exclusions do not impose artificial file boundaries.
+- **Evaluation:** preserve existing start/restart and peer-safety proof; add missing regression examples at those boundaries before structural changes. Current tests do not establish every escalation/failure example above. Structural review confirms a single termination progression, not merely shared descendant enumeration.
+- **Stop-safe outcome:** both environment entry points use one mechanism with their existing ownership and failure semantics. No persistent-data migration.
+- **Effort hypothesis:** S–M, medium confidence; bounded to two adapters and their existing lifecycle callers. Regression-fixture work is the principal sizing uncertainty.
 - **Depends on:** none.
+- **Open decisions:** none as of 2026-09-11. The correction follows existing behavior and Accepted ADRs 0006/0007; no new architectural exception is needed.
+- **Execution plan:** [Keep one owned-process termination mechanism](../quick/103-unify-owned-process-termination/PLAN.md).
 
 ## Execution readiness and design checks
 
-Story 4 remains refinement input. The product backlog records the selected
-order.
+Story 4 is refined and has a linked executable plan. Execution has not been
+authorized by the refinement request; its product-backlog entry remains queued.
 
 For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
 
