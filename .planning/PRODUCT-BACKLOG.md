@@ -23,6 +23,7 @@ changes.
 ## Taken
 
 - [Release backend worktree test ownership after execution](quick/102-release-backend-worktree-test-ownership/PLAN.md)
-- [Keep one owned-process termination mechanism](seeds/SEED-017-cohesive-design-corrections.md#story-4) — SEED-017
 
 ## Backlog
+
+- [Restart primary SUT only with proven process ownership](quick/104-refuse-unowned-primary-sut-restart/PLAN.md)

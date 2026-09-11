@@ -307,9 +307,9 @@ Slice 2 owns the safe-removal and failure-reporting concerns. If these proofs
 contradict the common model, stop at the preceding safe boundary and revise the
 affected remaining slices; do not erase the concern with more route branches.
 
-SEED-017 Story 4 remains independent. Any reuse of its process mechanism must
-preserve environment-specific ownership; this plan does not authorize delivery
-of that sibling. No conflict with Accepted ADRs 0006 or 0007 was identified.
+Owned-process termination retains environment-specific ownership adapters; this
+plan does not authorize changing those boundaries. No conflict with Accepted
+ADRs 0006 or 0007 was identified.
 
 ## Learnings
 

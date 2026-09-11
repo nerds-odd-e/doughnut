@@ -87,6 +87,37 @@ runSutServices({
   )
 }
 
+function writePersistentlyLiveSupervisor(checkoutRoot) {
+  writeFileSync(
+    path.join(checkoutRoot, 'run-supervisor.mjs'),
+    `import { spawn } from 'node:child_process'
+import { runSutServices } from ${JSON.stringify(
+      path.join(worktreeRoot, 'scripts/sut-services.mjs')
+    )}
+import { startSutOwnerControlFromEnv } from ${JSON.stringify(
+      path.join(worktreeRoot, 'scripts/sut-owner.mjs')
+    )}
+
+await startSutOwnerControlFromEnv()
+const child = spawn(process.execPath, ['-e', 'process.exit(17)'], {
+  stdio: ['ignore', 'pipe', 'pipe'],
+  detached: true,
+})
+const realKill = process.kill
+process.kill = (pid, signal) => {
+  if (pid === -child.pid) return signal === 0 ? true : undefined
+  return realKill(pid, signal)
+}
+runSutServices({
+  checkoutRoot: process.env.SUT_CHECKOUT_ROOT,
+  logFile: process.env.SUT_LOG_FILE,
+  serviceArgs: [],
+  spawnFn: () => child,
+})
+`
+  )
+}
+
 async function readPeerPids(checkoutRoot) {
   const pids = {}
   for (const name of peerNames) {
@@ -205,4 +236,48 @@ test('healthy supervisor logs a forced child exit and releases owned peers', asy
   assert.equal(health.ok, false)
   assert.equal(isPidAlive(foreign.pid), true)
   assert.equal(await isTcpListening(foreignListener.port), true)
+})
+
+test('supervisor reports bounded cleanup failure and retains ownership', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  writePersistentlyLiveSupervisor(checkout.root)
+  const owner = await claimSutOwnership(checkout.root)
+  const logFile = path.join(checkout.root, 'sut.log')
+  const supervisor = spawn(
+    process.execPath,
+    [path.join(checkout.root, 'run-supervisor.mjs')],
+    {
+      cwd: checkout.root,
+      env: {
+        ...process.env,
+        SUT_OWNER_TOKEN: owner.token,
+        SUT_OWNER_CONTROL_PATH: owner.controlPath,
+        SUT_CHECKOUT_ROOT: checkout.root,
+        SUT_LOG_FILE: logFile,
+      },
+      stdio: 'ignore',
+    }
+  )
+  t.after(() => {
+    try {
+      supervisor.kill('SIGKILL')
+    } catch {
+      // already gone
+    }
+  })
+
+  const [code, signal] = await new Promise((resolve) => {
+    supervisor.once('exit', (exitCode, exitSignal) =>
+      resolve([exitCode, exitSignal])
+    )
+  })
+  const log = await readFile(logFile, 'utf8')
+  assert.equal(signal, null)
+  assert.equal(code, 1)
+  assert.match(
+    log,
+    /SUT supervisor cleanup failed: Owned SUT process tree did not exit after SIGKILL within the bounded wait/
+  )
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), true)
 })

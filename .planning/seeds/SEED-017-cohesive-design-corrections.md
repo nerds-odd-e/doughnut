@@ -11,9 +11,9 @@ scope: L
 
 ## Result and audit boundary
 
-**Original audit findings (F1–F4):** two user-visible composition restrictions (F1/F2), one misplaced infrastructure policy (F3), and one duplicated lifecycle mechanism (F4). These are four root causes, not a defect count obtained by adding every affected plan. Several other plans improved cohesion or were superseded successfully.
+**Original audit findings (F1–F3):** two user-visible composition restrictions (F1/F2) and one misplaced infrastructure policy (F3). These are three root causes, not a defect count obtained by adding every affected plan. Several other plans improved cohesion or were superseded successfully.
 
-Window: **2026-09-05 11:02 through 2026-09-10 11:02, Asia/Singapore**, a fixed rolling 120 hours. Current code inspected at **`6876f46de098cf6b41dfcae7b2a2a0bebb7c16ec`**. Inventory contains **66 distinct completed/closed plan identities: 54 reviewed and 12 explicitly excluded**. There are 68 historical PLAN paths because two plans were renamed. Reused numeric IDs refer to different plans; the full directory names below disambiguate them.
+Window: **2026-09-05 11:02 through 2026-09-10 11:02, Asia/Singapore**, a fixed rolling 120 hours. Current code inspected at **`6876f46de098cf6b41dfcae7b2a2a0bebb7c16ec`**. Inventory contains **64 distinct completed/closed plan identities: 52 reviewed and 12 explicitly excluded**. There are 66 historical PLAN paths because two plans were renamed. Reused numeric IDs refer to different plans; the full directory names below disambiguate them.
 
 The original five-day inventory excluded the initial-publication family (plans
 078–087, 092 and 094); preserve that historical audit boundary.
@@ -75,18 +75,6 @@ The allowlist itself is **not proven wrong**: it prevents unverified tests from 
 
 Correction target: one small approved-spec registry declares required isolated capabilities; selection resolves a descriptor and orchestration acquires its resources. Resource lifecycle modules do not know feature filenames. Preserve the current four admissions, one-spec execution and unknown-spec refusal. This correction adds no newly admitted tests, external mocks or generic plugin framework.
 
-### F4 — Medium: Development and SUT implement the same termination lifecycle twice
-
-Current evidence: [sut-owned-process-tree.mjs](/Users/terryyin/git/doughnut/scripts/sut-owned-process-tree.mjs) and [development-owned-process-tree.mjs](/Users/terryyin/git/doughnut/scripts/development-owned-process-tree.mjs).
-
-Both capture descendants, signal descendants/group with TERM, poll for owned-tree disappearance, escalate with KILL and fail after a bounded wait. Both contain their own missing-process handling and wait/termination progression. Sharing descendant enumeration does not share that state machine.
-
-Provenance: 072 (`392599bf16`, `d191a6b33d`) established SUT descendant shutdown. 095 (`149809803a`) added the parallel Development implementation. Their ChildProcess-versus-recorded-PID entry points and ownership authentication legitimately differ. Other Development runtime concerns already reuse shared helpers; the finding is this particular duplicated mechanism, not the existence of two environments.
-
-Impact is maintenance divergence: a fix to escalation, liveness or failure propagation requires changing two implementations. No process leak was reproduced by this audit.
-
-Correction target: share termination of an already-verified owned process tree; retain separate ownership verification and thin caller adapters. Preserve peer safety, TERM-before-KILL, bounded failure and callers' observation of asynchronous failure. Do not combine environment state, ports, databases or ownership records.
-
 ## Plan-by-plan inventory
 
 Each row is one plan identity. Dates are September 2026 closure/provenance dates; SHAs are local Git anchors, not assertions that a single commit contains the complete execution. Read historical plans with `git show <sha>^:.planning/quick/<full-name>/PLAN.md` for deletion anchors, and inspect that commit's delivered status/proof as well. For retained 093, use `git show 6adf381f84:.planning/quick/093-release-private-openai-mock-after-cypress/PLAN.md`.
@@ -137,7 +125,6 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 | 069-local-note-edit-across-folder-move | 09-08 · `6b32ce0e04` | F1 interface residue: exact-subtree replay carries a scalar localPath. Keep identity-safe move support; ordinary history correction must not accidentally broaden structural replay. |
 | 070-isolated-openai-browser-mocks | 09-08 · `63423ccc48` | F3: mock-resource module exports a particular feature path and orchestration selects resources by that identity. Formerly numbered 069. |
 | 071-web-autosave-commit-batching | 09-08 · `4df82944d9` | No finding: batching uses common note/head/time state. The ordinary-note eligibility and time window are deliberate policy, not literal fixture identities. |
-| 072-owned-sut-descendant-shutdown | 09-08 · `67cc92e469` | F4 shared concept: establishes termination mechanism subsequently duplicated by 095; not evidence this original plan itself introduced duplication. |
 | 073-exclusive-openai-recording-proof | 09-09 · `428e021e60` | No new finding: paired recordings verify isolation through common owners; F3 remains in admission, not in this proof. |
 | 074-web-autosave-clock-precision | 09-08 · `76f8cb70b0` | No finding: timestamp precision correction applies across autosave state, not one timing example. |
 | 075-retire-worktree-databases | 09-08 · `1f723707fb` | No finding: generic disposable identity, admission and database evidence govern retirement. |
@@ -158,14 +145,6 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 | 092-small-initial-notebook-layouts | 09-09 · `524017c50a` | Excluded from original audit. |
 | 093-release-private-openai-mock-after-cypress | 09-10 · `6adf381f84` | No new finding: common event composition fixes overwritten cleanup callbacks. Current PLAN explicitly records done and live proof. |
 | 094-initial-notes-with-relationship | 09-10 · `cea9985238` | Excluded from original audit. |
-| 095-persistent-development-environment | 09-10 · `6876f46de0` | F4: separate Development termination state machine duplicates SUT descendant/TERM/wait/KILL logic. Other runtime helpers are already shared. |
-
-## Correction plan
-
-The active stories below cover independent correction outcomes. Each retains
-its own scope and proof; this seed is not a cross-subsystem executable plan.
-The remaining story is the infrastructure correction (4). The product
-backlog owns priority.
 
 ## Open product decision
 
@@ -175,37 +154,8 @@ Normal web authoring participation needs separate user outcomes; do not silently
 rebuild accepted history from live state. This question does not block the
 queued corrections.
 
-<a id="story-4"></a>
-
-### Story 4: Keep one owned-process termination mechanism
-
-- **Goal:** maintainers can correct the owned-tree termination lifecycle in one place while developers retain safe, independent Development and SUT shutdown/restart. This removes audit finding F4's maintenance divergence and supports concurrent verification; it does not claim to fix a reproduced process leak.
-- **Scope:** share descendant capture, TERM signalling, bounded polling, KILL escalation and final failure for an already-verified owned tree. Keep thin ChildProcess and recorded-PID adapters, including current liveness semantics and environment-specific diagnostics. Preserve existing public entry points and all their callers, including private OpenAI mock shutdown.
-- **Constraints:** ownership authentication remains with each environment before signalling; capture descendants before signals can reparent them; stop only the owned tree; observe shutdown completion or failure before reporting success, restarting or releasing ownership. Preserve TERM before KILL and current wait defaults. ADR 0007 requires proven ownership and separate environment resources; ADR 0006 requires visible failure rather than a swallowed cleanup error.
-- **Key examples:**
-  - Given a verified owned tree, stopping it removes the root/group and captured descendants; an unrelated process remains alive.
-  - Given a descendant that survives TERM, stopping escalates to KILL after the TERM wait; a process already gone is tolerated according to existing adapter semantics.
-  - Given a tree that remains live after KILL, shutdown fails within its existing bound. Development does not start a replacement; the SUT lifecycle owner observes failure and does not report successful cleanup or release ownership prematurely.
-  - Given missing, stale or conflicting ownership evidence, the environment's existing admission checks refuse signalling; sharing termination does not authorize resource adoption.
-- **Deferred promises:** new environment support, backend-test cancellation changes, new ownership protocols, process identity hardening, timeout-policy changes and a generic service-management framework. No changes to ports, databases or ownership-record formats. Necessary caller changes remain in scope; these exclusions do not impose artificial file boundaries.
-- **Evaluation:** preserve existing start/restart and peer-safety proof; add missing regression examples at those boundaries before structural changes. Current tests do not establish every escalation/failure example above. Structural review confirms a single termination progression, not merely shared descendant enumeration.
-- **Stop-safe outcome:** both environment entry points use one mechanism with their existing ownership and failure semantics. No persistent-data migration.
-- **Effort hypothesis:** S–M, medium confidence; bounded to two adapters and their existing lifecycle callers. Regression-fixture work is the principal sizing uncertainty.
-- **Depends on:** none.
-- **Open decisions:** none as of 2026-09-11. The correction follows existing behavior and Accepted ADRs 0006/0007; no new architectural exception is needed.
-- **Execution plan:** [Keep one owned-process termination mechanism](../quick/103-unify-owned-process-termination/PLAN.md).
-
-## Execution readiness and design checks
-
-Story 4 is refined and has a linked executable plan. Execution has not been
-authorized by the refinement request; its product-backlog entry remains queued.
-
-For each eventual executable plan, require a short final-design account: which domain concept owns the rule, which old handlers/tests/docs disappear, which invariants justify remaining refusals, and which public proof demonstrates composition. An example is evidence of a rule, not the name or dispatch key of a production algorithm. A cardinality limit requires a real product, identity or resource reason. Review the aggregate final diff and implicated unchanged code, not just each slice in isolation.
-
-Apply Accepted ADRs on portable representation, failure handling and environment isolation (0004, 0006, 0007). Keep fail-loud refusals for unsupported or ambiguous semantics; remove only restrictions shown to arise from example-shaped delivery contracts. Follow normal repository refactoring, formatting and test requirements when execution is separately requested. This audit changes no Open Dough rules or skills; upstream process work remains separate.
-
 ## Why this pattern survived
 
-Historical plans often explicitly made unsupported neighboring examples part of the contract. Execution could therefore satisfy the plan while creating an inconsistent combined capability. Later stories added another allowed case; shared low-level helpers preserved the higher-level scenario gate. Behavior-preserving cleanup could not remove a rejection that planning and tests had made a required behavior. F1/F2 show that directly. F3/F4 are narrower cohesion misses and do not establish the same intent or severity.
+Historical plans often explicitly made unsupported neighboring examples part of the contract. Execution could therefore satisfy the plan while creating an inconsistent combined capability. Later stories added another allowed case; shared low-level helpers preserved the higher-level scenario gate. Behavior-preserving cleanup could not remove a rejection that planning and tests had made a required behavior. F1/F2 show that directly. F3 is a narrower cohesion miss and does not establish the same intent or severity.
 
-This evidence supports fixing both the affected mechanisms and how future plans distinguish an example from an invariant. It does not support discarding all five days of work, blaming every small story, or claiming every specialized adapter is a defect.
+This evidence supports fixing both the affected mechanisms and how future plans distinguish an example from an invariant. It does not support discarding all five days of work or blaming every small story.
