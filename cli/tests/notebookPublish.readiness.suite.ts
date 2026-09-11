@@ -13,7 +13,10 @@ import {
   startPausedSameLineRebase,
   unmergedOperationObservation,
 } from './notebookPull.testHelpers.js'
-import { stubFetchWithAcceptedBundleFrom } from './notebookPublish.testHelpers.js'
+import {
+  localGitObservation,
+  stubFetchWithAcceptedBundleFrom,
+} from './notebookPublish.testHelpers.js'
 
 export function describeNotebookPublishReadiness(): void {
   describe('notebook publish (CLI routing, local readiness checks)', () => {
@@ -48,48 +51,38 @@ export function describeNotebookPublishReadiness(): void {
       expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
     })
 
-    test('a staged (index) change is rejected with an actionable readiness error', async () => {
-      const dir = initBoundCheckout(ctx.getWorkDir(), getApiConfig().apiBaseUrl)
-      fs.writeFileSync(join(dir, 'note.md'), '# hello notebook (staged edit)\n')
-      runGit(['add', 'note.md'], dir)
+    test.each(['staged', 'unstaged', 'untracked'] as const)(
+      '%s work warns, publishes committed main, and preserves local Git state',
+      async (kind) => {
+        const dir = initBoundCheckout(
+          ctx.getWorkDir(),
+          getApiConfig().apiBaseUrl
+        )
+        if (kind === 'untracked') {
+          fs.writeFileSync(join(dir, 'untracked.md'), '# new note\n')
+        } else {
+          fs.writeFileSync(
+            join(dir, 'note.md'),
+            `# hello notebook (${kind} edit)\n`
+          )
+          if (kind === 'staged') runGit(['add', 'note.md'], dir)
+        }
+        const before = localGitObservation(dir)
+        const fetchMock = stubFetchWithAcceptedBundleFrom(dir, ctx.getWorkDir())
 
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
-      )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('uncommitted changes')
-      )
-      expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
-    })
+        await run(['notebook', 'publish', dir])
 
-    test('an unstaged modification to a tracked file is rejected with an actionable readiness error', async () => {
-      const dir = initBoundCheckout(ctx.getWorkDir(), getApiConfig().apiBaseUrl)
-      fs.writeFileSync(
-        join(dir, 'note.md'),
-        '# hello notebook (unstaged edit)\n'
-      )
-
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
-      )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('uncommitted changes')
-      )
-      expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
-    })
-
-    test('an untracked file is rejected with an actionable readiness error', async () => {
-      const dir = initBoundCheckout(ctx.getWorkDir(), getApiConfig().apiBaseUrl)
-      fs.writeFileSync(join(dir, 'untracked.md'), '# new note\n')
-
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
-      )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('uncommitted changes')
-      )
-      expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
-    })
+        expect(ctx.getErrorSpy()).toHaveBeenCalledOnce()
+        expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+          `donut: warning: ${dir} has uncommitted changes (1 file not clean, including untracked files) — publishing committed main; local changes are not included.`
+        )
+        expect(fetchMock).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({ method: 'POST' })
+        )
+        expect(localGitObservation(dir)).toEqual(before)
+      }
+    )
 
     test('an unfinished rebase is rejected without submitting or changing the unmerged checkout', async () => {
       const dir = initBoundCheckout(ctx.getWorkDir(), getApiConfig().apiBaseUrl)

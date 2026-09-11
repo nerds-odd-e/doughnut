@@ -12,6 +12,7 @@ import {
   buildSourceRepo,
   bundleMain,
   cloneAsBoundCheckout,
+  localGitObservation,
   rejectionPost,
   stubFetchForSubmission,
 } from './notebookPublish.testHelpers.js'
@@ -63,32 +64,46 @@ export function describeNotebookPublishSubmission(): void {
       }
     )
 
-    test.each([
-      [400, 'note.md has invalid YAML frontmatter', 'BINDING_ERROR'],
-      [
-        409,
-        "expectedHead no longer matches the notebook's current accepted head.",
-        'RESOURCE_CONFLICT',
-      ],
-    ])(
-      'a %i ApiError reports the publication rejection reason and leaves local state untouched',
-      async (status, message, errorType) => {
-        const workDir = ctx.getWorkDir()
-        const { dir } = setUpEligibleCheckoutWithPostResponse(
-          workDir,
-          rejectionPost(status, message, errorType)
-        )
-        const headBefore = runGit(['rev-parse', 'main'], dir)
-        const statusBefore = runGit(['status', '--porcelain'], dir)
+    test('a 400 ApiError reports the publication rejection reason and leaves local state untouched', async () => {
+      const workDir = ctx.getWorkDir()
+      const message = 'note.md has invalid YAML frontmatter'
+      const { dir } = setUpEligibleCheckoutWithPostResponse(
+        workDir,
+        rejectionPost(400, message, 'BINDING_ERROR')
+      )
+      const headBefore = runGit(['rev-parse', 'main'], dir)
+      const statusBefore = runGit(['status', '--porcelain'], dir)
 
-        await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-          ProcessExitForTest
-        )
-        expect(ctx.getErrorSpy()).toHaveBeenCalledWith(`donut: ${message}`)
-        expect(runGit(['rev-parse', 'main'], dir)).toBe(headBefore)
-        expect(runGit(['status', '--porcelain'], dir)).toBe(statusBefore)
-      }
-    )
+      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+        ProcessExitForTest
+      )
+      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(`donut: ${message}`)
+      expect(runGit(['rev-parse', 'main'], dir)).toBe(headBefore)
+      expect(runGit(['status', '--porcelain'], dir)).toBe(statusBefore)
+    })
+
+    test('a 409 ApiError reports the reason and preserves dirty local state', async () => {
+      const workDir = ctx.getWorkDir()
+      const message =
+        "expectedHead no longer matches the notebook's current accepted head."
+      const { dir } = setUpEligibleCheckoutWithPostResponse(
+        workDir,
+        rejectionPost(409, message, 'RESOURCE_CONFLICT')
+      )
+      fs.writeFileSync(join(dir, 'note.md'), '# dirty tracked edit\n')
+      fs.writeFileSync(join(dir, 'untracked.md'), '# dirty untracked note\n')
+      const before = localGitObservation(dir)
+
+      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+        ProcessExitForTest
+      )
+      expect(ctx.getErrorSpy()).toHaveBeenNthCalledWith(
+        1,
+        `donut: warning: ${dir} has uncommitted changes (2 files not clean, including untracked files) — publishing committed main; local changes are not included.`
+      )
+      expect(ctx.getErrorSpy()).toHaveBeenNthCalledWith(2, `donut: ${message}`)
+      expect(localGitObservation(dir)).toEqual(before)
+    })
 
     test('a rejection without an ApiError message reports its HTTP status', async () => {
       const workDir = ctx.getWorkDir()

@@ -4,8 +4,13 @@ Source: [SEED-009 Story 2](../../seeds/SEED-009-git-backed-local-notebook-workfl
 refined from a real `notebook publish` refusal with two uncommitted files on
 2026-09-11.
 
-Status: planned. Story refinement and slice planning requested 2026-09-11;
-implementation not requested.
+Status: done. Executed 2026-09-11.
+
+Execution identity: originating checkout
+`/Users/terryyin/git/doughnut` on `main`; execution checkout
+`/Users/terryyin/git/doughnut-quick-104` on
+`codex/104-warn-and-publish-committed-main`; integration target `main`;
+authorized push destination `origin`.
 
 ## Goal and scope
 
@@ -60,7 +65,7 @@ duplicating Git queries or readiness messages.
 
 ### 1. Warn and submit committed main from a dirty checkout
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes for test-first implementation, focused cleanup, and the
 CLI suite; medium-high confidence. CLI-suite runtime is an external-wait
 exception. Stop and refine before 10 minutes of active work if output routing or
@@ -122,12 +127,11 @@ production branches.
 
 ## Delivery
 
-Planning only; execution is not authorized by this request. When authorized,
-use `dough-execute-plan`: move Story 2 from Backlog to Taken at execution start,
-deliver the slice test-first with Jidoka, run a fresh
-`dough-post-change-refactor` pass, run coordinator-owned
-`./scripts/run.sh pnpm format:changed` once, update this plan, commit, push, and
-handle CI asynchronously. No generated API or schema change is expected.
+The slice was implemented test-first, independently refactored, formatted once,
+committed, and pushed on the retained execution branch. No generated API or
+schema change was required. Push-triggered CI is `ci.yml` (`donut CI`) on
+`main` only, so the retained execution-branch push has no supported observer
+coverage and remains unobserved until integration.
 
 Keep this plan and its story through execution retrospective and story wrap-up.
 
@@ -137,3 +141,20 @@ Planning inspection confirms publication already bundles committed `main`
 independently of dirty files. The blocking behavior is confined to the shared
 checkout-readiness policy and its three publish tests. No tests were run and no
 product behavior was changed during planning.
+
+Execution replaced the three dirty-state refusals with one CLI-boundary data
+test over staged, unstaged, and untracked work. Each case observes one warning,
+reaches the publication POST, and compares committed `main`, the index diff,
+porcelain status, tracked content, and untracked content before and after. A
+dirty 409 rejection observes both the warning and server reason with the same
+preservation proof. The existing real bundle inspection and pull-readiness
+refusals remain green.
+
+Implementation plus focused cleanup took about 8 active minutes, above the
+5-minute target and below the 10-minute hard limit; CLI suite waits were the
+named external-wait exception. Focused and full proof passed:
+`CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run
+tests/notebookPublish.test.ts --reporter=dot` (32 tests) and
+`CURSOR_DEV=true nix develop -c pnpm cli:test`. Post-change refactoring made the
+shared readiness observation expose a dirty-file count and named the test
+dirtiness variants; focused proof remained 32/32 green.

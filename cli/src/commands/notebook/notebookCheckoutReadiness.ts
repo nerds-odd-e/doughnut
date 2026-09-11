@@ -17,10 +17,10 @@ function readGitOutput(directory: string, args: string[]): string {
   return result.stdout
 }
 
-function assertAttachedCleanMain(
+function attachedMainDirtyFileCount(
   directory: string,
   purpose: CheckoutPurpose
-): void {
+): number {
   const branch = readGitOutput(directory, [
     'rev-parse',
     '--abbrev-ref',
@@ -34,13 +34,9 @@ function assertAttachedCleanMain(
     )
   }
 
-  const status = readGitOutput(directory, ['status', '--porcelain'])
-  const changedLines = status.split('\n').filter((line) => line.trim() !== '')
-  if (changedLines.length > 0) {
-    throw new Error(
-      `${directory} has uncommitted changes (${changedLines.length} file${changedLines.length === 1 ? '' : 's'} not clean, including untracked files) — commit or clean them before ${purpose}.`
-    )
-  }
+  return readGitOutput(directory, ['status', '--porcelain'])
+    .split('\n')
+    .filter((line) => line.trim() !== '').length
 }
 
 function gitOperationIsActive(directory: string): boolean {
@@ -64,16 +60,20 @@ function gitOperationIsActive(directory: string): boolean {
 }
 
 /** Refuses active operations first — porcelain may be empty or dirty, and HEAD may be detached. */
-function assertReadyCheckout(
+function readyCheckoutDirtyFileCount(
   directory: string,
   purpose: CheckoutPurpose
-): void {
+): number {
   if (gitOperationIsActive(directory)) {
     throw new Error(
       `${directory} has an active Git operation. Finish or abort the active Git operation before ${purpose}.`
     )
   }
-  assertAttachedCleanMain(directory, purpose)
+  return attachedMainDirtyFileCount(directory, purpose)
+}
+
+function dirtyCheckoutDetail(directory: string, changedFiles: number): string {
+  return `${directory} has uncommitted changes (${changedFiles} file${changedFiles === 1 ? '' : 's'} not clean, including untracked files)`
 }
 
 /**
@@ -81,7 +81,12 @@ function assertReadyCheckout(
  * the index, or files.
  */
 export function assertLocalMainIsReadyToPublish(directory: string): void {
-  assertReadyCheckout(directory, 'publishing')
+  const dirtyFileCount = readyCheckoutDirtyFileCount(directory, 'publishing')
+  if (dirtyFileCount > 0) {
+    console.error(
+      `donut: warning: ${dirtyCheckoutDetail(directory, dirtyFileCount)} — publishing committed main; local changes are not included.`
+    )
+  }
 }
 
 /**
@@ -89,5 +94,10 @@ export function assertLocalMainIsReadyToPublish(directory: string): void {
  * the index, or files.
  */
 export function assertLocalMainIsReadyToReceive(directory: string): void {
-  assertReadyCheckout(directory, 'receiving')
+  const dirtyFileCount = readyCheckoutDirtyFileCount(directory, 'receiving')
+  if (dirtyFileCount > 0) {
+    throw new Error(
+      `${dirtyCheckoutDetail(directory, dirtyFileCount)} — commit or clean them before receiving.`
+    )
+  }
 }

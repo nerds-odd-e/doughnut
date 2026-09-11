@@ -63,6 +63,25 @@ export function postCount(fetchMock: ReturnType<typeof vi.fn>): number {
   ).length
 }
 
+export function localGitObservation(directory: string): {
+  main: string
+  index: string
+  status: string
+  trackedContent: string
+  untrackedContent: string | undefined
+} {
+  const untrackedPath = join(directory, 'untracked.md')
+  return {
+    main: runGit(['rev-parse', 'main'], directory),
+    index: runGit(['diff', '--cached', '--binary'], directory),
+    status: runGit(['status', '--porcelain=v1'], directory),
+    trackedContent: fs.readFileSync(join(directory, 'note.md'), 'utf8'),
+    untrackedContent: fs.existsSync(untrackedPath)
+      ? fs.readFileSync(untrackedPath, 'utf8')
+      : undefined,
+  }
+}
+
 /**
  * Stubs global fetch to distinguish the ancestry check's GET (accepted-bundle download) from the
  * submission's POST (proposal upload): GET requests are served `bundleFile`'s bytes; POST
