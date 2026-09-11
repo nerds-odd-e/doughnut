@@ -2,7 +2,11 @@ package com.odde.donut.services.notebookGit;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
@@ -18,10 +22,11 @@ import org.springframework.web.server.ResponseStatusException;
  * files remain context. Ordinary-note admission permits added and/or modified ordinary Markdown
  * notes at regular file modes, any number of ordinary-note deletions alone or with same-path edits,
  * or exactly one isolated equal-content rename (one removed and one added note sharing a blob).
- * Mixing removals with additions is refused when identity correspondence is uncertain. Unsafe
- * paths, non-regular modes, or a changed folder-reserved {@code README.md} are refused. Callers
- * only invoke this once proposal ancestry is confirmed to be a direct single-parent child of the
- * accepted commit.
+ * Rename correspondence is resolved across the complete candidate set before that admission rule is
+ * applied. Mixing removals with additions is refused when identity correspondence is uncertain.
+ * Unsafe paths, non-regular modes, or a changed folder-reserved {@code README.md} are refused.
+ * Callers only invoke this once proposal ancestry is confirmed to be a direct single-parent child
+ * of the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -132,42 +137,67 @@ public final class NotebookGitProposalTreeShape {
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
-    List<NoteChange> renameDetected = detectEqualBlobRename(changes);
-    if (renameDetected != null) {
-      return renameDetected;
+    List<NoteChange> resolvedChanges = resolveMoveCorrespondence(changes);
+    boolean hasRename =
+        resolvedChanges.stream().anyMatch(change -> change.kind() == ChangeKind.RENAMED);
+    if (hasRename) {
+      if (resolvedChanges.size() == 1) {
+        return resolvedChanges;
+      }
+      refuseUncertainRemovalAndAdditionMixture();
     }
-    refuseUncertainRemovalAndAdditionMixtures(changes);
-    return changes;
+    refuseUncertainRemovalAndAdditionMixtures(resolvedChanges);
+    return resolvedChanges;
   }
 
   /**
-   * Recognizes the one rename shape this proposal type accepts: a proposal containing exactly one
-   * removed and one added ordinary note with identical blob content. Returns {@code null} when the
-   * proposal does not match this shape, so callers fall back to deletion/edit admission and
-   * removal/addition refusal rules.
+   * Resolves every unambiguous removed/added pair with identical blob content while retaining all
+   * companion changes. A blob represented by multiple sources or destinations cannot establish
+   * identity correspondence, so the complete proposal is refused.
    */
-  private static List<NoteChange> detectEqualBlobRename(List<NoteChange> changes) {
-    if (changes.size() != 2) {
-      return null;
+  private static List<NoteChange> resolveMoveCorrespondence(List<NoteChange> changes) {
+    Map<ObjectId, List<NoteChange>> removalsByBlob = changesByBlob(changes, ChangeKind.DELETED);
+    Map<ObjectId, List<NoteChange>> additionsByBlob = changesByBlob(changes, ChangeKind.ADDED);
+    Map<String, String> sourcesByDestination = new HashMap<>();
+    Set<String> matchedSources = new HashSet<>();
+    for (Map.Entry<ObjectId, List<NoteChange>> removalGroup : removalsByBlob.entrySet()) {
+      List<NoteChange> additionGroup = additionsByBlob.get(removalGroup.getKey());
+      if (additionGroup == null) {
+        continue;
+      }
+      if (removalGroup.getValue().size() != 1 || additionGroup.size() != 1) {
+        refuseUncertainRemovalAndAdditionMixture();
+      }
+      NoteChange source = removalGroup.getValue().getFirst();
+      NoteChange destination = additionGroup.getFirst();
+      matchedSources.add(source.path());
+      sourcesByDestination.put(destination.path(), source.path());
     }
-    NoteChange deleted =
-        changes.stream()
-            .filter(change -> change.kind() == ChangeKind.DELETED)
-            .findFirst()
-            .orElse(null);
-    NoteChange added =
-        changes.stream()
-            .filter(change -> change.kind() == ChangeKind.ADDED)
-            .findFirst()
-            .orElse(null);
-    if (deleted == null || added == null) {
-      return null;
+
+    List<NoteChange> resolved = new ArrayList<>();
+    for (NoteChange change : changes) {
+      if (change.kind() == ChangeKind.DELETED && matchedSources.contains(change.path())) {
+        continue;
+      }
+      String source = sourcesByDestination.get(change.path());
+      if (change.kind() == ChangeKind.ADDED && source != null) {
+        resolved.add(new NoteChange(change.path(), ChangeKind.RENAMED, change.blobId(), source));
+      } else {
+        resolved.add(change);
+      }
     }
-    if (!deleted.blobId().equals(added.blobId())) {
-      return null;
+    return resolved;
+  }
+
+  private static Map<ObjectId, List<NoteChange>> changesByBlob(
+      List<NoteChange> changes, ChangeKind kind) {
+    Map<ObjectId, List<NoteChange>> changesByBlob = new HashMap<>();
+    for (NoteChange change : changes) {
+      if (change.kind() == kind) {
+        changesByBlob.computeIfAbsent(change.blobId(), ignored -> new ArrayList<>()).add(change);
+      }
     }
-    return List.of(
-        new NoteChange(added.path(), ChangeKind.RENAMED, added.blobId(), deleted.path()));
+    return changesByBlob;
   }
 
   private static void refuseUncertainRemovalAndAdditionMixtures(List<NoteChange> changes) {
@@ -176,6 +206,10 @@ public final class NotebookGitProposalTreeShape {
     if (!hasDeleted || !hasAdded) {
       return;
     }
+    refuseUncertainRemovalAndAdditionMixture();
+  }
+
+  private static void refuseUncertainRemovalAndAdditionMixture() {
     throw unsupportedTreeShape(
         "separate identity-changing work: publish an equal-content rename alone, or delete and"
             + " create notes in separate commits rather than mixing removals with additions");
