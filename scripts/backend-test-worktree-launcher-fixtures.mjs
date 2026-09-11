@@ -102,6 +102,7 @@ export function runWrapperAsync(checkout, options = {}) {
 
   return {
     waitForGradleReached: () => waitForFile(checkout.gradleReached),
+    waitForSignalReceived: () => waitForFile(checkout.signalReceived),
     release: () => writeFileSync(checkout.gradleRelease, ''),
     stop: () => child.kill(),
     signalProcessGroup: (signal) => process.kill(-child.pid, signal),

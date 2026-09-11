@@ -4,7 +4,10 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { makeLinkedWorktreeCheckout } from './backend-test-worktree-linked-fixtures.mjs'
-import { runWrapper } from './backend-test-worktree-launcher-fixtures.mjs'
+import {
+  runWrapper,
+  runWrapperAsync,
+} from './backend-test-worktree-launcher-fixtures.mjs'
 import {
   lockPaths,
   writeStaleOwnerLock,
@@ -96,6 +99,27 @@ test('ordinary backend completion releases ownership and permits an otherwise el
   const result = await runCheck(checkout.root)
   assert.equal(result.code, 0, result.err)
   assert.match(result.out, /idle snapshot/i)
+})
+
+test('uncatchable backend owner death retains evidence and retirement refuses it', async (t) => {
+  const checkout = makeLinkedWorktreeCheckout(t, {
+    config: JSON.stringify({ id: 'wt_a7c2' }),
+  })
+  const owner = runWrapperAsync(checkout, {
+    command: 'backend/gradlew',
+    args: ['-p', 'backend', 'migrateTestDB'],
+    detached: true,
+  })
+  await owner.waitForGradleReached()
+  owner.signalProcessGroup('SIGKILL')
+  const killed = await owner.waitForExit()
+  assert.equal(killed.signal, 'SIGKILL')
+  assert.equal(existsSync(lockPaths(checkout).dir), true)
+
+  const result = await runCheck(checkout.root)
+  assert.equal(result.code, 1)
+  assert.match(result.err, /stale or unverifiable backend worktree owner/)
+  assert.equal(existsSync(lockPaths(checkout).dir), true)
 })
 
 test('live SUT owner refuses and leaves the owner control alive', async (t) => {

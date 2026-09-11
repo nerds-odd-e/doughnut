@@ -176,8 +176,7 @@ backend_test_worktree_finalize() {
   local release_status=0
   trap - EXIT
 
-  if [[ "${backend_worktree_lock_owned:-0}" -eq 1 \
-    && -z "${backend_worktree_received_signal:-}" ]]; then
+  if [[ "${backend_worktree_lock_owned:-0}" -eq 1 ]]; then
     backend_test_worktree_release || release_status=$?
     if [[ "${release_status}" -ne 0 ]]; then
       echo "Failed to release backend worktree test ownership." >&2
@@ -185,6 +184,10 @@ backend_test_worktree_finalize() {
         status="${release_status}"
       fi
     fi
+  fi
+  if [[ -n "${backend_worktree_received_signal:-}" ]]; then
+    trap - INT TERM
+    kill -s "${backend_worktree_received_signal}" "$$"
   fi
   exit "${status}"
 }
@@ -211,9 +214,5 @@ backend_test_worktree_run() {
     status=$?
   fi
 
-  trap - INT TERM
-  if [[ -n "${backend_worktree_received_signal}" ]]; then
-    kill -s "${backend_worktree_received_signal}" "$$"
-  fi
   return "${status}"
 }

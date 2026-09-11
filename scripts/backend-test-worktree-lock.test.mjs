@@ -38,6 +38,11 @@ const ordinaryMigrate = {
   args: ['-p', 'backend', 'migrateTestDB'],
 }
 
+const ordinaryTest = {
+  command: 'backend/gradlew',
+  args: ['-p', 'backend', 'test'],
+}
+
 function configuredCheckout(t) {
   return makeCheckout(t, {
     config: JSON.stringify({ id: configuredId }),
@@ -72,10 +77,29 @@ async function assertSupervisedInterruption(t, startOwner) {
   const result = await owner.waitForExit()
   assert.equal(result.status, null, outputOf(result))
   assert.equal(result.signal, 'SIGINT', outputOf(result))
-  assert.equal(
-    readFileSync(lockPaths(checkout).ownerFile, 'utf8').trim(),
-    String(owner.pid)
-  )
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
+}
+
+async function assertVerifiedCancellation(
+  t,
+  { startOwner, waitUntilActive, captureWorker, releaseShutdown, signal }
+) {
+  const checkout = configuredCheckout(t)
+  const owner = startOwner(checkout)
+  await waitUntilActive(owner)
+  const workerPid = captureWorker(checkout)
+
+  owner.signalProcessGroup(signal)
+  await owner.waitForSignalReceived()
+  assertRefusedByActiveOwner(runLauncher(checkout))
+  assert.equal(existsSync(lockPaths(checkout).dir), true)
+
+  releaseShutdown(owner)
+  const result = await owner.waitForExit()
+  assert.equal(result.status, null, outputOf(result))
+  assert.equal(result.signal, signal, outputOf(result))
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
+  assert.throws(() => process.kill(workerPid, 0), { code: 'ESRCH' })
 }
 
 function assertReclaimedConfiguredOwner(checkout, result) {
@@ -161,6 +185,96 @@ test('ordinary migrate observes its Gradle child through interruption', (t) =>
   assertSupervisedInterruption(t, (checkout) =>
     runWrapperAsync(checkout, { ...ordinaryMigrate, detached: true })
   ))
+
+test('handled cancellation during preparation holds ownership until mysql stops, then releases it', (t) =>
+  assertVerifiedCancellation(t, {
+    startOwner: (checkout) =>
+      runLauncherAsync(checkout, {
+        detached: true,
+        env: { MYSQL_HOLD: '1', FAKE_DELAY_SIGNAL_EXIT: '1' },
+      }),
+    waitUntilActive: (owner) => owner.waitForMysqlReached(),
+    captureWorker: (checkout) =>
+      Number(readFileSync(path.join(checkout.root, 'mysql-pid.1'), 'utf8')),
+    releaseShutdown: (owner) => owner.releaseMysql(),
+    signal: 'SIGINT',
+  }))
+
+test('handled cancellation during preliminary migration holds ownership until gradle stops, then releases it', (t) =>
+  assertVerifiedCancellation(t, {
+    startOwner: (checkout) =>
+      runWrapperAsync(checkout, {
+        ...ordinaryTest,
+        detached: true,
+        env: { FAKE_DELAY_SIGNAL_EXIT: '1' },
+      }),
+    waitUntilActive: (owner) => owner.waitForGradleReached(),
+    captureWorker: (checkout) => readGradlePid(checkout),
+    releaseShutdown: (owner) => owner.release(),
+    signal: 'SIGTERM',
+  }))
+
+test('handled cancellation during final workload holds ownership until gradle stops, then releases it', (t) =>
+  assertVerifiedCancellation(t, {
+    startOwner: (checkout) =>
+      runWrapperAsync(checkout, {
+        ...ordinaryTest,
+        detached: true,
+        env: {
+          FAKE_DELAY_SIGNAL_EXIT: '1',
+          GRADLE_HOLD_INVOCATION: '2',
+        },
+      }),
+    waitUntilActive: (owner) => owner.waitForGradleReached(),
+    captureWorker: (checkout) => readGradlePid(checkout, 2),
+    releaseShutdown: (owner) => owner.release(),
+    signal: 'SIGINT',
+  }))
+
+test('cancelling one checkout leaves an unrelated checkout owner alive', async (t) => {
+  const checkout = configuredCheckout(t)
+  const peerCheckout = makeCheckout(t, {
+    config: JSON.stringify({ id: 'wt_peer' }),
+  })
+  const owner = runLauncherAsync(checkout, {
+    detached: true,
+    env: { FAKE_DELAY_SIGNAL_EXIT: '1' },
+  })
+  const peer = runLauncherAsync(peerCheckout, { detached: true })
+  t.after(() => {
+    owner.stop()
+    peer.stop()
+  })
+  await Promise.all([owner.waitForGradleReached(), peer.waitForGradleReached()])
+
+  owner.signalProcessGroup('SIGINT')
+  await owner.waitForSignalReceived()
+  assert.doesNotThrow(() => process.kill(peer.pid, 0))
+  owner.release()
+  assert.equal((await owner.waitForExit()).signal, 'SIGINT')
+  assert.doesNotThrow(() => process.kill(peer.pid, 0))
+
+  peer.release()
+  assert.equal((await peer.waitForExit()).status, 0)
+})
+
+test('cancellation remains the outcome when releasing changed ownership fails visibly', async (t) => {
+  const checkout = configuredCheckout(t)
+  const owner = runLauncherAsync(checkout, {
+    detached: true,
+    env: { FAKE_DELAY_SIGNAL_EXIT: '1' },
+  })
+  await owner.waitForGradleReached()
+  writeFileSync(lockPaths(checkout).ownerFile, '424242')
+
+  owner.signalProcessGroup('SIGINT')
+  await owner.waitForSignalReceived()
+  owner.release()
+  const result = await owner.waitForExit()
+  assert.equal(result.signal, 'SIGINT', outputOf(result))
+  assert.match(outputOf(result), /Failed to release/)
+  assert.equal(readFileSync(lockPaths(checkout).ownerFile, 'utf8'), '424242')
+})
 
 test('a stale owner record for an exited process is reclaimed and the launcher reaches gradle against the configured database', (t) => {
   const checkout = configuredCheckout(t)

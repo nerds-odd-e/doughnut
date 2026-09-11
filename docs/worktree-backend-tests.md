@@ -91,14 +91,15 @@ silently provisioned or adopted.
 
 Regardless of which workflow started it, only one worktree test invocation
 runs at a time per checkout: an overlapping second command in the same
-checkout refuses immediately rather than sharing the run. After an ordinary
-success or failure, including configuration, provisioning, migration, or test
-failure, the invocation releases only the ownership record still verified as
-its own. A release failure remains visible and never hides an existing workload
-failure. If an abnormal or interrupted invocation exits without verified
-release, the next invocation can reclaim its stale record automatically;
-retirement still refuses that record. Commands in different checkouts remain
-fully independent and may run concurrently.
+checkout refuses immediately rather than sharing the run. After success,
+ordinary failure, or handled SIGINT/SIGTERM cancellation, including during
+configuration, provisioning, migration, or tests, the invocation waits for its
+active work to stop and then releases only the ownership record still verified
+as its own. A release failure remains visible and never hides an existing
+workload failure or cancellation. An uncatchable crash, surviving work, or
+otherwise unverified shutdown retains the record; a later invocation may
+reclaim that stale record, but retirement still refuses it. Commands in
+different checkouts remain fully independent and may run concurrently.
 
 ## Ordinary migration in a configured checkout
 

@@ -52,12 +52,19 @@ function writeStandIn(scriptPath, lines) {
 // stand-ins below.
 function holdReleaseLines(envVar, reachedName, releaseName) {
   return [
-    `if [ -n "\${${envVar}:-}" ]; then`,
+    `if [ -n "\${${envVar}:-}" ] && { [ -z "\${${envVar}_INVOCATION:-}" ] || [ "$n" = "\${${envVar}_INVOCATION}" ]; }; then`,
+    '  delayed_signal=""',
+    '  if [ -n "${FAKE_DELAY_SIGNAL_EXIT:-}" ]; then',
+    '    trap \'delayed_signal=1; printf "received\\n" > "$root/signal-received"\' INT TERM',
+    '  fi',
     `  printf 'reached\\n' > "$root/${reachedName}"`,
     `  release="$root/${releaseName}"`,
     '  while [ ! -e "$release" ]; do',
     '    sleep 0.05',
     '  done',
+    '  if [ -n "$delayed_signal" ]; then',
+    '    exit 130',
+    '  fi',
     'fi',
   ]
 }
@@ -167,6 +174,7 @@ export function makeCheckout(t, { config } = {}) {
     mysqlInvocation,
     mysqlReached,
     mysqlRelease,
+    signalReceived: path.join(root, 'signal-received'),
   }
 }
 

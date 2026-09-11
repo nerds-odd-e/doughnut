@@ -6,8 +6,9 @@ recoverable from before-cleanup commit `056ddef4ba` at
 `.planning/seeds/SEED-017-cohesive-design-corrections.md`; reviewed through
 commits `8983d9db3f`, `65d88f55cc`, `be76f0d471`, and `1833e29ead`.
 
-Status: executing; story and slice refinement completed 2026-09-11.
-Slices 1–2 are delivered. Slice 3 remains.
+Status: complete; story and slice refinement completed 2026-09-11.
+All three slices are delivered. Retain this plan and its proof for execution
+retrospective and story wrap-up.
 
 ## Execution identity
 
@@ -278,7 +279,7 @@ Delivered proof (2026-09-11):
 
 ### 3. Release ownership after verified cancellation
 Type: Behavior
-Status: planned
+Status: done
 Sizing: approximately 5 active minutes, medium confidence, assuming Slice 1
 established the supervisor's signal/completion boundary. Unexpected Gradle tree
 behavior returns to that design before further release changes.
@@ -308,6 +309,22 @@ the verified cancellation contract and crash limitation.
 Safe stop: the complete promised lifecycle is delivered. Success, ordinary
 failure and handled cancellation release only proven ownership after work ends;
 crashes, foreign ownership and uncertain shutdown retain visible evidence.
+
+Delivered proof (2026-09-11):
+
+- `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passed all
+  85 process tests, covering handled SIGINT/SIGTERM during preparation,
+  preliminary migration and final workload, continued exclusion during
+  shutdown, worker completion, peer isolation and cleanup-failure precedence.
+- `CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement-evidence.test.mjs scripts/worktree-retirement-checkout-processes.test.mjs`
+  passed all 20 retirement tests, including retained evidence and refusal after
+  uncatchable owner death.
+- The release-enabled real workload used Gradle 9.7.1 and Azul JDK 25.0.3.
+  While test worker PID 56111 was active, SIGINT targeted verified foreground
+  process group 54935, distinct from coordinator group 57504. Owner PID 55108,
+  Gradle client PID 55130, daemon PID 55168 and the worker all terminated; no
+  captured process survived, the command returned cancellation failure, and
+  the lock was absent only after completion.
 
 ## Current decisions
 
@@ -353,3 +370,9 @@ of that sibling. No conflict with Accepted ADRs 0006 or 0007 was identified.
   replacement during finalization; ownership changes or unexpected evidence
   make cleanup fail visibly instead of authorizing deletion. Interrupted
   invocations still retain the exact original owner record for Slice 3.
+- Slice 3 confirmed handled signals use the same finalizer after controlled
+  child shutdown. A pre-existing empty stale-reclaim marker correctly made one
+  real observation fail closed; after its dead PID and emptiness were verified
+  and only that residue was removed, the repeated workload showed complete
+  process termination before ownership release. Uncatchable or unverifiable
+  termination continues to retain retirement-blocking evidence.
