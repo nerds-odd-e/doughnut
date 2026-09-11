@@ -57,7 +57,8 @@ Before writing, identify from the user's instructions and this project's guidanc
 - any supplied slice target and hard limit, including their permitted
   exceptions and overrun escalation;
 - required verification, refactoring, commit, and review gates;
-- relevant code, tests, stack rules, and Accepted ADRs; and
+- relevant code, tests, stack rules, and Accepted ADRs;
+- this project's established North Star location, when one exists; and
 - any phase or quick-task conventions that own the plan.
 
 Resolve these from this project, not this skill's location. First reuse a plan
@@ -81,6 +82,9 @@ or merely inferred location.
 Record the source, goal, included scope, material exclusions, assumptions, and
 key examples without enlarging the story or bounded correction. Read and apply:
 
+- [architectural thinking](references/architectural-thinking.md) to carry
+  PFE findings, relevant accepted decisions, and only warranted short-term
+  direction into the plan;
 - [slice decomposition](../dough-story-decomposition/references/problem-decomposition.md#decompose-slices),
   including its cumulative design assessment, sizing, and escalation rules; and
 - [executable-plan decisions](../dough-story-refinement/references/planning.md#write-an-executable-plan),

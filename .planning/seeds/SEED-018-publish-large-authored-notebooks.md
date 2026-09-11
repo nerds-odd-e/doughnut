@@ -39,8 +39,14 @@ request time were not captured, so the exact transport failure remains inferred.
   validation rejection. The user requested profiling followed by performance
   improvement.
 
-Capture two independently valuable stories in the explicit user priority order.
-No executable plan or implementation is authorized by this capture.
+The user subsequently split the performance work into an evidence-producing
+investigation followed by optimization. Static inspection alone can identify
+repeated work but cannot establish its runtime importance. Use a focused baseline
+profile to select areas worth improving, without requiring an optimization plan
+as an investigation deliverable.
+
+Capture three independently valuable stories in the explicit user priority order.
+This split does not authorize executable planning or implementation.
 
 ## Story Decomposition
 
@@ -56,7 +62,7 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
 Notebook owners can create, edit, and publish notes whose intended titles or
 aliases contain ASCII `|`, and follow references to those notes in Donut without
 renaming their knowledge. This removes the name-related publication obstacle;
-large-commit completion time remains story 2's outcome.
+large-commit completion time remains story 3's outcome, informed by story 2.
 
 #### Scope
 
@@ -195,7 +201,41 @@ Executable plan: [Accept pipe note names](../quick/105-accept-pipe-note-names/PL
 
 <a id="story-2"></a>
 
-### 2. Publish large notebook commits within a practical measured time
+### 2. Identify large-publication bottlenecks with a reproducible baseline
+
+- **For / why:** Donut maintainers can decide which areas of large-notebook
+  publication deserve improvement using runtime evidence, rather than selecting
+  repeated work solely because it looks expensive in the code.
+- **Evaluation:** A maintainer can repeat a representative publication workload
+  from a documented starting state using the delivered profiling infrastructure,
+  inspect the baseline data, and understand which improvement areas the evidence
+  supports and which remain uncertain.
+- **Scope:** Perform a focused static inspection first to identify candidate
+  costs, then baseline profiling of roughly 10,000 valid note additions and a
+  late-validation failure case. Capture end-to-end timing and server measurements,
+  workload and environment details, starting-state/reset instructions, and the
+  observed acceptance or rejection outcome. Preserve the reusable profiling
+  infrastructure and baseline data with reproducible instructions.
+- **Handoff:** Record the findings and links to the infrastructure and baseline
+  data in this story. Populate story 3's statement with evidence-backed areas to
+  improve and references to that same infrastructure and data. Distinguish static
+  hypotheses from measured bottlenecks. An executable optimization plan is not a
+  deliverable; story 3 is refined later using these outputs.
+- **Value / learning:** Establish where publication time is spent and provide a
+  repeatable basis for evaluating improvements. The evidence remains useful for
+  prioritization even if optimization is deferred or cancelled.
+- **Effort hypothesis:** L, low confidence; assumes a bounded investigation and
+  reusable workload setup, not a general performance-monitoring platform.
+- **Depends on:** No dependency on pipe support for a valid benchmark. Using the
+  original pipe-bearing jap3 content unchanged depends on story 1.
+- **Safe stopping point:** Maintainers have reproducible baseline evidence and
+  supported improvement areas without changing publication semantics or claiming
+  a performance improvement. Profiling preserves accepted data and history;
+  invalid proposals still reject atomically.
+
+<a id="story-3"></a>
+
+### 3. Publish large notebook commits within a practical measured time
 
 - **For / why:** Notebook owners can publish a commit of roughly 10,000 new notes
   and receive a definitive outcome without excessive waiting or manual splitting.
@@ -203,45 +243,56 @@ Executable plan: [Accept pipe note names](../quick/105-accept-pipe-note-names/PL
   head and notes are visible in Donut. Record comparable before/after end-to-end
   timing and server measurements. Invalid proposals still leave accepted history
   and stored notebook state unchanged and return a useful rejection.
-- **Scope:** Profile the publication workflow first, use measured bottlenecks to
-  select improvements, and repeat the same workload to demonstrate the benefit.
-  Include a valid workload and the late-validation failure case so success and
-  rejection costs are understood. Examine earlier validation as a candidate,
-  not a preselected technical solution. Preserve authorization, authored content,
+- **Scope:** Improve the areas supported by story 2's findings and repeat its
+  workloads using the delivered profiling infrastructure and baseline data to
+  demonstrate the benefit for success and rejection. Refine this story after
+  story 2 supplies that evidence; specific improvements are not selected yet.
+  Preserve authorization, authored content,
   note identity, learning history, and atomic acceptance. Increasing transport
   timeouts alone does not satisfy the story.
 - **Value / learning:** Determine what drives large-publication time and reduce
   that work, rather than assuming SQL counts alone establish the bottleneck.
-- **Effort hypothesis:** L, low confidence pending profiling; if the measured
+- **Improvement areas and evidence:** Pending story 2. Its handoff will add the
+  supported areas and links to profiling infrastructure and baseline data here
+  before later story refinement.
+- **Effort hypothesis:** L, low confidence pending story 2; if the measured
   work exceeds a few hours, refine the story into independently useful outcomes
   before execution planning rather than committing to a broad optimization rewrite.
-- **Depends on:** No dependency on pipe support for a valid benchmark. Using the
-  original pipe-bearing jap3 content unchanged depends on story 1. Prior related
-  notebook publication work supplies the existing functionality, not a new queue item.
+- **Depends on:** Story 2's findings, reusable profiling infrastructure, and
+  baseline data. Prior related notebook publication work supplies the existing
+  functionality, not a new queue item.
 - **Safe stopping point:** The measured workload publishes faster with existing
   correctness guarantees intact; this does not require general synchronization,
   background jobs, resumable upload, or all other large-data operations.
 
 ## Ordering and Scope Reduction
 
-The user explicitly selected story 1 as product backlog priority one and story 2
-as priority two. Preserve that order. If work must be deferred, defer story 2
-first; do not deliver name acceptance without working reference semantics.
+The user selected name acceptance first, then split the performance work into
+story 2's static inspection and baseline profiling followed by story 3's
+optimization. Preserve that order. Refine story 3 later from story 2's outputs.
+If work must be deferred, defer story 3 first; story 2 retains its measured
+learning and reusable profiling workflow. Do not deliver name acceptance without
+working reference semantics.
 
 ## Open Decisions
 
 - Story 1's remaining decisions are recorded in its section above.
-- Story 2: reproducible benchmark environment, acceptable completion-time target,
-  and bounded improvements remain for profiling and refinement. Approximately
-  10,000 additions is the motivating workload, not a product size limit.
+- Story 2: representative workload and reproducible benchmark environment remain
+  for refinement. Approximately 10,000 additions is the motivating workload, not
+  a product size limit.
+- Story 3: acceptable completion-time target and bounded improvement scope remain
+  for later refinement based on story 2's evidence.
 
 ## When to Surface
 
-Selected now as the first two backlog priorities following the jap3 diagnosis.
+Name acceptance is taken; investigation and optimization are the next two queued
+stories following the jap3 diagnosis and the user-requested split.
 
 ## Breadcrumbs
 
 - User discussion and explicit backlog ordering, 2026-09-11.
+- User-requested split, 2026-09-11: static inspection and baseline profiling
+  deliver infrastructure, data, and improvement areas; refine optimization later.
 - [ADR 0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md).
 - [SEED-009 — Git-backed local notebook workflow](SEED-009-git-backed-local-notebook-workflow.md).
 - [SEED-016 — Initial notebook and folder Readmes](SEED-016-initial-notebook-and-folder-readmes.md).

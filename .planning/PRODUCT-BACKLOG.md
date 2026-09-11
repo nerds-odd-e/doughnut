@@ -26,5 +26,6 @@ changes.
 
 ## Backlog list
 
-- [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-2) — SEED-018
+- [Identify large-publication bottlenecks with a reproducible baseline](seeds/SEED-018-publish-large-authored-notebooks.md#story-2) — SEED-018
+- [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-3) — SEED-018
 - [Restart primary SUT only with proven process ownership](quick/104-refuse-unowned-primary-sut-restart/PLAN.md)

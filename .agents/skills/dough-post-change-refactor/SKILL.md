@@ -65,10 +65,13 @@ any conflict for human resolution before the conflicting edit.
 
 If a candidate needs coordinated production refactoring in more than one
 production subsystem, stop before editing unless the human has authorized that
-named concept and those subsystems. Generic cleanup authorization is insufficient. Tests,
-fixtures, generated artifacts, and configuration following one production seam
-do not alone constitute a crossing; neither does the original behavior change
-spanning subsystems.
+named concept and those subsystems, or the active plan specifically identifies
+the cross-subsystem structure as necessary for the current authorized
+responsibility. The plan must connect the concept, affected boundaries, and
+current outcome; an inferred benefit, generic cleanup authorization, or a later
+story is insufficient. Tests, fixtures, generated artifacts, and configuration
+following one production seam do not alone constitute a crossing; neither does
+the original behavior change spanning subsystems.
 
 If this crossing becomes apparent during editing, stop before the first
 cross-subsystem edit and reverse only this agent's edits for that candidate.
