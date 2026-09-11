@@ -1,10 +1,68 @@
 # Notebook publication profiling
 
+## Findings and next experiment
+
+Repeated ORM flushing is the first investigation priority. The two completed
+valid publications place **98.25% and 98.213% of publication-thread execution
+samples** in Hibernate flush traversal, with roughly 571 GB of weighted request
+allocation in each. Property- and alias-index refresh callers recur in these
+stacks. Investigate who requires each flush, the dirty checking and cascade work
+it triggers over managed state, and the associated temporary allocations.
+These overlapping sampled stacks identify a dominant CPU cost; they do **not**
+predict 98% wall-time savings or establish that any flush can safely be removed.
+
+The first focused experiment should trace flush requirements and frequency along
+these index-refresh paths on a small fixture, then evaluate one correctness-safe
+change to that work. Explicit and query-triggered flushes may serve visibility or
+ordering requirements; establish those requirements before changing them. Keep
+accepted-head/content and late-rejection/rollback checks, including note identity
+and learning state. Parsing, Git work and database waits have weaker measured CPU
+evidence and should not displace this first priority without new evidence.
+
+Use the [first profile](#first-large-valid-capture) and
+[awake repeat](#awake-valid-repeat), their persistent raw data, and the versioned
+[analysis script](../scripts/profiling/AnalyzePublication.java). The
+[representative fixture](#representative-fixture-runner) and
+[HTTP capture helper](../e2e_test/config/notebookPublicationHttp.ts) provide the
+same public-operation boundary. Both large valid outcomes were independently
+verified; retain the documented Cypress failure/interruption qualifications.
+The [20-addition rejection proof](#small-late-rejection-capture) establishes late
+processing and preserved state. **Large rejection latency is unmeasured and
+explicitly deferred by the user; no further large run is required for this
+investigation.**
+
+For subsequent focused experiments:
+
+1. Start with the existing small fixture and a short complete-request capture on
+   an owned healthy SUT. This command uses 20 existing notes and 20 additions:
+
+   ```bash
+   PUBLICATION_PROFILE_EXISTING=20 PUBLICATION_PROFILE_ADDITIONS=20 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=66000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
+   ```
+
+   This limits each HTTP request to one minute. A timeout leaves incomplete
+   evidence; inspect the owned backend for completion before any reset or retry.
+
+2. Inspect the actual request-thread event span with the analysis script; separate
+   fixture setup, request time and receiver verification. Keep revision, fixture
+   fingerprints, JVM/logging/JFR settings and warm-up comparable. If a short
+   sample cannot distinguish the candidate costs, increase counts modestly or
+   add a focused flush-count observation, changing one factor at a time.
+3. Stop when a dominant cost and one concrete next experiment are clear. That
+   stopping point is already reached for this investigation. Do not repeat
+   10,000-note captures merely to strengthen the same ranking. Reserve large
+   confirmation for a candidate improvement that leaves a specific scaling
+   question unanswered. For bulk byte proof, use the retained read-only receiver
+   comparison approach instead of thousands of browser commands.
+
+This is an evidence handoff to [story 3](../.planning/seeds/SEED-018-publish-large-authored-notebooks.md#story-3),
+not an executable optimization plan or authorization to implement a change.
+
 ## Static candidates
 
 Inspected revision: `3548fb8bc317e3505b866133c5c8c0941257221c`.
-These are hypotheses for capture, not measured bottlenecks or optimization
-recommendations. No runtime baseline is recorded yet.
+The following inspection preceded the measurements. These static hypotheses
+remain separate from the measured findings above.
 
 The real boundary is `POST /api/notebooks/{notebook}/git-bundle?expectedHead=…`
 ([NotebookController.java](../backend/src/main/java/com/odde/donut/controllers/NotebookController.java#L480)).
@@ -466,5 +524,7 @@ summed pauses. Recorded request socket reads total 4.395 seconds across 1,940
 events; one write lasts 0.0353 seconds. No request park/monitor events exceed the
 recording thresholds. All execution stacks are truncated. The first capture's
 sampling, overlapping-category, allocation-estimate and limited-JIT caveats apply.
-These repeated measurements support prioritizing ORM flush traversal and allocation
-work; the late-rejection baseline and story-3 handoff remain outstanding.
+These repeated measurements support the flush-traversal and allocation priorities
+in the handoff above. The user ended further large profiling: existing small
+late-rejection proof is retained, and large rejection latency remains unmeasured
+and deferred.

@@ -205,81 +205,35 @@ Executable plan: [Accept pipe note names](../quick/105-accept-pipe-note-names/PL
 
 #### Goal
 
-Donut maintainers can decide which areas of large-notebook
-  publication deserve improvement using runtime evidence, rather than selecting
-  repeated work solely because it looks expensive in the code.
+Donut maintainers can choose the first area of publication work to optimize using
+sufficient runtime evidence, with the least necessary measurement cost.
 
 #### Scope
 
-- **Evaluation:** A maintainer can repeat a representative publication workload
-  from a documented starting state using the delivered profiling infrastructure,
-  inspect the baseline data, and understand which improvement areas the evidence
-  supports and which remain uncertain.
-- **Scope:** Perform a focused static inspection first to identify candidate
-  costs, then baseline profiling of roughly 10,000 valid note additions and a
-  late-validation failure case. Capture end-to-end timing and server measurements,
-  workload and environment details, starting-state/reset instructions, and the
-  observed acceptance or rejection outcome. Preserve the reusable profiling
-  infrastructure and baseline data with reproducible instructions.
-- **Handoff:** Record the findings and links to the infrastructure and baseline
-  data in this story. Populate story 3's statement with evidence-backed areas to
-  improve and references to that same infrastructure and data. Distinguish static
-  hypotheses from measured bottlenecks. An executable optimization plan is not a
-  deliverable; story 3 is refined later using these outputs.
-- **Value / learning:** Establish where publication time is spent and provide a
-  repeatable basis for evaluating improvements. The evidence remains useful for
-  prioritization even if optimization is deferred or cancelled.
-- **Effort hypothesis:** L, low confidence; assumes a bounded investigation and
-  reusable workload setup, not a general performance-monitoring platform.
-- **Depends on:** No dependency on pipe support for a valid benchmark. Using the
-  original pipe-bearing jap3 content unchanged depends on story 1.
-- **Safe stopping point:** Maintainers have reproducible baseline evidence and
-  supported improvement areas without changing publication semantics or claiming
-  a performance improvement. Profiling preserves accepted data and history;
-  invalid proposals still reject atomically.
-
-- **Benchmark boundaries:** Use an owned disposable local E2E environment and a
-  deterministic fixture representing an existing notebook plus approximately
-  10,000 additions. Include authored bodies, aliases, properties, references,
-  and folder placement; record their distribution and the fixture's limitations.
-  The original jap3 checkout may inform the workload through read-only inspection,
-  but the benchmark must not mutate it or require publishing to its real notebook.
-  Use valid names independent of unfinished pipe support. The invalid variant
-  changes one late-processed document to an invalid recognized-alias shape.
-- **Measurement boundaries:** Separate fixture preparation from publication
-  timing. Capture client outcome and server completion separately if the client
-  times out. A timeout or interrupted server run is partial evidence, not a
-  completed baseline. Keep revision, environment, warm-up, logging/profiler
-  settings, workload identity, and reset procedure alongside the data so later
-  comparisons use equivalent conditions. No performance threshold is required
-  for this investigation.
-- **Deferred:** Product optimizations, earlier validation changes, transport
-  timeout changes in the product, monitoring dashboards, general benchmark
-  frameworks, and the optimization story's refinement or executable plan.
-
-#### Key examples
-
-1. Given the documented disposable starting state, run the valid workload →
-   retain publication timing and server profiling data, verify the accepted head
-   and added content, then repeat after resetting to the same logical baseline.
-2. Given that same baseline and a proposal with one late invalid alias shape,
-   run publication → retain rejection timing and profiling data and verify that
-   accepted history, stored notebook content, existing identities, and learning
-   history remain unchanged. Confirm the rejection is actually late; do not
-   infer it merely from the filename.
-3. Given the static candidates and captured profiles, review findings → see
-   evidence-backed improvement areas and remaining uncertainties in story 3,
-   with working links to the reusable infrastructure and baseline data. No
-   optimization plan is needed to evaluate this outcome.
-
-#### Open decisions
-
-No blocking product questions. Exact fixture distribution and profiler settings
-are execution choices to document; story 3's time target remains deferred.
+- Preserve the existing static findings, reusable opt-in fixture/capture tools,
+  two valid large profiles, and small late-rejection/preserved-state proof.
+- Hand off supported priorities and uncertainties to story 3, with links to the
+  same infrastructure and data. No executable optimization plan is required.
+- User-directed revision after execution review: roughly 10,000 additions is a
+  motivating workload, not a required discovery size. No further large valid or
+  rejection run is required for this investigation. Large rejection latency is
+  unmeasured, not inferred from small correctness proof.
+- Use small fixtures and short captures for subsequent focused experiments;
+  increase size only when the evidence cannot distinguish candidate costs. Stop
+  discovery once a dominant cost and a concrete next experiment are clear.
+- Keep preparation separate from timing; distinguish completed HTTP outcomes,
+  interrupted test drivers, sampled CPU proportions, and latency. Retain revision,
+  fingerprints, reset commands, environment, profiler and host-sleep limitations.
+- Use only the owned disposable E2E environment; preserve accepted content,
+  identities, learning history and atomic rejection. Do not mutate real jap3 data.
+- Deferred: product optimizations, production transport changes, large-scale
+  confirmation after an improvement, monitoring platforms, story-3 refinement and
+  its executable plan. The completion-time target remains a later product decision.
 
 Executable plan: [Profile large notebook publication](../quick/106-profile-large-notebook-publication/PLAN.md).
 
-Reusable infrastructure and capture data: [Notebook publication profiling](../../docs/notebook-publication-profiling.md#representative-fixture-runner).
+Findings, reusable infrastructure and retained evidence:
+[Notebook publication profiling](../../docs/notebook-publication-profiling.md).
 
 <a id="story-3"></a>
 
@@ -291,19 +245,42 @@ Reusable infrastructure and capture data: [Notebook publication profiling](../..
   head and notes are visible in Donut. Record comparable before/after end-to-end
   timing and server measurements. Invalid proposals still leave accepted history
   and stored notebook state unchanged and return a useful rejection.
-- **Scope:** Improve the areas supported by story 2's findings and repeat its
-  workloads using the delivered profiling infrastructure and baseline data to
-  demonstrate the benefit for success and rejection. Refine this story after
-  story 2 supplies that evidence; specific improvements are not selected yet.
+- **Scope:** Refine a bounded improvement from the measured priorities below.
+  Use small fixtures and short captures first, retaining targeted correctness
+  checks; increase workload only when the evidence is inconclusive. Reserve large
+  confirmation for a candidate improvement and a remaining scaling question.
+  Specific implementation changes and a completion-time target remain unselected.
   Preserve authorization, authored content,
   note identity, learning history, and atomic acceptance. Increasing transport
   timeouts alone does not satisfy the story.
 - **Value / learning:** Determine what drives large-publication time and reduce
   that work, rather than assuming SQL counts alone establish the bottleneck.
-- **Improvement areas and evidence:** Pending story 2. Its handoff will add the
-  supported areas and links to profiling infrastructure and baseline data here
-  before later story refinement.
-- **Effort hypothesis:** L, low confidence pending story 2; if the measured
+- **Improvement areas and evidence:** The [findings and next experiment](../../docs/notebook-publication-profiling.md#findings-and-next-experiment)
+  identify repeated ORM flushing first: 98.25% and 98.213% of publication-thread
+  execution samples in two valid large captures contain Hibernate flush traversal.
+  Investigate flush ownership and requirements around property/alias-index
+  refresh, managed-state dirty checking/cascades, and temporary allocation
+  (about 571 GB weighted request allocation per capture). These are sampled CPU
+  and allocation findings, not a promise of 98% wall-time savings. Parsing, Git
+  and database waits have weaker evidence for the first improvement priority.
+- **First experiment:** On a small fixture, establish which explicit and
+  query-triggered flushes are required for visibility and ordering, then assess
+  one correctness-safe change. Do not blindly skip flushes. Stop investigation
+  when a dominant cost and a concrete next experiment are clear; expand counts
+  only to resolve an unanswered question. Preserve accepted head/content, note
+  identity, learning state and atomic late rejection while measuring the change.
+- **Reusable evidence:** Follow the same [fixture and capture procedure](../../docs/notebook-publication-profiling.md#findings-and-next-experiment),
+  [HTTP helper](../../e2e_test/config/notebookPublicationHttp.ts), and
+  [analysis script](../../scripts/profiling/AnalyzePublication.java).
+  The [first valid profile](../../docs/notebook-publication-profiling.md#first-large-valid-capture)
+  and [awake repeat](../../docs/notebook-publication-profiling.md#awake-valid-repeat)
+  link persistent raw recordings and independently verified accepted content;
+  retain their runner and host-sleep qualifications. The
+  [20-addition late-rejection proof](../../docs/notebook-publication-profiling.md#small-late-rejection-capture)
+  verifies preceding processing and preserved state. Large rejection latency
+  remains unmeasured and deferred; story 2 requires no further large capture.
+  Use the retained read-only bulk receiver comparison for large byte checks.
+- **Effort hypothesis:** L, low confidence until bounded refinement; if the measured
   work exceeds a few hours, refine the story into independently useful outcomes
   before execution planning rather than committing to a broad optimization rewrite.
 - **Depends on:** Story 2's findings, reusable profiling infrastructure, and
@@ -333,8 +310,9 @@ working reference semantics.
 
 ## When to Surface
 
-Name acceptance is taken; investigation and optimization are the next two queued
-stories following the jap3 diagnosis and the user-requested split.
+Use the retained profiling findings when refining the optimization story.
+Investigation stops at the supported first priority; further large measurements
+need a concrete unanswered question.
 
 ## Breadcrumbs
 

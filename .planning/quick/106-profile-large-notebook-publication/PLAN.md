@@ -1,8 +1,7 @@
 # Profile large notebook publication
 
 Source: [SEED-018 story 2](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-2).
-Status: paused at user-requested safe boundary on 2026-09-11.
-Execution was authorized for plan 106; resume from slice 9 only on user continuation.
+Status: complete under the user-authorized reduced discovery scope.
 
 ## Execution identity
 
@@ -20,14 +19,15 @@ Execution was authorized for plan 106; resume from slice 9 only on user continua
 Maintainers can reproduce a large-publication baseline and choose improvement
 areas using runtime evidence. Deliver focused static findings, reusable local
 profiling infrastructure, baseline data for valid and late-invalid proposals,
-and evidence-backed areas in story 3. Do not implement optimizations or write
+and evidence-backed areas in story 3. Existing small rejection proof suffices;
+no further large run is required. Do not implement optimizations or write
 story 3's execution plan. No speed target is needed for this learning outcome.
 
-Use a deterministic existing-notebook fixture plus roughly 10,000 additions,
-with bodies, aliases, properties, references, and folder placement. Document
-distribution and representativeness limits. Read-only jap3 inspection may inform
-the fixture; do not publish to the real notebook or modify that checkout.
-Use a deliberately invalid alias shape, independent of pipe-name support.
+Retain the completed deterministic fixture evidence (1,000 existing notes plus
+10,000 additions), its distribution and representativeness limitations. Reuse the
+small invalid-alias-shape rejection evidence, independent of pipe-name support.
+These are historical measurements, not instructions to repeat their scale.
+Do not publish to the real jap3 notebook or modify that checkout.
 
 ## Reuse and constraints
 
@@ -360,31 +360,67 @@ Independent read-only head/tree/clean/all-10,000-byte verification passed in
 interrupted (exit 143), not relabeled as passing. No new request/reset occurred.
 Verified runner/caffeinate descendants are stopped; backend PID 2406 remains.
 No active publication or JFR capture; no CI observer exists (main-only CI).
-Next unfinished slice is 9, large rejection and evidence-backed story-3 handoff.
+At that pause, the next unfinished slice was 9, large rejection and story-3 handoff;
+the later user-directed revision below replaces its measurement commitment.
 Execution checkout, branch, raw artifacts and this plan are retained.
 Independent documentation review confirmed retained evidence, no edits or runtime
 retests needed, `REFACTOR COMPLETE`. Coordinator selective formatting passed.
 This delivery records the completed valid repeat and pause; it does not authorize
 starting slice 9 while the user-requested pause remains in effect.
 
-### 9. Establish large rejection baseline and improvement-area handoff
+### 9. Hand off the dominant cost using existing evidence
 Type: Behavior
-Status: planned
-Proof: The approximately 10,000-addition invalid variant completes rejection with
-preserved-state proof; maintainers can follow story links to both outcome profiles
-and evidence-backed improvement areas in story 3.
+Status: done
+Proof: Maintainers can follow story 2 and story 3 links to the retained profiles,
+identify repeated ORM flushing as the first investigation priority, distinguish
+measured findings from hypotheses, and use a small-first measurement procedure.
 
-Run from the same logical starting state and settings as valid measurements.
-Confirm actual rejection point and unchanged accepted head, content, note IDs and
-learning records. Compare evidence with static hypotheses; record supported areas
-and uncertainties in story 3 with shared infrastructure/data links in stories 2–3.
-Include profiler/logging overhead and sampled-wait limitations; SQL counts alone
-do not establish database time. No quantitative speedup predictions, optimization
-implementation, or story 3 execution plan.
-Estimate: 5–10 minutes active analysis/documentation plus measured runtime exception.
-Safe stop: selected story's reproducible evidence and handoff complete.
+The user rejected the cost of further large profiling and authorized this plan
+revision and resumption. Reuse the two completed valid profiles and existing
+20-addition late-rejection/preservation proof. Do not run the planned 10,000-note
+rejection, rerun the valid workloads, or implement an optimization. Large rejection
+latency remains unmeasured, explicitly deferred rather than represented as proven.
+
+Update lasting findings and story 3 with supported flush/dirty-check/cascade and
+allocation priorities. Recommend a small workload and short captures for the next
+focused experiment, increasing size only if evidence is inconclusive. Stop once
+one dominant cost and a concrete next experiment are clear. Preserve targeted
+correctness checks; avoid per-file browser orchestration for bulk byte comparison.
+Large-scale confirmation belongs after a candidate improvement, when it answers
+a remaining scaling question. No executable optimization plan is needed here.
+Estimate: 5 minutes active documentation and evidence review; no runtime work.
+Safe stop: investigation's learning goal is fulfilled without another benchmark.
+
+Delivered a top-level findings/next-experiment handoff and aligned story 2/3.
+The two profiles support repeated flushing as the first priority; small rejection
+proof is retained and large rejection latency explicitly deferred. Future small
+capture instructions use a 60-second HTTP deadline and 66-second task allowance,
+with incomplete-timeout recovery guidance and adaptive sizing only if needed.
+Proof: coordinator inspected the source/plan/doc mappings and retained evidence;
+independent documentation review verified links and measured-claim qualifications,
+`REFACTOR COMPLETE`. No new benchmarks, runtime tests, or product changes.
+Approximately 3 minutes implementation and 2 minutes review; selective formatting
+passed. The revised discovery stopping condition is met. Story 3 remains a later
+refinement/implementation decision, not automatically executed here.
+
+All nine slices are complete under the revised scope. Keep the execution branch,
+worktree, plan and evidence for retrospective and story wrap-up. Story 2 remains
+Taken until wrap-up; no backlog cleanup, integration or worktree removal here.
+No eligible branch CI observer was started; CI remains unobserved.
 
 ## Execution learning and refinement
+
+User-directed efficiency correction: 10,000 additions was a motivating scale,
+not a necessary discovery workload. The two profiles already show approximately
+98.2% of publication-thread samples in Hibernate flush traversal. Further large
+profiling is unlikely to change the first investigation priority. Existing small
+rejection proof covers late processing and rollback observations; large rejection
+performance remains unknown. The revised source scope and slice 9 remove that
+measurement commitment. Preserve all prior evidence and runner qualifications.
+The long per-file Cypress checks, repeated status polling, and successive planning
+refinements added cost without proportional learning. Future measurements must
+have a decision-based stopping rule and escalate workload size only when needed.
+
 
 Second refinement: large-run orchestration and recovery reached approximately
 10 minutes active work, separately from the completed 83-minute request. The
@@ -445,9 +481,7 @@ when later cleaning up story history.
 
 ## Assessment
 
-No blocking product questions. Slices 2–3 have sizing uncertainty around JFR
-attachment, existing E2E helper reuse, client timeouts and full-workload duration.
-The small representative proof limits infrastructure risk before expensive runs.
-The three slices share one workload and capture path; no general framework,
-dashboard, optimization design, or independent benchmark platform is included.
-Planning has not run profiling or tests, and records no measured bottleneck yet.
+The current profiles are sufficient to prioritize a focused ORM-flush experiment.
+No further profiling or product change is needed to complete the revised discovery
+scope. Finish the evidence handoff, review its accuracy, and deliver it. Retain
+plan and source for retrospective; do not automatically start optimization.
