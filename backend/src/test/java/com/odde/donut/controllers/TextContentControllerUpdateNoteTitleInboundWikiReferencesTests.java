@@ -11,6 +11,7 @@ import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     extends TextContentControllerTestBase {
   @Autowired EntityManager entityManager;
+  @Autowired NoteController noteController;
 
   @Test
   void rejectsRenameWithoutReferenceHandlingWhenInboundWikiLinksExist()
@@ -96,6 +98,35 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
 
     makeMe.refresh(inbound.carrier());
     assertThat(inbound.carrier().getContent(), containsString("parent: \"[[Beta]]\""));
+  }
+
+  @Test
+  void pipeTitleRenameEscapesBodyAndYamlTargetsWithoutCapturingAnOrdinaryDisplayLink()
+      throws UnexpectedNoAccessRightException {
+    Note target = makeMe.aNote().title("Original").notebookOwnedBy(currentUser.getUser()).please();
+    Note separateA = makeMe.aNote().title("A").underSameNotebookAs(target).please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(target).please();
+    controller.updateNoteContent(
+        carrier,
+        contentDto(
+            "---\nparent: \"[[Original|yaml label]]\"\n---\n"
+                + "[[Original|body label]] and [[A|B]]"));
+    NoteUpdateTitleDTO titleDto = titleDto("A|B");
+    titleDto.setReferenceHandling(TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT);
+
+    controller.updateNoteTitle(target, titleDto);
+
+    makeMe.refresh(carrier);
+    assertThat(carrier.getContent(), containsString("parent: \"[[A\\\\|B|yaml label]]\""));
+    assertThat(carrier.getContent(), containsString("[[A\\|B|body label]] and [[A|B]]"));
+    List<WikiLink> links = noteController.showNote(carrier).getWikiLinks();
+    assertThat(links, hasSize(3));
+    assertThat(links.get(0).getDestinationNoteId(), equalTo(target.getId()));
+    assertThat(links.get(0).getDisplayText(), equalTo("yaml label"));
+    assertThat(links.get(1).getDestinationNoteId(), equalTo(target.getId()));
+    assertThat(links.get(1).getDisplayText(), equalTo("body label"));
+    assertThat(links.get(2).getDestinationNoteId(), equalTo(separateA.getId()));
+    assertThat(links.get(2).getDisplayText(), equalTo("B"));
   }
 
   @Test

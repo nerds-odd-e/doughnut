@@ -8,15 +8,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
+import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class TextContentControllerUpdateNoteTitleTests extends TextContentControllerTestBase {
   @Autowired NoteController noteController;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   NoteUpdateTitleDTO noteUpdateTitleDTO = titleDto("new title");
 
@@ -33,6 +37,24 @@ class TextContentControllerUpdateNoteTitleTests extends TextContentControllerTes
     NoteUpdateTitleDTO titleDto =
         objectMapper.readValue("{\"newTitle\": \"\\r\\nAfter\\r\\n\"}", NoteUpdateTitleDTO.class);
     assertThat(controller.updateNoteTitle(note, titleDto).getNote().getTitle(), equalTo("After"));
+  }
+
+  @Test
+  void renamingALearnedNoteToAPipeTitlePreservesItsIdentityAndLearning() throws Exception {
+    Note learned = makeMe.aNote().title("Original").notebookOwnedBy(currentUser.getUser()).please();
+    MemoryTracker tracker = makeMe.aMemoryTrackerFor(learned).recallCount(1).please();
+    Note referrer = makeMe.aNote().underSameNotebookAs(learned).please();
+    controller.updateNoteContent(referrer, contentDto("[[Original]]"));
+    NoteUpdateTitleDTO titleDto = titleDto("A|B");
+    titleDto.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
+
+    NoteRealm response = controller.updateNoteTitle(learned, titleDto);
+
+    assertThat(response.getNote().getId(), equalTo(learned.getId()));
+    assertThat(response.getNote().getTitle(), equalTo("A|B"));
+    MemoryTracker reloadedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+    assertThat(reloadedTracker.getNote().getId(), equalTo(learned.getId()));
+    assertThat(reloadedTracker.getRecallCount(), equalTo(1));
   }
 
   @Test

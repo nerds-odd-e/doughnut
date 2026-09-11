@@ -57,8 +57,9 @@ and large-commit performance (story 2).
 - Slice 5 overran at about 12 active minutes. Its controller proof established
   note/learning identity and body rewrite behavior, but the double-quoted YAML
   example failed because writing `\|` directly makes an invalid YAML escape.
-  Attempt-owned tests are parked in stash
-  `e9cb2f9b099138b9b540a0247214a936d05ecfce`. The disproved sizing assumption
+  Attempt-owned tests were parked in stash
+  `e9cb2f9b099138b9b540a0247214a936d05ecfce`, then restored for slice 5b and
+  the matched stash entry was dropped. The disproved sizing assumption
   was that the document rewriter could emit the same wiki spelling in body,
   single-quoted YAML, and double-quoted YAML; slice 5a now isolates that boundary.
 - The first slice 5a attempt then reached 10 active minutes without compiling;
@@ -189,9 +190,14 @@ loop and has no remaining unexplained preparation.
 
 ### 5b. Preserve references when renaming to a pipe title
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `TextContentControllerUpdateNoteTitleTests` and existing rewrite
 controller examples; backend suite passes.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed. The
+controller boundary preserves note and tracker identity/history, resolves body
+and double-quoted YAML links after rename, and leaves ordinary `[[A|B]]` bound
+to the separate note A.
 
 Behavior: Given a learned note referenced by another note, renaming it to `A|B`
 keeps the same note and learning records, and incoming references still resolve
