@@ -1,7 +1,7 @@
 # Accept pipe characters in note names
 
 Source: [SEED-018 story 1](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-1).
-Status: in progress. Execution authorized on 2026-09-11.
+Status: complete. Execution authorized and completed on 2026-09-11.
 
 ## Execution identity
 
@@ -301,12 +301,17 @@ and existing unchanged-publication path. Do not benchmark the motivating noteboo
 
 ### 9. Publish a pipe alias without weakening atomic validation
 Type: Behavior
-Status: planned
+Status: done
 Proof: A publication controller proposal changes an existing `Topic.md` to use
 `aliases: ['A|B']`; accepted download retains filename/YAML, and note-show resolves
 its escaped reference. Existing publication rejection tests plus one mixed
 valid-pipe/invalid-alias-shape proposal prove unchanged accepted head and state.
 Backend suite passes.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after
+the post-change refactor. Publication preserves the learned note, alias YAML,
+escaped resolution, tracker history, and lint finding; a mixed independently
+invalid proposal leaves the accepted binding and note contents unchanged.
 
 Behavior: Given a local alias edit, publication accepts the pipe-bearing alias
 without renaming its note or losing learning history. The corresponding lint
