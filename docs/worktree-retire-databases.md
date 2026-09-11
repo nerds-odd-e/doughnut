@@ -34,6 +34,12 @@ deletion reservation. Primary checkouts, missing/invalid identity, a duplicate
 identity in another registered worktree, and non-canonical E2E database names
 refuse visibly.
 
+Supported backend test and migration commands release their verified checkout
+ownership after ordinary success or failure, so a completed command does not by
+itself block this check. Stale, malformed, foreign, interrupted, or otherwise
+unverifiable backend ownership is preserved and still refuses retirement; the
+retirement command never reclaims it.
+
 Custom E2E names refuse rather than guessing ownership. There is no machine-wide
 allocation registry and no recovery from duplicate operator-supplied IDs.
 

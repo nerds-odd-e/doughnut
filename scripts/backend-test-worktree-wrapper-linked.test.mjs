@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFileSync, rmSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { makeLinkedWorktreeCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import {
@@ -82,7 +82,7 @@ test('later ordinary command in the same linked worktree reuses the allocated id
   const configPath = `${checkout.root}/.worktree.local.json`
   const provisionedConfig = readFileSync(configPath, 'utf8')
   const database = `doughnut_${JSON.parse(provisionedConfig).id}_test`
-  rmSync(lockPaths(checkout).dir, { recursive: true, force: true })
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
 
   const second = runWrapper(checkout, {
     command: 'backend/gradlew',

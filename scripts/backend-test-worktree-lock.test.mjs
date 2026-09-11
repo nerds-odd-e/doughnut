@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import {
@@ -72,6 +72,10 @@ async function assertSupervisedInterruption(t, startOwner) {
   const result = await owner.waitForExit()
   assert.equal(result.status, null, outputOf(result))
   assert.equal(result.signal, 'SIGINT', outputOf(result))
+  assert.equal(
+    readFileSync(lockPaths(checkout).ownerFile, 'utf8').trim(),
+    String(owner.pid)
+  )
 }
 
 function assertReclaimedConfiguredOwner(checkout, result) {
@@ -80,10 +84,7 @@ function assertReclaimedConfiguredOwner(checkout, result) {
     readGradleInvocation(checkout).url,
     jdbcUrl(`doughnut_${configuredId}_test`)
   )
-  assert.equal(
-    readFileSync(lockPaths(checkout).ownerFile, 'utf8').trim(),
-    String(result.pid)
-  )
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
 }
 
 test('active owner refuses a second launcher before it reads a malformed replacement config or reaches gradle', async (t) => {
@@ -202,4 +203,31 @@ test('two overlapping reclaimers of a stale lock leave only one gradle owner', {
   owner.release()
   const ownerResult = await ownerExit
   assert.equal(ownerResult.status, 0, outputOf(ownerResult))
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
+})
+
+test('changed ownership is preserved and failed release is visible', async (t) => {
+  const checkout = configuredCheckout(t)
+  const owner = runLauncherAsync(checkout)
+  await owner.waitForGradleReached()
+  writeFileSync(lockPaths(checkout).ownerFile, '424242')
+
+  owner.release()
+  const result = await owner.waitForExit()
+  assert.notEqual(result.status, 0, outputOf(result))
+  assert.match(outputOf(result), /ownership changed before release/)
+  assert.equal(readFileSync(lockPaths(checkout).ownerFile, 'utf8'), '424242')
+})
+
+test('failed release retains an existing workload failure status', async (t) => {
+  const checkout = configuredCheckout(t)
+  const owner = runLauncherAsync(checkout, { env: { FAKE_GRADLE_EXIT: '7' } })
+  await owner.waitForGradleReached()
+  writeFileSync(lockPaths(checkout).ownerFile, '424242')
+
+  owner.release()
+  const result = await owner.waitForExit()
+  assert.equal(result.status, 7, outputOf(result))
+  assert.match(outputOf(result), /Failed to release/)
+  assert.equal(readFileSync(lockPaths(checkout).ownerFile, 'utf8'), '424242')
 })

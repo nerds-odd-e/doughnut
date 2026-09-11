@@ -7,7 +7,7 @@ recoverable from before-cleanup commit `056ddef4ba` at
 commits `8983d9db3f`, `65d88f55cc`, `be76f0d471`, and `1833e29ead`.
 
 Status: executing; story and slice refinement completed 2026-09-11.
-Slice 1 is delivered. Slices 2–3 remain.
+Slices 1–2 are delivered. Slice 3 remains.
 
 ## Execution identity
 
@@ -227,7 +227,7 @@ Delivered proof (2026-09-11):
 
 ### 2. Release ownership after ordinary completion
 Type: Behavior
-Status: planned
+Status: done
 Sizing: 5–8 active minutes, medium confidence. The release predicate, changed
 residue assertions and retirement composition are one finalization proof loop;
 separating safe removal or failure reporting would create an unsafe interim.
@@ -264,6 +264,17 @@ do not yet claim cancellation release.
 Safe stop: normal successes and failures no longer strand ownership. Interrupted
 or uncertain invocations conservatively retain evidence; retirement never
 reclaims it. No database rollback or allocation repair is implied.
+
+Delivered proof (2026-09-11):
+
+- `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passed all
+  80 process tests, covering ordinary success and failure release, preparation
+  and migration exits, exact interrupted-owner evidence retention, foreign
+  ownership, release-failure precedence and stale recovery.
+- `CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement-evidence.test.mjs scripts/worktree-retirement-checkout-processes.test.mjs`
+  passed all 19 retirement tests. A completed public launcher leaves an
+  otherwise eligible checkout admissible while stale, malformed and other busy
+  evidence remains refused.
 
 ### 3. Release ownership after verified cancellation
 Type: Behavior
@@ -337,3 +348,8 @@ of that sibling. No conflict with Accepted ADRs 0006 or 0007 was identified.
   foreground-process-group interruption ends the observed worker tree before
   the supervisor exits. This supports using the supervisor's completion boundary
   for ordinary release in Slice 2 without yet authorizing cancellation release.
+- Slice 2 established an invocation-specific release gate within the existing
+  supported acquisition protocol. A live completing owner prevents supported
+  replacement during finalization; ownership changes or unexpected evidence
+  make cleanup fail visibly instead of authorizing deletion. Interrupted
+  invocations still retain the exact original owner record for Slice 3.
