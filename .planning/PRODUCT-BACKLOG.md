@@ -26,6 +26,7 @@ changes.
 
 ## Backlog
 
+- [Publish several note changes in one commit, including new folders](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11) — SEED-009
 - [Release backend worktree test ownership after execution](quick/102-release-backend-worktree-test-ownership/PLAN.md)
 - [Keep one owned-process termination mechanism](seeds/SEED-017-cohesive-design-corrections.md#story-4) — SEED-017
 

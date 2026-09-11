@@ -255,18 +255,43 @@ correction delivered as Story 10a.
 
 <a id="story-11"></a>
 
-### 11. Publish several note changes in one commit
+### 11. Publish several note changes in one commit, including new folders
 
-**Status:** delivered.
+**Status:** delivered baseline; implied-folder generalization refined and queued.
 
-- **Goal:** Publish related note additions and accompanying edits as one
-  authored commit.
-- **Scope:** One direct-child commit containing several additions, optionally
-  with existing-note edits at unchanged paths, at root or represented folders.
-  Accept all or none; additions get fresh identities and edits retain private
-  data. Edits-only batches are delivered separately in Story 14. Delete/move
-  mixtures, new folders, README changes, multiple unpublished commits, and
-  divergence remain excluded.
+- **Goal:** A notebook owner can publish related note additions and accompanying
+  edits as one authored commit, including additions whose Portable paths imply
+  new Folders, without inventing Folder Readmes.
+- **Scope:** Extend the delivered direct-child publication behavior for a
+  matching, non-empty accepted notebook. When added valid concepts sit beneath
+  one previously absent Folder path inside a represented Folder, publication
+  infers and materializes that Folder from the concept paths. A Folder Readme
+  remains optional content, not evidence required to admit a non-empty Folder.
+  Accept the commit atomically; additions get fresh identities, accompanying
+  unchanged-path edits retain identity and private data, and the accepted Git
+  tree is the authored tree. Reuse the same concept-path materialization rule
+  already demonstrated by initial publication rather than adding another
+  recognizer for a particular count, document type, or layout. A same-path live
+  Folder absent from accepted Portable content remains an identity collision;
+  do not silently adopt it. This extension makes no new promise about pull or
+  rebase, multiple unpublished commits, moves/deletions, or editing container
+  Readmes; their existing behavior is not a new rejection contract here.
+- **Key examples:**
+  - Given accepted content already represents `例文/`, when one direct-child
+    commit adds the observed ordinary Notes and Relationship notes beneath
+    `例文/111/` without `例文/111/README.md`, publishing creates the `111` Folder,
+    persists all concepts, and accepts that exact commit.
+  - The already-supported empty-notebook example with two ordinary Notes in an
+    implied root Folder and this existing-notebook example exercise one folder
+    inference model. Slice planning should remove contradictory example-shaped
+    guards and include directly implicated generalization supported by those
+    examples, without adding negative gates for unimplemented variations.
+  - If a live `例文/111` Folder exists but is absent from accepted Portable
+    content, publication continues to refuse the identity collision atomically.
+    This safety condition does not make README presence a Folder requirement.
+- **Proof direction:** Replace the obsolete missing-parent rejection scenario
+  with outside-in publication proof for the motivating example. Preserve the
+  independent live-folder collision proof.
 
 <a id="story-12"></a>
 
