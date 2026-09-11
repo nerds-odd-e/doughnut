@@ -6,8 +6,9 @@ recoverable from before-cleanup commit `056ddef4ba` at
 `.planning/seeds/SEED-017-cohesive-design-corrections.md`; reviewed through
 commits `8983d9db3f`, `65d88f55cc`, `be76f0d471`, and `1833e29ead`.
 
-Status: story refined 2026-09-11; implementation not requested. The existing
-execution slice remains provisional pending the lifecycle design concerns below.
+Status: planned; story and slice refinement completed 2026-09-11.
+Implementation not requested. Three ordered slices replace the original
+provisional lifecycle slice; none has been executed.
 
 ## Finding and bounded outcome
 
@@ -105,63 +106,178 @@ Excluded:
 
 ## Key examples and proof ownership
 
-| Promise | Observable proof |
+| Promise | Owning slice and observable proof |
 | --- | --- |
-| A completed supported backend command leaves no owned checkout lock | Process-level opt-in, ordinary test and migration-only cases observe completion, preserved exit code, and absent `.worktree.local.lock` |
-| Post-acquisition preparation or preliminary migration fails | Public-route cases observe the original failure, no later workload launch, and released ownership |
-| Cancellation releases only after owned work is finished | Process-level signal cases hold work during shutdown, observe continued exclusion until it ends, then the cancellation outcome and absent lock |
-| An overlapping command remains refused while the owner is live | Existing held-owner launcher/wrapper tests remain green |
-| Crash evidence and retirement safety remain fail closed | Retirement refuses stale/malformed records without reclaiming; launcher tests preserve existing stale-owner recovery and malformed-owner refusal |
-| Cleanup never removes foreign or unverifiable ownership | Public-route ownership-change case preserves the replacement record and reports the release problem |
-| Workload success cannot hide failed release | Public-route release-failure case reports a nonzero outcome and visible failure |
-| Both opt-in and ordinary wrapper routes share the lifecycle | One test for each public route reaches the same owner release behavior without a parallel cleanup rule |
+| A completed supported backend command leaves no owned checkout lock | 2: opt-in, ordinary test and migration-only cases observe completion, preserved exit code, and absent `.worktree.local.lock` |
+| Post-acquisition preparation or preliminary migration fails | 2: public-route cases observe the original failure, no later workload launch, and released ownership |
+| Cancellation releases only after owned work is finished | 3: signal cases hold work during shutdown, observe continued exclusion until it ends, then the cancellation outcome and absent lock |
+| An overlapping command remains refused while the owner is live | 1 establishes supervision and held-owner exclusion; 2 and 3 retain those cases as regression proof |
+| Crash evidence and retirement safety remain fail closed | 2 preserves retirement refusal and launcher stale recovery; 3 proves interrupted/unverified shutdown retains evidence |
+| Cleanup never removes foreign or unverifiable ownership | 2: ownership-change case preserves replacement evidence and reports the release problem; 3 reuses this release rule |
+| Workload success cannot hide failed release | 2: release-failure case reports nonzero on workload success, while an existing workload failure keeps its status and reports cleanup failure additionally |
+| Both routes share one lifecycle and preserve database/primary-checkout behavior | 1: existing public-route tests preserve selection, arguments, sequencing and pass-through; structural review verifies one lifecycle owner |
+| Normal completion permits the next retirement check when otherwise eligible | 2: complete a public command, then call the real retirement `--check` boundary with otherwise clear evidence and observe eligibility |
 
 These examples define lifecycle outcomes, not a separate implementation per
 command. One representative retirement `--check` boundary case with otherwise
 eligible evidence should show that normal completion no longer produces the
 backend-owner veto; retain refusal coverage for other evidence.
 
+## Cumulative design and proof context
+
+The common rule is one invocation owner, spanning acquisition, preparation and
+all sequential workload commands, with one completion observation and one
+owner-aware release operation. Launch routes select the workload; they do not
+own separate traps or cleanup policies. Prefer a synchronous live supervisor
+over detached cleanup. Keep the recorded owner alive until finalization is
+finished, so supported competitors cannot treat it as stale during release.
+Verify ownership immediately before removal and explain why the supported
+acquisition protocol cannot replace it during that interval. Unexpected evidence
+is a refusal, not permission to remove a directory recursively without checks.
+
+Completion and handled interruption are states of this same lifecycle, not
+different command implementations. Existing acquisition, database selection,
+retirement admission and handoff recursion protection remain cohesive. Do not
+introduce a new general process manager or copy Development/SUT termination
+loops. A different supervisor implementation is permitted if it preserves these
+responsibilities and the public process behavior.
+
+Fixture changes belong to the behavior they prove. The current fixture replaces
+Java and MySQL at the external boundary and copies an explicit script list;
+keep that list aligned if the shared lifecycle moves. Preserve status **and
+signal** observations in the asynchronous fixture (it currently records only
+the close status). Replace assertions equating the launcher PID with the owner
+only when the process topology changes; continue to prove live exclusion.
+
+### Focused verification commands
+
+- **Owner boundary:** `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree`
+- **Retirement boundary:** `CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement-evidence.test.mjs scripts/worktree-retirement-checkout-processes.test.mjs`
+- **Representative real workload:** in the execution-owned isolated linked
+  worktree, `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree`.
+  Use the repository-pinned Gradle 9.7.1 and Nix JDK, recording actual versions.
+  For the interruption observation, capture the owned process tree while a test
+  worker is active, send SIGINT to that invocation's verified foreground process
+  group, and observe worker/JVM termination and the command outcome. Never signal
+  a group shared with the coordinator. A run interrupted during migration or
+  before a worker starts does not establish worker cancellation behavior.
+  Record observed PIDs, signal target and result in this plan during execution.
+  Use the full backend suite when running backend tests, per `backend.mdc`.
+
+The real workload observation tests the concrete assumption that the chosen
+completion boundary accounts for Gradle-forked work. It is pending, not evidence
+already obtained. A surviving or unverifiable worker invalidates release at
+that boundary: retain the lock and revise remaining implementation before
+enabling release. Do not broaden to shared databases or unrelated environments.
+
 ## Ordered slices
 
-### 1. Complete the backend worktree owner lifecycle
+Each estimate includes implementation, focused checks and local cleanup. Target
+approximately five active minutes; inspect any path above five, and stop before
+exceeding ten active minutes to refine or escalate with evidence. External
+Gradle startup, suite execution and process waits are excluded from active time;
+no implementation-time exception is granted. Keep attempted work safe before
+replanning. All slices use the repository execution wrap-up when execution is
+authorized: fresh refactor agent, coordinator formatting once, commit and push.
+
+### 1. Observe the complete owned invocation
+Type: Structure
+Status: planned
+Sizing: 5–8 active minutes, medium confidence. Two routing handoffs and signal
+observation explain the above-target estimate; extracting another preparation
+slice would leave an unconsumed supervisor rather than a useful safe boundary.
+
+Structure: give the existing two routes one live lifecycle owner that observes
+preparation and sequential Gradle commands through completion. This immediately
+enables Slice 2's release. Preserve current command results, terminal interrupt
+behavior, datasource selection, migration-before-test ordering, admission and
+concurrent-owner refusal. Do not release the backend lock yet.
+
+Proof: one public-launcher/wrapper process loop demonstrates that held work
+retains a live owner and excludes a competing run, and that success, failure
+and interruption reach the caller. Run the owner boundary command; reuse its
+preparation/migration failures and primary/unrelated-task compatibility cases.
+Include the representative real interrupted workload above to establish the
+process boundary before any automatic release is introduced. Stand-ins may
+control timing but cannot replace that Gradle observation.
+
+Safe stop: the supervisor is used by both routes and preserves existing
+behavior; lock residue deliberately remains. A crash or uncertain process
+completion still leaves evidence. No inactive helper, pending failing test or
+new cleanup behavior is left for Slice 2 to repair.
+
+### 2. Release ownership after ordinary completion
 Type: Behavior
-Status: planned (provisional after story refinement)
-Sizing: the previous five-minute estimate is not substantiated by the newly
-explicit preparation, signal and release-failure cases. Reassess through slice
-planning before execution; keep one coherent lifecycle rather than splitting
-implementations by launch route.
+Status: planned
+Sizing: 5–8 active minutes, medium confidence. The release predicate, changed
+residue assertions and retirement composition are one finalization proof loop;
+separating safe removal or failure reporting would create an unsafe interim.
 
-Behavior: given a linked or configured worktree whose supported backend test or
-migration command owns `.worktree.local.lock` → the owned child completes,
-fails, or is cancelled → the command returns the child's outcome and removes
-only its own ownership record, so a subsequent retirement check is not blocked
-by normal-completion residue; live, malformed, crashed, successor and peer
-ownership remain protected.
+Behavior: an invocation acquired ownership and its preparation/workload ends
+normally, including a nonzero ordinary exit → finalization runs → only its
+verified ownership is released, preserving the command outcome and allowing
+an otherwise eligible retirement check.
 
-Use one owner-aware lifecycle for both `backend-test-worktree.sh` and
-`backend-worktree-gradle-route.sh`, covering acquisition through preparation and
-workload completion. The existing handoff may change as needed. Establish
-signal propagation, completion observation and safe release under the actual
-process topology before choosing the mechanism. Preserve the child outcome and
-retirement's evidence rules. No generic process framework is required by this
-story; reuse existing mechanisms if they fit the proven ownership contract.
+Implement the shared release operation at the lifecycle boundary from Slice 1,
+covering configuration/URL/provisioning failure, preliminary migration failure
+and final workload completion. A pre-acquisition refusal never reaches owned
+release. Explicitly exclude interrupted or unverified completion from release
+until Slice 3; naturally completed failure is not a crash. A cleanup failure
+must be visible: retain an existing command failure status, or return nonzero
+when the workload succeeded. Keep late or foreign ownership untouched.
 
-Primary proof:
+Proof: extend the existing public-route cases rather than testing an internal
+release helper. Observe absent lock after opt-in, ordinary test and migration-only
+completion; use existing failure variations for the earlier exits. Replace
+post-exit PID assertions and manual normal-lock deletion in the same change.
+Exercise changed ownership and failed release at this boundary to prove the
+same safe-finalization rule. Run the owner and retirement boundary commands.
+Compose a completed launcher with the existing `runCheck` retirement helper:
+use actual ownership/configuration files and substitute only external process
+and database evidence. An otherwise eligible checkout must pass `--check`;
+stale/malformed locks must still refuse retirement, and launcher stale-owner
+recovery must remain supported.
 
-```bash
-CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree
-CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement-evidence.test.mjs scripts/worktree-retirement-checkout-processes.test.mjs
-```
+Update `docs/worktree-backend-tests.md` and
+`docs/worktree-retire-databases.md` for ordinary release and preserved refusals;
+do not yet claim cancellation release.
 
-Inspect the process-level cases to confirm they assert completed, failed and
-cancelled ownership release at the public launcher/wrapper boundaries, not an
-internal cleanup helper. Keep the existing active-owner concurrency and stale
-retirement refusals as preserved-behavior proof. Update the two worktree guides
-only to state current product behavior after the proof exists.
+Safe stop: normal successes and failures no longer strand ownership. Interrupted
+or uncertain invocations conservatively retain evidence; retirement never
+reclaims it. No database rollback or allocation repair is implied.
 
-Safe stop: supported backend commands no longer strand normal ownership, while
-crashes and ambiguous ownership still block retirement until deliberately
-resolved.
+### 3. Release ownership after verified cancellation
+Type: Behavior
+Status: planned
+Sizing: approximately 5 active minutes, medium confidence, assuming Slice 1
+established the supervisor's signal/completion boundary. Unexpected Gradle tree
+behavior returns to that design before further release changes.
+
+Behavior: an owning invocation receives a handled SIGINT/SIGTERM while work is
+active → it observes the owned work stop → it releases its own record through
+Slice 2's finalizer and returns cancellation. Until that observation, a competing
+command remains excluded and retirement remains refused.
+
+Extend the shared completion predicate to verified cancellation; do not add
+route-specific cleanup. Use controlled shutdown barriers in external stand-ins
+for preparation, preliminary migration and final workload variations. Capture
+descendant evidence before signals can reparent workers. Uncatchable owner
+death, remaining workers or an unverified shutdown must not authorize release.
+Use the existing release-failure precedence, preserving cancellation plus a
+visible cleanup failure.
+
+Proof: the owner boundary signal cases observe continued exclusion during
+shutdown, then cancellation and absent lock after completion; a crash/unverified
+case retains the record and retirement refusal. Observe an unrelated peer
+remain alive. Repeat the representative real Gradle interruption with release
+enabled: no captured worker survives when the lock disappears. This second
+observation is justified by the new cancellation finalization behavior. Run the
+owner and retirement boundary commands and update both worktree guides to state
+the verified cancellation contract and crash limitation.
+
+Safe stop: the complete promised lifecycle is delivered. Success, ordinary
+failure and handled cancellation release only proven ownership after work ends;
+crashes, foreign ownership and uncertain shutdown retain visible evidence.
 
 ## Current decisions
 
@@ -171,27 +287,29 @@ resolved.
 - `.sut.local.lock` teardown remains outside this correction because its public
   shutdown-versus-restart contract requires a separate product decision.
 
-## Open concerns and handoff
+## Refinement assessment and remaining risks
 
-- **Process completion evidence:** determine how the owner observes cancellation
-  across preparation, the preliminary migration, and Gradle's JVM/test workers.
-  Shell stand-ins alone do not establish real Gradle descendant behavior. The
-  execution plan must select representative process evidence for that boundary.
-  Do not release on a supervisor's interrupted wait alone.
-- **Safe release protocol:** justify the ownership comparison and removal against
-  the existing admission/stale-reclamation protocol. Retain ambiguous records;
-  do not quietly turn this into a general stale-lock redesign.
-- **Proof and sizing:** revise the old assertions that require lock residue and
-  include retirement checks explicitly; the original primary command does not
-  run the retirement-evidence suite. Reassess slice sizing once the process
-  design is concrete.
-- **Adjacent work:** SEED-017 Story 4 concerns shared Development/SUT process
-  termination. This correction does not depend on delivering that story, but
-  any needed process termination should avoid adding a third competing mechanism.
+The original slice was **Refine**: supervision was hidden preparation, ordinary
+release and cancellation had separate observable completion conditions, and the
+five-minute estimate omitted changed fixture assumptions and retirement proof.
+It is replaced by three slices, with no completed evidence to migrate.
 
-No unresolved product-scope decision was found. These are implementation and
-verification concerns, not evidence that the defect is absent or authorization
-to execute. No conflict with Accepted ADRs 0006 or 0007 was identified.
+Slices 1–3 are **Ready** planning hypotheses: one immediately consumed Structure
+followed by two Behavior slices, with a single lifecycle throughout. They are
+ready for direct execution when separately authorized. This is not a claim that
+pending process evidence has passed. There is no story-scope escalation or
+resplit recommendation (three slices), and only external test/process waits
+are excluded from the active-time limit.
+
+The remaining implementation risk is Gradle process completion under signals;
+Slice 1 owns early evidence and Slice 3 owns release under that condition.
+Slice 2 owns the safe-removal and failure-reporting concerns. If these proofs
+contradict the common model, stop at the preceding safe boundary and revise the
+affected remaining slices; do not erase the concern with more route branches.
+
+SEED-017 Story 4 remains independent. Any reuse of its process mechanism must
+preserve environment-specific ownership; this plan does not authorize delivery
+of that sibling. No conflict with Accepted ADRs 0006 or 0007 was identified.
 
 ## Learnings
 
