@@ -1,6 +1,6 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { markdownWikiTokenFromDeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
+import { wikiLinkTokenFromDecodedParts } from "@/utils/authoredLinkMarkup"
 
 /** Owns the backend-authored Portable-path spelling for an insert (same- or cross-notebook, qualified by the backend) or wiki-link repair. */
 async function authoredPortablePathFor(
@@ -33,7 +33,7 @@ export async function authoredWikiLinkTokenForInsert(
     destinationNoteId
   )
   if (portablePath === undefined) return
-  return `[[${portablePath}]]`
+  return wikiLinkTokenFromDecodedParts(portablePath)
 }
 
 /**
@@ -54,8 +54,5 @@ export async function authoredWikiLinkTokenFromOriginalPath(
     originalPortablePath
   )
   if (portablePath === undefined) return
-  return markdownWikiTokenFromDeadWikiLinkPayload({
-    portablePath,
-    displayText: displayText ?? portablePath,
-  })
+  return wikiLinkTokenFromDecodedParts(portablePath, displayText)
 }

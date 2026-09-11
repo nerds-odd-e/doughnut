@@ -114,15 +114,6 @@ export function wikiLinkNoteIdLookup(
   return map
 }
 
-/** Stored wiki token for the clicked dead wiki link, for replace. */
-export function markdownWikiTokenFromDeadWikiLinkPayload(
-  p: DeadWikiLinkPayload
-): string {
-  const { portablePath, displayText } = p
-  if (portablePath === displayText) return `[[${portablePath}]]`
-  return `[[${portablePath}|${displayText}]]`
-}
-
 /** Markdown token for a wiki anchor (dead or live) from DOM; prefers `data-portable-path` / bracketed display. */
 export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
   const raw = anchor.textContent?.trim() ?? ""

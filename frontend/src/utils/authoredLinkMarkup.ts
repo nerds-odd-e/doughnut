@@ -1,5 +1,19 @@
 import type { WikiLink } from "@generated/donut-backend-api"
 
+function escapeWikiLinkPart(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|")
+}
+
+/** Encodes decoded target/display parts as one authored wiki-link token. */
+export function wikiLinkTokenFromDecodedParts(
+  target: string,
+  display = target
+): string {
+  const authoredTarget = escapeWikiLinkPart(target)
+  if (target === display) return `[[${authoredTarget}]]`
+  return `[[${authoredTarget}|${escapeWikiLinkPart(display)}]]`
+}
+
 /** Decodes wiki escapes once and splits on the first unescaped `|`. */
 export function splitWikiLinkInner(rawBetweenBrackets: string): {
   target: string

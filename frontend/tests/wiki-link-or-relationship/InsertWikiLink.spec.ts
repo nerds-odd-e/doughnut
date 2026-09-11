@@ -18,7 +18,7 @@ describe("InsertWikiLink", () => {
   setupInsertWikiLinkTests()
 
   it("inserts the backend-authored Portable path", async () => {
-    const portablePath = "Folder/Target CI"
+    const portablePath = "folder/A|B"
     mockSdkService(NoteController, "authoredPortablePath", { portablePath })
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Target CI").please()
@@ -34,7 +34,7 @@ describe("InsertWikiLink", () => {
     fireEvent.click(screen.getByText("Insert as a wiki link"))
     await flushPromises()
 
-    expect(insertedTexts).toContain(`[[${portablePath}]]`)
+    expect(insertedTexts).toContain("[[folder/A\\|B]]")
   })
 
   it("does not call the inserter when Add a new relationship note is clicked", async () => {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   authoredLinkOccurrences,
   splitWikiLinkInner,
+  wikiLinkTokenFromDecodedParts,
   wikiLinkFromAuthoredToken,
 } from "@/utils/authoredLinkMarkup"
 
@@ -38,6 +39,13 @@ describe("authoredLinkMarkup", () => {
       target: "Target",
       display: "label",
     })
+  })
+
+  it("encodes decoded wiki target and display parts", () => {
+    expect(wikiLinkTokenFromDecodedParts("a")).toBe("[[a]]")
+    expect(wikiLinkTokenFromDecodedParts("A|B", "shown|text\\label")).toBe(
+      "[[A\\|B|shown\\|text\\\\label]]"
+    )
   })
 
   it.each([

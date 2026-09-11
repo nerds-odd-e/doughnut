@@ -104,9 +104,14 @@ rewrite preparation from this proof loop.
 
 ### 3. Generate unambiguous wiki references
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted `InsertWikiLink.spec.ts` and dead-link repair examples assert the
 stored token from an API-provided Portable path; frontend suite passes.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed with 1,881
+tests after the post-change refactor. `wikiLinkTokenFromDecodedParts` is the
+single frontend serializer for inserted and repaired wiki tokens, escaping
+decoded destinations and labels without changing the separator or property key.
 
 Behavior: Given a selected destination whose authored Portable path contains a
 pipe, inserting or repairing its link writes an escaped destination and retains

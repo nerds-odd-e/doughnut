@@ -9,7 +9,6 @@ import {
   deadWikiLinkPayloadFromAnchor,
   escapeHtmlForWikiLinkDisplay,
   handleRichContentAnchorClick,
-  markdownWikiTokenFromDeadWikiLinkPayload,
   wikiLinkFromAuthoredToken,
   wikiLinkNoteIdLookup,
 } from "@/utils/wikiLinkMarkup"
@@ -149,21 +148,6 @@ describe("wikiLinkMarkup utils", () => {
       )
     }
   )
-
-  it("markdownWikiTokenFromDeadWikiLinkPayload matches simple and piped stored tokens", () => {
-    expect(
-      markdownWikiTokenFromDeadWikiLinkPayload({
-        portablePath: "a",
-        displayText: "a",
-      })
-    ).toBe("[[a]]")
-    expect(
-      markdownWikiTokenFromDeadWikiLinkPayload({
-        portablePath: "Target",
-        displayText: "label",
-      })
-    ).toBe("[[Target|label]]")
-  })
 
   it("escapes HTML-sensitive characters for display pipeline", () => {
     expect(escapeHtmlForWikiLinkDisplay(`a<b>"c`)).toBe("a&lt;b&gt;&quot;c")

@@ -19,12 +19,15 @@ describe("SearchForm dead wiki link actions", () => {
   describe("Dead link - link to existing note", () => {
     it("rewrites a missing wiki link to the backend-authored Portable path when the destination display name collides", async () => {
       mockSdkService(NoteController, "authoredPortablePath", {
-        portablePath: "ChosenFolder/Selected Note",
+        portablePath: "folder/A|B#prop:a%20part%20of",
       })
       const note = MakeMe.aNote.please()
       const updateSpy = await pointDeadWikiLinkAndCaptureUpdate({
-        content: "See [[original text]] for details.",
-        payload: deadWikiLinkPayload,
+        content: "See [[original text|shown\\|text\\\\label]] for details.",
+        payload: {
+          ...deadWikiLinkPayload,
+          displayText: "shown|text\\label",
+        },
         typeIn: "Selected",
         searchHits: [makeNoteHit("Selected Note", note.noteTopology.id + 100)],
       })
@@ -33,7 +36,7 @@ describe("SearchForm dead wiki link actions", () => {
         expect.objectContaining({
           body: expect.objectContaining({
             content:
-              "See [[ChosenFolder/Selected Note|original text]] for details.",
+              "See [[folder/A\\|B#prop:a%20part%20of|shown\\|text\\\\label]] for details.",
           }),
         })
       )

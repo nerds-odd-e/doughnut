@@ -40,10 +40,8 @@ import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"
 import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
-import {
-  type DeadWikiLinkPayload,
-  markdownWikiTokenFromDeadWikiLinkPayload,
-} from "@/utils/wikiLinkMarkup"
+import { type DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
+import { wikiLinkTokenFromDecodedParts } from "@/utils/authoredLinkMarkup"
 import {
   authoredWikiLinkTokenForInsert,
   authoredWikiLinkTokenFromOriginalPath,
@@ -108,8 +106,10 @@ async function onInsertWikiLinkAsProperty() {
 async function onDeadWikiLinkToNote() {
   if (!selectedSearchResult.value || !note || !deadWikiLinkPayload) return
   const destination = selectedSearchResult.value
-  const originalToken =
-    markdownWikiTokenFromDeadWikiLinkPayload(deadWikiLinkPayload)
+  const originalToken = wikiLinkTokenFromDecodedParts(
+    deadWikiLinkPayload.portablePath,
+    deadWikiLinkPayload.displayText
+  )
   const newLinkText = await authoredWikiLinkTokenFromOriginalPath(
     note.id,
     destination.noteTopology.id,
