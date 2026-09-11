@@ -31,7 +31,7 @@ When this checkout has no `.worktree.local.json` yet, the command:
    an existing database fails visibly and is never adopted.
 3. Persists `{"id":"<id>"}` to gitignored `.worktree.local.json` (ignore entry
    `/.worktree.local.json`) only after provisioning succeeds, printing
-   `Allocated new worktree environment: <id>`. Git also ignores the leftover
+   `Allocated new worktree environment: <id>`. Git also ignores the transient
    checkout lock with `/.worktree.local.lock` and the brief identity
    initialization lock with `/.worktree.identity.lock`.
 
@@ -79,7 +79,7 @@ FLUSH PRIVILEGES;
 ```
 
 Replace `wt_a7c2` / `doughnut_wt_a7c2_test` with the chosen identity. Confirm
-the ignore with `git check-ignore -v .worktree.local.json`. The leftover
+the ignore with `git check-ignore -v .worktree.local.json`. The transient
 checkout lock is ignored the same way (`/.worktree.local.lock`).
 
 With this config present, the command selects it directly: it never creates
@@ -91,10 +91,15 @@ silently provisioned or adopted.
 
 Regardless of which workflow started it, only one worktree test invocation
 runs at a time per checkout: an overlapping second command in the same
-checkout refuses immediately rather than sharing the run. If a previous
-invocation's process has exited without releasing ownership, the next
-invocation reclaims it automatically. Commands in different checkouts remain
-fully independent and may run concurrently.
+checkout refuses immediately rather than sharing the run. After success,
+ordinary failure, or handled SIGINT/SIGTERM cancellation, including during
+configuration, provisioning, migration, or tests, the invocation waits for its
+active work to stop and then releases only the ownership record still verified
+as its own. A release failure remains visible and never hides an existing
+workload failure or cancellation. An uncatchable crash, surviving work, or
+otherwise unverified shutdown retains the record; a later invocation may
+reclaim that stale record, but retirement still refuses it. Commands in
+different checkouts remain fully independent and may run concurrently.
 
 ## Ordinary migration in a configured checkout
 

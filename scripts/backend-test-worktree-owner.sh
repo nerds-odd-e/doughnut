@@ -51,6 +51,7 @@ backend_test_worktree_prepare() {
   local var_name
   local arg
   local admission_held=0
+  local reclaimed_dir=""
 
   release_retirement_admission() {
     if [[ "${admission_held}" -eq 1 ]]; then
@@ -77,8 +78,14 @@ backend_test_worktree_prepare() {
       echo "Backend worktree tests are already running in this checkout (owner pid ${owner_pid}). Refusing to start a second run." >&2
       exit 1
     fi
+    reclaimed_dir="${lock_dir}/reclaimed.${owner_pid}"
   fi
   echo "$$" > "${lock_dir}/owner.pid"
+  if [[ -n "${reclaimed_dir}" ]]; then
+    rmdir "${reclaimed_dir}"
+  fi
+  backend_worktree_lock_dir="${lock_dir}"
+  backend_worktree_lock_owned=1
   release_retirement_admission
 
   if [[ ! -f "${config_path}" ]]; then
@@ -132,4 +139,80 @@ backend_test_worktree_prepare() {
 
   echo "Selected database: ${database}"
   export SPRING_DATASOURCE_URL="${expected_url}"
+}
+
+# Move the ownership evidence behind an invocation-specific gate before
+# deleting it. Supported contenders cannot replace a live owner, and an
+# unexpected file appearing during release makes the final rmdir fail rather
+# than deleting that evidence.
+backend_test_worktree_release() {
+  local release_dir="${backend_worktree_lock_dir}/releasing.$$"
+  local moved_owner="${release_dir}/owner.pid"
+  local recorded_owner
+
+  mkdir "${release_dir}" || return $?
+  if ! mv "${backend_worktree_lock_dir}/owner.pid" "${moved_owner}"; then
+    rmdir "${release_dir}" 2>/dev/null || true
+    return 1
+  fi
+  recorded_owner="$(cat "${moved_owner}" 2>/dev/null || true)"
+  if [[ "${recorded_owner}" != "$$" ]]; then
+    if [[ ! -e "${backend_worktree_lock_dir}/owner.pid" ]]; then
+      mv "${moved_owner}" "${backend_worktree_lock_dir}/owner.pid" || true
+    fi
+    rmdir "${release_dir}" 2>/dev/null || true
+    echo "Backend worktree ownership changed before release; preserving the recorded evidence." >&2
+    return 1
+  fi
+
+  rm "${moved_owner}" || return $?
+  rmdir "${release_dir}" || return $?
+  rmdir "${backend_worktree_lock_dir}" || return $?
+  backend_worktree_lock_owned=0
+}
+
+backend_test_worktree_finalize() {
+  local status=$?
+  local release_status=0
+  trap - EXIT
+
+  if [[ "${backend_worktree_lock_owned:-0}" -eq 1 ]]; then
+    backend_test_worktree_release || release_status=$?
+    if [[ "${release_status}" -ne 0 ]]; then
+      echo "Failed to release backend worktree test ownership." >&2
+      if [[ "${status}" -eq 0 ]]; then
+        status="${release_status}"
+      fi
+    fi
+  fi
+  if [[ -n "${backend_worktree_received_signal:-}" ]]; then
+    trap - INT TERM
+    kill -s "${backend_worktree_received_signal}" "$$"
+  fi
+  exit "${status}"
+}
+
+# Keep the recorded invocation owner alive until its route-specific workload
+# has ended and its outcome has been observed.
+backend_test_worktree_run() {
+  local checkout_root="$1"
+  local workload="$2"
+  shift 2
+  backend_worktree_lock_owned=0
+  backend_worktree_lock_dir=""
+  backend_worktree_received_signal=""
+  local status
+
+  trap 'backend_worktree_received_signal=INT' INT
+  trap 'backend_worktree_received_signal=TERM' TERM
+  trap backend_test_worktree_finalize EXIT
+
+  backend_test_worktree_prepare "${checkout_root}" "$@"
+  if "${workload}"; then
+    status=0
+  else
+    status=$?
+  fi
+
+  return "${status}"
 }

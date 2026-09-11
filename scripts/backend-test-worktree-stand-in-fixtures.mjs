@@ -52,12 +52,19 @@ function writeStandIn(scriptPath, lines) {
 // stand-ins below.
 function holdReleaseLines(envVar, reachedName, releaseName) {
   return [
-    `if [ -n "\${${envVar}:-}" ]; then`,
+    `if [ -n "\${${envVar}:-}" ] && { [ -z "\${${envVar}_INVOCATION:-}" ] || [ "$n" = "\${${envVar}_INVOCATION}" ]; }; then`,
+    '  delayed_signal=""',
+    '  if [ -n "${FAKE_DELAY_SIGNAL_EXIT:-}" ]; then',
+    '    trap \'delayed_signal=1; printf "received\\n" > "$root/signal-received"\' INT TERM',
+    '  fi',
     `  printf 'reached\\n' > "$root/${reachedName}"`,
     `  release="$root/${releaseName}"`,
     '  while [ ! -e "$release" ]; do',
     '    sleep 0.05',
     '  done',
+    '  if [ -n "$delayed_signal" ]; then',
+    '    exit 130',
+    '  fi',
     'fi',
   ]
 }
@@ -127,6 +134,7 @@ export function makeCheckout(t, { config } = {}) {
     '  done',
     '} > "$record"',
     'cp "$record" "$root/gradle-invocation.$n"',
+    'printf \'%s\\n\' "$$" > "$root/gradle-pid.$n"',
     "printf 'GRADLE_STDOUT\\n'",
     "printf 'GRADLE_REACHED\\n' >&2",
     ...holdReleaseLines('GRADLE_HOLD', 'gradle-reached', 'gradle-release'),
@@ -166,6 +174,7 @@ export function makeCheckout(t, { config } = {}) {
     mysqlInvocation,
     mysqlReached,
     mysqlRelease,
+    signalReceived: path.join(root, 'signal-received'),
   }
 }
 
@@ -208,4 +217,10 @@ export function readGradleInvocations(checkout) {
     )
   }
   return invocations
+}
+
+export function readGradlePid(checkout, invocation = 1) {
+  return Number(
+    readFileSync(path.join(checkout.root, `gradle-pid.${invocation}`), 'utf8')
+  )
 }

@@ -11,6 +11,7 @@ export function mysqlStandInScriptLines(holdReleaseLines) {
     '  n=$(($(cat "$count") + 1))',
     'fi',
     'printf \'%s\\n\' "$n" > "$count"',
+    'printf \'%s\\n\' "$$" > "$root/mysql-pid.$n"',
     'record="$root/mysql-invocation.$n"',
     '{',
     '  for arg in "$@"; do',

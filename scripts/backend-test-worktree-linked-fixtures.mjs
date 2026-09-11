@@ -37,6 +37,7 @@ function relocateCheckout(checkout, newRoot) {
     mysqlInvocation: remap(checkout.mysqlInvocation),
     mysqlReached: remap(checkout.mysqlReached),
     mysqlRelease: remap(checkout.mysqlRelease),
+    signalReceived: remap(checkout.signalReceived),
   }
 }
 

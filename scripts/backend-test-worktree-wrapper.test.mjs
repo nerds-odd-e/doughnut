@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { realpathSync } from 'node:fs'
+import { existsSync, realpathSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import {
@@ -12,6 +12,7 @@ import {
   outputOf,
   runWrapper,
 } from './backend-test-worktree-launcher-fixtures.mjs'
+import { lockPaths } from './backend-test-worktree-lock-fixtures.mjs'
 
 test('configured wrapper migrateTestDB from root selects assigned database without testing', (t) => {
   const checkout = makeCheckout(t, {
@@ -29,6 +30,7 @@ test('configured wrapper migrateTestDB from root selects assigned database witho
   )
   assert.match(result.stderr, /GRADLE_REACHED/)
   assert.doesNotMatch(outputOf(result), /already running/i)
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
 
   const invocation = readGradleInvocation(checkout)
   assert.equal(
@@ -164,6 +166,7 @@ test('configured wrapper --continue does not run tests after migrate failure', (
   assert.notEqual(result.status, 0, outputOf(result))
   const invocations = readGradleInvocations(checkout)
   assert.equal(invocations.length, 1, outputOf(result))
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
   assert.equal(invocations[0].args.includes('migrateTestDB'), true)
   assert.equal(invocations[0].args.includes('test'), false)
   assert.equal(invocations[0].args.includes('--continue'), false)

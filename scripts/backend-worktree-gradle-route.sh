@@ -52,25 +52,32 @@ if [[ "${is_backend_project}" == true ]] \
 fi
 
 if [[ "${isolate_backend}" == true && ( -n "${test_task}" || "${has_migrate}" == true ) ]]; then
-  backend_test_worktree_prepare "${checkout_root}" "$@"
-  if [[ -n "${test_task}" ]]; then
-    export DONUT_WORKTREE_HANDOFF=1
+  gradle_args=("$@")
 
-    migrate_args=()
-    if [[ "${PWD}" -ef "${backend_dir}" ]]; then
-      migrate_args+=(migrateTestDB)
-    elif [[ "${test_task}" == ":backend:test" ]]; then
-      migrate_args+=(:backend:migrateTestDB)
+  run_routed_backend_workload() {
+    if [[ -n "${test_task}" ]]; then
+      local migrate_args=()
+      if [[ "${PWD}" -ef "${backend_dir}" ]]; then
+        migrate_args+=(migrateTestDB)
+      elif [[ "${test_task}" == ":backend:test" ]]; then
+        migrate_args+=(:backend:migrateTestDB)
+      else
+        migrate_args+=(-p backend migrateTestDB)
+      fi
+      migrate_args+=(--no-daemon)
+      "${backend_dir}/gradlew" "${migrate_args[@]}" || return $?
+
+      gradle_args+=(-Dspring.profiles.active=test --rerun-tasks --no-build-cache --no-daemon)
     else
-      migrate_args+=(-p backend migrateTestDB)
+      gradle_args+=(--no-daemon)
     fi
-    migrate_args+=(--no-daemon)
-    "${backend_dir}/gradlew" "${migrate_args[@]}"
 
-    set -- "$@" -Dspring.profiles.active=test --rerun-tasks --no-build-cache --no-daemon
-  else
-    set -- "$@" --no-daemon
-  fi
+    "${backend_dir}/gradlew" "${gradle_args[@]}"
+  }
+
+  export DONUT_WORKTREE_HANDOFF=1
+  backend_test_worktree_run "${checkout_root}" run_routed_backend_workload "$@"
+  exit $?
 fi
 
 export DONUT_WORKTREE_HANDOFF=1

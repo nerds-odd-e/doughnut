@@ -13,12 +13,14 @@ import {
   outputOf,
   runLauncher,
 } from './backend-test-worktree-launcher-fixtures.mjs'
+import { lockPaths } from './backend-test-worktree-lock-fixtures.mjs'
 
 test('malformed configuration refuses before gradle', (t) => {
   const checkout = makeCheckout(t, { config: '{"id":' })
   const result = runLauncher(checkout)
   assertRefusedBeforeGradle(checkout, result)
   assert.match(outputOf(result), /SyntaxError/i)
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
 })
 
 test('invalid id refuses before gradle', (t) => {
@@ -73,6 +75,7 @@ test('valid configuration execs one gradle migrate-then-test run', (t) => {
   const result = runLauncher(checkout)
   assert.equal(result.error, undefined, result.stderr)
   assert.equal(result.status, 0)
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
   assert.match(
     result.stdout,
     /Selected database: doughnut_wt_a7c2_test[\s\S]*GRADLE_STDOUT/
@@ -147,6 +150,7 @@ test('gradle child failure stays nonzero', (t) => {
   const result = runLauncher(checkout, { env: { FAKE_GRADLE_EXIT: '7' } })
   assert.equal(existsSync(checkout.gradleInvocation), true)
   assert.equal(result.status, 7)
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
 })
 
 test('worktreeTestRun opts test into mustRunAfter migrateTestDB', () => {

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { test } from 'node:test'
 import {
   jdbcUrl,
@@ -82,6 +82,7 @@ test('failed database administration leaves no config and never reaches gradle',
   const result = runLauncher(checkout, { env: { FAKE_MYSQL_EXIT: '1' } })
   assertRefusedBeforeGradle(checkout, result)
   assert.equal(existsSync(`${checkout.root}/.worktree.local.json`), false)
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
   assert.doesNotMatch(outputOf(result), /Selected database/)
 
   // The failure reports the generated target/stage it was diagnosing, and
@@ -183,10 +184,7 @@ test('a later invocation reuses the config a first-use run produced and skips CR
   const provisionedConfig = readFileSync(configPath, 'utf8')
   const database = `doughnut_${JSON.parse(provisionedConfig).id}_test`
 
-  // Clear the leftover checkout lock so a later command can acquire a fresh
-  // lock and reuse the established identity without going through stale
-  // reclaim.
-  rmSync(lockPaths(checkout).dir, { recursive: true, force: true })
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
 
   const second = runLauncher(checkout)
   assert.equal(second.status, 0, outputOf(second))

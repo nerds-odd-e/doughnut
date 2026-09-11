@@ -22,7 +22,6 @@ changes.
 
 ## Taken
 
-- [Release backend worktree test ownership after execution](quick/102-release-backend-worktree-test-ownership/PLAN.md)
 
 ## Backlog
 

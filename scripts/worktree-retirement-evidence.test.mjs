@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { makeLinkedWorktreeCheckout } from './backend-test-worktree-linked-fixtures.mjs'
+import {
+  runWrapper,
+  runWrapperAsync,
+} from './backend-test-worktree-launcher-fixtures.mjs'
 import {
   lockPaths,
   writeStaleOwnerLock,
@@ -66,6 +70,56 @@ test('stale backend worktree owner record refuses without reclaiming', async (t)
   assert.match(result.err, /not reclaimed/)
   assert.equal(existsSync(lockPaths(checkout).dir), true)
   assert.equal(isPidAlive(stalePid), false)
+})
+
+test('malformed backend worktree owner record refuses without reclaiming', async (t) => {
+  const checkout = makeLinkedWorktreeCheckout(t)
+  writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
+  const { dir, ownerFile } = lockPaths(checkout)
+  mkdirSync(dir)
+  writeFileSync(ownerFile, 'not-a-pid')
+
+  const result = await runCheck(checkout.root)
+  assert.equal(result.code, 1)
+  assert.match(result.err, /stale or unverifiable backend worktree owner/)
+  assert.equal(readFileSync(ownerFile, 'utf8'), 'not-a-pid')
+})
+
+test('ordinary backend completion releases ownership and permits an otherwise eligible retirement check', async (t) => {
+  const checkout = makeLinkedWorktreeCheckout(t, {
+    config: JSON.stringify({ id: 'wt_a7c2' }),
+  })
+  const completed = runWrapper(checkout, {
+    command: 'backend/gradlew',
+    args: ['-p', 'backend', 'migrateTestDB'],
+  })
+  assert.equal(completed.status, 0, completed.stderr)
+  assert.equal(existsSync(lockPaths(checkout).dir), false)
+
+  const result = await runCheck(checkout.root)
+  assert.equal(result.code, 0, result.err)
+  assert.match(result.out, /idle snapshot/i)
+})
+
+test('uncatchable backend owner death retains evidence and retirement refuses it', async (t) => {
+  const checkout = makeLinkedWorktreeCheckout(t, {
+    config: JSON.stringify({ id: 'wt_a7c2' }),
+  })
+  const owner = runWrapperAsync(checkout, {
+    command: 'backend/gradlew',
+    args: ['-p', 'backend', 'migrateTestDB'],
+    detached: true,
+  })
+  await owner.waitForGradleReached()
+  owner.signalProcessGroup('SIGKILL')
+  const killed = await owner.waitForExit()
+  assert.equal(killed.signal, 'SIGKILL')
+  assert.equal(existsSync(lockPaths(checkout).dir), true)
+
+  const result = await runCheck(checkout.root)
+  assert.equal(result.code, 1)
+  assert.match(result.err, /stale or unverifiable backend worktree owner/)
+  assert.equal(existsSync(lockPaths(checkout).dir), true)
 })
 
 test('live SUT owner refuses and leaves the owner control alive', async (t) => {
