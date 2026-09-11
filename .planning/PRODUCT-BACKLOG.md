@@ -23,9 +23,9 @@ changes.
 ## Taken
 
 - [Identify large-publication bottlenecks with a reproducible baseline](seeds/SEED-018-publish-large-authored-notebooks.md#story-2) — SEED-018
+- [Preserve pipe wiki links through rich editing](quick/107-preserve-pipe-wiki-links-through-rich-editing/PLAN.md)
 
 ## Backlog list
 
-- [Preserve pipe wiki links through rich editing](quick/107-preserve-pipe-wiki-links-through-rich-editing/PLAN.md)
 - [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-3) — SEED-018
 - [Restart primary SUT only with proven process ownership](quick/104-refuse-unowned-primary-sut-restart/PLAN.md)
