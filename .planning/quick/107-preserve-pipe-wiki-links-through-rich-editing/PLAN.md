@@ -1,9 +1,10 @@
 # Preserve pipe wiki links through rich editing
 
-Source: execution retrospective of
-[SEED-018 story 1](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-1)
-and its completed
-[plan 105](../105-accept-pipe-note-names/PLAN.md).
+Source: execution retrospective of SEED-018 story 1 and completed plan 105,
+recoverable from before-cleanup commit
+`d2fbd5af6926dfdab8e11927c3784aa9055c089a` at
+`.planning/seeds/SEED-018-publish-large-authored-notebooks.md` and
+`.planning/quick/105-accept-pipe-note-names/PLAN.md`.
 Status: planned.
 
 ## Historical provenance
