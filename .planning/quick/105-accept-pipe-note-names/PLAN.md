@@ -259,9 +259,14 @@ controller examples and 6a owns the shared validator change.
 
 ### 7. Find pipe compatibility warnings in notebook health
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NotebookHealthControllerTest` and mounted health-findings tests expose
 affected notes with warning severity; backend/frontend suites pass.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` and
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` passed (1,884 frontend
+tests). Health reports one non-auto-fix warning per affected note and routes its
+generic finding to `noteShow`; alias-only copy does not mention Windows.
 
 Behavior: Given persisted pipe titles or aliases, running notebook health
 identifies the affected notes with the appropriate brief compatibility warning.

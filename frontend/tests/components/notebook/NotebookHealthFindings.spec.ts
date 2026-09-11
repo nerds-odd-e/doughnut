@@ -81,3 +81,35 @@ describe("NotebookHealthFindings dead wiki links", () => {
     ).toBe(false)
   })
 })
+
+describe("NotebookHealthFindings pipe compatibility", () => {
+  it("links affected notes and shows the compatibility detail", () => {
+    const groups = [
+      {
+        ruleId: "pipe_name_compatibility",
+        title: "Pipe compatibility",
+        severity: "warning" as const,
+        autoFixable: false,
+        items: [
+          {
+            noteId: 12,
+            label: "Alias only",
+            message:
+              "An alias contains a pipe, so references may not work in other Markdown tools.",
+          },
+        ],
+      },
+    ]
+
+    const wrapper = mountFindings(groups)
+    const group = wrapper.get(
+      '[data-testid="notebook-health-group-pipe_name_compatibility"]'
+    )
+    const note = group.get('[data-testid="notebook-health-note-finding"]')
+
+    expect(note.text()).toBe("Alias only")
+    expect(linkTo(note)).toEqual(noteShowLocation(12))
+    expect(group.text()).toContain("references may not work")
+    expect(group.text()).not.toContain("Windows")
+  })
+})

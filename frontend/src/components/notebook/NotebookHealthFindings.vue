@@ -18,7 +18,18 @@
           class="flex flex-col gap-2"
         >
           <li v-for="(item, index) in group.items" :key="itemKey(item, index)">
-            {{ item.label }}
+            <router-link
+              v-if="item.noteId != null"
+              :to="noteShowLocation(item.noteId)"
+              class="font-semibold text-base-content no-underline hover:underline"
+              data-testid="notebook-health-note-finding"
+            >
+              {{ item.label }}
+            </router-link>
+            <span v-else>{{ item.label }}</span>
+            <p v-if="item.message" class="text-base-content/70">
+              {{ item.message }}
+            </p>
           </li>
         </ul>
 

@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.HealthFindingGroup;
 import com.odde.donut.controllers.dto.HealthFindingItem;
+import com.odde.donut.controllers.dto.HealthSeverity;
 import com.odde.donut.controllers.dto.NotebookHealthFixRequest;
 import com.odde.donut.controllers.dto.NotebookHealthLintReport;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -63,6 +65,38 @@ class NotebookHealthControllerTest extends ControllerTestBase {
 
   @Nested
   class LintHealth {
+    @Test
+    void reportsPipeTitleAndAliasCompatibilityPerAffectedNote()
+        throws UnexpectedNoAccessRightException {
+      Notebook notebook = ownedNotebook();
+      Note titleAndAlias =
+          makeMe
+              .aNote("Title||Pipe")
+              .notebook(notebook)
+              .content("---\naliases:\n  - Alias||Pipe\n---\n\nBody")
+              .please();
+      Note aliasOnly =
+          makeMe
+              .aNote("Alias only")
+              .notebook(notebook)
+              .content("---\naliases:\n  - Other|Name\n---\n\nBody")
+              .please();
+
+      HealthFindingGroup group =
+          healthGroup(controller.lint(notebook), HealthRuleIds.PIPE_NAME_COMPATIBILITY);
+
+      assertThat(group.getSeverity(), equalTo(HealthSeverity.warning));
+      assertThat(group.isAutoFixable(), equalTo(false));
+      assertThat(
+          group.getItems().stream().map(HealthFindingItem::getNoteId).toList(),
+          contains(titleAndAlias.getId(), aliasOnly.getId()));
+      assertThat(
+          group.getItems().stream().map(HealthFindingItem::getMessage).toList(),
+          contains(
+              "The title and an alias contain pipes, so its filename is not Windows-compatible and references may not work in other Markdown tools.",
+              "An alias contains a pipe, so references may not work in other Markdown tools."));
+    }
+
     @Test
     void ownerReceivesEmptyFolderFindingsWithoutMutatingNotebook()
         throws UnexpectedNoAccessRightException {
