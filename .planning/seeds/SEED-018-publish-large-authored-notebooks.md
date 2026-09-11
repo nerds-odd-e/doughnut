@@ -203,9 +203,14 @@ Executable plan: [Accept pipe note names](../quick/105-accept-pipe-note-names/PL
 
 ### 2. Identify large-publication bottlenecks with a reproducible baseline
 
-- **For / why:** Donut maintainers can decide which areas of large-notebook
+#### Goal
+
+Donut maintainers can decide which areas of large-notebook
   publication deserve improvement using runtime evidence, rather than selecting
   repeated work solely because it looks expensive in the code.
+
+#### Scope
+
 - **Evaluation:** A maintainer can repeat a representative publication workload
   from a documented starting state using the delivered profiling infrastructure,
   inspect the baseline data, and understand which improvement areas the evidence
@@ -232,6 +237,47 @@ Executable plan: [Accept pipe note names](../quick/105-accept-pipe-note-names/PL
   supported improvement areas without changing publication semantics or claiming
   a performance improvement. Profiling preserves accepted data and history;
   invalid proposals still reject atomically.
+
+- **Benchmark boundaries:** Use an owned disposable local E2E environment and a
+  deterministic fixture representing an existing notebook plus approximately
+  10,000 additions. Include authored bodies, aliases, properties, references,
+  and folder placement; record their distribution and the fixture's limitations.
+  The original jap3 checkout may inform the workload through read-only inspection,
+  but the benchmark must not mutate it or require publishing to its real notebook.
+  Use valid names independent of unfinished pipe support. The invalid variant
+  changes one late-processed document to an invalid recognized-alias shape.
+- **Measurement boundaries:** Separate fixture preparation from publication
+  timing. Capture client outcome and server completion separately if the client
+  times out. A timeout or interrupted server run is partial evidence, not a
+  completed baseline. Keep revision, environment, warm-up, logging/profiler
+  settings, workload identity, and reset procedure alongside the data so later
+  comparisons use equivalent conditions. No performance threshold is required
+  for this investigation.
+- **Deferred:** Product optimizations, earlier validation changes, transport
+  timeout changes in the product, monitoring dashboards, general benchmark
+  frameworks, and the optimization story's refinement or executable plan.
+
+#### Key examples
+
+1. Given the documented disposable starting state, run the valid workload →
+   retain publication timing and server profiling data, verify the accepted head
+   and added content, then repeat after resetting to the same logical baseline.
+2. Given that same baseline and a proposal with one late invalid alias shape,
+   run publication → retain rejection timing and profiling data and verify that
+   accepted history, stored notebook content, existing identities, and learning
+   history remain unchanged. Confirm the rejection is actually late; do not
+   infer it merely from the filename.
+3. Given the static candidates and captured profiles, review findings → see
+   evidence-backed improvement areas and remaining uncertainties in story 3,
+   with working links to the reusable infrastructure and baseline data. No
+   optimization plan is needed to evaluate this outcome.
+
+#### Open decisions
+
+No blocking product questions. Exact fixture distribution and profiler settings
+are execution choices to document; story 3's time target remains deferred.
+
+Executable plan: [Profile large notebook publication](../quick/106-profile-large-notebook-publication/PLAN.md).
 
 <a id="story-3"></a>
 
@@ -277,9 +323,9 @@ working reference semantics.
 ## Open Decisions
 
 - Story 1's remaining decisions are recorded in its section above.
-- Story 2: representative workload and reproducible benchmark environment remain
-  for refinement. Approximately 10,000 additions is the motivating workload, not
-  a product size limit.
+- Story 2: no blocking product questions; fixture distribution and measurement
+  settings are documented execution choices. Approximately 10,000 additions is
+  the motivating workload, not a product size limit.
 - Story 3: acceptable completion-time target and bounded improvement scope remain
   for later refinement based on story 2's evidence.
 
