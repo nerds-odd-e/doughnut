@@ -66,7 +66,7 @@ class NoteAliasIndexServiceTest {
               .aNote()
               .notebookOwnedBy(user)
               .content(
-                  "---\naliases:\n  - Color\n  - color\n  - \"   \"\n  - bad|alias\n---\n\nbody")
+                  "---\naliases:\n  - Color\n  - color\n  - \"   \"\n  - bad#alias\n---\n\nbody")
               .please();
 
       noteAliasIndexService.refreshForNote(note);

@@ -3,10 +3,17 @@ import type { PropertyValue } from "@/utils/noteProperties"
 export const AUTHORED_ALIASES_MESSAGE =
   "aliases must be a one-level YAML list of nonblank plain alias strings."
 
-const INVALID_ALIAS_CHARACTERS = /[|#^:]|\\|\/|＼|／|[\r\n]/
+const INVALID_ALIAS_CHARACTERS = /[#^:]|\\|\/|＼|／|[\r\n]/
+
+export const PIPE_ALIAS_WARNING =
+  "Pipe characters in aliases may make references incompatible with Obsidian or other Markdown tools."
 
 export function isAliasesPropertyKey(key: string): boolean {
   return key.trim().toLowerCase() === "aliases"
+}
+
+export function hasPipeAlias(items: string[]): boolean {
+  return items.some((item) => item.includes("|"))
 }
 
 function isValidPlainAliasText(trimmed: string): boolean {

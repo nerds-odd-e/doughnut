@@ -27,7 +27,7 @@ describe("authoredAliasesValidationErrorForPropertyValue", () => {
   it("accepts a valid one-level alias list", () => {
     expect(
       authoredAliasesValidationErrorForPropertyValue(
-        listPropertyValue(["color", "hue"])
+        listPropertyValue(["color", "A|B"])
       )
     ).toBeUndefined()
   })
@@ -48,7 +48,6 @@ describe("authoredAliasesValidationErrorForPropertyValue", () => {
 
   it("rejects invalid wiki-link characters", () => {
     for (const item of [
-      "bad|alias",
       "hash#tag",
       "caret^",
       "colon:",

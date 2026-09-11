@@ -72,7 +72,8 @@ and large-commit performance (story 2).
 - Slice 6 reached 10 active minutes with implementation present but proof
   incomplete. Four backend tests still used `bad|alias` as their invalid fixture,
   and the new mounted warning assertion read before Vue flushed. Eight owned
-  changes are parked in stash `d2470e535a294dec78604ba200e10d54c5d08bf1`.
+  changes were parked in stash `d2470e535a294dec78604ba200e10d54c5d08bf1`,
+  then restored for 6a/6b and the matched stash entry was dropped.
   The disproved sizing assumption was that alias write/warning and link
   resolution shared one short proof loop; they are now separate 6a and 6b
   behaviors.
@@ -219,10 +220,15 @@ rename mechanism.
 
 ### 6a. Save a pipe alias with a warning
 Type: Behavior
-Status: planned
+Status: done
 Proof: Text-content alias validation and mounted property-editor tests preserve
 `A|B`, retain rejection of independently invalid shapes, and show the alias-only
 warning after Vue flush; backend/frontend suites pass.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` and
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` passed (1,883 frontend
+tests). Both validators accept `|`, other invalid shapes still reject, and the
+mounted editor saves the alias after showing link-only compatibility copy.
 
 Behavior: Given an ordinary note, saving `aliases: ['A|B']` keeps that alias and
 shows a link-compatibility warning. The warning does not claim that the note's

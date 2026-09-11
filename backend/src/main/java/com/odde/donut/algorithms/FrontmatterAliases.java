@@ -19,7 +19,7 @@ public final class FrontmatterAliases {
       "aliases must be a one-level YAML list of nonblank plain alias strings.";
 
   private static final Pattern INVALID_ALIAS_CHARACTERS =
-      Pattern.compile("[|#^:]|\\\\|/|＼|／|[\\r\\n]");
+      Pattern.compile("[#^:]|\\\\|/|＼|／|[\\r\\n]");
 
   private FrontmatterAliases() {}
 

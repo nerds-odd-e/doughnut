@@ -101,6 +101,14 @@
       >
         {{ validationMessage }}
       </p>
+      <p
+        v-else-if="aliasCompatibilityWarning"
+        role="status"
+        class="text-warning text-xs mt-2"
+        data-testid="rich-note-property-value-dialog-warning"
+      >
+        {{ aliasCompatibilityWarning }}
+      </p>
       <div class="mt-4 flex justify-end gap-2">
         <button
           type="button"
@@ -125,8 +133,13 @@
 
 <script setup lang="ts">
 import { ChevronDown, ChevronUp, Minus } from "@lucide/vue"
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import Modal from "@/components/commons/Modal.vue"
+import {
+  hasPipeAlias,
+  isAliasesPropertyKey,
+  PIPE_ALIAS_WARNING,
+} from "@/utils/authoredAliasesValidation"
 import { authoredListPropertyValidationErrorForPropertyValue } from "@/utils/authoredListPropertyValidation"
 import {
   compactDisplayForPropertyValue,
@@ -166,6 +179,12 @@ const mode = ref<Mode>(initialDraft.mode)
 const draftText = ref(initialDraft.draftText)
 const draftListItems = ref<string[]>(initialDraft.draftListItems)
 const validationMessage = ref("")
+
+const aliasCompatibilityWarning = computed(() => {
+  if (!isAliasesPropertyKey(props.propertyKey)) return ""
+  const items = mode.value === "list" ? draftListItems.value : [draftText.value]
+  return hasPipeAlias(items) ? PIPE_ALIAS_WARNING : ""
+})
 
 watch(
   () => props.propertyValue,

@@ -1,4 +1,8 @@
-import { AUTHORED_ALIASES_MESSAGE } from "@/utils/authoredAliasesValidation"
+import {
+  AUTHORED_ALIASES_MESSAGE,
+  PIPE_ALIAS_WARNING,
+} from "@/utils/authoredAliasesValidation"
+import { nextTick } from "vue"
 import {
   listPropertyValue,
   parseNoteContentMarkdown,
@@ -39,7 +43,7 @@ describe("RichMarkdownEditor aliases property", () => {
   it("rejects an invalid alias in the property value dialog then saves a valid list", async () => {
     const wrapper = await mountPropertyValueDialog(h, ALIASES_LIST_MARKDOWN)
 
-    setListItemValue(0, "bad|alias")
+    setListItemValue(0, "bad#alias")
     await savePropertyValueDialog()
     expect(propertyValueDialogValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
@@ -49,6 +53,23 @@ describe("RichMarkdownEditor aliases property", () => {
 
     const last = h.lastEmittedMarkdown()
     expect(last).toMatch(/aliases:\s*\n\s*- hue/)
+    expect(propertyValueDialogEl()).toBeNull()
+  })
+
+  it("saves a pipe alias with a link-compatibility warning", async () => {
+    await mountPropertyValueDialog(h, ALIASES_LIST_MARKDOWN)
+
+    setListItemValue(0, "A|B")
+    await nextTick()
+    expect(
+      document.querySelector(
+        '[data-testid="rich-note-property-value-dialog-warning"]'
+      )?.textContent
+    ).toBe(PIPE_ALIAS_WARNING)
+    expect(PIPE_ALIAS_WARNING).not.toContain("Windows")
+    await savePropertyValueDialog()
+
+    expect(h.lastEmittedMarkdown()).toMatch(/aliases:\s*\n\s*- A\|B/)
     expect(propertyValueDialogEl()).toBeNull()
   })
 

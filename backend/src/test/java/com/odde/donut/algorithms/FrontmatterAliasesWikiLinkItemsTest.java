@@ -44,7 +44,7 @@ class FrontmatterAliasesWikiLinkItemsTest {
             aliases:
               - color
               - "[[Other Note]]"
-              - bad|alias
+              - bad#alias
               - good
             """);
 

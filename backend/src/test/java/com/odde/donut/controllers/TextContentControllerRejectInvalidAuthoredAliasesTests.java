@@ -46,7 +46,7 @@ class TextContentControllerRejectInvalidAuthoredAliasesTests extends TextContent
         ---
         aliases:
           - color
-          - bad|alias
+          - bad#alias
         ---
 
         body
@@ -78,14 +78,14 @@ class TextContentControllerRejectInvalidAuthoredAliasesTests extends TextContent
         ---
         aliases:
           - color
-          - hue
+          - A|B
         ---
 
         body
         """;
     assertThat(
         controller.updateNoteContent(note, contentDto(content)).getNote().getContent(),
-        containsString("aliases:\n  - color\n  - hue"));
+        containsString("aliases:\n  - color\n  - A|B"));
   }
 
   @Test

@@ -40,7 +40,7 @@ class FrontmatterAliasesTest {
             aliases:
               - color
               - "   "
-              - bad|alias
+              - bad#alias
               - [oops]
               - good
             """);
@@ -122,7 +122,7 @@ class FrontmatterAliasesTest {
         """
         ---
         aliases:
-          - bad|alias
+          - bad#alias
         ---
         """);
   }
