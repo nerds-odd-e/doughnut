@@ -278,9 +278,16 @@ Estimate: 4–5 minutes, medium confidence.
 
 ### 8. Publish and round-trip a pipe-titled file
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `NotebookGitAdvisoryNamePublicationControllerTest` with a real
 proposal bundle and downloaded accepted tree; backend suite passes.
+
+Evidence: The focused `NotebookGitAdvisoryNamePublicationControllerTest` and
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed. Publication,
+download, and unchanged reimport preserve `folder/A|B.md`, authored references,
+destination resolution, note identity, and the health warning. Durable
+validation already shares the note-title constraint; no parallel name model was
+added.
 
 Behavior: Given a valid `folder/A|B.md` with body and YAML references, publishing
 then downloading the accepted tree preserves filename, content, and reference
