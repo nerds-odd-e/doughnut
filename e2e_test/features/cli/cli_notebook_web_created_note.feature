@@ -219,3 +219,42 @@ Feature: CLI notebook web-created note
       Second example
 
       """
+
+  Scenario: Publishing a note rename with an unrelated edit is received by a clean clone
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I commit a rename of "Recipes/Pasta.md" to "Recipes/Pasta basics.md" and the following unrelated edit to "Overview.md" together in the cloned checkout:
+      """
+      ---
+      type: Note
+      ---
+      Composed publication received
+      """
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I pull the second cloned checkout using the installed CLI
+    Then the published checkout has exactly one commit after the second clone original head
+    And the second cloned checkout retains its original head as an ancestor
+    And the second cloned checkout is a clean checkout of the accepted head
+    And the second cloned checkout contains exactly:
+      | README.md                 |
+      | Overview.md               |
+      | Kitchen/README.md         |
+      | Recipes/README.md         |
+      | Recipes/Pasta basics.md   |
+    And the second cloned checkout file "Recipes/Pasta basics.md" is:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Boil water
+      """
+    And the second cloned checkout file "Overview.md" is:
+      """
+      ---
+      type: Note
+      ---
+      Composed publication received
+
+      """

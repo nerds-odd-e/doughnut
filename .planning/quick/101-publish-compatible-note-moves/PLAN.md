@@ -1,7 +1,7 @@
 # Publish compatible note moves
 
 Source: [SEED-017 Story 2b](../../seeds/SEED-017-cohesive-design-corrections.md#story-2b).
-Status: in progress. Execution authorized 2026-09-11.
+Status: completed. Execution authorized and completed 2026-09-11.
 
 ## Outcome and contract
 
@@ -157,7 +157,7 @@ staging/commit boundary ready for the immediately following workflow.
 
 ### 4. Receive a composed publication through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Depends on: slice 3
 Sizing: approximately 5 minutes active work plus Cypress/build waits;
 medium confidence; shared staging now exists from slice 3.
@@ -270,3 +270,9 @@ warrant story resplitting.
   renames while preserving each existing adapter's single `commitCheckout`
   boundary. The worktree-owned SUT healthcheck and the five-scenario installed
   CLI Cypress feature passed; the independent refactor review required no edits.
+- Slice 4 composed rename and edit staging into one commit and proved installed
+  publish/pull receipt in a clean second clone, including accepted head, direct
+  parent, ancestor, exact tree, preserved rename bytes and companion content.
+  The worktree-owned healthcheck passed and the expanded Cypress feature passed
+  all six scenarios. The final refactor consolidated repeated commit/HEAD-alias
+  orchestration and the focused Cypress proof remained green.

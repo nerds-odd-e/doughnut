@@ -253,5 +253,25 @@ export function createCliE2eNotebookCloneTasks() {
       stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
       return commitCheckout(checkoutDir, 'Rename cloned notebook note')
     },
+    commitCliNotebookCheckoutNoteRenameAndEdit({
+      checkoutDir,
+      fromRelativePath,
+      toRelativePath,
+      relativePath,
+      content,
+    }: {
+      checkoutDir: string
+      fromRelativePath: string
+      toRelativePath: string
+      relativePath: string
+      content: string
+    }): string {
+      stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
+      stageNoteChanges(checkoutDir, [{ relativePath, content }])
+      return commitCheckout(
+        checkoutDir,
+        'Rename and change cloned notebook notes'
+      )
+    },
   }
 }

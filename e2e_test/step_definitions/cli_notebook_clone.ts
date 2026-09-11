@@ -120,6 +120,24 @@ When(
 )
 
 When(
+  'I commit a rename of {string} to {string} and the following unrelated edit to {string} together in the cloned checkout:',
+  (
+    fromRelativePath: string,
+    toRelativePath: string,
+    relativePath: string,
+    content: string
+  ) =>
+    cli
+      .notebookCloneCheckout()
+      .commitRenameAndEdit(
+        fromRelativePath,
+        toRelativePath,
+        relativePath,
+        content
+      )
+)
+
+When(
   'I publish the cloned checkout expecting rejection from the installed CLI',
   () => cli.notebookCloneCheckout().publishExpectingRejection()
 )
@@ -162,6 +180,14 @@ When('I pull the second cloned checkout using the installed CLI', () =>
 Then(
   'the second cloned checkout retains its original head as an ancestor',
   () => cli.notebookCloneCheckout().expectReceiverOriginalHeadIsAncestor()
+)
+
+Then(
+  'the published checkout has exactly one commit after the second clone original head',
+  () =>
+    cli
+      .notebookCloneCheckout()
+      .expectPublishedHeadIsSingleCommitAfterReceiverOriginal()
 )
 
 Then(
