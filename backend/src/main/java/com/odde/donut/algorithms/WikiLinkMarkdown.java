@@ -2,6 +2,7 @@ package com.odde.donut.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,7 +15,46 @@ public final class WikiLinkMarkdown {
    * Portable path and display segments of a wiki-link inner (first {@code |} separates target from
    * display).
    */
-  public record WikiInnerSplit(PortablePath portablePath, String displayText) {}
+  public record WikiInnerSplit(
+      PortablePath portablePath,
+      String displayText,
+      String rawInner,
+      String rawTarget,
+      String rawDisplay,
+      boolean hasDisplaySeparator) {
+
+    String rewriteTarget(UnaryOperator<String> targetTransform) {
+      String trimmedTarget = rawTarget.trim();
+      String transformedTarget = targetTransform.apply(trimmedTarget);
+      if (transformedTarget.equals(trimmedTarget)) {
+        return rawInner;
+      }
+      return hasDisplaySeparator ? transformedTarget + "|" + rawDisplay : transformedTarget;
+    }
+
+    String rewriteTargetKeepingVisible(UnaryOperator<String> targetTransform) {
+      String trimmedTarget = rawTarget.trim();
+      String transformedTarget = targetTransform.apply(trimmedTarget);
+      if (transformedTarget.equals(trimmedTarget)) {
+        return rawInner;
+      }
+      String visibleText =
+          hasDisplaySeparator && !rawDisplay.trim().isEmpty() ? rawDisplay : trimmedTarget;
+      return transformedTarget + "|" + visibleText;
+    }
+
+    String rewriteNoteTitle(String newNoteTitle, boolean keepVisibleText) {
+      String trimmedTarget = rawTarget.trim();
+      String transformedTarget = PortablePath.replaceNoteTitle(trimmedTarget, newNoteTitle.trim());
+      if (transformedTarget.equals(trimmedTarget)) {
+        return rawInner;
+      }
+      if (hasDisplaySeparator && !rawDisplay.trim().isEmpty()) {
+        return transformedTarget + "|" + rawDisplay;
+      }
+      return keepVisibleText ? transformedTarget + "|" + trimmedTarget : transformedTarget;
+    }
+  }
 
   private WikiLinkMarkdown() {}
 
@@ -24,18 +64,26 @@ public final class WikiLinkMarkdown {
    */
   public static WikiInnerSplit splitInner(String rawBetweenBrackets) {
     if (rawBetweenBrackets == null || rawBetweenBrackets.isEmpty()) {
-      return new WikiInnerSplit(PortablePath.parse(""), "");
+      return new WikiInnerSplit(PortablePath.parse(""), "", rawBetweenBrackets, "", "", false);
     }
     int i = rawBetweenBrackets.indexOf('|');
     if (i == -1) {
-      return new WikiInnerSplit(PortablePath.parse(rawBetweenBrackets), rawBetweenBrackets);
+      return new WikiInnerSplit(
+          PortablePath.parse(rawBetweenBrackets),
+          rawBetweenBrackets,
+          rawBetweenBrackets,
+          rawBetweenBrackets,
+          "",
+          false);
     }
     String target = rawBetweenBrackets.substring(0, i);
     String display = rawBetweenBrackets.substring(i + 1);
     if (display.trim().isEmpty()) {
-      return new WikiInnerSplit(PortablePath.parse(target), target);
+      return new WikiInnerSplit(
+          PortablePath.parse(target), target, rawBetweenBrackets, target, display, true);
     }
-    return new WikiInnerSplit(PortablePath.parse(target), display);
+    return new WikiInnerSplit(
+        PortablePath.parse(target), display, rawBetweenBrackets, target, display, true);
   }
 
   /**

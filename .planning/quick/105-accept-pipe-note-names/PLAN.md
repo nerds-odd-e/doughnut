@@ -1,7 +1,14 @@
 # Accept pipe characters in note names
 
 Source: [SEED-018 story 1](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-1).
-Status: planned. Planning authorized; implementation not requested.
+Status: in progress. Execution authorized on 2026-09-11.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`
+- Execution checkout: `/Users/terryyin/git/doughnut-105-accept-pipe-note-names` on `codex/105-accept-pipe-note-names`
+- Integration target: `main`
+- CI observation: unavailable for the execution branch; `.github/workflows/ci.yml` (`donut CI`) is push-triggered only for `main`, so branch pushes have `pendingCi: unobserved`.
 
 ## Outcome and scope
 
@@ -55,9 +62,13 @@ implementation work. Never deliver a failing intermediate state.
 
 ### 1. Centralize wiki target transformations
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing wiki parsing, rename, relocation, and property-reference tests
 pass with unchanged authored output (backend command below).
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after the
+post-change refactor. `WikiInnerSplit` now owns target rewrites and preserves
+the raw authored inner when the target is unchanged.
 
 Replace repeated delimiter handling in `WikiLinkMarkdownRewrite` with the
 existing token abstraction, preserving raw spelling where a transformation

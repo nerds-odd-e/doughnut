@@ -63,8 +63,8 @@ class WikiLinkMarkdownTest {
   @Test
   void newInnerForFolderRename_leavesUnqualifiedTitleUnchanged() {
     assertThat(
-        WikiLinkMarkdownRewrite.newInnerForFolderRename("Title", "OldFolder", "NewFolder"),
-        equalTo("Title"));
+        WikiLinkMarkdownRewrite.newInnerForFolderRename("  Title  ", "OldFolder", "NewFolder"),
+        equalTo("  Title  "));
   }
 
   @Test

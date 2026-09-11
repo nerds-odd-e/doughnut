@@ -2,7 +2,6 @@ package com.odde.donut.algorithms;
 
 import com.odde.donut.validators.DisplayNamePathSeparators;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 /**
  * Rewrites one stored wiki Portable-path inner token. Note-ID URL Markdown links are never
@@ -23,8 +22,9 @@ public final class WikiLinkMarkdownRewrite {
       return newInnerWithHandling(storedLinkInner, authored.notePortion(), keepVisibleText);
     }
     return keepVisibleText
-        ? keepVisibleInner(storedLinkInner, _ -> authoredPortablePath)
-        : rewriteWikiInnerTarget(storedLinkInner, _ -> authoredPortablePath);
+        ? WikiLinkMarkdown.splitInner(storedLinkInner)
+            .rewriteTargetKeepingVisible(_ -> authoredPortablePath)
+        : WikiLinkMarkdown.splitInner(storedLinkInner).rewriteTarget(_ -> authoredPortablePath);
   }
 
   /**
@@ -42,9 +42,9 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
-    return rewriteWikiInnerTarget(
-        storedLinkInner,
-        token -> PortablePath.replaceFolderName(token, oldFolderName, newFolderName));
+    return WikiLinkMarkdown.splitInner(storedLinkInner)
+        .rewriteTarget(
+            token -> PortablePath.replaceFolderName(token, oldFolderName, newFolderName));
   }
 
   /**
@@ -57,8 +57,8 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
-    return rewriteWikiInnerTarget(
-        storedLinkInner, token -> PortablePath.replaceFolderTrail(token, newFolderNames));
+    return WikiLinkMarkdown.splitInner(storedLinkInner)
+        .rewriteTarget(token -> PortablePath.replaceFolderTrail(token, newFolderNames));
   }
 
   /**
@@ -78,9 +78,9 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
-    return keepVisibleInner(
-        storedLinkInner,
-        rawTargetToken -> PortablePath.replaceNotebookName(rawTargetToken, newNotebookName));
+    return WikiLinkMarkdown.splitInner(storedLinkInner)
+        .rewriteTargetKeepingVisible(
+            rawTargetToken -> PortablePath.replaceNotebookName(rawTargetToken, newNotebookName));
   }
 
   /**
@@ -100,14 +100,12 @@ public final class WikiLinkMarkdownRewrite {
 
   private static String qualifyUnqualifiedWikiInner(
       String storedLinkInner, String sourceNotebookName) {
-    int pipeIdx = storedLinkInner.indexOf('|');
-    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
-    String authoredToken = rawTargetPart.trim();
+    WikiLinkMarkdown.WikiInnerSplit token = WikiLinkMarkdown.splitInner(storedLinkInner);
+    String authoredToken = token.rawTarget().trim();
     if (authoredToken.isEmpty() || PortablePath.isQualifiedToken(authoredToken)) {
       return storedLinkInner;
     }
-    return keepVisibleInner(
-        storedLinkInner,
+    return token.rewriteTargetKeepingVisible(
         rawTargetToken -> PortablePath.replaceNotebookName(rawTargetToken, sourceNotebookName));
   }
 
@@ -119,53 +117,8 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return newNoteTitle;
     }
-    return rewriteWikiInnerNoteTitle(storedLinkInner, newNoteTitle, keepVisibleText);
-  }
-
-  private static String rewriteWikiInnerTarget(
-      String storedLinkInner, UnaryOperator<String> targetTransform) {
-    int pipeIdx = storedLinkInner.indexOf('|');
-    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
-    String newTargetToken = targetTransform.apply(rawTargetPart.trim());
-    if (pipeIdx == -1) {
-      return newTargetToken;
-    }
-    return newTargetToken + "|" + storedLinkInner.substring(pipeIdx + 1);
-  }
-
-  private static String rewriteWikiInnerNoteTitle(
-      String storedLinkInner, String newNoteTitle, boolean keepVisibleText) {
-    int pipeIdx = storedLinkInner.indexOf('|');
-    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
-    String newTargetToken =
-        PortablePath.replaceNoteTitle(rawTargetPart.trim(), newNoteTitle.trim());
-    if (pipeIdx == -1) {
-      return keepVisibleText ? newTargetToken + "|" + storedLinkInner.trim() : newTargetToken;
-    }
-    String rawDisplay = storedLinkInner.substring(pipeIdx + 1);
-    if (rawDisplay.trim().isEmpty()) {
-      return keepVisibleText ? newTargetToken + "|" + rawTargetPart.trim() : newTargetToken;
-    }
-    return newTargetToken + "|" + rawDisplay;
-  }
-
-  /**
-   * Shared keep-visible-text branching: replaces the target token using the given transform and
-   * always preserves whatever text readers currently see.
-   */
-  private static String keepVisibleInner(
-      String storedLinkInner, UnaryOperator<String> targetTokenTransform) {
-    int pipeIdx = storedLinkInner.indexOf('|');
-    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
-    String newTargetToken = targetTokenTransform.apply(rawTargetPart.trim());
-    if (pipeIdx == -1) {
-      return newTargetToken + "|" + storedLinkInner.trim();
-    }
-    String rawDisplay = storedLinkInner.substring(pipeIdx + 1);
-    if (rawDisplay.trim().isEmpty()) {
-      return newTargetToken + "|" + rawTargetPart.trim();
-    }
-    return newTargetToken + "|" + rawDisplay;
+    return WikiLinkMarkdown.splitInner(storedLinkInner)
+        .rewriteNoteTitle(newNoteTitle, keepVisibleText);
   }
 
   /** Converts OS-invalid characters in one wiki inner token. */
@@ -173,8 +126,7 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
-    UnaryOperator<String> convert =
-        DisplayNamePathSeparators::replaceOsInvalidCharsInWikiLinkTarget;
-    return rewriteWikiInnerTarget(storedLinkInner, convert);
+    return WikiLinkMarkdown.splitInner(storedLinkInner)
+        .rewriteTarget(DisplayNamePathSeparators::replaceOsInvalidCharsInWikiLinkTarget);
   }
 }
