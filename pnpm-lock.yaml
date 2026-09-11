@@ -96,7 +96,7 @@ importers:
         version: 2.9.4(supports-color@8.1.1)
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
-        version: 1.30.0(supports-color@8.1.1)(zod@4.5.4)
+        version: 1.30.0(supports-color@8.1.1)(zod@4.6.1)
       '@redocly/cli':
         specifier: 2.51.2
         version: 2.51.2
@@ -217,7 +217,7 @@ importers:
         version: 6.0.3
       vitest:
         specifier: 5.0.0
-        version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(jsdom@26.1.0(canvas@3.2.3)(supports-color@11.0.0))(vite@8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
+        version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(vite@8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
       zod:
         specifier: 4.6.1
         version: 4.6.1
@@ -399,7 +399,7 @@ importers:
     devDependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
-        version: 1.30.0(supports-color@11.0.0)(zod@4.5.4)
+        version: 1.30.0(supports-color@11.0.0)(zod@4.6.1)
       '@types/node':
         specifier: 26.5.0
         version: 26.5.0
@@ -416,8 +416,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(jsdom@26.1.0(canvas@3.2.3)(supports-color@11.0.0))(vite@8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
       zod:
-        specifier: ^4.5.4
-        version: 4.5.4
+        specifier: 4.6.1
+        version: 4.6.1
 
   packages/donut-api:
     dependencies:
@@ -6219,9 +6219,6 @@ packages:
     peerDependencies:
       zod: ^3.25.28 || ^4
 
-  zod@4.5.4:
-    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
-
   zod@4.6.1:
     resolution: {integrity: sha512-341aRWQsve0rvronKNTqZpjmzdbUDlFuzHaI/XLg/Ej82qffDJRRfBTCuv7+9q/rMjB6LSLyEBnW4InJeMtt/Q==}
 
@@ -7069,7 +7066,7 @@ snapshots:
 
   '@mixmark-io/domino@2.2.0': {}
 
-  '@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.5.4)':
+  '@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.6.1)':
     dependencies:
       '@hono/node-server': 2.1.1(hono@4.13.7)
       ajv: 8.20.0
@@ -7080,18 +7077,18 @@ snapshots:
       eventsource: 3.0.7
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@11.0.0)
-      express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@11.0.0)
+      express-rate-limit: 8.6.0(express@5.2.1(supports-color@11.0.0))(supports-color@11.0.0)
       hono: 4.13.7
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
-      zod: 4.5.4
-      zod-to-json-schema: 3.25.2(zod@4.5.4)
+      zod: 4.6.1
+      zod-to-json-schema: 3.25.2(zod@4.6.1)
     transitivePeerDependencies:
       - supports-color
 
-  '@modelcontextprotocol/sdk@1.30.0(supports-color@8.1.1)(zod@4.5.4)':
+  '@modelcontextprotocol/sdk@1.30.0(supports-color@8.1.1)(zod@4.6.1)':
     dependencies:
       '@hono/node-server': 2.1.1(hono@4.13.7)
       ajv: 8.20.0
@@ -7108,8 +7105,8 @@ snapshots:
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
-      zod: 4.5.4
-      zod-to-json-schema: 3.25.2(zod@4.5.4)
+      zod: 4.6.1
+      zod-to-json-schema: 3.25.2(zod@4.6.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -9109,10 +9106,10 @@ snapshots:
 
   expect-type@1.4.0: {}
 
-  express-rate-limit@8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@11.0.0):
+  express-rate-limit@8.6.0(express@5.2.1(supports-color@11.0.0))(supports-color@11.0.0):
     dependencies:
       debug: 4.4.3(supports-color@11.0.0)
-      express: 5.2.1(supports-color@8.1.1)
+      express: 5.2.1(supports-color@11.0.0)
       ip-address: 10.4.0
     transitivePeerDependencies:
       - supports-color
@@ -12047,6 +12044,31 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
+  vitest@5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(vite@8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0)):
+    dependencies:
+      '@types/chai': 5.2.3
+      '@vitest/mocker': 5.0.0(vite@8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
+      chai: 6.2.2
+      es-module-lexer: 2.3.2
+      expect-type: 1.4.0
+      magic-string: 1.2.3
+      obug: 2.1.4
+      picomatch: 4.0.5
+      std-env: 4.2.0
+      tinybench: 6.1.4
+      tinyexec: 1.3.0
+      tinyglobby: 0.2.17
+      vite: 8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
+      '@types/node': 26.5.0
+      '@vitest/browser-playwright': 5.0.0(playwright@1.63.0)(vite@8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(vitest@5.0.0)
+      '@vitest/ui': 5.0.0(vitest@5.0.0)
+      jsdom: 26.1.0(canvas@3.2.3)(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - msw
+
   void-elements@3.1.0: {}
 
   vscode-uri@3.1.0: {}
@@ -12349,10 +12371,8 @@ snapshots:
 
   zlibjs@0.3.1: {}
 
-  zod-to-json-schema@3.25.2(zod@4.5.4):
+  zod-to-json-schema@3.25.2(zod@4.6.1):
     dependencies:
-      zod: 4.5.4
-
-  zod@4.5.4: {}
+      zod: 4.6.1
 
   zod@4.6.1: {}
