@@ -69,7 +69,7 @@ The product constraints established in the discussion are:
    by one save is already supported for one local edit; extending batches across
    structural history is not required for that outcome.
 3. **Edits-only multi-note publish:** delivered as Story 14, independent of
-   receiving additions. Story 11 already publishes mixed additions and edits.
+   receiving additions. Mixed additions and edits already publish as one commit.
 4. **Complete synchronization:** defer the broad contract. The owner also
    values readable history; Story 10 (rolling ten-minute web autosave batching)
    is delivered. Durable web commits may change until exposed to a client or
@@ -140,7 +140,8 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 - **Scope:** One addition at the root or an existing represented folder, with
   fresh identity and valid authored Portable content. No implicit parent
   creation, README authoring, attachments, or identity copied from matching
-  text. Story 11 extends additions to batches.
+  text. Publication also accepts several added notes in one commit, including
+  notes whose paths imply a new Folder.
 
 <a id="story-5"></a>
 
@@ -351,9 +352,10 @@ correction delivered as Story 10a.
   local work and leaving remote history and notes unchanged by the attempt.
   Excludes additions, deletions, renames, moves, folder/README changes,
   multiple unpublished commits, divergent batch rebase, or drift repair. No new
-  UI, commands, or identity policy. Delivered additions-and-edits publication
-  remains Story 11; receiving web additions beside unpublished work remains
-  Stories 16–17. A previously web-created note is simply an existing note here.
+  UI, commands, or identity policy. Additions, implied Folders from concept
+  paths, and mixed additions-and-edits already publish as one commit; receiving
+  web additions beside unpublished work remains Stories 16–17. A previously
+  web-created note is simply an existing note here.
 
 <a id="story-15"></a>
 
@@ -477,8 +479,9 @@ SEED-015 worktree queue (reclaim, then CLI and MCP) ahead of further SEED-009
 selection; this reassessment does not displace that direction.
 
 Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, **15**,
-**10**, **10a**, and **19** are delivered. Remaining SEED-009 work follows the
-product backlog after worktree priorities.
+**10**, **10a**, and **19** are delivered, as is publication of added concepts
+that imply a new Folder without a Folder README. Remaining SEED-009 work
+follows the product backlog after worktree priorities.
 
 First-to-drop order among remaining unselected items follows the backlog.
 Delivered batch publication and batch reconciliation across one disjoint web
@@ -498,9 +501,10 @@ Preserve these boundaries in future refinement:
   Missing files do not establish missing Donut containers or identity intent.
 - Authored links remain unchanged during supported structural publication.
 - Ordinary Git handles content conflicts; ambiguous identity must still stop.
-- Web deletion/rename/move, earlier projection-drift recovery, folders without
-  README, new parents, deleted-path reuse, and multiple unpublished commits
-  remain outside this selection. Completing the queue is not full ADR 0002.
+- Web deletion/rename/move, earlier projection-drift recovery, edits to
+  existing notebook or folder Readmes, deleted-path reuse, and multiple
+  unpublished commits remain outside this selection. Completing the queue is
+  not full ADR 0002.
 
 ## Open Decisions
 
