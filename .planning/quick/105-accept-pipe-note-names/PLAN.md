@@ -61,6 +61,13 @@ and large-commit performance (story 2).
   `e9cb2f9b099138b9b540a0247214a936d05ecfce`. The disproved sizing assumption
   was that the document rewriter could emit the same wiki spelling in body,
   single-quoted YAML, and double-quoted YAML; slice 5a now isolates that boundary.
+- The first slice 5a attempt then reached 10 active minutes without compiling;
+  its quote-context scan was reverted. Story-boundary reassessment retains this
+  work because usable pipe titles require reference-preserving rename and the
+  remaining outcome is still one end-to-end story. Bounded research found the
+  smaller seam: use SnakeYAML scalar-node marks to rewrite only supported
+  leading-frontmatter value spans, re-rendering only changed double-quoted
+  scalars while preserving untouched frontmatter verbatim.
 
 ## Ordered slices
 
@@ -164,13 +171,17 @@ single-quoted YAML spelling while double-quoted YAML stores the extra YAML
 escape needed to decode to the same wiki token; backend suite passes.
 
 Make `WikiLinkMarkdownDocumentRewrite` preserve the containing scalar's YAML
-syntax when a rewritten target introduces wiki backslashes. Keep body and
-single-quoted YAML spelling unchanged; in leading-frontmatter double-quoted
-scalars, encode the backslash so SnakeYAML decodes the intended `\|`. Do not
-introduce a second wiki grammar or a general YAML rewriter.
+syntax when a rewritten target introduces wiki backslashes. Use SnakeYAML
+scalar-node marks for the same top-level scalar and direct-list-item shapes the
+frontmatter reader recognizes. Keep body, single-quoted YAML, and untouched
+frontmatter spelling unchanged; re-render only a changed double-quoted scalar
+so SnakeYAML decodes the intended `\|`. Do not introduce a second wiki grammar,
+re-dump the whole frontmatter, or add a general YAML rewriter.
 
 Enables immediately: slice 5b can rename references to a pipe title without
-persisting invalid YAML. Estimate: 3–5 minutes, medium confidence.
+persisting invalid YAML. Estimate: 7–10 minutes, medium confidence after the
+bounded node-mark investigation; the exact source-splice boundary is one proof
+loop and has no remaining unexplained preparation.
 
 ### 5b. Preserve references when renaming to a pipe title
 Type: Behavior
@@ -303,8 +314,11 @@ the story is not complete until both publication cases and all warnings pass.
 The longest hypotheses are the cross-runtime reading and web-edit slices;
 their preparation and independent publication outcomes are already separated.
 Slice 5's overrun exposed YAML scalar spelling as a separate preparation beat,
-now isolated in 5a immediately before the rename behavior in 5b. No other
-remaining slice has an unexplained path beyond the active-work hard limit. Full
+now isolated in 5a immediately before the rename behavior in 5b. After the
+first 5a approach also reached the limit, story-boundary reassessment retained
+the outcome and bounded research replaced the broad quote-context scan with one
+node-mark source-splice proof loop. No other remaining slice has an unexplained
+path beyond the active-work hard limit. Full
 backend-suite elapsed time is the explicit verification exception. Reassess
 slice 8 if durable validation contains a separate name model rather than the
 inspected shared rules; do not introduce parallel escape or normalization rules.
