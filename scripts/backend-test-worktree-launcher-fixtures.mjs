@@ -30,12 +30,16 @@ function launcherChildEnv(checkout, env) {
   })
 }
 
-function wrapperProcess(checkout, { command, cwd, args = [], env = {} } = {}) {
+function wrapperProcess(
+  checkout,
+  { command, cwd, args = [], env = {}, detached = false } = {}
+) {
   return {
     command: command ?? path.join(checkout.root, 'backend', 'gradlew'),
     args,
     cwd: cwd ?? checkout.root,
     env: launcherChildEnv(checkout, env),
+    detached,
   }
 }
 
@@ -69,11 +73,11 @@ export async function waitForFile(
 // that reaches GRADLE_REACHED and then blocks until explicitly released.
 // Returns a handle for observing that one active Gradle owner from outside.
 export function runWrapperAsync(checkout, options = {}) {
-  const { command, args, cwd, env } = wrapperProcess(checkout, {
+  const { command, args, cwd, env, detached } = wrapperProcess(checkout, {
     ...options,
     env: { ...options.env, GRADLE_HOLD: '1' },
   })
-  const child = spawn(command, args, { cwd, env })
+  const child = spawn(command, args, { cwd, env, detached })
   // No input is ever sent. Unlike spawnSync (which closes an unwritten
   // stdin immediately), async spawn() leaves stdin open until explicitly
   // ended, so a descendant reading stdin (e.g. the mysql stand-in's
@@ -91,8 +95,8 @@ export function runWrapperAsync(checkout, options = {}) {
   })
 
   const exited = new Promise((resolve) => {
-    child.on('close', (status) => {
-      resolve({ status, stdout, stderr })
+    child.on('close', (status, signal) => {
+      resolve({ status, signal, stdout, stderr })
     })
   })
 
@@ -100,6 +104,8 @@ export function runWrapperAsync(checkout, options = {}) {
     waitForGradleReached: () => waitForFile(checkout.gradleReached),
     release: () => writeFileSync(checkout.gradleRelease, ''),
     stop: () => child.kill(),
+    signalProcessGroup: (signal) => process.kill(-child.pid, signal),
+    pid: child.pid,
     // Waits for the checkout's mysql stand-in to reach and hold
     // (MYSQL_HOLD), then releases it. Used to inject an external config
     // writer between MySQL provisioning succeeding and the launcher's own
@@ -110,8 +116,11 @@ export function runWrapperAsync(checkout, options = {}) {
   }
 }
 
-export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
-  return runWrapperAsync(checkout, { command: checkout.launcher, args, env })
+export function runLauncherAsync(checkout, options = {}) {
+  return runWrapperAsync(checkout, {
+    ...options,
+    command: checkout.launcher,
+  })
 }
 
 export function assertRefusedBeforeGradle(checkout, result) {

@@ -6,9 +6,17 @@ recoverable from before-cleanup commit `056ddef4ba` at
 `.planning/seeds/SEED-017-cohesive-design-corrections.md`; reviewed through
 commits `8983d9db3f`, `65d88f55cc`, `be76f0d471`, and `1833e29ead`.
 
-Status: planned; story and slice refinement completed 2026-09-11.
-Implementation not requested. Three ordered slices replace the original
-provisional lifecycle slice; none has been executed.
+Status: executing; story and slice refinement completed 2026-09-11.
+Slice 1 is delivered. Slices 2–3 remain.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut`, branch `main`
+- Execution checkout: `/Users/terryyin/git/doughnut-102-release-backend-worktree-test-ownership`, branch `codex/102-release-backend-worktree-test-ownership`
+- Integration target: `main`
+- CI observation: unavailable for the execution branch because the repository's
+  `donut CI` workflow is push-triggered only on `main`; branch pushes are
+  unobserved.
 
 ## Finding and bounded outcome
 
@@ -182,7 +190,7 @@ authorized: fresh refactor agent, coordinator formatting once, commit and push.
 
 ### 1. Observe the complete owned invocation
 Type: Structure
-Status: planned
+Status: done
 Sizing: 5–8 active minutes, medium confidence. Two routing handoffs and signal
 observation explain the above-target estimate; extracting another preparation
 slice would leave an unconsumed supervisor rather than a useful safe boundary.
@@ -205,6 +213,17 @@ Safe stop: the supervisor is used by both routes and preserves existing
 behavior; lock residue deliberately remains. A crash or uncertain process
 completion still leaves evidence. No inactive helper, pending failing test or
 new cleanup behavior is left for Slice 2 to repair.
+
+Delivered proof (2026-09-11):
+
+- `CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passed all
+  78 process tests.
+- The isolated real workload used Gradle 9.7.1 and Azul JDK 25.0.3. While test
+  worker PID 69573 was active, SIGINT targeted verified foreground process group
+  67780, distinct from coordinator group 71404. The launcher, Gradle client,
+  daemon and test worker all terminated; no checkout test worker survived, the
+  command returned cancellation failure, and the owner lock remained as this
+  slice requires.
 
 ### 2. Release ownership after ordinary completion
 Type: Behavior
@@ -313,4 +332,8 @@ of that sibling. No conflict with Accepted ADRs 0006 or 0007 was identified.
 
 ## Learnings
 
-None from execution yet.
+- Slice 1 confirmed that a live shell supervisor can remain the recorded owner
+  while Gradle uses distinct client, daemon and test-worker processes, and that
+  foreground-process-group interruption ends the observed worker tree before
+  the supervisor exits. This supports using the supervisor's completion boundary
+  for ordinary release in Slice 2 without yet authorizing cancellation release.

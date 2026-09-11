@@ -6,6 +6,7 @@ import {
   jdbcUrl,
   makeCheckout,
   readGradleInvocation,
+  readGradlePid,
 } from './backend-test-worktree-stand-in-fixtures.mjs'
 import {
   assertRefusedBeforeGradle,
@@ -53,6 +54,24 @@ async function assertHeldOwnerRefusesCompetitor(
   assertRefusedByActiveOwner(startCompetitor(checkout))
   owner.release()
   assert.equal((await owner.waitForExit()).status, 0)
+}
+
+async function assertSupervisedInterruption(t, startOwner) {
+  const checkout = configuredCheckout(t)
+  const owner = startOwner(checkout)
+  await owner.waitForGradleReached()
+
+  assert.equal(
+    readFileSync(lockPaths(checkout).ownerFile, 'utf8').trim(),
+    String(owner.pid)
+  )
+  assert.notEqual(readGradlePid(checkout), owner.pid)
+  assertRefusedByActiveOwner(runLauncher(checkout))
+
+  owner.signalProcessGroup('SIGINT')
+  const result = await owner.waitForExit()
+  assert.equal(result.status, null, outputOf(result))
+  assert.equal(result.signal, 'SIGINT', outputOf(result))
 }
 
 function assertReclaimedConfiguredOwner(checkout, result) {
@@ -131,6 +150,16 @@ test('active opt-in launcher refuses an overlapping ordinary migrate before grad
     startOwner: runLauncherAsync,
     startCompetitor: (checkout) => runWrapper(checkout, ordinaryMigrate),
   }))
+
+test('opt-in launcher observes its Gradle child through interruption', (t) =>
+  assertSupervisedInterruption(t, (checkout) =>
+    runLauncherAsync(checkout, { detached: true })
+  ))
+
+test('ordinary migrate observes its Gradle child through interruption', (t) =>
+  assertSupervisedInterruption(t, (checkout) =>
+    runWrapperAsync(checkout, { ...ordinaryMigrate, detached: true })
+  ))
 
 test('a stale owner record for an exited process is reclaimed and the launcher reaches gradle against the configured database', (t) => {
   const checkout = configuredCheckout(t)

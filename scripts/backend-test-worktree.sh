@@ -28,7 +28,6 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 checkout_root="$(cd "${script_dir}/.." && pwd)"
 # shellcheck source=backend-test-worktree-owner.sh
 source "${script_dir}/backend-test-worktree-owner.sh"
-backend_test_worktree_prepare "${checkout_root}"
 
 cd "${checkout_root}"
 gradle_cmd=(
@@ -46,4 +45,7 @@ if [[ -n "${test_pattern}" ]]; then
   gradle_cmd+=(--tests "${test_pattern}")
 fi
 export DONUT_WORKTREE_HANDOFF=1
-exec "${gradle_cmd[@]}"
+run_backend_worktree_tests() {
+  "${gradle_cmd[@]}"
+}
+backend_test_worktree_run "${checkout_root}" run_backend_worktree_tests

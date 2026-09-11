@@ -127,6 +127,7 @@ export function makeCheckout(t, { config } = {}) {
     '  done',
     '} > "$record"',
     'cp "$record" "$root/gradle-invocation.$n"',
+    'printf \'%s\\n\' "$$" > "$root/gradle-pid.$n"',
     "printf 'GRADLE_STDOUT\\n'",
     "printf 'GRADLE_REACHED\\n' >&2",
     ...holdReleaseLines('GRADLE_HOLD', 'gradle-reached', 'gradle-release'),
@@ -208,4 +209,10 @@ export function readGradleInvocations(checkout) {
     )
   }
   return invocations
+}
+
+export function readGradlePid(checkout, invocation = 1) {
+  return Number(
+    readFileSync(path.join(checkout.root, `gradle-pid.${invocation}`), 'utf8')
+  )
 }

@@ -133,3 +133,29 @@ backend_test_worktree_prepare() {
   echo "Selected database: ${database}"
   export SPRING_DATASOURCE_URL="${expected_url}"
 }
+
+# Keep the recorded invocation owner alive until its route-specific workload
+# has ended and its outcome has been observed.
+backend_test_worktree_run() {
+  local checkout_root="$1"
+  local workload="$2"
+  shift 2
+  local received_signal=""
+  local status
+
+  trap 'received_signal=INT' INT
+  trap 'received_signal=TERM' TERM
+
+  backend_test_worktree_prepare "${checkout_root}" "$@"
+  if "${workload}"; then
+    status=0
+  else
+    status=$?
+  fi
+
+  trap - INT TERM
+  if [[ -n "${received_signal}" ]]; then
+    kill -s "${received_signal}" "$$"
+  fi
+  return "${status}"
+}
