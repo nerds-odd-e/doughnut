@@ -62,6 +62,9 @@ profile. Codec round-trips must be lossless for these rules.
   filename”). The title column (max 150) is the product source of truth.
   Filename length follows the title column. Sibling uniqueness implies
   unique files in a directory.
+- Preserve ASCII `|` in note titles and aliases; allow it with a compatibility
+  warning. Filename-as-title still applies: pipe-bearing filenames are not
+  Windows-compatible, and links may not work in other Markdown tools.
 - Author-owned `title` in YAML is preserved as authored. The codec does
   not insert `title:` to compensate for a basename that is not the
   display name. Preserve other author YAML. Stored notes use the title
@@ -88,6 +91,9 @@ profile. Codec round-trips must be lossless for these rules.
   exact-root fallback `/Title` when that display name is an ambiguous
   shorthand. The reader accepts a leading `/` on a path-shaped wiki
   destination (`[[/Title]]`) as the same bundle-root spelling.
+- Wiki links escape literal pipes as `\|` and backslashes as `\\`; the first
+  unescaped `|` separates the display label. Thus `[[A\|B]]` targets `A|B`,
+  while `[[A|B]]` retains its existing meaning. This is a Donut extension.
 - Wiki-link rules apply to the **body and to YAML frontmatter values** (scalars
   and one-level list items), including relationship `source` / `target` and
   `overlaps` items. Donut-authored frontmatter uses wiki links. A bare YAML path

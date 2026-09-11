@@ -23,6 +23,8 @@ changes.
 ## Taken
 
 
-## Backlog
+## Backlog list
 
+- [Accept pipe characters in note names with a compatibility warning](seeds/SEED-018-publish-large-authored-notebooks.md#story-1) — SEED-018
+- [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-2) — SEED-018
 - [Restart primary SUT only with proven process ownership](quick/104-refuse-unowned-primary-sut-restart/PLAN.md)
