@@ -1,0 +1,93 @@
+import assert from 'node:assert/strict'
+import { test } from 'node:test'
+import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
+import {
+  guardCypressNodeSetup,
+  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+} from './isolated-cypress.mjs'
+import {
+  assertRefusesBeforeReset,
+  cypressArgv,
+  isolatedCypressOpts,
+} from './isolated-cypress-test-helpers.mjs'
+import { startPrivateOpenAiMock } from './isolated-openai-mock.mjs'
+import {
+  listenForeignReadyTrackingMutations,
+  spawnIdleMockChild,
+  spawnOwnedManagementListener,
+} from './isolated-openai-mock-test-fixtures.mjs'
+import { OPEN_AI_MOCK_ENDPOINT_ENV_KEY } from './open-ai-mock-endpoint-expose-keys.mjs'
+import {
+  allocateFreePort,
+  closeServer,
+  completeIsolatedConfig,
+  isTcpListening,
+  listenHttpReady,
+  startLiveOwner,
+} from './sut-isolated-fixtures.mjs'
+
+test('foreign mock management or serving refuses Cypress setup before mutation', async (t) => {
+  const ownershipCases = [
+    { occupied: 'management', refusal: /refuses foreign management/ },
+    { occupied: 'serving', refusal: /refuses foreign serving/ },
+  ]
+  for (const { occupied, refusal } of ownershipCases) {
+    await t.test(`foreign ${occupied} listener`, async (t) => {
+      const checkout = makePrimaryCheckout(t, {
+        config: JSON.stringify(completeIsolatedConfig),
+      })
+      const live = await startLiveOwner(checkout.root)
+      t.after(() => live.server.close())
+
+      const foreign = await listenForeignReadyTrackingMutations()
+      t.after(() => closeServer(foreign.server))
+      const peerBody = 'peer-mock-response'
+      const peer = await listenHttpReady(peerBody)
+      t.after(() => closeServer(peer.server))
+
+      const ports =
+        occupied === 'management'
+          ? {
+              managementPort: foreign.port,
+              servingPort: await allocateFreePort(),
+            }
+          : {
+              managementPort: await allocateFreePort(),
+              servingPort: foreign.port,
+            }
+
+      const config = {
+        specPattern: SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+        baseUrl: 'http://localhost:5173',
+      }
+      await assertRefusesBeforeReset(
+        () =>
+          guardCypressNodeSetup(
+            checkout.root,
+            config,
+            isolatedCypressOpts({
+              argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+              startPrivateOpenAiMockFn: (opts) =>
+                startPrivateOpenAiMock({
+                  ...opts,
+                  allocatePortsFn: async () => ports,
+                  spawnFn: () =>
+                    occupied === 'management'
+                      ? spawnIdleMockChild()
+                      : spawnOwnedManagementListener(ports.managementPort),
+                }),
+            })
+          ),
+        refusal
+      )
+
+      assert.equal(foreign.mutationCount(), 0)
+      assert.equal(config.expose?.[OPEN_AI_MOCK_ENDPOINT_ENV_KEY], undefined)
+      assert.equal(await isTcpListening(foreign.port), true)
+      assert.equal(
+        await (await fetch(`http://127.0.0.1:${peer.port}/`)).text(),
+        peerBody
+      )
+    })
+  }
+})

@@ -16,7 +16,6 @@ import {
   hasExplicitCypressSpecSelection,
   selectedCypressSpecs,
   specsFromBeforeRun,
-  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress-spec-selection.mjs'
 import {
   observePrivateMockFailure,
@@ -102,10 +101,8 @@ export async function guardCypressNodeSetup(
   }
 
   const startMockIfNeeded = async (specs) => {
-    if (specs.length !== 1) {
-      assertSupportedIsolatedCypressSpecs(specs)
-    }
-    if (specs[0] !== SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC) {
+    const approved = assertSupportedIsolatedCypressSpecs(specs)
+    if (!approved.requiresPrivateOpenAiMock) {
       clearOpenAiMockEndpoint(config)
       return
     }
@@ -157,9 +154,7 @@ export async function guardCypressNodeSetup(
     })
     options.on('before:run', async (details) => {
       try {
-        const specs = specsFromBeforeRun(details, checkoutRoot)
-        assertSupportedIsolatedCypressSpecs(specs)
-        await startMockIfNeeded(specs)
+        await startMockIfNeeded(specsFromBeforeRun(details, checkoutRoot))
         if (privateMock) {
           await privateMock.verifyOwnership()
         }

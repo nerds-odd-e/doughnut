@@ -17,12 +17,14 @@ export function spawnIdleMockChild() {
   return spawnDetachedNode('setInterval(() => {}, 1000)')
 }
 
+const defaultPrivateMockEndpoint = {
+  managementUrl: 'http://127.0.0.1:18025',
+  servingPort: 18001,
+}
+
 /** Idle child wrapped with the same failure/stop surface as a private mock. */
 export function spawnIdlePrivateMockHandle(
-  endpoint = {
-    managementUrl: 'http://127.0.0.1:18025',
-    servingPort: 18001,
-  }
+  endpoint = defaultPrivateMockEndpoint
 ) {
   const child = spawnIdleMockChild()
   const lifecycle = observePrivateMockChild(child)
@@ -35,6 +37,33 @@ export function spawnIdlePrivateMockHandle(
     },
     stop: lifecycle.stop,
     killSync: lifecycle.killSync,
+  }
+}
+
+/** Process-free test double with the private-mock handle surface. */
+export function stubPrivateOpenAiMockHandle(
+  endpoint = defaultPrivateMockEndpoint
+) {
+  return {
+    endpoint,
+    child: {
+      once() {
+        /* stub */
+      },
+      pid: 4242,
+    },
+    async verifyOwnership() {
+      return true
+    },
+    async stop() {
+      /* stub */
+    },
+    killSync() {
+      /* stub */
+    },
+    getFailure() {
+      return null
+    },
   }
 }
 

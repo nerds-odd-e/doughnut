@@ -144,8 +144,9 @@ export function specsFromBeforeRun(details, checkoutRoot) {
 }
 
 export function assertSupportedIsolatedCypressSpecs(specs) {
-  if (specs.length === 1 && approvedIsolatedCypressSpec(specs[0])) {
-    return
+  if (specs.length === 1) {
+    const approved = approvedIsolatedCypressSpec(specs[0])
+    if (approved) return approved
   }
   throw new Error(
     'Isolated Cypress only supports one of ' +

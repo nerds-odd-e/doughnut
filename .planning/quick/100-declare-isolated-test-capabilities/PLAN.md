@@ -3,11 +3,10 @@
 Source: [SEED-017 Story 3](../../seeds/SEED-017-cohesive-design-corrections.md#story-3),
 including the seed's F3 audit finding and historical plans 061/070/088/089.
 Preserved lifecycle evidence: plans 073/093 and the current runner tests.
-Status: in progress. Execution authorized 2026-09-11 in worktree
+Status: done. Executed 2026-09-11 in worktree
 `/Users/terryyin/git/doughnut-quick-100` on branch
 `plan/100-declare-isolated-test-capabilities`. Push-triggered CI is `ci.yml`
-(`donut CI`) on `main` only; feature-branch pushes have no workflow. Observer
-will bind to `main` before the merge push.
+(`donut CI`) on `main` only; observer binds to `main` at the merge push.
 
 ## Correction contract
 
@@ -113,7 +112,7 @@ The correction remains incomplete until slice 2 consumes resource requirements.
 
 ### 2. Acquire isolated resources from approved requirements
 Type: Structure
-Status: planned
+Status: done
 Depends on: slice 1
 Sizing: about 5 minutes active work; medium confidence. Focused process tests
 and the live Cypress run have an explicit external-wait exception below.
@@ -166,6 +165,27 @@ the existing `acquireSutRunnerLease`/`releaseSutRunnerLease` API with `try/final
 for the reuse observation; do not start another full Cypress run just to prove
 lease acquisition. Record exact commands/observations in this PLAN during
 execution. A green Cypress exit without resource-release evidence is incomplete.
+
+Live proof (2026-09-11), this worktree `wt_0419c31c532240c3a3af7388068369fa`,
+origin `http://127.0.0.1:61914` (backend 61912, vite 61913, LB 61914).
+
+During `pnpm cypress run --spec e2e_test/features/ai_generated_content/note_content_completion.feature`
+(exit 0, 2 passing, ~16s wall):
+- owned mock pid **48014**, management `http://127.0.0.1:63912`, serving **63913**
+- pidfile `.isolated-openai-mb.43135.63912.pid`
+- shared primary `mb` pid 3434 on 2525/5001 left untouched
+
+After Cypress:
+- pid 48014 gone; 63912/63913 not listening; pidfile gone
+- `pnpm sut:healthcheck` OK
+- `acquireSutRunnerLease` / `releaseSutRunnerLease` in try/finally acquired twice
+  (token length 32) and released each time
+
+Post-change refactor: `assertSupportedIsolatedCypressSpecs` returns the approved
+entry so the runner does not look up the spec twice; foreign-ownership tests moved
+to `isolated-cypress-openai-mock-ownership.test.mjs`; mock stubs share
+`stubPrivateOpenAiMockHandle`. Focused tests still pass (27), including the new
+ownership file.
 
 Safe stop: one policy drives every existing selection path and resource
 decision; all currently supported runs retain their lifecycle guarantees.
@@ -235,3 +255,10 @@ by that registry, not a second filename table. Implementation plus focused proof
 was about 8 minutes (over the 5-minute target, under the 10-minute hard limit);
 the named focused tests were the bulk of remaining time after a small registry
 edit. No finer split. Refactor found no extra cohesion work.
+
+Slice 2: runner admits through `assertSupportedIsolatedCypressSpecs` and reads
+`requiresPrivateOpenAiMock` from that entry; unknown specs refuse rather than
+defaulting to no-mock. Implementation plus focused proof ~8 minutes; Cypress wall
+~16s measured separately. Live mock pid 48014 / ports 63912–63913 released;
+lease reusable. Refactor collapsed the double policy lookup and split the
+ownership tests under the ~250-line guideline.
