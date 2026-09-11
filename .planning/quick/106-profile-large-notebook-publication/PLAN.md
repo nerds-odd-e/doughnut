@@ -1,7 +1,18 @@
 # Profile large notebook publication
 
 Source: [SEED-018 story 2](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-2).
-Status: planned. Planning authorized; implementation not requested.
+Status: executing. User authorized execution of plan 106 on 2026-09-11.
+
+## Execution identity
+
+- Origin: `/Users/terryyin/git/doughnut`, branch `main`.
+- Taken-only claim: `3548fb8bc3`.
+- Execution: `/Users/terryyin/git/doughnut-106-profile-large-notebook-publication`,
+  branch `codex/106-profile-large-notebook-publication`, based on the claim.
+- Integration target: `main`; delivery: `origin/codex/106-profile-large-notebook-publication`.
+- CI observer: unavailable for this branch. `.github/workflows/ci.yml`
+  (`donut CI`) runs only on pushes to `main`; no eligible branch-push workflow.
+  No observer started; pending CI is unobserved.
 
 ## Outcome and boundaries
 
@@ -55,7 +66,7 @@ excuse additional implementation scope.
 
 ### 1. Identify what the baseline must distinguish
 Type: Behavior
-Status: planned
+Status: done
 Proof: A maintainer can inspect a short candidate table with code references,
 repetition/scaling hypotheses, and the runtime evidence needed to rank them.
 
@@ -68,6 +79,21 @@ same findings document. Stop once this guides capture; no exhaustive audit.
 
 Estimate: 5 minutes active work. Safe stop: useful inspection findings exist
 even before runtime measurement. This owns static inspection and workload rationale.
+
+Delivered [static findings](../../../docs/notebook-publication-profiling.md):
+six candidate groups with source links, scaling hypotheses and runtime
+discriminators, deterministic workload proposal, and capture boundaries.
+Coordinator inspected HTTP/application and both explicit index-flush boundaries.
+Approximately 5 minutes active implementation. Independent refactor: no edits,
+`REFACTOR COMPLETE`; documentation-only proof, no runtime claim.
+
+Environment preparation: first `CURSOR_DEV=true nix develop -c pnpm sut`
+failed startup. `sut.log` showed concurrent `backend:watch` and `backend:sut:ci`
+compilation writing `backend/build/classes/java/main`, causing deletion failure.
+Owned startup timed out and cleaned up. Serial
+`CURSOR_DEV=true nix develop -c backend/gradlew -p backend classes --no-daemon`
+passed; retrying ordinary owned startup. This is a pre-existing cold-build race,
+not a publication measurement or a repaired tooling defect.
 
 ### 2. Reproduce a measured publication on disposable data
 Type: Behavior
