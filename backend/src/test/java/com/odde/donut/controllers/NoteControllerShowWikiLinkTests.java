@@ -72,6 +72,38 @@ class NoteControllerShowWikiLinkTests extends ControllerTestBase {
   }
 
   @Test
+  void shouldResolveEscapedPipeAliasReferencesFromBodyAndFrontmatter()
+      throws UnexpectedNoAccessRightException {
+    Note aliasTarget =
+        makeMe
+            .aNote()
+            .notebookOwnedBy(currentUser.getUser())
+            .title("pipe alias target")
+            .aliases("A|B")
+            .please();
+    Note viewer =
+        makeMe
+            .aNote()
+            .underSameNotebookAs(aliasTarget)
+            .content(
+                """
+                ---
+                see: '[[A\\|B|From YAML]]'
+                ---
+                [[A\\|B|Read this]]
+                """)
+            .please();
+
+    List<WikiLink> wikiLinks = showWithWikiTitles(viewer).getWikiLinks();
+    assertThat(
+        wikiLinks.stream().map(WikiLink::getDisplayText).toList(),
+        containsInAnyOrder("From YAML", "Read this"));
+    assertThat(
+        wikiLinks.stream().map(WikiLink::getDestinationNoteId).toList(),
+        everyItem(equalTo(aliasTarget.getId())));
+  }
+
+  @Test
   void shouldResolveWikiLinkTitleIgnoringCase() throws UnexpectedNoAccessRightException {
     Note target =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("LinkedPage").please();

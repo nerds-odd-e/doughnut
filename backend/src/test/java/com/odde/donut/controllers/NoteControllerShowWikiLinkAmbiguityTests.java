@@ -61,16 +61,17 @@ class NoteControllerShowWikiLinkAmbiguityTests extends ControllerTestBase {
   }
 
   @Test
-  void shouldEmitAmbiguousWhenTwoNotesShareAnAlias() throws UnexpectedNoAccessRightException {
+  void shouldEmitAmbiguousWhenEscapedPipeReferenceMatchesTwoAliases()
+      throws UnexpectedNoAccessRightException {
     Note first =
         makeMe
             .aNote()
             .notebookOwnedBy(currentUser.getUser())
             .title("first")
-            .aliases("color")
+            .aliases("A|B")
             .please();
-    makeMe.aNote().underSameNotebookAs(first).title("second").aliases("color").please();
-    Note viewer = makeMe.aNote().underSameNotebookAs(first).content("Text [[color]].").please();
+    makeMe.aNote().underSameNotebookAs(first).title("second").aliases("A|B").please();
+    Note viewer = makeMe.aNote().underSameNotebookAs(first).content("Text [[A\\|B]].").please();
     assertThat(
         showWithWikiTitles(viewer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.AMBIGUOUS));

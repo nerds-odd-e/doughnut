@@ -241,9 +241,13 @@ exists and the remaining proof repairs are identified.
 
 ### 6b. Resolve pipe aliases without weakening ambiguity
 Type: Behavior
-Status: planned
+Status: done
 Proof: Note-show controller tests resolve escaped pipe aliases in body and
 recognized YAML, while two matches remain ambiguous; backend suite passes.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed. Note
+show resolves body and YAML references to one pipe alias with their
+labels, while two matching aliases remain unresolved as ambiguous.
 
 Behavior: Given one note with alias `A|B`, `[[A\|B|Read this]]` resolves to it
 from body and recognized YAML with the intended label. Given two matching
