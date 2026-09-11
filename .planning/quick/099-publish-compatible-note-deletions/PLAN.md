@@ -191,3 +191,14 @@ Do not mark the backlog story done or erase its history during planning.
 - CI workflow `ci.yml` (`donut CI`) is push-to-`main` only; feature-branch
   pushes have no push-triggered CI observation coverage.
 - Refactor: slice 1 removed story-leaking javadoc; slice 2 already clean.
+
+## Retrospective
+
+Reviewed commit manifest: `c5c9f2d990` (slice 1), `640fd94f02` (slice 2);
+fast-forwarded to `main` at `640fd94f02`.
+
+No implementation, test-coverage, or architecture findings requiring a
+correction plan. Process findings recorded in `DearDough.md` (DD-003,
+feature-branch / main-only CI observation). Product advice for wrap-up: remove
+this story from **Taken**; leave Story 3 Taken and Story 2b queued; do not add
+a recently-done ledger entry.
