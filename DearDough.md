@@ -70,3 +70,42 @@ makes an idle snapshot.
     before the worktree could be dropped.
   - Inference: `/shutdown` is for `pnpm sut:restart`, not checkout teardown;
     call `releaseSutOwnership` only after the owner is proven not live.
+
+- Execution: SEED-017 Story 2b / quick/101-publish-compatible-note-moves / 8983d9db3f
+  - Tool: Codex
+  - Model: GPT-5
+  - Open Dough release: 0.3.8
+  - Evidence: after the worktree-owned Cypress proof, the coordinator called
+    `beginSutOwnerShutdown`, waited until `verifyLiveSutOwner` was not ok, then
+    had to call `releaseSutOwnership` explicitly before retirement could inspect
+    an idle checkout.
+  - Observed effect: execution needed a custom shutdown/wait/release command
+    instead of a documented checkout-teardown operation before the worktree
+    databases and checkout could be removed.
+
+## DD-004 — Completed backend worktree tests leave a dead owner record that blocks retirement
+
+Supported isolated backend test and migration commands leave
+`.worktree.local.lock` after their process exits. A later backend command can
+reclaim that stale record, but `pnpm worktree:retire --check` correctly refuses
+to infer ownership from a dead PID, so normal test completion and safe retirement
+do not compose without manual lock removal.
+
+### Occurrences
+
+- Execution: SEED-017 Story 2b / quick/101-publish-compatible-note-moves / 8983d9db3f
+  - Tool: Codex
+  - Model: GPT-5
+  - Open Dough release: 0.3.8
+  - Evidence: after successful `pnpm backend:test_only` runs in
+    `/Users/terryyin/git/doughnut-quick-101`, `pnpm worktree:retire --check`
+    refused dead PID 23796 in `.worktree.local.lock` as "not reclaimed".
+    `ps` found no such process; moving that exact lock to Trash made the next
+    retirement check report an idle snapshot. Quick plan 102 records the
+    bounded correction and preserves retirement's stale-owner refusal.
+  - Observed effect: worktree cleanup required extra code inspection, PID
+    verification, and manual recoverable lock removal before the two disposable
+    databases could be dropped.
+  - Inference: the backend command handoff writes its owner PID and `exec`s the
+    child, but no normal-exit path releases ownership; this predates quick plan
+    101 and is not a note-publication regression.
