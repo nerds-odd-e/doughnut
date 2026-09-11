@@ -84,6 +84,12 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/mcp/mcp_services.feature
 ```
 
+Admission and each approved spec's resource requirements are declared in one
+isolated-runner registry. Only the note-content completion spec currently requires
+a runner-owned private OpenAI mock; the other three use the owning SUT and
+runner lease without it. The mock process does not own feature paths. Unknown or
+mixed spec selections refuse before reset so they do not use shared defaults.
+
 The CLI command is scoped to that one web-created-note feature. The MCP
 command is scoped to that one search/graph feature. Each checkout must
 already have its own healthy `pnpm sut` allocation; do not share the
