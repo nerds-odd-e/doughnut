@@ -1,6 +1,6 @@
 # Restart primary SUT only with proven process ownership
 
-Source: execution retrospective of [SEED-017, Story 4](../../seeds/SEED-017-cohesive-design-corrections.md#story-4) and plan 103.
+Source: execution retrospective of completed SEED-017 Story 4 and `.planning/quick/103-unify-owned-process-termination/PLAN.md`, preserved at before-cleanup commit `a32e908380`.
 Execution provenance: `7c664f3e713bfaa9897ef0c2be3445a63feb3ef0`, `1be32355f5e5f5188707a22da6ec19b301c79617`.
 Finding provenance: the primary-checkout port-signalling path predates that execution (`scripts/sut-restart.mjs`, originally `3beee1da81`); the reviewed execution did not introduce it.
 
@@ -20,7 +20,7 @@ The existing `terminateTcpListenersOnPort` test positively preserves that unsafe
 behavior by starting an arbitrary listener and expecting restart code to kill it.
 
 This is a current whole-product ownership weakness adjacent to, but older than,
-plan 103's unified already-owned-tree termination mechanism. It conflicts with
+the unified already-owned-tree termination mechanism. It conflicts with
 [ADR 0007 — Environments and isolation](../../../docs/adrs/0007-environments-and-isolation-accepted.md),
 which requires stopping when the environment or owner cannot be proven.
 
