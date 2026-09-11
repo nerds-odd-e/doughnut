@@ -44,29 +44,3 @@ clean solo re-run passing all tests.
     solo re-run passed 95/95.
   - Observed effect: two rounds of failure triage (checking for concurrent
     processes, re-running solo) before trusting the test suite's result.
-
-## DD-003 — Isolated SUT `/shutdown` retains the owner lock, so worktree retirement refuses until ownership is released
-
-`beginSutOwnerShutdown` is restart-shaped: it stops the owning children and
-sets retain-on-exit, leaving `.sut.local.lock` in place. `pnpm worktree:retire
---check` then vetoes that leftover as a stale owner record and will not reclaim
-it. After a confirmed dead owner, `releaseSutOwnership` is the teardown that
-makes an idle snapshot.
-
-### Occurrences
-
-- Execution: SEED-017 Story 3 / quick/100-declare-isolated-test-capabilities / d8886ebd13
-  - Tool: Cursor
-  - Model: Cursor Grok 4.6
-  - Open Dough release: 0.3.8
-  - Evidence: after live completion Cypress in `/Users/terryyin/git/doughnut-quick-100`,
-    `beginSutOwnerShutdown` returned `{ ok: true }` and `verifyLiveSutOwner`
-    became not ok, but `.sut.local.lock/owner.json` and `owner.sock` remained;
-    `pnpm worktree:retire --check` refused with "stale or unverifiable SUT owner
-    record (.sut.local.lock; not reclaimed)". `releaseSutOwnership` after
-    `live.ok === false` removed the lock; the next `--check` reported an idle
-    snapshot and retirement dropped `doughnut_e2e_wt_0419c31c532240c3a3af7388068369fa`.
-  - Observed effect: extra investigation of shutdown vs restart lock retention
-    before the worktree could be dropped.
-  - Inference: `/shutdown` is for `pnpm sut:restart`, not checkout teardown;
-    call `releaseSutOwnership` only after the owner is proven not live.
