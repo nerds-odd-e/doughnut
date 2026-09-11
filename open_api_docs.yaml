@@ -4280,7 +4280,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
-          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
         referenceHandling:
           type: string
           enum:
@@ -4485,7 +4485,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
-          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
         referenceHandling:
           type: string
           enum:
@@ -4973,7 +4973,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
-          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
         referenceHandling:
           type: string
           enum:

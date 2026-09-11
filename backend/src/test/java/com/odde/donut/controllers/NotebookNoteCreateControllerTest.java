@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -27,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
 
   @Autowired NoteController noteController;
+  @Autowired TextContentController textContentController;
   @Autowired EntityManager entityManager;
 
   private NoteCreationDTO noteCreate(String title) {
@@ -69,6 +71,22 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
 
     Note created = noteRepository.findById(result.getId()).orElseThrow();
     assertThat(created.getContent(), equalTo("---\ntype: Note\n---\n# Hello\n\n[[Link]]"));
+  }
+
+  @Test
+  void preservesPipeTitleAcrossCreationAndSubsequentBodySave() throws Exception {
+    Notebook notebook = ownedNotebook();
+    Note fullwidth = makeMe.aNote().notebook(notebook).title("A｜B").please();
+
+    NoteRealm created = controller.createNoteAtNotebookRoot(notebook, noteCreate("A|B"));
+    NoteUpdateContentDTO content = new NoteUpdateContentDTO();
+    content.setContent("Edited body");
+    textContentController.updateNoteContent(created.getNote(), content);
+    entityManager.flush();
+    entityManager.clear();
+
+    assertThat(noteRepository.findById(created.getId()).orElseThrow().getTitle(), equalTo("A|B"));
+    assertThat(noteRepository.findById(fullwidth.getId()).orElseThrow().getTitle(), equalTo("A｜B"));
   }
 
   @Test

@@ -125,10 +125,16 @@ Estimate: 4–5 minutes, medium confidence.
 
 ### 4. Create a pipe-titled note with a warning
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing note-create controller boundary saves/reloads exact `A|B`;
 mounted `PathNameEditor.spec.ts` proves nonblocking warning and submitted value.
 Backend/frontend suites pass.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript` regenerated
+the DTO constraint, `CURSOR_DEV=true nix develop -c pnpm openapi:lint` passed,
+and the backend/frontend suites passed after the post-change refactor (2,394
+backend tests and 1,882 frontend tests). The note-specific path preserves `|`;
+folder and notebook validation still reject it.
 
 Behavior: Given a new otherwise valid note, creating `A|B` preserves that title
 and warns about portability. An existing fullwidth `A｜B` remains distinct.

@@ -49,6 +49,11 @@ class DisplayNamePathSeparatorsTrimTest {
   }
 
   @Test
+  void normalizeNoteTitlePreservesAsciiPipe() {
+    assertThat(DisplayNamePathSeparators.normalizeNoteTitle(" A|B "), equalTo("A|B"));
+  }
+
+  @Test
   void normalizeDisplayNameConvertsAsciiControlsToSpaceThenTrims() {
     assertThat(
         DisplayNamePathSeparators.normalizeDisplayName("\u0001Recipe\u0007*\u001F"),

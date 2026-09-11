@@ -15,8 +15,14 @@ public final class DisplayNamePathSeparators {
   public static final String REGEXP =
       "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$";
 
+  public static final String NOTE_TITLE_REGEXP =
+      "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>\\x00-\\x1F]*[\\s\\x00-\\x1F]*$";
+
   public static final String MESSAGE =
       "Name must not contain \\ / : * ? \" < > | or ASCII control characters.";
+
+  public static final String NOTE_TITLE_MESSAGE =
+      "Name must not contain \\ / : * ? \" < > or ASCII control characters.";
 
   public static String trimSurroundingWhitespace(String value) {
     if (value == null) {
@@ -29,8 +35,20 @@ public final class DisplayNamePathSeparators {
     return trimSurroundingWhitespace(replaceOsInvalidChars(value));
   }
 
+  public static String normalizeNoteTitle(String value) {
+    return trimSurroundingWhitespace(replaceOsInvalidCharsExceptPipe(value));
+  }
+
   /** OS-invalid filename characters in note titles → fullwidth (ASCII controls → space). */
   public static String replaceOsInvalidChars(String value) {
+    return replaceOsInvalidChars(value, false);
+  }
+
+  private static String replaceOsInvalidCharsExceptPipe(String value) {
+    return replaceOsInvalidChars(value, true);
+  }
+
+  private static String replaceOsInvalidChars(String value, boolean preservePipe) {
     if (value == null) {
       return null;
     }
@@ -38,7 +56,7 @@ public final class DisplayNamePathSeparators {
     boolean changed = false;
     for (int i = 0; i < value.length(); i++) {
       char original = value.charAt(i);
-      char mapped = toFullwidthOrSpace(original);
+      char mapped = preservePipe && original == '|' ? original : toFullwidthOrSpace(original);
       converted.append(mapped);
       if (mapped != original) {
         changed = true;

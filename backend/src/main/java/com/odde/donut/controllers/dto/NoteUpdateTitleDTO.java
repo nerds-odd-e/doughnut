@@ -12,7 +12,9 @@ import lombok.Setter;
 public class NoteUpdateTitleDTO {
   @NotBlankDisplayName
   @Size(max = Note.MAX_TITLE_LENGTH)
-  @Pattern(regexp = DisplayNamePathSeparators.REGEXP, message = DisplayNamePathSeparators.MESSAGE)
+  @Pattern(
+      regexp = DisplayNamePathSeparators.NOTE_TITLE_REGEXP,
+      message = DisplayNamePathSeparators.NOTE_TITLE_MESSAGE)
   @NotReservedNoteTitle
   @Getter
   @Setter

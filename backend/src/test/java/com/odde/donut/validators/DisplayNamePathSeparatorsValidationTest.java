@@ -29,12 +29,18 @@ class DisplayNamePathSeparatorsValidationTest {
   @Autowired private Validator validator;
 
   @ParameterizedTest
-  @ValueSource(
-      strings = {"\\", "/", ":", "*", "?", "\"", "<", ">", "|", "\u0000", "\u0001", "\u001F"})
+  @ValueSource(strings = {"\\", "/", ":", "*", "?", "\"", "<", ">", "\u0000", "\u0001", "\u001F"})
   void noteTitle_rejectsOsInvalidCharacters(String invalidChar) {
     NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
     dto.setNewTitle("a" + invalidChar + "b");
     assertViolatesProperty(validator.validate(dto), "newTitle");
+  }
+
+  @Test
+  void noteTitle_allowsAsciiPipe() {
+    NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
+    dto.setNewTitle("a|b");
+    assertThat(validator.validate(dto).isEmpty(), equalTo(true));
   }
 
   @Test
@@ -45,7 +51,7 @@ class DisplayNamePathSeparatorsValidationTest {
     assertThat(violations, hasSize(1));
     assertThat(
         violations.iterator().next().getMessage(),
-        equalTo("Name must not contain \\ / : * ? \" < > | or ASCII control characters."));
+        equalTo("Name must not contain \\ / : * ? \" < > or ASCII control characters."));
   }
 
   @Test
@@ -72,14 +78,14 @@ class DisplayNamePathSeparatorsValidationTest {
   @Test
   void notebookUpdateName_rejectsOsInvalidCharacters() {
     NotebookUpdateRequest req = new NotebookUpdateRequest();
-    req.setName("x/y");
+    req.setName("x|y");
     assertViolatesProperty(validator.validate(req), "name");
   }
 
   @Test
   void folderCreationName_rejectsOsInvalidCharacters() {
     FolderCreationRequest req = new FolderCreationRequest();
-    req.setName("a:b");
+    req.setName("a|b");
     assertViolatesProperty(validator.validate(req), "name");
   }
 

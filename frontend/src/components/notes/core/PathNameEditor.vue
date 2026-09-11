@@ -67,6 +67,9 @@ const OKF_INCOMPATIBLE_TITLES = new Set(["index", "index.md", "log", "log.md"])
 const OKF_INCOMPATIBLE_TITLE_WARNING =
   "This title may make the portable notebook tree OKF-incompatible"
 
+const PIPE_TITLE_WARNING =
+  "Pipe characters are not compatible with Windows filenames, and references may not work in Obsidian or other Markdown tools"
+
 function isOkfIncompatibleTitle(title: string): boolean {
   return OKF_INCOMPATIBLE_TITLES.has(title.trim().toLowerCase())
 }
@@ -115,7 +118,7 @@ const props = withDefaults(
     editorRole?: string
     /** `data-test` on the inner editor (E2E note flows use `note-title`). */
     editorDataTest?: string
-    warnOnOkfIncompatibleTitle?: boolean
+    warnOnNoteTitleCompatibility?: boolean
   }>(),
   {
     readonly: false,
@@ -125,7 +128,7 @@ const props = withDefaults(
     initialSelectAll: false,
     editorRole: "title",
     editorDataTest: "note-title",
-    warnOnOkfIncompatibleTitle: false,
+    warnOnNoteTitleCompatibility: false,
   }
 )
 
@@ -137,12 +140,15 @@ const emit = defineEmits<{
 const root = ref<HTMLElement | null>(null)
 const replacementWarning = ref("")
 const linkWarning = ref("")
+const pipeWarning = ref("")
 
 const displayWarning = computed(() => {
   const parts = [
     replacementWarning.value,
     linkWarning.value,
-    props.warnOnOkfIncompatibleTitle && isOkfIncompatibleTitle(props.modelValue)
+    pipeWarning.value,
+    props.warnOnNoteTitleCompatibility &&
+    isOkfIncompatibleTitle(props.modelValue)
       ? OKF_INCOMPATIBLE_TITLE_WARNING
       : "",
   ].filter(Boolean)
@@ -153,12 +159,17 @@ function onModelUpdate(raw: string) {
   if (props.readonly) {
     replacementWarning.value = ""
     linkWarning.value = ""
+    pipeWarning.value = ""
     emit("update:modelValue", raw)
     return
   }
   const { value, replacementNote } = processIllegalPathChars(raw)
   replacementWarning.value = replacementNote
   linkWarning.value = hasLinkBreakChars(value) ? LINK_NAME_WARNING : ""
+  pipeWarning.value =
+    props.warnOnNoteTitleCompatibility && value.includes("|")
+      ? PIPE_TITLE_WARNING
+      : ""
   emit("update:modelValue", value)
 }
 

@@ -49,7 +49,21 @@ describe("PathNameEditor.vue", () => {
     )
   })
 
-  it("does not show the wiki link warning when the title contains |", async () => {
+  it("preserves a pipe title and warns nonblockingly about portability", async () => {
+    const wrapper = mount(PathNameEditor, {
+      props: { modelValue: "", warnOnNoteTitleCompatibility: true },
+    })
+    await emitEditorValue(wrapper, "a|b")
+    expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toBe("a|b")
+    expect(wrapper.find(".text-warning").text()).toContain(
+      "not compatible with Windows filenames"
+    )
+    expect(wrapper.find(".text-warning").text()).toContain(
+      "references may not work in Obsidian or other Markdown tools"
+    )
+  })
+
+  it("does not broaden the pipe warning to other name editors", async () => {
     const wrapper = mount(PathNameEditor, {
       props: { modelValue: "" },
     })
@@ -66,7 +80,7 @@ describe("PathNameEditor.vue", () => {
 
   it("warns that the portable tree may be OKF-incompatible when opted in and the title is index", () => {
     const wrapper = mount(PathNameEditor, {
-      props: { modelValue: "index", warnOnOkfIncompatibleTitle: true },
+      props: { modelValue: "index", warnOnNoteTitleCompatibility: true },
     })
     expect(wrapper.find(".text-warning").text()).toBe(
       "This title may make the portable notebook tree OKF-incompatible"
@@ -77,7 +91,7 @@ describe("PathNameEditor.vue", () => {
     "warns that the title %s is OKF-incompatible when opted in",
     (title) => {
       const wrapper = mount(PathNameEditor, {
-        props: { modelValue: title, warnOnOkfIncompatibleTitle: true },
+        props: { modelValue: title, warnOnNoteTitleCompatibility: true },
       })
       expect(wrapper.find(".text-warning").text()).toContain("OKF-incompatible")
     }
@@ -85,7 +99,7 @@ describe("PathNameEditor.vue", () => {
 
   it("does not show the OKF-incompatible warning for a readme title even when opted in", () => {
     const wrapper = mount(PathNameEditor, {
-      props: { modelValue: "readme", warnOnOkfIncompatibleTitle: true },
+      props: { modelValue: "readme", warnOnNoteTitleCompatibility: true },
     })
     expect(wrapper.find(".text-warning").exists()).toBe(false)
   })
