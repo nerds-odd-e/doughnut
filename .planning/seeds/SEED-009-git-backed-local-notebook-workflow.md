@@ -103,15 +103,37 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. They are not commitments.
 
 <a id="story-2"></a>
 
-### 2. Publish a local content edit to the same Donut note
+### 2. Publish committed main while warning about uncommitted work
 
-**Status:** delivered.
+**Status:** delivered baseline; dirty-worktree publication queued.
 
-- **Goal:** Publish a local content edit onto the same Donut note and keep its
-  learning data.
-- **Scope:** One direct-child commit editing one existing ordinary Markdown note
-  at an unchanged path; atomic accepted history/projection update. Structural
-  and stale proposals remain outside this content operation.
+- **Goal:** A notebook owner is warned about uncommitted local work and can
+  still publish the current committed `main` while keeping that work in progress.
+- **Scope:** Extend publication of an eligible committed `main` so working-tree
+  and index changes do not block it and are not included in the proposal. Build
+  and publish the bundle from the committed `main` ref, never by auto-committing,
+  stashing, resetting, or otherwise modifying local work. Before continuing,
+  emit a warning based on the current uncommitted-changes message and clarify
+  that publication is sending committed `main` only; local changes are not
+  included. On publication success or rejection, preserve the index,
+  working-tree files, untracked files, and local refs exactly. Existing commit
+  ancestry, binding, branch, active Git operation, authorization, and server
+  validation still determine whether that committed proposal can be accepted.
+  Pull remains a separate checkout-mutating workflow and keeps its own readiness
+  rules.
+- **Key examples:**
+  - Given eligible committed `main` plus an unstaged edit and an untracked file,
+    when the owner publishes, the CLI warns that two files are not clean and
+    that local changes are excluded, then the submitted bundle resolves to
+    committed `main`; neither local file is included or changed.
+  - The same behavior applies when local changes are staged: the index is not a
+    publication source, the warning is shown, and the index remains untouched.
+  - If the server rejects the committed proposal, all dirty local state remains
+    exactly as it was before the attempt.
+- **Proof direction:** Replace the publish-readiness tests that treat staged,
+  unstaged, and untracked files as errors with CLI-boundary proof that one warning
+  is shown, publication reaches submission, committed `main` is sent, and each
+  local state is preserved.
 
 <a id="story-3"></a>
 
