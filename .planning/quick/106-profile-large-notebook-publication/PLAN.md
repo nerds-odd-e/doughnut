@@ -1,7 +1,8 @@
 # Profile large notebook publication
 
 Source: [SEED-018 story 2](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-2).
-Status: executing. User authorized execution of plan 106 on 2026-09-11.
+Status: paused at user-requested safe boundary on 2026-09-11.
+Execution was authorized for plan 106; resume from slice 9 only on user continuation.
 
 ## Execution identity
 
@@ -332,7 +333,11 @@ Backend/E2E/CLI diff from first-run source `b650a294f6` remains empty.
 
 ### 8. Repeat the valid large-publication baseline
 Type: Behavior
-Status: planned
+Status: done
+Run 2 launched at 2026-09-11 12:36:16 UTC from clean `4543afeed1`, using the
+exact awake command in the findings document. Persistent `large-valid-2-driver.log`;
+agent `http_capture` owns PTY 91774. Preserve any in-flight request/recording and
+avoid concurrent PTY reads. Product/E2E/CLI remain identical to first-run source.
 Proof: A second successful 10,000-addition publication from a reset logical
 baseline has identical fingerprints, public accepted head/content proof, and a
 complete comparable profile with recorded timing variation.
@@ -343,6 +348,24 @@ observation changes must be recorded precisely. Analyze the second complete
 request against the first. Product code changes require fresh matching baselines.
 Estimate: 5 minutes active orchestration/analysis; long request runtime explicitly
 exempt. Safe stop: repeatable valid baseline without optimization claims.
+
+HTTP 200 completed in 3,772,320.997 ms (62m52.321s), same fingerprints and
+accepted head as run 1. Ordinary JFR stop succeeded; capture
+`2026-09-11T12-37-08.116Z` retains matching event/wall timestamps and no host sleep.
+Flush traversal appears in 162,917/165,881 samples (98.213%), repeating run 1;
+full bounded analysis and exact command are in the findings document.
+User requested a safe stop during slow per-file Cypress receiver checks.
+Independent read-only head/tree/clean/all-10,000-byte verification passed in
+2.5 seconds (`independent-verification.json`); Cypress was then deliberately
+interrupted (exit 143), not relabeled as passing. No new request/reset occurred.
+Verified runner/caffeinate descendants are stopped; backend PID 2406 remains.
+No active publication or JFR capture; no CI observer exists (main-only CI).
+Next unfinished slice is 9, large rejection and evidence-backed story-3 handoff.
+Execution checkout, branch, raw artifacts and this plan are retained.
+Independent documentation review confirmed retained evidence, no edits or runtime
+retests needed, `REFACTOR COMPLETE`. Coordinator selective formatting passed.
+This delivery records the completed valid repeat and pause; it does not authorize
+starting slice 9 while the user-requested pause remains in effect.
 
 ### 9. Establish large rejection baseline and improvement-area handoff
 Type: Behavior

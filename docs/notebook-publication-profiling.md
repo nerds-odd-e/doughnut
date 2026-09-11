@@ -423,3 +423,48 @@ Record any actual host suspension alongside each timing. Do not average the firs
 sleep-affected latency with an awake repeat as though conditions were equivalent.
 If a driver fails after HTTP completion, preserve its error and recording, then
 verify the public receiver as above; never relabel the failed scenario as passing.
+
+
+## Awake valid repeat
+
+The awake command above ran at source `4543afeed147922187d2b5eb2954e4488e191427`;
+backend, E2E and CLI code were unchanged from the first large run. Capture:
+`/Users/terryyin/Library/Application Support/Donut/publication-profiles/2026-09-11T12-37-08.116Z/`.
+Both fixture fingerprints, accepted head and receiver tree match the first run.
+HTTP 200 completed from 12:37:08.915 to 13:40:01.137 UTC on 2026-09-11:
+**3,772,320.997 ms (62 minutes 52.321 seconds)**. Ordinary capture stopped JFR
+at 13:40:01.213 UTC. Host logs show the scoped caffeinate assertion and no
+Sleep/Wake events during the request; JFR event times align with wall time.
+Do not average this awake latency with the first sleep-affected measurement.
+
+At the user's safe-stop request, Cypress was still performing its slow per-file
+receiver assertions. Read-only independent verification of the already publicly
+pulled receiver passed all 10,000 file-byte comparisons, accepted HEAD/tree and
+clean status in 2.5 seconds. `independent-verification.json` and
+`verify-received-checkout.py` retain this proof. The verified Cypress/caffeinate
+process tree was then stopped (exit 143); `runner-interruption.json` records it.
+This is independently verified acceptance, **not a passing Cypress scenario**.
+The harness `result.json` retains incomplete scenario status. No further request,
+reset or rejection run occurred. The progress-counter observation in this capture
+happened after HTTP completion and is not evidence of in-flight progression.
+
+Reproduce analysis with the versioned script; this uses the recording event span
+around the request, including small margins before/after its sampled execution:
+
+```bash
+CURSOR_DEV=true nix develop -c java scripts/profiling/AnalyzePublication.java '/Users/terryyin/Library/Application Support/Donut/publication-profiles/2026-09-11T12-37-08.116Z/publication.jfr' 2026-09-11T12:37:08.695249Z 2026-09-11T13:40:01.411885541Z http-nio-50809-exec-10
+```
+
+Publication samples span 12:37:08.926–13:40:01.224 UTC. The retained
+`observed-request-span-analysis.txt` reports 165,881 publication samples, of which
+162,917 (98.213%) contain Hibernate flush traversal; early/late prevalence is
+97.584%/98.824%. This repeats the first profile's 98.25% dominance. Property/alias
+index callers appear in 54,565/54,948 samples. Weighted request allocation is
+571.404 GB, close to the first estimate of 571.36 GB. Across the recording span,
+4,460 JVM collections have 62.872 seconds summed durations and 6.231 seconds
+summed pauses. Recorded request socket reads total 4.395 seconds across 1,940
+events; one write lasts 0.0353 seconds. No request park/monitor events exceed the
+recording thresholds. All execution stacks are truncated. The first capture's
+sampling, overlapping-category, allocation-estimate and limited-JIT caveats apply.
+These repeated measurements support prioritizing ORM flush traversal and allocation
+work; the late-rejection baseline and story-3 handoff remain outstanding.
