@@ -29,16 +29,3 @@ changes.
 
 - [Release backend worktree test ownership after execution](quick/102-release-backend-worktree-test-ownership/PLAN.md)
 - [Keep one owned-process termination mechanism](seeds/SEED-017-cohesive-design-corrections.md#story-4) — SEED-017
-
-## Recently done
-
-- [Use a persistent Development environment for manual feedback](seeds/SEED-015-concurrent-worktree-environments.md#story-7) — SEED-015
-- [Publish two notes and their relationship together](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-7) — SEED-016
-- [Publish three small initial layouts exposed by the jap1 failure](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-6) — SEED-016
-- [Run MCP E2E workflows against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-5) — SEED-015
-- [Run one non-interactive CLI E2E workflow against the owning worktree's environment](seeds/SEED-015-concurrent-worktree-environments.md#story-4) — SEED-015
-- [Publish the next small initial Readme-and-Note trees](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-5) — SEED-016
-- [Publish a minimal initial container with one note](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-4) — SEED-016
-- [Publish the initial notebook README by itself](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-3) — SEED-016
-- [Publish one initial note inside the new README-backed folder](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-2) — SEED-016
-- [Publish the initial notebook README with one README-only folder](seeds/SEED-016-initial-notebook-and-folder-readmes.md#story-1) — SEED-016
