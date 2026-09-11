@@ -30,6 +30,12 @@ irm 'https://doughnut.odd-e.com/install?win32=true' | iex
 donut
 ```
 
+`donut notebook publish <directory>` publishes the checkout's committed `main`.
+If the checkout has staged, unstaged, or untracked work, the command warns that
+those local changes are excluded and leaves them untouched. `donut notebook
+pull <directory>` changes the checkout and therefore still requires a clean
+local `main`.
+
 ## [Donut Technology Stack](./docs/tech_stack.md)
 
 ## [Current Architecture Videos](./docs/current_architecture_workshops.md)
