@@ -23,7 +23,6 @@ changes.
 ## Taken
 
 - [Identify large-publication bottlenecks with a reproducible baseline](seeds/SEED-018-publish-large-authored-notebooks.md#story-2) — SEED-018
-- [Preserve pipe wiki links through rich editing](quick/107-preserve-pipe-wiki-links-through-rich-editing/PLAN.md)
 
 ## Backlog list
 
