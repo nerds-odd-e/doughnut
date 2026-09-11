@@ -296,7 +296,7 @@ in the persistent capture directory; permanent findings link their exact command
 
 ### 7. Establish reliable continuation for long measurement
 Type: Behavior
-Status: planned
+Status: done
 Proof: A controlled short delayed task through the same nested Cypress/Cucumber
 boundary identifies or rules out the timeout hypothesis, preserves the original
 failure before screenshot handling, and demonstrates the chosen repeat command's
@@ -313,6 +313,22 @@ No parallel acceptance implementation or production timeout change. Expose origi
 runner errors and document recovery when completion has already occurred.
 Estimate: 5–10 minutes active, required probe runtime exempt. Safe stop: the
 repeat's observation path is evidenced before another expensive request.
+
+Disposable actual Cucumber/nested-chain probe: 1,000 ms task with default timeout
+200 ms and task timeout 5,000 ms completed and continued; a second task deliberately
+failed and preserved its original error before screenshot handling. Both with and
+without screenshots yielded expected exit 1, one pass and one controlled failure.
+Scripts/results retained in persistent `continuation-probe/`; exact commands and
+recorded 1,070/1,060 ms scenario durations are in the findings document.
+Nested default timeout is ruled out for this path. Original large failure remains
+unknown; host suspension is a possible contributor, not a proven root cause.
+No production/harness code changed and no SUT requests/resets occurred.
+The repeat uses scoped `caffeinate -is` and `screenshotOnRunFailure=false` for
+sleep prevention and error visibility, without claiming 83-minute reliability
+from a short probe. Approximately 8 minutes active diagnosis plus probe runtime.
+Independent doc review corrected durations against retained JSONL, whitespace
+passed, no runtime rerun needed, `REFACTOR COMPLETE`; selective format passed.
+Backend/E2E/CLI diff from first-run source `b650a294f6` remains empty.
 
 ### 8. Repeat the valid large-publication baseline
 Type: Behavior

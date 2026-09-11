@@ -385,3 +385,41 @@ repeatedly identify flush traversal and index-refresh callers. Profiling,
 ordinary logging, tier-1-only JIT and host suspension constrain interpretation.
 The evidence supports prioritizing ORM flush/dirty-check/cascade and associated
 allocation work for investigation; it does not predict a quantitative speedup.
+
+## Continuation probe and awake repeat
+
+A disposable Cucumber-compiled probe used the same nested Cypress chain as the
+HTTP page helper, with a 200 ms default command timeout and a 5,000 ms task timeout.
+A 1,000 ms task completed and its next assertion passed (logged scenario duration 1,070 ms; repeated with
+failure screenshots disabled, 1,060 ms). A second task deliberately rejected with
+`CONTROLLED_PUBLICATION_FAILURE`; a probe-local receiver retained that original
+error before screenshot handling. Each run correctly exited 1 with one passing
+scenario and one controlled failure. The nested default timeout hypothesis is
+ruled out for this path. This short probe does not prove 83-minute browser reliability
+or identify the original large-run failure; host suspension is a possible contributor.
+
+The probe made no SUT requests or database resets. Its scripts and results persist
+in `~/Library/Application Support/Donut/publication-profiles/continuation-probe/`.
+Executed commands (the temporary project is a diagnostic fixture, not a product test):
+
+```bash
+PROBE_RESULT=/tmp/donut-publication-continuation-probe/low-default.jsonl CURSOR_DEV=true nix develop -c pnpm exec cypress run --project /tmp/donut-publication-continuation-probe --browser chrome --config-file /tmp/donut-publication-continuation-probe/cypress.config.js
+PROBE_RESULT=/tmp/donut-publication-continuation-probe/no-screenshot.jsonl CURSOR_DEV=true nix develop -c pnpm exec cypress run --project /tmp/donut-publication-continuation-probe --browser chrome --config-file /tmp/donut-publication-continuation-probe/cypress.config.js --config screenshotOnRunFailure=false
+```
+
+For an awake large repeat on macOS, keep the lid open and use a command-scoped
+idle-sleep inhibitor. `-s` prevents system sleep while on AC power; this command
+does not override lid closure. Preserve original failures by disabling automatic
+failure screenshots; this improves error visibility and is not a claimed repair:
+
+```bash
+PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=10000 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=43200000 CURSOR_DEV=true caffeinate -is nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=43260000,defaultCommandTimeout=600000,screenshotOnRunFailure=false --expose tags=@publicationProfileHttp
+```
+
+Use the same command with `tags=@publicationProfileHttpRejection` for late rejection.
+Retain the existing task timeout and the longer default timeout needed by fixture
+injection; no production or benchmark code correction follows from the probe.
+Record any actual host suspension alongside each timing. Do not average the first
+sleep-affected latency with an awake repeat as though conditions were equivalent.
+If a driver fails after HTTP completion, preserve its error and recording, then
+verify the public receiver as above; never relabel the failed scenario as passing.
