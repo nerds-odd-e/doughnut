@@ -1,3 +1,4 @@
+import { nonInteractiveOutput } from './outputAssertions'
 import testability from '../../testability'
 import { notebookCloneCheckout } from './notebookCloneCheckout'
 import { expectCheckoutFileAt } from './notebookCloneCheckoutReceiver'
@@ -8,6 +9,15 @@ const title = (kind: string, i: number) =>
 const folder = (i: number) => `group-${String(i).padStart(2, '0')}`
 function document(kind: string, i: number, existing: number, count: number) {
   return `---\ntype: Note\naliases: ['${kind} alias ${i}']\nmeaning: '${kind} concept ${i}'\nsource: '[[${title('Existing', i % existing)}]]'\nrelated:\n  - '[[${title('Existing', (i + 1) % existing)}]]'\n  - '[[${title('Existing', (i + 2) % existing)}]]'\n---\n${kind} concept ${i}. ${'Deterministic authored prose. '.repeat(32)}\nSee [[${title('Existing', i % existing)}]] and [[${title(kind, (i + 1) % count)}]].\n`
+}
+
+function recordPublicationTiming(started: string) {
+  return cy.task('recordNotebookPublicationTiming', {
+    started,
+    stopped: new Date().toISOString(),
+    boundary:
+      'installed CLI execution, includes bundle preparation and client work',
+  })
 }
 
 export const notebookPublicationProfile = {
@@ -78,19 +88,51 @@ export const notebookPublicationProfile = {
           )
       })
   },
+  invalidateLast() {
+    return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+      cy
+        .task<string>('invalidateLastNotebookPublicationDocument', checkoutDir)
+        .then((path) => {
+          cy.wrap(path).as('publicationProfileInvalidPath')
+          return cy
+            .task<string>('normalizeNotebookPublicationProposal', checkoutDir)
+            .as('cliNotebookPublishHead')
+        })
+    )
+  },
+  publishRejection() {
+    return cy.then(() => {
+      const started = new Date().toISOString()
+      return notebookCloneCheckout()
+        .publishExpectingRejection()
+        .then(() => {
+          recordPublicationTiming(started)
+          return cy
+            .get<string>('@publicationProfileInvalidPath')
+            .then((path) =>
+              nonInteractiveOutput().expectContains(
+                `Invalid authored property at path "${path}"`
+              )
+            )
+        })
+    })
+  },
+  expectPreserved() {
+    return cy.get<string>('@cliCloneReceiverDestination').then((checkoutDir) =>
+      cy.get<string>('@publicationProfileInvalidPath').then((invalidPath) =>
+        cy.task('confirmRejectedNotebookPublicationProfile', {
+          checkoutDir,
+          invalidPath,
+        })
+      )
+    )
+  },
   publish() {
     return cy.then(() => {
       const started = new Date().toISOString()
       return notebookCloneCheckout()
         .publish()
-        .then(() =>
-          cy.task('recordNotebookPublicationTiming', {
-            started,
-            stopped: new Date().toISOString(),
-            boundary:
-              'installed CLI execution, includes bundle preparation and client work',
-          })
-        )
+        .then(() => recordPublicationTiming(started))
     })
   },
   start() {

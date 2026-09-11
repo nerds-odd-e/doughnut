@@ -183,3 +183,45 @@ Repeat the command to reset the owned database and rebuild this logical fixture.
 No explicit warm-up is performed; the same healthy JVM remains running. This
 synthetic content is not a measurement of jap3's distribution. Large runs and
 rejection/preserved-state proof remain separate execution steps.
+
+## Small late-rejection capture
+
+Run the same fixture with only the final added Git path's alias declaration
+changed to `aliases: {invalid: shape}`:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose tags=@publicationProfileRejection
+```
+
+Both profiling tags are excluded from ordinary runs. To check acceptance and
+rejection together, use `--expose 'tags=@publicationProfile or @publicationProfileRejection'`.
+The rejection capture preserves the valid baseline and verifies CLI exit 1 with
+`Invalid authored property at path "group-19/Added-00019.md"` for the small fixture.
+The invalid path is selected from Git's added-path traversal, rather than from
+the numerical addition index (which differs with multiple notes per folder).
+
+Read-only snapshots of the verified isolated database compare every `note` row
+(including identity and stored content), every `memory_tracker` row, and binding
+identity, accepted head, bundle SHA-256 and timestamps. A second clone pulls and
+must retain the baseline head/tree and clean status. To prove actual processing
+before rejection, the capture also reads the uncached note AUTO_INCREMENT
+counter before and after: the expected delta is exactly `additions - 1`.
+MySQL retains allocated IDs on rollback; combined with the actual final-path
+validation error and the sequential `conceptPaths` loop in
+`NotebookGitProposalDocumentApplication`, this establishes late processing.
+This is progression evidence, not database timing. The isolated fixture must
+have no concurrent writers.
+
+Small rejection passed twice with reset on 2026-09-11. Persistent captures:
+
+- `2026-09-11T10-31-50.438Z`: CLI 683 ms; recording interval 1174 ms.
+- `2026-09-11T10-32-37.440Z`: CLI 574 ms; recording interval 1022 ms.
+
+Both allocated 19 preceding note identities and preserved baseline head
+`650445c7f56dde3ed3afbf4f1ca8e94794757b0c`, stored rows and learning state.
+`jfr print --events jdk.ExecutionSample` reads request-thread samples from the
+first recording (Spring repository metadata and Hibernate SQL AST work).
+The combined focused command passed 2/2 (13 seconds), including the unchanged
+valid acceptance proof (`2026-09-11T10-32-30.710Z`, CLI 643 ms). These short
+samples establish capture mechanics; they do not rank large-run bottlenecks.
+No longer-wait HTTP harness was needed for the small request.

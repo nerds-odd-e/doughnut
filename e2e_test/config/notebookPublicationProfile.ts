@@ -1,3 +1,8 @@
+import assert from 'node:assert/strict'
+import {
+  publicationPersistedState,
+  expectPublicationStatePreserved,
+} from './notebookPublicationState'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -78,6 +83,27 @@ export function notebookPublicationProfileTasks(
         throw new Error('Profile counts must be positive integers')
       return parameters
     },
+    invalidateLastNotebookPublicationDocument(checkoutDir: string) {
+      const paths = git(
+        checkoutDir,
+        'diff',
+        '--name-only',
+        '--diff-filter=A',
+        'HEAD^',
+        'HEAD'
+      ).split('\n')
+      const invalidPath = paths.at(-1)!
+      const path = join(checkoutDir, invalidPath)
+      writeFileSync(
+        path,
+        readFileSync(path, 'utf8').replace(
+          /^aliases:.*$/m,
+          'aliases: {invalid: shape}'
+        )
+      )
+      execFileSync('git', ['-C', checkoutDir, 'add', '--', invalidPath])
+      return invalidPath
+    },
     normalizeNotebookPublicationProposal(checkoutDir: string) {
       execFileSync(
         'git',
@@ -151,6 +177,7 @@ export function notebookPublicationProfileTasks(
       mkdirSync(directory, { recursive: true })
       const metadata = {
         parameters,
+        persistedState: publicationPersistedState(repoRoot),
         learning,
         baselineHead: git(checkoutDir, 'rev-parse', 'HEAD^'),
         proposalHead: git(checkoutDir, 'rev-parse', 'HEAD'),
@@ -214,6 +241,50 @@ export function notebookPublicationProfileTasks(
     stopNotebookPublicationProfile() {
       if (!capture) throw new Error('No publication recording is active')
       return stopRecording(join(capture.directory, 'publication.jfr'))
+    },
+    confirmRejectedNotebookPublicationProfile({
+      checkoutDir,
+      invalidPath,
+    }: {
+      checkoutDir: string
+      invalidPath: string
+    }) {
+      assert.ok(capture && !capture.recordingActive, 'Expected stopped capture')
+      const metadata = JSON.parse(
+        readFileSync(join(capture.directory, 'capture.json'), 'utf8')
+      )
+      const after = publicationPersistedState(repoRoot)
+      const processedAdditions = expectPublicationStatePreserved(
+        metadata.persistedState,
+        after,
+        parameters.additions
+      )
+      assert.equal(git(checkoutDir, 'rev-parse', 'HEAD'), metadata.baselineHead)
+      assert.equal(
+        git(checkoutDir, 'rev-parse', 'HEAD:'),
+        metadata.baselineTree
+      )
+      assert.equal(git(checkoutDir, 'status', '--porcelain'), '')
+      const resultPath = join(capture.directory, 'result.json')
+      writeFileSync(
+        resultPath,
+        JSON.stringify(
+          {
+            ...JSON.parse(readFileSync(resultPath, 'utf8')),
+            outcome: 'rejected',
+            invalidPath,
+            processedAdditions,
+            acceptedHead: metadata.baselineHead,
+            preservedState: after,
+            rejectionEvidence:
+              'CLI exit 1 and Invalid authored property at the final added path asserted before pull',
+          },
+          null,
+          2
+        )
+      )
+      capture = undefined
+      return null
     },
     confirmNotebookPublicationProfile({
       acceptedHead,

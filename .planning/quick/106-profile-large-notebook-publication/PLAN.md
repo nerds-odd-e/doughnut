@@ -57,7 +57,7 @@ Use a deliberately invalid alias shape, independent of pipe-name support.
 
 ## Ordered slices
 
-Six sequential Behavior slices, each exposing one evaluable learning outcome.
+Seven sequential Behavior slices, each exposing one evaluable learning outcome.
 Target about 5 minutes active work per leaf; 5–10 minute estimates below rely on
 the existing lifecycle and publication helpers. At 10 minutes active work stop
 and finer-decompose remaining work. Long measured requests and required test
@@ -163,7 +163,7 @@ belongs to a longer-wait harness if the existing 60-second CLI E2E wait is excee
 
 ### 4. Measure rejection and verify preserved baseline state
 Type: Behavior
-Status: planned
+Status: done
 Proof: The small representative invalid variant rejects at the intended final
 addition and leaves accepted head, stored content, existing note identities and
 learning records unchanged, with complete timing and readable recording.
@@ -177,7 +177,39 @@ HTTP/server timing; do not change production timeouts or claim CLI success.
 Estimate: 5–10 minutes active; required request/test runtime exempt.
 Safe stop: both outcome measurements reproducible at small scale.
 
-### 5. Establish repeated valid large-publication baseline
+Proof: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose 'tags=@publicationProfile or @publicationProfileRejection'`
+passed 2/2 (13 seconds), including after fresh refactor. Rejection recordings
+`2026-09-11T10-31-50.438Z` and `2026-09-11T10-32-37.440Z` rejected
+`group-19/Added-00019.md`; note auto-increment advanced by exactly 19 while all
+note rows, tracker rows, binding head/bundle hash/timestamps remained unchanged.
+Public receiver pull retained clean baseline head/tree. JFR readable request
+samples retained, no active recording. CLI intervals 683/574 ms; capture intervals
+1174/1022 ms. This allocation observation proves late processing, not DB duration.
+Approximately 8 minutes active. Independent refactor extracted cohesive
+`notebookPublicationState.ts` and shared CLI timing; required marker returned.
+
+### 5. Observe complete publication through a longer-wait benchmark request
+Type: Behavior
+Status: planned
+Proof: The same representative small valid/rejected fixtures use the same public
+Git-bundle HTTP operation, record request-only elapsed time and HTTP outcome,
+and pass existing acceptance/preservation observations with readable JFR.
+
+The installed CLI E2E wait is 60 seconds (`cliE2eManagedPty.ts`), whereas the
+motivating workload consumed about 807 seconds of CPU before rejection. That
+known runner bound cannot observe the expected large request. Use the originally
+permitted benchmark-only HTTP transport with a longer wait; keep bundle setup
+outside request timing and use existing fixture/bundle and owned target facilities.
+Retain installed CLI smoke scenarios; distinguish HTTP measurement in explicit
+steps/scenarios and metadata. Do not change product transport, timeout, acceptance
+or authorization. Preserve incomplete outcomes and recording cleanup on failure.
+No independent acceptance implementation: submit the existing public operation
+and reuse its accepted-head/download and preserved-state observations.
+Estimate: 5–10 minutes active, required runtime exempt. Safe stop: longer-wait
+measurement path proven small before expensive runs. This refinements addresses
+the observed runner boundary, without changing story outcome or fixture design.
+
+### 6. Establish repeated valid large-publication baseline
 Type: Behavior
 Status: planned
 Proof: Approximately 10,000 additions publish successfully twice from the same
@@ -191,7 +223,7 @@ Estimate: 5 minutes active orchestration/analysis plus potentially long requests
 (prior observation about 807 seconds request CPU), an explicit runtime exception.
 Safe stop: reproducible success baseline without optimization claims.
 
-### 6. Establish large rejection baseline and improvement-area handoff
+### 7. Establish large rejection baseline and improvement-area handoff
 Type: Behavior
 Status: planned
 Proof: The approximately 10,000-addition invalid variant completes rejection with
