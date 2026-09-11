@@ -6,11 +6,16 @@ launching.
 
 ## Own one observer
 
-Start one observer per
-repository/branch/coordinator before the first push and reuse it across normal
-and repair pushes. The observer discovers later pushes; a changed SHA does not
+Start one observer per repository/branch/coordinator before the first push,
+where branch is the selected execution branch, and reuse it across normal and
+repair pushes. The observer discovers later pushes; a changed SHA does not
 require new setup. Push success closes routine delivery without waiting for CI
 or deployment.
+
+Bind the observer to the selected execution location. Observe that branch and
+use that checkout for every pause, stash, repair, delivery, and restoration
+operation. For planned execution, verify the binding against the retained
+execution identity; for quick execution, retain it in the conversation.
 
 The observer uses no AI calls. It emits failure, incomplete, and lost-coverage
 records incrementally. It never dispatches or retries a workflow, observes
@@ -104,8 +109,7 @@ until that missing history is accounted for.
    infrastructure, record the evidence and ignore the attempt without a repair
    commit. If HEAD already contains a demonstrated repair, accept the focused
    proof without manufacturing another commit. For a new repair, the coordinator
-   runs [wrap-up](wrap-up.md); the interrupted slice stays in progress. Preserve
-   the same observer through the repair push.
+   runs [wrap-up](wrap-up.md). Preserve the same observer through the repair push.
 5. **Restore and resume after repair or a justified no-change disposition.**
    Push a new repair first; otherwise proceed as soon as focused proof shows
    HEAD is already fixed or analysis proves all failures were infrastructure.

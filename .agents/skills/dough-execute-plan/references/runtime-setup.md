@@ -33,8 +33,10 @@ any project tooling wrapper):
 
 The branch is a required positional argument, never an inferred `main`.
 Record the verified workflow selector/name with the observer identity in the
-active plan. Do not change configuration during an observer's lifetime. A
-new coordinator must recover and close the old observer before replacing it.
+active plan for planned execution or in the conversation for quick execution.
+Do not create a plan or separate record for that quick context. Do not change
+configuration during an observer's lifetime. A new coordinator must recover
+and close the old observer before replacing it.
 When overriding the mailbox directory, provide the same absolute value to both
 launcher and hooks; a per-process `TMPDIR` does not establish shared identity.
 

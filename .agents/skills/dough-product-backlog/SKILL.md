@@ -26,7 +26,7 @@ required workflow is unavailable, stop that activity and ask for its guidance.
 
 - Place **Near-future direction** immediately after the title when it exists,
   then **Taken** immediately before **Backlog list**. Retain **Taken** when it is
-  empty. Do not add a finished-list or recently-done section.
+  empty.
 - Use bullet lists. Do not number items. Put the highest-priority queued item
   first. Preserve the order of entries already in **Taken** and append each
   newly taken entry.
@@ -102,18 +102,16 @@ the queue cannot be moved unambiguously.
 
 Once execution starts, leave the entry in **Taken** across pauses, failures,
 resumption, successful plan completion, and retrospective. Returning cancelled
-work to the queue requires an explicit backlog-maintenance decision. Story
-wrap-up removes completed work under its existing closure contract.
+work to the queue requires an explicit backlog-maintenance decision.
 
-## Complete items
+## Remove completed items
 
-- Completed story or correction closure belongs to
-  [dough-story-wrap-up](../dough-story-wrap-up/SKILL.md). Do not record a
-  completion chronicle in the canonical home or move the item onto a finished
-  list.
+- Route completed story or correction closure through
+  [dough-story-wrap-up](../dough-story-wrap-up/SKILL.md). It removes the entry
+  from its active list and owns applicable seed, plan, and proof cleanup.
 - Standalone maintenance may remove a completed item from either active list
-  when the human asks only for backlog maintenance. Leave plan, applicable seed,
-  and proof deletion to wrap-up. Do not create a recently-done or tombstone entry.
+  when the human asks only for backlog maintenance. The applicable seed, plan,
+  and proof remain available for later story wrap-up.
 
 ## Check and report
 
@@ -121,9 +119,6 @@ wrap-up removes completed work under its existing closure contract.
   prerequisite order in the queue.
 - Check section order, bullet formatting, and direction alignment when present.
   Confirm the direction is unchanged unless explicitly instructed by a human.
-- Do not require a recently-done section. If one exists from earlier guidance,
-  leave unrelated entries for wrap-up rather than converting them into a new
-  finished-list requirement.
 - Summarize changes and reasons briefly.
 - Follow commit conventions when authorized. Backlog maintenance alone does not
   authorize a commit or push.

@@ -123,7 +123,7 @@ Use this project's equivalent slice format when supplied; otherwise use:
 ```markdown
 ### N. Capability outcome
 Type: Behavior | Structure
-Status: planned | in-progress | done
+Status: planned | done
 Proof: <observable signal and focused verification>
 
 Behavior: <pre-condition → trigger → externally observable postcondition>
