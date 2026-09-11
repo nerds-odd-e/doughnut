@@ -57,7 +57,7 @@ Use a deliberately invalid alias shape, independent of pipe-name support.
 
 ## Ordered slices
 
-Three sequential Behavior slices, each exposing one evaluable learning outcome.
+Six sequential Behavior slices, each exposing one evaluable learning outcome.
 Target about 5 minutes active work per leaf; 5–10 minute estimates below rely on
 the existing lifecycle and publication helpers. At 10 minutes active work stop
 and finer-decompose remaining work. Long measured requests and required test
@@ -95,66 +95,113 @@ Owned startup timed out and cleaned up. Serial
 passed; retrying ordinary owned startup. This is a pre-existing cold-build race,
 not a publication measurement or a repaired tooling defect.
 
-### 2. Reproduce a measured publication on disposable data
+### 2. Capture a small accepted publication
 Type: Behavior
 Status: planned
-Proof: An opt-in small-scale run through the real HTTP publication boundary
-produces a readable recording, timing/result metadata, and a verified accepted
-head/content; reset and rerun establish the same logical starting state.
+Proof: The opt-in existing CLI E2E feature publishes 20 deterministic additions,
+produces a readable JFR recording spanning publication, and receives the accepted
+head and every authored document through the existing second-clone helpers.
 
-Use existing CLI E2E setup, Git fixtures, target ownership and cleanup. Extend
-only the missing deterministic workload and capture support. Record literal
-commands, Git revision, JVM/MySQL versions, fixture fingerprint, warm-up and
-logging settings, backend identity, output locations and reset instructions.
-Keep setup outside the timed publication. Store scripts and concise summaries
-in the repository; retain raw recordings in a documented persistent artifact
-location linked from the story, not an expiring temporary directory.
+Reuse the parked harness and correct JFR filename quoting. Verify owned PID and
+isolation before attachment. Retain recording, exact commands, JVM/process and
+revision metadata in a persistent artifact directory. Label recording interval
+separately from request timing. Failed scenarios stop capture and preserve partial
+recordings as incomplete; cleanup must not claim successful publication.
+Run the same small scenario after reset to establish capture repeatability.
+Document the initial fixture limitations and successful capture commands.
+Estimate: 5 minutes active completion of the parked attempt, test runtime exempt.
+Safe stop: useful small capture mechanism and verified acceptance, no large claim.
 
-The concrete uncertain assumption is that JFR can record the owned SUT JVM
-while this E2E path submits and observes publication. Prove it here before a
-large run: after resolving the owned PID and output directory, use
-`CURSOR_DEV=true nix develop -c jcmd <owned-backend-pid> JFR.start name=publication settings=profile`
-and after the request
-`CURSOR_DEV=true nix develop -c jcmd <owned-backend-pid> JFR.stop name=publication filename=<absolute-recording-path>`.
-Replace placeholders with the verified values and record the exact executed
-commands and result. Required postcondition: readable samples spanning the
-request plus persisted acceptance. Not yet run. Failure changes the capture
-approach in this plan before proceeding, without adopting a shared JVM.
-
-Estimate: 5–10 minutes active work, low confidence because capture integration
-is unproven. Safe stop: the small reproducible profiling workflow works; no
-large-performance claim. This owns reusable infrastructure and repeatability.
-
-### 3. Establish the large baseline and supported improvement areas
+### 3. Repeat a representative publication from a fingerprinted baseline
 Type: Behavior
 Status: planned
-Proof: A maintainer can follow story links to completed valid/rejection baseline
-data and see which improvement areas are supported by those measurements.
+Proof: A parameterized small-scale run creates the documented existing-note
+baseline, publishes deterministic additions, verifies accepted content and head,
+and repeats after reset with the same logical fixture fingerprint.
 
-Run the same workflow at approximately 10,000 additions and repeat the valid
-run after reset, documenting warm-up and variation. Run the late-invalid variant
-from the same logical baseline. Confirm its actual rejection point and unchanged
-accepted head, stored content, existing note identities and learning records.
-Verify accepted head and added content on success. Preserve raw recordings and
-timings with the exact revision and fixture; later code changes require a fresh
-matching baseline, not silently mixed results.
+Extend the same fixture/capture workflow to the documented content distribution,
+fixed Git identity/dates, existing learning record and parameterized counts.
+Record exact implemented distribution and representativeness limits. Capture
+request timing separately from setup and JFR interval, result/head, fixture
+fingerprint, revision, MySQL/JVM versions, logging and warm-up settings.
+Keep scripts/summaries in Git and raw recordings in the documented persistent
+location. Record reset commands and links from story 2.
+Estimate: 5–10 minutes active; fixture setup/request/test runtime exempt.
+Safe stop: reusable representative valid baseline, no 10,000-note measurement yet.
 
-Distinguish client timeout from server completion and retain both observations.
-If CLI timeout prevents a complete measurement, a documented harness-only
-request with a longer wait may observe the same HTTP operation; label it as
-HTTP/server timing rather than successful CLI timing. Do not change production
-timeouts. A stopped server request is incomplete evidence and cannot close this
-slice. Record profiler/logging overhead limitations and avoid unsupported
-quantitative speedup predictions.
+### 4. Measure rejection and verify preserved baseline state
+Type: Behavior
+Status: planned
+Proof: The small representative invalid variant rejects at the intended final
+addition and leaves accepted head, stored content, existing note identities and
+learning records unchanged, with complete timing and readable recording.
 
-Compare measurements with slice 1's hypotheses. Put the supported improvement
-areas, evidence and uncertainties in story 3, linking the shared infrastructure
-and data there and in story 2. No optimization implementation or execution plan.
+Change only the last processed document to invalid recognized-alias YAML shape.
+Verify processing order and actual late rejection using request evidence; do not
+infer it merely from filename. Reuse public publication boundary and existing
+E2E fixture/observation facilities. Preserve successful baseline proof. A longer
+wait harness for the same HTTP operation is permitted if needed, clearly labeled
+HTTP/server timing; do not change production timeouts or claim CLI success.
+Estimate: 5–10 minutes active; required request/test runtime exempt.
+Safe stop: both outcome measurements reproducible at small scale.
 
-Estimate: 5–10 minutes active analysis/documentation plus potentially long
-baseline runs (the prior observation included about 807 seconds of request CPU).
-Safe stop: a reusable baseline and evidence-based next-story statement exist.
-This owns both large-run outcomes, preserved-state proof and the story handoff.
+### 5. Establish repeated valid large-publication baseline
+Type: Behavior
+Status: planned
+Proof: Approximately 10,000 additions publish successfully twice from the same
+reset logical baseline, with accepted head/content proof and comparable profiles.
+
+Use the proven workflow, preserve recordings and exact revision/fingerprint,
+record warm-up and variation, and summarize CPU/allocation/GC and wait evidence.
+Distinguish client timeout from completed server request. An interrupted request
+is incomplete evidence. Later code changes require a fresh matching baseline.
+Estimate: 5 minutes active orchestration/analysis plus potentially long requests
+(prior observation about 807 seconds request CPU), an explicit runtime exception.
+Safe stop: reproducible success baseline without optimization claims.
+
+### 6. Establish large rejection baseline and improvement-area handoff
+Type: Behavior
+Status: planned
+Proof: The approximately 10,000-addition invalid variant completes rejection with
+preserved-state proof; maintainers can follow story links to both outcome profiles
+and evidence-backed improvement areas in story 3.
+
+Run from the same logical starting state and settings as valid measurements.
+Confirm actual rejection point and unchanged accepted head, content, note IDs and
+learning records. Compare evidence with static hypotheses; record supported areas
+and uncertainties in story 3 with shared infrastructure/data links in stories 2–3.
+Include profiler/logging overhead and sampled-wait limitations; SQL counts alone
+do not establish database time. No quantitative speedup predictions, optimization
+implementation, or story 3 execution plan.
+Estimate: 5–10 minutes active analysis/documentation plus measured runtime exception.
+Safe stop: selected story's reproducible evidence and handoff complete.
+
+## Execution learning and refinement
+
+Original slice 2 reached its 10-minute active-work hard limit. Its single-slice
+assumption incorrectly combined capture lifecycle, representative fixture,
+persisted acceptance and repeatability. Same story outcome remains understood;
+no product scope or architecture changes. Remaining work now follows one capture
+and workload model; later slices extend proven outcomes, not parallel harnesses.
+
+Attempt owned six E2E files, safely parked in stash
+`118c890f201d5773d8a17801f8da512e5e190d0d` before refinement. Restore onto the
+refinement commit to continue slice 2; no passing acceptance proof is claimed.
+`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose tags=@publicationProfile`
+failed at JFR.stop after publication because jcmd requires embedded quoting for
+paths containing spaces. The quoting fix is parked, unverified. Head/content
+assertions were not reached. No active recording or attempt subprocess remains.
+Recovery command succeeded:
+`CURSOR_DEV=true nix develop -c jcmd 2406 JFR.stop name=publication 'filename="/Users/terryyin/Library/Application Support/Donut/publication-profiles/2026-09-11T10-11-43.355Z/incomplete.jfr"'`.
+That directory retains metadata and the 825.8 kB incomplete recording.
+
+Owned SUT is now healthy at `http://127.0.0.1:50811`, backend 50809, Vite 50810,
+identity `wt_539226243fb14a2391240fed882700b2`. The retry after initial build race
+failed with missing DonutApplication.class despite up-to-date Gradle status.
+Stopped only the verified owner using `beginSutOwnerShutdown`, then
+`CURSOR_DEV=true nix develop -c backend/gradlew -p backend clean classes --no-daemon`
+and `CURSOR_DEV=true nix develop -c pnpm sut` passed. This repairs local compiled
+output, not the underlying pre-existing startup race.
 
 ## Verification and delivery
 
