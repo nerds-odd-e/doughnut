@@ -125,6 +125,64 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
+  void replaceWikiLinksMatchingTrimmedInner_preservesYamlScalarSpelling() {
+    String markdown =
+        """
+        ---
+        # authored 💡 comment
+        relationship: "[[Alpha]]"
+        links:
+          - "[[Alpha]]"
+          - '[[Alpha]]'
+        nested:
+          relationship: "[[Alpha]]"
+        untouched: "[[Other]]"
+        ---
+        Body [[Alpha]].""";
+
+    String rewritten =
+        WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
+            markdown, "Alpha", "A\\|B");
+
+    assertThat(
+        rewritten,
+        equalTo(
+            """
+            ---
+            # authored 💡 comment
+            relationship: "[[A\\\\|B]]"
+            links:
+              - "[[A\\\\|B]]"
+              - '[[A\\|B]]'
+            nested:
+              relationship: "[[Alpha]]"
+            untouched: "[[Other]]"
+            ---
+            Body [[A\\|B]]."""));
+    NoteLeadingFrontmatter.Split split = NoteLeadingFrontmatter.split(rewritten).orElseThrow();
+    assertThat(
+        split.frontmatter().supportedValueStringsInInsertionOrder(),
+        equalTo(List.of("[[A\\|B]]", "[[A\\|B]]", "[[A\\|B]]", "[[Other]]")));
+
+    assertThat(
+        WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
+            rewritten, "A\\|B", "C\\|D"),
+        equalTo(
+            """
+            ---
+            # authored 💡 comment
+            relationship: "[[C\\\\|D]]"
+            links:
+              - "[[C\\\\|D]]"
+              - '[[C\\|D]]'
+            nested:
+              relationship: "[[Alpha]]"
+            untouched: "[[Other]]"
+            ---
+            Body [[C\\|D]]."""));
+  }
+
+  @Test
   void newInnerForKeepNotebookMove_qualifiesUnqualifiedAndKeepsVisibleText() {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove("Title", "NewNb"),

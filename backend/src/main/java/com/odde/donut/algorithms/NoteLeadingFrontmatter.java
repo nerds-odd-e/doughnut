@@ -21,9 +21,13 @@ public final class NoteLeadingFrontmatter {
    */
   public record VerbatimSplit(String frontmatterBlock, String yamlRaw, String body) {
     String rebuild(String newYamlRaw) {
+      return rebuild(newYamlRaw, body);
+    }
+
+    String rebuild(String newYamlRaw, String newBody) {
       String yaml =
           newYamlRaw.isEmpty() || newYamlRaw.endsWith("\n") ? newYamlRaw : newYamlRaw + "\n";
-      return "---\n" + yaml + "---\n" + body;
+      return "---\n" + yaml + "---\n" + newBody;
     }
   }
 

@@ -165,10 +165,14 @@ are necessary for this single observable save; no export or rename work here.
 
 ### 5a. Preserve wiki escapes in YAML rewrites
 Type: Structure
-Status: planned
+Status: done
 Proof: Focused document-rewrite examples preserve existing body and
 single-quoted YAML spelling while double-quoted YAML stores the extra YAML
 escape needed to decode to the same wiki token; backend suite passes.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after
+the post-change refactor. Scalar-node source marks preserve untouched YAML and
+Unicode offsets; changed double-quoted values are the only values re-rendered.
 
 Make `WikiLinkMarkdownDocumentRewrite` preserve the containing scalar's YAML
 syntax when a rewritten target introduces wiki backslashes. Use SnakeYAML
