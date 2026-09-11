@@ -28,8 +28,7 @@ same public-operation boundary. Both large valid outcomes were independently
 verified; retain the documented Cypress failure/interruption qualifications.
 The [20-addition rejection proof](#small-late-rejection-capture) establishes late
 processing and preserved state. **Large rejection latency is unmeasured and
-explicitly deferred by the user; no further large run is required for this
-investigation.**
+not covered by the retained measurements.**
 
 For subsequent focused experiments:
 
@@ -48,15 +47,11 @@ For subsequent focused experiments:
    fingerprints, JVM/logging/JFR settings and warm-up comparable. If a short
    sample cannot distinguish the candidate costs, increase counts modestly or
    add a focused flush-count observation, changing one factor at a time.
-3. Stop when a dominant cost and one concrete next experiment are clear. That
-   stopping point is already reached for this investigation. Do not repeat
+3. Stop when a dominant cost and one concrete next experiment are clear. The retained evidence already identifies that priority. Do not repeat
    10,000-note captures merely to strengthen the same ranking. Reserve large
    confirmation for a candidate improvement that leaves a specific scaling
    question unanswered. For bulk byte proof, use the retained read-only receiver
    comparison approach instead of thousands of browser commands.
-
-This is an evidence handoff to [story 3](../.planning/seeds/SEED-018-publish-large-authored-notebooks.md#story-3),
-not an executable optimization plan or authorization to implement a change.
 
 ## Static candidates
 
