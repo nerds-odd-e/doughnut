@@ -173,9 +173,16 @@ export function spawnOwnedTreeStandIn(checkoutRoot, extraEnv = {}) {
     script,
     `import { spawn } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
-const grandchild = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' })
-writeFileSync(${JSON.stringify(pidsFile)}, JSON.stringify({ leader: process.pid, grandchild: grandchild.pid }))
-if (process.env.SUT_STANDIN_EXIT === '1') process.exit(1)
+const ignoreTerm = process.env.SUT_STANDIN_GRANDCHILD_IGNORE_TERM === '1'
+const grandchild = spawn(
+  process.execPath,
+  ['-e', \`if (\${JSON.stringify(ignoreTerm)}) process.on('SIGTERM', () => {}); if (process.send) process.send('ready'); setInterval(() => {}, 1000)\`],
+  { stdio: ['ignore', 'ignore', 'ignore', 'ipc'] }
+)
+grandchild.once('message', () => {
+  writeFileSync(${JSON.stringify(pidsFile)}, JSON.stringify({ leader: process.pid, grandchild: grandchild.pid }))
+  if (process.env.SUT_STANDIN_EXIT === '1') process.exit(1)
+})
 setInterval(() => {}, 1000)
 `
   )

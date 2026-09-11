@@ -97,6 +97,27 @@ test('isolated start early exit reaps leftover owned grandchildren', async (t) =
   assert.equal(isPidAlive(state.owned.grandchild), false)
 })
 
+test('isolated start escalates past a TERM-resistant owned descendant', async (t) => {
+  const foreign = spawnForeignProcess()
+  t.after(() => {
+    try {
+      foreign.kill('SIGKILL')
+    } catch {
+      // already gone
+    }
+  })
+  const { standIn, start, state } = prepareOwnedStandIn(t, {
+    env: { SUT_STANDIN_GRANDCHILD_IGNORE_TERM: '1' },
+    timeoutMs: 100,
+  })
+  state.owned = await waitForOwnedPids(standIn.pidsFile)
+
+  const code = await start
+  assert.equal(code, 1)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(isPidAlive(foreign.pid), true)
+})
+
 test('isolated start cancellation stops the owned process tree', async (t) => {
   const controller = new AbortController()
   const errors = []
