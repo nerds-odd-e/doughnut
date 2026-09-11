@@ -12,78 +12,122 @@ public final class WikiLinkMarkdown {
   public static final Pattern INNER_LINK_PATTERN = Pattern.compile("\\[\\[([^\\]]+)]]");
 
   /**
-   * Portable path and display segments of a wiki-link inner (first {@code |} separates target from
-   * display).
+   * Portable path and display segments of a wiki-link inner (first unescaped {@code |} separates
+   * target from display).
    */
   public record WikiInnerSplit(
       PortablePath portablePath,
       String displayText,
+      String decodedTarget,
       String rawInner,
       String rawTarget,
       String rawDisplay,
       boolean hasDisplaySeparator) {
 
     String rewriteTarget(UnaryOperator<String> targetTransform) {
-      String trimmedTarget = rawTarget.trim();
+      String trimmedTarget = decodedTarget().trim();
       String transformedTarget = targetTransform.apply(trimmedTarget);
       if (transformedTarget.equals(trimmedTarget)) {
         return rawInner;
       }
-      return hasDisplaySeparator ? transformedTarget + "|" + rawDisplay : transformedTarget;
+      String authoredTarget = escape(transformedTarget);
+      return hasDisplaySeparator ? authoredTarget + "|" + rawDisplay : authoredTarget;
     }
 
     String rewriteTargetKeepingVisible(UnaryOperator<String> targetTransform) {
-      String trimmedTarget = rawTarget.trim();
+      String trimmedTarget = decodedTarget().trim();
       String transformedTarget = targetTransform.apply(trimmedTarget);
       if (transformedTarget.equals(trimmedTarget)) {
         return rawInner;
       }
       String visibleText =
-          hasDisplaySeparator && !rawDisplay.trim().isEmpty() ? rawDisplay : trimmedTarget;
-      return transformedTarget + "|" + visibleText;
+          hasDisplaySeparator && !rawDisplay.trim().isEmpty() ? rawDisplay : escape(trimmedTarget);
+      return escape(transformedTarget) + "|" + visibleText;
     }
 
     String rewriteNoteTitle(String newNoteTitle, boolean keepVisibleText) {
-      String trimmedTarget = rawTarget.trim();
+      String trimmedTarget = decodedTarget().trim();
       String transformedTarget = PortablePath.replaceNoteTitle(trimmedTarget, newNoteTitle.trim());
       if (transformedTarget.equals(trimmedTarget)) {
         return rawInner;
       }
       if (hasDisplaySeparator && !rawDisplay.trim().isEmpty()) {
-        return transformedTarget + "|" + rawDisplay;
+        return escape(transformedTarget) + "|" + rawDisplay;
       }
-      return keepVisibleText ? transformedTarget + "|" + trimmedTarget : transformedTarget;
+      return keepVisibleText
+          ? escape(transformedTarget) + "|" + escape(trimmedTarget)
+          : escape(transformedTarget);
     }
   }
 
   private WikiLinkMarkdown() {}
 
   /**
-   * Splits wiki link inner text on the first {@code |}. Empty right-hand side is treated as no pipe
-   * (display equals target).
+   * Decodes wiki escapes once and splits on the first unescaped {@code |}. Empty right-hand side is
+   * treated as no pipe (display equals target).
    */
   public static WikiInnerSplit splitInner(String rawBetweenBrackets) {
     if (rawBetweenBrackets == null || rawBetweenBrackets.isEmpty()) {
-      return new WikiInnerSplit(PortablePath.parse(""), "", rawBetweenBrackets, "", "", false);
+      return new WikiInnerSplit(PortablePath.parse(""), "", "", rawBetweenBrackets, "", "", false);
     }
-    int i = rawBetweenBrackets.indexOf('|');
-    if (i == -1) {
+    StringBuilder target = new StringBuilder();
+    StringBuilder display = new StringBuilder();
+    StringBuilder current = target;
+    int separator = -1;
+    for (int i = 0; i < rawBetweenBrackets.length(); i++) {
+      char c = rawBetweenBrackets.charAt(i);
+      if (c == '\\' && i + 1 < rawBetweenBrackets.length()) {
+        char next = rawBetweenBrackets.charAt(i + 1);
+        if (next == '\\' || next == '|') {
+          current.append(next);
+          i++;
+          continue;
+        }
+      }
+      if (c == '|' && separator == -1) {
+        separator = i;
+        current = display;
+      } else {
+        current.append(c);
+      }
+    }
+    if (separator == -1) {
+      String decodedTarget = target.toString();
       return new WikiInnerSplit(
-          PortablePath.parse(rawBetweenBrackets),
-          rawBetweenBrackets,
+          PortablePath.parse(decodedTarget),
+          decodedTarget,
+          decodedTarget,
           rawBetweenBrackets,
           rawBetweenBrackets,
           "",
           false);
     }
-    String target = rawBetweenBrackets.substring(0, i);
-    String display = rawBetweenBrackets.substring(i + 1);
-    if (display.trim().isEmpty()) {
+    String decodedTarget = target.toString();
+    String decodedDisplay = display.toString();
+    String rawTarget = rawBetweenBrackets.substring(0, separator);
+    String rawDisplay = rawBetweenBrackets.substring(separator + 1);
+    if (decodedDisplay.trim().isEmpty()) {
       return new WikiInnerSplit(
-          PortablePath.parse(target), target, rawBetweenBrackets, target, display, true);
+          PortablePath.parse(decodedTarget),
+          decodedTarget,
+          decodedTarget,
+          rawBetweenBrackets,
+          rawTarget,
+          rawDisplay,
+          true);
     }
     return new WikiInnerSplit(
-        PortablePath.parse(target), display, rawBetweenBrackets, target, display, true);
+        PortablePath.parse(decodedTarget),
+        decodedDisplay,
+        decodedTarget,
+        rawBetweenBrackets,
+        rawTarget,
+        rawDisplay,
+        true);
+  }
+
+  static String escape(String decoded) {
+    return decoded.replace("\\", "\\\\").replace("|", "\\|");
   }
 
   /**
@@ -123,11 +167,10 @@ public final class WikiLinkMarkdown {
   static String authoredTokenDedupeKey(String token) {
     WikiInnerSplit split = splitInner(token);
     PortablePath portablePath = split.portablePath();
-    if (!portablePath.hasPropertySuffix()) {
-      return FrontmatterAliases.normalizedLookupKey(token);
-    }
     String folded =
-        portablePath.mapQualifiedNotePortion(FrontmatterAliases::normalizedLookupKey).format();
+        portablePath.hasPropertySuffix()
+            ? portablePath.mapQualifiedNotePortion(FrontmatterAliases::normalizedLookupKey).format()
+            : FrontmatterAliases.normalizedLookupKey(portablePath.format());
     if (split.displayText().equals(portablePath.format())) {
       return folded;
     }

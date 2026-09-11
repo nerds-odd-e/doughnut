@@ -80,9 +80,14 @@ rewrites on the old delimiter rule. Estimate: 4–5 minutes, medium confidence.
 
 ### 2. Read escaped wiki references consistently
 Type: Behavior
-Status: planned
+Status: done
 Proof: `WikiLinkMarkdownTest` and mounted Markdown rendering examples distinguish
 decoded destination and label; backend/frontend suites pass.
+
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed with
+2,392 tests, and `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed with
+1,881 tests after the post-change refactor. The backend and frontend scan the
+token once, and Markdown lexing protects escapes with a collision-free marker.
 
 Behavior: Given authored escaped wiki text in a body or recognized YAML value,
 reading it preserves the intended target and visible label. Use `[[A|B\|C]]`

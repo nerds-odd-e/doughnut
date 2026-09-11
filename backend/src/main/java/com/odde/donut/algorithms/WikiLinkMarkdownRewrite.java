@@ -101,7 +101,7 @@ public final class WikiLinkMarkdownRewrite {
   private static String qualifyUnqualifiedWikiInner(
       String storedLinkInner, String sourceNotebookName) {
     WikiLinkMarkdown.WikiInnerSplit token = WikiLinkMarkdown.splitInner(storedLinkInner);
-    String authoredToken = token.rawTarget().trim();
+    String authoredToken = token.decodedTarget().trim();
     if (authoredToken.isEmpty() || PortablePath.isQualifiedToken(authoredToken)) {
       return storedLinkInner;
     }

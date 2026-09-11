@@ -39,4 +39,14 @@ describe("authoredLinkMarkup", () => {
       display: "label",
     })
   })
+
+  it.each([
+    ["A|B", "A", "B"],
+    ["A|B\\|C|D", "A", "B|C|D"],
+    ["A\\|B\\|C", "A|B|C", "A|B|C"],
+    ["A\\\\|B", "A\\", "B"],
+    ["A\\x|B\\x", "A\\x", "B\\x"],
+  ])("splitWikiLinkInner decodes %s once", (authored, target, display) => {
+    expect(splitWikiLinkInner(authored)).toEqual({ target, display })
+  })
 })

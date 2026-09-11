@@ -6,7 +6,11 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class AuthoredNoteReferencesTest {
 
@@ -65,6 +69,24 @@ class AuthoredNoteReferencesTest {
     String content = Frontmatter.empty().set("example of", "[[" + title + "]]").fenced("");
 
     assertThat(wikiAuthoredLinks(content), equalTo(List.of(title)));
+  }
+
+  static Stream<Arguments> equivalentQuotedYamlWikiLinks() {
+    return Stream.of(
+        Arguments.of("reference: '[[A\\|B|C\\|D]]'"),
+        Arguments.of("reference: \"[[A\\\\|B|C\\\\|D]]\""));
+  }
+
+  @ParameterizedTest
+  @MethodSource("equivalentQuotedYamlWikiLinks")
+  void inOccurrenceOrder_parsesWikiEscapesAfterYamlDecoding(String yaml) {
+    String content = Frontmatter.parse(yaml).fenced("");
+    AuthoredNoteReference.WikiPortablePathTarget reference =
+        (AuthoredNoteReference.WikiPortablePathTarget)
+            AuthoredNoteReferences.inOccurrenceOrder(content, ORIGIN).getFirst();
+
+    assertThat(reference.portablePath().format(), equalTo("A|B"));
+    assertThat(reference.displayText(), equalTo("C|D"));
   }
 
   @Test

@@ -97,4 +97,19 @@ Body`
     )
     expect(live.exists()).toBe(true)
   })
+
+  it.each([
+    `---\ntopic: '[[A\\|B|C\\|D]]'\n---\n\nBody`,
+    `---\ntopic: "[[A\\\\|B|C\\\\|D]]"\n---\n\nBody`,
+  ])("renders equivalent quoted YAML wiki escapes", async (markdown) => {
+    const wrapper = await h.mountEditor(markdown, {
+      lastSavedMarkdown: markdown,
+      wikiLinks: [wikiLinkFromAuthoredToken("A\\|B|C\\|D", 42)],
+    })
+
+    const live = wrapper.get(
+      '[data-testid="rich-note-property-row-value-input"] a.donut-wiki-link'
+    )
+    expect(live.text()).toContain("C|D")
+  })
 })

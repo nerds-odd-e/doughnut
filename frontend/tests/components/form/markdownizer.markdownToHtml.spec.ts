@@ -52,6 +52,10 @@ describe("markdownizer markdownToHtml", () => {
       expect(toHtml(markdown)).toBe(expected)
     })
 
+    it("preserves authored private-use text while protecting wiki escapes from Markdown", () => {
+      expect(toHtml("\uE000 [[A\\|B]]")).toBe("<p>\uE000 [[A\\|B]]</p>")
+    })
+
     describe("list rendering as Quill editor format", () => {
       it("renders bullet list", () => {
         const ol = toHtmlElement("* item1\n* item2\n").querySelector("ol")

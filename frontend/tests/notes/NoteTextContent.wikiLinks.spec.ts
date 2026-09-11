@@ -63,6 +63,36 @@ describe("NoteTextContent wiki link display", () => {
     expect(live.getAttribute("data-portable-path")).toBe("Target Title")
   })
 
+  it("renders escaped pipes in a resolved label", async () => {
+    const targetNote = makeMe.aNote.title("A").please()
+    wrapper = mountNoteTextContent(
+      makeMe.aNote.content("Go [[A|B\\|C]].").please(),
+      {
+        readonly: true,
+        wikiLinks: [wikiLinkFromAuthoredToken("A|B\\|C", targetNote.id!)],
+      }
+    )
+    await flushPromises()
+
+    const live = wrapper.get(".ql-editor a.donut-wiki-link")
+    expect(live.text()).toContain("B|C")
+  })
+
+  it("renders an escaped-pipe target as unresolved instead of linking its prefix", async () => {
+    wrapper = mountNoteTextContent(
+      makeMe.aNote.content("Go [[A\\|B]].").please(),
+      {
+        readonly: true,
+        wikiLinks: [wikiLinkFromAuthoredToken("A", 42)],
+      }
+    )
+    await flushPromises()
+
+    const dead = wrapper.get(".ql-editor a.dead-wiki-link")
+    expect(dead.text()).toContain("A|B")
+    expect(dead.attributes("data-portable-path")).toBe("A|B")
+  })
+
   it("keeps file-looking Markdown URLs as ordinary anchors through render and serialize", async () => {
     wrapper = mountNoteTextContent(
       makeMe.aNote.content("See [Target](/folder/Target.md).").please(),

@@ -1,16 +1,31 @@
 import type { WikiLink } from "@generated/donut-backend-api"
 
-/** Splits inner wiki text on the first `|`; empty right-hand side is treated as no pipe. */
+/** Decodes wiki escapes once and splits on the first unescaped `|`. */
 export function splitWikiLinkInner(rawBetweenBrackets: string): {
   target: string
   display: string
 } {
-  const i = rawBetweenBrackets.indexOf("|")
-  if (i === -1) {
-    return { target: rawBetweenBrackets, display: rawBetweenBrackets }
+  let target = ""
+  let display = ""
+  let hasSeparator = false
+  for (let i = 0; i < rawBetweenBrackets.length; i++) {
+    const char = rawBetweenBrackets[i]!
+    const next = rawBetweenBrackets[i + 1]
+    if (char === "\\" && (next === "\\" || next === "|")) {
+      if (hasSeparator) display += next
+      else target += next
+      i++
+      continue
+    }
+    if (char === "|" && !hasSeparator) {
+      hasSeparator = true
+    } else if (hasSeparator) {
+      display += char
+    } else {
+      target += char
+    }
   }
-  const target = rawBetweenBrackets.slice(0, i)
-  const display = rawBetweenBrackets.slice(i + 1)
+  if (!hasSeparator) return { target, display: target }
   if (display.trim().length === 0) {
     return { target, display: target }
   }

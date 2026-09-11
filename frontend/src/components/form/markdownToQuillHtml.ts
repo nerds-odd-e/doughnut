@@ -8,6 +8,25 @@ export interface MarkdownToHtmlOptions {
   preserve_pre?: boolean
 }
 
+function markdownLexerWikiEscapeProtection(markdown: string): {
+  protectedMarkdown: string
+  restore: (html: string) => string
+} {
+  let marker = "\uE000"
+  while (markdown.includes(marker)) marker += "\uE000"
+  const escapedPipe = `${marker}pipe`
+  const escapedBackslash = `${marker}backslash`
+  return {
+    protectedMarkdown: markdown.replace(
+      /\[\[([^\]]+)]]/g,
+      (_token, inner: string) =>
+        `[[${inner.replace(/\\\\/g, escapedBackslash).replace(/\\\|/g, escapedPipe)}]]`
+    ),
+    restore: (html) =>
+      html.replaceAll(escapedPipe, "\\|").replaceAll(escapedBackslash, "\\\\"),
+  }
+}
+
 export default function markdownToQuillHtml(
   markdown: string | undefined,
   options?: MarkdownToHtmlOptions
@@ -224,8 +243,10 @@ export default function markdownToQuillHtml(
   const parser = new marked.Parser({ renderer })
   renderer.parser = parser
 
+  const wikiEscapes = markdownLexerWikiEscapeProtection(markdown || "")
+
   // Tokenize the markdown input
-  const tokens = marked.lexer(markdown || "")
+  const tokens = marked.lexer(wikiEscapes.protectedMarkdown)
 
   // Parse the tokens into HTML
   const result = parser.parse(tokens)
@@ -238,9 +259,11 @@ export default function markdownToQuillHtml(
 
   // Modify the final return to handle any remaining HTML list conversions
   // and wrap standalone <br> tags in paragraphs (only those between paragraphs)
-  return apply(result, [
-    removeWhitespaceBetweenTags,
-    convertHtmlList,
-    wrapStandaloneBrInParagraph,
-  ])
+  return wikiEscapes.restore(
+    apply(result, [
+      removeWhitespaceBetweenTags,
+      convertHtmlList,
+      wrapStandaloneBrInParagraph,
+    ])
+  )
 }

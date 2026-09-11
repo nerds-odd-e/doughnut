@@ -45,6 +45,24 @@ class WikiLinkMarkdownTest {
     assertThat(s.displayText(), equalTo("friendly label"));
   }
 
+  static Stream<Arguments> escapedWikiInnerExamples() {
+    return Stream.of(
+        Arguments.of("A|B", "A", "B"),
+        Arguments.of("A|B\\|C|D", "A", "B|C|D"),
+        Arguments.of("A\\|B\\|C", "A|B|C", "A|B|C"),
+        Arguments.of("A\\\\|B", "A\\", "B"),
+        Arguments.of("A\\x|B\\x", "A\\x", "B\\x"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("escapedWikiInnerExamples")
+  void splitInner_decodesOnceAndUsesFirstUnescapedPipe(
+      String authored, String target, String display) {
+    WikiLinkMarkdown.WikiInnerSplit split = WikiLinkMarkdown.splitInner(authored);
+    assertThat(split.portablePath().format(), equalTo(target));
+    assertThat(split.displayText(), equalTo(display));
+  }
+
   @Test
   void splitInner_emptyRightSideActsAsNoPipe() {
     WikiLinkMarkdown.WikiInnerSplit s = WikiLinkMarkdown.splitInner("Alpha|");
