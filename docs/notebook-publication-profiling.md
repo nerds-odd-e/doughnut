@@ -266,3 +266,122 @@ Cypress task allowance explicitly (this example allows four hours plus one minut
 ```bash
 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=14400000 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=14460000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
 ```
+
+## First large valid capture
+
+Source revision `b650a294f644dcdb24a622c3d801621fc881aaee`; 1,000 existing
+concepts, 10,000 additions and 20 folders. Run command:
+
+```bash
+PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=10000 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=43200000 CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=43260000,defaultCommandTimeout=600000 --expose tags=@publicationProfileHttp
+```
+
+Evidence directory:
+`/Users/terryyin/Library/Application Support/Donut/publication-profiles/2026-09-11T10-50-26.810Z/`.
+The adjacent `large-valid-1-driver.log` retains driver output. `capture.json`
+contains environment, fixture and initial persisted state; `timing.json` retains
+the complete HTTP response. Both logical fingerprints must match a comparison run:
+
+- Baseline: `30f8c2a12e2214f1a9b7f34e4c79d09d8473279899e3138b9ca0a029a0afa8f9`.
+- Proposal: `dbea65fb646eb7660faf6a509cee84f1b7adda9204e2aaa4fae137edb90da65d`.
+
+HTTP 200 returned accepted head `766dbfdbc7a32df0db60069a5e12c11d8f651538`
+from baseline `b7105dbdfcc2a4848f8380f2fd3b6d0ea435afaf`. The 1,437,474-byte
+bundle request ran from 10:50:28.471 to 12:13:35.494 UTC on 2026-09-11:
+**4,987,017.426 ms (83 minutes 7.017 seconds), including host suspension**.
+The host slept with its lid closed at 11:12:05 UTC and fully woke at 11:37:27,
+with intervening DarkWakes (`host-sleep.log`). This is not an uninterrupted
+wall-time baseline. Do not subtract sleep to invent a measured server duration.
+An awake repeat is necessary for a comparable latency measurement.
+
+The JVM was the same owned PID 2406, JDK 25.0.3, MySQL 8.4.11, ordinary E2E
+logging, no explicit warm-up after preceding smoke runs and fixture setup.
+`-XX:TieredStopAtLevel=1` and maximum heap 12 GiB are material local limits;
+these measurements cannot establish optimized-production JVM performance.
+
+### Runner failure and independent acceptance proof
+
+Cypress did not pass this scenario. Its browser exposed a failed runnable at
+`publishNotebookPublicationHttp` and an automatic screenshot timeout of 30 seconds.
+The initiating runner failure remains unresolved. HTTP completion was recorded
+independently by the Node task; JFR-stop and receiver checks had not run.
+
+After matching PID 2406's recorded start identity, recovery retained a safety
+JFR dump and then stopped recording. `completed-request-recovery.jfr` is 71.7 MB;
+`publication.jfr` is 72.9 MB. Exact commands:
+
+```bash
+CURSOR_DEV=true nix develop -c jcmd 2406 JFR.dump name=publication 'filename="/Users/terryyin/Library/Application Support/Donut/publication-profiles/2026-09-11T10-50-26.810Z/completed-request-recovery.jfr"'
+CURSOR_DEV=true nix develop -c jcmd 2406 JFR.stop name=publication 'filename="/Users/terryyin/Library/Application Support/Donut/publication-profiles/2026-09-11T10-50-26.810Z/publication.jfr"'
+DONUT_API_BASE_URL=http://127.0.0.1:50811 DONUT_CONFIG_DIR=/tmp/nix-shell.5yXTZv/cypress-cli-config-wWswMy CURSOR_DEV=true nix develop -c node /tmp/nix-shell.5yXTZv/cypress-donut-cli-HsX0kJ/bin/donut notebook pull /tmp/nix-shell.5yXTZv/cypress-cli-clone-Ez1Ri6/checkout
+```
+
+The existing installed CLI's public download succeeded. Independent assertions
+verified the receiver's clean accepted HEAD, tree
+`22a5eeb3dd6dc92e2778929a6392eecb9d5c85fc`, exactly 10,000 added paths, and
+all 10,000 authored documents byte-for-byte against the proposal checkout.
+`recovery-result.json` and `recovery-pull.log` preserve that proof. Temporary CLI
+paths above identify the executed recovery, not durable prerequisites for reruns.
+Only the failed runner's verified descendant processes were terminated afterward;
+`runner-recovery.json` retains their identities. No backend reset occurred.
+
+One authorized progress observation during the request read uncached note
+AUTO_INCREMENT: 8,144 allocated identities at 11:54:56.389 UTC relative to the
+initial counter, taking 33.95 ms. `progress-observation.json` retains this minor
+measurement intervention; it proves progress, not database execution time.
+
+### Captured execution and clock limitations
+
+The recording has seven chunks and retains its original start; observed
+`jdk.ActiveRecording` changes from zero to the effective 250 MB default limit.
+Its size is below that limit, with no evidence of retention truncation.
+However, JFR event timestamps and the HTTP wall clock diverge across host sleep.
+The summary reports 5,410 seconds, while event timestamps span
+10:50:27.386708458–11:56:22.094389541 UTC. Do not directly filter this capture
+by HTTP wall-clock end or treat those durations as interchangeable.
+
+Publication thread `http-nio-50809-exec-9` has 165,525 execution samples from
+10:50:28.474060166 through 11:49:19.938190583 in JFR's event time.
+The penultimate sample includes transaction `processCommit` and
+`doCleanupAfterCompletion` beneath `NotebookGitProposalPublisher.publish` and
+`NotebookController.publishNotebookGitProposal`; the final sample includes MVC
+return-value handling. Other threads continue afterward. This establishes
+captured progression through request completion despite the timestamp mismatch.
+The final event-time boundary differs from HTTP completion by about 24 minutes
+15 seconds, consistent with the documented suspension; exact clock conversion
+is not established.
+
+The following analysis uses the **observed publication-thread sample span**.
+It is a sampled span, not an exact independently instrumented request boundary.
+Early/late halves below refer only to JFR event time within that span. The versioned
+`scripts/profiling/AnalyzePublication.java` reads the recording directly without
+a large JSON export (a capture-local copy preserves the original analysis):
+
+```bash
+CURSOR_DEV=true nix develop -c java scripts/profiling/AnalyzePublication.java '/Users/terryyin/Library/Application Support/Donut/publication-profiles/2026-09-11T10-50-26.810Z/publication.jfr' 2026-09-11T10:50:28.474060166Z 2026-09-11T11:49:19.938190583Z http-nio-50809-exec-9
+```
+
+Output is retained as `observed-request-span-analysis.txt`, including final
+stacks, per-event last timestamps and active recording/settings evidence.
+The earlier `request-analysis.txt` intentionally retains the naive wall-window
+analysis that exposed the mismatch; use the observed-span output for figures.
+
+| Evidence | Observed result | Interpretation |
+| --- | --- | --- |
+| CPU stack samples | Hibernate in 164,607/165,525; `AbstractFlushingEventListener` in 162,631 (98.25%) | Repeated ORM flush traversal dominates sampled execution on this JVM. Stack categories overlap; these are not elapsed-time percentages. |
+| Flush across event-time halves | Early 82,672/84,589 (97.73%); late 79,959/80,936 (98.79%) | Dominance persists across the captured span; this alone does not prove a complexity exponent. |
+| Index-refresh callers | Property index in 54,321 samples; alias index in 54,728 | Supports investigating flush ownership at these call paths; caller counts can overlap other categories. |
+| Other candidate stacks | SnakeYAML 318; JGit 40; final projection 3; MySQL 1,075 | Much weaker sampled CPU evidence than ORM traversal, not proof these operations cost nothing. |
+| Allocation samples | 359,319 JVM-wide events; weighted estimate 575.17 GB overall, 571.36 GB on publication thread | Sample weights estimate allocation traffic, not retained heap or exact allocated-byte totals. Leading request classes include Object arrays (238.90 GB), dirty-check contexts (72.04 GB), HashMap nodes (52.23 GB), ArrayList iterators (43.79 GB). |
+| GC in observed span | 4,429 collections; summed GC event durations 63.80 s; summed pauses 7.102 s | JVM-wide durations include concurrent work and may overlap; do not add GC durations to request time. Allocation churn is substantial, but pauses do not explain the wall interval. |
+| Recorded request socket waits | 4,180 reads totaling 9.455 s; five writes totaling 0.02385 s | Thresholded recorded waits, not total database time. Socket destinations need separate attribution before calling all reads MySQL. |
+| Recorded request park/monitor waits | No ThreadPark or JavaMonitorEnter events on the selected thread | Absence above thresholds is not proof of no waiting. JVM-wide park totals include overlapping background threads and are not request latency. |
+
+Active settings: execution sampling every 10 ms; allocation sampling throttle
+300/s; SocketRead/SocketWrite threshold 1 ms and throttle 300/s; ThreadPark and
+JavaMonitorEnter threshold 10 ms. All but one publication execution stack is
+marked truncated, limiting deeper caller attribution. The captured frames still
+repeatedly identify flush traversal and index-refresh callers. Profiling,
+ordinary logging, tier-1-only JIT and host suspension constrain interpretation.
+The evidence supports prioritizing ORM flush/dirty-check/cascade and associated
+allocation work for investigation; it does not predict a quantitative speedup.

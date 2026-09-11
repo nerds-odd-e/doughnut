@@ -57,7 +57,10 @@ Use a deliberately invalid alias shape, independent of pipe-name support.
 
 ## Ordered slices
 
-Seven sequential Behavior slices, each exposing one evaluable learning outcome.
+Nine Behavior slices, each exposing one evaluable learning outcome. Slices 6
+and 7 may proceed independently: persistent-profile analysis and a disposable
+runner probe share neither files nor mutable SUT state. Slice 8 waits for both
+to be delivered; all other dependencies remain sequential.
 Target about 5 minutes active work per leaf; 5–10 minute estimates below rely on
 the existing lifecycle and publication helpers. At 10 minutes active work stop
 and finer-decompose remaining work. Long measured requests and required test
@@ -233,25 +236,99 @@ agents while that host limit remains. No observer exists (main-only CI).
 
 Large-run commands must also raise Cypress defaultCommandTimeout for baseline
 injection (ordinary default 6 seconds). Request-only timing excludes that setup.
-JDK 25 JFR.start help confirms default maxage 0 and maxsize 0, so recording
-retention is unlimited until stop. Keep the same JFR profile and JVM flags;
+JDK 25 JFR.start help lists default maxage 0 and maxsize 0, but the first large
+run reports an effective default maxsize of 250 MB. Verify full start/end coverage
+of each completed recording before accepting its profile evidence. Keep the same
+JFR profile and JVM flags;
 TieredStopAtLevel=1 is a material local-environment limitation.
 
-### 6. Establish repeated valid large-publication baseline
+### 6. Preserve and explain the first valid large-publication baseline
+Type: Behavior
+Status: done
+Run 1 started at source revision `b650a294f644dcdb24a622c3d801621fc881aaee`:
+`PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=10000 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=43200000 CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=43260000,defaultCommandTimeout=600000 --expose tags=@publicationProfileHttp`.
+Driver log: `/Users/terryyin/Library/Application Support/Donut/publication-profiles/large-valid-1-driver.log`.
+Agent `capture_small` owns exec session 23633; coordinator must not concurrently
+read its PTY. Preserve an in-flight server request and recording on interruption.
+
+Run 1 returned HTTP 200 at 12:13:35.494 UTC after 4,987,017.426 ms
+(83 minutes 7 seconds), accepted head `766dbfdbc7a32df0db60069a5e12c11d8f651538`.
+Cypress failed before JFR-stop/receiver checks; its exposed error is an automatic
+screenshot timeout, with original cause still under investigation. Do not call
+this a passing Cypress scenario. A manually preserved
+`completed-request-recovery.jfr` is readable, 71.7 MB, starts 10:50:27 UTC and
+contains request processing through transaction commit and MVC response handling
+(no 250 MB truncation). Independent public pull verified clean accepted head/tree
+and all 10,000 added document bytes (`recovery-result.json`). Manual JFR.stop saved
+`publication.jfr` (72.9 MB); the failed runner was then terminated, leaving backend
+PID 2406 running. No second large run starts until the continuation probe finishes.
+
+Material environment finding: `pmset` confirms clamshell sleep from local 19:12:05
+to full wake 19:37:27 (UTC 11:12:05–11:37:27), with intermittent dark wakes.
+`host-sleep.log` preserves only sleep/wake events. The HTTP elapsed includes sleep;
+JFR event timestamps drift about 24 minutes behind wall timestamps by request
+completion. Commit/response samples prove the request tail was retained, but
+wall-window filtering and an uninterrupted wall-time claim are invalid. Analyze
+the observed request-thread span and retain this caveat; do not subtract sleep
+as a fabricated server duration. Repeat with a scoped idle-sleep inhibitor and
+record whether any further host sleep occurs; lid closure can still suspend it.
+Proof: The completed 10,000-addition HTTP response, public receiver head/content
+verification, and full request-window JFR evidence establish one inspectable valid
+baseline, honestly retaining the original runner failure and recovery commands.
+
+Preserve recordings and exact revision/fingerprint; summarize request-window CPU,
+allocation/GC and wait evidence and distinguish the longer recording interval.
+The first run is already verified at the public boundary. Complete the bounded
+analysis/documentation, without rerunning valid proof or changing product code.
+Estimate: 5 minutes active analysis/documentation, profile processing runtime exempt.
+Safe stop: one complete valid baseline and reproducible recovery evidence exist.
+
+Delivered analysis and reusable `scripts/profiling/AnalyzePublication.java`:
+165,525 observed publication-thread samples, 162,631 (98.25%) containing Hibernate
+flush traversal; allocation/GC/wait evidence and sampling limits documented.
+The first latency includes confirmed host suspension; no uninterrupted latency
+claim. Approximately 9 minutes active analysis plus processing runtime.
+Independent refactor made the script readable, reran the documented analysis
+against the same recording, and verified identical output and whitespace.
+`REFACTOR COMPLETE`; no product tests/API generation triggered. Coordinator
+selective format passed with no fixes. Raw profiles and analysis outputs remain
+in the persistent capture directory; permanent findings link their exact commands.
+
+### 7. Establish reliable continuation for long measurement
 Type: Behavior
 Status: planned
-Proof: Approximately 10,000 additions publish successfully twice from the same
-reset logical baseline, with accepted head/content proof and comparable profiles.
+Proof: A controlled short delayed task through the same nested Cypress/Cucumber
+boundary identifies or rules out the timeout hypothesis, preserves the original
+failure before screenshot handling, and demonstrates the chosen repeat command's
+completion/failure observation. Do not claim an unobserved root cause or fix.
 
-Use the proven workflow, preserve recordings and exact revision/fingerprint,
-record warm-up and variation, and summarize CPU/allocation/GC and wait evidence.
-Distinguish client timeout from completed server request. An interrupted request
-is incomplete evidence. Later code changes require a fresh matching baseline.
-Estimate: 5 minutes active orchestration/analysis plus potentially long requests
-(prior observation about 807 seconds request CPU), an explicit runtime exception.
-Safe stop: reproducible success baseline without optimization claims.
+The first request completed but its browser driver failed before recording stop
+and public receiver assertions. An automatic screenshot timeout masked the original
+error. Ordinary task timeout was already 12 hours; source inspection alone does
+not prove nested then callbacks retained the 10-minute default timeout. Use a
+disposable short probe without resetting the measured SUT. If necessary, apply
+only the smallest supported benchmark continuation correction and prove both
+accepted/rejected small outcomes; preserve the same HTTP and acceptance boundary.
+No parallel acceptance implementation or production timeout change. Expose original
+runner errors and document recovery when completion has already occurred.
+Estimate: 5–10 minutes active, required probe runtime exempt. Safe stop: the
+repeat's observation path is evidenced before another expensive request.
 
-### 7. Establish large rejection baseline and improvement-area handoff
+### 8. Repeat the valid large-publication baseline
+Type: Behavior
+Status: planned
+Proof: A second successful 10,000-addition publication from a reset logical
+baseline has identical fingerprints, public accepted head/content proof, and a
+complete comparable profile with recorded timing variation.
+
+Use the evidenced continuation path after slices 6 and 7 are delivered. Keep the
+same product revision and fixture/JVM/profile settings; documentation or benchmark
+observation changes must be recorded precisely. Analyze the second complete
+request against the first. Product code changes require fresh matching baselines.
+Estimate: 5 minutes active orchestration/analysis; long request runtime explicitly
+exempt. Safe stop: repeatable valid baseline without optimization claims.
+
+### 9. Establish large rejection baseline and improvement-area handoff
 Type: Behavior
 Status: planned
 Proof: The approximately 10,000-addition invalid variant completes rejection with
@@ -269,6 +346,21 @@ Estimate: 5–10 minutes active analysis/documentation plus measured runtime exc
 Safe stop: selected story's reproducible evidence and handoff complete.
 
 ## Execution learning and refinement
+
+Second refinement: large-run orchestration and recovery reached approximately
+10 minutes active work, separately from the completed 83-minute request. The
+assumption that a small passing Cypress task would retain reliable browser
+continuation for the full large request was not established. No attempt-owned
+repository edits exist; completed artifacts are safely persistent, the recording
+is stopped, and the failed runner is terminated without touching the backend.
+Story boundary reassessed: the delivered public-boundary measurement is useful;
+remaining scope is still the same repeatable valid/rejected profiling outcome.
+No new product behavior, architecture, or sibling ordering is needed. Separate
+bounded profile analysis, a cheap continuation probe, the repeat, and rejection
+because those have independently evaluable proof and different runtime risks.
+The common model remains the existing public HTTP operation and receiver checks.
+Result: 9 slices, no resplit recommendation; execution can resume.
+
 
 Original slice 2 reached its 10-minute active-work hard limit. Its single-slice
 assumption incorrectly combined capture lifecycle, representative fixture,
