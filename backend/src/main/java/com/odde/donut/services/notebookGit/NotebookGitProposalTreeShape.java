@@ -21,12 +21,11 @@ import org.springframework.web.server.ResponseStatusException;
  * Changed documents are classified once by operation and container/concept role; unchanged accepted
  * files remain context. Ordinary-note admission permits added and/or modified ordinary Markdown
  * notes at regular file modes, any number of ordinary-note deletions alone or with same-path edits,
- * or exactly one isolated equal-content rename (one removed and one added note sharing a blob).
- * Rename correspondence is resolved across the complete candidate set before that admission rule is
- * applied. Mixing removals with additions is refused when identity correspondence is uncertain.
- * Unsafe paths, non-regular modes, or a changed folder-reserved {@code README.md} are refused.
- * Callers only invoke this once proposal ancestry is confirmed to be a direct single-parent child
- * of the accepted commit.
+ * and unambiguous equal-content moves with compatible companions. Move correspondence is resolved
+ * across the complete candidate set. Mixing unmatched removals with additions is refused when
+ * identity correspondence is uncertain. Unsafe paths, non-regular modes, or a changed
+ * folder-reserved {@code README.md} are refused. Callers only invoke this once proposal ancestry is
+ * confirmed to be a direct single-parent child of the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -129,24 +128,15 @@ public final class NotebookGitProposalTreeShape {
 
   /**
    * Accepts added and/or modified ordinary-note changes, any number of deletions alone or with
-   * same-path edits, or one isolated equal-content rename. Refuses mixing removals with additions
-   * when identity is uncertain (unequal blobs, equal-blob pairs with companion edits, or ambiguous
-   * multiple equal-blob candidates).
+   * same-path edits, and unambiguous equal-content moves with compatible companions. Refuses
+   * unmatched removal/addition mixtures and ambiguous equal-blob correspondence.
    */
   private static List<NoteChange> admitOrdinaryNoteChanges(List<NoteChange> changes) {
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
     List<NoteChange> resolvedChanges = resolveMoveCorrespondence(changes);
-    boolean hasRename =
-        resolvedChanges.stream().anyMatch(change -> change.kind() == ChangeKind.RENAMED);
-    if (hasRename) {
-      if (resolvedChanges.size() == 1) {
-        return resolvedChanges;
-      }
-      refuseUncertainRemovalAndAdditionMixture();
-    }
-    refuseUncertainRemovalAndAdditionMixtures(resolvedChanges);
+    refuseResidualRemovalAndAdditionMixture(resolvedChanges);
     return resolvedChanges;
   }
 
@@ -166,7 +156,7 @@ public final class NotebookGitProposalTreeShape {
         continue;
       }
       if (removalGroup.getValue().size() != 1 || additionGroup.size() != 1) {
-        refuseUncertainRemovalAndAdditionMixture();
+        refuseUncertainIdentityCorrespondence();
       }
       NoteChange source = removalGroup.getValue().getFirst();
       NoteChange destination = additionGroup.getFirst();
@@ -200,19 +190,20 @@ public final class NotebookGitProposalTreeShape {
     return changesByBlob;
   }
 
-  private static void refuseUncertainRemovalAndAdditionMixtures(List<NoteChange> changes) {
+  private static void refuseResidualRemovalAndAdditionMixture(List<NoteChange> changes) {
     boolean hasDeleted = changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED);
     boolean hasAdded = changes.stream().anyMatch(change -> change.kind() == ChangeKind.ADDED);
     if (!hasDeleted || !hasAdded) {
       return;
     }
-    refuseUncertainRemovalAndAdditionMixture();
+    refuseUncertainIdentityCorrespondence();
   }
 
-  private static void refuseUncertainRemovalAndAdditionMixture() {
+  private static void refuseUncertainIdentityCorrespondence() {
     throw unsupportedTreeShape(
-        "separate identity-changing work: publish an equal-content rename alone, or delete and"
-            + " create notes in separate commits rather than mixing removals with additions");
+        "identity correspondence is uncertain: unchanged-content moves may have compatible"
+            + " companions, but changed-content moves and unmatched removals mixed with additions"
+            + " are not supported");
   }
 
   private static ChangeKind changeKind(InspectedRegularFile file) {

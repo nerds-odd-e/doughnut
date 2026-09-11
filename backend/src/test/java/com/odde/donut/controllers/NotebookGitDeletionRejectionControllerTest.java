@@ -26,6 +26,7 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
   private static final String ORIGINAL = "---\ntype: Note\n---\noriginal content";
   private static final String OTHER = "---\ntype: Note\n---\nother content";
   private static final String EDITED = "---\ntype: Note\n---\nedited content";
+  private static final String NEW = "---\ntype: Note\n---\nnew";
   private static final String INVALID_EDIT = "---\ncustom: value\n---\nChanged body.\n";
 
   @ParameterizedTest
@@ -68,7 +69,7 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
             proposalBundleBytes(binding, proposedFiles),
             HttpStatus.BAD_REQUEST);
 
-    assertThat(exception.getReason(), containsString("separate identity-changing work"));
+    assertThat(exception.getReason(), containsString("identity correspondence is uncertain"));
     inCommittedTransaction(
         transactionManager,
         () -> {
@@ -86,28 +87,38 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
     NotebookGitProposalFile third = new NotebookGitProposalFile("Third.md", OTHER);
     return Stream.of(
         // unequal-blob removal + addition
+        Arguments.of(List.of(second, third, new NotebookGitProposalFile("Added.md", NEW))),
+        // one source and two equal-blob destinations
         Arguments.of(
             List.of(
                 second,
                 third,
-                new NotebookGitProposalFile("Added.md", "---\ntype: Note\n---\nnew"))),
-        // equal-blob removal + addition with companion same-path edit
-        Arguments.of(
-            List.of(
-                second,
-                new NotebookGitProposalFile("Third.md", EDITED),
-                new NotebookGitProposalFile("Renamed.md", ORIGINAL))),
-        // ambiguous multiple equal-blob remove/add candidates
+                new NotebookGitProposalFile("MovedA.md", ORIGINAL),
+                new NotebookGitProposalFile("MovedB.md", ORIGINAL))),
+        // two sources and one equal-blob destination
+        Arguments.of(List.of(third, new NotebookGitProposalFile("Moved.md", ORIGINAL))),
+        // two sources and two equal-blob destinations
         Arguments.of(
             List.of(
                 third,
                 new NotebookGitProposalFile("MovedA.md", ORIGINAL),
-                new NotebookGitProposalFile("MovedB.md", ORIGINAL))));
+                new NotebookGitProposalFile("MovedB.md", ORIGINAL))),
+        // an ambiguity alongside a separate unique pair
+        Arguments.of(
+            List.of(
+                new NotebookGitProposalFile("MovedA.md", ORIGINAL),
+                new NotebookGitProposalFile("MovedB.md", ORIGINAL),
+                new NotebookGitProposalFile("Unique.md", OTHER))),
+        // a unique pair plus residual unequal removal and addition
+        Arguments.of(
+            List.of(
+                second,
+                new NotebookGitProposalFile("Unique.md", OTHER),
+                new NotebookGitProposalFile("Added.md", NEW))));
   }
 
   @Test
-  void refusesADeletionBatchWhenACompanionEditIsInvalidWithoutChangingAcceptedNotes()
-      throws Exception {
+  void refusesAMoveWhenACompanionEditIsInvalidWithoutChangingAcceptedNotes() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     List<Integer> originalIds =
         inCommittedTransaction(
@@ -134,7 +145,10 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
         notebook,
         binding.getAcceptedGitObjectId(),
         proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("Second.md", INVALID_EDIT))),
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Renamed.md", ORIGINAL),
+                new NotebookGitProposalFile("Second.md", INVALID_EDIT))),
         HttpStatus.BAD_REQUEST);
 
     inCommittedTransaction(
@@ -146,6 +160,8 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
           assertThat(
               liveNotes.stream().map(Note::getContent).toList(),
               equalTo(List.of(ORIGINAL, ORIGINAL)));
+          assertThat(
+              liveNotes.stream().map(Note::getTitle).toList(), equalTo(List.of("First", "Second")));
         });
   }
 

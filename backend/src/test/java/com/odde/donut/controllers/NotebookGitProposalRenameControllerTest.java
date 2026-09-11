@@ -30,15 +30,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Verifies {@code publishNotebookGitProposal} accepts a same-parent equal-content rename, retaining
- * the original note's identity. Cross-parent relocation is covered in {@link
- * NotebookGitProposalRelocationControllerTest}. Combined parent-and-filename pairs are covered in
- * {@link NotebookGitProposalRelocateAndRenameControllerTest}. Content-changed mixed pairs remain
- * covered as rejections in {@link NotebookGitProposalTreeShapeControllerTest}.
+ * Verifies {@code publishNotebookGitProposal} accepts identity-preserving ordinary-note moves,
+ * including compatible companion changes. Folder-subtree relocation is covered in {@link
+ * NotebookGitProposalRelocationControllerTest}. Content-changed mixed pairs remain covered as
+ * rejections in {@link NotebookGitProposalTreeShapeControllerTest}.
  */
 class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
+  private static final String OTHER_NOTE_CONTENT = "---\ntype: Note\n---\nother content";
+  private static final String EDITED_NOTE_CONTENT = "---\ntype: Note\n---\nedited content";
+  private static final String FOLDER_ANCHOR_CONTENT = "---\ntype: Note\n---\nfolder anchor";
   private static final String MATCHING_CONTENT = "---\ntype: Note\n---\nmatching learned content";
   private static final String TARGET_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String REFERRER_CONTENT =
@@ -114,6 +116,116 @@ class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControlle
     assertThat(renamed.getTitle(), equalTo("renamed"));
     assertThat(renamed.getFolder().getId(), equalTo(folder.getId()));
     assertThat(renamed.getContent(), equalTo(TYPED_NOTE_CONTENT));
+  }
+
+  @Test
+  void acceptsAUniqueMoveWithACompanionEditWhileIgnoringAnUnchangedEqualBlob() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note moved = makeMe.aNote().notebook(notebook).title("A").content(TYPED_NOTE_CONTENT).please();
+    Note edited = makeMe.aNote().notebook(notebook).title("B").content(OTHER_NOTE_CONTENT).please();
+    Note unchanged =
+        makeMe.aNote().notebook(notebook).title("Unchanged").content(TYPED_NOTE_CONTENT).please();
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(moved.getId()).orElseThrow())
+                    .removedFromTracking()
+                    .please());
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        binding.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("D.md", TYPED_NOTE_CONTENT),
+                new NotebookGitProposalFile("B.md", EDITED_NOTE_CONTENT),
+                new NotebookGitProposalFile("Unchanged.md", TYPED_NOTE_CONTENT))));
+
+    assertThat(noteRepository.findById(moved.getId()).orElseThrow().getTitle(), equalTo("D"));
+    assertThat(
+        noteRepository.findById(edited.getId()).orElseThrow().getContent(),
+        equalTo(EDITED_NOTE_CONTENT));
+    assertThat(
+        noteRepository.findById(unchanged.getId()).orElseThrow().getTitle(), equalTo("Unchanged"));
+    assertThat(
+        memoryTrackerRepository.findById(tracker.getId()).orElseThrow().getNote().getId(),
+        equalTo(moved.getId()));
+  }
+
+  @Test
+  void acceptsSeveralUniqueMovesRegardlessOfPathOrdering() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder destination = makeMe.aFolder().notebook(notebook).name("Folder").please();
+    makeMe.aNote().folder(destination).title("Anchor").content(FOLDER_ANCHOR_CONTENT).please();
+    Note first =
+        makeMe.aNote().notebook(notebook).title("ZSource").content(TYPED_NOTE_CONTENT).please();
+    Note second =
+        makeMe.aNote().notebook(notebook).title("ASource").content(OTHER_NOTE_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        binding.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("ZDestination.md", OTHER_NOTE_CONTENT),
+                new NotebookGitProposalFile("Folder/ADestination.md", TYPED_NOTE_CONTENT),
+                new NotebookGitProposalFile("Folder/Anchor.md", FOLDER_ANCHOR_CONTENT))));
+
+    Note movedFirst = noteRepository.findById(first.getId()).orElseThrow();
+    assertThat(movedFirst.getTitle(), equalTo("ADestination"));
+    assertThat(movedFirst.getFolder().getId(), equalTo(destination.getId()));
+    assertThat(
+        noteRepository.findById(second.getId()).orElseThrow().getTitle(), equalTo("ZDestination"));
+  }
+
+  @Test
+  void acceptsAUniqueMoveWithAnAdditionOnlyCompanion() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note moved = makeMe.aNote().notebook(notebook).title("A").content(TYPED_NOTE_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("Keeper").content(OTHER_NOTE_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        binding.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Moved.md", TYPED_NOTE_CONTENT),
+                new NotebookGitProposalFile("Keeper.md", OTHER_NOTE_CONTENT),
+                new NotebookGitProposalFile("Added.md", EDITED_NOTE_CONTENT))));
+
+    assertThat(noteRepository.findById(moved.getId()).orElseThrow().getTitle(), equalTo("Moved"));
+    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(3));
+  }
+
+  @Test
+  void acceptsAUniqueMoveWithADeletionOnlyCompanion() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note moved = makeMe.aNote().notebook(notebook).title("A").content(TYPED_NOTE_CONTENT).please();
+    Note deleted =
+        makeMe.aNote().notebook(notebook).title("Delete").content(OTHER_NOTE_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("Keeper").content(EDITED_NOTE_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        binding.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Moved.md", TYPED_NOTE_CONTENT),
+                new NotebookGitProposalFile("Keeper.md", EDITED_NOTE_CONTENT))));
+
+    assertThat(noteRepository.findById(moved.getId()).orElseThrow().getTitle(), equalTo("Moved"));
+    assertThat(
+        noteRepository.findById(deleted.getId()).orElseThrow().getDeletedAt(), not(equalTo(null)));
   }
 
   @Test

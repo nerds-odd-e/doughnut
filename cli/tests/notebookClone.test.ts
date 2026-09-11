@@ -83,7 +83,12 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        'overwriting an existing note, and relocating or renaming together with a content edit in the same commit, are not supported yet'
+        'one or more uniquely matched unchanged-content Markdown note moves that may change folder and/or filename together with compatible same-path edits and either additions or deletions'
+      )
+    )
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Overwriting an existing note and changed-content moves are not supported yet'
       )
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(

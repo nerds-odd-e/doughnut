@@ -85,7 +85,7 @@ the feature is explicitly unfinished and the temporary gate belongs to slice 2.
 
 ### 2. Publish the complete compatible note change set atomically
 Type: Behavior
-Status: planned
+Status: done
 Depends on: slice 1
 Sizing: approximately 5 minutes active work plus the suite wait; medium confidence.
 Use existing fixture/proof helpers; scrutinize at five minutes and refine before
@@ -260,3 +260,9 @@ warrant story resplitting.
   correspondence pass while retaining the temporary single-rename admission
   gate. `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed; the
   independent refactor review found no competing algorithm or cleanup need.
+- Slice 2 removed the temporary admission gate and proved unique move
+  composition, identity/tracker preservation, order independence, companion
+  edits/additions/deletions, ambiguity and residual-mixture refusal, and rollback
+  with an invalid companion. `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+  and `CURSOR_DEV=true nix develop -c pnpm cli:test` passed. Active implementation
+  stayed within the ten-minute hard limit; suite waits used the stated exception.
