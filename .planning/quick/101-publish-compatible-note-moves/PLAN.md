@@ -135,7 +135,7 @@ receive truthful guidance; installed-CLI receiving proof remains owned by slice 
 
 ### 3. Share checkout staging before the commit boundary
 Type: Structure
-Status: planned
+Status: done
 Depends on: slice 2
 Sizing: approximately 5 minutes active work; medium confidence. Existing
 representative Cypress verification has the test-wait exception below.
@@ -266,3 +266,7 @@ warrant story resplitting.
   with an invalid companion. `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
   and `CURSOR_DEV=true nix develop -c pnpm cli:test` passed. Active implementation
   stayed within the ten-minute hard limit; suite waits used the stated exception.
+- Slice 3 extracted private staging operations for note changes, removals and
+  renames while preserving each existing adapter's single `commitCheckout`
+  boundary. The worktree-owned SUT healthcheck and the five-scenario installed
+  CLI Cypress feature passed; the independent refactor review required no edits.

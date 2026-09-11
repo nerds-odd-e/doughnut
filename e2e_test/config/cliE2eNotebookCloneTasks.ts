@@ -63,6 +63,35 @@ function commitCheckout(checkoutDir: string, message: string): string {
   return git(checkoutDir, 'rev-parse', 'HEAD')
 }
 
+function stageNoteChanges(
+  checkoutDir: string,
+  files: { relativePath: string; content: string }[]
+): void {
+  for (const { relativePath, content } of files) {
+    const filePath = join(checkoutDir, relativePath)
+    mkdirSync(dirname(filePath), { recursive: true })
+    writeFileSync(filePath, `${content}\n`)
+  }
+  git(
+    checkoutDir,
+    'add',
+    '--',
+    ...files.map(({ relativePath }) => relativePath)
+  )
+}
+
+function stageNoteRemoval(checkoutDir: string, relativePath: string): void {
+  git(checkoutDir, 'rm', '--', relativePath)
+}
+
+function stageNoteRename(
+  checkoutDir: string,
+  fromRelativePath: string,
+  toRelativePath: string
+): void {
+  git(checkoutDir, 'mv', fromRelativePath, toRelativePath)
+}
+
 function continueRebaseNoninteractively(checkoutDir: string): void {
   const result = spawnSync(
     'git',
@@ -199,17 +228,7 @@ export function createCliE2eNotebookCloneTasks() {
       checkoutDir: string
       files: { relativePath: string; content: string }[]
     }): string {
-      for (const { relativePath, content } of files) {
-        const filePath = join(checkoutDir, relativePath)
-        mkdirSync(dirname(filePath), { recursive: true })
-        writeFileSync(filePath, `${content}\n`)
-      }
-      git(
-        checkoutDir,
-        'add',
-        '--',
-        ...files.map(({ relativePath }) => relativePath)
-      )
+      stageNoteChanges(checkoutDir, files)
       return commitCheckout(checkoutDir, 'Change cloned notebook note')
     },
     commitCliNotebookCheckoutNoteRemoval({
@@ -219,7 +238,7 @@ export function createCliE2eNotebookCloneTasks() {
       checkoutDir: string
       relativePath: string
     }): string {
-      git(checkoutDir, 'rm', '--', relativePath)
+      stageNoteRemoval(checkoutDir, relativePath)
       return commitCheckout(checkoutDir, 'Remove cloned notebook note')
     },
     commitCliNotebookCheckoutNoteRename({
@@ -231,7 +250,7 @@ export function createCliE2eNotebookCloneTasks() {
       fromRelativePath: string
       toRelativePath: string
     }): string {
-      git(checkoutDir, 'mv', fromRelativePath, toRelativePath)
+      stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
       return commitCheckout(checkoutDir, 'Rename cloned notebook note')
     },
   }
