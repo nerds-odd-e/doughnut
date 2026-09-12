@@ -90,8 +90,7 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
 - **Reusable evidence:** Follow the same [fixture and capture procedure](../../docs/notebook-publication-profiling.md#findings-and-next-experiment),
   [HTTP helper](../../e2e_test/config/notebookPublicationHttp.ts), and
   [analysis script](../../scripts/profiling/AnalyzePublication.java).
-  The [first valid profile](../../docs/notebook-publication-profiling.md#first-large-valid-capture)
-  and [awake repeat](../../docs/notebook-publication-profiling.md#awake-valid-repeat)
+  The [baseline captures](../../docs/notebook-publication-profiling.md#baseline-captures)
   link persistent raw recordings and independently verified accepted content;
   retain their runner and host-sleep qualifications. The
   [20-addition late-rejection proof](../../docs/notebook-publication-profiling.md#small-late-rejection-capture)

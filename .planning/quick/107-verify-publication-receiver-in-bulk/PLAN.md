@@ -25,7 +25,7 @@ of the already pulled receiver checked all 10,000 bytes/head/tree/clean status i
 2.5 seconds. The workaround is retained outside Git; documented advice does not
 correct the reusable runner. No product-publication regression is attributed.
 
-Evidence: `docs/notebook-publication-profiling.md#awake-valid-repeat` and persistent
+Evidence: `docs/notebook-publication-profiling.md#baseline-captures` and persistent
 `2026-09-11T12-37-08.116Z/{receiver-driver-observation.json,independent-verification.json,verify-received-checkout.py}`
 under the documented publication-profiles directory.
 
@@ -115,7 +115,7 @@ publication run.
 
 ### 2. Retire the verbose profiling record and retain the optimization baseline
 Type: Structure
-Status: planned — cleanup added at the user's request after story wrap-up.
+Status: done
 Proof: Maintainers can locate the measured first priority, compare a later change
 with the valid baseline, and run the small opt-in profiler from concise maintained
 documentation; detailed execution history no longer occupies the current snapshot.
@@ -158,6 +158,20 @@ code is unchanged by this slice. No publication run or new benchmark is required
 Estimate: about 5 minutes active work. Safe stop: concise runnable reference and
 baseline remain available, with detailed evidence recoverable from Git/external
 captures. No need to wait for optimization to complete this repository cleanup.
+
+Done: `docs/notebook-publication-profiling.md` trimmed from 525 to 119 lines,
+retaining the ORM-flush finding, a compact "Baseline captures" table (merging
+the former "First large valid capture" and "Awake valid repeat" sections),
+the small late-rejection evidence, and current run instructions updated for
+slice 1's bulk verification task. Retained facts were checked against
+`git show 13a2e2edc6:docs/notebook-publication-profiling.md`. Links repaired:
+`.planning/seeds/SEED-018-publish-large-authored-notebooks.md` and this plan's
+own Evidence line now point `#awake-valid-repeat`/`#first-large-valid-capture`
+references to `#baseline-captures`; `#findings-and-next-experiment` and
+`#small-late-rejection-capture` anchors were unchanged. No dangling links
+remain (repo-wide grep confirmed); profiling code is unchanged.
+
+All slices complete.
 
 ## Suite assessment and retained coverage
 
