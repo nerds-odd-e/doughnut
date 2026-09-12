@@ -469,6 +469,102 @@ Development data backup or retirement, and general environment orchestration.
 **Architecture:** Follow
 [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md).
 
+<a id="story-8"></a>
+
+### 8. Run E2E tests with automatic service startup and cleanup
+
+**Status:** Selected for refinement on 2026-09-12; replaces the queued primary
+SUT restart correction (quick/104). No implementation or executable planning
+is authorized by this refinement.
+
+**Goal**
+
+Developers and AI tasks run a selected batch of E2E tests through one command
+without preparing, repairing, or leaving behind a separately managed application
+stack. Each invocation owns its services, preserving concurrent worktree and
+persistent Development isolation.
+
+**Purpose and decision**
+
+Persistent SUT originally supported manual development and avoided startup cost
+between test invocations. Story 7 now provides persistent Development. The user
+selected runner-owned E2E lifetime and removal of standalone SUT lifecycle
+commands, replacing the narrower proposal to authenticate primary restart.
+The outcome is reliable verification and cleanup; deleting scripts alone does
+not deliver it. Repeated startup overhead remains a tradeoff to measure.
+
+**Scope**
+
+- A script wrapper starts one application stack, waits for readiness, runs all
+  selected specs in that invocation, and stops its owned services at the end.
+  Service lifetime belongs outside Cucumber scenario hooks and fixture setup.
+- Remove public standalone SUT start/restart commands and their executable
+  entry scripts; do not introduce a standalone SUT stop command. Internal
+  startup, readiness, and owned-tree shutdown logic may be reused or relocated
+  behind the runner. This does not require deleting every SUT-named module.
+- Interactive Cypress owns one stack for the entire open session, including
+  reruns, and stops it when Cypress closes (user confirmed 2026-09-12).
+- No reuse across invocations or leave-running option is selected. Manual product
+  feedback uses Development. Diagnostics remain available after E2E shutdown.
+- Clean up application descendants and any private mocks started by the run on
+  success, test failure, startup failure after partial launch, and ordinary
+  cancellation. Report startup and cleanup failures visibly; cleanup must not
+  turn failed tests into success or conceal their diagnostics.
+- Ownership must precede signalling. Do not adopt or kill foreign listeners,
+  Development, another runner, or shared infrastructure. Existing busy-checkout
+  and allocation protections remain applicable. No promise of cleanup after
+  uncatchable termination or machine failure; subsequent runs must refuse
+  ambiguous ownership rather than kill by port.
+- Preserve worktree identity, database/port allocation, fixture isolation, and
+  existing supported test selections. Ending a run does not retire its database
+  or stop already-running shared MySQL/Redis. Broader isolated-spec support,
+  same-worktree concurrent jobs, and Cloud VM isolation remain deferred.
+- Update affected callers, agent guidance, documentation, and lifecycle tests
+  consistently with removal of the public commands. Local/CI rollout and
+  interactive Cypress boundaries remain explicit questions below.
+
+**Key examples**
+
+- With no application stack running, one command selects several supported
+  specs: one stack becomes ready, all selected tests run, and its application
+  processes are gone before the command finishes.
+- A selected test fails, or startup fails after launching only some services:
+  the command returns failure with useful diagnostics and stops what it owns.
+- The user cancels a running batch: the wrapper stops the test runner and owned
+  application/mock descendants while a peer worktree and Development remain live.
+- A foreign listener occupies the intended port: the run refuses without
+  signalling that listener or running tests against it.
+- Two supported runs in separate worktrees complete independently; finishing
+  one does not interrupt the other or alter Development data.
+
+**Architecture**
+
+Follow [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
+for environment and process ownership, and
+[ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md) for visible failures.
+Runner-owned lifetime supports these Accepted decisions; no ADR change is made.
+
+**Open questions and challenges**
+
+- Interactive Cypress decision (2026-09-12): one stack per `cy:open` session,
+  stopped when that session closes; reruns share the session stack.
+- Rollout: proposal is to update existing local and CI callers together so removal
+  is complete. CI currently has its own startup orchestration; migrate ownership
+  without nesting two owners. Awaiting user decision on this delivery boundary.
+- Measure cold/warm startup and repeated focused-run overhead during planning;
+  no numeric budget has been selected. Do not silently restore persistent reuse
+  as a performance workaround. Material cost should trigger scope discussion.
+- Removing lifecycle commands is a supported-workflow rule, not an attempt to
+  prevent developers from inspecting or debugging processes with OS tools.
+
+**Effort hypothesis:** M–L, low confidence until entry-point and CI ownership
+mapping; replaces quick/104's obsolete 5–8 minute estimate. Refine further if
+coherent delivery exceeds a few hours.
+
+**Safe stopping point:** The agreed E2E entry points own full batch/session
+lifetime, obsolete public lifecycle controls are removed, and existing supported
+verification workflows remain usable without manual SUT preparation.
+
 ## Ordering and Scope Reduction
 
 **Backlog review, 2026-09-09:** Stories 3, 4 and 5 are delivered, completing the
