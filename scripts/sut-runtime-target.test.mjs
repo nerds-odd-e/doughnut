@@ -8,6 +8,10 @@ import { runSutHealthcheck } from './sut-healthcheck.mjs'
 import { runSutServices } from './sut-services.mjs'
 import { healthyOnce, makeMockChild } from './sut-start-fixtures.mjs'
 import { runSutStart } from './sut-start.mjs'
+import {
+  LEGACY_SUT_RUNTIME_TARGET,
+  resolveSutRuntimeTarget,
+} from './sut-runtime-target.mjs'
 
 const explicitRuntimeTarget = {
   backendPort: 19081,
@@ -110,4 +114,13 @@ test('launcher feeds one explicit runtime target through services, start, and re
   } finally {
     await rm(dir, { recursive: true, force: true })
   }
+})
+
+test('SUT_RUNTIME_TARGET built overlay keeps legacy ports', () => {
+  assert.deepEqual(
+    resolveSutRuntimeTarget({
+      env: { SUT_RUNTIME_TARGET: '{"built":true}' },
+    }),
+    { ...LEGACY_SUT_RUNTIME_TARGET, built: true }
+  )
 })

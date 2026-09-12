@@ -2077,6 +2077,45 @@ test('defaultSpawnCypress: --browser chrome forwarded as ["--browser","chrome"] 
   assert.equal(args[browserIdx + 1], 'chrome', 'browser value is chrome')
 })
 
+test('CI built overlay: SUT_RUNTIME_TARGET {"built":true} probes legacy application ports', async (t) => {
+  const previous = process.env.SUT_RUNTIME_TARGET
+  process.env.SUT_RUNTIME_TARGET = '{"built":true}'
+  t.after(() => {
+    if (previous === undefined) delete process.env.SUT_RUNTIME_TARGET
+    else process.env.SUT_RUNTIME_TARGET = previous
+  })
+
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const probedPorts = []
+  let capturedTarget = null
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...primaryLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: async (hcOpts) => {
+        capturedTarget = hcOpts.runtimeTarget
+        return healthyOnce()
+      },
+    }),
+    isPortOccupiedFn: async (port) => {
+      probedPorts.push(port)
+      return false
+    },
+    spawnCypress: () => makeCypressChild(0),
+  })
+
+  assert.equal(code, 0)
+  assert.deepEqual(probedPorts, [
+    LEGACY_SUT_RUNTIME_TARGET.backendPort,
+    LEGACY_SUT_RUNTIME_TARGET.lbListenPort,
+  ])
+  assert.deepEqual(capturedTarget, {
+    ...LEGACY_SUT_RUNTIME_TARGET,
+    built: true,
+  })
+})
+
 test('defaultSpawnCypress: without --browser no --browser arg is emitted', () => {
   const captured = []
   const fakeChild = new EventEmitter()

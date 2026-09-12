@@ -19,8 +19,8 @@ export function resolveSutRuntimeTarget({
 } = {}) {
   if (runtimeTarget) return runtimeTarget
   const encoded = env[SUT_RUNTIME_TARGET_ENV]
-  if (encoded) return JSON.parse(encoded)
-  return LEGACY_SUT_RUNTIME_TARGET
+  if (!encoded) return LEGACY_SUT_RUNTIME_TARGET
+  return { ...LEGACY_SUT_RUNTIME_TARGET, ...JSON.parse(encoded) }
 }
 
 export function sutRuntimeTargetProcessEnv(target) {
