@@ -198,7 +198,7 @@ cleanup in wrapper and plugin. Do not change fixture reset semantics.
 
 ### 7. Keep one stack for an interactive Cypress session
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: Opening Cypress starts one owned stack; selecting/rerunning supported
 specs shares it and its required mocks; closing Cypress triggers full cleanup.
 Proof: Invocation-boundary session fixture exercises multiple selections/reruns
@@ -207,6 +207,17 @@ browser launch and continued enforcement of the existing isolated allowlist.
 Perform one focused interactive session check during execution, recording close
 cleanup; this is authorized manual proof in this slice, not product exploration.
 Sizing: 5–8 minutes active work; explicit browser startup waits excluded.
+Learning (manual proof): two defects found and fixed. (1) `cypress open` does
+NOT accept `--spec` (only `cypress run` does); the wrapper's `defaultSpawnCypressOpen`
+incorrectly forwarded `--spec` — fixed to invoke `cypress open --e2e --config-file
+e2e_test/config/ci.ts` without `--spec`; `--spec` is now only a resource-requirement
+hint. (2) `cypress open` (Electron) does NOT exit on SIGTERM (it prompts "Force
+exit with ^C again"); the slice-4 cancellation path hung waiting for the child
+exit, orphaning the owned SUT tree. Fixed with bounded SIGTERM→SIGKILL escalation
+for the Cypress child on cancellation (in shared `runCypressOnce`, so both batch
+and interactive benefit); normal close path unaffected. Manual proof confirmed
+end-to-end: SIGTERM → 5s → SIGKILL → `lifetime.shutdown()` → zero survivors, owned
+ports free, shared MySQL/Redis untouched.
 
 ### 8. Run primary batches with fresh owned services
 Type: Behavior

@@ -18,7 +18,16 @@ import {
 import { spawnIdlePrivateMockHandle } from './isolated-openai-mock-test-fixtures.mjs'
 import { sutOwnerLockDir, verifyLiveSutOwner } from './sut-owner.mjs'
 import { healthyOnce, neverHealthy } from './sut-start-fixtures.mjs'
-import { runE2eBatch } from './e2e-runner.mjs'
+import {
+  E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY,
+  E2E_RUNNER_MOCK_PGID_ENV_KEY,
+  E2E_RUNNER_OWNS_LIFETIME_ENV_KEY,
+} from './isolated-cypress.mjs'
+import {
+  defaultSpawnCypressOpen,
+  runE2eBatch,
+  runE2eInteractive,
+} from './e2e-runner.mjs'
 
 function makeCypressChild(exitCode, onSpawn) {
   const child = new EventEmitter()
@@ -855,4 +864,426 @@ test('service exit during Cypress run: Cypress stdio is preserved (not suppresse
   assert.equal(isPidAlive(state.owned.leader), false)
   assert.equal(isPidAlive(state.owned.grandchild), false)
   assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+})
+
+/**
+ * A Cypress child that simulates `cypress open` (Electron) behaviour on
+ * cancellation: it does NOT exit on SIGTERM (Electron prints a graceful-exit
+ * message and keeps running), and only exits on SIGKILL. Used to verify the
+ * wrapper's bounded SIGTERM→SIGKILL escalation on the cancellation path.
+ */
+function makeStickyCypressChild(onSpawn) {
+  const child = new EventEmitter()
+  child.pid = 0
+  child.stdout = new EventEmitter()
+  child.stderr = new EventEmitter()
+  child.killed = false
+  child.kill = (signal) => {
+    if (child.killed) return
+    if (signal === 'SIGKILL') {
+      child.killed = signal
+      queueMicrotask(() => child.emit('exit', null, child.killed))
+    }
+    // SIGTERM (and any other signal) is ignored: Electron does not exit on it.
+  }
+  child.unref = () => undefined
+  if (onSpawn) {
+    queueMicrotask(async () => {
+      try {
+        await onSpawn()
+      } catch {
+        // observation best-effort
+      }
+    })
+  }
+  return child
+}
+
+/**
+ * A Cypress `open` (interactive) child that stays alive until `.close()` is
+ * called (simulating the developer closing Cypress, which exits cleanly with
+ * code 0) or `.kill(signal)` is called (simulating cancellation/service-exit
+ * termination). `onSpawn` runs once the "session" is open, so the test can
+ * simulate spec selections/reruns and then close the session.
+ */
+function makeOpenCypressChild(onSpawn) {
+  const child = new EventEmitter()
+  child.pid = 0
+  child.stdout = new EventEmitter()
+  child.stderr = new EventEmitter()
+  child.killed = false
+  child.kill = (signal) => {
+    if (child.killed) return
+    child.killed = signal || 'SIGTERM'
+    queueMicrotask(() => child.emit('exit', null, child.killed))
+  }
+  child.close = () => {
+    if (child.killed) return
+    child.killed = true
+    queueMicrotask(() => child.emit('exit', 0, null))
+  }
+  child.unref = () => undefined
+  queueMicrotask(async () => {
+    try {
+      await onSpawn?.(child)
+    } catch {
+      // observation best-effort; do not block the exit
+    }
+  })
+  return child
+}
+
+test('interactive session: one owned stack shared across selections/reruns, no after-spec teardown, cleanup on close', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+
+  const code = await runE2eInteractive({
+    argv: [], // pure browsing: no preselected spec, no mock
+    ...isolatedLifetimeOpts(checkout.root, standIn),
+    spawnCypress: () =>
+      makeOpenCypressChild(async (session) => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        // "Selection" (first spec run within the open session): stack alive.
+        assert.equal(isPidAlive(state.owned.leader), true)
+        assert.equal(isPidAlive(state.owned.grandchild), true)
+        // "Rerun" (second spec run): the SAME stack is still alive — no
+        // after-spec teardown happened between selections.
+        assert.equal(isPidAlive(state.owned.leader), true)
+        assert.equal(isPidAlive(state.owned.grandchild), true)
+        // Closing Cypress ends the session.
+        session.close()
+      }),
+  })
+
+  assert.equal(code, 0, 'a clean close must return 0')
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('interactive session: owned mock stays alive across reruns (no after-spec teardown), stopped on close', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let mockStarts = 0
+  let mockStopCalls = 0
+  let mockPid = 0
+
+  const code = await runE2eInteractive({
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    startPrivateOpenAiMockFn: async () => {
+      mockStarts += 1
+      const handle = spawnIdlePrivateMockHandle()
+      mockPid = handle.child.pid
+      const realStop = handle.stop
+      handle.stop = async () => {
+        mockStopCalls += 1
+        await realStop()
+      }
+      return handle
+    },
+    spawnCypress: () =>
+      makeOpenCypressChild(async (session) => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        // First selection of the mock-requiring spec: mock + stack alive.
+        assert.equal(isPidAlive(mockPid), true)
+        assert.equal(mockStopCalls, 0, 'mock must not be stopped after a spec')
+        // Rerun: the SAME mock + stack are still alive — no after-spec teardown.
+        assert.equal(isPidAlive(mockPid), true)
+        assert.equal(
+          mockStopCalls,
+          0,
+          'mock must not be stopped between reruns'
+        )
+        session.close()
+      }),
+  })
+
+  assert.equal(code, 0)
+  assert.equal(mockStarts, 1, 'mock must start exactly once for the session')
+  assert.equal(mockStopCalls, 1, 'mock must be stopped once on close')
+  assert.equal(isPidAlive(mockPid), false)
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('interactive session: endpoint configuration verified before browser launch (owned endpoint injected into Cypress env)', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let capturedEnv = null
+  let mockEndpoint = null
+
+  const code = await runE2eInteractive({
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    startPrivateOpenAiMockFn: async () => {
+      const handle = spawnIdlePrivateMockHandle()
+      mockEndpoint = handle.endpoint
+      return handle
+    },
+    spawnCypress: (opts) => {
+      capturedEnv = opts.env
+      return makeOpenCypressChild(async (session) => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        session.close()
+      })
+    },
+  })
+
+  assert.equal(code, 0)
+  assert.ok(capturedEnv, 'Cypress env must be supplied before browser launch')
+  assert.equal(
+    capturedEnv[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY],
+    '1',
+    'plugin must be in adapter mode (wrapper owns the lifetime)'
+  )
+  const injected = JSON.parse(capturedEnv[E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY])
+  assert.deepEqual(
+    injected,
+    mockEndpoint,
+    'owned endpoint injected before launch'
+  )
+  assert.ok(
+    Number.isInteger(Number(capturedEnv[E2E_RUNNER_MOCK_PGID_ENV_KEY])),
+    'owned mock pgid injected before launch'
+  )
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+})
+
+test('interactive session: unsupported preselected spec refuses before the stack starts', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  let startCalled = false
+
+  const code = await runE2eInteractive({
+    argv: [
+      '--spec',
+      'e2e_test/features/note_creation_and_update/note_creation.feature',
+    ],
+    checkoutRoot: checkout.root,
+    startLifetime: async () => {
+      startCalled = true
+      throw new Error('should not start')
+    },
+    spawnCypress: () => makeOpenCypressChild(),
+  })
+
+  assert.equal(code, 1)
+  assert.equal(startCalled, false, 'must refuse before starting the stack')
+})
+
+test('interactive session: cancellation stops Cypress + stack + mock, returns nonzero, zero survivors', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const cancel = manualCancel()
+  let mockPid = 0
+  let openChild = null
+
+  const code = await runE2eInteractive({
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    startPrivateOpenAiMockFn: async () => {
+      const handle = spawnIdlePrivateMockHandle()
+      mockPid = handle.child.pid
+      return handle
+    },
+    spawnCypress: () => {
+      openChild = makeOpenCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(mockPid), true)
+        cancel.trigger()
+      })
+      return openChild
+    },
+    cancel,
+  })
+
+  assert.equal(code, 1, 'cancellation must return a visible nonzero outcome')
+  assert.ok(
+    openChild && openChild.killed,
+    'Cypress child must be signalled to stop'
+  )
+  assert.equal(isPidAlive(mockPid), false, 'mock must be stopped on cancel')
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('interactive session: required service exit terminates the session + cleanup, returns nonzero', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let openChild = null
+
+  const code = await runE2eInteractive({
+    argv: cypressArgv(),
+    ...isolatedLifetimeOpts(checkout.root, standIn),
+    spawnCypress: () => {
+      openChild = makeOpenCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        // Simulate a required application service exiting during the session.
+        process.kill(state.owned.leader, 'SIGKILL')
+      })
+      return openChild
+    },
+  })
+
+  assert.equal(
+    code,
+    1,
+    'service exit must end the session with visible failure'
+  )
+  assert.ok(
+    openChild && openChild.killed,
+    'Cypress child must be signalled to stop after the service exit'
+  )
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('interactive spawn: `cypress open` is invoked WITHOUT `--spec` (spec selection happens in the Cypress UI)', () => {
+  const captured = []
+  const fakeChild = new EventEmitter()
+  fakeChild.pid = 0
+  fakeChild.kill = () => undefined
+  fakeChild.unref = () => undefined
+  const spawnFn = (cmd, args, opts) => {
+    captured.push({ cmd, args, opts })
+    return fakeChild
+  }
+
+  // The wrapper still passes `specs` through to the spawner (so the caller's
+  // shape is stable), but `cypress open` must NOT receive `--spec` — even when
+  // a preselected spec was supplied as a resource-requirement hint upstream.
+  defaultSpawnCypressOpen({
+    specs: [SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC],
+    cwd: '/repo',
+    env: {},
+    cypressBin: '/repo/node_modules/cypress/bin/cypress',
+    configFile: 'e2e_test/config/ci.ts',
+    stdio: 'inherit',
+    spawnFn,
+  })
+
+  assert.equal(captured.length, 1, 'spawn must be invoked exactly once')
+  const { args } = captured[0]
+  assert.equal(args[0], '/repo/node_modules/cypress/bin/cypress')
+  assert.equal(args[1], 'open', 'first Cypress arg is the open mode')
+  assert.equal(
+    args.includes('--spec'),
+    false,
+    '--spec must NOT be forwarded to cypress open'
+  )
+  assert.equal(args.includes('--e2e'), true, '--e2e is forwarded')
+  assert.ok(
+    args.includes('--config-file') && args.includes('e2e_test/config/ci.ts'),
+    '--config-file is forwarded'
+  )
+})
+
+test('interactive cancel: SIGTERM-ignoring Cypress child is escalated to SIGKILL, then owned tree is cleaned with zero survivors', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const cancel = manualCancel()
+  let stickyChild = null
+  const killSignals = []
+
+  const code = await runE2eInteractive({
+    argv: cypressArgv(),
+    ...isolatedLifetimeOpts(checkout.root, standIn),
+    cancelEscalationMs: 50,
+    spawnCypress: () => {
+      stickyChild = makeStickyCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        assert.equal(isPidAlive(state.owned.grandchild), true)
+        cancel.trigger()
+      })
+      const realKill = stickyChild.kill
+      stickyChild.kill = (signal) => {
+        killSignals.push(signal)
+        return realKill.call(stickyChild, signal)
+      }
+      return stickyChild
+    },
+    cancel,
+  })
+
+  assert.equal(code, 1, 'cancellation must return a visible nonzero outcome')
+  assert.deepEqual(
+    killSignals,
+    ['SIGTERM', 'SIGKILL'],
+    'wrapper must escalate SIGTERM → SIGKILL when the Cypress child ignores SIGTERM'
+  )
+  assert.ok(stickyChild && stickyChild.killed === 'SIGKILL')
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('normal close path is unaffected: no spurious SIGKILL when Cypress exits on its own without cancellation', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const killSignals = []
+
+  const code = await runE2eInteractive({
+    argv: [],
+    ...isolatedLifetimeOpts(checkout.root, standIn),
+    cancelEscalationMs: 50,
+    spawnCypress: () => {
+      const child = makeOpenCypressChild(async (session) => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        // Developer closes Cypress cleanly — no cancellation triggered.
+        session.close()
+      })
+      const realKill = child.kill
+      child.kill = (signal) => {
+        killSignals.push(signal)
+        return realKill.call(child, signal)
+      }
+      return child
+    },
+  })
+
+  assert.equal(code, 0, 'a clean close must return 0 with no cancellation')
+  assert.deepEqual(killSignals, [], 'no signal must be sent on a clean close')
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
 })

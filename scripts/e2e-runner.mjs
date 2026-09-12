@@ -70,6 +70,36 @@ function defaultSpawnCypress({
 }
 
 /**
+ * Default Cypress `open` (interactive mode) spawner. Invokes the Cypress
+ * executable directly (not via a recursive pnpm call) so the wrapper remains
+ * the single service owner.
+ *
+ * `cypress open` does NOT accept `--spec` (that flag is only valid for
+ * `cypress run`); spec selection in interactive mode happens in the Cypress
+ * UI. An optional preselected `--spec` is still used by the wrapper upstream
+ * (via `assertSupportedIsolatedCypressSpecs`) to arrange required session
+ * resources — e.g. owning the private OpenAI mock for the session — but it is
+ * NOT forwarded to the `cypress open` CLI. The `specs` option is accepted
+ * here only so the caller can pass it through unchanged; it is intentionally
+ * ignored by the spawn args.
+ */
+export function defaultSpawnCypressOpen({
+  cwd,
+  env,
+  cypressBin,
+  configFile,
+  stdio,
+  spawnFn = spawn,
+}) {
+  const args = ['open', '--e2e', '--config-file', configFile]
+  return spawnFn(process.execPath, [cypressBin, ...args], {
+    cwd,
+    env,
+    stdio,
+  })
+}
+
+/**
  * No-op cancellation handle. The default for `runE2eBatch` so callers that do
  * not need signal handling install no process listeners. The `isMain` entry
  * point wires real SIGINT/SIGTERM handling via `wireBatchCancellation`.
@@ -134,6 +164,7 @@ export async function runE2eBatch({
   stdio = 'inherit',
   cancel = NO_CANCEL,
   startPrivateOpenAiMockFn = startPrivateOpenAiMock,
+  cancelEscalationMs,
   ...lifetimeOpts
 } = {}) {
   let specs
@@ -146,117 +177,24 @@ export async function runE2eBatch({
     errLog(error.message)
     return 1
   }
-
-  let lifetime
-  try {
-    lifetime = await startLifetime({
-      checkoutRoot,
-      log,
-      errLog,
-      signal: cancel.signal,
-      ...lifetimeOpts,
-    })
-  } catch (error) {
-    errLog(`Failed to start owned SUT lifetime: ${error.message}`)
-    cancel.detach()
-    return 1
-  }
-
-  // Observe the supervisor child exit promptly. The observer is attached
-  // before awaiting readiness so an exit between readiness and the Cypress
-  // run is not missed. This reuses the supervisor's own completion (the
-  // child handle's exit/close events); it is not a health-polling loop.
-  const childExit = observeChildExit(lifetime.child)
-
-  // When the batch requires a private OpenAI mock, the invocation owns the
-  // mock + runner lease for the entire batch (no after:spec release). The
-  // mock starts after the SUT is ready and is settled alongside the SUT in
-  // the single invocation shutdown.
-  const mockState = { handle: null, leaseToken: null }
-  let mockExit = null
-  const originalShutdown = lifetime.shutdown.bind(lifetime)
-  lifetime.shutdown = async () => {
-    if (mockState.handle) {
-      try {
-        await mockState.handle.stop()
-      } catch {
-        // best-effort during shutdown
-      }
-    }
-    if (mockState.leaseToken) {
-      try {
-        await releaseSutRunnerLease(checkoutRoot, mockState.leaseToken)
-      } catch {
-        // best-effort during shutdown
-      }
-    }
-    await originalShutdown()
-  }
-
-  try {
-    const ready = await lifetime.ready
-    if (!ready.ok) {
-      if (cancel.isTriggered()) {
-        errLog('E2E batch cancelled before SUT became ready.')
-      } else {
-        errLog(`SUT readiness failed (exit ${ready.exitCode}).`)
-      }
-      return 1
-    }
-
-    if (approved.requiresPrivateOpenAiMock) {
-      try {
-        mockState.leaseToken = await acquireSutRunnerLease(checkoutRoot)
-      } catch (error) {
-        errLog(`Failed to acquire runner lease: ${error.message}`)
-        return 1
-      }
-      try {
-        const allocation = loadCompleteIsolatedE2eAllocation(checkoutRoot)
-        mockState.handle = await startPrivateOpenAiMockFn({
-          checkoutRoot,
-          allocation,
-        })
-        mockExit = observeChildExit(mockState.handle.child)
-      } catch (error) {
-        errLog(`Failed to start owned private OpenAI mock: ${error.message}`)
-        return 1
-      }
-    }
-
-    const cypressEnv = { ...env }
-    if (mockState.handle) {
-      cypressEnv[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY] = '1'
-      cypressEnv[E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY] = JSON.stringify(
-        mockState.handle.endpoint
-      )
-      cypressEnv[E2E_RUNNER_MOCK_PGID_ENV_KEY] = String(
-        mockState.handle.child?.pid ?? ''
-      )
-    }
-
-    const cypressExitCode = await runCypressOnce({
-      specs,
-      spawnCypress,
-      cypressBin,
-      cypressConfigFile,
-      checkoutRoot,
-      env: cypressEnv,
-      stdio,
-      cancel,
-      childExit,
-      mockExit,
-      errLog,
-    })
-    if (cancel.isTriggered()) return 1
-    return cypressExitCode
-  } catch (error) {
-    errLog(`E2E batch failed: ${error.message}`)
-    return 1
-  } finally {
-    cancel.detach()
-    await lifetime.shutdown()
-  }
+  return runOwnedE2eInvocation({
+    specs,
+    approved,
+    spawnCypress,
+    checkoutRoot,
+    startLifetime,
+    cypressBin,
+    cypressConfigFile,
+    log,
+    errLog,
+    env,
+    stdio,
+    cancel,
+    startPrivateOpenAiMockFn,
+    label: 'E2E batch',
+    cancelEscalationMs,
+    ...lifetimeOpts,
+  })
 }
 
 /**
@@ -304,6 +242,7 @@ function runCypressOnce({
   childExit,
   mockExit = null,
   errLog = (s) => process.stderr.write(`${s}\n`),
+  cancelEscalationMs = 5_000,
 }) {
   return new Promise((resolve, reject) => {
     let child
@@ -326,19 +265,44 @@ function runCypressOnce({
     }
 
     let settled = false
+    let childExited = false
+    let escalationTimer = null
+    const clearEscalation = () => {
+      if (escalationTimer) {
+        clearTimeout(escalationTimer)
+        escalationTimer = null
+      }
+    }
     const settle = (value) => {
       if (settled) return
       settled = true
+      clearEscalation()
       resolve(value)
     }
 
     // On cancellation, stop the runner (the Cypress child) first; the owned
-    // descendants are settled by `lifetime.shutdown()` in the caller's finally.
+    // descendants are settled by `lifetime.shutdown()` in the caller's
+    // finally. `cypress open` (Electron) does NOT exit on SIGTERM — it prints
+    // a graceful-exit message and keeps running — so after signalling SIGTERM,
+    // escalate to SIGKILL within a bounded wait if the child has not exited.
+    // This unblocks the child-exit await so `lifetime.shutdown()` can run and
+    // clean up the owned tree. The normal (non-cancelled) close path is
+    // unaffected: no escalation timer is armed unless cancellation fires.
     cancel.onTriggered(() => {
       try {
         child.kill('SIGTERM')
       } catch {
         // already gone
+      }
+      if (!childExited) {
+        escalationTimer = setTimeout(() => {
+          if (childExited) return
+          try {
+            child.kill('SIGKILL')
+          } catch {
+            // already gone
+          }
+        }, cancelEscalationMs)
       }
     })
 
@@ -377,12 +341,240 @@ function runCypressOnce({
 
     child.once('error', (error) => {
       if (settled) return
+      clearEscalation()
       reject(error)
     })
     child.once('exit', (code, signal) => {
+      childExited = true
+      clearEscalation()
       if (signal) settle(1)
       else settle(code ?? 1)
     })
+  })
+}
+
+/**
+ * Run one owned E2E invocation: start the owned SUT (and, when the resolved
+ * spec requires it, the owned private OpenAI mock + runner lease), launch
+ * Cypress via `spawnCypress`, and settle every owned resource before
+ * returning Cypress's outcome. Shared by the batch (`run`) and interactive
+ * (`open`) entry points, which differ only in spec resolution (required vs
+ * optional) and the Cypress spawn mode. There is no after-spec teardown —
+ * the stack and its required mocks persist until Cypress exits, then full
+ * cleanup runs via `lifetime.shutdown()` (stop mock + release lease + stop
+ * SUT). The plugin acts only as an adapter when the wrapper owns the mock
+ * (`E2E_RUNNER_OWNS_LIFETIME=1`); the existing isolated allowlist continues
+ * to be enforced for selections the wrapper did not pre-own.
+ *
+ * The supervisor child exit is observed before awaiting readiness so an exit
+ * between readiness and the Cypress run is not missed; this reuses the
+ * supervisor's own completion (child exit/close events), not health polling.
+ *
+ * Cancellation (SIGINT/SIGTERM) and a required service exit (SUT supervisor
+ * or owned mock) during the run terminate Cypress and settle the owned tree
+ * with a visible nonzero outcome. `label` names the invocation kind in
+ * diagnostic messages.
+ *
+ * @returns {Promise<number>} Cypress's exit outcome (0 = success/clean close, nonzero = failure/cancel).
+ */
+async function runOwnedE2eInvocation({
+  specs,
+  approved,
+  spawnCypress,
+  checkoutRoot,
+  startLifetime,
+  cypressBin,
+  cypressConfigFile,
+  log,
+  errLog,
+  env,
+  stdio,
+  cancel,
+  startPrivateOpenAiMockFn,
+  label,
+  cancelEscalationMs,
+  ...lifetimeOpts
+}) {
+  let lifetime
+  try {
+    lifetime = await startLifetime({
+      checkoutRoot,
+      log,
+      errLog,
+      signal: cancel.signal,
+      ...lifetimeOpts,
+    })
+  } catch (error) {
+    errLog(`Failed to start owned SUT lifetime: ${error.message}`)
+    cancel.detach()
+    return 1
+  }
+
+  const childExit = observeChildExit(lifetime.child)
+
+  // When the resolved spec requires a private OpenAI mock, the invocation
+  // owns the mock + runner lease for the entire run (no after:spec release).
+  // The mock starts after the SUT is ready and is settled alongside the SUT
+  // in the single invocation shutdown.
+  const mockState = { handle: null, leaseToken: null }
+  let mockExit = null
+  const originalShutdown = lifetime.shutdown.bind(lifetime)
+  lifetime.shutdown = async () => {
+    if (mockState.handle) {
+      try {
+        await mockState.handle.stop()
+      } catch {
+        // best-effort during shutdown
+      }
+    }
+    if (mockState.leaseToken) {
+      try {
+        await releaseSutRunnerLease(checkoutRoot, mockState.leaseToken)
+      } catch {
+        // best-effort during shutdown
+      }
+    }
+    await originalShutdown()
+  }
+
+  try {
+    const ready = await lifetime.ready
+    if (!ready.ok) {
+      if (cancel.isTriggered()) {
+        errLog(`${label} cancelled before SUT became ready.`)
+      } else {
+        errLog(`SUT readiness failed (exit ${ready.exitCode}).`)
+      }
+      return 1
+    }
+
+    if (approved?.requiresPrivateOpenAiMock) {
+      try {
+        mockState.leaseToken = await acquireSutRunnerLease(checkoutRoot)
+      } catch (error) {
+        errLog(`Failed to acquire runner lease: ${error.message}`)
+        return 1
+      }
+      try {
+        const allocation = loadCompleteIsolatedE2eAllocation(checkoutRoot)
+        mockState.handle = await startPrivateOpenAiMockFn({
+          checkoutRoot,
+          allocation,
+        })
+        mockExit = observeChildExit(mockState.handle.child)
+      } catch (error) {
+        errLog(`Failed to start owned private OpenAI mock: ${error.message}`)
+        return 1
+      }
+    }
+
+    const cypressEnv = { ...env }
+    if (mockState.handle) {
+      cypressEnv[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY] = '1'
+      cypressEnv[E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY] = JSON.stringify(
+        mockState.handle.endpoint
+      )
+      cypressEnv[E2E_RUNNER_MOCK_PGID_ENV_KEY] = String(
+        mockState.handle.child?.pid ?? ''
+      )
+    }
+
+    const cypressExitCode = await runCypressOnce({
+      specs,
+      spawnCypress,
+      cypressBin,
+      cypressConfigFile,
+      checkoutRoot,
+      env: cypressEnv,
+      stdio,
+      cancel,
+      childExit,
+      mockExit,
+      errLog,
+      cancelEscalationMs,
+    })
+    if (cancel.isTriggered()) return 1
+    return cypressExitCode
+  } catch (error) {
+    errLog(`${label} failed: ${error.message}`)
+    return 1
+  } finally {
+    cancel.detach()
+    await lifetime.shutdown()
+  }
+}
+
+/**
+ * Run one interactive Cypress session: start the owned SUT (and, when the
+ * preselected spec requires it, the owned private OpenAI mock + runner
+ * lease), launch Cypress in `open` mode, and keep the single stack alive
+ * across every spec selection/rerun the developer makes in the Cypress UI.
+ * There is NO after-spec teardown — the stack and its required mocks persist
+ * until Cypress closes. When the `open` process exits, full cleanup runs via
+ * `lifetime.shutdown()` (stop mock + release lease + stop SUT).
+ *
+ * Spec selection is not known at launch in pure browsing mode. When the
+ * caller supplies an explicit `--spec` that requires a private mock, the
+ * wrapper owns the mock for the whole session and injects its endpoint into
+ * the Cypress config before the browser launches (the plugin acts only as an
+ * adapter via `E2E_RUNNER_OWNS_LIFETIME=1`). Without a preselected mock
+ * spec, no mock is started; the existing isolated allowlist continues to be
+ * enforced by the plugin for any selection made in the UI.
+ *
+ * Cancellation (SIGINT/SIGTERM) and a required service exit (SUT supervisor
+ * or owned mock) during the session terminate Cypress and settle the owned
+ * tree with a visible nonzero outcome.
+ *
+ * @returns {Promise<number>} Cypress's exit outcome (0 = closed cleanly, nonzero = failure/cancel).
+ */
+export async function runE2eInteractive({
+  argv = process.argv.slice(2),
+  checkoutRoot = repoRoot,
+  startLifetime = startOwnedSutLifetime,
+  spawnCypress = defaultSpawnCypressOpen,
+  cypressBin = DEFAULT_CYPRESS_BIN,
+  cypressConfigFile = DEFAULT_CYPRESS_CONFIG_FILE,
+  log = (s) => process.stdout.write(`${s}\n`),
+  errLog = (s) => process.stderr.write(`${s}\n`),
+  env = process.env,
+  stdio = 'inherit',
+  cancel = NO_CANCEL,
+  startPrivateOpenAiMockFn = startPrivateOpenAiMock,
+  cancelEscalationMs,
+  ...lifetimeOpts
+} = {}) {
+  // An interactive session may launch without an explicit --spec (pure
+  // browsing). When one is supplied, it must be a single supported spec; if
+  // it requires a private mock, the wrapper owns the mock for the session.
+  let preselectedSpecs = []
+  let approved = null
+  if (hasExplicitCypressSpecSelection(argv)) {
+    try {
+      const selected = selectedCypressSpecs({ argv, checkoutRoot })
+      approved = assertSupportedIsolatedCypressSpecs(selected)
+      preselectedSpecs = selected
+    } catch (error) {
+      errLog(error.message)
+      return 1
+    }
+  }
+  return runOwnedE2eInvocation({
+    specs: preselectedSpecs,
+    approved,
+    spawnCypress,
+    checkoutRoot,
+    startLifetime,
+    cypressBin,
+    cypressConfigFile,
+    log,
+    errLog,
+    env,
+    stdio,
+    cancel,
+    startPrivateOpenAiMockFn,
+    label: 'Interactive E2E session',
+    cancelEscalationMs,
+    ...lifetimeOpts,
   })
 }
 
@@ -392,6 +584,9 @@ const isMain = process.argv[1]
 
 if (isMain) {
   const cancel = wireBatchCancellation()
-  const code = await runE2eBatch({ cancel })
+  const interactive = process.argv.includes('--open')
+  const code = interactive
+    ? await runE2eInteractive({ cancel })
+    : await runE2eBatch({ cancel })
   process.exit(code)
 }
