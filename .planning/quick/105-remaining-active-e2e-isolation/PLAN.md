@@ -163,7 +163,7 @@ discrepancy.
 
 ### 4. Extract the existing Mountebank ownership from OpenAI configuration
 Type: Structure
-Status: planned
+Status: done
 Change: Expose the existing owned process, management listener, port allocation,
 and verification/stop behavior independently of OpenAI-specific endpoint names;
 OpenAI uses that same lifecycle adapter with unchanged observable behavior.
@@ -173,6 +173,18 @@ Proof: Existing private OpenAI endpoint, ownership, cancellation and failure
 boundary tests stay green, as do primary canonical mock behavior tests.
 Sizing: 5–8 minutes, medium confidence. If extraction entails separate independent
 protocol changes, stop and refine instead of combining them invisibly.
+Done 2026-09-12: extracted Mountebank ownership lifecycle into a new generic,
+service-label-parameterized adapter `scripts/isolated-mountebank-mock.mjs`
+(`observeOwnedMockChild`, `createEmptyRecordingImposter`,
+`startOwnedMountebankMock`); `isolated-openai-mock.mjs` is now a thin OpenAI
+adapter over it. Refactor renamed the generic ownership/ports modules to
+`isolated-mountebank-mock-ownership.mjs` / `isolated-mountebank-mock-ports.mjs`
+and made the OpenAI label explicit (`OPEN_AI_SERVICE_LABEL`) at the two
+production callers. No process observers, termination code, port-exclusion
+rules, or endpoint transport duplicated; one coherent change. Focused
+suites (77 tests) and primary canonical mock behavior suite (6 tests) green;
+OpenAI observable behavior unchanged. Slice 5's two-service contract is now
+enabled.
 
 ### 5. Own distinct OpenAI and Wikidata mock endpoints in one invocation
 Type: Behavior

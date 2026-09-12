@@ -8,10 +8,11 @@ import {
   GET_ISOLATED_OPEN_AI_MOCK_ENDPOINT_TASK,
   ISOLATED_OPEN_AI_MOCK_ENV_KEY,
   OPEN_AI_MOCK_ENDPOINT_ENV_KEY,
+  OPEN_AI_SERVICE_LABEL,
   VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK,
   startPrivateOpenAiMock,
 } from './isolated-openai-mock.mjs'
-import { assertOwnedMockListener } from './isolated-openai-mock-ownership.mjs'
+import { assertOwnedMockListener } from './isolated-mountebank-mock-ownership.mjs'
 import {
   assertSupportedIsolatedCypressSpecs,
   hasExplicitCypressSpecSelection,
@@ -116,11 +117,19 @@ async function adapterCypressNodeSetup(checkoutRoot, config, options, env) {
             'Isolated OpenAI mock ownership check requires the owned mock process group id.'
           )
         }
-        await assertOwnedMockListener(endpoint.servingPort, mockPgid, 'serving')
+        await assertOwnedMockListener(
+          endpoint.servingPort,
+          mockPgid,
+          'serving',
+          {
+            serviceLabel: OPEN_AI_SERVICE_LABEL,
+          }
+        )
         await assertOwnedMockListener(
           new URL(endpoint.managementUrl).port,
           mockPgid,
-          'management'
+          'management',
+          { serviceLabel: OPEN_AI_SERVICE_LABEL }
         )
         return true
       },

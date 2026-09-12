@@ -26,7 +26,10 @@ import {
   loadCompleteIsolatedE2eAllocation,
   worktreeIsolationApplies,
 } from './browser-worktree-isolation.mjs'
-import { startPrivateOpenAiMock } from './isolated-openai-mock.mjs'
+import {
+  OPEN_AI_SERVICE_LABEL,
+  startPrivateOpenAiMock,
+} from './isolated-openai-mock.mjs'
 import { acquireSutRunnerLease, releaseSutRunnerLease } from './sut-owner.mjs'
 import {
   E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY,
@@ -40,8 +43,8 @@ import { stopOwnedSutProcessTree } from './sut-owned-process-tree.mjs'
 import {
   SHARED_MOUNTEBANK_MANAGEMENT_PORT,
   SHARED_OPEN_AI_SERVING_PORT,
-} from './isolated-openai-mock-ports.mjs'
-import { assertPortFreeBeforeMockMutation } from './isolated-openai-mock-ownership.mjs'
+} from './isolated-mountebank-mock-ports.mjs'
+import { assertPortFreeBeforeMockMutation } from './isolated-mountebank-mock-ownership.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -142,8 +145,13 @@ export function defaultSpawnCypressOpen({
 export async function allocatePrimaryOpenAiMockPorts() {
   const managementPort = SHARED_MOUNTEBANK_MANAGEMENT_PORT
   const servingPort = SHARED_OPEN_AI_SERVING_PORT
-  await assertPortFreeBeforeMockMutation(managementPort, 'management')
-  await assertPortFreeBeforeMockMutation(servingPort, 'serving')
+  const ownershipOpts = { serviceLabel: OPEN_AI_SERVICE_LABEL }
+  await assertPortFreeBeforeMockMutation(
+    managementPort,
+    'management',
+    ownershipOpts
+  )
+  await assertPortFreeBeforeMockMutation(servingPort, 'serving', ownershipOpts)
   return { managementPort, servingPort }
 }
 
