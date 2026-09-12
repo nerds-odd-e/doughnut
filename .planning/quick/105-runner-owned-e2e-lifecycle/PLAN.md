@@ -1,9 +1,15 @@
 # Run E2E tests with automatic service startup and cleanup
 
 Source: [SEED-015 Story 8](../../seeds/SEED-015-concurrent-worktree-environments.md#story-8).
-Status: planned. User approved story refinement and planning on 2026-09-12;
-implementation is not authorized by that request. Supersedes quick/104's
-unexecuted primary restart correction. Backlog remains queued.
+Status: in progress (execution authorized 2026-09-12 via `/dough-execute-plan 105`).
+Supersedes quick/104's unexecuted primary restart correction. Backlog entry moved to Taken.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`, HEAD `8aedc53a11857bf84234ecad756813c1e0c6f3ac` (Taken-only commit).
+- Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/105-runner-owned-e2e-lifecycle` on branch `cursor/105-runner-owned-e2e-lifecycle`.
+- Integration target: `main`.
+- CI coverage: the `donut CI` workflow (`.github/workflows/ci.yml`) triggers only on pushes to `main`; the execution branch has no push-triggered CI, so CI observation coverage is missing for this branch. Hosted-CI verification for slice 10 will surface as a decision point when reached.
 
 ## Outcome and boundaries
 
@@ -108,7 +114,7 @@ under this planning-only request. Preserve unrelated working-tree changes.
 
 ### 1. Record the reused-stack feedback baseline
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: Given disposable owned benchmark checkouts, executing a few equivalent
 focused runs produces a reviewable baseline separating setup/readiness/test time.
 Proof: `docs/e2e-lifecycle-overhead.md` records commands, machine/cache conditions,
@@ -122,6 +128,11 @@ command deletion. No product performance threshold is selected.
 Command: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature`
 Sizing: 5 minutes active work; measured build/start/test waits may exceed 10
 minutes and must be reported, not counted as implementation overrun.
+Learning: the current `backend:sut` (`run-p backend:watch backend:sut:ci`) has a
+Gradle build-race on a fresh worktree `backend/build` — two failed 125s/123s
+attempts before a 15s successful start after removing the corrupted local
+build dir. Recorded in the baseline doc as observed behaviour. Slice 2
+(modularize startup) should not perpetuate this race; note for refactor.
 
 ### 2. Expose the existing owned startup lifetime
 Type: Structure
