@@ -1,9 +1,17 @@
 # Publish large notebook commits under one minute
 
-Status: planned; no execution started.
+Status: execution started.
 Source: [SEED-018 story 3](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-3).
-Target accepted by the user on 2026-09-12. This request authorizes planning and
-plan refinement only. Backlog placement remains unchanged.
+Target accepted by the user on 2026-09-12. Execution authorized by
+`/dough-execute-plan 106` on 2026-09-12.
+
+## Planned execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`
+- Execution checkout: `/Users/terryyin/git/d106-publish-large-notebooks` on `execute/106-publish-large-notebooks`
+- Integration target: `main`
+- Claim commit: `0f4e718df0`
+- CI observation: unavailable — `.github/workflows/ci.yml` (`donut CI`) is push-triggered only for `main`; this execution branch has no push-triggered CI workflow.
 
 ## Outcome and boundaries
 
@@ -89,15 +97,86 @@ Small publication capture on the owned isolated E2E stack:
 PUBLICATION_PROFILE_EXISTING=20 PUBLICATION_PROFILE_ADDITIONS=20 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=66000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
 ```
 
-Result: **not run**; planning supplies no engine-safety or performance evidence.
-Reuse current small rejection evidence for fixture suitability, not proof of a
-future changed implementation. No new 10,000-note baseline run is needed.
+Result: slice 1 pre-change small HTTP capture on this worktree
+(`doughnut_e2e_wt_55773df2d6ac449796e9d4c0abac2671`, JDK 25.0.3,
+`-XX:TieredStopAtLevel=1`, Hibernate 7.4.5.Final, MySQL 8.4.11).
+`pnpm cy:run` does not forward `--expose`/`--config`; tags were applied
+for this run only by a temporary `e2e_test/config/ci.ts` override that
+was reverted afterward.
+
+- Valid HTTP (`2026-09-12T07-59-47.043Z`): elapsedMs **205.722**, HTTP 200,
+  accepted head `62940858301bcc5c0f4bc7ab32e16a979bf311bd`, 20 authored
+  documents verified. Request-thread allocation weight **50,417,416**
+  bytes. 8 execution samples in ~206 ms (too few to re-rank the large-run
+  flush bottleneck); 5/8 in `org.hibernate`, including
+  `AbstractFlushingEventListener` / `NotePropertyIndexService` /
+  `NoteAliasIndexService`.
+- Late rejection (`2026-09-12T07-59-53.252Z`): elapsedMs **147.006**, HTTP
+  400 invalid aliases at `group-19/Added-00019.md`.
+
+No new 10,000-note baseline run. This is before-evidence only, not
+optimization.
+
+## Slice 1 engine observations (2026-09-12)
+
+Temporary request-scoped Hibernate `SessionEventListener` on the unchanged
+writer, then removed. Versions actually resolved in this worktree: Hibernate
+**7.4.5.Final**, isolated MySQL **8.4.11**. Controller reads after
+`REQUIRES_NEW` commit show property wiki values and inbound aliases.
+
+Per added or replaced note, after setup queries:
+
+1. AUTO partial flush in `NotePropertyIndexService.refreshForNote` with 0
+   entities (existing index lookup under `FlushModeType.COMMIT`).
+2. EXPLICIT `entityManager.flush()` in `NotePropertyIndexService.refreshForNote`
+   after unlinking/removing old index rows. Replacement flushed 12 entities /
+   21 collections; addition with no prior rows still flushed the whole context
+   (9 entities / 14 collections) so `replaceContent`'s transient
+   `authored_note_reference` children are visible to the following JPQL.
+3. AUTO partial flush in `ownRowsBySourceLocalKey` after restoring AUTO
+   (addition 9/9, replacement 10/10). This is a second traversal of already
+   flushed state.
+4. AUTO partial flush in `NoteAliasIndexService.refreshForNote` from bulk
+   `DELETE`, then EXPLICIT flush after the bulk delete.
+5. EXPLICIT `EntityPersister.flush()` after the concept loop in
+   `NotebookGitProposalDocumentApplication.apply` (additions), then an
+   additional explicit flush on accept.
+
+FK / uniqueness / visibility that must be preserved:
+
+- `note_property_index.uq_note_property_index_note_key_item` and FK
+  `authored_note_reference_id` (ON DELETE SET NULL). Old index rows must be
+  unlinked and flushed before inserting replacements; otherwise uniqueness
+  fails and `replaceContent` children stay transient for the JPQL map.
+- `note_alias_index.uq_note_alias_index_note_lookup` requires the bulk delete
+  to be flushed before inserting the new lookup key.
+- After that required explicit property flush, pending authored references are
+  already visible; the AUTO query flush is not required for visibility.
+- Rollback remains the existing serializable `REQUIRES_NEW` transaction;
+  slice 2 still owns atomic late-rejection proof.
+
+**Candidate for slice 2:** keep `FlushModeType.COMMIT` through
+`ownRowsBySourceLocalKey` (restore the prior flush mode only after the query
+and new index-row persist). That removes the redundant query-triggered
+whole-context auto-flush without changing the required explicit unlink flush,
+alias bulk-delete ordering, or the final apply flush. Do not skip the
+explicit property flush on this evidence: additions still need it for
+transient authored-reference visibility, and replacement needs it for uniqueness
+and FK ordering.
+
+Production writer flush semantics are unchanged in this slice.
+
+Small HTTP capture (20 existing / 20 additions / 20 folders) recorded
+elapsedMs **205.722** (accepted) and **147.006** (late invalid alias).
+JFR at this size is too sparse to rank flushes; engine-safety ordering
+comes from the controller probe above. Slice 2 can proceed with the
+COMMIT-through-`ownRowsBySourceLocalKey` candidate.
 
 ## Ordered slices
 
 ### 1. Make required refresh ordering observable on a small fixture
 Type: Structure
-Status: planned
+Status: done
 Change: Use the existing controller/profile fixture to expose the current
 refresh lifecycle with temporary, request-scoped flush observations. Add only
 missing stable-boundary characterization of existing derived-state visibility;
@@ -133,10 +212,15 @@ stored rows and learning state. Do not ship the optimization before rollback pro
 Preserve the ordinary installed-CLI success path with the existing small
 `@publicationProfile` scenario, using the same feature command and small default
 counts. Reuse valid regression evidence; add only assertions for exposed gaps.
-Sizing: 5–8 minutes active work, conditional on slice 1 identifying one local
-change. Required backend/build/browser waits may exceed the limit. If the
-candidate needs several mutation phases or uncertain new ownership, refine this
-slice before editing code; do not use the wait exception for implementation.
+Sizing: 5–8 minutes active work. Slice 1 identified one local change in the
+existing `NotePropertyIndexService.refreshForNote` lifecycle: keep
+`FlushModeType.COMMIT` through `ownRowsBySourceLocalKey`. No extra mutation
+phase or new owner. Required backend/build/browser waits may exceed the limit;
+do not use the wait exception for implementation.
+Isolated tagged captures: `pnpm cy:run` does not forward `--expose`/`--config`.
+Do not mutate committed `e2e_test/config/ci.ts`. Make the isolated tagged
+HTTP/CLI profile capture durable as part of this slice's proof path (forward
+those flags in the owned runner, or an equivalent env-driven tag override).
 
 ### 3. Confirm the representative commit publishes under one minute
 Type: Behavior
@@ -216,14 +300,13 @@ immediately enabled Behavior (2). Original large confirmation is now slice 3;
 ordinary CLI compatibility moved into slice 2's correctness proof. No completed
 work or promise was removed. Result: three slices; no story resplit indicated.
 
-Slice 1 is bounded to one small engine proof, with a stop on unresolved ordering.
-Slice 2 remains conditional on that evidence: its exact safe mutation and sizing
-cannot be certified by static inspection. The prerequisite completion must
-record the selected change and reassess this same plan before implementation.
-Slice 3 is a single scaling confirmation, with the unresolved risk that the
-bounded change will not achieve the required roughly 63-fold improvement.
+Slice 1 is done: Hibernate 7.4.5.Final / MySQL 8.4.11; required explicit
+property unlink flush and alias bulk-delete flush retained; redundant AUTO
+query flush after restoring AUTO is the candidate. Characterization tests and
+small HTTP before-capture (elapsedMs 205.722 / 147.006) are recorded.
+Slice 2 is reassessed as executable with that one local change. Isolated
+`pnpm cy:run` does not forward `--expose`; remaining captures must not rely on
+mutating committed `ci.ts`.
+Slice 3 remains a single scaling confirmation, with the unresolved risk that
+the bounded change will not achieve the required roughly 63-fold improvement.
 Required suite/build/fixture/runtime waits are the only sizing exceptions.
-
-There is no open product decision, but this assessment does not claim all
-slices are ready for direct execution or that the target is feasible. No product
-tests or captures were run during planning/refinement; all slices remain planned.
