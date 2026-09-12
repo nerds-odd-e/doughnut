@@ -473,10 +473,11 @@ Development data backup or retirement, and general environment orchestration.
 
 ### 9. Tolerate deep or long worktree checkout paths for isolated SUT bring-up
 
-**Status:** Candidate, added 2026-09-12 from a quick/107 (publication receiver
+**Status:** Refined 2026-09-12; selected for scope clarification. Added from a quick/107 (publication receiver
 bulk verification) execution retrospective finding. Recover the completed
 correction plan from `git show a7e0fe1dc4:.planning/quick/107-verify-publication-receiver-in-bulk/PLAN.md`.
-No refinement or executable planning is authorized yet.
+Executable [slice plan](../quick/107-checkout-independent-sut-sockets/PLAN.md)
+is planned; implementation has not started.
 
 **Goal**
 
@@ -500,35 +501,59 @@ was unrelated to SUT bring-up.
 
 **Scope**
 
-- Give the SUT ownership socket a location independent of checkout path
-  length — for example a fixed-length identity-derived name under a short,
-  stable base directory — while preserving existing per-checkout ownership
-  and refusal semantics (ADR 0007).
+- Supported local isolated SUT bring-up must work from an otherwise valid
+  checkout whose path would exceed the ownership socket's platform limit,
+  without requiring developers or AI coordinators to rename/move the checkout
+  or configure a socket-path override. Select the socket-location mechanism
+  during implementation planning, not as a story-level requirement.
+- Preserve per-checkout ownership and refusal semantics (ADR 0007): duplicate
+  starts leave the live owner running; runner leases and restart/shutdown
+  protections still work; cleanup or stale-owner recovery in one checkout
+  must not disturb another checkout's owner or resources.
 - Preserve every existing supported worktree/primary-checkout workflow (1a–1c,
   2/2a) unchanged from the developer's perspective; this is a bring-up
   reliability correction, not a new isolation capability or lifecycle change.
-- Exclude general parallel E2E support, story 8's runner-owned lifetime
-  redesign (address there if it also relocates SUT ownership), Cloud VM/CI
-  changes, and any change to worktree naming/placement conventions themselves
-  (this is Claude Code's convention, not this project's to change).
+- Preserve the runner-owned lifecycle and supported feature invocation behavior
+  delivered since this candidate was captured (stories 8 and 10); their
+  completed work does not remove the checkout-relative socket in
+  `scripts/sut-owner.mjs`.
+- Defer new E2E concurrency capabilities, a lifecycle redesign, Cloud VM/CI
+  changes, and changes to worktree naming/placement conventions. This story
+  removes the ownership socket's path-length limitation, not unrelated
+  filesystem or third-party tool limits. Production and persistent Development
+  data remain outside this disposable E2E workflow.
 
 **Key examples**
 
 - Given a worktree checkout whose absolute path plus the ownership socket
-  suffix would exceed the platform's socket path limit, when `pnpm sut` (or
-  equivalent isolated bring-up) starts, then it succeeds instead of failing
+  suffix would exceed the platform's socket path limit, when `pnpm cy:run`
+  brings up its isolated SUT for a supported feature, then it succeeds instead of failing
   with `EINVAL`.
 - Given two worktrees at different path depths running concurrently, when
   each brings up its isolated SUT, then neither's ownership record collides
   with the other's.
+- Given a live SUT in a long-path checkout, when another start is requested
+  there, then it refuses the duplicate and leaves the existing SUT running.
+- Given a runner holds that checkout's lease, when the owner-control shutdown
+  boundary is called, then it refuses without signalling owned processes;
+  after the runner releases its lease, owned shutdown remains usable. This
+  preserves the internal protection without restoring removed public SUT
+  start/restart commands.
+- Given one long-path checkout stops or recovers a dead owner, when it starts
+  again, then ownership can be established without affecting another live
+  checkout.
+
+**Open questions:** None blocking story understanding. Planning must choose
+the bounded socket location and account for its cleanup and existing owner
+records; those are implementation decisions within the preservation promises.
 
 **Effort hypothesis:** S–M, low confidence until the socket-relocation
 approach and its interaction with existing ownership/refusal checks are
 scoped.
 
-**Safe stopping point:** Isolated SUT bring-up succeeds from a worktree at any
-checkout path depth this project's supported tooling can produce, with
-existing ownership guarantees unchanged.
+**Safe stopping point:** Isolated SUT bring-up succeeds from an otherwise
+supported long-path worktree without hitting the ownership socket path limit,
+with existing ownership guarantees unchanged.
 
 ## Ordering and Scope Reduction
 

@@ -181,3 +181,48 @@ leaf, or decompose only where a stop-safe seam genuinely exists.
   - Inference: the 5-minute leaf target is the wrong anchor for a single
     cross-layer service-wiring responsibility; future plans should size such
     slices explicitly as multi-touchpoint wiring.
+
+## DD-013 — One-off profile capture treated as durable runner plumbing
+
+A tagged publication-profile capture drove a durable `pnpm cy:run` change to
+forward Cypress `--expose`/`--config`, including runner tests, then a closing
+slice reverted that forwarding because it served measurement rather than the
+kept product change.
+
+### Occurrences
+
+- Execution: SEED-018 story 3 / quick/106-publish-large-notebooks-under-one-minute / 78c24f31bb
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.12
+  - Evidence: slice 2 commit `6162492745` added forwarding in
+    `scripts/e2e-runner.mjs` and `scripts/e2e-runner.test.mjs`; close commit
+    `3613029688` restored those files to `78c24f31bb`; PLAN closing decision
+    (2026-09-12) says the plumbing served measurement, not the kept flush change.
+  - Observed effect: slice 2 included runner work beyond the property-index
+    flush change; slice 4 existed only to undo that forwarding.
+  - Inference: isolated tagged captures can use a documented one-off Cypress
+    invocation or known baseline waits without changing the owned runner.
+
+## DD-014 — Large-capture plan command copied small-fixture Cypress timeouts
+
+The first large confirmation command used the small HTTP capture's
+`taskTimeout=66000` and omitted the already-recorded large-fixture Cypress
+`defaultCommandTimeout`, so seed aborted before any publication measurement.
+
+### Occurrences
+
+- Execution: SEED-018 story 3 / quick/106-publish-large-notebooks-under-one-minute / 78c24f31bb
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.12
+  - Evidence: PLAN.md "Slice 3 confirmation attempt (2026-09-12)" — Cypress
+    failed at `cy.wrap()` waiting 6000 ms (`e2e_test/config/common.ts`) during
+    `When I seed the representative publication baseline`; spec duration 8 s;
+    no `timing.json` or profile directory. The same PLAN notes the awake large
+    captures used `taskTimeout=43260000,defaultCommandTimeout=600000`. Retry
+    with those waits then measured the 60 s miss.
+  - Observed effect: one setup-only abort (~40 s runner lifetime) plus
+    investigation before the authorized retry.
+  - Inference: large-fixture Cypress waits were already in the profiling
+    record; copying the small-path `--config` was enough to miss them.
