@@ -106,3 +106,38 @@ unrelated lockfile diff.
     execution; no functional impact since each drift was caught before
     commit, but the pattern would silently ship as an unrelated diff without
     that check.
+
+## DD-005 — Unit-test seams that satisfy a provisioning precondition can hide an ordering defect only the live integration proof exposes
+
+The runner-owned E2E wrapper's boundary tests injected a pre-resolved
+`runtimeTarget` (or drove the primary, non-isolated checkout) for
+`runOwnedE2eInvocation` / `runE2eBatch`. That seam satisfied the
+`resolveSutCheckoutTarget` precondition (which requires a complete E2E
+allocation) without exercising the real provisioning side effect that
+`startOwnedSutLifetime` performs. The wrapper called `resolveSutCheckoutTarget`
+*before* `startOwnedSutLifetime`, so a fresh isolated worktree with no
+allocation yet failed on first `pnpm cy:run` — but only the live concurrent
+proof surfaced this; the boundary suite passed throughout. The fix skips the
+pre-start resolve for isolated checkouts (letting `startOwnedSutLifetime`
+provision and resolve internally) and adds boundary tests for the
+fresh-isolated-worktree path.
+
+### Occurrences
+
+- Execution: SEED-015 Story 8 / quick-105-runner-owned-e2e-lifecycle / be7234f7f2
+  - Tool: Cursor
+  - Open Dough release: 0.3.12
+  - Evidence: slice 13's live concurrent proof failed in the peer worktree
+    with "Isolated worktree SUT needs a complete E2E allocation in
+    .worktree.local.json ... Missing: identity, e2e.database, e2e.backendPort,
+    e2e.vitePort, e2e.lbListenPort" thrown from `resolveSutCheckoutTarget` →
+    `loadCompleteIsolatedE2eAllocation`, called before `startOwnedSutLifetime`
+    in `runE2eBatch`. Pre-fix `scripts/e2e-runner.test.mjs` (at `47df168656`)
+    had zero matches for fresh-worktree / provisioning-path tests; the fix
+    commit `b0dad96aaa` added eight (fresh isolated worktree provisions, primary
+    regression guard, already-provisioned isolated re-reads allocation).
+  - Observed effect: one failed live-proof attempt, a defect fix, a Gradle
+    build-cache clear (a crashed `bootRunE2E --build-cache` had left a corrupted
+    cache entry that also failed the retry), and a re-run before slice 13's
+    proof passed. The boundary suite never caught the gap because the seam
+    elided the provisioning side effect.
