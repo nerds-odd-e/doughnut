@@ -64,19 +64,21 @@ function postJson(url, body) {
 }
 
 /**
- * Create an empty recording imposter on `servingPort` through `managementUrl`.
- * The `serviceLabel` names the service in failure messages.
+ * Create a recording imposter on `servingPort` through `managementUrl`.
+ * The `serviceLabel` names the service in failure messages. When `stubs` is
+ * supplied the imposter is created with those stubs; by default the imposter
+ * is empty (records requests, serves no canned response).
  */
 export async function createEmptyRecordingImposter(
   managementUrl,
   servingPort,
-  { serviceLabel = 'mock' } = {}
+  { serviceLabel = 'mock', stubs = [] } = {}
 ) {
   const response = await postJson(`${managementUrl}/imposters`, {
     protocol: 'http',
     port: servingPort,
     recordRequests: true,
-    stubs: [],
+    stubs,
   })
   if (response.statusCode !== 201) {
     throw new Error(
@@ -138,9 +140,14 @@ export function observeOwnedMockChild(child, { serviceLabel = 'mock' } = {}) {
 /**
  * Start one owned Mountebank management process and a single empty recording
  * imposter on a serving port. The caller supplies the port allocator
- * (`allocatePortsFn`) and the `serviceLabel` used in ownership/failure
- * messages; the allocator is responsible for excluding that service's
- * canonical serving port and the checkout's application ports.
+ * (`allocatePortsFn`, returning `{ managementPort, servingPort }`) and the
+ * `serviceLabel` used in ownership/failure messages; the allocator is
+ * responsible for excluding that service's canonical serving port and the
+ * checkout's application ports.
+ *
+ * Delegates to `startOwnedMountebankMockMulti` with one service config and
+ * adapts the return shape to the single-service contract (`endpoint` rather
+ * than `endpoints`).
  *
  * @returns {Promise<{
  *   endpoint: { managementUrl: string, servingPort: number },
@@ -163,8 +170,79 @@ export async function startOwnedMountebankMock({
       `startOwnedMountebankMock requires an allocatePortsFn (service: ${serviceLabel}).`
     )
   }
-  const ownershipOpts = { serviceLabel }
-  const { managementPort, servingPort } = await allocatePortsFn(allocation)
+  const multi = await startOwnedMountebankMockMulti({
+    checkoutRoot,
+    allocation,
+    spawnFn,
+    allocatePortsFn: async (a) => {
+      const { managementPort, servingPort } = await allocatePortsFn(a)
+      return { managementPort, servingPorts: [servingPort] }
+    },
+    serviceConfigs: [{ serviceLabel }],
+    managementLabel: serviceLabel,
+  })
+  const [endpoint] = multi.endpoints
+  return {
+    endpoint: {
+      managementUrl: endpoint.managementUrl,
+      servingPort: endpoint.servingPort,
+    },
+    child: multi.child,
+    verifyOwnership: multi.verifyOwnership,
+    stop: multi.stop,
+    killSync: multi.killSync,
+    getFailure: multi.getFailure,
+  }
+}
+
+/**
+ * Start one owned Mountebank management process and one recording imposter
+ * per service config, each on its own serving port, all under a single owned
+ * management listener. The caller supplies the port allocator
+ * (`allocatePortsFn`, returning `{ managementPort, servingPorts: [...] }`)
+ * and `serviceConfigs` (one per serving port, each carrying a `serviceLabel`
+ * and optional `stubs`). The management listener is verified under a shared
+ * `managementLabel`; each serving listener is verified under its own service
+ * label. Failure/cancellation settles the one process and all partial
+ * allocations without touching a peer.
+ *
+ * @returns {Promise<{
+ *   endpoints: { managementUrl: string, servingPort: number, serviceLabel: string }[],
+ *   child: import('node:child_process').ChildProcess,
+ *   verifyOwnership: () => Promise<true>,
+ *   stop: () => Promise<void>,
+ *   killSync: () => void,
+ *   getFailure: () => Error | null,
+ * }>}
+ */
+export async function startOwnedMountebankMockMulti({
+  checkoutRoot = repoRoot,
+  allocation,
+  spawnFn = spawn,
+  allocatePortsFn,
+  serviceConfigs,
+  managementLabel = 'multi-mock',
+} = {}) {
+  if (!Array.isArray(serviceConfigs) || serviceConfigs.length === 0) {
+    throw new Error(
+      'startOwnedMountebankMockMulti requires a non-empty serviceConfigs array.'
+    )
+  }
+  if (typeof allocatePortsFn !== 'function') {
+    throw new Error(
+      `startOwnedMountebankMockMulti requires an allocatePortsFn (management label: ${managementLabel}).`
+    )
+  }
+  const managementOpts = { serviceLabel: managementLabel }
+  const { managementPort, servingPorts } = await allocatePortsFn(allocation)
+  if (
+    !Array.isArray(servingPorts) ||
+    servingPorts.length !== serviceConfigs.length
+  ) {
+    throw new Error(
+      `startOwnedMountebankMockMulti: allocatePortsFn must return servingPorts matching serviceConfigs length (${serviceConfigs.length}).`
+    )
+  }
   const managementUrl = `http://127.0.0.1:${managementPort}`
   const pidfile = path.join(
     checkoutRoot,
@@ -192,41 +270,46 @@ export async function startOwnedMountebankMock({
   )
   child.unref()
 
-  const lifecycle = observeOwnedMockChild(child, ownershipOpts)
-
+  const lifecycle = observeOwnedMockChild(child, managementOpts)
   const throwIfMockFailed = () => {
     const failure = lifecycle.getFailure()
     if (failure) throw failure
   }
 
+  const endpoints = []
   try {
-    await waitForOwnedManagementListener(child, managementPort, ownershipOpts)
+    await waitForOwnedManagementListener(child, managementPort, managementOpts)
     throwIfMockFailed()
     await assertOwnedMockListener(
       managementPort,
-      ownedProcessGroupId(child, ownershipOpts),
+      ownedProcessGroupId(child, managementOpts),
       'management',
-      ownershipOpts
+      managementOpts
     )
-    await assertPortFreeBeforeMockMutation(
-      servingPort,
-      'serving',
-      ownershipOpts
-    )
-    throwIfMockFailed()
-    await createEmptyRecordingImposter(
-      managementUrl,
-      servingPort,
-      ownershipOpts
-    )
-    throwIfMockFailed()
-    await assertOwnedMockListener(
-      servingPort,
-      ownedProcessGroupId(child, ownershipOpts),
-      'serving',
-      ownershipOpts
-    )
-    throwIfMockFailed()
+    for (let i = 0; i < serviceConfigs.length; i++) {
+      const { serviceLabel, stubs = [] } = serviceConfigs[i]
+      const servingPort = servingPorts[i]
+      const serviceOpts = { serviceLabel }
+      await assertPortFreeBeforeMockMutation(
+        servingPort,
+        'serving',
+        serviceOpts
+      )
+      throwIfMockFailed()
+      await createEmptyRecordingImposter(managementUrl, servingPort, {
+        serviceLabel,
+        stubs,
+      })
+      throwIfMockFailed()
+      await assertOwnedMockListener(
+        servingPort,
+        ownedProcessGroupId(child, managementOpts),
+        'serving',
+        serviceOpts
+      )
+      throwIfMockFailed()
+      endpoints.push({ managementUrl, servingPort, serviceLabel })
+    }
   } catch (error) {
     await lifecycle.stop()
     throw error
@@ -234,25 +317,27 @@ export async function startOwnedMountebankMock({
 
   const verifyOwnership = async () => {
     throwIfMockFailed()
-    const ownedPgid = ownedProcessGroupId(child, ownershipOpts)
+    const ownedPgid = ownedProcessGroupId(child, managementOpts)
     await assertOwnedMockListener(
       managementPort,
       ownedPgid,
       'management',
-      ownershipOpts
+      managementOpts
     )
-    await assertOwnedMockListener(
-      servingPort,
-      ownedPgid,
-      'serving',
-      ownershipOpts
-    )
+    for (const endpoint of endpoints) {
+      await assertOwnedMockListener(
+        endpoint.servingPort,
+        ownedPgid,
+        'serving',
+        { serviceLabel: endpoint.serviceLabel }
+      )
+    }
     throwIfMockFailed()
     return true
   }
 
   return {
-    endpoint: { managementUrl, servingPort },
+    endpoints,
     child,
     verifyOwnership,
     stop: lifecycle.stop,

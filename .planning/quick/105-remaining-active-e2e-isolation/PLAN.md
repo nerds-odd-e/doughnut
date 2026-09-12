@@ -188,7 +188,7 @@ enabled.
 
 ### 5. Own distinct OpenAI and Wikidata mock endpoints in one invocation
 Type: Behavior
-Status: planned
+Status: done
 Behavior: A selection requiring both services receives one owned management
 process and separate recording serving endpoints; failure/cancellation settles
 that process and partial allocations without touching a peer.
@@ -201,6 +201,17 @@ foreign endpoint evidence refuses before mutation; exclude canonical mock and
 application ports from private allocation. Preserve the single-service case.
 Sizing: 5–8 minutes active work; real process startup wait excepted. Engine
 assumption not yet executed; this proof gates slice 6.
+Done 2026-09-12: **Real-engine assumption PASSED — Mountebank `@mbtest/mountebank`
+v2.9.4** serves two recording imposters with distinct responses under one owned
+management listener. Added `startOwnedMountebankMockMulti` +
+`allocateMountebankMockPortsMulti` and the `scripts/isolated-service-mocks.test.mjs`
+boundary fixture (4 tests). Refactor collapsed single-service starters/allocators
+to delegate to the multi-service core (one authoritative home). Boundary proof
+verifies: two distinct imposters, both serving listeners belong to the recorded
+child, all owned listeners gone after shutdown, unrelated listener survives,
+foreign/missing endpoint refuses before mutation, canonical mock (2525/5001/5002)
+and application ports excluded from private allocation. Single-service OpenAI
+regression (16 tests) green. Slice 6 unblocked.
 
 ### 6. Run active Wikidata features through private endpoints
 Type: Behavior
