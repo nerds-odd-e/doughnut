@@ -11,8 +11,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-3) — SEED-018; [slice plan](quick/108-publish-notebook-edits-faster/PLAN.md)
-
 ## Backlog list
 
 - [Document non-obvious rationale in the publication index-refresh simplification](quick/109-document-publication-index-refresh-rationale/PLAN.md)
