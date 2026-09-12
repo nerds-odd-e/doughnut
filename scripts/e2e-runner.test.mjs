@@ -29,6 +29,7 @@ import {
 } from './isolated-cypress.mjs'
 import {
   allocatePrimaryOpenAiMockPorts,
+  defaultSpawnCypress,
   defaultSpawnCypressOpen,
   runE2eBatch,
   runE2eInteractive,
@@ -1531,57 +1532,44 @@ test('primary batch: same lifecycle as isolated — primary shutdown stops the s
   assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
 })
 
-test('primary mock on canonical Mountebank port: owned by the invocation, stopped on shutdown, no runner lease', async (t) => {
+test('primary path: mock-requiring spec does NOT start a wrapper-owned mock (approved null, SUT Mountebank serves the spec)', async (t) => {
   const checkout = makePrimaryCheckout(t)
   const standIn = spawnOwnedTreeStandIn(checkout.root)
   const state = { owned: { leader: 0, grandchild: 0 } }
   trackOwnedTree(t, () => state.owned)
   let mockStarts = 0
-  let mockStopCalls = 0
-  let mockPid = 0
-  let passedAllocatePortsFn = null
+  let capturedEnv = null
 
   const code = await runE2eBatch({
     argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
     ...primaryLifetimeOpts(checkout.root, standIn, {
       healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
     }),
-    startPrivateOpenAiMockFn: async ({ allocatePortsFn }) => {
+    startPrivateOpenAiMockFn: async () => {
       mockStarts += 1
-      passedAllocatePortsFn = allocatePortsFn
-      const handle = spawnIdlePrivateMockHandle()
-      mockPid = handle.child.pid
-      const realStop = handle.stop
-      handle.stop = async () => {
-        mockStopCalls += 1
-        await realStop()
-      }
-      return handle
+      return spawnIdlePrivateMockHandle()
     },
-    spawnCypress: () =>
-      makeCypressChild(0, async () => {
+    spawnCypress: (opts) => {
+      capturedEnv = opts.env
+      return makeCypressChild(0, async () => {
         state.owned = await waitForOwnedPids(standIn.pidsFile)
-        assert.equal(isPidAlive(mockPid), true)
-        assert.equal(mockStopCalls, 0, 'mock must not be stopped mid-batch')
-      }),
+      })
+    },
   })
 
   assert.equal(code, 0)
   assert.equal(
     mockStarts,
-    1,
-    'mock must start exactly once for the primary batch'
+    0,
+    'primary path must not start a wrapper-owned mock even for the mock-requiring spec'
   )
-  assert.equal(mockStopCalls, 1, 'mock must be stopped once at invocation end')
   assert.equal(
-    passedAllocatePortsFn,
-    allocatePrimaryOpenAiMockPorts,
-    'primary mock must use the canonical-port allocator'
+    capturedEnv && capturedEnv[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY],
+    undefined,
+    'Cypress env must not signal wrapper-owned lifetime'
   )
-  assert.equal(isPidAlive(mockPid), false)
   assert.equal(isPidAlive(state.owned.leader), false)
   assert.equal(isPidAlive(state.owned.grandchild), false)
-  // No SUT owner → no runner lease is acquired for the primary mock.
   assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
 })
 
@@ -1889,15 +1877,13 @@ test('built-asset batch: required service exit terminates Cypress + settles owne
   assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
 })
 
-test('built-asset batch with mock: owned mock on canonical ports, stopped on shutdown, zero survivors', async (t) => {
+test('built-asset batch: mock-requiring spec does NOT start a wrapper-owned mock (primary path, approved null)', async (t) => {
   const checkout = makePrimaryCheckout(t)
   const standIn = spawnOwnedTreeStandIn(checkout.root)
   const state = { owned: { leader: 0, grandchild: 0 } }
   trackOwnedTree(t, () => state.owned)
   let mockStarts = 0
-  let mockStopCalls = 0
-  let mockPid = 0
-  let passedAllocatePortsFn = null
+  let capturedEnv = null
 
   const code = await runE2eBatch({
     argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
@@ -1905,39 +1891,29 @@ test('built-asset batch with mock: owned mock on canonical ports, stopped on shu
       healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
     }),
     runtimeTarget: BUILT_RUNTIME_TARGET,
-    startPrivateOpenAiMockFn: async ({ allocatePortsFn }) => {
+    startPrivateOpenAiMockFn: async () => {
       mockStarts += 1
-      passedAllocatePortsFn = allocatePortsFn
-      const handle = spawnIdlePrivateMockHandle()
-      mockPid = handle.child.pid
-      const realStop = handle.stop
-      handle.stop = async () => {
-        mockStopCalls += 1
-        await realStop()
-      }
-      return handle
+      return spawnIdlePrivateMockHandle()
     },
-    spawnCypress: () =>
-      makeCypressChild(0, async () => {
+    spawnCypress: (opts) => {
+      capturedEnv = opts.env
+      return makeCypressChild(0, async () => {
         state.owned = await waitForOwnedPids(standIn.pidsFile)
-        assert.equal(isPidAlive(mockPid), true)
-        assert.equal(mockStopCalls, 0, 'mock must not be stopped mid-batch')
-      }),
+      })
+    },
   })
 
   assert.equal(code, 0)
   assert.equal(
     mockStarts,
-    1,
-    'mock must start exactly once for the built batch'
+    0,
+    'built (primary) path must not start a wrapper-owned mock even for the mock-requiring spec'
   )
-  assert.equal(mockStopCalls, 1, 'mock must be stopped once at invocation end')
   assert.equal(
-    passedAllocatePortsFn,
-    allocatePrimaryOpenAiMockPorts,
-    'built target (primary) mock must use the canonical-port allocator'
+    capturedEnv && capturedEnv[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY],
+    undefined,
+    'Cypress env must not signal wrapper-owned lifetime'
   )
-  assert.equal(isPidAlive(mockPid), false)
   assert.equal(isPidAlive(state.owned.leader), false)
   assert.equal(isPidAlive(state.owned.grandchild), false)
   assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
@@ -1988,5 +1964,158 @@ test('built-asset batch: foreign listener on the Vite port does NOT refuse (buil
     await isPortStillListening(foreignVite.port),
     true,
     'foreign Vite listener must survive'
+  )
+})
+
+// ---------------------------------------------------------------------------
+// Slice 10: route CI E2E matrix jobs through the owned invocation wrapper.
+// The primary path accepts any --spec (no allowlist); the isolated path still
+// enforces the allowlist. --browser is forwarded to `cypress run`.
+// ---------------------------------------------------------------------------
+
+test('primary path: multi-line glob --spec accepted without throwing, joined --spec contains both globs comma-separated', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let capturedSpecs = null
+
+  const code = await runE2eBatch({
+    argv: ['--spec', 'e2e_test/features/foo/**\ne2e_test/features/bar/**'],
+    ...primaryLifetimeOpts(checkout.root, standIn),
+    spawnCypress: (opts) => {
+      capturedSpecs = opts.specs
+      return makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+      })
+    },
+  })
+
+  assert.equal(code, 0)
+  assert.ok(capturedSpecs, 'specs must be forwarded to Cypress')
+  assert.equal(capturedSpecs.length, 2, 'multi-line glob splits into two specs')
+  assert.deepEqual(
+    capturedSpecs,
+    ['e2e_test/features/foo/**', 'e2e_test/features/bar/**'],
+    'both globs preserved'
+  )
+  assert.equal(
+    capturedSpecs.join(','),
+    'e2e_test/features/foo/**,e2e_test/features/bar/**',
+    'joined --spec is comma-separated'
+  )
+})
+
+test('primary path: no private mock started (approved null), Cypress env has no E2E_RUNNER_OWNS_LIFETIME', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let capturedEnv = null
+  let mockStarted = false
+
+  const code = await runE2eBatch({
+    argv: ['--spec', 'e2e_test/features/foo/**\ne2e_test/features/bar/**'],
+    ...primaryLifetimeOpts(checkout.root, standIn),
+    startPrivateOpenAiMockFn: async () => {
+      mockStarted = true
+      return spawnIdlePrivateMockHandle()
+    },
+    spawnCypress: (opts) => {
+      capturedEnv = opts.env
+      return makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+      })
+    },
+  })
+
+  assert.equal(code, 0)
+  assert.equal(mockStarted, false, 'no private mock for primary path')
+  assert.equal(
+    capturedEnv && capturedEnv[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY],
+    undefined,
+    'Cypress env must not signal wrapper-owned lifetime'
+  )
+})
+
+test('defaultSpawnCypress: --browser chrome forwarded as ["--browser","chrome"] in cypress run args', () => {
+  const captured = []
+  const fakeChild = new EventEmitter()
+  fakeChild.pid = 0
+  fakeChild.kill = () => undefined
+  fakeChild.unref = () => undefined
+  const spawnFn = (cmd, args, opts) => {
+    captured.push({ cmd, args, opts })
+    return fakeChild
+  }
+
+  defaultSpawnCypress({
+    specs: ['e2e_test/features/foo/**'],
+    cwd: '/repo',
+    env: {},
+    cypressBin: '/repo/node_modules/cypress/bin/cypress',
+    configFile: 'e2e_test/config/ci.ts',
+    stdio: 'inherit',
+    browser: 'chrome',
+    spawnFn,
+  })
+
+  assert.equal(captured.length, 1)
+  const { args } = captured[0]
+  const browserIdx = args.indexOf('--browser')
+  assert.ok(browserIdx >= 0, '--browser must be in cypress run args')
+  assert.equal(args[browserIdx + 1], 'chrome', 'browser value is chrome')
+})
+
+test('defaultSpawnCypress: without --browser no --browser arg is emitted', () => {
+  const captured = []
+  const fakeChild = new EventEmitter()
+  fakeChild.pid = 0
+  fakeChild.kill = () => undefined
+  fakeChild.unref = () => undefined
+  const spawnFn = (cmd, args, opts) => {
+    captured.push({ cmd, args, opts })
+    return fakeChild
+  }
+
+  defaultSpawnCypress({
+    specs: ['e2e_test/features/foo/**'],
+    cwd: '/repo',
+    env: {},
+    cypressBin: '/repo/node_modules/cypress/bin/cypress',
+    configFile: 'e2e_test/config/ci.ts',
+    stdio: 'inherit',
+    spawnFn,
+  })
+
+  assert.equal(captured.length, 1)
+  const { args } = captured[0]
+  assert.equal(
+    args.includes('--browser'),
+    false,
+    'no --browser arg without a browser'
+  )
+})
+
+test('isolated path: non-allowlisted glob still refuses (allowlist enforced for isolated only)', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  let startCalled = false
+
+  const code = await runE2eBatch({
+    argv: ['--spec', 'e2e_test/features/foo/**\ne2e_test/features/bar/**'],
+    checkoutRoot: checkout.root,
+    startLifetime: async () => {
+      startCalled = true
+      throw new Error('should not start')
+    },
+    spawnCypress: () => makeCypressChild(0),
+  })
+
+  assert.equal(code, 1)
+  assert.equal(
+    startCalled,
+    false,
+    'must refuse non-allowlisted glob for isolated path'
   )
 })

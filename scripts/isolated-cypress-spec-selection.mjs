@@ -50,7 +50,7 @@ function specArgsFromArgv(argv) {
   }
   return specs.flatMap((value) =>
     value
-      .split(',')
+      .split(/[,\n]/)
       .map((part) => part.trim())
       .filter(Boolean)
   )

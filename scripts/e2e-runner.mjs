@@ -51,27 +51,48 @@ const DEFAULT_CYPRESS_BIN = path.join(
 )
 const DEFAULT_CYPRESS_CONFIG_FILE = 'e2e_test/config/ci.ts'
 
-function resolveSpecs(argv, checkoutRoot) {
+function browserFromArgv(argv) {
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i]
+    if (arg === '--browser' && argv[i + 1]) {
+      return argv[i + 1]
+    }
+    if (typeof arg === 'string' && arg.startsWith('--browser=')) {
+      return arg.slice('--browser='.length)
+    }
+  }
+  return
+}
+
+function resolveSpecs(argv, checkoutRoot, isolated) {
   if (!hasExplicitCypressSpecSelection(argv)) {
     throw new Error(
       'e2e-runner requires an explicit --spec selection of one supported spec.'
     )
   }
   const selected = selectedCypressSpecs({ argv, checkoutRoot })
+  if (!isolated) {
+    return { specs: selected, approved: null }
+  }
   const approved = assertSupportedIsolatedCypressSpecs(selected)
   return { specs: selected, approved }
 }
 
-function defaultSpawnCypress({
+export function defaultSpawnCypress({
   specs,
   cwd,
   env,
   cypressBin,
   configFile,
   stdio,
+  browser,
+  spawnFn = spawn,
 }) {
   const args = ['run', '--config-file', configFile, '--spec', specs.join(',')]
-  return spawn(process.execPath, [cypressBin, ...args], {
+  if (browser) {
+    args.push('--browser', browser)
+  }
+  return spawnFn(process.execPath, [cypressBin, ...args], {
     cwd,
     env,
     stdio,
@@ -191,10 +212,19 @@ export async function runE2eBatch({
   cancelEscalationMs,
   ...lifetimeOpts
 } = {}) {
+  const resolvedCheckoutTarget = resolveSutCheckoutTarget({
+    checkoutRoot,
+    runtimeTarget: lifetimeOpts.runtimeTarget,
+  })
+  const browser = browserFromArgv(argv)
   let specs
   let approved
   try {
-    const resolved = resolveSpecs(argv, checkoutRoot)
+    const resolved = resolveSpecs(
+      argv,
+      checkoutRoot,
+      resolvedCheckoutTarget.isolated
+    )
     specs = resolved.specs
     approved = resolved.approved
   } catch (error) {
@@ -217,6 +247,8 @@ export async function runE2eBatch({
     startPrivateOpenAiMockFn,
     label: 'E2E batch',
     cancelEscalationMs,
+    browser,
+    resolvedCheckoutTarget,
     ...lifetimeOpts,
   })
 }
@@ -267,6 +299,7 @@ function runCypressOnce({
   mockExit = null,
   errLog = (s) => process.stderr.write(`${s}\n`),
   cancelEscalationMs = 5_000,
+  browser,
 }) {
   return new Promise((resolve, reject) => {
     let child
@@ -278,6 +311,7 @@ function runCypressOnce({
         cwd: checkoutRoot,
         env,
         stdio,
+        browser,
       })
     } catch (error) {
       reject(error)
@@ -417,6 +451,8 @@ async function runOwnedE2eInvocation({
   startPrivateOpenAiMockFn,
   label,
   cancelEscalationMs,
+  browser,
+  resolvedCheckoutTarget,
   runtimeTarget,
   isPortOccupiedFn,
   ...lifetimeOpts
@@ -427,10 +463,9 @@ async function runOwnedE2eInvocation({
   // `startOwnedSutLifetime`; the primary target has no owner/claim gate, so
   // the wrapper guards its canonical ports here. Reuses the existing target
   // rules — no second allowlist or target manager.
-  const { isolated, target: resolvedTarget } = resolveSutCheckoutTarget({
-    checkoutRoot,
-    runtimeTarget,
-  })
+  const { isolated, target: resolvedTarget } =
+    resolvedCheckoutTarget ??
+    resolveSutCheckoutTarget({ checkoutRoot, runtimeTarget })
   if (!isolated) {
     const portCheck = isPortOccupiedFn ?? isTcpPortOccupied
     const occupied = await listOccupiedApplicationPorts(
@@ -569,6 +604,7 @@ async function runOwnedE2eInvocation({
       mockExit,
       errLog,
       cancelEscalationMs,
+      browser,
     })
     if (cancel.isTriggered()) return 1
     return cypressExitCode

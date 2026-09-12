@@ -261,7 +261,7 @@ across the distinct representations.
 
 ### 10. Route CI matrix jobs through the owned invocation
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: Each CI matrix job invokes the built-target wrapper for its existing
 selection, with one lifecycle owner and unchanged build/cache/tag/artifact policy.
 Proof: Inspect exact generated command/arguments at the command boundary;
@@ -272,6 +272,22 @@ workflow wiring and observe actual CI on execution's normal push; a local test
 alone must not be reported as successful hosted CI.
 Sizing: 4–6 minutes active work, medium confidence; hosted CI wait is an explicit
 external-wait exception, not grounds to rerun the full suite locally.
+Proof result: 50/50 boundary tests pass (5 new: primary multi-line glob --spec
+acceptance, primary no wrapper-owned mock, --browser forwarding, isolated
+allowlist regression guard). specArgsFromArgv splits on comma AND newline for the
+CI matrix YAML block. resolveSpecs gates assertSupportedIsolatedCypressSpecs to
+the isolated path only; primary returns approved:null (no wrapper mock — the SUT
+stack's start:mb provides Mountebank on 2525 and the spec uses shared 5001
+defaults; the plugin returns early for primary so E2E_RUNNER_OWNS_LIFETIME is
+irrelevant). ci.yml E2E-tests job replaced cypress-io/github-action with a build
+step (e2e-bundle-if-needed.sh) + `SUT_RUNTIME_TARGET='{"built":true}' node
+scripts/e2e-runner.mjs --spec "<matrix.spec>" --browser chrome`, preserving
+cache/NO_PROXY/secrets/artifacts. Post-change refactor: eliminated a duplicate
+resolveSutCheckoutTarget call (runE2eBatch resolves once, threads through to
+runOwnedE2eInvocation; interactive path falls back to internal resolution).
+Hosted CI observation deferred — the donut CI workflow triggers only on pushes
+to main, and the execution branch has no push-triggered CI; the workflow change
+will be observed after merge to main, not as a local substitute.
 
 ### 11. Keep paired isolation proofs usable with run-owned stacks
 Type: Behavior
