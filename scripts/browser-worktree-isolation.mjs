@@ -63,11 +63,7 @@ export function readPresentWorktreeLocalConfig(checkoutRoot) {
   return readWorktreeLocalConfig(checkoutRoot)
 }
 
-const SUPPORTED_ISOLATED_SUT_COMMANDS = new Set([
-  'pnpm sut',
-  'pnpm sut:healthcheck',
-  'pnpm sut:restart',
-])
+const SUPPORTED_ISOLATED_SUT_COMMANDS = new Set(['pnpm sut:healthcheck'])
 
 const E2E_ALLOCATION_FIELDS = ['e2e.database', ...E2E_PORT_CONFIG_FIELDS]
 

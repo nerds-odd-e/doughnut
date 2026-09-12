@@ -313,23 +313,66 @@ callers to start both allocations first (now stale); the spawnCypress option
 name on runPairedWorktreeResetIsolation is stale but left to keep this refactor
 minimal.
 
-### 12. Remove obsolete public lifecycle entry points
+### 12. Remove obsolete public lifecycle entry points (code)
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: Documented local/CI E2E commands all enter the owned wrapper; separate
 SUT start/restart/health command preparation and wait-for-existing-stack aliases
 are gone. `cy:run`, `cy:open`, and aggregate `test` route coherently with no
 recursive pnpm call or second service owner.
-Proof: Command-boundary routing checks plus reference audit of package scripts,
-CI, script harnesses, docs, AGENTS/CLAUDE, agent-map/rules, and mirrored skills.
-Internal health APIs/log commands remain usable. Delete obsolete executable
-adapters and port-killing helpers once caller-free; update lint references and
-preserve equivalent ownership regressions. Historical completed plans need not
-be rewritten. All live callers must migrate; no obsolete alias remains merely
-to avoid updating guidance.
-Sizing: 5–8 minutes, medium confidence. Remaining edits apply one command
-contract mechanically; harness behavior was isolated in slice 11. If another
-live caller needs independent behavioral adaptation, refine before deletion.
+Proof: Command-boundary routing checks. Remove `sut`, `sut:restart`,
+`sut:healthcheck`, `cy:run-with-sut`, `cy:run-on-sut` from package.json. Rewire
+`cy:run` to `node scripts/e2e-runner.mjs` and `test` to build bundles + the
+owned wrapper invocation (built target, full specPattern). Delete the obsolete
+`sut-restart.mjs` adapter and its tests once caller-free; the only non-package
+caller is the test fixture `browser-worktree-isolation-fixtures.mjs` (asserts
+restart rejection) — remove that assertion with the adapter. Internal health
+APIs (`sut-healthcheck.mjs`, `sut-start.mjs` owned lifetime) remain usable.
+Unify the signal-wiring duplication between `wireBatchCancellation`
+(e2e-runner.mjs) and `attachCancelSignals` (sut-start.mjs) noted by slice 4 —
+one cancellation path, no generic signal framework. Update `test:sut-restart`
+and `test:sut-start` script references for deleted files. Preserve equivalent
+ownership regressions (zero-survivor/cleanup assertions) in the remaining suite.
+Sizing: 8–10 minutes, medium confidence. Code + tests only; doc/guidance
+reference audit is slice 12b. If a live production caller needs non-mechanical
+behavioral adaptation, stop and refine.
+Proof result: removed sut, sut:restart, sut:healthcheck, cy:run-with-sut,
+cy:run-on-sut, test:sut-restart from package.json; rewired cy:run -> node
+scripts/e2e-runner.mjs and test -> build bundles + SUT_RUNTIME_TARGET='{"built":true}'
+node scripts/e2e-runner.mjs --spec 'e2e_test/features/**/*.feature'. Deleted
+sut-restart.mjs + sut-restart.test.mjs + sut-isolated-restart.test.mjs; removed
+the runSutRestart assertion from browser-worktree-isolation-fixtures.mjs and
+browser-worktree-isolation.test.mjs. Removed sut-start.mjs isMain entry +
+attachCancelSignals (unifies signal-wiring with wireBatchCancellation via
+deletion). runSutStart KEPT as an internal adapter (still meaningfully exercised
+by sut-start/sut-retirement-admission/sut-fresh-identity-start/sut-runtime-target
+tests and sut-isolated-fixtures). Cleaned stale code refs: sut-healthcheck.mjs
+comments, dead 'pnpm sut:restart'/'pnpm sut' entries in
+SUPPORTED_ISOLATED_SUT_COMMANDS (kept the functional 'pnpm sut:healthcheck' and
+the 'pnpm sut' guard branch that selects start-vs-complete allocation loading).
+Tests: 50 e2e-runner + 19 browser-worktree-isolation/harness + 36 sut-start/
+isolated-cypress + 21 sut-retirement/healthcheck + 8 cli-spec/fresh-identity
+all pass. Deferred concern: retainOwnership / holdSutOwnershipAcrossRestart
+is now dead production code (only test-exercised) from the removed restart flow;
+removing it touches sut-start.mjs/sut-owner.mjs/sut-services.mjs/
+sut-retirement-admission.test.mjs and is out of this slice's scope — candidate
+for a later cleanup. Doc/guidance reference audit is slice 12b.
+
+### 12b. Update guidance references for removed lifecycle entry points
+Type: Behavior
+Status: planned
+Behavior: No documented guidance references an obsolete `sut`/`sut:restart`/
+`sut:healthcheck`/`cy:run-with-sut`/`cy:run-on-sut` command; all local/CI E2E
+guidance routes through the owned wrapper.
+Proof: Reference audit across AGENTS.md, CLAUDE.md, .cursor/agent-map.md,
+.cursor/rules (e.g. e2e-authoring.mdc), docs (end-to-end-testing.md,
+worktree-browser-tests.md, development-setup.md, nix.md, notebook-publication-
+profiling.md, ona.md, README.md, DearDough.md), and mirrored skills
+(.claude/skills + .agents/skills). Replace obsolete command references with
+the owned wrapper entry points; remove stale "start both allocations first"
+instructions (slice 11 made the harness own its stack). Historical completed
+plans need not be rewritten. Internal health/log commands remain usable.
+Sizing: 5–8 minutes, low risk; mechanical reference audit.
 
 ### 13. Demonstrate independent concurrent E2E invocations
 Type: Behavior

@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 /**
- * Start SUT services in the background, wait for health, then exit.
+ * Owned SUT lifetime and legacy start adapter.
  *
- * Exit 0: all services healthy.
- * Exit 1: timeout, cancellation, or early process exit — diagnostics on stderr, log path printed.
+ * startOwnedSutLifetime is the wrapper's path: allocate the isolated/primary
+ * SUT target, spawn the detached supervisor, and expose its running lifetime
+ * to an in-process caller that owns shutdown.
+ *
+ * runSutStart is a legacy adapter that returns an exit code by driving the
+ * owned lifetime and leaving the detached supervisor running on success.
  *
  * Topology reference: docs/gcp/prod_env.md (Local dev / Cypress).
  * Log file: sut.log (repo root, gitignored).
- * PID file: sut.pid (repo root, gitignored) — stores the process group ID so
- *           `pnpm sut:restart` can find and stop the group.
+ * PID file: sut.pid (repo root, gitignored) — stores the process group ID.
  *
  * Env:
  *   SUT_TIMEOUT_MS  – max ms to wait for healthy (default: 120000)
@@ -118,7 +121,7 @@ export async function startOwnedSutLifetime({
   retainOwnership = false,
   signal,
 } = {}) {
-  // Retained-owner restart already holds SUT ownership; do not take the gate again.
+  // A retained-owner start already holds SUT ownership; do not take the gate again.
   const releaseAdmissionIfHeld =
     worktreeIsolationApplies(checkoutRoot) && !retainOwnership
       ? holdRetirementAdmission(checkoutRoot)
@@ -217,8 +220,8 @@ export async function startOwnedSutLifetime({
 /**
  * Legacy start adapter: spawn services, write PID file, wait for health, and
  * return an exit code. On a healthy start the detached supervisor keeps
- * running (so `pnpm sut:restart` and signal-based shutdown still work). On a
- * failed isolated start the owned tree and ownership are released.
+ * running. On a failed isolated start the owned tree and ownership are
+ * released.
  *
  * @param {{
  *   spawnFn?: typeof spawn,
@@ -238,7 +241,6 @@ export async function startOwnedSutLifetime({
  *   portClaimRoot?: string,
  *   retainOwnership?: boolean,
  *   signal?: AbortSignal,
- *   attachCancelSignals?: boolean,
  * }} [opts]
  * @returns {Promise<number>} exit code (0 = healthy, 1 = failed)
  */
@@ -260,59 +262,27 @@ export async function runSutStart({
   portClaimRoot,
   retainOwnership = false,
   signal,
-  attachCancelSignals = false,
 } = {}) {
-  let effectiveSignal = signal
-  let detachCancelSignals = () => undefined
-  if (!effectiveSignal && attachCancelSignals) {
-    const controller = new AbortController()
-    effectiveSignal = controller.signal
-    const onCancel = () => controller.abort()
-    process.once('SIGINT', onCancel)
-    process.once('SIGTERM', onCancel)
-    detachCancelSignals = () => {
-      process.off('SIGINT', onCancel)
-      process.off('SIGTERM', onCancel)
-    }
-  }
-  try {
-    const lifetime = await startOwnedSutLifetime({
-      spawnFn,
-      logFile,
-      pidFile,
-      timeoutMs,
-      pollMs,
-      log,
-      errLog,
-      healthcheckFn,
-      checkoutRoot,
-      runtimeTarget,
-      databaseExistsFn,
-      mysqlExecFn,
-      schemaExistsFn,
-      isPortOccupiedFn,
-      portClaimRoot,
-      retainOwnership,
-      signal: effectiveSignal,
-    })
-    const { exitCode } = await lifetime.ready
-    if (exitCode !== 0) await lifetime.shutdown()
-    return exitCode
-  } finally {
-    detachCancelSignals()
-  }
-}
-
-const isMain = process.argv[1]
-  ? fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
-  : false
-
-if (isMain) {
-  try {
-    const code = await runSutStart({ attachCancelSignals: true })
-    process.exit(code)
-  } catch (e) {
-    process.stderr.write(`${e instanceof Error ? e.message : String(e)}\n`)
-    process.exit(1)
-  }
+  const lifetime = await startOwnedSutLifetime({
+    spawnFn,
+    logFile,
+    pidFile,
+    timeoutMs,
+    pollMs,
+    log,
+    errLog,
+    healthcheckFn,
+    checkoutRoot,
+    runtimeTarget,
+    databaseExistsFn,
+    mysqlExecFn,
+    schemaExistsFn,
+    isPortOccupiedFn,
+    portClaimRoot,
+    retainOwnership,
+    signal,
+  })
+  const { exitCode } = await lifetime.ready
+  if (exitCode !== 0) await lifetime.shutdown()
+  return exitCode
 }

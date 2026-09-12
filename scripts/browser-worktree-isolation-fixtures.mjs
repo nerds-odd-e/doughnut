@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import { EventEmitter } from 'node:events'
 import { loadIsolatedE2eStartAllocation } from './browser-worktree-isolation.mjs'
 import {
   guardCypressNodeSetup,
@@ -7,31 +6,11 @@ import {
 } from './isolated-cypress.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
 import { runConfiguredStart } from './sut-isolated-fixtures.mjs'
-import { runSutRestart } from './sut-restart.mjs'
 
 export const isolatedCypressSpec = /only supports|spec selection/i
 export const malformedJson = /not valid JSON/i
 export const incompleteAllocation =
   /complete E2E allocation|Missing or invalid/i
-
-export function makeRestartSpies() {
-  const lsofCalls = []
-  const spawnCalls = []
-  return {
-    lsofCalls,
-    spawnCalls,
-    execFileFn: (cmd, args, cb) => {
-      lsofCalls.push({ cmd, args })
-      cb({ code: 1 }, '')
-    },
-    spawnFn: (...args) => {
-      spawnCalls.push(args)
-      const child = new EventEmitter()
-      queueMicrotask(() => child.emit('close', 0))
-      return child
-    },
-  }
-}
 
 function trackingHealthChecks(accessed) {
   return [
@@ -77,19 +56,6 @@ export async function assertReadersRefuseIncompleteAllocation(
   )
   assert.equal(healthLogs.length, 0)
   assert.equal(healthAccessed.length, 0)
-
-  const restart = makeRestartSpies()
-  await assert.rejects(
-    runSutRestart({
-      checkoutRoot,
-      execFileFn: restart.execFileFn,
-      spawnFn: restart.spawnFn,
-      log: () => undefined,
-    }),
-    incompleteAllocation
-  )
-  assert.equal(restart.lsofCalls.length, 0)
-  assert.equal(restart.spawnCalls.length, 0)
 
   const hooks = { reset: false }
   await assert.rejects(async () => {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Local SUT healthcheck for `pnpm sut`.
- * Run in this repo's shell wrapper: `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`.
+ * Local SUT healthcheck API. Used internally by the E2E runner wrapper to
+ * verify the owned SUT stack is ready.
  * Topology reference: docs/gcp/prod_env.md (Local dev / Cypress).
  */
 import http from 'node:http'
@@ -95,8 +95,8 @@ export function formatReadyLine(result) {
 
 function logUnhealthyHints(log) {
   log('SUT unhealthy or still starting.')
-  log('If you just started `pnpm sut`, wait a few seconds and run again.')
-  log('If services are down, start with `pnpm sut`.')
+  log('If you just started the SUT, wait a few seconds and run again.')
+  log('If services are down, start the SUT before retrying.')
 }
 
 function unhealthyWithoutChecks(reason) {

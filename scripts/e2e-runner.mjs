@@ -3,8 +3,8 @@
  * E2E batch runner wrapper: own one SUT stack (and, when the selected spec
  * requires it, one private OpenAI mock + runner lease) for the entire batch,
  * run the selected supported specs through Cypress once, then settle every
- * owned resource and return Cypress's outcome. Existing `pnpm cy:run` /
- * `pnpm sut` commands remain usable until the migration slice.
+ * owned resource and return Cypress's outcome. `pnpm cy:run` and `pnpm test`
+ * both enter this wrapper; the wrapper is the single SUT lifecycle owner.
  *
  * The wrapper invokes the Cypress executable directly (not via a recursive
  * pnpm call) to avoid a second service owner. Ownership is claimed by the
