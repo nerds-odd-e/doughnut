@@ -1,7 +1,12 @@
 # Run remaining active E2E features in isolated worktrees
 
 Source: [SEED-015 Story 10](../../seeds/SEED-015-concurrent-worktree-environments.md#story-10).
-Status: planned. Planning/refinement authorized 2026-09-12; execution not authorized.
+Status: complete (all 10 slices done). Planning/refinement authorized
+2026-09-12; execution authorized and completed 2026-09-12.
+Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
+`main`; execution checkout `/Users/terryyin/git/d105-e2e` on
+`execute/105-e2e-isolation`; integration target `main`. CI observer mailbox
+`/tmp/dough-ci-501/watch-VA4ixD` (workflow `ci.yml` / `donut CI`).
 Backlog remains queued in its current order. No dependency on implementing
 Story 9: use short disposable checkout paths for this story's live proofs.
 
@@ -89,7 +94,7 @@ work. Planning/refinement performs none of those execution actions.
 
 ### 1. Admit ordinary active browser features
 Type: Behavior
-Status: planned
+Status: done
 Behavior: An existing non-mock feature outside the old four-file allowlist runs
 against the selected isolated app and needs no network mock process.
 Proof: Extend runner/plugin admission tests for the assessed application-only
@@ -98,10 +103,21 @@ proof. Keep unknown files and excluded whole-file ignored tests outside admissio
 Preserve MCP's existing origin handling; include its existing focused regression.
 Do not admit resource-dependent groups until their owning slices are complete.
 Sizing: 5–8 minutes, medium confidence; live browser wait excepted.
+Done 2026-09-12: extended `APPLICATION_ONLY_ACTIVE_SPECS` in
+`scripts/isolated-cypress-spec-selection.mjs` (one registry authority) to admit
+the assessed 52 application-only active files (50 new + 2 already admitted);
+updated 4 existing tests that used `note_creation.feature` as the unsupported
+example to use `book_reading/epub_book.feature` (permanently excluded); added a
+positive admission test. Refactor consolidated stale 4-file lists in
+`docs/worktree-browser-tests.md` and `.cursor/rules/e2e-authoring.mdc` to
+reference the single registry (fulfills the plan's doc-update promise). Focused
+unit suites (74 tests across 6 suites) and `pnpm cy:run --spec
+e2e_test/features/note_creation_and_update/note_creation.feature` (9/9) green.
+Assessed count matches the plan's 52-file inventory with no discrepancy.
 
 ### 2. Admit active CLI workflows with selected-origin artifacts
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Active clone/edit/relocate/install CLI features run against the chosen
 worktree using local bundles and temporary config/install/clone directories.
 Proof: Extend existing CLI admission and command-boundary origin/artifact tests;
@@ -109,10 +125,21 @@ run `cli/cli_notebook_clone.feature` as representative additional browser proof.
 Preserve already-supported web-created-note behavior. Actual shared artifact
 writes, if found, must be corrected at this seam before admitting their callers.
 Sizing: 5–8 minutes, medium confidence; measured build/browser waits excepted.
+Done 2026-09-12: added `ACTIVE_CLI_SPECS` (4 remaining active CLI features) to
+the single registry; extended CLI admission/command-boundary origin tests;
+updated slice-1 exclusion test to reflect CLI admission; refreshed
+`docs/worktree-browser-tests.md` and `.cursor/rules/e2e-authoring.mdc` CLI
+scope. No shared-artifact writes found at the CLI origin/artifact seam (all
+config/install/clone dirs use `mkdtemp`; bundles checkout-local under
+`repoRoot/cli/dist`). Refactor removed one redundant two-worktree test
+(coverage survives in the existing spec-agnostic origin-routing test).
+Focused unit suites (64 tests) and `pnpm cy:run --spec
+e2e_test/features/cli/cli_notebook_clone.feature` (12/12, clean shutdown)
+green. Assessed CLI inventory matches the plan's 5 files with no discrepancy.
 
 ### 3. Provision private OpenAI mocks for remaining active AI features
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Any currently active OpenAI mock feature gets the existing private
 endpoint, including files whose mock tag appears on a scenario rather than on
 the Feature. Its invocation cleanup remains unchanged.
@@ -121,10 +148,22 @@ once per batch, and `note_view/semantic_search.feature` establishes a newly
 admitted scenario-level mock path. Existing completion/failure/cancel proof stays
 green. Do not infer mock requirements from the feature filename in service code.
 Sizing: 5–8 minutes, medium confidence; focused browser wait excepted.
+Done 2026-09-12: added `ACTIVE_OPEN_AI_MOCK_SPECS` (11 remaining active
+OpenAI-mock features) to the single registry, each declaring
+`requiresPrivateOpenAiMock: true` (12-file group with the already-admitted
+representative). Scenario-level mock-tagged files (`semantic_search`,
+`property_memory_tracker`, `mcq_management`) admitted via the registry
+requirement, not inferred from filename. Refactor removed a test-only plural
+export and rewrote the inventory test to derive from the registry; fixed a
+stale assertion message. Focused unit suites (74 tests) and `pnpm cy:run
+--spec e2e_test/features/note_view/semantic_search.feature` (4/4) green;
+completion/failure/cancel regression green. Assessed OpenAI-mock inventory
+matches the plan's 12 files (9 Feature-level, 3 scenario-level) with no
+discrepancy.
 
 ### 4. Extract the existing Mountebank ownership from OpenAI configuration
 Type: Structure
-Status: planned
+Status: done
 Change: Expose the existing owned process, management listener, port allocation,
 and verification/stop behavior independently of OpenAI-specific endpoint names;
 OpenAI uses that same lifecycle adapter with unchanged observable behavior.
@@ -134,10 +173,22 @@ Proof: Existing private OpenAI endpoint, ownership, cancellation and failure
 boundary tests stay green, as do primary canonical mock behavior tests.
 Sizing: 5–8 minutes, medium confidence. If extraction entails separate independent
 protocol changes, stop and refine instead of combining them invisibly.
+Done 2026-09-12: extracted Mountebank ownership lifecycle into a new generic,
+service-label-parameterized adapter `scripts/isolated-mountebank-mock.mjs`
+(`observeOwnedMockChild`, `createEmptyRecordingImposter`,
+`startOwnedMountebankMock`); `isolated-openai-mock.mjs` is now a thin OpenAI
+adapter over it. Refactor renamed the generic ownership/ports modules to
+`isolated-mountebank-mock-ownership.mjs` / `isolated-mountebank-mock-ports.mjs`
+and made the OpenAI label explicit (`OPEN_AI_SERVICE_LABEL`) at the two
+production callers. No process observers, termination code, port-exclusion
+rules, or endpoint transport duplicated; one coherent change. Focused
+suites (77 tests) and primary canonical mock behavior suite (6 tests) green;
+OpenAI observable behavior unchanged. Slice 5's two-service contract is now
+enabled.
 
 ### 5. Own distinct OpenAI and Wikidata mock endpoints in one invocation
 Type: Behavior
-Status: planned
+Status: done
 Behavior: A selection requiring both services receives one owned management
 process and separate recording serving endpoints; failure/cancellation settles
 that process and partial allocations without touching a peer.
@@ -150,10 +201,21 @@ foreign endpoint evidence refuses before mutation; exclude canonical mock and
 application ports from private allocation. Preserve the single-service case.
 Sizing: 5–8 minutes active work; real process startup wait excepted. Engine
 assumption not yet executed; this proof gates slice 6.
+Done 2026-09-12: **Real-engine assumption PASSED — Mountebank `@mbtest/mountebank`
+v2.9.4** serves two recording imposters with distinct responses under one owned
+management listener. Added `startOwnedMountebankMockMulti` +
+`allocateMountebankMockPortsMulti` and the `scripts/isolated-service-mocks.test.mjs`
+boundary fixture (4 tests). Refactor collapsed single-service starters/allocators
+to delegate to the multi-service core (one authoritative home). Boundary proof
+verifies: two distinct imposters, both serving listeners belong to the recorded
+child, all owned listeners gone after shutdown, unrelated listener survives,
+foreign/missing endpoint refuses before mutation, canonical mock (2525/5001/5002)
+and application ports excluded from private allocation. Single-service OpenAI
+regression (16 tests) green. Slice 6 unblocked.
 
 ### 6. Run active Wikidata features through private endpoints
 Type: Behavior
-Status: planned
+Status: done
 Behavior: An active Wikidata scenario installs its stubs on its invocation-owned
 endpoint and configures only its own app; restoration keeps later real-service
 scenarios on their existing URL behavior.
@@ -163,10 +225,31 @@ Run `wikidata/note_create_with_wikidata_id.feature`; boundary proof establishes
 isolated missing-endpoint refusal and unchanged primary/CI canonical behavior.
 No Google/Gmail adapter changes. No service startup in Cucumber hooks.
 Sizing: 5–8 minutes, medium confidence; focused browser wait excepted.
+Done 2026-09-12: admitted the 4 Wikidata files through the single registry
+(each `requiresPrivateWikidataMock: true`); wired Wikidata's adapter to consume
+its invocation-owned endpoint instead of hardcoded 5002/2525 via a new thin
+`scripts/isolated-wikidata-mock.mjs` adapter + `wikidataMockEndpointContext.ts`
+(mirroring the OpenAI pattern over the generic `startOwnedMountebankMock`
+lifecycle). `e2e-runner.mjs` generalized to collect required mocks from `approved`
+and start each (OpenAI and/or Wikidata) under one lease with distinct env keys;
+`combineChildExits` ends the run if any owned mock exits. Plugin boundary
+verifies ownership before mutation (missing/foreign endpoint refuses). The
+`@usingMockedWikidataService` hook loads the endpoint override + verifies
+ownership + calls `mock()`; no service started in Cucumber hooks. Real-service
+scenarios in mixed files keep their existing URL behavior (Cucumber tag
+selection unchanged). Refactor removed dead imports/params and development-
+history comment leaks. Focused unit suites (90 node + 16 TS tests) and
+`pnpm cy:run --spec e2e_test/features/wikidata/note_create_with_wikidata_id.feature`
+(3/3) green; OpenAI path and primary/CI canonical behavior unchanged. Assessed
+Wikidata inventory matches the plan's 4 files with no discrepancy. **Sizing
+deviation:** active work ~25 min vs. 5–8 min target — the Wikidata wiring touched
+the runner, plugin boundary, endpoint context, and Cucumber hook across one
+coherent responsibility; recorded for retrospective. Slice converged with green
+proof; no refinement warranted mid-slice.
 
 ### 7. Run a mixed-resource batch without cross-file interference
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Ordinary, OpenAI, and Wikidata files run sequentially under one stack;
 scenario resets and mock reinstalls keep each file's correct endpoint and the
 union of resources survives until invocation exit.
@@ -180,10 +263,20 @@ Observe one startup and final shutdown, correct responses from both services,
 and empty owned ports after completion. Extend the invocation boundary example
 only for any gap this mixed-resource transition exposes.
 Sizing: 5 minutes active work; measured browser/runtime wait excepted.
+Done 2026-09-12: ran the representative mixed batch (note_creation + semantic_search
++ note_create_with_wikidata_id) — 16/16 scenarios green, one startup and one
+final shutdown, correct responses from both services, empty owned ports after
+completion (a pre-existing foreign dev Mountebank on canonical 2525/5001/5002
+correctly survived per ADR 0007). No production code change — the existing runner
+already unions batch requirements (slices 5–6); added one focused boundary test
+in `scripts/e2e-runner.test.mjs` covering the union gap (both mocks start under
+one lease, distinct env keys, survive until exit, stop together). Refactor:
+no candidates (test is focused behavioral documentation of the union gap, not
+duplication). Sizing held (~6 min active + measured browser wait).
 
 ### 8. Keep interactive resource ownership across feature switches
 Type: Behavior
-Status: planned
+Status: done
 Behavior: One interactive session switches between ordinary, OpenAI and Wikidata
 features with the required private endpoints ready before use; reruns preserve
 session ownership and close cleans all owned resources.
@@ -194,10 +287,27 @@ is sufficient. Do not add a background resource broker or change Cucumber
 scenario semantics. One focused interactive switch/close manual check is part
 of this slice; inspect owned ports after closing.
 Sizing: 5–8 minutes, medium confidence; measured browser startup wait excepted.
+Done 2026-09-12: added a session-boundary fixture to `scripts/e2e-runner.test.mjs`
+proving one interactive session provisions the bounded OpenAI+Wikidata two-
+service set once, keeps both mocks alive across ordinary/OpenAI/Wikidata
+switches and reruns (no after-spec teardown), and cleans all owned resources
+on close (both mocks + SUT + lease, zero survivors; owned ports inspected).
+No production code change — the existing `runE2eInteractive`/preselection
+protocol already supports preselecting a batch that unions both mock
+requirements. No background resource broker added; no Cucumber scenario
+semantics changed. Refactor collapsed redundant narrative re-assertions into
+one canonical mid-session invariant block. Focused suites (81 tests) green.
+**Manual-check gap:** the literal `pnpm cy:open` GUI interactive switch/close
+path requires human interactive verification (no programmatic driver for the
+Cypress Electron UI); programmatic session lifecycle proven via the fixture.
+Manual command: `pnpm cy:open --spec e2e_test/features/ai_generated_content/note_content_completion.feature,e2e_test/features/wikidata/note_create_with_wikidata_id.feature`
+then switch specs in the UI, rerun, close, and inspect owned ports (a
+pre-existing foreign dev Mountebank on canonical 2525/5001/5002 may survive
+per ADR 0007).
 
 ### 9. Establish complete active-inventory coverage without changing filters
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Every currently active file is selectable with its declared resources;
 ignored scenarios and opt-in profiling selections retain existing tag behavior,
 and real-service scenarios retain their original external URL policy.
@@ -212,10 +322,26 @@ This is coverage of the migration contract, not a claim that all product
 scenarios or live external providers have been run successfully.
 Sizing: 5–8 minutes, medium confidence. If inventory exposes a new shared-resource
 family, stop for scope review; do not merely admit it to satisfy the count.
+Done 2026-09-12: added 5 inventory-reconciliation/boundary tests to
+`scripts/isolated-cypress.test.mjs` (filesystem scan, no hardcoded counts):
+active inventory reconciles with the single registry (admitted = active −
+live-provider); admitted files' resource groups match declared tags (Feature or
+scenario level); no new shared-resource family discovered (`@usingMockedGoogleService`
+only in wholly-ignored `cli_gmail.feature`); mixed Wikidata file admitted at the
+routing/filter boundary (real-service scenario is scenario-level, Cucumber chooses
+per scenario); live OpenAI file refused at the routing/filter boundary (Feature-level
+real-service tag, not admitted, preserves external-service behavior). Updated
+`docs/worktree-browser-tests.md` and `.cursor/rules/e2e-authoring.mdc` to mention
+Wikidata-mock specs and mixed-file behavior. Refactor removed a tautological
+assertion and a redundant branch. **Assessed inventory: 79 total = 5 wholly-ignored
++ 74 active (73 admitted + 1 live OpenAI). No discrepancy vs. plan. No new
+resource family — no scope-review stop.** Focused suites (81 + 5 + 1885 tests)
+green. `docs/e2e-lifecycle-overhead.md` (historical baseline) left unchanged per
+the "do not rewrite completed historical plans" rule.
 
 ### 10. Demonstrate newly admitted workflows cannot change a peer's resources
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Two concurrent worktree invocations using newly admitted features
 complete independently; resetting one app or reinstalling one Wikidata imposter
 leaves the peer's note and mock response unchanged.
@@ -226,6 +352,21 @@ MySQL/Redis and persistent Development unchanged. Existing OpenAI peer proof
 remains a regression, not a new parallel harness.
 Sizing: 5–8 minutes active work, medium confidence; real-service/browser waits
 excepted. A needed new coordination mechanism triggers refinement.
+Done 2026-09-12: extended the EXISTING paired reset barrier harness
+(`runPairedWorktreeResetIsolation`) with a minimal `wikidata-mock` mode
+mirroring the existing `openai-mock` mode (thin-adapter-per-service pattern,
+no new coordination mechanism). Added `WORKTREE_RESET_ISOLATION_BARRIER_AT_WIKIDATA_MOCK`
+and Wikidata isolation proof constants; `wikidataMockIsolationProofParams`;
+harness `wikidata-mock` mode runs `SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC` with
+distinct Wikidata proof env (foreign marker cross-set). New focused proof
+`scripts/worktree-reset-isolation-harness-wikidata-mock.test.mjs` records
+paired command (2 owned invocations), distinct origins (`/peer` vs `/resetter`,
+resetter resets only after peer seeds), distinct Wikidata responses (per-role
+markers, foreign marker cross-set), and no owned survivors. Refactor removed
+an unused `mockMode` local and updated a stale header doc. Existing OpenAI
+peer proof remains a regression (unchanged); existing ownership/coordination
+logic reused; shared MySQL/Redis and persistent Development untouched. All
+focused suites green. **All 10 slices complete — plan executed.**
 
 ## Promise ownership
 
