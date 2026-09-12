@@ -1,7 +1,6 @@
 import { nonInteractiveOutput } from './outputAssertions'
 import testability from '../../testability'
 import { notebookCloneCheckout } from './notebookCloneCheckout'
-import { expectCheckoutFileAt } from './notebookCloneCheckoutReceiver'
 
 const notebook = 'CLI Clone Notebook'
 const title = (kind: string, i: number) =>
@@ -190,26 +189,20 @@ export const notebookPublicationProfile = {
       .get<{ relativePath: string; content: string }[]>(
         '@cliNotebookProposalFiles'
       )
-      .each(({ relativePath, content }) =>
-        expectCheckoutFileAt(
-          'cliCloneReceiverDestination',
-          relativePath,
-          content
-        )
-      )
-      .then(() =>
-        cy.get<string>('@cliNotebookPublishHead').then((acceptedHead) =>
-          cy
-            .get<{ relativePath: string; content: string }[]>(
-              '@cliNotebookProposalFiles'
-            )
-            .then((files) =>
+      .then((files) =>
+        cy
+          .get<string>('@cliCloneReceiverDestination')
+          .then((checkoutDir) =>
+            cy.task('verifyPublicationReceiverFiles', { checkoutDir, files })
+          )
+          .then(() =>
+            cy.get<string>('@cliNotebookPublishHead').then((acceptedHead) =>
               cy.task('confirmNotebookPublicationProfile', {
                 acceptedHead,
                 documentCount: files.length,
               })
             )
-        )
+          )
       )
   },
 }

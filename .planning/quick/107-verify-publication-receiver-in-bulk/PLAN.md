@@ -59,7 +59,7 @@ not treated as a binding implementation contract.
 
 ### 1. Verify the publicly received proposal in one bulk observation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Given a publicly pulled receiver, the existing opt-in accepted scenario
 checks every expected file and records accepted outcome using one bulk filesystem
 observation. A missing or changed file reports its path and prevents accepted
@@ -88,6 +88,30 @@ stop and finer-decompose above 10 active minutes. Required test runtime is exemp
 Safe stop: cheap complete receiver proof, unchanged publication and rollback behavior.
 Concern: ensure the result is marked accepted only after the bulk check succeeds;
 a fast comparison that bypasses that ordering would weaken proof.
+
+Done: `scripts/profiling/verify-publication-receiver.mjs` exports
+`findPublicationReceiverMismatch`, proven with real temporary files at
+`scripts/profiling/verify-publication-receiver.test.mjs`
+(`CURSOR_DEV=true nix develop -c node --test scripts/profiling/verify-publication-receiver.test.mjs`,
+4/4 passing) covering multi-folder exact-byte matches, a missing file by path,
+changed content by path, and a newline-only difference by path. Integrated as
+one new Cypress task `verifyPublicationReceiverFiles`
+(`e2e_test/config/notebookPublicationProfile.ts`), called once from
+`expectReceived()` in
+`e2e_test/start/pageObjects/cli/notebookPublicationProfile.ts` in place of the
+per-file `expectCheckoutFileAt` loop; a thrown mismatch stops the chain before
+`confirmNotebookPublicationProfile`, preserving accept-only-after-verification
+ordering. `notebookCloneCheckoutReceiver.ts:expectCheckoutFileAt` and its other
+callers are unchanged and still have live callers elsewhere.
+Learning: the existing-integration Cypress command above could not be run from
+this execution's Git worktree — `pnpm sut`'s isolated-SUT bring-up builds a
+Unix-domain socket path (`<checkoutRoot>/.sut.local.lock/owner.sock`) that
+exceeds macOS's ~104-byte `sun_path` limit once the checkout sits this deep
+under `.claude/worktrees/...`; it fails during generic SUT ownership bring-up
+before any publication-profile-specific code runs, so it is unrelated to this
+slice's change. Recommend running that command from a shallower checkout to
+obtain the live end-to-end confirmation before relying on this in a large
+publication run.
 
 ### 2. Retire the verbose profiling record and retain the optimization baseline
 Type: Structure

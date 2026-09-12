@@ -12,6 +12,7 @@ import { join } from 'node:path'
 import { runSutHealthcheck } from '../../scripts/sut-healthcheck.mjs'
 import { resolveSutCheckoutTarget } from '../../scripts/sut-isolated-target.mjs'
 import { getListenerPids } from '../../scripts/sut-listener-pids.mjs'
+import { findPublicationReceiverMismatch } from '../../scripts/profiling/verify-publication-receiver.mjs'
 
 export function notebookPublicationProfileTasks(
   repoRoot: string,
@@ -304,6 +305,21 @@ export function notebookPublicationProfileTasks(
         )
       )
       capture = undefined
+      return null
+    },
+    verifyPublicationReceiverFiles({
+      checkoutDir,
+      files,
+    }: {
+      checkoutDir: string
+      files: { relativePath: string; content: string }[]
+    }) {
+      const mismatch = findPublicationReceiverMismatch(checkoutDir, files)
+      if (mismatch) {
+        throw new Error(
+          `Publication receiver file ${mismatch.reason}: ${mismatch.relativePath}`
+        )
+      }
       return null
     },
     confirmNotebookPublicationProfile({
