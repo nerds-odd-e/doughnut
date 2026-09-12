@@ -426,7 +426,7 @@ stays available" not separately verified (no Development stack was running).
 
 ### 14. Report recurring lifecycle overhead
 Type: Behavior
-Status: planned
+Status: delivered
 Behavior: Equivalent focused runs under the new lifecycle produce the completed
 retained report with baseline comparison and feedback-time assessment.
 Proof: Extend `docs/e2e-lifecycle-overhead.md` with first/cached readiness, test,
@@ -436,6 +436,21 @@ recurring overhead; record regressions without introducing an unapproved target
 or reuse mode. Confirm all benchmark-owned processes are stopped.
 Command: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature`
 Sizing: 5 minutes active analysis; measured build/test waits excepted.
+Evidence: Extended docs/e2e-lifecycle-overhead.md with a "New lifecycle
+(runner-owned) comparison — slice 14" section. Three repeated focused
+invocations (each owning the full lifecycle): 23.76s / 21.81s / 21.81s wall-clock,
+5 readiness polls (~12s), Cypress Duration 5s, Spring Boot context ~5.3–5.8s.
+Cold build-asset run (cleared backend/build, Gradle cache warm): 22.50s (build
+cache restores compileJava, so not a meaningful cold start). Multi-spec batch:
+documented as refused in isolated mode by design (slice 10 —
+assertSupportedIsolatedCypressSpecs requires specs.length === 1); a multi-spec
+batch is a primary-checkout scenario not measured here to avoid disturbing the
+primary checkout. Separated provisioning (one-time per worktree) / build
+(Gradle cache warm → ~1–2s) / recurring (~22s: readiness ~12s + test 5s +
+launch/shutdown ~5s). New vs baseline comparison table added. All benchmark-owned
+processes stopped after the runs (no listeners on 63214–6, sut.pid PIDs dead,
+sut.log SIGTERM shutdown); two stale orphan Cypress processes from earlier
+slice-13 attempts were terminated. No numeric performance target introduced.
 
 ## Proof ownership and cumulative assessment
 

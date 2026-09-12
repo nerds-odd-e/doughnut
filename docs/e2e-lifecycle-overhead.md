@@ -153,3 +153,122 @@ After ~8s:
   observed behaviour, not a threshold.
 - No numeric performance target is selected. This document is a baseline for
   comparison by later slices (especially slice 14), not an acceptance gate.
+
+## New lifecycle (runner-owned) comparison — slice 14
+
+After the runner-owned migration (SEED-015 Story 8), a single `pnpm cy:run`
+owns the whole lifecycle: it provisions (if needed), starts the SUT, waits for
+readiness, runs Cypress, and shuts the owned process tree down before returning.
+There is no separate start step and no reused long-lived stack — every
+invocation is self-contained and isolated.
+
+Command (unchanged from the baseline focused run):
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
+```
+
+### Conditions for these measurements
+
+- Same machine and shared MySQL `3309` / Redis `6380` as the baseline.
+- Worktree already provisioned by slice 13 (`wt_519dfcf7193a44c1866d82ba78a544f0`,
+  ports 63214/63215/63216, DB `doughnut_e2e_wt_519dfcf7193a44c1866d82ba78a544f0`).
+- Gradle build cache warm (`~/.gradle/caches/build-cache-1` populated); the
+  `--no-daemon` `bootRunE2E` process restores `compileJava` from the build cache
+  rather than recompiling.
+- Cypress / Electron warm after the first run in this set.
+
+### Three repeated focused invocations (each owns the full lifecycle)
+
+| Run | Position | Wall-clock | Readiness polls | Cypress Duration | Spring Boot context |
+| --- | --- | --- | --- | --- | --- |
+| 1 | first in set (cold Cypress) | 23.76s | 5 (~12s) | 5s | 5.813s |
+| 2 | repeated (warm Cypress) | 21.81s | 5 (~12s) | 5s | 5.287s |
+| 3 | repeated (warm Cypress) | 21.81s | 5 (~12s) | 5s | 5.423s |
+
+- Readiness: each invocation waits for the SUT to become healthy (backend TCP +
+  local LB HTTP `/__lb__/ready` + Vite). Five 3s polls (~12s) per run; the
+  Spring Boot context starts in ~5.3–5.8s and the remaining readiness wait is
+  poll alignment plus local LB / Vite startup.
+- Test: Cypress reports `Duration: 5 seconds` for the single scenario in every
+  run.
+- Shutdown: each invocation sends SIGTERM to the owned process tree; `sut.log`
+  ends with `Forced SUT service child exit (signal SIGTERM); releasing owned
+  peers` and the supervisor PID in `sut.pid` is no longer alive. Allocated
+  ports (63214/63215/63216) are free after each run.
+- Run 1 is ~2s slower than runs 2/3 because of first-set Cypress/Electron
+  warmup; runs 2 and 3 are within 10ms of each other.
+
+### Cold build-asset run (cleared `backend/build`, Gradle cache warm)
+
+Clearing the worktree-local `backend/build` and running once measured 22.50s
+wall-clock — essentially the same as the cached runs. The Gradle build cache
+restores `compileJava` without recompiling, so a missing worktree build
+directory is not a meaningful cold start. A truly cold build (empty Gradle
+build cache) would add recompilation time; that condition was not re-measured
+here (the baseline's failed attempts show the cold-build race risk on a fresh
+build directory, which is a separate concern).
+
+### Multi-spec batch
+
+Isolated Cypress supports exactly one allowlisted spec
+(`assertSupportedIsolatedCypressSpecs` requires `specs.length === 1`, slice 10),
+so a multi-spec batch is refused in an isolated worktree by design. A multi-spec
+batch is therefore a primary-checkout scenario (the primary target accepts any
+spec, `approved: null`); it was not measured here to avoid disturbing the
+primary checkout, which carries pre-existing orphan SUTs from earlier sessions.
+The recurring overhead comparison below is based on the single-spec focused
+invocation, which is the isolated-workload path the migration targets.
+
+### Separating provisioning/build cost from recurring overhead
+
+- One-time provisioning (per fresh worktree): E2E database + port allocation.
+  Already complete from slice 13; not re-timed here. It is a small fixed cost
+  paid once per checkout, not per invocation.
+- Build: with a warm Gradle build cache, `compileJava` is restored in ~1–2s
+  inside the `--no-daemon` `bootRunE2E` process. A cold Gradle build cache would
+  add recompilation; a cold worktree `backend/build` alone does not (cache hit).
+- Recurring per-invocation overhead (warm cache, warm Cypress): ~22s wall-clock,
+  split roughly as readiness ~12s (Spring Boot context ~5.4s + poll alignment +
+  LB/Vite) + Cypress test 5s + Cypress/Electron launch + nix shell + shutdown
+  ~5s.
+
+### New vs baseline comparison
+
+| Aspect | Baseline (old) | New lifecycle (runner-owned) |
+| --- | --- | --- |
+| Start step | separate one-time `pnpm sut` (~15s first) | none — each `pnpm cy:run` starts its own SUT |
+| Recurring focused run | ~7s (reused stack, no readiness wait) | ~22s (full lifecycle per invocation) |
+| Readiness per run | 0s (stack already up) | ~12s (boot + poll alignment) |
+| Shutdown per run | manual `sut:stop` / owner socket | automatic SIGTERM of owned tree before return |
+| Isolation | shared stack can leak/conflict | own ports, DB, process tree per invocation |
+| Multi-spec batch | one stack for many specs | isolated: one allowlisted spec; primary: any specs |
+
+The new lifecycle trades a lower recurring per-run wall-clock (the baseline's
+~7s reused-stack run) for a self-contained ~22s invocation that owns startup,
+readiness, test, and shutdown. The extra cost is dominated by Spring Boot
+context init (~5.4s) and readiness poll alignment (~12s at 3s granularity),
+plus Cypress/Electron launch. The benefit is that no long-lived shared SUT is
+left running, no separate start/stop step is needed, and each invocation is
+fully isolated and cleans up before returning.
+
+### Verified process cleanup after the benchmark
+
+After the three runs and the cold-build run, all benchmark-owned processes
+were stopped: no listeners on 63214/63215/63216, the `sut.pid` supervisor PIDs
+were dead, and `sut.log` showed the SIGTERM shutdown for each run. Two stale
+orphan Cypress processes left from earlier slice-13 proof attempts (before the
+provisioning defect was fixed) were terminated; none remained from these
+benchmark runs. Pre-existing orphan SUTs from earlier sessions (Sep 5 / Sep 9)
+in the primary checkout were not touched.
+
+### Variation notes (new lifecycle)
+
+- The ~12s readiness is coarse-grained because the 3s poll interval rounds up
+  to the next poll after the backend is ready; a shorter poll interval would
+  reduce the alignment loss but increase polling load.
+- Spring Boot context init (~5.4s) is the largest single readiness component
+  and is independent of the wrapper.
+- Cypress/Electron warmup accounts for the ~2s gap between run 1 and runs 2/3.
+- These timings are from one machine on one day with a warm Gradle build cache
+  and an already-provisioned worktree; they are observations, not targets.
