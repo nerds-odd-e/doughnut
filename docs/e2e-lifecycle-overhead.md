@@ -46,8 +46,9 @@ CURSOR_DEV=true nix develop -c node --input-type=module -e \
 - Shared MySQL: `127.0.0.1:3309` (already listening, not started by the SUT).
 - Shared Redis: `127.0.0.1:6380` (already listening, not started by the SUT).
 - Worktree path: `/Users/terryyin/git/doughnut/.worktrees/105-runner-owned-e2e-lifecycle`
-  (short disposable linked worktree; the known owner-socket path limit is a
-  separate Story 9 concern).
+  (short disposable linked worktree). Owner control sockets bind under `/tmp`
+  and are recorded in the checkout lock record, independent of checkout path
+  length.
 - Gradle daemon: warm from prior primary-checkout use.
 - Worktree-local `backend/build`: cold for the successful start (recompiled
   fresh after a corrupted partial build was removed; see notes below).

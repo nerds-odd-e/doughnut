@@ -226,3 +226,36 @@ The first large confirmation command used the small HTTP capture's
     investigation before the authorized retry.
   - Inference: large-fixture Cypress waits were already in the profiling
     record; copying the small-path `--config` was enough to miss them.
+
+## DD-015 — Indivisible resource-lifecycle slice overran its hard limit and was delivered rather than refined
+
+A Behavior slice that had to ship socket allocation together with release and
+leftover-endpoint fixture cleanup exceeded its own 10-minute hard limit
+(~12 minutes active, excluding wait exceptions). The plan required stopping to
+refine remaining work above 10 minutes, but the remaining work was that same
+resource-lifecycle cleanup; splitting it would have leaked relocated sockets.
+Execution recorded the overrun and delivered green.
+
+This resembles DD-012's undersized-leaf problem. Matching is uncertain: this
+slice was not mock-service wiring and already had an 8–10 minute estimate plus
+an explicit 10-minute hard stop.
+
+### Occurrences
+
+- Execution: SEED-015 story 9 / quick/107-checkout-independent-sut-sockets / b045550bd1
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.13
+  - Evidence: PLAN.md Learnings after slice 1 — active work ~12 min vs the
+    10-minute hard limit; leftover-endpoint fixture cleanup in-scope; "No
+    remaining slice to refine". Slice 1 originally required: "If active work
+    exceeds 10 minutes, stop safely, record the concrete overrun, and refine
+    remaining work rather than expanding this slice silently." The
+    implementation agent returned completed proof rather than an
+    oversized-slice stop.
+  - Observed effect: one slice delivered with recorded overrun; no
+    mid-execution refinement or revert.
+  - Inference: the hard-limit stop is the wrong control when leftover work is
+    required cleanup of the same relocated resource. Size such a slice for
+    allocation plus fixture-lifecycle updates, or name that cleanup as an
+    in-scope exception, rather than treating completion as silent expansion.

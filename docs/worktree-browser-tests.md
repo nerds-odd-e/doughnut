@@ -44,7 +44,14 @@ CURSOR_DEV=true nix develop -c node scripts/sut-healthcheck.mjs
 `pnpm cy:run` prints `Selected database:` and `Browser origin:` for the recorded
 allocation, starts backend + Vite + the local load balancer (no Mountebank),
 and waits until this checkout's live owner is healthy on those ports. A second
-start in the same checkout while that owner is live is refused. A name that
+start in the same checkout while that owner is live is refused.
+
+The live owner binds its control socket in a private short directory under
+`/tmp` and records that lexical address in this checkout's
+`.sut.local.lock/owner.json`. Checkout path length does not require a
+socket-path override. Duplicate starts, runner leases, owned shutdown, and
+dead-owner recovery still use that recorded endpoint; cleanup removes only
+the owned socket directory, never another checkout's resources. A name that
 already exists in MySQL before this checkout records it is a collision, not
 adoption. A recorded missing database, occupied port, or migration failure is
 not permission to adopt, delete, rebuild, or renumber.

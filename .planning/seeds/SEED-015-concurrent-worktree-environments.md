@@ -19,7 +19,9 @@ capacity of one development machine using the existing Nix environment.
 Backend tests, two focused browser specs, one CLI clone/pull/publish spec, and
 one MCP search/graph spec now use isolated worktree environments. The OpenAI
 completion spec has private mocks. Disposable worktree databases can be explicitly
-retired before checkout removal. Other mock and client workflows remain
+retired before checkout removal. Isolated SUT owner control binds a private
+short `/tmp` socket recorded in the checkout lock record, so bring-up does not
+depend on checkout path length. Other mock and client workflows remain
 unsupported; general parallel E2E support is unfinished. Owned SUT descendant
 shutdown (2b) is delivered.
 
