@@ -1,0 +1,342 @@
+# Run E2E tests with automatic service startup and cleanup
+
+Source: [SEED-015 Story 8](../../seeds/SEED-015-concurrent-worktree-environments.md#story-8).
+Status: planned. User approved story refinement and planning on 2026-09-12;
+implementation is not authorized by that request. Supersedes quick/104's
+unexecuted primary restart correction. Backlog remains queued.
+
+## Outcome and boundaries
+
+One E2E batch command owns startup, readiness, testing, and complete owned
+shutdown. One interactive Cypress session owns its stack across reruns until
+close. Developers and agents need no separate SUT lifecycle commands. Worktree
+identity/database allocation persists; explicit retirement remains separate.
+Local and CI entry points migrate in this story, public standalone SUT lifecycle
+commands disappear, and a retained startup-overhead report is delivered.
+
+Preserve primary/CI spec support, the existing isolated allowlist, fixture reset,
+Cucumber plugin callbacks, CLI screenshots, test exit status, Development and
+peer data/processes, shared MySQL/Redis, and existing build/cache behavior.
+Do not add Cucumber lifecycle orchestration, persistent-stack reuse, worktree
+creation hooks, a generic service manager, broader worktree spec support,
+same-worktree concurrency, Cloud VM isolation, or automatic ambiguous-owner
+recovery. Hard kill/machine failure cannot guarantee cleanup. Fail visibly
+rather than signalling foreign listeners or adopting a pre-existing SUT.
+
+## Current evidence and PFE decision
+
+- `sut-start.mjs` already prepares isolated identity/database/ports and waits for
+  readiness, but returns an exit code after spawning an unreferenced detached
+  supervisor. Modularize that startup responsibility to expose an owned running
+  lifetime to the wrapper; preserve the old adapter only until migration ends.
+- `sut-services.mjs`, `supervised-service-group.mjs`,
+  `sut-owned-process-tree.mjs`, and `owned-process-tree-termination.mjs` already
+  handle supervision and descendant shutdown. Reuse the owned-tree mechanism;
+  retain observable child completion in the invocation. Do not reproduce process
+  walks, escalation, or port-killing in the wrapper. Development shares the
+  lower-level lifecycle, so its behavior must remain unchanged.
+- `sut-owner.mjs`, retirement admission, and allocated-port checks represent
+  ownership and allocation. Reuse these concepts; fresh spawned handles supply
+  primary ownership, not `sut.pid` or port occupancy as authority.
+- `isolated-cypress.mjs` currently owns a lease/private mock in node setup and
+  releases at `after:spec`/`after:run`. Move lifetime authority to the invocation;
+  keep plugin tasks/configuration as adapters. `isolated-openai-mock.mjs` supplies
+  private-mock startup, endpoints, verification, and shutdown. Keep one resource
+  requirements registry; do not add a second allowlist in the wrapper.
+- `e2e_test/config/common.ts` composes Cucumber, screenshot, and isolation
+  callbacks. Preserve their non-lifecycle behavior and endpoint injection before
+  the browser consumes configuration. Interactive spec selection is not known
+  at process launch: use the existing supported registry/configuration boundary
+  to arrange required session resources, without rebuilding parent-argv parsing.
+- `package.json` has `cy:run`, `cy:open`, `cy:run-with-sut`, `cy:run-on-sut`,
+  `test`, `sut`, `sut:restart`, and `sut:healthcheck`. Make `cy:run` / `cy:open`
+  the documented owned entry points; the wrapper invokes the Cypress executable
+  directly to avoid recursion. Raw Cypress is not a second supported lifecycle
+  interface. Replace its references in guidance and callers.
+- `.github/workflows/ci.yml` uses Cypress action `start`/`wait-on`, built frontend
+  assets, matrix spec selection, Chrome, and existing cache/build setup. Reuse
+  build preparation but replace the action's lifecycle with the wrapper. Built
+  frontend versus local Vite is a launch/readiness distinction, not two owners.
+- Primary mocks use canonical Mountebank ports; preserve existing endpoint
+  contracts and start/stop only run-owned mocks. Occupied required ports refuse;
+  do not silently adopt an already-running shared mock. Private worktree mocks
+  continue using allocated endpoints.
+
+Follow Accepted [ADR 0007](../../../docs/adrs/0007-environments-and-isolation-accepted.md)
+and [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md).
+No North Star file was found; these decisions and the confirmed story provide
+sufficient direction without creating one.
+
+## Execution and proof contract
+
+All slices include their tests, local cleanup, and a green stopping point.
+Target about 5 minutes; estimates include implementation and focused tests.
+Above 5 minutes scrutinize; above 10 minutes stop and refine unless only an
+explicit measured E2E/build/external wait remains. No whole-suite run merely
+for planning. Do not weaken a proof or mock internal ownership code to fit time.
+
+Use `CURSOR_DEV=true nix develop -c …` for repo commands, git directly.
+New boundary tests belong in `scripts/e2e-runner.test.mjs` (split by behavior
+only when useful), driving the invocation with real lower-level lifecycle and
+crafted OS/subprocess boundaries. Reuse existing real-process fixtures for
+representative descendant and peer survival proof. Avoid timing microbenchmarks
+in automated assertions.
+
+Focused baseline command:
+
+```sh
+CURSOR_DEV=true nix develop -c node --test scripts/sut-start.test.mjs scripts/sut-isolated-start.test.mjs scripts/sut-isolated-start-release.test.mjs scripts/sut-services-child-exit.test.mjs scripts/isolated-cypress.test.mjs scripts/isolated-cypress-openai-mock.test.mjs scripts/isolated-cypress-openai-mock-cancel.test.mjs scripts/isolated-cypress-openai-mock-failure.test.mjs e2e_test/config/composeCypressPluginEvents.test.mjs
+```
+
+Invocation proof command after the new boundary exists:
+
+```sh
+CURSOR_DEV=true nix develop -c node --test scripts/e2e-runner.test.mjs
+```
+
+Run adjacent existing proofs only for the responsibility touched; update their
+boundary expectations with the migration. Preserve meaningful behavior tests
+when deleting obsolete restart/start adapter tests.
+
+Delivery follows dough-execute-plan: Jidoka, fresh post-change-refactor agent,
+API generation only if needed, coordinator `./scripts/run.sh pnpm format:changed`
+once, plan update without a second formatting pass, check-only commit hook,
+commit/push and asynchronous CI observation. Do not run those delivery actions
+under this planning-only request. Preserve unrelated working-tree changes.
+
+## Ordered slices
+
+### 1. Record the reused-stack feedback baseline
+Type: Behavior
+Status: planned
+Behavior: Given disposable owned benchmark checkouts, executing a few equivalent
+focused runs produces a reviewable baseline separating setup/readiness/test time.
+Proof: `docs/e2e-lifecycle-overhead.md` records commands, machine/cache conditions,
+three observations per selected repeated case, and verified process cleanup.
+Use a short disposable worktree path (known owner-socket path limit is separate
+Story 9). With current commands, start its SUT once and run the note-editing
+feature repeatedly; capture first startup separately from cached startup. Stop
+only the spawned authenticated tree, never primary ports. Do not delete build
+caches globally or invent a true cold-cache measurement. Baseline precedes old
+command deletion. No product performance threshold is selected.
+Command: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature`
+Sizing: 5 minutes active work; measured build/start/test waits may exceed 10
+minutes and must be reported, not counted as implementation overrun.
+
+### 2. Expose the existing owned startup lifetime
+Type: Structure
+Status: planned
+Change: Modularize existing startup to return its running child, readiness and
+owned shutdown/completion capability to an in-process caller, while the legacy
+start adapter retains its external behavior. Keep one startup/allocation model.
+Immediately enables slice 3; no generic lifecycle framework.
+Proof: Existing start/isolated-start/failure-release and Development supervisor
+regressions stay green, including cleanup when readiness fails.
+Sizing: 5–8 minutes; medium confidence. Reassess if supervisor completion requires
+an independent structural beat rather than widening this slice.
+
+### 3. Run an isolated no-mock batch through its own stack
+Type: Behavior
+Status: planned
+Behavior: Given an idle isolated checkout, the wrapper starts one stack, waits
+for readiness, runs selected supported no-mock specs once, and awaits shutdown
+before returning Cypress's outcome. Startup or Cypress launch failure also
+cleans partial owned work. Add the explicit wrapper entry point now; existing
+commands remain usable until the migration slice.
+Proof: Invocation-boundary tests verify batch lifetime, failed startup/launch,
+nonzero test result, and zero surviving owned processes; one representative
+real-process fixture proves peer survival. Allocation/foreign-port/busy-owner
+checks precede signalling and Cypress. Existing guards remain in force.
+Sizing: 5–8 minutes; medium confidence, using slice 2's running handle. One
+terminal-result lifecycle is the common rule for these cases.
+
+### 4. Cancel an E2E invocation without leaving descendants
+Type: Behavior
+Status: planned
+Behavior: SIGINT/SIGTERM during readiness or tests stops the runner and all
+owned application descendants, then returns a visible unsuccessful outcome.
+Proof: Invocation-boundary cancellation examples exercise the shared real owned
+shutdown; representative child/grandchild exit and peer survival. Cleanup failure
+remains visible, original test diagnostics survive, and completion waits for
+bounded escalation. Do not release ownership before work actually stops.
+Sizing: 5–8 minutes; medium confidence.
+
+### 5. End testing when a required application service exits
+Type: Behavior
+Status: planned
+Behavior: A required service exits after readiness while tests remain active:
+the wrapper terminates the test run and remaining owned services with failure.
+Proof: A child-exit fixture at the invocation boundary establishes prompt failure
+observation and settled cleanup, including exit between readiness and observer
+attachment. Preserve logs; reuse supervisor completion, not health polling as
+another service manager.
+Sizing: 4–6 minutes; medium confidence.
+
+### 6. Keep private mocks owned through the entire batch
+Type: Behavior
+Status: planned
+Behavior: A supported batch requiring OpenAI mocks has usable owned endpoints
+for every selected spec; mock/lease lifetime ends with the invocation, including
+mock startup failure, unexpected exit, and cancellation.
+Proof: Boundary tests run successive spec callbacks without premature release;
+existing mock ownership/failure/cancel cases move to their correct owner.
+`composeCypressPluginEvents` still executes Cucumber/screenshot callbacks.
+Use the registry's natural supported combinations, without expanding its policy.
+Sizing: 5–8 minutes; medium confidence. Move authority rather than duplicate
+cleanup in wrapper and plugin. Do not change fixture reset semantics.
+
+### 7. Keep one stack for an interactive Cypress session
+Type: Behavior
+Status: planned
+Behavior: Opening Cypress starts one owned stack; selecting/rerunning supported
+specs shares it and its required mocks; closing Cypress triggers full cleanup.
+Proof: Invocation-boundary session fixture exercises multiple selections/reruns
+and close, with no after-spec teardown. Verify endpoint configuration before
+browser launch and continued enforcement of the existing isolated allowlist.
+Perform one focused interactive session check during execution, recording close
+cleanup; this is authorized manual proof in this slice, not product exploration.
+Sizing: 5–8 minutes active work; explicit browser startup waits excluded.
+
+### 8. Run primary batches with fresh owned services
+Type: Behavior
+Status: planned
+Behavior: An unconfigured primary target uses canonical endpoints with services
+owned by the invocation, preserving existing primary spec selection. Occupied
+required application/mock ports refuse without adoption or signalling.
+Proof: Primary invocation tests cover successful completion, foreign listener,
+and mixed owned/foreign conflict with zero foreign signals. Preserve shared
+MySQL/Redis and Development. Use the same lifecycle and existing target rules.
+Sizing: 5–8 minutes; medium confidence. A separate launch target is justified by
+canonical endpoints, not a separate shutdown algorithm.
+
+### 9. Run a built-asset E2E batch under the invocation owner
+Type: Behavior
+Status: planned
+Behavior: Given prepared frontend/CLI/MCP bundles, the wrapper starts the
+built-frontend/backend/mock target, waits for its real readiness without a Vite
+listener, runs the selected specs and awaits cleanup.
+Proof: Invocation-boundary tests cover target arguments, readiness, selection
+forwarding and exit behavior through the existing lifecycle. Run one focused
+CI-equivalent selection with prepared assets; retain its command and result.
+Reuse `scripts/ci/e2e-bundle-if-needed.sh` and existing build scripts rather than
+adding build/cache logic to process ownership. The workflow remains unchanged
+until slice 10, so this commit preserves existing CI.
+Sizing: 5–8 minutes active work, medium confidence; measured build/browser waits
+excepted. Target differences are launch data, not another lifecycle algorithm.
+
+### 10. Route CI matrix jobs through the owned invocation
+Type: Behavior
+Status: planned
+Behavior: Each CI matrix job invokes the built-target wrapper for its existing
+selection, with one lifecycle owner and unchanged build/cache/tag/artifact policy.
+Proof: Inspect exact generated command/arguments at the command boundary;
+workflow passes matrix spec, Chrome and config through the wrapper and no longer
+uses competing action `start`/`wait-on`. Preserve existing build preparation,
+cache env, NO_PROXY, secrets handling and failure artifacts. Check focused
+workflow wiring and observe actual CI on execution's normal push; a local test
+alone must not be reported as successful hosted CI.
+Sizing: 4–6 minutes active work, medium confidence; hosted CI wait is an explicit
+external-wait exception, not grounds to rerun the full suite locally.
+
+### 11. Keep paired isolation proofs usable with run-owned stacks
+Type: Behavior
+Status: planned
+Behavior: Existing paired-worktree reset proof commands coordinate two owned
+invocations rather than asking developers to start persistent SUTs first.
+Proof: Harness command-boundary tests preserve barriers, selected mode/spec,
+endpoint handoff and cancellation cleanup. Harness delegates service ownership
+to each invocation and never starts another stack around it. Preserve existing
+CLI/MCP/private-mock proof meanings without expanding supported selections.
+Live peer/data proof belongs to slice 13; this slice's single proof loop is the
+harness entry command's orchestration contract.
+Sizing: 5–8 minutes, medium confidence. Reuse the existing barrier protocol;
+if its timing requires a new independent mechanism, stop and refine.
+
+### 12. Remove obsolete public lifecycle entry points
+Type: Behavior
+Status: planned
+Behavior: Documented local/CI E2E commands all enter the owned wrapper; separate
+SUT start/restart/health command preparation and wait-for-existing-stack aliases
+are gone. `cy:run`, `cy:open`, and aggregate `test` route coherently with no
+recursive pnpm call or second service owner.
+Proof: Command-boundary routing checks plus reference audit of package scripts,
+CI, script harnesses, docs, AGENTS/CLAUDE, agent-map/rules, and mirrored skills.
+Internal health APIs/log commands remain usable. Delete obsolete executable
+adapters and port-killing helpers once caller-free; update lint references and
+preserve equivalent ownership regressions. Historical completed plans need not
+be rewritten. All live callers must migrate; no obsolete alias remains merely
+to avoid updating guidance.
+Sizing: 5–8 minutes, medium confidence. Remaining edits apply one command
+contract mechanically; harness behavior was isolated in slice 11. If another
+live caller needs independent behavioral adaptation, refine before deletion.
+
+### 13. Demonstrate independent concurrent E2E invocations
+Type: Behavior
+Status: planned
+Behavior: Two supported invocations in separate worktrees complete independently
+while persistent Development stays available and unchanged.
+Proof: Adapted paired reset harness records peer availability/data preservation
+and no owned listeners/descendants after each invocation. Use the existing
+no-mock note-editing proof first and representative private-mock proof where
+its lifecycle changed; do not broaden into unrelated full-suite verification.
+Commands: new `pnpm cy:run --spec` for supported selections plus the existing
+`node scripts/worktree-reset-isolation-harness.mjs` modes after caller migration.
+Sizing: 5 minutes active work; measured real-service/browser waits excepted.
+
+### 14. Report recurring lifecycle overhead
+Type: Behavior
+Status: planned
+Behavior: Equivalent focused runs under the new lifecycle produce the completed
+retained report with baseline comparison and feedback-time assessment.
+Proof: Extend `docs/e2e-lifecycle-overhead.md` with first/cached readiness, test,
+shutdown and total times, three repeated focused invocations, one multi-spec
+batch, conditions and variation. Clearly separate provisioning/build costs from
+recurring overhead; record regressions without introducing an unapproved target
+or reuse mode. Confirm all benchmark-owned processes are stopped.
+Command: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature`
+Sizing: 5 minutes active analysis; measured build/test waits excepted.
+
+## Proof ownership and cumulative assessment
+
+| Story promise | Owning slices |
+| --- | --- |
+| One startup/shutdown per batch, readiness, test outcome | 3, 8 |
+| Partial launch, failed tests, cancellation, bounded failure | 3, 4 |
+| Unexpected required-service exit ends the run | 5, 6 |
+| Private mocks/lease survive all specs and then stop | 6 |
+| One stack through interactive reruns and close | 7 |
+| Foreign resources, busy checkout and peers remain protected | 3, 4, 8, 13 |
+| Persistent allocation, shared infrastructure and Development unchanged | 3, 8, 13 |
+| CI coverage/builds/artifacts preserved with one owner | 9, 10 |
+| Public commands removed; callers, guidance, proofs migrated | 11, 12 |
+| Diagnostics survive shutdown | 3–9 |
+| Cohesive reuse, no duplicated lifecycle | 2–12 plus required refactor gate |
+| Measured overhead report | 1, 14 |
+
+The common rule is a single invocation owns every process it starts and settles
+all owned work before returning. Launch targets describe actual local/CI
+service differences; interactive mode changes lifetime endpoint, not ownership.
+Fixture reset and configuration remain Cypress responsibilities. Intermediate
+commits retain legacy adapters until all replacement workflows exist; they are
+not the story's final state. No slice may ship a knowingly broken existing path.
+
+## Refinement assessment (2026-09-12)
+
+Original slice 9 was split into built-target behavior (9) and CI command
+migration (10). Original slice 10 was split into paired-harness migration (11)
+and final public command removal (12). Original final proofs became 13 and 14.
+No completed work or proof was discarded; there was no execution.
+
+Result: 14 slices. Each is Ready: one Behavior/Structure gate, one focused proof
+loop, a stated reuse path and plausible active-work sizing. Slices 2–9, 11–12
+retain medium estimates rather than claiming measured implementation times;
+stop/refine at the hard limit. Slices 1, 7, 9, 10, 13 and 14 permit only their
+stated measured startup/build/browser/CI waits beyond that limit.
+
+Cumulative design remains one invocation lifetime with target-specific launch
+configuration. No repeated ownership or allowlist representation is prescribed.
+No additional product questions or remaining slice-specific refinement concerns
+were identified in this assessment. Ready for direct execution under the
+refinement skill; separate user authorization is still required. No story
+resplit recommendation at 14 slices. Estimated active work is roughly 1–2 hours,
+plus measured runtime and required delivery gates; these remain hypotheses.

@@ -473,9 +473,9 @@ Development data backup or retirement, and general environment orchestration.
 
 ### 8. Run E2E tests with automatic service startup and cleanup
 
-**Status:** Selected for refinement on 2026-09-12; replaces the queued primary
-SUT restart correction (quick/104). No implementation or executable planning
-is authorized by this refinement.
+**Status:** Refined by the user on 2026-09-12; executable planning authorized.
+[Slice plan](../quick/105-runner-owned-e2e-lifecycle/PLAN.md). Execution is not yet authorized.
+Replaces the queued primary SUT restart correction (quick/104).
 
 **Goal**
 
@@ -501,7 +501,8 @@ not deliver it. Repeated startup overhead remains a tradeoff to measure.
 - Remove public standalone SUT start/restart commands and their executable
   entry scripts; do not introduce a standalone SUT stop command. Internal
   startup, readiness, and owned-tree shutdown logic may be reused or relocated
-  behind the runner. This does not require deleting every SUT-named module.
+  behind the runner. Keep lifecycle responsibilities cohesive with no duplicate
+  implementation. This does not require deleting every SUT-named module.
 - Interactive Cypress owns one stack for the entire open session, including
   reruns, and stops it when Cypress closes (user confirmed 2026-09-12).
 - No reuse across invocations or leave-running option is selected. Manual product
@@ -520,8 +521,14 @@ not deliver it. Repeated startup overhead remains a tradeoff to measure.
   or stop already-running shared MySQL/Redis. Broader isolated-spec support,
   same-worktree concurrent jobs, and Cloud VM isolation remain deferred.
 - Update affected callers, agent guidance, documentation, and lifecycle tests
-  consistently with removal of the public commands. Local/CI rollout and
-  interactive Cypress boundaries remain explicit questions below.
+  consistently with removal of the public commands. Local and CI migration are
+  both confirmed scope (2026-09-12); obsolete commands disappear in this story.
+  Replace CI's existing startup orchestration without nesting lifecycle owners.
+- Run a few bounded startup-overhead experiments: compare first startup, repeat
+  startup with existing build caches, and repeated focused test invocations with
+  an equivalent reused-stack baseline. Record readiness, test, cleanup, and total
+  elapsed time with workload and cache conditions. Use the results to assess the
+  feedback-time tradeoff; no numeric budget or persistent reuse is approved.
 
 **Key examples**
 
@@ -544,16 +551,42 @@ for environment and process ownership, and
 [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md) for visible failures.
 Runner-owned lifetime supports these Accepted decisions; no ADR change is made.
 
-**Open questions and challenges**
+**Confirmed ownership arrangement (2026-09-12)**
 
-- Interactive Cypress decision (2026-09-12): one stack per `cy:open` session,
-  stopped when that session closes; reruns share the session stack.
-- Rollout: proposal is to update existing local and CI callers together so removal
-  is complete. CI currently has its own startup orchestration; migrate ownership
-  without nesting two owners. Awaiting user decision on this delivery boundary.
-- Measure cold/warm startup and repeated focused-run overhead during planning;
-  no numeric budget has been selected. Do not silently restore persistent reuse
-  as a performance workaround. Material cost should trigger scope discussion.
+- Worktree lifetime owns stable identity and disposable database allocation;
+  explicit retirement remains responsible for reclaiming those databases.
+- E2E invocation owns application processes and private mocks.
+- Interactive Cypress owns one stack until its session closes.
+
+Worktree-creation startup and destruction shutdown were considered and not
+selected: they amortize startup but require persistent health/freshness recovery,
+consume resources while idle, and expand creation/removal integration. No
+worktree hooks, persistent supervisor, or cross-invocation reuse are selected.
+
+**Required measurement output**
+
+Deliver a concise retained report of the bounded overhead experiments, including
+commands/workload, environment and cache conditions, a few repeated observations,
+and readiness, test execution, shutdown, and total elapsed times. Compare
+first/cached startup and repeated focused invocations with an equivalent reused
+stack baseline. Distinguish one-time provisioning/build work from recurring
+lifecycle overhead and report variation rather than claiming a single timing is
+universal. Capture the baseline before removing the old entry points where useful.
+
+The report and an assessment of the feedback-time tradeoff are completion
+outputs. No numeric performance target, optimization campaign, or automatic
+switch back to persistent reuse is promised.
+
+**Remaining assessment points**
+
+- No unresolved product decision blocks execution planning. Measurement informs
+  a later performance decision rather than an unspecified pass/fail threshold.
+- Logs and existing test artifacts must survive process shutdown so failures
+  remain diagnosable without a leave-running option.
+- If an owned required service exits during testing, the run must report failure
+  and clean up remaining owned work rather than leave tests hanging indefinitely.
+- Preserve existing supported primary/CI test selections as well as the narrower
+  worktree allowlist; lifecycle migration does not broaden or shrink test support.
 - Removing lifecycle commands is a supported-workflow rule, not an attempt to
   prevent developers from inspecting or debugging processes with OS tools.
 
@@ -563,7 +596,8 @@ coherent delivery exceeds a few hours.
 
 **Safe stopping point:** The agreed E2E entry points own full batch/session
 lifetime, obsolete public lifecycle controls are removed, and existing supported
-verification workflows remain usable without manual SUT preparation.
+verification workflows remain usable without manual SUT preparation. The
+startup-overhead report is available for review.
 
 <a id="story-9"></a>
 
