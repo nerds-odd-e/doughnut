@@ -163,8 +163,11 @@ profiling during this refinement.
   by itself demonstrate the requested improvement.
 - Keep ADR 0004's authored-reference semantics, ADR 0006's deliberate failure
   handling, and ADR 0007's isolated disposable measurement environment.
-- This task is story refinement with experiments. Keep the story queued;
-  production delivery and executable slice planning are subsequent work.
+- **2026-09-12 planning request:** The replacement
+  [execution plan](../quick/108-publish-notebook-edits-faster/PLAN.md) now owns
+  the ordered delivery slices. The former quick/106 plan was already removed.
+  Keep the story queued until execution starts; the current request authorizes
+  planning, not production delivery.
 
 ## When to Surface
 
