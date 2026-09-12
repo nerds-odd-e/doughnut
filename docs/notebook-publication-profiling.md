@@ -1,29 +1,168 @@
 # Notebook publication profiling
 
-## Findings and next experiment
+## Current findings
 
-The current improvement round uses **1,000 existing notes and 1,000 edits**,
-not the historical 10,000-addition fixture. Its target is at least 50% less
-completed HTTP waiting time and simpler, smaller production code. The
-[story](../.planning/seeds/SEED-018-publish-large-authored-notebooks.md#story-3)
-owns the product commitment; the refinement below owns experimental evidence.
-Production still contains only the earlier extra property-query flush removal.
-The experimental candidate is not delivered by this investigation.
+The index-maintenance simplification is delivered. Its execution comparison
+measured **29,746.720 → 10,308.043 ms**, a **65.35% reduction**, with 10 fewer
+formatted production lines and all 2,404 backend tests passing. The original
+prototype investigation remains below; the delivered comparison is recoverable
+in `.planning/quick/108-publish-notebook-edits-faster/PLAN.md` at commit
+`1e2aef020c`.
 
-The dominant design cost is repeatedly flushing the whole growing Hibernate
-session while refreshing one note's derived indexes. On the smaller baseline,
-1,218 of 1,406 request-thread execution samples (86.6%) contain
-`AbstractFlushingEventListener`; weighted request allocation is 11.284 GB.
-The large historical recordings independently showed the same concentration.
-Sample proportions explain where to investigate; completed request timings
-establish improvement.
+The [selected next story](../.planning/seeds/SEED-018-publish-large-authored-notebooks.md#story-5)
+retains **1,000 existing notes / 1,000 updates**, seeking at least another 50%
+reduction through simpler production code. The new attachment-cleanup prototype
+below meets that experimental boundary. It is retained separately, not delivered.
 
-Use the note's already-owned authored-reference rows and replace derived index
-rows without making each index refresh flush the entire session. Existing
-loaded property-index objects must be discarded coherently with their database
-rows. A bulk delete alone passed the publication example but failed two
-existing title-rewrite tests. Intermediate flushes were needed by the previous
-persistence choreography; they are not an independent product requirement.
+## Attachment-cleanup refinement
+
+Investigation date: 2026-09-12. Delivered baseline revision:
+`85816929018967c3f995459be119f820bed89f7f`. Experiments use an owned linked
+checkout and disposable E2E/Unit Test databases under ADR 0007.
+
+### Updates and additions exercise shared and distinct work
+
+The update fixture modifies all 1,000 existing measured paths; it creates no new
+notes. It retains the two unchanged control notes and two control folders
+(1,002 notes, 22 folders total), exact authored content, aliases, and references.
+No image attachments are seeded in the timing fixture.
+
+Updates call `NotebookGitProjection.requireOneLiveNoteAtPath` and then
+`AuthoredNoteDocumentPersistence.persist`. Additions call
+`NotebookGitProposalNoteAddition.apply`, create a note with `NoteFactory`, then
+call that same persistence service. Both therefore run content/reference
+replacement, image cleanup, and property/alias/level index maintenance.
+Additions additionally check title placement and allocate identities/creator
+rows. A mixed commit uses the respective paths; equal changed-file counts do
+not imply equal work or equal performance gains.
+
+### Measured cause and domain rule
+
+Fresh analysis of delivered capture `2026-09-12T12-17-04.229Z` found 344 of 349
+flush samples beneath `NoteService.deleteOrphanImagesForPersistedContent`.
+The fresh median baseline confirms the concentration: 377 of 382 flush samples
+come through that cleanup, out of 527 request-thread execution samples.
+
+Cleanup queries every image belonging to a note, then excludes the referenced
+one in a Java loop. Even when no images exist, the query's automatic pre-flush
+traverses the accumulated managed note/reference state. The query result being
+empty does not avoid that preparatory work. This repeats once per saved note.
+
+The prototype expresses the existing domain rule directly: select images owned
+by this note except the image referenced by its saved content, and delete those
+entities. It uses the existing `EntityPersister` with a query-local
+`FlushModeType.COMMIT`, removes the service's image-repository dependency and
+unused finder, and retains `EntityPersister.remove` for normal blob cascades and
+transaction rollback. It preserves the existing invalid-image-path exception
+and adds no new condition, cache, batch mode, schema, or association.
+
+The flush setting is safe only for the established read responsibility, not for
+arbitrary queries. Existing image uploads assign ownership on creation, use
+identity inserts, and explicitly flush before returning the attachment path.
+Publication does not change image ownership. The query does not need pending
+note-content or derived-reference writes to select the note's orphan images.
+Hibernate documents both the query-local COMMIT mechanism and the absence of a
+general promise to expose pending entity changes to such queries; the domain
+invariants and preservation tests are therefore essential.
+[Hibernate flushing documentation](https://docs.hibernate.org/orm/current/userguide/html_single/#flushing-commit)
+
+### Completed update comparison
+
+Three fresh owned JVMs per version, same deterministic tree fingerprints,
+JDK 25.0.3, Hibernate 7.4.5.Final, MySQL 8.4.11, E2E logging,
+`-XX:TieredStopAtLevel=1`, 12 GiB maximum heap, JFR `settings=profile`, and
+`caffeinate -i`. Fixture setup precedes capture with no additional explicit
+warm-up. Runs are sequential; the backend test suite does not overlap captures.
+Measure HTTP start through the complete response including commit; exclude
+setup and receiver verification. Deadline: 60,000 ms.
+
+| Version | Capture directory | HTTP elapsed |
+| --- | --- | ---: |
+| Delivered baseline | `2026-09-12T14-45-11.896Z` | 11,845.828 ms |
+| Delivered baseline | `2026-09-12T14-46-11.668Z` | 11,907.715 ms |
+| Delivered baseline | `2026-09-12T14-46-53.757Z` | 13,621.153 ms |
+| Attachment-cleanup prototype | `2026-09-12T14-48-53.235Z` | 3,925.398 ms |
+| Attachment-cleanup prototype | `2026-09-12T14-52-28.807Z` | 3,003.783 ms |
+| Attachment-cleanup prototype | `2026-09-12T14-53-01.818Z` | 3,038.709 ms |
+
+Medians: **11,907.715 → 3,038.709 ms**, **74.48% less waiting**, **3.92× faster**.
+All candidate observations clear the fresh baseline's **5,953.858 ms** halfway
+boundary. Every driver exits 0, receives HTTP 200 and the same proposed head,
+verifies all 1,000 authored files, and confirms 1,002 unchanged note identities,
+unchanged learning, 1,000 exact updated aliases, and 2,000 exact related-property
+reference targets. This is a local fixture comparison, not a production SLA.
+
+The first prototype capture explains the change: whole-session flush samples
+fall from 382/527 in the median baseline to 10/128, with no remaining flush
+sample attributed to image cleanup. Weighted request allocation falls from
+2,515,005,272 to 985,961,696 bytes. These are sampled estimates; all selected
+execution stacks were truncated, and nearest visible application callers may
+under-attribute work. CPU sample percentages are not elapsed-time percentages.
+
+### Separate addition observation
+
+One completed run per version with **1,000 existing notes / 1,000 additions**:
+
+| Version | Capture | HTTP elapsed |
+| --- | --- | ---: |
+| Delivered baseline | `2026-09-12T14-47-36.519Z` | 22,202.953 ms |
+| Attachment-cleanup prototype | `2026-09-12T14-53-34.486Z` | 13,368.447 ms |
+
+Both returned HTTP 200, the proposed head, and all 1,000 added files exactly;
+their baseline/proposal tree fingerprints match. The observed **39.79%**
+reduction is exploratory, not a repeated median or a promised addition speedup.
+Baseline addition samples attribute 388 flush samples to image cleanup and
+410 to `NoteTitlePlacementRules.requireNoSoftDeletedTitleAt`, out of 943 total
+request-thread samples. With the prototype, 425 of 432 remaining flush samples
+come through title placement (600 total samples), and none through image cleanup.
+That addition-specific repeated query remains outside the selected update
+performance promise; do not generalize the update result to additions.
+
+Small preserved-behavior checks also passed: 20 additions accepted and verified
+in 171.495 ms (`2026-09-12T14-54-16.728Z`); malformed aliases in the final added
+path rejected in 111.142 ms (`2026-09-12T14-54-22.823Z`), after 19 preceding
+identities were allocated, with original head/content, notes, learning and
+derived rows unchanged. These times are correctness checks, not performance gates.
+
+### Alternatives and preservation
+
+| Candidate | Assessment |
+| --- | --- |
+| Query-local hint on the existing repository finder alone | Targets the cause but adds annotation machinery and keeps fetch-all/filter-later responsibility; not the preferred simplification |
+| Select the note's orphan images directly using the existing persister | Measured candidate; removes a dependency, redundant finder and Java exclusion branch while retaining entity deletion |
+| Add a note-owned image collection with orphan removal | Plausible domain model, but needs association synchronization across upload and fixture creation; more lifecycle work than the measured candidate requires; not benchmarked |
+| Bulk-delete image rows | Bypasses the existing entity cascade to attachment blobs and needs additional cleanup/state handling; not the same behavior |
+| Publication-wide flush mode, batching, or session clearing | Alters visibility and lifecycle for other queries, including title validation; unnecessary for this measured target |
+| Optimize repeated portable-path lookup first | Visible in update profiles, but much smaller than image-cleanup traversal before this change; not the best evidenced first target |
+
+Formatted production diff: **11 insertions / 15 deletions, net −4**, two existing
+files, no new production file. The cleanup predicate has the same alternatives
+as before; moving selection to the query introduces no new product case.
+Test-only changes add 10 lines to existing controller examples. All **2,404
+backend tests / 480 suites** pass with no failures/errors/skips, including shared
+content/title callers. Strengthened image examples confirm orphan blob deletion,
+retention of the referenced blob and another note's images, and restoration of
+the orphan image/blob when a later binding save fails.
+
+### Reproduction and evidence
+
+Use the maintained launcher with `PUBLICATION_PROFILE_EXISTING=1000`,
+`PUBLICATION_PROFILE_UPDATES=1000`, `PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000`
+and the default `@publicationProfileHttpUpdate` selection. The addition selection
+is `@publicationProfileHttp` with `PUBLICATION_PROFILE_ADDITIONS=1000`; do not
+reinterpret an update count as additions. The legacy capture metadata includes
+both active and inactive scenario counters, so the selected tag, tree
+fingerprints, run manifest, and received documents identify the actual workload.
+
+All captures are under `~/Library/Application Support/Donut/publication-profiles/`.
+The `second-refinement-2026-09-12/` companion retains the two-file
+`candidate.patch`, source copies/manifest, `preservation-tests.patch`, complete
+JUnit results, commands/driver logs, `comparison-summary.json`, and
+`ResidualPublication.java` with caller analysis for the delivered and fresh
+captures. Prototype runs name the common baseline revision plus this retained
+patch; they do not imply that revision contains the experimental source.
+Production patch SHA-256:
+`6fab86ea944d47fbf9b2693650a3cb7ac8e306a1c37d5f55c039135ae995c7fa`.
 
 ## Smaller-workload refinement
 

@@ -115,9 +115,50 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Depends on:** Existing clone, publication and clean fast-forward pull; no dependency on another new story is assumed.
 - **Safe stopping point:** This workflow remains independently usable if later stories are cancelled, with work and learning data preserved.
 
+<a id="story-26"></a>
+
+### 26. Reconsider note-title uniqueness and soft deletion with Git versioning
+
+- **For / why:** Notebook owners working between Donut and Git-compatible
+  tools need deletion and title-reuse rules that support continued authoring.
+- **Evaluation:** Confirm whether a soft-deleted note still reserves its title
+  within its folder, identify whether this is enforced by a database unique
+  index or application rules, and demonstrate the resulting effect on Git
+  workflows. Produce an evidence-backed recommendation for title reuse and
+  whether soft deletion should be retained, changed, or removed given Git
+  versioning, leaving the product decision explicit.
+- **Hypothesis, not confirmed:** A soft-deleted note may still hold its folder's
+  unique title and prevent another note from using it, potentially blocking
+  Git-compatible workflows. This capture does not establish the current behavior
+  or the claimed incompatibility.
+- **Key examples to investigate:** Delete a note, then create another note with
+  the same title in that folder; publish a local Git change reusing the deleted
+  note's path. Establish what happens to note identity and learning history,
+  and what recovery Git history provides compared with soft deletion.
+- **Scope:** Investigation and a product recommendation. Consider retaining
+  current behavior, changing title reservation while keeping soft deletion,
+  and replacing soft deletion where Git history provides sufficient recovery.
+  Whether Git history covers all affected notes and recovery needs remains an
+  open question. Implementation, migration, and removal of soft deletion are
+  not authorized by this capture. Story 23 keeps its existing scope pending
+  an explicit decision.
+- **Value / learning:** Resolve the suspected title-reuse obstacle and whether
+  soft deletion still serves owners alongside Git versioning before choosing
+  a behavior change.
+- **Effort hypothesis:** S–M, low confidence until investigation is bounded
+  during refinement.
+- **Depends on:** No new story prerequisite is established.
+- **Safe stopping point:** Verified current behavior and a recorded recommendation
+  remain useful even if implementation is deferred.
+- **Source:** Owner's 2026-09-12 request to capture this reconsideration as the
+  third product backlog story; both the suspected constraint and the future
+  of soft deletion remain open questions.
+
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns selection and order.
+The owner subsequently selected story 26 as second in the global queue, ahead
+of the remaining Git workflow stories below.
 Publish accumulated commits first, then make new web history append-only.
 Prioritize web rename and deletion ahead of container descriptions and web
 relocation. Drop the latter two from the queue first if learning changes the
