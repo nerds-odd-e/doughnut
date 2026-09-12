@@ -22,8 +22,6 @@ changes.
 
 ## Taken
 
-- [Verify publication receiver content without per-file browser overhead](quick/107-verify-publication-receiver-in-bulk/PLAN.md)
-
 ## Backlog list
 
 - [Tolerate deep or long worktree checkout paths for isolated SUT bring-up](seeds/SEED-015-concurrent-worktree-environments.md#story-9) — SEED-015

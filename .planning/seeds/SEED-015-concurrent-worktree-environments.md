@@ -569,9 +569,10 @@ verification workflows remain usable without manual SUT preparation.
 
 ### 9. Tolerate deep or long worktree checkout paths for isolated SUT bring-up
 
-**Status:** Candidate, added 2026-09-12 from a
-[quick/107 execution retrospective](../quick/107-verify-publication-receiver-in-bulk/PLAN.md)
-finding. No refinement or executable planning is authorized yet.
+**Status:** Candidate, added 2026-09-12 from a quick/107 (publication receiver
+bulk verification) execution retrospective finding. Recover the completed
+correction plan from `git show a7e0fe1dc4:.planning/quick/107-verify-publication-receiver-in-bulk/PLAN.md`.
+No refinement or executable planning is authorized yet.
 
 **Goal**
 
