@@ -221,7 +221,7 @@ ports free, shared MySQL/Redis untouched.
 
 ### 8. Run primary batches with fresh owned services
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: An unconfigured primary target uses canonical endpoints with services
 owned by the invocation, preserving existing primary spec selection. Occupied
 required application/mock ports refuse without adoption or signalling.

@@ -30,6 +30,15 @@ import {
   E2E_RUNNER_MOCK_PGID_ENV_KEY,
   E2E_RUNNER_OWNS_LIFETIME_ENV_KEY,
 } from './isolated-cypress.mjs'
+import { resolveSutCheckoutTarget } from './sut-isolated-target.mjs'
+import { listOccupiedApplicationPorts } from './local-runtime-target.mjs'
+import { isTcpPortOccupied } from './sut-healthcheck.mjs'
+import { stopOwnedSutProcessTree } from './sut-owned-process-tree.mjs'
+import {
+  SHARED_MOUNTEBANK_MANAGEMENT_PORT,
+  SHARED_OPEN_AI_SERVING_PORT,
+} from './isolated-openai-mock-ports.mjs'
+import { assertPortFreeBeforeMockMutation } from './isolated-openai-mock-ownership.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -97,6 +106,21 @@ export function defaultSpawnCypressOpen({
     env,
     stdio,
   })
+}
+
+/**
+ * Canonical primary Mountebank management + OpenAI serving ports for a
+ * primary-target batch that requires the private OpenAI mock. A foreign
+ * listener on either port is refusal — never adoption. Reuses the existing
+ * ownership-port check so the refusal message and semantics match the
+ * isolated private-mock path.
+ */
+export async function allocatePrimaryOpenAiMockPorts() {
+  const managementPort = SHARED_MOUNTEBANK_MANAGEMENT_PORT
+  const servingPort = SHARED_OPEN_AI_SERVING_PORT
+  await assertPortFreeBeforeMockMutation(managementPort, 'management')
+  await assertPortFreeBeforeMockMutation(servingPort, 'serving')
+  return { managementPort, servingPort }
 }
 
 /**
@@ -393,8 +417,36 @@ async function runOwnedE2eInvocation({
   startPrivateOpenAiMockFn,
   label,
   cancelEscalationMs,
+  runtimeTarget,
+  isPortOccupiedFn,
   ...lifetimeOpts
 }) {
+  // Resolve the launch target up front so a primary (unconfigured) checkout
+  // can refuse foreign listeners on its canonical application ports BEFORE
+  // spawning the supervisor. The isolated target's port check is owned by
+  // `startOwnedSutLifetime`; the primary target has no owner/claim gate, so
+  // the wrapper guards its canonical ports here. Reuses the existing target
+  // rules — no second allowlist or target manager.
+  const { isolated, target: resolvedTarget } = resolveSutCheckoutTarget({
+    checkoutRoot,
+    runtimeTarget,
+  })
+  if (!isolated) {
+    const portCheck = isPortOccupiedFn ?? isTcpPortOccupied
+    const occupied = await listOccupiedApplicationPorts(
+      resolvedTarget,
+      portCheck
+    )
+    if (occupied.length > 0) {
+      errLog(
+        `Primary SUT ports are already occupied (${occupied.join(', ')}). ` +
+          'Refusing to start; the foreign listener was not terminated.'
+      )
+      cancel.detach()
+      return 1
+    }
+  }
+
   let lifetime
   try {
     lifetime = await startLifetime({
@@ -402,6 +454,8 @@ async function runOwnedE2eInvocation({
       log,
       errLog,
       signal: cancel.signal,
+      runtimeTarget,
+      ...(isPortOccupiedFn ? { isPortOccupiedFn } : {}),
       ...lifetimeOpts,
     })
   } catch (error) {
@@ -435,6 +489,15 @@ async function runOwnedE2eInvocation({
       }
     }
     await originalShutdown()
+    // Primary target: `startOwnedSutLifetime` claims no SUT owner (the
+    // legacy adapter keeps the supervisor running), so its `shutdown()` is
+    // a no-op. The wrapper owns the processes it spawns — stop the
+    // supervisor child directly via the same owned-tree termination used by
+    // the isolated target. No separate shutdown algorithm; the only
+    // difference is the launch target.
+    if (!isolated) {
+      await stopOwnedSutProcessTree(lifetime.child)
+    }
   }
 
   try {
@@ -449,18 +512,32 @@ async function runOwnedE2eInvocation({
     }
 
     if (approved?.requiresPrivateOpenAiMock) {
-      try {
-        mockState.leaseToken = await acquireSutRunnerLease(checkoutRoot)
-      } catch (error) {
-        errLog(`Failed to acquire runner lease: ${error.message}`)
-        return 1
+      // The isolated target coordinates mock ownership through the SUT
+      // owner's runner lease. The primary target has no claimed owner, so
+      // the invocation owns the mock directly (no lease); the mock uses the
+      // canonical Mountebank/OpenAI serving ports instead of allocated ones.
+      if (isolated) {
+        try {
+          mockState.leaseToken = await acquireSutRunnerLease(checkoutRoot)
+        } catch (error) {
+          errLog(`Failed to acquire runner lease: ${error.message}`)
+          return 1
+        }
       }
       try {
-        const allocation = loadCompleteIsolatedE2eAllocation(checkoutRoot)
-        mockState.handle = await startPrivateOpenAiMockFn({
-          checkoutRoot,
-          allocation,
-        })
+        if (isolated) {
+          const allocation = loadCompleteIsolatedE2eAllocation(checkoutRoot)
+          mockState.handle = await startPrivateOpenAiMockFn({
+            checkoutRoot,
+            allocation,
+          })
+        } else {
+          mockState.handle = await startPrivateOpenAiMockFn({
+            checkoutRoot,
+            allocation: null,
+            allocatePortsFn: allocatePrimaryOpenAiMockPorts,
+          })
+        }
         mockExit = observeChildExit(mockState.handle.child)
       } catch (error) {
         errLog(`Failed to start owned private OpenAI mock: ${error.message}`)

@@ -1,11 +1,15 @@
 import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
 import { existsSync, readFileSync } from 'node:fs'
+import net from 'node:net'
 import path from 'node:path'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import {
+  allocateFreePort,
+  closeServer,
   isPidAlive,
+  listenTcp,
   spawnForeignProcess,
   spawnOwnedTreeStandIn,
   waitForOwnedPids,
@@ -24,6 +28,7 @@ import {
   E2E_RUNNER_OWNS_LIFETIME_ENV_KEY,
 } from './isolated-cypress.mjs'
 import {
+  allocatePrimaryOpenAiMockPorts,
   defaultSpawnCypressOpen,
   runE2eBatch,
   runE2eInteractive,
@@ -166,6 +171,31 @@ function healthcheckWaitingForPids(pidsFile) {
 
 function cypressArgv(spec = SUPPORTED_ISOLATED_CYPRESS_SPEC) {
   return ['--spec', spec]
+}
+
+/**
+ * Listen on a specific TCP port (for foreign-listener refusal tests on
+ * canonical ports). Returns `{ server, port }`. Rejects if the port is
+ * already occupied.
+ */
+function listenTcpOnPort(port) {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer((socket) => socket.end())
+    server.once('error', reject)
+    server.listen(port, '127.0.0.1', () => {
+      resolve({ server, port })
+    })
+  })
+}
+
+function isPortStillListening(port) {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ host: '127.0.0.1', port }, () => {
+      socket.end()
+      resolve(true)
+    })
+    socket.on('error', () => resolve(false))
+  })
 }
 
 function trackOwnedTree(t, getOwned) {
@@ -1286,4 +1316,296 @@ test('normal close path is unaffected: no spurious SIGKILL when Cypress exits on
   assert.equal(isPidAlive(state.owned.grandchild), false)
   assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
   assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+// ---------------------------------------------------------------------------
+// Slice 8: primary-target batches (unconfigured checkout, canonical endpoints)
+// ---------------------------------------------------------------------------
+//
+// An unconfigured primary checkout (no `.worktree.local.json`, not a linked
+// worktree) uses canonical endpoints (5173/5174/9081, `doughnut_e2e_test`)
+// with services owned by the invocation. The wrapper detects the primary
+// target via the existing `resolveSutCheckoutTarget` rules, refuses foreign
+// listeners on canonical application ports without adoption or signalling,
+// and stops the spawned supervisor child on shutdown via the same
+// owned-tree termination used by the isolated target (no separate shutdown
+// algorithm). Primary mocks use the canonical Mountebank port (2525).
+
+/**
+ * Lifetime options for a primary-target batch. The primary target has no
+ * isolated allocation, so the stand-in does not bind real canonical ports;
+ * `isPortOccupiedFn: async () => false` bypasses the real port check for the
+ * happy path (foreign-listener refusal is exercised separately with real
+ * listeners on ephemeral ports via a custom `runtimeTarget`).
+ */
+function primaryLifetimeOpts(checkoutRoot, standIn, extra = {}) {
+  return {
+    checkoutRoot,
+    spawnFn: standIn.spawnFn,
+    logFile: path.join(checkoutRoot, 'sut.log'),
+    pidFile: path.join(checkoutRoot, 'sut.pid'),
+    timeoutMs: extra.timeoutMs ?? 5_000,
+    pollMs: extra.pollMs ?? 50,
+    log: () => undefined,
+    errLog: () => undefined,
+    healthcheckFn: extra.healthcheckFn ?? healthyOnce,
+    isPortOccupiedFn: async () => false,
+  }
+}
+
+test('primary batch: unconfigured target → canonical endpoints → SUT owned by invocation → Cypress runs → cleanup → zero surviving owned processes', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  // No writeIsolatedConfig: this is an unconfigured primary checkout.
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...primaryLifetimeOpts(checkout.root, standIn),
+    spawnCypress: () =>
+      makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        assert.equal(isPidAlive(state.owned.grandchild), true)
+      }),
+  })
+
+  assert.equal(code, 0)
+  // Same lifecycle as the isolated target: the owned supervisor child +
+  // grandchild are reaped via the shared owned-tree termination.
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  // Primary target claims no SUT ownership (no owner lock dir is created).
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('primary batch: shared MySQL/Redis and Development preserved — a foreign peer survives, no SUT owner lock is created', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const foreign = spawnForeignProcess()
+  t.after(() => {
+    try {
+      foreign.kill('SIGKILL')
+    } catch {
+      // already gone
+    }
+  })
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...primaryLifetimeOpts(checkout.root, standIn),
+    spawnCypress: () =>
+      makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+      }),
+  })
+
+  assert.equal(code, 0)
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  // Shared infrastructure / foreign peers are not signalled by the batch.
+  assert.equal(isPidAlive(foreign.pid), true, 'foreign peer must survive')
+  // No SUT ownership is claimed on the primary target.
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+})
+
+test('primary batch: foreign listener on a canonical application port refuses without adoption or signalling', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  // Use a custom primary runtimeTarget with ephemeral ports so the real port
+  // check can detect a real foreign listener without touching live canonical
+  // ports (5173/5174/9081) that may be in use in the developer environment.
+  const foreignListener = await listenTcp()
+  t.after(() => closeServer(foreignListener.server))
+  const freeBackend = await allocateFreePort()
+  const freeVite = await allocateFreePort()
+  const runtimeTarget = {
+    backendPort: freeBackend,
+    vitePort: freeVite,
+    lbListenPort: foreignListener.port,
+    mountebankPort: 2525,
+  }
+  let startCalled = false
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    // Real port check: the foreign listener on the lb port is detected.
+    isPortOccupiedFn: async (port) => port === foreignListener.port,
+    startLifetime: async () => {
+      startCalled = true
+      throw new Error(
+        'must not start when a canonical port is foreign-occupied'
+      )
+    },
+    spawnCypress: () => makeCypressChild(0),
+  })
+
+  assert.equal(code, 1, 'must refuse when a canonical port is foreign-occupied')
+  assert.equal(startCalled, false, 'must refuse before spawning the supervisor')
+  // Zero foreign signals: the foreign listener is still alive.
+  assert.equal(
+    await isPortStillListening(foreignListener.port),
+    true,
+    'foreign listener must not be signalled'
+  )
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+})
+
+test('primary batch: mixed owned/foreign conflict refuses without signalling any foreign listener', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  // Two foreign listeners on two of the three canonical application ports;
+  // the third is free. The run must still refuse (mixed conflict) without
+  // signalling either foreign listener.
+  const foreignLb = await listenTcp()
+  const foreignVite = await listenTcp()
+  t.after(() => closeServer(foreignLb.server))
+  t.after(() => closeServer(foreignVite.server))
+  const freeBackend = await allocateFreePort()
+  const runtimeTarget = {
+    backendPort: freeBackend,
+    vitePort: foreignVite.port,
+    lbListenPort: foreignLb.port,
+    mountebankPort: 2525,
+  }
+  let startCalled = false
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    isPortOccupiedFn: async (port) =>
+      port === foreignLb.port || port === foreignVite.port,
+    startLifetime: async () => {
+      startCalled = true
+      throw new Error('must not start on a mixed owned/foreign conflict')
+    },
+    spawnCypress: () => makeCypressChild(0),
+  })
+
+  assert.equal(code, 1, 'must refuse on a mixed owned/foreign conflict')
+  assert.equal(startCalled, false, 'must refuse before spawning')
+  // Zero foreign signals: both foreign listeners survive.
+  for (const { port } of [foreignLb, foreignVite]) {
+    assert.equal(
+      await isPortStillListening(port),
+      true,
+      `foreign listener on ${port} must survive`
+    )
+  }
+})
+
+test('primary batch: same lifecycle as isolated — primary shutdown stops the spawned supervisor child (no separate algorithm)', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+
+  // A nonzero Cypress result still settles the owned tree via the same
+  // shutdown path (stopOwnedSutProcessTree), proving the primary target
+  // reuses the isolated target's owned-tree termination.
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...primaryLifetimeOpts(checkout.root, standIn),
+    spawnCypress: () =>
+      makeCypressChild(3, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+      }),
+  })
+
+  assert.equal(code, 3, 'must preserve the nonzero Cypress exit code')
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+})
+
+test('primary mock on canonical Mountebank port: owned by the invocation, stopped on shutdown, no runner lease', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let mockStarts = 0
+  let mockStopCalls = 0
+  let mockPid = 0
+  let passedAllocatePortsFn = null
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...primaryLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    startPrivateOpenAiMockFn: async ({ allocatePortsFn }) => {
+      mockStarts += 1
+      passedAllocatePortsFn = allocatePortsFn
+      const handle = spawnIdlePrivateMockHandle()
+      mockPid = handle.child.pid
+      const realStop = handle.stop
+      handle.stop = async () => {
+        mockStopCalls += 1
+        await realStop()
+      }
+      return handle
+    },
+    spawnCypress: () =>
+      makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(mockPid), true)
+        assert.equal(mockStopCalls, 0, 'mock must not be stopped mid-batch')
+      }),
+  })
+
+  assert.equal(code, 0)
+  assert.equal(
+    mockStarts,
+    1,
+    'mock must start exactly once for the primary batch'
+  )
+  assert.equal(mockStopCalls, 1, 'mock must be stopped once at invocation end')
+  assert.equal(
+    passedAllocatePortsFn,
+    allocatePrimaryOpenAiMockPorts,
+    'primary mock must use the canonical-port allocator'
+  )
+  assert.equal(isPidAlive(mockPid), false)
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  // No SUT owner → no runner lease is acquired for the primary mock.
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+})
+
+test('primary mock: occupied canonical Mountebank port refuses without adoption (allocator unit)', async (t) => {
+  // Foreign listener on the canonical Mountebank management port (2525).
+  // Skip if 2525 is already occupied in the live environment (e.g. a
+  // developer's Mountebank) — the refusal behavior is also covered by the
+  // application-port foreign-listener tests above.
+  const mbPort = 2525
+  let foreignMb
+  try {
+    foreignMb = await listenTcpOnPort(mbPort)
+  } catch {
+    t.skip('port 2525 already occupied in this environment; skipping')
+    return
+  }
+  t.after(() => closeServer(foreignMb.server))
+
+  // The primary allocator must refuse before any mock child is spawned; a
+  // foreign listener on the canonical management port is refusal, never
+  // adoption. The serving port (5001) uses the same ownership check, so this
+  // covers the canonical mock-port refusal behavior.
+  await assert.rejects(
+    allocatePrimaryOpenAiMockPorts(),
+    /refuses foreign management listener on port 2525/,
+    'must refuse a foreign listener on the canonical Mountebank port'
+  )
+  // The foreign listener is not signalled by the allocator.
+  assert.equal(
+    await isPortStillListening(mbPort),
+    true,
+    'foreign Mountebank must not be signalled'
+  )
 })
