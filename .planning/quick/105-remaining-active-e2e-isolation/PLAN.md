@@ -307,7 +307,7 @@ per ADR 0007).
 
 ### 9. Establish complete active-inventory coverage without changing filters
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Every currently active file is selectable with its declared resources;
 ignored scenarios and opt-in profiling selections retain existing tag behavior,
 and real-service scenarios retain their original external URL policy.
@@ -322,6 +322,22 @@ This is coverage of the migration contract, not a claim that all product
 scenarios or live external providers have been run successfully.
 Sizing: 5–8 minutes, medium confidence. If inventory exposes a new shared-resource
 family, stop for scope review; do not merely admit it to satisfy the count.
+Done 2026-09-12: added 5 inventory-reconciliation/boundary tests to
+`scripts/isolated-cypress.test.mjs` (filesystem scan, no hardcoded counts):
+active inventory reconciles with the single registry (admitted = active −
+live-provider); admitted files' resource groups match declared tags (Feature or
+scenario level); no new shared-resource family discovered (`@usingMockedGoogleService`
+only in wholly-ignored `cli_gmail.feature`); mixed Wikidata file admitted at the
+routing/filter boundary (real-service scenario is scenario-level, Cucumber chooses
+per scenario); live OpenAI file refused at the routing/filter boundary (Feature-level
+real-service tag, not admitted, preserves external-service behavior). Updated
+`docs/worktree-browser-tests.md` and `.cursor/rules/e2e-authoring.mdc` to mention
+Wikidata-mock specs and mixed-file behavior. Refactor removed a tautological
+assertion and a redundant branch. **Assessed inventory: 79 total = 5 wholly-ignored
++ 74 active (73 admitted + 1 live OpenAI). No discrepancy vs. plan. No new
+resource family — no scope-review stop.** Focused suites (81 + 5 + 1885 tests)
+green. `docs/e2e-lifecycle-overhead.md` (historical baseline) left unchanged per
+the "do not rewrite completed historical plans" rule.
 
 ### 10. Demonstrate newly admitted workflows cannot change a peer's resources
 Type: Behavior

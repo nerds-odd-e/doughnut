@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict'
+import { readFileSync, readdirSync } from 'node:fs'
+import path from 'node:path'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import {
   guardCypressNodeSetup,
@@ -20,6 +23,95 @@ import {
   startLiveOwner,
 } from './sut-isolated-fixtures.mjs'
 import { beginSutOwnerShutdown } from './sut-owner.mjs'
+import { assertSupportedIsolatedCypressSpecs } from './isolated-cypress-spec-selection.mjs'
+
+const REPO_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+)
+const FEATURES_DIR = path.join(REPO_ROOT, 'e2e_test', 'features')
+
+/** Known shared-resource families declared by active feature files. */
+const KNOWN_MOCK_TAG_FAMILIES = new Set([
+  '@usingMockedOpenAiService',
+  '@usingMockedWikidataService',
+])
+const KNOWN_REAL_SERVICE_TAGS = new Set([
+  '@usingRealOpenAiService',
+  '@usingRealWikidataService',
+])
+/** Tags that appear only in wholly-ignored files and are not active families. */
+const IGNORED_ONLY_RESOURCE_TAGS = new Set(['@usingMockedGoogleService'])
+
+function listFeatureFiles(dir) {
+  return readdirSync(dir, { recursive: true })
+    .filter((entry) => String(entry).endsWith('.feature'))
+    .map((entry) => path.join(dir, String(entry)))
+    .sort()
+}
+
+function relativeSpec(absolute) {
+  return path.relative(REPO_ROOT, absolute).replace(/\\/g, '/')
+}
+
+/** Extract Feature-level tags (tags on lines before the `Feature:` line). */
+function featureLevelTags(content) {
+  const lines = content.split(/\r?\n/)
+  const tags = []
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (trimmed.startsWith('Feature:')) break
+    if (trimmed.startsWith('@')) {
+      for (const tag of trimmed.split(/\s+/)) {
+        if (tag.startsWith('@')) tags.push(tag)
+      }
+    }
+  }
+  return tags
+}
+
+/** Extract all tags (Feature-level and scenario-level) from a feature file. */
+function allTags(content) {
+  const tags = new Set()
+  for (const line of content.split(/\r?\n/)) {
+    const trimmed = line.trim()
+    if (trimmed.startsWith('@')) {
+      for (const tag of trimmed.split(/\s+/)) {
+        if (tag.startsWith('@')) tags.add(tag)
+      }
+    }
+  }
+  return tags
+}
+
+function readFeature(absolute) {
+  return readFileSync(absolute, 'utf8')
+}
+
+/** Assess the current feature inventory from the filesystem (not a hardcoded count). */
+function assessInventory() {
+  const all = listFeatureFiles(FEATURES_DIR)
+  const byRel = new Map()
+  const whollyIgnored = []
+  const active = []
+  for (const absolute of all) {
+    const rel = relativeSpec(absolute)
+    const content = readFeature(absolute)
+    const fTags = featureLevelTags(content)
+    byRel.set(rel, {
+      absolute,
+      content,
+      featureTags: fTags,
+      allTags: allTags(content),
+    })
+    if (fTags.includes('@ignore')) {
+      whollyIgnored.push(rel)
+    } else {
+      active.push(rel)
+    }
+  }
+  return { all: all.map(relativeSpec), byRel, whollyIgnored, active }
+}
 
 test('selections containing unsupported isolated Cypress specs refuse before reset', async (t) => {
   const checkout = makePrimaryCheckout(t, {
@@ -281,5 +373,155 @@ test('owner shutdown refuses a new Cypress runner lease before reset', async (t)
         isolatedCypressOpts()
       ),
     /shutting down/
+  )
+})
+
+// --- Slice 9: complete active-inventory coverage / migration-contract reconciliation ---
+
+test('active inventory reconciles with the single registry: every active file is admitted or is a live-provider file; wholly-ignored files are not admitted', () => {
+  const { byRel, whollyIgnored, active } = assessInventory()
+  const admitted = new Set(SUPPORTED_ISOLATED_CYPRESS_SPECS)
+  // Live-provider files preserve existing external-service/credential behavior:
+  // identified by a Feature-level real-service tag, not by filename.
+  const liveProviderFiles = active.filter((rel) =>
+    byRel.get(rel).featureTags.some((tag) => KNOWN_REAL_SERVICE_TAGS.has(tag))
+  )
+  const liveProviderSet = new Set(liveProviderFiles)
+
+  // Every active file is either admitted by the registry or a live-provider file.
+  for (const rel of active) {
+    assert.ok(
+      admitted.has(rel) || liveProviderSet.has(rel),
+      `${rel} is active but neither admitted by the registry nor a live-provider file`
+    )
+  }
+  // No wholly-ignored file is admitted.
+  for (const rel of whollyIgnored) {
+    assert.equal(
+      admitted.has(rel),
+      false,
+      `${rel} is wholly-ignored and must not be admitted`
+    )
+  }
+  // No live-provider file is admitted (preserves real-service behavior).
+  for (const rel of liveProviderFiles) {
+    assert.equal(
+      admitted.has(rel),
+      false,
+      `${rel} is a live-provider file and must not be admitted`
+    )
+  }
+  // The registry admits exactly the active files minus live-provider files.
+  const expectedAdmitted = new Set(
+    active.filter((rel) => !liveProviderSet.has(rel))
+  )
+  assert.deepEqual(
+    [...admitted].sort(),
+    [...expectedAdmitted].sort(),
+    'registry admitted set must match active files minus live-provider files'
+  )
+})
+
+test('admitted files resource groups match their declared tags, including scenario-level tags and mixed files', () => {
+  const { byRel, active } = assessInventory()
+  const admitted = new Set(SUPPORTED_ISOLATED_CYPRESS_SPECS)
+  for (const rel of active) {
+    if (!admitted.has(rel)) continue
+    const tags = byRel.get(rel).allTags
+    const reqs = assertSupportedIsolatedCypressSpecs([rel])
+    const declaresOpenAiMock = tags.has('@usingMockedOpenAiService')
+    const declaresWikidataMock = tags.has('@usingMockedWikidataService')
+    assert.equal(
+      reqs.requiresPrivateOpenAiMock,
+      declaresOpenAiMock,
+      `${rel}: registry OpenAI-mock requirement must match @usingMockedOpenAiService tag`
+    )
+    assert.equal(
+      reqs.requiresPrivateWikidataMock,
+      declaresWikidataMock,
+      `${rel}: registry Wikidata-mock requirement must match @usingMockedWikidataService tag`
+    )
+  }
+})
+
+test('no new shared-resource family is discovered in the active inventory', () => {
+  const { byRel, active } = assessInventory()
+  const knownFamilies = new Set([
+    ...KNOWN_MOCK_TAG_FAMILIES,
+    ...KNOWN_REAL_SERVICE_TAGS,
+    ...IGNORED_ONLY_RESOURCE_TAGS,
+  ])
+  for (const rel of active) {
+    const tags = byRel.get(rel).allTags
+    for (const tag of tags) {
+      if (tag.startsWith('@usingMocked') || tag.startsWith('@usingReal')) {
+        assert.ok(
+          knownFamilies.has(tag),
+          `${rel}: discovered unknown resource family ${tag} — stop for scope review`
+        )
+      }
+    }
+  }
+})
+
+test('mixed Wikidata file is admitted at the routing/filter boundary; its real-service scenario preserves existing URL policy without a mock', () => {
+  const mixedSpec = 'e2e_test/features/wikidata/associate_wikidata.feature'
+  const { byRel } = assessInventory()
+  const info = byRel.get(mixedSpec)
+  assert.ok(info, `${mixedSpec} must exist in the inventory`)
+  // The file has both mocked and real-service scenarios.
+  assert.equal(
+    info.allTags.has('@usingMockedWikidataService'),
+    true,
+    `${mixedSpec} must have a @usingMockedWikidataService scenario`
+  )
+  assert.equal(
+    info.allTags.has('@usingRealWikidataService'),
+    true,
+    `${mixedSpec} must have a @usingRealWikidataService scenario`
+  )
+  // The registry admits the file and declares a Wikidata-mock requirement.
+  assert.equal(
+    SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(mixedSpec),
+    true,
+    `${mixedSpec} must be admitted by the registry`
+  )
+  const reqs = assertSupportedIsolatedCypressSpecs([mixedSpec])
+  assert.equal(reqs.requiresPrivateWikidataMock, true)
+  assert.equal(reqs.requiresPrivateOpenAiMock, false)
+  // The file is NOT a live-provider file: it does not have a Feature-level
+  // real-service tag. The real-service scenario is scenario-level, so the
+  // file is admitted and Cucumber's scenario tag selection chooses mocked
+  // versus real service URLs per scenario.
+  assert.equal(
+    info.featureTags.some((tag) => KNOWN_REAL_SERVICE_TAGS.has(tag)),
+    false,
+    `${mixedSpec} must not have a Feature-level real-service tag`
+  )
+})
+
+test('live OpenAI file is refused at the routing/filter boundary; it preserves existing external-service/credential behavior', () => {
+  const liveSpec =
+    'e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature'
+  const { byRel } = assessInventory()
+  const info = byRel.get(liveSpec)
+  assert.ok(info, `${liveSpec} must exist in the inventory`)
+  // The file has a Feature-level @usingRealOpenAiService tag.
+  assert.equal(
+    info.featureTags.includes('@usingRealOpenAiService'),
+    true,
+    `${liveSpec} must have a Feature-level @usingRealOpenAiService tag`
+  )
+  // The file is NOT admitted by the registry — preserves real-service behavior.
+  assert.equal(
+    SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(liveSpec),
+    false,
+    `${liveSpec} must not be admitted (preserves real-service behavior)`
+  )
+  // Selecting it in isolation is refused at the routing/filter boundary
+  // without paid/live requests.
+  assert.throws(
+    () => assertSupportedIsolatedCypressSpecs([liveSpec]),
+    /only supports selections/
   )
 })
