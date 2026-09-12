@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
+import com.odde.donut.entities.AttachmentBlob;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
@@ -185,6 +186,8 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
           assertThat(reloadedNote.getUpdatedAt(), is(noteUpdatedAt));
           assertThat(rowsFor(entityManager, reloadedNote), empty());
           assertThat(imageRepository.findById(orphan.getId()).isPresent(), is(true));
+          assertThat(
+              entityManager.find(AttachmentBlob.class, orphan.getBlob().getId()) != null, is(true));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));

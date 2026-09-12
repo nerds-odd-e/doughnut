@@ -5,9 +5,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiLink;
+import com.odde.donut.entities.AttachmentBlob;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.ImageRepository;
@@ -103,6 +106,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
       throws UnexpectedNoAccessRightException {
     Image kept = makeMe.anImage().forNote(note).please();
     Image orphan = makeMe.anImage().forNote(note).please();
+    Image otherNoteImage = makeMe.anImage().forNote(makeMe.aNote().please()).please();
 
     controller.updateNoteContent(
         note,
@@ -115,6 +119,9 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
 
     assertThat(imageRepository.findById(kept.getId()).isPresent(), equalTo(true));
     assertThat(imageRepository.findById(orphan.getId()).isPresent(), equalTo(false));
+    assertThat(entityManager.find(AttachmentBlob.class, orphan.getBlob().getId()), nullValue());
+    assertThat(entityManager.find(AttachmentBlob.class, kept.getBlob().getId()), notNullValue());
+    assertThat(imageRepository.findById(otherNoteImage.getId()).isPresent(), equalTo(true));
   }
 
   @Test

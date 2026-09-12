@@ -9,10 +9,15 @@ prototype investigation remains below; the delivered comparison is recoverable
 in `.planning/quick/108-publish-notebook-edits-faster/PLAN.md` at commit
 `1e2aef020c`.
 
-The [selected next story](../.planning/seeds/SEED-018-publish-large-authored-notebooks.md#story-5)
-retains **1,000 existing notes / 1,000 updates**, seeking at least another 50%
-reduction through simpler production code. The new attachment-cleanup prototype
-below meets that experimental boundary. It is retained separately, not delivered.
+Attachment cleanup now selects each note's orphan images directly with a
+query-local commit flush mode, then uses the entity deletion lifecycle so image
+and blob cascading and rollback remain intact. On the maintained **1,000
+existing notes / 1,000 updates** comparison, this design measures **12,089.157
+→ 3,095.452 ms median**, **74.39% less waiting** and 3.91× faster. It removes
+the fetch-all repository dependency and Java filtering branch, for a formatted
+production delta of 11 additions / 15 deletions, net **−4** lines. The
+maintained controller examples cover referenced and orphan image/blob behavior,
+another note's images, and late-failure restoration.
 
 ## Attachment-cleanup refinement
 
