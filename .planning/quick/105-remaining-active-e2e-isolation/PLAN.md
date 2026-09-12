@@ -249,7 +249,7 @@ proof; no refinement warranted mid-slice.
 
 ### 7. Run a mixed-resource batch without cross-file interference
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Ordinary, OpenAI, and Wikidata files run sequentially under one stack;
 scenario resets and mock reinstalls keep each file's correct endpoint and the
 union of resources survives until invocation exit.
@@ -263,6 +263,16 @@ Observe one startup and final shutdown, correct responses from both services,
 and empty owned ports after completion. Extend the invocation boundary example
 only for any gap this mixed-resource transition exposes.
 Sizing: 5 minutes active work; measured browser/runtime wait excepted.
+Done 2026-09-12: ran the representative mixed batch (note_creation + semantic_search
++ note_create_with_wikidata_id) — 16/16 scenarios green, one startup and one
+final shutdown, correct responses from both services, empty owned ports after
+completion (a pre-existing foreign dev Mountebank on canonical 2525/5001/5002
+correctly survived per ADR 0007). No production code change — the existing runner
+already unions batch requirements (slices 5–6); added one focused boundary test
+in `scripts/e2e-runner.test.mjs` covering the union gap (both mocks start under
+one lease, distinct env keys, survive until exit, stop together). Refactor:
+no candidates (test is focused behavioral documentation of the union gap, not
+duplication). Sizing held (~6 min active + measured browser wait).
 
 ### 8. Keep interactive resource ownership across feature switches
 Type: Behavior
