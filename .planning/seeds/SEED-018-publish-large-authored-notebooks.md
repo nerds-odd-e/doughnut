@@ -194,22 +194,23 @@ and [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
   A timeout is incomplete evidence. Publishing into a 10,000-note notebook
   and adding 10,000 notes in one request are different workloads; the latter
   is not implicitly included.
-- **Hypothesis:** Story 3 delivered a 65.35% publication-time reduction
-  (10,308.043 ms vs. a 29,746.720 ms baseline) on a 1,000-existing/1,000-edit
-  fixture by replacing whole-session flush/query choreography with direct
-  bulk queries and the note's own already-loaded reference collection. The
+- **Hypothesis:** The delivered smaller-workload improvements reduced the
+  1,000-existing/1,000-edit median from 29,746.720 ms first to 10,308.043 ms,
+  then from a fresh 12,089.157 ms baseline to 3,095.452 ms. They replaced
+  whole-session flush/query choreography with direct bulk queries and direct
+  orphan-image selection while retaining entity deletion. The
   near-future direction names a larger goal directly ("owners of notebooks
   with 10,000 notes can publish to the remote quickly, with reasonable
-  performance"), which story 3 did not attempt to validate. The delivered
-  change, together with story 5's next improvement, may or may not hold up
-  proportionally at that scale.
+  performance"). The smaller fixture does not establish whether those gains
+  hold proportionally at that scale.
 - **Evidence for a next round:** The
   [attachment-cleanup refinement](../../docs/notebook-publication-profiling.md#attachment-cleanup-refinement)
-  found 74.48% less waiting for updates, but only an exploratory 39.79% gain
-  for additions. The prototype's update flush samples fell to 10/128, while
-  addition flush samples remained concentrated in soft-deleted-title checking.
+  records 74.39% less waiting for delivered updates, but only an exploratory
+  39.79% gain for additions. Update image-cleanup flush samples fell to zero,
+  while addition flush samples remained concentrated in soft-deleted-title
+  checking.
   Do not use the earlier 73% flush share to claim index rebuilding is still
-  dominant after story 5. The historical 1,000-existing / 10,000-addition
+  dominant. The historical 1,000-existing / 10,000-addition
   captures remain unmeasured against these improvements.
 - **Value / learning:** Test whether the smaller-workload gains carry over to
   a large notebook and identify any remaining scaling limitation before
@@ -220,13 +221,13 @@ and [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
 - **Not yet resolved:** Representative changed-note count, acceptable waiting
   time, staged measurement boundaries that keep feedback practical, and whether
   a measured indexing simplification belongs in this story's eventual outcome.
-  These are refinement decisions, not reasons to enlarge story 5. Route to
+  These are refinement decisions. Route to
   [dough-story-refinement](../../../.claude/skills/dough-story-refinement/SKILL.md)
   before slice planning; this is not an executable story yet.
 - **Effort hypothesis:** M (1–2 hours), low confidence; assumes reuse of the
   existing profiler and bounded captures rather than an optimization round.
-- **Depends on:** Story 5 first, following the user's chosen learning order;
-  use its delivered behavior as the new baseline. Reuse profiling infrastructure
+- **Depends on:** The smaller-workload improvements are delivered; use their
+  behavior as the new baseline. Reuse profiling infrastructure
   (`scripts/profiling/run-notebook-publication-profile.mjs`,
   `PUBLICATION_PROFILE_EXISTING`/`PUBLICATION_PROFILE_UPDATES`/`PUBLICATION_PROFILE_ADDITIONS`).
 - **Safe stopping point:** Retain a verified scaling result and explicit limits
@@ -243,9 +244,9 @@ and [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
 
 #### Staged indexing hypothesis — user direction, 2026-09-12
 
-Keep story 5's tested attachment-cleanup recommendation and its performance and
-simplicity criteria. Investigate the following idea here, in the remaining
-larger performance story, rather than expanding story 5.
+Keep the current attachment-cleanup design and its measured performance and
+simplicity. Investigate the following idea here, in the remaining larger
+performance story.
 
 **Current behavior:** Publication creates or locates a note, then calls
 `AuthoredNoteDocumentPersistence.persist` for each changed note. That method
@@ -253,7 +254,7 @@ replaces content/source-owned authored-reference rows, persists the note,
 cleans up images, and immediately refreshes property, alias and level indexes
 through `NoteReferenceService`. The first optimization simplified those
 per-note refreshes; neither a publication-wide second pass nor a background
-indexing job is in place. The attachment-cleanup prototype does not change
+indexing job is in place. Attachment cleanup does not change
 indexing order and is compatible with investigating a different order later.
 
 **What the indexes mean:** Under
@@ -285,10 +286,10 @@ Use manageable 1,000-note workloads first and state updates/additions separately
 Include authored forward references to newly added notes, mutual/cyclic links,
 alias changes and removals, property references, and a late invalid document
 when those examples distinguish the proposed lifecycle. Compare completed
-request time, index-stage cost and allocations against story 5's delivered
-baseline. Escalate to 10,000-note validation only for a specific scaling question
-with a practical feedback boundary. These are investigation examples, not an
-exhaustive new acceptance matrix or an implementation plan.
+request time, index-stage cost and allocations against the delivered 3,095.452
+ms update median. Escalate to 10,000-note validation only for a specific
+scaling question with a practical feedback boundary. These are investigation
+examples, not an exhaustive new acceptance matrix or an implementation plan.
 
 **Later possibility: background indexing.** Consider separately whether the
 owner may see an accepted Git head/content before derived views catch up. Alias
@@ -309,8 +310,9 @@ The user has already queued
 [Reconsider note-title uniqueness and soft deletion with Git versioning](SEED-009-git-backed-local-notebook-workflow.md#story-26).
 That story owns the Git-compatible title-reuse direction and the reconsideration
 of title reservation and soft deletion, including whether soft deletion should
-change or be removed. Do not tune `requireNoSoftDeletedTitleAt` in story 5 or
-turn the existing title-blocking policy into a performance requirement here.
+change or be removed. Do not tune `requireNoSoftDeletedTitleAt` in this scaling
+story or turn the existing title-blocking policy into a performance requirement
+here.
 The profile establishes the application check's runtime cost; it does not
 establish which database unique constraint enforces the policy or authorize a
 specific schema/deletion change.
@@ -323,16 +325,11 @@ the backlog order merely because this observation is cross-linked.
 
 ## Ordering and Scope Reduction
 
-The user selected story 5 as backlog priority one and story 4 as priority two.
-Deliver another substantial gain on the useful 1,000-note feedback boundary
-before escalating to 10,000-note validation. If scope must shrink, defer story 4
-first; retain story 5's delivered value and both of its acceptance criteria.
-Story 5 is refined with measured evidence; story 4 still needs refinement of
-its workload and acceptable waiting time. Both remain non-executable planning
-inputs; neither this split nor the research delivers an implementation.
-The user explicitly authorizes temporary code experiments, measurement, and
-profiling during future refinement of either story, consistent with story 3's own
-authorized refinement.
+The product backlog owns current priority; story 4 remains behind the selected
+title-reuse investigation. Story 4 still needs refinement of its workload and
+acceptable waiting time. It remains a non-executable planning input. The user
+explicitly authorizes temporary code experiments, measurement, and profiling
+during its future refinement, consistent with the earlier authorized work.
 
 ## Breadcrumbs
 

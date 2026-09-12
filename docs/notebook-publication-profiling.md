@@ -9,68 +9,15 @@ prototype investigation remains below; the delivered comparison is recoverable
 in `.planning/quick/108-publish-notebook-edits-faster/PLAN.md` at commit
 `1e2aef020c`.
 
-The next attachment-cleanup execution retains **1,000 existing notes / 1,000
-updates** and measures **12,089.157 → 3,095.452 ms median**, **74.39% less
-waiting**. The delivered design selects each note's orphan images directly and
-removes the fetch-all repository dependency and Java filtering branch. Its
-formatted production diff is 11 additions / 15 deletions, net **−4** lines.
-
-## Attachment-cleanup execution comparison
-
-Execution date: 2026-09-12. Source revision recorded by all captures:
-`9468b251b7428ba4edc57deee2abb3de92dbce5f`; candidate production patch SHA-256:
-`6fab86ea944d47fbf9b2693650a3cb7ac8e306a1c37d5f55c039135ae995c7fa`.
-The baseline was captured before production edits and the candidate afterward
-in the same owned worktree, disposable database and ports. Both versions used
-JDK 25.0.3, Hibernate 7.4.5.Final, MySQL 8.4.11, the same E2E logging and JFR
-settings, and identical baseline/proposal tree fingerprints
-`30f8c2a12e2214f1a9b7f34e4c79d09d8473279899e3138b9ca0a029a0afa8f9` /
-`be732ca9d930db96bb35d3e23c41ac717710820c18728c29be7d5d8b999d9da9`.
-
-| Version | Capture directory | HTTP elapsed |
-| --- | --- | ---: |
-| Fresh baseline | `2026-09-12T15-17-46.472Z` | 11,847.590 ms |
-| Fresh baseline | `2026-09-12T15-18-47.887Z` | 13,303.793 ms |
-| Fresh baseline | `2026-09-12T15-19-37.831Z` | 12,089.157 ms |
-| Delivered attachment cleanup | `2026-09-12T15-23-05.647Z` | 3,028.152 ms |
-| Delivered attachment cleanup | `2026-09-12T15-23-44.883Z` | 3,095.452 ms |
-| Delivered attachment cleanup | `2026-09-12T15-24-23.523Z` | 3,125.534 ms |
-
-Medians: **12,089.157 → 3,095.452 ms**, **74.39% less waiting** and 3.91×
-faster. Every update run completed with HTTP 200, returned the same proposed
-head, verified all 1,000 authored documents, and preserved 1,002 note
-identities, learning, 1,000 aliases and 2,000 related-property targets. The
-separate 20-addition acceptance (`2026-09-12T15-22-25.085Z`, 160.706 ms) and
-late rejection (`2026-09-12T15-22-30.900Z`, 105.079 ms) also passed.
-
-Representative candidate capture `2026-09-12T15-23-44.883Z` contains
-`caller-analysis.txt`. Its completed request has 67 execution samples, with
-seven whole-session flush samples all attributed to transaction commit and
-zero flush samples attributed to image cleanup. The four sampled image-cleanup
-stacks execute the direct query without the prior pre-flush traversal.
-
-The production change removes `NoteService`'s `ImageRepository` dependency,
-the repository's unused note finder and the in-memory exclusion branch. One
-typed HQL selection with query-local `FlushModeType.COMMIT` now owns the orphan
-predicate, while `EntityPersister.remove` retains normal image/blob cascading
-and rollback. Strengthened existing controller examples prove kept image/blob,
-orphan image/blob, another note's image, and late-failure restoration behavior.
-The full backend suite passes, as do the small shared addition and late-invalid
-rejection HTTP scenarios.
-
-The update comparison command, run three times before and three times after the
-production edit, was:
-
-```sh
-PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_UPDATES=1000 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c caffeinate -i node scripts/profiling/run-notebook-publication-profile.mjs
-```
-
-Correctness commands were:
-
-```sh
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
-PUBLICATION_PROFILE_EXISTING=20 PUBLICATION_PROFILE_ADDITIONS=20 PUBLICATION_PROFILE_TAGS='@publicationProfileHttp or @publicationProfileHttpRejection' PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c caffeinate -i node scripts/profiling/run-notebook-publication-profile.mjs
-```
+Attachment cleanup now selects each note's orphan images directly with a
+query-local commit flush mode, then uses the entity deletion lifecycle so image
+and blob cascading and rollback remain intact. On the maintained **1,000
+existing notes / 1,000 updates** comparison, this design measures **12,089.157
+→ 3,095.452 ms median**, **74.39% less waiting** and 3.91× faster. It removes
+the fetch-all repository dependency and Java filtering branch, for a formatted
+production delta of 11 additions / 15 deletions, net **−4** lines. The
+maintained controller examples cover referenced and orphan image/blob behavior,
+another note's images, and late-failure restoration.
 
 ## Attachment-cleanup refinement
 

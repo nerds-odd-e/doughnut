@@ -15,6 +15,7 @@ with reasonable performance.
 
 ## Backlog list
 
+- [Remove the test-only image repository](quick/111-remove-test-only-image-repository/PLAN.md)
 - [Reconsider note-title uniqueness and soft deletion with Git versioning](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
