@@ -291,7 +291,7 @@ will be observed after merge to main, not as a local substitute.
 
 ### 11. Keep paired isolation proofs usable with run-owned stacks
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: Existing paired-worktree reset proof commands coordinate two owned
 invocations rather than asking developers to start persistent SUTs first.
 Proof: Harness command-boundary tests preserve barriers, selected mode/spec,
@@ -302,6 +302,16 @@ Live peer/data proof belongs to slice 13; this slice's single proof loop is the
 harness entry command's orchestration contract.
 Sizing: 5–8 minutes, medium confidence. Reuse the existing barrier protocol;
 if its timing requires a new independent mechanism, stop and refine.
+Proof result: 12/12 harness+openai-mock tests pass (2 new boundary tests: default
+spawn emits `node scripts/e2e-runner.mjs --spec <spec>`; paired run spawns
+exactly two owned invocations with role barrier env). spawnIsolatedCypress renamed
+to spawnIsolatedE2eRunner (reflects that it spawns the owned wrapper, not direct
+Cypress). 50/50 e2e-runner boundary + 20/20 baseline pass. No timing concern —
+the barrier is spec-driven (Cucumber hooks), unaffected by owned invocations.
+Deferred to slice 12: docs/worktree-browser-tests.md lines 96-100 still instruct
+callers to start both allocations first (now stale); the spawnCypress option
+name on runPairedWorktreeResetIsolation is stale but left to keep this refactor
+minimal.
 
 ### 12. Remove obsolete public lifecycle entry points
 Type: Behavior

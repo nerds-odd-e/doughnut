@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
- * Temporary paired Cypress runner for isolated reset isolation.
- * Uses the harness-local file barrier; not a reusable scheduler.
+ * Temporary paired owned-invocation runner for isolated reset isolation.
+ * Each role spawns the owned E2E wrapper (scripts/e2e-runner.mjs), which owns
+ * its own SUT stack for the invocation; the harness never starts another stack
+ * around it. Uses the harness-local file barrier; not a reusable scheduler.
  *
  * Default (fixture): note-editing DB reset isolation (same spec both roles).
  * OpenAI mock mode: note-content completion with distinct suggestions /
@@ -39,13 +41,13 @@ function waitForChildExit(child) {
   })
 }
 
-export function spawnIsolatedCypress(
+export function spawnIsolatedE2eRunner(
   cwd,
   extraEnv,
   spawnFn = spawn,
   spec = SUPPORTED_ISOLATED_CYPRESS_SPEC
 ) {
-  return spawnFn('pnpm', ['cypress', 'run', '--spec', spec], {
+  return spawnFn('node', ['scripts/e2e-runner.mjs', '--spec', spec], {
     cwd,
     env: { ...process.env, ...extraEnv },
     stdio: 'inherit',
@@ -95,7 +97,7 @@ export async function runPairedWorktreeResetIsolation(options) {
   const resetterProof = options.resetterProof ?? DEFAULT_RESETTER_PROOF
   const spawnCypress =
     options.spawnCypress ??
-    ((cwd, env, spec) => spawnIsolatedCypress(cwd, env, spawn, spec))
+    ((cwd, env, spec) => spawnIsolatedE2eRunner(cwd, env, spawn, spec))
   const log = options.log ?? ((line) => process.stdout.write(`${line}\n`))
   log(`Reset isolation barrier: ${barrierDir}`)
   log(`Mode: ${mode}`)
