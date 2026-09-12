@@ -390,7 +390,7 @@ reconciliation.
 
 ### 13. Demonstrate independent concurrent E2E invocations
 Type: Behavior
-Status: planned
+Status: delivered
 Behavior: Two supported invocations in separate worktrees complete independently
 while persistent Development stays available and unchanged.
 Proof: Adapted paired reset harness records peer availability/data preservation
@@ -400,6 +400,29 @@ its lifecycle changed; do not broaden into unrelated full-suite verification.
 Commands: new `pnpm cy:run --spec` for supported selections plus the existing
 `node scripts/worktree-reset-isolation-harness.mjs` modes after caller migration.
 Sizing: 5 minutes active work; measured real-service/browser waits excepted.
+Evidence: Live concurrent proof — two `pnpm cy:run --spec
+e2e_test/features/note_creation_and_update/worktree_note_editing.feature`
+invocations in separate worktrees (execution + peer-proof) ran concurrently;
+both exited 0 with 1/1 tests passing ("All specs passed!"). Both shut down their
+owned process trees (sut.log ends "Forced SUT service child exit (signal SIGTERM);
+releasing owned peers"; sut.pid processes dead) and freed their allocated ports
+(no listeners on 63214-6 / 57365-7). Harness adaptation adds
+`ownedListenersRemaining: { peer, resetter }` (occupied port labels via
+loadCompleteIsolatedE2eAllocation + listOccupiedApplicationPorts +
+isTcpPortOccupied) with `isPortOccupiedFn`/`loadAllocationFn` seams; 15/15
+harness + 53/53 e2e-runner boundary tests pass. Defect fixed during proof: first
+`pnpm cy:run` in a fresh isolated worktree failed because
+`runOwnedE2eInvocation`/`runE2eBatch`/`runE2eInteractive` called
+`resolveSutCheckoutTarget` (needs a complete allocation) before
+`startOwnedSutLifetime` (which provisions). Fix: compute `isolated` via
+`worktreeIsolationApplies` and skip the pre-start resolve for isolated
+checkouts (let startOwnedSutLifetime provision + resolve internally); primary
+path unchanged. Refactor: extracted shared `resolveInvocationCheckout` helper.
+Note: a crashed `bootRunE2E --build-cache` can leave a corrupted Gradle
+build-cache entry that makes subsequent concurrent builds fail; clearing
+`~/.gradle/caches/build-cache-1` resolves it. This is pre-existing
+shared-infrastructure flakiness, not a wrapper defect. "Persistent Development
+stays available" not separately verified (no Development stack was running).
 
 ### 14. Report recurring lifecycle overhead
 Type: Behavior

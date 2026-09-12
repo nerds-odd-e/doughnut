@@ -18,6 +18,14 @@ import {
 import { runPairedWorktreeResetIsolation } from './worktree-reset-isolation-harness.mjs'
 import { withWorktreeResetIsolationBarrierDir } from './worktree-reset-isolation-test-helpers.mjs'
 
+const fakeAllocation = (root) => ({
+  e2e: {
+    backendPort: root === '/peer' ? 40001 : 50001,
+    vitePort: root === '/peer' ? 40002 : 50002,
+    lbListenPort: root === '/peer' ? 40003 : 50003,
+  },
+})
+
 test('openai-mock mode uses the OpenAI completion spec and proof env', async () => {
   await withWorktreeResetIsolationBarrierDir(async (dir) => {
     const spawned = []
@@ -26,6 +34,8 @@ test('openai-mock mode uses the OpenAI completion spec and proof env', async () 
       resetterRoot: '/resetter',
       barrierDir: dir,
       mode: 'openai-mock',
+      loadAllocationFn: fakeAllocation,
+      isPortOccupiedFn: async () => false,
       peerProof: {
         suggestion: 'A custom peer suggestion.',
         requestMarker: 'CUSTOM_PEER_MARKER',

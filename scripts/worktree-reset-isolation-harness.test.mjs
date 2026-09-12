@@ -22,6 +22,14 @@ import {
 } from './worktree-reset-isolation-harness.mjs'
 import { withWorktreeResetIsolationBarrierDir } from './worktree-reset-isolation-test-helpers.mjs'
 
+const fakeAllocation = (root) => ({
+  e2e: {
+    backendPort: root === '/peer' ? 40001 : 50001,
+    vitePort: root === '/peer' ? 40002 : 50002,
+    lbListenPort: root === '/peer' ? 40003 : 50003,
+  },
+})
+
 test('barrier steps are no-ops without a paired-run role', async () => {
   const order = ['start']
   await waitBeforeReset({ env: {} })
@@ -114,6 +122,8 @@ test('paired harness starts both runners against one barrier', async () => {
       resetterRoot: '/resetter',
       barrierDir: dir,
       log: () => undefined,
+      loadAllocationFn: fakeAllocation,
+      isPortOccupiedFn: async () => false,
       spawnCypress: (cwd, env) => {
         spawned.push({ cwd, env })
         const child = new EventEmitter()
@@ -214,6 +224,8 @@ test('paired harness spawns exactly two owned invocations with role barrier env'
       resetterRoot: '/resetter',
       barrierDir: dir,
       log: () => undefined,
+      loadAllocationFn: fakeAllocation,
+      isPortOccupiedFn: async () => false,
       spawnCypress: (cwd, env, spec) => {
         spawned.push({ cwd, env, spec })
         const child = new EventEmitter()
@@ -261,6 +273,8 @@ test('cli mode spawns the CLI spec on the peer and note-editing on the resetter'
       barrierDir: dir,
       mode: 'cli',
       log: () => undefined,
+      loadAllocationFn: fakeAllocation,
+      isPortOccupiedFn: async () => false,
       spawnCypress: (cwd, env, spec) => {
         spawned.push({ cwd, env, spec })
         const child = new EventEmitter()
@@ -284,5 +298,125 @@ test('cli mode spawns the CLI spec on the peer and note-editing on the resetter'
     assert.equal(result.resetterSpec, SUPPORTED_ISOLATED_CYPRESS_SPEC)
     assert.equal(spawned[0].spec, SUPPORTED_ISOLATED_CLI_SPEC)
     assert.equal(spawned[1].spec, SUPPORTED_ISOLATED_CYPRESS_SPEC)
+  })
+})
+
+test('ownedListenersRemaining is empty for both roles when all allocated ports are free', async () => {
+  await withWorktreeResetIsolationBarrierDir(async (dir) => {
+    const result = await runPairedWorktreeResetIsolation({
+      peerRoot: '/peer',
+      resetterRoot: '/resetter',
+      barrierDir: dir,
+      log: () => undefined,
+      loadAllocationFn: fakeAllocation,
+      isPortOccupiedFn: async () => false,
+      spawnCypress: (cwd, env) => {
+        const child = new EventEmitter()
+        queueMicrotask(async () => {
+          if (
+            env[WORKTREE_RESET_ISOLATION_ROLE] ===
+            WORKTREE_RESET_ISOLATION_PEER_ROLE
+          ) {
+            await afterSeed({ env, timeoutMs: 2_000, pollMs: 10 })
+          } else {
+            await waitBeforeReset({ env, timeoutMs: 2_000, pollMs: 10 })
+            afterReset({ env })
+          }
+          child.emit('close', 0)
+        })
+        return child
+      },
+    })
+    assert.deepEqual(result.ownedListenersRemaining, {
+      peer: [],
+      resetter: [],
+    })
+  })
+})
+
+test('ownedListenersRemaining records an occupied allocated port for the role that holds it', async () => {
+  await withWorktreeResetIsolationBarrierDir(async (dir) => {
+    const peerAllocation = fakeAllocation('/peer')
+    const occupiedPeerPort = peerAllocation.e2e.lbListenPort
+    const probedPorts = []
+    const result = await runPairedWorktreeResetIsolation({
+      peerRoot: '/peer',
+      resetterRoot: '/resetter',
+      barrierDir: dir,
+      log: () => undefined,
+      loadAllocationFn: fakeAllocation,
+      isPortOccupiedFn: async (port) => {
+        probedPorts.push(port)
+        return port === occupiedPeerPort
+      },
+      spawnCypress: (cwd, env) => {
+        const child = new EventEmitter()
+        queueMicrotask(async () => {
+          if (
+            env[WORKTREE_RESET_ISOLATION_ROLE] ===
+            WORKTREE_RESET_ISOLATION_PEER_ROLE
+          ) {
+            await afterSeed({ env, timeoutMs: 2_000, pollMs: 10 })
+          } else {
+            await waitBeforeReset({ env, timeoutMs: 2_000, pollMs: 10 })
+            afterReset({ env })
+          }
+          child.emit('close', 0)
+        })
+        return child
+      },
+    })
+    assert.ok(
+      probedPorts.includes(peerAllocation.e2e.backendPort),
+      'peer backend port is probed'
+    )
+    assert.ok(
+      probedPorts.includes(peerAllocation.e2e.vitePort),
+      'peer vite port is probed'
+    )
+    assert.ok(
+      probedPorts.includes(peerAllocation.e2e.lbListenPort),
+      'peer LB port is probed'
+    )
+    assert.deepEqual(result.ownedListenersRemaining.peer, [
+      `local LB ${occupiedPeerPort}`,
+    ])
+    assert.deepEqual(result.ownedListenersRemaining.resetter, [])
+  })
+})
+
+test('ownedListenersRemaining scan does not kill or signal any spawned child', async () => {
+  await withWorktreeResetIsolationBarrierDir(async (dir) => {
+    const killCalls = []
+    const makeChild = (env) => {
+      const child = new EventEmitter()
+      child.kill = (signal) => {
+        killCalls.push({ role: env[WORKTREE_RESET_ISOLATION_ROLE], signal })
+        return true
+      }
+      queueMicrotask(async () => {
+        if (
+          env[WORKTREE_RESET_ISOLATION_ROLE] ===
+          WORKTREE_RESET_ISOLATION_PEER_ROLE
+        ) {
+          await afterSeed({ env, timeoutMs: 2_000, pollMs: 10 })
+        } else {
+          await waitBeforeReset({ env, timeoutMs: 2_000, pollMs: 10 })
+          afterReset({ env })
+        }
+        child.emit('close', 0)
+      })
+      return child
+    }
+    await runPairedWorktreeResetIsolation({
+      peerRoot: '/peer',
+      resetterRoot: '/resetter',
+      barrierDir: dir,
+      log: () => undefined,
+      loadAllocationFn: fakeAllocation,
+      isPortOccupiedFn: async () => true,
+      spawnCypress: (cwd, env) => makeChild(env),
+    })
+    assert.deepEqual(killCalls, [])
   })
 })

@@ -21,6 +21,9 @@ import {
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress.mjs'
+import { loadCompleteIsolatedE2eAllocation } from './browser-worktree-isolation.mjs'
+import { listOccupiedApplicationPorts } from './local-runtime-target.mjs'
+import { isTcpPortOccupied } from './sut-healthcheck.mjs'
 import {
   OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
@@ -98,6 +101,9 @@ export async function runPairedWorktreeResetIsolation(options) {
   const spawnCypress =
     options.spawnCypress ??
     ((cwd, env, spec) => spawnIsolatedE2eRunner(cwd, env, spawn, spec))
+  const isPortOccupiedFn = options.isPortOccupiedFn ?? isTcpPortOccupied
+  const loadAllocationFn =
+    options.loadAllocationFn ?? loadCompleteIsolatedE2eAllocation
   const log = options.log ?? ((line) => process.stdout.write(`${line}\n`))
   log(`Reset isolation barrier: ${barrierDir}`)
   log(`Mode: ${mode}`)
@@ -147,6 +153,16 @@ export async function runPairedWorktreeResetIsolation(options) {
       'Resetter reset happened before the peer seeded; the barrier did not hold.'
     )
   }
+  const ownedListenersRemaining = {
+    peer: await listOccupiedApplicationPorts(
+      loadAllocationFn(peerRoot).e2e,
+      isPortOccupiedFn
+    ),
+    resetter: await listOccupiedApplicationPorts(
+      loadAllocationFn(resetterRoot).e2e,
+      isPortOccupiedFn
+    ),
+  }
   return {
     barrierDir,
     peerExit,
@@ -159,6 +175,7 @@ export async function runPairedWorktreeResetIsolation(options) {
     resetterProof: openaiMock ? resetterProof : null,
     peerEnv,
     resetterEnv,
+    ownedListenersRemaining,
   }
 }
 

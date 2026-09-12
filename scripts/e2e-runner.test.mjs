@@ -2119,3 +2119,118 @@ test('isolated path: non-allowlisted glob still refuses (allowlist enforced for 
     'must refuse non-allowlisted glob for isolated path'
   )
 })
+
+// ---------------------------------------------------------------------------
+// Slice 13: fresh isolated worktree provisioning on first cy:run.
+// The wrapper must provision a fresh linked worktree (no .worktree.local.json)
+// on first `pnpm cy:run` instead of failing in resolveSutCheckoutTarget before
+// startOwnedSutLifetime provisions. `isolated` is determined via
+// worktreeIsolationApplies (identity file OR linked git worktree) without
+// requiring a complete allocation; the pre-start resolveSutCheckoutTarget is
+// skipped for isolated (startOwnedSutLifetime provisions + resolves).
+// ---------------------------------------------------------------------------
+
+/**
+ * A ready lifetime stand-in for provisioning tests: the SUT is already
+ * healthy and shutdown is a no-op. Used to fake `startLifetime` so the test
+ * observes the wrapper reached (and provisioned via) the lifetime start
+ * without spawning real services.
+ */
+function readyLifetimeStandIn() {
+  return {
+    child: { kill: () => undefined, pid: 0 },
+    target: {},
+    ready: Promise.resolve({ ok: true, exitCode: 0 }),
+    shutdown: async () => undefined,
+  }
+}
+
+test('fresh isolated worktree (no .worktree.local.json) provisions on first cy:run: startLifetime is called instead of failing in resolveSutCheckoutTarget', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  // No writeIsolatedConfig: simulate a fresh linked worktree with no
+  // allocation. isIsolatedCheckoutFn fakes the linked-worktree topology so
+  // the wrapper treats this checkout as isolated without a real git worktree.
+  let startCalled = false
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    checkoutRoot: checkout.root,
+    isIsolatedCheckoutFn: () => true,
+    startLifetime: async () => {
+      startCalled = true
+      return readyLifetimeStandIn()
+    },
+    spawnCypress: () => makeCypressChild(0),
+  })
+
+  assert.equal(code, 0)
+  assert.equal(
+    startCalled,
+    true,
+    'fresh isolated worktree must provision (startLifetime called); the wrapper must not fail in resolveSutCheckoutTarget before provisioning'
+  )
+})
+
+test('primary checkout regression guard: foreign listener on a canonical port still refuses BEFORE startLifetime (resolveSutCheckoutTarget + port check run first)', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const foreignListener = await listenTcp()
+  t.after(() => closeServer(foreignListener.server))
+  const freeBackend = await allocateFreePort()
+  const freeVite = await allocateFreePort()
+  const runtimeTarget = {
+    backendPort: freeBackend,
+    vitePort: freeVite,
+    lbListenPort: foreignListener.port,
+    mountebankPort: 2525,
+  }
+  let startCalled = false
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    isIsolatedCheckoutFn: () => false,
+    isPortOccupiedFn: async (port) => port === foreignListener.port,
+    startLifetime: async () => {
+      startCalled = true
+      throw new Error(
+        'must not start when a canonical port is foreign-occupied'
+      )
+    },
+    spawnCypress: () => makeCypressChild(0),
+  })
+
+  assert.equal(code, 1, 'must refuse when a canonical port is foreign-occupied')
+  assert.equal(
+    startCalled,
+    false,
+    'primary path must call resolveSutCheckoutTarget + port check before startLifetime'
+  )
+  assert.equal(
+    await isPortStillListening(foreignListener.port),
+    true,
+    'foreign listener must not be signalled'
+  )
+})
+
+test('already-provisioned isolated worktree still works: startLifetime is called and re-reads the existing allocation (no re-provisioning path skipped)', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  let startCalled = false
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    checkoutRoot: checkout.root,
+    isIsolatedCheckoutFn: () => true,
+    startLifetime: async () => {
+      startCalled = true
+      return readyLifetimeStandIn()
+    },
+    spawnCypress: () => makeCypressChild(0),
+  })
+
+  assert.equal(code, 0)
+  assert.equal(
+    startCalled,
+    true,
+    'already-provisioned isolated worktree must still reach startLifetime'
+  )
+})

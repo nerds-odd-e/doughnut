@@ -22,7 +22,10 @@ import {
   selectedCypressSpecs,
 } from './isolated-cypress-spec-selection.mjs'
 import { startOwnedSutLifetime } from './sut-start.mjs'
-import { loadCompleteIsolatedE2eAllocation } from './browser-worktree-isolation.mjs'
+import {
+  loadCompleteIsolatedE2eAllocation,
+  worktreeIsolationApplies,
+} from './browser-worktree-isolation.mjs'
 import { startPrivateOpenAiMock } from './isolated-openai-mock.mjs'
 import { acquireSutRunnerLease, releaseSutRunnerLease } from './sut-owner.mjs'
 import {
@@ -183,6 +186,27 @@ export function wireBatchCancellation(signals = ['SIGINT', 'SIGTERM']) {
 }
 
 /**
+ * Resolve the invocation checkout target shared by the batch and interactive
+ * entry points. `isolated` is determined from the checkout topology (via
+ * `isIsolatedCheckoutFn`) without requiring a complete allocation, so a fresh
+ * isolated worktree is not forced through `resolveSutCheckoutTarget` (which
+ * needs an allocation) before `startOwnedSutLifetime` provisions. For the
+ * primary target, the resolved target is computed up front so the wrapper
+ * can refuse foreign listeners on its canonical ports before spawning.
+ */
+function resolveInvocationCheckout({
+  checkoutRoot,
+  runtimeTarget,
+  isIsolatedCheckoutFn,
+}) {
+  const isolated = isIsolatedCheckoutFn(checkoutRoot)
+  const resolvedCheckoutTarget = isolated
+    ? undefined
+    : resolveSutCheckoutTarget({ checkoutRoot, runtimeTarget })
+  return { isolated, resolvedCheckoutTarget }
+}
+
+/**
  * Run one E2E batch: start the owned SUT, wait for readiness, run the selected
  * supported no-mock specs through Cypress once, then settle the owned tree.
  *
@@ -210,21 +234,19 @@ export async function runE2eBatch({
   cancel = NO_CANCEL,
   startPrivateOpenAiMockFn = startPrivateOpenAiMock,
   cancelEscalationMs,
+  isIsolatedCheckoutFn = worktreeIsolationApplies,
   ...lifetimeOpts
 } = {}) {
-  const resolvedCheckoutTarget = resolveSutCheckoutTarget({
+  const { isolated, resolvedCheckoutTarget } = resolveInvocationCheckout({
     checkoutRoot,
     runtimeTarget: lifetimeOpts.runtimeTarget,
+    isIsolatedCheckoutFn,
   })
   const browser = browserFromArgv(argv)
   let specs
   let approved
   try {
-    const resolved = resolveSpecs(
-      argv,
-      checkoutRoot,
-      resolvedCheckoutTarget.isolated
-    )
+    const resolved = resolveSpecs(argv, checkoutRoot, isolated)
     specs = resolved.specs
     approved = resolved.approved
   } catch (error) {
@@ -248,6 +270,7 @@ export async function runE2eBatch({
     label: 'E2E batch',
     cancelEscalationMs,
     browser,
+    isolated,
     resolvedCheckoutTarget,
     ...lifetimeOpts,
   })
@@ -452,6 +475,7 @@ async function runOwnedE2eInvocation({
   label,
   cancelEscalationMs,
   browser,
+  isolated,
   resolvedCheckoutTarget,
   runtimeTarget,
   isPortOccupiedFn,
@@ -462,10 +486,11 @@ async function runOwnedE2eInvocation({
   // spawning the supervisor. The isolated target's port check is owned by
   // `startOwnedSutLifetime`; the primary target has no owner/claim gate, so
   // the wrapper guards its canonical ports here. Reuses the existing target
-  // rules — no second allowlist or target manager.
-  const { isolated, target: resolvedTarget } =
-    resolvedCheckoutTarget ??
-    resolveSutCheckoutTarget({ checkoutRoot, runtimeTarget })
+  // rules — no second allowlist or target manager. Callers pre-compute
+  // `isolated` and `resolvedCheckoutTarget` via `resolveInvocationCheckout`;
+  // for the isolated target `resolvedCheckoutTarget` is undefined (no
+  // allocation needed before provisioning).
+  const resolvedTarget = resolvedCheckoutTarget?.target
   if (!isolated) {
     const portCheck = isPortOccupiedFn ?? isTcpPortOccupied
     const occupied = await listOccupiedApplicationPorts(
@@ -654,6 +679,7 @@ export async function runE2eInteractive({
   cancel = NO_CANCEL,
   startPrivateOpenAiMockFn = startPrivateOpenAiMock,
   cancelEscalationMs,
+  isIsolatedCheckoutFn = worktreeIsolationApplies,
   ...lifetimeOpts
 } = {}) {
   // An interactive session may launch without an explicit --spec (pure
@@ -671,6 +697,11 @@ export async function runE2eInteractive({
       return 1
     }
   }
+  const { isolated, resolvedCheckoutTarget } = resolveInvocationCheckout({
+    checkoutRoot,
+    runtimeTarget: lifetimeOpts.runtimeTarget,
+    isIsolatedCheckoutFn,
+  })
   return runOwnedE2eInvocation({
     specs: preselectedSpecs,
     approved,
@@ -687,6 +718,8 @@ export async function runE2eInteractive({
     startPrivateOpenAiMockFn,
     label: 'Interactive E2E session',
     cancelEscalationMs,
+    isolated,
+    resolvedCheckoutTarget,
     ...lifetimeOpts,
   })
 }
