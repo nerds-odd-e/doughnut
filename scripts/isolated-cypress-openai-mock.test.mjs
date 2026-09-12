@@ -10,6 +10,10 @@ import {
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress.mjs'
 import {
+  assertSupportedIsolatedCypressSpecs,
+  SUPPORTED_ISOLATED_CYPRESS_SPECS,
+} from './isolated-cypress-spec-selection.mjs'
+import {
   cypressArgv,
   isolatedCypressOpts,
   supportedConfig,
@@ -169,4 +173,70 @@ test('before:run does not start a second private mock for a confirmed selection'
     specs: [{ relative: SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC }],
   })
   assert.equal(mockStarts, 1)
+})
+
+test('the registry admits exactly the assessed OpenAI-mock inventory and each declares a private-mock requirement', () => {
+  // The registry (`APPROVED_ISOLATED_CYPRESS_SPECS` exposed via
+  // `SUPPORTED_ISOLATED_CYPRESS_SPECS`) is the single authority for which
+  // specs require a private OpenAI mock — not a parallel inventory list.
+  // The assessed inventory is 12 files (one representative plus the 11
+  // remaining active OpenAI-mock features admitted through
+  // `ACTIVE_OPEN_AI_MOCK_SPECS`); every admitted OpenAI-mock spec must
+  // declare `requiresPrivateOpenAiMock: true`.
+  const openAiMockSpecs = SUPPORTED_ISOLATED_CYPRESS_SPECS.filter(
+    (spec) =>
+      assertSupportedIsolatedCypressSpecs([spec]).requiresPrivateOpenAiMock
+  )
+  assert.equal(
+    openAiMockSpecs.length,
+    12,
+    'assessed OpenAI-mock inventory is 12 files admitted by the registry'
+  )
+  // A mixed OpenAI-mock + application batch unions to a mock requirement.
+  const mixed = assertSupportedIsolatedCypressSpecs([
+    SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+    'e2e_test/features/note_creation_and_update/note_creation.feature',
+  ])
+  assert.equal(mixed.requiresPrivateOpenAiMock, true)
+  // An application-only batch has no mock requirement.
+  const appOnly = assertSupportedIsolatedCypressSpecs([
+    'e2e_test/features/note_creation_and_update/note_creation.feature',
+  ])
+  assert.equal(appOnly.requiresPrivateOpenAiMock, false)
+})
+
+test('scenario-level mock tag is admitted via the registry requirement, not inferred from the feature filename', () => {
+  // `note_view/semantic_search.feature` carries `@usingMockedOpenAiService`
+  // on its scenarios, not on the Feature line. The registry declares the
+  // private-mock requirement for the file; service code does not infer it
+  // from the filename or tag placement.
+  const scenarioLevelSpec =
+    'e2e_test/features/note_view/semantic_search.feature'
+  assert.equal(
+    SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(scenarioLevelSpec),
+    true,
+    `${scenarioLevelSpec} must be admitted by the registry`
+  )
+  const requirement = assertSupportedIsolatedCypressSpecs([scenarioLevelSpec])
+  assert.equal(
+    requirement.requiresPrivateOpenAiMock,
+    true,
+    `${scenarioLevelSpec} must declare requiresPrivateOpenAiMock: true via the registry`
+  )
+  // The other two scenario-level mock-tagged files are admitted the same way.
+  for (const spec of [
+    'e2e_test/features/recall/property_memory_tracker.feature',
+    'e2e_test/features/note_creation_and_update/mcq_management.feature',
+  ]) {
+    assert.equal(
+      SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(spec),
+      true,
+      `${spec} must be admitted by the registry`
+    )
+    assert.equal(
+      assertSupportedIsolatedCypressSpecs([spec]).requiresPrivateOpenAiMock,
+      true,
+      `${spec} must declare requiresPrivateOpenAiMock: true via the registry`
+    )
+  }
 })

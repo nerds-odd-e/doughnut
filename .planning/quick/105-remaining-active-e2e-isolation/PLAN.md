@@ -139,7 +139,7 @@ green. Assessed CLI inventory matches the plan's 5 files with no discrepancy.
 
 ### 3. Provision private OpenAI mocks for remaining active AI features
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Any currently active OpenAI mock feature gets the existing private
 endpoint, including files whose mock tag appears on a scenario rather than on
 the Feature. Its invocation cleanup remains unchanged.
@@ -148,6 +148,18 @@ once per batch, and `note_view/semantic_search.feature` establishes a newly
 admitted scenario-level mock path. Existing completion/failure/cancel proof stays
 green. Do not infer mock requirements from the feature filename in service code.
 Sizing: 5–8 minutes, medium confidence; focused browser wait excepted.
+Done 2026-09-12: added `ACTIVE_OPEN_AI_MOCK_SPECS` (11 remaining active
+OpenAI-mock features) to the single registry, each declaring
+`requiresPrivateOpenAiMock: true` (12-file group with the already-admitted
+representative). Scenario-level mock-tagged files (`semantic_search`,
+`property_memory_tracker`, `mcq_management`) admitted via the registry
+requirement, not inferred from filename. Refactor removed a test-only plural
+export and rewrote the inventory test to derive from the registry; fixed a
+stale assertion message. Focused unit suites (74 tests) and `pnpm cy:run
+--spec e2e_test/features/note_view/semantic_search.feature` (4/4) green;
+completion/failure/cancel regression green. Assessed OpenAI-mock inventory
+matches the plan's 12 files (9 Feature-level, 3 scenario-level) with no
+discrepancy.
 
 ### 4. Extract the existing Mountebank ownership from OpenAI configuration
 Type: Structure

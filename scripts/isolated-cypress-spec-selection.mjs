@@ -34,10 +34,37 @@ const ACTIVE_CLI_SPECS = [
 export const SUPPORTED_ISOLATED_MCP_SPEC =
   'e2e_test/features/mcp/mcp_services.feature'
 
-/** OpenAI completion — currently the only approved spec that requires a
- * runner-owned private OpenAI mock. */
+/** OpenAI completion — the representative approved spec that requires a
+ * runner-owned private OpenAI mock. The remaining active OpenAI-mock
+ * features are admitted through `ACTIVE_OPEN_AI_MOCK_SPECS` below. */
 export const SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC =
   'e2e_test/features/ai_generated_content/note_content_completion.feature'
+
+/**
+ * Remaining active OpenAI-mock feature files — each declares an existing
+ * private-mock requirement. Assessed 2026-09-12 from `e2e_test/features/`.
+ * This includes files whose `@usingMockedOpenAiService` tag appears on a
+ * scenario rather than on the Feature (`semantic_search`,
+ * `property_memory_tracker`, `mcq_management`); the registry's declared
+ * requirement is the authority, not the feature filename or tag placement.
+ * `note_content_completion.feature` is the already-admitted representative
+ * (`SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC`); the remaining active OpenAI-mock
+ * features are admitted here. Wikidata-mock and live-OpenAI files belong to
+ * later slices and are not admitted here.
+ */
+const ACTIVE_OPEN_AI_MOCK_SPECS = [
+  'e2e_test/features/ai_generated_recall_questions/question_contest.feature',
+  'e2e_test/features/book_reading/ai_reorganize_layout.feature',
+  'e2e_test/features/bazaar/bazaar_subscription.feature',
+  'e2e_test/features/assimilation/note_refinement.feature',
+  'e2e_test/features/messages/conversation_about_a_note.feature',
+  'e2e_test/features/note_creation_and_update/record_live_audio.feature',
+  'e2e_test/features/recall/recall_quiz_ai_question.feature',
+  'e2e_test/features/user_admin/manage_ai_models.feature',
+  'e2e_test/features/note_view/semantic_search.feature',
+  'e2e_test/features/recall/property_memory_tracker.feature',
+  'e2e_test/features/note_creation_and_update/mcq_management.feature',
+]
 
 /**
  * Application-only active feature files — no declared network-mock tag and
@@ -109,6 +136,10 @@ const APPROVED_ISOLATED_CYPRESS_SPECS = [
     spec: SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
     requiresPrivateOpenAiMock: true,
   },
+  ...ACTIVE_OPEN_AI_MOCK_SPECS.map((spec) => ({
+    spec,
+    requiresPrivateOpenAiMock: true,
+  })),
   ...APPLICATION_ONLY_ACTIVE_SPECS.map((spec) => ({ spec })),
 ]
 

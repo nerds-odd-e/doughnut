@@ -135,22 +135,22 @@ test('application-only active specs are admitted; resource-dependent and ignored
       `${cliSpec} must be admitted by slice 2`
     )
   }
-  // Excluded groups: wholly-ignored (including CLI), OpenAI mock, Wikidata mock,
-  // live OpenAI — none admitted by slices 1–2.
+  // Excluded groups: wholly-ignored (including CLI), Wikidata mock, and live
+  // OpenAI — none admitted by slices 1–3. Active OpenAI-mock features are
+  // admitted by slice 3 through the same registry.
   for (const excluded of [
     'e2e_test/features/book_reading/epub_book.feature',
     'e2e_test/features/cli/cli_access_token.feature',
     'e2e_test/features/cli/cli_gmail.feature',
     'e2e_test/features/cli/cli_interactive_mode.feature',
     'e2e_test/features/cli/cli_recall.feature',
-    'e2e_test/features/ai_generated_recall_questions/question_contest.feature',
     'e2e_test/features/wikidata/note_create_with_wikidata_id.feature',
     'e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature',
   ]) {
     assert.equal(
       SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(excluded),
       false,
-      `${excluded} must not be admitted by slices 1–2`
+      `${excluded} must not be admitted by slices 1–3`
     )
   }
 })
