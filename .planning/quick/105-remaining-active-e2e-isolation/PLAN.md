@@ -1,7 +1,12 @@
 # Run remaining active E2E features in isolated worktrees
 
 Source: [SEED-015 Story 10](../../seeds/SEED-015-concurrent-worktree-environments.md#story-10).
-Status: planned. Planning/refinement authorized 2026-09-12; execution not authorized.
+Status: in progress. Planning/refinement authorized 2026-09-12; execution
+authorized 2026-09-12.
+Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
+`main`; execution checkout `/Users/terryyin/git/d105-e2e` on
+`execute/105-e2e-isolation`; integration target `main`. CI observer mailbox
+`/tmp/dough-ci-501/watch-VA4ixD` (workflow `ci.yml` / `donut CI`).
 Backlog remains queued in its current order. No dependency on implementing
 Story 9: use short disposable checkout paths for this story's live proofs.
 
@@ -89,7 +94,7 @@ work. Planning/refinement performs none of those execution actions.
 
 ### 1. Admit ordinary active browser features
 Type: Behavior
-Status: planned
+Status: done
 Behavior: An existing non-mock feature outside the old four-file allowlist runs
 against the selected isolated app and needs no network mock process.
 Proof: Extend runner/plugin admission tests for the assessed application-only
@@ -98,6 +103,17 @@ proof. Keep unknown files and excluded whole-file ignored tests outside admissio
 Preserve MCP's existing origin handling; include its existing focused regression.
 Do not admit resource-dependent groups until their owning slices are complete.
 Sizing: 5–8 minutes, medium confidence; live browser wait excepted.
+Done 2026-09-12: extended `APPLICATION_ONLY_ACTIVE_SPECS` in
+`scripts/isolated-cypress-spec-selection.mjs` (one registry authority) to admit
+the assessed 52 application-only active files (50 new + 2 already admitted);
+updated 4 existing tests that used `note_creation.feature` as the unsupported
+example to use `book_reading/epub_book.feature` (permanently excluded); added a
+positive admission test. Refactor consolidated stale 4-file lists in
+`docs/worktree-browser-tests.md` and `.cursor/rules/e2e-authoring.mdc` to
+reference the single registry (fulfills the plan's doc-update promise). Focused
+unit suites (74 tests across 6 suites) and `pnpm cy:run --spec
+e2e_test/features/note_creation_and_update/note_creation.feature` (9/9) green.
+Assessed count matches the plan's 52-file inventory with no discrepancy.
 
 ### 2. Admit active CLI workflows with selected-origin artifacts
 Type: Behavior

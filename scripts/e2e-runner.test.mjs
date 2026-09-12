@@ -383,10 +383,7 @@ test('unsupported spec selection refuses before the stack starts', async (t) => 
   let startCalled = false
 
   const code = await runE2eBatch({
-    argv: [
-      '--spec',
-      'e2e_test/features/note_creation_and_update/note_creation.feature',
-    ],
+    argv: ['--spec', 'e2e_test/features/book_reading/epub_book.feature'],
     checkoutRoot: checkout.root,
     startLifetime: async () => {
       startCalled = true
@@ -1120,10 +1117,7 @@ test('interactive session: unsupported preselected spec refuses before the stack
   let startCalled = false
 
   const code = await runE2eInteractive({
-    argv: [
-      '--spec',
-      'e2e_test/features/note_creation_and_update/note_creation.feature',
-    ],
+    argv: ['--spec', 'e2e_test/features/book_reading/epub_book.feature'],
     checkoutRoot: checkout.root,
     startLifetime: async () => {
       startCalled = true

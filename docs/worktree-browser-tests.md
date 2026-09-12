@@ -79,8 +79,11 @@ Pass comma-separated feature paths to `pnpm cy:run --spec` to run several
 supported features sequentially with one stack. The invocation starts a private
 OpenAI mock if any selected feature needs it, then cleans up once at the end.
 
-Select one or more of these supported specs; the command owns startup and
-cleanup. Selections containing other features are refused before reset:
+Select one or more supported specs; the command owns startup and cleanup. The
+admitted set — application-only active features plus the CLI, MCP, and
+OpenAI-mock focused specs — is declared in the isolated-runner registry
+(`scripts/isolated-cypress-spec-selection.mjs`). Selections containing
+unsupported features are refused before reset. For example:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
@@ -89,10 +92,10 @@ CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_note
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature
 ```
 
-Admission and each approved spec's resource requirements are declared in one
-isolated-runner registry. Only the note-content completion spec currently requires
-a runner-owned private OpenAI mock; the other three use the owning SUT and
-runner lease without it. The mock process does not own feature paths. Selections
+Each approved spec's resource requirements are declared in the same registry.
+Only the note-content completion spec currently requires a runner-owned private
+OpenAI mock; application-only, CLI, and MCP specs use the owning SUT and runner
+lease without it. The mock process does not own feature paths. Selections
 containing unknown specs refuse before reset so they do not use shared defaults.
 
 The CLI command is scoped to that one web-created-note feature. The MCP

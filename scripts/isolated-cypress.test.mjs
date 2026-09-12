@@ -25,8 +25,9 @@ test('selections containing unsupported isolated Cypress specs refuse before res
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const unsupported =
-    'e2e_test/features/note_creation_and_update/note_creation.feature'
+  // A wholly-ignored file is permanently outside admission; a resource-dependent
+  // file not yet admitted by its owning slice is also unsupported here.
+  const unsupported = 'e2e_test/features/book_reading/epub_book.feature'
 
   for (const argv of [
     cypressArgv(unsupported),
@@ -80,8 +81,7 @@ test('CLI glob spec selection is refused in before:run before reset', async (t) 
         specs: [
           { relative: SUPPORTED_ISOLATED_CYPRESS_SPEC },
           {
-            relative:
-              'e2e_test/features/note_creation_and_update/note_creation.feature',
+            relative: 'e2e_test/features/book_reading/epub_book.feature',
           },
         ],
       }),
@@ -110,6 +110,31 @@ test('MCP spec is allowlisted as a single isolated spec', async (t) => {
   )
   t.after(() => isolated.release())
   assert.equal(config.baseUrl, isolatedOrigin)
+})
+
+test('application-only active specs are admitted; resource-dependent and ignored files are not', () => {
+  // Representative admitted application-only spec (the live proof target).
+  assert.equal(
+    SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(
+      'e2e_test/features/note_creation_and_update/note_creation.feature'
+    ),
+    true
+  )
+  // Excluded groups: wholly-ignored, CLI (not yet this slice), OpenAI mock,
+  // Wikidata mock, live OpenAI — none admitted by slice 1.
+  for (const excluded of [
+    'e2e_test/features/book_reading/epub_book.feature',
+    'e2e_test/features/cli/cli_notebook_clone.feature',
+    'e2e_test/features/ai_generated_recall_questions/question_contest.feature',
+    'e2e_test/features/wikidata/note_create_with_wikidata_id.feature',
+    'e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature',
+  ]) {
+    assert.equal(
+      SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(excluded),
+      false,
+      `${excluded} must not be admitted by slice 1`
+    )
+  }
 })
 
 test('supported isolated Cypress sets origin before reset and serializes the runner lease', async (t) => {
