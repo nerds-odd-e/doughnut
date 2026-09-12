@@ -20,10 +20,6 @@ without claiming its complete synchronization contract. Further SEED-009
 candidates stay unselected until after the worktree queue unless priority
 changes.
 
-## Taken
-
-- [Run E2E tests with automatic service startup and cleanup](seeds/SEED-015-concurrent-worktree-environments.md#story-8) — SEED-015
-
 ## Backlog list
 
 - [Tolerate deep or long worktree checkout paths for isolated SUT bring-up](seeds/SEED-015-concurrent-worktree-environments.md#story-9) — SEED-015
