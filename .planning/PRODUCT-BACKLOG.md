@@ -20,7 +20,10 @@ without claiming its complete synchronization contract. Further SEED-009
 candidates stay unselected until after the worktree queue unless priority
 changes.
 
+## Taken
+
 ## Backlog list
 
 - [Tolerate deep or long worktree checkout paths for isolated SUT bring-up](seeds/SEED-015-concurrent-worktree-environments.md#story-9) — SEED-015
+- [Run remaining active E2E features in isolated worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-10) — SEED-015
 - [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-3) — SEED-018

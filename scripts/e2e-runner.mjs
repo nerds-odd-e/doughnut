@@ -70,7 +70,7 @@ function browserFromArgv(argv) {
 function resolveSpecs(argv, checkoutRoot, isolated) {
   if (!hasExplicitCypressSpecSelection(argv)) {
     throw new Error(
-      'e2e-runner requires an explicit --spec selection of one supported spec.'
+      'e2e-runner requires an explicit --spec selection of supported specs.'
     )
   }
   const selected = selectedCypressSpecs({ argv, checkoutRoot })

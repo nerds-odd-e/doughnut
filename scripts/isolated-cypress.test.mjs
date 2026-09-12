@@ -6,7 +6,6 @@ import {
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
   SUPPORTED_ISOLATED_CYPRESS_SPECS,
   SUPPORTED_ISOLATED_MCP_SPEC,
-  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress.mjs'
 import {
   assertRefusesBeforeReset,
@@ -22,7 +21,7 @@ import {
 } from './sut-isolated-fixtures.mjs'
 import { beginSutOwnerShutdown } from './sut-owner.mjs'
 
-test('unsupported or mixed isolated Cypress specs refuse before reset', async (t) => {
+test('selections containing unsupported isolated Cypress specs refuse before reset', async (t) => {
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
@@ -37,20 +36,6 @@ test('unsupported or mixed isolated Cypress specs refuse before reset', async (t
       'run',
       '--spec',
       `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${unsupported}`,
-    ],
-    [
-      'node',
-      'cypress',
-      'run',
-      '--spec',
-      `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC}`,
-    ],
-    [
-      'node',
-      'cypress',
-      'run',
-      '--spec',
-      `${SUPPORTED_ISOLATED_MCP_SPEC},${SUPPORTED_ISOLATED_CYPRESS_SPEC}`,
     ],
     ['node', 'cypress', 'run'],
   ]) {

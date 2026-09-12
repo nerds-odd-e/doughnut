@@ -17,6 +17,7 @@ import {
 } from './sut-isolated-fixtures.mjs'
 import {
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
+  SUPPORTED_ISOLATED_MCP_SPEC,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
 } from './isolated-cypress-spec-selection.mjs'
 import { spawnIdlePrivateMockHandle } from './isolated-openai-mock-test-fixtures.mjs'
@@ -227,7 +228,7 @@ function trackOwnedTree(t, getOwned) {
   })
 }
 
-test('batch lifetime: start → run → shutdown returns Cypress outcome', async (t) => {
+test('supported multi-feature batch shares one owned stack', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
   const standIn = spawnOwnedTreeStandIn(checkout.root)
@@ -235,14 +236,21 @@ test('batch lifetime: start → run → shutdown returns Cypress outcome', async
   trackOwnedTree(t, () => state.owned)
 
   const code = await runE2eBatch({
-    argv: cypressArgv(),
+    argv: cypressArgv(
+      `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${SUPPORTED_ISOLATED_MCP_SPEC}`
+    ),
     ...isolatedLifetimeOpts(checkout.root, standIn),
-    spawnCypress: () =>
-      makeCypressChild(0, async () => {
+    spawnCypress: ({ specs }) => {
+      assert.deepEqual(specs, [
+        SUPPORTED_ISOLATED_CYPRESS_SPEC,
+        SUPPORTED_ISOLATED_MCP_SPEC,
+      ])
+      return makeCypressChild(0, async () => {
         state.owned = await waitForOwnedPids(standIn.pidsFile)
         assert.equal(isPidAlive(state.owned.leader), true)
         assert.equal(isPidAlive(state.owned.grandchild), true)
-      }),
+      })
+    },
   })
 
   assert.equal(code, 0)
@@ -402,7 +410,9 @@ test('private-mock batch: owned mock stays alive across the batch and stops with
   let mockPid = 0
 
   const code = await runE2eBatch({
-    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    argv: cypressArgv(
+      `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC}`
+    ),
     ...isolatedLifetimeOpts(checkout.root, standIn, {
       healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
     }),

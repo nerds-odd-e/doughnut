@@ -144,13 +144,17 @@ export function specsFromBeforeRun(details, checkoutRoot) {
 }
 
 export function assertSupportedIsolatedCypressSpecs(specs) {
-  if (specs.length === 1) {
-    const approved = approvedIsolatedCypressSpec(specs[0])
-    if (approved) return approved
+  const approved = specs.map(approvedIsolatedCypressSpec)
+  if (approved.length > 0 && approved.every(Boolean)) {
+    return {
+      requiresPrivateOpenAiMock: approved.some(
+        (spec) => spec.requiresPrivateOpenAiMock
+      ),
+    }
   }
   throw new Error(
-    'Isolated Cypress only supports one of ' +
-      `${SUPPORTED_ISOLATED_CYPRESS_SPECS.join(' or ')}. ` +
+    'Isolated Cypress only supports selections from ' +
+      `${SUPPORTED_ISOLATED_CYPRESS_SPECS.join(', ')}. ` +
       'Refusing this spec selection so it does not reset, mock, or use shared defaults.'
   )
 }

@@ -19,7 +19,7 @@ Primary unconfigured checkouts and CI use `http://localhost:5173` as the Cypress
 app origin through the local load balancer. A linked worktree (or a primary
 with `.worktree.local.json`) uses that checkout's isolated origin
 `http://127.0.0.1:<lbListenPort>` — see `docs/worktree-browser-tests.md`. Isolated
-Cypress is allowlisted to exactly one of
+Cypress accepts one or more selections from
 `e2e_test/features/note_creation_and_update/worktree_note_editing.feature`,
 `e2e_test/features/ai_generated_content/note_content_completion.feature`,
 `e2e_test/features/cli/cli_notebook_web_created_note.feature`, or

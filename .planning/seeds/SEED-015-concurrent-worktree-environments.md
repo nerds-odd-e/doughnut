@@ -530,6 +530,49 @@ scoped.
 checkout path depth this project's supported tooling can produce, with
 existing ownership guarantees unchanged.
 
+<a id="story-10"></a>
+
+### 10. Run remaining active E2E features in isolated worktrees
+
+**Status:** Queued by user request on 2026-09-12; refinement required before
+execution planning. This is separate from removing the accidental single-spec
+restriction for already-supported features.
+
+**Goal**
+
+Developers and AI tasks can run the remaining active E2E scenarios in isolated
+worktrees without shared mock mutations or peer data/process interference.
+
+**Scope**
+
+- Assess non-ignored scenarios outside the current four-feature allowlist;
+  distinguish missing verification/admission from actual shared dependencies.
+- Migrate required shared resources, including Wikidata mock endpoints and
+  undeclared OpenAI mock requirements, to invocation-owned resources. Reuse the
+  existing runner lifetime and mock infrastructure rather than duplicate them.
+- Preserve fixture reset, application-origin routing, primary/CI coverage, and
+  supported multi-feature batches. Demonstrate representative peer isolation.
+- Ignored scenarios/features are excluded; do not re-enable or migrate them.
+  Removing obsolete ignored tests is a separate cleanup decision, not part of
+  this story or the current batching fix. Mixed files retain their active scope.
+- No persistent stacks, worktree startup hooks, same-worktree parallel jobs,
+  or broader environment orchestration.
+
+**Key examples**
+
+- An active Wikidata scenario runs against its own mock and completes while a
+  second worktree's mock responses remain unchanged.
+- An active OpenAI scenario outside the initial proof feature receives an
+  invocation-owned endpoint, and cleanup leaves no private mock process.
+- Active browser scenarios with no shared-resource dependency can run through
+  the same isolated command once verified, individually or in a selected batch.
+
+**Effort hypothesis:** L, low confidence until the active-scenario/resource
+inventory is refined; split by independently useful workflows if needed.
+**Safe stopping point:** Each admitted workflow has an isolated resource path
+and peer-safety proof; unsupported active workflows remain visibly excluded
+until migrated, with no implicit shared fallback.
+
 ## Ordering and Scope Reduction
 
 **Backlog review, 2026-09-09:** Stories 3, 4 and 5 are delivered, completing the
