@@ -11,9 +11,10 @@ with reasonable performance.
 
 ## Taken
 
+- [Publish 1,000 existing-note edits at least 50% faster again with simpler code](quick/110-publish-edits-with-simpler-attachment-cleanup/PLAN.md) — SEED-018
+
 ## Backlog list
 
-- [Publish 1,000 existing-note edits at least 50% faster again with simpler code](seeds/SEED-018-publish-large-authored-notebooks.md#story-5) — SEED-018
 - [Reconsider note-title uniqueness and soft deletion with Git versioning](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
