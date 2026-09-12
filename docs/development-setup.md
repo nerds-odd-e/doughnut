@@ -58,16 +58,16 @@ This starts the reload-capable Development stack (Spring profile `dev`, database
 Linked or configured worktrees refuse `pnpm dev` / `pnpm dev:restart`. E2E
 testability and reset endpoints are unavailable under `dev`.
 
-### E2E system under test (`pnpm sut`)
+### E2E system under test (`pnpm cy:run`)
 
 ```bash
-pnpm sut
+pnpm cy:run --spec <feature-path>
 ```
 
 This starts the disposable E2E stack (profile `e2e`, typically
 `doughnut_e2e_test`) on backend **9081**, browser/LB **5173**, Vite **5174**,
-and Mountebank on the primary checkout. Logs: `sut.log`. Use `pnpm sut:restart`
-for that stack. Do not put lasting manual work in E2E — use `pnpm dev` instead.
+and Mountebank on the primary checkout. Logs: `sut.log`. The `cy:run` wrapper
+owns its stack. Do not put lasting manual work in E2E — use `pnpm dev` instead.
 
 To start only the E2E backend, use `pnpm backend:sut`. Run complete backend
 verification with `pnpm backend:verify`.

@@ -77,7 +77,7 @@ Run the **full** suite for the target scope once. Capture per-test durations.
 
 | Scope | Profile command | Parse durations from |
 |-------|-----------------|----------------------|
-| **E2E** | `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json --expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'` (SUT up; `pnpm sut:healthcheck`) | JSON blocks in stdout — tee to `/tmp/e2e-profile.log` |
+| **E2E** | `CURSOR_DEV=true nix develop -c pnpm cy:run --spec 'e2e_test/features/**/*.feature' --reporter json --expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'` (wrapper owns its stack; verify with `node scripts/sut-healthcheck.mjs`) | JSON blocks in stdout — tee to `/tmp/e2e-profile.log` |
 | **Frontend** | `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run --reporter=json` | Vitest JSON `testResults[].assertionResults[].duration` |
 | **CLI** | `cd cli && CURSOR_DEV=true nix develop -c pnpm exec vitest run --reporter=json` | Same as Vitest |
 | **Backend** | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` then parse | `backend/build/test-results/test/TEST-*.xml` → `testcase@time` |

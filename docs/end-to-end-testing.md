@@ -9,7 +9,7 @@ external-service mocks. Run Mountebank in debug mode with
 
 Typical workflow:
 
-1. Start the services with `pnpm sut`.
+1. Run a feature with `pnpm cy:run --spec <feature-path>` (the wrapper owns its stack).
 2. Develop or debug interactively with `pnpm cy:open`.
 3. Run a feature headlessly with `pnpm cypress run --spec <feature-path>`.
 
@@ -18,7 +18,7 @@ WSL2 users must install `xvfb` outside Nix. Set
 
 | Purpose | Command |
 |---------|---------|
-| Start the full environment | `pnpm sut` (app at http://localhost:5173; [topology](./gcp/prod_env.md)) |
+| Run E2E (owns its stack) | `pnpm cy:run --spec <feature>` (app at http://localhost:5173; [topology](./gcp/prod_env.md)) |
 | Install E2E tooling | `pnpm --frozen-lockfile recursive install` |
 | Start backend only | `pnpm backend:sut` |
 | Start Mountebank only | `pnpm start:mb` |

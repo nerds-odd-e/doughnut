@@ -360,7 +360,7 @@ for a later cleanup. Doc/guidance reference audit is slice 12b.
 
 ### 12b. Update guidance references for removed lifecycle entry points
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: No documented guidance references an obsolete `sut`/`sut:restart`/
 `sut:healthcheck`/`cy:run-with-sut`/`cy:run-on-sut` command; all local/CI E2E
 guidance routes through the owned wrapper.
@@ -373,6 +373,20 @@ the owned wrapper entry points; remove stale "start both allocations first"
 instructions (slice 11 made the harness own its stack). Historical completed
 plans need not be rewritten. Internal health/log commands remain usable.
 Sizing: 5–8 minutes, low risk; mechanical reference audit.
+Proof result: 16 audited files updated (AGENTS.md, README.md, DearDough.md,
+.cursor/agent-map.md, .cursor/rules/e2e-authoring.mdc, .agents/skills/{manual-testing,
+test-optimization,cloud-vm-setup}/SKILL.md, docs/{end-to-end-testing,
+worktree-browser-tests,development-setup,nix,notebook-publication-profiling,
+ona,e2e-lifecycle-overhead}.md, docs/gcp/prod_env.md). Re-search confirms zero
+obsolete public-command references remain in audited files. Routing points to
+the owned wrapper (cy:run/cy:open/test) and the internal sut-healthcheck.mjs
+module diagnostic. Removed stale "start both allocations first" in
+docs/worktree-browser-tests.md (slice 11 made the harness own its stack).
+DearDough.md historical narrative uses neutral descriptions (not verbatim
+removed commands) to avoid falsifying the record. Pre-existing discrepancy
+noted: CLAUDE.md lacks the "Cursor Cloud specific instructions" section that
+AGENTS.md has — not introduced by this slice, deferred as a separate
+reconciliation.
 
 ### 13. Demonstrate independent concurrent E2E invocations
 Type: Behavior

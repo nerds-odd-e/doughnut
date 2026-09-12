@@ -41,7 +41,7 @@ All development tool commands henceforth should work when in the `nix` developme
 
 ```bash
 # from doughnut source root dir
-pnpm sut
+pnpm dev
 ```
 
 This starts backend, frontend, and mountebank - all with auto-reload on code changes.

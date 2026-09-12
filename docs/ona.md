@@ -34,7 +34,7 @@ git config user.email "your_email@your_domain.com"
 For ongoing development work, use:
 
 ```bash
-pnpm sut
+pnpm dev
 ```
 
 This starts backend, frontend, and mountebank - all with auto-reload on code changes. You can now develop and test without manually restarting services.

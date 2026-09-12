@@ -110,10 +110,10 @@ backend **8081**, browser/LB **5175**, Vite **5176**, log **`dev.log`**. Local
 sign-in (e.g. `manual` / `password`). No Mountebank; no E2E testability/reset.
 Isolated E2E allocation never selects those Development ports.
 
-**E2E** (`pnpm sut`) is disposable. Primary unconfigured checkouts and CI use
-the shared ports below. Cypress **`baseUrl`** in those contexts remains
-**`http://localhost:5173`**. A linked worktree, or a primary with
-`.worktree.local.json`, isolates instead — see
+**E2E** (`pnpm cy:run` / `pnpm test`) is disposable. Primary unconfigured
+checkouts and CI use the shared ports below. Cypress **`baseUrl`** in those
+contexts remains **`http://localhost:5173`**. A linked worktree, or a primary
+with `.worktree.local.json`, isolates instead — see
 [`worktree-browser-tests.md`](../worktree-browser-tests.md). Isolated start does
 not use Mountebank. Isolated Cypress uses **`http://127.0.0.1:<lbListenPort>`**
 from that checkout's allocation, not 5173.
@@ -123,18 +123,18 @@ from that checkout's allocation, not 5173.
 | **8081** | Spring Development (`pnpm dev`) |
 | **5175** | Development browser / local LB |
 | **5176** | Development Vite |
-| **2525** | Mountebank (primary / CI `pnpm sut` and `pnpm test` only) |
+| **2525** | Mountebank (primary / CI `pnpm cy:run` and `pnpm test` only) |
 | **9081** | Spring (primary sut / E2E profile default) |
 | **5173** | Local LB (`scripts/local-lb.mjs`) — primary / CI browser and Cypress **`baseUrl`** **`http://localhost:5173`** |
-| **5174** | Vite dev server default — only when using **`pnpm sut`** / **`pnpm local:lb:vite`** in an unconfigured primary checkout |
+| **5174** | Vite dev server default — only when using **`pnpm cy:run`** / **`pnpm local:lb:vite`** in an unconfigured primary checkout |
 
 **Readiness:** **`GET http://127.0.0.1:5173/__lb__/ready`** on the primary LB (or the isolated checkout's recorded LB port) → **200** (Spring health probed from the LB; use for **`wait-on`** / automation; set **`NO_PROXY=127.0.0.1,localhost`** in CI to avoid proxy issues on loopback).
 
-**Scripts:** **`pnpm local:lb`** — static from **`frontend/dist`** + Spring **9081** (no Vite). **`pnpm local:lb:vite`** — same LB, Vite upstream from **`LOCAL_LB_VITE_UPSTREAM`** (primary `pnpm sut` supplies `http://127.0.0.1:5174`; isolated start supplies the checkout's recorded Vite port). **CI** and **`pnpm test`** use **`local:lb`**; **`pnpm sut`** uses **`local:lb:vite`** + **`frontend:sut`**. Isolated `pnpm sut` omits **`start:mb`**. Build static first when needed: **`pnpm frontend:build`** or **`pnpm bundle:all`**. **`/doughnut-cli-latest/doughnut`** is served from **`cli/dist/donut-cli.bundle.mjs`** (**`pnpm cli:bundle`** — **`pnpm sut`** / **`pnpm test`** run this after install). Full env list: header on **`scripts/local-lb.mjs`** (`LOCAL_LB_STATIC_ROOT`, `LOCAL_LB_BACKEND`, `LOCAL_LB_VITE_UPSTREAM`, `LOCAL_LB_LISTEN_PORT`, `LOCAL_LB_ROUTING_JSON`).
+**Scripts:** **`pnpm local:lb`** — static from **`frontend/dist`** + Spring **9081** (no Vite). **`pnpm local:lb:vite`** — same LB, Vite upstream from **`LOCAL_LB_VITE_UPSTREAM`** (primary `pnpm cy:run` supplies `http://127.0.0.1:5174`; isolated start supplies the checkout's recorded Vite port). **CI** and **`pnpm test`** use **`local:lb`**; **`pnpm cy:run`** uses **`local:lb:vite`** + **`frontend:sut`**. Isolated `pnpm cy:run` omits **`start:mb`**. Build static first when needed: **`pnpm frontend:build`** or **`pnpm bundle:all`**. **`/doughnut-cli-latest/doughnut`** is served from **`cli/dist/donut-cli.bundle.mjs`** (**`pnpm cli:bundle`** — **`pnpm cy:run`** / **`pnpm test`** run this after install). Full env list: header on **`scripts/local-lb.mjs`** (`LOCAL_LB_STATIC_ROOT`, `LOCAL_LB_BACKEND`, `LOCAL_LB_VITE_UPSTREAM`, `LOCAL_LB_LISTEN_PORT`, `LOCAL_LB_ROUTING_JSON`).
 
-**Starting the stack:** **`pnpm sut`** starts all services in the background, waits until healthy (up to 120 s, configurable via `SUT_TIMEOUT_MS`), then exits 0. On failure it exits 1 with diagnostics and a tail of **`sut.log`** (repo root, gitignored). In an unconfigured primary checkout, **`pnpm sut:restart`** kills listeners on 5173/5174/9081, then runs **`pnpm sut`**. Isolated checkouts ask the verified live owner to stop its own children and start again on the recorded allocation; a busy Cypress runner or unverifiable owner is refused without signalling listeners.
+**Starting the stack:** **`pnpm cy:run --spec <feature>`** starts all services in the background, waits until healthy (up to 120 s, configurable via `SUT_TIMEOUT_MS`), then runs Cypress. On failure it exits 1 with diagnostics and a tail of **`sut.log`** (repo root, gitignored). In an unconfigured primary checkout, re-running **`pnpm cy:run`** reclaims the idle live owner on 5173/5174/9081. Isolated checkouts ask the verified live owner to stop its own children and start again on the recorded allocation; a busy Cypress runner or unverifiable owner is refused without signalling listeners.
 
-**Verify the stack:** **`pnpm sut:healthcheck`**. With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** / **`… sut:restart`** — see **`CLAUDE.md`**. Isolated health checks the live owning stack on the recorded ports, not a foreign listener.
+**Verify the stack:** internal **`sut-healthcheck.mjs`** module (e.g. `node scripts/sut-healthcheck.mjs`). With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c node scripts/sut-healthcheck.mjs`** — see **`CLAUDE.md`**. Isolated health checks the live owning stack on the recorded ports, not a foreign listener.
 
 ## 7. Book PDF storage (GCS, prod)
 

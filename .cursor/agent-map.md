@@ -57,11 +57,12 @@ Useful focused checks:
 **Development vs E2E:** For manual product feedback from the unconfigured primary,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
 `doughnut_development`, `dev.log` / `dev.pid`; restart with `pnpm dev:restart`;
-local sign-in e.g. `manual` / `password`). `pnpm sut` is the disposable E2E
+local sign-in e.g. `manual` / `password`). `pnpm cy:run` is the disposable E2E
 stack (http://localhost:5173/, profile `e2e`). Assume the stack you need is
 already running. If unsure for E2E, check
-`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`. Do not ask developers to
-restart services after normal code changes; backend and frontend auto-reload.
+`CURSOR_DEV=true nix develop -c node scripts/sut-healthcheck.mjs`. Do not ask
+developers to restart services after normal code changes; backend and frontend
+auto-reload.
 
 ## Architectural decisions (ADRs)
 

@@ -74,8 +74,8 @@ xvfb-run pnpm cypress run --spec e2e_test/features/<feature>.feature --config-fi
 </step>
 
 <step name="sut_health">
-- `pnpm sut:healthcheck` — check if stack is up
-- `pnpm sut:restart` — SIGTERM listeners on 5173/5174/9081, then restart (requires `lsof`)
+- `node scripts/sut-healthcheck.mjs` — internal module; check if stack is up
+- Re-run `pnpm cy:run` to reclaim an idle live owner (requires `lsof`)
 </step>
 
 </process>

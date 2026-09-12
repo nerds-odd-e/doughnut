@@ -20,10 +20,11 @@ Output: Verified behavior report + summary ending with
 **Use only when:** the developer explicitly asks for manual testing, or a plan
 slice includes it. **Do not use proactively.**
 
-**Prerequisites:** Assume `pnpm sut` is already running (backend, frontend,
-Mountebank — all auto-reload on code changes). If not running, suggest the user
-start it in a separate terminal. To use AI services, set `OPENAI_API_TOKEN`
-before `pnpm sut`.
+**Prerequisites:** Assume the E2E stack is already running (started with
+`pnpm cy:run`, which owns its stack — backend, frontend, Mountebank, all
+auto-reload on code changes). If not running, suggest the user run
+`pnpm cy:run --spec <feature>` in a separate terminal. To use AI services, set
+`OPENAI_API_TOKEN` before running `pnpm cy:run`.
 
 **Access points:**
 - Frontend: http://localhost:5173/
@@ -68,7 +69,7 @@ before committing.
 </process>
 
 <success_criteria>
-- `pnpm sut` running (or user notified to start it)
+- E2E stack running via `pnpm cy:run` (or user notified to start it)
 - Target flows exercised via browser MCP tools
 - Results verified with snapshots (and console/network if issues)
 - Final output includes `## MANUAL TEST COMPLETE`

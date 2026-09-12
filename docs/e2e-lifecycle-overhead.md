@@ -8,13 +8,14 @@ observations, not targets.
 
 ## Commands used
 
-Start (one-time per checkout, then reused):
+Start (one-time per checkout, then reused) — the `cy:run` wrapper owns its
+stack; the explicit start below is the legacy form captured by this baseline:
 
 ```bash
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL INPUT_DB_URL SERVER_PORT \
   LOCAL_LB_BACKEND LOCAL_LB_VITE_UPSTREAM LOCAL_LB_LISTEN_PORT \
   FRONTEND_DEV_PORT FRONTEND_BACKEND_ORIGIN SUT_RUNTIME_TARGET
-CURSOR_DEV=true nix develop -c pnpm sut
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
 ```
 
 Focused run (reused the stack above, run three times):
@@ -23,10 +24,10 @@ Focused run (reused the stack above, run three times):
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
 ```
 
-Healthcheck:
+Healthcheck (internal module API, not a public script):
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm sut:healthcheck
+CURSOR_DEV=true nix develop -c node scripts/sut-healthcheck.mjs
 ```
 
 Owned shutdown (no public `sut:stop` script exists today; the owner control
@@ -53,7 +54,7 @@ CURSOR_DEV=true nix develop -c node --input-type=module -e \
 - Cypress / Electron: cold for the first focused run, warm for runs 2 and 3.
 - No global build caches were deleted for this baseline.
 
-## Allocated identity (first `pnpm sut` in this worktree)
+## Allocated identity (first `pnpm cy:run` in this worktree)
 
 - Worktree id: `wt_519dfcf7193a44c1866d82ba78a544f0`
 - Selected database: `doughnut_e2e_wt_519dfcf7193a44c1866d82ba78a544f0`
@@ -62,7 +63,7 @@ CURSOR_DEV=true nix develop -c node --input-type=module -e \
 
 ## First startup (one-time provisioning + build + readiness)
 
-The first `pnpm sut` in a fresh worktree provisions the E2E database, allocates
+The first `pnpm cy:run` in a fresh worktree provisions the E2E database, allocates
 ports, compiles the backend, starts backend + Vite + local LB, and waits for
 readiness. This is a one-time cost; later focused runs reuse the running stack.
 
@@ -75,7 +76,7 @@ Observations from this session (wall-clock, `date` timestamps):
 | 3 (after removing corrupted worktree-local `backend/build`) | PASS | 15s | SUT healthy after 5 readiness polls. Backend `Started DonutApplication in 5.783s`; Tomcat bound on `63214`. |
 
 The successful first startup (attempt 3) measured **15s** wall-clock from
-`pnpm sut` to healthy. Of that, the Spring Boot application context took
+`pnpm cy:run` to healthy. Of that, the Spring Boot application context took
 **5.783s** (backend log). The Gradle daemon was already warm and the E2E
 database was already provisioned by attempt 1, so this 15s primarily reflects
 fresh worktree-local compilation + boot + readiness wait.

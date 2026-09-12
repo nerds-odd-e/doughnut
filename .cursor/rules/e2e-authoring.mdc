@@ -9,9 +9,9 @@ Use this rule when writing or modifying E2E tests, Cypress/Cucumber feature file
 
 ## Environment Assumption
 
-Assume the developer has already started services with `pnpm sut`, including backend auto-reload, frontend HMR, and Mountebank. Services automatically restart when code changes are made.
+Assume the developer has already started services with `pnpm cy:run` (the wrapper owns its stack), including backend auto-reload, frontend HMR, and Mountebank. Services automatically restart when code changes are made.
 
-If services are not running, suggest starting `pnpm sut` in a separate terminal.
+If services are not running, suggest running `pnpm cy:run --spec <feature>` in a separate terminal.
 
 ## Cypress Origin
 
@@ -28,13 +28,13 @@ CLI command is scoped to that one web-created-note feature. The MCP command
 is scoped to that one search/graph feature. The completion
 spec starts a runner-owned private OpenAI Mountebank; the note-editing, CLI,
 and MCP specs do not require Mountebank. Each isolated checkout needs its own
-healthy `pnpm sut` allocation. Paired CLI-vs-browser reset proof:
+healthy E2E allocation. Paired CLI-vs-browser reset proof:
 
 ```bash
 CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>
 ```
 
-CI vs `pnpm sut`, `wait-on`, `NO_PROXY`, and env vars are documented in
+CI vs `pnpm cy:run`, `wait-on`, `NO_PROXY`, and env vars are documented in
 `docs/gcp/prod_env.md`, Local dev / Cypress under section 6.
 
 ## Run E2E Tests

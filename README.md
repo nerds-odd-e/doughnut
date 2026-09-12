@@ -120,7 +120,7 @@ From `doughnut` source root directory
 pnpm frontend:verify
 ```
 
-##### Run frontend dev server only (Vite; use **`pnpm sut`** for the usual browser URL — see [prod_env.md](docs/gcp/prod_env.md))
+##### Run frontend dev server only (Vite; see [prod_env.md](docs/gcp/prod_env.md) for the full stack)
 
 ```bash
 pnpm frontend:sut
@@ -133,7 +133,7 @@ pnpm frontend:build
 pnpm backend:sut
 ```
 
-Expect the Vue production build under `frontend/dist`. The CLI install URL is served from GCS in prod; locally, `pnpm cli:bundle` produces `cli/dist/donut-cli.bundle.mjs`, and the local LB (`scripts/local-lb.mjs` via `pnpm sut` / `pnpm test`) serves `/doughnut-cli-latest/doughnut` from that file — not Spring on 9081.
+Expect the Vue production build under `frontend/dist`. The CLI install URL is served from GCS in prod; locally, `pnpm cli:bundle` produces `cli/dist/donut-cli.bundle.mjs`, and the local LB (`scripts/local-lb.mjs` via `pnpm cy:run` / `pnpm test`) serves `/doughnut-cli-latest/doughnut` from that file — not Spring on 9081.
 
 ### 7. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
 

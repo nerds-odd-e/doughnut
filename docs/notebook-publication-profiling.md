@@ -86,7 +86,7 @@ CURSOR_DEV=true nix develop -c java scripts/profiling/AnalyzePublication.java '/
 ```
 
 Small fixture (opt-in, excluded from ordinary CI). From an owned linked
-worktree with a healthy `pnpm sut`, run:
+worktree with a healthy E2E stack, run:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose tags=@publicationProfile
