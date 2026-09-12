@@ -2111,7 +2111,9 @@ test('primary mock: occupied canonical Mountebank port refuses without adoption 
 // The built target is distinguished from dev/isolated/primary targets purely
 // by launch data: `target.built === true` omits the Vite upstream env, the
 // `frontend:sut` service, the Vite TCP readiness check, and the Vite port in
-// foreign-listener refusal. It reuses the SAME `startOwnedSutLifetime` and
+// foreign-listener refusal. It starts `backend:sut:ci` (bootRun only)
+// instead of `backend:sut` (watch + bootRun) so two Gradle processes do not
+// compile the same outputs. It reuses the SAME `startOwnedSutLifetime` and
 // `lifetime.shutdown()` / owned-tree termination — no separate lifecycle.
 
 const BUILT_RUNTIME_TARGET = { ...LEGACY_SUT_RUNTIME_TARGET, built: true }
@@ -2129,7 +2131,16 @@ test('built target launch data: sutServiceArgs omits frontend:sut and uses local
     false,
     'must use local:lb not local:lb:vite'
   )
-  assert.equal(args.includes('backend:sut'), true, 'must start the backend')
+  assert.equal(
+    args.includes('backend:sut:ci'),
+    true,
+    'must start bootRun without Gradle watch'
+  )
+  assert.equal(
+    args.includes('backend:sut'),
+    false,
+    'must not start backend:watch alongside bootRun'
+  )
   assert.equal(
     args.includes('start:mb'),
     true,

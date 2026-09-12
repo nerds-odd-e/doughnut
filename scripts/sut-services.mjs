@@ -23,7 +23,12 @@ const repoRoot = path.resolve(
 )
 
 export function sutServiceArgs(target) {
-  const args = ['exec', 'run-p', '-lnr', 'backend:sut']
+  const args = [
+    'exec',
+    'run-p',
+    '-lnr',
+    target.built ? 'backend:sut:ci' : 'backend:sut',
+  ]
   if (target.mountebankPort != null) args.push('start:mb')
   // Built-asset target: serve the frontend from `frontend/dist` via the local
   // LB (no Vite dev server). `local:lb` and `local:lb:vite` are the same
