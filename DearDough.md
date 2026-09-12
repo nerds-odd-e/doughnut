@@ -1,6 +1,8 @@
 # DearDough Process Findings
 
-## DD-001 — Implementation subagent ends its turn "waiting" on its own background test instead of blocking for the result
+## ODF-007 — Implementation subagent ends its turn "waiting" on its own background test instead of blocking for the result
+
+Former local code: DD-001.
 
 An implementation subagent launched its own long-running test command
 asynchronously and then ended its turn reporting that it was "waiting" or
@@ -22,7 +24,9 @@ instructions to do so before reporting.
   - Observed effect: two extra coordinator round-trips (one resend, one
     direct verification run) before slice 4's wrap-up could proceed.
 
-## DD-002 — Concurrent Vitest processes against the same worktree cause spurious test timeouts under resource contention
+## ODF-008 — Concurrent Vitest processes against the same worktree cause spurious test timeouts under resource contention
+
+Former local code: DD-002.
 
 Running more than one Vitest process against the same CLI test suite at the
 same time (coordinator and/or subagents, or a formatting command running
@@ -45,7 +49,9 @@ clean solo re-run passing all tests.
   - Observed effect: two rounds of failure triage (checking for concurrent
     processes, re-running solo) before trusting the test suite's result.
 
-## DD-003 — Claude Code's `.claude/worktrees/<name>` nesting depth breaks this project's isolated SUT bring-up
+## ODF-009 — Claude Code's `.claude/worktrees/<name>` nesting depth breaks this project's isolated SUT bring-up
+
+Former local code: DD-003.
 
 Claude Code's `EnterWorktree` tool places a new worktree at
 `.claude/worktrees/<name>` under the repository root. For a descriptively
@@ -78,7 +84,9 @@ obtained from inside the worktree.
     recorded the gap in the plan and recommended running it from a shallower
     checkout instead of treating the correction as unproven.
 
-## DD-004 — `pnpm --frozen-lockfile install` inside project wrapper scripts repeatedly mutated `pnpm-lock.yaml`
+## ODF-010 — `pnpm --frozen-lockfile install` inside project wrapper scripts repeatedly mutated `pnpm-lock.yaml`
+
+Former local code: DD-004.
 
 This project's `./scripts/run.sh` wrapper (used for `pnpm format:changed`,
 commit's lint hook, and the SUT healthcheck module) runs `pnpm --frozen-lockfile
@@ -107,7 +115,9 @@ unrelated lockfile diff.
     commit, but the pattern would silently ship as an unrelated diff without
     that check.
 
-## DD-005 — Unit-test seams that satisfy a provisioning precondition can hide an ordering defect only the live integration proof exposes
+## ODF-011 — Unit-test seams that satisfy a provisioning precondition can hide an ordering defect only the live integration proof exposes
+
+Former local code: DD-005.
 
 The runner-owned E2E wrapper's boundary tests injected a pre-resolved
 `runtimeTarget` (or drove the primary, non-isolated checkout) for
@@ -141,3 +151,78 @@ fresh-isolated-worktree path.
     cache entry that also failed the retry), and a re-run before slice 13's
     proof passed. The boundary suite never caught the gap because the seam
     elided the provisioning side effect.
+
+## DD-012 — Cross-cutting service-wiring slices legitimately exceed the 5-minute execution-leaf target
+
+A slice that wires a new mocked external service across the runner, the Cypress
+plugin boundary, the endpoint-context module, and the Cucumber hook is one
+coherent responsibility that cannot be split along those layers without
+breaking stop-safety. Such a slice naturally runs ~25 minutes of active work
+versus the 5–8 minute execution-leaf target, with no mid-slice refinement
+warranted. Plans admitting a new mock service should size that wiring slice as
+a multi-touchpoint leaf (roughly 15–25 minutes) rather than a 5-minute Behavior
+leaf, or decompose only where a stop-safe seam genuinely exists.
+
+### Occurrences
+
+- Execution: SEED-015 Story 10 / quick-105-remaining-active-e2e-isolation / 7614f8418d
+  - Tool: Cursor
+  - Model: glm-5.2
+  - Open Dough release: 0.3.12
+  - Evidence: PLAN.md slice 6 "Done 2026-09-12" note — "**Sizing deviation:**
+    active work ~25 min vs. 5–8 min target — the Wikidata wiring touched the
+    runner, plugin boundary, endpoint context, and the Cucumber hook across one
+    coherent responsibility; recorded for retrospective. Slice converged with
+    green proof; no refinement warranted mid-slice." Slice 6's plan sizing
+    line read "5–8 minutes, medium confidence".
+  - Observed effect: one slice ran ~3× its 5–8 min target; the plan flagged it
+    for retrospective rather than refining mid-slice, and the slice converged
+    green with no rework.
+  - Inference: the 5-minute leaf target is the wrong anchor for a single
+    cross-layer service-wiring responsibility; future plans should size such
+    slices explicitly as multi-touchpoint wiring.
+
+## DD-013 — One-off profile capture treated as durable runner plumbing
+
+A tagged publication-profile capture drove a durable `pnpm cy:run` change to
+forward Cypress `--expose`/`--config`, including runner tests, then a closing
+slice reverted that forwarding because it served measurement rather than the
+kept product change.
+
+### Occurrences
+
+- Execution: SEED-018 story 3 / quick/106-publish-large-notebooks-under-one-minute / 78c24f31bb
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.12
+  - Evidence: slice 2 commit `6162492745` added forwarding in
+    `scripts/e2e-runner.mjs` and `scripts/e2e-runner.test.mjs`; close commit
+    `3613029688` restored those files to `78c24f31bb`; PLAN closing decision
+    (2026-09-12) says the plumbing served measurement, not the kept flush change.
+  - Observed effect: slice 2 included runner work beyond the property-index
+    flush change; slice 4 existed only to undo that forwarding.
+  - Inference: isolated tagged captures can use a documented one-off Cypress
+    invocation or known baseline waits without changing the owned runner.
+
+## DD-014 — Large-capture plan command copied small-fixture Cypress timeouts
+
+The first large confirmation command used the small HTTP capture's
+`taskTimeout=66000` and omitted the already-recorded large-fixture Cypress
+`defaultCommandTimeout`, so seed aborted before any publication measurement.
+
+### Occurrences
+
+- Execution: SEED-018 story 3 / quick/106-publish-large-notebooks-under-one-minute / 78c24f31bb
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.12
+  - Evidence: PLAN.md "Slice 3 confirmation attempt (2026-09-12)" — Cypress
+    failed at `cy.wrap()` waiting 6000 ms (`e2e_test/config/common.ts`) during
+    `When I seed the representative publication baseline`; spec duration 8 s;
+    no `timing.json` or profile directory. The same PLAN notes the awake large
+    captures used `taskTimeout=43260000,defaultCommandTimeout=600000`. Retry
+    with those waits then measured the 60 s miss.
+  - Observed effect: one setup-only abort (~40 s runner lifetime) plus
+    investigation before the authorized retry.
+  - Inference: large-fixture Cypress waits were already in the profiling
+    record; copying the small-path `--config` was enough to miss them.

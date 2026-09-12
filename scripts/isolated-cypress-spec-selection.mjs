@@ -5,29 +5,176 @@ import path from 'node:path'
 export const SUPPORTED_ISOLATED_CYPRESS_SPEC =
   'e2e_test/features/note_creation_and_update/worktree_note_editing.feature'
 
-/** Web-created-note CLI workflow — clones, creates, pulls, and publishes
- * against the owning worktree's own isolated backend and notebook data. */
+/** Representative admitted active CLI workflow (web-created note) — clones,
+ * creates, pulls, and publishes against the owning worktree's own isolated
+ * backend and notebook data. The remaining active CLI workflows are admitted
+ * through `ACTIVE_CLI_SPECS` below; this constant stays as the focused
+ * representative used by existing CLI origin/command-boundary tests. */
 export const SUPPORTED_ISOLATED_CLI_SPEC =
   'e2e_test/features/cli/cli_notebook_web_created_note.feature'
+
+/**
+ * Active CLI feature files without network mocks, assessed 2026-09-12 from
+ * `e2e_test/features/cli/`. Each uses `@bundleCliE2eInstall` and (except
+ * install-and-run) `@withCliConfig`; spawned CLI processes route to the
+ * selected app origin and use `mkdtemp` config/install/clone destinations
+ * plus checkout-local bundles. Wholly-ignored CLI files (`@ignore`:
+ * `cli_access_token.feature`, `cli_gmail.feature`, `cli_interactive_mode.feature`,
+ * `cli_recall.feature`) are never admitted.
+ */
+const ACTIVE_CLI_SPECS = [
+  'e2e_test/features/cli/cli_install_and_run.feature',
+  'e2e_test/features/cli/cli_notebook_clone.feature',
+  'e2e_test/features/cli/cli_notebook_existing_note_edits.feature',
+  'e2e_test/features/cli/cli_notebook_folder_relocation.feature',
+]
 
 /** MCP search/graph workflow — tool calls reach the owning worktree's
  * isolated backend and notebook data. */
 export const SUPPORTED_ISOLATED_MCP_SPEC =
   'e2e_test/features/mcp/mcp_services.feature'
 
-/** OpenAI completion — currently the only approved spec that requires a
- * runner-owned private OpenAI mock. */
+/** OpenAI completion — the representative approved spec that requires a
+ * runner-owned private OpenAI mock. The remaining active OpenAI-mock
+ * features are admitted through `ACTIVE_OPEN_AI_MOCK_SPECS` below. */
 export const SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC =
   'e2e_test/features/ai_generated_content/note_content_completion.feature'
+
+/** Wikidata entity lookup — the representative approved spec that requires a
+ * runner-owned private Wikidata mock. The remaining active Wikidata-mock
+ * features are admitted through `ACTIVE_WIKIDATA_MOCK_SPECS` below. */
+export const SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC =
+  'e2e_test/features/wikidata/note_create_with_wikidata_id.feature'
+
+/**
+ * Remaining active OpenAI-mock feature files — each declares an existing
+ * private-mock requirement. Assessed 2026-09-12 from `e2e_test/features/`.
+ * This includes files whose `@usingMockedOpenAiService` tag appears on a
+ * scenario rather than on the Feature (`semantic_search`,
+ * `property_memory_tracker`, `mcq_management`); the registry's declared
+ * requirement is the authority, not the feature filename or tag placement.
+ * `note_content_completion.feature` is the already-admitted representative
+ * (`SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC`); the remaining active OpenAI-mock
+ * features are admitted here. Wikidata-mock and live-OpenAI files belong to
+ * later slices and are not admitted here.
+ */
+const ACTIVE_OPEN_AI_MOCK_SPECS = [
+  'e2e_test/features/ai_generated_recall_questions/question_contest.feature',
+  'e2e_test/features/book_reading/ai_reorganize_layout.feature',
+  'e2e_test/features/bazaar/bazaar_subscription.feature',
+  'e2e_test/features/assimilation/note_refinement.feature',
+  'e2e_test/features/messages/conversation_about_a_note.feature',
+  'e2e_test/features/note_creation_and_update/record_live_audio.feature',
+  'e2e_test/features/recall/recall_quiz_ai_question.feature',
+  'e2e_test/features/user_admin/manage_ai_models.feature',
+  'e2e_test/features/note_view/semantic_search.feature',
+  'e2e_test/features/recall/property_memory_tracker.feature',
+  'e2e_test/features/note_creation_and_update/mcq_management.feature',
+]
+
+/**
+ * Active Wikidata-mock feature files — each declares an existing private-mock
+ * requirement on the Wikidata service. Assessed 2026-09-12 from
+ * `e2e_test/features/wikidata/`. `associate_wikidata.feature` is a mixed
+ * file: it also carries a `@usingRealWikidataService` scenario; that
+ * real-service scenario preserves its existing opt-in/credential filtering
+ * and is NOT mocked — the registry's declared requirement authorizes the
+ * private mock for the file, while Cucumber's scenario tag selection still
+ * chooses mocked versus real service URLs per scenario. The Wikidata adapter
+ * consumes its invocation-owned endpoint instead of the hardcoded 5002/
+ * default 2525. `note_create_with_wikidata_id.feature` is the
+ * already-admitted representative (`SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC`);
+ * the remaining active Wikidata-mock features are admitted here.
+ */
+const ACTIVE_WIKIDATA_MOCK_SPECS = [
+  'e2e_test/features/wikidata/associate_wikidata.feature',
+  'e2e_test/features/wikidata/associate_wikidata_location_entries.feature',
+  'e2e_test/features/wikidata/associate_wikidata_person_entries.feature',
+]
+
+/**
+ * Application-only active feature files — no declared network-mock tag and
+ * no CLI/MCP/OpenAI-mock/Wikidata-mock/live-provider resource requirement.
+ * Assessed 2026-09-12 from the current feature inventory; this is an explicit
+ * assessed path list, not a hardcoded count cap. Resource-dependent groups
+ * (CLI, OpenAI mock, Wikidata mock, live OpenAI) are admitted by their own
+ * slices; wholly-ignored files are never admitted.
+ */
+const APPLICATION_ONLY_ACTIVE_SPECS = [
+  'e2e_test/features/assimilation/assimilate_with_remembering_spelling.feature',
+  'e2e_test/features/assimilation/assimilation_page_types.feature',
+  'e2e_test/features/assimilation/assimilation_walkthrough.feature',
+  'e2e_test/features/assimilation/edit_when_assimilating.feature',
+  'e2e_test/features/bazaar/browsing.feature',
+  'e2e_test/features/bazaar/sharing.feature',
+  'e2e_test/features/book_reading/book_browsing.feature',
+  'e2e_test/features/book_reading/reading_record.feature',
+  'e2e_test/features/book_reading/reorganize_layout.feature',
+  'e2e_test/features/circles/creating_circles.feature',
+  'e2e_test/features/circles/notebooks_in_circles.feature',
+  'e2e_test/features/folder_organization/folder_organization.feature',
+  'e2e_test/features/folder_organization/folder_page_readme.feature',
+  'e2e_test/features/learning_session/commissioned_learning_session.feature',
+  'e2e_test/features/messages/message_center_with_unread_message_count.feature',
+  'e2e_test/features/messages/message_for_note.feature',
+  'e2e_test/features/note_creation_and_update/note_creation.feature',
+  'e2e_test/features/note_creation_and_update/note_deletion.feature',
+  'e2e_test/features/note_creation_and_update/note_edit.feature',
+  'e2e_test/features/note_topology/markdown_link.feature',
+  'e2e_test/features/note_topology/note_move.feature',
+  'e2e_test/features/note_topology/note_property.feature',
+  'e2e_test/features/note_topology/note_tree_view.feature',
+  'e2e_test/features/note_topology/property_wiki_link.feature',
+  'e2e_test/features/note_topology/wiki_link.feature',
+  'e2e_test/features/note_topology/wiki_link_insert.feature',
+  'e2e_test/features/note_topology/wiki_link_move.feature',
+  'e2e_test/features/note_view/note_frontmatter_image.feature',
+  'e2e_test/features/note_view/note_recent_update.feature',
+  'e2e_test/features/note_view/search_note.feature',
+  'e2e_test/features/notebooks/notebook_catalog_navigation.feature',
+  'e2e_test/features/notebooks/notebook_creation.feature',
+  'e2e_test/features/notebooks/notebook_export.feature',
+  'e2e_test/features/notebooks/notebook_group.feature',
+  'e2e_test/features/notebooks/notebook_health.feature',
+  'e2e_test/features/recall/accidental_match_scheduling.feature',
+  'e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature',
+  'e2e_test/features/recall/daily_probe.feature',
+  'e2e_test/features/recall/overlap_try_again.feature',
+  'e2e_test/features/recall/recall_quiz_spelling_question.feature',
+  'e2e_test/features/recall/spaced_repetition.feature',
+  'e2e_test/features/relationships/add_relationship.feature',
+  'e2e_test/features/relationships/relationship_edit_and_remove.feature',
+  'e2e_test/features/testability/feature_toggle.feature',
+  'e2e_test/features/testability/show_failure_report.feature',
+  'e2e_test/features/user_admin/manage_bazaar.feature',
+  'e2e_test/features/users/account_control.feature',
+  'e2e_test/features/users/new_user.feature',
+  'e2e_test/features/users/user_access_token.feature',
+  'e2e_test/features/users/user_profile.feature',
+]
 
 const APPROVED_ISOLATED_CYPRESS_SPECS = [
   { spec: SUPPORTED_ISOLATED_CYPRESS_SPEC },
   { spec: SUPPORTED_ISOLATED_CLI_SPEC },
+  ...ACTIVE_CLI_SPECS.map((spec) => ({ spec })),
   { spec: SUPPORTED_ISOLATED_MCP_SPEC },
   {
     spec: SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
     requiresPrivateOpenAiMock: true,
   },
+  ...ACTIVE_OPEN_AI_MOCK_SPECS.map((spec) => ({
+    spec,
+    requiresPrivateOpenAiMock: true,
+  })),
+  {
+    spec: SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC,
+    requiresPrivateWikidataMock: true,
+  },
+  ...ACTIVE_WIKIDATA_MOCK_SPECS.map((spec) => ({
+    spec,
+    requiresPrivateWikidataMock: true,
+  })),
+  ...APPLICATION_ONLY_ACTIVE_SPECS.map((spec) => ({ spec })),
 ]
 
 export const SUPPORTED_ISOLATED_CYPRESS_SPECS =
@@ -149,6 +296,9 @@ export function assertSupportedIsolatedCypressSpecs(specs) {
     return {
       requiresPrivateOpenAiMock: approved.some(
         (spec) => spec.requiresPrivateOpenAiMock
+      ),
+      requiresPrivateWikidataMock: approved.some(
+        (spec) => spec.requiresPrivateWikidataMock
       ),
     }
   }

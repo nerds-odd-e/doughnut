@@ -79,23 +79,35 @@ Pass comma-separated feature paths to `pnpm cy:run --spec` to run several
 supported features sequentially with one stack. The invocation starts a private
 OpenAI mock if any selected feature needs it, then cleans up once at the end.
 
-Select one or more of these supported specs; the command owns startup and
-cleanup. Selections containing other features are refused before reset:
+Select one or more supported specs; the command owns startup and cleanup. The
+admitted set — application-only active features plus the CLI, MCP,
+OpenAI-mock, and Wikidata-mock focused specs — is declared in the
+isolated-runner registry
+(`scripts/isolated-cypress-spec-selection.mjs`). Selections containing
+unsupported features are refused before reset. For example:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_content/note_content_completion.feature
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/wikidata/note_create_with_wikidata_id.feature
 ```
 
-Admission and each approved spec's resource requirements are declared in one
-isolated-runner registry. Only the note-content completion spec currently requires
-a runner-owned private OpenAI mock; the other three use the owning SUT and
-runner lease without it. The mock process does not own feature paths. Selections
-containing unknown specs refuse before reset so they do not use shared defaults.
+Each approved spec's resource requirements are declared in the same registry.
+OpenAI-mock specs require a runner-owned private OpenAI mock; Wikidata-mock
+specs require a runner-owned private Wikidata mock; application-only, CLI, and
+MCP specs use the owning SUT and runner lease without a mock. A mixed file
+(such as `associate_wikidata.feature`) may provision a mock even when its
+selected scenario does not use it; Cucumber's scenario tag selection still
+chooses mocked versus real service URLs per scenario. The mock process does
+not own feature paths. Selections containing unknown specs refuse before reset
+so they do not use shared defaults.
 
-The CLI command is scoped to that one web-created-note feature. The MCP
+The CLI command is scoped to the assessed active CLI workflows (web-created
+note, install-and-run, clone, existing-note edits, folder relocation); each
+uses the selected app origin for spawned CLI processes and temporary
+config/install/clone destinations with checkout-local bundles. The MCP
 command is scoped to that one search/graph feature. Each checkout must
 already have its own healthy E2E allocation; do not share the unconfigured
 primary checkout. To prove the CLI notebook survives a peer worktree's fixture

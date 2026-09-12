@@ -22,10 +22,7 @@ changes.
 
 ## Taken
 
-- [Run remaining active E2E features in isolated worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-10) — SEED-015; [slice plan](quick/105-remaining-active-e2e-isolation/PLAN.md)
 - [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-3) — SEED-018; [slice plan](quick/106-publish-large-notebooks-under-one-minute/PLAN.md)
+- [Tolerate deep or long worktree checkout paths for isolated SUT bring-up](seeds/SEED-015-concurrent-worktree-environments.md#story-9) — SEED-015; [slice plan](quick/107-checkout-independent-sut-sockets/PLAN.md)
 
 ## Backlog list
-
-- [Tolerate deep or long worktree checkout paths for isolated SUT bring-up](seeds/SEED-015-concurrent-worktree-environments.md#story-9) — SEED-015
-- [Run remaining active E2E features in isolated worktrees](seeds/SEED-015-concurrent-worktree-environments.md#story-10) — SEED-015

@@ -208,7 +208,7 @@ Save the committed final-closure tip and integrate it into the recorded target
 branch from its checkout, using the retained execution identity and this
 project's ordinary local merge conventions. Preserve unrelated target work. If target identity or
 safe integration cannot be established, retain the execution resources and
-report the blocker. Do not rebase, push, delete remote branches, or add CI waiting.
+report the blocker. Do not rebase, delete remote branches, or add CI waiting.
 
 Resolve merge conflicts by understanding the reasoning behind both sides and
 reconciling their intended behavior, using the surrounding code, history, and
@@ -222,6 +222,13 @@ Integration is complete when the saved final-closure tip is an ancestor of the
 recorded target branch and the target contains the committed closure. Recognize
 an already-integrated tip without merging again. Unresolved integration leaves
 the execution branch and worktree intact and blocks wrap-up completion.
+
+When the recorded target is `main`, push the integrated target to `origin`
+with `git push origin main` from the target checkout after verifying integration.
+This also applies to an already-integrated tip on retry. Require a successful
+push before resource cleanup or claiming completion. If the push fails, retain
+the execution resources and report the push failure separately from successful
+local integration; do not force-push.
 
 ## Remove integrated worktree resources safely
 
@@ -247,11 +254,13 @@ Report the selected work and its canonical identity, completion judgment,
 execution mode and retained checkout/branch/target identity when applicable,
 before-cleanup and final-closure commits when deletion happened, assimilated
 knowledge, deleted paths, the saved execution tip and local integration result
-in worktree mode, worktree and local-branch cleanup results, preserved
+in worktree mode, the push result when the target is `main`, worktree and
+local-branch cleanup results, preserved
 unsupported material and resources, and any gap that blocked closure.
 Distinguish a new merge from an already-integrated tip, integration success from
-partial or refused cleanup, and name unsafe or conflicted state without implying
-that the target was pushed or a remote branch was deleted.
+partial or refused cleanup, and local integration from a successful push to
+`origin`. Name unsafe or conflicted state without implying that a remote branch
+was deleted.
 Distinguish a completed wrap-up from a refusal that left files intact.
 
 End a successful closure with:
@@ -259,5 +268,5 @@ End a successful closure with:
 `## STORY WRAP-UP COMPLETE`
 
 Do not emit that marker when required context, unfinished work, unresolved
-recovery or worktree-mode integration, or remaining required worktree cleanup
+recovery, worktree-mode integration or required push, or remaining required worktree cleanup
 blocks closure.

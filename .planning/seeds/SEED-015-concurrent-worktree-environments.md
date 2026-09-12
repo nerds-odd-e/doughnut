@@ -473,10 +473,11 @@ Development data backup or retirement, and general environment orchestration.
 
 ### 9. Tolerate deep or long worktree checkout paths for isolated SUT bring-up
 
-**Status:** Candidate, added 2026-09-12 from a quick/107 (publication receiver
+**Status:** Refined 2026-09-12; selected for scope clarification. Added from a quick/107 (publication receiver
 bulk verification) execution retrospective finding. Recover the completed
 correction plan from `git show a7e0fe1dc4:.planning/quick/107-verify-publication-receiver-in-bulk/PLAN.md`.
-No refinement or executable planning is authorized yet.
+Executable [slice plan](../quick/107-checkout-independent-sut-sockets/PLAN.md)
+is planned; implementation has not started.
 
 **Goal**
 
@@ -500,137 +501,59 @@ was unrelated to SUT bring-up.
 
 **Scope**
 
-- Give the SUT ownership socket a location independent of checkout path
-  length — for example a fixed-length identity-derived name under a short,
-  stable base directory — while preserving existing per-checkout ownership
-  and refusal semantics (ADR 0007).
+- Supported local isolated SUT bring-up must work from an otherwise valid
+  checkout whose path would exceed the ownership socket's platform limit,
+  without requiring developers or AI coordinators to rename/move the checkout
+  or configure a socket-path override. Select the socket-location mechanism
+  during implementation planning, not as a story-level requirement.
+- Preserve per-checkout ownership and refusal semantics (ADR 0007): duplicate
+  starts leave the live owner running; runner leases and restart/shutdown
+  protections still work; cleanup or stale-owner recovery in one checkout
+  must not disturb another checkout's owner or resources.
 - Preserve every existing supported worktree/primary-checkout workflow (1a–1c,
   2/2a) unchanged from the developer's perspective; this is a bring-up
   reliability correction, not a new isolation capability or lifecycle change.
-- Exclude general parallel E2E support, story 8's runner-owned lifetime
-  redesign (address there if it also relocates SUT ownership), Cloud VM/CI
-  changes, and any change to worktree naming/placement conventions themselves
-  (this is Claude Code's convention, not this project's to change).
+- Preserve the runner-owned lifecycle and supported feature invocation behavior
+  delivered since this candidate was captured (stories 8 and 10); their
+  completed work does not remove the checkout-relative socket in
+  `scripts/sut-owner.mjs`.
+- Defer new E2E concurrency capabilities, a lifecycle redesign, Cloud VM/CI
+  changes, and changes to worktree naming/placement conventions. This story
+  removes the ownership socket's path-length limitation, not unrelated
+  filesystem or third-party tool limits. Production and persistent Development
+  data remain outside this disposable E2E workflow.
 
 **Key examples**
 
 - Given a worktree checkout whose absolute path plus the ownership socket
-  suffix would exceed the platform's socket path limit, when `pnpm sut` (or
-  equivalent isolated bring-up) starts, then it succeeds instead of failing
+  suffix would exceed the platform's socket path limit, when `pnpm cy:run`
+  brings up its isolated SUT for a supported feature, then it succeeds instead of failing
   with `EINVAL`.
 - Given two worktrees at different path depths running concurrently, when
   each brings up its isolated SUT, then neither's ownership record collides
   with the other's.
+- Given a live SUT in a long-path checkout, when another start is requested
+  there, then it refuses the duplicate and leaves the existing SUT running.
+- Given a runner holds that checkout's lease, when the owner-control shutdown
+  boundary is called, then it refuses without signalling owned processes;
+  after the runner releases its lease, owned shutdown remains usable. This
+  preserves the internal protection without restoring removed public SUT
+  start/restart commands.
+- Given one long-path checkout stops or recovers a dead owner, when it starts
+  again, then ownership can be established without affecting another live
+  checkout.
+
+**Open questions:** None blocking story understanding. Planning must choose
+the bounded socket location and account for its cleanup and existing owner
+records; those are implementation decisions within the preservation promises.
 
 **Effort hypothesis:** S–M, low confidence until the socket-relocation
 approach and its interaction with existing ownership/refusal checks are
 scoped.
 
-**Safe stopping point:** Isolated SUT bring-up succeeds from a worktree at any
-checkout path depth this project's supported tooling can produce, with
-existing ownership guarantees unchanged.
-
-<a id="story-10"></a>
-
-### 10. Run remaining active E2E features in isolated worktrees
-
-**Status:** Refined on 2026-09-12. User authorized slice planning and refinement,
-not implementation. Global ordering remains in the product backlog.
-[Slice plan](../quick/105-remaining-active-e2e-isolation/PLAN.md).
-
-**Goal**
-
-Developers and AI tasks can select the remaining active E2E feature files in
-local isolated worktrees, individually or sequentially in one invocation,
-without shared mock mutations or peer data/process interference. Close the
-current suite's admission and resource gaps using the delivered runner lifetime.
-
-**Bounded inventory (2026-09-12)**
-
-79 feature files exist; five are wholly `@ignore`, leaving 74 files with active
-scope (four already admitted). This is an inventory, not proof of runtime safety.
-
-| Current group | Files | Migration responsibility |
-| --- | --- | --- |
-| Application/browser plus existing MCP, no network-mock tag | 52 | Verify target routing and admit existing scenarios |
-| CLI without network mocks | 5 | Verify selected origin, temporary config/install paths and checkout-local bundles |
-| OpenAI mock users | 12 | Declare existing private-mock requirement, including scenario-level tags |
-| Wikidata mock users | 4 | Replace fixed management/serving endpoints with run-owned endpoints |
-| Live OpenAI audio feature | 1 | Preserve existing external-service/credential behavior and isolated app routing |
-
-Wikidata includes a live-service scenario in a mixed file. Mixed files also
-contain ignored and opt-in profiling scenarios: preserve existing scenario/tag
-filtering; admission is not permission to enable those scenarios.
-
-**Scope**
-
-- Admit the current active feature set once its resource paths are assessed;
-  no per-file implementation or new feature coverage is required when existing
-  routing and resource behavior already apply. Keep one authoritative selection
-  and resource-requirement representation shared by batch and interactive paths.
-- Use the existing private OpenAI mock for all current active OpenAI mock users.
-  Add private Wikidata endpoints by reusing the same Mountebank ownership,
-  allocation, verification and cleanup mechanism; no duplicate mock supervisor.
-- Preserve one stack per batch/session, union of selected resource requirements,
-  fixture reset, selected app origin, CLI/MCP routing, primary/CI test selection,
-  and cleanup on success/failure/cancellation. Missing private endpoint evidence
-  must not fall back to shared mock ports in isolated runs.
-- Existing primary/CI canonical mock contracts remain usable. Share internal
-  lifecycle code without making primary/CI adopt worktree allocation semantics.
-- Ignored tests are excluded, not deleted or re-enabled: whole-file exclusions
-  are `book_reading/epub_book.feature`, `cli/cli_access_token.feature`,
-  `cli/cli_gmail.feature`, `cli/cli_interactive_mode.feature`, and
-  `cli/cli_recall.feature`; ignored scenarios inside active files remain ignored.
-  Google/Gmail isolation and removal of ignored tests are outside this story.
-- Preserve live OpenAI/Wikidata tests' existing opt-in/credential and filtering
-  behavior without adding mocks for their real-service scenarios. Do not require
-  paid API calls or live-provider availability to prove lifecycle isolation.
-- No performance work, startup-race repairs, long-path socket correction
-  (Story 9), Cloud VM isolation, persistent stack reuse, worktree hooks,
-  same-worktree parallel jobs, automatic admission of arbitrary future features,
-  or general environment orchestration.
-
-**Key examples**
-
-- A note-creation feature outside the original allowlist runs in an isolated
-  checkout using its database; a peer note survives that invocation's reset.
-- A selected note-creation/OpenAI/Wikidata batch runs sequentially with one
-  stack and private endpoints for both mocked services; its cleanup leaves
-  the peer's mock responses and processes unchanged.
-- A previously excluded active CLI notebook feature reaches the selected
-  worktree's app and uses its own temporary/local artifacts.
-- An interactive session reruns and switches among supported active features
-  without dropping or replacing another invocation's resources.
-- An ignored scenario remains skipped; a mixed file's active scenarios remain
-  selectable; primary/CI keeps its current selection and mock behavior.
-
-**Architecture and existing solutions**
-
-Follow [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
-and [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md).
-`isolated-cypress-spec-selection.mjs` already unions batch requirements;
-`ServiceMocker` already accepts a management URL and serving port. CLI helpers
-already pass the selected origin and allocate temporary configuration/clone
-paths. Reuse these seams. The remaining structural gap is that the shared
-Mountebank process lifecycle is named and represented as OpenAI-only.
-
-**Evaluation and stopping boundary**
-
-Use selection/resource contract checks covering the bounded active inventory,
-focused existing browser examples for each materially different resource path,
-and representative paired-worktree isolation proof. Do not demand a new E2E
-scenario for every admitted file or a full suite run for each slice. Completion
-requires all current active files admitted, with any discovered actual shared
-resource gap resolved or raised for explicit scope review—not silently deferred.
-
-**Effort hypothesis:** L (2–4 hours), medium confidence after the resource
-inventory; external runtime and delivery gates vary. If another independent
-service/resource family emerges, stop and revisit scope rather than grow this
-into general test infrastructure work.
-
-**Open decisions:** None identified for this bounded migration. Unknown runtime
-failures may still change execution sizing; existing unrelated product defects
-are not automatically part of this story.
+**Safe stopping point:** Isolated SUT bring-up succeeds from an otherwise
+supported long-path worktree without hitting the ownership socket path limit,
+with existing ownership guarantees unchanged.
 
 ## Ordering and Scope Reduction
 

@@ -5,6 +5,7 @@
  * Barrier placement (`WORKTREE_RESET_ISOLATION_BARRIER_AT`):
  * - `fixture` (default): wait/signal around DB fixture reset
  * - `openai-mock`: wait/signal around private OpenAI mock install/reset
+ * - `wikidata-mock`: wait/signal around private Wikidata mock install/reset
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -12,9 +13,13 @@ import {
   OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_SUGGESTION,
+  WIKIDATA_MOCK_ISOLATION_ENTITY_LABEL,
+  WIKIDATA_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
+  WIKIDATA_MOCK_ISOLATION_REQUEST_MARKER,
   WORKTREE_RESET_ISOLATION_BARRIER_AT,
   WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE,
   WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
+  WORKTREE_RESET_ISOLATION_BARRIER_AT_WIKIDATA_MOCK,
   WORKTREE_RESET_ISOLATION_BARRIER_DIR,
   WORKTREE_RESET_ISOLATION_PEER_ROLE,
   WORKTREE_RESET_ISOLATION_RESETTER_ROLE,
@@ -26,9 +31,13 @@ export {
   OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_SUGGESTION,
+  WIKIDATA_MOCK_ISOLATION_ENTITY_LABEL,
+  WIKIDATA_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
+  WIKIDATA_MOCK_ISOLATION_REQUEST_MARKER,
   WORKTREE_RESET_ISOLATION_BARRIER_AT,
   WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE,
   WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
+  WORKTREE_RESET_ISOLATION_BARRIER_AT_WIKIDATA_MOCK,
   WORKTREE_RESET_ISOLATION_BARRIER_DIR,
   WORKTREE_RESET_ISOLATION_PEER_ROLE,
   WORKTREE_RESET_ISOLATION_RESETTER_ROLE,
@@ -68,12 +77,14 @@ export function isolationBarrierAt(env = process.env) {
     WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE
   if (
     at !== WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE &&
-    at !== WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK
+    at !== WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK &&
+    at !== WORKTREE_RESET_ISOLATION_BARRIER_AT_WIKIDATA_MOCK
   ) {
     throw new Error(
       `Unknown ${WORKTREE_RESET_ISOLATION_BARRIER_AT}=${at}. ` +
-        `Use ${WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE} or ` +
-        `${WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK}.`
+        `Use ${WORKTREE_RESET_ISOLATION_BARRIER_AT_FIXTURE}, ` +
+        `${WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK} or ` +
+        `${WORKTREE_RESET_ISOLATION_BARRIER_AT_WIKIDATA_MOCK}.`
     )
   }
   return at
@@ -93,6 +104,23 @@ export function openAiMockIsolationProofParams(env = process.env) {
   return foreignRequestMarker
     ? { suggestion, requestMarker, foreignRequestMarker }
     : { suggestion, requestMarker }
+}
+
+export function wikidataMockIsolationProofParams(env = process.env) {
+  const entityLabel = env[WIKIDATA_MOCK_ISOLATION_ENTITY_LABEL]
+  const requestMarker = env[WIKIDATA_MOCK_ISOLATION_REQUEST_MARKER]
+  const foreignRequestMarker =
+    env[WIKIDATA_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER]
+  if (!(entityLabel || requestMarker || foreignRequestMarker)) return null
+  if (!(entityLabel && requestMarker)) {
+    throw new Error(
+      `${WIKIDATA_MOCK_ISOLATION_ENTITY_LABEL} and ` +
+        `${WIKIDATA_MOCK_ISOLATION_REQUEST_MARKER} must be set together.`
+    )
+  }
+  return foreignRequestMarker
+    ? { entityLabel, requestMarker, foreignRequestMarker }
+    : { entityLabel, requestMarker }
 }
 
 export function appendCucumberExposeTag(config, extraTag) {
@@ -177,6 +205,9 @@ export function worktreeResetIsolationCypressTasks(env = process.env) {
     openAiMockIsolationProofParams() {
       return openAiMockIsolationProofParams(env)
     },
+    wikidataMockIsolationProofParams() {
+      return wikidataMockIsolationProofParams(env)
+    },
   }
 }
 
@@ -210,6 +241,16 @@ export function worktreeResetIsolationEnv(dir, role, options = {}) {
   if (options.foreignRequestMarker) {
     env[OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER] =
       options.foreignRequestMarker
+  }
+  if (options.wikidataEntityLabel) {
+    env[WIKIDATA_MOCK_ISOLATION_ENTITY_LABEL] = options.wikidataEntityLabel
+  }
+  if (options.wikidataRequestMarker) {
+    env[WIKIDATA_MOCK_ISOLATION_REQUEST_MARKER] = options.wikidataRequestMarker
+  }
+  if (options.wikidataForeignRequestMarker) {
+    env[WIKIDATA_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER] =
+      options.wikidataForeignRequestMarker
   }
   return env
 }
