@@ -46,11 +46,15 @@ public class NotePropertyIndexService {
         .setFlushMode(FlushModeType.COMMIT)
         .getResultList()
         .forEach(entityManager::detach);
+    // Inline deletion permits FlushModeType.COMMIT, avoiding the extra flush from the usual
+    // repository @Modifying @Query.
     entityManager
         .createQuery("DELETE FROM NotePropertyIndex i WHERE i.note.id = :noteId")
         .setParameter("noteId", note.getId())
         .setFlushMode(FlushModeType.COMMIT)
         .executeUpdate();
+    // Cascade persist makes still-transient authoredNoteReferenceRows readable before flush,
+    // preventing TransientPropertyValueException.
     entityManager.persist(note);
     NoteContentMarkdown.splitLeadingFrontmatter(note.getContent() == null ? "" : note.getContent())
         .ifPresent(

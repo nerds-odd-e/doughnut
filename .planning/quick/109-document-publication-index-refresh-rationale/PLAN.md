@@ -1,6 +1,6 @@
 # Document non-obvious rationale in the publication index-refresh simplification
 
-Status: planned.
+Status: completed.
 Source: bounded retrospective correction from
 [dough-execution-retrospective](../../../.claude/skills/dough-execution-retrospective/SKILL.md)
 on the completed execution of
@@ -10,6 +10,15 @@ Reviewed commit manifest: `a6fcddacad` (profiling infrastructure),
 `a05a66686c` (production simplification), both on branch
 `quick/108-publish-notebook-edits-faster`. This plan is planning-only; no
 execution authority is granted here.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`
+- Execution checkout: `/Users/terryyin/git/doughnut-quick-109-document-publication-index-refresh-rationale`
+  on `quick/109-document-publication-index-refresh-rationale`
+- Integration target: `main`
+- CI observation: unavailable for this execution branch because `ci.yml`
+  (`donut CI`) is push-triggered only for `main`; branch CI remains unobserved.
 
 ## Beneficiary and bounded outcome
 
@@ -78,7 +87,7 @@ architectural decision.
 
 ### 1. Add rationale comments to the two non-obvious index-refresh steps
 Type: Structure
-Status: planned
+Status: done
 Change: In
 `backend/src/main/java/com/odde/donut/services/NotePropertyIndexService.java`,
 add a short comment on the `entityManager.persist(note)` call explaining that
@@ -106,6 +115,11 @@ changes). Visual diff review confirms only comment lines were added and no
 executable statement, import, or formatting-relevant code moved.
 
 Sizing: under 5 minutes — three short comments in two existing files.
+
+Execution proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+passed unchanged. Visual diff review confirmed that the production change adds
+only comment lines and moves no executable statement or import. The independent
+post-change refactor found the comments already clean and made no further edits.
 
 ## Promise-to-proof ownership
 
