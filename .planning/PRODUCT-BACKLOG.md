@@ -12,6 +12,6 @@ candidates stay unselected unless priority changes.
 
 ## Taken
 
-## Backlog list
+- [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-3) — SEED-018; [slice plan](quick/108-publish-notebook-edits-faster/PLAN.md)
 
-- [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-3) — SEED-018
+## Backlog list
