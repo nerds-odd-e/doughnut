@@ -49,41 +49,6 @@ clean solo re-run passing all tests.
   - Observed effect: two rounds of failure triage (checking for concurrent
     processes, re-running solo) before trusting the test suite's result.
 
-## ODF-009 — Claude Code's `.claude/worktrees/<name>` nesting depth breaks this project's isolated SUT bring-up
-
-Former local code: DD-003.
-
-Claude Code's `EnterWorktree` tool places a new worktree at
-`.claude/worktrees/<name>` under the repository root. For a descriptively
-named execution worktree, the resulting checkout path is deep enough that
-this project's isolated-SUT bring-up — which derives a Unix domain
-socket at `<checkoutRoot>/.sut.local.lock/owner.sock` — exceeds macOS's
-~104-byte `sun_path` limit, failing with `EINVAL` before any product or test
-code runs. This blocked the plan's own specified Cypress integration proof
-for the whole execution; only the Node-level focused unit proof could be
-obtained from inside the worktree.
-
-### Occurrences
-
-- Execution: quick-107-verify-publication-receiver-in-bulk / d37290fac9
-  - Tool: Claude Code
-  - Model: claude-sonnet-5
-  - Open Dough release: 0.3.11
-  - Evidence: worktree path
-    `/Users/terryyin/git/doughnut/.claude/worktrees/107-verify-publication-receiver-in-bulk`
-    (86 characters) plus `/.sut.local.lock/owner.sock` (28 characters) = 113
-    bytes; `scripts/sut-owner.mjs` hardcodes that socket path relative to
-    checkout root with no override; confirmed via `listen EINVAL: invalid
-    argument` during isolated-SUT bring-up, traced by a reverted one-line debug
-    change to un-ignore stdio, and independently reproduced by the
-    coordinator via the SUT healthcheck module reporting a missing E2E
-    allocation.
-  - Observed effect: the plan's existing-integration Cypress command
-    (`--expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'`)
-    could not be run from the execution worktree for slice 1; the coordinator
-    recorded the gap in the plan and recommended running it from a shallower
-    checkout instead of treating the correction as unproven.
-
 ## ODF-010 — `pnpm --frozen-lockfile install` inside project wrapper scripts repeatedly mutated `pnpm-lock.yaml`
 
 Former local code: DD-004.
@@ -114,73 +79,6 @@ unrelated lockfile diff.
     execution; no functional impact since each drift was caught before
     commit, but the pattern would silently ship as an unrelated diff without
     that check.
-
-## ODF-011 — Unit-test seams that satisfy a provisioning precondition can hide an ordering defect only the live integration proof exposes
-
-Former local code: DD-005.
-
-The runner-owned E2E wrapper's boundary tests injected a pre-resolved
-`runtimeTarget` (or drove the primary, non-isolated checkout) for
-`runOwnedE2eInvocation` / `runE2eBatch`. That seam satisfied the
-`resolveSutCheckoutTarget` precondition (which requires a complete E2E
-allocation) without exercising the real provisioning side effect that
-`startOwnedSutLifetime` performs. The wrapper called `resolveSutCheckoutTarget`
-*before* `startOwnedSutLifetime`, so a fresh isolated worktree with no
-allocation yet failed on first `pnpm cy:run` — but only the live concurrent
-proof surfaced this; the boundary suite passed throughout. The fix skips the
-pre-start resolve for isolated checkouts (letting `startOwnedSutLifetime`
-provision and resolve internally) and adds boundary tests for the
-fresh-isolated-worktree path.
-
-### Occurrences
-
-- Execution: SEED-015 Story 8 / quick-105-runner-owned-e2e-lifecycle / be7234f7f2
-  - Tool: Cursor
-  - Open Dough release: 0.3.12
-  - Evidence: slice 13's live concurrent proof failed in the peer worktree
-    with "Isolated worktree SUT needs a complete E2E allocation in
-    .worktree.local.json ... Missing: identity, e2e.database, e2e.backendPort,
-    e2e.vitePort, e2e.lbListenPort" thrown from `resolveSutCheckoutTarget` →
-    `loadCompleteIsolatedE2eAllocation`, called before `startOwnedSutLifetime`
-    in `runE2eBatch`. Pre-fix `scripts/e2e-runner.test.mjs` (at `47df168656`)
-    had zero matches for fresh-worktree / provisioning-path tests; the fix
-    commit `b0dad96aaa` added eight (fresh isolated worktree provisions, primary
-    regression guard, already-provisioned isolated re-reads allocation).
-  - Observed effect: one failed live-proof attempt, a defect fix, a Gradle
-    build-cache clear (a crashed `bootRunE2E --build-cache` had left a corrupted
-    cache entry that also failed the retry), and a re-run before slice 13's
-    proof passed. The boundary suite never caught the gap because the seam
-    elided the provisioning side effect.
-
-## DD-012 — Cross-cutting service-wiring slices legitimately exceed the 5-minute execution-leaf target
-
-A slice that wires a new mocked external service across the runner, the Cypress
-plugin boundary, the endpoint-context module, and the Cucumber hook is one
-coherent responsibility that cannot be split along those layers without
-breaking stop-safety. Such a slice naturally runs ~25 minutes of active work
-versus the 5–8 minute execution-leaf target, with no mid-slice refinement
-warranted. Plans admitting a new mock service should size that wiring slice as
-a multi-touchpoint leaf (roughly 15–25 minutes) rather than a 5-minute Behavior
-leaf, or decompose only where a stop-safe seam genuinely exists.
-
-### Occurrences
-
-- Execution: SEED-015 Story 10 / quick-105-remaining-active-e2e-isolation / 7614f8418d
-  - Tool: Cursor
-  - Model: glm-5.2
-  - Open Dough release: 0.3.12
-  - Evidence: PLAN.md slice 6 "Done 2026-09-12" note — "**Sizing deviation:**
-    active work ~25 min vs. 5–8 min target — the Wikidata wiring touched the
-    runner, plugin boundary, endpoint context, and the Cucumber hook across one
-    coherent responsibility; recorded for retrospective. Slice converged with
-    green proof; no refinement warranted mid-slice." Slice 6's plan sizing
-    line read "5–8 minutes, medium confidence".
-  - Observed effect: one slice ran ~3× its 5–8 min target; the plan flagged it
-    for retrospective rather than refining mid-slice, and the slice converged
-    green with no rework.
-  - Inference: the 5-minute leaf target is the wrong anchor for a single
-    cross-layer service-wiring responsibility; future plans should size such
-    slices explicitly as multi-touchpoint wiring.
 
 ## DD-013 — One-off profile capture treated as durable runner plumbing
 
@@ -226,36 +124,3 @@ The first large confirmation command used the small HTTP capture's
     investigation before the authorized retry.
   - Inference: large-fixture Cypress waits were already in the profiling
     record; copying the small-path `--config` was enough to miss them.
-
-## DD-015 — Indivisible resource-lifecycle slice overran its hard limit and was delivered rather than refined
-
-A Behavior slice that had to ship socket allocation together with release and
-leftover-endpoint fixture cleanup exceeded its own 10-minute hard limit
-(~12 minutes active, excluding wait exceptions). The plan required stopping to
-refine remaining work above 10 minutes, but the remaining work was that same
-resource-lifecycle cleanup; splitting it would have leaked relocated sockets.
-Execution recorded the overrun and delivered green.
-
-This resembles DD-012's undersized-leaf problem. Matching is uncertain: this
-slice was not mock-service wiring and already had an 8–10 minute estimate plus
-an explicit 10-minute hard stop.
-
-### Occurrences
-
-- Execution: SEED-015 story 9 / quick/107-checkout-independent-sut-sockets / b045550bd1
-  - Tool: Cursor
-  - Model: Cursor Grok 4.6
-  - Open Dough release: 0.3.13
-  - Evidence: PLAN.md Learnings after slice 1 — active work ~12 min vs the
-    10-minute hard limit; leftover-endpoint fixture cleanup in-scope; "No
-    remaining slice to refine". Slice 1 originally required: "If active work
-    exceeds 10 minutes, stop safely, record the concrete overrun, and refine
-    remaining work rather than expanding this slice silently." The
-    implementation agent returned completed proof rather than an
-    oversized-slice stop.
-  - Observed effect: one slice delivered with recorded overrun; no
-    mid-execution refinement or revert.
-  - Inference: the hard-limit stop is the wrong control when leftover work is
-    required cleanup of the same relocated resource. Size such a slice for
-    allocation plus fixture-lifecycle updates, or name that cleanup as an
-    in-scope exception, rather than treating completion as silent expansion.

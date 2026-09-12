@@ -11,9 +11,9 @@ scope: L
 
 ## Result and audit boundary
 
-**Original audit findings (F1–F3):** two user-visible composition restrictions (F1/F2) and one misplaced infrastructure policy (F3). These are three root causes, not a defect count obtained by adding every affected plan. Several other plans improved cohesion or were superseded successfully.
+**Retained audit findings (F1/F2):** two user-visible composition restrictions in notebook workflows. Related notebook audit evidence is retained; the product backlog owns selection.
 
-Window: **2026-09-05 11:02 through 2026-09-10 11:02, Asia/Singapore**, a fixed rolling 120 hours. Current code inspected at **`6876f46de098cf6b41dfcae7b2a2a0bebb7c16ec`**. Inventory contains **64 distinct completed/closed plan identities: 52 reviewed and 12 explicitly excluded**. There are 66 historical PLAN paths because two plans were renamed. Reused numeric IDs refer to different plans; the full directory names below disambiguate them.
+Window: **2026-09-05 11:02 through 2026-09-10 11:02, Asia/Singapore**, a fixed rolling 120 hours. Current code inspected at **`6876f46de098cf6b41dfcae7b2a2a0bebb7c16ec`**. The retained rows below cover notebook and unrelated workflow evidence.
 
 The original five-day inventory excluded the initial-publication family (plans
 078–087, 092 and 094); preserve that historical audit boundary.
@@ -22,7 +22,7 @@ The original five-day inventory excluded the initial-publication family (plans
 
 Recovered tracked PLAN history under `.planning/quick` and `.planning/phases`, including deletions, renames and merged branches, using `git log --all --full-history --diff-merges=first-parent` with the fixed window. Inspected historical plan/closure evidence, associated implementation/proof changes and their present mechanisms. No completed phase PLAN was found in this window. Compared cumulative behavior, not filenames or class counts alone.
 
-The table gives **closure/provenance dates**, which can lag the last behavior change. A deletion was not by itself treated as proof of delivery: slice state, implementation or explicit delivered/closure evidence was checked. Some last pre-deletion documents had stale planned statuses; final commits also implemented or recorded those remaining outcomes. For example, 050 relocation closes at `040ff8c689`, and 095 closes at `6876f46de0` with persistence/concurrent-E2E observations. Plan 093 remains present and done. Former 050 release-freeze is 051; former 069 mock-isolation is 070. No independent completed 090/091 PLAN artifact was recovered; do not invent missing plan identities from numeric gaps. The recent initial-publication correction described as 091 is excluded regardless.
+The table gives **closure/provenance dates**, which can lag the last behavior change. A deletion was not by itself treated as proof of delivery: slice state, implementation or explicit delivered/closure evidence was checked. Some last pre-deletion documents had stale planned statuses; final commits also implemented or recorded those remaining outcomes. For example, 050 relocation closes at `040ff8c689`, and 095 closes at `6876f46de0` with persistence/concurrent-E2E observations. Former 050 release-freeze is 051. No independent completed 090/091 PLAN artifact was recovered; do not invent missing plan identities from numeric gaps. The recent initial-publication correction described as 091 is excluded regardless.
 
 This is a targeted **decomposition-to-design audit**, not a full correctness/security audit of every changed line. “No finding” means no concrete remaining instance of this pattern was established in the inspected concept. Local Git refs supply the history; no remote fetch or claim about unavailable branches. Full execution conversations for these other plans are unavailable, so causal attribution is to plan contracts and code evolution, not inferred agent deliberations. Later working-tree planning changes were preserved and not treated as executed code.
 
@@ -63,21 +63,9 @@ Provenance: 045 (`d14948b845`) established isolated deletion; 049 (`6e983e55a9`)
 
 These limits were explicitly part of the planned contracts. This is **design debt encoded during planning**, not evidence that implementation disobeyed its plan. Removing them changes supported behavior and must be captured as a correction story.
 
-### F3 — Medium: isolated E2E resource policy knows demonstration filenames
-
-Current evidence: [isolated-cypress-spec-selection.mjs](/Users/terryyin/git/doughnut/scripts/isolated-cypress-spec-selection.mjs), [isolated-openai-mock.mjs](/Users/terryyin/git/doughnut/scripts/isolated-openai-mock.mjs:30), [isolated-cypress.mjs](/Users/terryyin/git/doughnut/scripts/isolated-cypress.mjs:105).
-
-The runner's closed registration contains four specific feature files. The OpenAI resource implementation exports one of those file identities, and orchestration decides whether to acquire mock resources by comparing the selected filename with that constant. The general resource concept therefore owns knowledge of a particular example.
-
-Provenance: 061 established focused isolated admission; 070 implemented OpenAI setup for its selected feature; 088 admitted the CLI feature; 089 (`25d16928bf`) admitted MCP. 073's recording proof and 093's event-composition repair are useful shared lifecycle work, not additional findings.
-
-The allowlist itself is **not proven wrong**: it prevents unverified tests from resetting or mocking shared services. No claim is made that all other feature files can safely run today. The specific finding is the reversed dependency and scattered filename-driven resource policy. Consequence: changing or adding an approved spec's capability requires awareness across runner and resource code, encouraging another example-specific branch.
-
-Correction target: one small approved-spec registry declares required isolated capabilities; selection resolves a descriptor and orchestration acquires its resources. Resource lifecycle modules do not know feature filenames. Preserve the current four admissions, one-spec execution and unknown-spec refusal. This correction adds no newly admitted tests, external mocks or generic plugin framework.
-
 ## Plan-by-plan inventory
 
-Each row is one plan identity. Dates are September 2026 closure/provenance dates; SHAs are local Git anchors, not assertions that a single commit contains the complete execution. Read historical plans with `git show <sha>^:.planning/quick/<full-name>/PLAN.md` for deletion anchors, and inspect that commit's delivered status/proof as well. For retained 093, use `git show 6adf381f84:.planning/quick/093-release-private-openai-mock-after-cypress/PLAN.md`.
+Each row is one plan identity. Dates are September 2026 closure/provenance dates; SHAs are local Git anchors, not assertions that a single commit contains the complete execution. Read historical plans with `git show <sha>^:.planning/quick/<full-name>/PLAN.md` for deletion anchors, and inspect that commit's delivered status/proof as well.
 
 | Plan directory | Closure/provenance | Current-state assessment |
 | --- | --- | --- |
@@ -106,30 +94,19 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 | 051-freeze-pending-release-identities | 09-07 · `4c703786cf` | No finding: immutable candidate identity is a common release-state invariant. Formerly numbered 050. |
 | 052-clarify-note-rename-publication | 09-07 · `63dbba7f74` | F2 symptom: diagnostics/docs describe isolated rename eligibility. They need alignment when the underlying contract changes, not an independent redesign. |
 | 053-reconcile-local-web-content | 09-07 · `f3aec9da7f` | F1 origin: local-content rebase was framed around one local note. Current one/two-note branching preserves that example boundary. |
-| 054-configured-worktree-backend-tests | 09-07 · `63dbba7f74` | No finding: suite datasource/ownership are shared configuration; explicit opt-in was subsequently superseded by automatic routing. |
-| 055-worktree-suite-datasource-for-lock-tests | 09-07 · `63dbba7f74` | No finding: lock proofs use the configured suite database rather than a test-specific hardcoded database. |
 | 056-resolve-overlapping-note-edits | 09-07 · `63dbba7f74` | F1 affected: conflict continuation is reusable, but eligibility limits its reach. Broader change sets must retain all companion edits. |
-| 057-automatic-worktree-backend-tests | 09-07 · `63dbba7f74` | No finding: common worktree target selection and admission replace manual setup. |
-| 058-exclusive-worktree-checkout-lock | 09-07 · `63dbba7f74` | No finding: one active owner and stale-owner evidence are real concurrency invariants. |
 | 059-publish-folder-relocation | 09-08 · `6130c0be9a` | Related F2 boundary: exact whole-subtree correspondence is intentionally conservative identity evidence. No separate request to generalize ambiguous folder moves; preserve this path during correction. |
-| 060-ordinary-worktree-backend-commands | 09-08 · `05ad9753c9` | No finding: ordinary commands route through shared ownership/datasource selection. |
-| 061-concurrent-worktree-browser-e2e | 09-08 · `9e7b8e5f99` | F3 foundation: isolated runner is general, but spec admission/resource selection became coupled to feature filenames as later examples were added. |
 | 062-pull-note-addition-with-local-edit | 09-08 · `2f032ecfc5` | F1: accepted addition history is recognized through an exact single-addition scenario. |
 | 062-web-note-creation-local-refinement | 09-08 · `05ad9753c9` | No new finding: WebNoteCreationService uses shared construction, projection and accepted-snapshot persistence. Represented-folder checks protect projection consistency. |
 | 063-existing-note-batch-publication | 09-08 · `04336bd793` | Positive generalization: ordinary existing-note publication is a collection. F1 explains why pull remains narrower than publish. |
 | 064-existing-note-batch-guidance | 09-08 · `0b3a73eb53` | F1 symptom: guidance honestly documents batch-publish versus restricted pull; update it with the engine correction. |
 | 065-local-edit-over-web-creation-save | 09-08 · `0b3a73eb53` | F1: new exact addition-then-one-save recognizer extends the scenario catalogue rather than an accepted-history model. |
 | 066-local-edit-batch-rebase | 09-08 · `9e7b8e5f99` | F1: separate two-note algorithm allows exactly one save of a different third note; rejects already-based batches. |
-| 067-isolated-browser-allocation-safeguards | 09-08 · `7057a95fa6` | No finding: allocated-port and owner checks enforce peer safety across worktrees. |
 | 068-batch-pull-refusal-guidance | 09-08 · `0a797844b9` | F1 symptom: rejection messages and proofs entrench the two-note/one-save boundary; not a separate mechanism to fix. |
 | 069-local-note-edit-across-folder-move | 09-08 · `6b32ce0e04` | F1 interface residue: exact-subtree replay carries a scalar localPath. Keep identity-safe move support; ordinary history correction must not accidentally broaden structural replay. |
-| 070-isolated-openai-browser-mocks | 09-08 · `63423ccc48` | F3: mock-resource module exports a particular feature path and orchestration selects resources by that identity. Formerly numbered 069. |
 | 071-web-autosave-commit-batching | 09-08 · `4df82944d9` | No finding: batching uses common note/head/time state. The ordinary-note eligibility and time window are deliberate policy, not literal fixture identities. |
-| 073-exclusive-openai-recording-proof | 09-09 · `428e021e60` | No new finding: paired recordings verify isolation through common owners; F3 remains in admission, not in this proof. |
 | 074-web-autosave-clock-precision | 09-08 · `76f8cb70b0` | No finding: timestamp precision correction applies across autosave state, not one timing example. |
-| 075-retire-worktree-databases | 09-08 · `1f723707fb` | No finding: generic disposable identity, admission and database evidence govern retirement. |
 | 076-absorb-equivalent-final-newline-edit | 09-08 · `858835291e` | No independent mapping finding: exact LF equivalence and single-conflict safeguards protect whole-commit skipping. F1 must preserve companion edits when broadening eligibility. |
-| 077-retirement-admission-and-process-evidence | 09-08 · `dbc1bd7039` | No finding: evidence checks fail closed for ambiguous ownership; not per-worktree exceptions. |
 | 078-create-readme-only-folder | 09-09 · `f506502e0b` | Excluded from original audit. |
 | 079-initial-notebook-and-folder-readmes | 09-09 · `e9b56195eb` | Excluded from original audit. |
 | 080-require-empty-notebook-for-initial-readmes | 09-09 · `cd59ea24af` | Excluded from original audit. |
@@ -140,10 +117,7 @@ Each row is one plan identity. Dates are September 2026 closure/provenance dates
 | 085-minimal-initial-container-with-note | 09-09 · `cd59ea24af` | Excluded from original audit. |
 | 086-cohere-proposal-binding-persistence | 09-09 · `cd59ea24af` | Excluded from original audit. |
 | 087-next-small-initial-readme-note-trees | 09-09 · `cd59ea24af` | Excluded from original audit. |
-| 088-isolated-cli-web-note-e2e | 09-09 · `cd59ea24af` | F3: another literal spec registration added. CLI uses the owning environment correctly; issue is where resource policy lives. |
-| 089-isolated-mcp-services-e2e | 09-09 · `960c4cc2ba` | F3: another literal spec registration. Awaiting MCP client shutdown is a valid lifecycle fix, not an example-shaped workaround. |
 | 092-small-initial-notebook-layouts | 09-09 · `524017c50a` | Excluded from original audit. |
-| 093-release-private-openai-mock-after-cypress | 09-10 · `6adf381f84` | No new finding: common event composition fixes overwritten cleanup callbacks. Current PLAN explicitly records done and live proof. |
 | 094-initial-notes-with-relationship | 09-10 · `cea9985238` | Excluded from original audit. |
 
 ## Open product decision
@@ -156,6 +130,6 @@ queued corrections.
 
 ## Why this pattern survived
 
-Historical plans often explicitly made unsupported neighboring examples part of the contract. Execution could therefore satisfy the plan while creating an inconsistent combined capability. Later stories added another allowed case; shared low-level helpers preserved the higher-level scenario gate. Behavior-preserving cleanup could not remove a rejection that planning and tests had made a required behavior. F1/F2 show that directly. F3 is a narrower cohesion miss and does not establish the same intent or severity.
+Historical plans often explicitly made unsupported neighboring examples part of the contract. Execution could therefore satisfy the plan while creating an inconsistent combined capability. Later stories added another allowed case; shared low-level helpers preserved the higher-level scenario gate. Behavior-preserving cleanup could not remove a rejection that planning and tests had made a required behavior. F1/F2 show that directly.
 
 This evidence supports fixing both the affected mechanisms and how future plans distinguish an example from an invariant. It does not support discarding all five days of work or blaming every small story.

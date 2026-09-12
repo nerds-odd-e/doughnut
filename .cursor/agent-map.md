@@ -44,7 +44,7 @@ Useful focused checks:
 - Backend: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 - Isolated worktree backend tests: [`docs/worktree-backend-tests.md`](../docs/worktree-backend-tests.md). Linked worktrees isolate ordinary `pnpm backend:test` / `backend:test_only` and wrapper `test` / `migrateTestDB` automatically. Opt-in remains: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree`
 - Frontend single file: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts`
-- E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/path/to.feature`
+- E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/path/to.feature`
 - Log inspection: `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`, `dev`)
 - Diff whitespace: `scripts/check_diff_whitespace.sh` or `scripts/check_diff_whitespace.sh --cached`
 - Coordinator format of changed working-tree components:
@@ -58,11 +58,10 @@ Useful focused checks:
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
 `doughnut_development`, `dev.log` / `dev.pid`; restart with `pnpm dev:restart`;
 local sign-in e.g. `manual` / `password`). `pnpm cy:run` is the disposable E2E
-stack (http://localhost:5173/, profile `e2e`). Assume the stack you need is
-already running. If unsure for E2E, check
-`CURSOR_DEV=true nix develop -c node scripts/sut-healthcheck.mjs`. Do not ask
-developers to restart services after normal code changes; backend and frontend
-auto-reload.
+stack (http://localhost:5173/, profile `e2e`): each invocation starts and stops
+its own services. `pnpm cy:open` owns services for the interactive session.
+Do not ask developers to manage E2E services separately or restart Development
+after normal code changes; backend and frontend auto-reload.
 
 ## Architectural decisions (ADRs)
 

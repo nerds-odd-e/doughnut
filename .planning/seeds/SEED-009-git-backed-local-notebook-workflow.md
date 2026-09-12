@@ -422,9 +422,7 @@ correction delivered as Story 10a.
 
 ## Ordering and Scope Reduction
 
-The [product backlog](../PRODUCT-BACKLOG.md) owns global priority. Keep the
-SEED-015 worktree queue (reclaim, then CLI and MCP) ahead of further SEED-009
-selection; this reassessment does not displace that direction.
+The [product backlog](../PRODUCT-BACKLOG.md) owns global priority.
 
 Within this seed, **13**, **16**, **14**, **17**, **18**, **18a**, **15**,
 **10**, **10a**, and **19** are delivered, as is publication of added concepts
@@ -440,8 +438,7 @@ Preserve these boundaries in future refinement:
 - Exposed accepted history is immutable; unexposed web-content tips may amend
   within Story 10's window. Pull receives accepted history, never repairs
   unsynchronized web state or publishes automatically.
-- For [CLI isolation Story 4](SEED-015-concurrent-worktree-environments.md#story-4),
-  clone/pull downloads freeze a batch even if the later client operation fails.
+- Clone/pull downloads freeze a batch even if the later client operation fails.
   Avoid inspection downloads between saves intended to exercise amendment.
   Count accepted commits, not UI saves, when checking bounded rebase support;
   batching does not deliver repeated pull or broader divergent reconciliation.

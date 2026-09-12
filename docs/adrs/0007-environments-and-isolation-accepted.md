@@ -46,4 +46,4 @@ changing application, database, test, or lifecycle tooling.
 ## Related
 
 - [ADR 0006 — Failure handling](./0006-failure-handling-accepted.md)
-- Planning: [SEED-015, Story 7](../../.planning/seeds/SEED-015-concurrent-worktree-environments.md#story-7)
+- Operational guide: [Development setup](../development-setup.md)
