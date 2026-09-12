@@ -36,8 +36,7 @@ Also surface when adding scheduling columns, changing JDBC timezone, or revisiti
 
 Quick/071 added `notebook_git_binding.amendment_last_changed_at` in
 `V300000321`; include it when this deferred schema-wide work is selected.
-[SEED-009 Story 10a](SEED-009-git-backed-local-notebook-workflow.md#story-10a)
-corrects its fractional-second precision separately. Preserve null/frozen
+Its fractional-second precision has been corrected separately. Preserve null/frozen
 eligibility, UTC round-tripping, and the exact ten-minute comparison when
 changing the type; that correction does not complete this 2038 work.
 

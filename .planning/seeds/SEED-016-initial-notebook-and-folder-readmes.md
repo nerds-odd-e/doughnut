@@ -197,8 +197,6 @@ Pull and existing-note composition have separate homes in SEED-017.
 
 ## Breadcrumbs
 
-- [SEED-009 Story 19](SEED-009-git-backed-local-notebook-workflow.md#story-19)
-  delivers the sole-changed-path folder case.
 - Accepted ADR 0004 defines root and folder README Portable paths and their
   `type: Readme` contract.
 - Accepted ADR 0006 permits unimplemented behavior to fail loudly so it creates
