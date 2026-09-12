@@ -62,12 +62,15 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
   the accepted head and authored notes in Donut. Reduce the measured waiting
   time through one bounded improvement to the dominant publication cost.
 - **Scope — required behavior:** Improve repeated ORM flush work on the
-  publication property/alias-index refresh path. Select one correctness-safe
-  change using a small fixture and short capture; the implementation remains
-  open until visibility and ordering requirements are understood. Confirm that
-  the improvement scales to the retained representative workload: 1,000 existing
-  concepts, 10,000 additions, and 20 folders. These counts define a measurement
-  example, not a supported-size limit or a reason to reject other notebooks.
+  publication property/alias-index refresh path. One extra property-index
+  query-triggered auto-flush is already gone (`FlushModeType.COMMIT` covers
+  unlink, the required explicit flush, authored-reference lookup, and persist).
+  The remaining work is the required per-note whole-session flushes, with
+  alias-index now the larger sampled caller. Confirm that a correctness-safe
+  change to that remaining work scales to the retained representative
+  workload: 1,000 existing concepts, 10,000 additions, and 20 folders. These
+  counts define a measurement example, not a supported-size limit or a reason
+  to reject other notebooks.
 - **Scope — preserved constraints:** Preserve existing authorization and
   validation, authored content and reference semantics, note identity, learning
   history, and atomic acceptance. Invalid proposals must still produce a useful
@@ -88,7 +91,11 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
   valid workload must publish faster and meet the agreed practical-time target.
   The agreed target is strictly under 60,000 ms from HTTP request start through
   the complete successful response, including transport and server commit.
-  The user accepted under one minute on 2026-09-12; feasibility remains unproven.
+  The user accepted under one minute on 2026-09-12. Feasibility remains
+  unproven: the extra property-index query flush removal left a 60,000 ms
+  HTTP deadline capture incomplete at **60,003.112 ms**, still inside
+  `NotebookGitProposalPublisher.publish`. Small 20-note HTTP times (~187 ms
+  accepted / ~153 ms rejected) are not the story result.
 - **Key examples:**
   - Given the representative valid workload above, when its owner publishes the
     additions as one commit, publication returns success within the agreed target
@@ -100,23 +107,30 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
     `aliases: {invalid: shape}`, when publication reaches that invalid content
     after processing preceding additions, it returns the useful path-specific
     rejection and preserves baseline head, stored rows, and learning state.
-- **Value / learning:** Establish whether one safe reduction of the measured
-  repeated flush work makes large publication practical. Do not turn this into
-  another broad bottleneck investigation.
+- **Value / learning:** Establish whether one safe reduction of the remaining
+  measured flush work makes large publication practical. Do not turn this into
+  another broad bottleneck investigation. Skipping only the extra property-index
+  query flush was too small to meet the 60 s target.
 - **Improvement areas and evidence:** The [findings and next experiment](../../docs/notebook-publication-profiling.md#findings-and-next-experiment)
-  identify repeated ORM flushing first: 98.25% and 98.213% of publication-thread
-  execution samples in two valid large captures contain Hibernate flush traversal.
-  Investigate flush ownership and requirements around property/alias-index
-  refresh, managed-state dirty checking/cascades, and temporary allocation
-  (about 571 GB weighted request allocation per capture). These are sampled CPU
-  and allocation findings, not a promise of 98% wall-time savings. Parsing, Git
-  and database waits have weaker evidence for the first improvement priority.
-- **First experiment:** On a small fixture, establish which explicit and
-  query-triggered flushes are required for visibility and ordering, then assess
-  one correctness-safe change. Do not blindly skip flushes. Stop investigation
-  when a dominant cost and a concrete next experiment are clear; expand counts
-  only to resolve an unanswered question. Preserve accepted head/content, note
-  identity, learning state and atomic late rejection while measuring the change.
+  still identify repeated ORM flushing first. After the extra property-index
+  query flush was removed, a truncated 60 s capture still spent 2,671 of
+  3,006 request-thread samples in `AbstractFlushingEventListener`, with
+  alias-index 1,081 vs property-index 608. Remaining required flushes are the
+  explicit property unlink flush and the alias bulk-delete flush. These are
+  sampled CPU findings, not a promise of 98% wall-time savings. Parsing, Git
+  and database waits have weaker evidence for the next improvement.
+- **Prior attempt (2026-09-12):** Required explicit flushes were left in place;
+  only the redundant property-index query auto-flush was removed. Controller
+  tests keep property-wiki and alias visibility after commit, including stale
+  derived-entry removal. The representative large publication did not finish
+  under 60,000 ms ([large HTTP deadline capture](../../docs/notebook-publication-profiling.md#large-http-deadline-capture)).
+  Do not treat that extra-flush removal as the remaining experiment, and do
+  not start a second optimization unless this story is taken again.
+- **Measurement:** Keep the 60,000 ms HTTP deadline. Large fixture seed and
+  verification need Cypress
+  `taskTimeout=43260000,defaultCommandTimeout=600000`. The small HTTP
+  `taskTimeout=66000` aborts during 1,000-concept seed. Isolated tagged captures
+  use `pnpm cypress run --expose …`; `pnpm cy:run` does not forward those flags.
 - **Reusable evidence:** Follow the same [fixture and capture procedure](../../docs/notebook-publication-profiling.md#findings-and-next-experiment),
   [HTTP helper](../../e2e_test/config/notebookPublicationHttp.ts), and
   [analysis script](../../scripts/profiling/AnalyzePublication.java).
@@ -127,11 +141,10 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
   verifies preceding processing and preserved state. Large rejection latency
   remains unmeasured; further large captures need a specific unanswered question.
   Use the documented bulk receiver verification for large byte checks.
-- **Effort hypothesis:** L, low confidence until the small experiment establishes
-  the required flush semantics. Assumes one bounded change can meet the chosen
-  time target. If it cannot, report measured improvement and the remaining gap
-  for human scope review; do not silently widen optimization or declare a
-  faster-but-still-impractical result complete.
+- **Effort hypothesis:** L, low confidence. The assumption that removing one
+  extra property-index query flush would meet the 60 s target is disproved.
+  A later bounded change must still report the measured gap rather than
+  declare a faster-but-still-impractical result complete.
 - **Depends on:** The retained profiling findings, reusable infrastructure, and
   baseline data. Prior related notebook publication work supplies the existing
   functionality, not a new queue item.
@@ -142,23 +155,25 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
 ## Ordering and Scope Reduction
 
 Refine story 3 from the
-[retained profiling findings](../../docs/notebook-publication-profiling.md),
-starting with a small focused experiment. Preserve the existing name acceptance
-and reference semantics while optimizing publication.
+[retained profiling findings](../../docs/notebook-publication-profiling.md).
+The extra property-index query flush is already gone; remaining work is the
+required per-note flushes, especially alias-index. Preserve existing name
+acceptance and reference semantics while optimizing publication.
 
 ## Current Decisions
 
 - Story 3: the user accepted **under one minute** on 2026-09-12 for the
   representative valid workload under comparable awake local conditions.
-  The scope remains one bounded improvement to repeated flush work. If the
-  target requires broader work, return for scope review rather than adding
-  optimization areas automatically. No product-scope decisions remain open.
+  That target still stands. One extra property-index query flush has been
+  removed and is not enough. If a later attempt needs broader work than one
+  bounded remaining-flush change, return for scope review rather than adding
+  optimization areas automatically.
 
 ## When to Surface
 
-Use the retained profiling findings when refining the optimization story.
-Investigation stops at the supported first priority; further large measurements
-need a concrete unanswered question.
+Use the retained profiling findings when taking this story again. The extra
+property-index query flush is already gone; further large measurements need a
+concrete unanswered question about remaining required flushes.
 
 ## Breadcrumbs
 
