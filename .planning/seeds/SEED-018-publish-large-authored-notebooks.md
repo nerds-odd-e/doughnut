@@ -57,22 +57,50 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
 
 ### 3. Publish large notebook commits within a practical measured time
 
-- **For / why:** Notebook owners can publish a commit of roughly 10,000 new notes
-  and receive a definitive outcome without excessive waiting or manual splitting.
-- **Evaluation:** A representative valid large commit completes and its accepted
-  head and notes are visible in Donut. Record comparable before/after end-to-end
-  timing and server measurements. Invalid proposals still leave accepted history
-  and stored notebook state unchanged and return a useful rejection.
-- **Scope:** Refine a bounded improvement from the measured priorities below.
-  Use small fixtures and short captures first, retaining targeted correctness
-  checks; increase workload only when the evidence is inconclusive. Reserve large
-  confirmation for a candidate improvement and a remaining scaling question.
-  Specific implementation changes and a completion-time target remain unselected.
-  Preserve authorization, authored content,
-  note identity, learning history, and atomic acceptance. Increasing transport
-  timeouts alone does not satisfy the story.
-- **Value / learning:** Determine what drives large-publication time and reduce
-  that work, rather than assuming SQL counts alone establish the bottleneck.
+- **Goal:** A notebook owner publishes a valid large authored commit without
+  manually splitting it, receives a definitive successful outcome, and can see
+  the accepted head and authored notes in Donut. Reduce the measured waiting
+  time through one bounded improvement to the dominant publication cost.
+- **Scope — required behavior:** Improve repeated ORM flush work on the
+  publication property/alias-index refresh path. Select one correctness-safe
+  change using a small fixture and short capture; the implementation remains
+  open until visibility and ordering requirements are understood. Confirm that
+  the improvement scales to the retained representative workload: 1,000 existing
+  concepts, 10,000 additions, and 20 folders. These counts define a measurement
+  example, not a supported-size limit or a reason to reject other notebooks.
+- **Scope — preserved constraints:** Preserve existing authorization and
+  validation, authored content and reference semantics, note identity, learning
+  history, and atomic acceptance. Invalid proposals must still produce a useful
+  rejection without changing the accepted head or stored notebook state.
+  Increasing transport timeouts alone does not satisfy the story.
+- **Scope — deferred promises:** No general publication rewrite, optimization of
+  parsing/Git/database waits without evidence requiring reconsideration, background
+  jobs, progress UI, resumable uploads, general synchronization, or improvements
+  to other large-data operations. No new large-invalid-proposal latency target,
+  exhaustive workload matrix, or production-wide performance guarantee. These
+  are deferred commitments, not restrictions on naturally supported behavior.
+- **Evaluation:** Record comparable before/after publication request timing and
+  server measurements, plus successful accepted-head and byte-for-byte content
+  checks. Use the awake 62 min 52.321 s capture as the retained elapsed-time
+  reference; retain its local JVM qualifications and report material environment
+  differences. Measure publication separately from fixture setup and receiver
+  verification. A reduction in sampled flush cost alone is insufficient: the
+  valid workload must publish faster and meet the agreed practical-time target.
+  That target remains open below; refinement does not claim it is feasible.
+- **Key examples:**
+  - Given the representative valid workload above, when its owner publishes the
+    additions as one commit, publication returns success within the agreed target
+    and Donut exposes the accepted head and all authored file contents.
+  - Given a small notebook with existing note identities and learning state,
+    when its owner publishes valid additions, the new content is accepted while
+    those existing identities and learning state are preserved.
+  - Given the retained 20-addition fixture whose final path has malformed
+    `aliases: {invalid: shape}`, when publication reaches that invalid content
+    after processing preceding additions, it returns the useful path-specific
+    rejection and preserves baseline head, stored rows, and learning state.
+- **Value / learning:** Establish whether one safe reduction of the measured
+  repeated flush work makes large publication practical. Do not turn this into
+  another broad bottleneck investigation.
 - **Improvement areas and evidence:** The [findings and next experiment](../../docs/notebook-publication-profiling.md#findings-and-next-experiment)
   identify repeated ORM flushing first: 98.25% and 98.213% of publication-thread
   execution samples in two valid large captures contain Hibernate flush traversal.
@@ -96,15 +124,17 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
   [20-addition late-rejection proof](../../docs/notebook-publication-profiling.md#small-late-rejection-capture)
   verifies preceding processing and preserved state. Large rejection latency
   remains unmeasured; further large captures need a specific unanswered question.
-  Use the retained read-only bulk receiver comparison for large byte checks.
-- **Effort hypothesis:** L, low confidence until bounded refinement; if the measured
-  work exceeds a few hours, refine the story into independently useful outcomes
-  before execution planning rather than committing to a broad optimization rewrite.
+  Use the documented bulk receiver verification for large byte checks.
+- **Effort hypothesis:** L, low confidence until the small experiment establishes
+  the required flush semantics. Assumes one bounded change can meet the chosen
+  time target. If it cannot, report measured improvement and the remaining gap
+  for human scope review; do not silently widen optimization or declare a
+  faster-but-still-impractical result complete.
 - **Depends on:** The retained profiling findings, reusable infrastructure, and
   baseline data. Prior related notebook publication work supplies the existing
   functionality, not a new queue item.
-- **Safe stopping point:** The measured workload publishes faster with existing
-  correctness guarantees intact; this does not require general synchronization,
+- **Safe stopping point:** The measured workload meets the agreed time target
+  with existing correctness guarantees intact; this does not require general synchronization,
   background jobs, resumable upload, or all other large-data operations.
 
 ## Ordering and Scope Reduction
@@ -116,8 +146,12 @@ and reference semantics while optimizing publication.
 
 ## Open Decisions
 
-- Story 3: acceptable completion-time target and bounded improvement scope remain
-  for later refinement based on the retained profiling evidence.
+- Story 3: choose the maximum publication request time for the representative
+  valid workload under comparable awake local conditions. The refinement
+  recommendation is **under one minute**, subject to feasibility evidence; this
+  is a proposal, not a human-approved requirement. The scope is one bounded
+  improvement to repeated flush work. If the target requires broader work,
+  return for scope review rather than adding optimization areas automatically.
 
 ## When to Surface
 
