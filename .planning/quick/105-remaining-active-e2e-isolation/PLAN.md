@@ -276,7 +276,7 @@ duplication). Sizing held (~6 min active + measured browser wait).
 
 ### 8. Keep interactive resource ownership across feature switches
 Type: Behavior
-Status: planned
+Status: done
 Behavior: One interactive session switches between ordinary, OpenAI and Wikidata
 features with the required private endpoints ready before use; reruns preserve
 session ownership and close cleans all owned resources.
@@ -287,6 +287,23 @@ is sufficient. Do not add a background resource broker or change Cucumber
 scenario semantics. One focused interactive switch/close manual check is part
 of this slice; inspect owned ports after closing.
 Sizing: 5–8 minutes, medium confidence; measured browser startup wait excepted.
+Done 2026-09-12: added a session-boundary fixture to `scripts/e2e-runner.test.mjs`
+proving one interactive session provisions the bounded OpenAI+Wikidata two-
+service set once, keeps both mocks alive across ordinary/OpenAI/Wikidata
+switches and reruns (no after-spec teardown), and cleans all owned resources
+on close (both mocks + SUT + lease, zero survivors; owned ports inspected).
+No production code change — the existing `runE2eInteractive`/preselection
+protocol already supports preselecting a batch that unions both mock
+requirements. No background resource broker added; no Cucumber scenario
+semantics changed. Refactor collapsed redundant narrative re-assertions into
+one canonical mid-session invariant block. Focused suites (81 tests) green.
+**Manual-check gap:** the literal `pnpm cy:open` GUI interactive switch/close
+path requires human interactive verification (no programmatic driver for the
+Cypress Electron UI); programmatic session lifecycle proven via the fixture.
+Manual command: `pnpm cy:open --spec e2e_test/features/ai_generated_content/note_content_completion.feature,e2e_test/features/wikidata/note_create_with_wikidata_id.feature`
+then switch specs in the UI, rerun, close, and inspect owned ports (a
+pre-existing foreign dev Mountebank on canonical 2525/5001/5002 may survive
+per ADR 0007).
 
 ### 9. Establish complete active-inventory coverage without changing filters
 Type: Behavior
