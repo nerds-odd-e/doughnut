@@ -21,8 +21,8 @@ with `.worktree.local.json`) uses that checkout's isolated origin
 `http://127.0.0.1:<lbListenPort>` — see `docs/worktree-browser-tests.md`. Isolated
 Cypress accepts one or more selections from the assessed active feature set
 declared in `scripts/isolated-cypress-spec-selection.mjs` (application-only
-active specs plus the CLI, MCP, and OpenAI-mock focused specs) per run. The
-CLI command is scoped to that one web-created-note feature. The MCP command
+active specs plus the active CLI, MCP, and OpenAI-mock focused specs) per run.
+The CLI command is scoped to the assessed active CLI workflows. The MCP command
 is scoped to that one search/graph feature. The completion
 spec starts a runner-owned private OpenAI Mountebank; application-only, CLI,
 and MCP specs do not require Mountebank. Each isolated checkout needs its own
@@ -138,7 +138,7 @@ const notePage = {
 }
 ```
 
-CLI steps use `cli.xxx` page objects, not `start.xxx`. For the install feature, use `cli.backend()`, `cli.installation()`, and `cli.nonInteractiveOutput()` for spawned `version` / `update` stdout. Other `features/cli/*.feature` files are `@ignore` in CI; extend Vitest under `cli/tests/interactive/` for interactive TTY coverage instead of adding a second Cypress PTY harness.
+CLI steps use `cli.xxx` page objects, not `start.xxx`. For the install feature, use `cli.backend()`, `cli.installation()`, and `cli.nonInteractiveOutput()` for spawned `version` / `update` stdout. The `@interactiveCLI`-tagged CLI files (`cli_access_token.feature`, `cli_interactive_mode.feature`, `cli_recall.feature`) and `cli_gmail.feature` are `@ignore` in CI; extend Vitest under `cli/tests/interactive/` for interactive TTY coverage instead of adding a second Cypress PTY harness.
 
 ```typescript
 Then("I should see {string} in the non-interactive output", (expected: string) => {

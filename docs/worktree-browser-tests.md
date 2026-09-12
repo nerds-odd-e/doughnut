@@ -98,7 +98,10 @@ OpenAI mock; application-only, CLI, and MCP specs use the owning SUT and runner
 lease without it. The mock process does not own feature paths. Selections
 containing unknown specs refuse before reset so they do not use shared defaults.
 
-The CLI command is scoped to that one web-created-note feature. The MCP
+The CLI command is scoped to the assessed active CLI workflows (web-created
+note, install-and-run, clone, existing-note edits, folder relocation); each
+uses the selected app origin for spawned CLI processes and temporary
+config/install/clone destinations with checkout-local bundles. The MCP
 command is scoped to that one search/graph feature. Each checkout must
 already have its own healthy E2E allocation; do not share the unconfigured
 primary checkout. To prove the CLI notebook survives a peer worktree's fixture

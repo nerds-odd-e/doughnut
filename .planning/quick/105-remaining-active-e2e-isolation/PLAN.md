@@ -117,7 +117,7 @@ Assessed count matches the plan's 52-file inventory with no discrepancy.
 
 ### 2. Admit active CLI workflows with selected-origin artifacts
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Active clone/edit/relocate/install CLI features run against the chosen
 worktree using local bundles and temporary config/install/clone directories.
 Proof: Extend existing CLI admission and command-boundary origin/artifact tests;
@@ -125,6 +125,17 @@ run `cli/cli_notebook_clone.feature` as representative additional browser proof.
 Preserve already-supported web-created-note behavior. Actual shared artifact
 writes, if found, must be corrected at this seam before admitting their callers.
 Sizing: 5–8 minutes, medium confidence; measured build/browser waits excepted.
+Done 2026-09-12: added `ACTIVE_CLI_SPECS` (4 remaining active CLI features) to
+the single registry; extended CLI admission/command-boundary origin tests;
+updated slice-1 exclusion test to reflect CLI admission; refreshed
+`docs/worktree-browser-tests.md` and `.cursor/rules/e2e-authoring.mdc` CLI
+scope. No shared-artifact writes found at the CLI origin/artifact seam (all
+config/install/clone dirs use `mkdtemp`; bundles checkout-local under
+`repoRoot/cli/dist`). Refactor removed one redundant two-worktree test
+(coverage survives in the existing spec-agnostic origin-routing test).
+Focused unit suites (64 tests) and `pnpm cy:run --spec
+e2e_test/features/cli/cli_notebook_clone.feature` (12/12, clean shutdown)
+green. Assessed CLI inventory matches the plan's 5 files with no discrepancy.
 
 ### 3. Provision private OpenAI mocks for remaining active AI features
 Type: Behavior

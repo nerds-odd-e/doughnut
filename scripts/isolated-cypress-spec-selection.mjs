@@ -5,10 +5,29 @@ import path from 'node:path'
 export const SUPPORTED_ISOLATED_CYPRESS_SPEC =
   'e2e_test/features/note_creation_and_update/worktree_note_editing.feature'
 
-/** Web-created-note CLI workflow — clones, creates, pulls, and publishes
- * against the owning worktree's own isolated backend and notebook data. */
+/** Representative admitted active CLI workflow (web-created note) — clones,
+ * creates, pulls, and publishes against the owning worktree's own isolated
+ * backend and notebook data. The remaining active CLI workflows are admitted
+ * through `ACTIVE_CLI_SPECS` below; this constant stays as the focused
+ * representative used by existing CLI origin/command-boundary tests. */
 export const SUPPORTED_ISOLATED_CLI_SPEC =
   'e2e_test/features/cli/cli_notebook_web_created_note.feature'
+
+/**
+ * Active CLI feature files without network mocks, assessed 2026-09-12 from
+ * `e2e_test/features/cli/`. Each uses `@bundleCliE2eInstall` and (except
+ * install-and-run) `@withCliConfig`; spawned CLI processes route to the
+ * selected app origin and use `mkdtemp` config/install/clone destinations
+ * plus checkout-local bundles. Wholly-ignored CLI files (`@ignore`:
+ * `cli_access_token.feature`, `cli_gmail.feature`, `cli_interactive_mode.feature`,
+ * `cli_recall.feature`) are never admitted.
+ */
+const ACTIVE_CLI_SPECS = [
+  'e2e_test/features/cli/cli_install_and_run.feature',
+  'e2e_test/features/cli/cli_notebook_clone.feature',
+  'e2e_test/features/cli/cli_notebook_existing_note_edits.feature',
+  'e2e_test/features/cli/cli_notebook_folder_relocation.feature',
+]
 
 /** MCP search/graph workflow — tool calls reach the owning worktree's
  * isolated backend and notebook data. */
@@ -84,6 +103,7 @@ const APPLICATION_ONLY_ACTIVE_SPECS = [
 const APPROVED_ISOLATED_CYPRESS_SPECS = [
   { spec: SUPPORTED_ISOLATED_CYPRESS_SPEC },
   { spec: SUPPORTED_ISOLATED_CLI_SPEC },
+  ...ACTIVE_CLI_SPECS.map((spec) => ({ spec })),
   { spec: SUPPORTED_ISOLATED_MCP_SPEC },
   {
     spec: SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,

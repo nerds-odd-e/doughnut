@@ -23,6 +23,35 @@ test('web-created-note CLI spec is allowlisted for isolated runs', () => {
   )
 })
 
+test('active CLI workflows are admitted; wholly-ignored CLI files are not', () => {
+  // Slice 2 admits the assessed active CLI inventory through the one registry.
+  for (const cliSpec of [
+    'e2e_test/features/cli/cli_install_and_run.feature',
+    'e2e_test/features/cli/cli_notebook_clone.feature',
+    'e2e_test/features/cli/cli_notebook_existing_note_edits.feature',
+    'e2e_test/features/cli/cli_notebook_folder_relocation.feature',
+  ]) {
+    assert.equal(
+      SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(cliSpec),
+      true,
+      `${cliSpec} must be admitted`
+    )
+  }
+  // Wholly-ignored CLI files remain outside admission.
+  for (const ignored of [
+    'e2e_test/features/cli/cli_access_token.feature',
+    'e2e_test/features/cli/cli_gmail.feature',
+    'e2e_test/features/cli/cli_interactive_mode.feature',
+    'e2e_test/features/cli/cli_recall.feature',
+  ]) {
+    assert.equal(
+      SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(ignored),
+      false,
+      `${ignored} must not be admitted`
+    )
+  }
+})
+
 test('two isolated worktrees admit the CLI spec with distinct origins; an unlisted CLI spec still refuses', async (t) => {
   const firstPorts = {
     database: 'doughnut_e2e_wt_peer_a',
@@ -73,7 +102,7 @@ test('two isolated worktrees admit the CLI spec with distinct origins; an unlist
   assert.equal(configSecond.baseUrl, isolatedBrowserOrigin(secondPorts))
   assert.notEqual(configFirst.baseUrl, configSecond.baseUrl)
 
-  const unlistedCli = 'e2e_test/features/cli/cli_notebook_clone.feature'
+  const unlistedCli = 'e2e_test/features/cli/cli_access_token.feature'
   await assertRefusesBeforeReset(
     () =>
       guardCypressNodeSetup(

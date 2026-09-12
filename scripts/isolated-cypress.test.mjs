@@ -120,11 +120,29 @@ test('application-only active specs are admitted; resource-dependent and ignored
     ),
     true
   )
-  // Excluded groups: wholly-ignored, CLI (not yet this slice), OpenAI mock,
-  // Wikidata mock, live OpenAI — none admitted by slice 1.
+  // Active CLI workflows are admitted by slice 2 (selected-origin routing,
+  // temporary config/install/clone dirs, checkout-local bundles).
+  for (const cliSpec of [
+    'e2e_test/features/cli/cli_notebook_web_created_note.feature',
+    'e2e_test/features/cli/cli_install_and_run.feature',
+    'e2e_test/features/cli/cli_notebook_clone.feature',
+    'e2e_test/features/cli/cli_notebook_existing_note_edits.feature',
+    'e2e_test/features/cli/cli_notebook_folder_relocation.feature',
+  ]) {
+    assert.equal(
+      SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(cliSpec),
+      true,
+      `${cliSpec} must be admitted by slice 2`
+    )
+  }
+  // Excluded groups: wholly-ignored (including CLI), OpenAI mock, Wikidata mock,
+  // live OpenAI — none admitted by slices 1–2.
   for (const excluded of [
     'e2e_test/features/book_reading/epub_book.feature',
-    'e2e_test/features/cli/cli_notebook_clone.feature',
+    'e2e_test/features/cli/cli_access_token.feature',
+    'e2e_test/features/cli/cli_gmail.feature',
+    'e2e_test/features/cli/cli_interactive_mode.feature',
+    'e2e_test/features/cli/cli_recall.feature',
     'e2e_test/features/ai_generated_recall_questions/question_contest.feature',
     'e2e_test/features/wikidata/note_create_with_wikidata_id.feature',
     'e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature',
@@ -132,7 +150,7 @@ test('application-only active specs are admitted; resource-dependent and ignored
     assert.equal(
       SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(excluded),
       false,
-      `${excluded} must not be admitted by slice 1`
+      `${excluded} must not be admitted by slices 1–2`
     )
   }
 })
