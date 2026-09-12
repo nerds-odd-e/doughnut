@@ -148,7 +148,7 @@ an independent structural beat rather than widening this slice.
 
 ### 3. Run an isolated no-mock batch through its own stack
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: Given an idle isolated checkout, the wrapper starts one stack, waits
 for readiness, runs selected supported no-mock specs once, and awaits shutdown
 before returning Cypress's outcome. Startup or Cypress launch failure also
