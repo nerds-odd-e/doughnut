@@ -1,10 +1,11 @@
 # Remove the test-only image repository
 
 Status: planned
-Source: bounded correction from the execution retrospective for
-[SEED-018 story 5](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-5)
-and its completed
-[plan 110](../110-publish-edits-with-simpler-attachment-cleanup/PLAN.md).
+Source: bounded correction from the execution retrospective for the completed
+SEED-018 story 5 and plan 110, recoverable at before-cleanup commit
+`dee129d2b62619c1ce08a007a68163d437e2b38e`
+in `.planning/seeds/SEED-018-publish-large-authored-notebooks.md` and
+`.planning/quick/110-publish-edits-with-simpler-attachment-cleanup/PLAN.md`.
 Reviewed execution manifest: Taken/provenance commit `9468b251b7` and
 implementation commit `5642bb7509` on
 `quick/110-publish-edits-with-simpler-attachment-cleanup`.
@@ -84,8 +85,7 @@ verification wait, not permission to broaden the correction.
 ## Execution and delivery
 
 If execution is separately authorized, use `dough-execute-plan` in its default
-fresh-worktree mode. Preserve plan 110 and its retrospective inputs until story
-wrap-up closes them. Follow Jidoka, a fresh post-change refactor pass, API
+fresh-worktree mode. Follow Jidoka, a fresh post-change refactor pass, API
 generation only if a real trigger appears, one coordinator-owned
 `./scripts/run.sh pnpm format:changed`, plan update, check-only commit hook,
 push and applicable CI-observer handling. This retrospective supplies no

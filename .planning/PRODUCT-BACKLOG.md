@@ -11,8 +11,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Publish 1,000 existing-note edits at least 50% faster again with simpler code](quick/110-publish-edits-with-simpler-attachment-cleanup/PLAN.md) — SEED-018
-
 ## Backlog list
 
 - [Remove the test-only image repository](quick/111-remove-test-only-image-repository/PLAN.md)

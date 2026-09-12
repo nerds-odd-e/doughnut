@@ -45,14 +45,12 @@ repeated work but cannot establish its runtime importance. Use a focused baselin
 profile to select areas worth improving, without requiring an optimization plan
 as an investigation deliverable.
 
-The selected publication-performance story (former story 3) delivered a 65.35%
-reduction in publication time for a 1,000-note edit commit and is closed; see
+Smaller-workload profiling reduced the 1,000-existing/1,000-edit publication
+median from 29,746.720 ms first to 10,308.043 ms, then from a fresh 12,089.157
+ms baseline to 3,095.452 ms through cohesive index refresh and attachment
+cleanup. See
 [docs/notebook-publication-profiling.md](../../docs/notebook-publication-profiling.md)
-for the retained investigation. Delivered measurements and proof are recoverable
-in `.planning/quick/108-publish-notebook-edits-faster/PLAN.md` at commit
-`1e2aef020c`. The user selected another improvement on the same 1,000-note
-workload before larger-scale validation. Keeping the current 10.3-second wait
-or merely measuring a larger fixture does not deliver that next improvement.
+for the retained design, measurements and remaining scaling questions.
 
 ## Story Decomposition
 
@@ -60,125 +58,6 @@ Effort bands follow SEED-009: S = 30–60 minutes, M = 1–2 hours,
 L = 2–4 hours. Estimates are hypotheses, not commitments.
 
 Stories below are in priority order; stable story numbers retain their identity.
-
-<a id="story-5"></a>
-
-### 5. Publish 1,000 existing-note edits at least 50% faster again with simpler code
-
-Slice plan: [Publish notebook edits faster with simpler attachment cleanup](../quick/110-publish-edits-with-simpler-attachment-cleanup/PLAN.md).
-
-#### Goal
-
-Notebook owners publishing edits from Obsidian or an AI IDE wait at least 50%
-less than on the delivered first-round code for the same 1,000-existing-note /
-1,000-update commit. Achieve the gain by simplifying the production design:
-cleaner code, fewer formatted production lines, and a clearer expression of the
-domain rule. A faster but more complicated solution does not complete the story.
-
-#### Scope
-
-- **The 1,000 edits are updates, not additions.** They replace the contents of
-  all 1,000 measured existing paths without creating identities. Retain the
-  existing two unchanged control notes and two control folders (1,002 notes,
-  22 folders total). The deterministic timing fixture has aliases, properties,
-  authored references and prose, but no image attachments. Counts are examples,
-  not product limits; keep this comparison size because feedback is practical.
-- Compare at least three completed HTTP runs per version under comparable
-  conditions, from request start through complete response including commit.
-  Exclude fixture setup and receiver verification. Every counted run must
-  return the proposed head and verify the authored files. Incomplete requests
-  cannot enter a successful timing median.
-- Measure against the delivered first-round behavior, not the original
-  29.75-second baseline. Fresh refinement medians are **11,907.715 ms baseline
-  and 3,038.709 ms prototype**, a **74.48% reduction**. The corresponding 50%
-  boundary is **5,953.858 ms**. If measurement conditions change, recapture
-  comparable measurements; do not redefine the workload or success criteria.
-- Require a negative formatted production-line delta across the whole change,
-  with no relocated complexity or formatting compression. Reuse existing domain
-  ownership and lifecycle; do not add cases or parallel representations merely
-  to obtain the measured gain.
-- Preserve accepted content/head, note IDs, learning history, current and
-  obsolete derived-index semantics, authorization, validation, and atomic
-  rejection. Shared attachment cleanup must preserve the referenced image,
-  unrelated notes' images, blob cascades, and rollback.
-- Updates and additions both use `AuthoredNoteDocumentPersistence.persist`,
-  including image cleanup and derived indexes. Additions also create notes and
-  check title placement; updates instead locate and retain existing notes.
-  Preserve both paths, but this story's **50% performance promise is for
-  updates**. An exploratory 1,000-addition comparison found a smaller gain
-  (22,202.953 → 13,368.447 ms, one run each); that is supporting evidence,
-  not an additional performance guarantee.
-- Defer 10,000-note validation to story 4. An addition-specific optimization,
-  image-heavy throughput target, mixed-workload timing matrix, new background
-  publication flow, or timeout policy is not promised here.
-
-#### Key examples
-
-1. **Existing-note updates:** Given the deterministic 1,000-note baseline and
-   learned control state, publish updates to those paths. All 1,000 file bytes
-   and the accepted head match the proposal; IDs and learning are unchanged;
-   aliases/property references reflect the new contents with obsolete entries
-   removed. Completed median waiting time is at most half the comparable
-   baseline, with simpler and smaller production code.
-2. **Shared additions and late rejection:** A small 20-note addition proposal
-   is accepted with exact received content. If only its last path has malformed
-   aliases, the preceding 19 allocated identities establish late processing,
-   but accepted head/content, stored notes, learning and derived rows remain
-   unchanged after rejection. These are correctness examples, not timing gates.
-3. **Attachment ownership and lifecycle:** When saved content references one
-   of a note's images, keep that image/blob, delete its orphan images/blobs,
-   and leave another note's images intact. No image scalar removes the note's
-   images; the existing noncanonical-image-scalar exception still skips cleanup.
-   A later binding-save failure restores the removed image/blob with the other
-   publication state.
-
-#### Research and solution assessment
-
-[Attachment-cleanup refinement](../../docs/notebook-publication-profiling.md#attachment-cleanup-refinement)
-records the source paths, comparable captures, alternatives, source patch,
-preservation proof, and update/addition distinction. Fresh baseline profiling
-attributes **377 of 382 flush samples** to image cleanup, out of 527 total
-request-thread execution samples. Repeated automatic pre-flush traversal while
-asking for one note's images is the dominant evidenced target.
-
-The tested recommendation is to select **this note's orphan images** directly
-through the existing persister, without first flushing unrelated managed note
-state, then use the existing entity deletion lifecycle. This consolidates the
-selection rule and removes the service's image-repository dependency and unused
-finder. The prototype changes two existing production files: **11 lines added,
-15 removed, net −4**. It adds no production class, association, cache, batch
-mode or domain condition. A query-local COMMIT setting is justified by existing
-image creation/ownership behavior, not prescribed for every persistence query.
-
-All **2,404 backend tests** pass, with strengthened existing attachment/blob
-examples; all repeated update captures preserve exact stored state. Small
-addition and late-rejection HTTP examples pass. The exploratory addition profile
-also identifies an independent title-placement check as a major remaining cost;
-do not assume that updates and additions will share the same reduction.
-
-The prototype is retained outside the product checkout under
-`~/Library/Application Support/Donut/publication-profiles/second-refinement-2026-09-12/`.
-It is research evidence for planning, not delivered code. Relevant Accepted
-decisions remain [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-(authored content/reference semantics),
-[ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md) (deliberate failures),
-and [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
-(owned disposable experiments). No architectural exception is needed.
-
-- **Effort hypothesis:** M (1–2 hours), medium confidence after the tested
-  candidate; delivery must still reproduce the performance and preservation
-  proof. Reassess if new evidence invalidates the small shared change.
-- **Depends on:** Delivered first-round simplification and maintained profiler,
-  both available. Larger-scale validation is not a prerequisite.
-- **Safe stopping point:** A verified faster publication with preserved
-  semantics and simpler code retains value if later scale work is deferred.
-  A prototype alone does not complete the story.
-- **Open decisions:** None blocking the linked slice plan. Planning is
-  authorized; execution has not started. The performance and simplicity
-  criteria remain binding during delivery.
-- **Source:** User's 2026-09-12 priority-one selection and subsequent explicit
-  authorization for code exploration, experiments, measurement and profiling
-  during refinement, with the update/addition question answered first.
 
 <a id="story-4"></a>
 
