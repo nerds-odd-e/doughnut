@@ -1,6 +1,7 @@
 import { nonInteractiveOutput } from './outputAssertions'
 import testability from '../../testability'
 import { notebookCloneCheckout } from './notebookCloneCheckout'
+import type { PublicationProfileParameters } from '../../../config/notebookPublicationProfile'
 
 const notebook = 'CLI Clone Notebook'
 const title = (kind: string, i: number) =>
@@ -17,6 +18,30 @@ function recordPublicationTiming(started: string) {
     boundary:
       'installed CLI execution, includes bundle preparation and client work',
   })
+}
+
+function changedFiles(
+  pathKind: string,
+  contentKind: string,
+  count: number,
+  existing: number,
+  folders: number
+) {
+  return Array.from({ length: count }, (_, i) => ({
+    relativePath: `${folder(i % folders)}/${title(pathKind, i)}.md`,
+    content: document(contentKind, i, existing, count),
+  }))
+}
+
+function stageProposal(files: { relativePath: string; content: string }[]) {
+  notebookCloneCheckout().commitRelatedNoteChanges(files)
+  return cy
+    .get<string>('@cliCloneDestination')
+    .then((checkoutDir) =>
+      cy
+        .task<string>('normalizeNotebookPublicationProposal', checkoutDir)
+        .as('cliNotebookPublishHead')
+    )
 }
 
 function publishHttp() {
@@ -59,7 +84,7 @@ export const notebookPublicationProfile = {
   },
   seed() {
     return cy
-      .task<{ existing: number; additions: number; folders: number }>(
+      .task<PublicationProfileParameters>(
         'notebookPublicationProfileParameters'
       )
       .then((parameters) => {
@@ -101,28 +126,33 @@ export const notebookPublicationProfile = {
   },
   prepare() {
     return cy
-      .get<{ existing: number; additions: number; folders: number }>(
-        '@publicationProfileParameters'
-      )
-      .then((parameters) => {
-        const files = Array.from({ length: parameters.additions }, (_, i) => ({
-          relativePath: `${folder(i % parameters.folders)}/${title('Added', i)}.md`,
-          content: document(
+      .get<PublicationProfileParameters>('@publicationProfileParameters')
+      .then((parameters) =>
+        stageProposal(
+          changedFiles(
             'Added',
-            i,
+            'Added',
+            parameters.additions,
             parameters.existing,
-            parameters.additions
-          ),
-        }))
-        notebookCloneCheckout().commitRelatedNoteChanges(files)
-        return cy
-          .get<string>('@cliCloneDestination')
-          .then((checkoutDir) =>
-            cy
-              .task<string>('normalizeNotebookPublicationProposal', checkoutDir)
-              .as('cliNotebookPublishHead')
+            parameters.folders
           )
-      })
+        )
+      )
+  },
+  prepareEdit() {
+    return cy
+      .get<PublicationProfileParameters>('@publicationProfileParameters')
+      .then((parameters) =>
+        stageProposal(
+          changedFiles(
+            'Existing',
+            'Updated',
+            parameters.updates,
+            parameters.existing,
+            parameters.folders
+          )
+        )
+      )
   },
   invalidateLast() {
     return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>

@@ -1,11 +1,11 @@
 # Publish notebook edits at least twice as fast with simpler index maintenance
 
-Status: planned.
+Status: in progress — slice 1 done, slice 2 not started.
 Source: [SEED-018 story 3](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-3).
 Authority: 2026-09-12 request for a new replacement plan and slice refinement if
-needed. This request authorizes planning; execution has not started.
-Execution checkout/branch: unassigned; the execution workflow selects and records
-an isolated checkout before changing product code or moving the backlog item.
+needed. A subsequent 2026-09-12 request authorized execution.
+Execution checkout/branch: `.worktrees/quick-108-publish-notebook-edits-faster`
+on `quick/108-publish-notebook-edits-faster`, integration target `main`.
 
 ## Replacement and evidence
 
@@ -96,7 +96,7 @@ choice here; established ownership is sufficient, so no new topic is warranted.
 
 ### 1. Make the existing-note publication comparison reproducible
 Type: Structure
-Status: planned
+Status: done
 Change: Extend the existing opt-in publication profiler with an explicit
 existing-note-edit scenario and edited-file count, preserving the addition and
 rejection scenarios. This enables the immediately following performance Behavior.
@@ -138,6 +138,51 @@ and runner. Expect another 3–5 minutes for owned stack startup and three basel
 captures. These observed external waits are the stated sizing exception; they
 must not conceal additional implementation work. Stop-safe: maintained profiler
 works against unchanged production, and the story remains unfinished.
+
+Delivered: new `@publicationProfileHttpUpdate` scenario and `prepareEdit()`
+page-object method edit existing paths (`title('Existing', i)`) with `Updated`
+content, driven by a new `PUBLICATION_PROFILE_UPDATES` parameter kept distinct
+from `additions`; the four existing profile scenarios/tags are unchanged.
+`e2e_test/config/ci.ts` now derives both CI and local tag exclusions from one
+`publicationProfileTags` list. The maintained launcher
+`scripts/profiling/run-notebook-publication-profile.mjs` delegates stack
+lifecycle to `runE2eBatch`/`wireBatchCancellation`, defaults to
+`@publicationProfileHttpUpdate`, and honors a `PUBLICATION_PROFILE_TAGS`
+override (used by slice 2's small regression command below); it sizes
+`taskTimeout`/`defaultCommandTimeout` to the HTTP deadline plus a fixed
+600,000 ms setup margin, independent of the 60,000 ms publication deadline.
+Documented in `docs/notebook-publication-profiling.md`.
+
+20/20 smoke proof: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec
+e2e_test/features/cli/cli_notebook_web_created_note.feature --expose
+tags=@publicationProfileHttpUpdate` — accepted head, 20/20 edited files
+verified byte-for-byte.
+
+Three 1,000/1,000 baseline captures on unchanged production code, revision
+`f766a38a810575220443e41b6bbd5d8c80ba0ceb` (HEAD before slice 2), command
+`PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_UPDATES=1000
+PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c
+caffeinate -i node scripts/profiling/run-notebook-publication-profile.mjs`:
+
+| Run | Capture | HTTP elapsed |
+| --- | --- | ---: |
+| 1 | `2026-09-12T11-49-15.285Z` | 28,399.523 ms |
+| 2 | `2026-09-12T11-50-45.503Z` | 30,040.700 ms |
+| 3 | `2026-09-12T11-52-15.314Z` | 29,746.720 ms |
+
+Baseline median: **29,746.720 ms**. All three: HTTP 200, accepted head
+`da723a2a6025a6d624ccb9473cbfb71183d0c2c0`, all 1,000 edited files verified
+byte-for-byte. This is slice 2's comparison baseline; its 50% boundary is
+**≤ 14,873.360 ms**.
+
+A fresh `dough-post-change-refactor` pass consolidated the duplicated
+prepare/prepareEdit sequence into shared `changedFiles`/`stageProposal`
+helpers, introduced one `PublicationProfileParameters` type shared by
+`seed()`/`prepare()`/`prepareEdit()`, and deduplicated the `ci.ts` tag-exclusion
+strings; verified with `tsc --noEmit -p e2e_test/tsconfig.json` and two more
+passing runs of both the addition and edit HTTP scenarios together. The
+1,000/1,000 baseline captures above were not rerun after refactoring since it
+touched only E2E helper structure, not launcher timing or production code.
 
 ### 2. Publish the representative edit commit in at most half the baseline time
 Type: Behavior
@@ -234,5 +279,7 @@ this assessment. Known external waits and their sizing exceptions are explicit.
 No separate refinement pass was invoked; reconsider this assessment if execution
 uncovers active work beyond the stated estimates or invalidates the storage proof.
 
-Execution not started. No completed slices, new delivery measurements, or CI
-claims are recorded here yet. Backlog placement remains unchanged until execution.
+Execution started 2026-09-12. Story taken into **Taken** on the product backlog
+(commit `f766a38a81`); execution checkout/branch and CI observer recorded above.
+Slice 1 delivered (see its section for baseline numbers and proof); CI pending
+observation at delivery time. Slice 2 not yet started.

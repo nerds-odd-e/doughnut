@@ -14,6 +14,13 @@ import { resolveSutCheckoutTarget } from '../../scripts/sut-isolated-target.mjs'
 import { getListenerPids } from '../../scripts/sut-listener-pids.mjs'
 import { findPublicationReceiverMismatch } from '../../scripts/profiling/verify-publication-receiver.mjs'
 
+export interface PublicationProfileParameters {
+  existing: number
+  additions: number
+  updates: number
+  folders: number
+}
+
 export function notebookPublicationProfileTasks(
   repoRoot: string,
   on: Cypress.PluginEvents
@@ -65,9 +72,10 @@ export function notebookPublicationProfileTasks(
     if (capture?.recordingActive)
       stopRecording(join(capture.directory, 'incomplete.jfr'))
   })
-  const parameters = {
+  const parameters: PublicationProfileParameters = {
     existing: Number(process.env.PUBLICATION_PROFILE_EXISTING ?? 20),
     additions: Number(process.env.PUBLICATION_PROFILE_ADDITIONS ?? 20),
+    updates: Number(process.env.PUBLICATION_PROFILE_UPDATES ?? 20),
     folders: Number(process.env.PUBLICATION_PROFILE_FOLDERS ?? 20),
   }
   function git(checkoutDir: string, ...args: string[]) {

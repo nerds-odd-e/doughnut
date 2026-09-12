@@ -311,3 +311,16 @@ Feature: CLI notebook web-created note
     And I stop recording the owned publication JVM
     When I pull the second cloned checkout using the installed CLI
     Then the profiling baseline and learning state are preserved
+
+  @publicationProfileHttpUpdate
+  Scenario: Measuring HTTP publication of existing-note edits on an owned disposable backend
+    When I seed the representative publication baseline
+    And I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I prepare the small deterministic existing-note-edit publication profile
+    And I start recording the owned publication JVM
+    And I publish and time the profiling proposal through benchmark HTTP
+    And I stop recording the owned publication JVM
+    When I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout is a clean checkout of the accepted head
+    And the received checkout contains every profiling document unchanged

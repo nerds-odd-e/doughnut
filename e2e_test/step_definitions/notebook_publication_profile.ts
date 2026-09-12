@@ -4,6 +4,10 @@ import { notebookPublicationProfile } from '../start/pageObjects/cli/notebookPub
 When('I prepare the small deterministic publication profile', () =>
   notebookPublicationProfile.prepare()
 )
+When(
+  'I prepare the small deterministic existing-note-edit publication profile',
+  () => notebookPublicationProfile.prepareEdit()
+)
 When('I start recording the owned publication JVM', () =>
   notebookPublicationProfile.start()
 )
