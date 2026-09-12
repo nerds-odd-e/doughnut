@@ -163,7 +163,7 @@ terminal-result lifecycle is the common rule for these cases.
 
 ### 4. Cancel an E2E invocation without leaving descendants
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: SIGINT/SIGTERM during readiness or tests stops the runner and all
 owned application descendants, then returns a visible unsuccessful outcome.
 Proof: Invocation-boundary cancellation examples exercise the shared real owned

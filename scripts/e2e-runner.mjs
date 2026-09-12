@@ -64,8 +64,54 @@ function defaultSpawnCypress({
 }
 
 /**
+ * No-op cancellation handle. The default for `runE2eBatch` so callers that do
+ * not need signal handling install no process listeners. The `isMain` entry
+ * point wires real SIGINT/SIGTERM handling via `wireBatchCancellation`.
+ */
+const NO_CANCEL = {
+  signal: undefined,
+  isTriggered: () => false,
+  onTriggered: () => () => undefined,
+  detach: () => undefined,
+}
+
+/**
+ * Wire SIGINT/SIGTERM to a single AbortController for one batch invocation.
+ * The controller's signal aborts the readiness wait; `onTriggered` callbacks
+ * stop the Cypress child. One cancellation path — no generic signal framework.
+ */
+export function wireBatchCancellation(signals = ['SIGINT', 'SIGTERM']) {
+  const controller = new AbortController()
+  const onSignal = () => controller.abort()
+  for (const sig of signals) process.once(sig, onSignal)
+  return {
+    signal: controller.signal,
+    isTriggered: () => controller.signal.aborted,
+    onTriggered: (cb) => {
+      if (controller.signal.aborted) {
+        cb()
+        return () => undefined
+      }
+      controller.signal.addEventListener('abort', cb, { once: true })
+      return () => controller.signal.removeEventListener('abort', cb)
+    },
+    detach: () => {
+      for (const sig of signals) process.off(sig, onSignal)
+    },
+  }
+}
+
+/**
  * Run one E2E batch: start the owned SUT, wait for readiness, run the selected
  * supported no-mock specs through Cypress once, then settle the owned tree.
+ *
+ * Cancellation: when the supplied `cancel` is triggered (SIGINT/SIGTERM in
+ * production), the readiness wait is aborted and the running Cypress child is
+ * signalled to stop. The runner then awaits the existing `lifetime.shutdown()`
+ * (the shared real owned-tree termination + ownership release) before
+ * returning a visible nonzero outcome. Ownership is not released before the
+ * owned tree is actually stopped; a cleanup failure propagates rather than
+ * being masked as success.
  *
  * @returns {Promise<number>} Cypress's exit outcome (0 = success, nonzero = failure).
  */
@@ -80,6 +126,7 @@ export async function runE2eBatch({
   errLog = (s) => process.stderr.write(`${s}\n`),
   env = process.env,
   stdio = 'inherit',
+  cancel = NO_CANCEL,
   ...lifetimeOpts
 } = {}) {
   let specs
@@ -96,17 +143,23 @@ export async function runE2eBatch({
       checkoutRoot,
       log,
       errLog,
+      signal: cancel.signal,
       ...lifetimeOpts,
     })
   } catch (error) {
     errLog(`Failed to start owned SUT lifetime: ${error.message}`)
+    cancel.detach()
     return 1
   }
 
   try {
     const ready = await lifetime.ready
     if (!ready.ok) {
-      errLog(`SUT readiness failed (exit ${ready.exitCode}).`)
+      if (cancel.isTriggered()) {
+        errLog('E2E batch cancelled before SUT became ready.')
+      } else {
+        errLog(`SUT readiness failed (exit ${ready.exitCode}).`)
+      }
       return 1
     }
 
@@ -118,12 +171,15 @@ export async function runE2eBatch({
       checkoutRoot,
       env,
       stdio,
+      cancel,
     })
+    if (cancel.isTriggered()) return 1
     return cypressExitCode
   } catch (error) {
     errLog(`E2E batch failed: ${error.message}`)
     return 1
   } finally {
+    cancel.detach()
     await lifetime.shutdown()
   }
 }
@@ -136,6 +192,7 @@ function runCypressOnce({
   checkoutRoot,
   env,
   stdio,
+  cancel,
 }) {
   return new Promise((resolve, reject) => {
     let child
@@ -156,6 +213,15 @@ function runCypressOnce({
       reject(new Error('spawnCypress did not return a child process.'))
       return
     }
+    // On cancellation, stop the runner (the Cypress child) first; the owned
+    // descendants are settled by `lifetime.shutdown()` in the caller's finally.
+    cancel.onTriggered(() => {
+      try {
+        child.kill('SIGTERM')
+      } catch {
+        // already gone
+      }
+    })
     child.once('error', (error) => reject(error))
     child.once('exit', (code, signal) => {
       if (signal) resolve(1)
@@ -169,6 +235,7 @@ const isMain = process.argv[1]
   : false
 
 if (isMain) {
-  const code = await runE2eBatch()
+  const cancel = wireBatchCancellation()
+  const code = await runE2eBatch({ cancel })
   process.exit(code)
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
@@ -34,6 +34,56 @@ function makeCypressChild(exitCode, onSpawn) {
     child.emit('exit', exitCode, null)
   })
   return child
+}
+
+/**
+ * A Cypress child that stays alive until `.kill()` is called, then emits exit
+ * with the signal. Used to exercise cancellation during the Cypress run.
+ */
+function makeLiveCypressChild(onSpawn) {
+  const child = new EventEmitter()
+  child.pid = 0
+  child.stdout = new EventEmitter()
+  child.stderr = new EventEmitter()
+  child.killed = false
+  child.kill = (signal) => {
+    if (child.killed) return
+    child.killed = signal || 'SIGTERM'
+    queueMicrotask(() => child.emit('exit', null, child.killed))
+  }
+  child.unref = () => undefined
+  if (onSpawn) {
+    queueMicrotask(async () => {
+      try {
+        await onSpawn()
+      } catch {
+        // observation best-effort
+      }
+    })
+  }
+  return child
+}
+
+/**
+ * A cancellation handle driven manually by `trigger()` instead of process
+ * signals, so boundary tests control timing without relying on OS signals.
+ */
+function manualCancel() {
+  const controller = new AbortController()
+  return {
+    signal: controller.signal,
+    isTriggered: () => controller.signal.aborted,
+    onTriggered: (cb) => {
+      if (controller.signal.aborted) {
+        cb()
+        return () => undefined
+      }
+      controller.signal.addEventListener('abort', cb, { once: true })
+      return () => controller.signal.removeEventListener('abort', cb)
+    },
+    detach: () => undefined,
+    trigger: () => controller.abort(),
+  }
 }
 
 function makeCypressLaunchError(error, onSpawn) {
@@ -298,4 +348,166 @@ test('missing explicit --spec refuses before the stack starts', async (t) => {
 
   assert.equal(code, 1)
   assert.equal(startCalled, false)
+})
+
+test('cancel during readiness-wait: stops owned descendants and returns nonzero', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const cancel = manualCancel()
+  let cypressSpawned = false
+
+  // Trigger cancellation only once the owned tree has published its pids, so
+  // the test observes a live tree before the readiness wait is aborted.
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: async () => {
+        if (existsSync(standIn.pidsFile)) {
+          if (state.owned.leader === 0) {
+            state.owned = JSON.parse(readFileSync(standIn.pidsFile, 'utf8'))
+            cancel.trigger()
+          }
+        }
+        return {
+          ok: false,
+          tcpResults: [],
+          readinessResult: { ok: false },
+          exitCode: 1,
+        }
+      },
+      timeoutMs: 30_000,
+    }),
+    spawnCypress: () => {
+      cypressSpawned = true
+      return makeCypressChild(0)
+    },
+    cancel,
+  })
+
+  assert.equal(code, 1, 'cancellation must return a visible nonzero outcome')
+  assert.equal(
+    cypressSpawned,
+    false,
+    'Cypress must not run after readiness cancel'
+  )
+  assert.ok(state.owned.leader > 0, 'owned tree was alive when cancelled')
+  // Completion waits for bounded escalation: the owned tree is actually gone,
+  // not merely signalled.
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  // Ownership is released only after the owned tree is stopped.
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('cancel during Cypress run: stops Cypress child and owned descendants, returns nonzero', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const cancel = manualCancel()
+  let cypressChild = null
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...isolatedLifetimeOpts(checkout.root, standIn),
+    spawnCypress: () => {
+      cypressChild = makeLiveCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        assert.equal(isPidAlive(state.owned.grandchild), true)
+        // Trigger cancellation while the Cypress child is running.
+        cancel.trigger()
+      })
+      return cypressChild
+    },
+    cancel,
+  })
+
+  assert.equal(code, 1, 'cancellation must return a visible nonzero outcome')
+  // The Cypress child (the runner) was stopped first by the cancellation.
+  assert.ok(
+    cypressChild && cypressChild.killed,
+    'Cypress child must be signalled to stop'
+  )
+  // Completion waits for bounded escalation: owned tree actually gone.
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  // Ownership released only after the owned tree is stopped.
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('cancel during Cypress run: a foreign peer survives while the owned leader+grandchild are reaped', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const cancel = manualCancel()
+  const foreign = spawnForeignProcess()
+  t.after(() => {
+    try {
+      foreign.kill('SIGKILL')
+    } catch {
+      // already gone
+    }
+  })
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...isolatedLifetimeOpts(checkout.root, standIn),
+    spawnCypress: () =>
+      makeLiveCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        cancel.trigger()
+      }),
+    cancel,
+  })
+
+  assert.equal(code, 1)
+  // Representative child/grandchild exit: owned leader and grandchild reaped.
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  // Peer survival: the foreign process is NOT signalled by the batch.
+  assert.equal(
+    isPidAlive(foreign.pid),
+    true,
+    'foreign peer must survive cancellation'
+  )
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+})
+
+test('cleanup failure remains visible: a failing shutdown is not masked as success', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const cancel = manualCancel()
+  const throwingLifetime = {
+    child: { kill: () => undefined, pid: 0 },
+    target: {},
+    ready: Promise.resolve({ ok: true, exitCode: 0 }),
+    shutdown: async () => {
+      throw new Error('shutdown failed: owned tree did not exit')
+    },
+  }
+
+  await assert.rejects(
+    runE2eBatch({
+      argv: cypressArgv(),
+      checkoutRoot: checkout.root,
+      startLifetime: async () => throwingLifetime,
+      spawnCypress: () =>
+        makeLiveCypressChild(() => {
+          cancel.trigger()
+        }),
+      cancel,
+    }),
+    /shutdown failed/,
+    'a cleanup failure must propagate rather than be swallowed into success'
+  )
 })
