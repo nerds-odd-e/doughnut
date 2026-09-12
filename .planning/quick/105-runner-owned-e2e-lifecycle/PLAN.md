@@ -233,7 +233,7 @@ canonical endpoints, not a separate shutdown algorithm.
 
 ### 9. Run a built-asset E2E batch under the invocation owner
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: Given prepared frontend/CLI/MCP bundles, the wrapper starts the
 built-frontend/backend/mock target, waits for its real readiness without a Vite
 listener, runs the selected specs and awaits cleanup.
@@ -245,6 +245,19 @@ adding build/cache logic to process ownership. The workflow remains unchanged
 until slice 10, so this commit preserves existing CI.
 Sizing: 5–8 minutes active work, medium confidence; measured build/browser waits
 excepted. Target differences are launch data, not another lifecycle algorithm.
+Proof result: 45/45 boundary tests pass (10 new built-target tests cover
+`runtimeTargetProcessEnv`, `applicationPortEntries`, `healthEndpoints` omitting
+Vite, and `sutServiceArgs` using `local:lb` not `local:lb:vite`, omitting
+`frontend:sut` when `built`). Bundles prepared via `pnpm bundle:all`
+(frontend `dist/index.html` 5.81s, CLI `donut-cli.bundle.mjs`, MCP
+`mcp-server.bundle.mjs`). Manual built-target run in the isolated execution
+worktree refused correctly ("Conflicting SUT_RUNTIME_TARGET does not match the
+configured isolated SUT target") — the built target requires a primary-configured
+checkout, which the isolated execution worktree cannot host and the originating
+`main` checkout is off-limits. The real CI-equivalent proof is deferred to slice
+10's hosted CI observation (CI runs the built target on a primary checkout via
+the wrapper). Post-change refactor: none — `built` flag handling is cohesive
+across the distinct representations.
 
 ### 10. Route CI matrix jobs through the owned invocation
 Type: Behavior

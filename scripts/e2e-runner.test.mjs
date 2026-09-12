@@ -33,6 +33,13 @@ import {
   runE2eBatch,
   runE2eInteractive,
 } from './e2e-runner.mjs'
+import { sutServiceArgs } from './sut-services.mjs'
+import {
+  healthEndpoints,
+  listOccupiedApplicationPorts,
+  runtimeTargetProcessEnv,
+} from './local-runtime-target.mjs'
+import { LEGACY_SUT_RUNTIME_TARGET } from './sut-runtime-target.mjs'
 
 function makeCypressChild(exitCode, onSpawn) {
   const child = new EventEmitter()
@@ -1607,5 +1614,379 @@ test('primary mock: occupied canonical Mountebank port refuses without adoption 
     await isPortStillListening(mbPort),
     true,
     'foreign Mountebank must not be signalled'
+  )
+})
+
+// ---------------------------------------------------------------------------
+// Slice 9: built-asset-target batches (prepared frontend/CLI/MCP bundles,
+// no Vite dev server — the built frontend is served statically by the local LB)
+// ---------------------------------------------------------------------------
+//
+// The built target is distinguished from dev/isolated/primary targets purely
+// by launch data: `target.built === true` omits the Vite upstream env, the
+// `frontend:sut` service, the Vite TCP readiness check, and the Vite port in
+// foreign-listener refusal. It reuses the SAME `startOwnedSutLifetime` and
+// `lifetime.shutdown()` / owned-tree termination — no separate lifecycle.
+
+const BUILT_RUNTIME_TARGET = { ...LEGACY_SUT_RUNTIME_TARGET, built: true }
+
+test('built target launch data: sutServiceArgs omits frontend:sut and uses local:lb (no Vite)', () => {
+  const args = sutServiceArgs(BUILT_RUNTIME_TARGET)
+  assert.equal(
+    args.includes('frontend:sut'),
+    false,
+    'must not start Vite dev server'
+  )
+  assert.equal(args.includes('local:lb'), true, 'must start the local LB')
+  assert.equal(
+    args.includes('local:lb:vite'),
+    false,
+    'must use local:lb not local:lb:vite'
+  )
+  assert.equal(args.includes('backend:sut'), true, 'must start the backend')
+  assert.equal(
+    args.includes('start:mb'),
+    true,
+    'must start Mountebank (canonical port)'
+  )
+})
+
+test('built target launch data: runtimeTargetProcessEnv omits Vite upstream + dev port', () => {
+  const env = runtimeTargetProcessEnv(BUILT_RUNTIME_TARGET)
+  assert.equal(
+    env.LOCAL_LB_VITE_UPSTREAM,
+    undefined,
+    'no Vite upstream for built target'
+  )
+  assert.equal(
+    env.FRONTEND_DEV_PORT,
+    undefined,
+    'no Vite dev port for built target'
+  )
+  assert.equal(env.SERVER_PORT, '9081', 'backend port preserved')
+  assert.equal(
+    env.LOCAL_LB_BACKEND,
+    'http://127.0.0.1:9081',
+    'LB backend preserved'
+  )
+  assert.equal(env.LOCAL_LB_LISTEN_PORT, '5173', 'LB listen port preserved')
+  assert.equal(
+    env.FRONTEND_BACKEND_ORIGIN,
+    'http://127.0.0.1:9081',
+    'backend origin preserved'
+  )
+})
+
+test('built target launch data: healthEndpoints omits the frontend vite TCP check', () => {
+  const endpoints = healthEndpoints(BUILT_RUNTIME_TARGET)
+  const services = endpoints.tcpChecks.map((c) => c.service)
+  assert.equal(
+    services.includes('frontend vite'),
+    false,
+    'no Vite readiness check for built target'
+  )
+  assert.equal(services.includes('backend'), true, 'backend check preserved')
+  assert.equal(services.includes('local LB'), true, 'LB check preserved')
+  assert.equal(
+    services.includes('mountebank'),
+    true,
+    'Mountebank check preserved'
+  )
+  assert.equal(
+    endpoints.readinessUrl,
+    'http://127.0.0.1:5173/__lb__/ready',
+    'readiness URL preserved (LB + backend, no Vite)'
+  )
+})
+
+test('built target launch data: foreign-listener refusal skips the Vite port', async () => {
+  // A foreign listener on the Vite port must NOT trigger refusal for a built
+  // target (the Vite port is not used). A foreign listener on the LB port
+  // still must.
+  const freeVite = await allocateFreePort()
+  const freeLb = await allocateFreePort()
+  const builtTarget = {
+    backendPort: 9081,
+    vitePort: freeVite,
+    lbListenPort: freeLb,
+    mountebankPort: 2525,
+    built: true,
+  }
+  // Vite port occupied → not reported (built target skips it).
+  const occupiedNoVite = await listOccupiedApplicationPorts(
+    builtTarget,
+    async (port) => port === freeVite
+  )
+  assert.deepEqual(
+    occupiedNoVite,
+    [],
+    'built target must not report a foreign Vite listener'
+  )
+  // LB port occupied → reported (built target still checks backend + LB).
+  const occupiedLb = await listOccupiedApplicationPorts(
+    builtTarget,
+    async (port) => port === freeLb
+  )
+  assert.deepEqual(
+    occupiedLb,
+    [`local LB ${freeLb}`],
+    'built target must report a foreign LB listener'
+  )
+})
+
+test('built-asset batch: target arguments select the built target → SUT starts without Vite → readiness → Cypress runs → cleanup → zero survivors', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  // No writeIsolatedConfig: this is an unconfigured primary checkout with
+  // prepared bundles (built-asset target).
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let capturedHealthcheckTarget = null
+  let capturedSpecs = null
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...primaryLifetimeOpts(checkout.root, standIn, {
+      // Capture the runtimeTarget that reaches the healthcheck — it must
+      // carry built: true, proving the built target flows through the
+      // existing resolveSutCheckoutTarget → startOwnedSutLifetime →
+      // waitForSutHealthy path. Readiness does NOT wait for a Vite listener
+      // (the built target has no Vite dev server).
+      healthcheckFn: async (hcOpts) => {
+        capturedHealthcheckTarget = hcOpts.runtimeTarget
+        return {
+          ok: true,
+          tcpResults: [],
+          readinessResult: { ok: true },
+          exitCode: 0,
+        }
+      },
+    }),
+    runtimeTarget: BUILT_RUNTIME_TARGET,
+    spawnCypress: (opts) => {
+      capturedSpecs = opts.specs
+      return makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        assert.equal(isPidAlive(state.owned.grandchild), true)
+      })
+    },
+  })
+
+  assert.equal(code, 0)
+  // Target arguments forwarded correctly: the built target reaches the
+  // healthcheck with built: true (distinguished from dev/isolated/primary).
+  assert.equal(
+    capturedHealthcheckTarget?.built,
+    true,
+    'built target forwarded to healthcheck'
+  )
+  // Selection forwarding: selected specs reach Cypress.
+  assert.ok(
+    capturedSpecs && capturedSpecs.length === 1,
+    'one selected spec forwarded to Cypress'
+  )
+  assert.equal(
+    capturedSpecs[0],
+    SUPPORTED_ISOLATED_CYPRESS_SPEC,
+    'the selected supported spec is forwarded to Cypress'
+  )
+  // Cleanup: zero surviving owned processes.
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('built-asset batch: nonzero Cypress result still settles the owned tree (same lifecycle)', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...primaryLifetimeOpts(checkout.root, standIn),
+    runtimeTarget: BUILT_RUNTIME_TARGET,
+    spawnCypress: () =>
+      makeCypressChild(7, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+      }),
+  })
+
+  assert.equal(code, 7, 'must preserve the nonzero Cypress exit code')
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('built-asset batch: cancellation stops Cypress + owned tree, returns nonzero, zero survivors', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const cancel = manualCancel()
+  let cypressChild = null
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...primaryLifetimeOpts(checkout.root, standIn),
+    runtimeTarget: BUILT_RUNTIME_TARGET,
+    spawnCypress: () => {
+      cypressChild = makeLiveCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        cancel.trigger()
+      })
+      return cypressChild
+    },
+    cancel,
+  })
+
+  assert.equal(code, 1, 'cancellation must return a visible nonzero outcome')
+  assert.ok(
+    cypressChild && cypressChild.killed,
+    'Cypress child must be signalled to stop'
+  )
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('built-asset batch: required service exit terminates Cypress + settles owned tree, returns nonzero', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let cypressChild = null
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...primaryLifetimeOpts(checkout.root, standIn),
+    runtimeTarget: BUILT_RUNTIME_TARGET,
+    spawnCypress: () => {
+      cypressChild = makeLiveCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        // Simulate a required application service exiting during the run.
+        process.kill(state.owned.leader, 'SIGKILL')
+      })
+      return cypressChild
+    },
+  })
+
+  assert.equal(code, 1, 'service exit must end the run with visible failure')
+  assert.ok(
+    cypressChild && cypressChild.killed,
+    'Cypress child must be signalled to stop'
+  )
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('built-asset batch with mock: owned mock on canonical ports, stopped on shutdown, zero survivors', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let mockStarts = 0
+  let mockStopCalls = 0
+  let mockPid = 0
+  let passedAllocatePortsFn = null
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...primaryLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    runtimeTarget: BUILT_RUNTIME_TARGET,
+    startPrivateOpenAiMockFn: async ({ allocatePortsFn }) => {
+      mockStarts += 1
+      passedAllocatePortsFn = allocatePortsFn
+      const handle = spawnIdlePrivateMockHandle()
+      mockPid = handle.child.pid
+      const realStop = handle.stop
+      handle.stop = async () => {
+        mockStopCalls += 1
+        await realStop()
+      }
+      return handle
+    },
+    spawnCypress: () =>
+      makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(mockPid), true)
+        assert.equal(mockStopCalls, 0, 'mock must not be stopped mid-batch')
+      }),
+  })
+
+  assert.equal(code, 0)
+  assert.equal(
+    mockStarts,
+    1,
+    'mock must start exactly once for the built batch'
+  )
+  assert.equal(mockStopCalls, 1, 'mock must be stopped once at invocation end')
+  assert.equal(
+    passedAllocatePortsFn,
+    allocatePrimaryOpenAiMockPorts,
+    'built target (primary) mock must use the canonical-port allocator'
+  )
+  assert.equal(isPidAlive(mockPid), false)
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+})
+
+test('built-asset batch: foreign listener on the Vite port does NOT refuse (built target skips Vite)', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  // A foreign listener on the Vite port: the built target does not use Vite,
+  // so this must NOT trigger refusal. Use ephemeral ports to avoid touching
+  // real canonical ports.
+  const foreignVite = await listenTcp()
+  t.after(() => closeServer(foreignVite.server))
+  const freeBackend = await allocateFreePort()
+  const freeLb = await allocateFreePort()
+  const runtimeTarget = {
+    backendPort: freeBackend,
+    vitePort: foreignVite.port,
+    lbListenPort: freeLb,
+    mountebankPort: 2525,
+    built: true,
+  }
+  let startCalled = false
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    // Real port check: the foreign Vite listener is detected on its port.
+    isPortOccupiedFn: async (port) => port === foreignVite.port,
+    startLifetime: async () => {
+      startCalled = true
+      throw new Error('should not start — but only if a USED port is foreign')
+    },
+    spawnCypress: () => makeCypressChild(0),
+  })
+
+  // The built target skips the Vite port in foreign-listener refusal, so the
+  // foreign Vite listener does NOT block the start. startLifetime IS called
+  // (it throws here, returning 1, but proving refusal did not happen).
+  assert.equal(code, 1)
+  assert.equal(
+    startCalled,
+    true,
+    'must NOT refuse on a foreign Vite listener (built target)'
+  )
+  // The foreign Vite listener survives — not signalled.
+  assert.equal(
+    await isPortStillListening(foreignVite.port),
+    true,
+    'foreign Vite listener must survive'
   )
 })
