@@ -45,6 +45,7 @@ import {
   runE2eBatch,
   runE2eInteractive,
 } from './e2e-runner.mjs'
+import { startOwnedSutLifetime } from './sut-start.mjs'
 import { sutServiceArgs } from './sut-services.mjs'
 import {
   healthEndpoints,
@@ -1005,33 +1006,86 @@ test('cancel during Cypress run: a foreign peer survives while the owned leader+
   assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
 })
 
-test('cleanup failure remains visible: a failing shutdown is not masked as success', async (t) => {
+for (const [failure, cypressCode] of [
+  ['mock', 0],
+  ['lease', 0],
+  ['all', 7],
+]) {
+  test(`${failure} cleanup failures remain visible and preserve Cypress exit ${cypressCode}`, async (t) => {
+    const checkout = makePrimaryCheckout(t)
+    writeIsolatedConfig(checkout.root)
+    const { server } = await startLiveOwner(checkout.root, t)
+    const errors = []
+    const stopped = []
+    const code = await runE2eBatch({
+      argv: cypressArgv(
+        `${SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC},${SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC}`
+      ),
+      checkoutRoot: checkout.root,
+      errLog: (message) => errors.push(message),
+      startLifetime: async () => ({
+        ...readyLifetimeStandIn(),
+        shutdown: async () => {
+          stopped.push('SUT')
+          if (cypressCode) throw new Error('owned tree did not exit')
+        },
+      }),
+      startPrivateOpenAiMockFn: async () => ({
+        endpoint: {},
+        stop: async () => {
+          stopped.push('OpenAI')
+          if (failure !== 'lease') throw new Error('OpenAI did not exit')
+        },
+      }),
+      startPrivateWikidataMockFn: async () => ({
+        endpoint: {},
+        stop: async () => {
+          stopped.push('Wikidata')
+          if (failure !== 'mock') {
+            server.removeAllListeners('request')
+            server.on('request', (_req, res) => {
+              res.writeHead(500, { 'Content-Type': 'application/json' })
+              res.end(
+                JSON.stringify({ ok: false, error: 'lease release refused' })
+              )
+            })
+          }
+          if (failure !== 'lease') throw new Error('Wikidata did not exit')
+        },
+      }),
+      spawnCypress: () => makeCypressChild(cypressCode),
+    })
+    assert.equal(code, cypressCode || 1)
+    assert.deepEqual(stopped, ['OpenAI', 'Wikidata', 'SUT'])
+    if (failure !== 'lease') {
+      assert.match(errors.join('\n'), /OpenAI did not exit/)
+      assert.match(errors.join('\n'), /Wikidata did not exit/)
+    }
+    if (failure !== 'mock')
+      assert.match(errors.join('\n'), /lease release refused/)
+    if (cypressCode) assert.match(errors.join('\n'), /owned tree did not exit/)
+  })
+}
+
+test('Cypress launch diagnostics survive a cleanup failure', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
-  const cancel = manualCancel()
-  const throwingLifetime = {
-    child: { kill: () => undefined, pid: 0 },
-    target: {},
-    ready: Promise.resolve({ ok: true, exitCode: 0 }),
-    shutdown: async () => {
-      throw new Error('shutdown failed: owned tree did not exit')
-    },
-  }
-
-  await assert.rejects(
-    runE2eBatch({
-      argv: cypressArgv(),
-      checkoutRoot: checkout.root,
-      startLifetime: async () => throwingLifetime,
-      spawnCypress: () =>
-        makeLiveCypressChild(() => {
-          cancel.trigger()
-        }),
-      cancel,
+  const errors = []
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    checkoutRoot: checkout.root,
+    errLog: (message) => errors.push(message),
+    startLifetime: async () => ({
+      ...readyLifetimeStandIn(),
+      shutdown: async () => {
+        throw new Error('owned tree did not exit')
+      },
     }),
-    /shutdown failed/,
-    'a cleanup failure must propagate rather than be swallowed into success'
-  )
+    spawnCypress: makeCypressLaunchError(new Error('Cypress launch failed')),
+  })
+  assert.equal(code, 1)
+  assert.match(errors.join('\n'), /Cypress launch failed/)
+  assert.match(errors.join('\n'), /owned tree did not exit/)
 })
 
 test('required service exits during Cypress run: terminates Cypress, settles owned tree, returns nonzero', async (t) => {
@@ -1944,18 +1998,24 @@ test('primary batch: mixed owned/foreign conflict refuses without signalling any
   }
 })
 
-test('primary batch: same lifecycle as isolated — primary shutdown stops the spawned supervisor child (no separate algorithm)', async (t) => {
+test('primary batch: lifetime shutdown failure still stops the owned process tree and preserves Cypress status', async (t) => {
   const checkout = makePrimaryCheckout(t)
   const standIn = spawnOwnedTreeStandIn(checkout.root)
   const state = { owned: { leader: 0, grandchild: 0 } }
   trackOwnedTree(t, () => state.owned)
 
-  // A nonzero Cypress result still settles the owned tree via the same
-  // shutdown path (stopOwnedSutProcessTree), proving the primary target
-  // reuses the isolated target's owned-tree termination.
+  const errors = []
   const code = await runE2eBatch({
     argv: cypressArgv(),
     ...primaryLifetimeOpts(checkout.root, standIn),
+    errLog: (message) => errors.push(message),
+    startLifetime: async (options) => {
+      const lifetime = await startOwnedSutLifetime(options)
+      lifetime.shutdown = async () => {
+        throw new Error('primary lifetime shutdown failed')
+      }
+      return lifetime
+    },
     spawnCypress: () =>
       makeCypressChild(3, async () => {
         state.owned = await waitForOwnedPids(standIn.pidsFile)
@@ -1963,6 +2023,7 @@ test('primary batch: same lifecycle as isolated — primary shutdown stops the s
       }),
   })
 
+  assert.match(errors.join('\n'), /primary lifetime shutdown failed/)
   assert.equal(code, 3, 'must preserve the nonzero Cypress exit code')
   assert.equal(isPidAlive(state.owned.leader), false)
   assert.equal(isPidAlive(state.owned.grandchild), false)
