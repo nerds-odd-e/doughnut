@@ -11,8 +11,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Document non-obvious rationale in the publication index-refresh simplification](quick/109-document-publication-index-refresh-rationale/PLAN.md)
-
 ## Backlog list
 
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018

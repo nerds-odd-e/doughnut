@@ -26,6 +26,8 @@ public class NoteAliasIndexService {
   @Transactional
   public void refreshForNote(Note note) {
     Integer noteId = note.getId();
+    // Inline deletion permits FlushModeType.COMMIT, avoiding the extra flush from the usual
+    // repository @Modifying @Query.
     entityManager
         .createQuery("DELETE FROM NoteAliasIndex i WHERE i.note.id = :noteId")
         .setParameter("noteId", noteId)
