@@ -152,6 +152,12 @@ export async function runE2eBatch({
     return 1
   }
 
+  // Observe the supervisor child exit promptly. The observer is attached
+  // before awaiting readiness so an exit between readiness and the Cypress
+  // run is not missed. This reuses the supervisor's own completion (the
+  // child handle's exit/close events); it is not a health-polling loop.
+  const childExit = observeChildExit(lifetime.child)
+
   try {
     const ready = await lifetime.ready
     if (!ready.ok) {
@@ -172,6 +178,8 @@ export async function runE2eBatch({
       env,
       stdio,
       cancel,
+      childExit,
+      errLog,
     })
     if (cancel.isTriggered()) return 1
     return cypressExitCode
@@ -184,6 +192,39 @@ export async function runE2eBatch({
   }
 }
 
+/**
+ * Observe the supervisor child's exit without polling. Returns a handle
+ * whose `exited` promise resolves `true` when the child has exited, and
+ * `hasExited()` reports whether the exit was already observed. The promise
+ * is created synchronously so an exit in the readiness-to-run window is
+ * captured before the Cypress run attaches its own listener.
+ */
+function observeChildExit(child) {
+  if (!child || typeof child.on !== 'function') {
+    // No observable child (test mock): nothing to observe, so `exited` never
+    // resolves and `hasExited()` stays false — no spurious service-exit path.
+    return {
+      exited: new Promise(() => {
+        /* never resolves */
+      }),
+      hasExited: () => false,
+    }
+  }
+  let exited = false
+  const promise = new Promise((resolve) => {
+    if (child.exitCode != null || child.signalCode) {
+      exited = true
+      resolve(true)
+      return
+    }
+    child.once('exit', () => {
+      exited = true
+      resolve(true)
+    })
+  })
+  return { exited: promise, hasExited: () => exited }
+}
+
 function runCypressOnce({
   specs,
   spawnCypress,
@@ -193,6 +234,8 @@ function runCypressOnce({
   env,
   stdio,
   cancel,
+  childExit,
+  errLog = (s) => process.stderr.write(`${s}\n`),
 }) {
   return new Promise((resolve, reject) => {
     let child
@@ -213,6 +256,14 @@ function runCypressOnce({
       reject(new Error('spawnCypress did not return a child process.'))
       return
     }
+
+    let settled = false
+    const settle = (value) => {
+      if (settled) return
+      settled = true
+      resolve(value)
+    }
+
     // On cancellation, stop the runner (the Cypress child) first; the owned
     // descendants are settled by `lifetime.shutdown()` in the caller's finally.
     cancel.onTriggered(() => {
@@ -222,10 +273,38 @@ function runCypressOnce({
         // already gone
       }
     })
-    child.once('error', (error) => reject(error))
+
+    // A required application service (the supervisor child) exiting during
+    // the test run ends the batch with visible failure. Terminate Cypress
+    // promptly — do not wait for it to finish on its own — then let the
+    // caller's `lifetime.shutdown()` settle the remaining owned tree.
+    // Covers the timing window: if the child already exited between readiness
+    // and this attachment, end the run now.
+    const onChildExit = () => {
+      if (settled) return
+      errLog(
+        'Required SUT service exited during the test run; ending the batch with failure.'
+      )
+      try {
+        child.kill('SIGTERM')
+      } catch {
+        // already gone
+      }
+      settle(1)
+    }
+    if (childExit.hasExited()) {
+      onChildExit()
+    } else {
+      childExit.exited.then(onChildExit)
+    }
+
+    child.once('error', (error) => {
+      if (settled) return
+      reject(error)
+    })
     child.once('exit', (code, signal) => {
-      if (signal) resolve(1)
-      else resolve(code ?? 1)
+      if (signal) settle(1)
+      else settle(code ?? 1)
     })
   })
 }

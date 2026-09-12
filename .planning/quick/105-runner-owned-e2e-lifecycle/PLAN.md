@@ -174,7 +174,7 @@ Sizing: 5–8 minutes; medium confidence.
 
 ### 5. End testing when a required application service exits
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: A required service exits after readiness while tests remain active:
 the wrapper terminates the test run and remaining owned services with failure.
 Proof: A child-exit fixture at the invocation boundary establishes prompt failure
