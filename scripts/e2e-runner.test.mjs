@@ -11,7 +11,11 @@ import {
   waitForOwnedPids,
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
-import { SUPPORTED_ISOLATED_CYPRESS_SPEC } from './isolated-cypress-spec-selection.mjs'
+import {
+  SUPPORTED_ISOLATED_CYPRESS_SPEC,
+  SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+} from './isolated-cypress-spec-selection.mjs'
+import { spawnIdlePrivateMockHandle } from './isolated-openai-mock-test-fixtures.mjs'
 import { sutOwnerLockDir, verifyLiveSutOwner } from './sut-owner.mjs'
 import { healthyOnce, neverHealthy } from './sut-start-fixtures.mjs'
 import { runE2eBatch } from './e2e-runner.mjs'
@@ -118,6 +122,36 @@ function isolatedLifetimeOpts(checkoutRoot, standIn, extra = {}) {
     databaseExistsFn: () => true,
     portClaimRoot: path.join(checkoutRoot, '.doughnut-e2e-port-claims'),
     isPortOccupiedFn: async () => false,
+  }
+}
+
+/**
+ * Healthcheck that resolves only after the standIn has written its owned-pids
+ * file. The standIn awaits `startSutOwnerControlFromEnv()` before spawning the
+ * grandchild, so pids-present implies the owner control server is listening —
+ * which the wrapper needs to acquire the runner lease for a mock batch.
+ */
+function healthcheckWaitingForPids(pidsFile) {
+  return async () => {
+    try {
+      const pids = JSON.parse(readFileSync(pidsFile, 'utf8'))
+      if (Number.isInteger(pids.leader) && pids.leader > 0) {
+        return {
+          ok: true,
+          tcpResults: [],
+          readinessResult: { ok: true },
+          exitCode: 0,
+        }
+      }
+    } catch {
+      // pids file not written yet
+    }
+    return {
+      ok: false,
+      tcpResults: [],
+      readinessResult: { ok: false },
+      exitCode: 1,
+    }
   }
 }
 
@@ -310,26 +344,165 @@ test('unsupported spec selection refuses before the stack starts', async (t) => 
   assert.equal(startCalled, false, 'must refuse before starting the stack')
 })
 
-test('private-mock spec refuses in slice 3 before the stack starts', async (t) => {
+test('private-mock batch: owned mock stays alive across the batch and stops with the invocation', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
-  let startCalled = false
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let mockStarts = 0
+  let mockStopCalls = 0
+  let mockPid = 0
 
   const code = await runE2eBatch({
-    argv: [
-      '--spec',
-      'e2e_test/features/ai_generated_content/note_content_completion.feature',
-    ],
-    checkoutRoot: checkout.root,
-    startLifetime: async () => {
-      startCalled = true
-      throw new Error('should not start')
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    startPrivateOpenAiMockFn: async () => {
+      mockStarts += 1
+      const handle = spawnIdlePrivateMockHandle()
+      mockPid = handle.child.pid
+      // Wrap stop to count calls — the mock must be stopped exactly once
+      // (at invocation shutdown), never between specs.
+      const realStop = handle.stop
+      handle.stop = async () => {
+        mockStopCalls += 1
+        await realStop()
+      }
+      return handle
     },
-    spawnCypress: () => makeCypressChild(0),
+    spawnCypress: () =>
+      makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        // The mock is alive during the Cypress run (no premature release).
+        assert.equal(isPidAlive(mockPid), true)
+        assert.equal(mockStopCalls, 0, 'mock must not be stopped mid-batch')
+      }),
+  })
+
+  assert.equal(code, 0)
+  assert.equal(mockStarts, 1, 'mock must start exactly once for the batch')
+  assert.equal(mockStopCalls, 1, 'mock must be stopped once at invocation end')
+  assert.equal(isPidAlive(mockPid), false)
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('private-mock startup failure: cleans partial owned work (mock + SUT) and returns nonzero', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let cypressSpawned = false
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    startPrivateOpenAiMockFn: async () => {
+      throw new Error('private mock startup failed')
+    },
+    spawnCypress: () => {
+      cypressSpawned = true
+      return makeCypressChild(0)
+    },
   })
 
   assert.equal(code, 1)
-  assert.equal(startCalled, false)
+  assert.equal(
+    cypressSpawned,
+    false,
+    'Cypress must not run after mock startup failure'
+  )
+  state.owned = await waitForOwnedPids(standIn.pidsFile)
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('unexpected mock exit during Cypress run: terminates Cypress + settles owned services with failure', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  let cypressChild = null
+  let mockPid = 0
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    startPrivateOpenAiMockFn: async () => {
+      const handle = spawnIdlePrivateMockHandle()
+      mockPid = handle.child.pid
+      return handle
+    },
+    spawnCypress: () => {
+      cypressChild = makeLiveCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(mockPid), true)
+        assert.equal(isPidAlive(state.owned.leader), true)
+        // Simulate the private mock exiting unexpectedly during the run.
+        process.kill(mockPid, 'SIGKILL')
+      })
+      return cypressChild
+    },
+  })
+
+  assert.equal(code, 1, 'mock exit must end the run with visible failure')
+  assert.ok(
+    cypressChild && cypressChild.killed,
+    'Cypress child must be signalled to stop after the mock exit'
+  )
+  assert.equal(isPidAlive(mockPid), false)
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+})
+
+test('cancel during a mock-requiring batch: mock + SUT are stopped as part of invocation cleanup', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+  const cancel = manualCancel()
+  let mockPid = 0
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForPids(standIn.pidsFile),
+    }),
+    startPrivateOpenAiMockFn: async () => {
+      const handle = spawnIdlePrivateMockHandle()
+      mockPid = handle.child.pid
+      return handle
+    },
+    spawnCypress: () =>
+      makeLiveCypressChild(async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal(isPidAlive(mockPid), true)
+        cancel.trigger()
+      }),
+    cancel,
+  })
+
+  assert.equal(code, 1, 'cancellation must return a visible nonzero outcome')
+  assert.equal(isPidAlive(mockPid), false, 'mock must be stopped on cancel')
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
 })
 
 test('missing explicit --spec refuses before the stack starts', async (t) => {

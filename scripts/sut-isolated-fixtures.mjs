@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises'
 import http from 'node:http'
 import net from 'node:net'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import {
   closeListeningServer,
   listenEphemeralPort,
@@ -11,6 +12,11 @@ import {
 import { claimSutOwnership, startSutOwnerControl } from './sut-owner.mjs'
 import { healthyOnce } from './sut-start-fixtures.mjs'
 import { runSutStart } from './sut-start.mjs'
+
+const worktreeRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+)
 
 export const identityOnlyConfig = {
   id: 'wt_a7c2',
@@ -173,6 +179,10 @@ export function spawnOwnedTreeStandIn(checkoutRoot, extraEnv = {}) {
     script,
     `import { spawn } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
+import { startSutOwnerControlFromEnv } from ${JSON.stringify(
+      path.join(worktreeRoot, 'scripts/sut-owner.mjs')
+    )}
+await startSutOwnerControlFromEnv()
 const ignoreTerm = process.env.SUT_STANDIN_GRANDCHILD_IGNORE_TERM === '1'
 const grandchild = spawn(
   process.execPath,

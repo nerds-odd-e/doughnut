@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
- * E2E batch runner wrapper: own one SUT stack, run selected supported no-mock
- * specs through Cypress once, then settle the owned tree and return Cypress's
- * outcome. Existing `pnpm cy:run` / `pnpm sut` commands remain usable until
- * the migration slice.
+ * E2E batch runner wrapper: own one SUT stack (and, when the selected spec
+ * requires it, one private OpenAI mock + runner lease) for the entire batch,
+ * run the selected supported specs through Cypress once, then settle every
+ * owned resource and return Cypress's outcome. Existing `pnpm cy:run` /
+ * `pnpm sut` commands remain usable until the migration slice.
  *
  * The wrapper invokes the Cypress executable directly (not via a recursive
  * pnpm call) to avoid a second service owner. Ownership is claimed by the
- * owned lifetime before Cypress is signalled.
+ * owned lifetime before Cypress is signalled. The Cypress plugin acts only as
+ * an adapter when the wrapper owns the mock (signalled via env), injecting
+ * the owned endpoint into `expose` and registering read-only tasks.
  */
 import { spawn } from 'node:child_process'
 import path from 'node:path'
@@ -19,6 +22,14 @@ import {
   selectedCypressSpecs,
 } from './isolated-cypress-spec-selection.mjs'
 import { startOwnedSutLifetime } from './sut-start.mjs'
+import { loadCompleteIsolatedE2eAllocation } from './browser-worktree-isolation.mjs'
+import { startPrivateOpenAiMock } from './isolated-openai-mock.mjs'
+import { acquireSutRunnerLease, releaseSutRunnerLease } from './sut-owner.mjs'
+import {
+  E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY,
+  E2E_RUNNER_MOCK_PGID_ENV_KEY,
+  E2E_RUNNER_OWNS_LIFETIME_ENV_KEY,
+} from './isolated-cypress.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -31,20 +42,15 @@ const DEFAULT_CYPRESS_BIN = path.join(
 )
 const DEFAULT_CYPRESS_CONFIG_FILE = 'e2e_test/config/ci.ts'
 
-function resolveNoMockSpecs(argv, checkoutRoot) {
+function resolveSpecs(argv, checkoutRoot) {
   if (!hasExplicitCypressSpecSelection(argv)) {
     throw new Error(
-      'e2e-runner requires an explicit --spec selection of one supported no-mock spec.'
+      'e2e-runner requires an explicit --spec selection of one supported spec.'
     )
   }
   const selected = selectedCypressSpecs({ argv, checkoutRoot })
   const approved = assertSupportedIsolatedCypressSpecs(selected)
-  if (approved.requiresPrivateOpenAiMock) {
-    throw new Error(
-      'e2e-runner (slice 3) only runs no-mock specs; private-mock specs arrive in a later slice.'
-    )
-  }
-  return selected
+  return { specs: selected, approved }
 }
 
 function defaultSpawnCypress({
@@ -127,11 +133,15 @@ export async function runE2eBatch({
   env = process.env,
   stdio = 'inherit',
   cancel = NO_CANCEL,
+  startPrivateOpenAiMockFn = startPrivateOpenAiMock,
   ...lifetimeOpts
 } = {}) {
   let specs
+  let approved
   try {
-    specs = resolveNoMockSpecs(argv, checkoutRoot)
+    const resolved = resolveSpecs(argv, checkoutRoot)
+    specs = resolved.specs
+    approved = resolved.approved
   } catch (error) {
     errLog(error.message)
     return 1
@@ -158,6 +168,31 @@ export async function runE2eBatch({
   // child handle's exit/close events); it is not a health-polling loop.
   const childExit = observeChildExit(lifetime.child)
 
+  // When the batch requires a private OpenAI mock, the invocation owns the
+  // mock + runner lease for the entire batch (no after:spec release). The
+  // mock starts after the SUT is ready and is settled alongside the SUT in
+  // the single invocation shutdown.
+  const mockState = { handle: null, leaseToken: null }
+  let mockExit = null
+  const originalShutdown = lifetime.shutdown.bind(lifetime)
+  lifetime.shutdown = async () => {
+    if (mockState.handle) {
+      try {
+        await mockState.handle.stop()
+      } catch {
+        // best-effort during shutdown
+      }
+    }
+    if (mockState.leaseToken) {
+      try {
+        await releaseSutRunnerLease(checkoutRoot, mockState.leaseToken)
+      } catch {
+        // best-effort during shutdown
+      }
+    }
+    await originalShutdown()
+  }
+
   try {
     const ready = await lifetime.ready
     if (!ready.ok) {
@@ -169,16 +204,48 @@ export async function runE2eBatch({
       return 1
     }
 
+    if (approved.requiresPrivateOpenAiMock) {
+      try {
+        mockState.leaseToken = await acquireSutRunnerLease(checkoutRoot)
+      } catch (error) {
+        errLog(`Failed to acquire runner lease: ${error.message}`)
+        return 1
+      }
+      try {
+        const allocation = loadCompleteIsolatedE2eAllocation(checkoutRoot)
+        mockState.handle = await startPrivateOpenAiMockFn({
+          checkoutRoot,
+          allocation,
+        })
+        mockExit = observeChildExit(mockState.handle.child)
+      } catch (error) {
+        errLog(`Failed to start owned private OpenAI mock: ${error.message}`)
+        return 1
+      }
+    }
+
+    const cypressEnv = { ...env }
+    if (mockState.handle) {
+      cypressEnv[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY] = '1'
+      cypressEnv[E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY] = JSON.stringify(
+        mockState.handle.endpoint
+      )
+      cypressEnv[E2E_RUNNER_MOCK_PGID_ENV_KEY] = String(
+        mockState.handle.child?.pid ?? ''
+      )
+    }
+
     const cypressExitCode = await runCypressOnce({
       specs,
       spawnCypress,
       cypressBin,
       cypressConfigFile,
       checkoutRoot,
-      env,
+      env: cypressEnv,
       stdio,
       cancel,
       childExit,
+      mockExit,
       errLog,
     })
     if (cancel.isTriggered()) return 1
@@ -235,6 +302,7 @@ function runCypressOnce({
   stdio,
   cancel,
   childExit,
+  mockExit = null,
   errLog = (s) => process.stderr.write(`${s}\n`),
 }) {
   return new Promise((resolve, reject) => {
@@ -274,29 +342,38 @@ function runCypressOnce({
       }
     })
 
-    // A required application service (the supervisor child) exiting during
-    // the test run ends the batch with visible failure. Terminate Cypress
-    // promptly — do not wait for it to finish on its own — then let the
-    // caller's `lifetime.shutdown()` settle the remaining owned tree.
-    // Covers the timing window: if the child already exited between readiness
-    // and this attachment, end the run now.
-    const onChildExit = () => {
-      if (settled) return
-      errLog(
-        'Required SUT service exited during the test run; ending the batch with failure.'
-      )
-      try {
-        child.kill('SIGTERM')
-      } catch {
-        // already gone
+    // A required owned service (the SUT supervisor child, or the private
+    // OpenAI mock) exiting during the test run ends the batch with visible
+    // failure. Terminate Cypress promptly — do not wait for it to finish on
+    // its own — then let the caller's `lifetime.shutdown()` settle the
+    // remaining owned tree. Covers the timing window: if the child already
+    // exited between readiness and this attachment, end the run now.
+    const endRunOnRequiredExit = (exit, message) => {
+      if (!exit) return
+      const onExit = () => {
+        if (settled) return
+        errLog(message)
+        try {
+          child.kill('SIGTERM')
+        } catch {
+          // already gone
+        }
+        settle(1)
       }
-      settle(1)
+      if (exit.hasExited()) {
+        onExit()
+      } else {
+        exit.exited.then(onExit)
+      }
     }
-    if (childExit.hasExited()) {
-      onChildExit()
-    } else {
-      childExit.exited.then(onChildExit)
-    }
+    endRunOnRequiredExit(
+      childExit,
+      'Required SUT service exited during the test run; ending the batch with failure.'
+    )
+    endRunOnRequiredExit(
+      mockExit,
+      'Required private OpenAI mock exited during the test run; ending the batch with failure.'
+    )
 
     child.once('error', (error) => {
       if (settled) return

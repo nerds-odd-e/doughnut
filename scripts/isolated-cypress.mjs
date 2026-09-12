@@ -11,6 +11,7 @@ import {
   VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK,
   startPrivateOpenAiMock,
 } from './isolated-openai-mock.mjs'
+import { assertOwnedMockListener } from './isolated-openai-mock-ownership.mjs'
 import {
   assertSupportedIsolatedCypressSpecs,
   hasExplicitCypressSpecSelection,
@@ -29,6 +30,17 @@ import {
   releaseSutRunnerLease,
   releaseSutRunnerLeaseSync,
 } from './sut-owner.mjs'
+
+/**
+ * When the invocation wrapper (runE2eBatch) owns the private mock + runner
+ * lease for the whole batch, it sets this env var so the Cypress plugin acts
+ * only as an adapter: inject the owned endpoint into `expose` and register
+ * the read-only ownership/endpoint tasks. The plugin does NOT start/stop the
+ * mock or acquire/release the lease in adapter mode.
+ */
+export const E2E_RUNNER_OWNS_LIFETIME_ENV_KEY = 'E2E_RUNNER_OWNS_LIFETIME'
+export const E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY = 'E2E_RUNNER_MOCK_ENDPOINT'
+export const E2E_RUNNER_MOCK_PGID_ENV_KEY = 'E2E_RUNNER_MOCK_PGID'
 
 export {
   SUPPORTED_ISOLATED_CLI_SPEC,
@@ -50,6 +62,82 @@ function clearOpenAiMockEndpoint(config) {
   if (!config.expose || typeof config.expose !== 'object') return
   delete config.expose[OPEN_AI_MOCK_ENDPOINT_ENV_KEY]
   delete config.expose[ISOLATED_OPEN_AI_MOCK_ENV_KEY]
+}
+
+function parseRunnerOwnedEndpoint(env) {
+  const raw = env[E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY]
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw)
+    if (
+      parsed &&
+      typeof parsed.managementUrl === 'string' &&
+      Number.isInteger(parsed.servingPort) &&
+      parsed.servingPort > 0
+    ) {
+      return parsed
+    }
+  } catch {
+    // malformed wrapper endpoint
+  }
+  return null
+}
+
+function parseRunnerOwnedMockPgid(env) {
+  const raw = env[E2E_RUNNER_MOCK_PGID_ENV_KEY]
+  const pid = Number(raw)
+  return Number.isInteger(pid) && pid > 0 ? pid : null
+}
+
+/**
+ * Adapter mode: the invocation wrapper (runE2eBatch) already owns the private
+ * mock + runner lease for the whole batch. The plugin only injects the owned
+ * endpoint into `expose` (so the browser sees it before configuration is
+ * consumed) and registers the read-only endpoint/ownership tasks. It does NOT
+ * start/stop the mock, acquire/release the lease, or register after:spec /
+ * after:run cleanup — the wrapper's single lifetime owns all of that.
+ */
+async function adapterCypressNodeSetup(checkoutRoot, config, options, env) {
+  const endpoint = parseRunnerOwnedEndpoint(env)
+  const mockPgid = parseRunnerOwnedMockPgid(env)
+  if (endpoint) {
+    injectOpenAiMockEndpoint(config, endpoint)
+  }
+  if (typeof options.on === 'function') {
+    options.on('task', {
+      async [VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK]() {
+        if (!endpoint) {
+          throw new Error(
+            'Isolated OpenAI mock ownership check requires a private mock for this run.'
+          )
+        }
+        if (!mockPgid) {
+          throw new Error(
+            'Isolated OpenAI mock ownership check requires the owned mock process group id.'
+          )
+        }
+        await assertOwnedMockListener(endpoint.servingPort, mockPgid, 'serving')
+        await assertOwnedMockListener(
+          new URL(endpoint.managementUrl).port,
+          mockPgid,
+          'management'
+        )
+        return true
+      },
+      [GET_ISOLATED_OPEN_AI_MOCK_ENDPOINT_TASK]() {
+        return endpoint ?? null
+      },
+    })
+  }
+  return {
+    release: async () => {
+      /* wrapper owns the lifetime; the plugin has nothing to release */
+    },
+    origin: null,
+    privateMock: endpoint
+      ? { endpoint, child: null, verifyOwnership: async () => true }
+      : null,
+  }
 }
 
 export async function guardCypressNodeSetup(
@@ -93,6 +181,19 @@ export async function guardCypressNodeSetup(
   const origin = isolatedBrowserOrigin(allocation.e2e)
   refuseConflictingCypressOrigin(env, config, origin)
   await requireHealthyOwningSut(checkoutRoot, options.healthcheckFn)
+
+  // Adapter mode: the invocation wrapper owns the mock + lease for the batch.
+  if (env[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY] === '1') {
+    config.baseUrl = origin
+    const adapted = await adapterCypressNodeSetup(
+      checkoutRoot,
+      config,
+      options,
+      env
+    )
+    return { ...adapted, origin }
+  }
+
   const leaseToken = await acquireSutRunnerLease(checkoutRoot)
 
   let privateMock = null

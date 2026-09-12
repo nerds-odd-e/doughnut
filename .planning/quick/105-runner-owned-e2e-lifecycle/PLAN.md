@@ -185,7 +185,7 @@ Sizing: 4–6 minutes; medium confidence.
 
 ### 6. Keep private mocks owned through the entire batch
 Type: Behavior
-Status: planned
+Status: done (2026-09-12)
 Behavior: A supported batch requiring OpenAI mocks has usable owned endpoints
 for every selected spec; mock/lease lifetime ends with the invocation, including
 mock startup failure, unexpected exit, and cancellation.
