@@ -8,6 +8,8 @@
  * Default (fixture): note-editing DB reset isolation (same spec both roles).
  * OpenAI mock mode: note-content completion with distinct suggestions /
  * request markers and barrier around private mock install/reset.
+ * Wikidata mock mode: Wikidata entity lookup with distinct entity labels /
+ * request markers and barrier around private mock install/reset.
  * CLI mode: CLI peer spec + browser note-editing resetter.
  */
 import { spawn } from 'node:child_process'
@@ -20,6 +22,7 @@ import {
   SUPPORTED_ISOLATED_CLI_SPEC,
   SUPPORTED_ISOLATED_CYPRESS_SPEC,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+  SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC,
 } from './isolated-cypress.mjs'
 import { loadCompleteIsolatedE2eAllocation } from './browser-worktree-isolation.mjs'
 import { listOccupiedApplicationPorts } from './local-runtime-target.mjs'
@@ -28,8 +31,12 @@ import {
   OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_REQUEST_MARKER,
   OPENAI_MOCK_ISOLATION_SUGGESTION,
+  WIKIDATA_MOCK_ISOLATION_ENTITY_LABEL,
+  WIKIDATA_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER,
+  WIKIDATA_MOCK_ISOLATION_REQUEST_MARKER,
   readBarrierEvents,
   WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
+  WORKTREE_RESET_ISOLATION_BARRIER_AT_WIKIDATA_MOCK,
   WORKTREE_RESET_ISOLATION_PEER_ROLE,
   WORKTREE_RESET_ISOLATION_RESETTER_ROLE,
   worktreeResetIsolationEnv,
@@ -67,12 +74,31 @@ const DEFAULT_RESETTER_PROOF = {
   requestMarker: 'RESETTER_OPENAI_REQ_MARKER',
 }
 
+const DEFAULT_PEER_WIKIDATA_PROOF = {
+  entityLabel: 'Peer isolation entity',
+  requestMarker: 'PEER_WIKIDATA_REQ_MARKER',
+}
+
+const DEFAULT_RESETTER_WIKIDATA_PROOF = {
+  entityLabel: 'Resetter isolation entity',
+  requestMarker: 'RESETTER_WIKIDATA_REQ_MARKER',
+}
+
 function openAiMockProofEnvOptions(proof, oppositeProof) {
   return {
     barrierAt: WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
     suggestion: proof.suggestion,
     requestMarker: proof.requestMarker,
     foreignRequestMarker: oppositeProof.requestMarker,
+  }
+}
+
+function wikidataMockProofEnvOptions(proof, oppositeProof) {
+  return {
+    barrierAt: WORKTREE_RESET_ISOLATION_BARRIER_AT_WIKIDATA_MOCK,
+    wikidataEntityLabel: proof.entityLabel,
+    wikidataRequestMarker: proof.requestMarker,
+    wikidataForeignRequestMarker: oppositeProof.requestMarker,
   }
 }
 
@@ -87,17 +113,26 @@ export async function runPairedWorktreeResetIsolation(options) {
     (await mkdtemp(path.join(tmpdir(), 'worktree-reset-isolation-')))
   const mode = options.mode ?? 'fixture'
   const openaiMock = mode === 'openai-mock'
+  const wikidataMock = mode === 'wikidata-mock'
   const peerSpec =
     mode === 'cli'
       ? SUPPORTED_ISOLATED_CLI_SPEC
       : openaiMock
         ? SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC
-        : SUPPORTED_ISOLATED_CYPRESS_SPEC
+        : wikidataMock
+          ? SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC
+          : SUPPORTED_ISOLATED_CYPRESS_SPEC
   const resetterSpec = openaiMock
     ? SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC
-    : SUPPORTED_ISOLATED_CYPRESS_SPEC
+    : wikidataMock
+      ? SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC
+      : SUPPORTED_ISOLATED_CYPRESS_SPEC
   const peerProof = options.peerProof ?? DEFAULT_PEER_PROOF
   const resetterProof = options.resetterProof ?? DEFAULT_RESETTER_PROOF
+  const peerWikidataProof =
+    options.peerWikidataProof ?? DEFAULT_PEER_WIKIDATA_PROOF
+  const resetterWikidataProof =
+    options.resetterWikidataProof ?? DEFAULT_RESETTER_WIKIDATA_PROOF
   const spawnCypress =
     options.spawnCypress ??
     ((cwd, env, spec) => spawnIsolatedE2eRunner(cwd, env, spawn, spec))
@@ -123,15 +158,31 @@ export async function runPairedWorktreeResetIsolation(options) {
       `Resetter suggestion/marker: ${resetterProof.suggestion} / ${resetterProof.requestMarker}`
     )
   }
+  if (wikidataMock) {
+    log(
+      `Peer entity label/marker: ${peerWikidataProof.entityLabel} / ${peerWikidataProof.requestMarker}`
+    )
+    log(
+      `Resetter entity label/marker: ${resetterWikidataProof.entityLabel} / ${resetterWikidataProof.requestMarker}`
+    )
+  }
   const peerEnv = worktreeResetIsolationEnv(
     barrierDir,
     WORKTREE_RESET_ISOLATION_PEER_ROLE,
-    openaiMock ? openAiMockProofEnvOptions(peerProof, resetterProof) : {}
+    openaiMock
+      ? openAiMockProofEnvOptions(peerProof, resetterProof)
+      : wikidataMock
+        ? wikidataMockProofEnvOptions(peerWikidataProof, resetterWikidataProof)
+        : {}
   )
   const resetterEnv = worktreeResetIsolationEnv(
     barrierDir,
     WORKTREE_RESET_ISOLATION_RESETTER_ROLE,
-    openaiMock ? openAiMockProofEnvOptions(resetterProof, peerProof) : {}
+    openaiMock
+      ? openAiMockProofEnvOptions(resetterProof, peerProof)
+      : wikidataMock
+        ? wikidataMockProofEnvOptions(resetterWikidataProof, peerWikidataProof)
+        : {}
   )
   const peer = spawnCypress(peerRoot, peerEnv, peerSpec)
   const resetter = spawnCypress(resetterRoot, resetterEnv, resetterSpec)
@@ -173,6 +224,8 @@ export async function runPairedWorktreeResetIsolation(options) {
     resetterSpec,
     peerProof: openaiMock ? peerProof : null,
     resetterProof: openaiMock ? resetterProof : null,
+    peerWikidataProof: wikidataMock ? peerWikidataProof : null,
+    resetterWikidataProof: wikidataMock ? resetterWikidataProof : null,
     peerEnv,
     resetterEnv,
     ownedListenersRemaining,
@@ -200,6 +253,10 @@ if (isMain) {
       'peer-marker': { type: 'string' },
       'resetter-suggestion': { type: 'string' },
       'resetter-marker': { type: 'string' },
+      'peer-wikidata-label': { type: 'string' },
+      'peer-wikidata-marker': { type: 'string' },
+      'resetter-wikidata-label': { type: 'string' },
+      'resetter-wikidata-marker': { type: 'string' },
     },
   })
   const peerProof = {
@@ -212,12 +269,29 @@ if (isMain) {
     requestMarker:
       values['resetter-marker'] ?? DEFAULT_RESETTER_PROOF.requestMarker,
   }
+  const peerWikidataProof = {
+    entityLabel:
+      values['peer-wikidata-label'] ?? DEFAULT_PEER_WIKIDATA_PROOF.entityLabel,
+    requestMarker:
+      values['peer-wikidata-marker'] ??
+      DEFAULT_PEER_WIKIDATA_PROOF.requestMarker,
+  }
+  const resetterWikidataProof = {
+    entityLabel:
+      values['resetter-wikidata-label'] ??
+      DEFAULT_RESETTER_WIKIDATA_PROOF.entityLabel,
+    requestMarker:
+      values['resetter-wikidata-marker'] ??
+      DEFAULT_RESETTER_WIKIDATA_PROOF.requestMarker,
+  }
   runPairedWorktreeResetIsolation({
     peerRoot: values.peer,
     resetterRoot: values.resetter,
     mode: values.mode,
     peerProof,
     resetterProof,
+    peerWikidataProof,
+    resetterWikidataProof,
   })
     .then((result) => {
       if (result.mode === 'openai-mock') {
@@ -230,6 +304,18 @@ if (isMain) {
           `Resetter env marker=${result.resetterEnv[OPENAI_MOCK_ISOLATION_REQUEST_MARKER]} ` +
             `foreign marker=${result.resetterEnv[OPENAI_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER]} ` +
             `suggestion=${result.resetterEnv[OPENAI_MOCK_ISOLATION_SUGGESTION]}\n`
+        )
+      }
+      if (result.mode === 'wikidata-mock') {
+        process.stdout.write(
+          `Wikidata mock isolation OK. Peer env marker=${result.peerEnv[WIKIDATA_MOCK_ISOLATION_REQUEST_MARKER]} ` +
+            `foreign marker=${result.peerEnv[WIKIDATA_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER]} ` +
+            `entityLabel=${result.peerEnv[WIKIDATA_MOCK_ISOLATION_ENTITY_LABEL]}\n`
+        )
+        process.stdout.write(
+          `Resetter env marker=${result.resetterEnv[WIKIDATA_MOCK_ISOLATION_REQUEST_MARKER]} ` +
+            `foreign marker=${result.resetterEnv[WIKIDATA_MOCK_ISOLATION_FOREIGN_REQUEST_MARKER]} ` +
+            `entityLabel=${result.resetterEnv[WIKIDATA_MOCK_ISOLATION_ENTITY_LABEL]}\n`
         )
       }
     })

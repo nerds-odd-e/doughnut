@@ -1,8 +1,8 @@
 # Run remaining active E2E features in isolated worktrees
 
 Source: [SEED-015 Story 10](../../seeds/SEED-015-concurrent-worktree-environments.md#story-10).
-Status: in progress. Planning/refinement authorized 2026-09-12; execution
-authorized 2026-09-12.
+Status: complete (all 10 slices done). Planning/refinement authorized
+2026-09-12; execution authorized and completed 2026-09-12.
 Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
 `main`; execution checkout `/Users/terryyin/git/d105-e2e` on
 `execute/105-e2e-isolation`; integration target `main`. CI observer mailbox
@@ -341,7 +341,7 @@ the "do not rewrite completed historical plans" rule.
 
 ### 10. Demonstrate newly admitted workflows cannot change a peer's resources
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Two concurrent worktree invocations using newly admitted features
 complete independently; resetting one app or reinstalling one Wikidata imposter
 leaves the peer's note and mock response unchanged.
@@ -352,6 +352,21 @@ MySQL/Redis and persistent Development unchanged. Existing OpenAI peer proof
 remains a regression, not a new parallel harness.
 Sizing: 5–8 minutes active work, medium confidence; real-service/browser waits
 excepted. A needed new coordination mechanism triggers refinement.
+Done 2026-09-12: extended the EXISTING paired reset barrier harness
+(`runPairedWorktreeResetIsolation`) with a minimal `wikidata-mock` mode
+mirroring the existing `openai-mock` mode (thin-adapter-per-service pattern,
+no new coordination mechanism). Added `WORKTREE_RESET_ISOLATION_BARRIER_AT_WIKIDATA_MOCK`
+and Wikidata isolation proof constants; `wikidataMockIsolationProofParams`;
+harness `wikidata-mock` mode runs `SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC` with
+distinct Wikidata proof env (foreign marker cross-set). New focused proof
+`scripts/worktree-reset-isolation-harness-wikidata-mock.test.mjs` records
+paired command (2 owned invocations), distinct origins (`/peer` vs `/resetter`,
+resetter resets only after peer seeds), distinct Wikidata responses (per-role
+markers, foreign marker cross-set), and no owned survivors. Refactor removed
+an unused `mockMode` local and updated a stale header doc. Existing OpenAI
+peer proof remains a regression (unchanged); existing ownership/coordination
+logic reused; shared MySQL/Redis and persistent Development untouched. All
+focused suites green. **All 10 slices complete — plan executed.**
 
 ## Promise ownership
 
