@@ -1,6 +1,8 @@
 # DearDough Process Findings
 
-## DD-001 — Implementation subagent ends its turn "waiting" on its own background test instead of blocking for the result
+## ODF-007 — Implementation subagent ends its turn "waiting" on its own background test instead of blocking for the result
+
+Former local code: DD-001.
 
 An implementation subagent launched its own long-running test command
 asynchronously and then ended its turn reporting that it was "waiting" or
@@ -22,7 +24,9 @@ instructions to do so before reporting.
   - Observed effect: two extra coordinator round-trips (one resend, one
     direct verification run) before slice 4's wrap-up could proceed.
 
-## DD-002 — Concurrent Vitest processes against the same worktree cause spurious test timeouts under resource contention
+## ODF-008 — Concurrent Vitest processes against the same worktree cause spurious test timeouts under resource contention
+
+Former local code: DD-002.
 
 Running more than one Vitest process against the same CLI test suite at the
 same time (coordinator and/or subagents, or a formatting command running
@@ -45,7 +49,9 @@ clean solo re-run passing all tests.
   - Observed effect: two rounds of failure triage (checking for concurrent
     processes, re-running solo) before trusting the test suite's result.
 
-## DD-003 — Claude Code's `.claude/worktrees/<name>` nesting depth breaks this project's isolated SUT bring-up
+## ODF-009 — Claude Code's `.claude/worktrees/<name>` nesting depth breaks this project's isolated SUT bring-up
+
+Former local code: DD-003.
 
 Claude Code's `EnterWorktree` tool places a new worktree at
 `.claude/worktrees/<name>` under the repository root. For a descriptively
@@ -78,7 +84,9 @@ obtained from inside the worktree.
     recorded the gap in the plan and recommended running it from a shallower
     checkout instead of treating the correction as unproven.
 
-## DD-004 — `pnpm --frozen-lockfile install` inside project wrapper scripts repeatedly mutated `pnpm-lock.yaml`
+## ODF-010 — `pnpm --frozen-lockfile install` inside project wrapper scripts repeatedly mutated `pnpm-lock.yaml`
+
+Former local code: DD-004.
 
 This project's `./scripts/run.sh` wrapper (used for `pnpm format:changed`,
 commit's lint hook, and the SUT healthcheck module) runs `pnpm --frozen-lockfile
@@ -107,7 +115,9 @@ unrelated lockfile diff.
     commit, but the pattern would silently ship as an unrelated diff without
     that check.
 
-## DD-005 — Unit-test seams that satisfy a provisioning precondition can hide an ordering defect only the live integration proof exposes
+## ODF-011 — Unit-test seams that satisfy a provisioning precondition can hide an ordering defect only the live integration proof exposes
+
+Former local code: DD-005.
 
 The runner-owned E2E wrapper's boundary tests injected a pre-resolved
 `runtimeTarget` (or drove the primary, non-isolated checkout) for
