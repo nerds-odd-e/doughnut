@@ -172,6 +172,42 @@ JFR at this size is too sparse to rank flushes; engine-safety ordering
 comes from the controller probe above. Slice 2 can proceed with the
 COMMIT-through-`ownRowsBySourceLocalKey` candidate.
 
+## Slice 2 engine observations (2026-09-12)
+
+Candidate applied in `NotePropertyIndexService.refreshForNote`:
+`FlushModeType.COMMIT` now covers unlink, explicit flush,
+`ownRowsBySourceLocalKey`, and new index-row persist; prior mode is restored
+after persist. Explicit property unlink flush and alias bulk-delete flush
+are unchanged. `pnpm cy:run` now forwards `--expose` and `--config`.
+Instrumentation was request-scoped then removed; no production flush
+counter. Versions re-resolved: Hibernate **7.4.5.Final**, isolated MySQL
+**8.4.11**.
+
+Flush-sequence delta vs slice 1 (same controller publication path):
+
+1. AUTO 0/0 existing-index lookup under COMMIT — unchanged.
+2. EXPLICIT property unlink flush remains (replacement still 12/21).
+3. AUTO `ownRowsBySourceLocalKey` is now **0/0** (slice 1: addition 9/9,
+   replacement 10/10). The redundant whole-context traversal is gone.
+4. AUTO alias bulk-delete plus EXPLICIT alias flush remain.
+
+Small HTTP after-capture (20/20/20), same worktree
+`doughnut_e2e_wt_55773df2d6ac449796e9d4c0abac2671`:
+
+- Valid HTTP (`2026-09-12T08-17-41.867Z`): elapsedMs **186.894** (slice 1
+  **205.722**), HTTP 200, accepted head
+  `62940858301bcc5c0f4bc7ab32e16a979bf311bd`, 20 authored documents.
+- Late rejection (`2026-09-12T08-17-48.019Z`): elapsedMs **153.214**
+  (slice 1 **147.006**), HTTP 400 invalid aliases at
+  `group-19/Added-00019.md`; 19 preceding additions processed; accepted
+  head, stored rows, and learning state unchanged.
+
+Wall-clock at this size is noisy around ~200 ms; the required proof is
+less flush work, which held. Installed-CLI `@publicationProfile` passed
+with default 20/20. Slice 3 may proceed with the large confirmation; the
+unresolved risk remains that this bounded change may not achieve the
+roughly 63-fold large-run target.
+
 ## Ordered slices
 
 ### 1. Make required refresh ordering observable on a small fixture
@@ -196,7 +232,7 @@ does not expand to larger fixtures merely to repeat the bottleneck ranking.
 
 ### 2. Publish small additions with less repeated flush work
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given a valid small authored addition batch, when its owner publishes,
 the accepted contents and derived references are usable with less measured flush
 work and reduced publication time, preserving existing note and learning state.
@@ -217,10 +253,8 @@ existing `NotePropertyIndexService.refreshForNote` lifecycle: keep
 `FlushModeType.COMMIT` through `ownRowsBySourceLocalKey`. No extra mutation
 phase or new owner. Required backend/build/browser waits may exceed the limit;
 do not use the wait exception for implementation.
-Isolated tagged captures: `pnpm cy:run` does not forward `--expose`/`--config`.
-Do not mutate committed `e2e_test/config/ci.ts`. Make the isolated tagged
-HTTP/CLI profile capture durable as part of this slice's proof path (forward
-those flags in the owned runner, or an equivalent env-driven tag override).
+Isolated tagged captures: `pnpm cy:run` forwards `--expose`/`--config`.
+Do not mutate committed `e2e_test/config/ci.ts`.
 
 ### 3. Confirm the representative commit publishes under one minute
 Type: Behavior
@@ -242,7 +276,7 @@ fails, preserve the result and return for story scope review. Do not repeatedly
 run large captures or optimize a second area automatically.
 
 ```sh
-PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=10000 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=66000 --expose tags=@publicationProfileHttp
+PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=10000 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cy:run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=66000 --expose tags=@publicationProfileHttp
 ```
 
 The profiling helper already records request-through-response time. Assess its
@@ -304,9 +338,9 @@ Slice 1 is done: Hibernate 7.4.5.Final / MySQL 8.4.11; required explicit
 property unlink flush and alias bulk-delete flush retained; redundant AUTO
 query flush after restoring AUTO is the candidate. Characterization tests and
 small HTTP before-capture (elapsedMs 205.722 / 147.006) are recorded.
-Slice 2 is reassessed as executable with that one local change. Isolated
-`pnpm cy:run` does not forward `--expose`; remaining captures must not rely on
-mutating committed `ci.ts`.
-Slice 3 remains a single scaling confirmation, with the unresolved risk that
+Slice 2 is done: COMMIT through `ownRowsBySourceLocalKey` persist; AUTO
+query flush 9/9→0/0; explicit property and alias flushes remain; after-capture
+elapsedMs 186.894 / 153.214; `pnpm cy:run` forwards `--expose`/`--config`.
+Slice 3 is the remaining scaling confirmation, with the unresolved risk that
 the bounded change will not achieve the required roughly 63-fold improvement.
 Required suite/build/fixture/runtime waits are the only sizing exceptions.

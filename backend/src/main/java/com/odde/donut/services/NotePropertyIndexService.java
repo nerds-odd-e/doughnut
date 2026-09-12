@@ -50,28 +50,29 @@ public class NotePropertyIndexService {
         entityManager.remove(existingRow);
       }
       entityManager.flush();
+      Note indexOwner = entityManager.getReference(Note.class, noteId);
+      NoteContentMarkdown.splitLeadingFrontmatter(
+              note.getContent() == null ? "" : note.getContent())
+          .ifPresent(
+              lf -> {
+                Map<String, AuthoredNoteReferenceRow> bySourceLocalKey =
+                    ownRowsBySourceLocalKey(noteId);
+                Map<String, List<NotePropertyIndexPlanner.PlannedRow>> rowsByKey =
+                    new LinkedHashMap<>();
+                for (NotePropertyIndexPlanner.PlannedRow planned :
+                    NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)) {
+                  rowsByKey
+                      .computeIfAbsent(planned.propertyKey(), k -> new ArrayList<>())
+                      .add(planned);
+                }
+                rowsByKey.forEach(
+                    (propertyKey, plannedRows) ->
+                        persistRowsForPropertyKey(
+                            indexOwner, propertyKey, plannedRows, bySourceLocalKey));
+              });
     } finally {
       entityManager.setFlushMode(previousFlushMode);
     }
-    Note indexOwner = entityManager.getReference(Note.class, noteId);
-    NoteContentMarkdown.splitLeadingFrontmatter(note.getContent() == null ? "" : note.getContent())
-        .ifPresent(
-            lf -> {
-              Map<String, AuthoredNoteReferenceRow> bySourceLocalKey =
-                  ownRowsBySourceLocalKey(noteId);
-              Map<String, List<NotePropertyIndexPlanner.PlannedRow>> rowsByKey =
-                  new LinkedHashMap<>();
-              for (NotePropertyIndexPlanner.PlannedRow planned :
-                  NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)) {
-                rowsByKey
-                    .computeIfAbsent(planned.propertyKey(), k -> new ArrayList<>())
-                    .add(planned);
-              }
-              rowsByKey.forEach(
-                  (propertyKey, plannedRows) ->
-                      persistRowsForPropertyKey(
-                          indexOwner, propertyKey, plannedRows, bySourceLocalKey));
-            });
   }
 
   public List<AuthoredNoteReference> authoredReferencesForProperty(
