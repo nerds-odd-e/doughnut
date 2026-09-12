@@ -11,9 +11,10 @@ with reasonable performance.
 
 ## Taken
 
+- [Document non-obvious rationale in the publication index-refresh simplification](quick/109-document-publication-index-refresh-rationale/PLAN.md)
+
 ## Backlog list
 
-- [Document non-obvious rationale in the publication index-refresh simplification](quick/109-document-publication-index-refresh-rationale/PLAN.md)
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Keep web saves in an append-only Git history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21) — SEED-009
