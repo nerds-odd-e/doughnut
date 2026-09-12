@@ -1,6 +1,6 @@
 # Remove the test-only image repository
 
-Status: planned
+Status: completed
 Source: bounded correction from the execution retrospective for the completed
 SEED-018 story 5 and plan 110, recoverable at before-cleanup commit
 `dee129d2b62619c1ce08a007a68163d437e2b38e`
@@ -52,7 +52,7 @@ test lookup mechanism. No ADR change or exception is needed.
 
 ### 1. Remove the production abstraction that only tests call
 Type: Structure
-Status: planned
+Status: done
 
 Change: Delete
 `backend/src/main/java/com/odde/donut/entities/repositories/ImageRepository.java`.
@@ -74,6 +74,20 @@ present in all affected test hierarchies; this slice has one deletion/replacemen
 loop and one required backend-suite wait. The suite duration is an explicit
 verification wait, not permission to broaden the correction.
 
+Delivered evidence (2026-09-13): the empty six-line `ImageRepository` interface
+is deleted and all three controller-test callers observe `Image` persistence
+through their existing `EntityManager`. `rg -n "ImageRepository"
+backend/src/main backend/src/test` returned no matches. `CURSOR_DEV=true nix
+develop -c pnpm backend:test_only` passed the complete backend suite after the
+stopped local MySQL service was started; the first attempt had ended before test
+execution with a connection refusal on port 3309. The fresh post-change refactor
+made the image/blob restoration assertions direct `notNullValue()` observations,
+then the same full backend command passed again in one minute.
+`scripts/check_diff_whitespace.sh` passed before and after refactoring. No other
+production file, API, schema, timing fixture or product behavior changed. Active
+implementation time was approximately 1 minute 37 seconds and refactor time was
+approximately four minutes; service and suite waits use the stated exception.
+
 ## Promise-to-proof ownership
 
 | Promise | Owner | Observable proof |
@@ -84,12 +98,22 @@ verification wait, not permission to broaden the correction.
 
 ## Execution and delivery
 
-If execution is separately authorized, use `dough-execute-plan` in its default
-fresh-worktree mode. Follow Jidoka, a fresh post-change refactor pass, API
-generation only if a real trigger appears, one coordinator-owned
+Execution was explicitly authorized on 2026-09-13 and followed
+`dough-execute-plan` in its default fresh-worktree mode: Jidoka, a fresh
+post-change refactor pass, no API generation trigger, one coordinator-owned
 `./scripts/run.sh pnpm format:changed`, plan update, check-only commit hook,
-push and applicable CI-observer handling. This retrospective supplies no
-execution authority and does not add the correction to the product backlog.
+push and applicable CI-observer handling.
+
+Execution identity (started 2026-09-13): originating checkout
+`/Users/terryyin/git/doughnut` on `main`; execution checkout
+`/Users/terryyin/git/doughnut/.worktrees/quick-111-remove-test-only-image-repository`
+on `quick/111-remove-test-only-image-repository`; integration target `main`.
+The execution branch starts from Taken-only commit `a253fd0819`. The destructive
+later-outcome check found no conflict: the single slice removes only the empty
+repository interface, has no later slice, and preserves every named image/blob
+behavior in its own proof. GitHub Actions workflow `.github/workflows/ci.yml`
+(`donut CI`) is push-triggered only for `main`, so execution-branch CI
+notification coverage is unavailable.
 
 ## Planning assessment
 

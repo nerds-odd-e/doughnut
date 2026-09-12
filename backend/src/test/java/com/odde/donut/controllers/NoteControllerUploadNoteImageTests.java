@@ -8,9 +8,9 @@ import com.odde.donut.controllers.dto.NoteImageUploadDTO;
 import com.odde.donut.controllers.dto.NoteImageUploadResult;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.repositories.ImageRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
+import jakarta.persistence.EntityManager;
 import jakarta.validation.Validation;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerUploadNoteImageTests extends ControllerTestBase {
-  @Autowired ImageRepository imageRepository;
+  @Autowired EntityManager entityManager;
   @Autowired NoteController controller;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
@@ -40,7 +40,7 @@ class NoteControllerUploadNoteImageTests extends ControllerTestBase {
 
     assertThat(result.imagePath(), matchesPattern("/attachments/images/\\d+/my\\.png"));
     int imageId = Integer.parseInt(result.imagePath().split("/")[3]);
-    Image saved = imageRepository.findById(imageId).orElseThrow();
+    Image saved = entityManager.find(Image.class, imageId);
     assertThat(saved.getNote().getId(), equalTo(note.getId()));
   }
 
