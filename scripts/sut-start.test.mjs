@@ -9,7 +9,12 @@ import {
   makeMockChild,
   neverHealthy,
 } from './sut-start-fixtures.mjs'
-import { runSutStart, spawnSutServices, writePidFile } from './sut-start.mjs'
+import {
+  runSutStart,
+  spawnSutServices,
+  startOwnedSutLifetime,
+  writePidFile,
+} from './sut-start.mjs'
 
 test('writePidFile writes the PID to the given path', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'sut-start-test-'))
@@ -103,6 +108,44 @@ test('runSutStart exits 1 when healthcheck times out', async () => {
 
     assert.strictEqual(code, 1)
     assert.ok(logs.err.length > 0, 'should have error output')
+  } finally {
+    await rm(dir, { recursive: true, force: true })
+  }
+})
+
+test('startOwnedSutLifetime exposes the running child, readiness, and a no-op shutdown for the primary target', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'sut-start-test-'))
+  try {
+    const logFile = path.join(dir, 'sut.log')
+    const pidFile = path.join(dir, 'sut.pid')
+    const mockChild = makeMockChild(4242)
+    const logs = makeLogs()
+
+    const lifetime = await startOwnedSutLifetime({
+      checkoutRoot: dir,
+      spawnFn: () => mockChild,
+      logFile,
+      pidFile,
+      timeoutMs: 5_000,
+      pollMs: 50,
+      log: logs.log,
+      errLog: logs.errLog,
+      healthcheckFn: healthyOnce,
+    })
+
+    assert.equal(lifetime.child, mockChild)
+    assert.ok(lifetime.target, 'target is resolved')
+    assert.equal(typeof lifetime.shutdown, 'function')
+
+    const result = await lifetime.ready
+    assert.equal(result.ok, true)
+    assert.equal(result.exitCode, 0)
+
+    // Primary start claims no ownership; shutdown must not throw and leaves the
+    // detached supervisor handle in place for the legacy adapter.
+    await lifetime.shutdown()
+    const pidContent = await readFile(pidFile, 'utf8')
+    assert.strictEqual(pidContent, '4242')
   } finally {
     await rm(dir, { recursive: true, force: true })
   }

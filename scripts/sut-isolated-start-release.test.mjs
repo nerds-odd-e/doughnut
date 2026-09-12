@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { existsSync } from 'node:fs'
+import path from 'node:path'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
@@ -15,7 +16,8 @@ import {
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
 import { sutOwnerLockDir, verifyLiveSutOwner } from './sut-owner.mjs'
-import { neverHealthy } from './sut-start-fixtures.mjs'
+import { healthyOnce, neverHealthy } from './sut-start-fixtures.mjs'
+import { startOwnedSutLifetime } from './sut-start.mjs'
 
 function trackOwnedTree(t, getOwned) {
   t.after(() => {
@@ -133,4 +135,45 @@ test('isolated start cancellation stops the owned process tree', async (t) => {
   assert.equal(isPidAlive(state.owned.leader), false)
   assert.equal(isPidAlive(state.owned.grandchild), false)
   assert.ok(errors.some((line) => /cancelled/i.test(line)))
+})
+
+test('startOwnedSutLifetime shutdown stops a healthy owned stack and releases ownership', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+
+  const lifetime = await startOwnedSutLifetime({
+    checkoutRoot: checkout.root,
+    spawnFn: standIn.spawnFn,
+    logFile: path.join(checkout.root, 'sut.log'),
+    pidFile: path.join(checkout.root, 'sut.pid'),
+    timeoutMs: 5_000,
+    pollMs: 50,
+    log: () => undefined,
+    errLog: () => undefined,
+    healthcheckFn: healthyOnce,
+    databaseExistsFn: () => true,
+    portClaimRoot: path.join(checkout.root, '.doughnut-e2e-port-claims'),
+    isPortOccupiedFn: async () => false,
+  })
+
+  state.owned = await waitForOwnedPids(standIn.pidsFile)
+  assert.equal(isPidAlive(state.owned.leader), true)
+  assert.equal(isPidAlive(state.owned.grandchild), true)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), true)
+
+  const result = await lifetime.ready
+  assert.equal(result.ok, true)
+  assert.equal(result.exitCode, 0)
+
+  // The wrapper owns shutdown even after a successful ready: the legacy adapter
+  // would leave the supervisor running, but the lifetime caller can settle it.
+  await lifetime.shutdown()
+
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
 })

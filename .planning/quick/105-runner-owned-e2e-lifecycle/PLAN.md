@@ -136,7 +136,7 @@ build dir. Recorded in the baseline doc as observed behaviour. Slice 2
 
 ### 2. Expose the existing owned startup lifetime
 Type: Structure
-Status: planned
+Status: done (2026-09-12)
 Change: Modularize existing startup to return its running child, readiness and
 owned shutdown/completion capability to an in-process caller, while the legacy
 start adapter retains its external behavior. Keep one startup/allocation model.
