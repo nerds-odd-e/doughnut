@@ -26,5 +26,6 @@ changes.
 
 ## Backlog list
 
+- [Tolerate deep or long worktree checkout paths for isolated SUT bring-up](seeds/SEED-015-concurrent-worktree-environments.md#story-9) — SEED-015
 - [Publish large notebook commits within a practical measured time](seeds/SEED-018-publish-large-authored-notebooks.md#story-3) — SEED-018
 - [Run E2E tests with automatic service startup and cleanup](seeds/SEED-015-concurrent-worktree-environments.md#story-8) — SEED-015

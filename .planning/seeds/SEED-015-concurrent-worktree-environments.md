@@ -565,6 +565,66 @@ coherent delivery exceeds a few hours.
 lifetime, obsolete public lifecycle controls are removed, and existing supported
 verification workflows remain usable without manual SUT preparation.
 
+<a id="story-9"></a>
+
+### 9. Tolerate deep or long worktree checkout paths for isolated SUT bring-up
+
+**Status:** Candidate, added 2026-09-12 from a
+[quick/107 execution retrospective](../quick/107-verify-publication-receiver-in-bulk/PLAN.md)
+finding. No refinement or executable planning is authorized yet.
+
+**Goal**
+
+Developers and AI coordinators whose tooling places a Git worktree checkout
+deeper or under a longer name than this project's own linked-worktree
+convention can still bring up an isolated SUT for E2E verification, instead of
+that bring-up failing before any product or test code runs.
+
+**Purpose and decision**
+
+Isolated SUT ownership derives a Unix domain socket at
+`<checkoutRoot>/.sut.local.lock/owner.sock` (`scripts/sut-owner.mjs`), with the
+path hardcoded relative to checkout root and no override. A coordinator that
+places worktrees at a nested, descriptively named path (observed: Claude
+Code's `.claude/worktrees/<name>` convention) can produce a full checkout path
+long enough that this socket path exceeds macOS's ~104-byte `sun_path` limit,
+failing `pnpm sut` bring-up with `EINVAL` before any publication, fixture, or
+scenario code runs. This blocked a bounded correction's own specified
+integration proof end to end (quick/107, slice 1) even though its code change
+was unrelated to SUT bring-up.
+
+**Scope**
+
+- Give the SUT ownership socket a location independent of checkout path
+  length — for example a fixed-length identity-derived name under a short,
+  stable base directory — while preserving existing per-checkout ownership
+  and refusal semantics (ADR 0007).
+- Preserve every existing supported worktree/primary-checkout workflow (1a–1c,
+  2/2a) unchanged from the developer's perspective; this is a bring-up
+  reliability correction, not a new isolation capability or lifecycle change.
+- Exclude general parallel E2E support, story 8's runner-owned lifetime
+  redesign (address there if it also relocates SUT ownership), Cloud VM/CI
+  changes, and any change to worktree naming/placement conventions themselves
+  (this is Claude Code's convention, not this project's to change).
+
+**Key examples**
+
+- Given a worktree checkout whose absolute path plus the ownership socket
+  suffix would exceed the platform's socket path limit, when `pnpm sut` (or
+  equivalent isolated bring-up) starts, then it succeeds instead of failing
+  with `EINVAL`.
+- Given two worktrees at different path depths running concurrently, when
+  each brings up its isolated SUT, then neither's ownership record collides
+  with the other's.
+
+**Effort hypothesis:** S–M, low confidence until the socket-relocation
+approach and its interaction with existing ownership/refusal checks are
+scoped.
+
+**Safe stopping point:** Isolated SUT bring-up succeeds from a worktree at any
+checkout path depth this project's supported tooling can produce, with
+existing ownership guarantees unchanged.
+
 ## Ordering and Scope Reduction
 
 **Backlog review, 2026-09-09:** Stories 3, 4 and 5 are delivered, completing the
