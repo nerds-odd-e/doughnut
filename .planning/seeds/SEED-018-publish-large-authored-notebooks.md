@@ -143,13 +143,50 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
   selected workload's measured publication time by at least half with its
   correctness constraints intact. Larger-data work may remain for later rounds.
 
+<a id="story-4"></a>
+
+### 4. Validate publication performance at 10,000-note scale (idea, unrefined)
+
+- **Hypothesis:** Story 3 delivered a 65.35% publication-time reduction
+  (10,308.043 ms vs. a 29,746.720 ms baseline) on a 1,000-existing/1,000-edit
+  fixture by replacing whole-session flush/query choreography with direct
+  bulk queries and the note's own already-loaded reference collection. The
+  near-future direction names a larger goal directly ("owners of notebooks
+  with 10,000 notes can publish to the remote quickly, with reasonable
+  performance"), which story 3 did not attempt to validate. The delivered
+  change may or may not hold up proportionally at that scale.
+- **Evidence for a next round:** Per the
+  [smaller-workload refinement's JFR analysis](../../docs/notebook-publication-profiling.md#smaller-workload-refinement),
+  the corrected candidate still spent 73.0% of its request-thread samples in
+  remaining flush traversal — "evidence for a possible later round, not a
+  claim that publication is fully optimized." The historical large-fixture
+  captures under [Baseline captures](../../docs/notebook-publication-profiling.md#baseline-captures)
+  (1,000 existing / 10,000 additions) recorded 62-83 minute completions before
+  this round's simplification and remain unmeasured against the delivered
+  change.
+- **Not yet resolved:** beneficiary framing beyond "notebook owners with very
+  large notebooks," a concrete evaluable outcome at 10,000-note scale (a
+  reduction target, a completion-time ceiling, or both), whether the same
+  fixture-and-measurement approach scales cleanly to that size without a
+  separate feedback-loop reduction step, and effort. This is a candidate for
+  [dough-story-refinement](../../../.claude/skills/dough-story-refinement/SKILL.md)
+  before slice planning, not an executable story yet.
+- **Depends on:** Story 3's delivered simplification as the baseline to
+  extend or re-measure; the retained profiling infrastructure
+  (`scripts/profiling/run-notebook-publication-profile.mjs`,
+  `PUBLICATION_PROFILE_EXISTING`/`PUBLICATION_PROFILE_UPDATES`/`PUBLICATION_PROFILE_ADDITIONS`).
+- **Source:** recommendation from the
+  [execution retrospective](../../../.claude/skills/dough-execution-retrospective/SKILL.md)
+  on story 3's completed execution (`.planning/quick/108-publish-notebook-edits-faster`,
+  commits `a6fcddacad`, `a05a66686c`), 2026-09-12. Not yet selected or queued
+  in the product backlog.
+
 ## Ordering and Scope Reduction
 
-Story 3 stays at the top of the product backlog. Establish a useful completed
-small baseline, investigate the dominant design cost, and choose a solution
-that meets both speed and simplicity criteria before executable planning.
+Story 4 is an unrefined idea parked here, not yet selected for planning.
 The user explicitly authorizes temporary code experiments, measurement, and
-profiling during this refinement.
+profiling during any future refinement of it, consistent with story 3's own
+authorized refinement.
 
 ## Current Decisions
 

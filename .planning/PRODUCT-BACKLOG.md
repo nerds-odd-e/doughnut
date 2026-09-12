@@ -15,6 +15,7 @@ with reasonable performance.
 
 ## Backlog list
 
+- [Document non-obvious rationale in the publication index-refresh simplification](quick/109-document-publication-index-refresh-rationale/PLAN.md)
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Keep web saves in an append-only Git history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21) — SEED-009
 - [Receive a web note rename locally without losing its identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22) — SEED-009
