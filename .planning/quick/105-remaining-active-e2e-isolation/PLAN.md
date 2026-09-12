@@ -215,7 +215,7 @@ regression (16 tests) green. Slice 6 unblocked.
 
 ### 6. Run active Wikidata features through private endpoints
 Type: Behavior
-Status: planned
+Status: done
 Behavior: An active Wikidata scenario installs its stubs on its invocation-owned
 endpoint and configures only its own app; restoration keeps later real-service
 scenarios on their existing URL behavior.
@@ -225,6 +225,27 @@ Run `wikidata/note_create_with_wikidata_id.feature`; boundary proof establishes
 isolated missing-endpoint refusal and unchanged primary/CI canonical behavior.
 No Google/Gmail adapter changes. No service startup in Cucumber hooks.
 Sizing: 5–8 minutes, medium confidence; focused browser wait excepted.
+Done 2026-09-12: admitted the 4 Wikidata files through the single registry
+(each `requiresPrivateWikidataMock: true`); wired Wikidata's adapter to consume
+its invocation-owned endpoint instead of hardcoded 5002/2525 via a new thin
+`scripts/isolated-wikidata-mock.mjs` adapter + `wikidataMockEndpointContext.ts`
+(mirroring the OpenAI pattern over the generic `startOwnedMountebankMock`
+lifecycle). `e2e-runner.mjs` generalized to collect required mocks from `approved`
+and start each (OpenAI and/or Wikidata) under one lease with distinct env keys;
+`combineChildExits` ends the run if any owned mock exits. Plugin boundary
+verifies ownership before mutation (missing/foreign endpoint refuses). The
+`@usingMockedWikidataService` hook loads the endpoint override + verifies
+ownership + calls `mock()`; no service started in Cucumber hooks. Real-service
+scenarios in mixed files keep their existing URL behavior (Cucumber tag
+selection unchanged). Refactor removed dead imports/params and development-
+history comment leaks. Focused unit suites (90 node + 16 TS tests) and
+`pnpm cy:run --spec e2e_test/features/wikidata/note_create_with_wikidata_id.feature`
+(3/3) green; OpenAI path and primary/CI canonical behavior unchanged. Assessed
+Wikidata inventory matches the plan's 4 files with no discrepancy. **Sizing
+deviation:** active work ~25 min vs. 5–8 min target — the Wikidata wiring touched
+the runner, plugin boundary, endpoint context, and Cucumber hook across one
+coherent responsibility; recorded for retrospective. Slice converged with green
+proof; no refinement warranted mid-slice.
 
 ### 7. Run a mixed-resource batch without cross-file interference
 Type: Behavior

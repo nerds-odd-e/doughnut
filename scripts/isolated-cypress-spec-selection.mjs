@@ -40,6 +40,12 @@ export const SUPPORTED_ISOLATED_MCP_SPEC =
 export const SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC =
   'e2e_test/features/ai_generated_content/note_content_completion.feature'
 
+/** Wikidata entity lookup — the representative approved spec that requires a
+ * runner-owned private Wikidata mock. The remaining active Wikidata-mock
+ * features are admitted through `ACTIVE_WIKIDATA_MOCK_SPECS` below. */
+export const SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC =
+  'e2e_test/features/wikidata/note_create_with_wikidata_id.feature'
+
 /**
  * Remaining active OpenAI-mock feature files — each declares an existing
  * private-mock requirement. Assessed 2026-09-12 from `e2e_test/features/`.
@@ -64,6 +70,26 @@ const ACTIVE_OPEN_AI_MOCK_SPECS = [
   'e2e_test/features/note_view/semantic_search.feature',
   'e2e_test/features/recall/property_memory_tracker.feature',
   'e2e_test/features/note_creation_and_update/mcq_management.feature',
+]
+
+/**
+ * Active Wikidata-mock feature files — each declares an existing private-mock
+ * requirement on the Wikidata service. Assessed 2026-09-12 from
+ * `e2e_test/features/wikidata/`. `associate_wikidata.feature` is a mixed
+ * file: it also carries a `@usingRealWikidataService` scenario; that
+ * real-service scenario preserves its existing opt-in/credential filtering
+ * and is NOT mocked — the registry's declared requirement authorizes the
+ * private mock for the file, while Cucumber's scenario tag selection still
+ * chooses mocked versus real service URLs per scenario. The Wikidata adapter
+ * consumes its invocation-owned endpoint instead of the hardcoded 5002/
+ * default 2525. `note_create_with_wikidata_id.feature` is the
+ * already-admitted representative (`SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC`);
+ * the remaining active Wikidata-mock features are admitted here.
+ */
+const ACTIVE_WIKIDATA_MOCK_SPECS = [
+  'e2e_test/features/wikidata/associate_wikidata.feature',
+  'e2e_test/features/wikidata/associate_wikidata_location_entries.feature',
+  'e2e_test/features/wikidata/associate_wikidata_person_entries.feature',
 ]
 
 /**
@@ -139,6 +165,14 @@ const APPROVED_ISOLATED_CYPRESS_SPECS = [
   ...ACTIVE_OPEN_AI_MOCK_SPECS.map((spec) => ({
     spec,
     requiresPrivateOpenAiMock: true,
+  })),
+  {
+    spec: SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC,
+    requiresPrivateWikidataMock: true,
+  },
+  ...ACTIVE_WIKIDATA_MOCK_SPECS.map((spec) => ({
+    spec,
+    requiresPrivateWikidataMock: true,
   })),
   ...APPLICATION_ONLY_ACTIVE_SPECS.map((spec) => ({ spec })),
 ]
@@ -262,6 +296,9 @@ export function assertSupportedIsolatedCypressSpecs(specs) {
     return {
       requiresPrivateOpenAiMock: approved.some(
         (spec) => spec.requiresPrivateOpenAiMock
+      ),
+      requiresPrivateWikidataMock: approved.some(
+        (spec) => spec.requiresPrivateWikidataMock
       ),
     }
   }

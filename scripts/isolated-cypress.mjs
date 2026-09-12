@@ -12,6 +12,14 @@ import {
   VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK,
   startPrivateOpenAiMock,
 } from './isolated-openai-mock.mjs'
+import {
+  GET_ISOLATED_WIKIDATA_MOCK_ENDPOINT_TASK,
+  ISOLATED_WIKIDATA_MOCK_ENV_KEY,
+  VERIFY_ISOLATED_WIKIDATA_MOCK_OWNERSHIP_TASK,
+  WIKIDATA_MOCK_ENDPOINT_ENV_KEY,
+  WIKIDATA_SERVICE_LABEL,
+  startPrivateWikidataMock,
+} from './isolated-wikidata-mock.mjs'
 import { assertOwnedMockListener } from './isolated-mountebank-mock-ownership.mjs'
 import {
   assertSupportedIsolatedCypressSpecs,
@@ -42,6 +50,10 @@ import {
 export const E2E_RUNNER_OWNS_LIFETIME_ENV_KEY = 'E2E_RUNNER_OWNS_LIFETIME'
 export const E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY = 'E2E_RUNNER_MOCK_ENDPOINT'
 export const E2E_RUNNER_MOCK_PGID_ENV_KEY = 'E2E_RUNNER_MOCK_PGID'
+export const E2E_RUNNER_WIKIDATA_MOCK_ENDPOINT_ENV_KEY =
+  'E2E_RUNNER_WIKIDATA_MOCK_ENDPOINT'
+export const E2E_RUNNER_WIKIDATA_MOCK_PGID_ENV_KEY =
+  'E2E_RUNNER_WIKIDATA_MOCK_PGID'
 
 export {
   SUPPORTED_ISOLATED_CLI_SPEC,
@@ -49,6 +61,7 @@ export {
   SUPPORTED_ISOLATED_CYPRESS_SPECS,
   SUPPORTED_ISOLATED_MCP_SPEC,
   SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
+  SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC,
 } from './isolated-cypress-spec-selection.mjs'
 
 function injectOpenAiMockEndpoint(config, endpoint) {
@@ -63,6 +76,20 @@ function clearOpenAiMockEndpoint(config) {
   if (!config.expose || typeof config.expose !== 'object') return
   delete config.expose[OPEN_AI_MOCK_ENDPOINT_ENV_KEY]
   delete config.expose[ISOLATED_OPEN_AI_MOCK_ENV_KEY]
+}
+
+function injectWikidataMockEndpoint(config, endpoint) {
+  if (!config.expose || typeof config.expose !== 'object') {
+    config.expose = {}
+  }
+  config.expose[WIKIDATA_MOCK_ENDPOINT_ENV_KEY] = endpoint
+  config.expose[ISOLATED_WIKIDATA_MOCK_ENV_KEY] = true
+}
+
+function clearWikidataMockEndpoint(config) {
+  if (!config.expose || typeof config.expose !== 'object') return
+  delete config.expose[WIKIDATA_MOCK_ENDPOINT_ENV_KEY]
+  delete config.expose[ISOLATED_WIKIDATA_MOCK_ENV_KEY]
 }
 
 function parseRunnerOwnedEndpoint(env) {
@@ -90,6 +117,56 @@ function parseRunnerOwnedMockPgid(env) {
   return Number.isInteger(pid) && pid > 0 ? pid : null
 }
 
+function parseRunnerOwnedWikidataEndpoint(env) {
+  const raw = env[E2E_RUNNER_WIKIDATA_MOCK_ENDPOINT_ENV_KEY]
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw)
+    if (
+      parsed &&
+      typeof parsed.managementUrl === 'string' &&
+      Number.isInteger(parsed.servingPort) &&
+      parsed.servingPort > 0
+    ) {
+      return parsed
+    }
+  } catch {
+    // malformed wrapper endpoint
+  }
+  return null
+}
+
+function parseRunnerOwnedWikidataMockPgid(env) {
+  const raw = env[E2E_RUNNER_WIKIDATA_MOCK_PGID_ENV_KEY]
+  const pid = Number(raw)
+  return Number.isInteger(pid) && pid > 0 ? pid : null
+}
+
+function verifyOwnedMockListenerTasks(endpoint, mockPgid, serviceLabel) {
+  return async () => {
+    if (!endpoint) {
+      throw new Error(
+        `Isolated ${serviceLabel} mock ownership check requires a private mock for this run.`
+      )
+    }
+    if (!mockPgid) {
+      throw new Error(
+        `Isolated ${serviceLabel} mock ownership check requires the owned mock process group id.`
+      )
+    }
+    await assertOwnedMockListener(endpoint.servingPort, mockPgid, 'serving', {
+      serviceLabel,
+    })
+    await assertOwnedMockListener(
+      new URL(endpoint.managementUrl).port,
+      mockPgid,
+      'management',
+      { serviceLabel }
+    )
+    return true
+  }
+}
+
 /**
  * Adapter mode: the invocation wrapper (runE2eBatch) already owns the private
  * mock + runner lease for the whole batch. The plugin only injects the owned
@@ -101,40 +178,35 @@ function parseRunnerOwnedMockPgid(env) {
 async function adapterCypressNodeSetup(checkoutRoot, config, options, env) {
   const endpoint = parseRunnerOwnedEndpoint(env)
   const mockPgid = parseRunnerOwnedMockPgid(env)
+  const wikidataEndpoint = parseRunnerOwnedWikidataEndpoint(env)
+  const wikidataMockPgid = parseRunnerOwnedWikidataMockPgid(env)
   if (endpoint) {
     injectOpenAiMockEndpoint(config, endpoint)
+  }
+  if (wikidataEndpoint) {
+    injectWikidataMockEndpoint(config, wikidataEndpoint)
   }
   if (typeof options.on === 'function') {
     options.on('task', {
       async [VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK]() {
-        if (!endpoint) {
-          throw new Error(
-            'Isolated OpenAI mock ownership check requires a private mock for this run.'
-          )
-        }
-        if (!mockPgid) {
-          throw new Error(
-            'Isolated OpenAI mock ownership check requires the owned mock process group id.'
-          )
-        }
-        await assertOwnedMockListener(
-          endpoint.servingPort,
+        return verifyOwnedMockListenerTasks(
+          endpoint,
           mockPgid,
-          'serving',
-          {
-            serviceLabel: OPEN_AI_SERVICE_LABEL,
-          }
-        )
-        await assertOwnedMockListener(
-          new URL(endpoint.managementUrl).port,
-          mockPgid,
-          'management',
-          { serviceLabel: OPEN_AI_SERVICE_LABEL }
-        )
-        return true
+          OPEN_AI_SERVICE_LABEL
+        )()
       },
       [GET_ISOLATED_OPEN_AI_MOCK_ENDPOINT_TASK]() {
         return endpoint ?? null
+      },
+      async [VERIFY_ISOLATED_WIKIDATA_MOCK_OWNERSHIP_TASK]() {
+        return verifyOwnedMockListenerTasks(
+          wikidataEndpoint,
+          wikidataMockPgid,
+          WIKIDATA_SERVICE_LABEL
+        )()
+      },
+      [GET_ISOLATED_WIKIDATA_MOCK_ENDPOINT_TASK]() {
+        return wikidataEndpoint ?? null
       },
     })
   }
@@ -205,37 +277,61 @@ export async function guardCypressNodeSetup(
 
   const leaseToken = await acquireSutRunnerLease(checkoutRoot)
 
-  let privateMock = null
+  const privateMocks = {}
   let cleanupOnce = async () => {
     /* replaced after lease + mock are ready */
   }
 
   const startMockIfNeeded = async (specs) => {
     const approved = assertSupportedIsolatedCypressSpecs(specs)
-    if (!approved.requiresPrivateOpenAiMock) {
-      clearOpenAiMockEndpoint(config)
-      return
+    if (approved.requiresPrivateOpenAiMock && !privateMocks.openAi) {
+      privateMocks.openAi = await (
+        options.startPrivateOpenAiMockFn ?? startPrivateOpenAiMock
+      )({
+        checkoutRoot,
+        allocation,
+      })
+      injectOpenAiMockEndpoint(config, privateMocks.openAi.endpoint)
+      observePrivateMockFailure(privateMocks.openAi, cleanupOnce)
     }
-    if (privateMock) return
-    privateMock = await (
-      options.startPrivateOpenAiMockFn ?? startPrivateOpenAiMock
-    )({
-      checkoutRoot,
-      allocation,
-    })
-    injectOpenAiMockEndpoint(config, privateMock.endpoint)
-    observePrivateMockFailure(privateMock, cleanupOnce)
+    if (approved.requiresPrivateWikidataMock && !privateMocks.wikidata) {
+      privateMocks.wikidata = await (
+        options.startPrivateWikidataMockFn ?? startPrivateWikidataMock
+      )({
+        checkoutRoot,
+        allocation,
+      })
+      injectWikidataMockEndpoint(config, privateMocks.wikidata.endpoint)
+      observePrivateMockFailure(privateMocks.wikidata, cleanupOnce)
+    }
+    if (
+      !(
+        approved.requiresPrivateOpenAiMock ||
+        approved.requiresPrivateWikidataMock
+      )
+    ) {
+      clearOpenAiMockEndpoint(config)
+      clearWikidataMockEndpoint(config)
+    }
   }
 
   cleanupOnce = registerRunnerCleanup(async () => {
-    if (privateMock) {
-      await privateMock.stop()
-      privateMock = null
+    for (const mock of Object.values(privateMocks)) {
+      try {
+        await mock.stop()
+      } catch {
+        // best-effort during cleanup
+      }
+    }
+    for (const key of Object.keys(privateMocks)) {
+      delete privateMocks[key]
     }
     await releaseSutRunnerLease(checkoutRoot, leaseToken)
   })
   process.once('exit', () => {
-    privateMock?.killSync()
+    for (const mock of Object.values(privateMocks)) {
+      mock?.killSync()
+    }
     releaseSutRunnerLeaseSync(checkoutRoot, leaseToken)
   })
 
@@ -251,22 +347,33 @@ export async function guardCypressNodeSetup(
   if (typeof options.on === 'function') {
     options.on('task', {
       async [VERIFY_ISOLATED_OPEN_AI_MOCK_OWNERSHIP_TASK]() {
-        if (!privateMock) {
+        if (!privateMocks.openAi) {
           throw new Error(
             'Isolated OpenAI mock ownership check requires a private mock for this run.'
           )
         }
-        return privateMock.verifyOwnership()
+        return privateMocks.openAi.verifyOwnership()
       },
       [GET_ISOLATED_OPEN_AI_MOCK_ENDPOINT_TASK]() {
-        return privateMock?.endpoint ?? null
+        return privateMocks.openAi?.endpoint ?? null
+      },
+      async [VERIFY_ISOLATED_WIKIDATA_MOCK_OWNERSHIP_TASK]() {
+        if (!privateMocks.wikidata) {
+          throw new Error(
+            'Isolated Wikidata mock ownership check requires a private mock for this run.'
+          )
+        }
+        return privateMocks.wikidata.verifyOwnership()
+      },
+      [GET_ISOLATED_WIKIDATA_MOCK_ENDPOINT_TASK]() {
+        return privateMocks.wikidata?.endpoint ?? null
       },
     })
     options.on('before:run', async (details) => {
       try {
         await startMockIfNeeded(specsFromBeforeRun(details, checkoutRoot))
-        if (privateMock) {
-          await privateMock.verifyOwnership()
+        for (const mock of Object.values(privateMocks)) {
+          await mock.verifyOwnership()
         }
       } catch (error) {
         await cleanupOnce()
@@ -281,11 +388,11 @@ export async function guardCypressNodeSetup(
   return {
     release: cleanupOnce,
     origin,
-    privateMock: privateMock
+    privateMock: privateMocks.openAi
       ? {
-          endpoint: privateMock.endpoint,
-          child: privateMock.child,
-          verifyOwnership: privateMock.verifyOwnership,
+          endpoint: privateMocks.openAi.endpoint,
+          child: privateMocks.openAi.child,
+          verifyOwnership: privateMocks.openAi.verifyOwnership,
         }
       : null,
   }

@@ -3,6 +3,10 @@ import WikidataEntitiesBuilder, {
   type Claim,
 } from '../../support/json/WikidataEntitiesBuilder'
 import testability from '../testability'
+import {
+  type WikidataMockEndpointContext,
+  resolveWikidataMockEndpointContext,
+} from './wikidataMockEndpointContext'
 
 const stubWikidataApi = (
   serviceMocker: ServiceMocker,
@@ -26,8 +30,14 @@ const stubWikidataEntity = (
   )
 }
 
-const wikidataService = () => {
-  const serviceMocker = new ServiceMocker('wikidata', 5002)
+const wikidataService = (
+  endpoint: WikidataMockEndpointContext = resolveWikidataMockEndpointContext()
+) => {
+  const serviceMocker = new ServiceMocker(
+    'wikidata',
+    endpoint.servingPort,
+    endpoint.managementUrl
+  )
   return {
     mock() {
       testability().mockService(serviceMocker)

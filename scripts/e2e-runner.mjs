@@ -30,11 +30,17 @@ import {
   OPEN_AI_SERVICE_LABEL,
   startPrivateOpenAiMock,
 } from './isolated-openai-mock.mjs'
+import {
+  WIKIDATA_SERVICE_LABEL,
+  startPrivateWikidataMock,
+} from './isolated-wikidata-mock.mjs'
 import { acquireSutRunnerLease, releaseSutRunnerLease } from './sut-owner.mjs'
 import {
   E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY,
   E2E_RUNNER_MOCK_PGID_ENV_KEY,
   E2E_RUNNER_OWNS_LIFETIME_ENV_KEY,
+  E2E_RUNNER_WIKIDATA_MOCK_ENDPOINT_ENV_KEY,
+  E2E_RUNNER_WIKIDATA_MOCK_PGID_ENV_KEY,
 } from './isolated-cypress.mjs'
 import { resolveSutCheckoutTarget } from './sut-isolated-target.mjs'
 import { listOccupiedApplicationPorts } from './local-runtime-target.mjs'
@@ -43,6 +49,7 @@ import { stopOwnedSutProcessTree } from './sut-owned-process-tree.mjs'
 import {
   SHARED_MOUNTEBANK_MANAGEMENT_PORT,
   SHARED_OPEN_AI_SERVING_PORT,
+  SHARED_WIKIDATA_SERVING_PORT,
 } from './isolated-mountebank-mock-ports.mjs'
 import { assertPortFreeBeforeMockMutation } from './isolated-mountebank-mock-ownership.mjs'
 
@@ -156,6 +163,26 @@ export async function allocatePrimaryOpenAiMockPorts() {
 }
 
 /**
+ * Canonical primary Mountebank management + Wikidata serving ports for a
+ * primary-target batch that requires the private Wikidata mock. A foreign
+ * listener on either port is refusal — never adoption. Reuses the existing
+ * ownership-port check so the refusal message and semantics match the
+ * isolated private-mock path.
+ */
+export async function allocatePrimaryWikidataMockPorts() {
+  const managementPort = SHARED_MOUNTEBANK_MANAGEMENT_PORT
+  const servingPort = SHARED_WIKIDATA_SERVING_PORT
+  const ownershipOpts = { serviceLabel: WIKIDATA_SERVICE_LABEL }
+  await assertPortFreeBeforeMockMutation(
+    managementPort,
+    'management',
+    ownershipOpts
+  )
+  await assertPortFreeBeforeMockMutation(servingPort, 'serving', ownershipOpts)
+  return { managementPort, servingPort }
+}
+
+/**
  * No-op cancellation handle. The default for `runE2eBatch` so callers that do
  * not need signal handling install no process listeners. The `isMain` entry
  * point wires real SIGINT/SIGTERM handling via `wireBatchCancellation`.
@@ -241,6 +268,7 @@ export async function runE2eBatch({
   stdio = 'inherit',
   cancel = NO_CANCEL,
   startPrivateOpenAiMockFn = startPrivateOpenAiMock,
+  startPrivateWikidataMockFn = startPrivateWikidataMock,
   cancelEscalationMs,
   isIsolatedCheckoutFn = worktreeIsolationApplies,
   ...lifetimeOpts
@@ -275,6 +303,7 @@ export async function runE2eBatch({
     stdio,
     cancel,
     startPrivateOpenAiMockFn,
+    startPrivateWikidataMockFn,
     label: 'E2E batch',
     cancelEscalationMs,
     browser,
@@ -315,6 +344,23 @@ function observeChildExit(child) {
     })
   })
   return { exited: promise, hasExited: () => exited }
+}
+
+/**
+ * Combine several child-exit observers into one: the combined `exited`
+ * resolves when ANY observed child exits, and `hasExited()` reports whether
+ * any child has already exited. Used when an invocation owns more than one
+ * private mock child — a required mock exiting during the run ends it.
+ */
+function combineChildExits(observers) {
+  const valid = observers.filter(Boolean)
+  if (valid.length === 0) {
+    return null
+  }
+  return {
+    exited: Promise.race(valid.map((o) => o.exited)),
+    hasExited: () => valid.some((o) => o.hasExited()),
+  }
 }
 
 function runCypressOnce({
@@ -395,8 +441,8 @@ function runCypressOnce({
       }
     })
 
-    // A required owned service (the SUT supervisor child, or the private
-    // OpenAI mock) exiting during the test run ends the batch with visible
+    // A required owned service (the SUT supervisor child, or a private
+    // mock) exiting during the test run ends the batch with visible
     // failure. Terminate Cypress promptly — do not wait for it to finish on
     // its own — then let the caller's `lifetime.shutdown()` settle the
     // remaining owned tree. Covers the timing window: if the child already
@@ -425,7 +471,7 @@ function runCypressOnce({
     )
     endRunOnRequiredExit(
       mockExit,
-      'Required private OpenAI mock exited during the test run; ending the batch with failure.'
+      'Required private mock exited during the test run; ending the batch with failure.'
     )
 
     child.once('error', (error) => {
@@ -480,6 +526,7 @@ async function runOwnedE2eInvocation({
   stdio,
   cancel,
   startPrivateOpenAiMockFn,
+  startPrivateWikidataMockFn,
   label,
   cancelEscalationMs,
   browser,
@@ -534,24 +581,27 @@ async function runOwnedE2eInvocation({
 
   const childExit = observeChildExit(lifetime.child)
 
-  // When the resolved spec requires a private OpenAI mock, the invocation
-  // owns the mock + runner lease for the entire run (no after:spec release).
-  // The mock starts after the SUT is ready and is settled alongside the SUT
-  // in the single invocation shutdown.
-  const mockState = { handle: null, leaseToken: null }
-  let mockExit = null
+  // When the resolved specs require private mocks (OpenAI and/or Wikidata),
+  // the invocation owns each required mock + a single runner lease for the
+  // entire run (no after:spec release). Each mock starts after the SUT is
+  // ready and is settled alongside the SUT in the single invocation
+  // shutdown. Each service has its own thin adapter over the generic
+  // lifecycle; the invocation starts one per required mock.
+  const mockHandles = []
+  let leaseToken = null
+  const mockExitObservers = []
   const originalShutdown = lifetime.shutdown.bind(lifetime)
   lifetime.shutdown = async () => {
-    if (mockState.handle) {
+    for (const handle of mockHandles) {
       try {
-        await mockState.handle.stop()
+        await handle.stop()
       } catch {
         // best-effort during shutdown
       }
     }
-    if (mockState.leaseToken) {
+    if (leaseToken) {
       try {
-        await releaseSutRunnerLease(checkoutRoot, mockState.leaseToken)
+        await releaseSutRunnerLease(checkoutRoot, leaseToken)
       } catch {
         // best-effort during shutdown
       }
@@ -579,50 +629,76 @@ async function runOwnedE2eInvocation({
       return 1
     }
 
+    // Collect the required private mocks for this invocation. Each entry
+    // carries its starter, its endpoint/pgid env keys, and the primary-target
+    // canonical-port allocator. The isolated target coordinates ownership
+    // through the SUT owner's runner lease (acquired once per invocation);
+    // the primary target has no claimed owner, so the invocation owns each
+    // mock directly and uses the canonical serving ports.
+    const requiredMocks = []
     if (approved?.requiresPrivateOpenAiMock) {
-      // The isolated target coordinates mock ownership through the SUT
-      // owner's runner lease. The primary target has no claimed owner, so
-      // the invocation owns the mock directly (no lease); the mock uses the
-      // canonical Mountebank/OpenAI serving ports instead of allocated ones.
-      if (isolated) {
-        try {
-          mockState.leaseToken = await acquireSutRunnerLease(checkoutRoot)
-        } catch (error) {
-          errLog(`Failed to acquire runner lease: ${error.message}`)
-          return 1
-        }
-      }
+      requiredMocks.push({
+        label: OPEN_AI_SERVICE_LABEL,
+        start: startPrivateOpenAiMockFn,
+        endpointEnvKey: E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY,
+        pgidEnvKey: E2E_RUNNER_MOCK_PGID_ENV_KEY,
+        allocatePrimaryPorts: allocatePrimaryOpenAiMockPorts,
+      })
+    }
+    if (approved?.requiresPrivateWikidataMock) {
+      requiredMocks.push({
+        label: WIKIDATA_SERVICE_LABEL,
+        start: startPrivateWikidataMockFn,
+        endpointEnvKey: E2E_RUNNER_WIKIDATA_MOCK_ENDPOINT_ENV_KEY,
+        pgidEnvKey: E2E_RUNNER_WIKIDATA_MOCK_PGID_ENV_KEY,
+        allocatePrimaryPorts: allocatePrimaryWikidataMockPorts,
+      })
+    }
+
+    if (requiredMocks.length > 0 && isolated) {
       try {
-        if (isolated) {
-          const allocation = loadCompleteIsolatedE2eAllocation(checkoutRoot)
-          mockState.handle = await startPrivateOpenAiMockFn({
-            checkoutRoot,
-            allocation,
-          })
-        } else {
-          mockState.handle = await startPrivateOpenAiMockFn({
-            checkoutRoot,
-            allocation: null,
-            allocatePortsFn: allocatePrimaryOpenAiMockPorts,
-          })
-        }
-        mockExit = observeChildExit(mockState.handle.child)
+        leaseToken = await acquireSutRunnerLease(checkoutRoot)
       } catch (error) {
-        errLog(`Failed to start owned private OpenAI mock: ${error.message}`)
+        errLog(`Failed to acquire runner lease: ${error.message}`)
+        return 1
+      }
+    }
+
+    for (const required of requiredMocks) {
+      try {
+        const handle = isolated
+          ? await required.start({
+              checkoutRoot,
+              allocation: loadCompleteIsolatedE2eAllocation(checkoutRoot),
+            })
+          : await required.start({
+              checkoutRoot,
+              allocation: null,
+              allocatePortsFn: required.allocatePrimaryPorts,
+            })
+        mockHandles.push(handle)
+        const observed = observeChildExit(handle.child)
+        if (observed) mockExitObservers.push(observed)
+      } catch (error) {
+        errLog(
+          `Failed to start owned private ${required.label} mock: ${error.message}`
+        )
         return 1
       }
     }
 
     const cypressEnv = { ...env }
-    if (mockState.handle) {
+    if (mockHandles.length > 0) {
       cypressEnv[E2E_RUNNER_OWNS_LIFETIME_ENV_KEY] = '1'
-      cypressEnv[E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY] = JSON.stringify(
-        mockState.handle.endpoint
-      )
-      cypressEnv[E2E_RUNNER_MOCK_PGID_ENV_KEY] = String(
-        mockState.handle.child?.pid ?? ''
-      )
     }
+    for (let i = 0; i < mockHandles.length; i++) {
+      const handle = mockHandles[i]
+      const required = requiredMocks[i]
+      cypressEnv[required.endpointEnvKey] = JSON.stringify(handle.endpoint)
+      cypressEnv[required.pgidEnvKey] = String(handle.child?.pid ?? '')
+    }
+
+    const mockExit = combineChildExits(mockExitObservers)
 
     const cypressExitCode = await runCypressOnce({
       specs,
@@ -686,6 +762,7 @@ export async function runE2eInteractive({
   stdio = 'inherit',
   cancel = NO_CANCEL,
   startPrivateOpenAiMockFn = startPrivateOpenAiMock,
+  startPrivateWikidataMockFn = startPrivateWikidataMock,
   cancelEscalationMs,
   isIsolatedCheckoutFn = worktreeIsolationApplies,
   ...lifetimeOpts
@@ -724,6 +801,7 @@ export async function runE2eInteractive({
     stdio,
     cancel,
     startPrivateOpenAiMockFn,
+    startPrivateWikidataMockFn,
     label: 'Interactive E2E session',
     cancelEscalationMs,
     isolated,

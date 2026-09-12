@@ -135,24 +135,51 @@ test('application-only active specs are admitted; resource-dependent and ignored
       `${cliSpec} must be admitted by slice 2`
     )
   }
-  // Excluded groups: wholly-ignored (including CLI), Wikidata mock, and live
-  // OpenAI — none admitted by slices 1–3. Active OpenAI-mock features are
-  // admitted by slice 3 through the same registry.
+  // Excluded groups: wholly-ignored (including CLI) and live OpenAI — none
+  // admitted by slices 1–3 or 6. Active OpenAI-mock features are admitted by
+  // slice 3 and Wikidata-mock features by slice 6 through the same registry.
   for (const excluded of [
     'e2e_test/features/book_reading/epub_book.feature',
     'e2e_test/features/cli/cli_access_token.feature',
     'e2e_test/features/cli/cli_gmail.feature',
     'e2e_test/features/cli/cli_interactive_mode.feature',
     'e2e_test/features/cli/cli_recall.feature',
-    'e2e_test/features/wikidata/note_create_with_wikidata_id.feature',
     'e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature',
   ]) {
     assert.equal(
       SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(excluded),
       false,
-      `${excluded} must not be admitted by slices 1–3`
+      `${excluded} must not be admitted`
     )
   }
+})
+
+test('active Wikidata-mock specs are admitted by slice 6 with a private-mock requirement', () => {
+  // The four current Wikidata feature files are admitted through the single
+  // registry, each declaring requiresPrivateWikidataMock. The mixed file
+  // associate_wikidata.feature is admitted as a file; its real-service
+  // scenario preserves existing opt-in/credential filtering at scenario
+  // selection — the registry authorizes the private mock for the file, it
+  // does not mock real-service scenarios.
+  for (const wikidataSpec of [
+    'e2e_test/features/wikidata/associate_wikidata.feature',
+    'e2e_test/features/wikidata/associate_wikidata_location_entries.feature',
+    'e2e_test/features/wikidata/associate_wikidata_person_entries.feature',
+    'e2e_test/features/wikidata/note_create_with_wikidata_id.feature',
+  ]) {
+    assert.equal(
+      SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(wikidataSpec),
+      true,
+      `${wikidataSpec} must be admitted by slice 6`
+    )
+  }
+  // The mixed file's real-service sibling (live OpenAI) stays excluded.
+  assert.equal(
+    SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(
+      'e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature'
+    ),
+    false
+  )
 })
 
 test('supported isolated Cypress sets origin before reset and serializes the runner lease', async (t) => {

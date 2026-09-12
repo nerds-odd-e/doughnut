@@ -11,12 +11,14 @@ import {
 } from '../config/cliGmailE2eConfig'
 import start, { mock_services } from '../start'
 import { clearBrowserOpenAiMockEndpointOverride } from '../start/mock_services/openAiMockEndpointContext'
+import { clearBrowserWikidataMockEndpointOverride } from '../start/mock_services/wikidataMockEndpointContext'
 import { cli } from '../start/pageObjects/cli'
 import {
   ensurePrivateOpenAiMockReady,
   openAiMockIsolationBarrierActive,
   worktreeResetIsolationTask,
 } from './worktreeOpenAiMockIsolation'
+import { ensurePrivateWikidataMockReady } from './worktreeWikidataMockIsolation'
 
 // Ownership preflight for private OpenAI mocks must precede Before-order-0
 // fixture reset. Recheck again before OpenAI install/recreate below.
@@ -79,11 +81,13 @@ Before({ tags: '@randomizerWithFixedSeed' }, () => {
 })
 
 Before({ tags: '@usingMockedWikidataService' }, () => {
+  ensurePrivateWikidataMockReady()
   mock_services.wikidata().mock()
 })
 
 After({ tags: '@usingMockedWikidataService' }, () => {
   mock_services.wikidata().restore()
+  clearBrowserWikidataMockEndpointOverride()
 })
 
 Before({ tags: '@usingMockedOpenAiService' }, () => {

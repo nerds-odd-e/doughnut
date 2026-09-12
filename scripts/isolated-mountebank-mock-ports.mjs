@@ -16,6 +16,7 @@ import {
 
 export const SHARED_MOUNTEBANK_MANAGEMENT_PORT = 2525
 export const SHARED_OPEN_AI_SERVING_PORT = 5001
+export const SHARED_WIKIDATA_SERVING_PORT = 5002
 
 const ALLOCATE_ATTEMPTS = 24
 
@@ -114,5 +115,18 @@ export async function allocateMountebankMockPortsMulti(
 export async function allocatePrivateOpenAiMockPorts(allocation) {
   return allocateMountebankMockPorts(allocation, {
     excludeServingPorts: [SHARED_OPEN_AI_SERVING_PORT],
+  })
+}
+
+/**
+ * Wikidata-specific allocation: exclude the Wikidata canonical serving port
+ * (5002) in addition to the canonical management port and the checkout's app
+ * ports. Wikidata's adapter consumes this owned endpoint instead of the
+ * hardcoded 5002/default 2525.
+ * @returns {Promise<{ managementPort: number, servingPort: number }>}
+ */
+export async function allocatePrivateWikidataMockPorts(allocation) {
+  return allocateMountebankMockPorts(allocation, {
+    excludeServingPorts: [SHARED_WIKIDATA_SERVING_PORT],
   })
 }
