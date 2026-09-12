@@ -13,7 +13,6 @@ import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.AttachmentBlob;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.repositories.ImageRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -24,7 +23,6 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   private static final String ORDINARY_NOTE_FENCE = "---\ntype: Note\n---\n";
 
   @Autowired EntityManager entityManager;
-  @Autowired ImageRepository imageRepository;
 
   @Test
   void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException {
@@ -117,11 +115,11 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
                 + kept.getName()
                 + "\n---\nbody"));
 
-    assertThat(imageRepository.findById(kept.getId()).isPresent(), equalTo(true));
-    assertThat(imageRepository.findById(orphan.getId()).isPresent(), equalTo(false));
+    assertThat(entityManager.find(Image.class, kept.getId()), notNullValue());
+    assertThat(entityManager.find(Image.class, orphan.getId()), nullValue());
     assertThat(entityManager.find(AttachmentBlob.class, orphan.getBlob().getId()), nullValue());
     assertThat(entityManager.find(AttachmentBlob.class, kept.getBlob().getId()), notNullValue());
-    assertThat(imageRepository.findById(otherNoteImage.getId()).isPresent(), equalTo(true));
+    assertThat(entityManager.find(Image.class, otherNoteImage.getId()), notNullValue());
   }
 
   @Test
@@ -132,8 +130,8 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
 
     controller.updateNoteContent(note, contentDto("just markdown"));
 
-    assertThat(imageRepository.findById(first.getId()).isPresent(), equalTo(false));
-    assertThat(imageRepository.findById(second.getId()).isPresent(), equalTo(false));
+    assertThat(entityManager.find(Image.class, first.getId()), nullValue());
+    assertThat(entityManager.find(Image.class, second.getId()), nullValue());
   }
 
   @Test
@@ -145,8 +143,8 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     controller.updateNoteContent(
         note, contentDto("---\nimage: https://example.com/a.png\n---\nbody"));
 
-    assertThat(imageRepository.findById(first.getId()).isPresent(), equalTo(true));
-    assertThat(imageRepository.findById(second.getId()).isPresent(), equalTo(true));
+    assertThat(entityManager.find(Image.class, first.getId()), notNullValue());
+    assertThat(entityManager.find(Image.class, second.getId()), notNullValue());
   }
 
   @Test

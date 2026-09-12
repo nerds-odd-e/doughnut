@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
@@ -16,7 +17,6 @@ import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.entities.repositories.ImageRepository;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -35,8 +35,6 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
 
   @org.springframework.beans.factory.annotation.Autowired
   TextContentController textContentController;
-
-  @org.springframework.beans.factory.annotation.Autowired ImageRepository imageRepository;
 
   @AfterEach
   void resetFailureInjection() {
@@ -185,9 +183,9 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
           assertThat(reloadedNote.getContent(), is(ACCEPTED_CONTENT));
           assertThat(reloadedNote.getUpdatedAt(), is(noteUpdatedAt));
           assertThat(rowsFor(entityManager, reloadedNote), empty());
-          assertThat(imageRepository.findById(orphan.getId()).isPresent(), is(true));
+          assertThat(entityManager.find(Image.class, orphan.getId()), notNullValue());
           assertThat(
-              entityManager.find(AttachmentBlob.class, orphan.getBlob().getId()) != null, is(true));
+              entityManager.find(AttachmentBlob.class, orphan.getBlob().getId()), notNullValue());
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));

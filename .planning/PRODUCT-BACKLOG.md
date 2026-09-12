@@ -11,8 +11,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Remove the test-only image repository](quick/111-remove-test-only-image-repository/PLAN.md)
-
 ## Backlog list
 
 - [Reconsider note-title uniqueness and soft deletion with Git versioning](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
