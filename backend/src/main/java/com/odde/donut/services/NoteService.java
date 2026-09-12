@@ -8,12 +8,12 @@ import com.odde.donut.entities.Image;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.ImageRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.utils.ImageBuilder;
+import jakarta.persistence.FlushModeType;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.LinkedHashSet;
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 public class NoteService {
   private final NoteRepository noteRepository;
   private final MemoryTrackerRepository memoryTrackerRepository;
-  private final ImageRepository imageRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NoteReferenceHandling noteReferenceHandling;
@@ -38,12 +37,10 @@ public class NoteService {
       NoteReferenceService noteReferenceService,
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
-      ImageRepository imageRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
-    this.imageRepository = imageRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteReferenceService = noteReferenceService;
@@ -180,12 +177,15 @@ public class NoteService {
         ref instanceof NoteContentMarkdown.LeadingFrontmatterImageReference.Referenced referenced
             ? referenced.imageId()
             : null;
-    for (Image image : imageRepository.findByNote_Id(note.getId())) {
-      if (keepId != null && keepId.equals(image.getId())) {
-        continue;
-      }
-      entityPersister.remove(image);
-    }
+    entityPersister
+        .createQuery(
+            "FROM Image i WHERE i.note = :note AND (:keepId IS NULL OR i.id <> :keepId)",
+            Image.class)
+        .setParameter("note", note)
+        .setParameter("keepId", keepId)
+        .setFlushMode(FlushModeType.COMMIT)
+        .getResultList()
+        .forEach(entityPersister::remove);
   }
 
   public void restore(Note note, User viewer) {

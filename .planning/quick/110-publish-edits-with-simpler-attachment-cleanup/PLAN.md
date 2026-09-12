@@ -1,9 +1,10 @@
 # Publish notebook edits faster with simpler attachment cleanup
 
-Status: planned
+Status: completed
 Source: [SEED-018 story 5](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-5).
-Authority: 2026-09-12 request for slice planning and refinement if needed.
-Execution is not started; the story remains queued at priority one.
+Authority: 2026-09-12 request to execute plan 110.
+Execution completed on the retained execution branch; the story remains in
+**Taken** through retrospective and story wrap-up.
 
 ## Outcome and scope
 
@@ -91,7 +92,7 @@ shared simplification does not warrant a new one.
 
 ### 1. Halve completed edit-publication waiting time through simpler image cleanup
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given the representative existing-note proposal, when its owner
 publishes it, then the accepted publication completes in at most half the
@@ -153,6 +154,27 @@ These are explicit verification-wait exceptions, not allowance for an
 unbounded redesign. Stop-safe only after the coherent change passes all gates;
 if speed or simplicity fails, keep the slice unfinished and retain evidence.
 
+Delivered evidence (2026-09-12): three fresh baseline captures measured
+11,847.590 / 13,303.793 / 12,089.157 ms; three fresh candidate captures measured
+3,028.152 / 3,095.452 / 3,125.534 ms. The median fell from 12,089.157 to
+3,095.452 ms, a 74.39% reduction. All six runs completed with HTTP 200, the
+proposed head, 1,000 verified documents, 1,002 unchanged identities, unchanged
+learning, 1,000 aliases and 2,000 property-reference targets. Capture paths and
+environment metadata are retained in
+`docs/notebook-publication-profiling.md#attachment-cleanup-execution-comparison`.
+
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed all 2,404 tests.
+The literal small addition/rejection command above passed both scenarios. The
+representative candidate JFR recorded 67 request-thread samples, seven
+transaction-commit flush samples and zero image-cleanup flush samples; its
+analysis is retained with capture `2026-09-12T15-23-44.883Z`. Formatted
+production code added 11 and removed 15 lines (net −4), removing the repository
+dependency, unused finder and Java filtering without relocating the
+responsibility. `scripts/check_diff_whitespace.sh` passed. The fresh post-change
+refactor review found `none — already clean` and ended `## REFACTOR COMPLETE`
+without edits or invalidated proof. Active implementation/proof cleanup was
+approximately four minutes; profiler and suite waits used the stated exception.
+
 ## Promise-to-proof ownership
 
 All proof belongs to slice 1; correctness examples preserve the one changed
@@ -185,6 +207,15 @@ independent check-only lint hook → push the execution branch and observe CI
 asynchronously. Implementers/refactorers do not run the formatter or standalone
 `lint:changed`. Follow the execution workflow's integration and ownership rules;
 retain this plan and review evidence through retrospective and story wrap-up.
+
+Execution identity (started 2026-09-12): originating checkout
+`/Users/terryyin/git/doughnut` on `main`; execution checkout
+`/Users/terryyin/git/doughnut/.worktrees/quick-110-publish-edits-with-simpler-attachment-cleanup`
+on `quick/110-publish-edits-with-simpler-attachment-cleanup`; integration target
+`main`. The execution branch starts from Taken-only commit `9468b251b7`.
+GitHub Actions workflow `.github/workflows/ci.yml` (`donut CI`) is push-triggered
+only for `main`, so it cannot observe pushes to the retained execution branch;
+CI notification coverage is unavailable for this execution branch.
 
 Use the repository's five-minute slice target and ten-minute hard scrutiny:
 distinguish the stated external waits from active work. If active implementation
