@@ -2,13 +2,21 @@ import { nonInteractiveOutput } from './outputAssertions'
 import testability from '../../testability'
 import { notebookCloneCheckout } from './notebookCloneCheckout'
 import type { PublicationProfileParameters } from '../../../config/notebookPublicationProfile'
+import {
+  existingNoteTitle,
+  relatedReferenceIndex,
+  sourceReferenceIndex,
+} from '../../../config/notebookPublicationFixture'
 
 const notebook = 'CLI Clone Notebook'
 const title = (kind: string, i: number) =>
   `${kind}-${String(i).padStart(5, '0')}`
 const folder = (i: number) => `group-${String(i).padStart(2, '0')}`
 function document(kind: string, i: number, existing: number, count: number) {
-  return `---\ntype: Note\naliases: ['${kind} alias ${i}']\nmeaning: '${kind} concept ${i}'\nsource: '[[${title('Existing', i % existing)}]]'\nrelated:\n  - '[[${title('Existing', (i + 1) % existing)}]]'\n  - '[[${title('Existing', (i + 2) % existing)}]]'\n---\n${kind} concept ${i}. ${'Deterministic authored prose. '.repeat(32)}\nSee [[${title('Existing', i % existing)}]] and [[${title(kind, (i + 1) % count)}]].\n`
+  const source = existingNoteTitle(sourceReferenceIndex(i, existing))
+  const related0 = existingNoteTitle(relatedReferenceIndex(i, existing, 0))
+  const related1 = existingNoteTitle(relatedReferenceIndex(i, existing, 1))
+  return `---\ntype: Note\naliases: ['${kind} alias ${i}']\nmeaning: '${kind} concept ${i}'\nsource: '[[${source}]]'\nrelated:\n  - '[[${related0}]]'\n  - '[[${related1}]]'\n---\n${kind} concept ${i}. ${'Deterministic authored prose. '.repeat(32)}\nSee [[${source}]] and [[${title(kind, (i + 1) % count)}]].\n`
 }
 
 function recordPublicationTiming(started: string) {
@@ -213,6 +221,9 @@ export const notebookPublicationProfile = {
   },
   stop() {
     return cy.task('stopNotebookPublicationProfile')
+  },
+  expectEditsPersisted() {
+    return cy.task('confirmNotebookPublicationEditDerivedState')
   },
   expectReceived() {
     return cy

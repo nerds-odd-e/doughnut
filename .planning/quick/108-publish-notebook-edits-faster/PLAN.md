@@ -1,6 +1,6 @@
 # Publish notebook edits at least twice as fast with simpler index maintenance
 
-Status: in progress — slice 1 done, slice 2 not started.
+Status: done — both slices delivered.
 Source: [SEED-018 story 3](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-3).
 Authority: 2026-09-12 request for a new replacement plan and slice refinement if
 needed. A subsequent 2026-09-12 request authorized execution.
@@ -186,7 +186,7 @@ touched only E2E helper structure, not launcher timing or production code.
 
 ### 2. Publish the representative edit commit in at most half the baseline time
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given the same valid 1,000-edit proposal and baseline from slice 1,
 when its owner publishes it, then publication completes in at most half the
 baseline median with exact accepted content and preserved notebook semantics.
@@ -232,6 +232,81 @@ isolated HTTP checks, and three captures. Stack/test/capture waits are the state
 exception, not permission for an open-ended redesign. Stop-safe only after a
 green coherent change; if the 50% or simplicity gate fails, preserve evidence and
 keep this slice unfinished rather than redefine success.
+
+Delivered: applied the retained `candidate.patch` verbatim (it applied cleanly
+against current HEAD; no adaptation was needed) — `Note.authoredReferenceRowsBySourceLocalKey()`,
+direct-query bulk delete with `FlushModeType.COMMIT` in `NoteAliasIndexService`,
+and the detach/bulk-delete/`persist(note)`/rebuild-from-owned-references sequence
+in `NotePropertyIndexService`, removing the now-unused `deleteByNoteIdInBulk`
+and `ownRowsBySourceLocalKey`. A follow-up refactor pass extracted the
+`source`/`related` index-mapping arithmetic shared by the fixture generator and
+the new derived-state checker into `e2e_test/config/notebookPublicationFixture.ts`
+so the encode and decode sides cannot drift apart, and added a short rationale
+comment on the new detach-before-bulk-delete step.
+
+The profile state checker (`e2e_test/config/notebookPublicationState.ts`) now
+also tracks `note_alias_index` and `note_property_index` rows: the existing
+rejection-preservation check asserts they are byte-for-byte unchanged after a
+rolled-back publication, and a new `expectPublicationEditsPersisted` asserts
+an accepted edit's note identities/learning are unchanged while every edited
+note's alias and `source`/`related` property-reference targets match the
+fixture's deterministic mapping exactly.
+
+Full backend suite: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` —
+2,404 tests, 480 suites, 0 failures, including both
+`TextContentControllerUpdateNoteTitleInboundWikiReferencesTests` cases that
+broke the rejected first-prototype intermediate.
+
+Small regression: `PUBLICATION_PROFILE_EXISTING=20 PUBLICATION_PROFILE_ADDITIONS=20
+PUBLICATION_PROFILE_TAGS='@publicationProfileHttp or @publicationProfileHttpRejection'
+PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c
+caffeinate -i node scripts/profiling/run-notebook-publication-profile.mjs` —
+2/2 passing (20/20 addition accepted; 19-preceding-identity late rejection
+preserving all original rows, now including alias/property-index rows).
+
+Three 1,000/1,000 candidate captures against the finished, uncommitted change,
+same fixture/revision context as slice 1's baseline, command
+`PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_UPDATES=1000
+PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c
+caffeinate -i node scripts/profiling/run-notebook-publication-profile.mjs`:
+
+| Run | HTTP elapsed |
+| --- | ---: |
+| 1 | 9,974.289 ms |
+| 2 | 10,343.359 ms |
+| 3 | 10,308.043 ms |
+
+Candidate median: **10,308.043 ms** — a **65.35% reduction** against the
+29,746.720 ms baseline, clearing the 50% (≤ 14,873.360 ms) gate with margin.
+All three runs returned the same accepted head as slice 1's baseline
+(`da723a2a6025a6d624ccb9473cbfb71183d0c2c0`, same fixture), full byte-for-byte
+receiver verification, and an identical derived-state result
+(`noteIdentitiesUnchanged: 1002, learningUnchanged: true,
+exactUpdatedAliases: 1000, exactPropertyReferenceTargets: 2000`) matching the
+retained investigation's shape. No environment change was observed; no
+baseline recapture was needed. Each run's JFR recording is retained in its
+capture directory under `~/Library/Application Support/Donut/publication-profiles/`
+for later inspection; a fresh `AnalyzePublication.java` pass over these three
+captures specifically was not repeated, since the delivered code is the same
+mechanism already analyzed in the
+[smaller-workload refinement](../../../docs/notebook-publication-profiling.md#smaller-workload-refinement)
+investigation (whole-session flush/query traversal removed, replaced by direct
+bulk queries and the note's own reference collection) and the observed
+magnitude (65.35%) is consistent with that analysis.
+
+Formatted production diff (`backend/src/main/java`, after `spotlessApply`):
+48 insertions, 58 deletions across 4 files, **net −10 lines** (the reference
+prototype's own net −12 plus 2 lines for a rationale comment added during
+refactoring), removing the flush-mode save/restore block, per-index explicit
+flushes, the authored-reference reload query, and the unused repository
+delete method — no relocated complexity. Test/tooling diff (`e2e_test`):
++167/−18 across 5 changed files plus one new file
+(`notebookPublicationFixture.ts`), which is profiling infrastructure, not
+production code.
+
+Documentation updated: `docs/notebook-publication-profiling.md` already
+carried the investigation's full rationale from slice-1 delivery; no further
+doc change was required beyond what slice 1 recorded.
 
 ## Promise-to-proof ownership
 
@@ -279,7 +354,8 @@ this assessment. Known external waits and their sizing exceptions are explicit.
 No separate refinement pass was invoked; reconsider this assessment if execution
 uncovers active work beyond the stated estimates or invalidates the storage proof.
 
-Execution started 2026-09-12. Story taken into **Taken** on the product backlog
-(commit `f766a38a81`); execution checkout/branch and CI observer recorded above.
-Slice 1 delivered (see its section for baseline numbers and proof); CI pending
-observation at delivery time. Slice 2 not yet started.
+Execution started and completed 2026-09-12. Story taken into **Taken** on the
+product backlog (commit `f766a38a81`); execution checkout/branch and CI
+observer recorded above. Both slices delivered — see their sections for
+proof, commands, and measurements. This plan and story remain available for
+retrospective and story wrap-up; neither is invoked from here.

@@ -17,6 +17,10 @@ When('I stop recording the owned publication JVM', () =>
 Then('the received checkout contains every profiling document unchanged', () =>
   notebookPublicationProfile.expectReceived()
 )
+Then(
+  'the accepted edit yields exact updated aliases and property-reference targets',
+  () => notebookPublicationProfile.expectEditsPersisted()
+)
 
 When('I seed the representative publication baseline', () =>
   notebookPublicationProfile.seed()

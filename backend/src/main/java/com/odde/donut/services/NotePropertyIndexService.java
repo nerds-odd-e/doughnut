@@ -38,41 +38,37 @@ public class NotePropertyIndexService {
 
   @Transactional
   public void refreshForNote(Note note) {
-    Integer noteId = note.getId();
-    FlushModeType previousFlushMode = entityManager.getFlushMode();
-    entityManager.setFlushMode(FlushModeType.COMMIT);
-    try {
-      // replaceContent may leave new authored-reference children transient until flush; break FK
-      // links on existing index rows first so flush can persist the note aggregate safely.
-      for (NotePropertyIndex existingRow :
-          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(noteId)) {
-        existingRow.setAuthoredNoteReference(null);
-        entityManager.remove(existingRow);
-      }
-      entityManager.flush();
-      Note indexOwner = entityManager.getReference(Note.class, noteId);
-      NoteContentMarkdown.splitLeadingFrontmatter(
-              note.getContent() == null ? "" : note.getContent())
-          .ifPresent(
-              lf -> {
-                Map<String, AuthoredNoteReferenceRow> bySourceLocalKey =
-                    ownRowsBySourceLocalKey(noteId);
-                Map<String, List<NotePropertyIndexPlanner.PlannedRow>> rowsByKey =
-                    new LinkedHashMap<>();
-                for (NotePropertyIndexPlanner.PlannedRow planned :
-                    NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)) {
-                  rowsByKey
-                      .computeIfAbsent(planned.propertyKey(), k -> new ArrayList<>())
-                      .add(planned);
-                }
-                rowsByKey.forEach(
-                    (propertyKey, plannedRows) ->
-                        persistRowsForPropertyKey(
-                            indexOwner, propertyKey, plannedRows, bySourceLocalKey));
-              });
-    } finally {
-      entityManager.setFlushMode(previousFlushMode);
-    }
+    // Detach any rows already managed in this transaction before the bulk delete, which
+    // acts directly on the database and would otherwise leave stale managed copies behind.
+    entityManager
+        .createQuery("FROM NotePropertyIndex i WHERE i.note.id = :noteId", NotePropertyIndex.class)
+        .setParameter("noteId", note.getId())
+        .setFlushMode(FlushModeType.COMMIT)
+        .getResultList()
+        .forEach(entityManager::detach);
+    entityManager
+        .createQuery("DELETE FROM NotePropertyIndex i WHERE i.note.id = :noteId")
+        .setParameter("noteId", note.getId())
+        .setFlushMode(FlushModeType.COMMIT)
+        .executeUpdate();
+    entityManager.persist(note);
+    NoteContentMarkdown.splitLeadingFrontmatter(note.getContent() == null ? "" : note.getContent())
+        .ifPresent(
+            lf -> {
+              Map<String, AuthoredNoteReferenceRow> bySourceLocalKey =
+                  note.authoredReferenceRowsBySourceLocalKey();
+              Map<String, List<NotePropertyIndexPlanner.PlannedRow>> rowsByKey =
+                  new LinkedHashMap<>();
+              for (NotePropertyIndexPlanner.PlannedRow planned :
+                  NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)) {
+                rowsByKey
+                    .computeIfAbsent(planned.propertyKey(), k -> new ArrayList<>())
+                    .add(planned);
+              }
+              rowsByKey.forEach(
+                  (propertyKey, plannedRows) ->
+                      persistRowsForPropertyKey(note, propertyKey, plannedRows, bySourceLocalKey));
+            });
   }
 
   public List<AuthoredNoteReference> authoredReferencesForProperty(
@@ -93,7 +89,8 @@ public class NotePropertyIndexService {
       return plannedSourceLocalKeys.stream().map(indexedReferences::get).toList();
     }
 
-    Map<String, AuthoredNoteReferenceRow> authoredRows = ownRowsBySourceLocalKey(note.getId());
+    Map<String, AuthoredNoteReferenceRow> authoredRows =
+        note.authoredReferenceRowsBySourceLocalKey();
     return plannedSourceLocalKeys.stream()
         .map(authoredRows::get)
         .filter(Objects::nonNull)
@@ -115,21 +112,6 @@ public class NotePropertyIndexService {
                     .distinct()
                     .toList())
         .orElseGet(List::of);
-  }
-
-  private Map<String, AuthoredNoteReferenceRow> ownRowsBySourceLocalKey(Integer noteId) {
-    List<AuthoredNoteReferenceRow> ownRows =
-        entityManager
-            .createQuery(
-                "FROM AuthoredNoteReferenceRow r WHERE r.note.id = :noteId",
-                AuthoredNoteReferenceRow.class)
-            .setParameter("noteId", noteId)
-            .getResultList();
-    Map<String, AuthoredNoteReferenceRow> bySourceLocalKey = new HashMap<>();
-    for (AuthoredNoteReferenceRow row : ownRows) {
-      bySourceLocalKey.putIfAbsent(row.toDomainReference().sourceLocalKey(), row);
-    }
-    return bySourceLocalKey;
   }
 
   private void persistRowsForPropertyKey(

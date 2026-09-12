@@ -323,4 +323,5 @@ Feature: CLI notebook web-created note
     And I stop recording the owned publication JVM
     When I pull the second cloned checkout using the installed CLI
     Then the second cloned checkout is a clean checkout of the accepted head
+    And the accepted edit yields exact updated aliases and property-reference targets
     And the received checkout contains every profiling document unchanged

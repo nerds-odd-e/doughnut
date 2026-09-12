@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import {
   publicationPersistedState,
   expectPublicationStatePreserved,
+  expectPublicationEditsPersisted,
 } from './notebookPublicationState'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
@@ -329,6 +330,29 @@ export function notebookPublicationProfileTasks(
         )
       }
       return null
+    },
+    confirmNotebookPublicationEditDerivedState() {
+      if (!capture || capture.recordingActive)
+        throw new Error('Expected a stopped publication recording')
+      const metadata = JSON.parse(
+        readFileSync(join(capture.directory, 'capture.json'), 'utf8')
+      )
+      const after = publicationPersistedState(repoRoot)
+      const derivedState = expectPublicationEditsPersisted(
+        metadata.persistedState,
+        after,
+        parameters
+      )
+      const resultPath = join(capture.directory, 'result.json')
+      writeFileSync(
+        resultPath,
+        JSON.stringify(
+          { ...JSON.parse(readFileSync(resultPath, 'utf8')), derivedState },
+          null,
+          2
+        )
+      )
+      return derivedState
     },
     confirmNotebookPublicationProfile({
       acceptedHead,

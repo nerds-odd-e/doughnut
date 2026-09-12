@@ -4,7 +4,6 @@ import com.odde.donut.entities.NoteAliasIndex;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,10 +11,6 @@ public interface NoteAliasIndexRepository extends JpaRepository<NoteAliasIndex, 
   String SELECT_ALIAS_WITH_NOTEBOOK =
       "SELECT i FROM NoteAliasIndex i " + " JOIN FETCH i.note n " + " JOIN FETCH n.notebook nb ";
   String ACTIVE_NOTE_AND_NOTEBOOK = " AND n.deletedAt IS NULL " + " AND nb.deletedAt IS NULL ";
-
-  @Modifying
-  @Query("DELETE FROM NoteAliasIndex i WHERE i.note.id = :noteId")
-  void deleteByNoteIdInBulk(@Param("noteId") Integer noteId);
 
   List<NoteAliasIndex> findByNote_IdOrderByIdAsc(Integer noteId);
 

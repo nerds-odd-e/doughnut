@@ -6,6 +6,7 @@ import com.odde.donut.entities.NoteAliasIndex;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.NoteAliasIndexRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,11 @@ public class NoteAliasIndexService {
   @Transactional
   public void refreshForNote(Note note) {
     Integer noteId = note.getId();
-    noteAliasIndexRepository.deleteByNoteIdInBulk(noteId);
-    entityManager.flush();
+    entityManager
+        .createQuery("DELETE FROM NoteAliasIndex i WHERE i.note.id = :noteId")
+        .setParameter("noteId", noteId)
+        .setFlushMode(FlushModeType.COMMIT)
+        .executeUpdate();
 
     Notebook notebook = note.getNotebook();
     if (notebook == null || notebook.getId() == null) {

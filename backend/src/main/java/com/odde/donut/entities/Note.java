@@ -161,6 +161,15 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
+  public Map<String, AuthoredNoteReferenceRow> authoredReferenceRowsBySourceLocalKey() {
+    Map<String, AuthoredNoteReferenceRow> rows = new HashMap<>();
+    for (AuthoredNoteReferenceRow row : authoredNoteReferenceRows) {
+      rows.putIfAbsent(row.toDomainReference().sourceLocalKey(), row);
+    }
+    return rows;
+  }
+
+  @JsonIgnore
   public boolean matchAnswer(String spellingAnswer) {
     if (getNoteTitle().matchesForRecall(spellingAnswer)) {
       return true;
