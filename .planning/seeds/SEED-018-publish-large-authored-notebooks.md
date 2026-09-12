@@ -93,7 +93,9 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
   on story 3's completed execution (implementation commits `a6fcddacad`,
   `a05a66686c`; the spent plan itself is recoverable at
   `.planning/quick/108-publish-notebook-edits-faster/PLAN.md` as of commit
-  `1e2aef020c`), 2026-09-12. Not yet selected or queued in the product backlog.
+  `1e2aef020c`), 2026-09-12. Queued in the product backlog; still unrefined —
+  route to [dough-story-refinement](../../../.claude/skills/dough-story-refinement/SKILL.md)
+  before slice planning.
 
 ## Ordering and Scope Reduction
 
