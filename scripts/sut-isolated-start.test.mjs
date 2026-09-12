@@ -6,7 +6,9 @@ import {
   completeIsolatedConfig,
   isTcpListening,
   listenTcp,
+  makeShortIsolatedCheckout,
   runConfiguredStart,
+  startCheckoutLocalSocketOwner,
   startLiveOwner,
   withEnv,
   writeIsolatedConfig,
@@ -62,8 +64,7 @@ test('configured isolated start omits mountebank and prints the recorded target'
 test('duplicate isolated start refuses while the live owner remains', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const spawn = makeStartSpy()
   await assert.rejects(
     runConfiguredStart(checkout.root, spawn),
@@ -71,6 +72,15 @@ test('duplicate isolated start refuses while the live owner remains', async (t) 
   )
   assert.equal(spawn.calls.length, 0)
   assert.equal((await verifyLiveSutOwner(checkout.root)).ok, true)
+})
+
+test('duplicate isolated start refuses a live checkout-local socket owner', async (t) => {
+  const root = makeShortIsolatedCheckout(t)
+  await startCheckoutLocalSocketOwner(root, t)
+  const spawn = makeStartSpy()
+  await assert.rejects(runConfiguredStart(root, spawn), /already running/)
+  assert.equal(spawn.calls.length, 0)
+  assert.equal((await verifyLiveSutOwner(root)).ok, true)
 })
 
 test('occupied isolated ports refuse without terminating the foreign listener', async (t) => {

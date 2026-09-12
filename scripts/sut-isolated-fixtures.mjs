@@ -1,5 +1,13 @@
+import { randomBytes } from 'node:crypto'
 import { spawn } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import http from 'node:http'
 import net from 'node:net'
@@ -9,7 +17,14 @@ import {
   closeListeningServer,
   listenEphemeralPort,
 } from './sut-e2e-port-listen.mjs'
-import { claimSutOwnership, startSutOwnerControl } from './sut-owner.mjs'
+import {
+  claimSutOwnership,
+  ownerRecordPath,
+  releaseSutOwnership,
+  startSutOwnerControl,
+  SUT_OWNER_SOCKET_NAME,
+  sutOwnerLockDir,
+} from './sut-owner.mjs'
 import { healthyOnce } from './sut-start-fixtures.mjs'
 import { runSutStart } from './sut-start.mjs'
 
@@ -122,10 +137,58 @@ export function isTcpListening(port) {
   })
 }
 
-export async function startLiveOwner(checkoutRoot) {
+export function nestOverlongCheckoutLocalSocketRoot(baseRoot, t) {
+  let root = baseRoot
+  while (
+    Buffer.byteLength(
+      path.join(sutOwnerLockDir(root), SUT_OWNER_SOCKET_NAME)
+    ) <= 104
+  ) {
+    root = path.join(root, 'deep')
+  }
+  mkdirSync(root, { recursive: true })
+  t?.after(async () => {
+    await releaseSutOwnership(root)
+  })
+  return root
+}
+
+export function makeShortIsolatedCheckout(t, config) {
+  const root = mkdtempSync('/tmp/donut-co-')
+  t.after(async () => {
+    await releaseSutOwnership(root)
+    rmSync(root, { recursive: true, force: true })
+  })
+  writeIsolatedConfig(root, config)
+  return root
+}
+
+function releaseLiveOwnerAfter(t, checkoutRoot, server) {
+  t?.after(async () => {
+    await new Promise((resolve) => server.close(resolve))
+    await releaseSutOwnership(checkoutRoot)
+  })
+}
+
+export async function startLiveOwner(checkoutRoot, t) {
   const owner = await claimSutOwnership(checkoutRoot)
   const server = await startSutOwnerControl(owner)
+  releaseLiveOwnerAfter(t, checkoutRoot, server)
   return { owner, server }
+}
+
+export async function startCheckoutLocalSocketOwner(checkoutRoot, t) {
+  const lockDir = sutOwnerLockDir(checkoutRoot)
+  mkdirSync(lockDir)
+  const token = randomBytes(16).toString('hex')
+  const controlPath = path.join(lockDir, SUT_OWNER_SOCKET_NAME)
+  writeFileSync(
+    ownerRecordPath(checkoutRoot),
+    JSON.stringify({ token, controlPath })
+  )
+  const server = await startSutOwnerControl({ token, controlPath })
+  releaseLiveOwnerAfter(t, checkoutRoot, server)
+  return { owner: { token, controlPath, lockDir }, server }
 }
 
 export async function runConfiguredStart(checkoutRoot, spawn, extra = {}) {

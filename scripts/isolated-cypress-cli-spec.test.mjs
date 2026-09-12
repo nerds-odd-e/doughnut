@@ -71,10 +71,8 @@ test('two isolated worktrees admit the CLI spec with distinct origins; an unlist
   const second = makePrimaryCheckout(t, {
     config: JSON.stringify({ id: 'wt_peer_b', e2e: secondPorts }),
   })
-  const liveFirst = await startLiveOwner(first.root)
-  t.after(() => liveFirst.server.close())
-  const liveSecond = await startLiveOwner(second.root)
-  t.after(() => liveSecond.server.close())
+  await startLiveOwner(first.root, t)
+  await startLiveOwner(second.root, t)
 
   const configFirst = supportedConfig(
     'http://localhost:5173',

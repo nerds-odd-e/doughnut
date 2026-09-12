@@ -36,8 +36,7 @@ test('foreign mock management or serving refuses Cypress setup before mutation',
       const checkout = makePrimaryCheckout(t, {
         config: JSON.stringify(completeIsolatedConfig),
       })
-      const live = await startLiveOwner(checkout.root)
-      t.after(() => live.server.close())
+      await startLiveOwner(checkout.root, t)
 
       const foreign = await listenForeignReadyTrackingMutations()
       t.after(() => closeServer(foreign.server))

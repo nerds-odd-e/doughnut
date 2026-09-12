@@ -14,13 +14,20 @@ import {
   waitUntil,
   writeOwnedSupervisorRunPPeers,
 } from './sut-owned-supervisor-fixtures.mjs'
-import { claimSutOwnership, verifyLiveSutOwner } from './sut-owner.mjs'
+import {
+  claimSutOwnership,
+  releaseSutOwnership,
+  verifyLiveSutOwner,
+} from './sut-owner.mjs'
 
 test('live owner control exposes the spawned application process group', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
   writeOwnedSupervisorRunPPeers(checkout.root)
   const owner = await claimSutOwnership(checkout.root)
+  t.after(async () => {
+    await releaseSutOwnership(checkout.root)
+  })
   const { state } = spawnDetachedOwnedSupervisor(t, {
     checkoutRoot: checkout.root,
     owner,
@@ -58,8 +65,7 @@ test('live owner control exposes the spawned application process group', async (
 test('control-only live owner supplies no application group', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const owned = await verifyLiveSutOwner(checkout.root)
   assert.equal(owned.ok, true)
   assert.equal(owned.applicationGroupId, undefined)

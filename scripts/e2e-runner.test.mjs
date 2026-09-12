@@ -10,8 +10,10 @@ import {
   closeServer,
   isPidAlive,
   listenTcp,
+  nestOverlongCheckoutLocalSocketRoot,
   spawnForeignProcess,
   spawnOwnedTreeStandIn,
+  startLiveOwner,
   waitForOwnedPids,
   writeIsolatedConfig,
 } from './sut-isolated-fixtures.mjs'
@@ -22,7 +24,12 @@ import {
   SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC,
 } from './isolated-cypress-spec-selection.mjs'
 import { spawnIdlePrivateMockHandle } from './isolated-openai-mock-test-fixtures.mjs'
-import { sutOwnerLockDir, verifyLiveSutOwner } from './sut-owner.mjs'
+import {
+  ownerRecordPath,
+  SUT_OWNER_SOCKET_NAME,
+  sutOwnerLockDir,
+  verifyLiveSutOwner,
+} from './sut-owner.mjs'
 import { healthyOnce, neverHealthy } from './sut-start-fixtures.mjs'
 import {
   E2E_RUNNER_MOCK_ENDPOINT_ENV_KEY,
@@ -181,6 +188,26 @@ function healthcheckWaitingForPids(pidsFile) {
   }
 }
 
+function healthcheckWaitingForLiveOwner(checkoutRoot) {
+  return async () => {
+    const live = await verifyLiveSutOwner(checkoutRoot)
+    if (!live.ok) {
+      return {
+        ok: false,
+        tcpResults: [],
+        readinessResult: { ok: false },
+        exitCode: 1,
+      }
+    }
+    return {
+      ok: true,
+      tcpResults: [],
+      readinessResult: { ok: true },
+      exitCode: 0,
+    }
+  }
+}
+
 function cypressArgv(spec = SUPPORTED_ISOLATED_CYPRESS_SPEC) {
   return ['--spec', spec]
 }
@@ -263,6 +290,72 @@ test('supported multi-feature batch shares one owned stack', async (t) => {
   assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
 })
 
+test('long-path isolated checkout reaches live owner readiness without a socket override', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const root = nestOverlongCheckoutLocalSocketRoot(checkout.root, t)
+  assert.ok(
+    Buffer.byteLength(path.join(sutOwnerLockDir(root), SUT_OWNER_SOCKET_NAME)) >
+      104
+  )
+  writeIsolatedConfig(root)
+  const standIn = spawnOwnedTreeStandIn(root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...isolatedLifetimeOpts(root, standIn, {
+      healthcheckFn: healthcheckWaitingForLiveOwner(root),
+    }),
+    spawnCypress: () =>
+      makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal((await verifyLiveSutOwner(root)).ok, true)
+        const owner = JSON.parse(readFileSync(ownerRecordPath(root), 'utf8'))
+        assert.notEqual(
+          owner.controlPath,
+          path.join(sutOwnerLockDir(root), SUT_OWNER_SOCKET_NAME)
+        )
+      }),
+  })
+
+  assert.equal(code, 0)
+  assert.equal(isPidAlive(state.owned.leader), false)
+  assert.equal((await verifyLiveSutOwner(root)).ok, false)
+  assert.equal(existsSync(sutOwnerLockDir(root)), false)
+})
+
+test('owners at distinct checkout depths stay independent when one settles', async (t) => {
+  const peerCheckout = makePrimaryCheckout(t)
+  const peerRoot = nestOverlongCheckoutLocalSocketRoot(peerCheckout.root, t)
+  writeIsolatedConfig(peerRoot)
+  const peer = await startLiveOwner(peerRoot, t)
+
+  const checkout = makePrimaryCheckout(t)
+  writeIsolatedConfig(checkout.root)
+  const standIn = spawnOwnedTreeStandIn(checkout.root)
+  const state = { owned: { leader: 0, grandchild: 0 } }
+  trackOwnedTree(t, () => state.owned)
+
+  const code = await runE2eBatch({
+    argv: cypressArgv(),
+    ...isolatedLifetimeOpts(checkout.root, standIn, {
+      healthcheckFn: healthcheckWaitingForLiveOwner(checkout.root),
+    }),
+    spawnCypress: () =>
+      makeCypressChild(0, async () => {
+        state.owned = await waitForOwnedPids(standIn.pidsFile)
+        assert.equal((await verifyLiveSutOwner(checkout.root)).ok, true)
+        assert.equal((await verifyLiveSutOwner(peerRoot)).ok, true)
+      }),
+  })
+
+  assert.equal(code, 0)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+  assert.equal((await verifyLiveSutOwner(peerRoot)).ok, true)
+  assert.equal(existsSync(peer.owner.controlPath), true)
+})
+
 test('failed startup: readiness failure cleans partial owned work and returns nonzero', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
@@ -274,6 +367,9 @@ test('failed startup: readiness failure cleans partial owned work and returns no
   // Capture owned pids while the tree is alive (before the readiness timeout
   // settles and shutdown reaps it).
   const pidsPromise = waitForOwnedPids(standIn.pidsFile)
+  const ownerRecordPromise = pidsPromise.then(() =>
+    JSON.parse(readFileSync(ownerRecordPath(checkout.root), 'utf8'))
+  )
   const code = await runE2eBatch({
     argv: cypressArgv(),
     ...isolatedLifetimeOpts(checkout.root, standIn, {
@@ -286,6 +382,7 @@ test('failed startup: readiness failure cleans partial owned work and returns no
     },
   })
   state.owned = await pidsPromise
+  const owner = await ownerRecordPromise
 
   assert.equal(code, 1)
   assert.equal(
@@ -296,6 +393,7 @@ test('failed startup: readiness failure cleans partial owned work and returns no
   assert.equal(isPidAlive(state.owned.leader), false)
   assert.equal(isPidAlive(state.owned.grandchild), false)
   assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal(existsSync(path.dirname(owner.controlPath)), false)
   assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
 })
 

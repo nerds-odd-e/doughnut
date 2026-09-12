@@ -10,6 +10,7 @@ export {
 } from './sut-owner-control-server.mjs'
 
 export const SUT_OWNER_LOCK_DIR_NAME = '.sut.local.lock'
+export const SUT_OWNER_SOCKET_NAME = 'owner.sock'
 
 export function sutOwnerLockDir(checkoutRoot) {
   return path.join(checkoutRoot, SUT_OWNER_LOCK_DIR_NAME)

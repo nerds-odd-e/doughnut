@@ -75,8 +75,7 @@ test('successful isolated start releases the retirement admission gate', async (
 test('retained-owner restart start does not take the retirement admission gate', async (t) => {
   const checkout = makePrimaryCheckout(t)
   writeIsolatedConfig(checkout.root)
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   await holdSutOwnershipAcrossRestart(checkout.root)
   acquireRetirementAdmission(checkout.root)
   t.after(() => releaseRetirementAdmission(checkout.root))

@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { mysqlStandInScriptLines } from './backend-test-worktree-mysql-stand-in.mjs'
+import { releaseSutOwnership } from './sut-owner.mjs'
 
 export {
   readMysqlInvocation,
@@ -71,7 +72,10 @@ function holdReleaseLines(envVar, reachedName, releaseName) {
 
 export function makeCheckout(t, { config } = {}) {
   const root = mkdtempSync(path.join(tmpdir(), 'backend-test-worktree-'))
-  t.after(() => rmSync(root, { recursive: true, force: true }))
+  t.after(async () => {
+    await releaseSutOwnership(root)
+    rmSync(root, { recursive: true, force: true })
+  })
   mkdirSync(path.join(root, 'scripts'), { recursive: true })
   mkdirSync(path.join(root, 'backend'), { recursive: true })
 

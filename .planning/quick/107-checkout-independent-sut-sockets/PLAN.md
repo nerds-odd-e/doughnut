@@ -1,6 +1,6 @@
 # Bring up isolated E2E stacks from long checkout paths
 
-Status: planned; planning-only instruction, implementation not started.
+Status: done.
 Source: [SEED-015 story 9](../../seeds/SEED-015-concurrent-worktree-environments.md#story-9).
 Historical finding: `a7e0fe1dc4`; its deleted quick/107 publication-verification
 plan is provenance, not this plan. Number allocated after highest present
@@ -85,7 +85,7 @@ JS
 
 ### 1. Run an owned E2E invocation independently of checkout path length
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given an otherwise supported long-path isolated checkout, when the
 E2E runner starts its SUT and completes its selected feature, then the invocation
 can finish with its owned resources settled and other checkouts undisturbed.
@@ -109,24 +109,23 @@ Proof ownership (all owned by this slice):
 | Existing workflows | Existing runner, start/release, browser-isolation, and retirement-admission tests remain green |
 | User entry point | One supported feature completes through pnpm cy:run from an actual long-path linked checkout, then owned SUT is stopped |
 
-Focused command (extend existing files or add the new regression to this command):
-`CURSOR_DEV=true nix develop -c node --test scripts/e2e-runner.test.mjs scripts/sut-isolated-start.test.mjs scripts/sut-isolated-start-release.test.mjs scripts/browser-worktree-isolation.test.mjs scripts/sut-retirement-admission.test.mjs`.
+Focused verification (pass, 86 tests, after post-change refactor):
 
-For live acceptance, select one currently supported small feature from the
-runner's current spec policy and record its literal command and result here.
-Run `CURSOR_DEV=true nix develop -c pnpm cy:run --spec <selected-feature>` in the
-execution checkout with the old socket address longer than 104 bytes. Use the
-documented worktree setup; preserve shared services and unrelated checkouts.
-If the ordinary execution path is short, use a disposable long-path linked
-checkout of the implemented revision for this proof. Do not claim completion
-from stand-ins alone or convert a startup failure into a passing skip.
+```
+CURSOR_DEV=true nix develop -c node --test scripts/e2e-runner.test.mjs scripts/sut-isolated-start.test.mjs scripts/sut-isolated-start-release.test.mjs scripts/browser-worktree-isolation.test.mjs scripts/sut-retirement-admission.test.mjs
+```
 
-Estimate: 8–10 minutes active work including focused proof and local cleanup;
-scrutinize after 5 minutes. The indivisible change is allocation plus its release
-and recovery: splitting these would deliver resource leakage. Real Nix/service
-startup and focused live feature runtime are explicit wait-time exceptions.
-If active work exceeds 10 minutes, stop safely, record the concrete overrun,
-and refine remaining work rather than expanding this slice silently.
+Live proof (2026-09-12): disposable long-path linked checkout
+`/tmp/donut-107-live-proof/deep/deep/deep/deep/deep/deep/deep/deep/deep/deep/deep`
+(old socket path 115 bytes). Command:
+
+```
+SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
+```
+
+Result: pass (1 scenario). Owned SUT stopped afterward (`verifyLiveSutOwner` not ok; lock dir gone). Disposable worktree retired; shared MySQL 3309 / Redis 6380 and unrelated checkouts left untouched.
+
+Estimate was 8–10 minutes active work; actual ~12 minutes excluding Nix/service startup and Cypress runtime. See Learnings.
 
 Safe stop: the whole ownership lifecycle works with the new endpoint; no
 preparation-only or test-only delivery boundary. No extra Structure slice:
@@ -138,7 +137,14 @@ On separately authorized execution, apply dough-execute-plan: inspect origin
 branch/index; commit the exact Backlog-list → Taken claim first; create the
 execution worktree/branch using project conventions and retain origin,
 execution location, and integration target here before delegation.
-No execution identity has been allocated during planning.
+
+Planned-execution identity (claimed 2026-09-12, Taken commit `c8a0e2f934`):
+
+| Role | Checkout | Branch |
+| --- | --- | --- |
+| Originating | `/Users/terryyin/git/doughnut` | `main` |
+| Execution | `/Users/terryyin/git/d107-checkout-independent-sut-sockets` | `execute/107-checkout-independent-sut-sockets` |
+| Integration target | `/Users/terryyin/git/doughnut` | `main` |
 
 Each delivered slice requires Jidoka, a fresh dough-post-change-refactor agent,
 coordinator `./scripts/run.sh pnpm format:changed` once, plan proof update,
@@ -154,3 +160,15 @@ are identified and all cleanup ships in the same bounded change. The live
 feature run remains required proof, with external runtime excluded as above.
 No additional slice-specific concern requiring a separate refinement pass was
 identified in this assessment; revisit if implementation invalidates this sizing.
+
+## Learnings
+
+Slice 1 completed as the one authorized Behavior. Active work was about 12
+minutes excluding wait-time exceptions, over the 10-minute hard limit. The
+overrun was leftover-endpoint fixture cleanup required so the relocated socket
+does not leak, not a second outcome. No remaining slice to refine; record the
+overrun rather than splitting a delivered allocation+release change.
+
+CI observation is unavailable for this execution branch: `.github/workflows/ci.yml`
+(`donut CI`) is push-triggered only on `main`. Host probe printed a
+`CI_OBSERVER` receipt without `CI_MONITOR_READY`. Do not claim CI coverage.

@@ -1,6 +1,10 @@
 import { spawn } from 'node:child_process'
 import { isTcpListening } from './sut-isolated-fixtures.mjs'
-import { claimSutOwnership, startSutOwnerControl } from './sut-owner.mjs'
+import {
+  claimSutOwnership,
+  releaseSutOwnership,
+  startSutOwnerControl,
+} from './sut-owner.mjs'
 
 /**
  * Live owner whose applicationGroupId is a real detached child that listens
@@ -60,7 +64,10 @@ setInterval(() => {}, 1000)
     ...owner,
     getApplicationGroupId: () => child.pid,
   })
-  t.after(() => server.close())
+  t.after(async () => {
+    await new Promise((resolve) => server.close(resolve))
+    await releaseSutOwnership(checkoutRoot)
+  })
   const expectedPorts = ownedListeners.map((entry) => entry.port)
   const deadline = Date.now() + 5_000
   while (Date.now() < deadline) {

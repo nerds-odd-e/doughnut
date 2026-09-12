@@ -25,8 +25,7 @@ export async function spawnIdleMockRunnerBoundary(t, peerBody) {
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
 
   const peer = await listenHttpReady(peerBody)
   t.after(() => closeServer(peer.server))

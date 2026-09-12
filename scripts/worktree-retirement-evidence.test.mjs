@@ -25,6 +25,7 @@ import {
 import {
   acquireSutRunnerLease,
   claimSutOwnership,
+  releaseSutOwnership,
   sutOwnerLockDir,
   verifyLiveSutOwner,
 } from './sut-owner.mjs'
@@ -125,8 +126,7 @@ test('uncatchable backend owner death retains evidence and retirement refuses it
 test('live SUT owner refuses and leaves the owner control alive', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
 
   const result = await runCheck(checkout.root)
   assert.equal(result.code, 1)
@@ -138,8 +138,7 @@ test('live SUT owner refuses and leaves the owner control alive', async (t) => {
 test('Cypress runner lease refuses while the owner remains', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   await acquireSutRunnerLease(checkout.root)
 
   const result = await runCheck(checkout.root)
@@ -154,6 +153,9 @@ test('stale unverifiable SUT owner record refuses without reclaiming', async (t)
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
   await claimSutOwnership(checkout.root)
+  t.after(async () => {
+    await releaseSutOwnership(checkout.root)
+  })
   const dead = spawnSync(process.execPath, ['-e', ''])
   writeFileSync(
     path.join(sutOwnerLockDir(checkout.root), 'starting.pid'),

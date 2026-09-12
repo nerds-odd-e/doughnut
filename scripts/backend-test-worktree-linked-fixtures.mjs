@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import { cpSync, rmSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { makeCheckout } from './backend-test-worktree-stand-in-fixtures.mjs'
+import { releaseSutOwnership } from './sut-owner.mjs'
 
 function git(cwd, args) {
   const result = spawnSync('git', args, {
@@ -74,7 +75,10 @@ export function makeLinkedWorktreeCheckout(t, options) {
   git(primary.root, ['commit', '-m', 'fixture'])
   const linkedRoot = `${primary.root}-linked`
   git(primary.root, ['worktree', 'add', '--detach', linkedRoot])
-  t.after(() => rmSync(linkedRoot, { recursive: true, force: true }))
+  t.after(async () => {
+    await releaseSutOwnership(linkedRoot)
+    rmSync(linkedRoot, { recursive: true, force: true })
+  })
   const gitFile = path.join(linkedRoot, '.git')
   if (!statSync(gitFile).isFile()) {
     throw new Error(`expected linked worktree .git file at ${gitFile}`)

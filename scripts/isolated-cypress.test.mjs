@@ -148,8 +148,7 @@ test('CLI glob spec selection is refused in before:run before reset', async (t) 
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const listeners = {}
   const config = {
     specPattern: 'e2e_test/features/**/*.feature',
@@ -189,8 +188,7 @@ test('MCP spec is allowlisted as a single isolated spec', async (t) => {
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const config = supportedConfig(
     'http://localhost:5173',
     SUPPORTED_ISOLATED_MCP_SPEC
@@ -278,8 +276,7 @@ test('supported isolated Cypress sets origin before reset and serializes the run
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const config = supportedConfig()
   const listeners = {}
   const isolated = await guardCypressNodeSetup(
@@ -319,8 +316,7 @@ test('conflicting Cypress origin refuses before reset; matching origin remains u
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   await assertRefusesBeforeReset(
     () =>
       guardCypressNodeSetup(
@@ -362,8 +358,7 @@ test('owner shutdown refuses a new Cypress runner lease before reset', async (t)
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   await beginSutOwnerShutdown(checkout.root)
   await assertRefusesBeforeReset(
     () =>

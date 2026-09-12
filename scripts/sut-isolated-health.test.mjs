@@ -19,7 +19,11 @@ import {
   getListenerPids,
   processGroupId,
 } from './sut-listener-pids.mjs'
-import { claimSutOwnership, startSutOwnerControl } from './sut-owner.mjs'
+import {
+  claimSutOwnership,
+  releaseSutOwnership,
+  startSutOwnerControl,
+} from './sut-owner.mjs'
 import { startOwnedListeningOwner } from './sut-owned-listening-fixtures.mjs'
 
 test('isolated health requires the live owner even when a foreign ready listener exists', async (t) => {
@@ -57,8 +61,7 @@ test('control-only live owner is unhealthy even when foreign endpoints are ready
       lbListenPort: ready.port,
     },
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const health = await runSutHealthcheck({
     checkoutRoot: checkout.root,
     log: () => undefined,
@@ -203,7 +206,10 @@ setInterval(() => {}, 1000)
     ...owner,
     getApplicationGroupId: () => child.pid,
   })
-  t.after(() => server.close())
+  t.after(async () => {
+    await new Promise((resolve) => server.close(resolve))
+    await releaseSutOwnership(checkout.root)
+  })
 
   const deadline = Date.now() + 5_000
   while (Date.now() < deadline) {

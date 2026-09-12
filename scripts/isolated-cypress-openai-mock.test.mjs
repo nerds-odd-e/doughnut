@@ -32,8 +32,7 @@ test('no-mock isolated Cypress does not start a private mock process and leaves 
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const identityBefore = readFileSync(
     path.join(checkout.root, '.worktree.local.json'),
     'utf8'
@@ -69,8 +68,7 @@ test('CLI and MCP isolated specs acquire no private OpenAI mock', async (t) => {
       const checkout = makePrimaryCheckout(t, {
         config: JSON.stringify(completeIsolatedConfig),
       })
-      const live = await startLiveOwner(checkout.root)
-      t.after(() => live.server.close())
+      await startLiveOwner(checkout.root, t)
       let startMockCalls = 0
       const isolated = await guardCypressNodeSetup(
         checkout.root,
@@ -94,8 +92,7 @@ test('OpenAI mock isolated Cypress starts a private mock after the lease and inj
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const identityBefore = readFileSync(
     path.join(checkout.root, '.worktree.local.json'),
     'utf8'
@@ -142,8 +139,7 @@ test('before:run does not start a second private mock for a confirmed selection'
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  const live = await startLiveOwner(checkout.root)
-  t.after(() => live.server.close())
+  await startLiveOwner(checkout.root, t)
   const endpoint = {
     managementUrl: 'http://127.0.0.1:18025',
     servingPort: 18001,

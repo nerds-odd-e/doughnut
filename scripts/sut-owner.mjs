@@ -1,17 +1,27 @@
 import { randomBytes } from 'node:crypto'
-import { mkdir, readFile, rm, unlink, writeFile } from 'node:fs/promises'
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  unlink,
+  writeFile,
+} from 'node:fs/promises'
 import path from 'node:path'
 import {
   ownerRecordPath,
   readOwnerRecord,
+  SUT_OWNER_SOCKET_NAME,
   sutOwnerLockDir,
   verifyLiveSutOwner,
 } from './sut-owner-control.mjs'
 
 export {
   SUT_OWNER_LOCK_DIR_NAME,
+  SUT_OWNER_SOCKET_NAME,
   acquireSutRunnerLease,
   beginSutOwnerShutdown,
+  ownerRecordPath,
   releaseSutRunnerLease,
   releaseSutRunnerLeaseSync,
   startSutOwnerControl,
@@ -19,6 +29,8 @@ export {
   sutOwnerLockDir,
   verifyLiveSutOwner,
 } from './sut-owner-control.mjs'
+
+const OWNER_ENDPOINT_NAME_PREFIX = 'donut-sut-owner-'
 
 async function writeStartingPid(checkoutRoot) {
   await writeFile(startingPidPath(checkoutRoot), String(process.pid))
@@ -71,18 +83,54 @@ async function tryAcquireLockDir(lockDir) {
   }
 }
 
-async function reclaimDeadOwner(lockDir) {
+function isOwnedPrivateEndpointDir(dir) {
+  const normalized = path.normalize(dir)
+  const name = path.basename(normalized)
+  if (
+    !name.startsWith(OWNER_ENDPOINT_NAME_PREFIX) ||
+    name === OWNER_ENDPOINT_NAME_PREFIX
+  ) {
+    return false
+  }
+  const parent = path.dirname(normalized)
+  return parent === '/tmp' || parent === '/private/tmp'
+}
+
+async function unlinkIfPresent(filePath) {
+  try {
+    await unlink(filePath)
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
+  }
+}
+
+async function removeOwnedEndpoint(controlPath, lockDir) {
+  if (!controlPath) {
+    await unlinkIfPresent(path.join(lockDir, SUT_OWNER_SOCKET_NAME))
+    return
+  }
+  const endpointDir = path.dirname(controlPath)
+  if (isOwnedPrivateEndpointDir(endpointDir)) {
+    await rm(endpointDir, { recursive: true, force: true })
+    return
+  }
+  await unlinkIfPresent(controlPath)
+}
+
+async function reclaimDeadOwner(checkoutRoot, lockDir) {
   const reclaimDir = path.join(lockDir, `reclaim.${process.pid}`)
   try {
     await mkdir(reclaimDir)
   } catch {
     throw duplicateStartError()
   }
-  try {
-    await unlink(path.join(lockDir, 'owner.sock'))
-  } catch {
-    // absent
-  }
+  const owner = await readOwnerRecord(checkoutRoot)
+  await removeOwnedEndpoint(owner?.controlPath, lockDir)
+}
+
+async function allocateOwnerEndpoint() {
+  const endpointDir = await mkdtemp(`/tmp/${OWNER_ENDPOINT_NAME_PREFIX}`)
+  return path.join(endpointDir, SUT_OWNER_SOCKET_NAME)
 }
 
 export async function claimSutOwnership(checkoutRoot) {
@@ -95,10 +143,10 @@ export async function claimSutOwnership(checkoutRoot) {
     ) {
       throw duplicateStartError()
     }
-    await reclaimDeadOwner(lockDir)
+    await reclaimDeadOwner(checkoutRoot, lockDir)
   }
   const token = randomBytes(16).toString('hex')
-  const controlPath = path.join(lockDir, 'owner.sock')
+  const controlPath = await allocateOwnerEndpoint()
   await writeStartingPid(checkoutRoot)
   await writeFile(
     ownerRecordPath(checkoutRoot),
@@ -108,5 +156,8 @@ export async function claimSutOwnership(checkoutRoot) {
 }
 
 export async function releaseSutOwnership(checkoutRoot) {
-  await rm(sutOwnerLockDir(checkoutRoot), { recursive: true, force: true })
+  const lockDir = sutOwnerLockDir(checkoutRoot)
+  const owner = await readOwnerRecord(checkoutRoot)
+  await removeOwnedEndpoint(owner?.controlPath, lockDir)
+  await rm(lockDir, { recursive: true, force: true })
 }
