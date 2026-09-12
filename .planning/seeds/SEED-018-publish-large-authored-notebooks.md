@@ -86,7 +86,9 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
   differences. Measure publication separately from fixture setup and receiver
   verification. A reduction in sampled flush cost alone is insufficient: the
   valid workload must publish faster and meet the agreed practical-time target.
-  That target remains open below; refinement does not claim it is feasible.
+  The agreed target is strictly under 60,000 ms from HTTP request start through
+  the complete successful response, including transport and server commit.
+  The user accepted under one minute on 2026-09-12; feasibility remains unproven.
 - **Key examples:**
   - Given the representative valid workload above, when its owner publishes the
     additions as one commit, publication returns success within the agreed target
@@ -144,14 +146,13 @@ Refine story 3 from the
 starting with a small focused experiment. Preserve the existing name acceptance
 and reference semantics while optimizing publication.
 
-## Open Decisions
+## Current Decisions
 
-- Story 3: choose the maximum publication request time for the representative
-  valid workload under comparable awake local conditions. The refinement
-  recommendation is **under one minute**, subject to feasibility evidence; this
-  is a proposal, not a human-approved requirement. The scope is one bounded
-  improvement to repeated flush work. If the target requires broader work,
-  return for scope review rather than adding optimization areas automatically.
+- Story 3: the user accepted **under one minute** on 2026-09-12 for the
+  representative valid workload under comparable awake local conditions.
+  The scope remains one bounded improvement to repeated flush work. If the
+  target requires broader work, return for scope review rather than adding
+  optimization areas automatically. No product-scope decisions remain open.
 
 ## When to Surface
 
