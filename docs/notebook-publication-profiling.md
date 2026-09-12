@@ -2,33 +2,44 @@
 
 ## Findings and next experiment
 
-Repeated ORM flushing is the first investigation priority. The two completed
-valid large publications (1,000 existing concepts, 10,000 additions, 20 folders)
-place **98.25% and 98.213% of publication-thread execution samples** in
-Hibernate flush traversal, with roughly 571 GB of weighted request allocation
-in each. Property- and alias-index refresh callers recur in these stacks
-(54,321/54,728 samples in the first capture; 54,565/54,948 in the repeat).
-These overlapping sampled stacks identify a dominant CPU cost; they do **not**
-predict 98% wall-time savings or establish that any flush can safely be
-removed.
+Repeated ORM flushing remains the dominant sampled publication cost on the
+representative large fixture (1,000 existing concepts, 10,000 additions, 20
+folders). Two completed valid publications place **98.25% and 98.213%** of
+publication-thread execution samples in Hibernate flush traversal, with
+roughly 571 GB of weighted request allocation in each. Property- and
+alias-index refresh callers recur in those stacks (54,321/54,728 samples in
+the first capture; 54,565/54,948 in the repeat). These overlapping stacks
+identify a dominant CPU cost; they do **not** predict 98% wall-time savings
+or establish that any remaining flush can safely be removed.
 
-The first focused experiment should trace flush requirements and frequency
-along these index-refresh paths on a small fixture, then evaluate one
-correctness-safe change to that work. Explicit and query-triggered flushes may
-serve visibility or ordering requirements; establish those requirements before
-changing them. Keep accepted-head/content and late-rejection/rollback checks,
-including note identity and learning state. Parsing, Git work and database
-waits have weaker measured CPU evidence and should not displace this priority
-without new evidence.
+`NotePropertyIndexService.refreshForNote` keeps `FlushModeType.COMMIT` through
+unlink, the required explicit flush, authored-reference lookup, and new
+index-row persist. That removes a redundant query-triggered whole-session
+auto-flush. The explicit property unlink flush and
+`NoteAliasIndexService.refreshForNote` bulk-delete flush remain required for
+visibility and FK ordering. Publication still persists derived property wiki
+links and aliases so they are visible after an accepted commit, and replacing
+authored property wiki or alias values drops the stale derived entries.
+
+Skipping that extra property-index query flush does not make the
+representative workload finish within 60,000 ms. See
+[large HTTP deadline capture](#large-http-deadline-capture). Remaining cost
+is still per-note whole-session flush work; after that extra query flush is
+gone, alias-index is the larger sampled caller. Small HTTP captures of the
+20-note fixture stay well under one second and do not predict large-fixture
+wall time.
+
+Keep accepted-head/content, note identity, learning state, and atomic late
+rejection. Parsing, Git work, and database waits have weaker measured CPU
+evidence and should not displace this priority without new evidence.
 
 Use the [baseline captures](#baseline-captures), their persistent raw data,
 and the versioned [analysis script](../scripts/profiling/AnalyzePublication.java).
 The [small late-rejection capture](#small-late-rejection-capture) establishes
 late processing and preserved state; **large rejection latency is unmeasured**.
-Stop investigating once a dominant cost and one concrete next experiment are
-clear — do not repeat 10,000-note captures merely to reconfirm this ranking.
-Reserve a large confirmation run for a candidate improvement that leaves a
-specific scaling question unanswered.
+Do not repeat 10,000-note captures merely to reconfirm this ranking. Reserve a
+large confirmation run for a candidate that leaves a specific scaling
+question unanswered.
 
 ## Baseline captures
 
@@ -101,12 +112,20 @@ Cypress task, backed by `scripts/profiling/verify-publication-receiver.mjs`)
 instead of one browser assertion per file, so no manual read-only workaround
 is needed for ordinary runs.
 
-For an HTTP capture (needed for large fixtures, since the installed-CLI path
-keeps a 60-second wait), use the HTTP tags and scale the same env vars:
+For a small HTTP capture, use the HTTP tags and scale the same env vars:
 
 ```bash
 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=66000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
 ```
+
+For the representative large fixture (1,000 existing, 10,000 additions, 20
+folders), keep `PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000` and use the
+awake-baseline Cypress waits
+`--config taskTimeout=43260000,defaultCommandTimeout=600000`. The small
+`taskTimeout=66000` and default `defaultCommandTimeout` (6000 ms) abort during
+seed of 1,000 concepts and do not produce a publication measurement. Isolated
+tagged captures use `pnpm cypress run --expose …`; `pnpm cy:run` does not
+forward `--expose` or `--config`.
 
 A timeout or a runner failure leaves incomplete evidence — inspect the owned
 backend for actual completion before any reset or retry; never relabel a
@@ -114,36 +133,17 @@ failed/incomplete run as passing. Repeat a command to reset the owned E2E
 database and fixture before the next run, following
 [ADR 0007](adrs/0007-environments-and-isolation-accepted.md) isolation.
 
-## Large HTTP confirmation (blocked in fixture setup)
+## Large HTTP deadline capture
 
-Worktree `doughnut_e2e_wt_55773df2d6ac449796e9d4c0abac2671`, revision
-`61624927455b3479a84acb356d5d3b90e0c32e8f`, 2026-09-12T08:31:05Z, host kept
-awake. Command used `PUBLICATION_PROFILE_EXISTING=1000`
-`PUBLICATION_PROFILE_ADDITIONS=10000` `PUBLICATION_PROFILE_FOLDERS=20`
-`PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000` and
-`--config taskTimeout=66000`.
-
-Cypress failed before publication: `cy.wrap()` timed out at **6000 ms**
-(`defaultCommandTimeout`) while seeding 1,000 existing concepts. No profile
-directory, `timing.json`, JFR, fingerprints, or bulk-checker outcome. This is
-incomplete evidence, not a passed or failed 60 s publication. The HTTP deadline
-must stay at 60,000 ms; fixture and verification waits need longer Cypress
-`defaultCommandTimeout` and `taskTimeout` (the awake large captures used
-`taskTimeout=43260000,defaultCommandTimeout=600000`).
-
-## Large HTTP confirmation (HTTP deadline exceeded)
-
-Authorized retry of the same 1,000 / 10,000 / 20 fixture on
-`doughnut_e2e_wt_55773df2d6ac449796e9d4c0abac2671`, revision
-`61624927455b3479a84acb356d5d3b90e0c32e8f`. Host stayed awake
-(`caffeinate` 16:34:16–16:36:18 +0800; no Sleep/Wake in that interval).
-JDK 25.0.3, `-XX:TieredStopAtLevel=1`, 12 GiB max heap, Hibernate
-7.4.5.Final, MySQL 8.4.11. Same fingerprints as the awake baseline:
-baseline `30f8c2a12e2214f1a9b7f34e4c79d09d8473279899e3138b9ca0a029a0afa8f9`,
-proposal `dbea65fb646eb7660faf6a509cee84f1b7adda9204e2aaa4fae137edb90da65d`.
-Material difference vs the 2026-09-11 awake capture: the
-COMMIT-through-`ownRowsBySourceLocalKey` persist change, isolated worktree ports,
-and a 60,000 ms HTTP deadline instead of a one-hour wait.
+Representative fixture (1,000 existing concepts, 10,000 additions, 20
+folders) under a 60,000 ms HTTP deadline, host awake, JDK 25.0.3,
+`-XX:TieredStopAtLevel=1`, 12 GiB max heap, Hibernate 7.4.5.Final, MySQL
+8.4.11. Same fingerprints as the awake baseline: baseline
+`30f8c2a12e2214f1a9b7f34e4c79d09d8473279899e3138b9ca0a029a0afa8f9`, proposal
+`dbea65fb646eb7660faf6a509cee84f1b7adda9204e2aaa4fae137edb90da65d`. Material
+difference vs the 2026-09-11 awake capture: `FlushModeType.COMMIT` covers
+property-index lookup and persist, isolated worktree ports, and a 60,000 ms
+HTTP deadline instead of a one-hour wait.
 
 Capture `2026-09-12T08-35-11.940Z`:
 
@@ -162,14 +162,11 @@ Artifacts:
 (`timing.json`, `result.json`, `capture.json`, `incomplete.jfr`,
 `jfr-summary.txt`, `proposal.bundle`, `observed-request-span-analysis.txt`).
 
-Owned backend was still in `NotebookGitProposalPublisher.publish` when the
-client disconnected (Hikari leak detection at 16:36:13 on the request
-thread). The runner then began graceful shutdown. A disconnected client
-does not establish server cancellation. This is incomplete evidence, not a
-passed publication. Compared with the awake baseline **3,772,320.997 ms**,
-the request was aborted at about 1.6% of that wall time and had not
-finished. Return for story scope review; do not weaken the 60 s target or
-start a second optimization.
+The owned backend was still in `NotebookGitProposalPublisher.publish` when the
+client disconnected. A disconnected client does not establish server
+cancellation. This is incomplete evidence, not a passed publication. Compared
+with the awake baseline **3,772,320.997 ms**, the request was aborted at about
+1.6% of that wall time and had not finished.
 
 The full prior investigation record (static-candidate inspection, individual
 smoke-run accounts, recovery commands, and continuation-probe narration) is
