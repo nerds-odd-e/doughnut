@@ -13,7 +13,9 @@ scope. This is a separate correction, not reopening large profiling.
 
 Beneficiary: maintainers running the opt-in publication profiler.
 Outcome: the existing public publish/pull scenario verifies every expected received
-file and records acceptance without one browser-command chain per file.
+file and records acceptance without one browser-command chain per file. Retire
+the verbose profiling evidence record while keeping a concise, usable baseline
+for the pending optimization.
 
 Finding: `e2e_test/start/pageObjects/cli/notebookPublicationProfile.ts:expectReceived`
 still iterates through `expectCheckoutFileAt` for every proposal file. In the second
@@ -53,7 +55,7 @@ verification without interfering with other tasks. Relevant Accepted ADRs are
 No domain or cross-production-subsystem change is needed. Proposed ADR 0002 is
 not treated as a binding implementation contract.
 
-## Ordered slice
+## Ordered slices
 
 ### 1. Verify the publicly received proposal in one bulk observation
 Type: Behavior
@@ -86,6 +88,52 @@ stop and finer-decompose above 10 active minutes. Required test runtime is exemp
 Safe stop: cheap complete receiver proof, unchanged publication and rollback behavior.
 Concern: ensure the result is marked accepted only after the bulk check succeeds;
 a fast comparison that bypasses that ordering would weaken proof.
+
+### 2. Retire the verbose profiling record and retain the optimization baseline
+Type: Structure
+Status: planned — cleanup added at the user's request after story wrap-up.
+Proof: Maintainers can locate the measured first priority, compare a later change
+with the valid baseline, and run the small opt-in profiler from concise maintained
+documentation; detailed execution history no longer occupies the current snapshot.
+
+After slice 1, replace the 525-line `docs/notebook-publication-profiling.md` record
+in place with a short reference (aim for roughly 100 lines, not a new rigid limit).
+Delete historical static-candidate lists, individual smoke-run accounts, recovery
+commands tied to expired PIDs/checkouts, continuation probes and duplicate run
+narration. Keep the same document path for its useful current instructions; do not
+move the deleted narrative into another tracked archive or into the story seed.
+The full original record is recoverable with
+`git show 13a2e2edc6:docs/notebook-publication-profiling.md`.
+
+Retain only what the optimization still needs:
+- The ORM-flush priority (about 98.2% of request-thread execution samples), index
+  refresh callers, allocation estimate and the warning that sample shares do not
+  predict wall-time savings or establish which flushes can safely be removed.
+- A compact baseline table: both capture IDs and source revisions, fixture counts
+  and fingerprints, elapsed HTTP times, accepted-content proof, and environment
+  qualifiers. Identify the awake run as the usable elapsed-time reference;
+  distinguish the sleep-affected run and interrupted Cypress verification.
+- Small late-rejection correctness evidence; explicitly state that large rejection
+  latency remains unmeasured. Preserve the small-first stopping rule.
+- The raw-artifact location, minimum analysis invocation and current small-fixture
+  capture/reset/ownership instructions, updated for slice 1's bulk verification.
+
+Raw JFRs and recovery artifacts already live outside Git under
+`~/Library/Application Support/Donut/publication-profiles/`; retain them through
+optimization and its before/after review. This slice removes repository narration,
+not those external measurements or the reusable profiler/analyzer code. Deleting
+tracked text reduces the working-tree/documentation footprint, not Git history size;
+no history rewrite is needed or authorized.
+
+Repair links in SEED-018 story 3 and this plan when removing document anchors;
+point to the concise reference instead of recreating historical sections. Review
+other incoming links to the document and preserve their useful navigation.
+Verification: check the retained facts against the existing record before replacing
+it, inspect the documentation diff and affected links, and confirm the profiling
+code is unchanged by this slice. No publication run or new benchmark is required.
+Estimate: about 5 minutes active work. Safe stop: concise runnable reference and
+baseline remain available, with detailed evidence recoverable from Git/external
+captures. No need to wait for optimization to complete this repository cleanup.
 
 ## Suite assessment and retained coverage
 
