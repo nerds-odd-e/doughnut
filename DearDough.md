@@ -151,3 +151,33 @@ fresh-isolated-worktree path.
     cache entry that also failed the retry), and a re-run before slice 13's
     proof passed. The boundary suite never caught the gap because the seam
     elided the provisioning side effect.
+
+## DD-012 — Cross-cutting service-wiring slices legitimately exceed the 5-minute execution-leaf target
+
+A slice that wires a new mocked external service across the runner, the Cypress
+plugin boundary, the endpoint-context module, and the Cucumber hook is one
+coherent responsibility that cannot be split along those layers without
+breaking stop-safety. Such a slice naturally runs ~25 minutes of active work
+versus the 5–8 minute execution-leaf target, with no mid-slice refinement
+warranted. Plans admitting a new mock service should size that wiring slice as
+a multi-touchpoint leaf (roughly 15–25 minutes) rather than a 5-minute Behavior
+leaf, or decompose only where a stop-safe seam genuinely exists.
+
+### Occurrences
+
+- Execution: SEED-015 Story 10 / quick-105-remaining-active-e2e-isolation / 7614f8418d
+  - Tool: Cursor
+  - Model: glm-5.2
+  - Open Dough release: 0.3.12
+  - Evidence: PLAN.md slice 6 "Done 2026-09-12" note — "**Sizing deviation:**
+    active work ~25 min vs. 5–8 min target — the Wikidata wiring touched the
+    runner, plugin boundary, endpoint context, and the Cucumber hook across one
+    coherent responsibility; recorded for retrospective. Slice converged with
+    green proof; no refinement warranted mid-slice." Slice 6's plan sizing
+    line read "5–8 minutes, medium confidence".
+  - Observed effect: one slice ran ~3× its 5–8 min target; the plan flagged it
+    for retrospective rather than refining mid-slice, and the slice converged
+    green with no rework.
+  - Inference: the 5-minute leaf target is the wrong anchor for a single
+    cross-layer service-wiring responsibility; future plans should size such
+    slices explicitly as multi-touchpoint wiring.
