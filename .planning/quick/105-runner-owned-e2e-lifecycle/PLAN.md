@@ -1,7 +1,7 @@
 # Run E2E tests with automatic service startup and cleanup
 
 Source: [SEED-015 Story 8](../../seeds/SEED-015-concurrent-worktree-environments.md#story-8).
-Status: in progress (execution authorized 2026-09-12 via `/dough-execute-plan 105`).
+Status: done (all 15 slices delivered 2026-09-12 via `/dough-execute-plan 105`; branch `cursor/105-runner-owned-e2e-lifecycle` ready for integration into `main`).
 Supersedes quick/104's unexecuted primary restart correction. Backlog entry moved to Taken.
 
 ## Execution identity
