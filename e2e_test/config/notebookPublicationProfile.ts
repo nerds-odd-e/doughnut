@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import {
   publicationPersistedState,
   expectPublicationStatePreserved,
+  expectPublicationEditsPersisted,
 } from './notebookPublicationState'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
@@ -13,6 +14,13 @@ import { runSutHealthcheck } from '../../scripts/sut-healthcheck.mjs'
 import { resolveSutCheckoutTarget } from '../../scripts/sut-isolated-target.mjs'
 import { getListenerPids } from '../../scripts/sut-listener-pids.mjs'
 import { findPublicationReceiverMismatch } from '../../scripts/profiling/verify-publication-receiver.mjs'
+
+export interface PublicationProfileParameters {
+  existing: number
+  additions: number
+  updates: number
+  folders: number
+}
 
 export function notebookPublicationProfileTasks(
   repoRoot: string,
@@ -65,9 +73,10 @@ export function notebookPublicationProfileTasks(
     if (capture?.recordingActive)
       stopRecording(join(capture.directory, 'incomplete.jfr'))
   })
-  const parameters = {
+  const parameters: PublicationProfileParameters = {
     existing: Number(process.env.PUBLICATION_PROFILE_EXISTING ?? 20),
     additions: Number(process.env.PUBLICATION_PROFILE_ADDITIONS ?? 20),
+    updates: Number(process.env.PUBLICATION_PROFILE_UPDATES ?? 20),
     folders: Number(process.env.PUBLICATION_PROFILE_FOLDERS ?? 20),
   }
   function git(checkoutDir: string, ...args: string[]) {
@@ -321,6 +330,29 @@ export function notebookPublicationProfileTasks(
         )
       }
       return null
+    },
+    confirmNotebookPublicationEditDerivedState() {
+      if (!capture || capture.recordingActive)
+        throw new Error('Expected a stopped publication recording')
+      const metadata = JSON.parse(
+        readFileSync(join(capture.directory, 'capture.json'), 'utf8')
+      )
+      const after = publicationPersistedState(repoRoot)
+      const derivedState = expectPublicationEditsPersisted(
+        metadata.persistedState,
+        after,
+        parameters
+      )
+      const resultPath = join(capture.directory, 'result.json')
+      writeFileSync(
+        resultPath,
+        JSON.stringify(
+          { ...JSON.parse(readFileSync(resultPath, 'utf8')), derivedState },
+          null,
+          2
+        )
+      )
+      return derivedState
     },
     confirmNotebookPublicationProfile({
       acceptedHead,

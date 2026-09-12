@@ -285,14 +285,51 @@ For a small HTTP capture, use the HTTP tags and scale the same env vars:
 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=66000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
 ```
 
-For the revised 1,000-existing / 1,000-edit comparison, use the retained
-refinement launcher above. It gives fixture setup 600,000 ms independently
-of the 60,000 ms publication deadline. A 66,000 ms task timeout can expire
-while seeding and then provides no publication measurement. The old large
-captures used `taskTimeout=43260000,defaultCommandTimeout=600000`; this is
-historical reproduction information, not the current measurement requirement.
-Isolated tagged captures use `pnpm cypress run --expose …`; `pnpm cy:run`
-does not forward `--expose` or `--config`.
+An existing-note-edit HTTP profile exercises the same boundary against edits
+to already-existing notes instead of new ones (`@publicationProfileHttpUpdate`,
+via "I prepare the small deterministic existing-note-edit publication
+profile"). It uses its own maintained edited-file count,
+`PUBLICATION_PROFILE_UPDATES` (default 20), so `PUBLICATION_PROFILE_ADDITIONS`
+keeps meaning new notes everywhere. For a small smoke run:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --expose tags=@publicationProfileHttpUpdate
+```
+
+### Launcher
+
+For the 1,000-existing / 1,000-edit comparison (or any larger profiling run),
+use the maintained launcher `scripts/profiling/run-notebook-publication-profile.mjs`.
+It delegates all stack ownership/startup/lease/shutdown to the existing
+`runE2eBatch`/`wireBatchCancellation` E2E runner API — it adds no service
+lifecycle code of its own — and defaults its Cypress `--expose tags=…` to the
+existing-note-edit HTTP profile (`@publicationProfileHttpUpdate`):
+
+```bash
+PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_UPDATES=1000 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c caffeinate -i node scripts/profiling/run-notebook-publication-profile.mjs
+```
+
+Set `PUBLICATION_PROFILE_TAGS` to a full Cucumber tag expression to run other
+profile scenarios through the same launcher instead — for example, the small
+addition/rejection regression proof:
+
+```bash
+PUBLICATION_PROFILE_EXISTING=20 PUBLICATION_PROFILE_ADDITIONS=20 PUBLICATION_PROFILE_TAGS='@publicationProfileHttp or @publicationProfileHttpRejection' PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c caffeinate -i node scripts/profiling/run-notebook-publication-profile.mjs
+```
+
+`PUBLICATION_PROFILE_EXISTING`, `PUBLICATION_PROFILE_UPDATES`,
+`PUBLICATION_PROFILE_ADDITIONS`, `PUBLICATION_PROFILE_FOLDERS`, and
+`PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS` are inherited straight through to the
+Cypress tasks that already parse them; the launcher does not reimplement that
+parsing. The launcher sets `taskTimeout`/`defaultCommandTimeout` to the HTTP
+deadline plus a fixed 10-minute margin, so fixture setup and receiver
+verification stay independent of the 60,000 ms publication deadline — a
+66,000 ms task timeout can expire while seeding 1,000 notes and then provides
+no publication measurement. The old large captures used
+`taskTimeout=43260000,defaultCommandTimeout=600000`; this is historical
+reproduction information, not the current measurement requirement. Isolated
+tagged captures use `pnpm cypress run --expose …`; `pnpm cy:run` does not
+forward `--expose` or `--config`.
 
 A timeout or a runner failure leaves incomplete evidence — inspect the owned
 backend for actual completion before any reset or retry; never relabel a

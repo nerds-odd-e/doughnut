@@ -4,6 +4,10 @@ import { notebookPublicationProfile } from '../start/pageObjects/cli/notebookPub
 When('I prepare the small deterministic publication profile', () =>
   notebookPublicationProfile.prepare()
 )
+When(
+  'I prepare the small deterministic existing-note-edit publication profile',
+  () => notebookPublicationProfile.prepareEdit()
+)
 When('I start recording the owned publication JVM', () =>
   notebookPublicationProfile.start()
 )
@@ -12,6 +16,10 @@ When('I stop recording the owned publication JVM', () =>
 )
 Then('the received checkout contains every profiling document unchanged', () =>
   notebookPublicationProfile.expectReceived()
+)
+Then(
+  'the accepted edit yields exact updated aliases and property-reference targets',
+  () => notebookPublicationProfile.expectEditsPersisted()
 )
 
 When('I seed the representative publication baseline', () =>
