@@ -54,45 +54,17 @@ const DEFAULT_CYPRESS_BIN = path.join(
 )
 const DEFAULT_CYPRESS_CONFIG_FILE = 'e2e_test/config/ci.ts'
 
-function optionValuesFromArgv(argv, optionName) {
-  const flag = `--${optionName}`
-  const assignment = `${flag}=`
-  const values = []
+function browserFromArgv(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i]
-    if (arg === flag && argv[i + 1] !== undefined) {
-      values.push(String(argv[i + 1]))
-      i += 1
-      continue
+    if (arg === '--browser' && argv[i + 1]) {
+      return argv[i + 1]
     }
-    if (typeof arg === 'string' && arg.startsWith(assignment)) {
-      values.push(arg.slice(assignment.length))
+    if (typeof arg === 'string' && arg.startsWith('--browser=')) {
+      return arg.slice('--browser='.length)
     }
   }
-  return values
-}
-
-function cypressCliOptionsFromArgv(argv) {
-  return {
-    browser: optionValuesFromArgv(argv, 'browser')[0],
-    exposeValues: optionValuesFromArgv(argv, 'expose'),
-    configValues: optionValuesFromArgv(argv, 'config'),
-  }
-}
-
-function appendCypressCliArgs(
-  args,
-  { browser, exposeValues = [], configValues = [] } = {}
-) {
-  if (browser) {
-    args.push('--browser', browser)
-  }
-  for (const value of exposeValues) {
-    args.push('--expose', value)
-  }
-  for (const value of configValues) {
-    args.push('--config', value)
-  }
+  return
 }
 
 function resolveSpecs(argv, checkoutRoot, isolated) {
@@ -117,12 +89,12 @@ export function defaultSpawnCypress({
   configFile,
   stdio,
   browser,
-  exposeValues = [],
-  configValues = [],
   spawnFn = spawn,
 }) {
   const args = ['run', '--config-file', configFile, '--spec', specs.join(',')]
-  appendCypressCliArgs(args, { browser, exposeValues, configValues })
+  if (browser) {
+    args.push('--browser', browser)
+  }
   return spawnFn(process.execPath, [cypressBin, ...args], {
     cwd,
     env,
@@ -270,7 +242,7 @@ export async function runE2eBatch({
     runtimeTarget: lifetimeOpts.runtimeTarget,
     isIsolatedCheckoutFn,
   })
-  const cypressCliOptions = cypressCliOptionsFromArgv(argv)
+  const browser = browserFromArgv(argv)
   let specs
   let approved
   try {
@@ -297,7 +269,7 @@ export async function runE2eBatch({
     startPrivateOpenAiMockFn,
     label: 'E2E batch',
     cancelEscalationMs,
-    cypressCliOptions,
+    browser,
     isolated,
     resolvedCheckoutTarget,
     ...lifetimeOpts,
@@ -350,7 +322,7 @@ function runCypressOnce({
   mockExit = null,
   errLog = (s) => process.stderr.write(`${s}\n`),
   cancelEscalationMs = 5_000,
-  cypressCliOptions,
+  browser,
 }) {
   return new Promise((resolve, reject) => {
     let child
@@ -362,7 +334,7 @@ function runCypressOnce({
         cwd: checkoutRoot,
         env,
         stdio,
-        ...cypressCliOptions,
+        browser,
       })
     } catch (error) {
       reject(error)
@@ -502,7 +474,7 @@ async function runOwnedE2eInvocation({
   startPrivateOpenAiMockFn,
   label,
   cancelEscalationMs,
-  cypressCliOptions,
+  browser,
   isolated,
   resolvedCheckoutTarget,
   runtimeTarget,
@@ -657,7 +629,7 @@ async function runOwnedE2eInvocation({
       mockExit,
       errLog,
       cancelEscalationMs,
-      cypressCliOptions,
+      browser,
     })
     if (cancel.isTriggered()) return 1
     return cypressExitCode

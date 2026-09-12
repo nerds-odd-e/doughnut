@@ -1,13 +1,16 @@
 # Publish large notebook commits under one minute
 
-Status: execution started; awaiting story review.
+Status: closed; story target not met.
 Source: [SEED-018 story 3](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-3).
 Target accepted by the user on 2026-09-12. Execution authorized by
 `/dough-execute-plan 106` on 2026-09-12.
-Slice 3 missed the agreed **under 60,000 ms** HTTP target (`elapsedMs`
-60,003.112, incomplete response). Affected story field: **Evaluation**
-(practical-time target). Do not weaken that target or start a second
-optimization until the human reviews scope.
+
+Human closing decision (2026-09-12): declare this effort **mostly
+ineffective** for the under-60,000 ms story. Keep only the unnecessary
+extra property-index query flush removal. Revert isolated Cypress
+`--expose`/`--config` forwarding. Keep characterization tests and the
+recorded 60s miss. Do not start a second optimization. Do not mark the
+story complete.
 
 ## Planned execution identity
 
@@ -49,10 +52,11 @@ flush traversal. Change the existing solution; do not add a second import writer
   content saves. It delegates derived state to
   `NoteReferenceService.refreshDerivedIndexesForNote`, then the existing property,
   alias and level services. Preserve one definition of derived-index semantics.
-- `NotePropertyIndexService.refreshForNote` suppresses query auto-flush while
-  unlinking/removing old index rows, explicitly flushes, restores the prior mode,
-  and queries authored-reference rows. Its comment identifies transient children
-  and FK ordering as a real requirement to investigate.
+- `NotePropertyIndexService.refreshForNote` keeps `FlushModeType.COMMIT`
+  through unlink, the required explicit flush, `ownRowsBySourceLocalKey`,
+  and new index-row persist, then restores the prior mode. That is the one
+  kept product change: it removes a redundant query-triggered whole-session
+  auto-flush. The explicit property unlink flush remains required.
   `NoteAliasIndexService.refreshForNote` uses bulk deletion followed by an explicit
   flush. Both explicit and implicit flushes matter.
 - Other callers include note construction/extraction, content edits and title
@@ -257,12 +261,12 @@ existing `NotePropertyIndexService.refreshForNote` lifecycle: keep
 `FlushModeType.COMMIT` through `ownRowsBySourceLocalKey`. No extra mutation
 phase or new owner. Required backend/build/browser waits may exceed the limit;
 do not use the wait exception for implementation.
-Isolated tagged captures: `pnpm cy:run` forwards `--expose`/`--config`.
-Do not mutate committed `e2e_test/config/ci.ts`.
+Isolated tagged-capture forwarding of `--expose`/`--config` is closing
+work to revert; it is not part of the kept flush change.
 
 ### 3. Confirm the representative commit publishes under one minute
 Type: Behavior
-Status: planned
+Status: closed (target not met)
 Behavior: Given 1,000 existing concepts and a valid 10,000-concept addition across
 20 folders, when the owner publishes that one commit, its successful response
 arrives in less than 60,000 ms and its accepted head and authored bytes are visible.
@@ -297,7 +301,7 @@ if it were the retained HTTP baseline.
 | Accepted authored content and derived reference/alias semantics | 2: publication/controller reads and existing shared-save regressions |
 | Existing identity and learning history | 2: retained controller proof and fresh-transaction reads |
 | Authorization, validation and atomic late rejection | 2: existing controller suite plus small late-invalid-alias capture |
-| Large success below 60,000 ms, accepted head and exact content | 3: successful timed HTTP capture and bulk receiver verification |
+| Large success below 60,000 ms, accepted head and exact content | 3: closed — elapsedMs 60,003.112 incomplete; story target not met |
 | Ordinary installed-CLI success | 2: existing small CLI profile scenario |
 | Comparable before/after evidence | 1–2 small captures; 3 qualified awake large-baseline comparison |
 
@@ -345,9 +349,9 @@ small HTTP before-capture (elapsedMs 205.722 / 147.006) are recorded.
 Slice 2 is done: COMMIT through `ownRowsBySourceLocalKey` persist; AUTO
 query flush 9/9→0/0; explicit property and alias flushes remain; after-capture
 elapsedMs 186.894 / 153.214; `pnpm cy:run` forwards `--expose`/`--config`.
-Slice 3 remains planned: the first large-confirmation attempt did not reach
-the HTTP publication. Required suite/build/fixture/runtime waits are the
-only sizing exceptions.
+Slice 3 is closed without meeting the 60s target (elapsedMs 60,003.112,
+incomplete). Closing work: revert Cypress flag forwarding; keep the extra
+flush removal and characterization tests.
 
 ## Slice 3 confirmation attempt (2026-09-12)
 
@@ -406,5 +410,33 @@ setup succeeded. The HTTP request did not complete:
 
 Compared with awake baseline **3,772,320.997 ms**, this abort is about
 1.6% of that wall time and is not a finished publication. The 60 s target
-did not hold. Slice 3 stays planned. Return for **story scope review**.
-Do not weaken the 60 s target. Do not start a second optimization.
+did not hold.
+
+## Closing decision (2026-09-12)
+
+The human reviewed that miss and closed this plan as **mostly
+ineffective** for story 3. Keep:
+
+- `NotePropertyIndexService.refreshForNote` COMMIT window through query
+  and persist (one unnecessary extra auto-flush removed)
+- `NotebookGitPublicationControllerTest` property-wiki and alias
+  visibility after commit
+- this plan and `docs/notebook-publication-profiling.md` as the miss
+  record
+
+Revert the slice-2 isolated Cypress `--expose`/`--config` forwarding in
+`scripts/e2e-runner.mjs` and its tests. That plumbing served measurement,
+not the kept flush change. Do not start a second flush optimization.
+
+### 4. Revert isolated Cypress flag forwarding
+Type: Structure
+Status: done
+Change: Restore `scripts/e2e-runner.mjs` and `scripts/e2e-runner.test.mjs`
+to the pre-forwarding shape (HEAD `78c24f31bb`). Leave persistence,
+characterization tests, and profiling notes untouched.
+Proof: `CURSOR_DEV=true nix develop -c node --test scripts/e2e-runner.test.mjs`
+(53 pass). `pnpm cy:run` no longer forwards `--expose`/`--config`.
+Sizing: about 5 minutes; existing runner tests are the wait.
+
+Slice 3 remains closed without meeting the 60s promise. The story stays
+unfinished; wrap-up is not authorized by this close.

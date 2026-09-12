@@ -2048,12 +2048,17 @@ test('primary path: no private mock started (approved null), Cypress env has no 
   )
 })
 
-function spawnArgsFromDefaultCypress(opts = {}) {
+test('defaultSpawnCypress: --browser chrome forwarded as ["--browser","chrome"] in cypress run args', () => {
   const captured = []
   const fakeChild = new EventEmitter()
   fakeChild.pid = 0
   fakeChild.kill = () => undefined
   fakeChild.unref = () => undefined
+  const spawnFn = (cmd, args, opts) => {
+    captured.push({ cmd, args, opts })
+    return fakeChild
+  }
+
   defaultSpawnCypress({
     specs: ['e2e_test/features/foo/**'],
     cwd: '/repo',
@@ -2061,90 +2066,45 @@ function spawnArgsFromDefaultCypress(opts = {}) {
     cypressBin: '/repo/node_modules/cypress/bin/cypress',
     configFile: 'e2e_test/config/ci.ts',
     stdio: 'inherit',
-    ...opts,
-    spawnFn: (cmd, args, spawnOpts) => {
-      captured.push({ cmd, args, opts: spawnOpts })
-      return fakeChild
-    },
+    browser: 'chrome',
+    spawnFn,
   })
-  assert.equal(captured.length, 1)
-  return captured[0].args
-}
 
-test('defaultSpawnCypress: --browser chrome forwarded as ["--browser","chrome"] in cypress run args', () => {
-  const args = spawnArgsFromDefaultCypress({ browser: 'chrome' })
+  assert.equal(captured.length, 1)
+  const { args } = captured[0]
   const browserIdx = args.indexOf('--browser')
   assert.ok(browserIdx >= 0, '--browser must be in cypress run args')
   assert.equal(args[browserIdx + 1], 'chrome', 'browser value is chrome')
 })
 
-test('defaultSpawnCypress: without optional CLI flags those args are not emitted', () => {
-  const args = spawnArgsFromDefaultCypress()
+test('defaultSpawnCypress: without --browser no --browser arg is emitted', () => {
+  const captured = []
+  const fakeChild = new EventEmitter()
+  fakeChild.pid = 0
+  fakeChild.kill = () => undefined
+  fakeChild.unref = () => undefined
+  const spawnFn = (cmd, args, opts) => {
+    captured.push({ cmd, args, opts })
+    return fakeChild
+  }
+
+  defaultSpawnCypress({
+    specs: ['e2e_test/features/foo/**'],
+    cwd: '/repo',
+    env: {},
+    cypressBin: '/repo/node_modules/cypress/bin/cypress',
+    configFile: 'e2e_test/config/ci.ts',
+    stdio: 'inherit',
+    spawnFn,
+  })
+
+  assert.equal(captured.length, 1)
+  const { args } = captured[0]
   assert.equal(
     args.includes('--browser'),
     false,
     'no --browser arg without a browser'
   )
-  assert.equal(args.includes('--expose'), false)
-  assert.equal(args.includes('--config'), false)
-})
-
-test('defaultSpawnCypress: --expose and --config are forwarded in cypress run args', () => {
-  const args = spawnArgsFromDefaultCypress({
-    specs: ['e2e_test/features/cli/cli_notebook_web_created_note.feature'],
-    browser: 'chrome',
-    exposeValues: [
-      'tags=@publicationProfileHttp or @publicationProfileHttpRejection',
-    ],
-    configValues: ['taskTimeout=66000'],
-  })
-  const exposeIdx = args.indexOf('--expose')
-  assert.ok(exposeIdx >= 0, '--expose must be in cypress run args')
-  assert.equal(
-    args[exposeIdx + 1],
-    'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
-  )
-  const configIdx = args.indexOf('--config')
-  assert.ok(configIdx >= 0, '--config must be in cypress run args')
-  assert.equal(args[configIdx + 1], 'taskTimeout=66000')
-})
-
-test('runE2eBatch: --expose and --config from argv reach spawnCypress; --config-file is not treated as --config', async (t) => {
-  const checkout = makePrimaryCheckout(t)
-  const standIn = spawnOwnedTreeStandIn(checkout.root)
-  const state = { owned: { leader: 0, grandchild: 0 } }
-  trackOwnedTree(t, () => state.owned)
-  let captured = null
-
-  const code = await runE2eBatch({
-    argv: [
-      '--browser',
-      'chrome',
-      '--spec',
-      SUPPORTED_ISOLATED_CYPRESS_SPEC,
-      '--config-file',
-      'e2e_test/config/ci.ts',
-      '--config',
-      'taskTimeout=66000',
-      '--expose',
-      'tags=@publicationProfileHttp or @publicationProfileHttpRejection',
-    ],
-    ...primaryLifetimeOpts(checkout.root, standIn),
-    spawnCypress: (opts) => {
-      captured = opts
-      return makeCypressChild(0, async () => {
-        state.owned = await waitForOwnedPids(standIn.pidsFile)
-      })
-    },
-  })
-
-  assert.equal(code, 0)
-  assert.ok(captured, 'spawnCypress must receive the parsed Cypress flags')
-  assert.deepEqual(captured.exposeValues, [
-    'tags=@publicationProfileHttp or @publicationProfileHttpRejection',
-  ])
-  assert.deepEqual(captured.configValues, ['taskTimeout=66000'])
-  assert.equal(captured.browser, 'chrome')
 })
 
 test('isolated path: non-allowlisted glob still refuses (allowlist enforced for isolated only)', async (t) => {
