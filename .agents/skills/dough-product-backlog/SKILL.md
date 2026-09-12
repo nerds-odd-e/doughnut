@@ -13,7 +13,7 @@ Before editing, identify from human instructions or repository guidance:
 - Canonical seed locations, seed IDs, and heading or stable-anchor conventions
   when feature-story entries are affected.
 - Canonical executable-plan locations and plan identity conventions for
-  bounded-correction entries when they are affected.
+  bounded-correction entries or taken planned stories when they are affected.
 - Decomposition, refinement, and slice-planning workflows, when needed.
 - Commit conventions, if a commit is authorized.
 
@@ -35,7 +35,8 @@ required workflow is unavailable, stop that activity and ask for its guidance.
   its heading or stable anchor plus seed ID. A bounded correction without a
   supplied story links directly to its existing plan and uses the plan identity;
   the linked path is sufficient when that is this project's identity convention.
-  Keep details, estimates, dependencies, and status in that canonical home.
+  Taken planned stories also link directly to their slice plans. Keep details,
+  estimates, dependencies, and status in the canonical home.
 - Select work for the backlog list; do not inventory every candidate or turn
   the list into a roadmap or execution plan.
 
@@ -88,17 +89,17 @@ required workflow is unavailable, stop that activity and ask for its guidance.
 ## Take queued work for execution
 
 Move an entry from **Backlog list** to **Taken** only when execution of its
-authorized plan is starting. Resolving and refining a story, initial slice
-planning, slice-plan refinement, and an intention to execute leave it in the
-queue. If execution context or authorization fails before execution starts,
+authorized plan or explicitly selected planless quick story is starting.
+Refinement, planning, and an intention to execute leave it in the queue. If execution context or authorization fails before execution starts,
 leave the entry unchanged.
 
-Preserve the entry text, canonical link, and identity exactly. Remove it from
-the queue, append it after existing **Taken** entries, and perform both changes
-as one backlog update. If the entry is already in **Taken**, resume without
-duplicating or reordering it. If the executed work is in neither active list,
-do not fabricate an entry. Stop before execution when an entry expected from
-the queue cannot be moved unambiguously.
+Preserve the title, canonical link, and identity. Add any missing slice-plan
+link for a planned story, including on resume; stop if its plan is unresolved.
+Quick stories need no plan, and corrections need no duplicate plan link.
+
+Move the entry to the end of **Taken** in one backlog update. On resume, do not
+duplicate or reorder it. Do not fabricate absent entries; stop if an expected
+queued entry cannot be moved unambiguously.
 
 Once execution starts, leave the entry in **Taken** across pauses, failures,
 resumption, successful plan completion, and retrospective. Returning cancelled
