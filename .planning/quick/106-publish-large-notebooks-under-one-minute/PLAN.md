@@ -1,9 +1,13 @@
 # Publish large notebook commits under one minute
 
-Status: execution started.
+Status: execution started; awaiting story review.
 Source: [SEED-018 story 3](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-3).
 Target accepted by the user on 2026-09-12. Execution authorized by
 `/dough-execute-plan 106` on 2026-09-12.
+Slice 3 missed the agreed **under 60,000 ms** HTTP target (`elapsedMs`
+60,003.112, incomplete response). Affected story field: **Evaluation**
+(practical-time target). Do not weaken that target or start a second
+optimization until the human reviews scope.
 
 ## Planned execution identity
 
@@ -276,7 +280,7 @@ fails, preserve the result and return for story scope review. Do not repeatedly
 run large captures or optimize a second area automatically.
 
 ```sh
-PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=10000 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cy:run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=66000 --expose tags=@publicationProfileHttp
+PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=10000 PUBLICATION_PROFILE_FOLDERS=20 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cy:run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=43260000,defaultCommandTimeout=600000 --expose tags=@publicationProfileHttp
 ```
 
 The profiling helper already records request-through-response time. Assess its
@@ -341,6 +345,66 @@ small HTTP before-capture (elapsedMs 205.722 / 147.006) are recorded.
 Slice 2 is done: COMMIT through `ownRowsBySourceLocalKey` persist; AUTO
 query flush 9/9→0/0; explicit property and alias flushes remain; after-capture
 elapsedMs 186.894 / 153.214; `pnpm cy:run` forwards `--expose`/`--config`.
-Slice 3 is the remaining scaling confirmation, with the unresolved risk that
-the bounded change will not achieve the required roughly 63-fold improvement.
-Required suite/build/fixture/runtime waits are the only sizing exceptions.
+Slice 3 remains planned: the first large-confirmation attempt did not reach
+the HTTP publication. Required suite/build/fixture/runtime waits are the
+only sizing exceptions.
+
+## Slice 3 confirmation attempt (2026-09-12)
+
+One isolated worktree run of the slice-3 command
+(`doughnut_e2e_wt_55773df2d6ac449796e9d4c0abac2671`, HTTP deadline 60,000 ms).
+The host was kept awake with `caffeinate`; the runner finished in ~40 s.
+
+Result: **setup timeout, not a publication measurement.** Cypress failed at
+`cy.wrap()` waiting **6000 ms** (`defaultCommandTimeout: 6000` in
+`e2e_test/config/common.ts`) during `When I seed the representative publication
+baseline` — injectNotes of 1,000 concepts. Spec duration **8 s**. No
+`timing.json`, `result.json`, JFR, or fixture fingerprints were written (no
+directory under `~/Library/Application Support/Donut/publication-profiles/`
+for this attempt). Bulk receiver verification was not reached. `elapsedMs` is
+unmeasured; comparison with the awake baseline **3,772,320.997 ms** is not
+possible.
+
+Owned backend (PID 93572, port 63814, JDK 25.0.3, MySQL 8.4, Hibernate
+7.4.5.Final, `-XX:TieredStopAtLevel=1`): dispatcher initialized at
+16:31:26; no injectNotes completion or `git-bundle` request appears in
+`backend/logs/donut-e2e.log` before graceful shutdown at 16:31:40. The client
+disconnect does not establish server cancellation; the runner then tore down
+the SUT. Inspected after shutdown — no publication capture existed to preserve.
+
+`--config taskTimeout=66000` did not cause this failure. A longer Cypress
+**task** timeout is still needed for later fixture/verification waits (10,000
+file commit and bulk checker). Unblocking **this** seed also needs a longer
+Cypress **`defaultCommandTimeout`** for the injectNotes `cy.wrap`. The awake
+large captures used `--config taskTimeout=43260000,defaultCommandTimeout=600000`.
+Do not raise `PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS` above 60000. Do not
+treat this as a 60 s target miss or start a second optimization. Coordinator
+authorized one retry of the same HTTP capture with fixture/verification
+Cypress timeouts `taskTimeout=43260000,defaultCommandTimeout=600000` (the
+awake-baseline command waits). That retry is the one large publication
+attempt; the aborted seed is not a publication capture.
+
+## Slice 3 retry (2026-09-12) — 60 s target missed
+
+Same isolated worktree, host kept awake, HTTP deadline 60,000 ms. Fixture
+setup succeeded. The HTTP request did not complete:
+
+- `timing.json` `elapsedMs` **60,003.112** (`>= 60000`), outcome
+  `incomplete`, error `Publication benchmark HTTP deadline exceeded`
+- no successful response, no accepted head/tree, no bulk checker
+- artifacts:
+  `~/Library/Application Support/Donut/publication-profiles/2026-09-12T08-35-11.940Z/`
+- fingerprints match the awake baseline
+  (`30f8c2a1…` / `dbea65fb…`); JDK 25.0.3, `-XX:TieredStopAtLevel=1`,
+  Hibernate 7.4.5.Final, MySQL 8.4.11
+- request thread `http-nio-63814-exec-10` still inside `publish` at
+  disconnect (Hikari leak at 16:36:13); runner then shut the SUT down
+- truncated JFR: 3,006 request-thread samples; 2,671 in
+  `AbstractFlushingEventListener`; request allocation weight
+  10,503,558,320 bytes; `NoteAliasIndexService` 1,081 /
+  `NotePropertyIndexService` 608
+
+Compared with awake baseline **3,772,320.997 ms**, this abort is about
+1.6% of that wall time and is not a finished publication. The 60 s target
+did not hold. Slice 3 stays planned. Return for **story scope review**.
+Do not weaken the 60 s target. Do not start a second optimization.

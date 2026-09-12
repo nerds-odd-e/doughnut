@@ -114,6 +114,63 @@ failed/incomplete run as passing. Repeat a command to reset the owned E2E
 database and fixture before the next run, following
 [ADR 0007](adrs/0007-environments-and-isolation-accepted.md) isolation.
 
+## Large HTTP confirmation (blocked in fixture setup)
+
+Worktree `doughnut_e2e_wt_55773df2d6ac449796e9d4c0abac2671`, revision
+`61624927455b3479a84acb356d5d3b90e0c32e8f`, 2026-09-12T08:31:05Z, host kept
+awake. Command used `PUBLICATION_PROFILE_EXISTING=1000`
+`PUBLICATION_PROFILE_ADDITIONS=10000` `PUBLICATION_PROFILE_FOLDERS=20`
+`PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000` and
+`--config taskTimeout=66000`.
+
+Cypress failed before publication: `cy.wrap()` timed out at **6000 ms**
+(`defaultCommandTimeout`) while seeding 1,000 existing concepts. No profile
+directory, `timing.json`, JFR, fingerprints, or bulk-checker outcome. This is
+incomplete evidence, not a passed or failed 60 s publication. The HTTP deadline
+must stay at 60,000 ms; fixture and verification waits need longer Cypress
+`defaultCommandTimeout` and `taskTimeout` (the awake large captures used
+`taskTimeout=43260000,defaultCommandTimeout=600000`).
+
+## Large HTTP confirmation (HTTP deadline exceeded)
+
+Authorized retry of the same 1,000 / 10,000 / 20 fixture on
+`doughnut_e2e_wt_55773df2d6ac449796e9d4c0abac2671`, revision
+`61624927455b3479a84acb356d5d3b90e0c32e8f`. Host stayed awake
+(`caffeinate` 16:34:16–16:36:18 +0800; no Sleep/Wake in that interval).
+JDK 25.0.3, `-XX:TieredStopAtLevel=1`, 12 GiB max heap, Hibernate
+7.4.5.Final, MySQL 8.4.11. Same fingerprints as the awake baseline:
+baseline `30f8c2a12e2214f1a9b7f34e4c79d09d8473279899e3138b9ca0a029a0afa8f9`,
+proposal `dbea65fb646eb7660faf6a509cee84f1b7adda9204e2aaa4fae137edb90da65d`.
+Material difference vs the 2026-09-11 awake capture: the
+COMMIT-through-`ownRowsBySourceLocalKey` persist change, isolated worktree ports,
+and a 60,000 ms HTTP deadline instead of a one-hour wait.
+
+Capture `2026-09-12T08-35-11.940Z`:
+
+| Field | Value |
+| --- | --- |
+| HTTP `elapsedMs` | **60,003.112** (`timeoutMs` 60,000) |
+| Outcome | incomplete — `Publication benchmark HTTP deadline exceeded` |
+| Accepted head/tree | not received |
+| Bulk checker | not reached |
+| Request thread | `http-nio-63814-exec-10` |
+| Request allocation weight | 10,503,558,320 bytes in the truncated 60 s span |
+| Request-thread samples | 3,006 / 3,015; `AbstractFlushingEventListener` 2,671; `NoteAliasIndexService` 1,081; `NotePropertyIndexService` 608 |
+
+Artifacts:
+`~/Library/Application Support/Donut/publication-profiles/2026-09-12T08-35-11.940Z/`
+(`timing.json`, `result.json`, `capture.json`, `incomplete.jfr`,
+`jfr-summary.txt`, `proposal.bundle`, `observed-request-span-analysis.txt`).
+
+Owned backend was still in `NotebookGitProposalPublisher.publish` when the
+client disconnected (Hikari leak detection at 16:36:13 on the request
+thread). The runner then began graceful shutdown. A disconnected client
+does not establish server cancellation. This is incomplete evidence, not a
+passed publication. Compared with the awake baseline **3,772,320.997 ms**,
+the request was aborted at about 1.6% of that wall time and had not
+finished. Return for story scope review; do not weaken the 60 s target or
+start a second optimization.
+
 The full prior investigation record (static-candidate inspection, individual
 smoke-run accounts, recovery commands, and continuation-probe narration) is
 recoverable with `git show 13a2e2edc6:docs/notebook-publication-profiling.md`.
