@@ -2,46 +2,213 @@
 
 ## Findings and next experiment
 
-Repeated ORM flushing remains the dominant sampled publication cost on the
-representative large fixture (1,000 existing concepts, 10,000 additions, 20
-folders). Two completed valid publications place **98.25% and 98.213%** of
-publication-thread execution samples in Hibernate flush traversal, with
-roughly 571 GB of weighted request allocation in each. Property- and
-alias-index refresh callers recur in those stacks (54,321/54,728 samples in
-the first capture; 54,565/54,948 in the repeat). These overlapping stacks
-identify a dominant CPU cost; they do **not** predict 98% wall-time savings
-or establish that any remaining flush can safely be removed.
+The current improvement round uses **1,000 existing notes and 1,000 edits**,
+not the historical 10,000-addition fixture. Its target is at least 50% less
+completed HTTP waiting time and simpler, smaller production code. The
+[story](../.planning/seeds/SEED-018-publish-large-authored-notebooks.md#story-3)
+owns the product commitment; the refinement below owns experimental evidence.
+Production still contains only the earlier extra property-query flush removal.
+The experimental candidate is not delivered by this investigation.
 
-`NotePropertyIndexService.refreshForNote` keeps `FlushModeType.COMMIT` through
-unlink, the required explicit flush, authored-reference lookup, and new
-index-row persist. That removes a redundant query-triggered whole-session
-auto-flush. The explicit property unlink flush and
-`NoteAliasIndexService.refreshForNote` bulk-delete flush remain required for
-visibility and FK ordering. Publication still persists derived property wiki
-links and aliases so they are visible after an accepted commit, and replacing
-authored property wiki or alias values drops the stale derived entries.
+The dominant design cost is repeatedly flushing the whole growing Hibernate
+session while refreshing one note's derived indexes. On the smaller baseline,
+1,218 of 1,406 request-thread execution samples (86.6%) contain
+`AbstractFlushingEventListener`; weighted request allocation is 11.284 GB.
+The large historical recordings independently showed the same concentration.
+Sample proportions explain where to investigate; completed request timings
+establish improvement.
 
-Skipping that extra property-index query flush does not make the
-representative workload finish within 60,000 ms. See
-[large HTTP deadline capture](#large-http-deadline-capture). Remaining cost
-is still per-note whole-session flush work; after that extra query flush is
-gone, alias-index is the larger sampled caller. Small HTTP captures of the
-20-note fixture stay well under one second and do not predict large-fixture
-wall time.
+Use the note's already-owned authored-reference rows and replace derived index
+rows without making each index refresh flush the entire session. Existing
+loaded property-index objects must be discarded coherently with their database
+rows. A bulk delete alone passed the publication example but failed two
+existing title-rewrite tests. Intermediate flushes were needed by the previous
+persistence choreography; they are not an independent product requirement.
 
-Keep accepted-head/content, note identity, learning state, and atomic late
-rejection. Parsing, Git work, and database waits have weaker measured CPU
-evidence and should not displace this priority without new evidence.
+## Smaller-workload refinement
 
-Use the [baseline captures](#baseline-captures), their persistent raw data,
-and the versioned [analysis script](../scripts/profiling/AnalyzePublication.java).
-The [small late-rejection capture](#small-late-rejection-capture) establishes
-late processing and preserved state; **large rejection latency is unmeasured**.
-Do not repeat 10,000-note captures merely to reconfirm this ranking. Reserve a
-large confirmation run for a candidate that leaves a specific scaling
-question unanswered.
+Investigation date: 2026-09-12. Source baseline:
+`eb2972bf9ecbda5d09c7b762c677ea0986b7ffb1`, which already includes the earlier
+extra query-flush removal. All experiments use a separate linked worktree and
+its own E2E database/ports under [ADR 0007](adrs/0007-environments-and-isolation-accepted.md).
+No Production or Development data is used. No executable plan or delivered
+optimization is implied by these experiments.
+
+### Workload and comparison
+
+One notebook with 1,000 measured existing concept notes in 20 folders, plus
+the existing CLI scenario's two unchanged control notes and two control
+folders (1,002 notes and 22 folders in total). The proposal edits all
+1,000 measured existing file paths, changes their aliases and authored prose, and
+contains scalar/list properties and wiki references. It does not add 1,000
+new notes. Content is deterministic; every accepted run must pass the existing
+bulk receiver check for all 1,000 files and the proposed accepted head.
+
+- Baseline tree fingerprint:
+  `30f8c2a12e2214f1a9b7f34e4c79d09d8473279899e3138b9ca0a029a0afa8f9`.
+- Proposal tree fingerprint:
+  `be732ca9d930db96bb35d3e23c41ac717710820c18728c29be7d5d8b999d9da9`.
+- Boundary: HTTP request start through complete response body, including
+  transaction commit; fixture seed, proposal preparation, and receiver
+  verification excluded.
+- Same local JDK 25.0.3, MySQL 8.4.11, Hibernate 7.4.5.Final, ordinary E2E
+  logging, `-XX:TieredStopAtLevel=1`, and 12 GiB maximum heap. Each comparison
+  run starts a fresh owned JVM; deterministic fixture setup precedes capture.
+  No additional explicit warm-up. `caffeinate -i` holds the host awake.
+- Both versions use JFR `settings=profile`. Run comparisons sequentially,
+  without overlapping the backend test suite. The HTTP deadline is 60 seconds;
+  a deadline or failed receiver check is not a successful timing observation.
+
+The initial baseline completed in 29,655.518 ms, so 1,000/1,000 is a usable
+feedback boundary. There is no need to shrink it or revisit the 62-minute
+historical fixture to select the first improvement.
+
+### Completed comparison
+
+Three fresh-JVM runs per version, each with HTTP 200 and all 1,000 edited
+files verified byte-for-byte:
+
+| Version | Capture directory | HTTP elapsed |
+| --- | --- | ---: |
+| Current production baseline | `2026-09-12T11-10-05.476Z` | 31,263.244 ms |
+| Current production baseline | `2026-09-12T11-12-05.295Z` | 30,875.302 ms |
+| Current production baseline | `2026-09-12T11-15-27.820Z` | 30,729.429 ms |
+| Corrected candidate | `2026-09-12T11-11-07.216Z` | 11,597.602 ms |
+| Corrected candidate | `2026-09-12T11-13-05.476Z` | 11,326.380 ms |
+| Corrected candidate | `2026-09-12T11-13-45.688Z` | 11,253.182 ms |
+
+Baseline median: **30,875.302 ms**. Corrected candidate median:
+**11,326.380 ms**, a **63.32% reduction** (2.73× faster).
+The first-round boundary derived from this baseline is **≤ 15,437.651 ms**;
+the candidate clears it on every measured run. All six driver runs exited 0.
+These are local fixture results, not a production-wide latency guarantee.
+
+The earlier 29,655.518 ms calibration is excluded from those medians. Its HTTP
+and Cypress receiver checks passed, but its temporary launcher exited 1 after
+owned shutdown because it called the wrong cleanup method. The launcher was
+corrected before the six comparison runs; the original driver log is retained.
+
+JFR analysis of the median runs explains the gain:
+
+| Measurement | Baseline | Corrected candidate |
+| --- | ---: | ---: |
+| Request-thread execution samples | 1,406 | 519 |
+| Samples containing whole-session flush traversal | 1,218 | 379 |
+| Samples containing alias refresh | 632 | 7 |
+| Samples containing property refresh | 371 | 37 |
+| Weighted request allocation (decimal GB) | 11.284 | 2.515 |
+
+Weighted allocation falls about 77.7%. Stack categories overlap and the JFR
+allocation weights are estimates, not exact allocation counters. Remaining
+flush traversal still occupies 73.0% of the candidate's request-thread samples;
+this is evidence for a possible later round, not a claim that publication is
+fully optimized. The first 50% boundary is already met by the smaller shared
+change.
+
+### Candidate assessment
+
+| Candidate | Evidence and trade-off | Decision |
+| --- | --- | --- |
+| Remove just the earlier extra property-query auto-flush | Already present in the baseline; prior large deadline remained incomplete | Not a new improvement |
+| Bulk-replace indexes using in-memory authored references, leaving old managed property rows attached | Initial 10,485.873 ms HTTP result (64.6% faster), all 1,000 files verified, but two title-rewrite tests failed with `TransientPropertyValueException` | Reject this incomplete variant |
+| Discard obsolete managed property rows, bulk-replace derived rows, and use the note's current authored-reference collection | Preserves one source of reference state and removes repeated whole-session flushes; existing backend suite passes | Preferred: clears the measured 50% target with the correctness correction |
+| Defer index work into a publication-wide batch | Could reduce traversal further, but introduces batch lifecycle, ordering, and shared-caller coordination; not benchmarked | More machinery than needed if the smaller shared simplification meets the target |
+| Clear/detach the entire session between notes | Conflicts with the publisher's retained live-note/binding objects unless they are reloaded or merged; not benchmarked | Avoid the extra state-management burden for this round |
+| Parsing, Git, or timeout changes | Median baseline has 21 YAML and 4 JGit samples versus 1,218 flush samples; raising a deadline does not remove work | Weaker next target without new evidence |
+
+The preferred candidate reuses `Note.replaceContent`'s existing source-owned
+reference children. Property indexing no longer queries them back from the
+database. Its replacement sequence selects old property rows without an
+auto-flush, detaches those obsolete rows, bulk-deletes them, cascades persistence
+of the current note references, and creates replacement derived entries from
+the in-memory map. Alias replacement also avoids its per-note explicit and
+query-triggered flush. Final transaction commit and existing publisher
+boundaries retain persistence/rollback ownership.
+
+This keeps the schema and authored-reference semantics of
+[ADR 0004](adrs/0004-okf-compatible-notebook-markdown-accepted.md), including
+unresolved links. The property-reference FK already has `ON DELETE SET NULL`
+(`V300000315`); no new migration or persisted resolved-destination cache is
+needed. It also keeps [ADR 0006](adrs/0006-failure-handling-accepted.md)'s
+existing deliberate rejection and failure behavior.
+
+### Correctness and code size
+
+The corrected prototype passed the complete backend suite: **2,404 tests in
+480 suites, zero failures/errors/skips** (`pnpm backend:test_only` in the
+isolated worktree). The existing tests cover shared title rewrites, property
+and alias replacement, committed publication state, learning preservation,
+and atomic invalid publication. No tests were weakened to accept the prototype.
+
+An independent stored-state check on corrected candidate capture
+`2026-09-12T11-13-45.688Z` confirmed all **1,002 note identities unchanged**,
+unchanged learning records, exactly **1,000 expected updated aliases** (and
+therefore no leftover old aliases), and all **2,000 `related` property rows
+pointing at the exact expected authored-reference targets**. The check is
+retained as `derived-state-check.json` in that capture directory.
+
+The corrected candidate also passed focused HTTP checks on the original
+20-existing / 20-addition fixture:
+
+- `2026-09-12T11-17-09.639Z`: accepted in 184.206 ms, all 20 added documents
+  received byte-for-byte and the accepted head matched.
+- `2026-09-12T11-17-15.360Z`: rejected in 117.530 ms for malformed aliases at
+  `group-19/Added-00019.md`. Nineteen preceding note identities were allocated
+  before rejection. Baseline head/tree, every stored note, learning records,
+  property-index rows, alias-index rows, and authored-reference rows were
+  unchanged after rollback. The temporary state checker adds direct derived-row
+  comparisons to the existing rejection proof; it weakens no assertions.
+
+These small checks verify addition and rollback behavior; their elapsed times
+are not the optimization comparison. Both Cypress scenarios and the driver
+passed. `small-checks.json` and `small-rejection-state.patch` retain the evidence
+and the extra measurement assertion.
+
+After the repository's normal formatter, the corrected candidate changes four
+production files: **46 lines added, 58 removed, net −12**. It removes the
+service-wide flush-mode save/restore block, explicit per-index session flushes,
+the authored-reference reload query, and an unused repository delete method.
+It adds a small map over the note's existing reference collection and explicit
+handling of discarded managed property rows. There is no publication-only
+queue, cache, batch mode, schema change, or new production file. Fixture and
+launcher changes are experimental tooling and counted separately.
+
+### Reproduction and retained artifacts
+
+Raw captures remain under
+`~/Library/Application Support/Donut/publication-profiles/<capture>/` with
+`capture.json`, `timing.json`, `result.json`, and `publication.jfr`.
+`refinement-analysis.txt` is produced by the existing
+[analysis script](../scripts/profiling/AnalyzePublication.java) for that HTTP
+span and the publication thread identified from its samples.
+
+The companion `refinement-2026-09-12/` directory retains `candidate.patch`,
+`candidate-source/`, `fixture.patch`, `run-refinement-spike.mjs`, `repeat.py`,
+driver logs, the initial failure log, zipped full-suite JUnit results, source
+fingerprints, and formatted code counts. Patch metadata matters: capture revisions name the common baseline
+commit, while the retained patch identifies the experimental source.
+
+In a fresh owned linked checkout at the baseline revision, apply the fixture
+patch (it changes added paths to existing paths and uses updated content), put
+the retained launcher at `scripts/profiling/run-refinement-spike.mjs`, and
+install workspace dependencies. The launcher uses the repository's owned E2E
+batch API and passes the profiling tag and timeouts to Cypress. For a candidate
+run, additionally apply `candidate.patch`. Then run:
+
+```bash
+PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=1000 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c caffeinate -i node scripts/profiling/run-refinement-spike.mjs
+```
+
+The retained fixture reuses the legacy `PUBLICATION_PROFILE_ADDITIONS` count
+variable to mean number of edited files; it does not change the main branch's
+addition profiler. For portable final delivery, name the edited-file workload
+explicitly in the maintained harness. Verify before/after tree fingerprints
+and complete receiver success, not just HTTP status.
 
 ## Baseline captures
+
+These are historical large-addition captures, retained to explain the original
+bottleneck. They are not the comparison baseline for the revised smaller round.
 
 Both large captures used the same synthetic fixture: 1,000 existing concepts,
 10,000 additions, 20 folders. Fixture fingerprints (SHA-256 of recursive Git
@@ -118,14 +285,14 @@ For a small HTTP capture, use the HTTP tags and scale the same env vars:
 PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000 CURSOR_DEV=true nix develop -c pnpm cypress run --browser chrome --spec e2e_test/features/cli/cli_notebook_web_created_note.feature --config taskTimeout=66000 --expose 'tags=@publicationProfileHttp or @publicationProfileHttpRejection'
 ```
 
-For the representative large fixture (1,000 existing, 10,000 additions, 20
-folders), keep `PUBLICATION_PROFILE_REQUEST_TIMEOUT_MS=60000` and use the
-awake-baseline Cypress waits
-`--config taskTimeout=43260000,defaultCommandTimeout=600000`. The small
-`taskTimeout=66000` and default `defaultCommandTimeout` (6000 ms) abort during
-seed of 1,000 concepts and do not produce a publication measurement. Isolated
-tagged captures use `pnpm cypress run --expose …`; `pnpm cy:run` does not
-forward `--expose` or `--config`.
+For the revised 1,000-existing / 1,000-edit comparison, use the retained
+refinement launcher above. It gives fixture setup 600,000 ms independently
+of the 60,000 ms publication deadline. A 66,000 ms task timeout can expire
+while seeding and then provides no publication measurement. The old large
+captures used `taskTimeout=43260000,defaultCommandTimeout=600000`; this is
+historical reproduction information, not the current measurement requirement.
+Isolated tagged captures use `pnpm cypress run --expose …`; `pnpm cy:run`
+does not forward `--expose` or `--config`.
 
 A timeout or a runner failure leaves incomplete evidence — inspect the owned
 backend for actual completion before any reset or retry; never relabel a
@@ -135,7 +302,7 @@ database and fixture before the next run, following
 
 ## Large HTTP deadline capture
 
-Representative fixture (1,000 existing concepts, 10,000 additions, 20
+Historical fixture (1,000 existing concepts, 10,000 additions, 20
 folders) under a 60,000 ms HTTP deadline, host awake, JDK 25.0.3,
 `-XX:TieredStopAtLevel=1`, 12 GiB max heap, Hibernate 7.4.5.Final, MySQL
 8.4.11. Same fingerprints as the awake baseline: baseline

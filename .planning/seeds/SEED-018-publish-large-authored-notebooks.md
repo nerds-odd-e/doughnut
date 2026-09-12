@@ -45,8 +45,9 @@ repeated work but cannot establish its runtime importance. Use a focused baselin
 profile to select areas worth improving, without requiring an optimization plan
 as an investigation deliverable.
 
-Capture three independently valuable stories in the explicit user priority order.
-This split does not authorize executable planning or implementation.
+The remaining selected story is publication performance. Its updated scope and
+explicitly authorized refinement experiments follow; production delivery remains
+subsequent work.
 
 ## Story Decomposition
 
@@ -57,126 +58,123 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
 
 ### 3. Publish large notebook commits within a practical measured time
 
-- **Goal:** A notebook owner publishes a valid large authored commit without
-  manually splitting it, receives a definitive successful outcome, and can see
-  the accepted head and authored notes in Donut. Reduce the measured waiting
-  time through one bounded improvement to the dominant publication cost.
-- **Scope — required behavior:** Improve repeated ORM flush work on the
-  publication property/alias-index refresh path. One extra property-index
-  query-triggered auto-flush is already gone (`FlushModeType.COMMIT` covers
-  unlink, the required explicit flush, authored-reference lookup, and persist).
-  The remaining work is the required per-note whole-session flushes, with
-  alias-index now the larger sampled caller. Confirm that a correctness-safe
-  change to that remaining work scales to the retained representative
-  workload: 1,000 existing concepts, 10,000 additions, and 20 folders. These
-  counts define a measurement example, not a supported-size limit or a reason
-  to reject other notebooks.
-- **Scope — preserved constraints:** Preserve existing authorization and
-  validation, authored content and reference semantics, note identity, learning
-  history, and atomic acceptance. Invalid proposals must still produce a useful
+- **Goal:** A notebook owner publishes a valid authored commit with at least
+  **50% less measured waiting time** in the first improvement round, while
+  the production design becomes simpler and its formatted code has fewer
+  lines. Find the small part of the design responsible for most of the cost;
+  an isolated micro-optimization is insufficient.
+- **Scope — required behavior:** Improve the dominant publication cost on a
+  manageable representative workload. Start with **1,000 existing notes and
+  1,000 updates in one commit**, with aliases, properties, and authored links.
+  Here updates mean edits to existing notes; additions remain a supported
+  path and a useful focused regression example. Use 20 folders to preserve
+  the existing deterministic fixture shape. These counts are measurement
+  examples, never notebook-size limits.
+- **Scope — measurement boundary:** Measure HTTP request start through the
+  complete successful response, including transport and transaction commit.
+  Exclude fixture setup, bundle preparation, and receiver verification. Use
+  identical content, environment, JVM settings, profiling settings, and
+  readiness procedure before and after. Compare repeated completed runs,
+  preferably three per version with medians and individual times reported.
+  A timeout is incomplete evidence, not a measured baseline. If 1,000/1,000
+  prevents a useful feedback loop, reduce both counts (for example to 250/250,
+  then 100/100), establish a completed baseline, and hold that fixture fixed
+  for the comparison. Increase size only after the smaller case is practical.
+- **Scope — design criterion:** Remove repeated work and unnecessary
+  persistence choreography, reusing the note's existing authoritative state.
+  Assess all affected production files together: fewer formatted lines and
+  fewer responsibilities/representations, without shifting complexity to a
+  new helper, configuration, cache, or special publication path. Tests and
+  experimental tooling are reported separately from production code.
+- **Scope — preserved constraints:** Preserve authorization, validation,
+  authored bytes and reference semantics, note identities, learning history,
+  derived-index visibility, removal of obsolete derived entries, and atomic
+  acceptance. Invalid proposals must still give a useful path-specific
   rejection without changing the accepted head or stored notebook state.
-  Increasing transport timeouts alone does not satisfy the story.
-- **Scope — deferred promises:** No general publication rewrite, optimization of
-  parsing/Git/database waits without evidence requiring reconsideration, background
-  jobs, progress UI, resumable uploads, general synchronization, or improvements
-  to other large-data operations. No new large-invalid-proposal latency target,
-  exhaustive workload matrix, or production-wide performance guarantee. These
-  are deferred commitments, not restrictions on naturally supported behavior.
-- **Evaluation:** Record comparable before/after publication request timing and
-  server measurements, plus successful accepted-head and byte-for-byte content
-  checks. Use the awake 62 min 52.321 s capture as the retained elapsed-time
-  reference; retain its local JVM qualifications and report material environment
-  differences. Measure publication separately from fixture setup and receiver
-  verification. A reduction in sampled flush cost alone is insufficient: the
-  valid workload must publish faster and meet the agreed practical-time target.
-  The agreed target is strictly under 60,000 ms from HTTP request start through
-  the complete successful response, including transport and server commit.
-  The user accepted under one minute on 2026-09-12. Feasibility remains
-  unproven: the extra property-index query flush removal left a 60,000 ms
-  HTTP deadline capture incomplete at **60,003.112 ms**, still inside
-  `NotebookGitProposalPublisher.publish`. Small 20-note HTTP times (~187 ms
-  accepted / ~153 ms rejected) are not the story result.
+  Timeout increases alone cannot satisfy this story.
+- **Scope — deferred promises:** No 10,000-addition measurement requirement,
+  production-wide performance guarantee, exhaustive workload matrix, new
+  large-invalid-proposal latency target, background jobs, progress UI,
+  resumable uploads, or general synchronization. Other optimization areas
+  need evidence, but the former restriction to one particular flush removal
+  is withdrawn: change the design needed to meet this outcome simply.
+- **Evaluation:** Require at least a 50% reduction in median completed HTTP
+  time on the same selected fixture, plus accepted-head and byte-for-byte
+  received-content proof. Inspect profiles to explain the improvement;
+  sampled CPU percentages alone do not establish success. Require existing
+  backend correctness checks and focused committed-state/rollback evidence.
+  The repeated 1,000/1,000 baseline median is **30.875 seconds**, giving
+  a first-round boundary of **at most 15.438 seconds**. The corrected
+  experimental candidate reached **11.326 seconds** (63.32% lower)
+  with 12 fewer formatted production lines and all 2,404 backend tests passing.
+  This establishes a credible solution direction, not delivered story status.
 - **Key examples:**
-  - Given the representative valid workload above, when its owner publishes the
-    additions as one commit, publication returns success within the agreed target
-    and Donut exposes the accepted head and all authored file contents.
-  - Given a small notebook with existing note identities and learning state,
-    when its owner publishes valid additions, the new content is accepted while
-    those existing identities and learning state are preserved.
-  - Given the retained 20-addition fixture whose final path has malformed
-    `aliases: {invalid: shape}`, when publication reaches that invalid content
-    after processing preceding additions, it returns the useful path-specific
-    rejection and preserves baseline head, stored rows, and learning state.
-- **Value / learning:** Establish whether one safe reduction of the remaining
-  measured flush work makes large publication practical. Do not turn this into
-  another broad bottleneck investigation. Skipping only the extra property-index
-  query flush was too small to meet the 60 s target.
-- **Improvement areas and evidence:** The [findings and next experiment](../../docs/notebook-publication-profiling.md#findings-and-next-experiment)
-  still identify repeated ORM flushing first. After the extra property-index
-  query flush was removed, a truncated 60 s capture still spent 2,671 of
-  3,006 request-thread samples in `AbstractFlushingEventListener`, with
-  alias-index 1,081 vs property-index 608. Remaining required flushes are the
-  explicit property unlink flush and the alias bulk-delete flush. These are
-  sampled CPU findings, not a promise of 98% wall-time savings. Parsing, Git
-  and database waits have weaker evidence for the next improvement.
-- **Prior attempt (2026-09-12):** Required explicit flushes were left in place;
-  only the redundant property-index query auto-flush was removed. Controller
-  tests keep property-wiki and alias visibility after commit, including stale
-  derived-entry removal. The representative large publication did not finish
-  under 60,000 ms ([large HTTP deadline capture](../../docs/notebook-publication-profiling.md#large-http-deadline-capture)).
-  Do not treat that extra-flush removal as the remaining experiment, and do
-  not start a second optimization unless this story is taken again.
-- **Measurement:** Keep the 60,000 ms HTTP deadline. Large fixture seed and
-  verification need Cypress
-  `taskTimeout=43260000,defaultCommandTimeout=600000`. The small HTTP
-  `taskTimeout=66000` aborts during 1,000-concept seed. Isolated tagged captures
-  use `pnpm cypress run --expose …`; `pnpm cy:run` does not forward those flags.
-- **Reusable evidence:** Follow the same [fixture and capture procedure](../../docs/notebook-publication-profiling.md#findings-and-next-experiment),
-  [HTTP helper](../../e2e_test/config/notebookPublicationHttp.ts), and
-  [analysis script](../../scripts/profiling/AnalyzePublication.java).
-  The [baseline captures](../../docs/notebook-publication-profiling.md#baseline-captures)
-  link persistent raw recordings and independently verified accepted content;
-  retain their runner and host-sleep qualifications. The
-  [20-addition late-rejection proof](../../docs/notebook-publication-profiling.md#small-late-rejection-capture)
-  verifies preceding processing and preserved state. Large rejection latency
-  remains unmeasured; further large captures need a specific unanswered question.
-  Use the documented bulk receiver verification for large byte checks.
-- **Effort hypothesis:** L, low confidence. The assumption that removing one
-  extra property-index query flush would meet the 60 s target is disproved.
-  A later bounded change must still report the measured gap rather than
-  declare a faster-but-still-impractical result complete.
-- **Depends on:** The retained profiling findings, reusable infrastructure, and
-  baseline data. Prior related notebook publication work supplies the existing
-  functionality, not a new queue item.
-- **Safe stopping point:** The measured workload meets the agreed time target
-  with existing correctness guarantees intact; this does not require general synchronization,
-  background jobs, resumable upload, or all other large-data operations.
+  - Given 1,000 existing notes in the deterministic notebook, when the owner
+    publishes edits to all 1,000 in one commit, the completed request takes
+    at most half the comparable baseline median and the accepted files match
+    every proposed byte.
+  - Given learned notes with existing aliases and property wiki references,
+    when a valid proposal replaces their content, note identities and learning
+    state survive; new derived entries are visible and obsolete ones disappear.
+  - Given a valid addition to an existing notebook, publication still creates
+    the note and its derived entries using the same content-save behavior.
+  - Given a small commit with a malformed alias at the last changed path,
+    publication rejects it with that path and retains the original head,
+    notes, learning state, and derived indexes.
+  - Given a normal web title rewrite affecting references in frontmatter,
+    the shared index-maintenance change still preserves the existing outcome.
+- **Investigation and solution direction:** The
+  [smaller-workload refinement evidence](../../docs/notebook-publication-profiling.md#smaller-workload-refinement)
+  owns the experiments, candidate comparison, measurements, and remaining
+  qualifications. The leading hypothesis replaces whole-session flush/query
+  cycles with direct index replacement and the note's already-owned authored
+  references. Correct handling of obsolete managed index rows is part of
+  that responsibility; merely issuing a bulk delete is insufficient.
+- **Prior evidence:** The earlier extra query-flush removal remains in current
+  production code. The historical 1,000-existing / 10,000-addition recordings
+  explain the bottleneck but are not the comparison baseline or completion
+  gate for this revised round. Preserve their raw evidence and qualifications.
+- **Effort hypothesis:** M–L, with confidence determined by the retained
+  experimental correctness and timing results. Experiments inform refinement;
+  they are not a declaration of delivered production behavior.
+- **Depends on:** Existing publication behavior and reusable HTTP/JFR/receiver
+  profiling infrastructure. No new backlog item is needed for the investigation.
+- **Safe stopping point:** One coherent production simplification cuts the
+  selected workload's measured publication time by at least half with its
+  correctness constraints intact. Larger-data work may remain for later rounds.
 
 ## Ordering and Scope Reduction
 
-Refine story 3 from the
-[retained profiling findings](../../docs/notebook-publication-profiling.md).
-The extra property-index query flush is already gone; remaining work is the
-required per-note flushes, especially alias-index. Preserve existing name
-acceptance and reference semantics while optimizing publication.
+Story 3 stays at the top of the product backlog. Establish a useful completed
+small baseline, investigate the dominant design cost, and choose a solution
+that meets both speed and simplicity criteria before executable planning.
+The user explicitly authorizes temporary code experiments, measurement, and
+profiling during this refinement.
 
 ## Current Decisions
 
-- Story 3: the user accepted **under one minute** on 2026-09-12 for the
-  representative valid workload under comparable awake local conditions.
-  That target still stands. One extra property-index query flush has been
-  removed and is not enough. If a later attempt needs broader work than one
-  bounded remaining-flush change, return for scope review rather than adding
-  optimization areas automatically.
+- **2026-09-12 updated direction:** At least 50% improvement on a manageable
+  same-workload comparison, starting at 1,000 existing notes plus 1,000 updates;
+  reduce the fixture if needed for feedback. Production code must become
+  simpler and smaller.
+- This supersedes the old 10,000-addition / under-one-minute completion gate
+  and the restriction to a single remaining-flush adjustment. Under a minute
+  is still desirable, but is already true of the smaller baseline and cannot
+  by itself demonstrate the requested improvement.
+- Keep ADR 0004's authored-reference semantics, ADR 0006's deliberate failure
+  handling, and ADR 0007's isolated disposable measurement environment.
+- This task is story refinement with experiments. Keep the story queued;
+  production delivery and executable slice planning are subsequent work.
 
 ## When to Surface
 
-Use the retained profiling findings when taking this story again. The extra
-property-index query flush is already gone; further large measurements need a
-concrete unanswered question about remaining required flushes.
+Use the retained smaller-workload evidence when taking this story for planning.
+Do not repeat the 10,000-addition run or the already-delivered extra-flush change
+as the first experiment.
 
 ## Breadcrumbs
 
+- Updated refinement with explicitly authorized experiments, 2026-09-12: 50% faster on a manageable fixture and simpler, smaller production code.
 - User discussion and explicit backlog ordering, 2026-09-11.
 - User-requested split, 2026-09-11: static inspection and baseline profiling
   deliver infrastructure, data, and improvement areas; refine optimization later.
