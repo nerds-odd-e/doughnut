@@ -160,7 +160,7 @@ after implementation and again after the independent refactor on 2026-09-13.
 
 ### 2. Append a web note rename to accepted history
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given a synchronized bound notebook, rename a learned ordinary note
 with no inbound references using the web title action; accepted history appends
 the complete renamed Portable tree from the previous accepted parent while the
@@ -179,6 +179,9 @@ do not repeat the already passing CLI regression proof because it does not own
 this slice.
 Safe stop: web renames durably advance accepted history; local pull receipt is
 the immediately following behavior.
+Execution proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+with 2,418 tests after implementation and again after the independent refactor
+strengthened before/after learning-data assertions on 2026-09-13.
 
 ### 3. Receive the accepted web rename through ordinary pull
 Type: Behavior
@@ -295,13 +298,13 @@ recognizers or restrict the earlier examples' naturally supported behavior.
 Slice 1 has an immediate consumer; no structure is reserved for deferred moves
 or multi-notebook publication. Local pull remains ordinary Git fast-forward.
 
-Remaining concern: the final corrected controller and E2E fixtures have not yet
-run green. Slices 2 and 3 each now own one proof loop and a plausible five-minute
-resume hypothesis because their compatible edits already exist in the parked
-attempt. Required full backend/E2E runtime remains the stated timing exception.
-Another hard-limit overrun would trigger story-boundary reassessment rather than
-further routine subdivision. The later slices have no additional specific
-decomposition concern identified by this assessment.
+Slice 2's restored backend portion is now green and delivered from its own proof
+loop. The final corrected E2E fixture remains unverified and parked for Slice 3;
+stash `b40094d7602aa4a31771a1d88b3603cc0814e1a7` remains its recovery copy.
+Required E2E runtime remains the stated timing exception. Another hard-limit
+overrun would trigger story-boundary reassessment rather than further routine
+subdivision. The later slices have no additional specific decomposition concern
+identified by this assessment.
 
 Cross-notebook reference histories remain outside the promised local receipt;
 their existing web rewrite behavior must survive. Preserve the recorded boundary
