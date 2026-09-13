@@ -128,14 +128,14 @@ rollback-only test transaction for proof of the service's committed boundary.
 
 | Promise | Proof owner |
 | --- | --- |
-| Real web rename reaches a clean local checkout; old path absent, exact authored content, retained ancestry, clean accepted HEAD | Slice 2 installed CLI/browser E2E |
+| Real web rename reaches a clean local checkout; old path absent, exact authored content, retained ancestry, clean accepted HEAD | Slice 3 installed CLI/browser E2E |
 | Appends from the previous accepted parent; stored and downloaded history agree | Slice 2 controller/downloaded-bundle assertions |
 | Server note identity and learning data survive rename | Existing `TextContentControllerUpdateNoteTitleTests`; Slice 2 adds bound-notebook observation using the same fixture idiom |
-| Same-notebook reference choice reaches local files, including authored YAML semantics | Slice 3 referenced-rename E2E plus existing inbound-reference controller tests |
-| Missing required reference choice and unauthorized rename preserve state/history | Slice 4 bound controller rejection assertions; existing title tests retained |
-| Same-title produces no changed accepted tree/head | Slice 4 bound controller no-op assertion |
+| Same-notebook reference choice reaches local files, including authored YAML semantics | Slice 4 referenced-rename E2E plus existing inbound-reference controller tests |
+| Missing required reference choice and unauthorized rename preserve state/history | Slice 5 bound controller rejection assertions; existing title tests retained |
+| Same-title produces no changed accepted tree/head | Slice 5 bound controller no-op assertion |
 | Content saves, unbound rename, and existing web reference semantics retained through restructuring | Slice 1 existing controller suite; Slice 2 focused bound/unbound/drift observations only where shared lifecycle changes coverage |
-| No new local IDs or rename-specific transport | Existing CLI exact-tree tests and Slice 2 exact-file E2E; review production diff |
+| No new local IDs or rename-specific transport | Existing CLI exact-tree tests and Slice 3 exact-file E2E; review production diff |
 
 ## Ordered slices
 
@@ -158,36 +158,55 @@ Safe stop: content saves behave as before; web rename still has existing behavio
 Execution proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
 after implementation and again after the independent refactor on 2026-09-13.
 
-### 2. Receive a web note rename through ordinary pull
+### 2. Append a web note rename to accepted history
 Type: Behavior
 Status: planned
-Behavior: Given synchronized bound notebook and clean clone, rename a learned
-ordinary note with no inbound references using the web title action; pull yields
-the renamed file at the accepted head, without changing the note's server
-identity/learning data. This example does not restrict rename to unreferenced notes.
+Behavior: Given a synchronized bound notebook, rename a learned ordinary note
+with no inbound references using the web title action; accepted history appends
+the complete renamed Portable tree from the previous accepted parent while the
+note's server identity and learning data remain unchanged. This example does not
+restrict rename to unreferenced notes.
 Change: Move existing title orchestration into the shared editing owner; remove
 its duplicate controller ownership, preserve rename collaborators, and let the
 shared snapshot capture the result. Keep title/content API signatures unchanged.
 Proof: Add one bound controller example of the persisted/downloaded renamed tree,
 original accepted parent, and retained tracker/log data; use committed transaction
-support, not a test-only snapshot after rename. Add one actual web rename →
-installed CLI pull scenario using existing clone/rename/pull/exact-file steps.
-The controller owns private persistence observations; the E2E owns local receipt
-of the same outcome. Preserve author-owned YAML and H1 in the fixture bytes.
+support, not a test-only snapshot after rename. Preserve author-owned YAML and H1
+in the fixture bytes.
+Sizing: 5 active minutes plus the required full backend-suite wait. Resume from
+the parked backend production/controller-test portion of the oversized attempt;
+do not repeat the already passing CLI regression proof because it does not own
+this slice.
+Safe stop: web renames durably advance accepted history; local pull receipt is
+the immediately following behavior.
+
+### 3. Receive the accepted web rename through ordinary pull
+Type: Behavior
+Status: planned
+Behavior: Given a clean installed-CLI checkout at accepted A and the bound web
+rename appended as B, ordinary pull yields the renamed file at B, removes the old
+path, preserves exact authored content, retains A as an ancestor, and leaves the
+checkout clean.
+Change: Add one actual web rename → installed CLI pull scenario using existing
+clone/rename/pull/exact-file steps. Reuse the backend behavior from Slice 2 and
+the existing CLI pull unchanged unless the real journey exposes a product gap.
+Preserve author-owned YAML and H1 in the fixture bytes.
 Use `e2e_test/features/cli/cli_notebook_web_created_note.feature` alongside its
 existing acquisition scenarios, broadening the feature title to web note changes
 if needed; this assessed active spec avoids adding another E2E harness or changing
 worktree spec routing. No local edit/publish step after pull.
-Sizing: 5–8 active minutes, moderate-low confidence, plus required suite/E2E waits.
-Scrutinized above the 5-minute target: the title entry and its first real receipt
-proof must stay together; all unrelated reference variants are in Slice 3.
-The existing action body, lifecycle, and E2E steps are concrete reuse evidence.
-If wiring or fixture work exceeds 10 active minutes, stop and refine in place;
-do not commit a failing E2E or add a second rename lifecycle to save time.
+Proof: The installed-CLI E2E owns the exact local tree, pulled HEAD, ancestry,
+and cleanliness. Reuse the already passing focused CLI regression proof from the
+oversized attempt while its boundary remains unchanged; rerun only if resumed
+changes invalidate it.
+Sizing: 5 active minutes plus the required E2E wait. Resume from the parked E2E
+portion of the oversized attempt, whose last assertion correction remains to be
+run. If further harness repair reaches 10 active minutes, stop and reassess the
+story boundary rather than adding another receipt mechanism.
 Safe stop: the selected journey is green end to end; leave no failing scenario
 as a commit boundary.
 
-### 3. Receive the selected reference rewrite with the renamed note
+### 4. Receive the selected reference rewrite with the renamed note
 Type: Behavior
 Status: planned
 Behavior: Given a synchronized notebook with a same-notebook referrer, rename
@@ -209,7 +228,7 @@ Sizing: 5 active minutes plus required E2E/backend waits if production changes.
 Safe stop: referenced web renames are received under both existing choices;
 existing broader web referrer behavior is retained.
 
-### 4. Keep accepted history unchanged when no title change is accepted
+### 5. Keep accepted history unchanged when no title change is accepted
 Type: Behavior
 Status: planned
 Behavior: Given a bound notebook, an unchanged-title save or a title action
@@ -253,10 +272,22 @@ story-31 plan or its seed section. Recheck current shared code before execution.
 
 ## Refinement assessment and remaining concerns
 
-Refined in place on 2026-09-13 under the owner's conditional refinement request.
-Replaced original Slice 2 with Slices 2–4: ordinary receipt, reference-choice
-receipt, and unchanged-history boundaries. Four slices total; no resplit needed.
-All remain planned. Proof mappings were moved with their owning behaviors.
+Refined in place on 2026-09-13 after the first Slice 2 attempt exceeded the
+10-minute active-work hard limit. The attempt stopped at about 11 active minutes,
+excluding required test waits. Its combined backend publication and installed-CLI
+receipt assumption proved false: these required independent controller and E2E
+proof loops, and adapting both fixture boundaries caused the overrun. The exact
+CLI regression command passed; the backend retry was blocked while the worktree
+E2E runner owned test resources, and the final E2E assertion correction was not
+rerun. All six attempt-owned files are safely parked in stash object
+`b40094d7602aa4a31771a1d88b3603cc0814e1a7`.
+
+Replaced the unfinished combined Slice 2 with separate accepted-history and
+local-receipt Behaviors, followed by the existing reference-choice and
+unchanged-history Behaviors. Five slices total, including completed Slice 1;
+no story resplit is recommended. Proof mappings moved with their owning
+behaviors, and the parked compatible work/proof must be reused rather than
+repeated.
 
 Cumulative assessment: all examples exercise one web existing-note edit
 lifecycle and one complete Portable snapshot rule. Later slices must not add
@@ -264,13 +295,13 @@ recognizers or restrict the earlier examples' naturally supported behavior.
 Slice 1 has an immediate consumer; no structure is reserved for deferred moves
 or multi-notebook publication. Local pull remains ordinary Git fast-forward.
 
-Remaining concern: Slice 2's title-transaction migration plus the first live
-UI/CLI proof has moderate-low sizing confidence (5–8 active minutes). Existing
-collaborators and test steps bound it, but no runtime measurement was made here.
-The hard active-work limit and stop/refine instruction remain applicable.
-Required full backend/E2E runtime is the stated timing exception, not a reason
-to subdivide tests away from their behavior. The other slices have no additional
-specific decomposition concern identified by this assessment.
+Remaining concern: the final corrected controller and E2E fixtures have not yet
+run green. Slices 2 and 3 each now own one proof loop and a plausible five-minute
+resume hypothesis because their compatible edits already exist in the parked
+attempt. Required full backend/E2E runtime remains the stated timing exception.
+Another hard-limit overrun would trigger story-boundary reassessment rather than
+further routine subdivision. The later slices have no additional specific
+decomposition concern identified by this assessment.
 
 Cross-notebook reference histories remain outside the promised local receipt;
 their existing web rewrite behavior must survive. Preserve the recorded boundary
