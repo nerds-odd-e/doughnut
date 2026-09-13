@@ -29,10 +29,6 @@ describe("NoteUndoButton visibility", () => {
       expectedTitle: "undo trash note",
     },
     {
-      setup: (noteId: number) => noteEditingHistory.deleteNote(noteId),
-      expectedTitle: "undo delete note",
-    },
-    {
       setup: (noteId: number) => noteEditingHistory.createNote(noteId),
       expectedTitle: "undo create note",
     },

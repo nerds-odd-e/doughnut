@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -81,9 +80,8 @@ class MemoryTrackerUpdatePropertyKeyControllerTest extends MemoryTrackerControll
 
   @Test
   void shouldRejectRenameWhenNoteIsDeleted() {
-    Note note = ownedNote();
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).trashed().please();
     MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).propertyKey("topic").please();
-    noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
     ResponseStatusException ex =
         assertThrows(

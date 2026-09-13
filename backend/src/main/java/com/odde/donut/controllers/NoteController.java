@@ -120,33 +120,6 @@ class NoteController {
     return noteRecallInfo;
   }
 
-  @PostMapping(value = "/{note}/delete")
-  @Transactional
-  public List<NoteRealm> deleteNote(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody NoteDeleteDTO noteDeleteDTO)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(note);
-    noteService.destroy(
-        note,
-        noteDeleteDTO.getReferenceHandling(),
-        noteDeleteDTO.getSourcePropertyKey(),
-        authorizationService.getCurrentUser());
-    entityPersister.flush();
-    return List.of();
-  }
-
-  @PatchMapping(value = "/{note}/undo-delete")
-  @Transactional
-  public NoteRealm undoDeleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(note);
-    noteService.restore(note, authorizationService.getCurrentUser());
-    entityPersister.flush();
-
-    return noteRealmService.build(note, authorizationService.getCurrentUser());
-  }
-
   @PostMapping(value = "/{note}/trash")
   @Transactional
   public NoteRealm trashNote(

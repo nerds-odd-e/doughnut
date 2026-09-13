@@ -485,7 +485,7 @@ unrelated). Refactor removed one unused import.
 
 ### 11b. Remove note `deleted_at` and its live model/undo/title-resurrection paths
 Type: Behavior
-Status: planned
+Status: done
 Sizing: 5–8 minutes, low confidence; full suite wait exception.
 
 Behavior: Drop `note.deleted_at` and its live model/undo/title-resurrection paths.
@@ -510,6 +510,30 @@ Proof: `backend:verify` plus source/schema inventory proving no live note
 soft-delete concept. Regenerate API if changed and the database ERD. Full
 backend suite green.
 Safe stop: Upgrade is fully usable and repeatable; production is untouched.
+
+Learning: Created `V300000328__drop_note_deleted_at.sql` (drops `deleted_at`
+column + `idx_note_structural_peer`, recreates index without `deleted_at`).
+Removed `Note.deletedAt` field; `JPA_AVAILABLE`/`NATIVE_AVAILABLE`/
+`isAvailable()` now location-only (`!isTrashed()`). Removed `NoteService.
+destroy`/`restore`, `NoteController.deleteNote`/`undoDeleteNote` endpoints,
+`NoteTitlePlacementRules.requireNoSoftDeletedTitleAt` + `SOFT_DELETED_TITLE_
+CONFLICT` error type + all callers, `FolderConstructionService.createFolder`
+deleted-note guard, `Note.filterDeletedUnmodifiableNoteList`, dead
+`findByIdGreaterThanAndDeletedAtIsNullOrderByIdAsc`. Dropped `deletedAt IS NULL`
+from 5 `NoteRepository` queries and `NotebookGitRows.NOTES_QUERY`. Health rules
+(DeadWikiLink, OkfIncompatibleTitle, PipeName) now filter via a new
+`findAvailableNotesByNotebookIdOrderByIdAsc` repository method (refactored from
+in-memory `.filter(Note::isAvailable)` duplication). Removed 9 obsolete test
+files (delete/undo-delete controller tests, soft-deleted-title-conflict MVC
+test, NoteServiceTest, NoteTitlePlacementRulesFlushVisibilityTest, 3
+legacy-trash migration helper tests). Adapted ~20 backend test files to use
+`trashed()` instead of `softDeleted()`/`destroy`. Removed migration helper
+tests (proof now owned by the registered Flyway chain — V300000326 runs before
+V300000328 on every startup). Regenerated API client + ERD. Removed frontend
+dead code (`softDeletedTitleConflict.ts`, `restoreDeletedNote`/`undoDeleteNote`
+calls, "delete note" undo type, `note.deletedAt` warning). `backend:verify`
+green (2386 tests), full backend suite green, frontend tests green (1890
+tests). No live note soft-delete concept remains in `backend/src/main`.
 
 ### 12. The rehearsed upgrade preserves all retained notebook data
 Type: Behavior

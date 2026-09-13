@@ -44,16 +44,6 @@ describe("NoteUndoButton actions", () => {
       },
     },
     {
-      label: "delete note",
-      setup: () => {
-        const note = makeMe.aNote.please()
-        const noteRealm = makeMe.aNoteRealm.please()
-        noteEditingHistory.deleteNote(note.id)
-        mockSdkService(NoteController, "undoDeleteNote", noteRealm)
-        return { noteRealm, undoTitle: "undo delete note" }
-      },
-    },
-    {
       label: "edit title",
       setup: () => {
         const note = makeMe.aNote.please()
@@ -120,11 +110,12 @@ describe("NoteUndoButton actions", () => {
   })
 
   it("does not navigate when confirmation is cancelled", async () => {
-    const note = makeMe.aNote.please()
-    noteEditingHistory.deleteNote(note.id)
+    const noteRealm = makeMe.aNoteRealm.title("Original title").please()
+    noteEditingHistory.trashNote(noteRealm.id, "Original title", null)
+    mockSdkService(NoteController, "undoTrashNote", noteRealm)
     renderNoteUndoButton()
 
-    await clickUndoButton("undo delete note")
+    await clickUndoButton("undo trash note")
     await clickDialogCancel()
 
     expect(mockedPush).not.toHaveBeenCalled()
@@ -132,17 +123,6 @@ describe("NoteUndoButton actions", () => {
 
   describe("discard", () => {
     it.each([
-      {
-        action: "delete note",
-        setup: (
-          noteRealm1: ReturnType<typeof makeMe.aNoteRealm.please>,
-          noteRealm2: ReturnType<typeof makeMe.aNoteRealm.please>
-        ) => {
-          noteEditingHistory.deleteNote(noteRealm2.id)
-          noteEditingHistory.deleteNote(noteRealm1.id)
-        },
-        undoTitle: "undo delete note",
-      },
       {
         action: "edit title",
         setup: (
@@ -203,10 +183,10 @@ describe("NoteUndoButton actions", () => {
 
     it("closes dialog when discarding the last undo item", async () => {
       const note = makeMe.aNote.please()
-      noteEditingHistory.deleteNote(note.id)
+      noteEditingHistory.addEditingToUndoHistory(note.id, "edit title", "Old")
       renderNoteUndoButton()
 
-      await clickUndoButton("undo delete note")
+      await clickUndoButton("undo edit title")
       expectConfirmUndoVisible()
 
       await clickDialogDiscard()

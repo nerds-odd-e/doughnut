@@ -90,10 +90,10 @@ describe("global bar", () => {
 
   it("show undo when there is something to undo", async () => {
     const note = makeMe.aNote.please()
-    noteEditingHistory.deleteNote(note.id)
+    noteEditingHistory.trashNote(note.id, "Note", null)
     helper.component(GlobalBar).withCurrentUser(user).render()
 
-    expect(await screen.findByTitle("undo delete note")).not.toBeDisabled()
+    expect(await screen.findByTitle("undo trash note")).not.toBeDisabled()
   })
 
   it.each([

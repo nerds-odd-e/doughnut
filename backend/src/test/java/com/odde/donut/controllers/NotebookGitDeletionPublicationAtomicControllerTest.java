@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.MemoryTracker;
@@ -129,13 +128,11 @@ class NotebookGitDeletionPublicationAtomicControllerTest
               liveNotes.stream().map(Note::getId).toList(),
               hasItems(deletedA.getId(), deletedB.getId(), retained.getId()));
           // The would-be-deleted notes were hard-deleted inside the publication transaction; the
-          // binding-save failure rolled that back, so the rows survive and were never soft-deleted.
+          // binding-save failure rolled that back, so the rows survive.
           Note reloadedDeletedA = noteRepository.findById(deletedA.getId()).orElseThrow();
           assertThat(reloadedDeletedA.getContent(), equalTo(ORIGINAL_CONTENT));
-          assertThat(reloadedDeletedA.getDeletedAt(), nullValue());
           Note reloadedDeletedB = noteRepository.findById(deletedB.getId()).orElseThrow();
           assertThat(reloadedDeletedB.getContent(), equalTo(ORIGINAL_CONTENT));
-          assertThat(reloadedDeletedB.getDeletedAt(), nullValue());
           Note reloadedRetained = noteRepository.findById(retained.getId()).orElseThrow();
           assertThat(reloadedRetained.getContent(), equalTo(ORIGINAL_CONTENT));
           assertThat(reloadedRetained.getUpdatedAt(), is(retainedUpdatedAt));

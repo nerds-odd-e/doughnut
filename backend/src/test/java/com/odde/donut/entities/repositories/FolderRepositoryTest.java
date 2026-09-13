@@ -94,14 +94,16 @@ class FolderRepositoryTest {
     List<Integer> trashedFolderIds =
         entityManager
             .createQuery(
-                "SELECT f.id FROM Folder f WHERE f.trashedInDatabase = true ORDER BY f.id",
+                "SELECT f.id FROM Folder f WHERE f.trashedInDatabase = true AND f.notebook.id = :notebookId ORDER BY f.id",
                 Integer.class)
+            .setParameter("notebookId", notebook.getId())
             .getResultList();
     List<Integer> trashedNoteIds =
         entityManager
             .createQuery(
-                "SELECT n.id FROM Note n WHERE n.trashedInDatabase = true ORDER BY n.id",
+                "SELECT n.id FROM Note n WHERE n.trashedInDatabase = true AND n.notebook.id = :notebookId ORDER BY n.id",
                 Integer.class)
+            .setParameter("notebookId", notebook.getId())
             .getResultList();
 
     assertThat(

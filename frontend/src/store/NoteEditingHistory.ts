@@ -1,6 +1,6 @@
 export type HistoryRecord =
   | {
-      type: "edit title" | "edit content" | "delete note" | "create note"
+      type: "edit title" | "edit content" | "create note"
       noteId: Donut.ID
       textContent?: string
     }
@@ -55,10 +55,6 @@ export default class NoteEditingHistory {
       return
     }
     this.noteUndoHistories.pop()
-  }
-
-  deleteNote(noteId: Donut.ID) {
-    this.noteUndoHistories.push({ type: "delete note", noteId })
   }
 
   trashNote(

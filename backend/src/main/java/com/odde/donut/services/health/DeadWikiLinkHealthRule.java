@@ -43,7 +43,8 @@ public class DeadWikiLinkHealthRule implements HealthRule {
 
   @Override
   public HealthFindingGroup evaluate(Notebook notebook, HealthRunContext context) {
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> liveNotes =
+        noteRepository.findAvailableNotesByNotebookIdOrderByIdAsc(notebook.getId());
     List<HealthFindingGroup> children = new ArrayList<>();
     for (Note note : liveNotes) {
       List<String> deadTokens = wikiLinkResolver.missingWikiLinkTokens(note, context.viewer());

@@ -91,6 +91,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
   protected void beforeCreate(boolean needPersist) {
     NotebookBuilder notebookBuilder = new NotebookBuilder(entity.getNotebook(), makeMe);
     entity.assignNotebook(notebookBuilder.please(needPersist));
+    if (pendingTrash) {
+      this.folder = makeMe.aFolder().notebook(entity.getNotebook()).name("_trash").please();
+    }
     if (folder != null) {
       entity.setFolder(folder);
     }
@@ -202,18 +205,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder softDeleted() {
-    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    entity.setDeletedAt(timestamp);
-    return this;
-  }
+  private boolean pendingTrash;
 
   public NoteBuilder trashed() {
     if (entity.getNotebook() == null) {
       throw new AssertionError("trashed() requires .notebook(...) to be set first");
     }
-    Folder trash = makeMe.aFolder().notebook(entity.getNotebook()).name("_trash").please();
-    this.folder = trash;
+    this.pendingTrash = true;
     return this;
   }
 

@@ -1,6 +1,5 @@
 import type { Router } from "vue-router"
 import type { NoteCreationDto, NoteRealm } from "@generated/donut-backend-api"
-import { parseSoftDeletedTitleConflict } from "@/managedApi/softDeletedTitleConflict"
 import {
   applyParentRelationshipToCreateContent,
   type NoteCreationParentRelationship,
@@ -16,7 +15,6 @@ type NoteCreateApi = {
       refreshWikiLinkCacheForNoteIds?: number[]
     }
   ) => Promise<NoteRealm>
-  restoreDeletedNote: (router: Router, noteId: number) => Promise<NoteRealm>
 }
 
 type ConfirmPopups = {
@@ -49,12 +47,7 @@ export function contentForNewNote(input: {
 
 export function parseCreateNoteFailure(e: unknown): {
   fieldErrors: { newTitle?: string; wikidataId?: string }
-  softDeletedNoteId?: number
 } {
-  const conflict = parseSoftDeletedTitleConflict(e)
-  if (conflict?.deletedNoteId != null) {
-    return { fieldErrors: {}, softDeletedNoteId: conflict.deletedNoteId }
-  }
   return {
     fieldErrors: {
       newTitle: undefined,
@@ -87,25 +80,7 @@ export async function createNoteFromForm(input: {
     )
     input.onSuccess()
   } catch (e: unknown) {
-    const { fieldErrors, softDeletedNoteId } = parseCreateNoteFailure(e)
-    if (softDeletedNoteId != null) {
-      const confirmed = await input.popups.confirm(
-        "A note with this title was deleted. OK restores that note instead of creating a new one."
-      )
-      if (confirmed) {
-        try {
-          await input.api.restoreDeletedNote(input.router, softDeletedNoteId)
-          input.onSuccess()
-        } catch (res: unknown) {
-          input.onFieldErrors({
-            newTitle: undefined,
-            wikidataId: undefined,
-            ...(res as object),
-          })
-        }
-      }
-      return
-    }
+    const { fieldErrors } = parseCreateNoteFailure(e)
     input.onFieldErrors({
       newTitle: fieldErrors.newTitle,
       wikidataId: fieldErrors.wikidataId,

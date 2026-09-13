@@ -39,7 +39,7 @@ beforeEach(() => {
   setupGlobalClient(apiStatus)
   mockToast.error.mockClear()
   mockToast.warning.mockClear()
-  mockSdkService(NoteController, "deleteNote", undefined)
+  mockSdkService(NoteController, "trashNote", undefined)
   router = createRouter({
     history: createWebHistory(),
     routes,

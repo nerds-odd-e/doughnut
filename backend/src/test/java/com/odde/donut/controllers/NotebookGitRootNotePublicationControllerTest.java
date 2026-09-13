@@ -157,8 +157,7 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
                               note.getTitle(),
                               note.getContent(),
                               note.getCreatedAt(),
-                              note.getUpdatedAt(),
-                              note.getDeletedAt()))
+                              note.getUpdatedAt()))
                   .toList());
         });
   }
@@ -174,6 +173,5 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
       String noteTitle,
       String noteContent,
       Timestamp noteCreatedAt,
-      Timestamp noteUpdatedAt,
-      Timestamp noteDeletedAt) {}
+      Timestamp noteUpdatedAt) {}
 }

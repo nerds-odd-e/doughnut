@@ -208,7 +208,6 @@ export type Note = {
     noteTopology: NoteTopology;
     content?: string;
     id: number;
-    readonly deletedAt?: string;
 };
 
 export type NoteRealm = {
@@ -1286,67 +1285,6 @@ export type SubscriptionWritable = {
     fromDTO?: SubscriptionDto;
 };
 
-export type NoteWritable = {
-    noteTopology: NoteTopology;
-    content?: string;
-    id: number;
-};
-
-export type NoteRealmWritable = {
-    id: number;
-    note: NoteWritable;
-    /**
-     * Notebook chrome: entity plus optional catalog hints and optional notebook readme content.
-     */
-    notebookRealm: NotebookRealm;
-    /**
-     * Folders from notebook root outward; see each realm for trail semantics.
-     */
-    ancestorFolders?: Array<Folder>;
-    references?: Array<NoteTopology>;
-    wikiLinks?: Array<WikiLink>;
-    /**
-     * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
-     */
-    scopedReadmeContent?: string;
-};
-
-export type MemoryTrackerWritable = {
-    id: number;
-    note: NoteWritable;
-    lastRecalledAt?: string;
-    nextRecallAt: string;
-    assimilatedAt?: string;
-    stability?: number;
-    difficulty?: number;
-    removedFromTracking?: boolean;
-    type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
-    propertyKey?: string;
-    recallCount?: number;
-    recalledNote?: RecalledNote;
-    latestTutorFeedbackGrade?: number;
-    spelling?: boolean;
-};
-
-export type ConversationWritable = {
-    id: number;
-    subject?: ConversationSubjectWritable;
-    subjectOwnership?: Ownership;
-    conversationInitiator?: User;
-    createdAt: string;
-    updatedAt: string;
-};
-
-export type ConversationSubjectWritable = {
-    note?: NoteWritable;
-    recallPrompt?: AnsweredQuestion;
-};
-
-export type NoteRecallInfoWritable = {
-    memoryTrackers?: Array<MemoryTrackerWritable>;
-    skippedPropertyKeys?: Array<string>;
-};
-
 export type PutNotebookBookBlockReadingRecordData = {
     body?: BookBlockReadingRecordPutRequest;
     path: {
@@ -2002,24 +1940,6 @@ export type UploadNoteImageResponses = {
 };
 
 export type UploadNoteImageResponse = UploadNoteImageResponses[keyof UploadNoteImageResponses];
-
-export type DeleteNoteData = {
-    body: NoteDeleteDto;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/delete';
-};
-
-export type DeleteNoteResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type DeleteNoteResponse = DeleteNoteResponses[keyof DeleteNoteResponses];
 
 export type SemanticSearchData = {
     body: SearchTerm;
@@ -3021,24 +2941,6 @@ export type UndoTrashNoteResponses = {
 };
 
 export type UndoTrashNoteResponse = UndoTrashNoteResponses[keyof UndoTrashNoteResponses];
-
-export type UndoDeleteNoteData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/undo-delete';
-};
-
-export type UndoDeleteNoteResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type UndoDeleteNoteResponse = UndoDeleteNoteResponses[keyof UndoDeleteNoteResponses];
 
 export type UpdateNotebookReadmeContentData = {
     body: NoteUpdateContentDto;

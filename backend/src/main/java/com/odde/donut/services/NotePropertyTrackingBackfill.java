@@ -22,7 +22,6 @@ public final class NotePropertyTrackingBackfill {
       FROM note n
       INNER JOIN notebook nb ON n.notebook_id = nb.id
       INNER JOIN ownership o ON nb.ownership_id = o.id
-      WHERE n.deleted_at IS NULL
       """;
 
   private static final String EXISTING_PROPERTY_KEYS_QUERY =
@@ -32,7 +31,6 @@ public final class NotePropertyTrackingBackfill {
       INNER JOIN note n ON mt.note_id = n.id
       WHERE mt.user_id = ?
         AND mt.note_id = ?
-        AND n.deleted_at IS NULL
         AND mt.type = 'UNDERSTANDING'
         AND mt.property_key <> ''
       """;
@@ -44,12 +42,10 @@ public final class NotePropertyTrackingBackfill {
       """
       SELECT 1
       FROM memory_tracker mt
-      INNER JOIN note n ON mt.note_id = n.id
       WHERE mt.user_id = ?
         AND mt.note_id = ?
         AND mt.type = 'UNDERSTANDING'
         AND mt.property_key = ?
-        AND n.deleted_at IS NULL
       LIMIT 1
       """;
 

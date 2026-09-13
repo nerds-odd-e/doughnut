@@ -6,12 +6,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.RelationshipNoteMarkdown;
-import java.sql.Timestamp;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -158,7 +158,8 @@ class NoteRealmServiceTest {
   }
 
   private void softDelete(Note note) {
-    note.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+    Folder trash = makeMe.aFolder().notebook(note.getNotebook()).name("_trash").please();
+    note.setFolder(trash);
     makeMe.entityPersister.merge(note);
   }
 }

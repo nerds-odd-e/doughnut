@@ -12,7 +12,6 @@ import {
   mountFolderPageReady,
   openFolderSettingsTab,
   resolveTopConfirm,
-  softDeletedTitleConflictMessage,
 } from "@tests/pages/folderPageTestSupport"
 import type { Router } from "vue-router"
 
@@ -136,7 +135,7 @@ describe("FolderPage rename and dissolve", () => {
   })
 
   describe("dissolve", () => {
-    it("shows soft-deleted error; confirms merge on name conflict and retries", async () => {
+    it("confirms merge on name conflict and retries", async () => {
       const { wrapper } = mountFolderPage(router, 20, "Mid")
 
       const dissolveSpy = vi
@@ -144,8 +143,9 @@ describe("FolderPage rename and dissolve", () => {
         .mockResolvedValue(
           wrapSdkError({
             status: 409,
-            errorType: "SOFT_DELETED_TITLE_CONFLICT",
-            message: softDeletedTitleConflictMessage,
+            errorType: "FOLDER_NAME_CONFLICT",
+            message:
+              "A folder with this name already exists at the destination: Inner",
           })
         )
 
@@ -153,21 +153,6 @@ describe("FolderPage rename and dissolve", () => {
       const dissolveButton = wrapper.get(
         '[data-testid="folder-dissolve-button"]'
       )
-      await dissolveButton.trigger("click")
-      resolveTopConfirm(true)
-      await flushPromises()
-
-      expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
-
-      dissolveSpy.mockResolvedValue(
-        wrapSdkError({
-          status: 409,
-          errorType: "FOLDER_NAME_CONFLICT",
-          message:
-            "A folder with this name already exists at the destination: Inner",
-        })
-      )
-
       await dissolveButton.trigger("click")
       resolveTopConfirm(true)
       await flushPromises()

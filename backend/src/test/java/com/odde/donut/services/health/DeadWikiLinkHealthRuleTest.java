@@ -109,13 +109,7 @@ class DeadWikiLinkHealthRuleTest {
 
   @Test
   void excludesSoftDeletedSourceNotesFromAudit() {
-    makeMe
-        .aNote()
-        .title("Gone")
-        .notebook(notebook)
-        .content("See [[Missing]]")
-        .softDeleted()
-        .please();
+    makeMe.aNote().title("Gone").notebook(notebook).content("See [[Missing]]").trashed().please();
     Note live =
         makeMe.aNote().title("Live").notebook(notebook).content("See [[AlsoMissing]]").please();
 
@@ -128,7 +122,7 @@ class DeadWikiLinkHealthRuleTest {
 
   @Test
   void reportsMissingAndSoftDeletedTargetsAsDead() {
-    Note softTarget = makeMe.aNote().title("SoftTarget").notebook(notebook).softDeleted().please();
+    Note softTarget = makeMe.aNote().title("SoftTarget").notebook(notebook).trashed().please();
     makeMe
         .aNote()
         .title("Linker")

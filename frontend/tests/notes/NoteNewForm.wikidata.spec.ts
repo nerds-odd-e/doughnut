@@ -1,10 +1,6 @@
-import {
-  NoteController,
-  WikidataController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { WikidataController } from "@generated/donut-backend-api/sdk.gen"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import {
   mountNoteNewForm,
@@ -94,38 +90,6 @@ describe("NoteNewForm wikidata and soft-delete", () => {
       await flushPromises()
 
       expect(wrapper.text()).toContain("reserved")
-    })
-
-    it("asks confirmation on soft-deleted title conflict and calls undo delete when confirmed", async () => {
-      wrapper = mountNoteNewForm(notebookRootProps)
-      await setNoteNewFormTitle(wrapper, "note title")
-      popupsMock.confirm.mockResolvedValueOnce(true)
-      const restoredRealm = makeMe.aNoteRealm.please()
-      const undoSpy = mockSdkService(
-        NoteController,
-        "undoDeleteNote",
-        restoredRealm
-      )
-      sdkSpies.mockedCreateNoteAtRoot.mockResolvedValueOnce({
-        data: undefined,
-        error: {
-          message:
-            "A note with this title already exists here but was deleted.",
-          errorType: "SOFT_DELETED_TITLE_CONFLICT",
-          errors: { deletedNoteId: "99" },
-        },
-        request: {} as Request,
-        response: { status: 409, url: "" } as Response,
-        // biome-ignore lint/suspicious/noExplicitAny: SDK error result shape
-      } as any)
-
-      await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
-      await flushPromises()
-
-      expect(popupsMock.confirm).toHaveBeenCalledWith(
-        expect.stringContaining("deleted")
-      )
-      expect(undoSpy).toHaveBeenCalledWith({ path: { note: 99 } })
     })
   })
 

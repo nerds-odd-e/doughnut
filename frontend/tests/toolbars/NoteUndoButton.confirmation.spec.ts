@@ -36,13 +36,6 @@ describe("NoteUndoButton confirmation dialog", () => {
         message: /Are you sure you want to undo trashing /,
       },
       {
-        action: "delete note",
-        setup: (noteRealm: ReturnType<typeof makeMe.aNoteRealm.please>) =>
-          noteEditingHistory.deleteNote(noteRealm.id),
-        undoTitle: "undo delete note",
-        message: /Are you sure you want to undo deleting /,
-      },
-      {
         action: "create note",
         setup: (noteRealm: ReturnType<typeof makeMe.aNoteRealm.please>) =>
           noteEditingHistory.createNote(noteRealm.id),
@@ -139,13 +132,6 @@ describe("NoteUndoButton confirmation dialog", () => {
 
   describe("when note is not in cache", () => {
     it.each([
-      {
-        action: "delete note",
-        setup: (noteId: number) => noteEditingHistory.deleteNote(noteId),
-        undoTitle: "undo delete note",
-        message: (noteId: number) =>
-          `Are you sure you want to undo deleting note id: ${noteId}\\?`,
-      },
       {
         action: "edit title",
         setup: (noteId: number) =>

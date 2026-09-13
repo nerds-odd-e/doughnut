@@ -57,11 +57,11 @@ describe("storeUndoCommand", () => {
       expect(histories.noteUndoHistories).toHaveLength(2)
     })
 
-    it("creates a new entry for title edit after delete note", () => {
+    it("creates a new entry for title edit after trash note", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title")
-      histories.deleteNote(note1.id)
+      histories.trashNote(note1.id, "Title", null)
       histories.addEditingToUndoHistory(note1.id, "edit title", "New Title")
 
       expect(histories.noteUndoHistories).toHaveLength(3)

@@ -208,7 +208,6 @@ class NoteControllerTrashTests extends ControllerTestBase {
 
     assertThat(source.getContent(), containsString("a part of"));
     assertThat(source.getContent(), containsString("[[Earth]]"));
-    assertThat(relation.getDeletedAt(), nullValue());
     assertThat(relation.isTrashed(), equalTo(true));
   }
 

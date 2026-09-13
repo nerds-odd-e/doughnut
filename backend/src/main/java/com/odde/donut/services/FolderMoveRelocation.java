@@ -128,8 +128,6 @@ final class FolderMoveRelocation {
       return mergeTarget.get();
     }
 
-    subtree.requireNoSoftDeletedTitles(destinationNotebook, subtreeFolders);
-
     subtree.reassignToNotebook(subtreeFolders, destinationNotebook, now);
     folder.setParentFolder(newParent);
     folder.setUpdatedAt(now);

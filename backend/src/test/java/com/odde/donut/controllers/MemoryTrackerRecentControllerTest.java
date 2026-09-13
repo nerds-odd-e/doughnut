@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -44,12 +43,9 @@ class MemoryTrackerRecentControllerTest extends MemoryTrackerControllerTestBase 
     @Test
     void shouldExcludeMemoryTrackersForDeletedNotes() {
       Note activeNote = ownedNote();
-      Note deletedNote = ownedNote();
+      Note deletedNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).trashed().please();
       MemoryTracker activeTracker = ownedTracker(activeNote);
       ownedTracker(deletedNote);
-
-      noteService.destroy(
-          deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
       assertThat(controller.getRecentMemoryTrackers(), contains(activeTracker));
     }
@@ -81,15 +77,12 @@ class MemoryTrackerRecentControllerTest extends MemoryTrackerControllerTestBase 
     @Test
     void shouldExcludeMemoryTrackersForDeletedNotes() {
       Note activeNote = ownedNote();
-      Note deletedNote = ownedNote();
+      Note deletedNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).trashed().please();
       MemoryTracker activeTracker = ownedTracker(activeNote);
       MemoryTracker deletedTracker = ownedTracker(deletedNote);
 
       controller.markAsRecalled(activeTracker, Grade.GOOD);
       controller.markAsRecalled(deletedTracker, Grade.GOOD);
-
-      noteService.destroy(
-          deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
       assertThat(controller.getRecentlyRecalled(), contains(activeTracker));
     }

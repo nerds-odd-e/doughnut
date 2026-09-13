@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.donut.controllers.dto.ApiError;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -115,31 +114,6 @@ class NotebookFolderCrossNotebookMoveControllerTest
     makeMe.refresh(folderF);
     assertThat(folderF.getNotebook().getId(), equalTo(nbA.getId()));
     assertThat(folderF.getParentFolder(), nullValue());
-  }
-
-  @Test
-  void rejectsCrossNotebookMoveWhenSoftDeletedNoteHasSameTitleAtDestination()
-      throws UnexpectedNoAccessRightException {
-    Notebook nbA = ownedNotebook();
-    Notebook nbB = ownedNotebook();
-    Folder folderF = ownedFolder(nbB, "F");
-    Note deleted = makeMe.aNote().folder(folderF).title("DupTitle").please();
-    noteService.destroy(
-        deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
-
-    controller.moveFolder(nbB, folderF, folderMoveTo(nbA, null));
-    makeMe.aNote().folder(folderF).title("DupTitle").please();
-
-    ApiException ex =
-        assertThrows(
-            ApiException.class, () -> controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null)));
-    assertThat(
-        ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
-    assertThat(
-        ex.getErrorBody().getErrors().get("deletedNoteId"),
-        equalTo(String.valueOf(deleted.getId())));
-    makeMe.refresh(folderF);
-    assertThat(folderF.getNotebook().getId(), equalTo(nbA.getId()));
   }
 
   @Test

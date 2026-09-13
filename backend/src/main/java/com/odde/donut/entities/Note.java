@@ -1,7 +1,6 @@
 package com.odde.donut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.donut.algorithms.AuthoredNoteDocument;
@@ -32,10 +31,9 @@ public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   private static final String NATIVE_TRASHED =
       "coalesce(n.folder_id in (select tf.id from trashed_folder tf), false)";
-  public static final String JPA_AVAILABLE = "n.deletedAt IS NULL AND n.trashedInDatabase = false";
+  public static final String JPA_AVAILABLE = "n.trashedInDatabase = false";
   public static final String NATIVE_SELECT = "n.*, " + NATIVE_TRASHED + " AS trashedInDatabase";
-  public static final String NATIVE_AVAILABLE =
-      "n.deleted_at IS NULL AND " + NATIVE_TRASHED + " = false";
+  public static final String NATIVE_AVAILABLE = NATIVE_TRASHED + " = false";
 
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 
@@ -83,15 +81,9 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Timestamp createdAt;
 
-  @Setter
-  @Column(name = "deleted_at")
-  @Getter
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private Timestamp deletedAt;
-
   @JsonIgnore
   public boolean isAvailable() {
-    return deletedAt == null && !isTrashed();
+    return !isTrashed();
   }
 
   @JsonIgnore
@@ -124,10 +116,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @OrderBy("documentOrder ASC")
   @JsonIgnore
   private List<AuthoredNoteReferenceRow> authoredNoteReferenceRows = new ArrayList<>();
-
-  public static <T extends Note> List<T> filterDeletedUnmodifiableNoteList(List<T> notes) {
-    return notes.stream().filter(n -> n.getDeletedAt() == null).toList();
-  }
 
   @JsonIgnore
   public NoteTitle getNoteTitle() {

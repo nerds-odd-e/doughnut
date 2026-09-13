@@ -87,9 +87,6 @@ export interface StoredApi {
     }
   ): Promise<NoteRealm>
 
-  /** PATCH undo-delete for a soft-deleted note; refreshes storage and navigates to the note. */
-  restoreDeletedNote(router: Router, noteId: Donut.ID): Promise<NoteRealm>
-
   /** Refresh storage, sidebar listings, and navigate to this note (replace route). */
   focusNoteRealm(router: Router, noteRealm: NoteRealm): Promise<NoteRealm>
 
@@ -295,18 +292,6 @@ export default class StoredApiCollection implements StoredApi {
     return this.navigateToFocusedNote(router, focus)
   }
 
-  async restoreDeletedNote(router: Router, noteId: Donut.ID) {
-    const { data: noteRealm, error } = await apiCallWithLoading(() =>
-      NoteController.undoDeleteNote({
-        path: { note: noteId },
-      })
-    )
-    if (error || !noteRealm) {
-      throw new Error(toErrorMessage(error, "Failed to restore note"))
-    }
-    return this.focusNoteRealm(router, noteRealm)
-  }
-
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
     noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
     refreshSidebarStructuralListings()
@@ -418,15 +403,7 @@ export default class StoredApiCollection implements StoredApi {
       )
       return { noteRealm }
     }
-    const { data: noteRealm, error } = await apiCallWithLoading(() =>
-      NoteController.undoDeleteNote({
-        path: { note: undone.noteId },
-      })
-    )
-    if (error || !noteRealm) {
-      throw new Error(toErrorMessage(error, "Failed to undo delete note"))
-    }
-    return { noteRealm }
+    return { noteRealm: undefined }
   }
 
   private async undoMoveNote(

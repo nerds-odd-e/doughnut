@@ -68,9 +68,6 @@ public class FolderConstructionService {
         if (!contextNote.getNotebook().getId().equals(notebook.getId())) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not in notebook.");
         }
-        if (contextNote.getDeletedAt() != null) {
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Context note not found.");
-        }
         parentFolder = contextNote.getFolder();
       }
     }

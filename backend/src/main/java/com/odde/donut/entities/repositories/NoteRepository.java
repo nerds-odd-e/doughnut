@@ -88,9 +88,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
   @Query(value = selectFromNote + searchForTitleExact + " AND n.notebook.id = :notebookId")
   List<Note> searchExactInNotebook(Integer notebookId, @Param("key") String key);
 
-  /** Next bounded page of live notes after {@code id}, for the authored-reference backfill. */
-  List<Note> findByIdGreaterThanAndDeletedAtIsNullOrderByIdAsc(Integer id, Pageable pageable);
-
   @Query(
       value =
           selectFromNote
@@ -101,28 +98,27 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
   List<Note> findNotesInNotebookRootFolderScopeByNotebookId(
       @Param("notebookId") Integer notebookId);
 
-  @Query(
-      value =
-          selectFromNote
-              + " WHERE n.folder.id = :folderId AND n.deletedAt IS NULL"
-              + " ORDER BY n.id ASC")
+  @Query(value = selectFromNote + " WHERE n.folder.id = :folderId" + " ORDER BY n.id ASC")
   List<Note> findNotesInFolderOrderByIdAsc(@Param("folderId") Integer folderId);
 
   @Query(
       """
       SELECT DISTINCT n.folder.id FROM Note n
       WHERE n.notebook.id = :notebookId
-        AND n.deletedAt IS NULL
         AND n.folder IS NOT NULL
       """)
   List<Integer> findLiveNoteFolderIdsByNotebookId(@Param("notebookId") Integer notebookId);
 
+  @Query(value = selectFromNote + " WHERE n.notebook.id = :notebookId" + " ORDER BY n.id ASC")
+  List<Note> findLiveNotesByNotebookIdOrderByIdAsc(@Param("notebookId") Integer notebookId);
+
   @Query(
       value =
           selectFromNote
-              + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL"
+              + " WHERE n.notebook.id = :notebookId AND "
+              + Note.JPA_AVAILABLE
               + " ORDER BY n.id ASC")
-  List<Note> findLiveNotesByNotebookIdOrderByIdAsc(@Param("notebookId") Integer notebookId);
+  List<Note> findAvailableNotesByNotebookIdOrderByIdAsc(@Param("notebookId") Integer notebookId);
 
   @Query(
       value =
@@ -230,15 +226,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
   @Query(value = "SELECT count(1) as count from Note n " + " WHERE n.id in :noteIds" + fromNotebook)
   int countByAncestorAndInTheList(Integer notebookId, @Param("noteIds") List<Integer> noteIds);
 
-  @Query(
-      value =
-          "SELECT COUNT(nc) FROM NoteCreator nc WHERE nc.user.id = :userId AND nc.note.deletedAt"
-              + " IS NULL")
+  @Query(value = "SELECT COUNT(nc) FROM NoteCreator nc WHERE nc.user.id = :userId")
   long countByCreator(@Param("userId") Integer userId);
 
-  @Query(
-      value =
-          "SELECT MAX(nc.note.createdAt) FROM NoteCreator nc WHERE nc.user.id = :userId AND"
-              + " nc.note.deletedAt IS NULL")
+  @Query(value = "SELECT MAX(nc.note.createdAt) FROM NoteCreator nc WHERE nc.user.id = :userId")
   java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);
 }

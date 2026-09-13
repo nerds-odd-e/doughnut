@@ -31,15 +31,14 @@ public final class NotebookGitRows {
       ORDER BY id ASC
       """;
 
-  // Mirrors NoteRepository#findLiveNotesByNotebookIdOrderByIdAsc (same deleted_at filter and
-  // ordering) for the same reason as FOLDERS_QUERY above. Live notes include location-based trash
-  // (notes under a _trash folder subtree with deleted_at IS NULL), so the Portable tree naturally
-  // contains trash.
+  // Mirrors NoteRepository#findLiveNotesByNotebookIdOrderByIdAsc (same ordering) for the same
+  // reason as FOLDERS_QUERY above. Live notes include location-based trash (notes under a _trash
+  // folder subtree), so the Portable tree naturally contains trash.
   private static final String NOTES_QUERY =
       """
       SELECT folder_id, title, content
       FROM note
-      WHERE notebook_id = ? AND deleted_at IS NULL
+      WHERE notebook_id = ?
       ORDER BY id ASC
       """;
 

@@ -14,9 +14,6 @@ import { editPageName } from "./pageNameEditorTestSupport"
 export const folderNameConflictMessage =
   "A folder with this name already exists here."
 
-export const softDeletedTitleConflictMessage =
-  "A note with this title already exists here but was deleted. Restore the deleted note (Undo delete), or choose another title."
-
 export function createFolderPageRouter() {
   return createRouter({ history: createWebHistory(), routes })
 }

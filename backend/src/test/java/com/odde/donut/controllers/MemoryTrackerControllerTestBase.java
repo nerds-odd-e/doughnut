@@ -9,14 +9,12 @@ import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
-import com.odde.donut.services.NoteService;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
   @Autowired MemoryTrackerController controller;
-  @Autowired NoteService noteService;
 
   @BeforeEach
   void setupCurrentUser() {

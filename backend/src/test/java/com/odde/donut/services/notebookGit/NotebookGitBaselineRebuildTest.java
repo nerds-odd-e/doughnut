@@ -112,8 +112,7 @@ class NotebookGitBaselineRebuildTest {
     Timestamp oldCreatedAt = initialBinding.getCreatedAt();
 
     // Make the binding inconsistent: add a new live note and move Pasta into location-based trash
-    // (a _trash folder subtree, deleted_at stays NULL) so current DB content no longer matches the
-    // bound tree.
+    // (a _trash folder subtree) so current DB content no longer matches the bound tree.
     makeMe.aNote("Soup").folder(recipes).content("Heat broth").please();
     Folder trashRoot = makeMe.aFolder().notebook(notebook).name("_trash").please();
     Folder trashRecipes = makeMe.aFolder().parentFolder(trashRoot).name("Recipes").please();
@@ -189,10 +188,6 @@ class NotebookGitBaselineRebuildTest {
         jdbcTemplate.queryForObject(
             "SELECT id FROM folder WHERE id = ?", Integer.class, trashRecipesFolderId),
         equalTo(trashRecipesFolderId));
-    assertThat(
-        jdbcTemplate.queryForObject(
-            "SELECT deleted_at FROM note WHERE id = ?", Timestamp.class, pastaId),
-        equalTo(null));
   }
 
   @Test
@@ -347,7 +342,7 @@ class NotebookGitBaselineRebuildTest {
             """
             SELECT folder_id, title, content
             FROM note
-            WHERE notebook_id = ? AND deleted_at IS NULL
+            WHERE notebook_id = ?
             ORDER BY id ASC
             """,
             (rs, ignored) ->
