@@ -59,6 +59,82 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
 
 Stories below are in priority order; stable story numbers retain their identity.
 
+<a id="story-5"></a>
+
+### 5. Publish new notes faster while preserving deleted-title conflicts
+
+- **Goal / beneficiary:** Notebook owners publishing many new notes wait less
+  by reducing the cost of checking titles reserved by soft-deleted notes,
+  while receiving exactly the current publication and conflict behavior.
+- **Evidence:** The retained 1,000-existing / 1,000-addition observation after
+  attachment-cleanup optimization took 13,368.447 ms. Of 600 request-thread
+  execution samples, 425 were in flushing reached through
+  `NoteTitlePlacementRules.requireNoSoftDeletedTitleAt` (425 of 432 flush
+  samples). This is the leading sampled hotspot in that addition capture, not
+  a measured elapsed-time share or a repeated comparison baseline. See
+  [the profile](../../docs/notebook-publication-profiling.md#separate-addition-observation).
+- **Scope:** Optimize the existing shared title-conflict check and its
+  persistence interactions. Preserve notebook/folder scope, title matching,
+  deleted-note identity in errors, UI recovery behavior, Git path-context
+  errors, authorization, and atomic rollback. No title-policy relaxation,
+  trash implementation, production-data migration, or deletion-schema redesign.
+- **Acceptance boundary:** On the maintained 1,000-existing / 1,000-addition
+  workload, candidate median completed HTTP publication time must be strictly
+  less than half a fresh unchanged-baseline median (>50% less waiting).
+  Use three successful comparable runs per version, identical fixture and
+  environment settings, with setup and receiver verification outside the timer.
+  These are additions, deliberately differing from the earlier thread's update
+  workload to exercise the measured hotspot. No 10,000-note measurement here.
+- **Simplicity is also required:** Fewer formatted production lines overall in
+  the affected implementation, clearer domain intent, and less unnecessary work.
+  Do not obtain speed through added behavior, special modes, extra conditions,
+  parallel caches, background jobs, or expanded orchestration. Do not game line
+  counts by compressing formatting, deleting useful documentation, or moving
+  unchanged code outside the counted files. Count tests/tooling separately.
+- **Stopping rule:** Once >50% reduction, simplicity, and preservation are
+  established, finish this round. A larger natural gain is welcome; do not seek
+  further hotspots or expand scope to chase it. If a small simplification misses
+  the target, report that finding rather than adding complexity or claiming success.
+- **Key examples:** Many valid new notes publish faster with all authored content
+  and the proposed head intact. Existing addition/rename/relocation conflicts
+  retain their deleted-note identity and error context without resurrection or
+  partial acceptance. Existing UI recovery behavior is unchanged. Reuse current
+  proof; add only a missing observable transaction-visibility regression justified
+  by the chosen simplification, not an exhaustive new scenario matrix.
+- **Narrow solution direction:** Simplify the shared title lookup's unnecessary
+  persistence work. The existing orphan-image lookup demonstrates a query-local
+  flush approach, but its safety is not transferable by assumption: title checks
+  must see relevant pending deletion, restore, and placement state. Verify that
+  responsibility on the real database before accepting a candidate. Avoid
+  full-note loading if only an identifier is required and this simplifies the
+  same lookup. The earlier bulk-check fallback is not selected; a new batch
+  framework or publication-only policy would contradict this round's constraints.
+- **Refinement result:** Product scope and acceptance are settled. The remaining
+  uncertainty is technical feasibility of a small, behavior-preserving
+  simplification; the execution slice owns its proof and must stop if unsupported.
+  [Slice plan](../quick/112-publish-additions-with-simpler-title-check/PLAN.md).
+- **Future compatibility:** Keep the current rule in one place and optimize
+  how it is evaluated, without adding durable representations or public
+  contracts around title reservation. The future trash story can replace the
+  rule without inheriting a new cache or publication-specific policy. Do not
+  implement speculative trash abstractions now.
+- **Alternatives:** Raising timeouts or asking owners to split commits does
+  not remove repeated server work. Deleting the check or implementing trash
+  changes behavior and is outside this story. Retain the current implementation
+  if a candidate cannot demonstrate both correctness and a meaningful gain.
+- **Effort hypothesis:** M (1–2 hours), low confidence dominated by proof and measurement
+  waiting; one narrow simplification, with a stop if the approach needs expansion.
+- **Depends on:** Delivered attachment-cleanup and index-maintenance improvements
+  provide the baseline. No dependency on the deferred trash redesign.
+- **Safe stopping point:** Faster additions with unchanged semantics are useful
+  even if trash is never implemented. Broader 10,000-note validation stays in
+  story 4; do not claim that scale from a 1,000-addition comparison.
+- **Source:** Owner's 2026-09-13 request and clarification, plus the user
+  discussion in task `Optimize performance baseline`
+  (`01a09544-77d4-7f80-86da-11b7acbaa813`), read on 2026-09-13.
+  Preserve its small-first, >50% improvement through simplification intent;
+  current instructions select additions and keep trash last in the queue.
+
 <a id="story-4"></a>
 
 ### 4. Validate publication performance at 10,000-note scale
@@ -185,27 +261,30 @@ simplification if it achieves the required gain with less machinery.
 
 #### Soft deletion and title reuse — separate product work
 
-The user has already queued
-[Reconsider note-title uniqueness and soft deletion with Git versioning](SEED-009-git-backed-local-notebook-workflow.md#story-26).
-That story owns the Git-compatible title-reuse direction and the reconsideration
-of title reservation and soft deletion, including whether soft deletion should
-change or be removed. Do not tune `requireNoSoftDeletedTitleAt` in this scaling
-story or turn the existing title-blocking policy into a performance requirement
-here.
-The profile establishes the application check's runtime cost; it does not
-establish which database unique constraint enforces the policy or authorize a
-specific schema/deletion change.
+The owner has deferred
+[Align note deletion, trash, and title reuse with Git](SEED-009-git-backed-local-notebook-workflow.md#story-26)
+to the end of the backlog. That combined idea owns deletion/trash semantics,
+production migration, and future title reuse. It is not a prerequisite for this
+performance story.
 
-During this story's later refinement, consult that work's current decision and
-re-measure the addition path after any relevant behavior change. Record the
-remaining check cost separately while it exists so it is not mistaken for
-indexing cost. Do not duplicate the soft-delete investigation here or change
-the backlog order merely because this observation is cross-linked.
+The retained addition observation found 425 of 600 request-thread execution
+samples in flushing reached through `requireNoSoftDeletedTitleAt` (425 of 432
+flush samples). This is a strong addition-path hotspot signal, not a measured
+71% share of elapsed time or a demonstrated 10,000-note bottleneck. Ordinary
+existing-note content updates do not execute that creation check.
+
+The separate [addition optimization story](#story-5) now owns improving this
+check while preserving behavior. Use its delivered result as the baseline when
+available; measure any remaining check cost separately from derived indexing.
+The owner permits pursuing other improvements when this cost is not dominant.
+Do not duplicate that optimization here or require the broader deletion redesign
+merely to improve speed. No schema or deletion-policy change is selected.
 
 ## Ordering and Scope Reduction
 
-The product backlog owns current priority; story 4 remains behind the selected
-title-reuse investigation. Story 4 still needs refinement of its workload and
+The product backlog owns current priority: story 5's behavior-preserving addition
+optimization precedes story 4's scale validation, with the combined deletion/trash
+idea still last. Story 4 still needs refinement of its workload and
 acceptable waiting time. It remains a non-executable planning input. The user
 explicitly authorizes temporary code experiments, measurement, and profiling
 during its future refinement, consistent with the earlier authorized work.

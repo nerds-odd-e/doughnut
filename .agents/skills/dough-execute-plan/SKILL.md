@@ -166,26 +166,6 @@ selected current checkout and branch from the conversation instead.
    [execution decisions](references/execution-decisions.md). For a slice that
    removes or disables behavior or state, also run the
    [destructive later-outcome check](references/destructive-later-outcome-check.md).
-   During planned execution, carry a still-supported existing-solution finding
-   forward; do not repeat PFE for each slice. Reapply
-   [dough-pfe](../dough-pfe/SKILL.md) only when execution uncovers an unforeseen
-   introduction or relocation of responsibility, or when new evidence
-   invalidates the selected candidate or its domain fit. Give PFE the relevant
-   story, plan finding, candidate evidence, and new observation. If its result
-   requires structural work for the currently authorized responsibility, align
-   the remaining plan under [active-plan
-   refinement](../dough-story-refinement/references/planning.md#refine-the-active-plan)
-   before delegating or resuming the affected work; crossing a real product or
-   process boundary does not make that necessary work speculative. Stop the
-   affected path through execution decisions when domain meaning remains
-   unresolved or a consequential choice is not authorized. Do not use the
-   revisit to broaden the selected outcome or initiate unrelated cleanup.
-   When evidence instead contradicts recorded North Star direction, use
-   [the conflicting-direction handoff](references/execution-decisions.md#resolve-conflicting-recorded-direction):
-   stop the affected path, let the coordinator apply the linked planner
-   judgment and align the remaining plan, then resume only from the consistent
-   direction and plan. Do not let an executing role revise direction to justify
-   its work.
 3. For planned execution, if refinement is needed and learning escalation
    permits it, invoke
    [dough-slice-plan-refinement](../dough-slice-plan-refinement/SKILL.md) on the

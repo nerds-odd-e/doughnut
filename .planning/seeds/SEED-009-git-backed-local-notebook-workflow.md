@@ -116,50 +116,114 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Safe stopping point:** This workflow remains independently usable if later stories are cancelled, with work and learning data preserved.
 
 <a id="story-26"></a>
+<a id="story-27"></a>
 
-### 26. Reconsider note-title uniqueness and soft deletion with Git versioning
+### 26. Align note deletion, trash, and title reuse with Git
 
-- **For / why:** Notebook owners working between Donut and Git-compatible
-  tools need deletion and title-reuse rules that support continued authoring.
-- **Evaluation:** Confirm whether a soft-deleted note still reserves its title
-  within its folder, identify whether this is enforced by a database unique
-  index or application rules, and demonstrate the resulting effect on Git
-  workflows. Produce an evidence-backed recommendation for title reuse and
-  whether soft deletion should be retained, changed, or removed given Git
-  versioning, leaving the product decision explicit.
-- **Hypothesis, not confirmed:** A soft-deleted note may still hold its folder's
-  unique title and prevent another note from using it, potentially blocking
-  Git-compatible workflows. This capture does not establish the current behavior
-  or the claimed incompatibility.
-- **Key examples to investigate:** Delete a note, then create another note with
-  the same title in that folder; publish a local Git change reusing the deleted
-  note's path. Establish what happens to note identity and learning history,
-  and what recovery Git history provides compared with soft deletion.
-- **Scope:** Investigation and a product recommendation. Consider retaining
-  current behavior, changing title reservation while keeping soft deletion,
-  and replacing soft deletion where Git history provides sufficient recovery.
-  Whether Git history covers all affected notes and recovery needs remains an
-  open question. Implementation, migration, and removal of soft deletion are
-  not authorized by this capture. Story 23 keeps its existing scope pending
-  an explicit decision.
-- **Value / learning:** Resolve the suspected title-reuse obstacle and whether
-  soft deletion still serves owners alongside Git versioning before choosing
-  a behavior change.
-- **Effort hypothesis:** S–M, low confidence until investigation is bounded
-  during refinement.
-- **Depends on:** No new story prerequisite is established.
-- **Safe stopping point:** Verified current behavior and a recorded recommendation
-  remain useful even if implementation is deferred.
-- **Source:** Owner's 2026-09-12 request to capture this reconsideration as the
-  third product backlog story; both the suspected constraint and the future
-  of soft deletion remain open questions.
+- **Goal / beneficiary:** Notebook owners can delete, trash, and recreate notes
+  through Donut or ordinary Git/file operations with predictable effects on
+  content, identity, and learning history, without invisible title reservations.
+- **Status / priority:** Deferred combined idea, last in the product backlog.
+  Former story 27 is merged here; its anchor remains an alias. This is broad
+  non-executable planning input requiring decomposition before implementation,
+  not a prerequisite for publication performance work.
+- **Current evidence:** Source and existing controller tests inspected on
+  2026-09-13 show that the database unique index includes deleted notes and the
+  application rejects title reuse. UI creation offers to restore the old note
+  instead of applying new creation content. Git publication rejects addition,
+  rename, or relocation into a deleted note's reserved path; it does not restore
+  automatically and rejection preserves accepted state. Tests were read, not run.
+- **Value / learning:** Separate content recovery from identity recovery. The
+  same title, even with the same content, does not reliably distinguish restoring
+  an old note from creating a new one. Owners recovering the same note may expect
+  their non-Git learning data back, while new notes must not inherit old progress
+  merely because their names match.
+
+#### Agreed direction — 2026-09-13
+
+- **Permanent deletion:** Delete means removal from the database, including
+  dependent data whether or not Git represents it. Publishing a file deletion
+  has this meaning. Recreating that file, purposefully, accidentally, or from Git
+  history, creates a new note; permanently deleted dependent data is not recovered.
+- **Trash:** Replace the current soft-delete feature with a notebook trash folder
+  (working name `_trash/`). Its notes remain ordinary notes represented in Git,
+  retaining their identities and dependent learning data. Moving into trash
+  removes a note from normal use, recall, and assimilation; moving out restores
+  eligibility with retained learning data. Moving to trash frees the former path.
+- **Authority:** Location under the notebook trash folder, including descendants,
+  determines trash status. Metadata cannot independently make an outside note
+  trashed or an inside note active. Local moves into trash without timestamp
+  frontmatter are valid and must still exclude the notes from learning.
+- **Timestamp and cache:** The owner wants deletion/trash-date metadata in
+  frontmatter as the authoritative date when supplied, with the current
+  `deleted_at` responsibility moved out of the note table into a derived index
+  cache for efficient filtering. This is not a second authoritative soft-delete
+  state. The cache must support trash membership even when the date is absent.
+  Exact metadata naming, absent-date representation, and whether the server adds
+  missing date metadata (and how that enters append-only history) remain open.
+- **Existing production data:** Preserve existing soft-deleted notes and their
+  dependent data by migrating them into trash, retaining deletion dates. This
+  replaces the earlier suggestion to permanently discard those production rows.
+- **Architecture context:** [ADR 0004 — OKF-compatible notebook Markdown
+  profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+  governs Portable paths, preserved author YAML, and derived authored indexes.
+  The proposed trash-date cache and trash lifecycle are future product direction,
+  not an implemented format contract or an amendment to the ADR. Proposed ADR
+  0002 is non-binding.
+
+#### Key examples and boundaries
+
+- Active learned note → delete its file and publish → note and dependent data
+  are permanently removed; later file recreation does not restore trackers.
+- Active learned note → move under `_trash/` in Donut or locally and publish →
+  keep its identity and trackers, represent the moved file in Git, and exclude
+  it from recall and assimilation even without date frontmatter.
+- Trashed note → move out to an available path → resume normal learning with
+  retained tracker data. Stale timestamp metadata cannot override location.
+- Existing production soft-deleted note → migration → retained note, deletion
+  date, and dependent data in trash, with its former active path available.
+- Trash placement and restoration still face visible filename collisions:
+  different source folders, repeated trashing of the same name, or an occupied
+  restoration destination. Naming/layout and conflict handling remain unresolved;
+  preserving source subfolders alone does not solve repeated trashing.
+
+#### Open decisions and delivery boundaries
+
+- Final trash folder name/layout and collision resolution; UI distinction between
+  trash and permanent deletion, including whether trash must ship before the
+  existing Delete action becomes permanent.
+- Timestamp key/format, missing or invalid dates, server metadata enrichment,
+  and handling stale date metadata after moving out. Location authority is settled;
+  timestamp completion is deliberately deferred.
+- Migration details for dependent records and Git representation, and identity
+  preservation across supported local moves. No migration or implementation is
+  authorized by this capture. Story 23 keeps its current scope pending explicit
+  refinement against this future direction.
+- **Alternatives:** Title-reservation changes alone would be smaller but would
+  leave ambiguous implicit recovery. Automatic restoration on filename reuse
+  could incorrectly reconnect old trackers. The owner selected explicit trash
+  preservation and permanent deletion, while deferring delivery in favor of
+  near-future publication work.
+- **Effort hypothesis:** Likely larger than L (2–4 hours), low confidence due to
+  migration, Git moves, filtering, and UI consequences. Split into evaluable
+  stories when resurfaced; keep one combined backlog idea now as requested.
+- **Depends on / safe stopping point:** No prerequisite relationship with
+  publication performance is established. Existing behavior remains until
+  authorized delivery; retaining these decisions is useful if implementation
+  is deferred indefinitely.
+- **Source:** Owner's 2026-09-12 capture and 2026-09-13 split, discussion, and
+  explicit remerge/deprioritization. The latest production migration decision
+  preserves data rather than purging it.
 
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns selection and order.
-The owner subsequently selected story 26 as second in the global queue, ahead
-of the remaining Git workflow stories below.
-Publish accumulated commits first, then make new web history append-only.
+The owner merged title uniqueness and soft deletion into story 26 and moved it
+last in the queue. Publication performance takes priority; the broader trash
+model is useful future work, not required to pursue that immediate direction.
+Defer the combined idea first when reducing current scope.
+Among the remaining Git workflow stories, publish accumulated commits first,
+then make new web history append-only.
 Prioritize web rename and deletion ahead of container descriptions and web
 relocation. Drop the latter two from the queue first if learning changes the
 priority; retain their candidates here. None of this authorizes execution.
@@ -174,8 +238,8 @@ Keep these outside the current queue rather than cancelling them:
 - Recovery for notebooks whose live projection already differs from accepted
   history. Establish the owner's blocked journey and a deliberate preservation
   policy before selecting recovery work.
-- Deleted-path reuse and restoration; wider folder operations and
-  rename-with-content-edit identity decisions.
+- Wider folder operations and rename-with-content-edit identity decisions.
+  Deleted-path reuse and trash restoration are retained in deferred story 26.
 - Native standard Git transport, notebook binding within a project subdirectory,
   attachments, and history browsing or revision restoration.
 

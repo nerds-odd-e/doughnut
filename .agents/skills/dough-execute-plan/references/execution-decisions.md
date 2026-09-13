@@ -3,30 +3,44 @@
 Apply these decisions before delegation and after implementation and refactoring,
 even when tests pass.
 
+## Reassess before extending work
+
+When corrections accumulate, evidence challenges the premise, or the owner asks
+for simplification, reassess whether the remaining work is necessary before
+adding implementation or slices. State the smallest authorized, evaluable
+outcome and compare the strongest relevant simpler choice. Reuse available
+evidence; make a bounded check only for a decisive uncertainty, stating what it
+establishes and leaves unproved. Drop only obligations the owner has authorized
+removing; preserve compatible completed work and proof.
+
+Carry forward a supported existing-solution finding. Use
+[dough-pfe](../../dough-pfe/SKILL.md) for an unforeseen addition or relocation of
+responsibility, or evidence invalidating the selected candidate or domain fit;
+supply the relevant story, plan finding when present, candidate evidence, and
+new observation. Necessary structure may cross components or process boundaries
+without changing the authorized responsibility. Align the remaining plan, when
+one exists, through [active-plan
+refinement](../../dough-story-refinement/references/planning.md#refine-the-active-plan)
+before resuming affected work. Reassessment does not authorize unrelated cleanup
+or a broader outcome.
+
 ## Stop for human judgment
 
-Stop when an unresolved decision concerns user value, a structural choice
-constraining later slices or architecture, credentials or permissions, or
-ambiguity that could waste a commit. Also stop when evidence changes the selected
-feature story's beneficiary, outcome, evaluation, scope, or order relative to
-other stories, or changes a bounded correction's beneficiary, outcome, proof,
-or scope. Record the affected source and field; follow
-[learning escalation](../../dough-story-decomposition/references/problem-decomposition.md#size-and-escalate-slices)
-before refining more slices.
+Stop only the affected path when a consequential decision remains unresolved:
+user value, domain meaning or fit, structure constraining later work or
+architecture, credentials or permissions, or ambiguity that could waste a
+commit. For a change to the story or correction's beneficiary, outcome, proof
+or evaluation, scope, or story order, apply a change already authorized by the
+human; otherwise name the affected source and field, evidence, and specific
+decision needed, then wait.
+Follow [learning escalation](../../dough-story-decomposition/references/problem-decomposition.md#size-and-escalate-slices)
+before further subdivision. Use the handoff below for conflicting recorded
+direction; the executing role must not revise direction to justify its work.
 
-Explain the finding and required decision, then wait for the human. After a
-completed slice, first deliver safe work under [wrap-up](wrap-up.md). A refactor
-stop or unresolved proof failure prevents that delivery. Resolve routine naming,
-placement, test choices, minor refactoring, and defects caused by the current
-change within the authorized scope.
-
-An understood responsibility already authorized by the active plan does not
-become a new consequential choice merely because its necessary domain-coherent
-structure crosses a component or process boundary. Keep that work in the
-remaining plan and preserve the responsibility's meaning and applicable
-decisions. Stop when the meaning, fit, or consequential choice is unresolved;
-do not turn this distinction into permission for unplanned cleanup or a story
-outcome change.
+Deliver completed safe work under [wrap-up](wrap-up.md) before waiting unless a
+refactor stop or unresolved proof failure prevents delivery. Resolve routine
+naming, placement, test choices, minor refactoring, and necessary defects within
+the authorized scope without another approval.
 
 ## Resolve conflicting recorded direction
 

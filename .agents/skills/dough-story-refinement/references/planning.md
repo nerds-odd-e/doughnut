@@ -151,7 +151,16 @@ incomplete. Preserve completed evidence unless a changed boundary invalidates
 what it covers. For interim replacements, align affected callers, fixtures,
 assertions, and documentation with the final success and rejection behavior.
 
-Choose proof at the stable boundary of the promise:
+Choose the smallest sufficient proof at the stable boundary of the promise.
+Inspect assertions and setup: distinguish starting preconditions from behavior
+the product promises to establish. A fixture or seam supplying that behavior
+leaves it unproved; keep the evidence for what it actually observes. An inner
+operation finishing does not prove completion for its caller.
+
+Reuse sufficient evidence. Obtain only missing observations within authorized
+work; if unavailable, report what is covered and the specific unproved promise.
+That promise remains incomplete; reporting the gap does not fulfill or remove
+it. Limit success claims to the observed cases.
 
 | Situation | Proof |
 | --- | --- |

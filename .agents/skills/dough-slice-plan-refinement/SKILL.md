@@ -27,7 +27,8 @@ For a complete correction, use the plan's outcome, findings, scope, proof,
 decisions, and slices directly; do not require or create a seed. Name whichever
 required correction field is missing and stop. A complete plan permits
 refinement, not execution; preserve the invoking instruction's authorization
-boundary.
+boundary. Before choosing further subdivision, apply the shared
+[reassessment decision](../dough-execute-plan/references/execution-decisions.md#reassess-before-extending-work).
 
 - If no plan exists, use `dough-slice-planning`.
 - If a plan is marked as awaiting story refinement after resplitting, use

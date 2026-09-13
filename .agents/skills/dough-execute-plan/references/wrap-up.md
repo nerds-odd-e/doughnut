@@ -6,9 +6,8 @@ same proof and delivery gates.
 ## Accept proof
 
 Apply [proof ownership](../../dough-story-refinement/references/planning.md#own-executable-proof).
-Compare each promise with its assertion and enough setup to identify the tested
-boundary. Passing commands, test names, and `proof:` summaries alone are
-insufficient. Return incomplete or contradictory evidence to implementation,
+Passing commands, test names, and `proof:` summaries alone are insufficient.
+Return incomplete or contradictory evidence to implementation,
 naming the promise and gap; refactoring cannot supply missing behavior.
 
 Reuse inspected proof while promises and boundaries remain unchanged. Recover

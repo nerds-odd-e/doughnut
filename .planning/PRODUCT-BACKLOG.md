@@ -13,7 +13,7 @@ with reasonable performance.
 
 ## Backlog list
 
-- [Reconsider note-title uniqueness and soft deletion with Git versioning](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
+- [Publish new notes faster while preserving deleted-title conflicts](seeds/SEED-018-publish-large-authored-notebooks.md#story-5) — SEED-018
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Keep web saves in an append-only Git history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21) — SEED-009
@@ -21,3 +21,4 @@ with reasonable performance.
 - [Receive a web note deletion locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-23) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009
+- [Align note deletion, trash, and title reuse with Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
