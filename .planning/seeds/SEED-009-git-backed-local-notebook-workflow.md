@@ -351,18 +351,72 @@ from further splitting/refinement for now, by the owner's instruction.
 
 ### 34. Find and recover previously trashed notes through web navigation
 
-- **Goal / beneficiary:** A web owner can find a previously discarded note after
-  the immediate Undo interaction is gone, and recover it using Move.
-- **Scope capture:** Discover trash through notebook navigation, browse its
-  ordinary folders/notes with trash warnings, and move a selected note to an
-  active destination. Reuse existing views; no dedicated Restore or new Git
-  behavior is implied.
-- **Value / evaluation direction:** The owner finds and recovers an older trashed
-  note without retaining its URL or relying on search or session Undo.
-- **Status:** Unrefined, explicitly left for later discussion. Placed second
-  at the owner's request; no detailed examples, UI contract, or slice plan yet.
-- **Depends on / stopping point:** Existing web trash state and Move;
-  provides useful recovery independently of the Restore shortcut or folder Trash.
+- **Goal:** A notebook owner using the web can find a previously trashed note
+  after immediate Undo is gone and recover it through Move, without knowing
+  its URL. This makes the existing trash capability useful across sessions.
+- **Status:** Refined on 2026-09-13 for the owner's request for narrow scope and
+  early working feedback. Non-executable input; no implementation plan yet.
+
+#### Scope
+
+- Deliver one journey using notes already represented beneath notebook-root
+  `_trash`: discover that folder through notebook navigation, browse its nested
+  folders, open a note with its content and trash warning, and use existing Move
+  to put it at notebook root or in an existing active folder in the same notebook.
+- Reuse ordinary notebook/folder navigation and note views. Make trash status
+  clear when opening the trash root, a folder beneath it, or a trashed note.
+  An accessible `_trash` entry in the existing notebook tree is sufficient;
+  no separate trash dashboard or navigation redesign is required.
+- Recovery moves the existing note, preserving its identity, content, learning
+  history, and independent tracking preferences. Its warning disappears and
+  normal location-based eligibility resumes. Recovery does not recreate
+  references deliberately removed during trashing.
+- Preserve ordinary Move authorization and destination-conflict behavior,
+  existing Trash/Undo, authorized direct access, and legacy deleted-note
+  recovery. Trash browsing must not make trashed notes active in search,
+  learning, or wiki-link matching. These are continuity constraints from the
+  parent contract, not new lifecycle features.
+- **Deferred promises:** Legacy soft-delete migration (story 31), automatic
+  original-path Restore or missing-parent creation (story 32), folder Trash
+  (story 33), and Git/local compatibility (story 28). Also defer bulk recovery,
+  trash search/sorting/filtering, trash counts, permanent-delete/empty-trash UI,
+  and a new cross-notebook recovery journey. These omissions do not require
+  rejection of cases ordinary navigation or Move already supports.
+
+#### Key examples
+
+1. **Find and recover after leaving:** `Biology/Cells` was trashed into
+   `_trash/Biology/Cells`; the owner has left the page and no Undo is available.
+   Starting at the notebook, they browse `_trash` then `Biology`, see that the
+   folder is in trash, and open `Cells` with its content and trash warning.
+   They Move it to existing active `Biology`; it appears there without the
+   warning, with the same identity and retained learning history/preferences.
+2. **Original parent absent:** `_trash/Biology/Cells` exists but active `Biology`
+   does not. The owner can Move `Cells` to notebook root using the existing
+   destination control. This journey needs no parent reconstruction or Restore.
+3. **Destination occupied:** An independent active `Biology/Cells` already
+   exists. Attempting recovery there follows ordinary Move conflict behavior
+   without overwriting either note; the owner can choose a free destination.
+4. **Nothing to recover:** A notebook without a trash folder remains navigable;
+   this story need not create one merely to display an empty destination.
+   An existing empty trash folder uses ordinary empty-folder navigation.
+
+- **First feedback:** Have an owner start from a notebook, find a previously
+  trashed nested note, and recover it through Move without a saved URL or Undo.
+  Observe whether the tree entry and existing Move interaction are discoverable
+  enough before committing to additional recovery UI.
+- **Effort hypothesis:** S–M (30 minutes–2 hours), medium confidence, assuming
+  reuse of existing listing, warning, and Move behavior. Focused inspection
+  found root/child folder listings and a note trash warning already present;
+  the folder page lacks a trash warning. This is reuse evidence, not an executed
+  demonstration that the whole journey works. If delivery exceeds this band,
+  revisit the boundary before adding navigation or recovery mechanisms.
+- **Depends on / safe stopping point:** Existing location-based web trash and
+  Move; no migration or new Git prerequisite. Owners retain usable recovery
+  through navigation even if later convenience stories are deferred.
+- **Open decisions:** None blocking this bounded journey. Exact warning wording
+  and entry presentation can follow existing UI conventions; richer recovery
+  UI should be driven by the first feedback.
 
 <a id="story-31"></a>
 
