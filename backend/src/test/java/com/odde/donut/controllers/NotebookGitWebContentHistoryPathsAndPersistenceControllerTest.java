@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
-import static com.odde.donut.testability.NotebookGitBindingAmendmentFixture.markEligible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -11,30 +10,48 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import java.sql.Timestamp;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 class NotebookGitWebContentHistoryPathsAndPersistenceControllerTest
     extends NotebookGitWebContentHistoryControllerTestSupport {
 
+  @Autowired JdbcTemplate jdbcTemplate;
+
   @Test
-  void storedLegacyCandidateTipRemainsTheParentAfterSavingInAFreshPersistenceContext()
+  void legacyAmendmentMetadataDoesNotChangeTheAcceptedParentInAFreshPersistenceContext()
       throws Exception {
     Fixture fixture = fixture("Fresh");
-    String candidateHead =
+    String acceptedHeadBeforeSave =
         inCommittedTransaction(
             transactionManager,
             () -> {
               NotebookGitBinding binding = bindingById(fixture.notebookId());
-              markEligible(binding, fixture.noteId(), T1000);
-              notebookGitBindingRepository.save(binding);
-              return binding.getAcceptedGitObjectId();
+              String acceptedHead = binding.getAcceptedGitObjectId();
+              jdbcTemplate.update(
+                  """
+                  UPDATE notebook_git_binding
+                  SET amendment_head = ?,
+                      amendment_note_id = ?,
+                      amendment_last_changed_at = ?
+                  WHERE notebook_id = ?
+                  """,
+                  acceptedHead,
+                  fixture.noteId(),
+                  Timestamp.from(T1000),
+                  fixture.notebookId());
+              entityManager.clear();
+              return acceptedHead;
             });
 
     saveAt(fixture.noteId(), content("changed"), T1008);
 
     History history = historyFromBinding(fixture.notebookId(), "Fresh.md");
-    assertThat(history.headsNewestFirst().get(1), equalTo(ObjectId.fromString(candidateHead)));
+    assertThat(
+        history.headsNewestFirst().get(1), equalTo(ObjectId.fromString(acceptedHeadBeforeSave)));
   }
 
   @Test
