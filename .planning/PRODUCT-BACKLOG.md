@@ -15,12 +15,12 @@ with reasonable performance.
 ## Taken
 
 - [Find and recover previously trashed notes through web navigation](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-34) — SEED-009
+- [Keep web saves in an append-only Git history](quick/118-append-only-web-content-saves/PLAN.md) — SEED-009
 
 ## Backlog list
 - [Recover existing deleted notes through portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31) — SEED-009
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
 - [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
-- [Keep web saves in an append-only Git history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21) — SEED-009
 - [Receive a web note rename locally without losing its identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22) — SEED-009
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
