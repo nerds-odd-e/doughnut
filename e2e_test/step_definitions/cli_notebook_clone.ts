@@ -247,6 +247,17 @@ Then(
 )
 
 Then(
+  'the cloned checkout is a clean append-only chain from its original head',
+  () => cli.notebookCloneCheckout().expectCleanAppendOnlyChainFromOriginalHead()
+)
+
+Then(
+  'the cloned checkout file {string} at the accepted parent is:',
+  (relativePath: string, content: string) =>
+    cli.notebookCloneCheckout().expectCheckoutParentFile(relativePath, content)
+)
+
+Then(
   'the installed CLI reports the rebased local head as the accepted head',
   () => cli.notebookCloneCheckout().expectRebasedHeadAccepted()
 )

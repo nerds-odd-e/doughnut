@@ -1,6 +1,6 @@
 # Keep web content saves in append-only Git history
 
-Status: planned
+Status: done
 Source: [SEED-009, story 21](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21), refined 2026-09-13.
 Authority: Execution planning and conditional slice-plan refinement only.
 
@@ -147,7 +147,7 @@ bindings; no reconstruction of already-replaced historical commits is promised.
 
 ### 3. Pull successive web saves into a clean local checkout
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; existing browser edit and installed
 CLI steps are reused. E2E stack startup/runtime is an external-wait exception.
 
@@ -165,6 +165,18 @@ owner narrowly if needed. Do not fabricate `B`/`C` with fixture commits or reset
 the binding after saves: those would bypass the behavior under test.
 Reuse the CLI fast-forward unit suite without duplicating its checkout/config
 assertion matrix or adding a second browser exposure variant.
+
+Delivered proof:
+
+- `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts`
+  passed all 98 CLI pull tests.
+- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_existing_note_edits.feature`
+  passed all three scenarios. The new journey performs two real web-editor
+  saves, pulls with the installed CLI, observes clean checkout states and exact
+  `A → B → C` ancestry, and reads the authored Markdown at both `B` and `C`.
+
+Active implementation and focused-proof time was about four minutes; E2E
+startup/runtime was the stated external-wait exception.
 
 Safe stop: The owner's complete save-to-local-history journey is demonstrated.
 All three slices and the delivery gates are required for story completion.
@@ -216,6 +228,9 @@ for special production behavior. Existing continuity proof is reused.
   2's existing-candidate fixture.
 - Slice 2 required no production compatibility path: the ordinary append rule
   naturally preserves a tip that still carries legacy amendment metadata.
+- Slice 3 reused the existing checkout task/page-object seam; only a narrow
+  parent-file read and first-parent ancestry observation were needed to prove
+  the real save-to-local journey.
 
 ## Slice-plan refinement assessment
 

@@ -112,3 +112,26 @@ Feature: CLI notebook existing-note edits
     And I should see note "CLI Clone Notebook/Overview" has content "Weekly meal plan"
     And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
     And I should see note "CLI Clone Notebook/Shopping list" has content "Milk and eggs"
+
+  Scenario: Pulling successive web saves retains both accepted revisions
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I open the note "Shopping list" for editing
+    And I view the note content as rich content
+    And I update note "Shopping list" content to become "Milk"
+    And I update note "Shopping list" content from "Milk" to become "Milk and eggs"
+    When I pull the cloned checkout using the installed CLI
+    Then the cloned checkout is a clean append-only chain from its original head
+    And the cloned checkout file "Shopping list.md" at the accepted parent is:
+      """
+      ---
+      type: Note
+      ---
+      Milk
+      """
+    And the cloned checkout file "Shopping list.md" is:
+      """
+      ---
+      type: Note
+      ---
+      Milk and eggs
+      """
