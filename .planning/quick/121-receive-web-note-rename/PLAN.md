@@ -217,7 +217,7 @@ accepted Portable representation on 2026-09-13.
 
 ### 4. Receive the selected reference rewrite with the renamed note
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given a synchronized notebook with a same-notebook referrer, rename
 through the existing web action with a reference-handling choice; pull receives
 the rename and rewritten authored references together with the selected display
@@ -236,6 +236,10 @@ No fixture snapshot after the trigger, and no subsequent local publication.
 Sizing: 5 active minutes plus required E2E/backend waits if production changes.
 Safe stop: referenced web renames are received under both existing choices;
 existing broader web referrer behavior is retained.
+Execution proof: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec
+e2e_test/features/cli/cli_notebook_web_created_note.feature` passed all 9
+scenarios, including both reference-handling choices with body and YAML rewrites,
+on 2026-09-13. No production change was needed.
 
 ### 5. Keep accepted history unchanged when no title change is accepted
 Type: Behavior

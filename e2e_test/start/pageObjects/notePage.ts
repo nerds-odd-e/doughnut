@@ -20,7 +20,9 @@ import { noteWikiLinkMethods } from './noteWikiLinkMethods'
 const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title]'
 
-type TitleRenameReferenceChoice = 'KEEP_VISIBLE_TEXT' | 'UPDATE_VISIBLE_TEXT'
+export type TitleRenameReferenceChoice =
+  | 'KEEP_VISIBLE_TEXT'
+  | 'UPDATE_VISIBLE_TEXT'
 
 const titleRenameReferenceSaveTestId: Record<
   TitleRenameReferenceChoice,

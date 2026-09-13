@@ -86,6 +86,57 @@ Feature: CLI notebook web note changes
       Membranes
       """
 
+  Scenario Outline: Pulling a web note rename and its selected reference rewrite into a clean checkout
+    Given I have a note "Cells" under notebook "CLI Clone Notebook" in folder "Biology" with content:
+      """
+      ---
+      type: Note
+      ---
+      Cells
+      """
+    And I have a note "Cell guide" under notebook "CLI Clone Notebook" with content:
+      """
+      ---
+      type: Note
+      related: "[[Cells]]"
+      ---
+      See [[Cells]].
+      """
+    And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I route to the note "Cells"
+    And I set the note title to "Cell structure" using <referenceChoice> reference handling
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | README.md                   |
+      | Overview.md                 |
+      | Cell guide.md               |
+      | Biology/Cell structure.md   |
+      | Kitchen/README.md           |
+      | Recipes/README.md           |
+      | Recipes/Pasta.md            |
+    And the cloned checkout file "Biology/Cell structure.md" is:
+      """
+      ---
+      type: Note
+      ---
+      Cells
+      """
+    And the cloned checkout file "Cell guide.md" is:
+      """
+      ---
+      type: Note
+      related: '<expectedReference>'
+      ---
+      See <expectedReference>.
+      """
+
+    Examples:
+      | referenceChoice    | expectedReference                |
+      | KEEP_VISIBLE_TEXT  | [[Cell structure\|Cells]]        |
+      | UPDATE_VISIBLE_TEXT | [[Cell structure]]               |
+
   Scenario: Publishing a local refinement of received web-created note text updates Donut
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I create a title-only root note titled "Shopping list" in the notebook "CLI Clone Notebook"
