@@ -121,7 +121,7 @@ unfinished proof obligations below.
 
 ### 2. Preserve a previously recorded amendment candidate on the next save
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; existing committed-transaction
 fixtures supply persisted binding state; backend runtime exception as above.
 
@@ -136,6 +136,11 @@ content only if slice 1's canonical proof is insufficient. If entity mappings
 are removed, seed the existing legacy columns in test-owned SQL rather than
 retaining production accessors solely for this fixture. Do not simulate the
 old implementation by adding a production compatibility mode.
+
+Delivered proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+passed all 2,420 backend tests. A controller-boundary example commits matching
+legacy amendment metadata, performs the changed save in a fresh persistence
+context, and observes the exact prior accepted tip as the new head's parent.
 
 Safe stop: The new policy is proved for existing as well as newly edited
 bindings; no reconstruction of already-replaced historical commits is promised.
@@ -209,6 +214,8 @@ for special production behavior. Existing continuity proof is reused.
   policy. Bundle download and idempotent publication no longer need to clear
   amendment state, while the legacy persisted columns remain mapped for slice
   2's existing-candidate fixture.
+- Slice 2 required no production compatibility path: the ordinary append rule
+  naturally preserves a tip that still carries legacy amendment metadata.
 
 ## Slice-plan refinement assessment
 
