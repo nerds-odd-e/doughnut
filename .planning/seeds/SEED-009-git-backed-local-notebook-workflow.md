@@ -71,12 +71,37 @@ data; invalid or ambiguous changes must not silently discard work.
   practical value: story 21 addresses web history rewriting, but neither story
   resolves divergence. Reconsider the workflow priority before expanding this
   story to cover simultaneous editing.
+- **Current-queue challenge (renewed refinement):** The current third position
+  follows Restore and folder Trash; the earlier web-save/rename comparison above
+  is historical rationale, not the current choice. Restore saves manual Move and
+  parent reconstruction; folder Trash adds convenient subtree removal. Neither
+  is an established prerequisite for accumulated publication. If an owner is
+  already blocked by several commits, publication has a stronger immediate case
+  than these conveniences. Without that evidence, the selected web-trash detour
+  remains a reasonable priority. Readme editing and receiving web moves should
+  precede this story if those operations interrupt real sessions more often.
+  Portable-trash Git compatibility should precede it if ordinary trash activity
+  prevents the local workflow from completing. Scale validation has a documented
+  large-notebook failure behind it, but delivered smaller-workload improvements
+  mean current waiting must be checked before asserting it is still the blocker.
+  Unqueued alternatives include recovery of already inconsistent live/history
+  state and gaps in web-authoring synchronization, retained in SEED-017. Either
+  can outrank batching when it prevents an owner from starting or completing the
+  proposed session. Divergence also challenges this session model, but requires
+  a separate product decision compatible with the append-only direction.
+  Backlog order is unchanged; no urgency or new candidate is approved here.
 - **Strongest simpler alternative:** Publish after every local content commit
   using existing functionality. Try this as a baseline with the owner. It is
   insufficient when an owner already has accumulated commits or needs to commit
   without connectivity. Squashing or rebasing conflicts with the stated
   append-only direction. A new UI or generic synchronization mechanism is not
   needed to evaluate the selected outcome.
+- **Workaround limitation:** Publishing after each commit is preventive advice,
+  not a recovery path for an already accumulated chain. Reinspection confirms
+  the CLI currently recommends rebasing or recreating one commit after rejecting
+  such a chain, conflicting with the selected history-preservation direction.
+  Whether publishing existing intermediate commits one at a time is a usable
+  history-preserving workaround is unverified; do not promise that procedure.
 - **Proposed delivery scope:** One already bound notebook; Donut's content
   matches its accepted history; accepted head is an ancestor of local `main`;
   each intervening commit edits content of existing ordinary notes at unchanged
@@ -151,6 +176,13 @@ data; invalid or ambiguous changes must not silently discard work.
   state repaired by the tip is merely outside this delivery's promise or must
   be rejected, with a product reason for any rejection. Confirm value now with
   an actual blocked session or the owner's stated expected usage.
+- **Intermediate-state challenge:** Requiring every intermediate tree to be a
+  publishable notebook could defeat the goal of committing freely during local
+  work. Proposed answer for discussion: for unchanged-path content edits,
+  validate the final notebook state and retain intermediate commits as history;
+  an invalid draft fixed at the tip should not require rewriting that history.
+  This is not yet a human decision. Structural transitions remain a distinct
+  unresolved identity question, not implicitly covered by this recommendation.
 - **Depends on / safe stopping point:** Existing clone, publication and clean
   fast-forward pull; no new-story prerequisite is established. This content-only
   local-session workflow remains useful if all later stories are cancelled.
