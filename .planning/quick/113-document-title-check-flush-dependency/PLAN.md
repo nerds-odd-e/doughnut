@@ -1,10 +1,16 @@
 # Document the destroy()-order dependency behind the title-check flush optimization
 
-Status: planned
+Status: completed
 Source: dough-execution-retrospective finding on the SEED-018 story 5 execution
 (quick/112-publish-additions-with-simpler-title-check, commit `691e7be961`,
 not yet merged to main at the time of this correction plan).
-Authority: 2026-09-13 retrospective correction planning only; execution has not started.
+Authority: 2026-09-13 human invocation of `dough-execute-plan` authorized execution.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`
+- Execution checkout: `/Users/terryyin/git/doughnut-worktrees/quick-113-destroy-order-doc` on `codex/quick-113-destroy-order-doc`
+- Integration target: `main`
 
 ## Goal and boundary
 
@@ -65,7 +71,7 @@ data or fixtures, so ADR 0007 is not implicated.
 
 ### 1. Document the destroy() flush dependency
 Type: Structure
-Status: planned
+Status: done
 Proof: comment-only change; confirm
 `NoteTitlePlacementRulesFlushVisibilityTest` and the existing
 `SoftDeletedTitleConflictMvcTest` / `NotebookGitDeletedDestinationControllerTest`
@@ -85,4 +91,7 @@ so no new benchmark or test is warranted.
 
 ## Learnings and results
 
-None yet.
+- Added the comment at the load-bearing `merge(note)` then AUTO-flush repository-query sequence without changing behavior or statement order.
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed the full backend suite, including `NoteTitlePlacementRulesFlushVisibilityTest`, `SoftDeletedTitleConflictMvcTest`, and `NotebookGitDeletedDestinationControllerTest`.
+- Post-change refactor review found the comment already cohesive and made no edits; `scripts/check_diff_whitespace.sh` passed.
+- Branch CI observation is unavailable: `.github/workflows/ci.yml` (`donut CI`) triggers only for pushes to `main`, not the execution branch.
