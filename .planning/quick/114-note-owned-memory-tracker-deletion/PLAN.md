@@ -218,7 +218,7 @@ may further refine this into an owned observation.
 
 ### 5. Preserve recent learning and aggregate readouts
 Type: Structure
-Status: planned
+Status: done
 Sizing: 4–6 minutes of active work; one remaining readout deletion-source change.
 
 Change recent-list, latest timestamp and total-count deletion predicates in
@@ -231,6 +231,15 @@ history and aggregate values for active/deleted/removed fixtures. Trace aggregat
 callers and fill only missing observations. Record representative before/after
 aggregate and recent-history query plans. Safe stop: every runtime reader now
 uses note deletion, with the compatibility column still maintained.
+
+Refactor note: the three aggregate queries (`findLastAssimilationTimeByUser`,
+`findLastRecallTimeByUser`, `countByUser`) now share a `byUserIdAllFrom` fragment
+(no removal/type filter, unlike `byUserIdFrom`), mirroring the existing
+`byUserId<Qualifier>From` convention. Grep confirms no runtime reader references
+`rp.deleted_at`/`rp.deletedAt`; only the retained column mapping and writers
+remain for slice 7. EXPLAIN not captured (transient test DB); the structural
+change is identical to slice 2's recorded observation (one `note` PK `eq_ref`
+lookup; tracker-side access path unchanged).
 
 ### 6. Express deletion preservation without tracker timestamp assertions
 Type: Structure

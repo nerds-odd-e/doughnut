@@ -76,6 +76,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "
+              + " JOIN note n ON rp.note_id = n.id "
               + byUserIdWhere
               + " ORDER BY rp.assimilated_at DESC LIMIT 100",
       nativeQuery = true)
@@ -84,6 +85,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "
+              + " JOIN note n ON rp.note_id = n.id "
               + byUserIdWhere
               + " AND rp.last_recalled_at IS NOT NULL "
               + " ORDER BY rp.last_recalled_at DESC LIMIT 500",
@@ -111,30 +113,21 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   String byUserIdWhere =
       " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
-          + "   AND rp.deleted_at IS NULL ";
+          + "   AND n.deleted_at IS NULL ";
 
-  @Query(
-      value =
-          "SELECT MAX(rp.assimilated_at) FROM memory_tracker rp "
-              + " WHERE rp.user_id = :userId "
-              + "   AND rp.deleted_at IS NULL",
-      nativeQuery = true)
+  String byUserIdAllFrom =
+      " FROM memory_tracker rp "
+          + " JOIN note n ON rp.note_id = n.id "
+          + " WHERE rp.user_id = :userId "
+          + "   AND n.deleted_at IS NULL";
+
+  @Query(value = "SELECT MAX(rp.assimilated_at) " + byUserIdAllFrom, nativeQuery = true)
   Timestamp findLastAssimilationTimeByUser(@Param("userId") Integer userId);
 
-  @Query(
-      value =
-          "SELECT MAX(rp.last_recalled_at) FROM memory_tracker rp "
-              + " WHERE rp.user_id = :userId "
-              + "   AND rp.deleted_at IS NULL",
-      nativeQuery = true)
+  @Query(value = "SELECT MAX(rp.last_recalled_at) " + byUserIdAllFrom, nativeQuery = true)
   Timestamp findLastRecallTimeByUser(@Param("userId") Integer userId);
 
-  @Query(
-      value =
-          "SELECT COUNT(*) FROM memory_tracker rp "
-              + " WHERE rp.user_id = :userId "
-              + "   AND rp.deleted_at IS NULL",
-      nativeQuery = true)
+  @Query(value = "SELECT COUNT(*) " + byUserIdAllFrom, nativeQuery = true)
   long countByUser(@Param("userId") Integer userId);
 
   @Query(
