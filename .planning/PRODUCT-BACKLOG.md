@@ -14,11 +14,11 @@ with reasonable performance.
 
 ## Taken
 - [Recover existing deleted notes through portable trash](quick/120-recover-legacy-notes-and-rebuild-git/PLAN.md) — SEED-009 story 31
+- [Receive a web note rename locally](quick/121-receive-web-note-rename/PLAN.md) — SEED-009 story 22
 
 ## Backlog list
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
 - [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
-- [Receive a web note rename locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22) — SEED-009
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009
