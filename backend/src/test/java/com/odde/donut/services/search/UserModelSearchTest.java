@@ -69,8 +69,8 @@ class UserModelSearchTest {
   }
 
   @Test
-  void theSearchResultShouldNotIncludeSoftDeletedNote() {
-    makeMe.aNote("Some Note").notebook(notebook).softDeleted().please();
+  void theSearchResultShouldNotIncludeTrashedNote() {
+    makeMe.aNote("Some Note").notebook(notebook).trashed().please();
     searchTerm.setSearchKey("not");
     assertThat(search(), empty());
   }

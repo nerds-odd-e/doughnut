@@ -208,6 +208,15 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
+  public NoteBuilder trashed() {
+    if (entity.getNotebook() == null) {
+      throw new AssertionError("trashed() requires .notebook(...) to be set first");
+    }
+    Folder trash = makeMe.aFolder().notebook(entity.getNotebook()).name("_trash").please();
+    this.folder = trash;
+    return this;
+  }
+
   public NoteBuilder level(int i) {
     pendingLevel = i;
     return this;

@@ -404,7 +404,7 @@ removed dead code.
 
 ### 10. Consolidate the remaining legacy availability boundary
 Type: Structure
-Status: planned
+Status: done
 Sizing: 5–8 minutes, low confidence due to fixture breadth; suite wait exception.
 
 Structure: Narrow remaining live reads of note soft-deletion state to the
@@ -420,6 +420,33 @@ Proof: Full backend/frontend suites preserve current behavior; source inventory
 enumerates remaining legacy reads/writes and their removal in slice 11. Avoid a
 new availability abstraction, adapter registry, or a broad test rewrite.
 Safe stop: Legacy data still works; final switch has a bounded inventory.
+
+Learning: Consolidated one production query
+(`NoteRepository.findNotesInNotebookRootFolderScopeByNotebookId`) from direct
+`n.deletedAt IS NULL` to `Note.JPA_AVAILABLE`. This is behavior-equivalent because
+root notes have `folder IS NULL`, so `trashedInDatabase` (which checks if the
+note's folder is under `_trash` via the `trashed_folder` view) is always false —
+making the added `trashedInDatabase = false` predicate always true. The remaining
+direct `deletedAt IS NULL` reads were intentionally left as-is because their
+intent is to include trashed notes (folder browsing, Git export, health-rule
+occupancy, creator stats); consolidating them to `JPA_AVAILABLE` would silently
+exclude trash and break behavior. Adapted 4 ordinary inactive-note test
+fixtures to use real `_trash` location instead of the `deleted_at` marker
+(`EmptyFolderHealthRuleTest`, `ReadmeOnlyFolderHealthRuleTest`,
+`EmptyFolderBulkPurgeTest`, `UserModelSearchTest`). Refactor extracted a
+`NoteBuilder.trashed()` makeMe helper for the repeated `_trash` folder creation
+pattern. Full backend suite preserved current behavior (one pre-existing
+`FolderRepositoryTest` test-DB pollution failure is unrelated — verified on the
+unmodified slice-9 commit). Remaining `deleted_at` reads/writes inventory for
+slice 11: `Note.JPA_AVAILABLE`/`NATIVE_AVAILABLE`/`isAvailable()` (drop
+`deletedAt` term → location-only); `Note.filterDeletedUnmodifiableNoteList`
+(no-op); 5 `NoteRepository` queries (drop `deletedAt IS NULL` term);
+`findByIdGreaterThanAndDeletedAtIsNullOrderByIdAsc` (dead, delete);
+`NoteTitlePlacementRules.requireNoSoftDeletedTitleAt` (delete keystone);
+`NotebookGitRows.NOTES_QUERY` (drop term → no-op filter);
+`FolderConstructionService.createFolder` guard (remove); `NoteService.destroy`/
+`restore` (remove); `NoteController.deleteNote`/`undoDeleteNote` endpoints
+(remove); `Note.deletedAt` field + DB column (remove via new Flyway migration).
 
 ### 11. The real upgrade retires note soft deletion and resets Git once
 Type: Behavior

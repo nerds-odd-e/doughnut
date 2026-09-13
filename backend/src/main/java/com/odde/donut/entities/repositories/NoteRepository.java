@@ -94,7 +94,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
   @Query(
       value =
           selectFromNote
-              + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL AND n.folder IS NULL"
+              + " WHERE n.notebook.id = :notebookId AND "
+              + Note.JPA_AVAILABLE
+              + " AND n.folder IS NULL"
               + " ORDER BY n.id ASC")
   List<Note> findNotesInNotebookRootFolderScopeByNotebookId(
       @Param("notebookId") Integer notebookId);

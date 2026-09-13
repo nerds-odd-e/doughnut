@@ -72,7 +72,7 @@ class ReadmeOnlyFolderHealthRuleTest {
   }
 
   @Test
-  void softDeletedNoteDoesNotOccupyReadmeOnlyFolder() {
+  void trashedNoteDoesNotOccupyReadmeOnlyFolder() {
     Folder folder =
         makeMe
             .aFolder()
@@ -80,7 +80,7 @@ class ReadmeOnlyFolderHealthRuleTest {
             .name("OnlyDeleted")
             .readmeContent("still here")
             .please();
-    makeMe.aNote("gone").folder(folder).softDeleted().please();
+    makeMe.aNote("gone").notebook(notebook).trashed().please();
 
     assertThat(
         readmeOnlyFoldersGroup().getItems().stream().map(HealthFindingItem::getFolderId).toList(),

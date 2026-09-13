@@ -84,9 +84,9 @@ class EmptyFolderBulkPurgeTest {
   }
 
   @Test
-  void softDeletedOnlyEmptyFolderPurged() {
+  void trashedOnlyEmptyFolderPurged() {
     Folder folder = makeMe.aFolder().notebook(notebook).name("OnlyDeleted").please();
-    makeMe.aNote("gone").folder(folder).softDeleted().please();
+    makeMe.aNote("gone").notebook(notebook).trashed().please();
 
     notebookHealthService.fix(notebook, optInRequest());
 
