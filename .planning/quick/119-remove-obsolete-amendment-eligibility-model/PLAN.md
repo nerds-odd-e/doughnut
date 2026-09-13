@@ -1,13 +1,25 @@
 # Remove obsolete amendment eligibility from the runtime model
 
-Status: planned
+Status: done
 Source: bounded correction from the execution retrospective of completed
 SEED-009 story 21 and plan 118, recoverable at before-cleanup commit
 `66f0695099` in `.planning/seeds/SEED-009-git-backed-local-notebook-workflow.md`
 and `.planning/quick/118-append-only-web-content-saves/PLAN.md`. Reviewed
 implementation commits: `91062ce7f3`, `c41b56796e`, and `f237aa62c5`; backlog
 claim `f337c8425c` is provenance only.
-Authority: retrospective correction planning only; execution is not authorized.
+Authority: execution authorized by the user on 2026-09-13.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut`, branch `main`, claim
+  commit `ac2735c403`.
+- Execution checkout:
+  `/Users/terryyin/git/doughnut-worktrees/quick-119-remove-obsolete-amendment-eligibility-model`,
+  branch `codex/quick-119-remove-obsolete-amendment-eligibility-model`.
+- Integration target: `main`.
+- CI observation: unavailable for the execution branch because
+  `.github/workflows/ci.yml` (`donut CI`) is push-triggered only for `main`; no
+  observer started.
 
 ## Goal and bounded outcome
 
@@ -73,7 +85,7 @@ would preserve the same dead representation and does not address the finding.
 
 ### 1. Retire the obsolete amendment eligibility representation
 Type: Structure
-Status: planned
+Status: done
 Sizing: about 5 minutes of change work, medium confidence. Full backend-suite
 runtime is an external-wait exception; no implementation-time exception is
 granted.
@@ -100,6 +112,20 @@ SQL compatibility setup. The backend suite must remain CI-safe.
 Safe stop: The runtime model has one accepted-history policy, legacy stored
 metadata remains harmless and covered, and the historical database record is
 preserved without maintaining obsolete domain accessors or tests.
+
+Completed proof:
+
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after the
+  implementation and again after the independent refactor pass (`BUILD
+  SUCCESSFUL`, 6 tasks executed).
+- Focused source search found amendment persistence identifiers only in the two
+  immutable historical migrations and the controller test's compatibility SQL.
+- Historical migration diff and `scripts/check_diff_whitespace.sh` were clean.
+
+## Learnings
+
+- Test-owned SQL preserves compatibility coverage for legacy populated columns
+  without retaining their removed runtime representation.
 
 ## Construction assessment
 
