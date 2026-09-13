@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
@@ -252,6 +253,43 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
                 .setParameter("id", noteId)
                 .getSingleResult())
         .longValue();
+  }
+
+  /** Counts conversation_message rows belonging to any conversation of the given note. */
+  protected long countConversationMessagesByNoteId(Integer noteId) {
+    return ((Number)
+            entityManager
+                .createNativeQuery(
+                    "SELECT COUNT(*) FROM conversation_message cm "
+                        + "JOIN conversation c ON cm.conversation_id = c.id "
+                        + "WHERE c.note_id = :id")
+                .setParameter("id", noteId)
+                .getSingleResult())
+        .longValue();
+  }
+
+  /** Aggregates the complete note-dependent closure counts for absence/survival assertions. */
+  protected DependentCounts dependentCounts(Note note) {
+    return new DependentCounts(
+        countRowsByNoteId("memory_tracker", note.getId()),
+        countRecallPromptsByNoteId(note.getId()),
+        countRowsByNoteId("mcq", note.getId()),
+        countRowsByNoteId("image", note.getId()),
+        countRowsByNoteId("conversation", note.getId()),
+        countConversationMessagesByNoteId(note.getId()));
+  }
+
+  /** Snapshot of the complete note-dependent row counts used by deletion/retry proofs. */
+  protected record DependentCounts(
+      long memoryTracker,
+      long recallPrompt,
+      long mcq,
+      long image,
+      long conversation,
+      long conversationMessage) {
+    static DependentCounts allAbsent() {
+      return new DependentCounts(0, 0, 0, 0, 0, 0);
+    }
   }
 
   private <T> T committed(java.util.function.Supplier<T> action) {

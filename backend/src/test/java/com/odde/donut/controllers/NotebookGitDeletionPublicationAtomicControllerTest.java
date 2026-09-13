@@ -161,34 +161,4 @@ class NotebookGitDeletionPublicationAtomicControllerTest
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
   }
-
-  private DependentCounts dependentCounts(Note note) {
-    return new DependentCounts(
-        countRowsByNoteId("memory_tracker", note.getId()),
-        countRecallPromptsByNoteId(note.getId()),
-        countRowsByNoteId("mcq", note.getId()),
-        countRowsByNoteId("image", note.getId()),
-        countRowsByNoteId("conversation", note.getId()),
-        countConversationMessagesByNoteId(note.getId()));
-  }
-
-  private long countConversationMessagesByNoteId(Integer noteId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery(
-                    "SELECT COUNT(*) FROM conversation_message cm "
-                        + "JOIN conversation c ON cm.conversation_id = c.id "
-                        + "WHERE c.note_id = :id")
-                .setParameter("id", noteId)
-                .getSingleResult())
-        .longValue();
-  }
-
-  private record DependentCounts(
-      long memoryTracker,
-      long recallPrompt,
-      long mcq,
-      long image,
-      long conversation,
-      long conversationMessage) {}
 }

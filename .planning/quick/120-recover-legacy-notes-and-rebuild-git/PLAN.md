@@ -207,7 +207,7 @@ the duplicated note-dependent count helpers into the shared
 
 ### 4a. Retrying an accepted deletion has no second effect
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; backend wait exception.
 
 Behavior: A successfully accepted deletion proposal is retried through the
@@ -217,6 +217,18 @@ Proof: Extend the existing retry controller example, comparing head/bundle and
 the absent note/dependents across the retry. Reuse accepted-proposal identity;
 do not introduce a deletion tombstone or soft-delete marker for retry handling.
 Safe stop: The publisher's existing retry contract works with permanent removal.
+
+Learning: Extended `retriesAnAcceptedDeletionWithoutChangingHeadOrResurrectingTheNote`
+with the complete dependent fixture (memory_tracker, recall_prompt, mcq, image,
+conversation) on the deleted Target note. `publicationState` now carries
+`DependentCounts`, so across the retry the test compares the full dependent
+closure (equal before/after, and `== allAbsent()`), the accepted head/bundle
+unchanged, and the retained note/container intact. Reused accepted-proposal
+identity (same initialHead + same proposal bytes); no tombstone or new retry
+mechanism. `DependentCounts`/`dependentCounts`/`countConversationMessagesByNoteId`
+extracted to the shared `NotebookGitBundleControllerTestBase` (one representation
+of the dependent-closure concept), trimming slice 4's committed test to use the
+inherited helpers.
 
 ### 5. Recreating a permanently removed file creates a new note
 Type: Behavior
