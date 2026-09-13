@@ -91,7 +91,7 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
     controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
 
     MemoryTracker reloaded = memoryTrackerRepository.findById(trackerId).orElseThrow();
-    assertThat(reloaded.getDeletedAt(), is(nullValue()));
+    assertThat(reloaded.isActive(), is(true));
     assertThat(reloaded.getNote().getId(), equalTo(moon.getId()));
     assertThat(reloaded.getPropertyKey(), equalTo("a part of"));
     assertThat(reloaded.getType(), equalTo(MemoryTrackerType.UNDERSTANDING));

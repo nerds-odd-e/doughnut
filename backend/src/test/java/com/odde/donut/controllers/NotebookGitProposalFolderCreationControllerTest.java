@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -189,7 +190,7 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
         memoryTrackerRepository.findById(fixture.tracker().getId()).orElseThrow();
     assertThat(retained.getNote().getId(), equalTo(fixture.existing().getId()));
     assertThat(retained.getType(), equalTo(MemoryTrackerType.SPELLING));
-    assertThat(retained.getDeletedAt(), nullValue());
+    assertThat(retained.isActive(), is(true));
     Note noteA = noteByTitle(notes, "A");
     Note noteB = noteByTitle(notes, "B");
     assertThat(noteA.getId(), not(equalTo(fixture.existing().getId())));
@@ -465,8 +466,14 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
     assertThat(
         noteRepository.findById(occupied.getId()).orElseThrow().getTitle(), equalTo("addition"));
     assertThat(
-        memoryTrackerRepository.findById(fixture.tracker().getId()).orElseThrow().getDeletedAt(),
-        nullValue());
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                memoryTrackerRepository
+                    .findById(fixture.tracker().getId())
+                    .orElseThrow()
+                    .isActive()),
+        equalTo(true));
   }
 
   private LearnedNotebook boundNotebookWithLearnedNote() throws Exception {
@@ -516,7 +523,7 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
               notes.stream().map(Note::getContent).toList(),
               tracker == null ? null : tracker.getId(),
               tracker == null ? null : tracker.getType(),
-              tracker == null ? null : tracker.getDeletedAt());
+              tracker == null || tracker.isActive());
         });
   }
 
@@ -530,5 +537,5 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
       List<String> noteContents,
       Integer trackerId,
       MemoryTrackerType trackerType,
-      java.sql.Timestamp trackerDeletedAt) {}
+      boolean trackerActive) {}
 }

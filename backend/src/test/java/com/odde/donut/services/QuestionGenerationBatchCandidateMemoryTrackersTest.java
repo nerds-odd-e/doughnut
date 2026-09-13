@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
+import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
@@ -27,6 +28,7 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
+  @Autowired NoteService noteService;
 
   User user;
   Timestamp currentTime;
@@ -70,13 +72,11 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
   }
 
   @Test
-  void excludesDeletedTracker() {
+  void excludesTrackerForDeletedNote() {
+    Note deletedNote = makeMe.aNote().notebookOwnedBy(user).please();
     MemoryTracker deletedTracker =
-        makeMe
-            .aMemoryTrackerFor(makeMe.aNote().notebookOwnedBy(user).please())
-            .nextRecallAt(hoursFrom(currentTime, 1))
-            .deletedAt(currentTime)
-            .please();
+        makeMe.aMemoryTrackerFor(deletedNote).nextRecallAt(hoursFrom(currentTime, 1)).please();
+    noteService.destroy(deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, user);
 
     assertThat(candidateIds(), not(hasItem(deletedTracker.getId())));
   }

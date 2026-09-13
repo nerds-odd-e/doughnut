@@ -21,7 +21,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
       "SELECT CASE WHEN COUNT(rp) > 0 THEN true ELSE false END FROM MemoryTracker rp"
           + " WHERE rp.note.id = :noteId"
           + " AND rp.user.id = :userId"
-          + " AND rp.deletedAt IS NULL"
+          + " AND rp.note.deletedAt IS NULL"
           + " AND "
           + MemoryTrackerQueryFragments.JPA_WHERE_NOTE_LEVEL_TRACKER
           + " AND "
@@ -32,10 +32,11 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "
+              + " JOIN note n ON rp.note_id = n.id "
               + " WHERE rp.user_id = :userId "
               + "   AND rp.assimilated_at > :since "
               + "   AND rp.removed_from_tracking IS FALSE "
-              + "   AND rp.deleted_at IS NULL"
+              + "   AND n.deleted_at IS NULL"
               + "   AND rp.type = 'UNDERSTANDING'",
       nativeQuery = true)
   List<MemoryTracker> findAllByUserAndAssimilatedAtGreaterThan(
@@ -65,8 +66,9 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "
+              + " JOIN note n ON rp.note_id = n.id "
               + " WHERE rp.user_id = :userId "
-              + "   AND rp.deleted_at IS NULL "
+              + "   AND n.deleted_at IS NULL "
               + "   AND rp.note_id = :noteId",
       nativeQuery = true)
   List<MemoryTracker> findByUserAndNote(Integer userId, @Param("noteId") Integer noteId);
@@ -74,6 +76,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "
+              + " JOIN note n ON rp.note_id = n.id "
               + byUserIdWhere
               + " ORDER BY rp.assimilated_at DESC LIMIT 100",
       nativeQuery = true)
@@ -82,6 +85,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "
+              + " JOIN note n ON rp.note_id = n.id "
               + byUserIdWhere
               + " AND rp.last_recalled_at IS NOT NULL "
               + " ORDER BY rp.last_recalled_at DESC LIMIT 500",
@@ -92,80 +96,70 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
 
   String byUserIdFrom =
       " FROM memory_tracker rp "
+          + " JOIN note n ON rp.note_id = n.id "
           + " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
-          + "   AND rp.deleted_at IS NULL "
+          + "   AND n.deleted_at IS NULL "
           + "   AND rp.type <> 'COMMISSIONED' ";
 
   String byUserIdCommissionedFrom =
       " FROM memory_tracker rp "
+          + " JOIN note n ON rp.note_id = n.id "
           + " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
-          + "   AND rp.deleted_at IS NULL "
+          + "   AND n.deleted_at IS NULL "
           + "   AND rp.type = 'COMMISSIONED' ";
 
   String byUserIdWhere =
       " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
-          + "   AND rp.deleted_at IS NULL ";
+          + "   AND n.deleted_at IS NULL ";
 
-  @Query(
-      value =
-          "SELECT MAX(rp.assimilated_at) FROM memory_tracker rp "
-              + " WHERE rp.user_id = :userId "
-              + "   AND rp.deleted_at IS NULL",
-      nativeQuery = true)
+  String byUserIdAllFrom =
+      " FROM memory_tracker rp "
+          + " JOIN note n ON rp.note_id = n.id "
+          + " WHERE rp.user_id = :userId "
+          + "   AND n.deleted_at IS NULL";
+
+  @Query(value = "SELECT MAX(rp.assimilated_at) " + byUserIdAllFrom, nativeQuery = true)
   Timestamp findLastAssimilationTimeByUser(@Param("userId") Integer userId);
 
-  @Query(
-      value =
-          "SELECT MAX(rp.last_recalled_at) FROM memory_tracker rp "
-              + " WHERE rp.user_id = :userId "
-              + "   AND rp.deleted_at IS NULL",
-      nativeQuery = true)
+  @Query(value = "SELECT MAX(rp.last_recalled_at) " + byUserIdAllFrom, nativeQuery = true)
   Timestamp findLastRecallTimeByUser(@Param("userId") Integer userId);
 
-  @Query(
-      value =
-          "SELECT COUNT(*) FROM memory_tracker rp "
-              + " WHERE rp.user_id = :userId "
-              + "   AND rp.deleted_at IS NULL",
-      nativeQuery = true)
+  @Query(value = "SELECT COUNT(*) " + byUserIdAllFrom, nativeQuery = true)
   long countByUser(@Param("userId") Integer userId);
 
   @Query(
       value =
-          "SELECT mt.* FROM memory_tracker mt "
-              + "WHERE mt.user_id = :userId "
-              + "  AND mt.removed_from_tracking IS FALSE "
-              + "  AND mt.deleted_at IS NULL "
-              + "  AND mt.type <> 'SPELLING' "
-              + "  AND mt.type <> 'COMMISSIONED' "
-              + "  AND mt.next_recall_at <= :dueBy "
-              + "  AND NOT EXISTS ("
-              + "    SELECT 1 FROM recall_prompt rp "
-              + "    LEFT JOIN mcq ON rp.mcq_id = mcq.id "
-              + "    WHERE rp.memory_tracker_id = mt.id "
-              + "      AND rp.answer_id IS NULL "
+          "SELECT rp.* "
+              + byUserIdFrom
+              + "AND rp.type <> 'SPELLING' "
+              + "AND rp.next_recall_at <= :dueBy "
+              + "AND NOT EXISTS ("
+              + "    SELECT 1 FROM recall_prompt rcl "
+              + "    LEFT JOIN mcq ON rcl.mcq_id = mcq.id "
+              + "    WHERE rcl.memory_tracker_id = rp.id "
+              + "      AND rcl.answer_id IS NULL "
               + "      AND (mcq.id IS NULL OR mcq.is_contested = false)"
               + "  ) "
-              + "  AND NOT EXISTS ("
+              + "AND NOT EXISTS ("
               + "    SELECT 1 FROM question_generation_batch_request qgbr "
-              + "    WHERE qgbr.memory_tracker_id = mt.id "
+              + "    WHERE qgbr.memory_tracker_id = rp.id "
               + "      AND qgbr.status IN ('PENDING', 'OUTPUT_READY') "
               + "  ) "
-              + "  AND ("
+              + "AND ("
               + "    SELECT COUNT(*) FROM question_generation_batch_request qgbr "
-              + "    WHERE qgbr.memory_tracker_id = mt.id "
+              + "    WHERE qgbr.memory_tracker_id = rp.id "
               + "      AND qgbr.status = 'FAILED' "
               + "      AND NOT EXISTS ("
               + "        SELECT 1 FROM question_generation_batch_request imported "
-              + "        WHERE imported.memory_tracker_id = mt.id "
+              + "        WHERE imported.memory_tracker_id = rp.id "
               + "          AND imported.status = 'IMPORTED' "
               + "          AND imported.id > qgbr.id"
               + "      )"
-              + "  ) < 2 "
-              + "ORDER BY mt.next_recall_at",
+              + ") < 2 "
+              + "ORDER BY rp.next_recall_at",
       nativeQuery = true)
   List<MemoryTracker> findBatchQuestionGenerationCandidatesByUser(
       @Param("userId") Integer userId, @Param("dueBy") Timestamp dueBy);

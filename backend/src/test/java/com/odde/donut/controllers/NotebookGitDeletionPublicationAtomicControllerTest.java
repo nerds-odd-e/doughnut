@@ -101,7 +101,7 @@ class NotebookGitDeletionPublicationAtomicControllerTest
           assertThat(reloadedRetained.getUpdatedAt(), is(retainedUpdatedAt));
           MemoryTracker reloadedTracker =
               memoryTrackerRepository.findById(deletedATracker.getId()).orElseThrow();
-          assertThat(reloadedTracker.getDeletedAt(), nullValue());
+          assertThat(reloadedTracker.isActive(), equalTo(true));
           assertThat(reloadedTracker.getDifficulty(), equalTo(deletedATracker.getDifficulty()));
           assertThat(reloadedTracker.getStability(), equalTo(deletedATracker.getStability()));
           assertThat(

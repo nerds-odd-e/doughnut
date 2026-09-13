@@ -58,8 +58,14 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
         rejectWhenAWebCreationHasDriftedTheProjection(this::isolatedDeletionProposalBundle);
     assertThat(remaining.acceptedNote().getDeletedAt(), nullValue());
     assertThat(
-        memoryTrackerRepository.findById(remaining.tracker().getId()).orElseThrow().getDeletedAt(),
-        nullValue());
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                memoryTrackerRepository
+                    .findById(remaining.tracker().getId())
+                    .orElseThrow()
+                    .isActive()),
+        equalTo(true));
   }
 
   private DriftedWebCreation rejectWhenAWebCreationHasDriftedTheProjection(

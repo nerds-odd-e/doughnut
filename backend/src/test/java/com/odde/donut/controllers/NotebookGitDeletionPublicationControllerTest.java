@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteRecallInfo;
@@ -79,9 +78,12 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
     assertSoftDeletedWithLearning(deletedB, deletedBTracker);
     Note reloadedRetained = noteRepository.findById(retained.getId()).orElseThrow();
     assertThat(reloadedRetained.getContent(), equalTo(EDITED_CONTENT));
-    MemoryTracker stillLiveTracker =
-        memoryTrackerRepository.findById(retainedTracker.getId()).orElseThrow();
-    assertThat(stillLiveTracker.getDeletedAt(), nullValue());
+    assertThat(
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                memoryTrackerRepository.findById(retainedTracker.getId()).orElseThrow().isActive()),
+        equalTo(true));
     NoteRecallInfo retainedRecall = noteController.getNoteInfo(reloadedRetained);
     assertThat(retainedRecall.getMemoryTrackers(), hasSize(1));
     assertThat(
@@ -165,8 +167,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
         stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
     assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
     assertThat(stateAfterRetry.noteDeletedAt(), equalTo(stateAfterPublication.noteDeletedAt()));
-    assertThat(
-        stateAfterRetry.trackerDeletedAt(), equalTo(stateAfterPublication.trackerDeletedAt()));
+    assertThat(stateAfterRetry.trackerActive(), equalTo(stateAfterPublication.trackerActive()));
   }
 
   @Test
@@ -215,7 +216,11 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
     Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
     assertThat(reloaded.getDeletedAt(), notNullValue());
     MemoryTracker deletedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
-    assertThat(deletedTracker.getDeletedAt(), notNullValue());
+    assertThat(
+        inCommittedTransaction(
+            transactionManager,
+            () -> memoryTrackerRepository.findById(tracker.getId()).orElseThrow().isActive()),
+        equalTo(false));
     assertThat(deletedTracker.getDifficulty(), equalTo(tracker.getDifficulty()));
     assertThat(deletedTracker.getStability(), equalTo(tracker.getStability()));
     assertThat(noteController.getNoteInfo(reloaded).getMemoryTrackers(), hasSize(0));
@@ -242,7 +247,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
               binding.getUpdatedAt(),
               binding.getBundleBytes().clone(),
               reloadedNote.getDeletedAt(),
-              reloadedTracker.getDeletedAt());
+              reloadedTracker.isActive());
         });
   }
 
@@ -251,5 +256,5 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
       Timestamp bindingUpdatedAt,
       byte[] bundleBytes,
       Timestamp noteDeletedAt,
-      Timestamp trackerDeletedAt) {}
+      boolean trackerActive) {}
 }

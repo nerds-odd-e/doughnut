@@ -149,6 +149,19 @@ class NoteControllerDeleteTests extends ControllerTestBase {
       }
 
       @Test
+      void shouldExcludeDeletedNotesFromAssimilationQueue()
+          throws UnexpectedNoAccessRightException {
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
+
+        assertThat(
+            userService
+                .getUnassimilatedNotes(currentUser.getUser())
+                .map(unit -> unit.note().getId())
+                .toList(),
+            not(hasItem(subject.getId())));
+      }
+
+      @Test
       void shouldRestoreMemoryTrackersWhenNoteIsRestored() throws UnexpectedNoAccessRightException {
         makeMe.aMemoryTrackerFor(subject).please();
 
@@ -156,6 +169,24 @@ class NoteControllerDeleteTests extends ControllerTestBase {
         controller.undoDeleteNote(subject);
 
         assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(1));
+      }
+
+      @Test
+      void shouldPreserveRemovedFromTrackingPreferenceAcrossDeleteAndUndo()
+          throws UnexpectedNoAccessRightException {
+        MemoryTracker removedTracker =
+            makeMe.aMemoryTrackerFor(subject).removedFromTracking().please();
+
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
+        assertThat(subject.getDeletedAt(), is(not(nullValue())));
+        assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(0));
+
+        controller.undoDeleteNote(subject);
+        assertThat(subject.getDeletedAt(), is(nullValue()));
+        var restoredTrackers = userService.getMemoryTrackersFor(currentUser.getUser(), subject);
+        assertThat(restoredTrackers, hasSize(1));
+        assertThat(restoredTrackers.getFirst().getId(), equalTo(removedTracker.getId()));
+        assertThat(restoredTrackers.getFirst().getRemovedFromTracking(), is(true));
       }
     }
   }
