@@ -14,8 +14,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Remove memory tracker deleted_at and rely on note deletion state](seeds/SEED-019-note-owned-memory-tracker-deletion-state.md#story-1) — SEED-019
-
 ## Backlog list
 
 - [Portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
