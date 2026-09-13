@@ -166,7 +166,7 @@ public class NotebookGitProposalPublisher {
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.DELETED) {
         Note deletedNote =
             projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());
-        noteService.destroy(
+        noteService.permanentlyRemove(
             deletedNote,
             NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS,
             authorizationService.getCurrentUser());

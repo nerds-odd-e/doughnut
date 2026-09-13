@@ -120,17 +120,18 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerT
     assertThat(copyView.getNote().getContent(), equalTo(COPIED_CONTENT));
     assertHasNoPrivateAssociations(copy);
 
+    // The deleted original and its complete dependent data are permanently gone.
     inCommittedTransaction(
         transactionManager,
         () -> {
-          MemoryTracker tracker =
-              memoryTrackerRepository.findById(associations.trackerId()).orElseThrow();
-          assertThat(tracker.getNote().getId(), equalTo(original.getId()));
-          Mcq mcq = mcqRepository.findById(associations.mcqId()).orElseThrow();
-          assertThat(mcq.getNote().getId(), equalTo(original.getId()));
-          Conversation conversation =
-              conversationRepository.findById(associations.conversationId()).orElseThrow();
-          assertThat(conversation.getSubject().getNote().getId(), equalTo(original.getId()));
+          assertThat(noteRepository.findById(original.getId()).isPresent(), equalTo(false));
+          assertThat(
+              memoryTrackerRepository.findById(associations.trackerId()).isPresent(),
+              equalTo(false));
+          assertThat(mcqRepository.findById(associations.mcqId()).isPresent(), equalTo(false));
+          assertThat(
+              conversationRepository.findById(associations.conversationId()).isPresent(),
+              equalTo(false));
         });
   }
 

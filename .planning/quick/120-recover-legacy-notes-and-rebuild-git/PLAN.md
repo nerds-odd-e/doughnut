@@ -156,7 +156,7 @@ changes were needed (plain `@ManyToOne`, no cascade conflicts).
 
 ### 3. Published file removal permanently deletes its note
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes after slice 2, medium confidence; backend wait exception.
 
 Behavior: A fresh valid Git proposal removes an ordinary note file; publication
@@ -169,6 +169,16 @@ fixture, read absence after a fresh transaction, and download the accepted tree
 to observe file absence. Both learned and unlearned note shapes follow the same
 rule; no recognition by fixture count. Safe stop: File deletion has its new
 agreed meaning while retained legacy soft-deleted data still exists.
+
+Learning: New `NoteService.permanentlyRemove` hard-deletes the note row (slice-2
+CASCADE removes dependents); `NotebookGitProposalPublisher` DELETED branch now
+calls it instead of `destroy`. `authored_note_reference` has no inbound target
+FK to `note`, so source-owned refs are cascade-removed and inbound referrer text
+survives as dead links (LEAVE_DEAD_LINKS). The retired "Git-deletion reserves the
+deleted note's title" behavior (encoded by `NotebookGitDeletedDestinationControllerTest`)
+was removed with the behavior change; slice 5 owns the positive same-path
+recreation proof. Web `deleteNote`/`destroy`/`restore` soft-delete paths are
+untouched (legacy recovery until slice 11).
 
 ### 4. Failed deletion publication leaves the accepted notebook intact
 Type: Behavior

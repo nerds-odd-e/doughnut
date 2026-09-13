@@ -224,8 +224,7 @@ class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControlle
                 new NotebookGitProposalFile("Keeper.md", EDITED_NOTE_CONTENT))));
 
     assertThat(noteRepository.findById(moved.getId()).orElseThrow().getTitle(), equalTo("Moved"));
-    assertThat(
-        noteRepository.findById(deleted.getId()).orElseThrow().getDeletedAt(), not(equalTo(null)));
+    assertThat(noteRepository.findById(deleted.getId()).isPresent(), equalTo(false));
   }
 
   @Test

@@ -152,6 +152,21 @@ public class NoteService {
     entityPersister.flush();
   }
 
+  /**
+   * Permanently removes {@code note} and its complete dependent data. The note row is hard-deleted;
+   * note-owned dependents (memory_tracker, recall_prompt, mcq, image, conversation, and
+   * authored_note_reference source rows) are removed by their ON DELETE CASCADE foreign keys. The
+   * reference-handling contract is applied first so authored inbound text in referrer notes is
+   * preserved for {@link NoteDeleteReferenceHandling#LEAVE_DEAD_LINKS}. Used by Git publication of
+   * a file deletion; web trash and legacy recovery still use {@link #destroy}.
+   */
+  public void permanentlyRemove(
+      Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    applyNoteDeleteReferenceHandling(note, referenceHandling, null, viewer, currentUTCTimestamp);
+    entityPersister.remove(note);
+  }
+
   public void applyNoteDeleteReferenceHandling(
       Note note,
       NoteDeleteReferenceHandling referenceHandling,
