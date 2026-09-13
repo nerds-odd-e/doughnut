@@ -79,8 +79,9 @@ const getCurrentContent = (): string => {
 }
 
 const getOldContent = (): string => {
-  if (!history.value?.textContent) return ""
-  return history.value.textContent
+  const undo = history.value
+  if (undo?.type !== "edit title" && undo?.type !== "edit content") return ""
+  return undo.textContent ?? ""
 }
 
 const getUndoMessage = (): string => {
@@ -103,6 +104,10 @@ const getUndoMessage = (): string => {
       return noteTopology
         ? "Are you sure you want to undo deleting "
         : `Are you sure you want to undo deleting ${noteIdentifier}?`
+    case "trash note":
+      return noteTopology
+        ? "Are you sure you want to undo trashing "
+        : `Are you sure you want to undo trashing ${noteIdentifier}?`
     case "create note":
       return noteTopology
         ? "Are you sure you want to undo creating "

@@ -24,6 +24,11 @@ describe("NoteUndoButton visibility", () => {
 
   it.each([
     {
+      setup: (noteId: number) =>
+        noteEditingHistory.trashNote(noteId, "Note", null),
+      expectedTitle: "undo trash note",
+    },
+    {
       setup: (noteId: number) => noteEditingHistory.deleteNote(noteId),
       expectedTitle: "undo delete note",
     },

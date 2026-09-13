@@ -1,6 +1,10 @@
 <template>
-  <div class="daisy-alert daisy-alert-warning" v-if="note.deletedAt">
-    This note has been deleted
+  <div
+    class="daisy-alert daisy-alert-warning"
+    data-testid="note-availability-warning"
+    v-if="note.deletedAt || trashed"
+  >
+    {{ trashed ? "This note is in trash" : "This note has been deleted" }}
   </div>
   <NoteEditableTitle
     v-bind="{
@@ -44,6 +48,7 @@ defineProps({
   wikiLinks: { type: Array as PropType<WikiLink[]>, required: true },
   isReadmeContext: { type: Boolean, default: false },
   hasInboundReferences: { type: Boolean, default: false },
+  trashed: { type: Boolean, default: false },
 })
 
 defineEmits<{ deadWikiLinkClick: [payload: DeadWikiLinkPayload] }>()

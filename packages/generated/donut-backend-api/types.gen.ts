@@ -334,6 +334,11 @@ export type SpellingVerificationResult = {
     correct?: boolean;
 };
 
+export type NoteDeleteDto = {
+    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS' | 'REDUCE_TO_SOURCE_PROPERTY';
+    sourcePropertyKey?: string;
+};
+
 export type SearchTerm = {
     searchKey: string;
     allMyNotebooksAndSubscriptions?: boolean;
@@ -391,11 +396,6 @@ export type NoteImageUploadResult = {
      * Path suitable for the note frontmatter `image:` scalar (e.g. /attachments/images/{id}/{filename}).
      */
     imagePath: string;
-};
-
-export type NoteDeleteDto = {
-    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS' | 'REDUCE_TO_SOURCE_PROPERTY';
-    sourcePropertyKey?: string;
 };
 
 export type NotebookUpdateRequest = {
@@ -851,6 +851,14 @@ export type NoteUpdateContentDto = {
 
 export type UpdateNotebookGroupRequest = {
     notebookGroupId?: number;
+};
+
+export type NoteTrashUndoDto = {
+    priorTitle: string;
+    /**
+     * Prior containing folder id, or null when the note was at notebook root.
+     */
+    priorFolderId?: number;
 };
 
 /**
@@ -1923,6 +1931,24 @@ export type VerifySpellingResponses = {
 
 export type VerifySpellingResponse = VerifySpellingResponses[keyof VerifySpellingResponses];
 
+export type TrashNoteData = {
+    body: NoteDeleteDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/trash';
+};
+
+export type TrashNoteResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type TrashNoteResponse = TrashNoteResponses[keyof TrashNoteResponses];
+
 export type SemanticSearchWithinData = {
     body: SearchTerm;
     path: {
@@ -2977,6 +3003,24 @@ export type UpdateSubscriptionGroupResponses = {
 };
 
 export type UpdateSubscriptionGroupResponse = UpdateSubscriptionGroupResponses[keyof UpdateSubscriptionGroupResponses];
+
+export type UndoTrashNoteData = {
+    body: NoteTrashUndoDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/undo-trash';
+};
+
+export type UndoTrashNoteResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type UndoTrashNoteResponse = UndoTrashNoteResponses[keyof UndoTrashNoteResponses];
 
 export type UndoDeleteNoteData = {
     body?: never;

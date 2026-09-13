@@ -85,8 +85,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Note Controller
 
 - `verifySpelling`: POST `/api/notes/{note}/verify-spelling` -> `VerifySpellingResponse` (request: `VerifySpellingData`; path: note; body: AnswerSpellingDto; response body: SpellingVerificationResult)
+- `trashNote`: POST `/api/notes/{note}/trash` -> `TrashNoteResponse` (request: `TrashNoteData`; path: note; body: NoteDeleteDto; response body: NoteRealm)
 - `uploadNoteImage`: POST `/api/notes/{note}/images` -> `UploadNoteImageResponse` (request: `UploadNoteImageData`; path: note; body: NoteImageUploadDto; response body: NoteImageUploadResult)
 - `deleteNote`: POST `/api/notes/{note}/delete` -> `DeleteNoteResponse` (request: `DeleteNoteData`; path: note; body: NoteDeleteDto; response body: Array<NoteRealm>)
+- `undoTrashNote`: PATCH `/api/notes/{note}/undo-trash` -> `UndoTrashNoteResponse` (request: `UndoTrashNoteData`; path: note; body: NoteTrashUndoDto; response body: NoteRealm)
 - `undoDeleteNote`: PATCH `/api/notes/{note}/undo-delete` -> `UndoDeleteNoteResponse` (request: `UndoDeleteNoteData`; path: note; response body: NoteRealm)
 - `showNote`: GET `/api/notes/{note}` -> `ShowNoteResponse` (request: `ShowNoteData`; path: note; response body: NoteRealm)
 - `getNoteInfo`: GET `/api/notes/{note}/note-info` -> `GetNoteInfoResponse` (request: `GetNoteInfoData`; path: note; response body: NoteRecallInfo)

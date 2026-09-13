@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 import org.springframework.lang.NonNull;
 
 @Entity
@@ -29,6 +30,12 @@ import org.springframework.lang.NonNull;
 @JsonPropertyOrder({"noteTopology", "content"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
+  private static final String NATIVE_TRASHED =
+      "coalesce(n.folder_id in (select tf.id from trashed_folder tf), false)";
+  public static final String JPA_AVAILABLE = "n.deletedAt IS NULL AND n.trashedInDatabase = false";
+  public static final String NATIVE_SELECT = "n.*, " + NATIVE_TRASHED + " AS trashedInDatabase";
+  public static final String NATIVE_AVAILABLE =
+      "n.deleted_at IS NULL AND " + NATIVE_TRASHED + " = false";
 
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 
@@ -44,6 +51,9 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Folder folder;
+
+  @Formula("coalesce(folder_id in (select tf.id from trashed_folder tf), false)")
+  private boolean trashedInDatabase;
 
   @Column(name = "content", columnDefinition = "mediumtext")
   @Getter
@@ -78,6 +88,16 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
+
+  @JsonIgnore
+  public boolean isAvailable() {
+    return deletedAt == null && !isTrashed();
+  }
+
+  @JsonIgnore
+  public boolean isTrashed() {
+    return folder != null && folder.isTrashed();
+  }
 
   @OneToMany(mappedBy = "note")
   @JsonIgnore

@@ -1,5 +1,6 @@
 package com.odde.donut.entities.repositories;
 
+import com.odde.donut.entities.Note;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +30,9 @@ class NonProdNoteEmbeddingSemanticSearcher {
             + " AS emb,\n"
             + "         ROW_NUMBER() OVER (PARTITION BY ne.note_id ORDER BY ne.updated_at DESC) rn\n"
             + "  FROM note_embeddings ne\n"
-            + "  JOIN note n ON n.id = ne.note_id AND n.deleted_at IS NULL\n"
+            + "  JOIN note n ON n.id = ne.note_id AND "
+            + Note.NATIVE_AVAILABLE
+            + "\n"
             + "  JOIN notebook nb ON nb.id = n.notebook_id AND nb.deleted_at IS NULL\n"
             + "  LEFT JOIN ownership o ON o.id = nb.ownership_id\n"
             + "  WHERE "

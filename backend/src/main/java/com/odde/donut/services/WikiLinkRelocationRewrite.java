@@ -87,7 +87,7 @@ public class WikiLinkRelocationRewrite {
       Set<Integer> movedNoteIds,
       Timestamp updatedAt,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
-    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+    WikiLinkRewriteSupport.forEachAvailableNoteInMoveSet(
         entityManager,
         movedNoteIds,
         note ->
@@ -129,7 +129,7 @@ public class WikiLinkRelocationRewrite {
       String newFolderName,
       Timestamp updatedAt,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
-    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+    WikiLinkRewriteSupport.forEachAvailableNoteInMoveSet(
         entityManager,
         noteIdsInSubtree,
         note ->
@@ -150,7 +150,7 @@ public class WikiLinkRelocationRewrite {
       String newNotebookName,
       Timestamp updatedAt,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
-    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+    WikiLinkRewriteSupport.forEachAvailableNoteInMoveSet(
         entityManager,
         movedNoteIds,
         note ->
@@ -170,7 +170,7 @@ public class WikiLinkRelocationRewrite {
       Timestamp updatedAt,
       User viewer,
       Map<Integer, Map<String, Note>> coMovedTargetsByAuthoredLinkByNoteId) {
-    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+    WikiLinkRewriteSupport.forEachAvailableNoteInMoveSet(
         entityManager,
         movedNoteIds,
         note ->

@@ -65,7 +65,7 @@
       <DropdownMenuActionButton
         :title="titles.delete"
         :icon="Trash2"
-        @click="deleteNote"
+        @click="trashNote"
       />
     </DropdownMenuItem>
   </template>
@@ -145,7 +145,7 @@
       :class="toolbarGhostBtnClass"
       :title="titles.delete"
       :aria-label="titles.delete"
-      @click="deleteNote"
+      @click="trashNote"
     >
       <Trash2 class="w-6 h-6" aria-hidden="true" />
     </button>
@@ -175,7 +175,7 @@ import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import RefineNoteModal from "@/components/recall/RefineNoteModal.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
-import { useNoteDeleteFlow } from "@/composables/useNoteDeleteFlow"
+import { useNoteTrashFlow } from "@/composables/useNoteTrashFlow"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
@@ -217,7 +217,7 @@ const { toggle, isOpenForNote } = useAssimilationView()
 const { isAudioOpen, toggleAudio } = useNoteToolbarPanel()
 const noteId = computed(() => props.note.id)
 const noteTitle = computed(() => props.note.noteTopology.title)
-const { deleteNote } = useNoteDeleteFlow(noteId, noteTitle)
+const { trashNote } = useNoteTrashFlow(noteId, noteTitle)
 
 const exportPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
 const shortcutScope = useNoteShortcutScope()
@@ -231,7 +231,7 @@ useKeyboardShortcut(
   shortcutsEnabled
 )
 
-useKeyboardShortcut("note-delete", deleteNote, shortcutsEnabled)
+useKeyboardShortcut("note-delete", trashNote, shortcutsEnabled)
 
 const noteHasContent = computed(() => hasNoteContent(props.note.content))
 const showRefineNoteModal = ref(false)

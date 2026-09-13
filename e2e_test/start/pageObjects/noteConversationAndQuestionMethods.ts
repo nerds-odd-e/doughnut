@@ -9,17 +9,17 @@ import { questionListPage } from './questionListPage'
 import { toolbarButton } from './toolbarButton'
 
 export const noteConversationAndQuestionMethods = () => ({
-  deleteNote() {
-    this.moreOptions().deleteNote()
+  trashNote() {
+    this.moreOptions().trashNote()
   },
   deleteRelationshipNote() {
     this.moreOptions().deleteRelationshipNote()
   },
-  deleteNoteAndLeaveReferencesAsDeadWikiLinks() {
-    this.moreOptions().deleteNoteAndLeaveReferencesAsDeadWikiLinks()
+  trashNoteAndLeaveReferencesAsDeadWikiLinks() {
+    this.moreOptions().trashNoteAndLeaveReferencesAsDeadWikiLinks()
   },
-  deleteNoteAndRemoveFromReferenceProperties() {
-    this.moreOptions().deleteNoteAndRemoveFromReferenceProperties()
+  trashNoteAndRemoveFromReferenceProperties() {
+    this.moreOptions().trashNoteAndRemoveFromReferenceProperties()
   },
   deleteNoteAndReduceToSourceProperty() {
     this.moreOptions().deleteNoteAndReduceToSourceProperty()

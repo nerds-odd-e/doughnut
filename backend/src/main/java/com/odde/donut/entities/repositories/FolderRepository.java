@@ -10,47 +10,49 @@ import org.springframework.data.repository.query.Param;
 
 public interface FolderRepository extends CrudRepository<Folder, Integer> {
 
-  String folderNameLike =
-      " WHERE LOWER(f.name) LIKE LOWER(:pattern) AND f.notebook.deletedAt IS NULL ";
-  String folderNameExact = " WHERE LOWER(f.name) = LOWER(:key) AND f.notebook.deletedAt IS NULL ";
+  String FOLDER_SEARCHABLE = " AND f.notebook.deletedAt IS NULL AND f.trashedInDatabase = false ";
+  String FOLDER_NAME_LIKE = " WHERE LOWER(f.name) LIKE LOWER(:pattern)" + FOLDER_SEARCHABLE;
+  String FOLDER_NAME_EXACT = " WHERE LOWER(f.name) = LOWER(:key)" + FOLDER_SEARCHABLE;
 
-  @Query("SELECT f FROM Folder f" + folderNameLike + " AND f.notebook.id = :notebookId")
+  @Query("SELECT f FROM Folder f" + FOLDER_NAME_LIKE + " AND f.notebook.id = :notebookId")
   List<Folder> searchInNotebook(
       @Param("notebookId") Integer notebookId, @Param("pattern") String pattern, Pageable pageable);
 
-  @Query("SELECT f FROM Folder f" + folderNameExact + " AND f.notebook.id = :notebookId")
+  @Query("SELECT f FROM Folder f" + FOLDER_NAME_EXACT + " AND f.notebook.id = :notebookId")
   List<Folder> searchExactInNotebook(
       @Param("notebookId") Integer notebookId, @Param("key") String key);
 
-  @Query("SELECT f FROM Folder f" + folderNameLike + " AND f.notebook.ownership.user.id = :userId")
+  @Query(
+      "SELECT f FROM Folder f" + FOLDER_NAME_LIKE + " AND f.notebook.ownership.user.id = :userId")
   List<Folder> searchForUserInAllMyNotebooks(
       @Param("userId") Integer userId, @Param("pattern") String pattern, Pageable pageable);
 
-  @Query("SELECT f FROM Folder f" + folderNameExact + " AND f.notebook.ownership.user.id = :userId")
+  @Query(
+      "SELECT f FROM Folder f" + FOLDER_NAME_EXACT + " AND f.notebook.ownership.user.id = :userId")
   List<Folder> searchExactForUserInAllMyNotebooks(
       @Param("userId") Integer userId, @Param("key") String key);
 
   @Query(
       "SELECT f FROM Folder f JOIN f.notebook.subscriptions s ON s.user.id = :userId"
-          + folderNameLike)
+          + FOLDER_NAME_LIKE)
   List<Folder> searchForUserInAllMySubscriptions(
       @Param("userId") Integer userId, @Param("pattern") String pattern, Pageable pageable);
 
   @Query(
       "SELECT f FROM Folder f JOIN f.notebook.subscriptions s ON s.user.id = :userId"
-          + folderNameExact)
+          + FOLDER_NAME_EXACT)
   List<Folder> searchExactForUserInAllMySubscriptions(
       @Param("userId") Integer userId, @Param("key") String key);
 
   @Query(
       "SELECT f FROM Folder f JOIN f.notebook.ownership.circle.members m ON m.id = :userId"
-          + folderNameLike)
+          + FOLDER_NAME_LIKE)
   List<Folder> searchForUserInAllMyCircle(
       @Param("userId") Integer userId, @Param("pattern") String pattern, Pageable pageable);
 
   @Query(
       "SELECT f FROM Folder f JOIN f.notebook.ownership.circle.members m ON m.id = :userId"
-          + folderNameExact)
+          + FOLDER_NAME_EXACT)
   List<Folder> searchExactForUserInAllMyCircle(
       @Param("userId") Integer userId, @Param("key") String key);
 

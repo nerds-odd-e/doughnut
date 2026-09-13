@@ -234,7 +234,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean isActive() {
-    return getNote().getDeletedAt() == null && !Boolean.TRUE.equals(removedFromTracking);
+    return getNote().isAvailable() && !Boolean.TRUE.equals(removedFromTracking);
   }
 
   @JsonIgnore

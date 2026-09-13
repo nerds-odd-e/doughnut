@@ -1,4 +1,4 @@
-Feature: Note deletion
+Feature: Note trash
 
   Background:
     Given I am logged in as an existing user
@@ -10,60 +10,60 @@ Feature: Note deletion
       | TDD            | LeSS in Action/tech |
       | CI System      | LeSS in Action/tech |
 
-  Scenario: Delete a note
-    When I delete note "TDD"
-    Then I should see the note "TDD" is marked as deleted
+  Scenario: Trash a note
+    When I trash note "TDD"
+    Then I should see the note "TDD" is in trash
 
-  Scenario: Deleting a note in a folder opens that folder page
-    When I delete note "TDD"
+  Scenario: Trashing a note in a folder opens that folder page
+    When I trash note "TDD"
     Then I should be on a notebook folder page
 
-  Scenario: Deleting a note at notebook root opens the notebook page
-    When I delete note "LeSS in Action"
+  Scenario: Trashing a note at notebook root opens the notebook page
+    When I trash note "LeSS in Action"
     Then I should be on the notebook root page
 
-  Scenario: Deleting a note leaves folder peers
+  Scenario: Trashing a note leaves folder peers
     Given there is "a part of" relationship between note "TDD" and "tech" in notebook "LeSS training"
     And I should see "TDD" has relationship "a part of" "tech"
-    When I delete note "TDD" and leave references as dead wiki links
+    When I trash note "TDD" and leave references as dead wiki links
     Then I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
 
-  Scenario: Undo delete restores relationships
+  Scenario: Immediate Undo restores a trashed note and its relationships
     Given there is "a part of" relationship between note "TDD" and "tech" in notebook "LeSS training"
-    And I delete note "TDD" and leave references as dead wiki links
-    When I undo "delete note"
+    And I trash note "TDD" and leave references as dead wiki links
+    When I undo "trash note"
     Then I should see "TDD" has relationship "a part of" "tech"
 
   @ignore
-  Scenario: Delete a note then delete its parent and undo
-    Given I delete note "TDD" at 13:00
-    And I delete note "tech" at 14:00
-    When I undo delete note to recover note "tech"
+  Scenario: Trash a note then trash its parent and undo
+    Given I trash note "TDD" at 13:00
+    And I trash note "tech" at 14:00
+    When I undo trash note to recover note "tech"
     And I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
-    When I undo delete note to recover note "TDD"
+    When I undo trash note to recover note "TDD"
     And I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
       | TDD        |
 
-  Scenario: Deleting a note does not remove other notes by structural descent
+  Scenario: Trashing a note does not remove other notes by structural descent
     Given I have a notebook "Descendants suite" with notes:
       | Title            | Folder                        |
       | Descendants Test |                               |
       | parent           | Descendants Test              |
       | child            | Descendants Test/parent       |
       | Unit Test        | Descendants Test/parent/child |
-    When I delete note "child"
-    Then I should see the note "child" is marked as deleted
+    When I trash note "child"
+    Then I should see the note "child" is in trash
     And I should see folder "Descendants suite/Descendants Test/parent/child" containing these notes:
       | note-title |
       | Unit Test  |
 
-  Scenario: Deleting a note leaves inbound relationship notes and folder peers
+  Scenario: Trashing a note leaves inbound relationship notes and folder peers
     Given I have a notebook "References suite" with notes:
       | Title           | Folder          |
       | References Test |                 |
@@ -71,14 +71,14 @@ Feature: Note deletion
       | target          | References Test |
     And there is "a part of" relationship between note "source" and "target" in notebook "References suite"
     And I should see "source" has relationship "a part of" "target"
-    When I delete note "target" and leave references as dead wiki links
+    When I trash note "target" and leave references as dead wiki links
     And I navigate to References suite/References Test note
     Then I should see folder "References suite/References Test" containing these notes:
       | note-title |
       | source     |
     And I should see note "References suite/References Test/source" has relationship "a part of" "target"
 
-  Scenario: Deleting a referenced note can remove it from reference properties while leaving body wiki links dead
+  Scenario: Trashing a referenced note can remove it from reference properties while leaving body wiki links dead
     Given I have a notebook "Reference cleanup suite" with notes:
       | Title             | Folder            |
       | Reference Cleanup |                   |
@@ -90,7 +90,7 @@ Feature: Note deletion
       ---
       Body keeps [[target]]
       """
-    When I delete note "target" and remove it from properties of references
+    When I trash note "target" and remove it from properties of references
     And I navigate to Reference cleanup suite/Reference Cleanup/source note
     Then I should not see rich note property "target"
     And I should see wiki link "target" as a dead wiki link

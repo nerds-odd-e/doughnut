@@ -10,7 +10,11 @@ public interface NoteStructuralPeerQueries {
 
   @Query(
       value =
-          "SELECT n.* FROM note n WHERE n.folder_id = :folderId AND n.deleted_at IS NULL "
+          "SELECT "
+              + Note.NATIVE_SELECT
+              + " FROM note n WHERE n.folder_id = :folderId AND "
+              + Note.NATIVE_AVAILABLE
+              + " "
               + "AND n.id NOT IN (:excludeIds) ORDER BY n.id ASC LIMIT :limit",
       nativeQuery = true)
   List<Note> findStructuralPeersInFolderOrderByIdAscLimited(
@@ -20,7 +24,11 @@ public interface NoteStructuralPeerQueries {
 
   @Query(
       value =
-          "SELECT n.* FROM note n WHERE n.folder_id = :folderId AND n.deleted_at IS NULL "
+          "SELECT "
+              + Note.NATIVE_SELECT
+              + " FROM note n WHERE n.folder_id = :folderId AND "
+              + Note.NATIVE_AVAILABLE
+              + " "
               + "AND n.id NOT IN (:excludeIds) "
               + "ORDER BY CRC32(CONCAT(CAST(n.id AS CHAR), CAST(:seed AS CHAR))) ASC LIMIT :limit",
       nativeQuery = true)
@@ -32,8 +40,12 @@ public interface NoteStructuralPeerQueries {
 
   @Query(
       value =
-          "SELECT n.* FROM note n WHERE n.notebook_id = :notebookId AND n.folder_id IS NULL "
-              + "AND n.deleted_at IS NULL AND n.id NOT IN (:excludeIds) ORDER BY n.id ASC LIMIT :limit",
+          "SELECT "
+              + Note.NATIVE_SELECT
+              + " FROM note n WHERE n.notebook_id = :notebookId AND n.folder_id IS NULL "
+              + "AND "
+              + Note.NATIVE_AVAILABLE
+              + " AND n.id NOT IN (:excludeIds) ORDER BY n.id ASC LIMIT :limit",
       nativeQuery = true)
   List<Note> findStructuralPeersInNotebookRootOrderByIdAscLimited(
       @Param("notebookId") Integer notebookId,
@@ -42,8 +54,12 @@ public interface NoteStructuralPeerQueries {
 
   @Query(
       value =
-          "SELECT n.* FROM note n WHERE n.notebook_id = :notebookId AND n.folder_id IS NULL "
-              + "AND n.deleted_at IS NULL AND n.id NOT IN (:excludeIds) "
+          "SELECT "
+              + Note.NATIVE_SELECT
+              + " FROM note n WHERE n.notebook_id = :notebookId AND n.folder_id IS NULL "
+              + "AND "
+              + Note.NATIVE_AVAILABLE
+              + " AND n.id NOT IN (:excludeIds) "
               + "ORDER BY CRC32(CONCAT(CAST(n.id AS CHAR), CAST(:seed AS CHAR))) ASC LIMIT :limit",
       nativeQuery = true)
   List<Note> findStructuralPeersInNotebookRootOrderBySeedLimited(

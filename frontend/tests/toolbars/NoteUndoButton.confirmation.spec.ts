@@ -25,6 +25,17 @@ describe("NoteUndoButton confirmation dialog", () => {
   describe("when note is in cache", () => {
     it.each([
       {
+        action: "trash note",
+        setup: (noteRealm: ReturnType<typeof makeMe.aNoteRealm.please>) =>
+          noteEditingHistory.trashNote(
+            noteRealm.id,
+            noteRealm.note.noteTopology.title,
+            null
+          ),
+        undoTitle: "undo trash note",
+        message: /Are you sure you want to undo trashing /,
+      },
+      {
         action: "delete note",
         setup: (noteRealm: ReturnType<typeof makeMe.aNoteRealm.please>) =>
           noteEditingHistory.deleteNote(noteRealm.id),

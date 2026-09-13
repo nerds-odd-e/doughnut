@@ -373,3 +373,82 @@ test fixes outside its primary schema-removal scope.
     the coordinator pre-filtering; the compile-time safety net catches
     misses, but shifting that work to the later slice blurs the slice's
     intended boundary.
+
+## DD-038 — Noncanonical proof handoffs force report-only coordinator round-trips
+
+Delegated slice work completed with the requested tests and evidence, but the
+agent returned proof in prose or near-matching YAML instead of the exact
+lower-case proof schema required by execution. The coordinator had to request
+report-only reformats after the substantive work was already complete.
+
+### Occurrences
+
+- Execution: SEED-009 story 29 / quick/115-web-note-trash-and-undo / 2be6138738
+  - Timestamp: unknown
+  - Tool: Codex
+  - Model: GPT-5
+  - Open Dough release: 0.3.16
+  - Evidence: slice 6 required two report-only follow-ups after first returning
+    custom Command/Result/Focused-proof fields and then title-cased YAML keys;
+    slice 7 required one report-only follow-up after returning a custom report
+    rather than the required proof block. Each final handoff described the same
+    already-completed tests and changes.
+  - Observed effect: three extra coordinator-agent round-trips produced no new
+    implementation or verification evidence.
+  - Inference: exact proof serialization is not reliably enforced at the agent
+    boundary even when a literal template is supplied; structured validation
+    before accepting the handoff would remove this clerical loop.
+
+## DD-039 — Hard-limit refinement after completed work creates bookkeeping without a smaller remaining leaf
+
+The slice hard-limit protocol fired after the web Trash/Undo outcome and its
+proof were already complete, then fired again after its required fresh refactor
+completed. With no incomplete implementation left to decompose, each stop
+parked exact work and revised execution history without changing the remaining
+delivery shape.
+
+### Occurrences
+
+- Execution: SEED-009 story 29 / quick/115-web-note-trash-and-undo / 2be6138738
+  - Timestamp: unknown
+  - Tool: Codex
+  - Model: GPT-5
+  - Open Dough release: 0.3.16
+  - Evidence: plan 115 slice 9 records about 21–24 active minutes excluding
+    suite waits; plan-only commits `ebd4839d26` and `b1a571154b` followed
+    separate exact-work stash/restore cycles after implementation/proof and
+    after post-change refactoring, while retaining the same single Behavior
+    slice because all compatible work was complete.
+  - Observed effect: two plan-only commits and two park/restore cycles changed
+    the overrun record but produced no smaller executable remaining work.
+  - Inference: the hard-limit path needs a stop condition for a fully completed,
+    compatible outcome: record the overrun once during final plan update when
+    no implementation or proof remains, while retaining escalation for actual
+    unfinished work.
+
+## DD-040 — Shared query classified by dominant purpose hid an incompatible production caller
+
+The plan correctly preserved a live-note query for Git/export retention, but its
+consumer assessment treated that method as if all callers shared the same
+storage meaning. A production commissioned-learning caller also used it and
+therefore retained trashed notes in report matching.
+
+### Occurrences
+
+- Execution: SEED-009 story 29 / quick/115-web-note-trash-and-undo / 2be6138738
+  - Timestamp: unknown
+  - Tool: Codex
+  - Model: GPT-5
+  - Open Dough release: 0.3.16
+  - Evidence: plan 115's consumer table explicitly says
+    `findLiveNotesByNotebookIdOrderByIdAsc` serves Git state loading and must
+    retain legacy content inclusion; current caller search also finds
+    `LearningSessionService.record`, which matches commissioned report titles
+    from that query without a later `Note.isAvailable()` or tracker-activity
+    check.
+  - Observed effect: all planned suites passed while a trashed commissioned note
+    remained gradeable by report; retrospective correction plan 116 was needed.
+  - Inference: when one shared query has mixed production callers, consumer
+    inventory must classify each call site by domain purpose rather than assign
+    the method one dominant category; focused proof should cover every
+    incompatible category.

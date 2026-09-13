@@ -32,7 +32,10 @@ describe("storeUndoCommand", () => {
       )
 
       expect(histories.noteUndoHistories).toHaveLength(1)
-      expect(histories.noteUndoHistories[0]!.textContent).toBe("Original Title")
+      expect(histories.noteUndoHistories[0]).toMatchObject({
+        type: "edit title",
+        textContent: "Original Title",
+      })
     })
 
     it("creates a new entry for the same field on a different note", () => {

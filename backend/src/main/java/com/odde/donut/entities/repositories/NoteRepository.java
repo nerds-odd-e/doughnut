@@ -20,11 +20,15 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
   String searchForTitleLike =
       " WHERE LOWER("
           + SearchTitleNormalizer.NORMALIZED_NOTE_TITLE_JPQL
-          + ") LIKE LOWER(:pattern) AND n.deletedAt IS NULL ";
+          + ") LIKE LOWER(:pattern) AND "
+          + Note.JPA_AVAILABLE
+          + " ";
   String searchForTitleExact =
       " WHERE LOWER("
           + SearchTitleNormalizer.NORMALIZED_NOTE_TITLE_JPQL
-          + ") = LOWER(:key) AND n.deletedAt IS NULL ";
+          + ") = LOWER(:key) AND "
+          + Note.JPA_AVAILABLE
+          + " ";
 
   @Query(
       value =
@@ -40,7 +44,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
       value =
           selectFromNote
               + " JOIN FETCH n.notebook nb "
-              + " WHERE LOWER(n.title) = LOWER(:noteTitle) AND n.deletedAt IS NULL "
+              + " WHERE LOWER(n.title) = LOWER(:noteTitle) AND "
+              + Note.JPA_AVAILABLE
               + " AND nb.deletedAt IS NULL "
               + " AND LOWER(nb.name) = LOWER(:notebookName) "
               + " ORDER BY n.id ASC")
@@ -51,7 +56,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
       value =
           selectFromNote
               + " JOIN FETCH n.notebook nb "
-              + " WHERE LOWER(n.title) = LOWER(:noteTitle) AND n.deletedAt IS NULL "
+              + " WHERE LOWER(n.title) = LOWER(:noteTitle) AND "
+              + Note.JPA_AVAILABLE
               + " AND nb.deletedAt IS NULL "
               + " ORDER BY n.id ASC")
   List<Note> findByNoteTitleOrderByIdAsc(@Param("noteTitle") String noteTitle);
@@ -141,7 +147,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
       value =
           selectFromNote
               + " WHERE n.notebook.ownership.user.id = :userId"
-              + " AND n.deletedAt IS NULL"
+              + " AND "
+              + Note.JPA_AVAILABLE
               + " ORDER BY n.updatedAt DESC"
               + " LIMIT 20")
   List<Note> findRecentNotesByUser(@Param("userId") Integer userId);
@@ -155,7 +162,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
   String unassimilatedWhereClause =
       " WHERE "
           + "   rp IS NULL "
-          + "   AND n.deletedAt IS NULL "
+          + "   AND "
+          + Note.JPA_AVAILABLE
+          + " "
           + "   AND "
           + AssimilationSequenceSkip.JPA_NOT_EXISTS_NOTE_LEVEL_SKIP
           + " AND "

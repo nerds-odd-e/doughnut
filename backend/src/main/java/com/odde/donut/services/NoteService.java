@@ -142,19 +142,41 @@ public class NoteService {
       String sourcePropertyKey,
       User viewer) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    if (referenceHandling == NoteDeleteReferenceHandling.REDUCE_TO_SOURCE_PROPERTY) {
-      noteReferenceHandling.reduceRelationNoteToSourceProperty(
-          note, sourcePropertyKey, viewer, currentUTCTimestamp);
-    } else if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
-      noteReferenceHandling.removeNoteLinksFromReferrerProperties(
-          note, viewer, currentUTCTimestamp);
-    }
+    applyNoteDeleteReferenceHandling(
+        note, referenceHandling, sourcePropertyKey, viewer, currentUTCTimestamp);
     note.setUpdatedAt(currentUTCTimestamp);
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
     // Flush the soft-delete before destroy returns. NoteTitlePlacementRules' COMMIT lookup
     // depends on this order; see NoteTitlePlacementRulesFlushVisibilityTest.
     entityPersister.flush();
+  }
+
+  public void applyNoteDeleteReferenceHandling(
+      Note note,
+      NoteDeleteReferenceHandling referenceHandling,
+      String sourcePropertyKey,
+      User viewer) {
+    applyNoteDeleteReferenceHandling(
+        note,
+        referenceHandling,
+        sourcePropertyKey,
+        viewer,
+        testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  private void applyNoteDeleteReferenceHandling(
+      Note note,
+      NoteDeleteReferenceHandling referenceHandling,
+      String sourcePropertyKey,
+      User viewer,
+      Timestamp updatedAt) {
+    if (referenceHandling == NoteDeleteReferenceHandling.REDUCE_TO_SOURCE_PROPERTY) {
+      noteReferenceHandling.reduceRelationNoteToSourceProperty(
+          note, sourcePropertyKey, viewer, updatedAt);
+    } else if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
+      noteReferenceHandling.removeNoteLinksFromReferrerProperties(note, viewer, updatedAt);
+    }
   }
 
   /**

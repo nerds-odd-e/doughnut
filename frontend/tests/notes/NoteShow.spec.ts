@@ -2,7 +2,7 @@ import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest"
 
 describe("new/updated pink banner", () => {
@@ -77,5 +77,49 @@ describe("note without children", () => {
     render(note)
     await flushPromises()
     expect(wrapper.findAll('[title="collapse children"]')).toHaveLength(0)
+  })
+})
+
+const legacyDeletedRealm = makeMe.aNoteRealm.please()
+
+describe("note availability warning", () => {
+  it.each([
+    {
+      realm: makeMe.aNoteRealm
+        .ancestorFolders([
+          testFolderStub(1, "_TrAsH"),
+          testFolderStub(2, "Archived topics"),
+        ])
+        .please(),
+      warning: "This note is in trash",
+    },
+    {
+      realm: {
+        ...legacyDeletedRealm,
+        note: {
+          ...legacyDeletedRealm.note,
+          deletedAt: "2026-09-13T00:00:00.000Z",
+        },
+      },
+      warning: "This note has been deleted",
+    },
+    { realm: makeMe.aNoteRealm.please(), warning: undefined },
+  ])("shows $warning", async ({ realm, warning }) => {
+    mockSdkService(NoteController, "showNote", realm)
+    const wrapper = helper
+      .component(NoteShow)
+      .withRouter()
+      .withCleanStorage()
+      .withProps({ noteId: realm.id, expandChildren: true })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+
+    const availabilityWarning = wrapper.find(
+      '[data-testid="note-availability-warning"]'
+    )
+    expect(availabilityWarning.exists()).toBe(warning !== undefined)
+    if (warning !== undefined) expect(availabilityWarning.text()).toBe(warning)
+    wrapper.unmount()
   })
 })

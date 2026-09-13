@@ -241,12 +241,10 @@ before that boundary is unfinished work, not the final architecture. Story 31
 owns its removal. The independent memory tracker deletion work is complete;
 tracker activity is now derived from the owning note's deletion state.
 
-For stories 29 and 31, the selected query direction is a read-only SQL view of
-trash-folder ancestry, shared by existing JPA/native query owners. It stores no
-membership state; object checks use current ancestry after moves. The isolated
-MySQL/Hibernate proof and implementation boundaries live in the
-[web trash plan](../quick/115-web-note-trash-and-undo/PLAN.md). This replaces the
-unresolved query-shape hypothesis, not the domain rule or deferred Git scope.
+The active query boundary uses a read-only SQL view of trash-folder ancestry,
+shared by existing JPA/native query owners. It stores no membership state;
+object checks use current ancestry after moves. Story 31 retains this
+location-derived boundary while removing the legacy deletion state.
 
 #### Continuous behavior preservation
 
@@ -257,10 +255,10 @@ earlier stories. Prefer the same guarantee at every slice boundary. Never remove
 a working behavior with a promise to reconstruct it in a later story.
 
 Keep the existing path working until its replacement supports the required
-behavior. In particular, legacy note recovery remains usable until migration; story 29 preserves
-reference-handling choices when replacing the web
-action; story 31 migrates data and removes old machinery only with recovery,
-visibility, learning, and direct access working through the replacement.
+behavior. In particular, legacy note recovery remains usable until migration;
+web Trash preserves reference-handling choices; story 31 migrates data and
+removes old machinery only with recovery, visibility, learning, and direct
+access working through the replacement.
 Minimal temporary compatibility is allowed for these boundaries and is owned
 for removal by story 31. It must not become a second authority for new trash.
 
@@ -285,8 +283,8 @@ that implementation already satisfies them.
   membership and a prefix-removing Restore shortcut provide the chosen behavior.
 - Highest-learning hypothesis: an owner can trash and recover a learned note
   through ordinary web navigation and Move, with one location rule governing
-  visibility and participation. Story 29 tests this directly, without requiring
-  a local checkout or new Git move/rename support.
+  visibility and participation. The web Trash/Undo capability established this
+  without requiring a local checkout or new Git move/rename support.
 - Direct SQL migration runs with the application release. The owner explicitly
   does not want a separate rollout plan, opt-in, placeholder gate, or migration
   approval ceremony. This overrides the default gated-DML guidance for this
@@ -349,63 +347,6 @@ reference handling, and navigation. Refine and split a web story found larger
 than L without introducing a second mechanism. Story 28 is explicitly exempt
 from further splitting/refinement for now, by the owner's instruction.
 
-<a id="story-29"></a>
-
-### 29. Trash a note on the web and undo the action
-
-Plan: [Web note trash and immediate undo](../quick/115-web-note-trash-and-undo/PLAN.md)
-
-- **Goal:** A web owner can replace ordinary note deletion with recoverable trash
-  and immediately undo a mistake, preserving identity and learning history.
-- **Scope:** Use the existing Delete/Undo interaction. Trash places the note under
-  root `_trash` with its full path, required parents, and the first free numbered
-  suffix. Location governs search, learning, and wiki eligibility. The former
-  active path is available for a new independent note. Keep reference choices,
-  direct ID access with a warning, ordinary editing/Move, and legacy recovery
-  working. Immediate Undo reverses the action's placement and collision rename
-  using existing session-history semantics and ordinary destination conflicts.
-- **Smallest useful feedback:** Trash a real learned note and undo immediately;
-  observe its disappearance from active use and return with the same history.
-  Existing direct access and Move keep retained notes recoverable beyond Undo.
-- **Deferred promises:** Discovery/navigation improvements for older trash are
-  story 34. Dedicated Restore and original-parent recreation are story 32;
-  migration is story 31; folder Trash is story 33. No new Git/local behavior,
-  permanent-delete UI, empty trash, date metadata, or new trash management screen.
-  Existing navigation remains working, without a new browsing acceptance journey.
-- **Why this cut:** The existing deletion/undo loop gives immediate web feedback.
-  Finding older discarded notes is independently valuable and can be the next
-  story. Repeated-trash safety cannot be removed when title reuse is available;
-  partial search/learning/link exclusion would make trash misleading.
-- **Effort hypothesis:** M–L (1–4 hours), low confidence around shared eligibility
-  changes. Removing discovery work narrows the story but does not remove its
-  cross-cutting participation responsibility. Planning may expose further sizing
-  concerns; keep behavior working through every replacement.
-- **Depends on:** Existing web placement/undo and the completed tracker
-  simplification. No new Git feature is a prerequisite.
-- **Safe stopping point:** Trash and immediate Undo work; direct access/Move and
-  legacy recovery remain usable. Story 31 removes temporary legacy coexistence.
-
-#### Key examples and preserved behavior
-
-| Pre-condition | Trigger | Required result |
-| --- | --- | --- |
-| A learned note has retained history and an independently stopped tracker. | Trash then immediately Undo. | The same note leaves and returns to search/learning/wiki eligibility; history and stopped-tracking preference survive. |
-| The original note was trashed and a new note created at its old path. | Trash the new note, then Undo that action. | Both trash operations preserve independent identities; the second uses a free suffix in trash and Undo restores its original name/placement if available. |
-| A note has referring properties or qualifies for relationship reduction. | Trash with an existing reference choice. | The chosen transformation is preserved; Undo does not reconstruct explicitly removed properties. |
-| A user retains a trashed note URL or has a legacy soft-deleted note. | Open/edit/Move the trashed note, or invoke existing legacy recovery. | Existing authorized access and recovery remain working, with a warning for the trashed note. |
-
-#### Current refinement decisions
-
-Keep the existing note action and post-action navigation; adjust wording to trash.
-Keep immediate Undo instead of waiting for the dedicated Restore button. Undo
-is the inverse of the action; Restore later strips the visible prefix and keeps
-suffixes. Reuse current ephemeral undo history, not a persistent original-path
-journal. Occupied destinations use ordinary move-conflict behavior.
-
-No unresolved product choice prevents slice planning for this scope. Existing
-query coverage and placement reuse remain implementation/sizing concerns. The
-owner authorized slice planning and refinement if needed, not implementation.
-
 <a id="story-34"></a>
 
 ### 34. Find and recover previously trashed notes through web navigation
@@ -420,7 +361,7 @@ owner authorized slice planning and refinement if needed, not implementation.
   note without retaining its URL or relying on search or session Undo.
 - **Status:** Unrefined, explicitly left for later discussion. Placed second
   at the owner's request; no detailed examples, UI contract, or slice plan yet.
-- **Depends on / stopping point:** Story 29's trash state and existing Move;
+- **Depends on / stopping point:** Existing web trash state and Move;
   provides useful recovery independently of the Restore shortcut or folder Trash.
 
 <a id="story-31"></a>
@@ -444,7 +385,7 @@ owner authorized slice planning and refinement if needed, not implementation.
 - **Effort hypothesis:** L, low confidence, particularly migration and existing
   callers. Refine further if necessary; do not turn Git enhancement into a
   prerequisite or promise unsupported behavior to make retirement appear complete.
-- **Depends on:** Story 29's web trash and preserved Move recovery. The deferred
+- **Depends on:** Existing web trash and preserved Move recovery. The deferred
   Git compatibility story is not a prerequisite.
 - **Safe stopping point:** All legacy deleted data is migrated and the old note
   soft-delete structure is gone, with existing behaviors preserved. This remains
@@ -465,8 +406,9 @@ owner authorized slice planning and refinement if needed, not implementation.
 - **Value / learning:** A small web convenience proves recovery needs no original
   path journal, timestamp grouping, or separate folder-undo concept.
 - **Effort hypothesis:** M, low confidence around missing parents and references.
-- **Depends on:** Story 29. Story 31 is higher priority for structural completion,
-  not a technical prerequisite. No new Git compatibility promise is included.
+- **Depends on:** Existing web note Trash. Story 31 is higher priority for
+  structural completion, not a technical prerequisite. No new Git compatibility
+  promise is included.
 - **Safe stopping point:** Restore is useful independently of a folder Trash
   action, permanent deletion UI, or empty-trash capability.
 
@@ -486,8 +428,8 @@ owner authorized slice planning and refinement if needed, not implementation.
   without inventing timestamp-based group recovery.
 - **Effort hypothesis:** M, low confidence, assuming reuse of existing subtree
   moves and the common eligibility rules.
-- **Depends on:** Story 29. Story 32 supplies convenience, not required recovery.
-  No new Git compatibility promise is included.
+- **Depends on:** Existing web note Trash. Story 32 supplies convenience, not
+  required recovery. No new Git compatibility promise is included.
 - **Safe stopping point:** The folder workflow is useful without web permanent
   deletion, automatic expiry, or empty-trash actions.
 
@@ -519,10 +461,9 @@ owner authorized slice planning and refinement if needed, not implementation.
 
 ## Ordering and Scope Reduction
 
-The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The owner replaced
-local-first delivery with web-driven stories 29, 34, 31, 32, and 33, after the
-completed tracker simplification. Story 29 supplies an evaluable web loop;
-story 34 adds discovery of older trash; story 31 completes migration and removal
+The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The implemented
+web Trash/Undo loop supplies the starting behavior; story 34 adds discovery of
+older trash; story 31 completes migration and removal
 of the old structure before convenience
 expansion. Neither relies on completing new Git move/rename or trash compatibility.
 

@@ -20,9 +20,7 @@
                 notebookId: noteRealm.notebookRealm.notebook.id,
                 activeNoteRealm: noteRealm,
                 breadcrumbFolders:
-                  ancestorFolders.length > 0
-                    ? ancestorFolders
-                    : (noteRealm.ancestorFolders ?? []),
+                  effectiveAncestorFolders(noteRealm),
                 asMarkdown,
                 conversationButton: noConversationButton,
                 readonly: readonly(noteRealm),
@@ -42,6 +40,7 @@
                     wikiLinks: noteRealm.wikiLinks ?? [],
                     isReadmeContext: isReadmeTitle(noteRealm),
                     hasInboundReferences: noteHasInboundWikiReferences(noteRealm),
+                    trashed: noteIsTrashed(noteRealm),
                   }"
                   @dead-wiki-link-click="onDeadWikiLinkClick"
                 />
@@ -138,6 +137,14 @@ const isReadmeTitle = (noteRealm: NoteRealm) =>
 
 const noteHasInboundWikiReferences = (noteRealm: NoteRealm) =>
   (noteRealm.references?.length ?? 0) > 0
+
+const effectiveAncestorFolders = (noteRealm: NoteRealm) =>
+  props.ancestorFolders.length > 0
+    ? props.ancestorFolders
+    : (noteRealm.ancestorFolders ?? [])
+
+const noteIsTrashed = (noteRealm: NoteRealm) =>
+  effectiveAncestorFolders(noteRealm)[0]?.name.toLowerCase() === "_trash"
 
 const pendingDeadWikiLink = ref<DeadWikiLinkPayload | null>(null)
 

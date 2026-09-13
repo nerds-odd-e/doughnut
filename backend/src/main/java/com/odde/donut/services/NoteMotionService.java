@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -19,14 +20,14 @@ public class NoteMotionService {
 
   /** Places {@code source} in {@code targetFolder}. */
   public void executeMoveIntoFolder(Note source, Folder targetFolder) {
-    Notebook targetNotebook = targetFolder.getNotebook();
-    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-        targetNotebook, targetFolder, source.getTitle());
-    source.assignNotebook(targetNotebook);
-    source.setFolder(targetFolder);
-    entityPersister.flush();
-    entityPersister.merge(source);
-    entityPersister.flush();
+    executePlacement(source, targetFolder.getNotebook(), targetFolder, source.getTitle());
+  }
+
+  public void executeMoveIntoFolderWithAvailableTitle(Note source, Folder targetFolder) {
+    String availableTitle =
+        noteTitlePlacementRules.firstAvailableTitleAt(
+            targetFolder.getNotebook(), targetFolder, source.getTitle(), source.getId());
+    executePlacement(source, targetFolder.getNotebook(), targetFolder, availableTitle);
   }
 
   /** Clears {@code subject}'s folder so it sits in its current notebook's root. */
@@ -36,9 +37,18 @@ public class NoteMotionService {
 
   /** Assigns {@code source} to {@code targetNotebook} and clears folder (notebook root). */
   public void executeMoveToNotebookRoot(Note source, Notebook targetNotebook) {
-    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(targetNotebook, null, source.getTitle());
+    executePlacement(source, targetNotebook, null, source.getTitle());
+  }
+
+  public void executePlacement(
+      Note source, Notebook targetNotebook, Folder targetFolderOrNull, String targetTitle) {
+    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
+        targetNotebook, targetFolderOrNull, targetTitle);
+    noteTitlePlacementRules.requireNoOtherNoteTitleAt(
+        targetNotebook, targetFolderOrNull, targetTitle, source.getId());
+    source.setTitle(new DisplayName(targetTitle));
     source.assignNotebook(targetNotebook);
-    source.setFolder(null);
+    source.setFolder(targetFolderOrNull);
     entityPersister.flush();
     entityPersister.merge(source);
     entityPersister.flush();

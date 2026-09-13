@@ -86,7 +86,7 @@ public class WikiLinkResolver {
   private NoteReferenceResolution resolveNoteIdUrlTarget(
       AuthoredNoteReference.NoteIdUrlTarget url, Note sourceNote, User viewer) {
     Note target = noteRepository.findById(url.noteId()).orElse(null);
-    if (target == null || target.getDeletedAt() != null) {
+    if (target == null || !target.isAvailable()) {
       return new NoteReferenceResolution.Missing();
     }
     Notebook notebook =

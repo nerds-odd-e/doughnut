@@ -33,7 +33,7 @@ final class WikiLinkRewriteSupport {
 
   private WikiLinkRewriteSupport() {}
 
-  static void forEachNonDeletedNoteInMoveSet(
+  static void forEachAvailableNoteInMoveSet(
       EntityManager entityManager, Set<Integer> movedNoteIds, Consumer<Note> action) {
     if (movedNoteIds.isEmpty()) {
       return;
@@ -42,7 +42,7 @@ final class WikiLinkRewriteSupport {
     Collections.sort(noteIds);
     for (Integer noteId : noteIds) {
       Note note = entityManager.find(Note.class, noteId);
-      if (note != null && note.getDeletedAt() == null) {
+      if (note != null && note.isAvailable()) {
         action.accept(note);
       }
     }
@@ -91,7 +91,7 @@ final class WikiLinkRewriteSupport {
         continue;
       }
       Note referrer = entityManager.find(Note.class, referrerId);
-      if (referrer == null || referrer.getDeletedAt() != null) {
+      if (referrer == null || !referrer.isAvailable()) {
         continue;
       }
       String content = referrer.getContent() != null ? referrer.getContent() : "";

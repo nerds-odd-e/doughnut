@@ -1,5 +1,6 @@
 package com.odde.donut.entities.repositories;
 
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteAliasIndex;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface NoteAliasIndexRepository extends JpaRepository<NoteAliasIndex, Integer> {
   String SELECT_ALIAS_WITH_NOTEBOOK =
       "SELECT i FROM NoteAliasIndex i " + " JOIN FETCH i.note n " + " JOIN FETCH n.notebook nb ";
-  String ACTIVE_NOTE_AND_NOTEBOOK = " AND n.deletedAt IS NULL " + " AND nb.deletedAt IS NULL ";
+  String ACTIVE_NOTE_AND_NOTEBOOK = " AND " + Note.JPA_AVAILABLE + " AND nb.deletedAt IS NULL ";
 
   List<NoteAliasIndex> findByNote_IdOrderByIdAsc(Integer noteId);
 

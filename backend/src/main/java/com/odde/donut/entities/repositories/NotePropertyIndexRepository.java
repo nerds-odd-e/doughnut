@@ -1,6 +1,7 @@
 package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.AssimilationSequenceSkip;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteLevelIndex;
 import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.NotebookSettings;
@@ -20,7 +21,9 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
 
   String unassimilatedWhereClause =
       " WHERE mt IS NULL"
-          + " AND n.deletedAt IS NULL "
+          + " AND "
+          + Note.JPA_AVAILABLE
+          + " "
           + " AND "
           + AssimilationSequenceSkip.JPA_NOT_EXISTS_PROPERTY_SKIP
           + " AND "
