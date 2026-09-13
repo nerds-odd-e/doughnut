@@ -322,16 +322,17 @@ Proof: Extend note_deletion.feature for the actual web Trash/Undo journey.
 Existing mounted delete/undo/store tests cover reference choices, failed Undo,
 post-action navigation, warning/editing/Move, and preserving the original title.
 
-Overrun learning — 2026-09-13: implementation, diagnosis, and slice-local cleanup
-took approximately 11–12 active minutes, excluding frontend and E2E suite waits.
+Overrun learning — 2026-09-13: implementation, diagnosis, and refactor cleanup
+took approximately 21–24 active minutes, excluding frontend and E2E suite waits.
 The sizing hypothesis missed the mounted compatibility sweep across toolbar,
-autosave, reference-choice, history, and Undo tests plus retry-safe trash history.
-All implementation and both required proof loops completed compatibly; no
+autosave, reference-choice, history, and Undo tests, retry-safe trash history,
+and stale duplicated E2E/delete-flow naming exposed by the refactor. All
+implementation, refactoring, and required proof loops completed compatibly; no
 incomplete attempt remains. The completed work is parked in stash
-`18f1ab768dc660e79c3029a34fe26b9118d00a38` while this refinement is delivered.
+`1be40c89bb5056b3be37226a433352efb024ed97` while this refinement is delivered.
 Retain one Behavior slice: it still owns one web Trash/Undo outcome, and splitting
 already-completed compatible work would create retrospective delivery groupings
-rather than safer remaining execution leaves. Only refactor and delivery remain.
+rather than safer remaining execution leaves. Only coordinator delivery remains.
 
 Wire existing Delete flow to the new adapter, with clear trash wording and
 unchanged confirmation choices. Capture original placement/title before mutation
