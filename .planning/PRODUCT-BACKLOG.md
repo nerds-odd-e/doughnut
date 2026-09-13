@@ -14,9 +14,10 @@ with reasonable performance.
 
 ## Taken
 
+- [Trash a note on the web and undo the action](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-29) — SEED-009 — [plan](quick/115-web-note-trash-and-undo/PLAN.md)
+
 ## Backlog list
 
-- [Trash a note on the web and undo the action](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-29) — SEED-009
 - [Find and recover previously trashed notes through web navigation](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-34) — SEED-009
 - [Recover existing deleted notes through portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31) — SEED-009
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
