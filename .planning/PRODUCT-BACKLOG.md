@@ -14,7 +14,6 @@ with reasonable performance.
 
 ## Taken
 - [Recover existing deleted notes through portable trash](quick/120-recover-legacy-notes-and-rebuild-git/PLAN.md) — SEED-009 story 31
-- [Receive a web note rename locally](quick/121-receive-web-note-rename/PLAN.md) — SEED-009 story 22
 
 ## Backlog list
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009

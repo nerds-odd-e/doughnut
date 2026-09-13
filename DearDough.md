@@ -399,19 +399,6 @@ report-only reformats after the substantive work was already complete.
     boundary even when a literal template is supplied; structured validation
     before accepting the handoff would remove this clerical loop.
 
-- Execution: SEED-009 story 22 / quick/121-receive-web-note-rename / 55ba46b9f4
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: 0.3.16
-  - Evidence: refined slices 2 and 5 each returned passing command evidence in
-    prose or a custom title-cased shape after the delegation supplied the exact
-    lower-case `proof` / `command` / `covers` / `result` template.
-  - Observed effect: two report-only coordinator-agent follow-ups reformatted
-    already-completed proof without adding implementation or verification.
-  - Inference: this recurrence supports validating the handoff schema before an
-    implementation agent finalizes its report, rather than relying on prompt text.
-
 ## DD-039 — Hard-limit refinement after completed work creates bookkeeping without a smaller remaining leaf
 
 The slice hard-limit protocol fired after the web Trash/Undo outcome and its
@@ -499,27 +486,3 @@ re-application in the worktree before staging.
     tools do not bind to the worktree from an earlier `cd` used for shell
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
-
-## DD-042 — A slice combined independent backend and E2E proof loops despite the one-loop gate
-
-The first web-rename receipt slice combined accepted-history publication at a
-controller boundary with installed-CLI pull receipt at an E2E boundary. The two
-behaviors required different fixtures, commands, and repair cycles, so the slice
-crossed its hard limit before both proofs were green.
-
-### Occurrences
-
-- Execution: SEED-009 story 22 / quick/121-receive-web-note-rename / 55ba46b9f4
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: 0.3.16
-  - Evidence: the original PLAN Slice 2 owned both controller/downloaded-bundle
-    and installed-CLI E2E proof; at about 11 active minutes it stopped with the
-    CLI suite green but backend and E2E fixture corrections still unverified.
-  - Observed effect: six files were parked, a plan-only refinement commit
-    `a597e63cf9` split the work, and the backend and E2E portions were restored
-    and delivered separately.
-  - Inference: applying the existing one-proof-loop gate to the commands and
-    fixture ownership during planning would have produced the successful split
-    before execution and avoided the park/refine/restore cycle.
