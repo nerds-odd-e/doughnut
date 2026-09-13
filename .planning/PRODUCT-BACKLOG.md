@@ -11,9 +11,10 @@ with reasonable performance.
 
 ## Taken
 
+- [Publish new notes faster while preserving deleted-title conflicts](quick/112-publish-additions-with-simpler-title-check/PLAN.md) — SEED-018
+
 ## Backlog list
 
-- [Publish new notes faster while preserving deleted-title conflicts](seeds/SEED-018-publish-large-authored-notebooks.md#story-5) — SEED-018
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Keep web saves in an append-only Git history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21) — SEED-009
