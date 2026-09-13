@@ -18,7 +18,7 @@ with reasonable performance.
 - [Recover existing deleted notes through portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31) — SEED-009
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
 - [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
-- [Receive a web note rename locally without losing its identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22) — SEED-009
+- [Pull a web note rename, then publish local edits back to the same Donut note](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22) — SEED-009
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009

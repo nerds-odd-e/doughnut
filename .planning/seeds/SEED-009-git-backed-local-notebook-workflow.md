@@ -157,15 +157,100 @@ data; invalid or ambiguous changes must not silently discard work.
 
 <a id="story-22"></a>
 
-### 22. Receive a web note rename locally without losing its identity
+### 22. Pull a web note rename, then publish local edits back to the same Donut note
 
-- **For / why:** An owner can rename a learned note in Donut and continue refining it locally.
-- **Evaluation:** Given a synchronized notebook and a local checkout with no unpublished work, a web rename appends accepted history; pull receives the renamed path, and a later local content publication retains the same learned note.
-- **Value / learning:** Closes an ordinary web action that otherwise interrupts the shared editing loop. Web identity is known, avoiding inference from a local rename-with-edit.
-- **Scope:** One notebook; local history is behind or equal. Preserve authored-reference semantics. No divergent reconciliation or cross-notebook transfer.
-- **Effort hypothesis:** M, low confidence pending focused refinement.
-- **Depends on:** Existing clone, publication and clean fast-forward pull; no dependency on another new story is assumed.
-- **Safe stopping point:** This workflow remains independently usable if later stories are cancelled, with work and learning data preserved.
+- **Refinement status:** Refined on 2026-09-13 at the owner's request to challenge
+  purpose, timing, and scope. Refinement only; no execution plan or implementation
+  is authorized. Priority is unchanged.
+- **Goal:** A notebook owner can correct a learned note's name while using Donut,
+  then continue refining its content in a local editor and publish back to the
+  same Donut note, retaining its learning history.
+- **Meaning of identity:** The owner clarified that local files have no stable
+  Donut ID. Locally, the old path disappears and the new path appears; whether
+  the filesystem moves or recreates the file is irrelevant. The retained
+  identity is the server-side note ID and its learning data after the round trip.
+  This follows [Accepted ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md):
+  Portable paths change on rename; Donut note IDs stay server-side.
+- **Why / critical challenge:** The benefit is freedom to switch editing tools
+  after an ordinary web action without manual repair or restarting learning.
+  Merely making Git display a renamed file would not establish that value: the
+  subsequent publication must update the original learned note. Conversely,
+  preserving a supposed local file identity adds no user benefit and is not a
+  requirement. The owner confirms the wording problem does not invalidate the
+  item, but no frequency, failed session, or recovery cost is recorded here.
+- **Why now / recommendation:** The shared web/local editing direction and the
+  owner's earlier prioritization support addressing this basic transition before
+  broad synchronization work. They do not establish urgency or justify moving
+  it above the queued portable-trash work. Retain its current place provisionally;
+  before implementation, confirm an expected near-term session that needs web
+  rename followed by local editing. If owners comfortably stay in one editor,
+  defer it. This story does not depend on accumulated local publication or web
+  moves, and their future value is not a reason to enlarge this delivery.
+- **Strongest simpler alternative:** Finish both the rename and content editing
+  in Donut, postponing the switch to a local editor. That is sufficient when
+  switching tools is optional; it is insufficient when the owner needs Obsidian
+  or an AI IDE for the next edit. Renaming locally and publishing is another
+  candidate workaround, but its fit and current support must be demonstrated
+  before recommending it. Manual duplicate renaming on both sides is not an
+  established safe workflow.
+- **Delivery scope:** One already bound notebook with live Donut content matching
+  accepted history. Rename an existing ordinary note in place through the web's
+  existing title action to a valid, unoccupied name. Append accepted history;
+  pull into a clean local checkout whose head is an ancestor of or equal to the
+  accepted head. The old file path disappears and the new path contains the
+  note's content. Make a local content edit at that new path, commit, and publish
+  through the existing command; Donut retains the note ID, URL, and learning
+  history. No overlapping unpublished local work or intervening web changes are
+  needed to demonstrate this journey.
+- **Preserved behavior and constraints:** Retain authorization, existing title
+  validation and collision behavior, authored content, and the web rename's
+  existing reference-handling semantics. Any reference updates produced by that
+  action must travel with the accepted history; narrowing to one renamed note
+  does not permit dropping affected references. Preserve the append-only commit
+  chain. Add no stable IDs to local Markdown. Clean sequential editing is the
+  delivery assumption, not a new editing lock. Example counts are not limits;
+  deferred cases do not justify new rejection rules or regressions.
+- **Key examples:**
+  1. Donut and local are synchronized at A with learned note `Biology/Cells.md`.
+     Rename it on the web to `Cell structure`: accepted history advances to B,
+     retaining A. Pull receives `Biology/Cell structure.md` and removes the old
+     path. Edit its body locally, commit C, and publish: Donut shows that body
+     at the original note URL, with the original note ID and learning history;
+     accepted history is A → B → C.
+  2. Another note references `Cells`. Perform the same rename using the existing
+     web reference-handling choice. Pull reproduces the resulting authored
+     reference content, and publication of the later local edit preserves those
+     semantics. A reference policy redesign is not part of this story.
+  3. Rename to a name already occupied under the same parent: existing collision
+     behavior applies, with neither note overwritten and no accepted rename
+     history published for a failed action.
+- **Deferred promises:** Local-origin rename detection, rename combined with
+  local content edits, folder/notebook renames, moves, trash/deletion/recreation,
+  cross-notebook transfer, accumulated local commit publication, divergent
+  histories and conflict recovery, new reference policies, history UI, and
+  performance targets. Existing supported behavior remains supported.
+- **Evidence and remaining uncertainty:** Source inspection shows
+  `cli/src/commands/notebook/notebookPull.ts` already has an ordinary fast-forward
+  receiving path. This suggests receipt may be reusable; it does not prove the
+  web rename is published correctly or that the subsequent local edit retains
+  the learned note. No tests were run during refinement and no complete current
+  journey was demonstrated. Establish the actual missing behavior before
+  planning changes; if the round trip already works, prefer closing the gap in
+  evidence over inventing implementation work. Confirm the existing web rename
+  reference choices with a concrete fixture when preparing proof.
+- **Learning and stop condition:** Have an owner perform the first example with
+  a note they actually want to rename and continue editing locally. Observe
+  whether avoiding manual repair enables the intended next edit, and whether
+  the clean sequential workflow fits. This proves feasibility, not frequency of
+  demand. If overlapping edits are essential, revisit the selected story rather
+  than silently adding reconciliation.
+- **Effort hypothesis:** Retain M (1–2 hours), low confidence. Reuse of existing
+  rename, accepted-history, pull, and publication behavior needs confirmation;
+  no detailed implementation or slice estimate is claimed.
+- **Depends on / safe stopping point:** Existing web rename, clone, publication,
+  and clean fast-forward pull. No new-story prerequisite is established. The
+  rename → pull → edit → publish journey delivers value independently if all
+  later Git stories are cancelled.
 
 <a id="story-23"></a>
 
@@ -277,6 +362,12 @@ that implementation already satisfies them.
   does not want a separate rollout plan, opt-in, placeholder gate, or migration
   approval ceremony. This overrides the default gated-DML guidance for this
   migration; it does not waive data-preservation proof.
+- Subsequent owner clarification for story 31: inconsistent server Git history
+  may be abandoned entirely. Build one fresh base from current migrated notebook
+  data, with no old parent/history. Include permanent removal on accepted Git
+  file deletion; moving to trash is the recoverable operation. This narrowly
+  supersedes the earlier all-Git-work deferral and continuity obligation for
+  those outcomes. Validate on isolated data here; tag and release later.
 
 #### Agreed external behavior contract
 
@@ -339,10 +430,10 @@ from further splitting/refinement for now, by the owner's instruction.
 
 ### 31. Recover existing deleted notes through portable trash
 
-- **Refinement status:** Refined on 2026-09-13 for web delivery. The Git caller
-  preservation conflict below remains unresolved; this is not execution-ready.
-  “Portable trash” names the existing location model, not a promise of new Git
-  compatibility. No execution plan or implementation is authorized here.
+- **Refinement status:** Refined on 2026-09-13; the owner subsequently resolved
+  the Git preservation conflict below and authorized slice planning and optional
+  plan refinement. Implementation and production release are not authorized.
+  [Executable plan](../quick/120-recover-legacy-notes-and-rebuild-git/PLAN.md).
 - **Goal:** An existing notebook owner can find a previously soft-deleted note
   in web trash, recover it with the existing Move action, and reuse its former
   name without resurrecting the old note or losing its learning history.
@@ -357,9 +448,9 @@ from further splitting/refinement for now, by the owner's instruction.
   convenience but leave old title reservations and two deletion mechanisms.
   No production count of affected notes or measured recovery demand has been
   supplied: urgency rests on the owner's chosen completion boundary, not an
-  evidenced volume of complaints. Keep this priority provisionally; if safe
-  retirement requires a new Git lifecycle, revisit the boundary with the owner
-  rather than hiding that work inside a web story.
+  evidenced volume of complaints. The owner has now included replacement of
+  inconsistent Git baselines and permanent file-deletion behavior, making full
+  retirement possible without preserving obsolete history or a second state.
 
 #### Scope
 
@@ -375,16 +466,32 @@ from further splitting/refinement for now, by the owner's instruction.
 - **Preserved behavior:** Retain authorization, active content, new web
   Trash/Undo, deletion reference choices, and ordinary move conflicts. Migration
   does not replay deletion reference handling or recreate previously removed
-  references. Adapt callers only to preserve supported outcomes; any changed
-  Git lifecycle is a product decision, not an implied implementation detail.
+  references. The explicit Git changes below supersede preservation of old Git
+  history and soft deletion on file removal; other supported outcomes remain.
+- **Git baseline:** Rebuild each live notebook's accepted snapshot/history from
+  its migrated database content, including trash. Preserve notebook/note IDs and
+  all retained user data; only the inconsistent Git history is discarded.
+  Build one fresh root commit with no parent. Abandon the previous base and all
+  server commits; do not append a reset commit, replay, merge, or retain history.
+  Fresh local checkout replaces history reconciliation. No recovery of local-only
+  edits from an old checkout is promised, and no existing checkout is erased.
+- **File deletion:** An accepted Git file removal permanently deletes that note
+  and its dependent data. Recoverable removal is a move into `_trash`; leaving
+  trash preserves identity/history. No temporary ban on deletion publication is
+  needed. This is the owner's explicit replacement of the old lifecycle.
+- **Validation only:** Prove migration, baseline replacement, data preservation,
+  failure/retry behavior, and continued supported use on isolated test data.
+  Tagging, release, and any production migration/reset occur outside this story,
+  potentially after other stories. The SQL migration still ships with that later
+  release; this story adds no rollout ceremony or production operation.
 - **Deferred promises:** Restore shortcut and automatic reconstruction of an
-  active destination (32), folder Trash action (33), all new local/Git trash
-  compatibility and permanent file-deletion semantics (28), empty trash,
+  active destination (32), folder Trash action (33), remaining local/Git trash
+  compatibility (28), empty trash,
   permanent-delete UI, expiry, and performance expansion. Deferral adds no new
   rejection rule to otherwise valid existing operations.
 - **Dependencies:** Existing web trash browsing and Move recovery are available.
-  New Git capabilities remain deferred. Full structural retirement nevertheless
-  depends on resolving the concrete preservation conflict below.
+  Git scope is limited to the baseline and deletion decisions above. Broader
+  local move/rename and web-to-local synchronization remain deferred.
 - **Safe stopping point:** Existing deleted data is recoverable through web
   trash, former names are reusable, and the old note deletion structure is gone
   with supported behavior preserved. Migration alone cannot be declared complete
@@ -407,6 +514,12 @@ from further splitting/refinement for now, by the owner's instruction.
 4. The owner recovers a migrated note to notebook root or another existing
    active folder with Move. Recovery does not require the original parent to
    exist and does not promise to reconstruct it automatically.
+5. A notebook has inconsistent old Git history. After migration and baseline
+   replacement its downloadable tree matches the migrated data, including trash,
+   with exactly one new root commit and no previous history.
+6. A fresh checkout publishes a file removal. The note and dependent learning
+   data are permanently gone; recreating the file creates a new identity. A
+   failed publication does not partially delete data or advance the accepted tip.
 
 #### Solution and architecture boundaries
 
@@ -427,7 +540,7 @@ constrains retained learning state. These are Accepted; ADR 0002 remains Propose
 and supplies no authority to expand this story into synchronization redesign.
 No change to an Accepted ADR is proposed.
 
-#### Unresolved details and evidence
+#### Resolved conflict and implementation questions
 
 - **Git preservation conflict:** `NotebookGitProposalPublisher` still calls
   `NoteService.destroy` for a published file deletion. The controller tests in
@@ -436,12 +549,10 @@ No change to an Accepted ADR is proposed.
   through `findLiveNotesByNotebookIdOrderByIdAsc`, which excludes soft-deleted
   rows but includes location-based trash. Replacing soft delete with a trash
   move therefore changes the projected file set; hard deletion discards retained
-  data. Neither is established as a behavior-preserving substitution. Migration
-  of old deleted notes also changes that projection. Resolve this before
-  dependent execution planning. Recommendation pending owner response: preserve
-  the narrow web scope, demonstrate a bounded preservation solution, or return
-  the retirement boundary for a human decision. Do not silently activate story 28,
-  add a second hidden state, or leave `deleted_at` indefinitely.
+  data. The owner resolved both issues: replace inconsistent baseline/history
+  after migrating retained data; future accepted file deletions are permanent.
+  Preserve data during migration, not after its later explicit permanent removal.
+  Broader story 28 remains deferred; no second hidden state is justified.
 - **Legacy delete/undo callers:** `StoredApiCollection` still invokes the old
   delete and undo-delete endpoints. Their currently supported user outcomes must
   be accounted for before removing those paths; retaining timestamp deletion or
@@ -452,8 +563,8 @@ No change to an Accepted ADR is proposed.
   trash contents. Ordinary basename collisions are agreed; an intermediate-path
   conflict requiring a different visible placement needs an explicit example
   before planning. Do not infer historical original paths from missing metadata.
-- **Confidence:** The earlier L estimate (2–4 hours) is unvalidated. The coupled
-  caller retirement makes a confident narrow-delivery estimate premature.
+- **Confidence:** The earlier L estimate (2–4 hours) remains unvalidated; include
+  baseline replacement and permanent-deletion proof when estimating slices.
   These are focused source findings, not executed migration or regression proof.
 
 <a id="story-32"></a>
@@ -510,7 +621,9 @@ No change to an Accepted ADR is proposed.
   history, and distinguish recoverable trash moves from permanent file deletion.
 - **Scope capture:** All trash-related Git/local compatibility, including local
   trash/recovery moves, receiving web trash/restoration locally, migrated trash
-  representation, and permanent file removal/recreation semantics. Former
+  representation. Story 31 now owns the fresh Git baseline and permanent file
+  removal/recreation semantics under the owner's subsequent scope decision;
+  reuse that behavior here rather than reimplementing it. Former
   stories 28 and 30 and the web-deletion synchronization outcome of story 23
   are consolidated here; their anchors remain for traceability.
 - **Evaluation direction:** An owner can continue the same trash/recovery journey
