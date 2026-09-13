@@ -1,6 +1,6 @@
 # Recover retained deleted notes and rebuild notebook Git baselines
 
-Status: in progress
+Status: done
 Source: [SEED-009 story 31](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31).
 
 ## Execution identity
