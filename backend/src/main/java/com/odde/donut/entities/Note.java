@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 import org.springframework.lang.NonNull;
 
 @Entity
@@ -30,6 +31,9 @@ import org.springframework.lang.NonNull;
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   public static final String JPA_AVAILABLE = "n.deletedAt IS NULL";
+  public static final String NATIVE_SELECT =
+      "n.*, coalesce(n.folder_id in (select tf.id from trashed_folder tf), false)"
+          + " AS trashedInDatabase";
   public static final String NATIVE_AVAILABLE = "n.deleted_at IS NULL";
 
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
@@ -46,6 +50,9 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Folder folder;
+
+  @Formula("coalesce(folder_id in (select tf.id from trashed_folder tf), false)")
+  private boolean trashedInDatabase;
 
   @Column(name = "content", columnDefinition = "mediumtext")
   @Getter
@@ -84,6 +91,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean isAvailable() {
     return deletedAt == null;
+  }
+
+  @JsonIgnore
+  public boolean isTrashed() {
+    return folder != null && folder.isTrashed();
   }
 
   @OneToMany(mappedBy = "note")

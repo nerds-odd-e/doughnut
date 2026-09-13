@@ -10,7 +10,9 @@ public interface NoteStructuralPeerQueries {
 
   @Query(
       value =
-          "SELECT n.* FROM note n WHERE n.folder_id = :folderId AND "
+          "SELECT "
+              + Note.NATIVE_SELECT
+              + " FROM note n WHERE n.folder_id = :folderId AND "
               + Note.NATIVE_AVAILABLE
               + " "
               + "AND n.id NOT IN (:excludeIds) ORDER BY n.id ASC LIMIT :limit",
@@ -22,7 +24,9 @@ public interface NoteStructuralPeerQueries {
 
   @Query(
       value =
-          "SELECT n.* FROM note n WHERE n.folder_id = :folderId AND "
+          "SELECT "
+              + Note.NATIVE_SELECT
+              + " FROM note n WHERE n.folder_id = :folderId AND "
               + Note.NATIVE_AVAILABLE
               + " "
               + "AND n.id NOT IN (:excludeIds) "
@@ -36,7 +40,9 @@ public interface NoteStructuralPeerQueries {
 
   @Query(
       value =
-          "SELECT n.* FROM note n WHERE n.notebook_id = :notebookId AND n.folder_id IS NULL "
+          "SELECT "
+              + Note.NATIVE_SELECT
+              + " FROM note n WHERE n.notebook_id = :notebookId AND n.folder_id IS NULL "
               + "AND "
               + Note.NATIVE_AVAILABLE
               + " AND n.id NOT IN (:excludeIds) ORDER BY n.id ASC LIMIT :limit",
@@ -48,7 +54,9 @@ public interface NoteStructuralPeerQueries {
 
   @Query(
       value =
-          "SELECT n.* FROM note n WHERE n.notebook_id = :notebookId AND n.folder_id IS NULL "
+          "SELECT "
+              + Note.NATIVE_SELECT
+              + " FROM note n WHERE n.notebook_id = :notebookId AND n.folder_id IS NULL "
               + "AND "
               + Note.NATIVE_AVAILABLE
               + " AND n.id NOT IN (:excludeIds) "

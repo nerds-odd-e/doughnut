@@ -11,10 +11,14 @@ import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 @Entity
 @Table(name = "folder")
 public class Folder extends EntityIdentifiedByIdOnly {
+
+  @Formula("id in (select tf.id from trashed_folder tf)")
+  private boolean trashedInDatabase;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
@@ -70,5 +74,14 @@ public class Folder extends EntityIdentifiedByIdOnly {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public Integer getParentFolderId() {
     return parentFolder == null ? null : parentFolder.getId();
+  }
+
+  @JsonIgnore
+  public boolean isTrashed() {
+    Folder root = this;
+    while (root.parentFolder != null) {
+      root = root.parentFolder;
+    }
+    return root.getName().equalsIgnoreCase("_trash");
   }
 }

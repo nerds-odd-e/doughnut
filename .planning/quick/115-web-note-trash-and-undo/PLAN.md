@@ -204,10 +204,17 @@ no separate statistics or batch rewrite. This is the SQL side of slice 4.
 
 ### 3. Derive folder membership for queries
 Type: Structure
-Status: planned
+Status: done
 Size: 5–10 minutes plus schema/API tooling wait as applicable.
 Proof: A focused real-database membership/query test reproduces the isolated
 probe's distinguishing cases and same-transaction current-state behavior.
+
+Delivered the recursive `trashed_folder` view, Hibernate query mappings, native
+projection support, and current-ancestry object accessors. Both
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` and
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed. The ERD exporter ran
+against `doughnut_development`; the generated ERD was unchanged because the view
+adds no table or foreign-key relationship.
 
 Add the schema-only view and query field mappings; use existing ancestry for
 current object accessors. No reader switches until slice 4. Carry production
