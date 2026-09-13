@@ -115,3 +115,23 @@ Feature: Note trash
     And I should see folder "Biology study/Biology" containing these notes:
       | note-title |
       | Cells      |
+
+  @mockBrowserTime
+  Scenario: Recover a trashed note to notebook root when the original parent is absent
+    Given I have a notebook "Biology study" with notes:
+      | Title | Folder          | Content      |
+      | Cells | _trash/Biology | Mitochondria |
+    When I jump to the notebook "Biology study"
+    And I reload the notebook page
+    And I expand the children of note "_trash" in the sidebar
+    And I open the folder page for "Biology" under open parent "_trash"
+    Then I should see the folder page is in trash
+    When I open the note "Cells" from the sidebar
+    Then I should see the current note is in trash
+    When I move the current note to notebook "Biology study" root
+    Then I should see the current note is not in trash
+    When I open the notebook "Biology study" from the notebook catalog
+    Then I should see the note tree in the sidebar
+      | note-title |
+      | Cells      |
+    And I should not see sidebar folder "Biology"

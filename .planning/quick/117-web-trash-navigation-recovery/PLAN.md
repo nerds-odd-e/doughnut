@@ -121,7 +121,7 @@ assertions do not cover it. No new recovery endpoint or Undo dependency.
 
 ### 3. Recover to notebook root when the original parent is absent
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; existing root destination is reused.
 
 Behavior: `_trash/Biology/Cells` exists without active `Biology` → owner chooses
