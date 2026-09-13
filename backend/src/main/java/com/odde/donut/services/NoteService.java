@@ -153,6 +153,9 @@ public class NoteService {
     note.setUpdatedAt(currentUTCTimestamp);
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
+    // Keep this query after merge: it AUTO-flushes the soft-delete before destroy returns.
+    // NoteTitlePlacementRules' COMMIT lookup depends on this order; see
+    // NoteTitlePlacementRulesFlushVisibilityTest.
     for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
       mt.setDeletedAt(currentUTCTimestamp);
       entityPersister.merge(mt);

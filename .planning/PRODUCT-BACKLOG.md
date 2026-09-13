@@ -11,8 +11,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Document the destroy()-order dependency behind the title-check flush optimization](quick/113-document-title-check-flush-dependency/PLAN.md)
-
 ## Backlog list
 
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
