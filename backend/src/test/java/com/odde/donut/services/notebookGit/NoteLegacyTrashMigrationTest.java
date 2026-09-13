@@ -118,10 +118,7 @@ class NoteLegacyTrashMigrationTest {
     Integer liveNoteId = liveNote.getId();
     Integer notebookId = notebook.getId();
 
-    jdbcTemplate.update(
-        "UPDATE note SET deleted_at = ? WHERE id = ?",
-        Timestamp.from(Instant.parse("2026-08-01T00:00:00Z")),
-        deletedNoteId);
+    markNoteLegacyDeleted(deletedNoteId);
 
     Instant migrationTime = Instant.parse("2026-09-13T12:00:00Z");
     runMigration(migrationTime);
@@ -223,10 +220,7 @@ class NoteLegacyTrashMigrationTest {
         "UPDATE notebook SET deleted_at = ? WHERE id = ?",
         Timestamp.from(Instant.parse("2026-07-01T00:00:00Z")),
         deletedNotebookId);
-    jdbcTemplate.update(
-        "UPDATE note SET deleted_at = ? WHERE id = ?",
-        Timestamp.from(Instant.parse("2026-08-01T00:00:00Z")),
-        deletedNoteId);
+    markNoteLegacyDeleted(deletedNoteId);
 
     Instant migrationTime = Instant.parse("2026-09-13T12:00:00Z");
     runMigration(migrationTime);
@@ -266,10 +260,7 @@ class NoteLegacyTrashMigrationTest {
     Integer alreadyTrashedId = alreadyTrashed.getId();
     Integer legacyDeletedId = legacyDeleted.getId();
 
-    jdbcTemplate.update(
-        "UPDATE note SET deleted_at = ? WHERE id = ?",
-        Timestamp.from(Instant.parse("2026-08-01T00:00:00Z")),
-        legacyDeletedId);
+    markNoteLegacyDeleted(legacyDeletedId);
 
     Instant migrationTime = Instant.parse("2026-09-13T12:00:00Z");
     runMigration(migrationTime);
@@ -291,6 +282,213 @@ class NoteLegacyTrashMigrationTest {
         jdbcTemplate.queryForObject(
             "SELECT deleted_at FROM note WHERE id = ?", Timestamp.class, legacyDeletedId),
         nullValue());
+  }
+
+  @Test
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void legacyNoteAlreadyUnderTrashKeepsItsLocationWithoutDoublePrefix() throws Exception {
+    User owner = makeMe.aUser().please();
+    ownerUserIdsToClean.add(owner.getId());
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Folder trashRoot = makeMe.aFolder().notebook(notebook).name("_trash").please();
+    Folder trashRecipes = makeMe.aFolder().parentFolder(trashRoot).name("Recipes").please();
+    Folder trashPasta = makeMe.aFolder().parentFolder(trashRecipes).name("Pasta").please();
+    Note alreadyTrashed =
+        makeMe.aNote("Carbonara").folder(trashPasta).content("Guanciale").please();
+    Integer noteId = alreadyTrashed.getId();
+    Integer notebookId = notebook.getId();
+    Integer folderId = trashPasta.getId();
+    String content = alreadyTrashed.getContent();
+
+    markNoteLegacyDeleted(noteId);
+
+    runMigration(Instant.parse("2026-09-13T12:00:00Z"));
+
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT folder_id FROM note WHERE id = ?", Integer.class, noteId),
+        equalTo(folderId));
+    assertThat(folderPathFromRoot(folderId), equalTo("_trash/Recipes/Pasta"));
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT deleted_at FROM note WHERE id = ?", Timestamp.class, noteId),
+        nullValue());
+    assertThat(
+        jdbcTemplate.queryForObject("SELECT title FROM note WHERE id = ?", String.class, noteId),
+        equalTo("Carbonara"));
+    assertThat(
+        jdbcTemplate.queryForObject("SELECT content FROM note WHERE id = ?", String.class, noteId),
+        equalTo(content));
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT notebook_id FROM note WHERE id = ?", Integer.class, noteId),
+        equalTo(notebookId));
+  }
+
+  @Test
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void collidingLegacyNoteGetsSuffixedTitleInTrashAlongsideLiveTrashedNote() throws Exception {
+    User owner = makeMe.aUser().please();
+    ownerUserIdsToClean.add(owner.getId());
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Folder recipes = makeMe.aFolder().notebook(notebook).name("Recipes").please();
+    Folder pasta = makeMe.aFolder().parentFolder(recipes).name("Pasta").please();
+    Folder trashRoot = makeMe.aFolder().notebook(notebook).name("_trash").please();
+    Folder trashRecipes = makeMe.aFolder().parentFolder(trashRoot).name("Recipes").please();
+    Folder trashPasta = makeMe.aFolder().parentFolder(trashRecipes).name("Pasta").please();
+    Note liveTrashed = makeMe.aNote("Carbonara").folder(trashPasta).content("First").please();
+    Note legacyDeleted = makeMe.aNote("Carbonara").folder(pasta).content("Second").please();
+    Integer liveTrashedId = liveTrashed.getId();
+    Integer legacyDeletedId = legacyDeleted.getId();
+
+    markNoteLegacyDeleted(legacyDeletedId);
+
+    runMigration(Instant.parse("2026-09-13T12:00:00Z"));
+
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT title FROM note WHERE id = ?", String.class, liveTrashedId),
+        equalTo("Carbonara"));
+    assertThat(
+        folderPathFromRoot(
+            jdbcTemplate.queryForObject(
+                "SELECT folder_id FROM note WHERE id = ?", Integer.class, liveTrashedId)),
+        equalTo("_trash/Recipes/Pasta"));
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT title FROM note WHERE id = ?", String.class, legacyDeletedId),
+        equalTo("Carbonara (2)"));
+    assertThat(
+        folderPathFromRoot(
+            jdbcTemplate.queryForObject(
+                "SELECT folder_id FROM note WHERE id = ?", Integer.class, legacyDeletedId)),
+        equalTo("_trash/Recipes/Pasta"));
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT deleted_at FROM note WHERE id = ?", Timestamp.class, legacyDeletedId),
+        nullValue());
+  }
+
+  @Test
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void mixedCaseTrashRootIsMatchedCaseInsensitivelyAndContentsPreserved() throws Exception {
+    User owner = makeMe.aUser().please();
+    ownerUserIdsToClean.add(owner.getId());
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Folder trashRoot = makeMe.aFolder().notebook(notebook).name("_Trash").please();
+    Folder trashRecipes = makeMe.aFolder().parentFolder(trashRoot).name("Recipes").please();
+    makeMe.aFolder().parentFolder(trashRecipes).name("Pasta").please();
+    Folder recipes = makeMe.aFolder().notebook(notebook).name("Recipes").please();
+    Folder pasta = makeMe.aFolder().parentFolder(recipes).name("Pasta").please();
+    Note legacyDeleted = makeMe.aNote("Carbonara").folder(pasta).content("Legacy").please();
+    Integer legacyDeletedId = legacyDeleted.getId();
+    Integer trashRootId = trashRoot.getId();
+
+    markNoteLegacyDeleted(legacyDeletedId);
+
+    runMigration(Instant.parse("2026-09-13T12:00:00Z"));
+
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT name FROM folder WHERE id = ?", String.class, trashRootId),
+        equalTo("_Trash"));
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM folder WHERE notebook_id = ? AND parent_folder_id IS NULL AND LOWER(name) = '_trash'",
+            Integer.class,
+            notebook.getId()),
+        equalTo(1));
+    assertThat(
+        folderPathFromRoot(
+            jdbcTemplate.queryForObject(
+                "SELECT folder_id FROM note WHERE id = ?", Integer.class, legacyDeletedId)),
+        equalTo("_Trash/Recipes/Pasta"));
+  }
+
+  @Test
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void existingTrashFolderReadmesArePreservedAcrossMigration() throws Exception {
+    User owner = makeMe.aUser().please();
+    ownerUserIdsToClean.add(owner.getId());
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Folder trashRoot =
+        makeMe.aFolder().notebook(notebook).name("_trash").readmeContent("# Trash root").please();
+    Folder trashRecipes =
+        makeMe
+            .aFolder()
+            .parentFolder(trashRoot)
+            .name("Recipes")
+            .readmeContent("# Trash recipes")
+            .please();
+    Folder recipes = makeMe.aFolder().notebook(notebook).name("Recipes").please();
+    Note legacyDeleted = makeMe.aNote("Pasta").folder(recipes).content("Legacy").please();
+    Integer legacyDeletedId = legacyDeleted.getId();
+    Integer trashRootId = trashRoot.getId();
+    Integer trashRecipesId = trashRecipes.getId();
+
+    markNoteLegacyDeleted(legacyDeletedId);
+
+    runMigration(Instant.parse("2026-09-13T12:00:00Z"));
+
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT readme_content FROM folder WHERE id = ?", String.class, trashRootId),
+        equalTo("# Trash root"));
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT readme_content FROM folder WHERE id = ?", String.class, trashRecipesId),
+        equalTo("# Trash recipes"));
+    assertThat(
+        folderPathFromRoot(
+            jdbcTemplate.queryForObject(
+                "SELECT folder_id FROM note WHERE id = ?", Integer.class, legacyDeletedId)),
+        equalTo("_trash/Recipes"));
+  }
+
+  @Test
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void everyMigratedNoteEndsUpWithAUniqueNotebookFolderTitleCombination() throws Exception {
+    User owner = makeMe.aUser().please();
+    ownerUserIdsToClean.add(owner.getId());
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Folder recipes = makeMe.aFolder().notebook(notebook).name("Recipes").please();
+    Folder pasta = makeMe.aFolder().parentFolder(recipes).name("Pasta").please();
+    Folder trashRoot = makeMe.aFolder().notebook(notebook).name("_trash").please();
+    Folder trashRecipes = makeMe.aFolder().parentFolder(trashRoot).name("Recipes").please();
+    Folder trashPasta = makeMe.aFolder().parentFolder(trashRecipes).name("Pasta").please();
+    Note liveTrashed = makeMe.aNote("Carbonara").folder(trashPasta).content("Live").please();
+    Note legacyColliding = makeMe.aNote("Carbonara").folder(pasta).content("Legacy").please();
+    Note legacyOther = makeMe.aNote("Salad").folder(recipes).content("Other").please();
+
+    markNoteLegacyDeleted(legacyColliding.getId());
+    markNoteLegacyDeleted(legacyOther.getId());
+
+    runMigration(Instant.parse("2026-09-13T12:00:00Z"));
+
+    List<String> uniqueKeys =
+        jdbcTemplate.queryForList(
+            "SELECT CONCAT(notebook_id, ':', folder_id, ':', title) FROM note WHERE id IN (?, ?, ?)",
+            String.class,
+            liveTrashed.getId(),
+            legacyColliding.getId(),
+            legacyOther.getId());
+    assertThat(new java.util.LinkedHashSet<>(uniqueKeys).size(), equalTo(uniqueKeys.size()));
+    assertThat(uniqueKeys.size(), equalTo(3));
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT title FROM note WHERE id = ?", String.class, legacyColliding.getId()),
+        equalTo("Carbonara (2)"));
+    assertThat(
+        jdbcTemplate.queryForObject(
+            "SELECT title FROM note WHERE id = ?", String.class, liveTrashed.getId()),
+        equalTo("Carbonara"));
+  }
+
+  private void markNoteLegacyDeleted(Integer noteId) {
+    jdbcTemplate.update(
+        "UPDATE note SET deleted_at = ? WHERE id = ?",
+        Timestamp.from(Instant.parse("2026-08-01T00:00:00Z")),
+        noteId);
   }
 
   private void runMigration(Instant migrationTime) throws Exception {

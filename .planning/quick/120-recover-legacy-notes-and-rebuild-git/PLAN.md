@@ -373,7 +373,7 @@ helper into the shared `NotebookGitRows` class.
 
 ### 9. Migration preserves existing trash and colliding legacy content
 Type: Behavior
-Status: planned
+Status: done
 Sizing: 5–8 minutes, low confidence; isolated SQL proof wait exception.
 
 Behavior: Existing trash is preserved while colliding incoming legacy notes
@@ -387,6 +387,20 @@ payloads before/after and check every final path is unique. Inspect note/folder
 namespace rules before adding an intermediate-path special case: use the
 existing domain rule, and surface only a genuinely unresolved placement policy.
 Safe stop: Candidate migration handles coexistence without loss or overwrites.
+
+Learning: Fixed `NoteLegacyTrashMigration.migrateNote` to detect notes already
+under a `_trash` root (case-insensitive) by checking the root segment of the
+folder trail. If already trashed, the note keeps its current `folder_id` and only
+`deleted_at` is cleared (with in-place title conflict resolution) — no double
+`_trash` prefix. Otherwise the original mirror-trail-under-`_trash` logic applies.
+Added 5 tests to `NoteLegacyTrashMigrationTest`: already-trashed note keeps
+location without double prefix; colliding legacy note gets suffixed title
+alongside a live trashed occupant; mixed-case `_Trash` root is reused
+case-insensitively with contents preserved; existing trash folder Readmes are
+preserved across migration; every migrated note ends up with a unique
+`(notebook_id, folder_id, title)` combination. Refactor extracted a
+`markNoteLegacyDeleted` test helper for the repeated soft-delete fixture step and
+removed dead code.
 
 ### 10. Consolidate the remaining legacy availability boundary
 Type: Structure

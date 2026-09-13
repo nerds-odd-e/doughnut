@@ -107,10 +107,16 @@ public final class NoteLegacyTrashMigration {
   private static void migrateNote(Connection connection, NoteRow note, Timestamp now)
       throws SQLException {
     int notebookId = note.notebookId();
-    Integer trashRootId = findOrCreateTrashRoot(connection, notebookId, now);
-    Integer destinationFolderId = trashRootId;
-    if (note.folderId() != null) {
-      List<FolderRow> trail = folderTrailFromRootToContaining(connection, note.folderId());
+    List<FolderRow> trail =
+        note.folderId() == null
+            ? List.of()
+            : folderTrailFromRootToContaining(connection, note.folderId());
+    Integer destinationFolderId;
+    if (!trail.isEmpty() && trail.get(0).name().equalsIgnoreCase(TRASH_ROOT_NAME)) {
+      destinationFolderId = note.folderId();
+    } else {
+      Integer trashRootId = findOrCreateTrashRoot(connection, notebookId, now);
+      destinationFolderId = trashRootId;
       for (FolderRow segment : trail) {
         destinationFolderId =
             findOrCreateChildFolder(
