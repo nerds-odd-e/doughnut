@@ -1,6 +1,10 @@
 # Exclude trashed notes from commissioned learning reports
 
-Status: planned
+Status: done
+Execution mode: Story Branch Mode
+Originating checkout: `/Users/terryyin/git/doughnut` on `main`
+Execution checkout: `/Users/terryyin/git/doughnut-worktrees/116-learning-report-excludes-trashed-notes` on `codex/116-learning-report-excludes-trashed-notes`
+Integration target: `main` in `/Users/terryyin/git/doughnut`
 Source: bounded correction from the retrospective of completed SEED-009 story
 29 and plan 115. Their source and execution contract are recoverable from
 before-cleanup commit `745c8450f5` at
@@ -91,7 +95,7 @@ ADR 0002 remains Proposed and is not a constraint for this correction.
 
 ### 1. Trashed commissioned notes cannot be graded by report
 Type: Behavior
-Status: planned
+Status: done
 Size: about 5 minutes; one repository selection change and one controller proof
 loop, with backend-suite wait outside active work.
 Proof: `LearningSessionRecordTests` exercises the public controller record
@@ -107,6 +111,22 @@ does not Grade that tracker and returns the existing ineligible-entry outcome.
 Use a repository selection that composes `Note.JPA_AVAILABLE` for this learning
 boundary. Do not narrow `findLiveNotesByNotebookIdOrderByIdAsc`; its inclusive
 storage/export callers must continue seeing retained trashed files.
+
+Execution learning: The behavior was already enforced at the actual grading
+boundary. `LearningSessionService` resolves a matched note through
+`UserService.getMemoryTrackersFor`, whose `MemoryTrackerRepository.findByUserAndNote`
+query composes `Note.NATIVE_AVAILABLE`. The new controller regression passed
+before any production change, so adding another note-selection query would
+duplicate availability and change title-matching semantics without a failing
+example. The delivered change is focused regression proof only.
+
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after the
+test refactor and formatting, covering the trashed-note rejection, unchanged
+RecallLog and scheduling state, and existing active-note recording behavior.
+
+CI observation: unavailable for the execution branch because `.github/workflows/ci.yml`
+triggers pushes to `main` only. Delivery continues without claiming branch CI
+coverage.
 
 ## Proof ownership and delivery
 

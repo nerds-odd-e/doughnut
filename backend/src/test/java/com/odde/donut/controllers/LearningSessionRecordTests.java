@@ -4,11 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.donut.controllers.dto.RecordLearningSessionResponse;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -45,12 +46,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
     SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
     MemoryTracker holaTracker = fixture.holaTracker();
-    var trackerStateBefore =
-        Arrays.asList(
-            holaTracker.getLastRecalledAt(),
-            holaTracker.getRecallCount(),
-            holaTracker.getStability(),
-            holaTracker.getNextRecallAt());
+    TrackerLearningState trackerStateBefore = learningStateOf(holaTracker);
     long logsBefore = recallLogRepository.count();
 
     RecordLearningSessionResponse response =
@@ -68,13 +64,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     assertThat(response.getRecordedItems(), empty());
     assertThat(response.getRejectedEntries(), hasSize(2));
     assertThat(recallLogRepository.count(), equalTo(logsBefore));
-    assertThat(
-        Arrays.asList(
-            holaTracker.getLastRecalledAt(),
-            holaTracker.getRecallCount(),
-            holaTracker.getStability(),
-            holaTracker.getNextRecallAt()),
-        equalTo(trackerStateBefore));
+    assertThat(learningStateOf(holaTracker), equalTo(trackerStateBefore));
   }
 
   @Test
@@ -102,6 +92,39 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
+  void rejectsTrashedCommissionedNoteWithoutChangingItsLearningHistoryOrSchedule()
+      throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    Notebook notebook =
+        makeMe
+            .aNotebook()
+            .creatorAndOwner(currentUser.getUser())
+            .name("Spanish conversation")
+            .please();
+    Folder trash = makeMe.aFolder().notebook(notebook).name("_trash").please();
+    Note note = makeMe.aNote().folder(trash).title("Hola").content("Hello").please();
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerFor(note).commissioned().nextRecallAt(dayTwo).please();
+    TrackerLearningState trackerStateBefore = learningStateOf(tracker);
+
+    RecordLearningSessionResponse response =
+        controller.record(
+            recordRequest(notebook, learningSessionReport("Hola", 4)), "Asia/Shanghai");
+
+    assertThat(response.getRecordedItems(), empty());
+    assertThat(response.getRejectedEntries(), hasSize(1));
+    assertThat(
+        response.getRejectedEntries().getFirst().getReason(),
+        containsString("No commissioned memory tracker"));
+    assertThat(
+        recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(tracker.getId()),
+        empty());
+    assertThat(learningStateOf(tracker), equalTo(trackerStateBefore));
+  }
+
+  @Test
   void legacyScoresTagReportRecordsGrades() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
@@ -118,4 +141,20 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     assertThat(response.getRecordedItems().get(1).getGrade(), equalTo(1));
     assertThat(fixture.holaTracker().getLastRecalledAt(), equalTo(dayTwo));
   }
+
+  private static TrackerLearningState learningStateOf(MemoryTracker tracker) {
+    return new TrackerLearningState(
+        tracker.getLastRecalledAt(),
+        tracker.getRecallCount(),
+        tracker.getStability(),
+        tracker.getDifficulty(),
+        tracker.getNextRecallAt());
+  }
+
+  private record TrackerLearningState(
+      Timestamp lastRecalledAt,
+      Integer recallCount,
+      Float stability,
+      Float difficulty,
+      Timestamp nextRecallAt) {}
 }
