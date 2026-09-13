@@ -157,100 +157,64 @@ data; invalid or ambiguous changes must not silently discard work.
 
 <a id="story-22"></a>
 
-### 22. Pull a web note rename, then publish local edits back to the same Donut note
+### 22. Receive a web note rename locally
 
-- **Refinement status:** Refined on 2026-09-13 at the owner's request to challenge
-  purpose, timing, and scope. Refinement only; no execution plan or implementation
-  is authorized. Priority is unchanged.
-- **Goal:** A notebook owner can correct a learned note's name while using Donut,
-  then continue refining its content in a local editor and publish back to the
-  same Donut note, retaining its learning history.
-- **Meaning of identity:** The owner clarified that local files have no stable
-  Donut ID. Locally, the old path disappears and the new path appears; whether
-  the filesystem moves or recreates the file is irrelevant. The retained
-  identity is the server-side note ID and its learning data after the round trip.
-  This follows [Accepted ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md):
-  Portable paths change on rename; Donut note IDs stay server-side.
-- **Why / critical challenge:** The benefit is freedom to switch editing tools
-  after an ordinary web action without manual repair or restarting learning.
-  Merely making Git display a renamed file would not establish that value: the
-  subsequent publication must update the original learned note. Conversely,
-  preserving a supposed local file identity adds no user benefit and is not a
-  requirement. The owner confirms the wording problem does not invalidate the
-  item, but no frequency, failed session, or recovery cost is recorded here.
-- **Why now / recommendation:** The shared web/local editing direction and the
-  owner's earlier prioritization support addressing this basic transition before
-  broad synchronization work. They do not establish urgency or justify moving
-  it above the queued portable-trash work. Retain its current place provisionally;
-  before implementation, confirm an expected near-term session that needs web
-  rename followed by local editing. If owners comfortably stay in one editor,
-  defer it. This story does not depend on accumulated local publication or web
-  moves, and their future value is not a reason to enlarge this delivery.
-- **Strongest simpler alternative:** Finish both the rename and content editing
-  in Donut, postponing the switch to a local editor. That is sufficient when
-  switching tools is optional; it is insufficient when the owner needs Obsidian
-  or an AI IDE for the next edit. Renaming locally and publishing is another
-  candidate workaround, but its fit and current support must be demonstrated
-  before recommending it. Manual duplicate renaming on both sides is not an
-  established safe workflow.
-- **Delivery scope:** One already bound notebook with live Donut content matching
-  accepted history. Rename an existing ordinary note in place through the web's
-  existing title action to a valid, unoccupied name. Append accepted history;
-  pull into a clean local checkout whose head is an ancestor of or equal to the
-  accepted head. The old file path disappears and the new path contains the
-  note's content. Make a local content edit at that new path, commit, and publish
-  through the existing command; Donut retains the note ID, URL, and learning
-  history. No overlapping unpublished local work or intervening web changes are
-  needed to demonstrate this journey.
-- **Preserved behavior and constraints:** Retain authorization, existing title
-  validation and collision behavior, authored content, and the web rename's
-  existing reference-handling semantics. Any reference updates produced by that
-  action must travel with the accepted history; narrowing to one renamed note
-  does not permit dropping affected references. Preserve the append-only commit
-  chain. Add no stable IDs to local Markdown. Clean sequential editing is the
-  delivery assumption, not a new editing lock. Example counts are not limits;
-  deferred cases do not justify new rejection rules or regressions.
+- **Refinement status:** Refined and scope corrected on 2026-09-13. The owner
+  confirms web renaming happens frequently and receiving those changes locally
+  is a much-needed next behavior. Slice planning is authorized; implementation
+  is not. Backlog priority is unchanged.
+- **Goal / why now:** A notebook owner who frequently renames notes on the web
+  can pull those names into their local notebook without manually repeating the
+  rename or replacing the checkout. Staying in one editor does not meet this
+  stated need. Earlier uncertainty about whether the owner needs this behavior
+  is resolved by that explicit usage evidence.
+- **Scope:** One already bound notebook whose live content matches accepted
+  history; rename an existing ordinary note within its current folder or at
+  notebook root using the existing web title action. Append accepted history.
+  A clean local checkout, behind or equal to that history, receives the new
+  filename and note content through ordinary pull, with the old path absent.
+  The story ends there: no local content edit or subsequent publication is
+  required. Preserve web note ID, URL, and learning history during the rename.
+- **Identity clarification:** Local Markdown carries no stable Donut ID. Its
+  Portable path changes; moving versus deleting and recreating the filesystem
+  entry is immaterial. The server note retains its identity. Follow
+  [Accepted ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md).
+- **Preserved behavior:** Keep existing authorization, title rules, authored
+  body/YAML, and reference-handling choices. Include same-notebook reference
+  rewrites in the received snapshot. Preserve existing web behavior for other
+  notebook referrers; synchronizing those other notebooks is not a new promise.
+  Failed web renames must not publish a partial rename. No new file IDs, editing
+  lock, history rewriting, or fixture-derived rejection rules.
 - **Key examples:**
-  1. Donut and local are synchronized at A with learned note `Biology/Cells.md`.
-     Rename it on the web to `Cell structure`: accepted history advances to B,
-     retaining A. Pull receives `Biology/Cell structure.md` and removes the old
-     path. Edit its body locally, commit C, and publish: Donut shows that body
-     at the original note URL, with the original note ID and learning history;
-     accepted history is A → B → C.
-  2. Another note references `Cells`. Perform the same rename using the existing
-     web reference-handling choice. Pull reproduces the resulting authored
-     reference content, and publication of the later local edit preserves those
-     semantics. A reference policy redesign is not part of this story.
-  3. Rename to a name already occupied under the same parent: existing collision
-     behavior applies, with neither note overwritten and no accepted rename
-     history published for a failed action.
-- **Deferred promises:** Local-origin rename detection, rename combined with
-  local content edits, folder/notebook renames, moves, trash/deletion/recreation,
-  cross-notebook transfer, accumulated local commit publication, divergent
-  histories and conflict recovery, new reference policies, history UI, and
-  performance targets. Existing supported behavior remains supported.
-- **Evidence and remaining uncertainty:** Source inspection shows
-  `cli/src/commands/notebook/notebookPull.ts` already has an ordinary fast-forward
-  receiving path. This suggests receipt may be reusable; it does not prove the
-  web rename is published correctly or that the subsequent local edit retains
-  the learned note. No tests were run during refinement and no complete current
-  journey was demonstrated. Establish the actual missing behavior before
-  planning changes; if the round trip already works, prefer closing the gap in
-  evidence over inventing implementation work. Confirm the existing web rename
-  reference choices with a concrete fixture when preparing proof.
-- **Learning and stop condition:** Have an owner perform the first example with
-  a note they actually want to rename and continue editing locally. Observe
-  whether avoiding manual repair enables the intended next edit, and whether
-  the clean sequential workflow fits. This proves feasibility, not frequency of
-  demand. If overlapping edits are essential, revisit the selected story rather
-  than silently adding reconciliation.
-- **Effort hypothesis:** Retain M (1–2 hours), low confidence. Reuse of existing
-  rename, accepted-history, pull, and publication behavior needs confirmation;
-  no detailed implementation or slice estimate is claimed.
-- **Depends on / safe stopping point:** Existing web rename, clone, publication,
-  and clean fast-forward pull. No new-story prerequisite is established. The
-  rename → pull → edit → publish journey delivers value independently if all
-  later Git stories are cancelled.
+  1. Donut and local share A with learned note `Biology/Cells.md`. Rename on the
+     web to `Cell structure`; accepted history appends B. Pull receives
+     `Biology/Cell structure.md` with the authored body/YAML and removes
+     `Biology/Cells.md`. Local is clean at B, retaining A as an ancestor;
+     the web note and its learning data remain the same.
+  2. A note in that notebook references `Cells`. Rename using either existing
+     reference choice; pull receives the resulting reference content with the
+     renamed file, preserving the selected visible-text semantics.
+  3. A referenced rename without the required reference-handling choice is
+     rejected by the existing action. The note, referrer, and accepted history
+     remain unchanged. Repeating an unchanged title creates no file-tree change.
+- **Deferred promises:** Local editing/publication after pull, local-origin
+  rename inference, moves, folder/notebook rename, trash/deletion/recreation,
+  divergent reconciliation, cross-notebook synchronization, new reference
+  policy, drift repair, and performance targets. These are delivery exclusions,
+  not instructions to reject naturally supported cases or regress existing work.
+- **Evidence:** `TextContentController.updateNoteTitle` currently changes live
+  notes and references without advancing accepted history. Content saves already
+  use `WebNoteContentSaveService` and `AcceptedSnapshotPersistence`.
+  `notebookPull.ts` and `notebookPull.fastForward.pathReceipt.ts` provide ordinary
+  fast-forward receipt and existing path-change proof. The missing web-origin
+  journey must be demonstrated through the real title action and local pull;
+  fixtures must not publish the rename on its behalf. Source/tests inspected,
+  not executed during planning.
+- **Effort hypothesis:** M (1–2 hours), low confidence around shared edit
+  orchestration and full-suite/E2E verification time.
+- **Depends on / safe stopping point:** Existing web rename, accepted snapshots,
+  clone, and clean fast-forward pull. No new-story prerequisite. The owner sees
+  the renamed local file even if later publishing and move stories are cancelled.
 
 <a id="story-23"></a>
 
