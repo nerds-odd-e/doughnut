@@ -5,7 +5,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.Folder;
@@ -16,6 +18,8 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.RecallLogRepository;
+import com.odde.donut.exceptions.ApiException;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
@@ -38,6 +42,69 @@ class NotebookGitWebContentHistoryControllerTest
   private static final String NOTE_PATH = "Root Note.md";
   private static final String CONTENT_1000 = "---\ntype: Note\n---\ncontent at 10:00";
   private static final String CONTENT_1008 = "---\ntype: Note\n---\ncontent at 10:08";
+  private static final String REFERENCE_CONTENT = content("See [[Target]].");
+
+  @Test
+  void unchangedTitleKeepsAcceptedHistoryWhileRetainingTimestampSemantics() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note note = makeMe.aNote().notebook(notebook).title("Original").please();
+    NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    String acceptedHead = accepted.getAcceptedGitObjectId();
+    byte[] acceptedBundle = accepted.getBundleBytes().clone();
+    testabilitySettings.timeTravelTo(Timestamp.from(T1008));
+
+    textContentController.updateNoteTitle(note, titleDto("Original"));
+
+    assertAcceptedHistoryUnchanged(notebook.getId(), acceptedHead, acceptedBundle);
+    assertThat(
+        noteRepository.findById(note.getId()).orElseThrow().getUpdatedAt(),
+        is(Timestamp.from(T1008)));
+  }
+
+  @Test
+  void missingReferenceChoiceKeepsAcceptedHistoryAndLiveNotesUnchanged() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note target = makeMe.aNote().notebook(notebook).title("Target").please();
+    Note referrer = makeMe.aNote().notebook(notebook).please();
+    textContentController.updateNoteContent(referrer, contentDto(REFERENCE_CONTENT));
+    NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    String acceptedHead = accepted.getAcceptedGitObjectId();
+    byte[] acceptedBundle = accepted.getBundleBytes().clone();
+
+    ApiException thrown =
+        assertThrows(
+            ApiException.class,
+            () -> textContentController.updateNoteTitle(target, titleDto("Renamed")));
+
+    assertThat(thrown.getErrorBody().getErrorType(), is(ApiError.ErrorType.BINDING_ERROR));
+    assertAcceptedHistoryUnchanged(notebook.getId(), acceptedHead, acceptedBundle);
+    assertThat(noteRepository.findById(target.getId()).orElseThrow().getTitle(), is("Target"));
+    assertThat(
+        noteRepository.findById(referrer.getId()).orElseThrow().getContent(),
+        is(REFERENCE_CONTENT));
+  }
+
+  @Test
+  void deniedOwnerKeepsAcceptedHistoryAndLiveNotesUnchanged() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note target = makeMe.aNote().notebook(notebook).title("Target").please();
+    Note referrer = makeMe.aNote().notebook(notebook).please();
+    textContentController.updateNoteContent(referrer, contentDto(REFERENCE_CONTENT));
+    NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    String acceptedHead = accepted.getAcceptedGitObjectId();
+    byte[] acceptedBundle = accepted.getBundleBytes().clone();
+    currentUser.setUser(createFixtureUser());
+
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> textContentController.updateNoteTitle(target, titleDto("Renamed")));
+
+    assertAcceptedHistoryUnchanged(notebook.getId(), acceptedHead, acceptedBundle);
+    assertThat(noteRepository.findById(target.getId()).orElseThrow().getTitle(), is("Target"));
+    assertThat(
+        noteRepository.findById(referrer.getId()).orElseThrow().getContent(),
+        is(REFERENCE_CONTENT));
+  }
 
   @Test
   void webRenameAppendsTheRenamedPortableTreeAndPreservesLearningIdentity() throws Exception {
@@ -157,5 +224,18 @@ class NotebookGitWebContentHistoryControllerTest
         assertThat(commit.getFullMessage(), is("Edit note content: Root Note"));
       }
     }
+  }
+
+  private static NoteUpdateTitleDTO titleDto(String title) {
+    NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
+    dto.setNewTitle(title);
+    return dto;
+  }
+
+  private void assertAcceptedHistoryUnchanged(
+      Integer notebookId, String acceptedHead, byte[] acceptedBundle) {
+    NotebookGitBinding reloaded = bindingById(notebookId);
+    assertThat(reloaded.getAcceptedGitObjectId(), is(acceptedHead));
+    assertThat(reloaded.getBundleBytes(), is(acceptedBundle));
   }
 }

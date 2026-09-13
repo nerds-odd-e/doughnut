@@ -1,6 +1,6 @@
 # Receive a web note rename locally
 
-Status: in progress
+Status: done
 Source: [SEED-009 story 22](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22)
 Created: 2026-09-13
 Authority: execution authorized by the owner on 2026-09-13.
@@ -243,7 +243,7 @@ on 2026-09-13. No production change was needed.
 
 ### 5. Keep accepted history unchanged when no title change is accepted
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given a bound notebook, an unchanged-title save or a title action
 rejected by existing authorization/reference-choice rules leaves the accepted
 head and bundle unchanged. A rejected action also retains live title/referrer
@@ -258,6 +258,10 @@ These business outcomes are distinct from testing an allowed loud exception.
 Sizing: 5 active minutes plus the required full backend suite wait.
 Safe stop: failed/no-op requests cannot publish a spurious rename; successful
 receipt from earlier slices remains green.
+Execution proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+with 2,421 tests on 2026-09-13. Bound controller examples cover unchanged-title
+timestamp semantics plus missing-choice and denied-owner rejection without
+accepted-history, target-title, or referrer-content changes.
 
 ## Verification and delivery
 
