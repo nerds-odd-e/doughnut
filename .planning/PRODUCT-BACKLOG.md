@@ -14,9 +14,9 @@ with reasonable performance.
 
 ## Taken
 
-## Backlog list
-
 - [Find and recover previously trashed notes through web navigation](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-34) — SEED-009
+
+## Backlog list
 - [Recover existing deleted notes through portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31) — SEED-009
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
 - [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
