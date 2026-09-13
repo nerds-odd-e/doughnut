@@ -237,3 +237,72 @@ the observer to see, regardless of how long it watches.
     inspecting the workflow's `on:` block for the target branch), not just
     confirming the workflow file/name resolve, or it will silently watch a
     branch that structurally cannot produce events.
+
+## DD-018 — `EnterWorktree`'s default base ref and branch-name sanitization conflict with this project's worktree/branch convention
+
+The harness's built-in `EnterWorktree` tool, used to set up a planned-execution
+worktree for an intended branch name containing `/` (this project's
+`quick/<slug>` convention), does not treat that name as a literal branch name:
+each `/`-segment is sanitized and a `worktree-` prefix is added, and its
+default `baseRef: "fresh"` branches from `origin/<default-branch>` rather than
+local `HEAD`, silently omitting a commit already made locally on the
+originating branch before the worktree was created.
+
+### Occurrences
+
+- Execution: SEED-018 story 5 / quick/112-publish-additions-with-simpler-title-check / 691e7be961
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.14
+  - Evidence: `EnterWorktree(name: "quick/112-publish-additions-with-simpler-title-check")`
+    returned branch `worktree-quick+112-publish-additions-with-simpler-title-check`
+    checked out at `4b89109c99` (origin/main's tip), while local `main` was
+    already one commit ahead at `aaabfcf552` (the backlog "Taken" transition
+    commit made just before). The coordinator detected the mismatch via `git
+    branch --show-current` / `git log --oneline`, called
+    `ExitWorktree(action: "remove")`, then created
+    `.worktrees/112-publish-additions-with-simpler-title-check` with plain
+    `git worktree add -b quick/112-publish-additions-with-simpler-title-check
+    aaabfcf552` under this project's own gitignored `.worktrees/` convention.
+  - Observed effect: one full extra round-trip (create, inspect, remove)
+    before the correctly named/based worktree existed; no lost work, since
+    nothing had yet been written into the discarded worktree.
+  - Inference: a coordinator following a project convention that both names
+    execution branches literally and requires branching from a fresh
+    local-only commit should create the worktree with plain `git worktree add`
+    rather than `EnterWorktree`, whenever either constraint applies.
+
+## DD-019 — Delegated implementation agent's own background watches kept notifying the coordinator after its final report
+
+An implementation subagent that ran several sequential long-running background
+benchmark commands during one delegated slice appears to have armed a
+watch/monitor for each one. After the agent returned its complete final report
+to the coordinator, each of those watches individually timed out afterward and
+fired its own separate "stale, already complete" task-notification back to the
+coordinator, one at a time.
+
+### Occurrences
+
+- Execution: SEED-018 story 5 / quick/112-publish-additions-with-simpler-title-check / 691e7be961
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.14
+  - Evidence: after the implementation agent (delegated task for this slice)
+    returned its full final report (baseline/candidate benchmark numbers,
+    proof log), the coordinator received seven further separate
+    task-notifications for the same already-completed task, each one
+    self-described in its own result text as a "stale monitor timeout" for one
+    specific already-reported benchmark run (baseline runs 1-3, candidate runs
+    1-3, and the small acceptance/rejection run), arriving individually over
+    the following several minutes while a second delegated agent (the
+    post-change-refactor pass) was concurrently running.
+  - Observed effect: seven extra coordinator turns, each requiring inspection
+    of the notification and a one-line "no action needed" acknowledgment,
+    interleaved with the unrelated in-progress refactor-agent notification the
+    coordinator was actually waiting on.
+  - Inference: each notification's own text confirmed it added no information
+    beyond the agent's already-received final report, so the cost was purely
+    coordinator attention; a subagent that arms one watch per background
+    command it launches, without stopping or consolidating those watches once
+    it has already produced its own synchronous final report, generates this
+    kind of post-completion notification noise.

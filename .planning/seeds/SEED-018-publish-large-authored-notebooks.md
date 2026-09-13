@@ -59,82 +59,6 @@ L = 2–4 hours. Estimates are hypotheses, not commitments.
 
 Stories below are in priority order; stable story numbers retain their identity.
 
-<a id="story-5"></a>
-
-### 5. Publish new notes faster while preserving deleted-title conflicts
-
-- **Goal / beneficiary:** Notebook owners publishing many new notes wait less
-  by reducing the cost of checking titles reserved by soft-deleted notes,
-  while receiving exactly the current publication and conflict behavior.
-- **Evidence:** The retained 1,000-existing / 1,000-addition observation after
-  attachment-cleanup optimization took 13,368.447 ms. Of 600 request-thread
-  execution samples, 425 were in flushing reached through
-  `NoteTitlePlacementRules.requireNoSoftDeletedTitleAt` (425 of 432 flush
-  samples). This is the leading sampled hotspot in that addition capture, not
-  a measured elapsed-time share or a repeated comparison baseline. See
-  [the profile](../../docs/notebook-publication-profiling.md#separate-addition-observation).
-- **Scope:** Optimize the existing shared title-conflict check and its
-  persistence interactions. Preserve notebook/folder scope, title matching,
-  deleted-note identity in errors, UI recovery behavior, Git path-context
-  errors, authorization, and atomic rollback. No title-policy relaxation,
-  trash implementation, production-data migration, or deletion-schema redesign.
-- **Acceptance boundary:** On the maintained 1,000-existing / 1,000-addition
-  workload, candidate median completed HTTP publication time must be strictly
-  less than half a fresh unchanged-baseline median (>50% less waiting).
-  Use three successful comparable runs per version, identical fixture and
-  environment settings, with setup and receiver verification outside the timer.
-  These are additions, deliberately differing from the earlier thread's update
-  workload to exercise the measured hotspot. No 10,000-note measurement here.
-- **Simplicity is also required:** Fewer formatted production lines overall in
-  the affected implementation, clearer domain intent, and less unnecessary work.
-  Do not obtain speed through added behavior, special modes, extra conditions,
-  parallel caches, background jobs, or expanded orchestration. Do not game line
-  counts by compressing formatting, deleting useful documentation, or moving
-  unchanged code outside the counted files. Count tests/tooling separately.
-- **Stopping rule:** Once >50% reduction, simplicity, and preservation are
-  established, finish this round. A larger natural gain is welcome; do not seek
-  further hotspots or expand scope to chase it. If a small simplification misses
-  the target, report that finding rather than adding complexity or claiming success.
-- **Key examples:** Many valid new notes publish faster with all authored content
-  and the proposed head intact. Existing addition/rename/relocation conflicts
-  retain their deleted-note identity and error context without resurrection or
-  partial acceptance. Existing UI recovery behavior is unchanged. Reuse current
-  proof; add only a missing observable transaction-visibility regression justified
-  by the chosen simplification, not an exhaustive new scenario matrix.
-- **Narrow solution direction:** Simplify the shared title lookup's unnecessary
-  persistence work. The existing orphan-image lookup demonstrates a query-local
-  flush approach, but its safety is not transferable by assumption: title checks
-  must see relevant pending deletion, restore, and placement state. Verify that
-  responsibility on the real database before accepting a candidate. Avoid
-  full-note loading if only an identifier is required and this simplifies the
-  same lookup. The earlier bulk-check fallback is not selected; a new batch
-  framework or publication-only policy would contradict this round's constraints.
-- **Refinement result:** Product scope and acceptance are settled. The remaining
-  uncertainty is technical feasibility of a small, behavior-preserving
-  simplification; the execution slice owns its proof and must stop if unsupported.
-  [Slice plan](../quick/112-publish-additions-with-simpler-title-check/PLAN.md).
-- **Future compatibility:** Keep the current rule in one place and optimize
-  how it is evaluated, without adding durable representations or public
-  contracts around title reservation. The future trash story can replace the
-  rule without inheriting a new cache or publication-specific policy. Do not
-  implement speculative trash abstractions now.
-- **Alternatives:** Raising timeouts or asking owners to split commits does
-  not remove repeated server work. Deleting the check or implementing trash
-  changes behavior and is outside this story. Retain the current implementation
-  if a candidate cannot demonstrate both correctness and a meaningful gain.
-- **Effort hypothesis:** M (1–2 hours), low confidence dominated by proof and measurement
-  waiting; one narrow simplification, with a stop if the approach needs expansion.
-- **Depends on:** Delivered attachment-cleanup and index-maintenance improvements
-  provide the baseline. No dependency on the deferred trash redesign.
-- **Safe stopping point:** Faster additions with unchanged semantics are useful
-  even if trash is never implemented. Broader 10,000-note validation stays in
-  story 4; do not claim that scale from a 1,000-addition comparison.
-- **Source:** Owner's 2026-09-13 request and clarification, plus the user
-  discussion in task `Optimize performance baseline`
-  (`01a09544-77d4-7f80-86da-11b7acbaa813`), read on 2026-09-13.
-  Preserve its small-first, >50% improvement through simplification intent;
-  current instructions select additions and keep trash last in the queue.
-
 <a id="story-4"></a>
 
 ### 4. Validate publication performance at 10,000-note scale
@@ -153,20 +77,31 @@ Stories below are in priority order; stable story numbers retain their identity.
   1,000-existing/1,000-edit median from 29,746.720 ms first to 10,308.043 ms,
   then from a fresh 12,089.157 ms baseline to 3,095.452 ms. They replaced
   whole-session flush/query choreography with direct bulk queries and direct
-  orphan-image selection while retaining entity deletion. The
+  orphan-image selection while retaining entity deletion. The now-delivered
+  addition optimization (below) reduced the 1,000-existing/1,000-addition
+  median from a fresh 11,876.320 ms baseline to 3,064.883 ms (74.2% less
+  waiting) the same way: replacing a full-entity, default-auto-flush query
+  with a scalar-id `EntityManager` read under `FlushModeType.COMMIT`. The
   near-future direction names a larger goal directly ("owners of notebooks
   with 10,000 notes can publish to the remote quickly, with reasonable
-  performance"). The smaller fixture does not establish whether those gains
-  hold proportionally at that scale.
+  performance"). Neither smaller fixture establishes whether those gains hold
+  proportionally at 10,000-note scale.
 - **Evidence for a next round:** The
   [attachment-cleanup refinement](../../docs/notebook-publication-profiling.md#attachment-cleanup-refinement)
-  records 74.39% less waiting for delivered updates, but only an exploratory
-  39.79% gain for additions. Update image-cleanup flush samples fell to zero,
-  while addition flush samples remained concentrated in soft-deleted-title
-  checking.
-  Do not use the earlier 73% flush share to claim index rebuilding is still
-  dominant. The historical 1,000-existing / 10,000-addition
-  captures remain unmeasured against these improvements.
+  records 74.39% less waiting for delivered updates. Additions were originally
+  only an exploratory 39.79% gain after that same refinement, with addition
+  flush samples remaining concentrated in soft-deleted-title checking
+  (425 of 432 flush samples); the now-delivered
+  [addition title-check simplification](../../docs/notebook-publication-profiling.md#additions-title-check-simplification)
+  addressed that hotspot directly and reached 74.2%, matching the update
+  result's order of magnitude. Do not use the earlier 73% flush share to claim
+  index rebuilding is still dominant. The historical 1,000-existing /
+  10,000-addition captures remain unmeasured against these improvements.
+  **Hypothesis for this round (unvalidated):** if the 10,000-note run again
+  shows a flush-dominated per-note query as the leading cost, the same
+  `EntityPersister`/`FlushModeType.COMMIT`-on-read pattern used for the title
+  check may be worth checking against that query too, after proving its own
+  same-transaction visibility the same way.
 - **Value / learning:** Test whether the smaller-workload gains carry over to
   a large notebook and identify any remaining scaling limitation before
   claiming acceptable large-notebook performance. Include the user's staged
@@ -181,8 +116,9 @@ Stories below are in priority order; stable story numbers retain their identity.
   before slice planning; this is not an executable story yet.
 - **Effort hypothesis:** M (1–2 hours), low confidence; assumes reuse of the
   existing profiler and bounded captures rather than an optimization round.
-- **Depends on:** The smaller-workload improvements are delivered; use their
-  behavior as the new baseline. Reuse profiling infrastructure
+- **Depends on:** The smaller-workload improvements are delivered for both
+  updates (3,095.452 ms median) and additions (3,064.883 ms median); use both
+  as the new baseline. Reuse profiling infrastructure
   (`scripts/profiling/run-notebook-publication-profile.mjs`,
   `PUBLICATION_PROFILE_EXISTING`/`PUBLICATION_PROFILE_UPDATES`/`PUBLICATION_PROFILE_ADDITIONS`).
 - **Safe stopping point:** Retain a verified scaling result and explicit limits
@@ -273,21 +209,24 @@ flush samples). This is a strong addition-path hotspot signal, not a measured
 71% share of elapsed time or a demonstrated 10,000-note bottleneck. Ordinary
 existing-note content updates do not execute that creation check.
 
-The separate [addition optimization story](#story-5) now owns improving this
-check while preserving behavior. Use its delivered result as the baseline when
-available; measure any remaining check cost separately from derived indexing.
+The now-delivered
+[addition title-check simplification](../../docs/notebook-publication-profiling.md#additions-title-check-simplification)
+addressed this check while preserving behavior, reaching a 74.2% reduction at
+1,000/1,000 scale. Use that result as this story's addition baseline; measure
+any remaining check cost at 10,000-note scale separately from derived indexing.
 The owner permits pursuing other improvements when this cost is not dominant.
 Do not duplicate that optimization here or require the broader deletion redesign
 merely to improve speed. No schema or deletion-policy change is selected.
 
 ## Ordering and Scope Reduction
 
-The product backlog owns current priority: story 5's behavior-preserving addition
-optimization precedes story 4's scale validation, with the combined deletion/trash
-idea still last. Story 4 still needs refinement of its workload and
-acceptable waiting time. It remains a non-executable planning input. The user
-explicitly authorizes temporary code experiments, measurement, and profiling
-during its future refinement, consistent with the earlier authorized work.
+The product backlog owns current priority: the addition-optimization story is
+delivered (see story 4's evidence above), so story 4's scale validation is next,
+with the combined deletion/trash idea still last. Story 4 still needs
+refinement of its workload and acceptable waiting time. It remains a
+non-executable planning input. The user explicitly authorizes temporary code
+experiments, measurement, and profiling during its future refinement,
+consistent with the earlier authorized work.
 
 ## Breadcrumbs
 

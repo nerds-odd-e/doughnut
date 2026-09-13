@@ -2,13 +2,12 @@ package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.entities.Folder;
-import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.ApiException;
+import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.validators.DisplayNamePathSeparators;
+import jakarta.persistence.FlushModeType;
 import java.util.List;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,10 +17,10 @@ public class NoteTitlePlacementRules {
       "A note with this title already exists here but was deleted. Restore the deleted note"
           + " (Undo delete), or choose another title.";
 
-  private final NoteRepository noteRepository;
+  private final EntityPersister entityPersister;
 
-  public NoteTitlePlacementRules(NoteRepository noteRepository) {
-    this.noteRepository = noteRepository;
+  public NoteTitlePlacementRules(EntityPersister entityPersister) {
+    this.entityPersister = entityPersister;
   }
 
   public void requireNoSoftDeletedTitleAt(Notebook notebook, Folder folderOrNull, String title) {
@@ -31,17 +30,30 @@ public class NoteTitlePlacementRules {
       return;
     }
     Integer folderId = folderOrNull != null ? folderOrNull.getId() : null;
-    List<Note> matches =
-        noteRepository.findSoftDeletedByNotebookFolderAndTitleOrderByIdAsc(
-            notebook.getId(), folderId, trimmed, PageRequest.of(0, 1));
+    // Callers already flush any same-transaction soft-delete via an ordinary query first (see
+    // NoteTitlePlacementRulesFlushVisibilityTest), so this read can skip the unrelated-inserts
+    // auto-flush that otherwise dominates bulk publication.
+    List<Integer> matches =
+        entityPersister
+            .createQuery(
+                "SELECT n.id FROM Note n WHERE n.notebook.id = :notebookId AND n.deletedAt IS"
+                    + " NOT NULL AND LOWER(n.title) = LOWER(:title) AND ((:folderId IS NULL AND"
+                    + " n.folder IS NULL) OR (:folderId IS NOT NULL AND n.folder.id ="
+                    + " :folderId)) ORDER BY n.id ASC",
+                Integer.class)
+            .setParameter("notebookId", notebook.getId())
+            .setParameter("folderId", folderId)
+            .setParameter("title", trimmed)
+            .setFlushMode(FlushModeType.COMMIT)
+            .setMaxResults(1)
+            .getResultList();
     if (matches.isEmpty()) {
       return;
     }
-    Note deleted = matches.getFirst();
     ApiError apiError =
         new ApiError(
             SOFT_DELETED_TITLE_CONFLICT_MESSAGE, ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT);
-    apiError.add("deletedNoteId", String.valueOf(deleted.getId()));
+    apiError.add("deletedNoteId", String.valueOf(matches.getFirst()));
     throw new ApiException(apiError);
   }
 }

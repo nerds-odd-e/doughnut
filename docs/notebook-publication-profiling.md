@@ -169,6 +169,59 @@ patch; they do not imply that revision contains the experimental source.
 Production patch SHA-256:
 `6fab86ea944d47fbf9b2693650a3cb7ac8e306a1c37d5f55c039135ae995c7fa`.
 
+## Additions title-check simplification
+
+Follow-up on the "Separate addition observation" finding above: the
+addition-specific `NoteTitlePlacementRules.requireNoSoftDeletedTitleAt` query
+remained on Hibernate's default AUTO flush mode, forcing a full-session flush
+of every still-pending insert before each per-note title-conflict check.
+
+### Measured cause and change
+
+The shared lookup (`NoteRepository.findSoftDeletedByNotebookFolderAndTitleOrderByIdAsc`,
+a Spring Data query hydrating full `Note` entities) was replaced with a direct
+`EntityManager` query (via the existing `EntityPersister.createQuery` helper,
+already used the same way by `NoteService.deleteOrphanImagesForPersistedContent`)
+selecting only the matched note's `id`, with `FlushModeType.COMMIT` and
+`setMaxResults(1)`. The now-unused repository method was removed. Only soft-deleted
+notes are ever matched, and soft-deletion is never pending on a concurrently
+processed sibling addition, so skipping the auto-flush does not change which
+rows the query can see for this call's purpose. A same-transaction visibility
+proof (`NoteTitlePlacementRulesFlushVisibilityTest`, real Hibernate/MySQL Unit
+Test database, no mocking) confirms a soft-delete performed via
+`NoteService.destroy(...)` immediately beforehand is still detected, because
+`destroy()` itself triggers an ordinary AUTO-flush query before returning.
+
+### Completed addition comparison
+
+One completed run per version with **1,000 existing notes / 1,000 additions**,
+using this checkout's `run-notebook-publication-profile.mjs` launcher
+(`PUBLICATION_PROFILE_EXISTING=1000 PUBLICATION_PROFILE_ADDITIONS=1000
+PUBLICATION_PROFILE_TAGS=@publicationProfileHttp`), completed HTTP time
+including transaction commit:
+
+| Version | Run 1 | Run 2 | Run 3 | Median |
+| --- | ---: | ---: | ---: | ---: |
+| Baseline | 11,921.864 ms | 11,876.320 ms | 11,687.244 ms | 11,876.320 ms |
+| Candidate | 2,843.633 ms | 3,951.632 ms | 3,064.883 ms | 3,064.883 ms |
+
+Candidate median is **25.8% of baseline** (a 74.2% reduction), well past the
+required <0.5× threshold. Each run verified the proposed head, a clean
+receiving checkout, and all 1,000 added documents byte-for-byte.
+
+Small preserved-behavior checks also passed against the candidate: 20
+additions accepted and verified, and a late rejection correctly rolled back
+prior work, via `PUBLICATION_PROFILE_EXISTING=20 PUBLICATION_PROFILE_ADDITIONS=20
+PUBLICATION_PROFILE_TAGS='@publicationProfileHttp or @publicationProfileHttpRejection'`.
+The full backend suite (481 test classes), including `SoftDeletedTitleConflictMvcTest`
+and `NotebookGitDeletedDestinationControllerTest`, passed unchanged.
+
+Formatted production diff: **23 insertions / 29 deletions, net −6**, across the
+two existing files touched (`NoteTitlePlacementRules.java`,
+`NoteRepository.java`); no new production file. One repository method was
+removed entirely rather than generalized. Test-only changes add one new file
+(`NoteTitlePlacementRulesFlushVisibilityTest.java`).
+
 ## Smaller-workload refinement
 
 Investigation date: 2026-09-12. Source baseline:
