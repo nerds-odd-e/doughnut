@@ -18,6 +18,19 @@ When(
 )
 
 When(
+  'I open the folder page for {string} under open parent {string}',
+  (childLabel: string, parentLabel: string) => {
+    start.noteSidebar().openFolderPageUnderOpenParent(parentLabel, childLabel)
+  }
+)
+
+Then('I should see the folder page is in trash', () => {
+  cy.get('[data-testid="folder-availability-warning"]').should(($el) => {
+    expect($el.text().trim()).to.equal('This folder is in trash')
+  })
+})
+
+When(
   'I open the folder page for {string} in notebook {string}',
   (folderLabel: string, notebookName: string) => {
     start.jumpToFolderPage(folderLabel, notebookName)

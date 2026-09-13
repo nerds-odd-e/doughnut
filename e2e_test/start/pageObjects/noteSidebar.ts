@@ -27,6 +27,16 @@ function folderRowControls(treeitem: Cypress.Chainable<JQuery<HTMLElement>>) {
   return treeitem.children('.folder-row')
 }
 
+/** Deepest visible child folder treeitem under an expanded parent. */
+function folderTreitemUnderOpenParent(parentLabel: string, childLabel: string) {
+  return folderTreitemByLabel(parentLabel)
+    .find(`[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`, {
+      timeout: sidebarActionTimeoutMs,
+    })
+    .filter(':visible')
+    .last()
+}
+
 function expandFolder(label: string) {
   waitUntilAppIsNotBusy()
   revealFolderInSidebar(label)
@@ -111,20 +121,23 @@ export const noteSidebar = () => {
 
     activateFolderUnderOpenParent(parentLabel: string, childLabel: string) {
       waitUntilAppIsNotBusy()
-      const childFolder = folderTreitemByLabel(parentLabel)
-        .find(
-          `[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`,
-          { timeout: sidebarActionTimeoutMs }
-        )
-        .filter(':visible')
-        .last()
-      folderRowControls(childFolder).find('.folder-label-area').click()
+      folderRowControls(folderTreitemUnderOpenParent(parentLabel, childLabel))
+        .find('.folder-label-area')
+        .click()
       waitUntilAppIsNotBusy()
     },
 
     openFolderPageByLabel(folderLabel: string) {
       waitUntilAppIsNotBusy()
       folderRowControls(folderTreitemByLabel(folderLabel))
+        .find('[data-testid="sidebar-folder-open-page-link"]')
+        .click()
+      waitUntilAppIsNotBusy()
+    },
+
+    openFolderPageUnderOpenParent(parentLabel: string, childLabel: string) {
+      waitUntilAppIsNotBusy()
+      folderRowControls(folderTreitemUnderOpenParent(parentLabel, childLabel))
         .find('[data-testid="sidebar-folder-open-page-link"]')
         .click()
       waitUntilAppIsNotBusy()

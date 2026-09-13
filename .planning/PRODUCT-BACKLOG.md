@@ -14,7 +14,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Find and recover previously trashed notes through web navigation](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-34) — SEED-009
 - [Keep web saves in an append-only Git history](quick/118-append-only-web-content-saves/PLAN.md) — SEED-009
 
 ## Backlog list
