@@ -11,8 +11,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Document the destroy()-order dependency behind the title-check flush optimization](quick/113-document-title-check-flush-dependency/PLAN.md)
-
 ## Backlog list
 
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
