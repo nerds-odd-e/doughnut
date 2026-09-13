@@ -1,5 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
+import static com.odde.donut.services.notebookGit.NotebookGitRebuildTestSupport.runBackfill;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -11,7 +12,6 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.MakeMe;
-import java.sql.Connection;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +67,7 @@ class NotebookGitFleetCutoverBackfillTest {
     jdbcTemplate.update("UPDATE notebook SET deleted_at = NOW() WHERE id = ?", deleted.getId());
 
     Instant cutoverTime = Instant.parse("2026-09-04T10:15:30Z");
-    runBackfill(cutoverTime);
+    runBackfill(dataSource, cutoverTime);
 
     NotebookGitBinding firstBinding = assertSingleRootCommitBinding(first);
     NotebookGitBinding secondBinding = assertSingleRootCommitBinding(second);
@@ -77,7 +76,7 @@ class NotebookGitFleetCutoverBackfillTest {
         equalTo(false));
 
     // Re-running is idempotent: no second binding, no changed accepted head.
-    runBackfill(cutoverTime.plusSeconds(60));
+    runBackfill(dataSource, cutoverTime.plusSeconds(60));
 
     NotebookGitBinding firstAfterRetry =
         notebookGitBindingRepository.findByNotebook_Id(first.getId()).orElseThrow();
@@ -108,15 +107,6 @@ class NotebookGitFleetCutoverBackfillTest {
         makeMe.aFolder().notebook(notebook).name(folderName).readmeContent(folderReadme).please();
     makeMe.aNote("Pasta").folder(folder).content("Boil water").please();
     return notebook;
-  }
-
-  private void runBackfill(Instant cutoverTime) throws Exception {
-    Connection connection = DataSourceUtils.getConnection(dataSource);
-    try {
-      NotebookGitFleetCutoverBackfill.run(connection, cutoverTime);
-    } finally {
-      DataSourceUtils.releaseConnection(connection, dataSource);
-    }
   }
 
   private NotebookGitBinding assertSingleRootCommitBinding(Notebook notebook) throws Exception {

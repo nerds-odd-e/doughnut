@@ -537,7 +537,7 @@ tests). No live note soft-delete concept remains in `backend/src/main`.
 
 ### 12. The rehearsed upgrade preserves all retained notebook data
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes of verification changes, medium confidence; backend
 runtime exception.
 
@@ -555,6 +555,29 @@ concurrent old-app writes and provide a fresh checkout; do not implement a new
 maintenance-mode product feature or perform the release.
 Safe stop: Validated upgrade and existing user journeys; all product data intact
 except files explicitly deleted in the permanent-removal acceptance examples.
+
+Learning: Added `NotebookUpgradeDataPreservationTest` — a single test that
+rehearses the actual isolated upgrade (V300000326–V300000328) against a
+representative notebook. Builds a rich fixture: live notes in nested folders
+(`Recipes/Italian/Pasta`, `Recipes/Salad`), a trashed note under
+`_trash/Recipes/Italian/Old Pasta`, memory trackers (spelling) on a live and a
+trashed note, an authored `[[Pasta]]` wiki-link reference, notebook readme, and
+folder readmes at two depths. Establishes a Git binding via fleet backfill,
+captures before-manifests (notes, memory trackers, folders, authored
+references as ordered lists of records), runs the baseline rebuild via raw JDBC,
+captures after-manifests, and asserts they equal the before-manifests exactly
+(field-by-field content and relationships, not row counts alone). Reads the new
+bundle and asserts exactly one parentless root commit with no old history, and
+its complete Portable tree equals current DB content. Findings: schema versions
+V300000326–V300000328; fixture coverage includes live notes, trashed notes,
+memory trackers, authored references, folder/notebook readmes; observed
+outcome: all retained data byte-for-byte unchanged, one root commit, Portable
+tree matches DB. Limitation: the later release must exclude concurrent
+old-app writes and provide a fresh checkout. Refactor extracted shared test
+helpers into `NotebookGitRebuildTestSupport` (raw-connection entry points,
+cleanup, bundle read-back, Portable tree comparison), now used by
+`NotebookUpgradeDataPreservationTest`, `NotebookGitBaselineRebuildTest`, and
+`NotebookGitFleetCutoverBackfillTest`.
 
 ### 13. An owner recovers a migrated note through existing web navigation
 Type: Behavior
