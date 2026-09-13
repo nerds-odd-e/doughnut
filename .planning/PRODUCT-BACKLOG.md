@@ -13,9 +13,9 @@ Owners of notebooks with 10,000 notes can publish to the remote quickly,
 with reasonable performance.
 
 ## Taken
+- [Recover existing deleted notes through portable trash](quick/120-recover-legacy-notes-and-rebuild-git/PLAN.md) — SEED-009 story 31
 
 ## Backlog list
-- [Recover existing deleted notes through portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31) — SEED-009
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
 - [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
 - [Pull a web note rename, then publish local edits back to the same Donut note](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22) — SEED-009
