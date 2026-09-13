@@ -248,6 +248,23 @@ the observer to see, regardless of how long it watches.
     confirming the workflow file/name resolve, or it will silently watch a
     branch that structurally cannot produce events.
 
+- Execution: SEED-019 story 1 / quick/114-note-owned-memory-tracker-deletion / be43a2c1e5
+  - Tool: Cursor
+  - Model: GLM 5.2
+  - Open Dough release: 0.3.15
+  - Evidence: `.github/workflows/ci.yml` triggers only on `push:
+    branches: [main]`; `gh run list --branch 114-note-owned-memory-tracker-deletion`
+    returned no runs despite seven pushes to that branch; the CI observer
+    (started during slice 1 delivery) ran for the full execution and was
+    stopped at completion reporting `pendingCi: unobserved`.
+  - Observed effect: the CI observer watched a branch that structurally
+    cannot produce CI events for the entire execution; the runtime-setup
+    probe verified only that the workflow file/name resolved and the host
+    bridge was ready, so the gap was not caught at setup.
+  - Inference: same as the original ODF-034 finding — the runtime-setup
+    trigger-condition check is still absent; the recurrence confirms the
+    anti-pattern persists across releases.
+
 ## ODF-035 — `EnterWorktree`'s default base ref and branch-name sanitization conflict with this project's worktree/branch convention
 
 Former local code: DD-018.
@@ -320,3 +337,39 @@ coordinator, one at a time.
     command it launches, without stopping or consolidating those watches once
     it has already produced its own synchronous final report, generates this
     kind of post-completion notification noise.
+
+## DD-037 — Coordinator pre-filtered grep results for a test-only representation slice, missing sites the later field-removal slice had to fix
+
+A test-only representation slice (replacing soon-to-be-removed field
+references with owned observations) was delegated with a pre-filtered file
+list: the coordinator classified each `getDeletedAt()` grep hit as a Note
+or MemoryTracker assertion and delegated only the files with tracker
+assertions. Two sites were missed — one file entirely omitted from the
+delegation, and one remaining call in an included file — because the
+classification was incomplete. The later slice that removed the field
+caught both at compile time, but at the cost of that slice doing extra
+test fixes outside its primary schema-removal scope.
+
+### Occurrences
+
+- Execution: SEED-019 story 1 / quick/114-note-owned-memory-tracker-deletion / be43a2c1e5
+  - Tool: Cursor
+  - Model: GLM 5.2
+  - Open Dough release: 0.3.15
+  - Evidence: slice 6 (test-only representation) delegation listed five
+    files with tracker `deletedAt` assertions but omitted
+    `NoteControllerDeleteReduceToSourceTests` (whose
+    `relation.getDeletedAt()` / `reloaded.getDeletedAt()` calls were tracker
+    assertions the coordinator marked "need to check"); slice 7 (field
+    removal) commit `be43a2c1e5` fixed that file plus one remaining
+    `retained.getDeletedAt()` call in
+    `NotebookGitProposalFolderCreationControllerTest` that slice 6 missed.
+  - Observed effect: slice 7's implementation agent fixed two extra test
+    files at compile time; no extra coordinator round-trip, but the later
+    slice carried representation work the earlier slice was meant to own.
+  - Inference: for a test-only representation slice that replaces references
+    to a field removed in a later slice, delegate all grep matches and let
+    the implementation agent classify each (Note vs tracker), rather than
+    the coordinator pre-filtering; the compile-time safety net catches
+    misses, but shifting that work to the later slice blurs the slice's
+    intended boundary.
