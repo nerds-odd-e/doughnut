@@ -36,30 +36,6 @@ public final class NotebookGitFleetCutoverBackfill {
       ORDER BY n.id ASC
       """;
 
-  private static final String NOTEBOOK_README_QUERY =
-      "SELECT readme_content FROM notebook WHERE id = ?";
-
-  // Mirrors FolderRepository#findByNotebookIdOrderByIdAsc, which NotebookExportRows uses on the
-  // JPA path (NotebookGitCutoverService). No JPA context exists yet at migration time, so keep
-  // this filter/order in sync by hand if that repository query ever changes.
-  private static final String FOLDERS_QUERY =
-      """
-      SELECT id, parent_folder_id, name, readme_content
-      FROM folder
-      WHERE notebook_id = ?
-      ORDER BY id ASC
-      """;
-
-  // Mirrors NoteRepository#findLiveNotesByNotebookIdOrderByIdAsc (same deleted_at filter and
-  // ordering) for the same reason as FOLDERS_QUERY above.
-  private static final String NOTES_QUERY =
-      """
-      SELECT folder_id, title, content
-      FROM note
-      WHERE notebook_id = ? AND deleted_at IS NULL
-      ORDER BY id ASC
-      """;
-
   private static final String INSERT_BINDING =
       """
       INSERT INTO notebook_git_binding
@@ -100,9 +76,9 @@ public final class NotebookGitFleetCutoverBackfill {
 
   static void bindNotebook(Connection connection, int notebookId, Instant cutoverTime)
       throws SQLException {
-    String notebookReadmeContent = readNotebookReadme(connection, notebookId);
-    List<ExportFolderRow> folders = readFolders(connection, notebookId);
-    List<ExportNoteRow> notes = readNotes(connection, notebookId);
+    String notebookReadmeContent = NotebookGitRows.readNotebookReadme(connection, notebookId);
+    List<ExportFolderRow> folders = NotebookGitRows.readFolders(connection, notebookId);
+    List<ExportNoteRow> notes = NotebookGitRows.readNotes(connection, notebookId);
     List<PortableTreeEntry> entries =
         PortableTreeSnapshot.build(notebookReadmeContent, folders, notes);
 
@@ -117,54 +93,6 @@ public final class NotebookGitFleetCutoverBackfill {
           NotebookGitBundleWriter.write(gitRepository);
       insertBinding(connection, notebookId, written, cutoverTime);
     }
-  }
-
-  private static String readNotebookReadme(Connection connection, int notebookId)
-      throws SQLException {
-    try (PreparedStatement statement = connection.prepareStatement(NOTEBOOK_README_QUERY)) {
-      statement.setInt(1, notebookId);
-      try (ResultSet resultSet = statement.executeQuery()) {
-        resultSet.next();
-        return resultSet.getString("readme_content");
-      }
-    }
-  }
-
-  private static List<ExportFolderRow> readFolders(Connection connection, int notebookId)
-      throws SQLException {
-    List<ExportFolderRow> folders = new ArrayList<>();
-    try (PreparedStatement statement = connection.prepareStatement(FOLDERS_QUERY)) {
-      statement.setInt(1, notebookId);
-      try (ResultSet resultSet = statement.executeQuery()) {
-        while (resultSet.next()) {
-          folders.add(
-              new ExportFolderRow(
-                  resultSet.getInt("id"),
-                  readNullableInt(resultSet, "parent_folder_id"),
-                  resultSet.getString("name"),
-                  resultSet.getString("readme_content")));
-        }
-      }
-    }
-    return folders;
-  }
-
-  private static List<ExportNoteRow> readNotes(Connection connection, int notebookId)
-      throws SQLException {
-    List<ExportNoteRow> notes = new ArrayList<>();
-    try (PreparedStatement statement = connection.prepareStatement(NOTES_QUERY)) {
-      statement.setInt(1, notebookId);
-      try (ResultSet resultSet = statement.executeQuery()) {
-        while (resultSet.next()) {
-          notes.add(
-              new ExportNoteRow(
-                  readNullableInt(resultSet, "folder_id"),
-                  resultSet.getString("title"),
-                  resultSet.getString("content")));
-        }
-      }
-    }
-    return notes;
   }
 
   private static void insertBinding(
@@ -182,10 +110,5 @@ public final class NotebookGitFleetCutoverBackfill {
       statement.setTimestamp(5, cutoverTimestamp);
       statement.executeUpdate();
     }
-  }
-
-  private static Integer readNullableInt(ResultSet resultSet, String column) throws SQLException {
-    int value = resultSet.getInt(column);
-    return resultSet.wasNull() ? null : value;
   }
 }

@@ -254,7 +254,7 @@ permanence post-condition is already owned by the sibling
 
 ### 6. A migrated notebook can receive a consistent new Git baseline
 Type: Behavior
-Status: planned
+Status: done
 Sizing: 5–8 minutes, medium confidence; backend wait exception.
 
 Behavior: The upgrade operation receives a notebook with existing inconsistent
@@ -269,6 +269,21 @@ then download/read its bundle and compare exact entries and parent count zero.
 Prove retained database identities/data unchanged. Implement as migration-owned
 JDBC-capable behavior usable before JPA; register no automatic upgrade yet.
 Safe stop: Tested replacement operation exists; ordinary startup is unchanged.
+
+Learning: Added `NotebookGitBaselineRebuild.rebuildNotebook`, a JDBC operation
+that mirrors `NotebookGitFleetCutoverBackfill` but `UPDATE`s an existing
+`notebook_git_binding` row (head + bundle + accepted_at) instead of inserting.
+It is atomic: `setAutoCommit(false)`, commit on success, rollback on error,
+restore auto-commit in `finally`. It reuses `PortableTreeSnapshot`,
+`NotebookGitBundleBuilder`, and `NotebookGitBundleWriter` to build a fresh
+single-root commit from current DB content (active and trashed notes,
+folders, notebook Readme). `NotebookGitBaselineRebuildTest` proves an
+inconsistent binding is replaced with a fresh single-root snapshot whose
+tree equals current DB content, while notebook identity/ownership is
+retained. Refactor extracted shared JDBC row-reading SQL/helpers
+(`readNotebookReadme`, `readFolders`, `readNotes`, `readNullableInt`) into a
+new `NotebookGitRows` class used by both `NotebookGitFleetCutoverBackfill`
+and `NotebookGitBaselineRebuild`; full backend suite stayed green.
 
 ### 7. Baseline replacement fails and retries without partial binding state
 Type: Behavior
