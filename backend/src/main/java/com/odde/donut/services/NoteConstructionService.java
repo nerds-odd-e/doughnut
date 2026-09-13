@@ -57,10 +57,10 @@ public class NoteConstructionService {
     this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
-  private void persistNoteContent(Note note, String content) {
+  private Note persistNoteContent(Note note, String content) {
     applyContent(note, content);
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    entityPersister.save(note);
+    return entityPersister.save(note);
   }
 
   /** Prepares {@code content} for save and replaces the note's Markdown and references from it. */
@@ -126,7 +126,7 @@ public class NoteConstructionService {
         noteFactory.create(
             originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
     persistNoteContent(newNote, newNoteContent);
-    persistNoteContent(originalNote, aiResult.updatedOriginalNoteContent);
+    originalNote = persistNoteContent(originalNote, aiResult.updatedOriginalNoteContent);
 
     noteService.deleteOrphanImagesForPersistedContent(newNote);
     noteService.deleteOrphanImagesForPersistedContent(originalNote);
