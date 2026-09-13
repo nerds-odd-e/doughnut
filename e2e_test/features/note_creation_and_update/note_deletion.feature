@@ -135,3 +135,24 @@ Feature: Note trash
       | note-title |
       | Cells      |
     And I should not see sidebar folder "Biology"
+
+  @mockBrowserTime
+  Scenario: Recover a trashed note when a new note has taken its old active name
+    Given I have a notebook "Recovery suite" with notes:
+      | Title  | Folder |
+      | Origin |        |
+      | Old    | Origin |
+    When I trash note "Old"
+    And I create a note with title "Old" under the folder "Origin" in the notebook "Recovery suite"
+    And I jump to the notebook "Recovery suite"
+    And I reload the notebook page
+    And I expand the children of note "_trash" in the sidebar
+    And I open the folder page for "Origin" under open parent "_trash"
+    Then I should see the folder page is in trash
+    When I open the note "Old" from the sidebar
+    Then I should see the current note is in trash
+    When I move the current note to notebook "Recovery suite" root
+    Then I should see the current note is not in trash
+    And I should see folder "Recovery suite/Origin" containing these notes:
+      | note-title |
+      | Old        |

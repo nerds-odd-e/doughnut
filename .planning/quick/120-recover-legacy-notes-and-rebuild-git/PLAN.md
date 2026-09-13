@@ -581,7 +581,7 @@ cleanup, bundle read-back, Portable tree comparison), now used by
 
 ### 13. An owner recovers a migrated note through existing web navigation
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; E2E runtime exception.
 
 Behavior: After the real isolated upgrade, an owner browses a migrated note in
@@ -595,6 +595,24 @@ examples for title reuse and learning preferences. Do not satisfy the migration
 precondition by injecting already-trashed notes. The browser scenario owns the
 recovery journey; data manifest and bundle shape stay owned by slice 12.
 Safe stop: The migrated data is usable through the existing web product.
+
+Learning: Extended `note_deletion.feature` with a new `@mockBrowserTime`
+scenario "Recover a trashed note when a new note has taken its old active
+name". It trashes "Old" via the UI, creates a new "Old" under the same folder
+(proving title reuse — previously blocked by
+`NoteTitlePlacementRules.requireNoSoftDeletedTitleAt`, removed in slice 11b),
+browses `_trash` in the sidebar, opens the trashed note, and recovers it to
+notebook root. The scenario reuses existing step definitions — no new steps
+were needed. Adapted the recovery destination to notebook root (not the
+occupied folder) because `undoTrashNote` uses `executePlacement` which rejects
+on conflict (`RESOURCE_CONFLICT`), not auto-suffix — matching the "ordinary
+conflict behavior" cited in the plan. Added `NoteTrashRecoveryLearning
+PreferencesTest` (2 tests) proving trash inactivates memory trackers
+(`isActive() == false`), undo-trash reactivates them, and the tracker's type,
+property_key, stability, difficulty, and removed_from_tracking are preserved
+through the cycle. E2E: 11/11 passing. Controller: 2/2 passing. Refactor
+hoisted duplicated `leaveDeadLinks()` and `undoTo()` test helpers to
+`ControllerTestBase`.
 
 ## Promise ownership and representative storage proof
 

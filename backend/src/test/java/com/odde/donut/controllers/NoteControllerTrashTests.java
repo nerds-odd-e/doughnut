@@ -11,7 +11,6 @@ import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteDeleteDTO;
 import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.controllers.dto.NoteTrashUndoDTO;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
@@ -209,18 +208,5 @@ class NoteControllerTrashTests extends ControllerTestBase {
     assertThat(source.getContent(), containsString("a part of"));
     assertThat(source.getContent(), containsString("[[Earth]]"));
     assertThat(relation.isTrashed(), equalTo(true));
-  }
-
-  private NoteDeleteDTO leaveDeadLinks() {
-    NoteDeleteDTO request = new NoteDeleteDTO();
-    request.setReferenceHandling(NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS);
-    return request;
-  }
-
-  private NoteTrashUndoDTO undoTo(String title, Folder folder) {
-    NoteTrashUndoDTO request = new NoteTrashUndoDTO();
-    request.setPriorTitle(title);
-    request.setPriorFolderId(folder == null ? null : folder.getId());
-    return request;
   }
 }
