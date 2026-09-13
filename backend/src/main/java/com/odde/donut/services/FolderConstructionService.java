@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
+import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -10,6 +11,7 @@ import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -73,8 +75,28 @@ public class FolderConstructionService {
       }
     }
 
+    return createFolder(notebook, parentFolder, new DisplayName(name));
+  }
+
+  public Folder ensureTrashParentFor(Note note) {
+    Notebook notebook = note.getNotebook();
+    Folder parent =
+        folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .filter(Folder::isTrashed)
+            .findFirst()
+            .orElseGet(() -> createFolder(notebook, null, new DisplayName("_trash")));
+    for (Folder sourceFolder : FolderTrailSegments.fromRootToContainingFolder(note)) {
+      parent = findOrCreateFolder(notebook, parent, new DisplayName(sourceFolder.getName()));
+    }
+    return parent;
+  }
+
+  public Folder createFolder(Notebook notebook, Folder parentFolder, DisplayName displayName) {
+    if (parentFolder != null && !parentFolder.getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
+    }
+
     Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();
-    DisplayName displayName = new DisplayName(name);
     folderSiblingNameValidation.requireNoConflictingSibling(
         notebook.getId(), parentFolderId, displayName);
 
@@ -87,5 +109,13 @@ public class FolderConstructionService {
     folder.setUpdatedAt(now);
     entityPersister.save(folder);
     return folder;
+  }
+
+  private Folder findOrCreateFolder(
+      Notebook notebook, Folder parentFolder, DisplayName displayName) {
+    Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();
+    return folderSiblingNameValidation
+        .findConflictingSibling(notebook.getId(), parentFolderId, displayName, Set.of())
+        .orElseGet(() -> createFolder(notebook, parentFolder, displayName));
   }
 }

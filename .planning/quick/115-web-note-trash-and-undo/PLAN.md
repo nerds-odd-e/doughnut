@@ -243,10 +243,14 @@ recovery remains operational. No new folder or trash navigation UI is added.
 
 ### 5. Reuse parent construction for full-path placement
 Type: Structure
-Status: planned
+Status: done
 Size: ~5 minutes.
 Proof: Existing folder-creation controller behavior is unchanged; the placement
 boundary reuses an existing root regardless of case and only creates missing parents.
+
+Extended the existing folder-construction boundary to find or create the root
+trash and mirror only missing original parents using the existing sibling-name
+rules. `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
 
 Expose the suitable parent-based construction operation behind its current
 adapter. Prepare the original-path mirror beneath root trash, using existing
