@@ -2,6 +2,9 @@
 
 ## Near-future direction
 
+First, take a detour to deliver portable trash: replace the current soft delete
+with a portable trash solution for notebook owners.
+
 Notebook owners can refine notes in Obsidian or an AI IDE while continuing to
 use them in Donut, preserving their work and learning history. Git history is
 a single, append-only sequence of commits, with no branching or rebasing;
@@ -13,11 +16,12 @@ with reasonable performance.
 
 ## Backlog list
 
+- [Remove memory tracker deleted_at and rely on note deletion state](seeds/SEED-019-note-owned-memory-tracker-deletion-state.md#story-1) — SEED-019
+- [Portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
 - [Keep web saves in an append-only Git history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21) — SEED-009
 - [Receive a web note rename locally without losing its identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22) — SEED-009
 - [Receive a web note deletion locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-23) — SEED-009
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009
-- [Align note deletion, trash, and title reuse with Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018

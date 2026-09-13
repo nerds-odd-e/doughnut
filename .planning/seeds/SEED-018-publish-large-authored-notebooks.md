@@ -198,7 +198,7 @@ simplification if it achieves the required gain with less machinery.
 #### Soft deletion and title reuse — separate product work
 
 The owner has deferred
-[Align note deletion, trash, and title reuse with Git](SEED-009-git-backed-local-notebook-workflow.md#story-26)
+[Portable trash](SEED-009-git-backed-local-notebook-workflow.md#story-26)
 to the end of the backlog. That combined idea owns deletion/trash semantics,
 production migration, and future title reuse. It is not a prerequisite for this
 performance story.

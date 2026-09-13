@@ -218,13 +218,14 @@ data; invalid or ambiguous changes must not silently discard work.
 <a id="story-26"></a>
 <a id="story-27"></a>
 
-### 26. Align note deletion, trash, and title reuse with Git
+### 26. Portable trash
 
 - **Goal / beneficiary:** Notebook owners can delete, trash, and recreate notes
   through Donut or ordinary Git/file operations with predictable effects on
   content, identity, and learning history, without invisible title reservations.
-- **Status / priority:** Deferred combined idea, near the bottom of the product backlog,
-  ahead only of the explicitly deprioritized publication-optimization work.
+- **Status / priority:** Queued immediately after the independent memory tracker
+  deletion-state story: replace the current soft delete with portable trash as
+  a detour before the existing near-future direction.
   Former story 27 is merged here; its anchor remains an alias. This is broad
   non-executable planning input requiring decomposition before implementation,
   not a prerequisite for publication performance work.
