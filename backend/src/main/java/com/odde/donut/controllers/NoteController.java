@@ -3,10 +3,13 @@ package com.odde.donut.controllers;
 import com.odde.donut.controllers.dto.*;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.AssimilationSequenceSkipRepository;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.FolderConstructionService;
+import com.odde.donut.services.NoteMotionService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.services.PortablePathAuthoring;
@@ -24,6 +27,7 @@ import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -40,6 +44,9 @@ class NoteController {
   private final RecallLogRepository recallLogRepository;
   private final AssimilationSequenceSkipRepository skipRepository;
   private final PortablePathAuthoring portablePathAuthoring;
+  private final FolderRepository folderRepository;
+  private final FolderConstructionService folderConstructionService;
+  private final NoteMotionService noteMotionService;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -51,7 +58,10 @@ class NoteController {
       NoteRealmService noteRealmService,
       RecallLogRepository recallLogRepository,
       AssimilationSequenceSkipRepository skipRepository,
-      PortablePathAuthoring portablePathAuthoring) {
+      PortablePathAuthoring portablePathAuthoring,
+      FolderRepository folderRepository,
+      FolderConstructionService folderConstructionService,
+      NoteMotionService noteMotionService) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
@@ -62,6 +72,9 @@ class NoteController {
     this.recallLogRepository = recallLogRepository;
     this.skipRepository = skipRepository;
     this.portablePathAuthoring = portablePathAuthoring;
+    this.folderRepository = folderRepository;
+    this.folderConstructionService = folderConstructionService;
+    this.noteMotionService = noteMotionService;
   }
 
   @GetMapping("/{note}")
@@ -132,6 +145,49 @@ class NoteController {
     entityPersister.flush();
 
     return noteRealmService.build(note, authorizationService.getCurrentUser());
+  }
+
+  @PostMapping(value = "/{note}/trash")
+  @Transactional
+  public NoteRealm trashNote(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody NoteDeleteDTO noteDeleteDTO)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    User user = authorizationService.getCurrentUser();
+    noteService.applyNoteDeleteReferenceHandling(
+        note, noteDeleteDTO.getReferenceHandling(), noteDeleteDTO.getSourcePropertyKey(), user);
+    Folder trashParent = folderConstructionService.ensureTrashParentFor(note);
+    noteMotionService.executeMoveIntoFolderWithAvailableTitle(note, trashParent);
+    return noteRealmService.build(note, user);
+  }
+
+  @PatchMapping(value = "/{note}/undo-trash")
+  @Transactional
+  public NoteRealm undoTrashNote(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody NoteTrashUndoDTO undo)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    Folder priorFolder = resolvePriorFolder(undo.getPriorFolderId());
+    Notebook destinationNotebook =
+        priorFolder == null ? note.getNotebook() : priorFolder.getNotebook();
+    authorizationService.assertAuthorization(destinationNotebook);
+    noteMotionService.executePlacement(
+        note, destinationNotebook, priorFolder, undo.getPriorTitle());
+    return noteRealmService.build(note, authorizationService.getCurrentUser());
+  }
+
+  private Folder resolvePriorFolder(Integer priorFolderId) {
+    if (priorFolderId == null) {
+      return null;
+    }
+    return folderRepository
+        .findById(priorFolderId)
+        .orElseThrow(
+            () ->
+                new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Prior containing folder not found."));
   }
 
   @GetMapping("/recent")

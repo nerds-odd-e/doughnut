@@ -294,11 +294,19 @@ the target. No automatic move rewrites or restoration of removed properties.
 
 ### 8. Offer an atomic trash and undo operation
 Type: Behavior
-Status: planned
+Status: done
 Size: 5–10 minutes using slices 5–7; if orchestration grows, refine before exposure.
 Proof: Through NoteController's authenticated boundary, trash then undo a learned
 note, including repeated trash/name reuse and existing reference-choice deltas;
 observe real state transitions, retained IDs/history and atomic conflicts.
+
+Added authenticated `trashNote` and `undoTrashNote` controller operations using
+the shared reference, construction, and placement owners. Seven controller
+scenarios cover authorization, full-path placement, retained identity/history/
+preferences, repeated name reuse, atomic conflicts, and both transforming
+reference choices. After API generation, `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only`, `CURSOR_DEV=true nix develop -c pnpm frontend:test`, and
+`CURSOR_DEV=true nix develop -c pnpm openapi:lint` all passed.
 
 Add the explicit trash and undo-trash adapters using the prepared operations.
 Return the current realm for direct access. Undo validates the caller's prior

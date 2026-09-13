@@ -674,6 +674,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SpellingVerificationResult"
+  /api/notes/{note}/trash:
+    post:
+      tags:
+      - note-controller
+      operationId: trashNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteDeleteDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/semantic-search:
     post:
       tags:
@@ -1959,6 +1983,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Subscription"
+  /api/notes/{note}/undo-trash:
+    patch:
+      tags:
+      - note-controller
+      operationId: undoTrashNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteTrashUndoDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/undo-delete:
     patch:
       tags:
@@ -4048,6 +4096,19 @@ components:
       properties:
         correct:
           type: boolean
+    NoteDeleteDTO:
+      type: object
+      properties:
+        referenceHandling:
+          type: string
+          enum:
+          - REMOVE_FROM_PROPERTIES
+          - LEAVE_DEAD_LINKS
+          - REDUCE_TO_SOURCE_PROPERTY
+        sourcePropertyKey:
+          type: string
+      required:
+      - referenceHandling
     SearchTerm:
       type: object
       properties:
@@ -4130,19 +4191,6 @@ components:
             \ /attachments/images/{id}/{filename})."
       required:
       - imagePath
-    NoteDeleteDTO:
-      type: object
-      properties:
-        referenceHandling:
-          type: string
-          enum:
-          - REMOVE_FROM_PROPERTIES
-          - LEAVE_DEAD_LINKS
-          - REDUCE_TO_SOURCE_PROPERTY
-        sourcePropertyKey:
-          type: string
-      required:
-      - referenceHandling
     NotebookUpdateRequest:
       type: object
       properties:
@@ -4990,6 +5038,21 @@ components:
         notebookGroupId:
           type: integer
           format: int32
+    NoteTrashUndoDTO:
+      type: object
+      properties:
+        priorTitle:
+          type: string
+          maxLength: 150
+          minLength: 0
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
+        priorFolderId:
+          type: integer
+          format: int32
+          description: "Prior containing folder id, or null when the note was at notebook\
+            \ root."
+      required:
+      - priorTitle
     FolderRenameRequest:
       type: object
       description: Rename a folder in place within its current parent.
