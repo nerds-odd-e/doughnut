@@ -182,7 +182,7 @@ untouched (legacy recovery until slice 11).
 
 ### 4. Failed deletion publication leaves the accepted notebook intact
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; backend wait exception.
 
 Behavior: A proposal containing a deletion fails an existing publication check;
@@ -192,6 +192,18 @@ Proof: Extend existing atomic controller cases with populated dependents;
 observe persisted head/bundle and note data in a new transaction. These examples
 extend the publisher's single transaction rule, not a deletion journal.
 Safe stop: Permanent removal does not weaken existing publication atomicity.
+
+Learning: Extended `NotebookGitDeletionPublicationAtomicControllerTest` with the
+complete dependent fixture (memory_tracker, recall_prompt, mcq, image,
+conversation) on the would-be-deleted notes (learned + unlearned shapes), captured
+dependent counts before an injected binding-save failure, and asserted the counts
+are unchanged after rollback — the CASCADE deletion rolled back with the
+publication transaction. Updated the old `getDeletedAt() == null` assertions to
+permanent-removal semantics (the note row survives the hard-delete rollback and was
+never soft-deleted). The existing failure-injection point already fires after the
+permanent-removal hard delete, so no new injection was needed. Refactor collapsed
+the duplicated note-dependent count helpers into the shared
+`NotebookGitBundleControllerTestBase`.
 
 ### 4a. Retrying an accepted deletion has no second effect
 Type: Behavior

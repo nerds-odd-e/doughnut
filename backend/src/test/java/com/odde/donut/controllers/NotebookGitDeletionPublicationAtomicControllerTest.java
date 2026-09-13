@@ -49,6 +49,7 @@ class NotebookGitDeletionPublicationAtomicControllerTest
         makeMe.aNote().notebook(notebook).title("DeletedB").content(ORIGINAL_CONTENT).please();
     Note retained =
         makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
+    // Learned shape for deletedA: memory_tracker + recall_prompt + mcq + image + conversation.
     MemoryTracker deletedATracker =
         inCommittedTransaction(
             transactionManager,
@@ -57,6 +58,37 @@ class NotebookGitDeletionPublicationAtomicControllerTest
                     .aMemoryTrackerFor(noteRepository.findById(deletedA.getId()).orElseThrow())
                     .difficulty(7f)
                     .please());
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(
+                  memoryTrackerRepository.findById(deletedATracker.getId()).orElseThrow())
+              .withMcqForNote(noteRepository.findById(deletedA.getId()).orElseThrow())
+              .please();
+          makeMe
+              .anImage()
+              .forNote(noteRepository.findById(deletedA.getId()).orElseThrow())
+              .please();
+          makeMe
+              .aConversation()
+              .forANote(noteRepository.findById(deletedA.getId()).orElseThrow())
+              .please();
+        });
+    // Unlearned shape for deletedB: image + conversation, no memory_tracker.
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          makeMe
+              .anImage()
+              .forNote(noteRepository.findById(deletedB.getId()).orElseThrow())
+              .please();
+          makeMe
+              .aConversation()
+              .forANote(noteRepository.findById(deletedB.getId()).orElseThrow())
+              .please();
+        });
     snapshotCurrentPortableTree(notebook);
     NotebookGitBinding binding =
         inCommittedTransaction(
@@ -69,6 +101,10 @@ class NotebookGitDeletionPublicationAtomicControllerTest
         inCommittedTransaction(
             transactionManager,
             () -> noteRepository.findById(retained.getId()).orElseThrow().getUpdatedAt());
+    DependentCounts deletedADependentsBefore =
+        inCommittedTransaction(transactionManager, () -> dependentCounts(deletedA));
+    DependentCounts deletedBDependentsBefore =
+        inCommittedTransaction(transactionManager, () -> dependentCounts(deletedB));
     byte[] proposal =
         proposalBundleBytes(
             binding, List.of(new NotebookGitProposalFile("Retained.md", EDITED_CONTENT)));
@@ -92,9 +128,13 @@ class NotebookGitDeletionPublicationAtomicControllerTest
           assertThat(
               liveNotes.stream().map(Note::getId).toList(),
               hasItems(deletedA.getId(), deletedB.getId(), retained.getId()));
+          // The would-be-deleted notes were hard-deleted inside the publication transaction; the
+          // binding-save failure rolled that back, so the rows survive and were never soft-deleted.
           Note reloadedDeletedA = noteRepository.findById(deletedA.getId()).orElseThrow();
+          assertThat(reloadedDeletedA.getContent(), equalTo(ORIGINAL_CONTENT));
           assertThat(reloadedDeletedA.getDeletedAt(), nullValue());
           Note reloadedDeletedB = noteRepository.findById(deletedB.getId()).orElseThrow();
+          assertThat(reloadedDeletedB.getContent(), equalTo(ORIGINAL_CONTENT));
           assertThat(reloadedDeletedB.getDeletedAt(), nullValue());
           Note reloadedRetained = noteRepository.findById(retained.getId()).orElseThrow();
           assertThat(reloadedRetained.getContent(), equalTo(ORIGINAL_CONTENT));
@@ -112,9 +152,43 @@ class NotebookGitDeletionPublicationAtomicControllerTest
           assertThat(
               reloadedTracker.getRemovedFromTracking(),
               equalTo(deletedATracker.getRemovedFromTracking()));
+          // The complete dependent closure (recall_prompt, mcq, image, conversation + messages)
+          // was CASCADE-deleted inside the publication transaction and restored by its rollback.
+          assertThat(dependentCounts(deletedA), equalTo(deletedADependentsBefore));
+          assertThat(dependentCounts(deletedB), equalTo(deletedBDependentsBefore));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
   }
+
+  private DependentCounts dependentCounts(Note note) {
+    return new DependentCounts(
+        countRowsByNoteId("memory_tracker", note.getId()),
+        countRecallPromptsByNoteId(note.getId()),
+        countRowsByNoteId("mcq", note.getId()),
+        countRowsByNoteId("image", note.getId()),
+        countRowsByNoteId("conversation", note.getId()),
+        countConversationMessagesByNoteId(note.getId()));
+  }
+
+  private long countConversationMessagesByNoteId(Integer noteId) {
+    return ((Number)
+            entityManager
+                .createNativeQuery(
+                    "SELECT COUNT(*) FROM conversation_message cm "
+                        + "JOIN conversation c ON cm.conversation_id = c.id "
+                        + "WHERE c.note_id = :id")
+                .setParameter("id", noteId)
+                .getSingleResult())
+        .longValue();
+  }
+
+  private record DependentCounts(
+      long memoryTracker,
+      long recallPrompt,
+      long mcq,
+      long image,
+      long conversation,
+      long conversationMessage) {}
 }

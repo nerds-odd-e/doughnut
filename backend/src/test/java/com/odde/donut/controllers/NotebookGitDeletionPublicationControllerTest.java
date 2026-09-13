@@ -17,7 +17,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.testability.GitBundleTestReader;
-import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -41,7 +40,6 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
 
   @Autowired NoteController noteController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
-  @Autowired EntityManager entityManager;
 
   @Test
   void publishesLearnedNoteDeletionsWithASamePathEditAsTheExactAuthoredCommit() throws Exception {
@@ -263,27 +261,6 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
                 memoryTrackerRepository.findById(tracker.getId()).isPresent(), equalTo(false));
           }
         });
-  }
-
-  private long countRowsByNoteId(String table, Integer noteId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery("SELECT COUNT(*) FROM " + table + " WHERE note_id = :id")
-                .setParameter("id", noteId)
-                .getSingleResult())
-        .longValue();
-  }
-
-  private long countRecallPromptsByNoteId(Integer noteId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery(
-                    "SELECT COUNT(*) FROM recall_prompt rp "
-                        + "JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
-                        + "WHERE mt.note_id = :id")
-                .setParameter("id", noteId)
-                .getSingleResult())
-        .longValue();
   }
 
   private static List<WikiLink.Resolution> targetResolutions(NoteRealm shown) {

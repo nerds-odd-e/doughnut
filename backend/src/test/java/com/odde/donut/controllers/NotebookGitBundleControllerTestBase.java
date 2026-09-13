@@ -231,6 +231,29 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
         new PortableTreeEntry("README.md", "---\ntype: Readme\n---\nreadme original"));
   }
 
+  /** Counts rows in {@code table} that reference the given note via {@code note_id}. */
+  protected long countRowsByNoteId(String table, Integer noteId) {
+    return ((Number)
+            entityManager
+                .createNativeQuery("SELECT COUNT(*) FROM " + table + " WHERE note_id = :id")
+                .setParameter("id", noteId)
+                .getSingleResult())
+        .longValue();
+  }
+
+  /** Counts recall prompts whose memory tracker belongs to the given note. */
+  protected long countRecallPromptsByNoteId(Integer noteId) {
+    return ((Number)
+            entityManager
+                .createNativeQuery(
+                    "SELECT COUNT(*) FROM recall_prompt rp "
+                        + "JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
+                        + "WHERE mt.note_id = :id")
+                .setParameter("id", noteId)
+                .getSingleResult())
+        .longValue();
+  }
+
   private <T> T committed(java.util.function.Supplier<T> action) {
     return inCommittedTransaction(transactionManager, action);
   }
