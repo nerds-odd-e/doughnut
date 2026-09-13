@@ -123,7 +123,8 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Goal / beneficiary:** Notebook owners can delete, trash, and recreate notes
   through Donut or ordinary Git/file operations with predictable effects on
   content, identity, and learning history, without invisible title reservations.
-- **Status / priority:** Deferred combined idea, last in the product backlog.
+- **Status / priority:** Deferred combined idea, near the bottom of the product backlog,
+  ahead only of the explicitly deprioritized publication-optimization work.
   Former story 27 is merged here; its anchor remains an alias. This is broad
   non-executable planning input requiring decomposition before implementation,
   not a prerequisite for publication performance work.
@@ -218,10 +219,10 @@ data; invalid or ambiguous changes must not silently discard work.
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns selection and order.
-The owner merged title uniqueness and soft deletion into story 26 and moved it
-last in the queue. Publication performance takes priority; the broader trash
-model is useful future work, not required to pursue that immediate direction.
-Defer the combined idea first when reducing current scope.
+The owner merged title uniqueness and soft deletion into story 26. The broader
+trash model is useful future work, but Git workflow stories now take priority
+and publication-optimization work follows it at the bottom of the queue. Defer
+the combined idea first when reducing Git workflow scope.
 Among the remaining Git workflow stories, publish accumulated commits first,
 then make new web history append-only.
 Prioritize web rename and deletion ahead of container descriptions and web
