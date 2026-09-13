@@ -102,7 +102,9 @@ unrelated lockfile diff.
     commit, but the pattern would silently ship as an unrelated diff without
     that check.
 
-## DD-013 — One-off profile capture treated as durable runner plumbing
+## ODF-030 — One-off profile capture treated as durable runner plumbing
+
+Former local code: DD-013.
 
 A tagged publication-profile capture drove a durable `pnpm cy:run` change to
 forward Cypress `--expose`/`--config`, including runner tests, then a closing
@@ -124,7 +126,9 @@ kept product change.
   - Inference: isolated tagged captures can use a documented one-off Cypress
     invocation or known baseline waits without changing the owned runner.
 
-## DD-014 — Large-capture plan command copied small-fixture Cypress timeouts
+## ODF-031 — Large-capture plan command copied small-fixture Cypress timeouts
+
+Former local code: DD-014.
 
 The first large confirmation command used the small HTTP capture's
 `taskTimeout=66000` and omitted the already-recorded large-fixture Cypress
@@ -147,7 +151,9 @@ The first large confirmation command used the small HTTP capture's
   - Inference: large-fixture Cypress waits were already in the profiling
     record; copying the small-path `--config` was enough to miss them.
 
-## DD-015 — Plan sizing for a three-run 1,000-note E2E capture slice undercounted actual owned-stack/fixture lifecycle cost
+## ODF-032 — Plan sizing for a three-run 1,000-note E2E capture slice undercounted actual owned-stack/fixture lifecycle cost
+
+Former local code: DD-015.
 
 A slice's stated sizing exception ("3-5 additional minutes for owned stack
 startup and three baseline captures") was written for the external-wait
@@ -181,7 +187,9 @@ itself fast (tens of seconds).
     only," so the multiplier is a qualified upper-bound observation, not an
     exact ratio.
 
-## DD-016 — Reviewing an unmerged execution branch from a different checkout's working tree returns stale pre-change file content
+## ODF-033 — Reviewing an unmerged execution branch from a different checkout's working tree returns stale pre-change file content
+
+Former local code: DD-016.
 
 Reading a production file's working tree from a checkout that has not merged
 the reviewed execution's branch silently returns the pre-change version, with
@@ -209,7 +217,9 @@ on a separate branch or worktree.
     <ref>`) rather than the coordinator's own working tree, whenever that
     tree has not merged the branch under review.
 
-## DD-017 — CI observer started for a feature branch that this project's workflow never triggers on
+## ODF-034 — CI observer started for a feature branch that this project's workflow never triggers on
+
+Former local code: DD-017.
 
 `dough-execute-plan`'s CI-observation setup verified only that the workflow
 file and name existed and that the notification host bridge was ready; it did
@@ -238,7 +248,9 @@ the observer to see, regardless of how long it watches.
     confirming the workflow file/name resolve, or it will silently watch a
     branch that structurally cannot produce events.
 
-## DD-018 — `EnterWorktree`'s default base ref and branch-name sanitization conflict with this project's worktree/branch convention
+## ODF-035 — `EnterWorktree`'s default base ref and branch-name sanitization conflict with this project's worktree/branch convention
+
+Former local code: DD-018.
 
 The harness's built-in `EnterWorktree` tool, used to set up a planned-execution
 worktree for an intended branch name containing `/` (this project's
@@ -272,7 +284,9 @@ originating branch before the worktree was created.
     local-only commit should create the worktree with plain `git worktree add`
     rather than `EnterWorktree`, whenever either constraint applies.
 
-## DD-019 — Delegated implementation agent's own background watches kept notifying the coordinator after its final report
+## ODF-036 — Delegated implementation agent's own background watches kept notifying the coordinator after its final report
+
+Former local code: DD-019.
 
 An implementation subagent that ran several sequential long-running background
 benchmark commands during one delegated slice appears to have armed a

@@ -18,11 +18,15 @@ with reasonable performance.
 
 ## Backlog list
 
-- [Portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-26) — SEED-009
+- [Trash a note on the web and undo the action](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-29) — SEED-009
+- [Find and recover previously trashed notes through web navigation](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-34) — SEED-009
+- [Recover existing deleted notes through portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31) — SEED-009
+- [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
+- [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
 - [Keep web saves in an append-only Git history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21) — SEED-009
 - [Receive a web note rename locally without losing its identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22) — SEED-009
-- [Receive a web note deletion locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-23) — SEED-009
 - [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009
+- [Use portable trash across Donut and local Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018

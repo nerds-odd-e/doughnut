@@ -181,15 +181,11 @@ data; invalid or ambiguous changes must not silently discard work.
 
 <a id="story-23"></a>
 
-### 23. Receive a web note deletion locally
+### Former story 23 — Receive a web note deletion locally
 
-- **For / why:** An owner can remove an obsolete note in Donut and have the local notebook reflect that decision.
-- **Evaluation:** Given synchronized state and no unpublished local work, deleting a note on the web appends accepted history; pull removes its Portable file while retaining existing deletion and private-data semantics.
-- **Value / learning:** Prevents deleted content remaining in the owner's active local knowledge set and blocking subsequent refinement.
-- **Scope:** Ordinary-note deletion, without restoring deleted notes, reusing reserved deleted paths, or reconciling independent local edits.
-- **Effort hypothesis:** M, low confidence pending focused refinement.
-- **Depends on:** Existing clone, publication and clean fast-forward pull; no dependency on another new story is assumed.
-- **Safe stopping point:** This workflow remains independently usable if later stories are cancelled, with work and learning data preserved.
+Merged into [Use portable trash across Donut and local Git](#story-28) by the
+owner's web-first reprioritization. Its web-deletion synchronization outcome is
+retained there; this anchor remains for existing references.
 
 <a id="story-24"></a>
 
@@ -218,118 +214,339 @@ data; invalid or ambiguous changes must not silently discard work.
 <a id="story-26"></a>
 <a id="story-27"></a>
 
-### 26. Portable trash
+### Portable trash — parent problem (former stories 26 and 27)
 
-- **Goal / beneficiary:** Notebook owners can delete, trash, and recreate notes
-  through Donut or ordinary Git/file operations with predictable effects on
-  content, identity, and learning history, without invisible title reservations.
-- **Status / priority:** Queued immediately after the independent memory tracker
-  deletion-state story: replace the current soft delete with portable trash as
-  a detour before the existing near-future direction.
-  Former story 27 is merged here; its anchor remains an alias. This is broad
-  non-executable planning input requiring decomposition before implementation,
-  not a prerequisite for publication performance work.
-- **Current evidence:** Source and existing controller tests inspected on
-  2026-09-13 show that the database unique index includes deleted notes and the
-  application rejects title reuse. UI creation offers to restore the old note
-  instead of applying new creation content. Git publication rejects addition,
-  rename, or relocation into a deleted note's reserved path; it does not restore
-  automatically and rejection preserves accepted state. Tests were read, not run.
-- **Value / learning:** Separate content recovery from identity recovery. The
-  same title, even with the same content, does not reliably distinguish restoring
-  an old note from creating a new one. Owners recovering the same note may expect
-  their non-Git learning data back, while new notes must not inherit old progress
-  merely because their names match.
+For notebook owners, hidden deletion state and reserved old titles should become
+visible, portable trash that preserves learning history and supports ordinary
+file moves, with a simpler domain model and no loss of existing data.
 
-#### Agreed direction — 2026-09-13
+#### North Star and completion boundary
 
-- **Permanent deletion:** Delete means removal from the database, including
-  dependent data whether or not Git represents it. Publishing a file deletion
-  has this meaning. Recreating that file, purposefully, accidentally, or from Git
-  history, creates a new note; permanently deleted dependent data is not recovered.
-- **Trash:** Replace the current soft-delete feature with a notebook trash folder
-  (working name `_trash/`). Its notes remain ordinary notes represented in Git,
-  retaining their identities and dependent learning data. Moving into trash
-  removes a note from normal use, recall, and assimilation; moving out restores
-  eligibility with retained learning data. Moving to trash frees the former path.
-- **Authority:** Location under the notebook trash folder, including descendants,
-  determines trash status. Metadata cannot independently make an outside note
-  trashed or an inside note active. Local moves into trash without timestamp
-  frontmatter are valid and must still exclude the notes from learning.
-- **Timestamp and cache:** The owner wants deletion/trash-date metadata in
-  frontmatter as the authoritative date when supplied, with the current
-  `deleted_at` responsibility moved out of the note table into a derived index
-  cache for efficient filtering. This is not a second authoritative soft-delete
-  state. The cache must support trash membership even when the date is absent.
-  Exact metadata naming, absent-date representation, and whether the server adds
-  missing date metadata (and how that enters append-only history) remain open.
-- **Existing production data:** Preserve existing soft-deleted notes and their
-  dependent data by migrating them into trash, retaining deletion dates. This
-  replaces the earlier suggestion to permanently discard those production rows.
-- **Architecture context:** [ADR 0004 — OKF-compatible notebook Markdown
-  profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-  governs Portable paths, preserved author YAML, and derived authored indexes.
-  The proposed trash-date cache and trash lifecycle are future product direction,
-  not an implemented format contract or an amendment to the ADR. Proposed ADR
-  0002 is non-binding.
+Location owns trash membership; ordinary moves own entering and leaving trash.
+Memory trackers follow their note's availability while retaining identity,
+learning history, and independent tracking preferences. Restore is a shortcut
+for a move, and permanent deletion removes the entity and dependent data.
 
-#### Key examples and boundaries
+The owner expects a cohesive solution, cleaner domain mapping, fewer concepts,
+and a net reduction in product code after completion. Lines of code are a
+supporting check, not a reason to compress code or remove meaningful proof.
+Do not add an independent trash state, timestamp protocol, restoration journal,
+or parallel reference resolver to implement these behaviors. Any proposed cache
+needs measured justification and must be derived, not a second authority.
 
-- Active learned note → delete its file and publish → note and dependent data
-  are permanently removed; later file recreation does not restore trackers.
-- Active learned note → move under `_trash/` in Donut or locally and publish →
-  keep its identity and trackers, represent the moved file in Git, and exclude
-  it from recall and assimilation even without date frontmatter.
-- Trashed note → move out to an available path → resume normal learning with
-  retained tracker data. Stale timestamp metadata cannot override location.
-- Existing production soft-deleted note → migration → retained note, deletion
-  date, and dependent data in trash, with its former active path available.
-- Trash placement and restoration still face visible filename collisions:
-  different source folders, repeated trashing of the same name, or an occupied
-  restoration destination. Naming/layout and conflict handling remain unresolved;
-  preserving source subfolders alone does not solve repeated trashing.
+The selected sequence must reach story 31: all existing soft-deleted notes are
+migrated, note `deleted_at` and its old state-management paths are removed, and
+existing owners can use their retained data through trash. Temporary coexistence
+before that boundary is unfinished work, not the final architecture. Story 31
+owns its removal. The independent [memory tracker story](SEED-019-note-owned-memory-tracker-deletion-state.md#story-1)
+remains separately Taken and is assumed complete for this sequence.
 
-#### Open decisions and delivery boundaries
+#### Continuous behavior preservation
 
-- Final trash folder name/layout and collision resolution; UI distinction between
-  trash and permanent deletion, including whether trash must ship before the
-  existing Delete action becomes permanent.
-- Timestamp key/format, missing or invalid dates, server metadata enrichment,
-  and handling stale date metadata after moving out. Location authority is settled;
-  timestamp completion is deliberately deferred.
-- Migration details for dependent records and Git representation, and identity
-  preservation across supported local moves. No migration or implementation is
-  authorized by this capture. Story 23 keeps its current scope pending explicit
-  refinement against this future direction.
-- **Alternatives:** Title-reservation changes alone would be smaller but would
-  leave ambiguous implicit recovery. Automatic restoration on filename reuse
-  could incorrectly reconnect old trackers. The owner selected explicit trash
-  preservation and permanent deletion, while deferring delivery in favor of
-  near-future publication work.
-- **Effort hypothesis:** Likely larger than L (2–4 hours), low confidence due to
-  migration, Git moves, filtering, and UI consequences. Split into evaluable
-  stories when resurfaced; keep one combined backlog idea now as requested.
-- **Depends on / safe stopping point:** No prerequisite relationship with
-  publication performance is established. Existing behavior remains until
-  authorized delivery; retaining these decisions is useful if implementation
-  is deferred indefinitely.
-- **Source:** Owner's 2026-09-12 capture and 2026-09-13 split, discussion, and
-  explicit remerge/deprioritization. The latest production migration decision
-  preserves data rather than purging it.
+Use gradual replacement in the spirit of the Strangler Application pattern.
+Every completed story must keep all agreed preserved external behavior working
+for both legacy and newly represented data, together with behavior delivered by
+earlier stories. Prefer the same guarantee at every slice boundary. Never remove
+a working behavior with a promise to reconstruct it in a later story.
+
+Keep the existing path working until its replacement supports the required
+behavior. In particular, legacy note recovery remains usable until migration; story 29 preserves
+reference-handling choices when replacing the web
+action; story 31 migrates data and removes old machinery only with recovery,
+visibility, learning, and direct access working through the replacement.
+Minimal temporary compatibility is allowed for these boundaries and is owned
+for removal by story 31. It must not become a second authority for new trash.
+
+During refinement and slice planning, identify the preserved behaviors touched
+by each replacement and carry their regression proof through that boundary.
+If a proposed cut breaks continuity, change the cut rather than defer repair.
+An explicitly changed behavior switches to its agreed replacement within the
+same completed story. This seed specifies continuity obligations, not evidence
+that implementation already satisfies them.
+
+#### Human decisions and alternatives — 2026-09-13
+
+- Beneficiaries are notebook owners using Donut and ordinary local Markdown/Git
+  tools. Value now is reliable recovery and title reuse without duplicated state.
+- Deferring retains invisible title reservations and the complicated deletion
+  model. Merely allowing title reuse is smaller but leaves recovery ambiguous.
+- The owner selected web-only feedback to drive the trash sequence. Local move
+  and rename support is incomplete; building trash around those prerequisites
+  would delay the useful web outcome. All trash/Git and local-file compatibility
+  work stays together in lower-priority story 28, unsplit and unrefined.
+- A timestamp or original-path record was considered and rejected. Root path
+  membership and a prefix-removing Restore shortcut provide the chosen behavior.
+- Highest-learning hypothesis: an owner can trash and recover a learned note
+  through ordinary web navigation and Move, with one location rule governing
+  visibility and participation. Story 29 tests this directly, without requiring
+  a local checkout or new Git move/rename support.
+- Direct SQL migration runs with the application release. The owner explicitly
+  does not want a separate rollout plan, opt-in, placeholder gate, or migration
+  approval ceremony. This overrides the default gated-DML guidance for this
+  migration; it does not waive data-preservation proof.
+
+#### Agreed external behavior contract
+
+**Preserve:** authorized direct access; note content and learning history;
+independent removed-from-tracking preferences; ordinary editing and renaming;
+ordinary move permissions and destination conflicts; deletion warnings and
+reference choices (leave dead links, remove from referring properties with its
+non-recovery warning, and eligible relationship reduction to a source property).
+Keep authored outgoing references and the existing behavior that inactive
+referrers are omitted from incoming-reference displays.
+
+**Change:** trashing preserves the original path beneath notebook-root `_trash`;
+root matching is case-insensitive and Donut creates lowercase `_trash`. Location
+controls search, recall, assimilation, and wiki-link matching/ambiguity
+eligibility. Trashed content stays in the Portable tree. Former active paths
+become reusable by independent new notes. Leaving references during trashing
+keeps their authored spelling, using deletion reference handling rather than
+ordinary move rewriting. Actual file deletion permanently removes dependent
+data; later recreation has a new identity.
+
+**Add:** browse trash and directly open its notes/folders with a warning; Move
+remains available with active destinations; Restore strips the leading trash
+component and recursively creates missing parent folders. Trashing and moving
+folders apply to descendants. A web trash collision suffixes the incoming
+basename with the first available ` (2)`, ` (3)`, etc., before `.md` for notes.
+A colliding incoming folder is suffixed as a whole rather than merged. Restore
+retains that visible suffix and follows ordinary destination-conflict rules.
+Editing or renaming in trash changes the path Restore subsequently uses.
+
+**Remove at completion:** hidden soft-delete title reservations and implicit
+restoration on title reuse; note soft-delete and timestamp-matching undo as
+separate lifecycle mechanisms. No `trashed_at` is needed. The earlier suggestion
+to retain deletion-date metadata is superseded by this decision.
+
+#### Architecture and evidence
+
+[ADR 0004 — Trash](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash)
+owns the accepted format and eligibility rules. [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md)
+keeps direct note URLs identity-based. [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)
+governs retained learning state. [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
+is Proposed; consult its identity/acceptance discussion without treating its
+older rebase or deletion-retention wording as binding.
+
+Source inspection during this discussion found reference choices in
+`useNoteDeleteFlow`, deletion/undo in `NoteService`, and inactive-referrer
+filtering in `AuthoredNoteReferenceInboundFacade`. These are navigation evidence,
+not a complete audit or executed proof. Existing web moves and folder navigation
+are reuse hypotheses to validate in refinement. The owner identified incomplete
+local move/rename support; it is not a foundation for the web trash stories.
+
+### Selected web trash stories
+
+Each story below is non-executable planning input. S = 30–60 minutes,
+M = 1–2 hours, L = 2–4 hours. Estimates assume reuse of existing web moves,
+reference handling, and navigation. Refine and split a web story found larger
+than L without introducing a second mechanism. Story 28 is explicitly exempt
+from further splitting/refinement for now, by the owner's instruction.
+
+<a id="story-29"></a>
+
+### 29. Trash a note on the web and undo the action
+
+Plan: [Web note trash and immediate undo](../quick/115-web-note-trash-and-undo/PLAN.md)
+
+- **Goal:** A web owner can replace ordinary note deletion with recoverable trash
+  and immediately undo a mistake, preserving identity and learning history.
+- **Scope:** Use the existing Delete/Undo interaction. Trash places the note under
+  root `_trash` with its full path, required parents, and the first free numbered
+  suffix. Location governs search, learning, and wiki eligibility. The former
+  active path is available for a new independent note. Keep reference choices,
+  direct ID access with a warning, ordinary editing/Move, and legacy recovery
+  working. Immediate Undo reverses the action's placement and collision rename
+  using existing session-history semantics and ordinary destination conflicts.
+- **Smallest useful feedback:** Trash a real learned note and undo immediately;
+  observe its disappearance from active use and return with the same history.
+  Existing direct access and Move keep retained notes recoverable beyond Undo.
+- **Deferred promises:** Discovery/navigation improvements for older trash are
+  story 34. Dedicated Restore and original-parent recreation are story 32;
+  migration is story 31; folder Trash is story 33. No new Git/local behavior,
+  permanent-delete UI, empty trash, date metadata, or new trash management screen.
+  Existing navigation remains working, without a new browsing acceptance journey.
+- **Why this cut:** The existing deletion/undo loop gives immediate web feedback.
+  Finding older discarded notes is independently valuable and can be the next
+  story. Repeated-trash safety cannot be removed when title reuse is available;
+  partial search/learning/link exclusion would make trash misleading.
+- **Effort hypothesis:** M–L (1–4 hours), low confidence around shared eligibility
+  changes. Removing discovery work narrows the story but does not remove its
+  cross-cutting participation responsibility. Planning may expose further sizing
+  concerns; keep behavior working through every replacement.
+- **Depends on:** Existing web placement/undo and the separately Taken tracker
+  simplification. No new Git feature is a prerequisite.
+- **Safe stopping point:** Trash and immediate Undo work; direct access/Move and
+  legacy recovery remain usable. Story 31 removes temporary legacy coexistence.
+
+#### Key examples and preserved behavior
+
+| Pre-condition | Trigger | Required result |
+| --- | --- | --- |
+| A learned note has retained history and an independently stopped tracker. | Trash then immediately Undo. | The same note leaves and returns to search/learning/wiki eligibility; history and stopped-tracking preference survive. |
+| The original note was trashed and a new note created at its old path. | Trash the new note, then Undo that action. | Both trash operations preserve independent identities; the second uses a free suffix in trash and Undo restores its original name/placement if available. |
+| A note has referring properties or qualifies for relationship reduction. | Trash with an existing reference choice. | The chosen transformation is preserved; Undo does not reconstruct explicitly removed properties. |
+| A user retains a trashed note URL or has a legacy soft-deleted note. | Open/edit/Move the trashed note, or invoke existing legacy recovery. | Existing authorized access and recovery remain working, with a warning for the trashed note. |
+
+#### Current refinement decisions
+
+Keep the existing note action and post-action navigation; adjust wording to trash.
+Keep immediate Undo instead of waiting for the dedicated Restore button. Undo
+is the inverse of the action; Restore later strips the visible prefix and keeps
+suffixes. Reuse current ephemeral undo history, not a persistent original-path
+journal. Occupied destinations use ordinary move-conflict behavior.
+
+No unresolved product choice prevents slice planning for this scope. Existing
+query coverage and placement reuse remain implementation/sizing concerns. The
+owner authorized slice planning and refinement if needed, not implementation.
+
+<a id="story-34"></a>
+
+### 34. Find and recover previously trashed notes through web navigation
+
+- **Goal / beneficiary:** A web owner can find a previously discarded note after
+  the immediate Undo interaction is gone, and recover it using Move.
+- **Scope capture:** Discover trash through notebook navigation, browse its
+  ordinary folders/notes with trash warnings, and move a selected note to an
+  active destination. Reuse existing views; no dedicated Restore or new Git
+  behavior is implied.
+- **Value / evaluation direction:** The owner finds and recovers an older trashed
+  note without retaining its URL or relying on search or session Undo.
+- **Status:** Unrefined, explicitly left for later discussion. Placed second
+  at the owner's request; no detailed examples, UI contract, or slice plan yet.
+- **Depends on / stopping point:** Story 29's trash state and existing Move;
+  provides useful recovery independently of the Restore shortcut or folder Trash.
+
+<a id="story-31"></a>
+
+### 31. Recover existing deleted notes through portable trash
+
+- **For / why:** Existing web owners find previously deleted content in the same
+  trash as newly trashed notes, with history intact and former paths reusable.
+- **Evaluation:** Upgrade a notebook with soft-deleted learned notes; browse them
+  under their trash paths, recover with Move, and reuse their former names for
+  new notes. Existing note URLs, active content, and dependent data remain usable.
+- **Scope:** Automatic SQL data/schema migration with release; preserve IDs,
+  content, and dependent records using agreed placement/collision behavior.
+  Retire note `deleted_at`, its old writes/filters/undo mechanisms, and hidden
+  title-conflict restoration. Adapt existing callers as necessary to preserve
+  their currently supported external behavior using the new representation.
+  This is part of safe replacement, not a new Git feature or permanent-delete
+  contract. Location is the remaining authority for note trash availability.
+- **Value / learning:** Completes structural retirement with a directly visible
+  recovery benefit for existing owners; avoids permanent compatibility machinery.
+- **Effort hypothesis:** L, low confidence, particularly migration and existing
+  callers. Refine further if necessary; do not turn Git enhancement into a
+  prerequisite or promise unsupported behavior to make retirement appear complete.
+- **Depends on:** Story 29's web trash and preserved Move recovery. The deferred
+  Git compatibility story is not a prerequisite.
+- **Safe stopping point:** All legacy deleted data is migrated and the old note
+  soft-delete structure is gone, with existing behaviors preserved. This remains
+  the required completion boundary even if later convenience work is deferred.
+
+<a id="story-32"></a>
+
+### 32. Restore a trashed item to its visible original path
+
+- **For / why:** A web owner can put a note or folder back without choosing its
+  destination and reconstructing the parent folders manually.
+- **Evaluation:** Restore `_trash/Biology/Cells (2)` while `Biology` is absent;
+  create the parent and move to `Biology/Cells (2)` with retained identity/history.
+  The same prefix-removing action restores a folder and its descendants.
+- **Scope:** Restore toolbar action on trashed notes/folders; reuse existing
+  parents, recursively create missing ones, and apply ordinary destination
+  conflicts. Renames in trash change the visible path used for restoration.
+- **Value / learning:** A small web convenience proves recovery needs no original
+  path journal, timestamp grouping, or separate folder-undo concept.
+- **Effort hypothesis:** M, low confidence around missing parents and references.
+- **Depends on:** Story 29. Story 31 is higher priority for structural completion,
+  not a technical prerequisite. No new Git compatibility promise is included.
+- **Safe stopping point:** Restore is useful independently of a folder Trash
+  action, permanent deletion UI, or empty-trash capability.
+
+<a id="story-33"></a>
+
+### 33. Trash a folder on the web as one recoverable subtree
+
+- **For / why:** A web owner can set aside an organized body of notes in one
+  action without mixing it into an earlier trash operation.
+- **Evaluation:** With `_trash/Biology` present, trash active `Biology`; place the
+  whole subtree in `_trash/Biology (2)`. Browse and move it out with every note's
+  identity/history retained and participation following location.
+- **Scope:** Folder Trash action, recursive eligibility, full-path placement and
+  whole-folder collision suffixing. Preserve the existing trash subtree and
+  ordinary editing/Move. Use Restore when available from story 32.
+- **Value / learning:** Extends the demonstrated web move model to a subtree
+  without inventing timestamp-based group recovery.
+- **Effort hypothesis:** M, low confidence, assuming reuse of existing subtree
+  moves and the common eligibility rules.
+- **Depends on:** Story 29. Story 32 supplies convenience, not required recovery.
+  No new Git compatibility promise is included.
+- **Safe stopping point:** The folder workflow is useful without web permanent
+  deletion, automatic expiry, or empty-trash actions.
+
+### Deferred combined compatibility story
+
+<a id="story-28"></a>
+<a id="story-30"></a>
+
+### 28. Use portable trash across Donut and local Git
+
+- **Goal / beneficiary:** Notebook owners can use the agreed trash lifecycle
+  across the web and local files without losing content, identity, or learning
+  history, and distinguish recoverable trash moves from permanent file deletion.
+- **Scope capture:** All trash-related Git/local compatibility, including local
+  trash/recovery moves, receiving web trash/restoration locally, migrated trash
+  representation, and permanent file removal/recreation semantics. Former
+  stories 28 and 30 and the web-deletion synchronization outcome of story 23
+  are consolidated here; their anchors remain for traceability.
+- **Evaluation direction:** An owner can continue the same trash/recovery journey
+  between Donut and a local notebook with the agreed identity and data semantics.
+- **Status / sizing:** Deliberately broad, unsplit, and unrefined at the owner's
+  request. Likely larger than L; no execution-size or readiness claim is made.
+- **Priority:** After the existing Git web-save, rename, accumulated-publication,
+  Readme-edit, and web-move stories, before publication performance validation.
+  Exact technical prerequisites remain unassessed until this story is selected.
+- **Boundary:** This story owns new compatibility outcomes. Preserving already
+  supported behavior during web restructuring remains each web story's duty;
+  this backlog deferral does not authorize breaking it and repairing it later.
 
 ## Ordering and Scope Reduction
 
-The [product backlog](../PRODUCT-BACKLOG.md) owns selection and order.
-The owner merged title uniqueness and soft deletion into story 26. The broader
-trash model is useful future work, but Git workflow stories now take priority
-and publication-optimization work follows it at the bottom of the queue. Defer
-the combined idea first when reducing Git workflow scope.
-Among the remaining Git workflow stories, make new web history append-only,
-then receive web renames and deletions, then publish accumulated local commits.
-This is the owner's priority decision after challenging story 20's value now.
-Prioritize these stories ahead of container descriptions and web
-relocation. Drop the latter two from the queue first if learning changes the
-priority; retain their candidates here. None of this authorizes execution.
+The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The owner replaced
+local-first delivery with web-driven stories 29, 34, 31, 32, and 33, after the
+separately Taken tracker simplification. Story 29 supplies an evaluable web loop;
+story 34 adds discovery of older trash; story 31 completes migration and removal
+of the old structure before convenience
+expansion. Neither relies on completing new Git move/rename or trash compatibility.
+
+Story 31 is required completion work, not optional cleanup. If work pauses before
+it, keep the old behavior usable and its retirement visibly unfinished. Defer
+folder Trash first, then the Restore shortcut; Move already supplies recovery.
+No database-, API-, or UI-only preparation story is queued.
+
+After those web stories, keep existing Git stories 21, 22, 20, 24, and 25 in
+relative order. Then queue the single unrefined story 28. Former story 23 is
+absorbed there because its deletion-sync scope overlaps the new trash lifecycle;
+its outcome is retained rather than cancelled. Publication performance remains
+after that combined compatibility item.
+
+## Refinement Questions and Sizing Risks
+
+- During story 31 refinement, inspect current persistence and callers to ensure
+  migration and retirement preserve supported behavior. Existing Git consistency
+  must not regress, but no new Git compatibility acceptance journey is to be
+  refined or split out of story 28 now. If an actual preservation conflict is
+  discovered, surface the concrete conflict rather than silently expanding
+  the web story or keeping old state indefinitely. No deployment plan is requested.
+- Existing user-authored root `_trash` content needs migration inspection so the
+  new reserved meaning does not silently lose or overwrite existing content.
+- Restore uses ordinary conflicts when a required parent path is a non-folder.
+- Folder deletion-reference warnings have no existing folder-delete flow to copy;
+  refine the application of existing choices before story 33, without inventing
+  automatic reference removal.
+- Check simplicity cumulatively through story 31: fewer product-code lines and
+  concepts, one state owner, and removal of duplicated rules. Preserve meaningful
+  external proof even if test coverage increases total repository lines.
 
 ## Deferred Directions
 
@@ -342,7 +559,7 @@ Keep these outside the current queue rather than cancelling them:
   history. Establish the owner's blocked journey and a deliberate preservation
   policy before selecting recovery work.
 - Wider folder operations and rename-with-content-edit identity decisions.
-  Deleted-path reuse and trash restoration are retained in deferred story 26.
+  All trash-related Git/local work is retained together in deferred story 28.
 - Native standard Git transport, notebook binding within a project subdirectory,
   attachments, and history browsing or revision restoration.
 
