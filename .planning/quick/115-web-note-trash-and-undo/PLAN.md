@@ -258,11 +258,17 @@ naming and ownership checks. This prepares slice 8, not general folder sync.
 
 ### 6. Prepare collision-safe reversible placement
 Type: Structure
-Status: planned
+Status: done
 Size: 5–10 minutes; one placement responsibility and its bounded proof loop.
 Proof: The stable placement boundary preserves note ID/dependents, selects the
 first free suffix, and restores a supplied prior title/placement atomically;
 occupied targets leave content unchanged.
+
+Extended `NoteMotionService` with one atomic exact-placement operation and a
+collision-safe available-title variant backed by the existing placement rules.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed, covering retained
+IDs/dependents, first-free and length-bounded suffixing, exact reversal, and
+pre-mutation conflict safety.
 
 Extend existing placement, not its external reference rewriting policy. Allocate
 incoming names under existing comparison and length rules. If a suffix needs
