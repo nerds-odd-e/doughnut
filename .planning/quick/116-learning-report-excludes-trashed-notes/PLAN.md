@@ -1,9 +1,11 @@
 # Exclude trashed notes from commissioned learning reports
 
 Status: planned
-Source: bounded correction from the retrospective of
-[SEED-009, story 29](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-29)
-and its completed [execution plan](../115-web-note-trash-and-undo/PLAN.md).
+Source: bounded correction from the retrospective of completed SEED-009 story
+29 and plan 115. Their source and execution contract are recoverable from
+before-cleanup commit `745c8450f5` at
+`.planning/seeds/SEED-009-git-backed-local-notebook-workflow.md` and
+`.planning/quick/115-web-note-trash-and-undo/PLAN.md`.
 Authority: Planning only, authorized by the 2026-09-13
 `dough-execution-retrospective` instruction. No implementation, commit, push,
 or backlog change is authorized.
@@ -34,8 +36,8 @@ content need those files. `LearningSessionService.record` also uses that
 storage-oriented query to match report titles. Unlike due-work selection, this
 recording path does not subsequently check `Note.isAvailable()` or
 `MemoryTracker.isActive()`. A commissioned report can therefore append a
-RecallLog and reschedule a trashed note, contrary to story 29 and
-[ADR 0004's trash rule](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash).
+RecallLog and reschedule a trashed note, contrary to the portable-trash contract
+and [ADR 0004's trash rule](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash).
 
 ## Goal and bounded scope
 
@@ -109,7 +111,7 @@ storage/export callers must continue seeing retained trashed files.
 ## Proof ownership and delivery
 
 The single Behavior slice owns both correction promises: trashed entries are
-not recorded, and active entries remain recordable. Existing plan-115 tests
+not recorded, and active entries remain recordable. Existing trash tests
 continue to own location membership, due recall exclusion, search/wiki
 eligibility, trash placement, and web Undo; do not duplicate those journeys.
 

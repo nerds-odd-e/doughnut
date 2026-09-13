@@ -14,8 +14,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Trash a note on the web and undo the action](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-29) — SEED-009 — [plan](quick/115-web-note-trash-and-undo/PLAN.md)
-
 ## Backlog list
 
 - [Exclude trashed notes from commissioned learning reports](quick/116-learning-report-excludes-trashed-notes/PLAN.md)
