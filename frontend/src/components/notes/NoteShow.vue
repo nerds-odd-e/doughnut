@@ -108,6 +108,7 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
+import { isLocationInTrash } from "@/utils/folderTrash"
 import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
@@ -144,7 +145,7 @@ const effectiveAncestorFolders = (noteRealm: NoteRealm) =>
     : (noteRealm.ancestorFolders ?? [])
 
 const noteIsTrashed = (noteRealm: NoteRealm) =>
-  effectiveAncestorFolders(noteRealm)[0]?.name.toLowerCase() === "_trash"
+  isLocationInTrash(effectiveAncestorFolders(noteRealm), undefined)
 
 const pendingDeadWikiLink = ref<DeadWikiLinkPayload | null>(null)
 

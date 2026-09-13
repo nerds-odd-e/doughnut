@@ -1,4 +1,4 @@
-import type { Notebook } from "@generated/donut-backend-api"
+import type { Folder, Notebook } from "@generated/donut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import FolderPage from "@/pages/FolderPage.vue"
@@ -38,6 +38,7 @@ export function stubFolderPageListingMocks(
 export type MountFolderPageOptions = {
   fetchFolderPage?: ReturnType<typeof vi.fn>
   extraNotebooks?: Notebook[]
+  ancestorFolders?: Folder[]
 }
 
 export function mountFolderPage(
@@ -50,6 +51,7 @@ export function mountFolderPage(
     options.fetchFolderPage ?? vi.fn().mockResolvedValue(undefined)
   const extraNotebooks = options.extraNotebooks ?? []
   const folderRealm = makeMe.aFolderRealm.folder(folderId, folderName).please()
+  folderRealm.ancestorFolders = options.ancestorFolders ?? []
   stubFolderPageListingMocks(
     makeMe.notebookCatalog
       .notebooks(folderRealm.notebookRealm.notebook, ...extraNotebooks)

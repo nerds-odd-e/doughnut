@@ -76,7 +76,7 @@ exception permits a broad navigation or Move rewrite.
 
 ### 1. Recognize trash while browsing ordinary folders
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; existing realm data is sufficient.
 
 Behavior: Owner opens notebook-root `_trash`, or a folder beneath it, through

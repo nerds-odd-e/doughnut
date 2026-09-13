@@ -7,6 +7,13 @@
     />
     <div v-else class="container mx-auto pt-0 pb-4 max-w-6xl">
       <div class="folder-page-summary mb-6" data-testid="folder-page-summary">
+        <div
+          v-if="folderIsTrashed"
+          class="daisy-alert daisy-alert-warning mb-2"
+          data-testid="folder-availability-warning"
+        >
+          This folder is in trash
+        </div>
         <p
           class="text-sm text-base-content/70 mb-2"
           data-testid="folder-page-kind-label"
@@ -62,6 +69,7 @@ import ReadmeSettingsTabs, {
 } from "@/components/commons/ReadmeSettingsTabs.vue"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { isLocationInTrash } from "@/utils/folderTrash"
 
 const props = defineProps<{
   folderRealm: FolderRealm | undefined
@@ -73,6 +81,13 @@ const folderForView = computed((): FolderRealm | undefined => {
   if (r?.notebookRealm?.notebook == null) return undefined
   return r
 })
+
+const folderIsTrashed = computed(() =>
+  isLocationInTrash(
+    folderForView.value?.ancestorFolders ?? [],
+    folderForView.value?.folder
+  )
+)
 
 const activeTab = ref<ReadmeSettingsTab>("readme")
 
