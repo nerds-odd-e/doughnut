@@ -185,7 +185,7 @@ strengthened before/after learning-data assertions on 2026-09-13.
 
 ### 3. Receive the accepted web rename through ordinary pull
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given a clean installed-CLI checkout at accepted A and the bound web
 rename appended as B, ordinary pull yields the renamed file at B, removes the old
 path, preserves exact authored content, retains A as an ancestor, and leaves the
@@ -208,6 +208,12 @@ run. If further harness repair reaches 10 active minutes, stop and reassess the
 story boundary rather than adding another receipt mechanism.
 Safe stop: the selected journey is green end to end; leave no failing scenario
 as a commit boundary.
+Execution proof: `CURSOR_DEV=true nix develop -c pnpm cli:test --
+tests/notebookPull.test.ts` passed with 448 tests in the oversized attempt and
+remained reusable because no CLI source changed. `CURSOR_DEV=true nix develop -c
+pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature`
+passed all 7 scenarios after the restored fixture bytes were aligned with the
+accepted Portable representation on 2026-09-13.
 
 ### 4. Receive the selected reference rewrite with the renamed note
 Type: Behavior
@@ -298,13 +304,12 @@ recognizers or restrict the earlier examples' naturally supported behavior.
 Slice 1 has an immediate consumer; no structure is reserved for deferred moves
 or multi-notebook publication. Local pull remains ordinary Git fast-forward.
 
-Slice 2's restored backend portion is now green and delivered from its own proof
-loop. The final corrected E2E fixture remains unverified and parked for Slice 3;
-stash `b40094d7602aa4a31771a1d88b3603cc0814e1a7` remains its recovery copy.
-Required E2E runtime remains the stated timing exception. Another hard-limit
-overrun would trigger story-boundary reassessment rather than further routine
-subdivision. The later slices have no additional specific decomposition concern
-identified by this assessment.
+Slices 2 and 3 are now green and delivered from their separate proof loops. The
+oversized attempt's compatible backend and E2E work has been assimilated; stash
+`b40094d7602aa4a31771a1d88b3603cc0814e1a7` is no longer needed after Slice 3
+delivery. Another hard-limit overrun would trigger story-boundary reassessment
+rather than further routine subdivision. The later slices have no additional
+specific decomposition concern identified by this assessment.
 
 Cross-notebook reference histories remain outside the promised local receipt;
 their existing web rewrite behavior must survive. Preserve the recorded boundary

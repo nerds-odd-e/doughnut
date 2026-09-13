@@ -252,6 +252,14 @@ Then(
 )
 
 Then(
+  'the cloned checkout retains its original head as an ancestor and is clean at the accepted head',
+  () =>
+    cli
+      .notebookCloneCheckout()
+      .expectOriginalHeadIsAncestorAndCleanAcceptedHead()
+)
+
+Then(
   'the cloned checkout file {string} at the accepted parent is:',
   (relativePath: string, content: string) =>
     cli.notebookCloneCheckout().expectCheckoutParentFile(relativePath, content)

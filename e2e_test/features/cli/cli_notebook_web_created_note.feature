@@ -1,7 +1,7 @@
 @bundleCliE2eInstall
 @withCliConfig
-Feature: CLI notebook web-created note
-  As a notebook owner, I want to pull a note I created on the web into my local Git checkout so I
+Feature: CLI notebook web note changes
+  As a notebook owner, I want to pull note changes I made on the web into my local Git checkout so I
   can continue with ordinary local tools.
 
   Background:
@@ -47,6 +47,43 @@ Feature: CLI notebook web-created note
       type: Note
       ---
 
+      """
+
+  Scenario: Pulling a web note rename into a clean checkout
+    Given I have a note "Cells" under notebook "CLI Clone Notebook" in folder "Biology" with content:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes
+      """
+    And I assimilate the note "Cells"
+    And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I update note title "Cells" to become "Cell structure"
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | README.md                   |
+      | Overview.md                 |
+      | Biology/Cell structure.md   |
+      | Kitchen/README.md           |
+      | Recipes/README.md           |
+      | Recipes/Pasta.md            |
+    And the cloned checkout file "Biology/Cell structure.md" is:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes
       """
 
   Scenario: Publishing a local refinement of received web-created note text updates Donut

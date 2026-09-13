@@ -235,6 +235,43 @@ function notebookCloneCheckout() {
             })
         )
     },
+    expectOriginalHeadIsAncestorAndCleanAcceptedHead(): Cypress.Chainable<null> {
+      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+        cy
+          .get<CliNotebookCheckoutState>('@cliNotebookOriginalCheckout')
+          .then((original) => {
+            expect(original.status, 'checkout at A should be clean').to.equal(
+              ''
+            )
+            return cy
+              .task<boolean>('cliNotebookCheckoutIsAncestorOfHead', {
+                checkoutDir,
+                ancestor: original.head,
+              })
+              .then((isAncestor) => ({
+                isAncestor,
+                originalHead: original.head,
+              }))
+          })
+          .then(({ isAncestor, originalHead }) => {
+            expect(
+              isAncestor,
+              `original head ${originalHead} should be an ancestor of HEAD in ${checkoutDir}`
+            ).to.equal(true)
+            return cy
+              .get<CliNotebookCheckoutState>('@cliNotebookRebasedCheckout')
+              .then((pulled) => {
+                expect(
+                  pulled.status,
+                  'received checkout should be clean'
+                ).to.equal('')
+                return nonInteractiveOutput().expectContains(
+                  `Accepted head: ${pulled.head}`
+                )
+              })
+          })
+      )
+    },
     expectCheckoutParentFile(
       relativePath: string,
       content: string
