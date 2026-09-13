@@ -2,6 +2,10 @@ package com.odde.donut.controllers;
 
 import com.odde.donut.controllers.currentUser.CurrentUser;
 import com.odde.donut.controllers.currentUser.ThreadLocalCurrentUser;
+import com.odde.donut.controllers.dto.NoteDeleteDTO;
+import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.donut.controllers.dto.NoteTrashUndoDTO;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.testability.MakeMe;
@@ -36,5 +40,18 @@ public abstract class ControllerTestBase {
   /** See {@link MakeMe#authorReferencingContent(Note, String)}. */
   protected void authorReferencingContent(Note note, String content) {
     makeMe.authorReferencingContent(note, content);
+  }
+
+  protected NoteDeleteDTO leaveDeadLinks() {
+    NoteDeleteDTO request = new NoteDeleteDTO();
+    request.setReferenceHandling(NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS);
+    return request;
+  }
+
+  protected NoteTrashUndoDTO undoTo(String title, Folder folder) {
+    NoteTrashUndoDTO request = new NoteTrashUndoDTO();
+    request.setPriorTitle(title);
+    request.setPriorFolderId(folder == null ? null : folder.getId());
+    return request;
   }
 }

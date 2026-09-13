@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.donut.controllers.dto.FolderListing;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.NoteTopology;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -78,7 +77,7 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
   }
 
   @Test
-  void nestedFolderListingStillShowsNotesAfterPeerTitleNoteSoftDeleted()
+  void nestedFolderListingStillShowsNotesAfterPeerTitleNoteTrashed()
       throws UnexpectedNoAccessRightException {
     Notebook nb = ownedNotebook();
     Folder fDt = ownedFolder(nb, "Descendants Test");
@@ -86,12 +85,8 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     Folder fChild = makeMe.aFolder().parentFolder(fParent).name("child").please();
     makeMe.aNote("Descendants Test").notebook(nb).please();
     makeMe.aNote("parent").folder(fDt).please();
-    Note noteChild = makeMe.aNote("child").folder(fParent).please();
+    makeMe.aNote("child").notebook(nb).trashed().please();
     makeMe.aNote("Unit Test").folder(fChild).please();
-
-    noteService.destroy(
-        noteChild, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
-    makeMe.entityPersister.flush();
 
     FolderListing listing = controller.listNotebookFolderListing(nb, fChild.getId());
     assertEquals(1, listing.noteTopologies().size());

@@ -32,7 +32,7 @@ describe("storedApiCollection", () => {
     const parentNote = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
-      mockSdkService(NoteController, "deleteNote", [parentNote])
+      mockSdkService(NoteController, "trashNote", parentNote)
     })
 
     it("should remove the created note from cache after undo", async () => {
@@ -52,8 +52,8 @@ describe("storedApiCollection", () => {
       ).toBeUndefined()
     })
 
-    it("should navigate to notebook page when delete returns no realms", async () => {
-      mockSdkService(NoteController, "deleteNote", [])
+    it("should navigate to notebook page when trash returns no realms", async () => {
+      mockSdkService(NoteController, "trashNote", note)
       const noteEditingHistory = new NoteEditingHistory()
       storageAccessor.value = createNoteStorage(noteEditingHistory)
 
@@ -66,6 +66,23 @@ describe("storedApiCollection", () => {
       expect(routerPush).toHaveBeenCalledWith({
         name: "notebookPage",
         params: { notebookId: note.notebookRealm.notebook.id },
+      })
+    })
+
+    it("uses the recoverable trash path with LEAVE_DEAD_LINKS instead of soft-delete", async () => {
+      const trashSpy = mockSdkService(NoteController, "trashNote", note)
+      const noteEditingHistory = new NoteEditingHistory()
+      storageAccessor.value = createNoteStorage(noteEditingHistory)
+
+      storageAccessor.value.refreshNoteRealm(note)
+      noteEditingHistory.createNote(note.id)
+
+      const sa = storageAccessor.value.storedApi()
+      await sa.undo(router)
+
+      expect(trashSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { referenceHandling: "LEAVE_DEAD_LINKS" },
       })
     })
   })

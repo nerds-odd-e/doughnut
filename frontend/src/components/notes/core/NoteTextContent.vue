@@ -2,9 +2,9 @@
   <div
     class="daisy-alert daisy-alert-warning"
     data-testid="note-availability-warning"
-    v-if="note.deletedAt || trashed"
+    v-if="trashed"
   >
-    {{ trashed ? "This note is in trash" : "This note has been deleted" }}
+    This note is in trash
   </div>
   <NoteEditableTitle
     v-bind="{

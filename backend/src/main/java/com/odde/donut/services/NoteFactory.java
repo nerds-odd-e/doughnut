@@ -22,25 +22,21 @@ public class NoteFactory {
   private final AuthorizationService authorizationService;
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
-  private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public NoteFactory(
       AuthorizationService authorizationService,
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
-      NoteTitlePlacementRules noteTitlePlacementRules,
       CanonicalDonutOrigin canonicalDonutOrigin) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
-    this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
   public Note create(Notebook notebook, Folder folderOrNull, String title) {
     throwIfReservedTitle(title);
-    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, folderOrNull, title);
     Note note = new Note();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeNewNote(notebook, ts, title);

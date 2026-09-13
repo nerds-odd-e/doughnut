@@ -6,11 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.donut.controllers.dto.AnsweredQuestion;
 import com.odde.donut.controllers.dto.DueMemoryTrackers;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionType;
-import com.odde.donut.services.NoteService;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
@@ -18,11 +16,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class RecallsControllerTests extends RecallsControllerTestBase {
-  @Autowired NoteService noteService;
 
   @Nested
   class Repeat {
@@ -101,12 +97,9 @@ class RecallsControllerTests extends RecallsControllerTestBase {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
       Note activeNote = ownedNote();
-      Note deletedNote = ownedNote();
+      Note deletedNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).trashed().please();
       dueTracker(activeNote, currentTime);
       dueTracker(deletedNote, currentTime);
-
-      noteService.destroy(
-          deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 

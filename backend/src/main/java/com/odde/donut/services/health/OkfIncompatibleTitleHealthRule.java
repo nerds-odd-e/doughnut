@@ -45,7 +45,8 @@ public class OkfIncompatibleTitleHealthRule implements HealthRule {
 
   @Override
   public HealthFindingGroup evaluate(Notebook notebook, HealthRunContext context) {
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> liveNotes =
+        noteRepository.findAvailableNotesByNotebookIdOrderByIdAsc(notebook.getId());
     List<HealthFindingItem> items = new ArrayList<>();
     for (Note note : liveNotes) {
       if (!isOkfIncompatibleTitle(note.getTitle())) {

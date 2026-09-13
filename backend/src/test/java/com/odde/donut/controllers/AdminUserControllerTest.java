@@ -6,14 +6,12 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.UserForListing;
 import com.odde.donut.controllers.dto.UserListingPage;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteCreator;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.NoteService;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -22,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class AdminUserControllerTest extends ControllerTestBase {
   @Autowired AdminUserController controller;
-  @Autowired NoteService noteService;
 
   @Test
   void nonAdminCannotAccessUserListing() {
@@ -54,15 +51,13 @@ class AdminUserControllerTest extends ControllerTestBase {
     void excludesMemoryTrackersForDeletedNotesFromCountAndLastAssimilationTime()
         throws UnexpectedNoAccessRightException {
       User userWithTrackers = makeMe.aUser().please();
-      Note deletedNote = makeMe.aNote().please();
       Timestamp assimilationTime = makeMe.aTimestamp().of(2025, 5).please();
+      Note deletedNote = makeMe.aNote().notebookOwnedBy(userWithTrackers).trashed().please();
       makeMe
           .aMemoryTrackerFor(deletedNote)
           .by(userWithTrackers)
           .assimilatedAt(assimilationTime)
           .please();
-      noteService.destroy(
-          deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
       UserForListing userListing = listingFor(userWithTrackers);
 

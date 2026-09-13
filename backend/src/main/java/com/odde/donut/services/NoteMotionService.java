@@ -42,8 +42,6 @@ public class NoteMotionService {
 
   public void executePlacement(
       Note source, Notebook targetNotebook, Folder targetFolderOrNull, String targetTitle) {
-    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-        targetNotebook, targetFolderOrNull, targetTitle);
     noteTitlePlacementRules.requireNoOtherNoteTitleAt(
         targetNotebook, targetFolderOrNull, targetTitle, source.getId());
     source.setTitle(new DisplayName(targetTitle));

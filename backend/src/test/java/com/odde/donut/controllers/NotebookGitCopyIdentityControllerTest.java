@@ -120,18 +120,50 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerT
     assertThat(copyView.getNote().getContent(), equalTo(COPIED_CONTENT));
     assertHasNoPrivateAssociations(copy);
 
+    // The deleted original and its complete dependent data are permanently gone.
     inCommittedTransaction(
         transactionManager,
         () -> {
-          MemoryTracker tracker =
-              memoryTrackerRepository.findById(associations.trackerId()).orElseThrow();
-          assertThat(tracker.getNote().getId(), equalTo(original.getId()));
-          Mcq mcq = mcqRepository.findById(associations.mcqId()).orElseThrow();
-          assertThat(mcq.getNote().getId(), equalTo(original.getId()));
-          Conversation conversation =
-              conversationRepository.findById(associations.conversationId()).orElseThrow();
-          assertThat(conversation.getSubject().getNote().getId(), equalTo(original.getId()));
+          assertThat(noteRepository.findById(original.getId()).isPresent(), equalTo(false));
+          assertThat(
+              memoryTrackerRepository.findById(associations.trackerId()).isPresent(),
+              equalTo(false));
+          assertThat(mcqRepository.findById(associations.mcqId()).isPresent(), equalTo(false));
+          assertThat(
+              conversationRepository.findById(associations.conversationId()).isPresent(),
+              equalTo(false));
         });
+  }
+
+  @Test
+  void recreatesSamePathWithAFreshIdentityAfterAcceptedPermanentRemoval() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note original =
+        makeMe.aNote().notebook(notebook).title("Original").content(COPIED_CONTENT).please();
+    commitPrivateAssociations(original);
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] deletionProposal = proposalBundleBytes(binding, List.of());
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), deletionProposal);
+
+    NotebookGitBinding afterDeletion =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] recreationProposal =
+        proposalBundleBytes(
+            afterDeletion, List.of(new NotebookGitProposalFile("Original.md", COPIED_CONTENT)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), afterDeletion.getAcceptedGitObjectId(), recreationProposal);
+
+    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(liveNotes, hasSize(1));
+    Note recreated = liveNotes.getFirst();
+    NoteRealm recreatedView = noteController.showNote(recreated);
+    assertThat(recreated.getTitle(), equalTo("Original"));
+    assertThat(recreatedView.getId(), not(equalTo(original.getId())));
+    assertThat(recreatedView.getNote().getContent(), equalTo(COPIED_CONTENT));
+    assertHasNoPrivateAssociations(recreated);
   }
 
   private void assertHasNoPrivateAssociations(Note note) throws Exception {

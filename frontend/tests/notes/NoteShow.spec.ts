@@ -80,8 +80,6 @@ describe("note without children", () => {
   })
 })
 
-const legacyDeletedRealm = makeMe.aNoteRealm.please()
-
 describe("note availability warning", () => {
   it.each([
     {
@@ -92,16 +90,6 @@ describe("note availability warning", () => {
         ])
         .please(),
       warning: "This note is in trash",
-    },
-    {
-      realm: {
-        ...legacyDeletedRealm,
-        note: {
-          ...legacyDeletedRealm.note,
-          deletedAt: "2026-09-13T00:00:00.000Z",
-        },
-      },
-      warning: "This note has been deleted",
     },
     { realm: makeMe.aNoteRealm.please(), warning: undefined },
   ])("shows $warning", async ({ realm, warning }) => {

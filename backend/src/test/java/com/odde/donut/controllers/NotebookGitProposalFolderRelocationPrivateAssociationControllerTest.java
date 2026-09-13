@@ -2,8 +2,6 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
@@ -39,14 +37,6 @@ class NotebookGitProposalFolderRelocationPrivateAssociationControllerTest
         makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
     Note relocatedNote =
         makeMe.aNote().folder(topics).title("Original").content(MATCHING_CONTENT).please();
-    Note deletedNote =
-        makeMe
-            .aNote()
-            .folder(topics)
-            .title("Gone")
-            .content(MATCHING_CONTENT)
-            .softDeleted()
-            .please();
     Note untouchedNote =
         makeMe.aNote().notebook(notebook).title("Untouched").content(MATCHING_CONTENT).please();
     RelocatedNoteAssociations associations =
@@ -91,9 +81,6 @@ class NotebookGitProposalFolderRelocationPrivateAssociationControllerTest
             .getNote()
             .getId(),
         equalTo(relocatedNote.getId()));
-    assertThat(
-        noteRepository.findById(deletedNote.getId()).orElseThrow().getDeletedAt(),
-        not(nullValue()));
 
     NotebookGitBinding afterMove =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();

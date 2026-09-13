@@ -100,10 +100,6 @@ const getUndoMessage = (): string => {
       return noteTopology
         ? "Are you sure you want to undo editing the content of "
         : `Are you sure you want to undo editing the content of ${noteIdentifier}?`
-    case "delete note":
-      return noteTopology
-        ? "Are you sure you want to undo deleting "
-        : `Are you sure you want to undo deleting ${noteIdentifier}?`
     case "trash note":
       return noteTopology
         ? "Are you sure you want to undo trashing "

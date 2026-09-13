@@ -9,7 +9,6 @@ import {
   folderNameConflictMessage,
   mountFolderPage,
   resolveTopConfirm,
-  softDeletedTitleConflictMessage,
   stubRouterPush,
   submitMoveForm,
 } from "@tests/pages/folderPageTestSupport"
@@ -28,7 +27,7 @@ describe("FolderPage move conflicts", () => {
   })
 
   describe("move", () => {
-    it("keeps soft-deleted conflicts inline, preserves typed conflicts on cancel, and merges on retry", async () => {
+    it("preserves typed conflicts on cancel and merges on retry", async () => {
       const { wrapper, folderRealm } = mountFolderPage(router, 10, "Dup")
       const targetFolder = makeMe.aFolder
         .folder(99, folderRealm.folder.name)
@@ -36,13 +35,6 @@ describe("FolderPage move conflicts", () => {
 
       const moveSpy = vi
         .spyOn(NotebookController, "moveFolder")
-        .mockResolvedValueOnce(
-          wrapSdkError({
-            status: 409,
-            errorType: "SOFT_DELETED_TITLE_CONFLICT",
-            message: softDeletedTitleConflictMessage,
-          })
-        )
         .mockResolvedValue(
           wrapSdkError({
             message: folderNameConflictMessage,
@@ -50,10 +42,6 @@ describe("FolderPage move conflicts", () => {
           })
         )
       const pushSpy = stubRouterPush(router)
-
-      await submitMoveForm(wrapper)
-      expect(usePopups().popups.peek()).toHaveLength(0)
-      expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
 
       await submitMoveForm(wrapper)
       expect(usePopups().popups.peek()?.[0]?.type).toBe("confirm")
@@ -64,7 +52,7 @@ describe("FolderPage move conflicts", () => {
       resolveTopConfirm(false)
       await flushPromises()
       expect(wrapper.text()).toContain(folderNameConflictMessage)
-      expect(moveSpy).toHaveBeenCalledTimes(2)
+      expect(moveSpy).toHaveBeenCalledTimes(1)
       expect(pushSpy).not.toHaveBeenCalled()
 
       await submitMoveForm(wrapper)
@@ -72,7 +60,7 @@ describe("FolderPage move conflicts", () => {
       resolveTopConfirm(true)
       await flushPromises()
 
-      expect(moveSpy).toHaveBeenCalledTimes(4)
+      expect(moveSpy).toHaveBeenCalledTimes(3)
       expect(moveSpy).toHaveBeenLastCalledWith(
         expect.objectContaining({
           body: expect.objectContaining({ merge: true }),

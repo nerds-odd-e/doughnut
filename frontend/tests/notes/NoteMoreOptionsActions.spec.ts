@@ -39,7 +39,7 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
   beforeEach(() => {
     usePopups().popups.register({ popupInfo: [] })
     mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
-    mockSdkService(NoteController, "deleteNote", undefined)
+    mockSdkService(NoteController, "trashNote", undefined)
   })
 
   afterEach(() => {

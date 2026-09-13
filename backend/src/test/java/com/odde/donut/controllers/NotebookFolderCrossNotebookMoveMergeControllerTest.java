@@ -2,15 +2,11 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.donut.controllers.dto.ApiError;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Test;
 
@@ -41,31 +37,6 @@ class NotebookFolderCrossNotebookMoveMergeControllerTest
     assertTrue(listingHasFolder(nbB, null, target));
     assertThat(listingHasFolder(nbB, null, source), equalTo(false));
     assertThat(listingHasFolder(nbA, null, source), equalTo(false));
-  }
-
-  @Test
-  void rejectsCrossNotebookMergeWhenSoftDeletedNoteHasSameTitleAtDestinationFolder() {
-    Notebook nbA = ownedNotebook();
-    Notebook nbB = ownedNotebook();
-    Folder target = ownedFolder(nbB, "Dup");
-    Note deleted = makeMe.aNote().folder(target).title("ConflictTitle").please();
-    noteService.destroy(
-        deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
-
-    Folder holder = ownedFolder(nbA, "Holder");
-    Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
-    makeMe.aNote().folder(source).title("ConflictTitle").please();
-
-    ApiException ex =
-        assertThrows(
-            ApiException.class, () -> controller.moveFolder(nbA, source, folderMergeTo(nbB, null)));
-    assertThat(
-        ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
-    assertThat(
-        ex.getErrorBody().getErrors().get("deletedNoteId"),
-        equalTo(String.valueOf(deleted.getId())));
-    makeMe.refresh(source);
-    assertThat(source.getNotebook().getId(), equalTo(nbA.getId()));
   }
 
   @Test

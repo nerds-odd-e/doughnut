@@ -132,24 +132,19 @@ public class NoteService {
     return List.copyOf(ids);
   }
 
-  public void destroy(Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
-    destroy(note, referenceHandling, null, viewer);
-  }
-
-  public void destroy(
-      Note note,
-      NoteDeleteReferenceHandling referenceHandling,
-      String sourcePropertyKey,
-      User viewer) {
+  /**
+   * Permanently removes {@code note} and its complete dependent data. The note row is hard-deleted;
+   * note-owned dependents (memory_tracker, recall_prompt, mcq, image, conversation, and
+   * authored_note_reference source rows) are removed by their ON DELETE CASCADE foreign keys. The
+   * reference-handling contract is applied first so authored inbound text in referrer notes is
+   * preserved for {@link NoteDeleteReferenceHandling#LEAVE_DEAD_LINKS}. Used by Git publication of
+   * a file deletion.
+   */
+  public void permanentlyRemove(
+      Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    applyNoteDeleteReferenceHandling(
-        note, referenceHandling, sourcePropertyKey, viewer, currentUTCTimestamp);
-    note.setUpdatedAt(currentUTCTimestamp);
-    note.setDeletedAt(currentUTCTimestamp);
-    entityPersister.merge(note);
-    // Flush the soft-delete before destroy returns. NoteTitlePlacementRules' COMMIT lookup
-    // depends on this order; see NoteTitlePlacementRulesFlushVisibilityTest.
-    entityPersister.flush();
+    applyNoteDeleteReferenceHandling(note, referenceHandling, null, viewer, currentUTCTimestamp);
+    entityPersister.remove(note);
   }
 
   public void applyNoteDeleteReferenceHandling(
@@ -206,13 +201,6 @@ public class NoteService {
         .setFlushMode(FlushModeType.COMMIT)
         .getResultList()
         .forEach(entityPersister::remove);
-  }
-
-  public void restore(Note note, User viewer) {
-    if (note.getDeletedAt() != null) {
-      note.setDeletedAt(null);
-      entityPersister.merge(note);
-    }
   }
 
   public NoteImageUploadResult uploadNoteImage(

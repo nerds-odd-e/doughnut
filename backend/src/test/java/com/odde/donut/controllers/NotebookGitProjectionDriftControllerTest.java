@@ -41,10 +41,8 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
 
   @Test
   void rejectsADeletionBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
-    Note remaining =
-        rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(
-            this::isolatedDeletionProposalBundle);
-    assertThat(remaining.getDeletedAt(), nullValue());
+    rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(
+        this::isolatedDeletionProposalBundle);
   }
 
   @Test
@@ -56,7 +54,6 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
   void rejectsADeletionWhenAWebCreationHasDriftedTheProjection() throws Exception {
     DriftedWebCreation remaining =
         rejectWhenAWebCreationHasDriftedTheProjection(this::isolatedDeletionProposalBundle);
-    assertThat(remaining.acceptedNote().getDeletedAt(), nullValue());
     assertThat(
         inCommittedTransaction(
             transactionManager,

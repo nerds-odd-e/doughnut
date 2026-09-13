@@ -1,5 +1,7 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
+import { noteShowLocation } from "@/routes/noteShowLocation"
+import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
@@ -109,5 +111,48 @@ describe("storedApiCollection trash note", () => {
       type: "trash note",
       noteId: realm.id,
     })
+  })
+
+  it("keeps the trashed note in cache instead of removing it", async () => {
+    const storage = createNoteStorage()
+    const realm = makeMe.aNoteRealm.please()
+    storage.refreshNoteRealm(realm)
+    mockSdkService(NoteController, "trashNote", realm)
+
+    await storage.storedApi().trashNote(router, realm.id, {
+      referenceHandling: "LEAVE_DEAD_LINKS",
+    })
+
+    expect(storage.refOfNoteRealm(realm.id).value).toBeTruthy()
+  })
+
+  it("refreshes sidebar structural listings after trash", async () => {
+    const storage = createNoteStorage()
+    const realm = makeMe.aNoteRealm.please()
+    storage.refreshNoteRealm(realm)
+    mockSdkService(NoteController, "trashNote", realm)
+    const before = sidebarStructuralRefreshKey.value
+
+    await storage.storedApi().trashNote(router, realm.id, {
+      referenceHandling: "LEAVE_DEAD_LINKS",
+    })
+
+    expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
+  })
+
+  it("navigates to the source note when reducing to a source property", async () => {
+    const storage = createNoteStorage()
+    const realm = makeMe.aNoteRealm.please()
+    storage.refreshNoteRealm(realm)
+    mockSdkService(NoteController, "trashNote", realm)
+    const sourceNoteId = 501
+
+    await storage.storedApi().trashNote(router, realm.id, {
+      referenceHandling: "REDUCE_TO_SOURCE_PROPERTY",
+      sourcePropertyKey: "a part of",
+      sourceNoteId,
+    })
+
+    expect(routerReplace).toHaveBeenCalledWith(noteShowLocation(sourceNoteId))
   })
 })

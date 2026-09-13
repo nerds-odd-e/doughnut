@@ -773,32 +773,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteImageUploadResult"
-  /api/notes/{note}/delete:
-    post:
-      tags:
-      - note-controller
-      operationId: deleteNote
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteDeleteDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/notes/semantic-search:
     post:
       tags:
@@ -2000,24 +1974,6 @@ paths:
             schema:
               $ref: "#/components/schemas/NoteTrashUndoDTO"
         required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
-  /api/notes/{note}/undo-delete:
-    patch:
-      tags:
-      - note-controller
-      operationId: undoDeleteNote
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
       responses:
         "200":
           description: OK
@@ -3826,10 +3782,6 @@ components:
         id:
           type: integer
           format: int32
-        deletedAt:
-          type: string
-          format: date-time
-          readOnly: true
       required:
       - id
       - noteTopology

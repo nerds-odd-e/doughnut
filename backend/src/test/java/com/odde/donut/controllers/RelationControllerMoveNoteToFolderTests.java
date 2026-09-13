@@ -8,8 +8,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
-import com.odde.donut.controllers.dto.NoteDeleteDTO;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.SearchTerm;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
@@ -136,12 +134,6 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
     assertThat(
         memoryTrackerRepository.findById(removedTrackerId).orElseThrow().getRemovedFromTracking(),
         equalTo(true));
-  }
-
-  private NoteDeleteDTO leaveDeadLinks() {
-    NoteDeleteDTO request = new NoteDeleteDTO();
-    request.setReferenceHandling(NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS);
-    return request;
   }
 
   private void assertParticipation(

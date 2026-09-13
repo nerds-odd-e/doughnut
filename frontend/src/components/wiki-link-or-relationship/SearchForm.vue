@@ -46,10 +46,6 @@ import {
   authoredWikiLinkTokenForInsert,
   authoredWikiLinkTokenFromOriginalPath,
 } from "@/utils/wikiLinkAuthoring"
-import {
-  moveBlockedBySoftDeletedTitleMessage,
-  parseSoftDeletedTitleConflict,
-} from "@/managedApi/softDeletedTitleConflict"
 
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
@@ -127,39 +123,23 @@ async function onDeadWikiLinkToNote() {
   )
 }
 
-async function reportMoveBlockedBySoftDeletedTitle(e: unknown) {
-  const conflict = parseSoftDeletedTitleConflict(e)
-  if (!conflict) {
-    throw e
-  }
-  await popups.confirm(moveBlockedBySoftDeletedTitleMessage(conflict))
-}
-
 async function moveUnderFolder(targetFolderId: number) {
   if (!(await popups.confirm("Move note into this folder?"))) {
     return
   }
-  try {
-    await storageAccessor.value
-      .storedApi()
-      .moveNoteToFolder(note!.id, targetFolderId)
-    emit("closeDialog")
-  } catch (e) {
-    await reportMoveBlockedBySoftDeletedTitle(e)
-  }
+  await storageAccessor.value
+    .storedApi()
+    .moveNoteToFolder(note!.id, targetFolderId)
+  emit("closeDialog")
 }
 
 async function moveToNotebookRoot(targetNotebookId: number) {
   if (!(await popups.confirm("Move note to this notebook's root?"))) {
     return
   }
-  try {
-    await storageAccessor.value
-      .storedApi()
-      .moveNoteToNotebookRoot(note!.id, targetNotebookId)
-    emit("closeDialog")
-  } catch (e) {
-    await reportMoveBlockedBySoftDeletedTitle(e)
-  }
+  await storageAccessor.value
+    .storedApi()
+    .moveNoteToNotebookRoot(note!.id, targetNotebookId)
+  emit("closeDialog")
 }
 </script>

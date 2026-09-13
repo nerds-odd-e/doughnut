@@ -62,9 +62,9 @@ class EmptyFolderHealthRuleTest {
   }
 
   @Test
-  void softDeletedNoteDoesNotOccupyFolder() {
+  void trashedNoteDoesNotOccupyFolder() {
     Folder folder = makeMe.aFolder().notebook(notebook).name("OnlyDeleted").please();
-    makeMe.aNote("gone").folder(folder).softDeleted().please();
+    makeMe.aNote("gone").notebook(notebook).trashed().please();
 
     assertThat(
         emptyFoldersGroup().getItems().stream().map(HealthFindingItem::getFolderId).toList(),

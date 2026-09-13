@@ -35,10 +35,10 @@ class NotebookTest {
     }
 
     @Test
-    void shouldExcludeSoftDeletedNotesFromNotebook() {
-      makeMe.aNote().notebook(notebook).softDeleted().please();
+    void shouldIncludeTrashedNotesInNotebook() {
+      makeMe.aNote().notebook(notebook).trashed().please();
       makeMe.refresh(notebook);
-      assertThat(notebook.getNotes().size()).isEqualTo(1);
+      assertThat(notebook.getNotes().size()).isEqualTo(2);
     }
   }
 

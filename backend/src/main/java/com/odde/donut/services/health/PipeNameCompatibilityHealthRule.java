@@ -49,7 +49,7 @@ public class PipeNameCompatibilityHealthRule implements HealthRule {
   @Override
   public HealthFindingGroup evaluate(Notebook notebook, HealthRunContext context) {
     List<HealthFindingItem> items = new ArrayList<>();
-    for (Note note : noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId())) {
+    for (Note note : noteRepository.findAvailableNotesByNotebookIdOrderByIdAsc(notebook.getId())) {
       boolean pipeTitle = note.getTitle().contains("|");
       boolean pipeAlias =
           FrontmatterAliases.fromNoteContent(note.getContent()).stream()

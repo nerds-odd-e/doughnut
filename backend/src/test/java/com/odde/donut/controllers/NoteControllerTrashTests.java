@@ -11,7 +11,6 @@ import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteDeleteDTO;
 import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.controllers.dto.NoteTrashUndoDTO;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
@@ -85,6 +84,31 @@ class NoteControllerTrashTests extends ControllerTestBase {
     assertThat(
         memoryTrackerRepository.findById(stoppedId).orElseThrow().getRemovedFromTracking(),
         equalTo(true));
+  }
+
+  @Test
+  void trashingAndUndoingPreservesAuthoredContentAndNoteIdentity()
+      throws UnexpectedNoAccessRightException {
+    Folder originalFolder =
+        makeMe
+            .aFolder()
+            .notebook(makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please())
+            .name("Topics")
+            .please();
+    Note note = makeMe.aNote("Subject").folder(originalFolder).please();
+    NoteUpdateContentDTO content = new NoteUpdateContentDTO();
+    content.setContent("---\ntype: Note\n---\nAuthored body that must survive trash");
+    textContentController.updateNoteContent(note, content);
+    Integer noteId = note.getId();
+    String authoredContent = note.getContent();
+
+    NoteRealm trashed = controller.trashNote(note, leaveDeadLinks());
+    NoteRealm restored = controller.undoTrashNote(note, undoTo("Subject", originalFolder));
+
+    assertThat(restored.getNote().getId(), equalTo(noteId));
+    assertThat(restored.getNote().isTrashed(), equalTo(false));
+    assertThat(note.getContent(), equalTo(authoredContent));
+    assertThat(note.getFolder().getId(), equalTo(originalFolder.getId()));
   }
 
   @Test
@@ -183,20 +207,6 @@ class NoteControllerTrashTests extends ControllerTestBase {
 
     assertThat(source.getContent(), containsString("a part of"));
     assertThat(source.getContent(), containsString("[[Earth]]"));
-    assertThat(relation.getDeletedAt(), nullValue());
     assertThat(relation.isTrashed(), equalTo(true));
-  }
-
-  private NoteDeleteDTO leaveDeadLinks() {
-    NoteDeleteDTO request = new NoteDeleteDTO();
-    request.setReferenceHandling(NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS);
-    return request;
-  }
-
-  private NoteTrashUndoDTO undoTo(String title, Folder folder) {
-    NoteTrashUndoDTO request = new NoteTrashUndoDTO();
-    request.setPriorTitle(title);
-    request.setPriorFolderId(folder == null ? null : folder.getId());
-    return request;
   }
 }

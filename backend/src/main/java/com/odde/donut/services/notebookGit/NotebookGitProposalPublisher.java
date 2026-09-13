@@ -7,13 +7,11 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteService;
-import com.odde.donut.services.NoteTitlePlacementRules;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -40,7 +38,6 @@ public class NotebookGitProposalPublisher {
   private final EntityPersister entityPersister;
   private final NotebookGitProposalFilenameTitle filenameTitle;
   private final NoteService noteService;
-  private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final NotebookGitProposalFolderRelocation folderRelocation;
   private final NotebookGitProposalDocumentApplication documentApplication;
   private final NotebookGitProposalNoteAddition noteAddition;
@@ -55,7 +52,6 @@ public class NotebookGitProposalPublisher {
       EntityPersister entityPersister,
       NotebookGitProposalFilenameTitle filenameTitle,
       NoteService noteService,
-      NoteTitlePlacementRules noteTitlePlacementRules,
       NotebookGitProposalFolderRelocation folderRelocation,
       NotebookGitProposalDocumentApplication documentApplication,
       NotebookGitProposalNoteAddition noteAddition) {
@@ -68,7 +64,6 @@ public class NotebookGitProposalPublisher {
     this.entityPersister = entityPersister;
     this.filenameTitle = filenameTitle;
     this.noteService = noteService;
-    this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.folderRelocation = folderRelocation;
     this.documentApplication = documentApplication;
     this.noteAddition = noteAddition;
@@ -166,7 +161,7 @@ public class NotebookGitProposalPublisher {
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.DELETED) {
         Note deletedNote =
             projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());
-        noteService.destroy(
+        noteService.permanentlyRemove(
             deletedNote,
             NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS,
             authorizationService.getCurrentUser());
@@ -226,11 +221,6 @@ public class NotebookGitProposalPublisher {
     Folder destinationFolder =
         noteAddition.representedDestinationFolder(
             folders, proposal, acceptedHead, noteChange.path());
-    try {
-      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, destinationFolder, newTitle);
-    } catch (ApiException exception) {
-      throw exception.withContext("Cannot rename to path \"" + noteChange.path() + "\"");
-    }
     note.setTitle(new DisplayName(newTitle));
     note.setFolder(destinationFolder);
     note.setUpdatedAt(publishedAt);

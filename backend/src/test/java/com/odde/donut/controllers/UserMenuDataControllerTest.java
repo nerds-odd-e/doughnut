@@ -6,11 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.MenuDataDTO;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.services.NoteService;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 class UserMenuDataControllerTest extends ControllerTestBase {
   @Autowired UserController controller;
-  @Autowired NoteService noteService;
 
   @BeforeEach
   void setup() {
@@ -61,12 +58,9 @@ class UserMenuDataControllerTest extends ControllerTestBase {
     Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
     testabilitySettings.timeTravelTo(currentTime);
     Note activeNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-    Note deletedNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    Note deletedNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).trashed().please();
     makeMe.aMemoryTrackerFor(activeNote).please();
     makeMe.aMemoryTrackerFor(deletedNote).please();
-
-    noteService.destroy(
-        deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
     MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
 

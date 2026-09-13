@@ -10,7 +10,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.testability.MakeMe;
-import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -102,10 +101,8 @@ class WikiLinkResolverReferenceResolutionTest {
   @Test
   void resolveReference_returnsMissing_whenNoteIdUrlTargetIsSoftDeleted() {
     User owner = makeMe.aUser().please();
-    Note target = makeMe.aNote().notebookOwnedBy(owner).please();
+    Note target = makeMe.aNote().notebookOwnedBy(owner).trashed().please();
     Note source = makeMe.aNote().underSameNotebookAs(target).please();
-    target.setDeletedAt(new Timestamp(System.currentTimeMillis()));
-    makeMe.entityPersister.merge(target);
 
     NoteReferenceResolution resolution =
         wikiLinkResolver.resolveReference(

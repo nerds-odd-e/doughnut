@@ -28,7 +28,6 @@ public class FolderRelocationService {
   private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final FolderSubtree subtree;
@@ -40,7 +39,6 @@ public class FolderRelocationService {
       FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      NoteTitlePlacementRules noteTitlePlacementRules,
       WikiLinkRewriteService wikiLinkRewriteService,
       WikiLinkRelocationRewrite wikiLinkRelocationRewrite) {
     this.folderRepository = folderRepository;
@@ -48,12 +46,9 @@ public class FolderRelocationService {
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
-    this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
-    this.subtree =
-        new FolderSubtree(
-            folderRepository, noteRepository, entityPersister, noteTitlePlacementRules);
+    this.subtree = new FolderSubtree(folderRepository, noteRepository, entityPersister);
     this.folderMoveRelocation =
         new FolderMoveRelocation(
             folderRepository,
@@ -144,7 +139,6 @@ public class FolderRelocationService {
 
     List<Note> directNotes = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
     for (Note note : directNotes) {
-      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, destination, note.getTitle());
       note.setFolder(destination);
       entityPersister.merge(note);
     }

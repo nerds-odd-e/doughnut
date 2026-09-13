@@ -21,17 +21,14 @@ final class FolderSubtree {
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
-  private final NoteTitlePlacementRules noteTitlePlacementRules;
 
   FolderSubtree(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
-      EntityPersister entityPersister,
-      NoteTitlePlacementRules noteTitlePlacementRules) {
+      EntityPersister entityPersister) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
-    this.noteTitlePlacementRules = noteTitlePlacementRules;
   }
 
   Set<Integer> collectNoteIds(List<Folder> subtreeFolders) {
@@ -46,15 +43,6 @@ final class FolderSubtree {
 
   Set<Integer> collectNoteIdsInSubtree(Folder root) {
     return collectNoteIds(collectFolders(root));
-  }
-
-  void requireNoSoftDeletedTitles(Notebook destinationNotebook, List<Folder> subtreeFolders) {
-    for (Folder subtreeFolder : subtreeFolders) {
-      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
-        noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-            destinationNotebook, subtreeFolder, note.getTitle());
-      }
-    }
   }
 
   List<Folder> collectFolders(Folder root) {
@@ -112,8 +100,6 @@ final class FolderSubtree {
 
     List<Note> srcNotes = noteRepository.findNotesInFolderOrderByIdAsc(source.getId());
     for (Note note : srcNotes) {
-      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-          destinationNotebook, target, note.getTitle());
       note.setFolder(target);
       if (crossNotebook) {
         note.assignNotebook(destinationNotebook);

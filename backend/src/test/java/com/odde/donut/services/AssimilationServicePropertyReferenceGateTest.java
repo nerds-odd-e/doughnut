@@ -146,7 +146,8 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
     Note carrier = makeMe.aNote().underSameNotebookAs(target).please();
     makeMe.authorReferencingContent(carrier, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
     notePropertyIndexService.refreshForNote(carrier);
-    target.setDeletedAt(makeMe.aTimestamp().please());
+    Folder trash = makeMe.aFolder().notebook(target.getNotebook()).name("_trash").please();
+    target.setFolder(trash);
     makeMe.entityPersister.merge(target);
     makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
 

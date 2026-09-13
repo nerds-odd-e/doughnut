@@ -102,7 +102,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public List<Note> getNotes() {
-    return Note.filterDeletedUnmodifiableNoteList(notes);
+    return List.copyOf(notes);
   }
 
   // Hibernate and JPA does not maintain the consistency of the bidirectional relationships
