@@ -15,7 +15,7 @@ export const noteMoreOptionsTitles = {
   refine: "Refine note",
   audio: "Audio tools",
   assimilation: "Assimilate",
-  delete: "Delete note (d)",
+  delete: "Trash note (d)",
   overflowMenu: "more options",
 } as const
 

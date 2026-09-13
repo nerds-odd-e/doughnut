@@ -121,6 +121,12 @@ export interface StoredApi {
     options: NoteDeleteOptions
   ): Promise<NoteRealm | undefined>
 
+  trashNote(
+    router: Router,
+    noteId: Donut.ID,
+    options: NoteDeleteOptions
+  ): Promise<NoteRealm | undefined>
+
   moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID): Promise<void>
 
   moveNoteToNotebookRoot(
@@ -128,6 +134,17 @@ export interface StoredApi {
     targetNotebookId: number
   ): Promise<void>
 }
+
+function noteReferenceHandlingBody(options: NoteDeleteOptions): NoteDeleteDto {
+  const body: NoteDeleteDto = {
+    referenceHandling: options.referenceHandling,
+  }
+  if (options.sourcePropertyKey !== undefined) {
+    body.sourcePropertyKey = options.sourcePropertyKey
+  }
+  return body
+}
+
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory
 
@@ -368,6 +385,25 @@ export default class StoredApiCollection implements StoredApi {
   }> {
     const undone = this.noteEditingHistory.peekUndo()
     if (!undone) throw new Error("undo history is empty")
+    if (undone.type === "trash note") {
+      const { data: noteRealm, error } = await apiCallWithLoading(() =>
+        NoteController.undoTrashNote({
+          path: { note: undone.noteId },
+          body: {
+            priorTitle: undone.originalTitle,
+            ...(undone.originalFolderId == null
+              ? {}
+              : { priorFolderId: undone.originalFolderId }),
+          },
+        })
+      )
+      if (error || !noteRealm) {
+        throw new Error(toErrorMessage(error, "Failed to undo trash note"))
+      }
+      this.noteEditingHistory.popUndoHistory()
+      refreshSidebarStructuralListings()
+      return { noteRealm: this.storage.refreshNoteRealm(noteRealm) }
+    }
     this.noteEditingHistory.popUndoHistory()
     if (undone.type === "edit title" || undone.type === "edit content") {
       const noteRealm = await this.updateTextContentWithoutUndo(
@@ -487,12 +523,9 @@ export default class StoredApiCollection implements StoredApi {
     noteId: Donut.ID,
     options: NoteDeleteOptions
   ) {
-    const { referenceHandling, sourcePropertyKey, sourceNoteId } = options
+    const { referenceHandling, sourceNoteId } = options
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
-    const body: NoteDeleteDto = { referenceHandling }
-    if (sourcePropertyKey !== undefined) {
-      body.sourcePropertyKey = sourcePropertyKey
-    }
+    const body = noteReferenceHandlingBody(options)
     const { data: res, error } = await apiCallWithLoading(() =>
       NoteController.deleteNote({
         path: { note: noteId },
@@ -536,6 +569,53 @@ export default class StoredApiCollection implements StoredApi {
     }
     await this.routerReplaceFocus(router)
     return focusRealm
+  }
+
+  async trashNote(
+    router: Router,
+    noteId: Donut.ID,
+    options: NoteDeleteOptions
+  ) {
+    const { referenceHandling, sourceNoteId } = options
+    const cachedRealm = this.storage.refOfNoteRealm(noteId).value
+    if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")
+    const body = noteReferenceHandlingBody(options)
+    const { data: trashedRealm, error } = await apiCallWithLoading(() =>
+      NoteController.trashNote({
+        path: { note: noteId },
+        body,
+      })
+    )
+    if (error || !trashedRealm) return
+
+    const notebookId = cachedRealm.notebookRealm.notebook.id
+    const originalFolderId = realmLeafFolder(cachedRealm)?.id ?? null
+    this.noteEditingHistory.trashNote(
+      noteId,
+      cachedRealm.note.noteTopology.title,
+      originalFolderId
+    )
+    this.storage.refreshNoteRealm(trashedRealm)
+    refreshSidebarStructuralListings()
+    if (
+      referenceHandling === "REDUCE_TO_SOURCE_PROPERTY" &&
+      sourceNoteId !== undefined
+    ) {
+      await router.replace(noteShowLocation(sourceNoteId))
+      return
+    }
+    if (originalFolderId != null) {
+      await router.replace({
+        name: "folderPage",
+        params: { notebookId, folderId: originalFolderId },
+      })
+    } else {
+      await router.replace({
+        name: "notebookPage",
+        params: { notebookId },
+      })
+    }
+    return trashedRealm
   }
 
   async moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID) {

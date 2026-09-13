@@ -27,9 +27,9 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     const deleteHeld = new Promise<void>((r) => {
       resolveDelete = r
     })
-    mockSdkServiceWithImplementation(NoteController, "deleteNote", async () => {
+    mockSdkServiceWithImplementation(NoteController, "trashNote", async () => {
       await deleteHeld
-      return []
+      return qualifyingRelationRealmForDelete().relationRealm
     })
 
     const { relationRealm } = qualifyingRelationRealmForDelete()
@@ -53,9 +53,13 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
   })
 
   it("offers reduce-to-property using the current note after prop change without remount", async () => {
-    deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
     const { relationId, moonNote, relationNote } =
       relationNotesForPropChangeTest()
+    deleteNoteSpy.mockResolvedValue(
+      wrapSdkResponse(
+        qualifyingRelationRealmForDelete({ relationId }).relationRealm
+      )
+    )
     const wrapper = await mountDeleteFormWithNotePropChange(
       moonNote,
       relationNote
@@ -73,7 +77,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     )
     expect(popup.options[0]?.label).toBe("Reduce to a property of the source")
     expect(popup.options[1]?.label).toBe(
-      `Delete "${relationNote.noteTopology.title}"`
+      `Trash "${relationNote.noteTopology.title}"`
     )
 
     usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")

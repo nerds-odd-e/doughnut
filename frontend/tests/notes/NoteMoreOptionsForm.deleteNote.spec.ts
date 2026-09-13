@@ -6,6 +6,7 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   noteMoreOptionsDeleteFormNote as note,
+  noteMoreOptionsDeleteFormNoteRealm,
   clickDeleteNote,
   deleteNoteSpy,
   renderer,
@@ -17,7 +18,9 @@ setupNoteMoreOptionsDeleteFormTests()
 
 describe("NoteMoreOptionsForm delete note", () => {
   it("calls deleteNote when confirmed and skips when cancelled", async () => {
-    deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
+    deleteNoteSpy.mockResolvedValue(
+      wrapSdkResponse(noteMoreOptionsDeleteFormNoteRealm)
+    )
     const wrapper = renderer.withProps({ note }).mount()
 
     await flushPromises()
@@ -31,7 +34,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     await clickDeleteNote(wrapper)
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
-    expect(popups?.[0]?.message).toBe('Confirm to delete "Note1.1.1"?')
+    expect(popups?.[0]?.message).toBe('Confirm to trash "Note1.1.1"?')
 
     usePopups().popups.done(true)
     await awaitDeleteSideEffects()
@@ -43,8 +46,8 @@ describe("NoteMoreOptionsForm delete note", () => {
   })
 
   it("asks how to handle references when the note has inbound references", async () => {
-    deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
     const noteRealm = makeMe.aNoteRealm.please()
+    deleteNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
     useStorageAccessor().value.refreshNoteRealm({
       ...noteRealm,
       references: [makeMe.aNoteRealm.please().note.noteTopology],

@@ -1,6 +1,6 @@
 # Web note trash and immediate undo
 
-Status: planned
+Status: completed
 Source: [SEED-009, story 29](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-29)
 Authority: Plan execution, commit, and push authorized by the 2026-09-13
 `dough-execute-plan 115` instruction. Story 34 remains second and unrefined.
@@ -316,11 +316,20 @@ an incomplete web button; no new Git semantics are selected.
 
 ### 9. Use trash and immediate Undo from the web
 Type: Behavior
-Status: planned
+Status: done
 Size: 5–10 minutes plus browser-suite wait; an explicit integration leaf.
 Proof: Extend note_deletion.feature for the actual web Trash/Undo journey.
 Existing mounted delete/undo/store tests cover reference choices, failed Undo,
 post-action navigation, warning/editing/Move, and preserving the original title.
+
+Replaced the web Delete action with Trash and a distinct retry-safe `trash note`
+history record whose Undo calls the atomic inverse. The shared confirmation and
+reference choices, autosave barrier, navigation, and legacy Undo actions remain.
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` passed (343 files, 1,895
+tests). `CURSOR_DEV=true nix develop -c pnpm cy:run --spec
+e2e_test/features/note_creation_and_update/note_deletion.feature` passed all
+eight scenarios; the refactor's affected relationship feature also passed all
+five scenarios.
 
 Overrun learning — 2026-09-13: implementation, diagnosis, and refactor cleanup
 took approximately 21–24 active minutes, excluding frontend and E2E suite waits.
@@ -328,8 +337,8 @@ The sizing hypothesis missed the mounted compatibility sweep across toolbar,
 autosave, reference-choice, history, and Undo tests, retry-safe trash history,
 and stale duplicated E2E/delete-flow naming exposed by the refactor. All
 implementation, refactoring, and required proof loops completed compatibly; no
-incomplete attempt remains. The completed work is parked in stash
-`1be40c89bb5056b3be37226a433352efb024ed97` while this refinement is delivered.
+incomplete attempt remains. The exact parked work was restored after each
+refinement commit and its temporary stash was dropped after verification.
 Retain one Behavior slice: it still owns one web Trash/Undo outcome, and splitting
 already-completed compatible work would create retrospective delivery groupings
 rather than safer remaining execution leaves. Only coordinator delivery remains.

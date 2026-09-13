@@ -54,7 +54,7 @@ function setBodyValue(textarea: HTMLTextAreaElement, content: string) {
 
 async function startDelete(choice: boolean | string) {
   const deleteButton = document.querySelector(
-    'button[title="Delete note (d)"]'
+    'button[title="Trash note (d)"]'
   ) as HTMLButtonElement
   deleteButton.click()
   await flushPromises()
@@ -99,7 +99,7 @@ describe("note show autosave before deletion", () => {
           .please()
       }
     )
-    const deleteSpy = mockSdkService(NoteController, "deleteNote", [])
+    const deleteSpy = mockSdkService(NoteController, "trashNote", relationRealm)
     deleteSpy.mockImplementation(async () => {
       mutationOrder.push("delete")
       return wrapSdkError("delete failed")

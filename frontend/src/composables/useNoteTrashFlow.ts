@@ -14,18 +14,18 @@ import {
   reopenNoteContentMutations,
 } from "@/composables/noteContentMutationBarrier"
 
-const REDUCE_DELETE_LOADING_MESSAGE = "Reducing to source property..."
-const DELETE_LOADING_MESSAGE = "Deleting note..."
+const REDUCE_TO_PROPERTY_LOADING_MESSAGE = "Reducing to source property..."
+const TRASH_LOADING_MESSAGE = "Trashing note..."
 
-function deleteLoadingMessageFor(
+function trashLoadingMessageFor(
   referenceHandling: NoteDeleteReferenceHandling
 ): string {
   return referenceHandling === "REDUCE_TO_SOURCE_PROPERTY"
-    ? REDUCE_DELETE_LOADING_MESSAGE
-    : DELETE_LOADING_MESSAGE
+    ? REDUCE_TO_PROPERTY_LOADING_MESSAGE
+    : TRASH_LOADING_MESSAGE
 }
 
-export function useNoteDeleteFlow(
+export function useNoteTrashFlow(
   noteId: MaybeRefOrGetter<number>,
   noteTitle: MaybeRefOrGetter<string>
 ) {
@@ -38,7 +38,7 @@ export function useNoteDeleteFlow(
 
   const noteHasReferences = () => (noteRealm()?.references?.length ?? 0) > 0
 
-  const chooseDeleteReferenceHandling =
+  const chooseTrashReferenceHandling =
     async (): Promise<NoteDeleteOptions | null> => {
       const id = toValue(noteId)
       const title = toValue(noteTitle)
@@ -55,7 +55,7 @@ export function useNoteDeleteFlow(
               value: "REDUCE_TO_SOURCE_PROPERTY",
             },
             {
-              label: `Delete ${label}`,
+              label: `Trash ${label}`,
               value: "LEAVE_DEAD_LINKS",
             },
           ]
@@ -72,7 +72,7 @@ export function useNoteDeleteFlow(
       }
 
       if (!noteHasReferences()) {
-        return (await popups.confirm(`Confirm to delete ${label}?`))
+        return (await popups.confirm(`Confirm to trash ${label}?`))
           ? { referenceHandling: "LEAVE_DEAD_LINKS" }
           : null
       }
@@ -93,23 +93,23 @@ export function useNoteDeleteFlow(
       return referenceHandling ? { referenceHandling } : null
     }
 
-  const deleteNote = async () => {
-    const deleteChoice = await chooseDeleteReferenceHandling()
-    if (!deleteChoice) return
+  const trashNote = async () => {
+    const trashChoice = await chooseTrashReferenceHandling()
+    if (!trashChoice) return
 
     await runWithBlockingApiLoading(async () => {
       const id = toValue(noteId)
       if (!(await closeAndFlushNoteContentMutations(id))) return
       const storage = storageAccessor.value
       try {
-        await storage.storedApi().deleteNote(router, id, deleteChoice)
+        await storage.storedApi().trashNote(router, id, trashChoice)
       } finally {
         if (storage.refOfNoteRealm(id).value) {
           reopenNoteContentMutations(id)
         }
       }
-    }, deleteLoadingMessageFor(deleteChoice.referenceHandling))
+    }, trashLoadingMessageFor(trashChoice.referenceHandling))
   }
 
-  return { deleteNote }
+  return { trashNote }
 }

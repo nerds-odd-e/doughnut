@@ -11,14 +11,14 @@ import { questionListPage } from './questionListPage'
 const titles = {
   audio: 'Audio tools',
   assimilation: 'Assimilate',
-  delete: 'Delete note (d)',
+  trash: 'Trash note (d)',
   questions: 'Questions for the note',
 } as const
 
 const clickMoreOption = clickToolbarOverflowAction
 
-const deleteNoteWithConfirmation = (confirmButtonName: string | RegExp) => {
-  clickMoreOption(titles.delete)
+const trashNoteWithConfirmation = (confirmButtonName: string | RegExp) => {
+  clickMoreOption(titles.trash)
   cy.findByRole('button', { name: confirmButtonName }).click()
   waitUntilAppIsNotBusy()
 }
@@ -31,23 +31,23 @@ export const noteMoreOptions = () => {
   noteToolbar().should('exist')
 
   return {
-    deleteNote() {
-      deleteNoteWithConfirmation('OK')
+    trashNote() {
+      trashNoteWithConfirmation('OK')
     },
-    /** Plain delete for a relationship note (reduce vs delete options dialog). */
+    /** Remove a relationship note without reducing it to a source property. */
     deleteRelationshipNote() {
-      deleteNoteWithConfirmation(/^Delete "/)
+      trashNoteWithConfirmation(/^Trash "/)
     },
-    deleteNoteAndLeaveReferencesAsDeadWikiLinks() {
-      deleteNoteWithConfirmation('Leave all references as dead wiki links')
+    trashNoteAndLeaveReferencesAsDeadWikiLinks() {
+      trashNoteWithConfirmation('Leave all references as dead wiki links')
     },
-    deleteNoteAndRemoveFromReferenceProperties() {
-      deleteNoteWithConfirmation(
+    trashNoteAndRemoveFromReferenceProperties() {
+      trashNoteWithConfirmation(
         'Remove from properties of references (undo will not recover the removed property)'
       )
     },
     deleteNoteAndReduceToSourceProperty() {
-      deleteNoteWithConfirmation('Reduce to a property of the source')
+      trashNoteWithConfirmation('Reduce to a property of the source')
     },
     openQuestionList() {
       clickMoreOption(titles.questions)

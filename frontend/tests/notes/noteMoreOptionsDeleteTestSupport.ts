@@ -39,7 +39,7 @@ export const loadingModalMask = () =>
   document.querySelector(".loading-modal-mask")
 
 export function deleteNoteButton(wrapper: VueWrapper) {
-  return wrapper.find('button[title="Delete note (d)"]')
+  return wrapper.find('button[title="Trash note (d)"]')
 }
 
 export async function clickDeleteNote(wrapper: VueWrapper) {
@@ -84,7 +84,11 @@ export function setupNoteMoreOptionsDeleteFormTests() {
     usePopups().popups.register({ popupInfo: [] })
     mockToast.error.mockClear()
     mockToast.warning.mockClear()
-    deleteNoteSpy = mockSdkService(NoteController, "deleteNote", undefined)
+    deleteNoteSpy = mockSdkService(
+      NoteController,
+      "trashNote",
+      noteMoreOptionsDeleteFormNoteRealm
+    )
     renderer = helper
       .component(NoteMoreOptionsFormWithGlobalLoading)
       .withRouter(noteMoreOptionsDeleteFormRouter)

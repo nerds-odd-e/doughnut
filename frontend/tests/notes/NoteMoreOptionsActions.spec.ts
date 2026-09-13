@@ -104,7 +104,7 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
       const popups = usePopups().popups.peek()
       expect(popups?.length).toBe(1)
       expect(popups?.[0]?.type).toBe("confirm")
-      expect(popups?.[0]?.message).toBe('Confirm to delete "Note1.1.1"?')
+      expect(popups?.[0]?.message).toBe('Confirm to trash "Note1.1.1"?')
     }
   )
 
@@ -142,7 +142,7 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
         document.querySelector('button[title="Export... (e)"]')
       ).not.toBeNull()
       expect(
-        document.querySelector('button[title="Delete note (d)"]')
+        document.querySelector('button[title="Trash note (d)"]')
       ).not.toBeNull()
     }
   )

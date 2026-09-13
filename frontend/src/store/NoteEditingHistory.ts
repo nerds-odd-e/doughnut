@@ -1,17 +1,24 @@
-export interface HistoryRecord {
-  type:
-    | "edit title"
-    | "edit content"
-    | "delete note"
-    | "create note"
-    | "move note"
-  noteId: Donut.ID
-  textContent?: string
-  /** Previous folder before the move; null means notebook root. */
-  originalFolderId?: number | null
-  /** Notebook the note was in before the move (needed to undo root placement across notebooks). */
-  originalNotebookId?: number
-}
+export type HistoryRecord =
+  | {
+      type: "edit title" | "edit content" | "delete note" | "create note"
+      noteId: Donut.ID
+      textContent?: string
+    }
+  | {
+      type: "move note"
+      noteId: Donut.ID
+      /** Previous folder before the move; null means notebook root. */
+      originalFolderId: number | null
+      /** Notebook the note was in before the move (needed to undo root placement across notebooks). */
+      originalNotebookId: number
+    }
+  | {
+      type: "trash note"
+      noteId: Donut.ID
+      originalTitle: string
+      /** Previous folder before trash; null means notebook root. */
+      originalFolderId: number | null
+    }
 
 export default class NoteEditingHistory {
   noteUndoHistories: HistoryRecord[]
@@ -52,6 +59,19 @@ export default class NoteEditingHistory {
 
   deleteNote(noteId: Donut.ID) {
     this.noteUndoHistories.push({ type: "delete note", noteId })
+  }
+
+  trashNote(
+    noteId: Donut.ID,
+    originalTitle: string,
+    originalFolderId: number | null
+  ) {
+    this.noteUndoHistories.push({
+      type: "trash note",
+      noteId,
+      originalTitle,
+      originalFolderId,
+    })
   }
 
   createNote(noteId: Donut.ID) {

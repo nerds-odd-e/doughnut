@@ -34,6 +34,15 @@ setupNoteUndoButtonTests()
 describe("NoteUndoButton actions", () => {
   it.each([
     {
+      label: "trash note",
+      setup: () => {
+        const noteRealm = makeMe.aNoteRealm.title("Original title").please()
+        noteEditingHistory.trashNote(noteRealm.id, "Original title", null)
+        mockSdkService(NoteController, "undoTrashNote", noteRealm)
+        return { noteRealm, undoTitle: "undo trash note" }
+      },
+    },
+    {
       label: "delete note",
       setup: () => {
         const note = makeMe.aNote.please()
