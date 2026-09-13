@@ -137,37 +137,34 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
 
   @Query(
       value =
-          "SELECT mt.* FROM memory_tracker mt "
-              + "WHERE mt.user_id = :userId "
-              + "  AND mt.removed_from_tracking IS FALSE "
-              + "  AND mt.deleted_at IS NULL "
-              + "  AND mt.type <> 'SPELLING' "
-              + "  AND mt.type <> 'COMMISSIONED' "
-              + "  AND mt.next_recall_at <= :dueBy "
-              + "  AND NOT EXISTS ("
-              + "    SELECT 1 FROM recall_prompt rp "
-              + "    LEFT JOIN mcq ON rp.mcq_id = mcq.id "
-              + "    WHERE rp.memory_tracker_id = mt.id "
-              + "      AND rp.answer_id IS NULL "
+          "SELECT rp.* "
+              + byUserIdFrom
+              + "AND rp.type <> 'SPELLING' "
+              + "AND rp.next_recall_at <= :dueBy "
+              + "AND NOT EXISTS ("
+              + "    SELECT 1 FROM recall_prompt rcl "
+              + "    LEFT JOIN mcq ON rcl.mcq_id = mcq.id "
+              + "    WHERE rcl.memory_tracker_id = rp.id "
+              + "      AND rcl.answer_id IS NULL "
               + "      AND (mcq.id IS NULL OR mcq.is_contested = false)"
               + "  ) "
-              + "  AND NOT EXISTS ("
+              + "AND NOT EXISTS ("
               + "    SELECT 1 FROM question_generation_batch_request qgbr "
-              + "    WHERE qgbr.memory_tracker_id = mt.id "
+              + "    WHERE qgbr.memory_tracker_id = rp.id "
               + "      AND qgbr.status IN ('PENDING', 'OUTPUT_READY') "
               + "  ) "
-              + "  AND ("
+              + "AND ("
               + "    SELECT COUNT(*) FROM question_generation_batch_request qgbr "
-              + "    WHERE qgbr.memory_tracker_id = mt.id "
+              + "    WHERE qgbr.memory_tracker_id = rp.id "
               + "      AND qgbr.status = 'FAILED' "
               + "      AND NOT EXISTS ("
               + "        SELECT 1 FROM question_generation_batch_request imported "
-              + "        WHERE imported.memory_tracker_id = mt.id "
+              + "        WHERE imported.memory_tracker_id = rp.id "
               + "          AND imported.status = 'IMPORTED' "
               + "          AND imported.id > qgbr.id"
               + "      )"
-              + "  ) < 2 "
-              + "ORDER BY mt.next_recall_at",
+              + ") < 2 "
+              + "ORDER BY rp.next_recall_at",
       nativeQuery = true)
   List<MemoryTracker> findBatchQuestionGenerationCandidatesByUser(
       @Param("userId") Integer userId, @Param("dueBy") Timestamp dueBy);

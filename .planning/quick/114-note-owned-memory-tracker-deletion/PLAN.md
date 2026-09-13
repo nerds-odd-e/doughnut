@@ -176,7 +176,7 @@ lookup is cheap. No material regression observed; no scale benchmark attempted.
 
 ### 3. Select batch question candidates by note deletion
 Type: Structure
-Status: planned
+Status: done
 Sizing: 3–5 minutes of active work, plus required suite wait.
 
 Change batch candidate deletion filtering in `MemoryTrackerRepository`, keeping
@@ -186,6 +186,11 @@ Proof: `QuestionGenerationBatchCandidateMemoryTrackersTest` drives the existing
 candidate boundary; deleted notes remain excluded and existing retry/pending
 cases retain their results. Add only missing deleted-note coverage.
 Safe stop: no question-generation lifecycle changes or schema change.
+
+Refactor note: the batch-candidate query now reuses the existing `byUserIdFrom`
+fragment (outer alias `mt`→`rp`; inner `recall_prompt` alias `rp`→`rcl` to avoid
+collision), preserving all type/due/subquery/order semantics. The deleted-tracker
+fixture was reconciled to delete the note via `noteService.destroy(...)`.
 
 ### 4. Preserve assimilation eligibility through note-owned deletion
 Type: Structure
