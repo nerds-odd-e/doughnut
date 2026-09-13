@@ -88,6 +88,31 @@ class NoteControllerTrashTests extends ControllerTestBase {
   }
 
   @Test
+  void trashingAndUndoingPreservesAuthoredContentAndNoteIdentity()
+      throws UnexpectedNoAccessRightException {
+    Folder originalFolder =
+        makeMe
+            .aFolder()
+            .notebook(makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please())
+            .name("Topics")
+            .please();
+    Note note = makeMe.aNote("Subject").folder(originalFolder).please();
+    NoteUpdateContentDTO content = new NoteUpdateContentDTO();
+    content.setContent("---\ntype: Note\n---\nAuthored body that must survive trash");
+    textContentController.updateNoteContent(note, content);
+    Integer noteId = note.getId();
+    String authoredContent = note.getContent();
+
+    NoteRealm trashed = controller.trashNote(note, leaveDeadLinks());
+    NoteRealm restored = controller.undoTrashNote(note, undoTo("Subject", originalFolder));
+
+    assertThat(restored.getNote().getId(), equalTo(noteId));
+    assertThat(restored.getNote().isTrashed(), equalTo(false));
+    assertThat(note.getContent(), equalTo(authoredContent));
+    assertThat(note.getFolder().getId(), equalTo(originalFolder.getId()));
+  }
+
+  @Test
   void repeatedTrashAfterNameReuseKeepsDistinctNotesAndUsesTheFirstFreeTrashTitle()
       throws UnexpectedNoAccessRightException {
     Note earlier = makeMe.aNote("Reusable").notebookOwnedBy(currentUser.getUser()).please();

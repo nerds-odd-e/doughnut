@@ -16,6 +16,7 @@ import {
   expectNoteTitleVisible,
   mockedPush,
   noteEditingHistory,
+  refreshNoteRealms,
   renderNoteUndoButton,
   setupNoteUndoButtonTests,
   setupTwoCachedNotes,
@@ -80,19 +81,6 @@ describe("NoteUndoButton actions", () => {
         return { noteRealm, undoTitle: "undo edit content" }
       },
     },
-    {
-      label: "create note",
-      setup: () => {
-        const noteRealm = makeMe.aNoteRealm.please()
-        const parentNoteRealm = makeMe.aNoteRealm.please()
-        noteEditingHistory.createNote(noteRealm.id)
-        mockSdkService(NoteController, "deleteNote", [parentNoteRealm])
-        return {
-          noteRealm: parentNoteRealm,
-          undoTitle: "undo create note",
-        }
-      },
-    },
   ])(
     "navigates to note after confirming undo for $label",
     async ({ setup }) => {
@@ -110,6 +98,26 @@ describe("NoteUndoButton actions", () => {
       })
     }
   )
+
+  it("undo create note trashes the note and navigates to the notebook fallback", async () => {
+    const noteRealm = makeMe.aNoteRealm.please()
+    refreshNoteRealms(noteRealm)
+    noteEditingHistory.createNote(noteRealm.id)
+    const trashSpy = mockSdkService(NoteController, "trashNote", noteRealm)
+
+    renderNoteUndoButton()
+    await clickUndoButton("undo create note")
+    await clickDialogOk()
+
+    expect(trashSpy).toHaveBeenCalledWith({
+      path: { note: noteRealm.id },
+      body: { referenceHandling: "LEAVE_DEAD_LINKS" },
+    })
+    expect(mockedPush).toHaveBeenCalledWith({
+      name: "notebookPage",
+      params: { notebookId: noteRealm.notebookRealm.notebook.id },
+    })
+  })
 
   it("does not navigate when confirmation is cancelled", async () => {
     const note = makeMe.aNote.please()

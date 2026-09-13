@@ -1,7 +1,14 @@
 # Recover retained deleted notes and rebuild notebook Git baselines
 
-Status: planned
+Status: in progress
 Source: [SEED-009 story 31](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31).
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on branch `main`; claim commit `8205114639` (Taken-only).
+- Execution checkout: `/Users/terryyin/git/doughnut-worktrees/120-recover-legacy-notes-and-rebuild-git` on branch `quick/120-recover-legacy-notes-and-rebuild-git`.
+- Integration target: `main` (default).
+- Backlog: story 31 moved to **Taken** in `PRODUCT-BACKLOG.md` (commit `8205114639`).
 Authority: slice planning and optional refinement only. No implementation,
 tagging, release, production read/copy/reset, or production migration is authorized.
 Allocation: 120 follows allocated quick 119, now closed in Git history.
@@ -98,7 +105,7 @@ for retrospective/wrap-up; do not clean them up after the last test alone.
 
 ### 1. Existing web removal uses recoverable trash
 Type: Behavior
-Status: planned
+Status: done
 Sizing: 5–8 minutes, medium confidence; backend/frontend suite wait exception.
 
 Behavior: An owner uses an existing removal or undo-create flow; the note is
@@ -111,6 +118,13 @@ Proof: Mounted/store entry-point examples for affected removal/Undo journeys;
 controller reference-handling and trash examples preserve content and identity.
 Do not silently map a recoverable web operation to Git permanent removal.
 Safe stop: New web removals use trash; old data remains recoverable.
+
+Learning: `StoredApi.deleteNote` had no production callers (components already
+used `useNoteTrashFlow` → `trashNote`); the legacy soft-delete entry point was
+already dead. Slice 1 removed it and routed `undoCreateNote` through `trashNote`.
+Soft-delete recovery (`restoreDeletedNote` + `undoInner` "delete note" fallback)
+is retained until slice 11. No backend production code changed; one focused
+`NoteControllerTrashTests` example proves authored content survives trash/undo.
 
 ### 2. Note dependency ownership supports permanent removal
 Type: Structure

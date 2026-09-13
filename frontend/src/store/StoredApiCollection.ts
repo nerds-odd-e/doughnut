@@ -115,12 +115,6 @@ export interface StoredApi {
 
   undo(router: Router): Promise<NoteRealm | undefined>
 
-  deleteNote(
-    router: Router,
-    noteId: Donut.ID,
-    options: NoteDeleteOptions
-  ): Promise<NoteRealm | undefined>
-
   trashNote(
     router: Router,
     noteId: Donut.ID,
@@ -482,23 +476,20 @@ export default class StoredApiCollection implements StoredApi {
   }> {
     const cached = this.storage.refOfNoteRealm(noteId).value
     const notebookFallbackId = cached?.notebookRealm.notebook.id
-    const { data: res, error } = await apiCallWithLoading(() =>
-      NoteController.deleteNote({
+    const { data: trashedRealm, error } = await apiCallWithLoading(() =>
+      NoteController.trashNote({
         path: { note: noteId },
         body: { referenceHandling: "LEAVE_DEAD_LINKS" },
       })
     )
-    if (error || !res) {
+    if (error || !trashedRealm) {
       throw new Error(toErrorMessage(error, "Failed to undo create note"))
     }
     this.storage.removeNoteRealm(noteId)
-    if (res.length === 0) {
-      return {
-        noteRealm: undefined,
-        ...(notebookFallbackId !== undefined ? { notebookFallbackId } : {}),
-      }
+    return {
+      noteRealm: undefined,
+      ...(notebookFallbackId !== undefined ? { notebookFallbackId } : {}),
     }
-    return { noteRealm: this.storage.refreshNoteRealm(res[0]!) }
   }
 
   async undo(router: Router) {
@@ -516,59 +507,6 @@ export default class StoredApiCollection implements StoredApi {
     }
     await router.push(noteShowLocation(noteRealm.id))
     return noteRealm
-  }
-
-  async deleteNote(
-    router: Router,
-    noteId: Donut.ID,
-    options: NoteDeleteOptions
-  ) {
-    const { referenceHandling, sourceNoteId } = options
-    const cachedRealm = this.storage.refOfNoteRealm(noteId).value
-    const body = noteReferenceHandlingBody(options)
-    const { data: res, error } = await apiCallWithLoading(() =>
-      NoteController.deleteNote({
-        path: { note: noteId },
-        body,
-      })
-    )
-    if (error || !res) {
-      return
-    }
-    this.noteEditingHistory.deleteNote(noteId)
-    this.storage.removeNoteRealm(noteId)
-    if (
-      referenceHandling === "REDUCE_TO_SOURCE_PROPERTY" &&
-      sourceNoteId !== undefined
-    ) {
-      refreshSidebarStructuralListings()
-      await router.replace(noteShowLocation(sourceNoteId))
-      return
-    }
-    let notebookId = cachedRealm?.notebookRealm.notebook.id
-    let focusRealm: NoteRealm | undefined
-    if (res.length > 0) {
-      focusRealm = this.storage.refreshNoteRealm(res[0]!)
-      notebookId = notebookId ?? focusRealm.notebookRealm.notebook.id
-    }
-    refreshSidebarStructuralListings()
-    if (notebookId !== undefined) {
-      const leaf = realmLeafFolder(cachedRealm)
-      if (leaf?.id != null) {
-        await router.replace({
-          name: "folderPage",
-          params: { notebookId, folderId: leaf.id },
-        })
-      } else {
-        await router.replace({
-          name: "notebookPage",
-          params: { notebookId },
-        })
-      }
-      return focusRealm
-    }
-    await this.routerReplaceFocus(router)
-    return focusRealm
   }
 
   async trashNote(
