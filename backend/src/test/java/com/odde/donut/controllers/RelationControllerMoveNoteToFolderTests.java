@@ -7,12 +7,15 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.dto.NoteDeleteDTO;
+import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.SearchTerm;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.RelationshipLiteralSearchHits;
@@ -30,6 +33,7 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   @Autowired RecallsController recallsController;
   @Autowired AssimilationController assimilationController;
   @Autowired MemoryTrackerController memoryTrackerController;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @BeforeEach
   void setup() {
@@ -93,6 +97,49 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
 
     assertThat(target.isAvailable(), equalTo(true));
     assertParticipation(target, referrer, tracker, true);
+  }
+
+  @Test
+  void webTrashThenOrdinaryMovePreservesNoteAndTrackerIdsHistoryAndPreferences()
+      throws UnexpectedNoAccessRightException {
+    Timestamp now = makeMe.aTimestamp().of(1, 8).please();
+    testabilitySettings.timeTravelTo(now);
+    Notebook notebook = ownedNotebook("Knowledge");
+    Folder activeFolder = makeMe.aFolder().notebook(notebook).name("Biology").please();
+    Note target = makeMe.aNote("Cells").folder(activeFolder).please();
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerFor(target).assimilatedAt(now).recallCount(1).please();
+    MemoryTracker removedTracker =
+        makeMe.aMemoryTrackerFor(target).spelling().removedFromTracking().please();
+    Integer noteId = target.getId();
+    Integer trackerId = tracker.getId();
+    Integer removedTrackerId = removedTracker.getId();
+
+    noteController.trashNote(target, leaveDeadLinks());
+
+    assertThat(target.getId(), equalTo(noteId));
+    assertThat(target.isTrashed(), equalTo(true));
+    assertThat(target.getFolder().getParentFolder().getName(), equalTo("_trash"));
+
+    controller.moveNoteToFolder(target, activeFolder);
+
+    makeMe.refresh(target);
+    assertThat(target.getId(), equalTo(noteId));
+    assertThat(target.isTrashed(), equalTo(false));
+    assertThat(target.getFolder().getId(), equalTo(activeFolder.getId()));
+    assertThat(
+        memoryTrackerRepository.findById(trackerId).orElseThrow().getNote().getId(),
+        equalTo(noteId));
+    assertThat(memoryTrackerController.getRecallHistory(tracker), hasSize(1));
+    assertThat(
+        memoryTrackerRepository.findById(removedTrackerId).orElseThrow().getRemovedFromTracking(),
+        equalTo(true));
+  }
+
+  private NoteDeleteDTO leaveDeadLinks() {
+    NoteDeleteDTO request = new NoteDeleteDTO();
+    request.setReferenceHandling(NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS);
+    return request;
   }
 
   private void assertParticipation(

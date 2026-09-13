@@ -40,6 +40,16 @@ Then('I should see the note {string} is in trash', (noteTopology: string) => {
   cy.findByText('This note is in trash')
 })
 
+Then('I should see the current note is in trash', () => {
+  cy.get('[data-testid="note-availability-warning"]').should(($el) => {
+    expect($el.text().trim()).to.equal('This note is in trash')
+  })
+})
+
+Then('I should see the current note is not in trash', () => {
+  cy.get('[data-testid="note-availability-warning"]').should('not.exist')
+})
+
 Then(
   'I should see the note {string} is marked as deleted',
   (noteTopology: string) => {

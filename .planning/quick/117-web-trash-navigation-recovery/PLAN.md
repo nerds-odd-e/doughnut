@@ -92,7 +92,7 @@ No trash folder is created by viewing a notebook.
 
 ### 2. Recover an older note into an existing active folder
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; reuse existing folder-navigation,
 Trash, remount, and Move page objects. Test startup is an external-wait exception.
 

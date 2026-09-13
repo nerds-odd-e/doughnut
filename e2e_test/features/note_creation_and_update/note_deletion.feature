@@ -94,3 +94,24 @@ Feature: Note trash
     And I navigate to Reference cleanup suite/Reference Cleanup/source note
     Then I should not see rich note property "target"
     And I should see wiki link "target" as a dead wiki link
+
+  @mockBrowserTime
+  Scenario: Recover an older trashed note into an existing active folder after a remount
+    Given I have a notebook "Biology study" with notes:
+      | Title | Folder  | Content      |
+      | Cells | Biology | Mitochondria |
+    When I trash note "Cells"
+    And I jump to the notebook "Biology study"
+    And I reload the notebook page
+    And I expand the children of note "_trash" in the sidebar
+    And I open the folder page for "Biology" under open parent "_trash"
+    Then I should see the folder page is in trash
+    When I open the note "Cells" from the sidebar
+    Then I should see the current note is in trash
+    And the note content should include "Mitochondria"
+    When I move the current note under folder "Biology" in notebook "Biology study"
+    Then I should see the current note is not in trash
+    And the note content should include "Mitochondria"
+    And I should see folder "Biology study/Biology" containing these notes:
+      | note-title |
+      | Cells      |
