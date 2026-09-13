@@ -351,11 +351,13 @@ from further splitting/refinement for now, by the owner's instruction.
 
 ### 34. Find and recover previously trashed notes through web navigation
 
+Plan: [Web trash navigation and recovery](../quick/117-web-trash-navigation-recovery/PLAN.md)
+
 - **Goal:** A notebook owner using the web can find a previously trashed note
   after immediate Undo is gone and recover it through Move, without knowing
   its URL. This makes the existing trash capability useful across sessions.
 - **Status:** Refined on 2026-09-13 for the owner's request for narrow scope and
-  early working feedback. Non-executable input; no implementation plan yet.
+  early working feedback. Slice plan linked above; implementation has not started.
 
 #### Scope
 
