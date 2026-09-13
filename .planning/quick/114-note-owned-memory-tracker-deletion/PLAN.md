@@ -243,7 +243,7 @@ lookup; tracker-side access path unchanged).
 
 ### 6. Express deletion preservation without tracker timestamp assertions
 Type: Structure
-Status: planned
+Status: done
 Sizing: 5–8 minutes of active work; test-only representation change, with one
 full-suite proof loop. If fixture coupling needs more than 10 active minutes,
 reassess the affected scenarios before continuing.
@@ -265,6 +265,14 @@ Proof: the existing delete/Git/restoration controller suites and added missing
 delete/undo observation pass with the old persistence still present. The
 unchanged flush regression remains. Safe stop: only proof representation has
 changed; old schema and product behavior remain intact.
+
+Done: replaced MemoryTracker `deletedAt` assertions in 5 Git publication/deletion
+controller test files with `MemoryTracker.isActive()` / tracker-availability
+observations; Note `deletedAt` assertions kept as authoritative source. Added
+`shouldPreserveRemovedFromTrackingPreferenceAcrossDeleteAndUndo` characterization
+(previously-removed-tracker delta). `NoteServiceTest` differing-timestamps
+legacy-state example preserved for slice 7. No production code changed; column,
+mapping, builder setter, and synchronization remain functional.
 
 ### 7. Retire the duplicate persistence state with a populated SQL upgrade
 Type: Structure

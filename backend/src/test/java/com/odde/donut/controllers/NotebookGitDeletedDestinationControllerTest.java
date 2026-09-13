@@ -60,8 +60,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
     PublicationState afterRejection =
         publicationState(notebook, deletion.reserved(), deletion.tracker());
     assertThat(afterRejection.noteDeletedAt(), equalTo(deletion.afterDeletion().noteDeletedAt()));
-    assertThat(
-        afterRejection.trackerDeletedAt(), equalTo(deletion.afterDeletion().trackerDeletedAt()));
+    assertThat(afterRejection.trackerActive(), equalTo(deletion.afterDeletion().trackerActive()));
     inCommittedTransaction(
         transactionManager,
         () ->
@@ -101,8 +100,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
     PublicationState afterRejection =
         publicationState(notebook, deletion.reserved(), deletion.tracker());
     assertThat(afterRejection.noteDeletedAt(), equalTo(deletion.afterDeletion().noteDeletedAt()));
-    assertThat(
-        afterRejection.trackerDeletedAt(), equalTo(deletion.afterDeletion().trackerDeletedAt()));
+    assertThat(afterRejection.trackerActive(), equalTo(deletion.afterDeletion().trackerActive()));
     Note reloadedSource = noteRepository.findById(renamedSource.getId()).orElseThrow();
     assertThat(reloadedSource.getTitle(), equalTo("Renamed source"));
     assertThat(reloadedSource.getUpdatedAt(), equalTo(sourceUpdatedAtBeforeRename));
@@ -150,8 +148,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
     PublicationState afterRejection =
         publicationState(notebook, deletion.reserved(), deletion.tracker());
     assertThat(afterRejection.noteDeletedAt(), equalTo(deletion.afterDeletion().noteDeletedAt()));
-    assertThat(
-        afterRejection.trackerDeletedAt(), equalTo(deletion.afterDeletion().trackerDeletedAt()));
+    assertThat(afterRejection.trackerActive(), equalTo(deletion.afterDeletion().trackerActive()));
     inCommittedTransaction(
         transactionManager,
         () -> {
@@ -239,10 +236,10 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
           return new PublicationState(
               binding.getAcceptedGitObjectId(),
               reloadedNote.getDeletedAt(),
-              reloadedTracker.getDeletedAt());
+              reloadedTracker.isActive());
         });
   }
 
   private record PublicationState(
-      String acceptedHead, Timestamp noteDeletedAt, Timestamp trackerDeletedAt) {}
+      String acceptedHead, Timestamp noteDeletedAt, boolean trackerActive) {}
 }

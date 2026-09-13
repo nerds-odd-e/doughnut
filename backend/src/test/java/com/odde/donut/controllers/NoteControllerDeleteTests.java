@@ -170,6 +170,24 @@ class NoteControllerDeleteTests extends ControllerTestBase {
 
         assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(1));
       }
+
+      @Test
+      void shouldPreserveRemovedFromTrackingPreferenceAcrossDeleteAndUndo()
+          throws UnexpectedNoAccessRightException {
+        MemoryTracker removedTracker =
+            makeMe.aMemoryTrackerFor(subject).removedFromTracking().please();
+
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
+        assertThat(subject.getDeletedAt(), is(not(nullValue())));
+        assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(0));
+
+        controller.undoDeleteNote(subject);
+        assertThat(subject.getDeletedAt(), is(nullValue()));
+        var restoredTrackers = userService.getMemoryTrackersFor(currentUser.getUser(), subject);
+        assertThat(restoredTrackers, hasSize(1));
+        assertThat(restoredTrackers.getFirst().getId(), equalTo(removedTracker.getId()));
+        assertThat(restoredTrackers.getFirst().getRemovedFromTracking(), is(true));
+      }
     }
   }
 }

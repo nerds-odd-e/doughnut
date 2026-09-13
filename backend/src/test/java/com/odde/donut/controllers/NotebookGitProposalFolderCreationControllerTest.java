@@ -465,8 +465,14 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
     assertThat(
         noteRepository.findById(occupied.getId()).orElseThrow().getTitle(), equalTo("addition"));
     assertThat(
-        memoryTrackerRepository.findById(fixture.tracker().getId()).orElseThrow().getDeletedAt(),
-        nullValue());
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                memoryTrackerRepository
+                    .findById(fixture.tracker().getId())
+                    .orElseThrow()
+                    .isActive()),
+        equalTo(true));
   }
 
   private LearnedNotebook boundNotebookWithLearnedNote() throws Exception {
@@ -516,7 +522,7 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
               notes.stream().map(Note::getContent).toList(),
               tracker == null ? null : tracker.getId(),
               tracker == null ? null : tracker.getType(),
-              tracker == null ? null : tracker.getDeletedAt());
+              tracker == null || tracker.isActive());
         });
   }
 
@@ -530,5 +536,5 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
       List<String> noteContents,
       Integer trackerId,
       MemoryTrackerType trackerType,
-      java.sql.Timestamp trackerDeletedAt) {}
+      boolean trackerActive) {}
 }
