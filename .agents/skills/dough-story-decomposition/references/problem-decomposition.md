@@ -100,11 +100,10 @@ retaining an externally evaluable result. Start with a concrete case before a
 general solution; extract abstractions after repetition. Keep a prototype
 bounded to the cheapest evidence needed for its question.
 
-Estimate comparatively using the project's S/M/L definitions, without code
-inspection or implementation design. Record the band, confidence, and
-assumptions. Resolve missing band definitions before writing estimates. Split
-a likely larger-than-L story using the moves above; do not equalize estimates
-by making cuts that fail the 3V gate.
+Estimate comparatively using the project's S/M/L definitions. Record the band,
+confidence, and assumptions. Resolve missing band definitions before writing
+estimates. Split a likely larger-than-L story using the moves above; do not
+equalize estimates by making cuts that fail the 3V gate.
 
 ## Order and reassess
 

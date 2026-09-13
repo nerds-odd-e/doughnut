@@ -199,10 +199,10 @@ closure must be committed in either execution mode; uncommitted cleanup is not
 completion. Report unresolved ownership or commit failures without claiming
 closure.
 
-Direct-current-branch mode ends with committed closure. Worktree mode continues
+Direct-current-branch mode ends with committed closure. Story Branch Mode continues
 with integration and resource cleanup below.
 
-## Integrate committed worktree closure
+## Integrate committed Story Branch Mode closure
 
 Save the committed final-closure tip and integrate it into the recorded target
 branch from its checkout, using the retained execution identity and this
@@ -254,7 +254,7 @@ Report the selected work and its canonical identity, completion judgment,
 execution mode and retained checkout/branch/target identity when applicable,
 before-cleanup and final-closure commits when deletion happened, assimilated
 knowledge, deleted paths, the saved execution tip and local integration result
-in worktree mode, the push result when the target is `main`, worktree and
+in Story Branch Mode, the push result when the target is `main`, worktree and
 local-branch cleanup results, preserved
 unsupported material and resources, and any gap that blocked closure.
 Distinguish a new merge from an already-integrated tip, integration success from
@@ -268,5 +268,5 @@ End a successful closure with:
 `## STORY WRAP-UP COMPLETE`
 
 Do not emit that marker when required context, unfinished work, unresolved
-recovery, worktree-mode integration or required push, or remaining required worktree cleanup
+recovery, Story Branch Mode integration or required push, or remaining required worktree cleanup
 blocks closure.

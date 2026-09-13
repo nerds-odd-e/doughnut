@@ -30,10 +30,11 @@ Manual copying sacrifices the continuous workflow and can lose identity.
 Deferring all further work would leave that requirement unanswered even after
 publication becomes faster.
 
-Recommend accumulated local publication first: it tests the central assumption
-that ordinary commit-by-commit work can be exchanged without rewriting history.
-Then address append-only web saves and common web authoring gaps. The ordering
-is proposed on value and risk, not measured user frequency.
+The owner prioritized append-only web saves, receiving web renames, and receiving
+web deletions ahead of accumulated local publication on 2026-09-13. These basic
+web workflow changes take precedence while publishing after each local commit
+remains a smaller workaround. Accumulated publication is retained after them;
+its frequency and urgency remain unmeasured.
 
 ## Story Decomposition
 
@@ -47,13 +48,112 @@ data; invalid or ambiguous changes must not silently discard work.
 
 ### 20. Publish accumulated local commits without rewriting history
 
-- **For / why:** An owner can commit naturally while working locally, then publish the accumulated work when Donut's accepted head is an ancestor of local main.
-- **Evaluation:** Given several successive local commits editing existing notes and no independent remote changes, publication brings Donut to the local tip with the same commit IDs and order; a clean receiving checkout obtains that history and content.
-- **Value / learning:** Directly closes the explicitly identified remote-behind gap. Receiving already-accepted linear history is recorded as delivered; do not invent a duplicate catch-up story.
-- **Scope:** Existing-note content commits are the first delivery promise; structural-history expansion is deferred. Divergence is outside this direction. Failure must preserve the local chain and leave any accepted progress explicit and retryable.
-- **Effort hypothesis:** L, low confidence pending focused refinement.
-- **Depends on:** Existing clone, publication and clean fast-forward pull; no dependency on another new story is assumed.
-- **Safe stopping point:** This workflow remains independently usable if later stories are cancelled, with work and learning data preserved.
+- **Refinement status:** Refined on 2026-09-13. The narrower delivery and failure
+  policy below are recommendations, not approved product decisions. No execution
+  plan or implementation is authorized by this refinement.
+- **Goal:** A notebook owner can finish a local editing session with several
+  commits, publish once, and continue using those notes in Donut without
+  reconstructing work or losing note identity and learning history. Preserving
+  commit IDs is an existing direction constraint; the user benefit is freedom
+  from publishing after every commit.
+- **Current evidence:** Focused inspection confirms both
+  `cli/src/commands/notebook/notebookPublishAncestry.ts` and
+  `NotebookGitProposalAncestry.java` require the same head or one direct child.
+  Existing CLI and controller tests encode that restriction. This establishes
+  a real capability gap, not its frequency or urgency. Tests were inspected,
+  not run, during refinement.
+- **Purpose and timing challenge:** The owner moved this story below append-only
+  web saves, web rename, and web deletion on 2026-09-13 following refinement.
+  The seed contains no measured frequency of blocked accumulated
+  work. If owners can comfortably publish after each commit, defer this story;
+  meeting a Git direction alone does not establish value now. If web saves
+  commonly overlap local sessions, this narrower delivery may have little
+  practical value: story 21 addresses web history rewriting, but neither story
+  resolves divergence. Reconsider the workflow priority before expanding this
+  story to cover simultaneous editing.
+- **Strongest simpler alternative:** Publish after every local content commit
+  using existing functionality. Try this as a baseline with the owner. It is
+  insufficient when an owner already has accumulated commits or needs to commit
+  without connectivity. Squashing or rebasing conflicts with the stated
+  append-only direction. A new UI or generic synchronization mechanism is not
+  needed to evaluate the selected outcome.
+- **Proposed delivery scope:** One already bound notebook; Donut's content
+  matches its accepted history; accepted head is an ancestor of local `main`;
+  each intervening commit edits content of existing ordinary notes at unchanged
+  paths. Publish through the existing command and show the final contents in
+  Donut. Retain the original commit chain so a clean receiving checkout obtains
+  the same history and final content. Several edits to the same note are the
+  first example; edits across existing notes follow the same promise. Example
+  commit and note counts are not limits.
+- **Proposed failure simplification:** Accept the complete eligible chain or
+  leave Donut's accepted head and live content unchanged. Preserve local work
+  in either case. After an interrupted response, retry can discover that the
+  tip was already accepted without duplicating work. If the remote advances,
+  fail clearly without overwriting it; automatic recovery is deferred. This
+  replaces the ambiguous partial-progress promise with a proposed atomic
+  outcome, subject to confirming that existing publication supports it.
+- **Deferred promises:** Multi-commit creation, deletion, renaming, moving,
+  container Readme changes, simultaneous web/local editing, recovery of live
+  content already inconsistent with accepted Git history, history UI,
+  per-commit progress/resume, and 10,000-note performance targets. Deferral
+  does not itself require rejecting naturally supported cases or regressing
+  existing single-commit behavior. Branching, merging and rebasing remain
+  outside the explicitly selected linear-history direction.
+- **Key examples:**
+  1. Donut and local start at A. Locally B edits an existing note and C refines
+     it again. Publish once: Donut shows C's contents, the same learned note
+     remains, and a clean receiver obtains A → B → C with identical commit IDs.
+  2. The response is lost after successful acceptance of C. Retrying reports
+     the accepted C and leaves history and note identity unchanged.
+  3. Donut advances independently from A before publication. Publication fails
+     clearly, preserving both sides; this delivery does not reconcile them.
+- **Learning and stop condition:** Have an owner perform one real local editing
+  session with accumulated content commits, publish once, and continue learning
+  in Donut. Compare with the publish-after-each-commit baseline: did batching
+  remove an actual interruption, and did the no-overlapping-web-edits condition
+  fit the session? Record any unsupported operation that blocked completion.
+  One successful session establishes workflow feasibility, not widespread
+  demand. Use that evidence before adding structural history or more recovery.
+- **What looks easiest:** Reuse the existing publication command, content-edit
+  application and clean receiving flow. The publisher already has a transaction
+  and same-head handling, which makes atomic publication plausible, not proven.
+  Removing the two ancestry guards alone is insufficient evidence of correct
+  history validation, retry behavior or preservation of learning data.
+- **Effort hypothesis:** Retain L (2–4 hours), low confidence, until intermediate
+  history semantics are settled. M (1–2 hours) is plausible only if existing
+  publication and receipt can safely handle the chain without per-commit live
+  application or new recovery machinery. No basis yet for an S estimate.
+  If bounded delivery still exceeds L, revisit the promise rather than quietly
+  adding a general history processor.
+- **Assumptions to validate:**
+  1. Owners actually accumulate commits often enough to prefer this over
+     publishing each commit; demand evidence is missing.
+  2. Existing-note content editing alone is useful before structural changes;
+     a real session should test this.
+  3. Owners can use a session without overlapping web changes; this is a
+     delivery precondition, not an enforced editing lock.
+  4. Donut's live content matches accepted history at session start; repairing
+     an existing mismatch belongs to separately selected recovery work.
+  5. Every intermediate commit in the first example is a valid existing-note
+     content edit. Whether invalid intermediate content repaired at the tip
+     must be accepted is unresolved; the example is not a rejection rule.
+  6. Only the tip must become live Donut content; preserving intermediate Git
+     commits does not require exposing each intermediate state in the app.
+  7. Whole-publication atomicity and retry can reuse existing behavior. The
+     transaction and same-head branch support investigating this, but do not
+     prove all storage and network failure outcomes.
+  8. Existing clone and clean pull can receive the longer accepted history;
+     focused end-to-end evidence is still needed for this publication flow.
+  9. Existing ownership checks, content fidelity, note identity and learning
+     preservation remain applicable; these are obligations, not scope cuts.
+- **Open decisions before execution planning:** Confirm whole-chain acceptance
+  versus partial progress. Decide whether an intermediate invalid or structural
+  state repaired by the tip is merely outside this delivery's promise or must
+  be rejected, with a product reason for any rejection. Confirm value now with
+  an actual blocked session or the owner's stated expected usage.
+- **Depends on / safe stopping point:** Existing clone, publication and clean
+  fast-forward pull; no new-story prerequisite is established. This content-only
+  local-session workflow remains useful if all later stories are cancelled.
 
 <a id="story-21"></a>
 
@@ -223,9 +323,10 @@ The owner merged title uniqueness and soft deletion into story 26. The broader
 trash model is useful future work, but Git workflow stories now take priority
 and publication-optimization work follows it at the bottom of the queue. Defer
 the combined idea first when reducing Git workflow scope.
-Among the remaining Git workflow stories, publish accumulated commits first,
-then make new web history append-only.
-Prioritize web rename and deletion ahead of container descriptions and web
+Among the remaining Git workflow stories, make new web history append-only,
+then receive web renames and deletions, then publish accumulated local commits.
+This is the owner's priority decision after challenging story 20's value now.
+Prioritize these stories ahead of container descriptions and web
 relocation. Drop the latter two from the queue first if learning changes the
 priority; retain their candidates here. None of this authorizes execution.
 
@@ -253,8 +354,9 @@ the newly selected append-only stories.
 
 - How often do web renames, deletions and moves interrupt actual owner work?
   The order above is a value hypothesis, to revise with use.
-- Multi-commit publication refinement must settle useful failure/retry behavior
-  if an intermediate commit is invalid, without discarding or rewriting work.
+- Story 20 owns the proposed atomic publication policy and unresolved
+  intermediate-history semantics; settle those decisions before its execution
+  planning, without discarding or rewriting work.
 - Additional web creation modes and container mutations need concrete owner
   journeys before story selection; this queue is not a completeness claim.
 

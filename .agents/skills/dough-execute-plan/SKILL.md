@@ -55,7 +55,7 @@ Resolve from this project:
 
 - execution-source kind, slice target, hard limit, and exceptions; for planned
   execution also resolve the plan path, slice-status vocabulary, and whether
-  worktree mode applies or the caller selected execution on the current branch;
+  Story Branch Mode applies or the caller selected execution on the current branch;
 - product backlog path and selected entry when this work was selected from
   **Backlog list**;
 - navigation, focused test commands, runtime wrapper, and workflow precedence;
@@ -90,7 +90,7 @@ backlog; do not fabricate an entry. Refinement and planning do not invoke this
 transition. Leave taken work there through pauses, failures, completion, and
 retrospective; story wrap-up owns completed-work removal.
 
-For planned execution in worktree mode, perform a read-only preflight in the
+For planned execution in Story Branch Mode, perform a read-only preflight in the
 originating checkout before moving the entry. Resolve its current branch and
 backlog path, inspect tracked and staged changes, and confirm that the exact
 backlog transition can be committed without including or disturbing unrelated
@@ -108,10 +108,12 @@ above produce no empty Taken-only commit.
 
 ## Choose the execution location
 
-Planned execution uses worktree mode unless the caller explicitly selects the
-current branch. After a worktree-mode claim is committed, create a new branch
-and Git worktree from that commit before delegation. When backlog inspection
-established that no claim applies, use the verified current HEAD instead.
+Planned execution uses Story Branch Mode unless the caller explicitly selects
+the current branch. Story Branch Mode gives the selected story or bounded
+correction its own execution branch and Git worktree. After its claim is
+committed, create that branch and worktree from the claim commit before
+delegation. When backlog inspection established that no claim applies, use the
+verified current HEAD instead.
 Resolve names and location from this project's conventions and the current
 host's ordinary Git facilities; do not invent a parallel registry,
 configuration format, or worktree manager. If a required convention or safe
@@ -143,7 +145,7 @@ different branch.
 
 Run delegation, post-change refactoring, generators, formatting, staging,
 commits, normal pushes, and CI repair from the selected execution location.
-Push the execution branch to the authorized destination in worktree mode. Pass
+Push the execution branch to the authorized destination in Story Branch Mode. Pass
 the planned-execution identity and selected location explicitly whenever
 handing work to another agent or host adapter so that a tool's own default
 working directory cannot redirect the execution. For quick execution, pass the
