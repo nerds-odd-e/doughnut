@@ -326,7 +326,7 @@ failure/retry tests.
 
 ### 8. A legacy deleted note migrates into recoverable web trash
 Type: Behavior
-Status: planned
+Status: done
 Sizing: 5–8 minutes, low confidence; isolated SQL proof wait exception.
 
 Behavior: A representative old-schema notebook with a deleted learned note
@@ -345,6 +345,31 @@ Keep the candidate SQL outside the auto-discovered versioned Flyway directory
 until its cases are complete. It is the actual upgrade recipe, not a second
 runtime migration algorithm. Slice 11 registers the validated recipe immutably.
 Safe stop: Validated candidate upgrade; deployed startup behavior unchanged.
+
+Learning: Added `NoteLegacyTrashMigration` (JDBC helper, outside `db/migration/`
+so Flyway does not auto-discover it). Its `run(Connection, Instant)` method finds
+all notes with `deleted_at IS NOT NULL AND notebook_id IS NOT NULL`, and for each
+note: finds/creates the `_trash` root folder for its notebook (case-insensitive
+match per `Folder.isTrashed`), walks the note's folder trail from root to
+containing folder, mirrors that trail under `_trash` top-down (matching
+`FolderConstructionService.ensureTrashParentFor`), moves the note to the final
+trash folder, suffixes the title on conflict (` (2)`, ` (3)`, etc. matching
+`NoteMotionService`), clears `deleted_at`, and updates `updated_at`. Atomic with
+rollback on error; idempotent on retry. Notes in deleted notebooks migrate the
+same way; `notebook.deleted_at` is NOT cleared.
+
+Tests: `NoteLegacyTrashMigrationTest` (3 tests) proves a deleted learned note in
+`Recipes/Italian/Pasta` migrates to `_trash/Recipes/Italian/Pasta` retaining
+id/content/title/notebook/trackers, `deleted_at` cleared, trashed via the
+`trashed_folder` view, live note unaffected, baseline rebuild includes the
+trashed note in the Portable tree; notes in deleted notebooks migrate without
+clearing notebook deletion; title suffixing when a live trashed note already
+holds the same title. `NoteLegacyTrashMigrationControllerTest` (1 test) proves
+the migrated note is visible through `NoteController.showNote` and recoverable
+via `NoteController.undoTrashNote` (Move to notebook root). Memory trackers
+created via raw JDBC in tests due to `MemoryTracker.user` cascade issues in
+`NOT_SUPPORTED` test mode. Refactor collapsed a duplicated `readNullableInt`
+helper into the shared `NotebookGitRows` class.
 
 ### 9. Migration preserves existing trash and colliding legacy content
 Type: Behavior

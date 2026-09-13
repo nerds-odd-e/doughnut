@@ -91,7 +91,7 @@ public final class NotebookGitRows {
     return notes;
   }
 
-  private static Integer readNullableInt(ResultSet resultSet, String column) throws SQLException {
+  static Integer readNullableInt(ResultSet resultSet, String column) throws SQLException {
     int value = resultSet.getInt(column);
     return resultSet.wasNull() ? null : value;
   }
