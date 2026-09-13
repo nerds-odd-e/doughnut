@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -76,5 +77,20 @@ class MemoryTrackerUpdatePropertyKeyControllerTest extends MemoryTrackerControll
     assertThrows(
         ResponseStatusException.class,
         () -> controller.updatePropertyKey(tracker, renameTo("subject")));
+  }
+
+  @Test
+  void shouldRejectRenameWhenNoteIsDeleted() {
+    Note note = ownedNote();
+    MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).propertyKey("topic").please();
+    noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
+
+    ResponseStatusException ex =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> controller.updatePropertyKey(tracker, renameTo("subject")));
+
+    assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    assertThat(ex.getReason(), equalTo("Memory tracker is deleted"));
   }
 }

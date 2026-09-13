@@ -1,9 +1,17 @@
 # Note-owned memory tracker deletion
 
-Status: planned
+Status: in progress
 Source: [SEED-019, story 1](../../seeds/SEED-019-note-owned-memory-tracker-deletion-state.md#story-1)
 Authority: 2026-09-13 request to slice-plan and refine if needed; implementation
 is not authorized by this request. Backlog placement remains unchanged.
+
+## Execution identity (Story Branch Mode)
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on branch `main`;
+  claim commit `752dd18eae` (Taken-only transition for SEED-019 story 1).
+- Execution checkout: `/Users/terryyin/git/doughnut.worktrees/114-note-owned-memory-tracker-deletion`
+  on branch `114-note-owned-memory-tracker-deletion`, based on the claim commit.
+- Integration target: `main`.
 
 ## Goal and scope
 
@@ -122,7 +130,7 @@ problem. Do not deliver a red intermediate state.
 
 ### 1. Derive in-memory tracker activity from the note
 Type: Structure
-Status: planned
+Status: done
 Sizing: 4–5 minutes of active work, plus required suite wait.
 
 Replace deletion reads in `MemoryTracker.isActive()` and property-key editing
@@ -136,6 +144,14 @@ Proof: `MemoryTrackerTrackingControllerTest`,
 coverage preserve activity, removal, rename conflict/stat retention and eligible
 match behavior. Add the missing deleted-note rename observation if absent.
 Safe stop: both persisted timestamps still synchronize as before.
+
+Learning: the `deletedAt`-only branch in
+`RecallPromptAccidentalMatchConfusionAdjustmentTests` was unreachable in
+production — `NoteService.destroy()` mirrors note deletion to all trackers on the
+note, so a tracker-only `deletedAt` (note still active) never occurs through
+supported workflows. Collapsed to the reachable `removedFromTracking` case. This
+confirms the pre-reader assessment: no independent tracker soft-delete writer was
+found. Carry into slices 6–7.
 
 ### 2. Select due learning work by note deletion
 Type: Structure

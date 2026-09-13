@@ -21,8 +21,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptControllerTestBase {
@@ -134,16 +132,11 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       assertNoConfusionLog(understandingTracker);
     }
 
-    @ParameterizedTest
-    @CsvSource({"removedFromTracking", "deletedAt"})
-    void shouldFallBackToUnderstandingWhenSpellingTrackerBecomesInactive(String inactivationMethod)
+    @Test
+    void shouldFallBackToUnderstandingWhenSpellingTrackerBecomesInactive()
         throws UnexpectedNoAccessRightException {
       MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
-      if ("removedFromTracking".equals(inactivationMethod)) {
-        matchedSpellingTracker.setRemovedFromTracking(true);
-      } else {
-        matchedSpellingTracker.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
-      }
+      matchedSpellingTracker.setRemovedFromTracking(true);
       makeMe.entityPersister.save(matchedSpellingTracker);
 
       controller.answerSpelling(recallPrompt, answerDTO);
