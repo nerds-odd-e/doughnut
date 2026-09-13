@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class DeletableEntityFkClosureTest {
 
-  private static final List<String> HARD_DELETABLE_ROOTS = List.of("memory_tracker");
+  private static final List<String> HARD_DELETABLE_ROOTS = List.of("memory_tracker", "note");
 
   /**
    * Deliberate RESTRICT / NO ACTION edges inside a hard-deletable subtree. Each entry must carry a

@@ -128,7 +128,7 @@ is retained until slice 11. No backend production code changed; one focused
 
 ### 2. Note dependency ownership supports permanent removal
 Type: Structure
-Status: planned
+Status: done
 Sizing: 5–8 minutes, low confidence until the live FK closure is inspected.
 
 Structure: Establish complete deletion ownership for note-dependent rows using
@@ -142,6 +142,17 @@ be represented with an evidenced, reasoned exception rather than ignored edges.
 Proof: Existing deletion/controller suite remains green, migrated schema matches
 the intended closure, ERD regenerated for changed FKs. No permanent web-delete
 UI or generalized deletion framework. Safe stop: Existing behaviors unchanged.
+
+Learning: The live note FK closure had three edges the plan flagged as needing
+human judgment. The owner chose CASCADE for all three — `conversation.note_id`
+(note-dependent chat history, deletes with the note), `image.note_id` (1:1
+note-owned uploads), and `recall_prompt.mcq_id` (removes the NO ACTION blocker;
+recall_prompt is also CASCADE from memory_tracker). Migration
+`V300000325__cascade_note_dependents_on_note_delete.sql` renames the constraints
+(MySQL rejects re-adding a dropped name in the same ALTER) and preserves the
+prior `ON UPDATE RESTRICT` on `image.note_id`. `note` added to
+`HARD_DELETABLE_ROOTS`; `ALLOWED_RESTRICTING_FKS` stays empty. No JPA entity
+changes were needed (plain `@ManyToOne`, no cascade conflicts).
 
 ### 3. Published file removal permanently deletes its note
 Type: Behavior
