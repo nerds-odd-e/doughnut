@@ -4,6 +4,13 @@ Status: planned
 Source: [SEED-009, story 21](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21), refined 2026-09-13.
 Authority: Execution planning and conditional slice-plan refinement only.
 
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut`, branch `main`, claim commit `f337c8425c0662561d78edd571ade9f848b32a52`.
+- Execution checkout: `/Users/terryyin/git/doughnut-worktrees/story-21`, branch `story-21-append-only-web-content-saves`.
+- Integration target: `main`.
+- CI observation: unavailable for the execution branch because `.github/workflows/ci.yml` (`donut CI`) is push-triggered only for `main`; no observer started.
+
 ## Goal and scope
 
 An owner saves successive content edits to an existing ordinary note on the
@@ -76,7 +83,7 @@ plan before continuing. Never use a failing suite as a delivery boundary.
 
 ### 1. Preserve each changed web content save in accepted history
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes of change work, medium confidence; scrutinized because
 the old amendment expectations span three controller test classes. Full backend
 suite runtime is an explicit external-wait exception, not extra coding time.
@@ -94,6 +101,14 @@ append rule; do not preserve a matrix for a removed timing policy. Retain the
 already sufficient no-op, content/learning identity, nested path, no-binding,
 pre-existing drift, denied/invalid save, atomicity and concurrent writer proof.
 Change the policy and all directly contradictory expectations together.
+
+Delivered proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+passed all 2,419 backend tests after implementation and again after the
+post-change refactor. The controller boundary observes the exact accepted IDs
+and contents for `A → B → C`; the download-between-saves variant observes the
+same append rule. Active change and focused-repair time was about eight minutes,
+below the ten-minute hard limit; backend suite runtime was the stated external
+wait exception.
 
 Reuse existing append persistence and remove the now-unused tip replacement
 path. Keep current API and save transaction behavior. This is one policy/proof
@@ -187,6 +202,13 @@ Three Behavior slices exercise one append rule. No preparatory Structure,
 new lifecycle owner, schema retirement project, or deferred operation is needed.
 Slices 2 and 3 own distinct compatibility and reception proof; neither asks
 for special production behavior. Existing continuity proof is reused.
+
+## Learnings
+
+- Slice 1 removed the sole force-replacement path and the amendment-window
+  policy. Bundle download and idempotent publication no longer need to clear
+  amendment state, while the legacy persisted columns remain mapped for slice
+  2's existing-candidate fixture.
 
 ## Slice-plan refinement assessment
 

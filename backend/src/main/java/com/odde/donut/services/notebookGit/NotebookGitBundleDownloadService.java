@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Locks the notebook Git binding, freezes amendment eligibility for the current tip, and returns
- * that tip's bundle bytes in a write transaction that completes before response delivery.
- */
+/** Selects the accepted bundle under the notebook Git writer lock. */
 @Service
 public class NotebookGitBundleDownloadService {
   private final NotebookGitBindingRepository bindingRepository;
@@ -20,7 +17,7 @@ public class NotebookGitBundleDownloadService {
   }
 
   @Transactional
-  public byte[] selectAndFreeze(Integer notebookId) {
+  public byte[] select(Integer notebookId) {
     NotebookGitBinding binding =
         bindingRepository
             .findByNotebookIdForUpdate(notebookId)
@@ -28,7 +25,6 @@ public class NotebookGitBundleDownloadService {
                 () ->
                     new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
-    binding.clearAmendmentEligibility();
     return binding.getBundleBytes();
   }
 }

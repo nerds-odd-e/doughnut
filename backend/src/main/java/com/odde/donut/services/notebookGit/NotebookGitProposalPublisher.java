@@ -99,7 +99,6 @@ public class NotebookGitProposalPublisher {
     if (proposal.mainHead().equals(acceptedHead)) {
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      binding.clearAmendmentEligibility();
       return binding.getAcceptedGitObjectId();
     }
     if (!expectedHead.equals(binding.getAcceptedGitObjectId())) {

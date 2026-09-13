@@ -465,7 +465,7 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    byte[] bundleBytes = notebookGitBundleDownloadService.selectAndFreeze(notebook.getId());
+    byte[] bundleBytes = notebookGitBundleDownloadService.select(notebook.getId());
     String filename = "notebook-" + notebook.getId() + ".bundle";
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")

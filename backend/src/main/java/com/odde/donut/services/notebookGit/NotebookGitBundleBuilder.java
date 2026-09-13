@@ -19,11 +19,8 @@ import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectInserter;
 import org.eclipse.jgit.lib.PersonIdent;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefUpdate;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 
 /**
  * Turns a canonical Portable-tree snapshot (see {@code notebookExport.PortableTreeSnapshot} into an
@@ -77,43 +74,6 @@ public final class NotebookGitBundleBuilder {
     }
   }
 
-  /**
-   * Replaces {@code tipToReplace} (must be current {@code refs/heads/main}) with a new tip that
-   * keeps the same parent and original author metadata, uses {@code committerTime} for the
-   * committer, and force-updates main. Ordinary {@link #append} callers stay fast-forward only.
-   */
-  public static ObjectId replaceTip(
-      Repository repository,
-      ObjectId tipToReplace,
-      List<PortableTreeEntry> entries,
-      String message,
-      Instant committerTime) {
-    try (ObjectInserter inserter = repository.newObjectInserter();
-        RevWalk revWalk = new RevWalk(repository)) {
-      Ref mainRef = repository.exactRef(Constants.R_HEADS + "main");
-      if (mainRef == null || !mainRef.getObjectId().equals(tipToReplace)) {
-        throw new IllegalStateException("Tip to replace is not the current main head");
-      }
-      RevCommit tip = revWalk.parseCommit(tipToReplace);
-      if (tip.getParentCount() != 1) {
-        throw new IllegalStateException("Tip to replace must have exactly one parent");
-      }
-      ObjectId treeId = writeTree(entries, inserter);
-      PersonIdent author = tip.getAuthorIdent();
-      PersonIdent committer =
-          new PersonIdent(
-              author.getName(), author.getEmailAddress(), committerTime, ZoneOffset.UTC);
-      CommitBuilder commitBuilder = commitBuilder(treeId, author, committer, message);
-      commitBuilder.setParentId(tip.getParent(0));
-      ObjectId commitId = inserter.insert(commitBuilder);
-      inserter.flush();
-      forceUpdateMainBranch(repository, commitId);
-      return commitId;
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
   private static ObjectId writeTree(List<PortableTreeEntry> entries, ObjectInserter inserter)
       throws IOException {
     DirCache dirCache = DirCache.newInCore();
@@ -137,15 +97,10 @@ public final class NotebookGitBundleBuilder {
   private static CommitBuilder commitBuilder(
       ObjectId treeId, String authorName, String authorEmail, String message, Instant commitTime) {
     PersonIdent ident = new PersonIdent(authorName, authorEmail, commitTime, ZoneOffset.UTC);
-    return commitBuilder(treeId, ident, ident, message);
-  }
-
-  private static CommitBuilder commitBuilder(
-      ObjectId treeId, PersonIdent author, PersonIdent committer, String message) {
     CommitBuilder commitBuilder = new CommitBuilder();
     commitBuilder.setTreeId(treeId);
-    commitBuilder.setAuthor(author);
-    commitBuilder.setCommitter(committer);
+    commitBuilder.setAuthor(ident);
+    commitBuilder.setCommitter(ident);
     commitBuilder.setMessage(message);
     return commitBuilder;
   }
@@ -157,17 +112,6 @@ public final class NotebookGitBundleBuilder {
     RefUpdate.Result result = refUpdate.update();
     if (result != RefUpdate.Result.NEW && result != RefUpdate.Result.FAST_FORWARD) {
       throw new IllegalStateException("Unexpected ref update result: " + result);
-    }
-  }
-
-  private static void forceUpdateMainBranch(Repository repository, ObjectId commitId)
-      throws IOException {
-    RefUpdate refUpdate = repository.updateRef(Constants.R_HEADS + "main");
-    refUpdate.setNewObjectId(commitId);
-    refUpdate.setForceUpdate(true);
-    RefUpdate.Result result = refUpdate.update();
-    if (result != RefUpdate.Result.FORCED) {
-      throw new IllegalStateException("Unexpected forced ref update result: " + result);
     }
   }
 }

@@ -1,11 +1,9 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.controllers.NotebookGitNoteCreationControllerTestSupport.titleOnly;
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
@@ -22,13 +20,13 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
-class NotebookGitWebContentAmendmentExposureControllerTest
-    extends NotebookGitWebContentAmendmentControllerTestSupport {
+class NotebookGitWebContentHistoryExposureControllerTest
+    extends NotebookGitWebContentHistoryControllerTestSupport {
 
   @Test
-  void downloadThenTwoQuickSavesKeepDownloadedHeadAsParentOfOneBatch() throws Exception {
+  void downloadingBetweenQuickSavesDoesNotChangeAppendPolicy() throws Exception {
     Fixture fixture = fixture("Pulled");
-    saveAt(fixture.noteId(), content("exposed"), T1000);
+    saveAt(fixture.noteId(), content("first"), T1000);
     ResponseEntity<byte[]> downloaded =
         controller.downloadNotebookGitBundle(
             notebookRepository.findById(fixture.notebookId()).orElseThrow());
@@ -37,27 +35,12 @@ class NotebookGitWebContentAmendmentExposureControllerTest
       downloadedHead = GitBundleTestReader.fetchHead(repository, downloaded.getBody());
     }
 
-    saveAt(fixture.noteId(), content("batch-1"), T1008);
-    saveAt(fixture.noteId(), content("batch-2"), T1016);
+    saveAt(fixture.noteId(), content("second"), T1008);
     History afterSaves = historyFromBinding(fixture.notebookId(), "Pulled.md");
     assertThat(
         afterSaves.contentsNewestFirst(),
-        equalTo(List.of(content("batch-2"), content("exposed"), ACCEPTED_CONTENT)));
+        equalTo(List.of(content("second"), content("first"), ACCEPTED_CONTENT)));
     assertThat(afterSaves.headsNewestFirst().get(1), equalTo(downloadedHead));
-
-    ResponseEntity<byte[]> secondDownload =
-        controller.downloadNotebookGitBundle(
-            notebookRepository.findById(fixture.notebookId()).orElseThrow());
-    NotebookGitBinding afterSecondDownload =
-        inCommittedTransaction(
-            transactionManager,
-            () ->
-                notebookGitBindingRepository.findByNotebook_Id(fixture.notebookId()).orElseThrow());
-    assertThat(afterSecondDownload.getAmendmentHead(), nullValue());
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId frozen = GitBundleTestReader.fetchHead(repository, secondDownload.getBody());
-      assertThat(frozen.getName(), equalTo(afterSecondDownload.getAcceptedGitObjectId()));
-    }
   }
 
   @Test

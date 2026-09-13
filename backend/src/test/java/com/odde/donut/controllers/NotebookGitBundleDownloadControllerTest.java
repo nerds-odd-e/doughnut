@@ -1,12 +1,10 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
-import static com.odde.donut.testability.NotebookGitBindingAmendmentFixture.markEligible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -15,7 +13,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.GitBundleTestReader;
-import java.time.Instant;
 import java.util.concurrent.Callable;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
@@ -25,19 +22,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
-class NotebookGitBundleDownloadFreezeControllerTest
-    extends NotebookGitWebContentControllerTestBase {
+class NotebookGitBundleDownloadControllerTest extends NotebookGitWebContentControllerTestBase {
 
-  private static final Instant ELIGIBLE_AT = Instant.parse("2026-09-08T10:00:00Z");
   private static final String FIRST_WEB_CONTENT = "---\ntype: Note\n---\nfirst web edit";
 
   @Test
-  void downloadFreezesEligibleTipAndReturnsThatHead() throws Exception {
+  void downloadReturnsTheAcceptedHead() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    markEligible(binding, note.getId(), ELIGIBLE_AT);
-    notebookGitBindingRepository.save(binding);
     String expectedHead = binding.getAcceptedGitObjectId();
 
     ResponseEntity<byte[]> response = controller.downloadNotebookGitBundle(notebook);
@@ -51,9 +44,6 @@ class NotebookGitBundleDownloadFreezeControllerTest
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
     assertThat(after.getAcceptedGitObjectId(), equalTo(expectedHead));
-    assertThat(after.getAmendmentHead(), nullValue());
-    assertThat(after.getAmendmentNoteId(), nullValue());
-    assertThat(after.getAmendmentLastChangedAt(), nullValue());
   }
 
   @Test
@@ -61,8 +51,6 @@ class NotebookGitBundleDownloadFreezeControllerTest
     Notebook notebook = createGitBackedNotebook();
     Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding before = snapshotCurrentPortableTree(notebook);
-    markEligible(before, note.getId(), ELIGIBLE_AT);
-    notebookGitBindingRepository.save(before);
     String headBefore = before.getAcceptedGitObjectId();
     Integer notebookId = notebook.getId();
     Integer noteId = note.getId();
@@ -86,18 +74,16 @@ class NotebookGitBundleDownloadFreezeControllerTest
       ObjectId downloadedHead = GitBundleTestReader.fetchHead(repository, race.second().getBody());
       assertThat(downloadedHead.getName(), equalTo(after.getAcceptedGitObjectId()));
     }
-    assertThat(after.getAmendmentHead(), nullValue());
     assertThat(race.first().getNote().getContent(), is(FIRST_WEB_CONTENT));
   }
 
   @Test
-  void deniedDownloadLeavesEligibilityUntouched() throws Exception {
+  void deniedDownloadLeavesAcceptedHistoryUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    markEligible(binding, note.getId(), ELIGIBLE_AT);
-    notebookGitBindingRepository.save(binding);
-    String eligibleHead = binding.getAcceptedGitObjectId();
+    String acceptedHead = binding.getAcceptedGitObjectId();
+    byte[] acceptedBundle = binding.getBundleBytes();
     currentUser.setUser(createFixtureUser());
 
     assertThrows(
@@ -108,9 +94,8 @@ class NotebookGitBundleDownloadFreezeControllerTest
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    assertThat(after.getAmendmentHead(), equalTo(eligibleHead));
-    assertThat(after.getAmendmentNoteId(), equalTo(note.getId()));
-    assertThat(after.getAmendmentLastChangedAt().toInstant(), equalTo(ELIGIBLE_AT));
+    assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHead));
+    assertThat(after.getBundleBytes(), equalTo(acceptedBundle));
   }
 
   @Test
