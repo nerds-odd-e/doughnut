@@ -339,28 +339,122 @@ from further splitting/refinement for now, by the owner's instruction.
 
 ### 31. Recover existing deleted notes through portable trash
 
-- **For / why:** Existing web owners find previously deleted content in the same
-  trash as newly trashed notes, with history intact and former paths reusable.
-- **Evaluation:** Upgrade a notebook with soft-deleted learned notes; browse them
-  under their trash paths, recover with Move, and reuse their former names for
-  new notes. Existing note URLs, active content, and dependent data remain usable.
-- **Scope:** Automatic SQL data/schema migration with release; preserve IDs,
-  content, and dependent records using agreed placement/collision behavior.
-  Retire note `deleted_at`, its old writes/filters/undo mechanisms, and hidden
-  title-conflict restoration. Adapt existing callers as necessary to preserve
-  their currently supported external behavior using the new representation.
-  This is part of safe replacement, not a new Git feature or permanent-delete
-  contract. Location is the remaining authority for note trash availability.
-- **Value / learning:** Completes structural retirement with a directly visible
-  recovery benefit for existing owners; avoids permanent compatibility machinery.
-- **Effort hypothesis:** L, low confidence, particularly migration and existing
-  callers. Refine further if necessary; do not turn Git enhancement into a
-  prerequisite or promise unsupported behavior to make retirement appear complete.
-- **Depends on:** Existing web trash and preserved Move recovery. The deferred
-  Git compatibility story is not a prerequisite.
-- **Safe stopping point:** All legacy deleted data is migrated and the old note
-  soft-delete structure is gone, with existing behaviors preserved. This remains
-  the required completion boundary even if later convenience work is deferred.
+- **Refinement status:** Refined on 2026-09-13 for web delivery. The Git caller
+  preservation conflict below remains unresolved; this is not execution-ready.
+  “Portable trash” names the existing location model, not a promise of new Git
+  compatibility. No execution plan or implementation is authorized here.
+- **Goal:** An existing notebook owner can find a previously soft-deleted note
+  in web trash, recover it with the existing Move action, and reuse its former
+  name without resurrecting the old note or losing its learning history.
+- **Why this story, now:** Web Trash, browsing, and Move recovery already supply
+  the user journey. Migrating older deleted notes extends that journey to retained
+  data and completes the agreed replacement of hidden deletion state. The current
+  `Note` availability rules still combine `deletedAt` and trash ancestry, so the
+  coexistence is concrete. Restore is a convenience; folder Trash expands the
+  workflow. Neither is needed to recover a migrated note.
+- **Timing challenge:** The strongest smaller alternative is to keep using
+  existing recovery and deliver Restore first. That would give faster visible
+  convenience but leave old title reservations and two deletion mechanisms.
+  No production count of affected notes or measured recovery demand has been
+  supplied: urgency rests on the owner's chosen completion boundary, not an
+  evidenced volume of complaints. Keep this priority provisionally; if safe
+  retirement requires a new Git lifecycle, revisit the boundary with the owner
+  rather than hiding that work inside a web story.
+
+#### Scope
+
+- **Required outcome:** Release-time SQL migration places all retained
+  soft-deleted notes in their notebook's trash using the agreed path and collision
+  rules. Preserve note IDs, content, authored references, attachments, dependent
+  records, learning state, and independent tracking preferences. Use existing
+  web browsing, direct access, editing, and Move; no new recovery screen is needed.
+- **Required completion:** Remove note `deleted_at` and its runtime writes,
+  filters, timestamp undo, and implicit restoration on title reuse. Note location
+  then determines availability. This concerns note deletion; notebook deletion
+  and unrelated lifecycle columns are outside the outcome.
+- **Preserved behavior:** Retain authorization, active content, new web
+  Trash/Undo, deletion reference choices, and ordinary move conflicts. Migration
+  does not replay deletion reference handling or recreate previously removed
+  references. Adapt callers only to preserve supported outcomes; any changed
+  Git lifecycle is a product decision, not an implied implementation detail.
+- **Deferred promises:** Restore shortcut and automatic reconstruction of an
+  active destination (32), folder Trash action (33), all new local/Git trash
+  compatibility and permanent file-deletion semantics (28), empty trash,
+  permanent-delete UI, expiry, and performance expansion. Deferral adds no new
+  rejection rule to otherwise valid existing operations.
+- **Dependencies:** Existing web trash browsing and Move recovery are available.
+  New Git capabilities remain deferred. Full structural retirement nevertheless
+  depends on resolving the concrete preservation conflict below.
+- **Safe stopping point:** Existing deleted data is recoverable through web
+  trash, former names are reusable, and the old note deletion structure is gone
+  with supported behavior preserved. Migration alone cannot be declared complete
+  while the agreed retirement remains unfinished. This story retains value if
+  Restore and folder Trash are never delivered.
+
+#### Key examples
+
+1. A learned, soft-deleted `Biology/Cells` exists before upgrade. After upgrade,
+   the owner browses `_trash/Biology/Cells`, opens the same note URL, and reads
+   the same content. It stays out of search, learning, and wiki-link matching
+   while trashed. Move to an active destination retains its identity and learning
+   history; independently removed trackers remain removed.
+2. After migration, creating a new `Biology/Cells` creates an independent note.
+   The migrated note stays in trash. Moving it onto that occupied destination
+   follows the existing conflict behavior; neither note is overwritten or merged.
+3. `_trash/Biology/Cells` already exists when another deleted `Biology/Cells`
+   migrates. Keep the existing item and place the incoming note at the first
+   available suffixed basename, such as `Cells (2)`. Preserve both IDs and content.
+4. The owner recovers a migrated note to notebook root or another existing
+   active folder with Move. Recovery does not require the original parent to
+   exist and does not promise to reconstruct it automatically.
+
+#### Solution and architecture boundaries
+
+Use the existing folder-location model and Move capability. The read-only
+`trashed_folder` ancestry view already supplies the database availability
+boundary; removing the legacy predicate must leave that boundary in place.
+No trash flag, timestamp protocol, original-path journal, or parallel reference
+resolver is justified. The release-time SQL migration and absence of a separate
+rollout/opt-in ceremony are already owner decisions.
+
+[ADR 0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash)
+requires location-derived trash, retained Portable files, and exclusion from
+learning and wiki-link matching.
+[ADR 0005 — Web routes](../../docs/adrs/0005-web-routes-accepted.md)
+keeps note URLs identity-based.
+[ADR 0003 — Spaced-repetition scheduling policy](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)
+constrains retained learning state. These are Accepted; ADR 0002 remains Proposed
+and supplies no authority to expand this story into synchronization redesign.
+No change to an Accepted ADR is proposed.
+
+#### Unresolved details and evidence
+
+- **Git preservation conflict:** `NotebookGitProposalPublisher` still calls
+  `NoteService.destroy` for a published file deletion. The controller tests in
+  `NotebookGitDeletionPublicationControllerTest` expect retained notes and
+  learning state with inactive trackers. `NotebookGitStateLoader` loads notes
+  through `findLiveNotesByNotebookIdOrderByIdAsc`, which excludes soft-deleted
+  rows but includes location-based trash. Replacing soft delete with a trash
+  move therefore changes the projected file set; hard deletion discards retained
+  data. Neither is established as a behavior-preserving substitution. Migration
+  of old deleted notes also changes that projection. Resolve this before
+  dependent execution planning. Recommendation pending owner response: preserve
+  the narrow web scope, demonstrate a bounded preservation solution, or return
+  the retirement boundary for a human decision. Do not silently activate story 28,
+  add a second hidden state, or leave `deleted_at` indefinitely.
+- **Legacy delete/undo callers:** `StoredApiCollection` still invokes the old
+  delete and undo-delete endpoints. Their currently supported user outcomes must
+  be accounted for before removing those paths; retaining timestamp deletion or
+  building the separate Restore convenience is not an assumed answer.
+- **Migration placement:** Inspect legacy rows already beneath `_trash` and
+  pre-existing case variants or occupied intermediate paths. Proposal: retain
+  already-trashed paths without a second `_trash` prefix and preserve existing
+  trash contents. Ordinary basename collisions are agreed; an intermediate-path
+  conflict requiring a different visible placement needs an explicit example
+  before planning. Do not infer historical original paths from missing metadata.
+- **Confidence:** The earlier L estimate (2–4 hours) is unvalidated. The coupled
+  caller retirement makes a confident narrow-delivery estimate premature.
+  These are focused source findings, not executed migration or regression proof.
 
 <a id="story-32"></a>
 
