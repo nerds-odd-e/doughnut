@@ -13,9 +13,9 @@ Owners of notebooks with 10,000 notes can publish to the remote quickly,
 with reasonable performance.
 
 ## Taken
+- [Remove obsolete amendment eligibility from the runtime model](quick/119-remove-obsolete-amendment-eligibility-model/PLAN.md)
 
 ## Backlog list
-- [Remove obsolete amendment eligibility from the runtime model](quick/119-remove-obsolete-amendment-eligibility-model/PLAN.md)
 - [Recover existing deleted notes through portable trash](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-31) — SEED-009
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
 - [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
