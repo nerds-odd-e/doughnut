@@ -1,8 +1,8 @@
 # Publish additions with a simpler title check
 
-Status: planned
+Status: done
 Source: [SEED-018 story 5](../../seeds/SEED-018-publish-large-authored-notebooks.md#story-5)
-Authority: 2026-09-13 story refinement and planning only; execution has not started.
+Authority: 2026-09-13 story refinement and planning; executed 2026-09-13.
 
 ## Goal and boundary
 
@@ -114,7 +114,7 @@ do not create a broad new scenario matrix or unrelated test cleanup.
 
 ### 1. Publish additions in less than half the time through a simpler shared lookup
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given the unchanged 1,000-existing / 1,000-addition fixture, publication
 through the existing HTTP boundary completes in less than half the fresh baseline
 median time, with the same content, title-conflict, and rollback behavior.
@@ -163,5 +163,27 @@ as an achieved result. No execution or benchmark has been performed for this pla
 
 ## Learnings and results
 
-None yet. Record baseline/candidate evidence, visibility proof, code-size delta,
-and any reason for stopping here during authorized execution.
+Delivered. The shared lookup in `NoteTitlePlacementRules.requireNoSoftDeletedTitleAt`
+switched from a Spring Data query (`NoteRepository.findSoftDeletedByNotebookFolderAndTitleOrderByIdAsc`,
+full-entity hydration, default Hibernate AUTO flush) to a direct `EntityManager`
+query via the existing `EntityPersister.createQuery` helper, selecting only the
+matched note's `id`, with `FlushModeType.COMMIT` and `setMaxResults(1)`. The
+now-unused repository method was removed.
+
+Baseline median 11,876.320 ms, candidate median 3,064.883 ms (1,000 existing /
+1,000 additions, completed HTTP time, three runs each) — a 74.2% reduction,
+well past the required >50%. Formatted production diff: 23 insertions / 29
+deletions, net **−6** lines across the two touched files; no new production
+file. Full detail and the reproduction command are recorded in
+[Additions title-check simplification](../../../docs/notebook-publication-profiling.md#additions-title-check-simplification).
+
+Visibility proof: added `NoteTitlePlacementRulesFlushVisibilityTest` (real
+Hibernate/MySQL Unit Test database, no mocking, no internal test-only API),
+proving a same-transaction soft-delete performed via `NoteService.destroy(...)`
+is still detected by the new `FlushModeType.COMMIT` query with no intervening
+query — `destroy()` itself performs an ordinary AUTO-flush query before
+returning, which is why visibility holds. Existing `SoftDeletedTitleConflictMvcTest`
+and `NotebookGitDeletedDestinationControllerTest` pass unchanged with their
+original assertions. Full backend suite (481 test classes) passes.
+
+A fresh `dough-post-change-refactor` pass found no candidates: `none — already clean`.
