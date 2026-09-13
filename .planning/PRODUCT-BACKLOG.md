@@ -14,8 +14,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Exclude trashed notes from commissioned learning reports](quick/116-learning-report-excludes-trashed-notes/PLAN.md)
-
 ## Backlog list
 
 - [Find and recover previously trashed notes through web navigation](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-34) — SEED-009
