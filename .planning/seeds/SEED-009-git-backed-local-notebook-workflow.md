@@ -159,11 +159,14 @@ data; invalid or ambiguous changes must not silently discard work.
 
 ### 21. Keep web saves in an append-only Git history
 
+Plan: [Append-only web content saves](../quick/118-append-only-web-content-saves/PLAN.md)
+
 - **Goal:** A notebook owner editing an existing ordinary note's content on
   the web can rely on each accepted Git revision remaining in history, so a
   later local pull retains the sequence of saved changes.
 - **Status:** Refined on 2026-09-13 at the owner's request for narrow scope,
-  explicitly excluding deletion and Trash. No executable plan yet.
+  explicitly excluding deletion and Trash. Slice plan linked above;
+  implementation has not started.
 
 #### Scope
 
