@@ -279,6 +279,16 @@ export async function waitForFile(filePath, timeoutMs = 5000) {
   }
 }
 
+export async function waitForGone(filePath, timeoutMs = 5000) {
+  const deadline = Date.now() + timeoutMs
+  while (existsSync(filePath)) {
+    if (Date.now() >= deadline) {
+      throw new Error(`timed out waiting for ${filePath} to be gone`)
+    }
+    await new Promise((resolve) => setTimeout(resolve, 20))
+  }
+}
+
 export async function waitForOwnedPids(pidsFile, timeoutMs = 3_000) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {

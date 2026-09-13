@@ -29,9 +29,11 @@ import {
   recordingMysql,
   runConfiguredStart,
   waitForFile,
+  waitForGone,
 } from './sut-isolated-fixtures.mjs'
 import { makeStartSpy } from './sut-start-fixtures.mjs'
 import { WORKTREE_ID_PATTERN } from './worktree-identity.mjs'
+import { retirementAdmissionGatePath } from './worktree-retirement-admission.mjs'
 
 const sutStartHref = new URL('./sut-start.mjs', import.meta.url).href
 const startFixturesHref = new URL('./sut-start-fixtures.mjs', import.meta.url)
@@ -123,6 +125,7 @@ test('overlapping SUT and backend first-use publish one identity with distinct p
   t.after(() => sut.kill())
 
   await waitForFile(`${checkout.root}/.worktree.local.json`)
+  await waitForGone(retirementAdmissionGatePath(checkout.root))
   const backend = runLauncher(checkout, { env: { FAKE_SCHEMA_MISSING: '1' } })
   assert.equal(backend.status, 0, outputOf(backend))
   assert.doesNotMatch(outputOf(backend), /Allocated new worktree environment/)
