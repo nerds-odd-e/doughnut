@@ -223,11 +223,17 @@ This exposes no stored authority and performs no legacy data migration.
 
 ### 4. Folder location controls active participation
 Type: Behavior
-Status: planned
+Status: done
 Size: 5–10 minutes; change the prepared condition owners together.
 Proof: Existing public Move boundary moves a learned note into/out of a trash
 folder; public search/recall/assimilation/reference observations change together
 while history, independent preferences, and direct access remain intact.
+
+Activated the derived membership in object, JPA, native, and folder-search
+availability, and added the current-note trash warning without changing the API
+shape. `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed with a
+public Move scenario covering participation and retained data; `CURSOR_DEV=true
+nix develop -c pnpm frontend:test` passed with mounted trash nodes warning proof.
 
 Activate membership in object/JPA/native predicates atomically. Include folder
 search exclusion and the derived note warning in the current view. Generate API

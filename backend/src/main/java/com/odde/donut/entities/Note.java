@@ -30,11 +30,12 @@ import org.springframework.lang.NonNull;
 @JsonPropertyOrder({"noteTopology", "content"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
-  public static final String JPA_AVAILABLE = "n.deletedAt IS NULL";
-  public static final String NATIVE_SELECT =
-      "n.*, coalesce(n.folder_id in (select tf.id from trashed_folder tf), false)"
-          + " AS trashedInDatabase";
-  public static final String NATIVE_AVAILABLE = "n.deleted_at IS NULL";
+  private static final String NATIVE_TRASHED =
+      "coalesce(n.folder_id in (select tf.id from trashed_folder tf), false)";
+  public static final String JPA_AVAILABLE = "n.deletedAt IS NULL AND n.trashedInDatabase = false";
+  public static final String NATIVE_SELECT = "n.*, " + NATIVE_TRASHED + " AS trashedInDatabase";
+  public static final String NATIVE_AVAILABLE =
+      "n.deleted_at IS NULL AND " + NATIVE_TRASHED + " = false";
 
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 
@@ -90,7 +91,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean isAvailable() {
-    return deletedAt == null;
+    return deletedAt == null && !isTrashed();
   }
 
   @JsonIgnore

@@ -7,12 +7,15 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.dto.SearchTerm;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.testability.RelationshipLiteralSearchHits;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +26,10 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired NoteController noteController;
   @Autowired RelationController controller;
+  @Autowired SearchController searchController;
+  @Autowired RecallsController recallsController;
+  @Autowired AssimilationController assimilationController;
+  @Autowired MemoryTrackerController memoryTrackerController;
 
   @BeforeEach
   void setup() {
@@ -48,6 +55,75 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
     assertThat(result, hasSize(1));
     makeMe.refresh(mover);
     assertThat(mover.getFolder().getId(), equalTo(targetFolder.getId()));
+  }
+
+  @Test
+  void movingLearnedNoteIntoAndOutOfTrashChangesParticipationButPreservesItsData()
+      throws UnexpectedNoAccessRightException {
+    Timestamp now = makeMe.aTimestamp().of(1, 8).please();
+    testabilitySettings.timeTravelTo(now);
+    Notebook notebook = ownedNotebook("Knowledge");
+    Folder trash = makeMe.aFolder().notebook(notebook).name("_trash").please();
+    Folder descendant = makeMe.aFolder().parentFolder(trash).name("Old topics").please();
+    Note target = makeMe.aNote("Target topic").notebook(notebook).please();
+    Note referrer = makeMe.aNote("Referrer").notebook(notebook).please();
+    authorReferencingContent(referrer, "See [[Target topic]].");
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerFor(target).assimilatedAt(now).recallCount(1).please();
+    MemoryTracker removedTracker =
+        makeMe.aMemoryTrackerFor(target).spelling().removedFromTracking().please();
+
+    assertParticipation(target, referrer, tracker, true);
+    assertThat(
+        searchController.searchForRelationshipTarget(searchTerm("Old topics")).stream()
+            .noneMatch(
+                hit -> hit.getFolderId() != null && hit.getFolderId().equals(descendant.getId())),
+        equalTo(true));
+
+    controller.moveNoteToFolder(target, descendant);
+
+    assertThat(target.isAvailable(), equalTo(false));
+    assertParticipation(target, referrer, tracker, false);
+    assertThat(
+        memoryTrackerController.showMemoryTracker(removedTracker).getRemovedFromTracking(),
+        equalTo(true));
+    assertThat(memoryTrackerController.getRecallHistory(tracker), hasSize(1));
+
+    controller.moveNoteToNotebookRoot(target);
+
+    assertThat(target.isAvailable(), equalTo(true));
+    assertParticipation(target, referrer, tracker, true);
+  }
+
+  private void assertParticipation(
+      Note target, Note referrer, MemoryTracker tracker, boolean available)
+      throws UnexpectedNoAccessRightException {
+    assertThat(
+        RelationshipLiteralSearchHits.noteMatches(
+                searchController.searchForRelationshipTarget(searchTerm(target.getTitle())))
+            .stream()
+            .anyMatch(result -> result.getNoteTopology().getId() == target.getId()),
+        equalTo(available));
+    assertThat(
+        recallsController.recalling("Asia/Shanghai", 0).getToRepeat().stream()
+            .anyMatch(candidate -> candidate.getMemoryTrackerId() == tracker.getId()),
+        equalTo(available));
+    assertThat(
+        assimilationController.next("Asia/Shanghai").getCounts().getAssimilatedCountOfTheDay(),
+        equalTo(available ? 1 : 0));
+    List<WikiLink> wikiLinks = noteController.showNote(referrer).getWikiLinks();
+    assertThat(wikiLinks, hasSize(available ? 1 : 0));
+    if (available) {
+      assertThat(wikiLinks.getFirst().getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
+    }
+    assertThat(noteController.showNote(target).getNote().isTrashed(), equalTo(!available));
+  }
+
+  private SearchTerm searchTerm(String searchKey) {
+    SearchTerm searchTerm = new SearchTerm();
+    searchTerm.setSearchKey(searchKey);
+    searchTerm.setAllMyNotebooksAndSubscriptions(true);
+    return searchTerm;
   }
 
   @Test
