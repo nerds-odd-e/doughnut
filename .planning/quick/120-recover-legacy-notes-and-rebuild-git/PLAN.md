@@ -448,31 +448,67 @@ slice 11: `Note.JPA_AVAILABLE`/`NATIVE_AVAILABLE`/`isAvailable()` (drop
 `restore` (remove); `NoteController.deleteNote`/`undoDeleteNote` endpoints
 (remove); `Note.deletedAt` field + DB column (remove via new Flyway migration).
 
-### 11. The real upgrade retires note soft deletion and resets Git once
+### 11a. Register the validated data migrations as Flyway migrations
+Type: Behavior
+Status: done
+Sizing: 5–8 minutes, low confidence; full migration/test runtime exception.
+
+Behavior: Register the validated trash migration and baseline rebuild as new
+Flyway Java migrations above the current highest version. The trash migration
+runs `NoteLegacyTrashMigration.run`; the baseline rebuild runs
+`NotebookGitBaselineRebuild.rebuildNotebook` for every live notebook with an
+existing binding. No codebase changes to the live model, services, or
+controllers. The `deleted_at` column and its reads/writes remain intact.
+
+Proof: `backend:verify` with populated old data (legacy `deleted_at` rows +
+inconsistent bindings) confirms the Flyway chain runs the data migrations in
+order, migrates legacy deleted notes into `_trash`, and rebuilds live notebook
+baselines. Restart through Flyway preserves a completed replacement unchanged.
+Safe stop: Registered data migrations exist; live `deleted_at` code is unchanged.
+
+Learning: Created `V300000326__MigrateLegacyDeletedNotesToTrash.java` and
+`V300000327__RebuildNotebookGitBaselines.java` as Flyway `BaseJavaMigration`
+subclasses (both with `canExecuteInTransaction() = false` since the helpers
+manage their own transactions). V300000326 delegates to
+`NoteLegacyTrashMigration.run(connection, Instant.now())`. V300000327 queries all
+live notebooks with an existing `notebook_git_binding` row and calls
+`NotebookGitBaselineRebuild.rebuildNotebook` per notebook, failing fast on any
+error (Flyway retries on next startup; already-rebuilt baselines are replaced
+idempotently). `RecoverLegacyNotesAndRebuildGitMigrationsTest` (2 tests) proves
+the migration classes work end-to-end by invoking `migrate(Context)` directly
+against a fixture with a `deleted_at` note + inconsistent binding, then verifying
+trash placement and baseline rebuild. The baseline rebuild commit is
+content-deterministic (same tree → same commit hash), so a Flyway-tracked restart
+leaves the completed replacement byte-identical. Full backend suite preserved
+current behavior (the one pre-existing `FolderRepositoryTest` failure is
+unrelated). Refactor removed one unused import.
+
+### 11b. Remove note `deleted_at` and its live model/undo/title-resurrection paths
 Type: Behavior
 Status: planned
-Sizing: 5–8 minutes after preceding proof, low confidence; full migration/test
-runtime exception. Reassess before starting if the remaining inventory exceeds
-one proof loop or 10 minutes of implementation.
+Sizing: 5–8 minutes, low confidence; full suite wait exception.
 
-Behavior: Starting from the supported old database schema, the real application
-upgrade migrates all retained deleted notes, rebuilds live notebooks' baselines,
-and removes note `deleted_at` and its live model/undo/title-resurrection paths.
+Behavior: Drop `note.deleted_at` and its live model/undo/title-resurrection paths.
 Search, recall, assimilation and wiki eligibility now follow location alone;
 Portable snapshots still include trashed notes. New notes at old paths get new
 identities; ordinary occupied-destination conflicts remain.
 
-Register the validated SQL and JDBC reset using new versions above the current
-highest migration at execution time; never edit a committed migration. Order
-data placement, reset and schema removal so each retry can recover. Keep
-legacy schema available to any historical migration that requires it. Add no
-default-off placeholder or production gate: the owner's direct-migration
-decision applies when this product is later released.
+Register the column drop as a new SQL migration above the data migrations.
+Remove `Note.deletedAt`, `NoteService.destroy`/`restore`,
+`NoteController.deleteNote`/`undoDeleteNote`, `NoteTitlePlacementRules.
+requireNoSoftDeletedTitleAt`, the `FolderConstructionService.createFolder`
+deleted-note guard, and `Note.filterDeletedUnmodifiableNoteList`. Update
+`Note.JPA_AVAILABLE`/`NATIVE_AVAILABLE`/`isAvailable()` to location-only. Drop
+the `deletedAt IS NULL` term from the remaining `NoteRepository` queries and
+`NotebookGitRows.NOTES_QUERY`. Delete the dead
+`findByIdGreaterThanAndDeletedAtIsNullOrderByIdAsc`. Adapt all tests that
+reference `deleted_at`, `destroy`, `restore`, `deleteNote`, or `undoDeleteNote`
+to use trash or `permanentlyRemove` instead. Never edit a committed migration.
+Keep legacy schema available to any historical migration that requires it.
 
-Proof: Actual Flyway old-to-new chain with populated old data, followed by fresh
-JPA/controller load; backend:verify plus source/schema inventory proving no
-live note soft-delete concept. Restart through Flyway and prove it preserves a
-completed replacement unchanged. Regenerate API if changed and the database ERD.
+Proof: `backend:verify` plus source/schema inventory proving no live note
+soft-delete concept. Regenerate API if changed and the database ERD. Full
+backend suite green.
 Safe stop: Upgrade is fully usable and repeatable; production is untouched.
 
 ### 12. The rehearsed upgrade preserves all retained notebook data
