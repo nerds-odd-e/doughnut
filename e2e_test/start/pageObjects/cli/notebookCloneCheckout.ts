@@ -208,6 +208,52 @@ function notebookCloneCheckout() {
     ): Cypress.Chainable<null> {
       return expectCheckoutFileAt('cliCloneDestination', relativePath, content)
     },
+    expectCleanAppendOnlyChainFromOriginalHead(): Cypress.Chainable<null> {
+      return cy
+        .get<CliNotebookCheckoutState>('@cliNotebookOriginalCheckout')
+        .then((original) =>
+          cy
+            .get<CliNotebookCheckoutState>('@cliNotebookRebasedCheckout')
+            .then((pulled) => {
+              expect(original.status, 'checkout at A should be clean').to.equal(
+                ''
+              )
+              expect(pulled.status, 'checkout at C should be clean').to.equal(
+                ''
+              )
+              expect(pulled.head, 'C should differ from B').to.not.equal(
+                pulled.parent
+              )
+              expect(pulled.parent, 'B should differ from A').to.not.equal(
+                original.head
+              )
+              expect(
+                pulled.grandparent,
+                'accepted history should be A → B → C'
+              ).to.equal(original.head)
+              return cy.wrap(null)
+            })
+        )
+    },
+    expectCheckoutParentFile(
+      relativePath: string,
+      content: string
+    ): Cypress.Chainable<null> {
+      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+        cy
+          .task<string>('readCliNotebookCheckoutParentFile', {
+            checkoutDir,
+            relativePath,
+          })
+          .then((actual) => {
+            expect(
+              actual,
+              `${relativePath} should be readable at accepted parent B`
+            ).to.equal(content.trimEnd())
+            return cy.wrap(null)
+          })
+      )
+    },
     /** Uses the system `git` executable (ADR 0002): one branch, one parentless commit, no dirt. */
     expectCleanSingleCommitCheckoutOnBranch(
       branch: string

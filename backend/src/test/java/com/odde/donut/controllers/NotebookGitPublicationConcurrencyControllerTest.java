@@ -37,7 +37,7 @@ class NotebookGitPublicationConcurrencyControllerTest
       "---\ntype: Note\n---\nweb edit after publication";
 
   @Test
-  void twoQueuedWebSavesKeepOneFinalContentBatch() throws Exception {
+  void twoQueuedWebSavesAppendBothAcceptedRevisions() throws Exception {
     Fixture fixture = fixture();
     Instant firstAt = Instant.parse("2026-09-08T10:00:00Z");
     Instant secondAt = Instant.parse("2026-09-08T10:08:00Z");
@@ -57,7 +57,9 @@ class NotebookGitPublicationConcurrencyControllerTest
     assertThat(race.first().getNote().getContent(), is(FIRST_WEB_CONTENT));
     assertThat(race.second().getNote().getContent(), is(SECOND_WEB_CONTENT));
     assertAcceptedHistory(
-        fixture, List.of(SECOND_WEB_CONTENT, ACCEPTED_CONTENT), SECOND_WEB_CONTENT);
+        fixture,
+        List.of(SECOND_WEB_CONTENT, FIRST_WEB_CONTENT, ACCEPTED_CONTENT),
+        SECOND_WEB_CONTENT);
   }
 
   @Test

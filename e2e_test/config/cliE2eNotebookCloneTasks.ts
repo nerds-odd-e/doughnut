@@ -17,6 +17,7 @@ import { dirname, join, relative } from 'node:path'
 export interface CliNotebookCheckoutState {
   head: string
   parent: string
+  grandparent: string
   branch: string
   rootCommitCount: string
   status: string
@@ -108,14 +109,14 @@ function continueRebaseNoninteractively(checkoutDir: string): void {
   }
 }
 
-function firstParent(checkoutDir: string): string {
+function firstParent(checkoutDir: string, treeish = 'HEAD'): string {
   const parts = git(
     checkoutDir,
     'rev-list',
     '--parents',
     '-n',
     '1',
-    'HEAD'
+    treeish
   ).split(' ')
   return parts[1] ?? ''
 }
@@ -152,6 +153,7 @@ export function createCliE2eNotebookCloneTasks() {
       return {
         head: git(checkoutDir, 'rev-parse', 'HEAD'),
         parent,
+        grandparent: parent ? firstParent(checkoutDir, parent) : '',
         branch: git(checkoutDir, 'rev-parse', '--abbrev-ref', 'HEAD'),
         rootCommitCount: git(
           checkoutDir,
@@ -166,6 +168,19 @@ export function createCliE2eNotebookCloneTasks() {
         blobs: blobsAt(checkoutDir, 'HEAD'),
         parentBlobs: parent ? blobsAt(checkoutDir, parent) : {},
       }
+    },
+    readCliNotebookCheckoutParentFile({
+      checkoutDir,
+      relativePath,
+    }: {
+      checkoutDir: string
+      relativePath: string
+    }): string {
+      const parent = firstParent(checkoutDir)
+      if (!parent) {
+        throw new Error(`HEAD in ${checkoutDir} has no parent`)
+      }
+      return git(checkoutDir, 'show', `${parent}:${relativePath}`)
     },
     /** Relative file paths of the checkout, excluding `.git`, for canonical-tree assertions. */
     listNotebookCheckoutEntries(checkoutDir: string): string[] {

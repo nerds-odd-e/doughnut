@@ -14,12 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Migration evidence for widening {@code amendment_last_changed_at} and freezing prior eligibility.
- * Ordinary amendment batching stays covered by {@link
- * NotebookGitWebContentAmendmentControllerTest}.
+ * Migration evidence for widening {@code amendment_last_changed_at} and clearing prior metadata.
+ * Append-only content history stays covered by {@link NotebookGitWebContentHistoryControllerTest}.
  */
 class NotebookGitAmendmentClockPrecisionUpgradeTest
-    extends NotebookGitWebContentAmendmentControllerTestSupport {
+    extends NotebookGitWebContentHistoryControllerTestSupport {
 
   private static final String PRE_MIGRATION_DDL =
       """
@@ -129,7 +128,7 @@ class NotebookGitAmendmentClockPrecisionUpgradeTest
   }
 
   @Test
-  void afterUpgradeFreezeChangedSaveAppendsAndEstablishesPreciseEligibility() throws Exception {
+  void afterUpgradeFreezeChangedSaveAppendsWithoutReestablishingEligibility() throws Exception {
     Fixture fixture = fixture("UpgradeAppend");
     saveAt(fixture.noteId(), content("pre-upgrade"), T1000);
     NotebookGitBinding beforeFreeze =
@@ -170,7 +169,8 @@ class NotebookGitAmendmentClockPrecisionUpgradeTest
             transactionManager,
             () ->
                 notebookGitBindingRepository.findByNotebook_Id(fixture.notebookId()).orElseThrow());
-    assertThat(afterSave.getAmendmentNoteId(), equalTo(fixture.noteId()));
-    assertThat(afterSave.getAmendmentLastChangedAt().toInstant(), equalTo(T1000_600));
+    assertThat(afterSave.getAmendmentHead(), nullValue());
+    assertThat(afterSave.getAmendmentNoteId(), nullValue());
+    assertThat(afterSave.getAmendmentLastChangedAt(), nullValue());
   }
 }
