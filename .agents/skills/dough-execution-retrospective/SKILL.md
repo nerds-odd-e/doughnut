@@ -395,6 +395,7 @@ the order of supported findings:
 ### Occurrences
 
 - Execution: <stable execution identity>
+  - Timestamp: <ISO 8601 occurrence time with timezone | unknown>
   - Tool: <Codex, Cursor, Claude Code, or another identified tool>
   - Model: <model identifier, when available>
   - Open Dough release: <version | unknown | unreleased | modified>
@@ -408,6 +409,18 @@ transcript copies. The occurrence rows are the visible count; do not add a
 redundant total. Record one-off costs, useful practices, potentially general problems,
 and supported observations about this retrospective without claiming recurrence
 or generality the evidence does not establish.
+
+Record `Timestamp:` for every new occurrence: the time the reported event
+occurred, in ISO 8601 with a timezone (for example,
+`2026-09-13T14:30:00+08:00`). Use execution evidence, or read the current clock
+when observing the event live. If its time cannot be established, write
+`unknown`; do not substitute the retrospective or import time, a nearby commit
+time, or invent precision from a date alone. Preserve an available date or
+time range in Evidence when an exact timestamp is unknown. Preserve timestamps
+on rereview; fill an unknown only when new evidence supplies the occurrence
+time. A timestamp does not change execution identity or create another row.
+Older rows without timestamps remain interpretable; do not rewrite them merely
+on replay.
 
 Record the tool name for every new occurrence. Use the tool that executed the
 work, such as Codex, Cursor, or Claude Code, rather than the tool reviewing it.
