@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteDeleteDTO;
 import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.SearchTerm;
@@ -17,6 +18,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.RelationshipLiteralSearchHits;
 import java.sql.Timestamp;
@@ -260,5 +262,39 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
     assertThat(
         noteController.showNote(destReferrer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.AMBIGUOUS));
+  }
+
+  @Test
+  void moveFromTrashIntoOccupiedDestinationReportsOrdinaryConflictAndLeavesBothNotesIntact()
+      throws UnexpectedNoAccessRightException {
+    Notebook notebook = ownedNotebook("Knowledge");
+    Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
+    Note trashed = makeMe.aNote("Cells").folder(biology).please();
+    noteController.trashNote(trashed, leaveDeadLinks());
+    makeMe.refresh(trashed);
+    Folder trashParent = trashed.getFolder();
+    assertThat(trashed.isTrashed(), equalTo(true));
+    Note occupier = makeMe.aNote("Cells").folder(biology).please();
+    Integer occupierId = occupier.getId();
+
+    ApiException conflict =
+        assertThrows(ApiException.class, () -> controller.moveNoteToFolder(trashed, biology));
+
+    assertThat(
+        conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    makeMe.refresh(trashed);
+    makeMe.refresh(occupier);
+    assertThat(trashed.isTrashed(), equalTo(true));
+    assertThat(trashed.getFolder().getId(), equalTo(trashParent.getId()));
+    assertThat(occupier.getId(), equalTo(occupierId));
+    assertThat(occupier.getFolder().getId(), equalTo(biology.getId()));
+    assertThat(occupier.getTitle(), equalTo("Cells"));
+
+    controller.moveNoteToNotebookRoot(trashed);
+
+    makeMe.refresh(trashed);
+    assertThat(trashed.isTrashed(), equalTo(false));
+    assertThat(trashed.getFolder(), nullValue());
+    assertThat(occupier.getFolder().getId(), equalTo(biology.getId()));
   }
 }

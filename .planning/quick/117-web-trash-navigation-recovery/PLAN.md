@@ -135,7 +135,7 @@ missing-parent precondition rather than adding a parent-deletion workflow.
 
 ### 4. Keep recovery safe when the selected destination is occupied
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; validation already precedes mutation.
 
 Behavior: Independent active `Biology/Cells` occupies the requested destination

@@ -10,6 +10,7 @@ import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { describe, expect, it } from "vitest"
 import {
   confirmMovePopup,
+  makeFolderHit,
   makeNotebookHit,
   renderSearchForm,
   searchAndClickMoveUnder,
@@ -58,6 +59,49 @@ describe("SearchForm actions", () => {
       expect(conflictPopup?.type).toBe("confirm")
       expect(conflictPopup?.message).toContain(conflictMessage)
       expect(conflictPopup?.message).toContain("rename the note you are moving")
+    })
+
+    it("retains a usable destination interaction for retry after a conflict", async () => {
+      const note = MakeMe.aNote.please()
+      const occupiedFolderId = 42
+      const freeFolderId = 99
+      const moveSpy = mockSdkService(
+        RelationController,
+        "moveNoteToFolder",
+        []
+      ).mockResolvedValueOnce(
+        wrapSdkError({
+          status: 409,
+          errorType: "SOFT_DELETED_TITLE_CONFLICT",
+          message:
+            "A note with this title already exists here but was deleted.",
+        })
+      )
+
+      await searchAndClickMoveUnder(note, occupiedFolderId)
+      await confirmMovePopup()
+
+      expect(moveSpy).toHaveBeenCalledTimes(1)
+      expect(usePopups().popups.peek()?.[0]?.type).toBe("confirm")
+
+      usePopups().popups.done(false)
+      await flushPromises()
+
+      const searchInput = screen.getByPlaceholderText("Search")
+      expect(searchInput).toBeTruthy()
+
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+        makeFolderHit(freeFolderId, "Biology"),
+      ])
+      await typeInSearch(searchInput, "Bio")
+      fireEvent.click(screen.getByText("Move Under"))
+      await flushPromises()
+      await confirmMovePopup()
+
+      expect(moveSpy).toHaveBeenCalledTimes(2)
+      expect(moveSpy).toHaveBeenNthCalledWith(2, {
+        path: { sourceNote: note.id, targetFolder: freeFolderId },
+      })
     })
   })
 
