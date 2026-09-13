@@ -12,6 +12,8 @@ import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class WebNoteContentSaveService {
+public class WebNoteEditService {
   private final NotebookGitStateLoader notebookGitStateLoader;
   private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
@@ -28,7 +30,7 @@ public class WebNoteContentSaveService {
   private final NotebookGitProjection projection;
   private final AcceptedSnapshotPersistence acceptedSnapshotPersistence;
 
-  public WebNoteContentSaveService(
+  public WebNoteEditService(
       NotebookGitStateLoader notebookGitStateLoader,
       NoteRepository noteRepository,
       AuthorizationService authorizationService,
@@ -44,8 +46,23 @@ public class WebNoteContentSaveService {
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
-  public Note save(
+  public Note saveContent(
       Integer noteId, Integer notebookId, AuthoredNoteDocument document, Timestamp updatedAt)
+      throws UnexpectedNoAccessRightException {
+    return edit(
+        noteId,
+        notebookId,
+        note -> authoredNoteDocumentPersistence.persist(note, document, updatedAt),
+        note -> "Edit note content: " + note.getTitle(),
+        updatedAt);
+  }
+
+  private Note edit(
+      Integer noteId,
+      Integer notebookId,
+      Consumer<Note> mutation,
+      Function<Note, String> commitMessage,
+      Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
     var lockedState = notebookGitStateLoader.findByNotebookIdForUpdate(notebookId);
     Note note =
@@ -55,7 +72,7 @@ public class WebNoteContentSaveService {
     }
     authorizationService.assertAuthorization(note);
     if (lockedState.isEmpty()) {
-      authoredNoteDocumentPersistence.persist(note, document, updatedAt);
+      mutation.accept(note);
       return note;
     }
 
@@ -68,7 +85,7 @@ public class WebNoteContentSaveService {
         throw new IllegalStateException("Accepted bundle main does not match its persisted head");
       }
       boolean acceptedTreeMatchedBeforeSave = acceptedTreeMatches(state, accepted);
-      authoredNoteDocumentPersistence.persist(note, document, updatedAt);
+      mutation.accept(note);
       if (!acceptedTreeMatchedBeforeSave) {
         return note;
       }
@@ -81,8 +98,8 @@ public class WebNoteContentSaveService {
               state.notebook().getReadmeContent(),
               state.folders(),
               NotebookExportRows.notes(state.liveNotes()));
-      String message = "Edit note content: " + note.getTitle();
-      acceptedSnapshotPersistence.persist(accepted, entries, binding, updatedAt, message);
+      acceptedSnapshotPersistence.persist(
+          accepted, entries, binding, updatedAt, commitMessage.apply(note));
     }
     return note;
   }

@@ -16,7 +16,7 @@ import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.WikiLinkRewriteService;
-import com.odde.donut.services.notebookGit.WebNoteContentSaveService;
+import com.odde.donut.services.notebookGit.WebNoteEditService;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +37,7 @@ class TextContentController {
   private final NoteRealmService noteRealmService;
   private final NoteReferenceService noteReferenceService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
-  private final WebNoteContentSaveService webNoteContentSaveService;
+  private final WebNoteEditService webNoteEditService;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public TextContentController(
@@ -47,7 +47,7 @@ class TextContentController {
       NoteRealmService noteRealmService,
       NoteReferenceService noteReferenceService,
       WikiLinkRewriteService wikiLinkRewriteService,
-      WebNoteContentSaveService webNoteContentSaveService,
+      WebNoteEditService webNoteEditService,
       CanonicalDonutOrigin canonicalDonutOrigin) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -55,7 +55,7 @@ class TextContentController {
     this.noteRealmService = noteRealmService;
     this.noteReferenceService = noteReferenceService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
-    this.webNoteContentSaveService = webNoteContentSaveService;
+    this.webNoteEditService = webNoteEditService;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
@@ -112,7 +112,7 @@ class TextContentController {
     AuthoredNoteDocument document =
         AuthoredNoteContent.prepareDocumentForSave(contentDTO.getContent(), canonicalDonutOrigin);
     Note savedNote =
-        webNoteContentSaveService.save(
+        webNoteEditService.saveContent(
             note.getId(),
             note.getNotebook().getId(),
             document,

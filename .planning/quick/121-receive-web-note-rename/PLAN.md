@@ -1,9 +1,20 @@
 # Receive a web note rename locally
 
-Status: planned
+Status: in progress
 Source: [SEED-009 story 22](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-22)
 Created: 2026-09-13
-Authority: slice planning only; product implementation is not authorized.
+Authority: execution authorized by the owner on 2026-09-13.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut`
+- Originating branch: `main`
+- Claim commit: `0934f3adfb5419d91029016b1314afbb326eeae7`
+- Execution checkout: `/Users/terryyin/git/doughnut-worktrees/121-receive-web-note-rename`
+- Execution branch: `quick/121-receive-web-note-rename`
+- Integration target: `main`
+- CI observation: unavailable for this execution branch; `.github/workflows/ci.yml`
+  (`donut CI`) triggers pushes only on `main`.
 
 ## Goal and boundary
 
@@ -130,7 +141,7 @@ rollback-only test transaction for proof of the service's committed boundary.
 
 ### 1. Share the existing web note edit lifecycle
 Type: Structure
-Status: planned
+Status: done
 Enables: immediately following web rename receipt Behavior.
 Change: Generalize WebNoteContentSaveService to WebNoteEditService and keep
 its existing content entry behavior. Extract only its known existing-note
@@ -144,6 +155,8 @@ Sizing: 5 minutes active work hypothesis; full backend verification may exceed
 the target as the explicit required-test wait exception. If extraction reveals
 independent concepts or exceeds 10 active minutes, stop and refine this plan.
 Safe stop: content saves behave as before; web rename still has existing behavior.
+Execution proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+after implementation and again after the independent refactor on 2026-09-13.
 
 ### 2. Receive a web note rename through ordinary pull
 Type: Behavior
