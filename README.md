@@ -34,7 +34,9 @@ donut
 If the checkout has staged, unstaged, or untracked work, the command warns that
 those local changes are excluded and leaves them untouched. `donut notebook
 pull <directory>` changes the checkout and therefore still requires a clean
-local `main`.
+local `main`. Web edits to an existing note append the notebook's accepted Git
+history. After a web title change, pull fast-forwards that history, replaces the
+old Markdown path with the title-derived path, and keeps the checkout clean.
 
 ## [Donut Technology Stack](./docs/tech_stack.md)
 
