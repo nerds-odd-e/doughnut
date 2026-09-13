@@ -29,6 +29,7 @@ import org.springframework.lang.NonNull;
 @JsonPropertyOrder({"noteTopology", "content"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
+  public static final String JPA_AVAILABLE = "n.deletedAt IS NULL";
 
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 
@@ -78,6 +79,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
+
+  @JsonIgnore
+  public boolean isAvailable() {
+    return deletedAt == null;
+  }
 
   @OneToMany(mappedBy = "note")
   @JsonIgnore

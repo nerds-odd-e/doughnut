@@ -148,7 +148,7 @@ public class MemoryTrackerService {
   }
 
   public void updatePropertyKey(MemoryTracker memoryTracker, String newPropertyKey) {
-    if (memoryTracker.getNote().getDeletedAt() != null) {
+    if (!memoryTracker.getNote().isAvailable()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Memory tracker is deleted");
     }
     if (memoryTracker.isNoteLevelTracker()) {

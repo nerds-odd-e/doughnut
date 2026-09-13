@@ -120,7 +120,7 @@ public class AuthoredNoteReferenceInboundFacade {
    * viewer} to own or subscribe to the referrer's own notebook ({@link User#canReferTo}).
    */
   private boolean referrerVisibleToViewer(Note sourceNote, Note target, User viewer) {
-    if (sourceNote.getDeletedAt() != null) {
+    if (!sourceNote.isAvailable()) {
       return false;
     }
     Notebook referrerNotebook = sourceNote.getNotebook();

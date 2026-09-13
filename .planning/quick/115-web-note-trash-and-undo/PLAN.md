@@ -2,8 +2,19 @@
 
 Status: planned
 Source: [SEED-009, story 29](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-29)
-Authority: Refine this plan only. Product implementation, commit, and push have
-not been authorized. Story 34 remains second and unrefined.
+Authority: Plan execution, commit, and push authorized by the 2026-09-13
+`dough-execute-plan 115` instruction. Story 34 remains second and unrefined.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut`
+- Originating branch and claim: `main` at `423199b4b1`
+- Execution checkout: `/Users/terryyin/git/doughnut-115-web-note-trash-and-undo`
+- Execution branch: `codex/115-web-note-trash-and-undo`
+- Integration target: `main`
+- Push destination: `origin/codex/115-web-note-trash-and-undo`
+- CI observation: unavailable for this execution branch because `.github/workflows/ci.yml`
+  triggers pushes only to `main`; local slice proof remains required.
 
 ## Goal and scope
 
@@ -164,9 +175,13 @@ first exposed. No resplit is warranted solely by the withdrawn count.
 
 ### 1. Name existing object and JPA note availability
 Type: Structure
-Status: planned
+Status: done
 Size: 5–10 minutes; mechanical replacements within existing owners.
 Proof: Existing controller deletion/recovery, search, and assimilation results stay green.
+
+Delivered `Note.isAvailable()` and the shared legacy-only JPA predicate, including
+availability naming through the implicated object and query callers. Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
 
 Introduce shared legacy-only availability vocabulary for objects/JPA and route
 the classified active consumers through it. Preserve independent conditions and

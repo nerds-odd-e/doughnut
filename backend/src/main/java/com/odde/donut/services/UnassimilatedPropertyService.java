@@ -100,7 +100,7 @@ public class UnassimilatedPropertyService {
   }
 
   private boolean isHandled(Note destinationNote, User viewer) {
-    return destinationNote.getDeletedAt() == null
+    return destinationNote.isAvailable()
         && memoryTrackerRepository.existsCompletedNoteLevelUnderstandingTracker(
             destinationNote.getId(), viewer.getId());
   }

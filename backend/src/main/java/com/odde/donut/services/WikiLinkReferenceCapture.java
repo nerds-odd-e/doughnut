@@ -47,7 +47,7 @@ class WikiLinkReferenceCapture {
   Map<Integer, Map<Integer, List<String>>> liveResolvedInboundReferencesByNoteId(
       Set<Integer> targetNoteIds, User viewer) {
     Map<Integer, Map<Integer, List<String>>> byNoteId = new LinkedHashMap<>();
-    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+    WikiLinkRewriteSupport.forEachAvailableNoteInMoveSet(
         entityManager,
         targetNoteIds,
         note -> byNoteId.put(note.getId(), liveResolvedInboundReferences(note, viewer)));
@@ -62,7 +62,7 @@ class WikiLinkReferenceCapture {
   Map<Integer, Map<String, Note>> liveResolvedOutgoingWikiLinksToCoMovedNotes(
       Set<Integer> movedNoteIds, User viewer) {
     Map<Integer, Map<String, Note>> byNoteId = new LinkedHashMap<>();
-    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+    WikiLinkRewriteSupport.forEachAvailableNoteInMoveSet(
         entityManager,
         movedNoteIds,
         note ->
