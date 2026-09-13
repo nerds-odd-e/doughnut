@@ -166,8 +166,7 @@ final class WikiLinkRewriteSupport {
     }
     movedNote.replaceContent(AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin));
     movedNote.setUpdatedAt(updatedAt);
-    entityPersister.save(movedNote);
-    noteReferenceService.refreshDerivedIndexesForNote(movedNote);
+    noteReferenceService.refreshDerivedIndexesForNote(entityPersister.save(movedNote));
   }
 
   /**
