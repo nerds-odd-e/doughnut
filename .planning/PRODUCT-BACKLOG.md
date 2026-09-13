@@ -11,8 +11,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Publish new notes faster while preserving deleted-title conflicts](quick/112-publish-additions-with-simpler-title-check/PLAN.md) — SEED-018
-
 ## Backlog list
 
 - [Document the destroy()-order dependency behind the title-check flush optimization](quick/113-document-title-check-flush-dependency/PLAN.md)
