@@ -241,6 +241,13 @@ before that boundary is unfinished work, not the final architecture. Story 31
 owns its removal. The independent memory tracker deletion work is complete;
 tracker activity is now derived from the owning note's deletion state.
 
+For stories 29 and 31, the selected query direction is a read-only SQL view of
+trash-folder ancestry, shared by existing JPA/native query owners. It stores no
+membership state; object checks use current ancestry after moves. The isolated
+MySQL/Hibernate proof and implementation boundaries live in the
+[web trash plan](../quick/115-web-note-trash-and-undo/PLAN.md). This replaces the
+unresolved query-shape hypothesis, not the domain rule or deferred Git scope.
+
 #### Continuous behavior preservation
 
 Use gradual replacement in the spirit of the Strangler Application pattern.
@@ -373,7 +380,7 @@ Plan: [Web note trash and immediate undo](../quick/115-web-note-trash-and-undo/P
   changes. Removing discovery work narrows the story but does not remove its
   cross-cutting participation responsibility. Planning may expose further sizing
   concerns; keep behavior working through every replacement.
-- **Depends on:** Existing web placement/undo and the separately Taken tracker
+- **Depends on:** Existing web placement/undo and the completed tracker
   simplification. No new Git feature is a prerequisite.
 - **Safe stopping point:** Trash and immediate Undo work; direct access/Move and
   legacy recovery remain usable. Story 31 removes temporary legacy coexistence.
@@ -514,7 +521,7 @@ owner authorized slice planning and refinement if needed, not implementation.
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The owner replaced
 local-first delivery with web-driven stories 29, 34, 31, 32, and 33, after the
-separately Taken tracker simplification. Story 29 supplies an evaluable web loop;
+completed tracker simplification. Story 29 supplies an evaluable web loop;
 story 34 adds discovery of older trash; story 31 completes migration and removal
 of the old structure before convenience
 expansion. Neither relies on completing new Git move/rename or trash compatibility.
