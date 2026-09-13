@@ -278,10 +278,15 @@ renamed. This bounded naming consequence does not add a persistent title journal
 
 ### 7. Reuse deletion reference transformation
 Type: Structure
-Status: planned
+Status: done
 Size: ~5 minutes.
 Proof: NoteControllerDeleteReferenceHandlingTests and
 NoteControllerDeleteReduceToSourceTests retain their existing outcomes.
+
+Exposed `NoteService.applyNoteDeleteReferenceHandling` as the single selected
+policy operation while retaining legacy destroy timing and behavior.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed, including all
+existing reference-handling and reduce-to-source controller scenarios.
 
 Extract the current pre-delete policy invocation so legacy destroy and the next
 trash operation use the same code. Resolve/transmute references before moving
