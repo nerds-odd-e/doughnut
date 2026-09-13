@@ -1,10 +1,12 @@
 # Remove obsolete amendment eligibility from the runtime model
 
 Status: planned
-Source: bounded correction from the execution retrospective of
-[SEED-009 story 21](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-21)
-and plan 118. Reviewed implementation commits: `91062ce7f3`, `c41b56796e`,
-and `f237aa62c5`; backlog claim `f337c8425c` is provenance only.
+Source: bounded correction from the execution retrospective of completed
+SEED-009 story 21 and plan 118, recoverable at before-cleanup commit
+`66f0695099` in `.planning/seeds/SEED-009-git-backed-local-notebook-workflow.md`
+and `.planning/quick/118-append-only-web-content-saves/PLAN.md`. Reviewed
+implementation commits: `91062ce7f3`, `c41b56796e`, and `f237aa62c5`; backlog
+claim `f337c8425c` is provenance only.
 Authority: retrospective correction planning only; execution is not authorized.
 
 ## Goal and bounded outcome
