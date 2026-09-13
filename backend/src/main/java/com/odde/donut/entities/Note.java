@@ -30,6 +30,7 @@ import org.springframework.lang.NonNull;
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   public static final String JPA_AVAILABLE = "n.deletedAt IS NULL";
+  public static final String NATIVE_AVAILABLE = "n.deleted_at IS NULL";
 
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 

@@ -190,9 +190,13 @@ no folder-location behavior changes yet.
 
 ### 2. Name existing native note availability
 Type: Structure
-Status: planned
+Status: done
 Size: ~5 minutes; retain existing joins and shared fragments.
 Proof: Existing semantic search and recall/statistics controller results stay green.
+
+Delivered the shared fixed-alias native availability predicate across semantic
+search, embedding, structural-peer, and memory-tracker query owners. Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
 
 Use a short legacy-only native condition in the existing note/embedding/peer and
 tracker fragments. Reuse `byUserIdFrom`, `byUserIdAllFrom` and commissioned variants;

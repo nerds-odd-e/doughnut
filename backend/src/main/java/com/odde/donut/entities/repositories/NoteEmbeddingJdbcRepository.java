@@ -1,5 +1,6 @@
 package com.odde.donut.entities.repositories;
 
+import com.odde.donut.entities.Note;
 import java.util.Optional;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
@@ -139,7 +140,9 @@ public class NoteEmbeddingJdbcRepository {
             + ", q.qv, 'distance_measure=l2_squared') AS combined_dist "
             + "FROM note_embeddings ne "
             + "JOIN q "
-            + "JOIN note n ON n.id = ne.note_id AND n.deleted_at IS NULL "
+            + "JOIN note n ON n.id = ne.note_id AND "
+            + Note.NATIVE_AVAILABLE
+            + " "
             + "JOIN notebook nb ON nb.id = n.notebook_id AND nb.deleted_at IS NULL "
             + "LEFT JOIN ownership o ON o.id = nb.ownership_id "
             + "WHERE "
@@ -191,7 +194,9 @@ public class NoteEmbeddingJdbcRepository {
             + "SELECT n.id\n"
             + "FROM note n\n"
             + "LEFT JOIN last_embedding e ON e.note_id = n.id\n"
-            + "WHERE n.notebook_id = ? AND n.deleted_at IS NULL\n"
+            + "WHERE n.notebook_id = ? AND "
+            + Note.NATIVE_AVAILABLE
+            + "\n"
             + "  AND (e.last_updated IS NULL OR n.updated_at > e.last_updated)";
 
     return jdbcTemplate.query(sql, ps -> ps.setInt(1, notebookId), (rs, rowNum) -> rs.getInt(1));
