@@ -1,6 +1,6 @@
 # Find and recover trashed notes through web navigation
 
-Status: planned
+Status: done
 Source: [SEED-009, story 34](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-34), refined 2026-09-13.
 Authority: Slice planning and scope/refinement review only. Product execution
 is not authorized by this request.
