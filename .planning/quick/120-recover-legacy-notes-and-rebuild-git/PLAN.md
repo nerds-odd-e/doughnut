@@ -232,7 +232,7 @@ inherited helpers.
 
 ### 5. Recreating a permanently removed file creates a new note
 Type: Behavior
-Status: planned
+Status: done
 Sizing: about 5 minutes, medium confidence; backend wait exception.
 
 Behavior: After accepted deletion, a later valid publication recreates the same
@@ -240,6 +240,17 @@ path; it creates a new note identity without the deleted note's learning state.
 Proof: Publish/delete/recreate through existing controller helpers and read back
 IDs and learning association. Do not add support for new rename/move shapes.
 Safe stop: Path reuse cannot resurrect permanently removed data.
+
+Learning: Added `recreatesSamePathWithAFreshIdentityAfterAcceptedPermanentRemoval`
+to `NotebookGitCopyIdentityControllerTest` — the positive proof replacing the
+retired `NotebookGitDeletedDestinationControllerTest`. No production change was
+needed: slice 3's hard delete frees the path, and
+`NoteTitlePlacementRules.requireNoSoftDeletedTitleAt` only matches soft-deleted
+(`deletedAt IS NOT NULL`) notes, so same-path recreation works out of the box.
+The new test asserts only its unique delta (same-path recreation → fresh id,
+expected title/content, no inherited private associations); the deletion-
+permanence post-condition is already owned by the sibling
+`publishesALaterSameContentAdditionWithAFreshIdentityAfterAcceptedDeletion`.
 
 ### 6. A migrated notebook can receive a consistent new Git baseline
 Type: Behavior
