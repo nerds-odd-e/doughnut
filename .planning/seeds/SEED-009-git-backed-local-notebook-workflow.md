@@ -238,8 +238,8 @@ The selected sequence must reach story 31: all existing soft-deleted notes are
 migrated, note `deleted_at` and its old state-management paths are removed, and
 existing owners can use their retained data through trash. Temporary coexistence
 before that boundary is unfinished work, not the final architecture. Story 31
-owns its removal. The independent [memory tracker story](SEED-019-note-owned-memory-tracker-deletion-state.md#story-1)
-remains separately Taken and is assumed complete for this sequence.
+owns its removal. The independent memory tracker deletion work is complete;
+tracker activity is now derived from the owning note's deletion state.
 
 #### Continuous behavior preservation
 
