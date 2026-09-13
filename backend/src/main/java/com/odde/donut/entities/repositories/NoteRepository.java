@@ -163,7 +163,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
 
   String joinMemoryTracker =
       " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId"
-          + " AND rp.deletedAt IS NULL"
           + " AND "
           + MemoryTrackerQueryFragments.JPA_WHERE_NOTE_LEVEL_TRACKER
           + " AND "

@@ -21,7 +21,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
       "SELECT CASE WHEN COUNT(rp) > 0 THEN true ELSE false END FROM MemoryTracker rp"
           + " WHERE rp.note.id = :noteId"
           + " AND rp.user.id = :userId"
-          + " AND rp.deletedAt IS NULL"
+          + " AND rp.note.deletedAt IS NULL"
           + " AND "
           + MemoryTrackerQueryFragments.JPA_WHERE_NOTE_LEVEL_TRACKER
           + " AND "
@@ -32,10 +32,11 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "
+              + " JOIN note n ON rp.note_id = n.id "
               + " WHERE rp.user_id = :userId "
               + "   AND rp.assimilated_at > :since "
               + "   AND rp.removed_from_tracking IS FALSE "
-              + "   AND rp.deleted_at IS NULL"
+              + "   AND n.deleted_at IS NULL"
               + "   AND rp.type = 'UNDERSTANDING'",
       nativeQuery = true)
   List<MemoryTracker> findAllByUserAndAssimilatedAtGreaterThan(
@@ -65,8 +66,9 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "
+              + " JOIN note n ON rp.note_id = n.id "
               + " WHERE rp.user_id = :userId "
-              + "   AND rp.deleted_at IS NULL "
+              + "   AND n.deleted_at IS NULL "
               + "   AND rp.note_id = :noteId",
       nativeQuery = true)
   List<MemoryTracker> findByUserAndNote(Integer userId, @Param("noteId") Integer noteId);

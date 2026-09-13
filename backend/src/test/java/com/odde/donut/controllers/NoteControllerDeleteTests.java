@@ -149,6 +149,19 @@ class NoteControllerDeleteTests extends ControllerTestBase {
       }
 
       @Test
+      void shouldExcludeDeletedNotesFromAssimilationQueue()
+          throws UnexpectedNoAccessRightException {
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
+
+        assertThat(
+            userService
+                .getUnassimilatedNotes(currentUser.getUser())
+                .map(unit -> unit.note().getId())
+                .toList(),
+            not(hasItem(subject.getId())));
+      }
+
+      @Test
       void shouldRestoreMemoryTrackersWhenNoteIsRestored() throws UnexpectedNoAccessRightException {
         makeMe.aMemoryTrackerFor(subject).please();
 

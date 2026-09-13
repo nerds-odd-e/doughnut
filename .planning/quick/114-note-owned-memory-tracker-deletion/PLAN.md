@@ -194,7 +194,7 @@ fixture was reconciled to delete the note via `noteService.destroy(...)`.
 
 ### 4. Preserve assimilation eligibility through note-owned deletion
 Type: Structure
-Status: planned
+Status: done
 Sizing: 5–8 minutes of active work; three repositories share one eligibility rule.
 
 Update tracker existence/user-note/recent-assimilation reads and the note-level
@@ -207,6 +207,14 @@ Proof: `AssimilationControllerAssimilateTests`, spelling/commissioned assimilati
 controller tests, and existing property-unit/reference-gate tests preserve queue
 membership, prerequisite handling, and tracker identity on existing workflows.
 Safe stop: no duplicate trackers or new assimilation rules; writers still sync.
+
+Learning: `NoteServiceTest.restore_only_restores_memory_trackers_with_same_deleted_at_as_note`
+constructs a differing-timestamp legacy state (tracker `deletedAt` ≠ note `deletedAt`).
+After partial restore (note not deleted, one tracker retains `deletedAt`), `findByUserAndNote`
+now returns both trackers since it filters on note deletion. Reconciled only the
+storage-coupled third assertion to a direct `findByNote_IdIn` + Java-side `deletedAt`
+filter, preserving the fixture setup and legacy-state example for slice 6/7. Slice 6
+may further refine this into an owned observation.
 
 ### 5. Preserve recent learning and aggregate readouts
 Type: Structure

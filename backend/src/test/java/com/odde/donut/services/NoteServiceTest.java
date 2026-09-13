@@ -8,9 +8,11 @@ import static org.hamcrest.Matchers.nullValue;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.testability.MakeMe;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 class NoteServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired NoteService noteService;
-  @Autowired UserService userService;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
   void restore_only_restores_memory_trackers_with_same_deleted_at_as_note() {
@@ -50,6 +52,10 @@ class NoteServiceTest {
     assertThat(
         makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT2.getId()).getDeletedAt(),
         nullValue());
-    assertThat(userService.getMemoryTrackersFor(owner, note), hasSize(1));
+    assertThat(
+        memoryTrackerRepository.findByNote_IdIn(List.of(note.getId())).stream()
+            .filter(mt -> mt.getDeletedAt() == null)
+            .toList(),
+        hasSize(1));
   }
 }

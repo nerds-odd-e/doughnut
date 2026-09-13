@@ -15,7 +15,6 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
 
   String unassimilatedJoinPropertyTracker =
       " LEFT JOIN n.memoryTrackers mt ON mt.user.id = :userId"
-          + " AND mt.deletedAt IS NULL"
           + " AND mt.type <> com.odde.donut.entities.MemoryTrackerType.SPELLING"
           + " AND mt.propertyKey = i.propertyKey";
 
