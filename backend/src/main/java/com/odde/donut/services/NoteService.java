@@ -5,7 +5,6 @@ import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.NoteImageUploadDTO;
 import com.odde.donut.controllers.dto.NoteImageUploadResult;
 import com.odde.donut.entities.Image;
-import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
@@ -153,13 +152,9 @@ public class NoteService {
     note.setUpdatedAt(currentUTCTimestamp);
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
-    // Keep this query after merge: it AUTO-flushes the soft-delete before destroy returns.
-    // NoteTitlePlacementRules' COMMIT lookup depends on this order; see
-    // NoteTitlePlacementRulesFlushVisibilityTest.
-    for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
-      mt.setDeletedAt(currentUTCTimestamp);
-      entityPersister.merge(mt);
-    }
+    // Flush the soft-delete before destroy returns. NoteTitlePlacementRules' COMMIT lookup
+    // depends on this order; see NoteTitlePlacementRulesFlushVisibilityTest.
+    entityPersister.flush();
   }
 
   /**
@@ -192,22 +187,10 @@ public class NoteService {
   }
 
   public void restore(Note note, User viewer) {
-    Timestamp deletedAt = note.getDeletedAt();
-    if (deletedAt != null) {
-      for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
-        if (sameTimestamp(deletedAt, mt.getDeletedAt())) {
-          mt.setDeletedAt(null);
-          entityPersister.merge(mt);
-        }
-      }
+    if (note.getDeletedAt() != null) {
+      note.setDeletedAt(null);
+      entityPersister.merge(note);
     }
-    note.setDeletedAt(null);
-    entityPersister.merge(note);
-  }
-
-  private boolean sameTimestamp(Timestamp a, Timestamp b) {
-    if (a == null || b == null) return a == b;
-    return Math.abs(a.getTime() - b.getTime()) < 1000;
   }
 
   public NoteImageUploadResult uploadNoteImage(

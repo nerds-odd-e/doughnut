@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -189,7 +190,7 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
         memoryTrackerRepository.findById(fixture.tracker().getId()).orElseThrow();
     assertThat(retained.getNote().getId(), equalTo(fixture.existing().getId()));
     assertThat(retained.getType(), equalTo(MemoryTrackerType.SPELLING));
-    assertThat(retained.getDeletedAt(), nullValue());
+    assertThat(retained.isActive(), is(true));
     Note noteA = noteByTitle(notes, "A");
     Note noteB = noteByTitle(notes, "B");
     assertThat(noteA.getId(), not(equalTo(fixture.existing().getId())));

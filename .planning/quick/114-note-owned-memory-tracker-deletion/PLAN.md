@@ -276,7 +276,7 @@ mapping, builder setter, and synchronization remain functional.
 
 ### 7. Retire the duplicate persistence state with a populated SQL upgrade
 Type: Structure
-Status: planned
+Status: done
 Sizing: 8–10 minutes of active work assuming the index/data assessment supports
 a simple migration; required full-suite wait is the only timing exception.
 If it instead needs data reconciliation or a different uniqueness design,
@@ -296,6 +296,23 @@ controller scenarios retain identities, schedules, logs and removed preferences;
 `NoteTitlePlacementRulesFlushVisibilityTest`, soft-deleted-title MVC tests, and
 Git deletion/publication/rollback controller tests preserve current outcomes.
 Safe stop: final schema and application agree, with no tracker deletion column.
+
+Done — index/data assessment conclusion: the plain unique index
+`(user_id, note_id, type, property_key)` is behavior-preserving. The
+duplicate-key state allowed by the old functional index (two trackers, same
+key, one soft-deleted) is unreachable through application workflows:
+assimilation refuses to create a tracker when one with the same
+`(user, note, type, property_key)` already exists, note deletion mirrors to all
+trackers without removing rows, and tracker hard-delete removes rows entirely.
+The differing-timestamp `NoteServiceTest` legacy state was unreachable in
+production (no independent tracker soft-delete writer). Under the note-owned
+model, restore makes all trackers on the note available; the
+`removedFromTracking` preference is independent and preserved. Migration
+`V300000323` drops the old functional index, drops the `deleted_at` column,
+and adds the plain unique index. `NoteService.destroy` preserves the flush
+via explicit `entityPersister.flush()`. `NotePropertyTrackingBackfill` native
+queries switched to `JOIN note` + `n.deleted_at IS NULL`. ERD regenerated
+(unchanged — compact ERD shows only PK/FK).
 
 ## Promise ownership
 

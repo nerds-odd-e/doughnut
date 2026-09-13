@@ -27,13 +27,14 @@ public final class NotePropertyTrackingBackfill {
 
   private static final String EXISTING_PROPERTY_KEYS_QUERY =
       """
-      SELECT property_key
-      FROM memory_tracker
-      WHERE user_id = ?
-        AND note_id = ?
-        AND deleted_at IS NULL
-        AND type = 'UNDERSTANDING'
-        AND property_key <> ''
+      SELECT mt.property_key
+      FROM memory_tracker mt
+      INNER JOIN note n ON mt.note_id = n.id
+      WHERE mt.user_id = ?
+        AND mt.note_id = ?
+        AND n.deleted_at IS NULL
+        AND mt.type = 'UNDERSTANDING'
+        AND mt.property_key <> ''
       """;
 
   private static final String INSERT_INDEX =
@@ -42,12 +43,13 @@ public final class NotePropertyTrackingBackfill {
   private static final String TRACKER_EXISTS_QUERY =
       """
       SELECT 1
-      FROM memory_tracker
-      WHERE user_id = ?
-        AND note_id = ?
-        AND type = 'UNDERSTANDING'
-        AND property_key = ?
-        AND deleted_at IS NULL
+      FROM memory_tracker mt
+      INNER JOIN note n ON mt.note_id = n.id
+      WHERE mt.user_id = ?
+        AND mt.note_id = ?
+        AND mt.type = 'UNDERSTANDING'
+        AND mt.property_key = ?
+        AND n.deleted_at IS NULL
       LIMIT 1
       """;
 

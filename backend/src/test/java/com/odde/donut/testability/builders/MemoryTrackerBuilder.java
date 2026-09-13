@@ -90,9 +90,4 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     entity.setPropertyKey(propertyKey);
     return this;
   }
-
-  public MemoryTrackerBuilder deletedAt(Timestamp deletedAt) {
-    entity.setDeletedAt(deletedAt);
-    return this;
-  }
 }

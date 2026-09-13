@@ -171,12 +171,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return Fsrs.isNew(getStability());
   }
 
-  @Column(name = "deleted_at")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private Timestamp deletedAt;
-
   @JsonProperty("latestTutorFeedbackGrade")
   @Transient
   @Getter

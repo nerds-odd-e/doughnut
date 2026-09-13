@@ -2,16 +2,14 @@ package com.odde.donut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.is;
 
+import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.testability.MakeMe;
-import com.odde.donut.utils.TimestampOperations;
-import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,34 +26,39 @@ class NoteServiceTest {
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
-  void restore_only_restores_memory_trackers_with_same_deleted_at_as_note() {
-    Timestamp t1 = makeMe.aTimestamp().of(1, 0).please();
-    Timestamp t2 = TimestampOperations.addHoursToTimestamp(t1, 1);
-
+  void restore_makes_all_trackers_on_the_note_available_preserving_identities_and_preferences() {
     User owner = makeMe.aUser().please();
     Note note = makeMe.aNote().notebookOwnedBy(owner).please();
-    MemoryTracker mtDeletedAtT1 = makeMe.aMemoryTrackerFor(note).please();
-    MemoryTracker mtDeletedAtT2 = makeMe.aMemoryTrackerFor(note).spelling().please();
+    MemoryTracker understandingTracker = makeMe.aMemoryTrackerFor(note).please();
+    MemoryTracker spellingTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
+    MemoryTracker removedTracker =
+        makeMe.aMemoryTrackerFor(note).propertyKey("summary").removedFromTracking().please();
 
-    mtDeletedAtT1.setDeletedAt(t1);
-    makeMe.entityPersister.merge(mtDeletedAtT1);
-    note.setDeletedAt(t2);
-    mtDeletedAtT2.setDeletedAt(t2);
-    makeMe.entityPersister.merge(note);
-    makeMe.entityPersister.merge(mtDeletedAtT2);
-
+    noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
     noteService.restore(note, owner);
 
+    List<MemoryTracker> trackers = memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()));
+    assertThat(trackers, hasSize(3));
     assertThat(
-        makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT1.getId()).getDeletedAt(),
-        notNullValue());
+        trackers.stream()
+            .filter(mt -> mt.getId().equals(understandingTracker.getId()))
+            .findFirst()
+            .orElseThrow()
+            .isActive(),
+        is(true));
     assertThat(
-        makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT2.getId()).getDeletedAt(),
-        nullValue());
+        trackers.stream()
+            .filter(mt -> mt.getId().equals(spellingTracker.getId()))
+            .findFirst()
+            .orElseThrow()
+            .isActive(),
+        is(true));
     assertThat(
-        memoryTrackerRepository.findByNote_IdIn(List.of(note.getId())).stream()
-            .filter(mt -> mt.getDeletedAt() == null)
-            .toList(),
-        hasSize(1));
+        trackers.stream()
+            .filter(mt -> mt.getId().equals(removedTracker.getId()))
+            .findFirst()
+            .orElseThrow()
+            .isActive(),
+        is(false));
   }
 }
