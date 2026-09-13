@@ -92,16 +92,18 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
 
   String byUserIdFrom =
       " FROM memory_tracker rp "
+          + " JOIN note n ON rp.note_id = n.id "
           + " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
-          + "   AND rp.deleted_at IS NULL "
+          + "   AND n.deleted_at IS NULL "
           + "   AND rp.type <> 'COMMISSIONED' ";
 
   String byUserIdCommissionedFrom =
       " FROM memory_tracker rp "
+          + " JOIN note n ON rp.note_id = n.id "
           + " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
-          + "   AND rp.deleted_at IS NULL "
+          + "   AND n.deleted_at IS NULL "
           + "   AND rp.type = 'COMMISSIONED' ";
 
   String byUserIdWhere =

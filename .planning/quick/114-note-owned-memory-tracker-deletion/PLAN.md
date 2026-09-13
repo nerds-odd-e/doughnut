@@ -155,7 +155,7 @@ found. Carry into slices 6–7.
 
 ### 2. Select due learning work by note deletion
 Type: Structure
-Status: planned
+Status: done
 Sizing: 4–6 minutes of active work; scrutinized as one due-work selection rule.
 
 Change the ordinary and commissioned due-query fragments and their active count
@@ -166,6 +166,13 @@ Proof: `RecallsControllerTests`, `RecallsCommissionedLearningSessionTests` and
 `RecallServiceDueWorkTest`; active/deleted/removed fixtures preserve selected
 work and count results. Record representative before/after due-query plans.
 Safe stop: other reads and all writes retain the old synchronized column.
+
+Query plan observation (MySQL 8.4, isolated worktree DB, minimal fixture): both
+due queries keep their tracker-side index (`user_note_spelling_active` ref for
+ordinary; `idx_memory_tracker_user_next_recall_at` range for commissioned) and
+add one `note` PRIMARY KEY `eq_ref` lookup per surviving tracker row for
+`n.deleted_at IS NULL`. Tracker-side index choice unchanged; the added PK
+lookup is cheap. No material regression observed; no scale benchmark attempted.
 
 ### 3. Select batch question candidates by note deletion
 Type: Structure
