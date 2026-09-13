@@ -452,3 +452,37 @@ therefore retained trashed notes in report matching.
     inventory must classify each call site by domain purpose rather than assign
     the method one dominant category; focused proof should cover every
     incompatible category.
+
+## DD-041 — Coordinator applied a plan update to the main checkout instead of the Story Branch Mode worktree
+
+During planned execution under Story Branch Mode, the coordinator's
+file-editing tools default to the main checkout's working directory. A plan
+status update was applied to the main checkout's copy of the PLAN file rather
+than the execution worktree's copy, requiring a revert in the main checkout and
+re-application in the worktree before staging.
+
+### Occurrences
+
+- Execution: SEED-009 story 34 / quick/117-web-trash-navigation-recovery / c94efe0af3
+  - Timestamp: 2026-09-13T19:07:00+08:00
+  - Tool: Cursor
+  - Model: GLM 5.2
+  - Open Dough release: 0.3.16
+  - Evidence: after slice 1 implementation returned, the coordinator edited
+    `/Users/terryyin/git/doughnut/.planning/quick/117-web-trash-navigation-recovery/PLAN.md`
+    (main checkout) instead of
+    `/Users/terryyin/git/doughnut-worktrees/story-34/.planning/quick/117-web-trash-navigation-recovery/PLAN.md`
+    (execution worktree). `git -C /Users/terryyin/git/doughnut status --short
+    .planning/` showed the modification in main while the worktree's plan was
+    clean; the coordinator reverted main with `git checkout -- <path>` and
+    re-applied the edit in the worktree before staging. Slice 1's commit
+    (c94efe0af3) was made at 2026-09-13T19:08:45+08:00, bounding the slip to
+    just before it.
+  - Observed effect: one revert and one re-application of the same one-line
+    plan-status edit; no lost work and no contaminated commit, since the
+    mismatch was caught by checking both checkouts' status before staging.
+  - Inference: during Story Branch Mode, plan updates and other coordinator
+    edits must target the execution worktree path explicitly; the editing
+    tools do not bind to the worktree from an earlier `cd` used for shell
+    commands. Verifying which checkout a file edit landed in (as done here)
+    contains the slip to a cheap revert.
