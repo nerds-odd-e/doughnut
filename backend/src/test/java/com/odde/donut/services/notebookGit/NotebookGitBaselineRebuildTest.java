@@ -2,9 +2,11 @@ package com.odde.donut.services.notebookGit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -20,6 +22,7 @@ import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.MakeMe;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -148,12 +151,8 @@ class NotebookGitBaselineRebuildTest {
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId headObjectId =
           GitBundleTestReader.fetchHead(readBack, rebuiltBinding.getBundleBytes());
-      assertThat(headObjectId.getName(), equalTo(rebuiltBinding.getAcceptedGitObjectId()));
-
       try (RevWalk revWalk = new RevWalk(readBack)) {
         RevCommit commit = revWalk.parseCommit(headObjectId);
-        assertThat(commit.getParentCount(), equalTo(0));
-
         revWalk.reset();
         revWalk.markStart(commit);
         int commitCount = 0;
@@ -161,17 +160,12 @@ class NotebookGitBaselineRebuildTest {
           commitCount++;
         }
         assertThat(commitCount, equalTo(1));
-
-        // The new Portable tree equals the current DB content (readme, folders, live notes incl.
-        // the trash-located Pasta note).
-        List<PortableTreeEntry> foundEntries = readTreeEntries(readBack, commit);
-        List<PortableTreeEntry> expectedEntries = currentPortableTreeFromDb(notebook.getId());
-
-        List<PortableTreeEntry> sortedExpected =
-            expectedEntries.stream().sorted((a, b) -> a.path().compareTo(b.path())).toList();
-        assertThat(foundEntries, contains(sortedExpected.toArray(new PortableTreeEntry[0])));
       }
     }
+
+    // The new Portable tree equals the current DB content (readme, folders, live notes incl.
+    // the trash-located Pasta note).
+    assertBundleTreeEqualsCurrentContent(rebuiltBinding, notebook.getId());
 
     // Retained database identities/data unchanged.
     assertThat(
@@ -199,6 +193,100 @@ class NotebookGitBaselineRebuildTest {
         jdbcTemplate.queryForObject(
             "SELECT deleted_at FROM note WHERE id = ?", Timestamp.class, pastaId),
         equalTo(null));
+  }
+
+  @Test
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void aMiddleRunFailureLeavesEachPersistedBindingConsistentAndRetryFinishesTheReset()
+      throws Exception {
+    User owner = makeMe.aUser().please();
+    ownerUserIdsToClean.add(owner.getId());
+    Notebook notebookA =
+        makeMe.aNotebook().creatorAndOwner(owner).readmeContent("# A readme").please();
+    Folder folderA = makeMe.aFolder().notebook(notebookA).name("Recipes").please();
+    makeMe.aNote("Pasta").folder(folderA).content("Boil water").please();
+    Notebook notebookB =
+        makeMe.aNotebook().creatorAndOwner(owner).readmeContent("# B readme").please();
+    makeMe.aNote("Salad").content("Toss leaves").please();
+    Notebook notebookC =
+        makeMe.aNotebook().creatorAndOwner(owner).readmeContent("# C readme").please();
+    makeMe.aNote("Soup").content("Heat broth").please();
+
+    Instant initialCutover = Instant.parse("2026-09-04T10:15:30Z");
+    runBackfill(initialCutover);
+
+    NotebookGitBinding bindingA =
+        notebookGitBindingRepository.findByNotebook_Id(notebookA.getId()).orElseThrow();
+    NotebookGitBinding bindingB =
+        notebookGitBindingRepository.findByNotebook_Id(notebookB.getId()).orElseThrow();
+    String oldHeadA = bindingA.getAcceptedGitObjectId();
+    byte[] oldBundleA = bindingA.getBundleBytes();
+    Timestamp oldUpdatedAtA = bindingA.getUpdatedAt();
+    String oldHeadB = bindingB.getAcceptedGitObjectId();
+    byte[] oldBundleB = bindingB.getBundleBytes();
+    Timestamp oldUpdatedAtB = bindingB.getUpdatedAt();
+
+    makeMe.aNote("Bread").folder(folderA).content("Knead dough").please();
+    makeMe.aNote("Dressing").content("Whisk oil").please();
+
+    jdbcTemplate.update(
+        "DELETE FROM notebook_git_binding WHERE notebook_id = ?", notebookC.getId());
+
+    Instant failedRebuildTime = Instant.parse("2026-09-13T12:00:00Z");
+    SQLException failure =
+        assertThrows(SQLException.class, () -> runRebuild(notebookC.getId(), failedRebuildTime));
+    assertThat(
+        failure.getMessage(),
+        containsString("No notebook_git_binding row found for notebook_id=" + notebookC.getId()));
+
+    NotebookGitBinding bindingAAfterFailure =
+        notebookGitBindingRepository.findByNotebook_Id(notebookA.getId()).orElseThrow();
+    NotebookGitBinding bindingBAfterFailure =
+        notebookGitBindingRepository.findByNotebook_Id(notebookB.getId()).orElseThrow();
+    assertThat(bindingAAfterFailure.getAcceptedGitObjectId(), equalTo(oldHeadA));
+    assertThat(bindingAAfterFailure.getBundleBytes(), equalTo(oldBundleA));
+    assertThat(bindingAAfterFailure.getUpdatedAt(), equalTo(oldUpdatedAtA));
+    assertThat(bindingBAfterFailure.getAcceptedGitObjectId(), equalTo(oldHeadB));
+    assertThat(bindingBAfterFailure.getBundleBytes(), equalTo(oldBundleB));
+    assertThat(bindingBAfterFailure.getUpdatedAt(), equalTo(oldUpdatedAtB));
+    assertThat(
+        notebookGitBindingRepository.findByNotebook_Id(notebookC.getId()).isPresent(),
+        equalTo(false));
+
+    Instant retryTime = Instant.parse("2026-09-13T12:30:00Z");
+    runRebuild(notebookA.getId(), retryTime);
+    runRebuild(notebookB.getId(), retryTime);
+
+    NotebookGitBinding rebuiltA =
+        notebookGitBindingRepository.findByNotebook_Id(notebookA.getId()).orElseThrow();
+    NotebookGitBinding rebuiltB =
+        notebookGitBindingRepository.findByNotebook_Id(notebookB.getId()).orElseThrow();
+    assertThat(rebuiltA.getAcceptedGitObjectId(), not(equalTo(oldHeadA)));
+    assertThat(rebuiltA.getBundleBytes(), not(equalTo(oldBundleA)));
+    assertThat(rebuiltA.getUpdatedAt(), equalTo(Timestamp.from(retryTime)));
+    assertThat(rebuiltB.getAcceptedGitObjectId(), not(equalTo(oldHeadB)));
+    assertThat(rebuiltB.getBundleBytes(), not(equalTo(oldBundleB)));
+    assertThat(rebuiltB.getUpdatedAt(), equalTo(Timestamp.from(retryTime)));
+
+    assertBundleTreeEqualsCurrentContent(rebuiltA, notebookA.getId());
+    assertBundleTreeEqualsCurrentContent(rebuiltB, notebookB.getId());
+  }
+
+  private void assertBundleTreeEqualsCurrentContent(NotebookGitBinding binding, int notebookId)
+      throws Exception {
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, binding.getBundleBytes());
+      assertThat(headObjectId.getName(), equalTo(binding.getAcceptedGitObjectId()));
+      try (RevWalk revWalk = new RevWalk(readBack)) {
+        RevCommit commit = revWalk.parseCommit(headObjectId);
+        assertThat(commit.getParentCount(), equalTo(0));
+        List<PortableTreeEntry> foundEntries = readTreeEntries(readBack, commit);
+        List<PortableTreeEntry> expectedEntries = currentPortableTreeFromDb(notebookId);
+        List<PortableTreeEntry> sortedExpected =
+            expectedEntries.stream().sorted((a, b) -> a.path().compareTo(b.path())).toList();
+        assertThat(foundEntries, contains(sortedExpected.toArray(new PortableTreeEntry[0])));
+      }
+    }
   }
 
   private void runBackfill(Instant cutoverTime) throws Exception {

@@ -287,7 +287,7 @@ and `NotebookGitBaselineRebuild`; full backend suite stayed green.
 
 ### 7. Baseline replacement fails and retries without partial binding state
 Type: Behavior
-Status: planned
+Status: done
 Sizing: 5–8 minutes, low confidence; MySQL 8.4 proof and suite wait exception.
 
 Behavior: Failure during a multi-notebook rebuild leaves each persisted binding
@@ -302,6 +302,27 @@ final trees. The pre-JPA JDBC helper must explicitly roll back pending changes
 on error; restoring auto-commit must not accidentally commit them. Normal
 restart proof is completed with registered migration in slice 11.
 Safe stop: Reset lifecycle has evidence before integration into startup.
+
+Learning: Added a focused test
+`aMiddleRunFailureLeavesEachPersistedBindingConsistentAndRetryFinishesTheReset`
+to `NotebookGitBaselineRebuildTest` (test-only; no production change). Three
+notebooks A/B/C are backfilled so each gets a binding, then C's binding row is
+deleted. `rebuildNotebook(C)` builds C's bundle (the middle of the run) and
+fails at the `UPDATE` step with 0 rows affected → `SQLException`. The test
+proves A's and B's bindings are byte-for-byte unchanged (head, bundle,
+`updated_at`) after C's failure — each binding stays internally consistent with
+no partial new-bundle/old-head state, and the rollback plus
+`finally { setAutoCommit(original) }` committed nothing. Retrying
+`rebuildNotebook(A)` then `rebuildNotebook(B)` succeeds, replacing both with
+fresh single-root baselines whose Portable trees equal each notebook's current
+DB content (verified via bundle read-back). Per-notebook transaction ownership
+was chosen over a `rebuildAllNotebooks` entry point: `rebuildNotebook` already
+manages its own transaction and its only DB write is the `UPDATE`, so
+per-notebook atomicity plus independent retry is the simplest consistent
+contract. Normal-restart not-re-applied is deferred to slice 11. Refactor
+extracted the shared bundle read-back + tree-equality check into
+`assertBundleTreeEqualsCurrentContent`, now reused by both the happy-path and
+failure/retry tests.
 
 ### 8. A legacy deleted note migrates into recoverable web trash
 Type: Behavior
