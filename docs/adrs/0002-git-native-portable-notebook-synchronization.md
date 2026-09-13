@@ -211,8 +211,12 @@ boundaries meaningful for private identity while keeping the Portable tree
 ID-free.
 
 Once a move is accepted, Donut updates the existing Note or Folder entity.
-Identity-bound learning data stays attached. When a delete-and-create is
-accepted, the old entity's non-portable data stays with the deleted entity and
+Identity-bound learning data stays attached. This also applies to moves into
+or out of the trash folder defined by
+[ADR 0004 — Trash](./0004-okf-compatible-notebook-markdown-accepted.md#trash);
+the projected location determines trash status and learning availability.
+When a delete-and-create is accepted, the old entity's non-portable data stays
+with the deleted entity and
 is not transferred to the new one.
 
 ### Represent every accepted web edit in Git

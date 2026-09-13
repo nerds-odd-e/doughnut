@@ -2,6 +2,7 @@
 
 **Status:** Accepted  
 **Date:** 2026-09-01
+**Amended:** 2026-09-13 — portable trash rules, decided by Terry Yin
 **Decision makers:** Terry Yin  
 **Consulted:** None 
 
@@ -76,6 +77,20 @@ profile. Codec round-trips must be lossless for these rules.
   It addresses the note within that Portable notebook tree revision and
   changes when the note is renamed or moved. Donut note ID is server-side.
 
+### Trash
+
+- The notebook-root folder `_trash/` is reserved for trash. Its name is
+  matched case-insensitively; Donut creates it as `_trash`.
+- Notes beneath that folder, including all descendants, are trashed. Folder
+  location determines trash status.
+- Trashed notes remain ordinary Portable notebook files. Moving notes or
+  folders into or out of trash follows ordinary move and destination-collision
+  rules.
+- Trashed notes are excluded from search results and learning participation.
+  Memory trackers remain associated with the same note IDs, preserving
+  learning history and independent tracking preferences. Their availability
+  follows the note's trash status.
+
 ### Links and attachments
 
 - Portable inter-note links use wiki `[[portable-path]]` /
@@ -83,8 +98,9 @@ profile. Codec round-trips must be lossless for these rules.
   `[[Title-or-Alias]]` is a shorthand Portable path whose resolution scope is
   the source notebook's Portable notebook tree. `Notebook:Title-or-Alias`
   qualifies that scope with another notebook. Candidate matching includes note
-  display names and recognized aliases. A shorthand Portable path resolves only
-  when it identifies one destination under that scope. With no match it is
+  display names and recognized aliases. Trashed notes are excluded from
+  wiki-link destination matching and ambiguity checks. A shorthand Portable
+  path resolves only when it identifies one destination under that scope. With no match it is
   unresolved; with multiple matches it is ambiguous and therefore unresolved,
   and Donut asks for a longer path. The authored destination remains unchanged.
   Donut-authored wiki bundle-root path form has no leading `/`, except the
