@@ -257,7 +257,9 @@ coordinator, one at a time.
     it has already produced its own synchronous final report, generates this
     kind of post-completion notification noise.
 
-## DD-037 — Coordinator pre-filtered grep results for a test-only representation slice, missing sites the later field-removal slice had to fix
+## ODF-042 — Coordinator pre-filtered grep results for a test-only representation slice, missing sites the later field-removal slice had to fix
+
+Former local code: DD-037.
 
 A test-only representation slice (replacing soon-to-be-removed field
 references with owned observations) was delegated with a pre-filtered file
@@ -293,7 +295,9 @@ test fixes outside its primary schema-removal scope.
     misses, but shifting that work to the later slice blurs the slice's
     intended boundary.
 
-## DD-038 — Noncanonical proof handoffs force report-only coordinator round-trips
+## ODF-043 — Noncanonical proof handoffs force report-only coordinator round-trips
+
+Former local code: DD-038.
 
 Delegated slice work completed with the requested tests and evidence, but the
 agent returned proof in prose or near-matching YAML instead of the exact
@@ -318,7 +322,9 @@ report-only reformats after the substantive work was already complete.
     boundary even when a literal template is supplied; structured validation
     before accepting the handoff would remove this clerical loop.
 
-## DD-039 — Hard-limit refinement after completed work creates bookkeeping without a smaller remaining leaf
+## ODF-044 — Hard-limit refinement after completed work creates bookkeeping without a smaller remaining leaf
+
+Former local code: DD-039.
 
 The slice hard-limit protocol fired after the web Trash/Undo outcome and its
 proof were already complete, then fired again after its required fresh refactor
@@ -345,7 +351,9 @@ delivery shape.
     no implementation or proof remains, while retaining escalation for actual
     unfinished work.
 
-## DD-040 — Shared query classified by dominant purpose hid an incompatible production caller
+## ODF-045 — Shared query classified by dominant purpose hid an incompatible production caller
+
+Former local code: DD-040.
 
 The plan correctly preserved a live-note query for Git/export retention, but its
 consumer assessment treated that method as if all callers shared the same
@@ -372,7 +380,9 @@ therefore retained trashed notes in report matching.
     the method one dominant category; focused proof should cover every
     incompatible category.
 
-## DD-041 — Coordinator applied a plan update to the main checkout instead of the Story Branch Mode worktree
+## ODF-046 — Coordinator applied a plan update to the main checkout instead of the Story Branch Mode worktree
+
+Former local code: DD-041.
 
 During planned execution under Story Branch Mode, the coordinator's
 file-editing tools default to the main checkout's working directory. A plan
