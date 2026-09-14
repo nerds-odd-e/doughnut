@@ -105,44 +105,64 @@ validation and conflict lookup in one placement path exposed by
 authored-reference capture and rewriting. The full backend suite passed after
 the independent refactor pass.
 
-### 2. Trash a folder and recover its retained subtree through the web
+### 2. Place an authorized folder subtree in trash
 Type: Behavior
 Status: planned
-Behavior: Given `Research/Biology/Topic` with saved Readme/frontmatter, a direct
-note, a nested learned note and an empty nested folder, and no conflicting trash
-destination → confirm Trash, revisit after reload, then Move the subtree to
-notebook root → the same retained subtree is usable at `Topic`; active siblings
-are unchanged. While in trash, descendants are excluded from active use.
+Behavior: Given an owned active `Research/Biology/Topic` subtree with saved
+Readme/frontmatter, direct and nested notes, learning state, an empty descendant,
+and authored references → invoke folder Trash → the same subtree is placed at
+`_trash/Research/Biology/Topic`, its content and identities are retained without
+authored-reference rewriting, and participation follows trash ancestry.
 Change: Extend existing trash-parent construction for the folder's ancestor
 trail and use shared placement in an authorized transactional folder action in
-`NotebookController`/the existing folder domain owner. Reuse current folder
-Settings confirmation/loading/navigation/refresh and Move. API generation is
-part of this slice. Preserve references by doing no content transformation.
+`NotebookController`/the existing folder domain owner. API generation is part
+of this slice. Preserve references by doing no content transformation.
 Authorize and validate the source before creating trash parents. Root `_trash`
-and already-trashed folders are not eligible for the active-folder Trash action.
-Until slice 3 adds automatic collision naming, ordinary conflict refusal remains
+Until slice 4 adds automatic collision naming, ordinary conflict refusal remains
 a safe interim result; do not overwrite or merge.
-Proof: One scenario in `e2e_test/features/folder_organization/folder_trash.feature`
-owns Trash → reload/browse → Move recovery, observing the mirrored nested path,
-saved Readme/content, and unchanged active siblings. Reuse existing folder and
-Move steps. Controller tests drive the new Trash action with the retained-subtree
-fixture from slice 1: prove the action retains those identities, leaves internal
-and external authored references unchanged, and live reference/search/learning
-eligibility follows trash ancestry. Reuse slice 1's full data-preservation proof
-rather than repeat every assertion. Mounted-page tests own cancellation, action
-visibility and former-parent/root navigation. Controller authorization tests
-establish no writes for a foreign/mismatched source.
+Proof: Controller tests drive the new Trash action with the retained-subtree
+fixture from slice 1: prove mirrored-path placement, retained identities and
+content, unchanged internal and external authored references, and live
+reference/search/learning eligibility following trash ancestry. Reuse slice 1's
+full data-preservation proof rather than repeat every assertion. Controller
+authorization tests establish no writes for a foreign/mismatched source. Run
+the full backend suite and regenerate the API client.
 Atomicity: Use the real existing HTTP transaction boundary for parent creation
 and placement; propagate unexpected errors. Review that no mutation runs outside
 that transaction or in per-descendant transactions. Ordinary validation refusal
 must leave the source and earlier trash unchanged. Do not add failure injection,
 compensation machinery, or synthetic catch paths solely to test a loud failure.
-Sizing: target 5 minutes active work; UI/API integration remains the main
-uncertainty. Slice 1 owns shared placement and its detailed preservation proof.
-Nested paths follow the general rule; do not build a root-only mode. Apply the
-10-minute stop/refine limit rather than treating this estimate as an exception.
+Sizing: target 5 minutes active work. The initial combined attempt exceeded the
+10-minute hard limit after implementing the production API and generating the
+client; its new controller test had five compile errors, so no backend proof was
+accepted. Attempt-owned changes are parked in stash
+`c87d9055c1cd52bbcdb422f3e0ad6783b4490173`. This leaf finishes that coherent
+HTTP boundary and proof without repeating completed compatible implementation.
 
-### 3. Keep a colliding folder Trash separate from earlier trash
+### 3. Trash and recover the retained subtree through the web
+Type: Behavior
+Status: planned
+Behavior: Given `Research/Biology/Topic` with saved Readme/frontmatter, a direct
+note, a nested learned note and an empty nested folder, and no conflicting trash
+destination → confirm Trash in Folder Settings, revisit after reload, then Move
+the subtree to notebook root → the same retained subtree is usable at `Topic`;
+active siblings are unchanged.
+Change: Reuse the existing folder Settings confirmation/loading/navigation and
+sidebar refresh with the slice 2 API. After Trash, navigate to the former parent
+or notebook root. Reuse existing Move for recovery; add no Undo, Restore, or
+recovery endpoint. Root `_trash` and already-trashed folders do not offer the
+active-folder action.
+Proof: Mounted-page tests own cancellation, action visibility, loading, and
+former-parent/root navigation. One scenario in
+`e2e_test/features/folder_organization/folder_trash.feature` owns Trash →
+reload/browse → Move recovery, observing the mirrored nested path, saved
+Readme/content, and unchanged active siblings. Reuse existing folder and Move
+steps. Run the full frontend suite and the focused E2E feature.
+Sizing: target 5 minutes active work. The parked combined attempt already has a
+passing focused mounted-page test; this leaf owns the missing full frontend and
+complete browser-journey proof.
+
+### 4. Keep a colliding folder Trash separate from earlier trash
 Type: Behavior
 Status: planned
 Behavior: `_trash/Biology` and `_trash/Biology (3)` exist → Trash active `Biology`
@@ -171,12 +191,13 @@ local work owned by this behavior, not a separately deliverable subsystem.
 
 | Promise | Owner |
 | --- | --- |
-| Complete web Trash/revisit/Move recovery, nested original path, parent/root navigation | Slice 2 E2E and mounted-page observations |
-| Readme/frontmatter, content, identity, learning history/preferences, empty descendants | Slice 1 shared-placement controller proof; slice 2 new-action identity checks and representative content/Readme in E2E |
+| Complete web Trash/revisit/Move recovery, nested original path, parent/root navigation | Slice 3 E2E and mounted-page observations |
+| Readme/frontmatter, content, identity, learning history/preferences, empty descendants | Slice 1 shared-placement controller proof; slice 2 new-action identity checks and slice 3 representative content/Readme in E2E |
 | Location-driven search/learning/wiki eligibility; authored links and derived references remain coherent | Slice 2 public controller observations based on existing note-recovery tests |
-| Permission, cancellation, active-source constraint, transactional mutation boundary | Slice 2 controller/mounted tests and transaction-boundary inspection |
-| Earlier trash untouched; whole-folder first-free suffix; suffix survives Move | Slice 3 E2E/controller observations |
-| Ordinary folder Move/reference rewriting/conflicts and note Trash/Undo preserved | Slice 1/3 existing regressions plus full backend checks during behavior slices |
+| Permission, active-source constraint, transactional mutation boundary | Slice 2 controller tests and transaction-boundary inspection |
+| Cancellation and active-action visibility | Slice 3 mounted-page observations |
+| Earlier trash untouched; whole-folder first-free suffix; suffix survives Move | Slice 4 E2E/controller observations |
+| Ordinary folder Move/reference rewriting/conflicts and note Trash/Undo preserved | Slice 1/4 existing regressions plus full backend checks during behavior slices |
 
 Run repo tooling with `CURSOR_DEV=true nix develop -c`:
 
@@ -203,11 +224,11 @@ story from the backlog, authorize execution, commit, push, or release.
 
 ## Remaining concerns and current evidence
 
-- Slice 2 has the highest sizing uncertainty: a new action must integrate with
-  the existing page, generated client, and real recovery journey. Slice 1 removes
-  the identified placement preparation and owns detailed data-preservation proof.
-  Do not create extra endpoints or UI modes to split the journey. If active work exceeds 10 minutes, stop with concrete
-  evidence and refine the remaining work rather than broadening this plan.
+- The original slice 2 combined the transactional HTTP behavior with mounted UI
+  and a browser recovery journey, and exceeded the 10-minute hard limit. The
+  remaining work is now split by stable observable boundary: slice 2 owns the
+  HTTP contract and slice 3 owns the complete user journey. This changes proof
+  ownership, not the selected story or product behavior.
 - Slices 1–2 must preserve ordinary Move rewriting while Trash preserves authored
   spelling. Merely calling the existing complete Move method is insufficient.
   Inspect this distinction in the independent refactoring pass.
@@ -222,7 +243,8 @@ story from the backlog, authorize execution, commit, push, or release.
   slices extend the same rule; none creates a per-story or per-example engine.
   No architectural conflict was identified in this planning assessment.
 
-Refinement: retained the shared-placement slice, narrowed the web slice's proof
-to its new behavior, and folded the former name-selection Structure slice into
-the collision behavior. Three slices remain. No story promise or North Star
-direction changed; no implementation or product verification ran in refinement.
+Refinement: after the combined folder-trash slice overran, retained its compatible
+partial implementation and split its two proof loops into the transactional HTTP
+behavior and the mounted/E2E web journey. Four total slices now exist, one done
+and three remaining. The shared-placement and collision designs are unchanged;
+no story promise or North Star direction changed.
