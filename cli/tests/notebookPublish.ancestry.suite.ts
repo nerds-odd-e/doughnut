@@ -13,21 +13,12 @@ import {
   buildSourceRepo,
   bundleMain,
   cloneAsBoundCheckout,
+  commitFileChange,
   postCount,
   stubFetchForSubmission,
   stubFetchWithBundleFile,
 } from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
-
-function commitFileChange(
-  dir: string,
-  contents: string,
-  message: string
-): void {
-  fs.writeFileSync(join(dir, 'note.md'), contents)
-  runGit(['add', 'note.md'], dir)
-  runGit(['commit', '--quiet', '-m', message], dir)
-}
 
 function commitRelatedNoteChanges(
   dir: string,

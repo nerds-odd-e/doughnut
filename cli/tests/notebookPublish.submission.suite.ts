@@ -9,10 +9,13 @@ import {
   runGit,
 } from './notebookClone.testHelpers.js'
 import {
+  STALE_HEAD_MESSAGE,
   buildSourceRepo,
   bundleMain,
   cloneAsBoundCheckout,
+  commitFileChange,
   localGitObservation,
+  postCount,
   rejectionPost,
   stubFetchForSubmission,
 } from './notebookPublish.testHelpers.js'
@@ -84,11 +87,9 @@ export function describeNotebookPublishSubmission(): void {
 
     test('a 409 ApiError reports the reason and preserves dirty local state', async () => {
       const workDir = ctx.getWorkDir()
-      const message =
-        "expectedHead no longer matches the notebook's current accepted head."
       const { dir } = setUpEligibleCheckoutWithPostResponse(
         workDir,
-        rejectionPost(409, message, 'RESOURCE_CONFLICT')
+        rejectionPost(409, STALE_HEAD_MESSAGE, 'RESOURCE_CONFLICT')
       )
       fs.writeFileSync(join(dir, 'note.md'), '# dirty tracked edit\n')
       fs.writeFileSync(join(dir, 'untracked.md'), '# dirty untracked note\n')
@@ -101,8 +102,45 @@ export function describeNotebookPublishSubmission(): void {
         1,
         `donut: warning: ${dir} has uncommitted changes (2 files not clean, including untracked files) — publishing committed main; local changes are not included.`
       )
-      expect(ctx.getErrorSpy()).toHaveBeenNthCalledWith(2, `donut: ${message}`)
+      expect(ctx.getErrorSpy()).toHaveBeenNthCalledWith(
+        2,
+        `donut: ${STALE_HEAD_MESSAGE}`
+      )
       expect(localGitObservation(dir)).toEqual(before)
+    })
+
+    test('a multi-commit range whose expectedHead is stale after a competing web save reports the conflict once and leaves the local chain intact', async () => {
+      const workDir = ctx.getWorkDir()
+      const { dir, fetchMock } = setUpEligibleCheckoutWithPostResponse(
+        workDir,
+        rejectionPost(409, STALE_HEAD_MESSAGE, 'RESOURCE_CONFLICT')
+      )
+      const acceptedAtA = runGit(['rev-parse', 'main'], dir)
+      const firstEdit = '# hello notebook (edit 1)\n'
+      const secondEdit = '# hello notebook (edit 2)\n'
+      commitFileChange(dir, firstEdit, 'edit note 1')
+      const middle = runGit(['rev-parse', 'main'], dir)
+      commitFileChange(dir, secondEdit, 'edit note 2')
+      const tip = runGit(['rev-parse', 'main'], dir)
+
+      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+        ProcessExitForTest
+      )
+      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+        `donut: ${STALE_HEAD_MESSAGE}`
+      )
+      expect(postCount(fetchMock)).toBe(1)
+      const postCall = fetchMock.mock.calls.find(
+        ([, init]: [unknown, { method?: string } | undefined]) =>
+          init?.method === 'POST'
+      )
+      expect(postCall?.[0]).toContain(
+        `/notebooks/42/git-bundle?expectedHead=${encodeURIComponent(acceptedAtA)}`
+      )
+      expect(runGit(['rev-parse', 'main'], dir)).toBe(tip)
+      expect(runGit(['rev-parse', 'main^'], dir)).toBe(middle)
+      expect(runGit(['rev-parse', 'main^^'], dir)).toBe(acceptedAtA)
+      expect(fs.readFileSync(join(dir, 'note.md'), 'utf8')).toBe(secondEdit)
     })
 
     test('a rejection without an ApiError message reports its HTTP status', async () => {

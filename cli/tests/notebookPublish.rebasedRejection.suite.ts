@@ -8,6 +8,7 @@ import {
   runGit,
 } from './notebookClone.testHelpers.js'
 import {
+  STALE_HEAD_MESSAGE,
   bundleGetResponse,
   bundleMain,
   postCount,
@@ -23,8 +24,6 @@ import {
 } from './notebookPull.rebase.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 
-const STALE_HEAD_MESSAGE =
-  "expectedHead no longer matches the notebook's current accepted head."
 const DRIFT_MESSAGE =
   "The notebook's current Portable content differs from accepted main; refresh the checkout before publishing."
 

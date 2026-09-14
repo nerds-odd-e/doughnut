@@ -1,7 +1,8 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 12 done; slice 10 still awaiting product answer (skipped);
-slice 13 next. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
+Status: in progress — all executable slices done (1–9, 11–13). Slice 10 still
+awaits the unanswered deletion/recreation identity decision and remains
+non-executable until answered. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
 ## Planned-execution identity
 
@@ -291,12 +292,15 @@ intact local A→middle→T chain on retry.
 
 ### 13. Preserve a competing accepted web save
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Web save wins while the local range still expects A → publish → stale
 rejection preserves the winning web history and the unmodified local range.
 Proof: Extend current concurrency and CLI stale-response fixtures to multiple
 commits. No rebase, queue, or automatic resubmission against a changed head.
 Estimate: 3–5 minutes active work.
+Learnings: No production change. Existing expectedHead check covers multi-commit
+local ranges; controller + CLI proofs show web history retained, local
+A→middle→tip unmodified, single POST, no rebase/resubmit.
 
 ## Proof and execution discipline
 
