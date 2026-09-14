@@ -99,10 +99,10 @@
 - Legacy DigitalOcean Packer artifact present (`infra/digital_ocean/packer.json`) — not the active prod path
 
 **CI Pipeline:**
-- GitHub Actions: `.github/workflows/ci.yml` (lint, backend/frontend/other unit tests, E2E, package artifacts)
-- Deploy: `.github/workflows/deploy.yml` (triggered by successful CI on `main`; GCS upload, conditional MIG deploy, health probe)
+- GitHub Actions: `.github/workflows/ci.yml` on every branch push (lint, backend/frontend/other unit tests, E2E, package artifacts)
+- Deploy: `.github/workflows/deploy.yml` on application tags selecting an exact tested `main` commit (GCS upload, conditional MIG deploy, health probe)
 - Related: `cli-release.yml`, `mig_status_check.yml`
-- Notifications: Slack webhook on CI or deploy failure (`SLACK_WEBHOOK_URL`); Discord webhook env present in CI but action commented out
+- Notifications: Slack webhook on CI or deploy failure (`SLACK_WEBHOOK_URL`); CI passes it only to its local failure-notification action
 - Auth to GCP in deploy: `GCP_CREDENTIALS` secret via `google-github-actions/auth`
 
 ## Environment Configuration
