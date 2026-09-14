@@ -1,7 +1,17 @@
 # Trash and recover a folder
 
-Status: planned; no implementation started. Authority: refinement and slice
-planning only. Source: [SEED-009 story 33](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33).
+Status: in progress; slice 1 delivered. Execution authorized on 2026-09-14.
+Source: [SEED-009 story 33](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33).
+
+Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
+`main`; execution checkout
+`/Users/terryyin/git/doughnut-worktrees/123-trash-and-recover-folder` on
+`quick/123-trash-and-recover-folder`, created from claim commit `5e9fe951f0`;
+integration target `main`.
+
+CI observation: unavailable for the execution branch. `.github/workflows/ci.yml`
+(`donut CI`) is push-triggered only for `main`, so the branch-bound observer
+required by execution cannot cover `quick/123-trash-and-recover-folder`.
 
 ## Goal and scope
 
@@ -71,7 +81,7 @@ journeys remain unfinished, not a commit boundary.
 
 ### 1. Share folder placement while preserving ordinary Move
 Type: Structure
-Status: planned
+Status: done
 Change: Expose the existing non-merge folder placement through its current
 relocation owner, separating placement from ordinary Move's reference capture
 and rewrite. Keep ordinary moves, conflict handling, explicit merges, and
@@ -88,6 +98,12 @@ Existing `NotebookFolderMoveControllerTest` and
 `NotebookFolderMoveWikiLinkRewriteControllerTest` preserve ordinary Move and
 reference rewriting. Run the full backend suite; no helper-level test surface.
 Sizing: about 5 minutes active work; existing behavior owns the regression proof.
+
+Delivered learning: `FolderMoveRelocation` now keeps same-notebook destination
+validation and conflict lookup in one placement path exposed by
+`FolderRelocationService`; ordinary Move alone surrounds that placement with
+authored-reference capture and rewriting. The full backend suite passed after
+the independent refactor pass.
 
 ### 2. Trash a folder and recover its retained subtree through the web
 Type: Behavior

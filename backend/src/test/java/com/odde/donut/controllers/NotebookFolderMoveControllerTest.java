@@ -2,21 +2,81 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookFolderMoveControllerTest extends NotebookFolderManagementControllerTestBase {
+
+  @Autowired MemoryTrackerController memoryTrackerController;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
+
+  @Test
+  void movesRetainedTrashedSubtreeBackToActiveParticipation()
+      throws UnexpectedNoAccessRightException {
+    Timestamp now = makeMe.aTimestamp().of(1, 8).please();
+    testabilitySettings.timeTravelTo(now);
+    Notebook notebook = ownedNotebook();
+    Folder trash = ownedFolder(notebook, "_trash");
+    Folder retained =
+        makeMe.aFolder().parentFolder(trash).name("Biology").readmeContent("# Biology").please();
+    Folder emptyDescendant = makeMe.aFolder().parentFolder(retained).name("Empty").please();
+    Note directNote = makeMe.aNote("Cells").folder(retained).please();
+    Folder nested = makeMe.aFolder().parentFolder(retained).name("Nested").please();
+    Note learnedNote = makeMe.aNote("Genetics").folder(nested).please();
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerFor(learnedNote).assimilatedAt(now).recallCount(1).please();
+    MemoryTracker stoppedTracker =
+        makeMe.aMemoryTrackerFor(learnedNote).spelling().removedFromTracking().please();
+
+    assertThat(retained.isTrashed(), equalTo(true));
+    assertThat(directNote.isAvailable(), equalTo(false));
+    assertThat(tracker.isActive(), equalTo(false));
+    Integer retainedId = retained.getId();
+    Integer directNoteId = directNote.getId();
+    Integer learnedNoteId = learnedNote.getId();
+    Integer trackerId = tracker.getId();
+    Integer stoppedTrackerId = stoppedTracker.getId();
+
+    controller.moveFolder(notebook, retained, folderMove(null));
+
+    makeMe.refresh(retained);
+    makeMe.refresh(emptyDescendant);
+    makeMe.refresh(directNote);
+    makeMe.refresh(learnedNote);
+    MemoryTracker recoveredTracker = memoryTrackerRepository.findById(trackerId).orElseThrow();
+    assertThat(retained.getId(), equalTo(retainedId));
+    assertThat(retained.getParentFolder(), nullValue());
+    assertThat(retained.getReadmeContent(), equalTo("# Biology"));
+    assertThat(retained.isTrashed(), equalTo(false));
+    assertThat(emptyDescendant.getParentFolder().getId(), equalTo(retainedId));
+    assertThat(directNote.getId(), equalTo(directNoteId));
+    assertThat(directNote.isAvailable(), equalTo(true));
+    assertThat(learnedNote.getId(), equalTo(learnedNoteId));
+    assertThat(learnedNote.isAvailable(), equalTo(true));
+    assertThat(recoveredTracker.getNote().getId(), equalTo(learnedNoteId));
+    assertThat(recoveredTracker.isActive(), equalTo(true));
+    assertThat(memoryTrackerController.getRecallHistory(tracker), hasSize(1));
+    assertThat(
+        memoryTrackerRepository.findById(stoppedTrackerId).orElseThrow().getRemovedFromTracking(),
+        equalTo(true));
+  }
 
   @Test
   void movesChildFolderToNotebookRoot() throws UnexpectedNoAccessRightException {

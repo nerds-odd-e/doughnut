@@ -69,6 +69,11 @@ public class FolderRelocationService {
     return folderMoveRelocation.moveFolder(notebook, folder, request, destinationNotebook, viewer);
   }
 
+  public Folder placeFolderWithinNotebook(Notebook notebook, Folder folder, Folder newParent) {
+    return folderMoveRelocation.placeFolderWithinNotebook(
+        notebook, folder, newParent, testabilitySettings.getCurrentUTCTimestamp());
+  }
+
   public Folder renameFolder(
       Notebook notebook, Folder folder, FolderRenameRequest request, User viewer) {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
