@@ -1,8 +1,58 @@
 #!/bin/bash
 
-# Set the metadata server to the get projct id
-PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")
-BUCKET=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/attributes/BUCKET" -H "Metadata-Flavor: Google")
+set -euo pipefail
+
+METADATA_BASE_URL="http://metadata.google.internal/computeMetadata/v1"
+METADATA_HEADER="Metadata-Flavor: Google"
+HOSTS_FILE="${HOSTS_FILE:-/etc/hosts}"
+
+if ! DATABASE_PRIVATE_IP=$(curl -fsS \
+  "$METADATA_BASE_URL/instance/attributes/DATABASE_PRIVATE_IP" \
+  -H "$METADATA_HEADER"); then
+  echo "Error: DATABASE_PRIVATE_IP instance metadata is required" >&2
+  exit 1
+fi
+
+is_ipv4_address() {
+  local address=$1 octet
+  local -a octets
+
+  [[ "$address" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || return 1
+  IFS=. read -r -a octets <<<"$address"
+  for octet in "${octets[@]}"; do
+    [[ "$octet" =~ ^(0|[1-9][0-9]{0,2})$ ]] || return 1
+    ((10#$octet <= 255)) || return 1
+  done
+}
+
+if ! is_ipv4_address "$DATABASE_PRIVATE_IP"; then
+  echo "Error: DATABASE_PRIVATE_IP instance metadata must be a valid IPv4 address: <$DATABASE_PRIVATE_IP>" >&2
+  exit 1
+fi
+
+hosts_update=$(mktemp)
+awk -v database_private_ip="$DATABASE_PRIVATE_IP" '
+  {
+    routes_database = 0
+    for (field = 2; field <= NF; field += 1) {
+      if ($field == "db-server") {
+        routes_database = 1
+      }
+    }
+    if (!routes_database) {
+      print
+    }
+  }
+  END {
+    print database_private_ip "\tdb-server"
+  }
+' "$HOSTS_FILE" >"$hosts_update"
+cat "$hosts_update" >"$HOSTS_FILE"
+rm "$hosts_update"
+
+# Set the metadata server to get the project id.
+PROJECTID=$(curl -fsS "$METADATA_BASE_URL/project/project-id" -H "$METADATA_HEADER")
+BUCKET=$(curl -fsS "$METADATA_BASE_URL/instance/attributes/BUCKET" -H "$METADATA_HEADER")
 ARTIFACT="donut"
 VERSION="0.0.1-SNAPSHOT"
 

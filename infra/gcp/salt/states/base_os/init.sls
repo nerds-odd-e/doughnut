@@ -1,13 +1,3 @@
-/etc/hosts:
-  file.blockreplace:
-    - marker_start: "# BEGIN SALT MANAGED ZONE"
-    - marker_end: "# END SALT MANAGED ZONE"
-    - content: |
-        10.111.16.12      db-server
-    - append_if_not_found: True
-    - backup: '.bak'
-    - show_changes: True
-
 mysql-apt-config-install:
   cmd.run:
     - name: |

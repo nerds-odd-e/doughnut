@@ -13,6 +13,7 @@ ZONE="us-east1-b"
 MIG_NAME="doughnut-app-group"
 TEMPLATE_NAME="doughnut-app-debian12-zulu25-openai-mig-template"
 STARTUP_SCRIPT="${STARTUP_SCRIPT_PATH:-${SCRIPTPATH}/mig-zulu25-openai-app-instance-startup.sh}"
+DATABASE_PRIVATE_IP=$(bash "$SCRIPTPATH/read-production-database-private-ip.sh")
 
 echo "Updating MIG instance template with new startup script..."
 
@@ -50,7 +51,7 @@ gcloud compute instance-templates create $NEW_TEMPLATE_NAME \
   --scopes "userinfo-email,cloud-platform" \
   --machine-type e2-medium \
   --metadata-from-file startup-script=${STARTUP_SCRIPT} \
-  --metadata BUCKET=dough-01 \
+  --metadata BUCKET=dough-01,DATABASE_PRIVATE_IP="$DATABASE_PRIVATE_IP" \
   --tags mig-app-srv
 
 echo "New template created: $NEW_TEMPLATE_NAME"

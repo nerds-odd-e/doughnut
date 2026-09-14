@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+#
+# Unit tests for production database routing in the GCP MIG startup boundary.
+# Uses fake host commands and never contacts GCP.
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+STARTUP_SCRIPT="$REPO_ROOT/infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh"
+UPDATE_TEMPLATE_SCRIPT="$REPO_ROOT/infra/gcp/scripts/update-mig-startup-script.sh"
+CREATE_TEMPLATE_SCRIPT="$REPO_ROOT/infra/gcp/scripts/create-mig-app-instance-template.sh"
+REAL_BASH="$(command -v bash)"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+assert_equals() {
+	local expected=$1 actual=$2 message=$3
+	[[ "$actual" == "$expected" ]] || fail "$message — expected <$expected> got <$actual>"
+}
+
+write_startup_fakes() {
+	local fake_bin=$1
+	mkdir -p "$fake_bin"
+
+	cat >"$fake_bin/curl" <<'EOF'
+#!/bin/sh
+case "$*" in
+*'/project/project-id'*) printf 'test-project' ;;
+*'/instance/attributes/BUCKET'*) printf 'test-bucket' ;;
+*'/instance/attributes/DATABASE_PRIVATE_IP'*) printf '%s' "${FAKE_DATABASE_PRIVATE_IP:-}" ;;
+*'/service-accounts/default/token'*) printf '{"access_token":"test-token"}' ;;
+*'secretmanager.googleapis.com'*) printf '{"payload":{"data":"dGVzdC1zZWNyZXQ="}}' ;;
+*) echo "unexpected curl request: $*" >&2; exit 1 ;;
+esac
+EOF
+
+	cat >"$fake_bin/gsutil" <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+
+	cat >"$fake_bin/systemctl" <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+
+	cat >"$fake_bin/bash" <<'EOF'
+#!/bin/sh
+printf 'java-started\n' >>"${JAVA_START_LOG:?}"
+EOF
+
+	chmod +x "$fake_bin/curl" "$fake_bin/gsutil" "$fake_bin/systemctl" "$fake_bin/bash"
+}
+
+run_startup() {
+	local fake_bin=$1 hosts_file=$2 database_private_ip=${3-}
+	PATH="$fake_bin:$PATH" \
+		HOSTS_FILE="$hosts_file" \
+		FAKE_DATABASE_PRIVATE_IP="$database_private_ip" \
+		JAVA_START_LOG="$JAVA_START_LOG" \
+		"$REAL_BASH" "$STARTUP_SCRIPT"
+}
+
+wait_for_java_start_count() {
+	local expected=$1 attempt actual
+	for attempt in {1..100}; do
+		actual=$(wc -l <"$JAVA_START_LOG" | tr -d ' ')
+		[[ "$actual" == "$expected" ]] && return 0
+		sleep 0.01
+	done
+	return 1
+}
+
+test_startup_replaces_stale_database_host_idempotently() {
+	local work fake_bin expected
+	work=$(mktemp -d)
+	trap "rm -rf '$work'" RETURN
+	fake_bin="$work/fakebin"
+	write_startup_fakes "$fake_bin"
+	JAVA_START_LOG="$work/java.log"
+	export JAVA_START_LOG
+	: >"$JAVA_START_LOG"
+	printf '127.0.0.1 localhost\n10.111.16.12 db-server\n' >"$work/hosts"
+
+	run_startup "$fake_bin" "$work/hosts" 10.111.16.18
+	run_startup "$fake_bin" "$work/hosts" 10.111.16.18
+	wait_for_java_start_count 2 || fail "startup did not launch Java after valid database routing setup"
+
+	expected=$'127.0.0.1 localhost\n10.111.16.18\tdb-server'
+	assert_equals "$expected" "$(cat "$work/hosts")" \
+		"startup must replace every stale db-server entry with exactly one selected route"
+	assert_equals "2" "$(wc -l <"$JAVA_START_LOG" | tr -d ' ')" \
+		"startup must launch Java after each valid routing setup"
+}
+
+test_startup_rejects_missing_or_invalid_database_metadata_before_java() {
+	local work fake_bin candidate
+	work=$(mktemp -d)
+	trap "rm -rf '$work'" RETURN
+	fake_bin="$work/fakebin"
+	write_startup_fakes "$fake_bin"
+	JAVA_START_LOG="$work/java.log"
+	export JAVA_START_LOG
+	: >"$JAVA_START_LOG"
+
+	for candidate in '' 999.111.16.18; do
+		printf '127.0.0.1 localhost\n10.111.16.12 db-server\n' >"$work/hosts"
+		if run_startup "$fake_bin" "$work/hosts" "$candidate" >/dev/null 2>&1; then
+			fail "startup must reject missing or invalid DATABASE_PRIVATE_IP metadata: <$candidate>"
+		fi
+	done
+	sleep 0.05
+
+	assert_equals "0" "$(wc -l <"$JAVA_START_LOG" | tr -d ' ')" \
+		"startup must not launch Java when database routing metadata is unusable"
+}
+
+write_gcloud_fake() {
+	local fake_bin=$1
+	mkdir -p "$fake_bin"
+	cat >"$fake_bin/gcloud" <<'EOF'
+#!/bin/sh
+printf '%s\n' "$*" >>"${GCLOUD_LOG:?}"
+case "$*" in
+*'instance-groups managed describe'*) printf 'projects/test/global/instanceTemplates/old-template\n' ;;
+esac
+EOF
+	chmod +x "$fake_bin/gcloud"
+}
+
+assert_template_receives_selected_database_ip() {
+	local script=$1 work fake_bin selected_database_private_ip
+	work=$(mktemp -d)
+	trap "rm -rf '$work'" RETURN
+	fake_bin="$work/fakebin"
+	write_gcloud_fake "$fake_bin"
+	GCLOUD_LOG="$work/gcloud.log" PATH="$fake_bin:$PATH" "$REAL_BASH" "$script" >/dev/null
+	selected_database_private_ip=$(tr -d '[:space:]' <"$REPO_ROOT/infra/gcp/config/production-database-private-ip")
+	grep -q -- "--metadata BUCKET=dough-01,DATABASE_PRIVATE_IP=$selected_database_private_ip" "$work/gcloud.log" \
+		|| fail "$(basename "$script") must pass the selected database private IP into the instance template"
+}
+
+test_instance_templates_receive_the_single_database_configuration() {
+	"$REAL_BASH" "$REPO_ROOT/infra/gcp/scripts/read-production-database-private-ip.sh" >/dev/null \
+		|| fail "production database private IP must have one valid explicit configuration source"
+	assert_template_receives_selected_database_ip "$UPDATE_TEMPLATE_SCRIPT"
+	assert_template_receives_selected_database_ip "$CREATE_TEMPLATE_SCRIPT"
+	! rg -q 'db-server' "$REPO_ROOT/infra/gcp/salt/states/base_os/init.sls" \
+		|| fail "Salt base image must not bake a database route that can outlive deployment configuration"
+}
+
+main() {
+	test_startup_replaces_stale_database_host_idempotently
+	test_startup_rejects_missing_or_invalid_database_metadata_before_java
+	test_instance_templates_receive_the_single_database_configuration
+	echo "ok production database routing tests"
+}
+
+main "$@"
