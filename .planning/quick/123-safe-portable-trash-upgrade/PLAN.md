@@ -161,18 +161,51 @@ procedure's own commit boundaries.
 
 ### 3. Preserve a populated notebook through all three migrations
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Pre-326 populated schema → actual Flyway 326–328 upgrade → retained
 notebook identities/data and final Portable tree match the intended conversion.
-Proof: Canonical small fixture with active/deleted notes, existing trash, nested
-folders/readmes, occupied trash title, authored references, trackers/preferences,
-recall history and bindings. Compare full retained row snapshots with an explicit
-allowlist of conversion changes (placement/title suffix/cleared marker/timestamps
-and rebuilt binding payload), plus independently expected paths/content in the
-downloaded bundle. Preserve existing folders and binding identity/ownership.
-Include bound/unbound and deleted-notebook selection as focused data variations;
-do not silently narrow the migration's retained-data promise to live bound notes.
+Proof: Rewrote `NotebookUpgradeDataPreservationTest` (its prior body only
+replayed V300000327's rebuild directly against the already-fully-migrated live
+suite schema, so it never exercised the real 326→328 chain) to seed a canonical
+fixture via raw JDBC into slice 1's `PreUpgradeFixtureSchema` at version 325,
+across three notebooks/owners: Notebook A (bound, live) with nested folders
+carrying folder readme content, an existing `_trash` subtree occupying the
+exact destination a legacy-deleted note converts to (forcing collision
+suffixing to "Old Pasta (2)"), a legacy-deleted note already directly under
+`_trash` (deleted_at-clear only, no relocation), authored wiki-link references,
+recall history, an independent `removed_from_tracking` preference, and a
+pre-existing `notebook_git_binding`; Notebook B (unbound, live); Notebook C
+(bound, soft-deleted notebook). Runs the actual registered Flyway chain for
+real (326→327, then 328) and asserts full row snapshots against an explicit
+documented allowlist (folder_id/title only for legacy-deleted rows, deleted_at
+clearing, updated_at bump, new `_trash` roots only for notebooks that lacked
+one, rebuilt binding payload for the live bound notebook, untouched binding
+for the soft-deleted notebook) — everything else (every memory_tracker row,
+every authored_note_reference row, every pre-existing folder including its
+readme_content, every untouched note) byte-for-byte unchanged. The rebuilt
+notebook's Git tree is independently checked against a hardcoded expected
+path/content list (including two `README.md` entries computed via the real
+`ExportReadmeMarkdown.assemble(...)`, not hand-derived frontmatter) and
+cross-checked against `NotebookGitRebuildTestSupport.currentPortableTreeFromDb`.
+Preserve existing folders and binding identity/ownership: confirmed (ids
+unchanged, non-touched folders equal before/after). Bound/unbound/deleted-
+notebook variations included; the migration's retained-data promise is not
+narrowed to live bound notes.
 Estimate: 5 minutes active using existing fixture/tree assertions.
+Learnings: Active time ran well over target — implementation ~70-80 minutes,
+coordinator review ~20 minutes — consistent with the plan's own expectation
+that this is "a substantial proof." Coordinator review (delegated
+post-change-refactor was not attempted here given the migration-adjacent
+content pattern from slice 2; reviewed directly instead) found a real, if
+narrower, coverage gap: the initial fixture set every folder's `readme_content`
+to NULL, so the before/after row-equality check that is supposed to prove
+folder readmes survive the upgrade was trivially true (NULL equals NULL) and
+proved nothing — silently narrowing the plan's explicit "nested folders/readmes"
+fixture requirement. Fixed by giving two folders real readme content and adding
+the corresponding `README.md` tree entries (computed via the real export code
+rather than hand-typed frontmatter, to avoid a second, possibly-wrong,
+reimplementation of the frontmatter format). Full backend suite green after
+the fix.
 
 ### 4. Retry an interrupted legacy-trash conversion
 Type: Behavior
