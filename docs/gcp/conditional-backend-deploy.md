@@ -26,6 +26,12 @@ green run or another commit, and neither keeps a runner in a polling loop.
    Application Release. Once the same commit's CI succeeds and artifacts are
    available, explicitly rerun the original Application Release workflow without
    moving the tag. A rerun still selects the highest pending numeric version.
+   If a manual MIG template update or recovery rollout preceded the release,
+   also wait for the group to report both `status.isStable: true` and
+   `status.versionTarget.isReached: true`, and confirm every backend is healthy.
+   Reaching the target template alone does not make overlapping replacements
+   safe; starting the tagged rollout while the prior rollout is still verifying
+   can temporarily leave the load balancer with no healthy upstream.
 3. Confirm the selected source contains the tag-triggered `deploy.yml`. **The first
    release must include this workflow cutover.** Older pre-cutover source does not
    acquire a tag trigger when main changes. Later, a tested earlier main commit

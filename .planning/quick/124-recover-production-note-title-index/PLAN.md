@@ -63,7 +63,7 @@ Internal change: keep `uk_note_notebook_folder_title` and its observable conflic
 ### 3. Recover and persist production on the safe database
 
 Type: Behavior
-Status: in progress
+Status: done
 Proof: Given the original database crash loop and an isolated pre-crash PITR target, applying the tested index correction and routing configuration results in a healthy database, a stable MIG, and HTTP 200 production health/read smoke checks after rollout.
 
 Behavior: Production is unavailable because instances resolve the unsafe original database → validate the PITR target, apply the tested index replacement before application migrations, persist its private IP in infrastructure, release the tested correction, and roll out → production remains healthy through a fresh VM startup and retains case-insensitive duplicate-title rejection.
@@ -92,12 +92,16 @@ Behavior: Production is unavailable because instances resolve the unsafe origina
 - Metadata-driven routing tests passed: `production-database-routing.test`, `mig-startup-java-command.test`, and `deploy-backend-jar-to-gcp-mig.sh.test`. A fresh post-refactor `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed migration plus all 2,418 backend tests.
 - The database ERD exporter used `doughnut_development`; `docs/database-erd.md` was already current and did not change. `./scripts/run.sh pnpm format:changed` completed successfully once after refactoring/generation.
 - Production public health returned HTTP 200 after routing the current instance to the repaired database. MIG template `doughnut-app-debian12-zulu25-openai-mig-template-1789390278` is configured with `DATABASE_PRIVATE_IP=10.111.16.24`; durable source delivery, exact-SHA CI, and the forward application release remain.
+- Exact commit `0c8a3579343306487a73d401866c244b1774046e` passed CI run `34846522332` with non-expired backend, frontend, and CLI artifacts. Application tag `v1.3.4` passed release run `34847279946`; its final health probe reported the exact commit, and `deploy/last-successful-deploy.json` records the same SHA.
+- The tagged rollout began while the preceding manual recovery rollout was still not stable. After the MIG reached the new template, the release probe observed `503 no healthy upstream` from `13:15:00Z` through `13:16:02Z`, then HTTP 200 at `13:16:12Z`. Both instances subsequently became stable and healthy on template `doughnut-app-debian12-zulu25-openai-mig-template-1789391354`. Future recovery operations should wait for a previous rollout to be stable and healthy before starting the tagged rollout.
+- Both production instances resolve `db-server` to `10.111.16.24` and locally report the exact release commit. Flyway version `300000329` is successful, the repaired tracker duplicate count remains zero, the note table has three stored generated uniqueness columns and three ordinary index parts, `fk_note_folder` is `RESTRICT`, and `CHECK TABLE note EXTENDED` is OK. Public root, hashed frontend asset, login, backend health, and CLI paths return HTTP 200.
 
 ## Accepted proof
 
 - Tracker repair boundary: production `memory_tracker` plus its three direct child tables on isolated `doughnut-db-pitr-050830b`. Setup was the read-only exact-pair/FK inventory; observation was guarded affected counts `27/0/44/47/0/27`, preserved child counts and ID sums, and zero duplicate groups after commit.
 - Note-index boundary: `V300000329__ReplaceNoteTitleFunctionalIndex` and `NoteTitlePersistenceTest`. The schema test inspects generated-column expressions, ordinary unique-index parts, and the `RESTRICT` FK. Literal proof: `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed all 2,418 tests after refactor.
 - Routing boundary: the single IP config, reader, template creators, startup `/etc/hosts` replacement, and absence of the Salt-baked route. Literal proofs: `CURSOR_DEV=true nix develop -c bash scripts/test/production-database-routing.test`, `... mig-startup-java-command.test`, and `... deploy-backend-jar-to-gcp-mig.sh.test`, all passed.
+- Release boundary: exact-SHA CI run `34846522332`, application release run `34847279946`, stable two-instance MIG template `1789391354`, exact-commit local/public health responses, successful Flyway row `300000329`, and public SPA/asset/login/CLI smoke checks.
 
 ## Execution identity
 

@@ -350,8 +350,31 @@ re-application in the worktree before staging.
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
 
+## DD-047 — Starting a tagged rollout before the recovery rollout stabilized caused a brief second outage
+
+The tagged application rollout began while the preceding manual recovery
+rollout had reached its target template but still reported `isStable: false`.
+The overlapping replacement sequence temporarily left the load balancer with
+no healthy backend.
+
+### Occurrences
+
+- Execution: quick/124-recover-production-note-title-index / 6a009fb968
+  - Timestamp: 2026-09-14T21:15:00+08:00
+  - Tool: Codex
+  - Model: GPT-5
+  - Open Dough release: unknown
+  - Evidence: Application Release run `34847279946` logged `503` with `no
+    healthy upstream` at `13:15:00Z` through `13:16:02Z`, then the exact-commit
+    health response at `13:16:12Z`; the pre-tag recovery snapshot recorded the
+    prior MIG target as reached but `isStable: false`.
+  - Observed effect: production had no healthy backend for about 61 seconds
+    during an otherwise successful recovery release.
+  - Inference: serialize recovery and tagged rollouts by requiring the MIG to
+    be stable and healthy before initiating the next replacement sequence.
+
 ## Retention
 
-- Highest allocated local number: 46
+- Highest allocated local number: 47
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
