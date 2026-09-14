@@ -123,18 +123,39 @@ public class NotebookGitProposalPublisher {
       return acceptMatchingProposedTree(state, proposal, publishedAt);
     }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
-        NotebookGitProposalFolderShape.requireExactOrEmpty(files);
+        NotebookGitProposalFolderShape.requireExactOrCarried(
+            proposal.repository(), acceptedHead, proposal.mainHead(), files);
     NotebookGitStateLoader.LockedNotebookState published;
     final NotebookGitProposalTreeShape.AdmittedShape admitted;
     if (relocation.isPresent()) {
-      published = folderRelocation.apply(state, proposal, acceptedHead, relocation.get());
       documents =
           NotebookGitProposalTreeShape.classifyChangedDocuments(
               NotebookGitProposalFolderShape.residualOutside(files, relocation.get()));
       if (documents.isEmpty()) {
+        published = folderRelocation.apply(state, proposal, acceptedHead, relocation.get());
         return acceptMatchingProposedTree(published, proposal);
       }
       admitted = NotebookGitProposalTreeShape.requireAdmittedResidualShape(documents);
+      List<NotebookGitProposalTreeShape.ChangedDocument> beforeRelocation = new ArrayList<>();
+      List<NotebookGitProposalTreeShape.ChangedDocument> afterRelocation = new ArrayList<>();
+      partitionAroundRelocation(
+          admitted.additions(), relocation.get(), beforeRelocation, afterRelocation);
+      published = state;
+      if (!beforeRelocation.isEmpty()) {
+        projection.requireMatchingAcceptedTree(
+            notebook, folders, liveNotes, proposal.repository(), acceptedHead);
+        published = documentApplication.apply(published, proposal, beforeRelocation, publishedAt);
+        published =
+            folderRelocation.applyAfterMatchedAcceptedTree(
+                published, proposal, acceptedHead, relocation.get());
+      } else {
+        published = folderRelocation.apply(published, proposal, acceptedHead, relocation.get());
+      }
+      if (!afterRelocation.isEmpty()) {
+        published =
+            applyAdditionsUnderRelocatedDestination(
+                published, proposal, afterRelocation, publishedAt);
+      }
     } else {
       admitted =
           NotebookGitProposalTreeShape.requireAdmittedShape(
@@ -145,9 +166,10 @@ public class NotebookGitProposalPublisher {
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
       published =
           new NotebookGitStateLoader.LockedNotebookState(binding, notebook, folders, liveNotes);
-    }
-    if (!admitted.additions().isEmpty()) {
-      published = documentApplication.apply(published, proposal, admitted.additions(), publishedAt);
+      if (!admitted.additions().isEmpty()) {
+        published =
+            documentApplication.apply(published, proposal, admitted.additions(), publishedAt);
+      }
     }
     List<Note> proposedLiveNotes = new ArrayList<>(published.liveNotes());
     List<ExportFolderRow> proposedFolders = published.folders();
@@ -178,6 +200,60 @@ public class NotebookGitProposalPublisher {
             published.binding(), published.notebook(), proposedFolders, proposedLiveNotes),
         proposal,
         publishedAt);
+  }
+
+  /**
+   * Container or note additions under the relocated destination need the source Folder reparented
+   * first; additions that create or fill the destination parent must run before reparenting.
+   */
+  private static void partitionAroundRelocation(
+      List<NotebookGitProposalTreeShape.ChangedDocument> additions,
+      NotebookGitProposalFolderShape.FolderRelocation relocation,
+      List<NotebookGitProposalTreeShape.ChangedDocument> beforeRelocation,
+      List<NotebookGitProposalTreeShape.ChangedDocument> afterRelocation) {
+    String destPrefix = relocation.destPrefix();
+    for (NotebookGitProposalTreeShape.ChangedDocument addition : additions) {
+      if (addition.path().startsWith(destPrefix + "/")) {
+        afterRelocation.add(addition);
+      } else {
+        beforeRelocation.add(addition);
+      }
+    }
+  }
+
+  /**
+   * Tip concept notes under an already-reparented destination resolve against live folders and tip
+   * representation; they must not re-materialize the relocated ancestry from the accepted tree.
+   */
+  private NotebookGitStateLoader.LockedNotebookState applyAdditionsUnderRelocatedDestination(
+      NotebookGitStateLoader.LockedNotebookState published,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      List<NotebookGitProposalTreeShape.ChangedDocument> additions,
+      Timestamp publishedAt) {
+    ObjectId acceptedHead = ObjectId.fromString(published.binding().getAcceptedGitObjectId());
+    List<Note> notes = new ArrayList<>(published.liveNotes());
+    List<NotebookGitProposalTreeShape.ChangedDocument> containers = new ArrayList<>();
+    for (NotebookGitProposalTreeShape.ChangedDocument addition : additions) {
+      if (addition.role() == NotebookGitProposalTreeShape.DocumentRole.CONTAINER) {
+        containers.add(addition);
+        continue;
+      }
+      notes.add(
+          noteAddition.applyAtRepresentedPath(
+              published.notebook(),
+              published.folders(),
+              proposal,
+              acceptedHead,
+              addition.path(),
+              publishedAt));
+    }
+    NotebookGitStateLoader.LockedNotebookState withNotes =
+        new NotebookGitStateLoader.LockedNotebookState(
+            published.binding(), published.notebook(), published.folders(), notes);
+    if (containers.isEmpty()) {
+      return withNotes;
+    }
+    return documentApplication.apply(withNotes, proposal, containers, publishedAt);
   }
 
   private static boolean isEmptyAcceptedNotebook(

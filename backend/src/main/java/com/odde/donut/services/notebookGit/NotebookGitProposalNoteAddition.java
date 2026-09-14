@@ -56,6 +56,25 @@ class NotebookGitProposalNoteAddition {
         notebook, proposal, path, publishedAt, destinationFolder(materializedFolders, path));
   }
 
+  /**
+   * Creates a note at a path whose parent Folder already exists and is tip- or accepted-represented
+   * (for example under a folder relocated earlier in the same publication).
+   */
+  Note applyAtRepresentedPath(
+      Notebook notebook,
+      List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      String path,
+      Timestamp publishedAt) {
+    return apply(
+        notebook,
+        proposal,
+        path,
+        publishedAt,
+        representedDestinationFolder(folders, proposal, acceptedHead, path));
+  }
+
   private Note apply(
       Notebook notebook,
       NotebookGitProposalImporter.ImportedProposal proposal,

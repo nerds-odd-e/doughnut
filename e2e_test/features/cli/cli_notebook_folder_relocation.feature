@@ -69,3 +69,34 @@ Feature: CLI notebook folder relocation
     And I publish the second cloned checkout using the installed CLI
     Then the installed CLI reports the rebased local head as the accepted head
     And I should see note "CLI Clone Notebook/Kitchen/Recipes/Pasta" has content "Simmer until al dente"
+
+  Scenario: Publishing relocate then descendant edit and add commits retains identities and history
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I commit a rename of "Recipes" to "Kitchen/Recipes" in the cloned checkout
+    And I commit the following document changes together in the cloned checkout:
+      | path                         | content |
+      | Kitchen/Recipes/Pasta.md     | ---\ntype: Note\nauthor: Chef Boyardee\n---\nSimmer until al dente |
+      | Kitchen/Recipes/Sauce.md     | ---\ntype: Note\n---\nTomato base |
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I should see note "CLI Clone Notebook/Kitchen/Recipes/Pasta" has content "Simmer until al dente"
+    And I should see note "CLI Clone Notebook/Kitchen/Recipes/Sauce" has content "Tomato base"
+    When I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout preserves the publisher's A to C history
+    And the second cloned checkout contains exactly:
+      | README.md                     |
+      | Overview.md                   |
+      | Kitchen/README.md             |
+      | Kitchen/Recipes/README.md     |
+      | Kitchen/Recipes/Pasta.md      |
+      | Kitchen/Recipes/Sauce.md      |
+    And the second cloned checkout file "Kitchen/Recipes/Pasta.md" is:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Simmer until al dente
+
+      """

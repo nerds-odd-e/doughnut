@@ -1,8 +1,7 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 8 done; slice 9 next. Slice 10 awaits the existing
-unanswered deletion/recreation decision and remains non-executable until answered.
-Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
+Status: in progress. Slice 9 done; slice 10 still awaiting product answer (skipped);
+slice 11 next. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
 ## Planned-execution identity
 
@@ -233,7 +232,7 @@ kept; obsolete mixed-change refusal removed.
 
 ### 9. Compose folder relocation across a mixed commit range
 Type: Behavior
-Status: planned
+Status: done
 Behavior: B relocates a represented subtree; C edits a descendant and adds a note
 → publish → the final subtree/content retains the correct original identities.
 Change: Carry folder origins and descendant paths through the same range
@@ -245,6 +244,10 @@ round trip with mixed commits and verify the original history/final files.
 Review that each existing folder is placed only at its resolved final location.
 Estimate: 5 minutes active work after slice 8. Stop and decompose if final
 collision handling requires more work; do not introduce per-mixture branches.
+Learnings: `carryExactFolderRelocation` walks adjacent exact README mappings into
+one accepted→tip prefix pair; tip blob drift after an exact step still relocates.
+Residuals include tip concept edits/adds under dest; tip parent representation
+excludes the relocated subtree. Controller + CLI mixed-commit history proofs.
 
 ### 10. Settle deletion followed by recreation
 Type: Behavior
