@@ -1,8 +1,8 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 10 next — ADR 0002 deletion/recreation decision adopted
-(confirmed deletion ends identity; recreation starts a new one). Slices 1–9 and
-11–13 already done. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
+Status: complete — all slices 1–13 done. ADR 0002 deletion/recreation decision
+delivered in slice 10. Retained for retrospective and story wrap-up.
+Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
 ## Planned-execution identity
 
@@ -12,8 +12,9 @@ Status: in progress. Slice 10 next — ADR 0002 deletion/recreation decision ado
   `/Users/terryyin/git/doughnut-worktrees/122-publish-accumulated-local-commits`
   on `quick/122-publish-accumulated-local-commits`
 - Integration target: `main`
-- CI observer: restarting for slice 10; workflow `ci.yml` (`donut CI`); repo
-  `nerds-odd-e/doughnut`; branch `quick/122-publish-accumulated-local-commits`
+- CI observer: mailbox `/tmp/dough-ci-501/watch-oYI032`; workflow `ci.yml`
+  (`donut CI`); repo `nerds-odd-e/doughnut`; branch
+  `quick/122-publish-accumulated-local-commits`
 
 ## Goal and boundary
 
@@ -251,7 +252,7 @@ excludes the relocated subtree. Controller + CLI mixed-commit history proofs.
 
 ### 10. Settle deletion followed by recreation
 Type: Behavior
-Status: planned
+Status: done
 Decision: Adopted from [ADR 0002](../../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
 (2026-09-14, Terry Yin): a confirmed committed deletion ends the identity;
 recreation starts a new identity, even at the same path with identical bytes
@@ -263,6 +264,11 @@ final path/bytes equal A.
 Proof: Controller checks IDs and complete dependent removal, not just tree
 contents. No intermediate entity or inferred undo is introduced.
 Estimate: 3–5 minutes active work after the answer.
+Learnings: `settleDeletionGapReplacements` uses carried origins vs tip presence
+to emit DELETED+ADDED across a confirmed deletion gap, including identical tip
+bytes. Publisher applies deletions before additions. Correspondence/inspection/
+ordinary-note application split from TreeShape for cohesion. Exact moves still
+retain identity.
 
 ### 11. Preserve atomic rejection of the composed range
 Type: Behavior
