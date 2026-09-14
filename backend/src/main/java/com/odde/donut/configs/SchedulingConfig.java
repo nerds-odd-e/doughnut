@@ -1,5 +1,7 @@
 package com.odde.donut.configs;
 
+import static com.odde.donut.DonutApplication.PORTABLE_TRASH_UPGRADE_PROFILE;
+
 import com.odde.donut.entities.repositories.FailureReportRepository;
 import com.odde.donut.services.GithubService;
 import com.odde.donut.testability.TestabilitySettings;
@@ -11,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableScheduling
-@Profile("prod")
+@Profile("prod & !" + PORTABLE_TRASH_UPGRADE_PROFILE)
 public class SchedulingConfig {
 
   @Bean

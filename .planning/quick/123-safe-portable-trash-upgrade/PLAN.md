@@ -644,7 +644,7 @@ triggered for this branch.
 
 ### 11a. Start the upgrade task without application writers
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Select the temporary portable-trash upgrade task → Spring starts a
 non-web context with scheduling disabled before any application-ready work can
 run → neither HTTP nor scheduled application writers exist, while ordinary
@@ -658,6 +658,17 @@ no registered scheduled tasks and no automatic production migration callback;
 the ordinary no-task mode retains its current web/scheduling configuration.
 Estimate: 5 minutes active. If disabling writer surfaces requires constructing
 a parallel application graph, stop and revisit the seam instead.
+Learnings: `upgradePortableTrash` now configures the existing
+`DonutApplication` bootstrap before startup with `WebApplicationType.NONE` and
+one temporary profile. That profile excludes both `SchedulingConfig`'s
+`@EnableScheduling` owner and the ordinary application-ready Flyway callback;
+ordinary no-task startup retains servlet, scheduling and ready-migration
+configuration. A red-first focused test now observes both configurations using
+Spring's profile/bean boundary. It passed 2/2 before and after the fresh
+refactor, as did `spotlessJavaCheck` and whitespace checks; the single required
+`format:changed` pass was a no-op. Implementation took ~6 minutes and refactor
+~4 minutes. No parallel application graph, migration execution or cloud state
+was introduced.
 
 ### 11b. Give the one-shot task an explicit migration lifecycle
 Type: Behavior
