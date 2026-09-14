@@ -254,14 +254,42 @@ delivery ~20 minutes.
 
 ### 5. Retry a partially rebuilt notebook fleet
 Type: Behavior
-Status: planned
+Status: done
 Behavior: At least one notebook rebuild commits and a later rebuild is
 interrupted → retry registered 327 and finish 328 → every selected binding
 contains a complete tree and matching head with retained notebook data.
-Proof: Multiple bound notebooks; interrupt within a rebuild and between commits
-as variations of the same recovery contract. Reuse existing rollback/bundle
-assertions. Compare tree/data, not old Git SHA or rebuild timestamp equality.
-Estimate: 5 minutes active; no fleet checkpoint table or new retry service.
+Proof: New `NotebookGitBaselineRebuildFleetInterruptionTest`. Verified against
+actual source (`V300000327__RebuildNotebookGitBaselines`,
+`NotebookGitBaselineRebuild.rebuildNotebook`) that the migration queries every
+live bound notebook ordered by `id ASC` and rebuilds each in a plain loop on
+one connection, with `canExecuteInTransaction() == false`; each notebook's
+rebuild is its own `setAutoCommit(false)` → single `UPDATE
+notebook_git_binding` → `commit()`, rollback on exception. So a fleet of N
+notebooks is genuinely N independent commits, and the migration keeps no
+per-notebook checkpoint — a retry unconditionally re-rebuilds every live bound
+notebook (confirmed idempotent by the class's own javadoc and existing
+`NotebookGitBaselineRebuildTest` coverage). Three notebooks seeded in
+id-ascending fleet order: one whose rebuild is invoked directly outside
+Flyway so it genuinely commits before the interruption; one interrupted via a
+discarded second connection performing the same single-UPDATE shape with no
+commit (InnoDB rolls it back); one left completely untouched
+("between notebook baseline rebuilds", the story's key example #2). A real
+`repair()+migrate()` retry through 328 then leaves every one of the three with
+a complete tree, a recorded head matching the bundle's actual advertised head,
+exactly one parentless root commit, and content matching current DB state —
+compared via `NotebookGitRebuildTestSupport`/`GitBundleTestReader`, never
+against the pre-retry Git SHA or timestamp (a correctly-retried notebook is
+expected to get a new head regardless of which state it started from).
+Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+Estimate: 5 minutes active; no fleet checkpoint table or new retry service —
+none was built; the migration's own unconditional-reprocessing design already
+satisfies the retry contract.
+Learnings: Active time ~30-35 minutes (implementation) plus coordinator
+independent source verification and full-suite re-run (~10 minutes) —
+consistent with slice 4's investigation-then-proof pattern. No defect found;
+the plan's PFE claim about per-notebook transactions was confirmed exactly
+against source rather than assumed. This implementation agent, unlike slice
+4's, ran and reported the full backend suite itself before ending its turn.
 
 ### 6. Complete the upgrade with 10,000 deleted notes
 Type: Behavior
