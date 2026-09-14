@@ -19,25 +19,66 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit.
  * Changed documents are classified once by operation and container/concept role; unchanged accepted
- * files remain context. Ordinary-note admission permits added and/or modified ordinary Markdown
- * notes at regular file modes, any number of ordinary-note deletions alone or with same-path edits,
- * and unambiguous equal-content moves with compatible companions. Move correspondence is resolved
- * across the complete candidate set. Mixing unmatched removals with additions is refused when
- * identity correspondence is uncertain. Unsafe paths, non-regular modes, or a changed
- * folder-reserved {@code README.md} are refused. Callers only invoke this once proposal ancestry is
- * confirmed to be a contiguous single-parent range from the accepted commit.
+ * files remain context. Publication admission partitions added container Readmes from ordinary-note
+ * changes so folder Readmes can accompany note edits. Ordinary-note admission permits added and/or
+ * modified ordinary Markdown notes at regular file modes, any number of ordinary-note deletions
+ * alone or with same-path edits, and unambiguous equal-content moves with compatible companions.
+ * Move correspondence is resolved across the complete candidate set. Mixing unmatched removals with
+ * additions is refused when identity correspondence is uncertain. Unsafe paths, non-regular modes,
+ * or a changed folder-reserved {@code README.md} are refused. Callers only invoke this once
+ * proposal ancestry is confirmed to be a contiguous single-parent range from the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
   private NotebookGitProposalTreeShape() {}
 
-  static List<NoteChange> requireAllowedNoteChanges(List<ChangedDocument> documents) {
+  /**
+   * Admits container README additions alongside ordinary-note changes. Non-added container changes
+   * stay reserved. Container additions mixed with concept removals stay reserved until that
+   * composition is supported.
+   */
+  static AdmittedShape requireAdmittedShape(List<ChangedDocument> documents) {
+    List<ChangedDocument> containerAdditions = new ArrayList<>();
+    List<ChangedDocument> conceptDocuments = new ArrayList<>();
+    for (ChangedDocument document : documents) {
+      if (document.role() == DocumentRole.CONTAINER) {
+        if (document.kind() != ChangeKind.ADDED) {
+          throw reservedFolderReadme(document.path());
+        }
+        containerAdditions.add(document);
+      } else {
+        conceptDocuments.add(document);
+      }
+    }
+    List<NoteChange> noteChanges = List.of();
+    if (!conceptDocuments.isEmpty()) {
+      noteChanges = requireAllowedNoteChanges(conceptDocuments);
+    }
+    if (!containerAdditions.isEmpty()
+        && conceptDocuments.stream().anyMatch(document -> document.kind() == ChangeKind.DELETED)) {
+      throw reservedFolderReadme(containerAdditions.getFirst().path());
+    }
+    Set<String> addedPaths = new HashSet<>();
+    for (NoteChange change : noteChanges) {
+      if (change.kind() == ChangeKind.ADDED) {
+        addedPaths.add(change.path());
+      }
+    }
+    List<ChangedDocument> additions = new ArrayList<>(containerAdditions);
+    for (ChangedDocument document : conceptDocuments) {
+      if (addedPaths.contains(document.path())) {
+        additions.add(document);
+      }
+    }
+    return new AdmittedShape(noteChanges, additions);
+  }
+
+  private static List<NoteChange> requireAllowedNoteChanges(List<ChangedDocument> documents) {
     return admitOrdinaryNoteChanges(noteChangesFrom(documents));
   }
 
-  static boolean isAdditionOnly(List<ChangedDocument> documents) {
-    return !documents.isEmpty()
-        && documents.stream().allMatch(document -> document.kind() == ChangeKind.ADDED);
+  private static ResponseStatusException reservedFolderReadme(String path) {
+    return unsupportedTreeShape("path \"" + path + "\" is a folder README, which is reserved");
   }
 
   /**
@@ -115,8 +156,7 @@ public final class NotebookGitProposalTreeShape {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {
       if (document.role() == DocumentRole.CONTAINER) {
-        throw unsupportedTreeShape(
-            "path \"" + document.path() + "\" is a folder README, which is reserved");
+        throw reservedFolderReadme(document.path());
       }
       if (!document.path().endsWith(".md")) {
         throw unsupportedTreeShape("path \"" + document.path() + "\" is not a Markdown note");
@@ -267,6 +307,12 @@ public final class NotebookGitProposalTreeShape {
       return kind == ChangeKind.DELETED ? file.acceptedBlobId() : file.proposedBlobId();
     }
   }
+
+  /**
+   * Ordinary-note changes plus the addition documents (container Readmes and residual concept
+   * additions) ready for document application.
+   */
+  record AdmittedShape(List<NoteChange> noteChanges, List<ChangedDocument> additions) {}
 
   /**
    * @param path the current (proposed-tree) Portable path; for RENAMED this is the new path

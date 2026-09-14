@@ -1,6 +1,6 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 2 done; slice 3 next. Slice 10 awaits the existing
+Status: in progress. Slice 3 done; slice 4 next. Slice 10 awaits the existing
 unanswered deletion/recreation decision and remains non-executable until answered.
 Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
@@ -136,7 +136,7 @@ seam separate from addition-only ahead of slice 3. No same-tree identity shortcu
 
 ### 3. Compose additions with existing-note edits
 Type: Behavior
-Status: planned
+Status: done
 Behavior: B adds a folder/Readme and notes while editing an existing note; C
 edits a newly added note → publish → the complete final content is available.
 Change: Feed additions to existing document application alongside ordinary
@@ -145,6 +145,11 @@ Proof: Controller tests assert new final content/derived references, retained
 existing identities and represented root/nested destinations as data variations.
 Reuse current creation and initial-tree tests. No new materializer architecture.
 Estimate: 5 minutes active work.
+Learnings: Removed exclusive `isAdditionOnly` branch. Admission of container
+Readme additions + concept note changes lives in
+`NotebookGitProposalTreeShape.requireAdmittedShape`; publisher applies admitted
+additions through existing document application alongside MODIFIED. Reserved
+Readme / rename-into-README refusals preserved.
 
 ### 4. Leave no live entity for a new note removed before publication
 Type: Behavior

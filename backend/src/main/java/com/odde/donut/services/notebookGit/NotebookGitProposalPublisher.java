@@ -122,41 +122,20 @@ public class NotebookGitProposalPublisher {
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
       return acceptMatchingProposedTree(state, proposal, publishedAt);
     }
-    if (NotebookGitProposalTreeShape.isAdditionOnly(documents)) {
-      projection.requireMatchingAcceptedTree(
-          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      return acceptMatchingProposedTree(
-          documentApplication.apply(state, proposal, documents, publishedAt),
-          proposal,
-          publishedAt);
-    }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);
     if (relocation.isPresent()) {
       return acceptMatchingProposedTree(
           folderRelocation.apply(state, proposal, acceptedHead, relocation.get()), proposal);
     }
-    List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
-        NotebookGitProposalTreeShape.requireAllowedNoteChanges(documents);
+    NotebookGitProposalTreeShape.AdmittedShape admitted =
+        NotebookGitProposalTreeShape.requireAdmittedShape(documents);
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
     projection.requireMatchingAcceptedTree(
         notebook, folders, liveNotes, proposal.repository(), acceptedHead);
     List<Note> proposedLiveNotes = new ArrayList<>(liveNotes);
-    List<String> addedPaths = new ArrayList<>();
-    for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
-      if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
-        addedPaths.add(noteChange.path());
-      }
-    }
-    List<NotebookGitProposalTreeShape.ChangedDocument> additions = new ArrayList<>();
-    for (NotebookGitProposalTreeShape.ChangedDocument document : documents) {
-      if (!addedPaths.contains(document.path())) {
-        continue;
-      }
-      additions.add(document);
-    }
-    for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
+    for (NotebookGitProposalTreeShape.NoteChange noteChange : admitted.noteChanges()) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document =
             noteAddition.readValidatedDocument(proposal, noteChange.path());
@@ -178,8 +157,8 @@ public class NotebookGitProposalPublisher {
     NotebookGitStateLoader.LockedNotebookState published =
         new NotebookGitStateLoader.LockedNotebookState(
             binding, notebook, folders, proposedLiveNotes);
-    if (!additions.isEmpty()) {
-      published = documentApplication.apply(published, proposal, additions, publishedAt);
+    if (!admitted.additions().isEmpty()) {
+      published = documentApplication.apply(published, proposal, admitted.additions(), publishedAt);
     }
     return acceptMatchingProposedTree(published, proposal, publishedAt);
   }

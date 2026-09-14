@@ -13,7 +13,9 @@ import static org.hamcrest.Matchers.nullValue;
 import com.odde.donut.algorithms.FrontmatterNoteLevel;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
+import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.MemoryTrackerType;
@@ -23,6 +25,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.ApiException;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
@@ -30,7 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +49,10 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved folder readme.\n";
   private static final String EXISTING_CONTENT =
       "---\ntype: Note\n---\nExisting learned content.\n";
+  private static final String EDITED_EXISTING_WITH_LINK =
+      "---\ntype: Note\n---\nExisting learned content linking [[Added]].\n";
+  private static final String ADDED_INITIAL = "---\ntype: Note\n---\nInitial added body.\n";
+  private static final String ADDED_FINAL = "---\ntype: Note\n---\nFinal added body.\n";
   private static final String NOTE_A =
       "---\ntype: Note\nauthor: local\n---\nPrecisely preserved A.\n";
   private static final String NOTE_B =
@@ -55,6 +65,108 @@ class NotebookGitProposalFolderCreationControllerTest extends NotebookGitBundleC
   @Autowired FolderRepository folderRepository;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired TextContentController textContentController;
+  @Autowired NoteController noteController;
+
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  void publishesMixedAddAndEditRangeWithFolderReadmeAndFinalAddedContent(boolean nestedDestination)
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note existing =
+        makeMe.aNote().notebook(notebook).title("Existing").content(EXISTING_CONTENT).please();
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(existing.getId()).orElseThrow())
+                    .spelling()
+                    .please());
+    Folder nestedParent = null;
+    if (nestedDestination) {
+      nestedParent = makeMe.aFolder().notebook(notebook).name("Parent").please();
+      makeMe
+          .aNote()
+          .folder(nestedParent)
+          .title("Keeper")
+          .content("---\ntype: Note\n---\nKeeper body.\n")
+          .please();
+    }
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    String folderReadmePath =
+        nestedDestination ? "Parent/Child/README.md" : "Field Notes/README.md";
+    String addedNotePath = nestedDestination ? "Parent/Child/Added.md" : "Field Notes/Added.md";
+    String keeperPath = "Parent/Keeper.md";
+    String keeperContent = "---\ntype: Note\n---\nKeeper body.\n";
+    ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
+    ObjectId tip;
+    byte[] proposalBytes;
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      List<NotebookGitProposalFile> afterB = new ArrayList<>();
+      afterB.add(new NotebookGitProposalFile("Existing.md", EDITED_EXISTING_WITH_LINK));
+      if (nestedDestination) {
+        afterB.add(new NotebookGitProposalFile(keeperPath, keeperContent));
+      }
+      afterB.add(new NotebookGitProposalFile(folderReadmePath, FOLDER_README));
+      afterB.add(new NotebookGitProposalFile(addedNotePath, ADDED_INITIAL));
+      ObjectId afterAddAndEdit =
+          commitOnTopOf(repository, List.of(acceptedHead), afterB, "Add folder and edit existing");
+      List<NotebookGitProposalFile> afterC = new ArrayList<>();
+      afterC.add(new NotebookGitProposalFile("Existing.md", EDITED_EXISTING_WITH_LINK));
+      if (nestedDestination) {
+        afterC.add(new NotebookGitProposalFile(keeperPath, keeperContent));
+      }
+      afterC.add(new NotebookGitProposalFile(folderReadmePath, FOLDER_README));
+      afterC.add(new NotebookGitProposalFile(addedNotePath, ADDED_FINAL));
+      tip = commitOnTopOf(repository, List.of(afterAddAndEdit), afterC, "Edit newly added note");
+      proposalBytes = bundleBytesForHead(repository, tip);
+    }
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    assertThat(publishedHead, equalTo(tip.getName()));
+    Note reloadedExisting = noteRepository.findById(existing.getId()).orElseThrow();
+    assertThat(reloadedExisting.getContent(), equalTo(EDITED_EXISTING_WITH_LINK));
+    MemoryTracker retained = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+    assertThat(retained.getNote().getId(), equalTo(existing.getId()));
+    Folder created =
+        folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .filter(folder -> folder.getName().equals(nestedDestination ? "Child" : "Field Notes"))
+            .findFirst()
+            .orElseThrow();
+    assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
+    if (nestedParent == null) {
+      assertThat(created.getParentFolderId(), nullValue());
+    } else {
+      assertThat(created.getParentFolderId(), equalTo(nestedParent.getId()));
+    }
+    Note added =
+        noteByTitle(
+            noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), "Added");
+    assertThat(added.getContent(), equalTo(ADDED_FINAL));
+    assertThat(added.getFolder().getId(), equalTo(created.getId()));
+    NoteRealm existingView =
+        inCommittedTransaction(
+            transactionManager,
+            () -> {
+              try {
+                return noteController.showNote(
+                    noteRepository.findById(existing.getId()).orElseThrow());
+              } catch (UnexpectedNoAccessRightException exception) {
+                throw new IllegalStateException(exception);
+              }
+            });
+    assertThat(existingView.getWikiLinks(), hasSize(1));
+    assertThat(existingView.getWikiLinks().getFirst().getAuthoredLink(), equalTo("Added"));
+    assertThat(
+        existingView.getWikiLinks().getFirst().getResolution(),
+        equalTo(WikiLink.Resolution.RESOLVED));
+    assertThat(
+        existingView.getWikiLinks().getFirst().getDestinationNoteId(), equalTo(added.getId()));
+  }
 
   @Test
   void publishesANewRootFolderAsTheExactAuthoredCommitAndMakesItDownloadable() throws Exception {
