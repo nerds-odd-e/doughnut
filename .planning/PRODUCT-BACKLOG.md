@@ -14,8 +14,9 @@ with reasonable performance.
 
 ## Taken
 
+- [Retire the spent portable-trash migration after production success](quick/125-retire-spent-data-migrations/PLAN.md) — SEED-009
+
 ## Backlog list
-- [Retire the spent portable-trash migration after production success](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-39) — SEED-009
 - [Make repeated trash and Undo journeys clean and predictable](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-38) — SEED-009
 - [Receive web-created folders and their notes locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-35) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
