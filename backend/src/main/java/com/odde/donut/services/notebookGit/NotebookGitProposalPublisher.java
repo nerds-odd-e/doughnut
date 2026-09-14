@@ -200,7 +200,7 @@ public class NotebookGitProposalPublisher {
       List<Note> liveNotes,
       NotebookGitProposalTreeShape.NoteChange noteChange,
       Timestamp publishedAt) {
-    Note note = projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.fromPath());
+    Note note = projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.origin().path());
     String newTitle = filenameTitle.requireValid(noteChange.path());
     Folder destinationFolder =
         noteAddition.representedDestinationFolder(

@@ -1,6 +1,6 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 4 done; slice 5 next. Slice 10 awaits the existing
+Status: in progress. Slice 5 done; slice 6 next. Slice 10 awaits the existing
 unanswered deletion/recreation decision and remains non-executable until answered.
 Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
@@ -167,13 +167,16 @@ on intermediate commits.
 
 ### 5. Retain original note correspondence independently of final content
 Type: Structure
-Status: planned
+Status: done
 Change: Adapt the existing note-change representation to carry its accepted
 origin separately from final path/blob. Existing single-commit moves use it.
 This is the minimum preparation for slice 6; no general operation hierarchy.
 Proof: Existing rename/move, companion-edit, identity preservation and ambiguity
 rejection tests remain green. Classification and correspondence perform no writes.
 Estimate: 5 minutes active work; change existing representation, not all owners.
+Learnings: `NoteChange` now carries `NoteOrigin(path, blobId)` instead of
+`fromPath`; rename application uses `origin().path()`. `origin.blobId` is unused
+until slice 6 when final blob may differ from the accepted origin blob.
 
 ### 6. Compose exact note moves with subsequent edits
 Type: Behavior

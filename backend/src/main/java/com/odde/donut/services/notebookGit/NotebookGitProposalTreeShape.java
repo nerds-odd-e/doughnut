@@ -188,7 +188,7 @@ public final class NotebookGitProposalTreeShape {
   private static List<NoteChange> resolveMoveCorrespondence(List<NoteChange> changes) {
     Map<ObjectId, List<NoteChange>> removalsByBlob = changesByBlob(changes, ChangeKind.DELETED);
     Map<ObjectId, List<NoteChange>> additionsByBlob = changesByBlob(changes, ChangeKind.ADDED);
-    Map<String, String> sourcesByDestination = new HashMap<>();
+    Map<String, NoteOrigin> originsByDestination = new HashMap<>();
     Set<String> matchedSources = new HashSet<>();
     for (Map.Entry<ObjectId, List<NoteChange>> removalGroup : removalsByBlob.entrySet()) {
       List<NoteChange> additionGroup = additionsByBlob.get(removalGroup.getKey());
@@ -201,7 +201,7 @@ public final class NotebookGitProposalTreeShape {
       NoteChange source = removalGroup.getValue().getFirst();
       NoteChange destination = additionGroup.getFirst();
       matchedSources.add(source.path());
-      sourcesByDestination.put(destination.path(), source.path());
+      originsByDestination.put(destination.path(), new NoteOrigin(source.path(), source.blobId()));
     }
 
     List<NoteChange> resolved = new ArrayList<>();
@@ -209,9 +209,9 @@ public final class NotebookGitProposalTreeShape {
       if (change.kind() == ChangeKind.DELETED && matchedSources.contains(change.path())) {
         continue;
       }
-      String source = sourcesByDestination.get(change.path());
-      if (change.kind() == ChangeKind.ADDED && source != null) {
-        resolved.add(new NoteChange(change.path(), ChangeKind.RENAMED, change.blobId(), source));
+      NoteOrigin origin = originsByDestination.get(change.path());
+      if (change.kind() == ChangeKind.ADDED && origin != null) {
+        resolved.add(new NoteChange(change.path(), ChangeKind.RENAMED, change.blobId(), origin));
       } else {
         resolved.add(change);
       }
@@ -315,14 +315,21 @@ public final class NotebookGitProposalTreeShape {
   record AdmittedShape(List<NoteChange> noteChanges, List<ChangedDocument> additions) {}
 
   /**
+   * Accepted-tree path and blob that established note identity. Carried separately from the
+   * proposed-tree final {@link NoteChange#path()} and {@link NoteChange#blobId()} so later
+   * composition can retain correspondence when final placement or content differs.
+   */
+  record NoteOrigin(String path, ObjectId blobId) {}
+
+  /**
    * @param path the current (proposed-tree) Portable path; for RENAMED this is the new path
    * @param blobId the raw blob object id relevant to this change: the added blob (proposed tree)
    *     for ADDED, the removed blob (accepted tree) for DELETED, the proposed blob for MODIFIED
-   *     (not meaningfully used by callers today), and the shared blob for RENAMED
-   * @param fromPath the original (accepted-tree) Portable path being renamed from; present only for
-   *     RENAMED, {@code null} otherwise
+   *     (not meaningfully used by callers today), and the shared blob for RENAMED today
+   * @param origin accepted-tree correspondence establishing identity; present for RENAMED, {@code
+   *     null} otherwise
    */
-  record NoteChange(String path, ChangeKind kind, ObjectId blobId, String fromPath) {}
+  record NoteChange(String path, ChangeKind kind, ObjectId blobId, NoteOrigin origin) {}
 
   enum ChangeKind {
     ADDED,
