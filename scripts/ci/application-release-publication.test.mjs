@@ -48,10 +48,19 @@ for (const scenario of [
       )
       return
     }
-    assert.equal(result.status, 0, result.stderr)
+    if (forced) assert.notEqual(result.status, 0)
+    else assert.equal(result.status, 0, result.stderr)
     assert.match(
       readFileSync(join(root, 'captured-map'), 'utf8'),
       /selected-source-only/
+    )
+    assert.equal(
+      readFileSync(join(root, 'captured-spa'), 'utf8'),
+      'selected SPA'
+    )
+    assert.equal(
+      readFileSync(join(root, 'captured-cli'), 'utf8'),
+      'selected CLI'
     )
     const calls = readFileSync(trace, 'utf8').trim().split('\n')
     assert.equal(
@@ -65,117 +74,39 @@ for (const scenario of [
     ])
     assert.match(calls[4], /^gcloud compute url-maps import /)
     if (forced) {
-      assert.ok(
-        calls.includes(
-          `gsutil cp ${jar} gs://private-backend/backend_app_jar/donut-0.0.1-SNAPSHOT.jar`
-        )
-      )
-      // Ordinary rolling replacement must never be used for this release:
-      // the maintenance-protected sequence below replaces it entirely.
-      assert.ok(
-        !calls.some((call) => call.includes('rolling-action replace')),
-        'ordinary rolling-action replace must not be issued'
-      )
-      // Maintenance-protected order: jar upload (already asserted above,
-      // before any template/replace action) -> template created ->
-      // maintenance entry (set-instance-template + stop-instances +
-      // quiescence poll) -> instances started back up -> rollout wait ->
-      // healthcheck -> record.
-      const jarUploadIndex = calls.indexOf(
-        `gsutil cp ${jar} gs://private-backend/backend_app_jar/donut-0.0.1-SNAPSHOT.jar`
-      )
-      const templateCreateIndex = calls.findIndex((call) =>
-        call.startsWith('gcloud compute instance-templates create ')
-      )
-      const setTemplateIndex = calls.findIndex((call) =>
-        call.startsWith(
-          'gcloud compute instance-groups managed set-instance-template doughnut-app-group --template='
-        )
-      )
-      const stopInstancesIndex = calls.indexOf(
-        'gcloud compute instance-groups managed stop-instances doughnut-app-group --zone=us-east1-b --all-instances'
-      )
-      const listInstancesIndex = calls.findIndex(
-        (call) =>
-          call ===
-          'gcloud compute instance-groups managed list-instances doughnut-app-group --zone=us-east1-b --format=value(instanceStatus)'
-      )
-      const startInstancesIndex = calls.indexOf(
-        'gcloud compute instance-groups managed start-instances doughnut-app-group --zone=us-east1-b --all-instances'
-      )
-      const rolloutWaitIndex = calls.findIndex((call) =>
-        call.startsWith(
-          'gcloud compute instance-groups managed wait-until doughnut-app-group --version-target-reached'
-        )
-      )
-      const healthcheckIndex = calls.findIndex((call) =>
-        call.startsWith('curl ')
-      )
-      const recordIndex = calls.indexOf(
-        'gsutil cp - gs://private-backend/deploy/last-successful-deploy.json'
-      )
-      for (const index of [
-        jarUploadIndex,
-        templateCreateIndex,
-        setTemplateIndex,
-        stopInstancesIndex,
-        listInstancesIndex,
-        startInstancesIndex,
-        rolloutWaitIndex,
-        healthcheckIndex,
-        recordIndex,
-      ]) {
-        assert.notEqual(index, -1)
-      }
-      assert.ok(
-        jarUploadIndex < templateCreateIndex &&
-          templateCreateIndex < setTemplateIndex &&
-          setTemplateIndex < stopInstancesIndex &&
-          stopInstancesIndex < listInstancesIndex &&
-          listInstancesIndex < startInstancesIndex &&
-          startInstancesIndex < rolloutWaitIndex &&
-          rolloutWaitIndex < healthcheckIndex &&
-          healthcheckIndex < recordIndex,
-        `expected maintenance-protected order, got: ${calls.join('\n')}`
-      )
-      assert.match(
-        calls[templateCreateIndex],
-        /--metadata-from-file startup-script=\S+mig-zulu25-openai-app-instance-startup\.sh/
-      )
-      const newTemplateName = calls[templateCreateIndex].split(' ')[4]
-      assert.equal(
-        calls[setTemplateIndex],
-        `gcloud compute instance-groups managed set-instance-template doughnut-app-group --template=${newTemplateName} --zone=us-east1-b`
-      )
-      assert.equal(
-        JSON.parse(readFileSync(join(root, 'saved-record'))).git_sha,
-        sha
-      )
-      assert.equal(
-        readFileSync(join(root, 'captured-startup'), 'utf8'),
-        startup
-      )
-      assert.equal(
-        JSON.parse(readFileSync(join(root, 'saved-record')))
-          .startup_script_sha256,
-        hash(startup)
-      )
-    } else {
-      assert.match(result.stdout, /Deploy skipped/)
-      assert.equal(calls.length, 8)
-      // A skipped deploy must skip everything, including maintenance entry:
-      // no template/replace/stop/start/quiescence-poll calls at all.
+      assert.match(result.stderr, /Release stopped safely with the MIG closed/)
+      const jarUpload = `gsutil cp ${jar} gs://private-backend/backend_app_jar/donut-0.0.1-SNAPSHOT.jar`
+      assert.deepEqual(calls.slice(calls.indexOf(jarUpload)), [
+        jarUpload,
+        'gcloud compute instance-groups managed describe doughnut-app-group --zone=us-east1-b --format=value(targetSize)',
+        'gcloud compute instance-groups managed update doughnut-app-group --update-policy-type=OPPORTUNISTIC --zone=us-east1-b',
+        'gcloud compute instance-groups managed resize doughnut-app-group --size=0 --zone=us-east1-b',
+        'gcloud compute instance-groups managed list-instances doughnut-app-group --zone=us-east1-b --format=value(instance)',
+      ])
       assert.ok(
         !calls.some(
           (call) =>
             call.includes('set-instance-template') ||
-            call.includes('stop-instances') ||
-            call.includes('start-instances') ||
-            call.includes('list-instances') ||
             call.includes('instance-templates create') ||
-            call.includes('rolling-action replace')
+            call.includes('start-instances') ||
+            call.includes('rolling-action') ||
+            call.includes('wait-until') ||
+            call.startsWith('curl ')
+        )
+      )
+      assert.equal(existsSync(join(root, 'saved-record')), false)
+      assert.deepEqual(
+        readApplicationRecords(applicationRecords).map(
+          (record) => record.outcome
         ),
-        `expected no maintenance/rollout calls when skipped, got: ${calls.join('\n')}`
+        ['publishing']
+      )
+    } else {
+      assert.match(result.stdout, /Deploy skipped/)
+      assert.equal(calls.length, 8)
+      assert.ok(
+        !calls.some((call) => call.includes('instance-groups managed')),
+        `expected no maintenance calls when skipped, got: ${calls.join('\n')}`
       )
       assert.deepEqual(readApplicationRecords(applicationRecords), [
         {
@@ -209,9 +140,7 @@ test('failed publication leaves the admitted application publishing', (t) => {
     t,
     'failed-frontend'
   )
-
   const result = publish()
-
   assert.notEqual(result.status, 0)
   const calls = readFileSync(trace, 'utf8').trim().split('\n')
   assert.equal(calls.length, 2)

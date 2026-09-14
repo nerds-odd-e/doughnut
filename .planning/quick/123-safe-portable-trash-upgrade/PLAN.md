@@ -590,7 +590,7 @@ branch.
 
 ### 10b. Stop actual publication at the closed boundary
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Application Release reaches verified zero-size maintenance before the
 one-shot task exists → backend publication stops non-zero → no template
 assignment, migration, reopen, rollout, healthcheck or successful deploy record
@@ -604,6 +604,18 @@ every forbidden later call, while preserving frontend/CLI publication and the
 release record's publishing outcome.
 Estimate: 5 minutes active after 10a. Keep publication-fixture changes local to
 this boundary; do not add the one-shot task or reopen path.
+Learnings: The actual Application Release/backend-deploy owner now uploads the
+selected jar, invokes the verified zero-size maintenance entry, and exits
+non-zero with an explicit safe-stop message. Seven focused publication tests
+preserve source selection, frontend/CLI publication, hash skip, failure and
+workflow wiring while proving exact closure order, a `publishing` release
+record, and absence of template creation/assignment, migration, reopen,
+rollout, healthcheck and successful deploy record. The focused suite and
+production-script shellcheck passed before and after the fresh refactor pass;
+`format:changed` then completed once and normalized one JavaScript file. The
+implementation took 2m10s and the refactor ~7 minutes. No cloud resource was
+mutated; branch CI remains unavailable because the workflow observes `main`
+pushes only.
 
 ### 10c. Align the direct deploy-script contract with fail-closed publication
 Type: Structure

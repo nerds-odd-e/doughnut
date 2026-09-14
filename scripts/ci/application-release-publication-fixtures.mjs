@@ -126,10 +126,9 @@ fi`
     `echo "gcloud $*" >> "$TRACE"
 for arg in "$@"; do
   if [[ "$arg" == --source=* ]]; then cp "\${arg#--source=}" "$CAPTURED_MAP"; fi
-  if [[ "$arg" == startup-script=* ]]; then cp "\${arg#startup-script=}" "$CAPTURED_STARTUP"; fi
 done
-if [[ "$*" == *"managed describe"* ]]; then echo current-template; fi
-if [[ "$*" == *"list-instances"* ]]; then echo TERMINATED; fi`
+if [[ "$*" == *"managed describe"* && "$*" == *"targetSize"* ]]; then echo 2; fi
+if [[ "$*" == *"list-instances"* ]]; then :; fi`
   )
   fake(
     'curl',
@@ -164,7 +163,6 @@ printf 200`
         RELEASE_CI_RUN_ID: String(ci.runId),
         RELEASE_CI_RUN_ATTEMPT: String(ci.runAttempt),
         CAPTURED_MAP: join(root, 'captured-map'),
-        CAPTURED_STARTUP: join(root, 'captured-startup'),
         GCS_BUCKET: 'private-backend',
         GCS_FRONTEND_BUCKET: 'public-frontend',
         ARTIFACT: 'donut',
@@ -173,7 +171,6 @@ printf 200`
         CLI_BUNDLE_SOURCE: artifacts(ci.runId).cli,
         DEPLOY_JAR_PATH: artifacts(ci.runId).jar,
         FORCE_FULL_DEPLOY: '',
-        HEALTHCHECK_RETRY_SLEEP_SECONDS: '0',
         MAINTENANCE_STOP_GRACE_SECONDS: '0',
         MAINTENANCE_QUIESCENCE_POLL_SECONDS: '0',
         MAINTENANCE_QUIESCENCE_TIMEOUT_SECONDS: '5',

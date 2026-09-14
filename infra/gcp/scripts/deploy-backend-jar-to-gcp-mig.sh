@@ -7,16 +7,10 @@ set -euo pipefail
 # Env: GCS_BUCKET, ARTIFACT, VERSION; optional DEPLOY_JAR_PATH; GITHUB_SHA (set by CI).
 # Optional FORCE_FULL_DEPLOY=1: run upload + rollout even when hashes match the record.
 #
-# One-time maintenance-protected rollout for the portable-trash schema
-# upgrade release (SEED-009 story 37, plan slice 9,
-# .planning/quick/123-safe-portable-trash-upgrade/PLAN.md): the ordinary
-# create-template-then-rolling-replace route
-# (update-mig-startup-script.sh) is replaced below with
-# create-mig-instance-template-for-maintenance.sh + enter-maintenance-mode.sh
-# + exit-maintenance-mode.sh, so every old writer is stopped and verified
-# quiescent before any instance can run this release's jar/schema. Story 39
-# reverts this once production has succeeded (see the plan's temporary
-# removal inventory).
+# The portable-trash schema upgrade release closes the MIG before any
+# schema-dependent work. Until verified upgrade and reopen exist, publication
+# deliberately fails after the MIG is closed and leaves the release record
+# publishing.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -73,23 +67,7 @@ fi
 echo "Deploying: jar SHA-256 $new_hash (record had ${recorded_hash:-<none>}); startup script SHA-256 $new_startup_script_hash (record had ${recorded_startup_script_hash:-<none>})."
 gsutil cp "$JAR_PATH" "$JAR_DEST"
 
-NEW_TEMPLATE_NAME="$(bash "$SCRIPT_DIR/create-mig-instance-template-for-maintenance.sh")"
+bash "$SCRIPT_DIR/enter-maintenance-mode.sh"
 
-MAINTENANCE_INSTANCE_TEMPLATE="$NEW_TEMPLATE_NAME" bash "$SCRIPT_DIR/enter-maintenance-mode.sh"
-
-bash "$SCRIPT_DIR/exit-maintenance-mode.sh"
-
-bash "$SCRIPT_DIR/check-mig-rollout.sh"
-
-export GITHUB_SHA
-bash "$SCRIPT_DIR/app-instance-healthcheck.sh"
-
-jq -n \
-  --arg sha "$new_hash" \
-  --arg startup_script_sha "$new_startup_script_hash" \
-  --arg git "$GITHUB_SHA" \
-  --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-  '{sha256: $sha, startup_script_sha256: $startup_script_sha, git_sha: $git, recorded_at: $at}' \
-  | gsutil cp - "$RECORD_URI"
-
-echo "Recorded last successful deploy at $RECORD_URI"
+echo "Release stopped safely with the MIG closed; verified upgrade and reopen are not implemented yet." >&2
+exit 1
