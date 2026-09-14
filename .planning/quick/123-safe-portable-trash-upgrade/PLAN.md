@@ -209,14 +209,48 @@ the fix.
 
 ### 4. Retry an interrupted legacy-trash conversion
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Migration connection is interrupted during conversion or after its
 commit before Flyway success recording → retry → same retained notes appear
 exactly once at their valid trash destinations, without extra suffixes/folders.
-Proof: Use test-owned connection interruption at the transaction boundaries,
-then fresh connection repair/migrate; compare slice 3's expected result. An
-uncommitted conversion rolls back. No permanent production failure switch.
+Proof: New `NoteLegacyTrashMigrationInterruptionTest` (a focused file, not a
+`PreUpgradeFixtureSchema`-alternative harness — reuses slice 1's fixture
+schema; separate from `NotebookUpgradeDataPreservationTest` because this
+proof's parameterized-interruption-state shape mirrors slice 2's test rather
+than that file's single-pass snapshot style). Verified against the actual
+source (`NoteLegacyTrashMigration.run`, `V300000326__...canExecuteInTransaction()
+== false`) that the whole conversion runs inside one explicit transaction with
+exactly one `commit()` at the end and rollback on any exception — so unlike
+328's multi-statement DDL, 326 has no reachable "partially committed" state;
+it is either entirely committed or entirely rolled back. Two scenarios proved
+instead of an unreachable partial-commit case: (1) a second connection
+performs writes of the same shape the real conversion makes, with autocommit
+disabled, then is discarded without `commit()` — proves MySQL/InnoDB rolls the
+whole thing back (no orphaned trash folder, no partial note update) and a real
+`repair()+migrate()` retry then completes correctly; (2) the real
+`NoteLegacyTrashMigration.run` is invoked directly outside Flyway so the
+conversion fully commits but `flyway_schema_history` has no row — mirroring a
+process loss after commit but before Flyway's bookkeeping (the 326 analogue of
+slice 2's history-unrecorded case) — proving retry is a safe no-op by the
+migration's own `deleted_at IS NOT NULL` candidate-selection idempotency. Both
+scenarios assert exactly one `_trash` root/child folder (no duplication by
+retry), the pre-existing collision note untouched, the collision-suffixed note
+titled exactly once ("Draft (2)"), and exactly one successful history row.
+Compared against slice 3-style exact-destination assertions. An uncommitted
+conversion rolls back: proved directly (not merely asserted).
+Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
 Estimate: 5 minutes active; extend the single fixture, not a second harness.
+Learnings: The delegated implementation agent produced complete, correct code
+(fixture, both scenarios, assertions) but stalled before running the full
+suite or reporting — the harness's own safety classifier was also reported
+unavailable for this run, so its output could not be pre-screened. The
+coordinator independently verified the transaction-boundary claim against the
+actual `NoteLegacyTrashMigration`/`V300000326__...` source before trusting it,
+then ran the focused test and full suite directly (both green), and fixed one
+cosmetic style issue (a fully-qualified `Matchers.not` instead of a static
+import). No functional defect found. Active time: implementation ~40 minutes
+before stalling (per its background transcript), coordinator verification and
+delivery ~20 minutes.
 
 ### 5. Retry a partially rebuilt notebook fleet
 Type: Behavior
