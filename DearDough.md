@@ -426,20 +426,6 @@ delivery shape.
     no implementation or proof remains, while retaining escalation for actual
     unfinished work.
 
-- Execution: SEED-009 story 37 / quick/123-safe-portable-trash-upgrade / 74e36ccc75
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: unknown
-  - Evidence: completed plan slices 1–6 each estimated about five active minutes;
-    their recorded active times range from about 30 minutes to about 90 minutes,
-    with the overrun recorded only after each slice had converged.
-  - Observed effect: the six validation leaves accumulated several hours of
-    active work without the stated ten-minute hard limit producing a smaller
-    unfinished leaf or an earlier scope reassessment.
-  - Inference: this is the same late hard-limit problem: recording the miss after
-    completed work preserves history but cannot control the execution in progress.
-
 ## DD-040 — Shared query classified by dominant purpose hid an incompatible production caller
 
 The plan correctly preserved a live-note query for Git/export retention, but its
@@ -501,30 +487,8 @@ re-application in the worktree before staging.
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
 
-## DD-042 — Conflicting no-gate direction was not reconciled before release-orchestration execution
+## Retention
 
-The canonical story direction said the owner did not want a separate rollout
-plan, opt-in, placeholder gate, or migration approval ceremony. The initial
-execution plan nevertheless made MIG maintenance and release orchestration part
-of the completion path, and execution continued into that work after the actual
-migration behavior and representative-scale proofs were complete.
-
-### Occurrences
-
-- Execution: SEED-009 story 37 / quick/123-safe-portable-trash-upgrade / 74e36ccc75
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: unknown
-  - Evidence: the pre-execution seed's 2026-09-13 human decision rejected a
-    separate rollout/gate; plan commit `98eda027d7` still included maintenance
-    slices 7–11; commits `20d89ae65e` through `4bf16e8372` added or repeatedly
-    refined MIG, publication, one-shot-task, and runbook work after slice 6;
-    owner scope correction led commit `5242f41a25` to restore every non-planning
-    file exactly to the slice-6 boundary `a3f9da8bc8`.
-  - Observed effect: sixteen post-validation commits and three abandoned
-    task-specific stashes were discarded; the owner reported roughly four to
-    five hours spent on an expanding validation task before convergence.
-  - Inference: the recorded human constraint and the plan's broader completion
-    path should have triggered a scope-conflict stop before implementation, then
-    the two release-readiness questions should have served as the stop condition.
+- Highest allocated local number: 42
+- Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
+- Occurrence history is partial

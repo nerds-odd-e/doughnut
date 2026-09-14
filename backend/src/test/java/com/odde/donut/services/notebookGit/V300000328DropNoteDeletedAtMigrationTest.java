@@ -28,9 +28,9 @@ import org.springframework.test.context.ActiveProfiles;
  *
  * <p>Before this migration was revised, retrying it after {@code idx_note_structural_peer} had
  * already been dropped reproduced MySQL error 1091 ("Can't DROP 'idx_note_structural_peer'; check
- * that column/key exists"), matching SEED-009 story 37's release-audit provenance. That
- * reproduction used the migration's original (pre-revision) SQL directly against MySQL and is not
- * re-executed here, since the resource under test is now the fixed migration.
+ * that column/key exists"). That reproduction used the migration's original (pre-revision) SQL
+ * directly against MySQL and is not re-executed here, since the resource under test is now the
+ * fixed migration.
  */
 @SpringBootTest
 @ActiveProfiles("test")

@@ -4,9 +4,8 @@
 -- dropped column so structural-peer lookups keep their covering index.
 --
 -- One-time human-authorized exception to migration immutability (Terry Yin, 2026-09-14): this
--- committed migration is revised in place because it has not yet been applied to production. See
--- SEED-009 story 37 ("Release portable trash without risking notebook data") for the full
--- authorization. Do not use this as precedent for editing any other committed migration.
+-- committed migration is revised in place because it has not yet been applied to production. Do
+-- not use this as precedent for editing any other committed migration.
 --
 -- Retry safety: MySQL 8.4 does not support IF [NOT] EXISTS on ALTER TABLE ADD/DROP COLUMN or
 -- DROP INDEX (verified empirically against MySQL 8.4.11; that syntax is a MariaDB-only
