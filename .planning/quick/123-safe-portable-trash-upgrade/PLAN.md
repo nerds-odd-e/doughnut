@@ -1,0 +1,308 @@
+# Release portable trash without risking notebook data
+
+Source: [SEED-009 story 37](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-37).
+Status: planned; planning-only instruction. No implementation or release performed.
+
+## Outcome and decisions
+
+Notebook owners retain authored notebook data and learning identities through
+the legacy-trash upgrade. The operator can recover an interrupted upgrade while
+old application writers remain excluded. Preserve the resulting Portable tree;
+the already-selected baseline rebuild intentionally replaces prior Git history.
+Owners need fresh checkouts and instructions to preserve unpublished local work
+before replacing a checkout. This release does not implement local-history merge.
+
+Terry Yin, 2026-09-14: production has not deployed this migration; explicitly
+revise committed `V300000328` as a one-time exception to migration immutability.
+Record that exception in its implementation commit. Do not edit other committed
+migrations without an evidenced need and corresponding owner direction. Do not
+renumber the failed migration or pretend a later migration can bypass it.
+
+Use a bounded maintenance release, backup/restore and verified writer exclusion.
+No general migration framework, resumable job service, permanent fault-injection
+hooks, zero-downtime expand/contract rollout, UI polish or trash feature expansion.
+10,000 deleted notes is representative safety evidence, not a product limit or
+permanent benchmark/SLA. Optimize only an observed obstacle to this release.
+
+## Existing solutions and architectural assessment
+
+PFE assessment (migration, product and deployment boundaries):
+
+- Reuse `NoteLegacyTrashMigration`'s whole-conversion transaction and
+  `NotebookGitBaselineRebuild`'s per-notebook transaction. Registered Java
+  migrations 326/327 already call them. Exercise the registered chain, rather
+  than duplicating their recipes in tests or adding another production runner.
+- Change `V300000328__drop_note_deleted_at.sql` in place. Prefer one atomic
+  index/column alteration with narrowly scoped schema-state handling for retry,
+  including commit-before-Flyway-history recording. A single ALTER alone does
+  not establish that retry works after its commit. Reconcile the known partial
+  states from the old script; unexpected schema shapes fail with a clear message.
+- `NotebookGitRebuildTestSupport`, `GitBundleTestReader`, committed fixtures and
+  existing baseline tests supply data/tree assertions. The current
+  `NotebookUpgradeDataPreservationTest` starts after migrations; extend/replace
+  its migration-only proof with a populated pre-upgrade Flyway rehearsal.
+  `MemoryTrackerDeletedAtUpgradeTest` copies SQL into a temporary table: do not
+  copy that technique for proof of actual Flyway ordering or durable DDL.
+- Use the existing worktree-owned disposable MySQL allocation. A temporary
+  isolated schema/harness is justified for pre-upgrade DDL and interrupted
+  commits, which must not mutate the ordinary suite schema or Development.
+  Keep it local to this migration's test support, with deterministic teardown.
+- Existing `publish-application.sh`, backend deployment scripts, Application
+  Release workflow and release runbook own rollout. Add only the one-time
+  maintenance path/guard needed there; ordinary rolling replacement does not
+  prove writer exclusion. No parallel release orchestrator.
+
+Accepted ADR 0004 (`docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md`)
+requires location-based trash with retained Portable files and learning identity.
+ADR 0007 (`docs/adrs/0007-environments-and-isolation-accepted.md`) requires owned,
+isolated test data. No ADR deviation. `.planning/NORTH-STAR.md`'s publication
+composition topic does not require new direction for this one-time upgrade.
+
+## Slices
+
+Target about 5 minutes active work including implementation, proof and local
+cleanup. More than 5 minutes requires scrutiny; more than 10 requires finer
+decomposition and recording the failed sizing assumption. Mandatory full backend
+suite/startup, the single scale rehearsal and cloud rehearsal waiting are explicit
+wait-only exceptions, recorded separately. No active-work exception. Every slice
+ends green; an unfinished slice is never evidence that production release is safe.
+
+### 1. Isolate a populated pre-upgrade Flyway fixture
+Type: Structure
+Status: planned
+Change: Add minimal migration-only test support that creates an owned disposable
+schema, migrates actual repository resources to version 325, accepts raw-JDBC
+fixtures before 326, and closes/drops only that schema. Reuse existing test
+connection/isolation conventions. This directly enables slice 2.
+Proof: A harness lifecycle check observes version 325 and `note.deleted_at`,
+then cleanup, without changes to the enclosing suite schema. Do not introduce
+a generic schema registry or a new test service.
+Estimate: 5 minutes active; if schema ownership/setup needs another mechanism,
+stop and refine before expanding it.
+
+### 2. Recover the column retirement at the actual Flyway boundary
+Type: Behavior
+Status: planned
+Behavior: A populated note table is in an original or known interrupted 328
+state → run revised 328 through repair/migrate → final schema and retained rows
+are correct, including retry after DDL commit before successful history recording.
+Change: Reproduce the old missing-index failure first; revise only 328. Test
+original schema, index absent/column present, both absent, and completed DDL
+without success history. Assert final index columns/order and column absence;
+already-recorded success stays unchanged. Unknown schema is not silently accepted.
+Proof: One parameterized Flyway boundary check over those states with snapshots
+of preserved rows. Use actual migration resource, not copied SQL. Exercise a
+real connection interruption at the DDL/history boundary in the owned schema.
+Engine hypothesis: production-family MySQL 8.4/InnoDB supports the selected
+ALTER form and its atomicity. Require this isolated proof before broader work;
+record `SELECT VERSION()`, `SHOW CREATE TABLE note`, command and observed result.
+Command: `CURSOR_DEV=true nix develop -c pnpm backend:verify` (new rehearsal is
+included in the normal backend suite). Result: pending; no engine claim verified.
+Estimate: 5 minutes active after fixture support; a failed engine assumption
+changes this slice before proceeding, not by adding a fallback framework.
+
+### 3. Preserve a populated notebook through all three migrations
+Type: Behavior
+Status: planned
+Behavior: Pre-326 populated schema → actual Flyway 326–328 upgrade → retained
+notebook identities/data and final Portable tree match the intended conversion.
+Proof: Canonical small fixture with active/deleted notes, existing trash, nested
+folders/readmes, occupied trash title, authored references, trackers/preferences,
+recall history and bindings. Compare full retained row snapshots with an explicit
+allowlist of conversion changes (placement/title suffix/cleared marker/timestamps
+and rebuilt binding payload), plus independently expected paths/content in the
+downloaded bundle. Preserve existing folders and binding identity/ownership.
+Include bound/unbound and deleted-notebook selection as focused data variations;
+do not silently narrow the migration's retained-data promise to live bound notes.
+Estimate: 5 minutes active using existing fixture/tree assertions.
+
+### 4. Retry an interrupted legacy-trash conversion
+Type: Behavior
+Status: planned
+Behavior: Migration connection is interrupted during conversion or after its
+commit before Flyway success recording → retry → same retained notes appear
+exactly once at their valid trash destinations, without extra suffixes/folders.
+Proof: Use test-owned connection interruption at the transaction boundaries,
+then fresh connection repair/migrate; compare slice 3's expected result. An
+uncommitted conversion rolls back. No permanent production failure switch.
+Estimate: 5 minutes active; extend the single fixture, not a second harness.
+
+### 5. Retry a partially rebuilt notebook fleet
+Type: Behavior
+Status: planned
+Behavior: At least one notebook rebuild commits and a later rebuild is
+interrupted → retry registered 327 and finish 328 → every selected binding
+contains a complete tree and matching head with retained notebook data.
+Proof: Multiple bound notebooks; interrupt within a rebuild and between commits
+as variations of the same recovery contract. Reuse existing rollback/bundle
+assertions. Compare tree/data, not old Git SHA or rebuild timestamp equality.
+Estimate: 5 minutes active; no fleet checkpoint table or new retry service.
+
+### 6. Complete the upgrade with 10,000 deleted notes
+Type: Behavior
+Status: planned
+Behavior: One large notebook with 10,000 legacy-deleted notes plus active content,
+and smaller neighboring notebooks → actual full upgrade and one interrupted/retry
+run → complete retained content/identities and correct bound Portable trees.
+Proof: Batch seed deterministic raw-JDBC data into the same pre-upgrade fixture;
+include shared nested parents, existing trash, bounded occupied-name collisions,
+long-title suffixing and representative linked learning/reference rows. Compare
+all 10,000 note identities/content, all dependent rows seeded, and complete trees;
+counts alone are insufficient. Reuse small cases for error permutations instead
+of repeating the full matrix at scale. Record rows, elapsed time per migration,
+database version, host resources and observed memory/transaction trouble.
+Estimate: 5 minutes active plus measured run waiting. Unexpected cost or failure
+triggers a bounded reassessment; no invented production latency threshold.
+
+### 7. Establish a quiescent maintenance state
+Type: Behavior
+Status: planned
+Behavior: Old application processes are serving → enter the one-time maintenance
+path → all schema-dependent writers are stopped and verified absent before any
+migration is permitted. Account for background writers, not just incoming HTTP.
+Change: Add the minimum bounded maintenance operation to existing deployment
+ownership; no migration runs merely because a stop request was submitted.
+Proof: Existing publication/deployment test fixtures with fake cloud commands
+observe stop, wait and quiescence verification in order. Failed verification
+prevents migration. This path remains opt-in and cannot release by itself yet.
+Estimate: 5 minutes active, reusing existing shell orchestration and test fixtures.
+
+### 8. Keep old writers stopped after replacement or process failure
+Type: Behavior
+Status: planned
+Behavior: Maintenance has been entered and migration is interrupted → lifecycle
+replacement, autohealing or an operator retry occurs → old binaries cannot
+resume writing. The maintenance state survives loss of the invoking process.
+Change: Use existing cloud lifecycle controls for the bounded maintenance window;
+do not rely on a shell trap or an HTTP gate to stop background writes.
+Proof: Extend the same boundary fixture with replacement/retry variations;
+observe that only the selected compatible artifact may subsequently start.
+No new durable state service; record the cloud-owned controls in the runbook.
+Estimate: 5 minutes active. If the existing lifecycle controls cannot establish
+this invariant, stop and reassess the bounded release approach.
+
+### 9. Route normal publication through the protected upgrade
+Type: Behavior
+Status: planned
+Behavior: Application Release selects the portable-trash artifact → publication
+→ maintenance protections precede every schema-dependent rollout and routing
+cannot reopen early. Ordinary rolling replacement cannot bypass the protection.
+Change: Wire slices 7–8 into existing publication ownership for this one release;
+preserve selected SHA/artifacts, frontend/CLI publication and release records.
+Proof: Extend `scripts/ci/application-release-publication.test.mjs` at its actual
+publication entry point to assert the complete order and guard against the normal
+rolling route, including retries and conditional backend-deploy skip behavior.
+Command: `CURSOR_DEV=true nix develop -c node --test scripts/ci/application-release-publication.test.mjs`.
+Estimate: 5 minutes active after 7–8. Local fake-cloud proof does not prove GCP isolation.
+
+### 10. Recover a failed release without reopening an unsafe application
+Type: Behavior
+Status: planned
+Behavior: Backup/preflight, migration or verification fails in the maintenance
+path → operator follows recovery → writes remain excluded until either the
+verified new state or a verified backup restoration with compatible app exists.
+Change: Add a short one-time section to the canonical release runbook with
+backup identification and restore rehearsal, pre/post identity/content checks,
+actual Flyway/schema preflight, retry states and fresh-checkout communication
+that protects unpublished local work. No automatic schema rollback.
+Proof: Same publication boundary tests observe failure stays closed and only
+successful verification permits reopening; walk its commands against the owned
+fixture including restoring backup. Document exact operator inputs and evidence.
+Estimate: 5 minutes active plus restore waiting; reuse slices 2–9 observations.
+
+### 11. Rehearse the supported release path on an isolated populated copy
+Type: Behavior
+Status: planned
+Behavior: A production-shaped pre-upgrade copy and old/new release processes →
+run the documented maintenance sequence with interruption/retry → only the
+compatible app serves the verified retained notebook data after reopening.
+Proof: Use the real release/migration entry points on an explicitly disposable
+environment. Observe writer exclusion including replacement/autohealing, full
+upgrade/restore recovery and final application/Portable-tree checks; retain
+sanitized exact commands, versions, row comparisons and timing in this plan.
+Use an authorized isolated pre-upgrade production copy when available; if only
+synthetic data or fake cloud exists, label that limitation and leave the missing
+release proof pending. Do not access or mutate production under this plan.
+Estimate: 5 minutes active orchestration after slices 7–10, external waiting
+separate. Missing disposable cloud/copy access blocks only this proof; do not
+build a general staging platform to get around it.
+
+## Proof ownership and release boundary
+
+| Promise | Owner |
+| --- | --- |
+| Safe isolated pre-upgrade fixture and actual engine evidence | 1–2 |
+| Column/index retry and Flyway history correctness | 2 |
+| Authored data, folders, references, learning/preferences and bindings retained | 3 |
+| Interruption recovery for conversion and per-notebook rebuild | 4–5 |
+| Thousands of deleted notes, complete trees, measured operating cost | 6 |
+| Old writers excluded; failures remain in maintenance | 7–10; real observation 11 |
+| Backup/restore, row/content comparisons, fresh-checkout guidance | 10–11 |
+| Remove all migration-only additions after production success | Story 39; inventory below |
+
+Production release is separate from this implementation plan: use the existing
+release-application workflow with an authorized immutable tag/exact tested SHA.
+Before release verify owner-confirmed pending migration state in actual Flyway
+history/schema and require the missing release proof above. After release record
+successful production migration and retained-data/application checks before
+activating cleanup. Local green CI is neither deployment nor cleanup permission.
+
+## Temporary removal inventory
+
+Removal owner: [SEED-009 story 39](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-39).
+Update exact paths as each slice lands; this is a deletion list, not a framework.
+
+- Existing 326/327/328 versioned migration files; migration-exclusive
+  `NoteLegacyTrashMigration` and `NotebookGitBaselineRebuild` implementations.
+- Migration-only portions of `NotebookUpgradeDataPreservationTest`,
+  `NotebookGitBaselineRebuildTest` and `NotebookGitRebuildTestSupport`; inspect
+  callers before removing helpers used by other still-required tests.
+- New fixture schema support, historical fixtures, scale case, interruption
+  instrumentation and any dedicated task/command (slices 1–6).
+- Temporary maintenance guard/path, its migration-only publication tests and
+  one-time runbook instructions (slices 7–11); remove after safe retirement.
+
+Story 39 must safely fold final DDL into the existing baseline and deploy/confirm
+a new tip above all ever-applied versions before removing old migrations. Fresh
+install and already-upgraded startup must both pass afterward. Keep ordinary
+trash, learning and Git runtime behavior/tests. Do not remove evidence before
+production success or retain dead conversion helpers after safe retirement.
+
+## Execution discipline and assessment
+
+Execute only under a later execution instruction using dough-execute-plan:
+claim backlog then establish the story worktree; Jidoka → fresh independent
+post-change-refactor agent → API generation only if triggered → coordinator's
+one `./scripts/run.sh pnpm format:changed` → plan update → commit/check-only hook
+→ push and asynchronous CI observation. Preserve pre-existing planning edits.
+
+Backend migration changes require migration plus the full backend suite. The
+documented `pnpm backend:verify` wrapper currently runs a formatter; during slice
+execution use its equivalent without that extra formatter: in the story's
+isolated worktree run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+(the worktree test task owns migration). If executing in an explicitly selected
+unconfigured primary, first run `CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test`, then
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only`. Record which actual
+command runs slice 2's engine proof. Regenerate the ERD per database-erd guidance
+if schema migrations change. No frontend/API change is expected.
+
+Planning inspected code only; all proof results remain pending. The common model
+is the existing conversion transaction, per-notebook rebuild transaction, one
+schema reconciliation and one maintenance release owner. No per-case production
+pipeline.
+
+Refinement: the original rollout slice 7 combined establishing quiescence,
+lifecycle protection and publication wiring. Replaced it with slices 7–9 and
+renumbered recovery/rehearsal to 10–11, preserving all proof owners. Result:
+11 slices, no completed work replaced, no story resplit recommended. The smaller
+manual alternative remains preferred where existing cloud controls suffice;
+these slices do not require a product maintenance UI or permanent infrastructure.
+
+Slices 1–10 have one bounded proof loop after this refinement and are ready for
+direct execution under a separate execution instruction. Slice 2 still carries
+the explicit engine-proof gate before broader implementation. Slice 11 is
+conditional on a proven disposable environment/copy; its access has not been
+established here. Execution has not started and the complete release cannot be
+certified safe until all applicable real-environment observations are present.
+Sizing exceptions cover test/rehearsal waiting only; active integration overruns
+remain subject to the 10-minute refinement limit.

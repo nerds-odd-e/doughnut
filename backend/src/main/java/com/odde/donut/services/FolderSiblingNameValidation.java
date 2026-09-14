@@ -59,6 +59,18 @@ public class FolderSiblingNameValidation {
     return findConflictingSibling(notebookId, parentFolderId, name, Set.of(excludedFolderId));
   }
 
+  public DisplayName firstAvailableSiblingName(
+      Integer notebookId, Integer parentFolderId, DisplayName requestedName, int excludedFolderId) {
+    return new DisplayName(
+        NumberedNameSelection.firstAvailable(
+            requestedName.value(),
+            Folder.MAX_NAME_LENGTH,
+            candidate ->
+                findConflictingSibling(
+                        notebookId, parentFolderId, new DisplayName(candidate), excludedFolderId)
+                    .isPresent()));
+  }
+
   /**
    * Move folder: destination siblings may not use the moved folder's name except the folder itself.
    */

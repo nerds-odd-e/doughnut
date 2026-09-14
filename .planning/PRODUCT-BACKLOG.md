@@ -15,9 +15,11 @@ with reasonable performance.
 ## Taken
 
 - [Publish accumulated local commits without rewriting history](quick/122-publish-accumulated-local-commits/PLAN.md) — SEED-009
+- [Release portable trash without risking notebook data](quick/123-safe-portable-trash-upgrade/PLAN.md) — SEED-009
 
 ## Backlog list
-- [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
+- [Retire the spent portable-trash upgrade after production success](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-39) — SEED-009
+- [Make repeated trash and Undo journeys clean and predictable](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-38) — SEED-009
 - [Receive web-created folders and their notes locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-35) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009

@@ -37,7 +37,7 @@ Feature: Nested Note creation
   Scenario: Undo creating a new note
     When I create a note with title "New Note" under the folder "LeSS in Action" in the notebook "LeSS training"
     And I undo "create note"
-    Then I should see the note "New Note" is marked as deleted
+    Then I should see the note "New Note" is in trash
     And I should see folder "LeSS training/LeSS in Action" containing these notes:
       | note-title |
       | team       |

@@ -22,19 +22,10 @@ public class NoteTitlePlacementRules {
 
   public String firstAvailableTitleAt(
       Notebook notebook, Folder folderOrNull, String requestedTitle, Integer sourceNoteId) {
-    if (!isOccupiedByAnotherNote(notebook, folderOrNull, requestedTitle, sourceNoteId)) {
-      return requestedTitle;
-    }
-    for (int suffixNumber = 2; ; suffixNumber++) {
-      String suffix = " (" + suffixNumber + ")";
-      String candidate =
-          requestedTitle.substring(
-                  0, Math.min(requestedTitle.length(), Note.MAX_TITLE_LENGTH - suffix.length()))
-              + suffix;
-      if (!isOccupiedByAnotherNote(notebook, folderOrNull, candidate, sourceNoteId)) {
-        return candidate;
-      }
-    }
+    return NumberedNameSelection.firstAvailable(
+        requestedTitle,
+        Note.MAX_TITLE_LENGTH,
+        candidate -> isOccupiedByAnotherNote(notebook, folderOrNull, candidate, sourceNoteId));
   }
 
   public void requireNoOtherNoteTitleAt(
