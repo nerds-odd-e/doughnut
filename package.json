@@ -118,7 +118,7 @@
     "typescript": "6.0.3",
     "util": "^0.12.5",
     "wait-on": "^9.1.0",
-    "yaml": ">=2.9.0"
+    "yaml": "2.9.1"
   },
   "dependencies": {
     "vue-toastification": "2.0.0-rc.5"
