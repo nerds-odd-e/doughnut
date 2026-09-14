@@ -560,7 +560,7 @@ stop/start timing, autohealing, update-policy convergence).
 
 ### 10a. Close the MIG before changing its template
 Type: Behavior
-Status: planned
+Status: done
 Behavior: The production-family MIG has running old instances and a PROACTIVE
 replace policy → enter maintenance → the policy becomes opportunistic, the
 MIG's original target size is retained for recovery, its target size becomes
@@ -573,6 +573,20 @@ target size, durable zero target and process loss after every command. Assert
 stable gcloud command forms rather than accepting unsupported `--all-instances`.
 Estimate: 5 minutes active. Reuse native update-policy, resize, describe and
 list-instances commands; do not add a maintenance state service.
+Learnings: Replaced the invalid template-first/`--all-instances` path with the
+stable describe → OPPORTUNISTIC update policy → resize zero → empty-instance
+poll sequence. The original target size is emitted before mutation so the later
+publication/recovery owner can retain it; the standalone script deliberately
+owns neither template assignment nor reopen. Six focused Node tests cover
+command order, durable policy/target state across process loss after every
+command, and fail-closed behavior (including leaving PROACTIVE unchanged when
+the initial describe fails). The focused suite and shellcheck passed before and
+after the fresh refactor pass; `format:changed` then completed once and fixed
+the two JavaScript fixture files. No cloud resource was mutated. Fresh agent
+validation took ~51 seconds and refactoring ~8 minutes; the implementation was
+selectively recovered from the earlier oversized correction stash. Branch CI
+remains unobservable because `donut CI` runs on pushes to `main`, not this story
+branch.
 
 ### 10b. Stop actual publication at the closed boundary
 Type: Behavior
