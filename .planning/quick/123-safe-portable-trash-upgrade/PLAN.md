@@ -400,7 +400,7 @@ Flyway migration), and no defect found.
 
 ### 8. Keep old writers stopped after replacement or process failure
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Maintenance has been entered and migration is interrupted → lifecycle
 replacement, autohealing or an operator retry occurs → old binaries cannot
 resume writing. The maintenance state survives loss of the invoking process.
@@ -411,6 +411,48 @@ observe that only the selected compatible artifact may subsequently start.
 No new durable state service; record the cloud-owned controls in the runbook.
 Estimate: 5 minutes active. If the existing lifecycle controls cannot establish
 this invariant, stop and reassess the bounded release approach.
+Learnings: The invariant IS establishable with existing controls — no
+reassessment needed. `enter-maintenance-mode.sh` now runs
+`gcloud ... set-instance-template doughnut-app-group
+--template="$MAINTENANCE_INSTANCE_TEMPLATE"` (verb/argument shape confirmed
+identical to the existing `update-mig-startup-script.sh`) as its first step,
+*before* `stop-instances`. `instanceTemplate` is a field GCP stores on the
+MIG resource itself, durable independent of this script's process; this
+MIG's existing autohealing policy (`add-mig-autohealing.sh`) and PROACTIVE
+`most-disruptive-action=replace` update policy
+(`configure-mig-update-policy.sh`) both recreate/replace instances from
+whatever template is currently assigned — documented GCP MIG behavior, not
+new to this repo. So once the template swap commits, any later instance
+start for this MIG (autohealing after the stop, the update policy's own
+convergence, or an operator's manual retry) necessarily boots the compatible
+template, never the old one, even if this script dies immediately after
+that first `gcloud` call. New `docs/gcp/portable-trash-maintenance-release-runbook.md`
+records this reasoning plus a genuine operational caveat the implementer
+found and did not paper over: every instance template's startup script
+downloads the backend jar from one fixed GCS path
+(`backend_app_jar/donut-0.0.1-SNAPSHOT.jar`, confirmed against
+`mig-zulu25-openai-app-instance-startup.sh`), so template identity alone
+does not pin which jar bytes an instance runs — slice 9 must ensure the
+compatible jar is uploaded to that path no later than the template-swap
+step, not merely after this script exits. Proof extended
+`application-release-maintenance-fixtures.mjs`/`.test.mjs` (2→4 tests) with
+a fake `describe --format=value(instanceTemplate)` read standing in for a
+later, independent invocation (what autohealing/convergence/retry would
+see): proves the compatible template is durably set even when
+`stop-instances` fails right after, and that a missing
+`MAINTENANCE_INSTANCE_TEMPLATE` fails loudly before any `gcloud` call,
+leaving the prior template untouched. Post-change-refactor found nothing to
+change (re-checked the fake-command-trace duplication question already
+settled in slice 7 — still no shared extraction point, confirmed again).
+Coordinator independently re-verified: cross-checked the `set-instance-template`
+verb against `update-mig-startup-script.sh` and the fixed-GCS-path claim
+against `mig-zulu25-openai-app-instance-startup.sh`/`deploy-backend-jar-to-gcp-mig.sh`
+directly, confirmed `git status` showed only the claimed files touched, and
+re-ran all 4 maintenance tests, the 7 publication tests and shellcheck
+myself before and after formatting — all green throughout. No backend Java
+touched, so the full backend suite was not re-run. Active time ~40-45
+minutes across implementation (including a web search to confirm GCP MIG
+autohealing/update-policy semantics), refactor and coordinator verification.
 
 ### 9. Route normal publication through the protected upgrade
 Type: Behavior
