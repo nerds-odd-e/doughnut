@@ -14,10 +14,11 @@ with reasonable performance.
 
 ## Taken
 
+- [Publish accumulated local commits without rewriting history](quick/122-publish-accumulated-local-commits/PLAN.md) — SEED-009
+
 ## Backlog list
 - [Trash a folder on the web as one recoverable subtree](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33) — SEED-009
 - [Receive web-created folders and their notes locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-35) — SEED-009
-- [Publish accumulated local commits without rewriting history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009
 - [Use portable trash across Donut and local Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28) — SEED-009
