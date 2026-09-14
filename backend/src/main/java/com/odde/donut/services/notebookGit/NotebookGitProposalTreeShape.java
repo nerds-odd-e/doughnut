@@ -25,7 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
  * across the complete candidate set. Mixing unmatched removals with additions is refused when
  * identity correspondence is uncertain. Unsafe paths, non-regular modes, or a changed
  * folder-reserved {@code README.md} are refused. Callers only invoke this once proposal ancestry is
- * confirmed to be a direct single-parent child of the accepted commit.
+ * confirmed to be a contiguous single-parent range from the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 

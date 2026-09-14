@@ -108,7 +108,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(before)
     })
@@ -159,7 +159,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
       expect(postCount(fetchMock)).toBe(0)
       expect(runGit(['rev-parse', 'main'], dir)).toBe(localHead)
@@ -169,9 +169,27 @@ export function describeNotebookPublishAncestry(): void {
       )
     })
 
-    test('local main several commits ahead of the accepted head is rejected with an ancestry error', async () => {
+    test('local main several content-edit commits ahead of the accepted head reaches submission', async () => {
       const workDir = ctx.getWorkDir()
       const sourceRepoDir = buildSourceRepo(workDir)
+      runGit(['checkout', '--quiet', '-b', 'feature'], sourceRepoDir)
+      commitFileChange(
+        sourceRepoDir,
+        '# hello notebook (side)\n',
+        'side commit'
+      )
+      runGit(['checkout', '--quiet', 'main'], sourceRepoDir)
+      runGit(
+        [
+          'merge',
+          '--no-ff',
+          '--quiet',
+          '-m',
+          'merge below accepted',
+          'feature',
+        ],
+        sourceRepoDir
+      )
       const bundleFile = join(workDir, 'accepted.bundle')
       bundleMain(sourceRepoDir, bundleFile)
       stubFetchWithBundleFile(bundleFile)
@@ -184,13 +202,10 @@ export function describeNotebookPublishAncestry(): void {
       )
       commitFileChange(dir, '# hello notebook (edit 1)\n', 'edit note 1')
       commitFileChange(dir, '# hello notebook (edit 2)\n', 'edit note 2')
+      const localHead = runGit(['rev-parse', 'main'], dir)
 
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
-      )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
-      )
+      await run(['notebook', 'publish', dir])
+      expect(runGit(['rev-parse', 'main'], dir)).toBe(localHead)
     })
 
     test('local main with unrelated history is rejected with an ancestry error', async () => {
@@ -206,7 +221,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
     })
 
@@ -235,7 +250,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
     })
   })

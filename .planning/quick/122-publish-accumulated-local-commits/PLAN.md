@@ -1,8 +1,20 @@
 # Publish accumulated local commits without rewriting history
 
-Status: planned; no implementation started. Slice 10 awaits the existing
-unanswered deletion/recreation decision. Authority: planning/refinement only.
+Status: in progress. Slice 1 done; slice 2 next. Slice 10 awaits the existing
+unanswered deletion/recreation decision and remains non-executable until answered.
 Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
+
+## Planned-execution identity
+
+- Originating checkout/branch: `/Users/terryyin/git/doughnut` on `main`
+  (claim commit `f245ee2f5a`)
+- Execution checkout/branch:
+  `/Users/terryyin/git/doughnut-worktrees/122-publish-accumulated-local-commits`
+  on `quick/122-publish-accumulated-local-commits`
+- Integration target: `main`
+- CI observer: mailbox `/tmp/dough-ci-501/watch-W7emfp`; workflow `ci.yml`
+  (`donut CI`); repo `nerds-odd-e/doughnut`; branch
+  `quick/122-publish-accumulated-local-commits`
 
 ## Goal and boundary
 
@@ -91,7 +103,7 @@ Each completed leaf must be green and preserve existing supported publication.
 
 ### 1. Publish several content-edit commits in one request
 Type: Behavior
-Status: planned
+Status: done
 Behavior: B and C each edit existing notes → publish once → Donut and a receiving
 checkout contain C's contents and the original A → B → C history.
 Change: Relax both ancestry guards to verify a whole single-parent range; keep
@@ -103,6 +115,11 @@ bundle submission without local mutation. Extend one installed-CLI round trip
 in `cli_notebook_existing_note_edits.feature` to verify original SHAs/parents
 and final files. Ancestry examples include a merge below a single-parent tip.
 Estimate: 5 minutes active work; reuse existing commit/bundle and E2E helpers.
+Learnings: Backend and CLI first-parent walks accept contiguous A..T; tip content
+application unchanged. Publish cannot reuse pull's `rev-list … --not accepted`
+seam when the accepted SHA is absent from the checkout. Merge tips / unrelated /
+stale still refuse. Controller helper `ContentEditRange` and E2E
+`readCheckoutStateAt` keep proof focused.
 
 ### 2. Accept new history with an unchanged final tree
 Type: Behavior

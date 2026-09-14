@@ -196,6 +196,11 @@ Then(
 )
 
 Then(
+  "the second cloned checkout preserves the publisher's A to C history",
+  () => cli.notebookCloneCheckout().expectReceiverPreservesPublisherHistory()
+)
+
+Then(
   'the second cloned checkout file {string} is:',
   (relativePath: string, content: string) =>
     cli

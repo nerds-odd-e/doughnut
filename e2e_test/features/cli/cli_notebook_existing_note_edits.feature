@@ -67,6 +67,40 @@ Feature: CLI notebook existing-note edits
 
       """
 
+  Scenario: Publishing successive content-edit commits updates Donut and preserves history
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I commit the following related edits together in the cloned checkout:
+      | path        | content |
+      | Overview.md | ---\ntype: Note\n---\nDraft meal plan |
+    And I commit the following related edits together in the cloned checkout:
+      | path             | content |
+      | Overview.md      | ---\ntype: Note\n---\nWeekly meal plan |
+      | Recipes/Pasta.md | ---\ntype: Note\nauthor: Marcella Hazan\n---\nSimmer until al dente |
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I should see note "CLI Clone Notebook/Overview" has content "Weekly meal plan"
+    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
+    When I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout preserves the publisher's A to C history
+    And the second cloned checkout file "Overview.md" is:
+      """
+      ---
+      type: Note
+      ---
+      Weekly meal plan
+
+      """
+    And the second cloned checkout file "Recipes/Pasta.md" is:
+      """
+      ---
+      type: Note
+      author: Marcella Hazan
+      ---
+      Simmer until al dente
+
+      """
+
   Scenario: Pulling then publishing keeps a related Overview and Pasta batch after a Shopping list web save
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I commit the following related edits together in the cloned checkout:

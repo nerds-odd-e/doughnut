@@ -121,7 +121,7 @@ export function describeNotebookPublishRebasedRejection(): void {
       ).rejects.toThrow(ProcessExitForTest)
 
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
       expect(postCount(fetchMock)).toBe(0)
       expect(fetchMock.mock.calls).toHaveLength(1)
