@@ -4,42 +4,33 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.flywaydb.core.Flyway;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.client.RestTemplate;
 
 public record DonutTaskRunner(ConfigurableApplicationContext context) {
-  public static final String PORTABLE_TRASH_UPGRADE_SUCCESS = "PORTABLE_TRASH_UPGRADE_SUCCESS";
-
   private int getPort() {
     if (context instanceof ServletWebServerApplicationContext serverContext) {
       return serverContext.getWebServer().getPort();
     }
-    throw new IllegalStateException("Application is not running on a web server.");
+    System.out.println("Application is not running on a web server.");
+    System.exit(-1);
+    throw new RuntimeException("Application is not running on a web server.");
   }
 
-  private int runTask(Runnable task, String successMessage) {
-    int exitCode = 0;
+  private void runTask(Runnable task) {
     try {
       task.run();
+      SpringApplication.exit(context, () -> 0);
     } catch (Exception e) {
       e.printStackTrace();
-      exitCode = -1;
+      SpringApplication.exit(context, () -> -1);
     }
-    try {
-      context.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-      exitCode = -1;
-    }
-    if (exitCode == 0) {
-      System.out.println(successMessage);
-    }
-    return exitCode;
   }
 
-  public int generateOpenAPIDocs() {
-    return runTask(
+  public void generateOpenAPIDocs() {
+    runTask(
         () -> {
           String docsUrl = "http://localhost:" + getPort() + "/api-docs.yaml";
           RestTemplate restTemplate = new RestTemplate();
@@ -50,21 +41,17 @@ public record DonutTaskRunner(ConfigurableApplicationContext context) {
           } catch (IOException e) {
             throw new RuntimeException(e);
           }
-        },
-        "OpenAPI documentation saved successfully.");
+          System.out.println("OpenAPI documentation saved successfully.");
+        });
   }
 
-  public int migrateTestDB() {
-    return runTask(this::migrateDatabase, "Test database migrated successfully.");
-  }
-
-  public int upgradePortableTrash() {
-    return runTask(this::migrateDatabase, PORTABLE_TRASH_UPGRADE_SUCCESS);
-  }
-
-  private void migrateDatabase() {
-    Flyway flyway = context.getBean(Flyway.class);
-    flyway.repair();
-    flyway.migrate();
+  public void migrateTestDB() {
+    runTask(
+        () -> {
+          Flyway flyway = context.getBean(Flyway.class);
+          flyway.repair();
+          flyway.migrate();
+          System.out.println("Test database migrated successfully.");
+        });
   }
 }

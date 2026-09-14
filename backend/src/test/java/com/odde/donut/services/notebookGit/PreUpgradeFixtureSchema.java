@@ -102,14 +102,6 @@ final class PreUpgradeFixtureSchema implements AutoCloseable {
     return schemaUrl;
   }
 
-  String jdbcUsername() {
-    return APP_USER;
-  }
-
-  String jdbcPassword() {
-    return APP_PASSWORD;
-  }
-
   /**
    * A fresh {@link FluentConfiguration} pointed at the owned schema with the project's actual
    * migration resources, matching {@link #createAtVersion325}'s configuration. Callers add {@code

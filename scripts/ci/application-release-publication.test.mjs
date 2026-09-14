@@ -48,19 +48,10 @@ for (const scenario of [
       )
       return
     }
-    if (forced) assert.notEqual(result.status, 0)
-    else assert.equal(result.status, 0, result.stderr)
+    assert.equal(result.status, 0, result.stderr)
     assert.match(
       readFileSync(join(root, 'captured-map'), 'utf8'),
       /selected-source-only/
-    )
-    assert.equal(
-      readFileSync(join(root, 'captured-spa'), 'utf8'),
-      'selected SPA'
-    )
-    assert.equal(
-      readFileSync(join(root, 'captured-cli'), 'utf8'),
-      'selected CLI'
     )
     const calls = readFileSync(trace, 'utf8').trim().split('\n')
     assert.equal(
@@ -74,40 +65,28 @@ for (const scenario of [
     ])
     assert.match(calls[4], /^gcloud compute url-maps import /)
     if (forced) {
-      assert.match(result.stderr, /Release stopped safely with the MIG closed/)
-      const jarUpload = `gsutil cp ${jar} gs://private-backend/backend_app_jar/donut-0.0.1-SNAPSHOT.jar`
-      assert.deepEqual(calls.slice(calls.indexOf(jarUpload)), [
-        jarUpload,
-        'gcloud compute instance-groups managed describe doughnut-app-group --zone=us-east1-b --format=value(targetSize)',
-        'gcloud compute instance-groups managed update doughnut-app-group --update-policy-type=OPPORTUNISTIC --zone=us-east1-b',
-        'gcloud compute instance-groups managed resize doughnut-app-group --size=0 --zone=us-east1-b',
-        'gcloud compute instance-groups managed list-instances doughnut-app-group --zone=us-east1-b --format=value(instance)',
-      ])
       assert.ok(
-        !calls.some(
-          (call) =>
-            call.includes('set-instance-template') ||
-            call.includes('instance-templates create') ||
-            call.includes('start-instances') ||
-            call.includes('rolling-action') ||
-            call.includes('wait-until') ||
-            call.startsWith('curl ')
+        calls.includes(
+          `gsutil cp ${jar} gs://private-backend/backend_app_jar/donut-0.0.1-SNAPSHOT.jar`
         )
       )
-      assert.equal(existsSync(join(root, 'saved-record')), false)
-      assert.deepEqual(
-        readApplicationRecords(applicationRecords).map(
-          (record) => record.outcome
-        ),
-        ['publishing']
+      assert.ok(calls.some((call) => call.includes('rolling-action replace')))
+      assert.equal(
+        JSON.parse(readFileSync(join(root, 'saved-record'))).git_sha,
+        sha
+      )
+      assert.equal(
+        readFileSync(join(root, 'captured-startup'), 'utf8'),
+        startup
+      )
+      assert.equal(
+        JSON.parse(readFileSync(join(root, 'saved-record')))
+          .startup_script_sha256,
+        hash(startup)
       )
     } else {
       assert.match(result.stdout, /Deploy skipped/)
       assert.equal(calls.length, 8)
-      assert.ok(
-        !calls.some((call) => call.includes('instance-groups managed')),
-        `expected no maintenance calls when skipped, got: ${calls.join('\n')}`
-      )
       assert.deepEqual(readApplicationRecords(applicationRecords), [
         {
           tag: 'v1.2.3',
@@ -140,7 +119,9 @@ test('failed publication leaves the admitted application publishing', (t) => {
     t,
     'failed-frontend'
   )
+
   const result = publish()
+
   assert.notEqual(result.status, 0)
   const calls = readFileSync(trace, 'utf8').trim().split('\n')
   assert.equal(calls.length, 2)

@@ -128,20 +128,9 @@ EOS
 		printf '#!%s\n' "$REAL_BASH"
 		cat <<'EOS'
 case "$*" in
-*create-mig-instance-template-for-maintenance.sh*)
-	echo "create-mig-instance-template-for-maintenance $*" >>"${ROLLING_LOG:?}"
-	echo "create-mig-instance-template-for-maintenance" >>"${STEPS_LOG:?}"
-	echo "fake-maintenance-template"
-	exit 0
-	;;
-*enter-maintenance-mode.sh*)
-	echo "enter-maintenance-mode $*" >>"${ROLLING_LOG:?}"
-	echo "enter-maintenance-mode" >>"${STEPS_LOG:?}"
-	exit 0
-	;;
-*exit-maintenance-mode.sh*)
-	echo "exit-maintenance-mode $*" >>"${ROLLING_LOG:?}"
-	echo "exit-maintenance-mode" >>"${STEPS_LOG:?}"
+*update-mig-startup-script.sh*)
+	echo "update-mig-startup-script $*" >>"${ROLLING_LOG:?}"
+	echo "update-mig-startup-script" >>"${STEPS_LOG:?}"
 	exit 0
 	;;
 *check-mig-rollout.sh*)

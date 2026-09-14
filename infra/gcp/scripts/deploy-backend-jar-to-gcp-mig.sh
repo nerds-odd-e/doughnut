@@ -3,14 +3,9 @@ set -euo pipefail
 
 # Compares the built jar and startup script SHA-256 values to
 # gs://${GCS_BUCKET}/deploy/last-successful-deploy.json. If both match, skips
-# GCS upload and the MIG rollout (record only advances after success).
+# GCS upload and MIG rolling replace (record only advances after success).
 # Env: GCS_BUCKET, ARTIFACT, VERSION; optional DEPLOY_JAR_PATH; GITHUB_SHA (set by CI).
-# Optional FORCE_FULL_DEPLOY=1: run upload + rollout even when hashes match the record.
-#
-# The portable-trash schema upgrade release closes the MIG before any
-# schema-dependent work. Until verified upgrade and reopen exist, publication
-# deliberately fails after the MIG is closed and leaves the release record
-# publishing.
+# Optional FORCE_FULL_DEPLOY=1: run upload + rolling replace even when hashes match the record.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -57,7 +52,7 @@ if [[ -n "$recorded_hash" &&
   -n "$recorded_startup_script_hash" &&
   "$recorded_startup_script_hash" == "$new_startup_script_hash" ]]; then
   if [[ "${FORCE_FULL_DEPLOY:-}" == "1" ]]; then
-    echo "Force full deploy: jar and startup script SHA-256 values match record; continuing with upload and rollout."
+    echo "Force full deploy: jar and startup script SHA-256 values match record; continuing with upload and rolling replace."
   else
     echo "Deploy skipped: jar and startup script SHA-256 values match last successful deploy record."
     exit 0
@@ -67,7 +62,19 @@ fi
 echo "Deploying: jar SHA-256 $new_hash (record had ${recorded_hash:-<none>}); startup script SHA-256 $new_startup_script_hash (record had ${recorded_startup_script_hash:-<none>})."
 gsutil cp "$JAR_PATH" "$JAR_DEST"
 
-bash "$SCRIPT_DIR/enter-maintenance-mode.sh"
+bash "$SCRIPT_DIR/update-mig-startup-script.sh"
 
-echo "Release stopped safely with the MIG closed; verified upgrade and reopen are not implemented yet." >&2
-exit 1
+bash "$SCRIPT_DIR/check-mig-rollout.sh"
+
+export GITHUB_SHA
+bash "$SCRIPT_DIR/app-instance-healthcheck.sh"
+
+jq -n \
+  --arg sha "$new_hash" \
+  --arg startup_script_sha "$new_startup_script_hash" \
+  --arg git "$GITHUB_SHA" \
+  --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  '{sha256: $sha, startup_script_sha256: $startup_script_sha, git_sha: $git, recorded_at: $at}' \
+  | gsutil cp - "$RECORD_URI"
+
+echo "Recorded last successful deploy at $RECORD_URI"

@@ -1,22 +1,20 @@
-# Release portable trash without risking notebook data
+# Validate the portable-trash Flyway upgrade
 
 Source: [SEED-009 story 37](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-37).
-Status: planned; planning-only instruction. No implementation or release performed.
+Status: complete; migration validation concluded. No release was performed.
 
 ## Outcome and decisions
 
-Notebook owners retain authored notebook data and learning identities through
-the legacy-trash upgrade. The operator can recover an interrupted upgrade while
-old application writers remain excluded. Preserve the resulting Portable tree;
-the already-selected baseline rebuild intentionally replaces prior Git history.
-Owners need fresh checkouts and instructions to preserve unpublished local work
-before replacing a checkout. This release does not implement local-history merge.
+The actual registered Flyway chain preserves authored notebook data and learning
+identities through the legacy-trash upgrade, recovers from the supported
+interruption states, and produces the intended Portable tree. The baseline rebuild
+intentionally replaces prior Git history.
 
-Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
-`main`; execution checkout
-`/Users/terryyin/git/doughnut-worktrees/123-safe-portable-trash-upgrade` on
-`quick/123-safe-portable-trash-upgrade`; integration target `main`; delivery
-destination `origin/quick/123-safe-portable-trash-upgrade`.
+The upgrade is Flyway-owned, not SQL-only: `V300000326` and `V300000327` are
+Java Flyway migrations, and `V300000328` is a SQL Flyway migration. Normal
+non-test application startup runs `flyway.repair()` followed by
+`flyway.migrate()`; these migrations require no separate MIG, task profile,
+publication gate, or maintenance command.
 
 Terry Yin, 2026-09-14: production has not deployed this migration; explicitly
 revise committed `V300000328` as a one-time exception to migration immutability.
@@ -24,11 +22,11 @@ Record that exception in its implementation commit. Do not edit other committed
 migrations without an evidenced need and corresponding owner direction. Do not
 renumber the failed migration or pretend a later migration can bypass it.
 
-Use a bounded maintenance release, backup/restore and verified writer exclusion.
-No general migration framework, resumable job service, permanent fault-injection
-hooks, zero-downtime expand/contract rollout, UI polish or trash feature expansion.
-10,000 deleted notes is representative safety evidence, not a product limit or
-permanent benchmark/SLA. Optimize only an observed obstacle to this release.
+On 2026-09-14, after slices 1–6 confirmed both expected migration behavior and
+the 10,000-note representative scale case, Terry Yin corrected the scope: stop
+at migration validation. Separate MIG lifecycle, one-shot task, publication,
+maintenance, backup/restore, and release-orchestration work is out of scope and
+was removed. The scale result is safety evidence, not a product limit or SLA.
 
 ## Existing solutions and architectural assessment
 
@@ -53,22 +51,8 @@ PFE assessment (migration, product and deployment boundaries):
   isolated schema/harness is justified for pre-upgrade DDL and interrupted
   commits, which must not mutate the ordinary suite schema or Development.
   Keep it local to this migration's test support, with deterministic teardown.
-- Existing `publish-application.sh`, backend deployment scripts, Application
-  Release workflow and release runbook own rollout. Add only the one-time
-  maintenance path/guard needed there; ordinary rolling replacement does not
-  prove writer exclusion. No parallel release orchestrator.
-- Execution correction after slice 9: keep that same release owner, but replace
-  the unsafe stop/start assumption with GCP's existing durable MIG controls and
-  the application's existing one-shot `DonutTaskRunner` seam. The live MIG is
-  `PROACTIVE`; Google documents that a template change then rolls out to existing
-  VMs automatically, so `set-instance-template` cannot precede quiescence.
-  Stable gcloud 535 also requires explicit instance names for `stop-instances`
-  and `start-instances`; the implemented `--all-instances` form is unsupported.
-  Use an opportunistic policy plus a zero-sized MIG as the durable closed state,
-  run and verify the upgrade in a non-serving/non-scheduling one-shot process,
-  and create serving instances only after that proof. Change the existing
-  deployment/task ownership; do not add a second release orchestrator or a
-  permanent migration service.
+- Existing publication and deployment ownership remains unchanged. This plan
+  does not add a release gate or a parallel migration runner.
 
 Accepted ADR 0004 (`docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md`)
 requires location-based trash with retained Portable files and learning identity.
@@ -81,9 +65,8 @@ composition topic does not require new direction for this one-time upgrade.
 Target about 5 minutes active work including implementation, proof and local
 cleanup. More than 5 minutes requires scrutiny; more than 10 requires finer
 decomposition and recording the failed sizing assumption. Mandatory full backend
-suite/startup, the single scale rehearsal and cloud rehearsal waiting are explicit
-wait-only exceptions, recorded separately. No active-work exception. Every slice
-ends green; an unfinished slice is never evidence that production release is safe.
+suite/startup and the single scale rehearsal are explicit wait-only exceptions,
+recorded separately. No active-work exception. Every slice ends green.
 
 ### 1. Isolate a populated pre-upgrade Flyway fixture
 Type: Structure
@@ -367,479 +350,7 @@ both green. Active time ~35-40 minutes across implementation, refactor and
 coordinator verification; measured run waiting was on the order of seconds,
 not minutes, so no bounded reassessment was triggered.
 
-### 7. Establish a quiescent maintenance state
-Type: Behavior
-Status: done
-Correction status: The local fake proof and implementation were later
-invalidated by stable gcloud command shape and the live MIG's PROACTIVE update
-policy. Slices 10-13 replace the unsafe mechanics while preserving this slice's
-writer-exclusion outcome; this historical result is not release evidence.
-Behavior: Old application processes are serving → enter the one-time maintenance
-path → all schema-dependent writers are stopped and verified absent before any
-migration is permitted. Account for background writers, not just incoming HTTP.
-Change: Add the minimum bounded maintenance operation to existing deployment
-ownership; no migration runs merely because a stop request was submitted.
-Proof: Existing publication/deployment test fixtures with fake cloud commands
-observe stop, wait and quiescence verification in order. Failed verification
-prevents migration. This path remains opt-in and cannot release by itself yet.
-Estimate: 5 minutes active, reusing existing shell orchestration and test fixtures.
-Learnings: New standalone `infra/gcp/scripts/enter-maintenance-mode.sh` (not
-wired into `publish-application.sh` or `deploy-backend-jar-to-gcp-mig.sh` —
-verified untouched): `gcloud compute instance-groups managed stop-instances
-doughnut-app-group --zone=us-east1-b --all-instances`, a fixed grace sleep,
-then a poll loop against `list-instances --format=value(instanceStatus)`
-until no instance reports `RUNNING|STOPPING|PROVISIONING|STAGING|REPAIRING`
-or a timeout is hit; exit code alone is the signal (0 = migration permitted).
-`doughnut-app-group`/`us-east1-b` and the `stop-instances`/`list-instances`
-verb shapes were confirmed against `create-app-mig.sh`,
-`check-mig-rollout.sh` and `perform-rolling-replace-app-mig.sh` rather than
-invented. Background-writer coverage confirmed against actual source:
-`SchedulingConfig.java` (`@EnableScheduling`, `@Profile("prod")`) plus
-`QuestionGenerationBatchMaintenanceJob`/`EmbeddingMaintenanceJob` run
-`@Scheduled` in-process inside each MIG instance's JVM — no separate worker
-fleet exists, so stopping the MIG's instances excludes both HTTP and
-scheduled-job writers with one primitive. New
-`application-release-maintenance-fixtures.mjs`/`-maintenance.test.mjs` follow
-the existing fake-cloud-command trace pattern from
-`application-release-publication-fixtures.mjs`, asserting stop → poll(s) →
-permit in order, and that a forced-timeout scenario fails with no
-migration-permitted signal and no more than one poll. Post-change-refactor
-checked for reusable poll/trace helpers elsewhere in `infra/gcp/scripts/` and
-the `scripts/ci/application-release-*-fixtures.mjs` family; found none exist
-(each fixture file independently owns its idiom; `check-mig-rollout.sh` uses
-the native `wait-until --version-target-reached`, which has no "stopped"
-equivalent) — no extraction needed, file left as implemented. Coordinator
-independently re-verified: cross-checked MIG name/zone/verb claims and the
-scheduled-job claim directly against source, confirmed via `git status` that
-only the three new files exist (no wiring into ordinary publish scripts),
-and re-ran both new tests, the full existing publication test suite (7/7),
-and `shellcheck` myself — all green, both before and after the formatting
-pass. No backend Java touched, so the full backend suite was not re-run for
-this slice. Active time ~25-30 minutes across implementation, refactor and
-coordinator verification — first slice not gated by the earlier
-migration-file permission-classifier restriction (deployment scripts, not a
-Flyway migration), and no defect found.
-
-### 8. Keep old writers stopped after replacement or process failure
-Type: Behavior
-Status: done
-Correction status: The claim that `set-instance-template` does not replace
-running instances is false for this MIG's PROACTIVE policy. Slices 10-13 replace
-the mechanism and own this outcome before release; this historical result is
-not release evidence.
-Behavior: Maintenance has been entered and migration is interrupted → lifecycle
-replacement, autohealing or an operator retry occurs → old binaries cannot
-resume writing. The maintenance state survives loss of the invoking process.
-Change: Use existing cloud lifecycle controls for the bounded maintenance window;
-do not rely on a shell trap or an HTTP gate to stop background writes.
-Proof: Extend the same boundary fixture with replacement/retry variations;
-observe that only the selected compatible artifact may subsequently start.
-No new durable state service; record the cloud-owned controls in the runbook.
-Estimate: 5 minutes active. If the existing lifecycle controls cannot establish
-this invariant, stop and reassess the bounded release approach.
-Learnings: The invariant IS establishable with existing controls — no
-reassessment needed. `enter-maintenance-mode.sh` now runs
-`gcloud ... set-instance-template doughnut-app-group
---template="$MAINTENANCE_INSTANCE_TEMPLATE"` (verb/argument shape confirmed
-identical to the existing `update-mig-startup-script.sh`) as its first step,
-*before* `stop-instances`. `instanceTemplate` is a field GCP stores on the
-MIG resource itself, durable independent of this script's process; this
-MIG's existing autohealing policy (`add-mig-autohealing.sh`) and PROACTIVE
-`most-disruptive-action=replace` update policy
-(`configure-mig-update-policy.sh`) both recreate/replace instances from
-whatever template is currently assigned — documented GCP MIG behavior, not
-new to this repo. So once the template swap commits, any later instance
-start for this MIG (autohealing after the stop, the update policy's own
-convergence, or an operator's manual retry) necessarily boots the compatible
-template, never the old one, even if this script dies immediately after
-that first `gcloud` call. New `docs/gcp/portable-trash-maintenance-release-runbook.md`
-records this reasoning plus a genuine operational caveat the implementer
-found and did not paper over: every instance template's startup script
-downloads the backend jar from one fixed GCS path
-(`backend_app_jar/donut-0.0.1-SNAPSHOT.jar`, confirmed against
-`mig-zulu25-openai-app-instance-startup.sh`), so template identity alone
-does not pin which jar bytes an instance runs — slice 9 must ensure the
-compatible jar is uploaded to that path no later than the template-swap
-step, not merely after this script exits. Proof extended
-`application-release-maintenance-fixtures.mjs`/`.test.mjs` (2→4 tests) with
-a fake `describe --format=value(instanceTemplate)` read standing in for a
-later, independent invocation (what autohealing/convergence/retry would
-see): proves the compatible template is durably set even when
-`stop-instances` fails right after, and that a missing
-`MAINTENANCE_INSTANCE_TEMPLATE` fails loudly before any `gcloud` call,
-leaving the prior template untouched. Post-change-refactor found nothing to
-change (re-checked the fake-command-trace duplication question already
-settled in slice 7 — still no shared extraction point, confirmed again).
-Coordinator independently re-verified: cross-checked the `set-instance-template`
-verb against `update-mig-startup-script.sh` and the fixed-GCS-path claim
-against `mig-zulu25-openai-app-instance-startup.sh`/`deploy-backend-jar-to-gcp-mig.sh`
-directly, confirmed `git status` showed only the claimed files touched, and
-re-ran all 4 maintenance tests, the 7 publication tests and shellcheck
-myself before and after formatting — all green throughout. No backend Java
-touched, so the full backend suite was not re-run. Active time ~40-45
-minutes across implementation (including a web search to confirm GCP MIG
-autohealing/update-policy semantics), refactor and coordinator verification.
-
-### 9. Route normal publication through the protected upgrade
-Type: Behavior
-Status: done
-Correction status: The publication route reaches the intended scripts, but the
-route is not protected: it uses unsupported `--all-instances`, can start a
-proactive replacement before quiescence, and starts HTTP/background writers
-before the external verification step. Slices 10-14 correct the actual entry
-point; this historical result is not release evidence.
-Behavior: Application Release selects the portable-trash artifact → publication
-→ maintenance protections precede every schema-dependent rollout and routing
-cannot reopen early. Ordinary rolling replacement cannot bypass the protection.
-Change: Wire slices 7–8 into existing publication ownership for this one release;
-preserve selected SHA/artifacts, frontend/CLI publication and release records.
-Proof: Extend `scripts/ci/application-release-publication.test.mjs` at its actual
-publication entry point to assert the complete order and guard against the normal
-rolling route, including retries and conditional backend-deploy skip behavior.
-Command: `CURSOR_DEV=true nix develop -c node --test scripts/ci/application-release-publication.test.mjs`.
-Estimate: 5 minutes active after 7–8. Local fake-cloud proof does not prove GCP isolation.
-Learnings: Confirmed the actual publication entry point first (not assumed):
-`.github/workflows/deploy.yml`'s `Deploy` job step `id: publish` runs
-`GITHUB_SHA="$RELEASE_SHA" bash infra/gcp/scripts/publish-application.sh`,
-and `application-release-publication-fixtures.mjs` spawns that exact command
-with `cwd: repositoryRoot` against a deliberately-stubbed selected-source
-copy — proving the current worktree's script is what's under test, matching
-this slice's target. `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh`
-now replaces its single ordinary `update-mig-startup-script.sh` call
-(create-template-then-immediately-`rolling-action replace`, which keeps most
-old instances serving/writing during a one-at-a-time rollout) with: new
-`create-mig-instance-template-for-maintenance.sh` (duplicates only the
-template-creation gcloud call, does not assign/replace) →
-`enter-maintenance-mode.sh` (slices 7/8, template swap + stop + verified
-quiescence) → new `exit-maintenance-mode.sh` (`start-instances`, the natural
-mirror of `stop-instances`) → unchanged `check-mig-rollout.sh` →
-`app-instance-healthcheck.sh` → unchanged record write. Jar upload stays
-first, unchanged, which already satisfies slice 8's "compatible jar before
-template swap" caveat without reordering. `update-mig-startup-script.sh`
-and `publish-application.sh` are both byte-for-byte untouched (only a
-comment updated in `enter-maintenance-mode.sh`); the branching lives
-entirely inside `deploy-backend-jar-to-gcp-mig.sh`, unconditional (no
-feature flag — matches the plan's "one-time... no general framework"
-requirement; story 39 reverts it). New `docs/gcp/portable-trash-maintenance-release-runbook.md`
-sections and `application-release-publication.test.mjs`'s extended `forced`
-scenario assert the complete order via array-index comparisons and that
-`rolling-action replace` never appears in the trace anywhere; the `skip`
-scenario asserts none of the maintenance/rollout calls run at all when the
-hash-compare skip applies (preserving existing skip behavior exactly).
-Implementation discovered and updated a pre-existing, previously-unmentioned
-shell-test suite (`scripts/test/deploy-backend-jar-to-gcp-mig.sh.test`/
-`-test-lib.sh`, run by `scripts/test/run_all_script_tests.sh`, wired into
-CI) that would otherwise have gone red — its four deploy scenarios and
-step-ordering assertion were updated to expect the new maintenance sequence
-and assert `rolling-action` never appears. Post-change-refactor made one
-cosmetic biome-formatting fix to the test file and, on independent review,
-corrected a claim in this slice's own framing: the shell-test suite only
-ever asserted `update-mig-startup-script.sh` gets *invoked* (black-box), not
-its own internal gcloud sequence — that file has always had zero direct
-test coverage of its own content, unchanged before and after this slice, so
-routing around it automatically does not newly weaken coverage that existed
-before. Coordinator independently re-verified: read every diff in full
-(both new scripts, the modified deploy script, both fixture/test files, the
-shell-test-suite diff, the runbook diff) before running anything, then
-re-ran the 7 publication tests, the 4 maintenance tests (unaffected), the
-full 18-test `run_all_script_tests.sh` suite (including
-`deploy-backend-jar-to-gcp-mig.sh.test` directly), and shellcheck on every
-touched script myself — all green, both before and after the refactor
-pass's formatting fix. This is the most invasive slice so far (it rewrites
-the real production publish entry point's backend-rollout branch); commit
-went through without a permission-classifier block, same as slices 6-8. No
-backend Java touched, so the full backend suite was not re-run. Active time
-~50-60 minutes across implementation, refactor and coordinator verification
-— the largest slice yet, consistent with the plan's own expectation that
-slices routing through real deployment ownership would run over the 5-minute
-estimate. Explicitly out of scope here and left to slice 11: this is local
-fake-`gcloud`/`gsutil` proof only, proving command ordering and that the
-ordinary rolling-replace route is structurally unreachable in this script —
-it cannot and does not prove real GCP-side behavior (actual instance
-stop/start timing, autohealing, update-policy convergence).
-
-### 10a. Close the MIG before changing its template
-Type: Behavior
-Status: done
-Behavior: The production-family MIG has running old instances and a PROACTIVE
-replace policy → enter maintenance → the policy becomes opportunistic, the
-MIG's original target size is retained for recovery, its target size becomes
-zero, and no instance remains before any template or migration change occurs.
-Change: Replace `enter-maintenance-mode.sh`'s template-first stop command with
-the native policy/describe/resize-zero sequence only. Do not change the caller
-or reopen behavior in this slice.
-Proof: The standalone maintenance fake boundary asserts actual order, retained
-target size, durable zero target and process loss after every command. Assert
-stable gcloud command forms rather than accepting unsupported `--all-instances`.
-Estimate: 5 minutes active. Reuse native update-policy, resize, describe and
-list-instances commands; do not add a maintenance state service.
-Learnings: Replaced the invalid template-first/`--all-instances` path with the
-stable describe → OPPORTUNISTIC update policy → resize zero → empty-instance
-poll sequence. The original target size is emitted before mutation so the later
-publication/recovery owner can retain it; the standalone script deliberately
-owns neither template assignment nor reopen. Six focused Node tests cover
-command order, durable policy/target state across process loss after every
-command, and fail-closed behavior (including leaving PROACTIVE unchanged when
-the initial describe fails). The focused suite and shellcheck passed before and
-after the fresh refactor pass; `format:changed` then completed once and fixed
-the two JavaScript fixture files. No cloud resource was mutated. Fresh agent
-validation took ~51 seconds and refactoring ~8 minutes; the implementation was
-selectively recovered from the earlier oversized correction stash. Branch CI
-remains unobservable because `donut CI` runs on pushes to `main`, not this story
-branch.
-
-### 10b. Stop actual publication at the closed boundary
-Type: Behavior
-Status: done
-Behavior: Application Release reaches verified zero-size maintenance before the
-one-shot task exists → backend publication stops non-zero → no template
-assignment, migration, reopen, rollout, healthcheck or successful deploy record
-can occur, and the application release remains publishing.
-Change: Replace the actual backend publication caller's old exit/reopen path
-with this temporary fail-closed boundary. Slice 13 replaces the stop with the
-verified task path; until then there is deliberately no successful backend
-publication route.
-Proof: The actual publication fake boundary asserts the zero-size sequence and
-every forbidden later call, while preserving frontend/CLI publication and the
-release record's publishing outcome.
-Estimate: 5 minutes active after 10a. Keep publication-fixture changes local to
-this boundary; do not add the one-shot task or reopen path.
-Learnings: The actual Application Release/backend-deploy owner now uploads the
-selected jar, invokes the verified zero-size maintenance entry, and exits
-non-zero with an explicit safe-stop message. Seven focused publication tests
-preserve source selection, frontend/CLI publication, hash skip, failure and
-workflow wiring while proving exact closure order, a `publishing` release
-record, and absence of template creation/assignment, migration, reopen,
-rollout, healthcheck and successful deploy record. The focused suite and
-production-script shellcheck passed before and after the fresh refactor pass;
-`format:changed` then completed once and normalized one JavaScript file. The
-implementation took 2m10s and the refactor ~7 minutes. No cloud resource was
-mutated; branch CI remains unavailable because the workflow observes `main`
-pushes only.
-
-### 10c. Align the direct deploy-script contract with fail-closed publication
-Type: Structure
-Status: done
-Change: Update the existing direct deploy shell-test fixture to document the
-same temporary fail-closed behavior as the application-publication boundary,
-without deleting unrelated hash-skip coverage or teaching its fake commands an
-unsupported GCP shape. This immediately enables slice 11's application task
-without leaving CI's second deployment boundary contradictory.
-Proof: The direct deploy shell suite and shellcheck pass with its success-route
-expectation replaced only by the zero-size/fail-closed outcome.
-Estimate: 5 minutes active after 10b.
-Learnings: The direct deploy harness still proves missing-jar failure and the
-full unchanged jar/startup-hash skip, then drives no-record, changed-jar,
-changed-startup and forced releases through the real maintenance-entry script.
-Each changed release proves exact describe → OPPORTUNISTIC update → resize zero
-→ empty-list order, jar upload, a non-zero safe stop, and absence of template
-creation/assignment, reopen, rollout, healthcheck and success-record writes.
-The fresh refactor centralized failure-safe temporary-directory cleanup and
-made the fake `bash`/`gcloud` boundaries reject unsupported commands. The direct
-suite, source-aware shellcheck and whitespace checks passed before and after
-the refactor; the single required `format:changed` pass made no edits.
-Implementation took ~6 minutes and refactoring ~10 minutes. No production or
-cloud state changed in this structure-only slice; branch CI is still not
-triggered for this branch.
-
-### 11a. Start the upgrade task without application writers
-Type: Behavior
-Status: done
-Behavior: Select the temporary portable-trash upgrade task → Spring starts a
-non-web context with scheduling disabled before any application-ready work can
-run → neither HTTP nor scheduled application writers exist, while ordinary
-application startup remains unchanged.
-Change: Extend the existing `DonutApplication`/`odd-e.donut.task` selection seam
-to configure this one task before context startup. Keep one application
-bootstrap; do not add a second main class. Ensure the task, not the ordinary
-production application-ready listener, owns its migration lifecycle.
-Proof: A focused application/task-mode boundary observes a non-servlet context,
-no registered scheduled tasks and no automatic production migration callback;
-the ordinary no-task mode retains its current web/scheduling configuration.
-Estimate: 5 minutes active. If disabling writer surfaces requires constructing
-a parallel application graph, stop and revisit the seam instead.
-Learnings: `upgradePortableTrash` now configures the existing
-`DonutApplication` bootstrap before startup with `WebApplicationType.NONE` and
-one temporary profile. That profile excludes both `SchedulingConfig`'s
-`@EnableScheduling` owner and the ordinary application-ready Flyway callback;
-ordinary no-task startup retains servlet, scheduling and ready-migration
-configuration. A red-first focused test now observes both configurations using
-Spring's profile/bean boundary. It passed 2/2 before and after the fresh
-refactor, as did `spotlessJavaCheck` and whitespace checks; the single required
-`format:changed` pass was a no-op. Implementation took ~6 minutes and refactor
-~4 minutes. No parallel application graph, migration execution or cloud state
-was introduced.
-
-### 11b. Give the one-shot task an explicit migration lifecycle
-Type: Behavior
-Status: done
-Behavior: The isolated upgrade task receives the configured Flyway owner → it
-runs repair then the actual registered migration chain exactly once → success
-closes the context with a stable success signal and zero exit, while any failure
-closes it and exits non-zero without reporting success.
-Change: Extend `DonutTaskRunner` and the existing task dispatch only. Reuse the
-Flyway bean and migration resources; do not create another Flyway runner or
-copy migration recipes. Story 39 removes this temporary task.
-Proof: A focused task-runner boundary observes repair/migrate order, one call,
-the exact success token and both exit outcomes without requiring a web server.
-Estimate: 5 minutes active after 11a.
-Learnings: The existing task dispatch now routes `upgradePortableTrash` through
-one cohesive `DonutTaskRunner` Flyway recipe: obtain the configured bean, repair,
-migrate, then close the context. Only complete task and close success prints the
-stable `PORTABLE_TRASH_UPGRADE_SUCCESS` token and returns zero; failures while
-obtaining Flyway, repairing, migrating or closing return non-zero, suppress the
-token and still attempt one close. `DonutApplication.main` remains the sole
-process-exit owner, and the existing test-migration/OpenAPI task commands use
-the same lifecycle with their prior success messages. The initial red compile
-proved the absent dispatch/task API; a later red close-failure test exposed and
-closed an escaped-exception gap. Six focused tests, `spotlessJavaCheck` and
-whitespace checks pass after the final fresh refactor; the single required
-`format:changed` pass was a no-op. Implementation took ~10 minutes across the
-initial pass and correction; final refactor passes took ~13 minutes combined.
-
-### 11c. Keep test-profile startup migration out of task mode
-Type: Structure
-Status: done
-Change: Make the existing no-op startup Flyway strategy own
-`portable-trash-upgrade` even when the `test` profile supplies the disposable
-schema, and exclude the ordinary test startup migration strategy in that task
-profile. Do not add a third strategy.
-Proof: A focused profile boundary proves ordinary test startup still selects its
-repair/migrate strategy while `test` + `portable-trash-upgrade` selects exactly
-the no-op owner, leaving migration to `DonutTaskRunner`.
-Estimate: 5 minutes active after 11b.
-Learnings: The two existing startup strategy owners now partition profiles
-without overlap: ordinary `test` selects repair/migrate, while non-test and
-`portable-trash-upgrade` select the no-op owner. A red-first focused Spring
-profile test caught the task combination invoking Flyway before dispatch; its
-three scenarios now prove exactly one strategy bean and the expected Flyway
-interactions for prod, test and test-plus-task. The fresh refactor reused the
-central task-profile constant in both annotations. Focused tests,
-`spotlessJavaCheck` and whitespace checks passed; the single required
-`format:changed` pass was a no-op. Implementation and refactor each took ~4
-minutes. No process, database or cloud state was touched by this structural
-slice.
-
-### 11d. Run the real task process against an owned V325 schema
-Type: Behavior
-Status: done
-Behavior: A fresh owned V325 schema and the application test artifact → start a
-fresh `upgradePortableTrash` process pointed at that schema → the process exits
-zero with the exact success token and Flyway history reaches latest exactly
-once.
-Change: Add one reusable test process owner beside `PreUpgradeFixtureSchema`.
-Use the real application main/runtime classpath and datasource properties; do
-not call `DonutTaskRunner` in-process or copy migration configuration.
-Proof: A focused integration test observes the child process result/token and
-queries the owned schema's latest successful Flyway history. The structural
-writer-exclusion proof remains owned by 11a.
-Estimate: 5 minutes active plus process waiting.
-Learnings: Added one package-private process owner that launches the real
-`DonutApplication` main on the current test runtime artifact with the task and
-owned datasource selected, drains combined output continuously, and bounds
-both execution and forced termination. The focused integration test creates a
-real V325 schema, observes child exit zero and exactly one exact success-token
-line, then confirms latest successful Flyway version `300000328` occurs once.
-The fresh refactor moved datasource credentials out of visible JVM arguments
-into the child environment and made output/interrupt/cleanup failure paths
-bounded and diagnostic. The focused test passed in ~5.6 seconds, with
-`spotlessJavaCheck` and whitespace checks green; `format:changed` was a no-op.
-Implementation took ~4 minutes and refactor ~5 minutes. Only the owned local
-test schema was created and dropped; no external or cloud state was touched.
-
-Validation conclusion, 2026-09-14: no-go for application release in the current
-state. Existing migration suites already cover populated preservation, restart
-states, scale and Portable trees, while 11d proves the real isolated task can
-upgrade an owned V325 schema to latest with the exact success signal. Repeating
-all large private fixtures through the subprocess would be disproportionate and
-does not change the decisive gap: the real publication script deliberately
-exits non-zero with the serving MIG at zero because slices 12-14 have not yet
-wired the task, compatible template, verified reopen and recovery. Removed the
-proposed 11e-11h duplicate validation work; converge on that missing release
-path before reconsidering readiness.
-
-### 12. Execute the one-shot task while the serving MIG stays closed
-Type: Behavior
-Status: planned
-Behavior: The MIG is durably zero-sized and the compatible artifact is uploaded
-→ the release owner runs the one-shot task on an isolated transient GCP VM →
-only its explicit verified-success result permits continuation; failure,
-timeout, process loss or ambiguous output leaves the serving MIG at zero.
-Change: Keep orchestration inside the existing backend deployment script and
-reuse its template/startup-script/service-account/network knowledge. The
-transient VM is not a backend-service member and is removed deterministically;
-it is a one-release resource, not a staging platform or durable service.
-Proof: Publication-boundary fakes cover success, task failure, timeout and
-invoker loss, including cleanup ownership and no serving-MIG resize/template
-advance on any missing success. The task command is the packaged slice-11 entry,
-not copied SQL or a mocked Flyway call.
-Estimate: 5 minutes active. Missing permission for a transient VM is a slice-12
-Jidoka stop, not authority to run the task inside a serving application.
-
-### 13. Reopen only the verified compatible application
-Type: Behavior
-Status: planned
-Behavior: The one-shot task has emitted verified success and the serving MIG is
-still zero-sized → assign the compatible serving template, restore the retained
-target size and intended update policy, wait for rollout and health → only the
-compatible application can write; a failure before verified success cannot
-reach any reopening command.
-Proof: Publication-boundary tests assert the success token is the sole gate to
-template assignment/resize, all failure permutations remain closed, and the
-successful path restores the prior target size rather than a hard-coded fleet
-size. Preserve selected artifacts, frontend/CLI publication and release-record
-semantics from slice 9.
-Estimate: 5 minutes active after slices 10-12.
-
-### 14. Recover a failed release without reopening an unsafe application
-Type: Behavior
-Status: planned
-Behavior: Backup/preflight, one-shot migration or verification fails → operator
-follows recovery → the serving MIG stays zero until either the verified new
-state or a verified backup restoration with a compatible app exists.
-Change: Add a short one-time section to the canonical release runbook with
-backup identification and restore rehearsal, pre/post identity/content checks,
-actual Flyway/schema preflight, retry states and fresh-checkout communication
-that protects unpublished local work. Correctly distinguish Cloud SQL backup
-NAME restore-to-new from backup ID restore semantics. No automatic schema
-rollback.
-Proof: The corrected publication boundary from slices 10-13 observes failure
-stays closed and only verified success permits reopening; walk the documented
-commands against owned disposable fixtures and record what remains cloud-only.
-Document exact operator inputs and evidence.
-Estimate: 5 minutes active plus restore waiting; reuse slices 2-6 and 10-13.
-
-### 15. Rehearse backup restoration on a disposable Cloud SQL target
-Type: Behavior
-Status: planned
-Behavior: A named pre-maintenance backup and a fresh disposable target → run the
-documented Cloud SQL restore path and identity/content preflight → the restored
-target is verified before any compatible application is allowed to use it.
-Proof: Use only an explicitly authorized disposable Cloud SQL instance, retain
-sanitized backup-name/target/version/timing and row comparison evidence, and
-delete only the rehearsal-owned target afterward. Never restore into or mutate
-`doughnut-db-instance` or adopt an ambiguously owned instance.
-Estimate: 5 minutes active orchestration plus external waiting. Missing explicit
-ownership of a disposable target blocks this proof only.
-
-### 16. Rehearse the supported release path on an isolated populated copy
-Type: Behavior
-Status: planned
-Behavior: A production-shaped pre-upgrade copy and old/new release processes →
-run the documented zero-MIG/one-shot/reopen sequence with interruption/retry →
-only the compatible app serves verified retained notebook data after reopening.
-Proof: Use the real release/migration entry points on an explicitly disposable
-environment. Observe zero-size writer exclusion, task-process isolation,
-replacement/autohealing behavior, full upgrade/restore recovery and final
-application/Portable-tree checks; retain sanitized exact commands, versions,
-row comparisons and timing in this plan. If only synthetic data or fake cloud
-exists, label that limitation and leave the missing release proof pending. Do
-not access or mutate production under this plan.
-Estimate: 5 minutes active orchestration after slices 10-15, external waiting
-separate. Missing disposable cloud/copy access blocks only this proof; do not
-build a general staging platform to get around it.
-
-## Proof ownership and release boundary
+## Conclusion and scope correction
 
 | Promise | Owner |
 | --- | --- |
@@ -848,127 +359,17 @@ build a general staging platform to get around it.
 | Authored data, folders, references, learning/preferences and bindings retained | 3 |
 | Interruption recovery for conversion and per-notebook rebuild | 4–5 |
 | Thousands of deleted notes, complete trees, measured operating cost | 6 |
-| Old writers excluded; failures remain in maintenance | Historical 7–9 replaced by 10–14; real observation 16 |
-| Backup/restore, row/content comparisons, fresh-checkout guidance | 11, 14–16 |
-| Remove all migration-only additions after production success | Story 39; inventory below |
 
-Production release is separate from this implementation plan: use the existing
-release-application workflow with an authorized immutable tag/exact tested SHA.
-Before release verify owner-confirmed pending migration state in actual Flyway
-history/schema and require the missing release proof above. After release record
-successful production migration and retained-data/application checks before
-activating cleanup. Local green CI is neither deployment nor cleanup permission.
+Both requested release-readiness questions are answered by the completed slices:
 
-## Temporary removal inventory
+- The migration works as expected, including populated upgrade, retained-data
+  equality, Flyway retry states, and interrupted conversion/baseline rebuild.
+- The migration works on the representative large fixture: 10,002 legacy-deleted
+  notes (10,000 in one notebook) completed in about 4.2 seconds clean and about
+  0.5 seconds for the post-conversion retry, on MySQL 8.4.11 with a 512 MB JVM.
 
-Removal owner: [SEED-009 story 39](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-39).
-Update exact paths as each slice lands; this is a deletion list, not a framework.
-
-- Existing 326/327/328 versioned migration files; migration-exclusive
-  `NoteLegacyTrashMigration` and `NotebookGitBaselineRebuild` implementations.
-- Migration-only portions of `NotebookUpgradeDataPreservationTest`,
-  `NotebookGitBaselineRebuildTest` and `NotebookGitRebuildTestSupport`; inspect
-  callers before removing helpers used by other still-required tests.
-- New fixture schema support, historical fixtures, scale case, interruption
-  instrumentation and any dedicated task/command (slices 1–6).
-- Temporary maintenance guard/path, one-shot task, transient migration runner,
-  migration-only publication tests and one-time runbook instructions (slices
-  7–16); remove after safe retirement.
-
-Story 39 must safely fold final DDL into the existing baseline and deploy/confirm
-a new tip above all ever-applied versions before removing old migrations. Fresh
-install and already-upgraded startup must both pass afterward. Keep ordinary
-trash, learning and Git runtime behavior/tests. Do not remove evidence before
-production success or retain dead conversion helpers after safe retirement.
-
-## Execution discipline and assessment
-
-Execute only under a later execution instruction using dough-execute-plan:
-claim backlog then establish the story worktree; Jidoka → fresh independent
-post-change-refactor agent → API generation only if triggered → coordinator's
-one `./scripts/run.sh pnpm format:changed` → plan update → commit/check-only hook
-→ push and asynchronous CI observation. Preserve pre-existing planning edits.
-
-Backend migration changes require migration plus the full backend suite. The
-documented `pnpm backend:verify` wrapper currently runs a formatter; during slice
-execution use its equivalent without that extra formatter: in the story's
-isolated worktree run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
-(the worktree test task owns migration). If executing in an explicitly selected
-unconfigured primary, first run `CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test`, then
-`CURSOR_DEV=true nix develop -c pnpm backend:test_only`. Record which actual
-command runs slice 2's engine proof. Regenerate the ERD per database-erd guidance
-if schema migrations change. No frontend/API change is expected.
-
-The original planning pass inspected code only; subsequent slice learnings above
-contain executed proof. The common model remains the existing conversion
-transaction, per-notebook rebuild transaction, one schema reconciliation and one
-maintenance release owner. No per-case production pipeline.
-
-Historical refinement: the original rollout slice 7 combined establishing quiescence,
-lifecycle protection and publication wiring. Replaced it with slices 7–9 and
-renumbered recovery/rehearsal to 10–11, preserving all proof owners. Result:
-11 slices, no completed work replaced, no story resplit recommended. The smaller
-manual alternative remains preferred where existing cloud controls suffice;
-these slices do not require a product maintenance UI or permanent infrastructure.
-
-Execution correction, 2026-09-14: slices 7-9 delivered local fake-cloud changes,
-but their central safety premise was disproved before slice 10 delivery. The
-live MIG is PROACTIVE; official GCP behavior automatically applies a changed
-template to existing VMs. Stable gcloud 535 requires explicit `--instances` for
-stop/start, so the implemented `--all-instances` path would fail. Starting the
-new app before external verification also starts production `@Scheduled` jobs;
-a `publishing` release record is not writer exclusion. The blocked slice-10
-draft and its two passing local checks are preserved in stash
-`ffea5685ac96f33ffa387bdc09d46028e1c6478a`; reuse only the still-valid wording
-or fixture pieces after the corrected path exists. Its 3m22s active attempt was
-within target and produced no deliverable proof for the invalidated promise.
-
-PFE reassessment selects one coherent correction: change the existing
-Application Release/backend-deploy owner, use native opportunistic-policy and
-zero-size MIG state for durable exclusion, and extend the existing
-`DonutTaskRunner` one-shot seam for migration/verification. This keeps one
-release owner and one Flyway entry rather than adding a parallel orchestrator.
-ADR 0004's retained Portable data and ADR 0007's isolation remain satisfied; no
-ADR conflict or exception was found.
-
-The first corrected slice attempt crossed the hard limit: 9m33s of clocked
-implementation plus required pre-clock reading/analysis. Its standalone MIG,
-publication and direct-shell changes and passing focused proof are preserved in
-stash `8581eb3e3e18f06157a70dfd978e9c21cc1519d4`. The failed sizing assumption
-was that closing the standalone MIG formed the whole proof loop; changing the
-actual publication boundary also invalidated a separate direct deploy shell
-suite. Replaced slice 10 with 10a-10c so each owns one proof loop; restore only
-the files owned by the active replacement and retain the stash until all three
-have been delivered. The attempt's focused Node and direct shell tests passed,
-as did shellcheck for the two production scripts; shellcheck of the rewritten
-test itself remained incomplete because its dynamic sourced helper was not
-resolved.
-
-The reduced plan has 21 slices, so story resplit is still recommended by the planning
-workflow. Do not resplit automatically: the first nine historical slices and
-their correction provenance must remain attributable. Slices 10-14 are locally
-executable under the current execution instruction; slices 15-16 are conditional
-on an explicitly owned disposable Cloud SQL/application environment, whose
-access is still unestablished. No production resource was mutated while finding
-this contradiction. Sizing exceptions cover full-suite/rehearsal waiting only;
-active integration remains subject to the 10-minute hard refinement limit.
-
-Slice-11 refinement, 2026-09-14: inspection found three independently failing
-boundaries in the existing task seam: `SpringApplication.run` creates the web
-context before dispatch, production scheduling is enabled separately, and the
-ordinary application-ready listener owns migration before `DonutTaskRunner`.
-Split the original slice 11 into 11a-11c so writer exclusion, explicit task
-lifecycle, and real populated/interrupted subprocess rehearsal each own one
-proof loop. No product scope or recovery promise changed.
-
-Slice-11c refinement, 2026-09-14: the implementation pass stopped without edits
-after ~8 minutes because the test profile auto-migrates before task dispatch,
-the 721-line populated invariant owner requires an intermediate V327 snapshot,
-and three private interruption harnesses cannot be composed directly with a
-latest-version subprocess. Replaced 11c with 11c-11h so startup-strategy
-selection, the real process seam, invariant extraction, populated rehearsal,
-interruption extraction and interrupted rehearsal each have one proof owner.
-The user then capped validation scope: 11e-11h were removed before delivery,
-their partial extraction preserved only in stash
-`4b9b01d860619bad4fc6628a9dfde4441da84643`, and 11d is the final added
-validation boundary.
+No MIG, one-shot task, maintenance path, publication gate, or release runbook is
+needed to answer those questions, and all such post-validation additions were
+reverted. Production application is the trigger for the separate cleanup owner,
+[SEED-009 story 39](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-39),
+whose story body now carries the exact temporary-artifact inventory.
