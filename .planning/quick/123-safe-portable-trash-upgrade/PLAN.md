@@ -565,11 +565,17 @@ Behavior: The production-family MIG has running old instances and a PROACTIVE
 replace policy → enter maintenance → the policy becomes opportunistic, the
 MIG's original target size is retained for recovery, its target size becomes
 zero, and no instance remains before any template or migration change occurs.
+Change: Replace the current template-first stop/start path at the actual backend
+publication entry with a safe interim boundary: after verified zero size, this
+slice deliberately stops the release non-zero and leaves its record publishing.
+Slice 13 replaces that temporary stop with verified reopen; until then no
+unsupported `start-instances` command or successful publication path remains.
 Proof: Extend the publication/maintenance fake-cloud boundary to assert the
 actual order and durable zero target; process loss after each command leaves
 either the unchanged old service or a zero-sized service, never a mixed-version
-rollout. Assert stable gcloud command forms rather than teaching the fake to
-accept unsupported `--all-instances`.
+rollout. Assert the actual publication now fails closed after maintenance entry
+and stable gcloud command forms rather than teaching the fake to accept
+unsupported `--all-instances`.
 Estimate: 5 minutes active. Reuse native update-policy, resize, describe and
 list-instances commands; do not add a maintenance state service.
 
