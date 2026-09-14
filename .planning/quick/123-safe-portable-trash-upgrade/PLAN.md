@@ -456,7 +456,7 @@ autohealing/update-policy semantics), refactor and coordinator verification.
 
 ### 9. Route normal publication through the protected upgrade
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Application Release selects the portable-trash artifact → publication
 → maintenance protections precede every schema-dependent rollout and routing
 cannot reopen early. Ordinary rolling replacement cannot bypass the protection.
@@ -467,6 +467,65 @@ publication entry point to assert the complete order and guard against the norma
 rolling route, including retries and conditional backend-deploy skip behavior.
 Command: `CURSOR_DEV=true nix develop -c node --test scripts/ci/application-release-publication.test.mjs`.
 Estimate: 5 minutes active after 7–8. Local fake-cloud proof does not prove GCP isolation.
+Learnings: Confirmed the actual publication entry point first (not assumed):
+`.github/workflows/deploy.yml`'s `Deploy` job step `id: publish` runs
+`GITHUB_SHA="$RELEASE_SHA" bash infra/gcp/scripts/publish-application.sh`,
+and `application-release-publication-fixtures.mjs` spawns that exact command
+with `cwd: repositoryRoot` against a deliberately-stubbed selected-source
+copy — proving the current worktree's script is what's under test, matching
+this slice's target. `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh`
+now replaces its single ordinary `update-mig-startup-script.sh` call
+(create-template-then-immediately-`rolling-action replace`, which keeps most
+old instances serving/writing during a one-at-a-time rollout) with: new
+`create-mig-instance-template-for-maintenance.sh` (duplicates only the
+template-creation gcloud call, does not assign/replace) →
+`enter-maintenance-mode.sh` (slices 7/8, template swap + stop + verified
+quiescence) → new `exit-maintenance-mode.sh` (`start-instances`, the natural
+mirror of `stop-instances`) → unchanged `check-mig-rollout.sh` →
+`app-instance-healthcheck.sh` → unchanged record write. Jar upload stays
+first, unchanged, which already satisfies slice 8's "compatible jar before
+template swap" caveat without reordering. `update-mig-startup-script.sh`
+and `publish-application.sh` are both byte-for-byte untouched (only a
+comment updated in `enter-maintenance-mode.sh`); the branching lives
+entirely inside `deploy-backend-jar-to-gcp-mig.sh`, unconditional (no
+feature flag — matches the plan's "one-time... no general framework"
+requirement; story 39 reverts it). New `docs/gcp/portable-trash-maintenance-release-runbook.md`
+sections and `application-release-publication.test.mjs`'s extended `forced`
+scenario assert the complete order via array-index comparisons and that
+`rolling-action replace` never appears in the trace anywhere; the `skip`
+scenario asserts none of the maintenance/rollout calls run at all when the
+hash-compare skip applies (preserving existing skip behavior exactly).
+Implementation discovered and updated a pre-existing, previously-unmentioned
+shell-test suite (`scripts/test/deploy-backend-jar-to-gcp-mig.sh.test`/
+`-test-lib.sh`, run by `scripts/test/run_all_script_tests.sh`, wired into
+CI) that would otherwise have gone red — its four deploy scenarios and
+step-ordering assertion were updated to expect the new maintenance sequence
+and assert `rolling-action` never appears. Post-change-refactor made one
+cosmetic biome-formatting fix to the test file and, on independent review,
+corrected a claim in this slice's own framing: the shell-test suite only
+ever asserted `update-mig-startup-script.sh` gets *invoked* (black-box), not
+its own internal gcloud sequence — that file has always had zero direct
+test coverage of its own content, unchanged before and after this slice, so
+routing around it automatically does not newly weaken coverage that existed
+before. Coordinator independently re-verified: read every diff in full
+(both new scripts, the modified deploy script, both fixture/test files, the
+shell-test-suite diff, the runbook diff) before running anything, then
+re-ran the 7 publication tests, the 4 maintenance tests (unaffected), the
+full 18-test `run_all_script_tests.sh` suite (including
+`deploy-backend-jar-to-gcp-mig.sh.test` directly), and shellcheck on every
+touched script myself — all green, both before and after the refactor
+pass's formatting fix. This is the most invasive slice so far (it rewrites
+the real production publish entry point's backend-rollout branch); commit
+went through without a permission-classifier block, same as slices 6-8. No
+backend Java touched, so the full backend suite was not re-run. Active time
+~50-60 minutes across implementation, refactor and coordinator verification
+— the largest slice yet, consistent with the plan's own expectation that
+slices routing through real deployment ownership would run over the 5-minute
+estimate. Explicitly out of scope here and left to slice 11: this is local
+fake-`gcloud`/`gsutil` proof only, proving command ordering and that the
+ordinary rolling-replace route is structurally unreachable in this script —
+it cannot and does not prove real GCP-side behavior (actual instance
+stop/start timing, autohealing, update-policy convergence).
 
 ### 10. Recover a failed release without reopening an unsafe application
 Type: Behavior

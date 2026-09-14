@@ -128,7 +128,8 @@ for arg in "$@"; do
   if [[ "$arg" == --source=* ]]; then cp "\${arg#--source=}" "$CAPTURED_MAP"; fi
   if [[ "$arg" == startup-script=* ]]; then cp "\${arg#startup-script=}" "$CAPTURED_STARTUP"; fi
 done
-if [[ "$*" == *"managed describe"* ]]; then echo current-template; fi`
+if [[ "$*" == *"managed describe"* ]]; then echo current-template; fi
+if [[ "$*" == *"list-instances"* ]]; then echo TERMINATED; fi`
   )
   fake(
     'curl',
@@ -173,6 +174,9 @@ printf 200`
         DEPLOY_JAR_PATH: artifacts(ci.runId).jar,
         FORCE_FULL_DEPLOY: '',
         HEALTHCHECK_RETRY_SLEEP_SECONDS: '0',
+        MAINTENANCE_STOP_GRACE_SECONDS: '0',
+        MAINTENANCE_QUIESCENCE_POLL_SECONDS: '0',
+        MAINTENANCE_QUIESCENCE_TIMEOUT_SECONDS: '5',
         FAIL_GSUTIL_MATCH:
           failGsutilMatch || (scenario === 'failed-frontend' ? 'rsync' : ''),
       },

@@ -32,9 +32,11 @@ set -euo pipefail
 # template, never the old one, even if this script is killed immediately
 # after.
 #
-# This script is a standalone, opt-in operation. It is deliberately NOT
-# called from publish-application.sh or deploy-backend-jar-to-gcp-mig.sh --
-# wiring it into ordinary publication is a later, separate plan slice.
+# This script is called from deploy-backend-jar-to-gcp-mig.sh's
+# maintenance-protected rollout (plan slice 9) for this one-time release,
+# in place of the ordinary create-template-then-rolling-replace route
+# (update-mig-startup-script.sh). It remains usable standalone (e.g. for a
+# manual operator run) -- callers must set MAINTENANCE_INSTANCE_TEMPLATE.
 #
 # Env:
 #   ZONE (default us-east1-b)

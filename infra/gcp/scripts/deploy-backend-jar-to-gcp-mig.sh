@@ -3,9 +3,20 @@ set -euo pipefail
 
 # Compares the built jar and startup script SHA-256 values to
 # gs://${GCS_BUCKET}/deploy/last-successful-deploy.json. If both match, skips
-# GCS upload and MIG rolling replace (record only advances after success).
+# GCS upload and the MIG rollout (record only advances after success).
 # Env: GCS_BUCKET, ARTIFACT, VERSION; optional DEPLOY_JAR_PATH; GITHUB_SHA (set by CI).
-# Optional FORCE_FULL_DEPLOY=1: run upload + rolling replace even when hashes match the record.
+# Optional FORCE_FULL_DEPLOY=1: run upload + rollout even when hashes match the record.
+#
+# One-time maintenance-protected rollout for the portable-trash schema
+# upgrade release (SEED-009 story 37, plan slice 9,
+# .planning/quick/123-safe-portable-trash-upgrade/PLAN.md): the ordinary
+# create-template-then-rolling-replace route
+# (update-mig-startup-script.sh) is replaced below with
+# create-mig-instance-template-for-maintenance.sh + enter-maintenance-mode.sh
+# + exit-maintenance-mode.sh, so every old writer is stopped and verified
+# quiescent before any instance can run this release's jar/schema. Story 39
+# reverts this once production has succeeded (see the plan's temporary
+# removal inventory).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -52,7 +63,7 @@ if [[ -n "$recorded_hash" &&
   -n "$recorded_startup_script_hash" &&
   "$recorded_startup_script_hash" == "$new_startup_script_hash" ]]; then
   if [[ "${FORCE_FULL_DEPLOY:-}" == "1" ]]; then
-    echo "Force full deploy: jar and startup script SHA-256 values match record; continuing with upload and rolling replace."
+    echo "Force full deploy: jar and startup script SHA-256 values match record; continuing with upload and rollout."
   else
     echo "Deploy skipped: jar and startup script SHA-256 values match last successful deploy record."
     exit 0
@@ -62,7 +73,11 @@ fi
 echo "Deploying: jar SHA-256 $new_hash (record had ${recorded_hash:-<none>}); startup script SHA-256 $new_startup_script_hash (record had ${recorded_startup_script_hash:-<none>})."
 gsutil cp "$JAR_PATH" "$JAR_DEST"
 
-bash "$SCRIPT_DIR/update-mig-startup-script.sh"
+NEW_TEMPLATE_NAME="$(bash "$SCRIPT_DIR/create-mig-instance-template-for-maintenance.sh")"
+
+MAINTENANCE_INSTANCE_TEMPLATE="$NEW_TEMPLATE_NAME" bash "$SCRIPT_DIR/enter-maintenance-mode.sh"
+
+bash "$SCRIPT_DIR/exit-maintenance-mode.sh"
 
 bash "$SCRIPT_DIR/check-mig-rollout.sh"
 

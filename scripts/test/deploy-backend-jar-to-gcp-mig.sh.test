@@ -76,7 +76,10 @@ test_deploys_when_startup_script_hash_differs() {
 	export DEPLOY_JAR_PATH="$jar"
 	run_deploy "$work" "$fake_bin"
 	assert_file_exists "$work/rolling.log"
-	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked when startup script hash differs"
+	grep -q create-mig-instance-template-for-maintenance.sh "$work/rolling.log" || fail "maintenance template creation not invoked when startup script hash differs"
+	grep -q enter-maintenance-mode.sh "$work/rolling.log" || fail "maintenance entry not invoked when startup script hash differs"
+	grep -q exit-maintenance-mode.sh "$work/rolling.log" || fail "maintenance exit not invoked when startup script hash differs"
+	! grep -q rolling-action "$work/rolling.log" || fail "ordinary rolling replacement must not be used"
 	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked when startup script hash differs"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged when startup script differs"
 	trap - EXIT
@@ -97,7 +100,10 @@ test_deploys_when_no_record() {
 	export DEPLOY_JAR_PATH="$jar"
 	run_deploy "$work" "$fake_bin"
 	assert_file_exists "$work/rolling.log"
-	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked"
+	grep -q create-mig-instance-template-for-maintenance.sh "$work/rolling.log" || fail "maintenance template creation not invoked"
+	grep -q enter-maintenance-mode.sh "$work/rolling.log" || fail "maintenance entry not invoked"
+	grep -q exit-maintenance-mode.sh "$work/rolling.log" || fail "maintenance exit not invoked"
+	! grep -q rolling-action "$work/rolling.log" || fail "ordinary rolling replacement must not be used"
 	assert_rollout_invoked "$work/rollout.log"
 	assert_healthcheck_invoked "$work/healthcheck.log"
 	grep -q "GITHUB_SHA=$TEST_GIT_SHA" "$work/healthcheck.log" || fail "GITHUB_SHA not passed through to healthcheck"
@@ -123,7 +129,9 @@ test_deploys_when_record_hash_differs() {
 	run_deploy "$work" "$fake_bin"
 	assert_file_exists "$work/rolling.log"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged on mismatch"
-	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked on jar mismatch"
+	grep -q create-mig-instance-template-for-maintenance.sh "$work/rolling.log" || fail "maintenance template creation not invoked on jar mismatch"
+	grep -q enter-maintenance-mode.sh "$work/rolling.log" || fail "maintenance entry not invoked on jar mismatch"
+	grep -q exit-maintenance-mode.sh "$work/rolling.log" || fail "maintenance exit not invoked on jar mismatch"
 	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked on jar mismatch"
 	trap - EXIT
 	rm -rf "$work"
@@ -146,7 +154,9 @@ test_force_full_deploy_when_record_matches_jar_hash() {
 	run_deploy "$work" "$fake_bin"
 	unset FORCE_FULL_DEPLOY
 	assert_file_exists "$work/rolling.log"
-	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked when forced"
+	grep -q create-mig-instance-template-for-maintenance.sh "$work/rolling.log" || fail "maintenance template creation not invoked when forced"
+	grep -q enter-maintenance-mode.sh "$work/rolling.log" || fail "maintenance entry not invoked when forced"
+	grep -q exit-maintenance-mode.sh "$work/rolling.log" || fail "maintenance exit not invoked when forced"
 	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked when forced"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged when forced"
 	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged when forced"
@@ -199,6 +209,13 @@ test_waits_for_rollout_before_healthcheck() {
 		/app-instance-healthcheck/ { h=NR }
 		END { if (!r || !h || r >= h) exit 1 }
 	' "$work/steps.log" || fail "rollout wait must run before healthcheck"
+	awk '
+		/create-mig-instance-template-for-maintenance/ { c=NR }
+		/enter-maintenance-mode/ { e=NR }
+		/exit-maintenance-mode/ { x=NR }
+		/check-mig-rollout/ { r=NR }
+		END { if (!c || !e || !x || !r || c >= e || e >= x || x >= r) exit 1 }
+	' "$work/steps.log" || fail "maintenance-protected sequence must run in order before the rollout wait"
 	trap - EXIT
 	rm -rf "$work"
 }
