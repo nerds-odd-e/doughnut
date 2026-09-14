@@ -1,7 +1,7 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 11 done; slice 10 still awaiting product answer (skipped);
-slice 12 next. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
+Status: in progress. Slice 12 done; slice 10 still awaiting product answer (skipped);
+slice 13 next. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
 ## Planned-execution identity
 
@@ -279,12 +279,15 @@ accepted head A, IDs, dependents, and bundle remain intact after rejection.
 
 ### 12. Retry an accepted range without repeating its effects
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Response is lost after T is accepted → retry while T is still current
 → report T with unchanged IDs and no repeated creations/removals.
 Proof: Extend existing idempotent controller and CLI transport/retry fixtures.
 Check the local chain/files remain intact. No receipt lookup for historical tips.
 Estimate: 3–5 minutes active work.
+Learnings: No production change. Existing identical-head short-circuit covers
+multi-commit tip T; controller + CLI proofs show unchanged IDs/binding and
+intact local A→middle→T chain on retry.
 
 ### 13. Preserve a competing accepted web save
 Type: Behavior

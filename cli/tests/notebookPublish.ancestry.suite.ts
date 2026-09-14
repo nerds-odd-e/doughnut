@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 import { dirname, join } from 'node:path'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import {
@@ -14,6 +14,7 @@ import {
   bundleMain,
   cloneAsBoundCheckout,
   postCount,
+  stubFetchForSubmission,
   stubFetchWithBundleFile,
 } from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
@@ -206,6 +207,57 @@ export function describeNotebookPublishAncestry(): void {
 
       await run(['notebook', 'publish', dir])
       expect(runGit(['rev-parse', 'main'], dir)).toBe(localHead)
+    })
+
+    test('retrying when a multi-commit tip is already accepted reports that tip and leaves local chain intact', async () => {
+      const workDir = ctx.getWorkDir()
+      const sourceRepoDir = buildSourceRepo(workDir)
+
+      const dir = cloneAsBoundCheckout(
+        workDir,
+        sourceRepoDir,
+        getApiConfig().apiBaseUrl,
+        'checkout'
+      )
+      const firstEdit = '# hello notebook (edit 1)\n'
+      const secondEdit = '# hello notebook (edit 2)\n'
+      commitFileChange(dir, firstEdit, 'edit note 1')
+      const middle = runGit(['rev-parse', 'main'], dir)
+      commitFileChange(dir, secondEdit, 'edit note 2')
+      const tip = runGit(['rev-parse', 'main'], dir)
+      const acceptedAtA = runGit(['rev-parse', 'main^^'], dir)
+
+      const alreadyAcceptedBundle = join(workDir, 'already-accepted-tip.bundle')
+      bundleMain(dir, alreadyAcceptedBundle)
+      const fetchMock = stubFetchForSubmission(alreadyAcceptedBundle, {
+        status: 200,
+        ok: true,
+        text: () => Promise.resolve(tip),
+      })
+      const logSpy = vi
+        .spyOn(console, 'log')
+        .mockImplementation(() => undefined)
+      try {
+        await run(['notebook', 'publish', dir])
+
+        expect(logSpy).toHaveBeenCalledWith(
+          `Published notebook. Accepted head: ${tip}`
+        )
+        expect(postCount(fetchMock)).toBe(1)
+        const postCall = fetchMock.mock.calls.find(
+          ([, init]: [unknown, { method?: string } | undefined]) =>
+            init?.method === 'POST'
+        )
+        expect(postCall?.[0]).toContain(
+          `/notebooks/42/git-bundle?expectedHead=${encodeURIComponent(tip)}`
+        )
+        expect(runGit(['rev-parse', 'main'], dir)).toBe(tip)
+        expect(runGit(['rev-parse', 'main^'], dir)).toBe(middle)
+        expect(runGit(['rev-parse', 'main^^'], dir)).toBe(acceptedAtA)
+        expect(fs.readFileSync(join(dir, 'note.md'), 'utf8')).toBe(secondEdit)
+      } finally {
+        logSpy.mockRestore()
+      }
     })
 
     test('local main with unrelated history is rejected with an ancestry error', async () => {

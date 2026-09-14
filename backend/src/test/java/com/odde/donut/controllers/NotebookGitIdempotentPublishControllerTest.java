@@ -3,14 +3,32 @@ package com.odde.donut.controllers;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.testability.GitBundleTestReader;
+import java.sql.Timestamp;
+import java.util.List;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentControllerTestBase {
+
+  private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
+  private static final String RETAINED_EDITED_CONTENT =
+      "---\ntype: Note\n---\nEdited authored bytes.\n";
+  private static final String ADDED_CONTENT = "---\ntype: Note\n---\nNewly added authored bytes.\n";
+
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
   void idempotentPublishReturnsUnchangedHeadAndHistory() throws Exception {
@@ -52,4 +70,122 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHead));
     assertThat(after.getBundleBytes(), equalTo(currentBundle));
   }
+
+  @Test
+  void retriesAnAlreadyAcceptedMultiCommitRangeWithoutRepeatingCreationsOrRemovals()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note deleted =
+        makeMe.aNote().notebook(notebook).title("Deleted").content(ORIGINAL_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
+    MemoryTracker deletedTracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(deleted.getId()).orElseThrow())
+                    .difficulty(7f)
+                    .please());
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(
+                  memoryTrackerRepository.findById(deletedTracker.getId()).orElseThrow())
+              .withMcqForNote(noteRepository.findById(deleted.getId()).orElseThrow())
+              .please();
+          makeMe.anImage().forNote(noteRepository.findById(deleted.getId()).orElseThrow()).please();
+          makeMe
+              .aConversation()
+              .forANote(noteRepository.findById(deleted.getId()).orElseThrow())
+              .please();
+        });
+    NotebookGitBinding initialBinding = snapshotCurrentPortableTree(notebook);
+    String initialHead = initialBinding.getAcceptedGitObjectId();
+    ObjectId acceptedHead = ObjectId.fromString(initialHead);
+    ObjectId tip;
+    byte[] proposalBytes;
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.fetchHead(repository, initialBinding.getBundleBytes());
+      ObjectId afterDeleteAndEdit =
+          commitOnTopOf(
+              repository,
+              List.of(acceptedHead),
+              List.of(new NotebookGitProposalFile("Retained.md", RETAINED_EDITED_CONTENT)),
+              "Delete learned note and edit retained");
+      tip =
+          commitOnTopOf(
+              repository,
+              List.of(afterDeleteAndEdit),
+              List.of(
+                  new NotebookGitProposalFile("Retained.md", RETAINED_EDITED_CONTENT),
+                  new NotebookGitProposalFile("Added.md", ADDED_CONTENT)),
+              "Add unrelated note");
+      proposalBytes = bundleBytesForHead(repository, tip);
+    }
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
+    PublicationState stateAfterPublication = publicationState(notebook, deleted);
+    assertThat(publishedHead, equalTo(tip.getName()));
+    assertThat(stateAfterPublication.notes(), hasSize(2));
+    assertThat(stateAfterPublication.deletedPresent(), equalTo(false));
+    assertThat(stateAfterPublication.dependentCounts(), equalTo(DependentCounts.allAbsent()));
+
+    testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-06-01 00:00:00"));
+    String retriedHead =
+        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
+
+    assertThat(retriedHead, equalTo(publishedHead));
+    PublicationState stateAfterRetry = publicationState(notebook, deleted);
+    assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
+    assertThat(
+        stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
+    assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
+    assertThat(stateAfterRetry.notes(), equalTo(stateAfterPublication.notes()));
+    assertThat(stateAfterRetry.deletedPresent(), equalTo(stateAfterPublication.deletedPresent()));
+    assertThat(stateAfterRetry.dependentCounts(), equalTo(stateAfterPublication.dependentCounts()));
+  }
+
+  private PublicationState publicationState(Notebook notebook, Note deleted) {
+    return inCommittedTransaction(
+        transactionManager,
+        () -> {
+          NotebookGitBinding binding =
+              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+          List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+          return new PublicationState(
+              binding.getAcceptedGitObjectId(),
+              binding.getUpdatedAt(),
+              binding.getBundleBytes().clone(),
+              notes.stream()
+                  .map(
+                      note ->
+                          new PublishedNoteState(
+                              note.getId(),
+                              note.getTitle(),
+                              note.getContent(),
+                              note.getCreatedAt(),
+                              note.getUpdatedAt()))
+                  .toList(),
+              noteRepository.findById(deleted.getId()).isPresent(),
+              dependentCounts(deleted));
+        });
+  }
+
+  private record PublicationState(
+      String acceptedHead,
+      Timestamp bindingUpdatedAt,
+      byte[] bundleBytes,
+      List<PublishedNoteState> notes,
+      boolean deletedPresent,
+      DependentCounts dependentCounts) {}
+
+  private record PublishedNoteState(
+      Integer noteId,
+      String noteTitle,
+      String noteContent,
+      Timestamp noteCreatedAt,
+      Timestamp noteUpdatedAt) {}
 }
