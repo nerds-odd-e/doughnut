@@ -1,6 +1,6 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 5 done; slice 6 next. Slice 10 awaits the existing
+Status: in progress. Slice 6 done; slice 7 next. Slice 10 awaits the existing
 unanswered deletion/recreation decision and remains non-executable until answered.
 Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
@@ -180,7 +180,7 @@ until slice 6 when final blob may differ from the accepted origin blob.
 
 ### 6. Compose exact note moves with subsequent edits
 Type: Behavior
-Status: planned
+Status: done
 Behavior: B renames/moves a learned note unchanged with unrelated edits; C edits
 that note → publish → its final path/content retains the original identity.
 Change: Carry the existing exact correspondence through adjacent changes and
@@ -191,6 +191,12 @@ and final content. Reuse final-path placement tests. A same-transition changed-
 content move remains outside current inference; no endpoint-equality shortcut.
 Estimate: 5 minutes active work after slice 5; refine if the origin map starts
 needing simulated entities or copied domain rules.
+Learnings: Exact-move origins walk adjacent first-parent steps via shared
+`NotebookGitProposalAncestry.firstParentRange`; tip RENAMED keeps accepted
+`NoteOrigin` when tip bytes differ. Publisher applies additions before renames
+and persists tip content when blob ≠ origin. Placement accepts tip-represented
+destinations. Same-transition changed-content moves still refuse. No simulated
+entities.
 
 ### 7. Compose resolved removals with edits and additions
 Type: Behavior

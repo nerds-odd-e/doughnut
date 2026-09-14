@@ -23,10 +23,12 @@ import org.springframework.web.server.ResponseStatusException;
  * changes so folder Readmes can accompany note edits. Ordinary-note admission permits added and/or
  * modified ordinary Markdown notes at regular file modes, any number of ordinary-note deletions
  * alone or with same-path edits, and unambiguous equal-content moves with compatible companions.
- * Move correspondence is resolved across the complete candidate set. Mixing unmatched removals with
- * additions is refused when identity correspondence is uncertain. Unsafe paths, non-regular modes,
- * or a changed folder-reserved {@code README.md} are refused. Callers only invoke this once
- * proposal ancestry is confirmed to be a contiguous single-parent range from the accepted commit.
+ * Exact move correspondence is resolved on the tip diff and also carried through adjacent
+ * first-parent steps so an unchanged rename followed by a later edit retains accepted origin when
+ * tip bytes differ. Mixing unmatched removals with additions is refused when identity
+ * correspondence is uncertain. Unsafe paths, non-regular modes, or a changed folder-reserved {@code
+ * README.md} are refused. Callers only invoke this once proposal ancestry is confirmed to be a
+ * contiguous single-parent range from the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -37,7 +39,11 @@ public final class NotebookGitProposalTreeShape {
    * stay reserved. Container additions mixed with concept removals stay reserved until that
    * composition is supported.
    */
-  static AdmittedShape requireAdmittedShape(List<ChangedDocument> documents) {
+  static AdmittedShape requireAdmittedShape(
+      Repository repository,
+      ObjectId acceptedHead,
+      ObjectId proposedHead,
+      List<ChangedDocument> documents) {
     List<ChangedDocument> containerAdditions = new ArrayList<>();
     List<ChangedDocument> conceptDocuments = new ArrayList<>();
     for (ChangedDocument document : documents) {
@@ -52,10 +58,12 @@ public final class NotebookGitProposalTreeShape {
     }
     List<NoteChange> noteChanges = List.of();
     if (!conceptDocuments.isEmpty()) {
-      noteChanges = requireAllowedNoteChanges(conceptDocuments);
+      noteChanges =
+          admitOrdinaryNoteChanges(
+              repository, acceptedHead, proposedHead, noteChangesFrom(conceptDocuments));
     }
     if (!containerAdditions.isEmpty()
-        && conceptDocuments.stream().anyMatch(document -> document.kind() == ChangeKind.DELETED)) {
+        && noteChanges.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)) {
       throw reservedFolderReadme(containerAdditions.getFirst().path());
     }
     Set<String> addedPaths = new HashSet<>();
@@ -71,10 +79,6 @@ public final class NotebookGitProposalTreeShape {
       }
     }
     return new AdmittedShape(noteChanges, additions);
-  }
-
-  private static List<NoteChange> requireAllowedNoteChanges(List<ChangedDocument> documents) {
-    return admitOrdinaryNoteChanges(noteChangesFrom(documents));
   }
 
   private static ResponseStatusException reservedFolderReadme(String path) {
@@ -171,25 +175,124 @@ public final class NotebookGitProposalTreeShape {
    * same-path edits, and unambiguous equal-content moves with compatible companions. Refuses
    * unmatched removal/addition mixtures and ambiguous equal-blob correspondence.
    */
-  private static List<NoteChange> admitOrdinaryNoteChanges(List<NoteChange> changes) {
+  private static List<NoteChange> admitOrdinaryNoteChanges(
+      Repository repository,
+      ObjectId acceptedHead,
+      ObjectId proposedHead,
+      List<NoteChange> changes) {
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
-    List<NoteChange> resolvedChanges = resolveMoveCorrespondence(changes);
+    Map<String, NoteOrigin> originsAtTip =
+        carryExactMoveOrigins(repository, acceptedHead, proposedHead);
+    List<NoteChange> resolvedChanges = resolveMoveCorrespondence(changes, originsAtTip);
     refuseResidualRemovalAndAdditionMixture(resolvedChanges);
     return resolvedChanges;
   }
 
   /**
-   * Resolves every unambiguous removed/added pair with identical blob content while retaining all
-   * companion changes. A blob represented by multiple sources or destinations cannot establish
-   * identity correspondence, so the complete proposal is refused.
+   * Carries each accepted concept-note origin through adjacent first-parent steps using only exact
+   * equal-content moves. Tip paths that retain continuity map to their accepted {@link NoteOrigin}.
    */
-  private static List<NoteChange> resolveMoveCorrespondence(List<NoteChange> changes) {
+  private static Map<String, NoteOrigin> carryExactMoveOrigins(
+      Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
+    List<ObjectId> range =
+        NotebookGitProposalAncestry.firstParentRange(repository, acceptedHead, proposedHead);
+    Map<String, NoteOrigin> origins = conceptOriginsAt(repository, acceptedHead);
+    for (int i = 1; i < range.size(); i++) {
+      origins =
+          advanceOriginsThroughExactMoves(repository, range.get(i - 1), range.get(i), origins);
+    }
+    return origins;
+  }
+
+  private static Map<String, NoteOrigin> conceptOriginsAt(
+      Repository repository, ObjectId commitId) {
+    try (RevWalk revWalk = new RevWalk(repository);
+        TreeWalk walk = new TreeWalk(repository)) {
+      RevCommit commit = revWalk.parseCommit(commitId);
+      walk.addTree(commit.getTree());
+      walk.setRecursive(true);
+      Map<String, NoteOrigin> origins = new HashMap<>();
+      while (walk.next()) {
+        String path = walk.getPathString();
+        if (!path.endsWith(".md") || "README.md".equals(basename(path))) {
+          continue;
+        }
+        if (!FileMode.REGULAR_FILE.equals(walk.getFileMode(0))) {
+          continue;
+        }
+        origins.put(path, new NoteOrigin(path, walk.getObjectId(0)));
+      }
+      return origins;
+    } catch (IOException e) {
+      throw unsupportedTreeShape("accepted tree could not be read for note origins", e);
+    }
+  }
+
+  private static Map<String, NoteOrigin> advanceOriginsThroughExactMoves(
+      Repository repository,
+      ObjectId parentHead,
+      ObjectId childHead,
+      Map<String, NoteOrigin> origins) {
+    List<ChangedDocument> conceptDocuments = new ArrayList<>();
+    for (ChangedDocument document :
+        classifyChangedDocuments(inspectRegularFiles(repository, parentHead, childHead))) {
+      if (document.role() == DocumentRole.CONCEPT) {
+        conceptDocuments.add(document);
+      }
+    }
+    List<NoteChange> resolved = resolveEqualBlobMoves(noteChangesFrom(conceptDocuments));
+    Map<String, NoteOrigin> next = new HashMap<>(origins);
+    for (NoteChange change : resolved) {
+      if (change.kind() == ChangeKind.RENAMED) {
+        NoteOrigin carried = next.remove(change.origin().path());
+        if (carried != null) {
+          next.put(change.path(), carried);
+        }
+      } else if (change.kind() == ChangeKind.DELETED) {
+        next.remove(change.path());
+      }
+    }
+    return next;
+  }
+
+  /**
+   * Resolves every unambiguous removed/added pair with identical blob content while retaining all
+   * companion changes, then applies origins carried through exact adjacent moves when tip bytes
+   * differ. A blob represented by multiple sources or destinations cannot establish identity
+   * correspondence, so the complete proposal is refused.
+   */
+  private static List<NoteChange> resolveMoveCorrespondence(
+      List<NoteChange> changes, Map<String, NoteOrigin> originsAtTip) {
+    List<NoteChange> equalBlobResolved = resolveEqualBlobMoves(changes);
+    Map<String, NoteChange> deletionsByPath = new HashMap<>();
+    for (NoteChange change : equalBlobResolved) {
+      if (change.kind() == ChangeKind.DELETED) {
+        deletionsByPath.put(change.path(), change);
+      }
+    }
+    Map<String, NoteOrigin> composedOriginsByDestination = new HashMap<>();
+    for (NoteChange change : equalBlobResolved) {
+      if (change.kind() != ChangeKind.ADDED) {
+        continue;
+      }
+      NoteOrigin carried = originsAtTip.get(change.path());
+      if (carried == null) {
+        continue;
+      }
+      if (!deletionsByPath.containsKey(carried.path())) {
+        refuseUncertainIdentityCorrespondence();
+      }
+      composedOriginsByDestination.put(change.path(), carried);
+    }
+    return replaceMatchedAdditionsWithRenames(equalBlobResolved, composedOriginsByDestination);
+  }
+
+  private static List<NoteChange> resolveEqualBlobMoves(List<NoteChange> changes) {
     Map<ObjectId, List<NoteChange>> removalsByBlob = changesByBlob(changes, ChangeKind.DELETED);
     Map<ObjectId, List<NoteChange>> additionsByBlob = changesByBlob(changes, ChangeKind.ADDED);
     Map<String, NoteOrigin> originsByDestination = new HashMap<>();
-    Set<String> matchedSources = new HashSet<>();
     for (Map.Entry<ObjectId, List<NoteChange>> removalGroup : removalsByBlob.entrySet()) {
       List<NoteChange> additionGroup = additionsByBlob.get(removalGroup.getKey());
       if (additionGroup == null) {
@@ -200,10 +303,17 @@ public final class NotebookGitProposalTreeShape {
       }
       NoteChange source = removalGroup.getValue().getFirst();
       NoteChange destination = additionGroup.getFirst();
-      matchedSources.add(source.path());
       originsByDestination.put(destination.path(), new NoteOrigin(source.path(), source.blobId()));
     }
+    return replaceMatchedAdditionsWithRenames(changes, originsByDestination);
+  }
 
+  private static List<NoteChange> replaceMatchedAdditionsWithRenames(
+      List<NoteChange> changes, Map<String, NoteOrigin> originsByDestination) {
+    Set<String> matchedSources = new HashSet<>();
+    for (NoteOrigin origin : originsByDestination.values()) {
+      matchedSources.add(origin.path());
+    }
     List<NoteChange> resolved = new ArrayList<>();
     for (NoteChange change : changes) {
       if (change.kind() == ChangeKind.DELETED && matchedSources.contains(change.path())) {
@@ -325,7 +435,8 @@ public final class NotebookGitProposalTreeShape {
    * @param path the current (proposed-tree) Portable path; for RENAMED this is the new path
    * @param blobId the raw blob object id relevant to this change: the added blob (proposed tree)
    *     for ADDED, the removed blob (accepted tree) for DELETED, the proposed blob for MODIFIED
-   *     (not meaningfully used by callers today), and the shared blob for RENAMED today
+   *     (not meaningfully used by callers today), and the proposed tip blob for RENAMED (may differ
+   *     from {@link NoteOrigin#blobId()} when an exact move was followed by an edit)
    * @param origin accepted-tree correspondence establishing identity; present for RENAMED, {@code
    *     null} otherwise
    */

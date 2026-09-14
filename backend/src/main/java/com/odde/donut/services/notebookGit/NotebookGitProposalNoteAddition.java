@@ -89,10 +89,11 @@ class NotebookGitProposalNoteAddition {
   Folder representedDestinationFolder(
       List<ExportFolderRow> folders,
       NotebookGitProposalImporter.ImportedProposal proposal,
-      ObjectId placementHead,
+      ObjectId acceptedHead,
       String path) {
     Integer destinationFolderId =
-        projection.requireRepresentedFolderId(folders, proposal.repository(), placementHead, path);
+        projection.requireRepresentedFolderId(
+            folders, proposal.repository(), acceptedHead, proposal.mainHead(), path);
     return destinationFolderId == null
         ? null
         : entityPersister.find(Folder.class, destinationFolderId);

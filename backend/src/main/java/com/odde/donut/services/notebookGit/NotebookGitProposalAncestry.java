@@ -1,6 +1,9 @@
 package com.odde.donut.services.notebookGit;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -27,18 +30,35 @@ public final class NotebookGitProposalAncestry {
    */
   public static void assertFollowsAcceptedHead(
       Repository repository, ObjectId proposedHead, ObjectId acceptedHead) {
+    firstParentRange(repository, acceptedHead, proposedHead);
+  }
+
+  /**
+   * Contiguous first-parent commits from {@code acceptedHead} through {@code proposedHead},
+   * inclusive. Callers that only need validation may discard the list.
+   *
+   * @throws ResponseStatusException 409 CONFLICT when the range is not a contiguous single-parent
+   *     descendant of {@code acceptedHead}, or the walk cannot be inspected
+   */
+  static List<ObjectId> firstParentRange(
+      Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
     if (proposedHead.equals(acceptedHead)) {
-      return;
+      return List.of(acceptedHead);
     }
     try (RevWalk walk = new RevWalk(repository)) {
+      List<ObjectId> fromTip = new ArrayList<>();
       ObjectId current = proposedHead;
       while (!current.equals(acceptedHead)) {
+        fromTip.add(current);
         RevCommit commit = walk.parseCommit(current);
         if (commit.getParentCount() != 1) {
           throw ancestryConflict();
         }
         current = commit.getParent(0);
       }
+      fromTip.add(acceptedHead);
+      Collections.reverse(fromTip);
+      return fromTip;
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT, "Proposal's main head could not be inspected for ancestry.", e);

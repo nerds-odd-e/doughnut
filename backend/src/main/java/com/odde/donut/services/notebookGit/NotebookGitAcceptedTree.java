@@ -55,8 +55,17 @@ final class NotebookGitAcceptedTree {
     return folderPath + note.getTitle() + ".md";
   }
 
-  static boolean representedInAccepted(String folderPath, List<PortableTreeEntry> accepted) {
-    return accepted.stream().anyMatch(entry -> entry.path().startsWith(folderPath));
+  static boolean representedInTree(String folderPath, List<PortableTreeEntry> entries) {
+    return representedInTree(folderPath, entries, null);
+  }
+
+  static boolean representedInTree(
+      String folderPath, List<PortableTreeEntry> entries, String excludingPath) {
+    return entries.stream()
+        .anyMatch(
+            entry ->
+                entry.path().startsWith(folderPath)
+                    && (excludingPath == null || !entry.path().equals(excludingPath)));
   }
 
   static Map<Integer, ExportFolderRow> indexFoldersById(List<ExportFolderRow> folders) {

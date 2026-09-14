@@ -129,38 +129,46 @@ public class NotebookGitProposalPublisher {
           folderRelocation.apply(state, proposal, acceptedHead, relocation.get()), proposal);
     }
     NotebookGitProposalTreeShape.AdmittedShape admitted =
-        NotebookGitProposalTreeShape.requireAdmittedShape(documents);
+        NotebookGitProposalTreeShape.requireAdmittedShape(
+            proposal.repository(), acceptedHead, proposal.mainHead(), documents);
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
     projection.requireMatchingAcceptedTree(
         notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-    List<Note> proposedLiveNotes = new ArrayList<>(liveNotes);
+    NotebookGitStateLoader.LockedNotebookState published =
+        new NotebookGitStateLoader.LockedNotebookState(binding, notebook, folders, liveNotes);
+    if (!admitted.additions().isEmpty()) {
+      published = documentApplication.apply(published, proposal, admitted.additions(), publishedAt);
+    }
+    List<Note> proposedLiveNotes = new ArrayList<>(published.liveNotes());
+    List<ExportFolderRow> proposedFolders = published.folders();
     for (NotebookGitProposalTreeShape.NoteChange noteChange : admitted.noteChanges()) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document =
             noteAddition.readValidatedDocument(proposal, noteChange.path());
         Note changedNote =
-            projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());
+            projection.requireOneLiveNoteAtPath(
+                proposedFolders, proposedLiveNotes, noteChange.path());
         authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.DELETED) {
         Note deletedNote =
-            projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());
+            projection.requireOneLiveNoteAtPath(
+                proposedFolders, proposedLiveNotes, noteChange.path());
         noteService.permanentlyRemove(
             deletedNote,
             NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS,
             authorizationService.getCurrentUser());
         proposedLiveNotes.remove(deletedNote);
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.RENAMED) {
-        applyRename(notebook, folders, proposal, acceptedHead, liveNotes, noteChange, publishedAt);
+        applyRename(
+            proposedFolders, proposal, acceptedHead, proposedLiveNotes, noteChange, publishedAt);
       }
     }
-    NotebookGitStateLoader.LockedNotebookState published =
+    return acceptMatchingProposedTree(
         new NotebookGitStateLoader.LockedNotebookState(
-            binding, notebook, folders, proposedLiveNotes);
-    if (!admitted.additions().isEmpty()) {
-      published = documentApplication.apply(published, proposal, admitted.additions(), publishedAt);
-    }
-    return acceptMatchingProposedTree(published, proposal, publishedAt);
+            published.binding(), published.notebook(), proposedFolders, proposedLiveNotes),
+        proposal,
+        publishedAt);
   }
 
   private static boolean isEmptyAcceptedNotebook(
@@ -193,7 +201,6 @@ public class NotebookGitProposalPublisher {
   }
 
   private void applyRename(
-      Notebook notebook,
       List<ExportFolderRow> folders,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
@@ -209,5 +216,10 @@ public class NotebookGitProposalPublisher {
     note.setFolder(destinationFolder);
     note.setUpdatedAt(publishedAt);
     entityPersister.save(note);
+    if (!noteChange.blobId().equals(noteChange.origin().blobId())) {
+      AuthoredNoteDocument document =
+          noteAddition.readValidatedDocument(proposal, noteChange.path());
+      authoredNoteDocumentPersistence.persist(note, document, publishedAt);
+    }
   }
 }
