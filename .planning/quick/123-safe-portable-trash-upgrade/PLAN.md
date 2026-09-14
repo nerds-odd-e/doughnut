@@ -558,26 +558,50 @@ ordinary rolling-replace route is structurally unreachable in this script —
 it cannot and does not prove real GCP-side behavior (actual instance
 stop/start timing, autohealing, update-policy convergence).
 
-### 10. Close the MIG before changing its template
+### 10a. Close the MIG before changing its template
 Type: Behavior
 Status: planned
 Behavior: The production-family MIG has running old instances and a PROACTIVE
 replace policy → enter maintenance → the policy becomes opportunistic, the
 MIG's original target size is retained for recovery, its target size becomes
 zero, and no instance remains before any template or migration change occurs.
-Change: Replace the current template-first stop/start path at the actual backend
-publication entry with a safe interim boundary: after verified zero size, this
-slice deliberately stops the release non-zero and leaves its record publishing.
-Slice 13 replaces that temporary stop with verified reopen; until then no
-unsupported `start-instances` command or successful publication path remains.
-Proof: Extend the publication/maintenance fake-cloud boundary to assert the
-actual order and durable zero target; process loss after each command leaves
-either the unchanged old service or a zero-sized service, never a mixed-version
-rollout. Assert the actual publication now fails closed after maintenance entry
-and stable gcloud command forms rather than teaching the fake to accept
-unsupported `--all-instances`.
+Change: Replace `enter-maintenance-mode.sh`'s template-first stop command with
+the native policy/describe/resize-zero sequence only. Do not change the caller
+or reopen behavior in this slice.
+Proof: The standalone maintenance fake boundary asserts actual order, retained
+target size, durable zero target and process loss after every command. Assert
+stable gcloud command forms rather than accepting unsupported `--all-instances`.
 Estimate: 5 minutes active. Reuse native update-policy, resize, describe and
 list-instances commands; do not add a maintenance state service.
+
+### 10b. Stop actual publication at the closed boundary
+Type: Behavior
+Status: planned
+Behavior: Application Release reaches verified zero-size maintenance before the
+one-shot task exists → backend publication stops non-zero → no template
+assignment, migration, reopen, rollout, healthcheck or successful deploy record
+can occur, and the application release remains publishing.
+Change: Replace the actual backend publication caller's old exit/reopen path
+with this temporary fail-closed boundary. Slice 13 replaces the stop with the
+verified task path; until then there is deliberately no successful backend
+publication route.
+Proof: The actual publication fake boundary asserts the zero-size sequence and
+every forbidden later call, while preserving frontend/CLI publication and the
+release record's publishing outcome.
+Estimate: 5 minutes active after 10a. Keep publication-fixture changes local to
+this boundary; do not add the one-shot task or reopen path.
+
+### 10c. Align the direct deploy-script contract with fail-closed publication
+Type: Structure
+Status: planned
+Change: Update the existing direct deploy shell-test fixture to document the
+same temporary fail-closed behavior as the application-publication boundary,
+without deleting unrelated hash-skip coverage or teaching its fake commands an
+unsupported GCP shape. This immediately enables slice 11's application task
+without leaving CI's second deployment boundary contradictory.
+Proof: The direct deploy shell suite and shellcheck pass with its success-route
+expectation replaced only by the zero-size/fail-closed outcome.
+Estimate: 5 minutes active after 10b.
 
 ### 11. Run a verified upgrade without application writers
 Type: Behavior
@@ -772,7 +796,20 @@ release owner and one Flyway entry rather than adding a parallel orchestrator.
 ADR 0004's retained Portable data and ADR 0007's isolation remain satisfied; no
 ADR conflict or exception was found.
 
-The refined plan has 16 slices, so story resplit is recommended by the planning
+The first corrected slice attempt crossed the hard limit: 9m33s of clocked
+implementation plus required pre-clock reading/analysis. Its standalone MIG,
+publication and direct-shell changes and passing focused proof are preserved in
+stash `8581eb3e3e18f06157a70dfd978e9c21cc1519d4`. The failed sizing assumption
+was that closing the standalone MIG formed the whole proof loop; changing the
+actual publication boundary also invalidated a separate direct deploy shell
+suite. Replaced slice 10 with 10a-10c so each owns one proof loop; restore only
+the files owned by the active replacement and retain the stash until all three
+have been delivered. The attempt's focused Node and direct shell tests passed,
+as did shellcheck for the two production scripts; shellcheck of the rewritten
+test itself remained incomplete because its dynamic sourced helper was not
+resolved.
+
+The refined plan has 18 slices, so story resplit is recommended by the planning
 workflow. Do not resplit automatically: the first nine historical slices and
 their correction provenance must remain attributable. Slices 10-14 are locally
 executable under the current execution instruction; slices 15-16 are conditional
