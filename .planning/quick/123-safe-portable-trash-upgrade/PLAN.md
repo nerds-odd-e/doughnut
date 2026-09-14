@@ -642,25 +642,55 @@ Implementation took ~6 minutes and refactoring ~10 minutes. No production or
 cloud state changed in this structure-only slice; branch CI is still not
 triggered for this branch.
 
-### 11. Run a verified upgrade without application writers
+### 11a. Start the upgrade task without application writers
 Type: Behavior
 Status: planned
-Behavior: A populated pre-326 schema and the selected compatible jar → invoke a
-one-shot upgrade task with no web server and no scheduler → the actual
-repair/migrate chain and pre/post schema/identity/count invariants pass, the task
-exits with an explicit success signal, and no application writer exists.
-Change: Extend the existing `DonutTaskRunner`/`odd-e.donut.task` seam only as
-needed for this temporary production-family task. Reuse the existing migration
-and Portable-tree verification owners; do not create another Flyway runner or
-copy the migration recipes. Story 39 removes the temporary task.
-Proof: Drive the packaged task against `PreUpgradeFixtureSchema` with the same
-populated and interrupted states already owned by slices 2-6. Observe process
-exit, schema/history, retained identities/content/counts and trees; prove the
-task mode exposes neither HTTP nor scheduled jobs. Run the full backend suite
-because production Java/migration startup changes.
-Estimate: 5 minutes active plus full-suite waiting. If the existing task seam
-cannot start without writer surfaces, stop and refine before adding a second
-application bootstrap.
+Behavior: Select the temporary portable-trash upgrade task → Spring starts a
+non-web context with scheduling disabled before any application-ready work can
+run → neither HTTP nor scheduled application writers exist, while ordinary
+application startup remains unchanged.
+Change: Extend the existing `DonutApplication`/`odd-e.donut.task` selection seam
+to configure this one task before context startup. Keep one application
+bootstrap; do not add a second main class. Ensure the task, not the ordinary
+production application-ready listener, owns its migration lifecycle.
+Proof: A focused application/task-mode boundary observes a non-servlet context,
+no registered scheduled tasks and no automatic production migration callback;
+the ordinary no-task mode retains its current web/scheduling configuration.
+Estimate: 5 minutes active. If disabling writer surfaces requires constructing
+a parallel application graph, stop and revisit the seam instead.
+
+### 11b. Give the one-shot task an explicit migration lifecycle
+Type: Behavior
+Status: planned
+Behavior: The isolated upgrade task receives the configured Flyway owner → it
+runs repair then the actual registered migration chain exactly once → success
+closes the context with a stable success signal and zero exit, while any failure
+closes it and exits non-zero without reporting success.
+Change: Extend `DonutTaskRunner` and the existing task dispatch only. Reuse the
+Flyway bean and migration resources; do not create another Flyway runner or
+copy migration recipes. Story 39 removes this temporary task.
+Proof: A focused task-runner boundary observes repair/migrate order, one call,
+the exact success token and both exit outcomes without requiring a web server.
+Estimate: 5 minutes active after 11a.
+
+### 11c. Rehearse the packaged task against real pre-upgrade data
+Type: Behavior
+Status: planned
+Behavior: A populated or deliberately interrupted pre-326 schema and the
+selected compatible application artifact → invoke the one-shot task in a fresh
+process → schema/history, retained identities/content/counts and Portable trees
+match the existing slice 2-6 invariants and the process reports explicit
+success without exposing writers.
+Change: Reuse `PreUpgradeFixtureSchema` and the existing migration/Portable-tree
+verification owners. Add only the subprocess seam needed to point the real task
+at the owned disposable schema; do not duplicate the fixture or invariant
+recipes.
+Proof: Drive both populated and interrupted states through a fresh task process,
+then assert process exit/signal plus the existing pre/post invariants and Flyway
+history. Run the full backend suite because production Java/migration startup
+changes.
+Estimate: 5 minutes active plus full-suite waiting. Refine again if sharing the
+existing invariant owner cannot stay within one commit-sized proof loop.
 
 ### 12. Execute the one-shot task while the serving MIG stays closed
 Type: Behavior
@@ -848,7 +878,7 @@ as did shellcheck for the two production scripts; shellcheck of the rewritten
 test itself remained incomplete because its dynamic sourced helper was not
 resolved.
 
-The refined plan has 18 slices, so story resplit is recommended by the planning
+The refined plan has 20 slices, so story resplit is recommended by the planning
 workflow. Do not resplit automatically: the first nine historical slices and
 their correction provenance must remain attributable. Slices 10-14 are locally
 executable under the current execution instruction; slices 15-16 are conditional
@@ -856,3 +886,11 @@ on an explicitly owned disposable Cloud SQL/application environment, whose
 access is still unestablished. No production resource was mutated while finding
 this contradiction. Sizing exceptions cover full-suite/rehearsal waiting only;
 active integration remains subject to the 10-minute hard refinement limit.
+
+Slice-11 refinement, 2026-09-14: inspection found three independently failing
+boundaries in the existing task seam: `SpringApplication.run` creates the web
+context before dispatch, production scheduling is enabled separately, and the
+ordinary application-ready listener owns migration before `DonutTaskRunner`.
+Split the original slice 11 into 11a-11c so writer exclusion, explicit task
+lifecycle, and real populated/interrupted subprocess rehearsal each own one
+proof loop. No product scope or recovery promise changed.
