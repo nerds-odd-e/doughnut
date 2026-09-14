@@ -697,24 +697,79 @@ whitespace checks pass after the final fresh refactor; the single required
 `format:changed` pass was a no-op. Implementation took ~10 minutes across the
 initial pass and correction; final refactor passes took ~13 minutes combined.
 
-### 11c. Rehearse the packaged task against real pre-upgrade data
+### 11c. Keep test-profile startup migration out of task mode
+Type: Structure
+Status: planned
+Change: Make the existing no-op startup Flyway strategy own
+`portable-trash-upgrade` even when the `test` profile supplies the disposable
+schema, and exclude the ordinary test startup migration strategy in that task
+profile. Do not add a third strategy.
+Proof: A focused profile boundary proves ordinary test startup still selects its
+repair/migrate strategy while `test` + `portable-trash-upgrade` selects exactly
+the no-op owner, leaving migration to `DonutTaskRunner`.
+Estimate: 5 minutes active after 11b.
+
+### 11d. Run the real task process against an owned V325 schema
 Type: Behavior
 Status: planned
-Behavior: A populated or deliberately interrupted pre-326 schema and the
-selected compatible application artifact → invoke the one-shot task in a fresh
-process → schema/history, retained identities/content/counts and Portable trees
-match the existing slice 2-6 invariants and the process reports explicit
-success without exposing writers.
-Change: Reuse `PreUpgradeFixtureSchema` and the existing migration/Portable-tree
-verification owners. Add only the subprocess seam needed to point the real task
-at the owned disposable schema; do not duplicate the fixture or invariant
-recipes.
-Proof: Drive both populated and interrupted states through a fresh task process,
-then assert process exit/signal plus the existing pre/post invariants and Flyway
-history. Run the full backend suite because production Java/migration startup
-changes.
-Estimate: 5 minutes active plus full-suite waiting. Refine again if sharing the
-existing invariant owner cannot stay within one commit-sized proof loop.
+Behavior: A fresh owned V325 schema and the application test artifact → start a
+fresh `upgradePortableTrash` process pointed at that schema → the process exits
+zero with the exact success token and Flyway history reaches latest exactly
+once.
+Change: Add one reusable test process owner beside `PreUpgradeFixtureSchema`.
+Use the real application main/runtime classpath and datasource properties; do
+not call `DonutTaskRunner` in-process or copy migration configuration.
+Proof: A focused integration test observes the child process result/token and
+queries the owned schema's latest successful Flyway history. The structural
+writer-exclusion proof remains owned by 11a.
+Estimate: 5 minutes active plus process waiting.
+
+### 11e. Extract the populated upgrade invariant owner
+Type: Structure
+Status: planned
+Change: Extract the populated seed, before/after snapshots and final
+identity/content/count/Portable-tree assertions from the existing 721-line
+`NotebookUpgradeDataPreservationTest` into one package-private fixture owner.
+Keep its current staged V327-before-V328 proof behavior unchanged.
+Proof: The existing populated preservation test passes unchanged in meaning,
+including its intermediate V327 allowlist and final V328 schema assertions.
+Estimate: 5 minutes active; stop and refine rather than weakening or duplicating
+the invariant set.
+
+### 11f. Rehearse populated data through the real task process
+Type: Behavior
+Status: planned
+Behavior: The extracted populated V325 fixture → invoke the fresh task process
+→ its final snapshot preserves the same identities/content/counts and Portable
+trees and reports the exact successful process outcome.
+Change: Reuse the 11d process owner and 11e fixture/assertion owner only.
+Proof: A focused populated-process test observes exit/token, latest Flyway
+history and the extracted final invariant set.
+Estimate: 5 minutes active plus process waiting.
+
+### 11g. Extract one representative interrupted-V328 fixture
+Type: Structure
+Status: planned
+Change: Expose the existing owned setup for one committed partial-DDL V328
+interruption, its before-row snapshot and its final schema/history assertions as
+a package-private fixture owner. Keep the current all-states parameterized
+boundary proof unchanged.
+Proof: `V300000328DropNoteDeletedAtMigrationTest` still passes every existing
+retry state using the extracted owner with no duplicated DDL or assertions.
+Estimate: 5 minutes active.
+
+### 11h. Resume the interrupted schema through the real task process
+Type: Behavior
+Status: planned
+Behavior: The representative committed partial-DDL schema with no successful
+V328 history → invoke the fresh task process → repair/migrate completes, rows
+match the before snapshot, final schema/history are correct, and the process
+exits zero with the exact success token.
+Change: Compose only the 11d process owner and 11g interruption fixture.
+Proof: A focused interrupted-process test observes process result/token and the
+extracted row/schema/history invariants. Then run the full backend suite because
+11a-11h changed production startup/migration behavior.
+Estimate: 5 minutes active plus full-suite waiting.
 
 ### 12. Execute the one-shot task while the serving MIG stays closed
 Type: Behavior
@@ -902,7 +957,7 @@ as did shellcheck for the two production scripts; shellcheck of the rewritten
 test itself remained incomplete because its dynamic sourced helper was not
 resolved.
 
-The refined plan has 20 slices, so story resplit is recommended by the planning
+The refined plan has 25 slices, so story resplit is recommended by the planning
 workflow. Do not resplit automatically: the first nine historical slices and
 their correction provenance must remain attributable. Slices 10-14 are locally
 executable under the current execution instruction; slices 15-16 are conditional
@@ -918,3 +973,11 @@ ordinary application-ready listener owns migration before `DonutTaskRunner`.
 Split the original slice 11 into 11a-11c so writer exclusion, explicit task
 lifecycle, and real populated/interrupted subprocess rehearsal each own one
 proof loop. No product scope or recovery promise changed.
+
+Slice-11c refinement, 2026-09-14: the implementation pass stopped without edits
+after ~8 minutes because the test profile auto-migrates before task dispatch,
+the 721-line populated invariant owner requires an intermediate V327 snapshot,
+and three private interruption harnesses cannot be composed directly with a
+latest-version subprocess. Replaced 11c with 11c-11h so startup-strategy
+selection, the real process seam, invariant extraction, populated rehearsal,
+interruption extraction and interrupted rehearsal each have one proof owner.
