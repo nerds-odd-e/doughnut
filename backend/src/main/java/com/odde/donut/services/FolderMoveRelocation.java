@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.FolderMoveRequest;
+import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -72,7 +73,7 @@ final class FolderMoveRelocation {
     Set<Integer> movedNoteIds = subtree.collectNoteIdsInSubtree(folder);
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(movedNoteIds, viewer);
-    persistFolderPlacement(folder, newParent, now);
+    persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
         movedNoteIds, now, inboundReferencesByNoteId);
     return folder;
@@ -81,8 +82,12 @@ final class FolderMoveRelocation {
   Folder placeFolderWithinNotebook(
       Notebook notebook, Folder folder, Folder newParent, Timestamp now) {
     requireFolderInNotebook(folder, notebook);
-    validateDestinationAndFindMergeTarget(notebook, folder, newParent, false);
-    return persistFolderPlacement(folder, newParent, now);
+    requireNewParentInNotebook(newParent, notebook);
+    FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
+    DisplayName availableName =
+        folderSiblingNameValidation.firstAvailableSiblingName(
+            notebook.getId(), newParent.getId(), new DisplayName(folder.getName()), folder.getId());
+    return persistFolderPlacement(folder, newParent, availableName, now);
   }
 
   private Optional<Folder> validateDestinationAndFindMergeTarget(
@@ -96,7 +101,9 @@ final class FolderMoveRelocation {
         notebook.getId(), destParentId, folder, merge);
   }
 
-  private Folder persistFolderPlacement(Folder folder, Folder newParent, Timestamp now) {
+  private Folder persistFolderPlacement(
+      Folder folder, Folder newParent, DisplayName name, Timestamp now) {
+    folder.setName(name);
     folder.setParentFolder(newParent);
     folder.setUpdatedAt(now);
     entityPersister.flush();

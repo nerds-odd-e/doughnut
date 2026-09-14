@@ -29,3 +29,25 @@ Feature: Trash and recover a folder
     And I should see sidebar folder "Empty Nested" under open folder "Nested"
     When I route to the note "Active sibling"
     Then the note content on the current page should be "Sibling body marker"
+
+  Scenario: Keep a colliding trashed folder separate and recover it with its suffix
+    Given I have a notebook "Colliding Folder Trash NB" with notes:
+      | Title          | Content                 | Folder               |
+      | Incoming cells | Incoming identity marker | Biology              |
+      | Earlier cells  | Earlier trash marker     | _trash/Biology       |
+      | Later cells    | Later trash marker       | _trash/Biology (3)   |
+      | Destination    | Destination marker       | Recovered destination |
+    When I open the folder page for "Biology" in notebook "Colliding Folder Trash NB"
+    And I trash the current folder
+    And I reload the folder page
+    And I expand folder path "_trash" in the sidebar
+    And I open the folder page at path "_trash/Biology (2)"
+    Then I should see the folder page is in trash
+    When I move the current folder to notebook "Colliding Folder Trash NB" folder "Recovered destination"
+    Then the folder page heading should be "Biology (2)"
+    When I route to the note "Incoming cells"
+    Then the note content on the current page should be "Incoming identity marker"
+    When I route to the note "Earlier cells"
+    Then the note content on the current page should be "Earlier trash marker"
+    When I route to the note "Later cells"
+    Then the note content on the current page should be "Later trash marker"

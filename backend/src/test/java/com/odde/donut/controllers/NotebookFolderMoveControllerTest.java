@@ -133,6 +133,32 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
   }
 
   @Test
+  void moveConflictLeavesTrashedSubtreeRecoverable() throws UnexpectedNoAccessRightException {
+    Notebook notebook = ownedNotebook();
+    Folder trash = ownedFolder(notebook, "_trash");
+    Folder trashed = makeMe.aFolder().parentFolder(trash).name("Biology").please();
+    Note retained = makeMe.aNote("Retained").folder(trashed).please();
+    Folder occupiedDestination = ownedFolder(notebook, "Occupied destination");
+    makeMe.aFolder().parentFolder(occupiedDestination).name("Biology").please();
+    Folder freeDestination = ownedFolder(notebook, "Free destination");
+
+    assertThrows(
+        ApiException.class,
+        () -> controller.moveFolder(notebook, trashed, folderMove(occupiedDestination.getId())));
+
+    makeMe.refresh(trashed);
+    assertThat(trashed.getParentFolder().getId(), equalTo(trash.getId()));
+    assertThat(trashed.isTrashed(), equalTo(true));
+
+    controller.moveFolder(notebook, trashed, folderMove(freeDestination.getId()));
+
+    makeMe.refresh(trashed);
+    makeMe.refresh(retained);
+    assertThat(trashed.getParentFolder().getId(), equalTo(freeDestination.getId()));
+    assertThat(retained.getFolder().getId(), equalTo(trashed.getId()));
+  }
+
+  @Test
   void folderNotInNotebookReturns404() {
     Folder folderInB = ownedFolder(ownedNotebook(), "Only B");
 

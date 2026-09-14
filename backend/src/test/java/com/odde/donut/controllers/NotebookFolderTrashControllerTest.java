@@ -106,6 +106,48 @@ class NotebookFolderTrashControllerTest extends NotebookControllerTestBase {
     assertThat(trashed.getParentFolder().getId(), equalTo(trash.getId()));
   }
 
+  @Test
+  void usesFirstFreeSiblingNameWithExistingCaseRulesWithoutChangingEarlierTrash()
+      throws UnexpectedNoAccessRightException {
+    Notebook notebook = ownedNotebook();
+    Folder trash = ownedFolder(notebook, "_trash");
+    Folder earlier = makeMe.aFolder().parentFolder(trash).name("Biology").please();
+    Note earlierNote = makeMe.aNote("Earlier").folder(earlier).please();
+    makeMe.aFolder().parentFolder(trash).name("biology (2)").please();
+    Folder later = makeMe.aFolder().parentFolder(trash).name("Biology (3)").please();
+    Note laterNote = makeMe.aNote("Later").folder(later).please();
+    Folder incoming = ownedFolder(notebook, "Biology");
+    Note incomingNote = makeMe.aNote("Incoming").folder(incoming).please();
+    Integer incomingId = incoming.getId();
+
+    Folder result = controller.trashFolder(notebook, incoming);
+
+    makeMe.refresh(earlierNote);
+    makeMe.refresh(laterNote);
+    makeMe.refresh(incomingNote);
+    assertThat(result.getId(), equalTo(incomingId));
+    assertThat(result.getName(), equalTo("Biology (2)"));
+    assertThat(result.getParentFolder().getId(), equalTo(trash.getId()));
+    assertThat(incomingNote.getFolder().getId(), equalTo(incoming.getId()));
+    assertThat(earlierNote.getFolder().getId(), equalTo(earlier.getId()));
+    assertThat(laterNote.getFolder().getId(), equalTo(later.getId()));
+  }
+
+  @Test
+  void suffixFitsTheFolderNameLengthLimit() throws UnexpectedNoAccessRightException {
+    Notebook notebook = ownedNotebook();
+    String longestName = makeMe.aStringOfLength(Folder.MAX_NAME_LENGTH);
+    Folder incoming = ownedFolder(notebook, longestName);
+    Folder trash = ownedFolder(notebook, "_trash");
+    makeMe.aFolder().parentFolder(trash).name(longestName).please();
+
+    Folder result = controller.trashFolder(notebook, incoming);
+
+    assertThat(
+        result.getName(),
+        equalTo(longestName.substring(0, Folder.MAX_NAME_LENGTH - " (2)".length()) + " (2)"));
+  }
+
   private int folderCount() {
     return Math.toIntExact(folderRepository.count());
   }

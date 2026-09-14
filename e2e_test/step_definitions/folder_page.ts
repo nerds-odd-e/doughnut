@@ -79,6 +79,17 @@ When('I move the current folder to notebook root', () => {
     .confirmMove()
 })
 
+When(
+  'I move the current folder to notebook {string} folder {string}',
+  (notebookName: string, destFolder: string) => {
+    folderPage()
+      .openOrganizeForm()
+      .selectDestinationNotebook(notebookName)
+      .selectFolderDestinationByName(destFolder)
+      .confirmMove()
+  }
+)
+
 When('I rename the folder heading to {string}', (name: string) => {
   folderPage().renameHeading(name)
 })
@@ -129,9 +140,7 @@ When(
       .noteSidebar()
       .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
       .selectDestinationNotebook(notebookName)
-      .openFolderSearch()
-      .searchFolderDestination(destFolder)
-      .selectFolderSearchResultByName(destFolder)
+      .selectFolderDestinationByName(destFolder)
       .confirmMove()
   }
 )
@@ -142,9 +151,7 @@ When(
     folderPage()
       .openOrganizeForm()
       .selectDestinationNotebook(notebookName)
-      .openFolderSearch()
-      .searchFolderDestination(destFolder)
-      .selectFolderSearchResultByName(destFolder)
+      .selectFolderDestinationByName(destFolder)
       .confirmMerge()
   }
 )
@@ -177,9 +184,7 @@ When(
     start
       .noteSidebar()
       .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
-      .openFolderSearch()
-      .searchFolderDestination(destFolder)
-      .selectFolderSearchResultByName(destFolder)
+      .selectFolderDestinationByName(destFolder)
       .confirmMove()
   }
 )

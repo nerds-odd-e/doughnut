@@ -1,6 +1,6 @@
 # Trash and recover a folder
 
-Status: in progress; slices 1–3 delivered. Execution authorized on 2026-09-14.
+Status: done; all four slices delivered. Execution authorized on 2026-09-14.
 Source: [SEED-009 story 33](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33).
 
 Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
@@ -179,7 +179,7 @@ passed after the independent refactor pass.
 
 ### 4. Keep a colliding folder Trash separate from earlier trash
 Type: Behavior
-Status: planned
+Status: done
 Behavior: `_trash/Biology` and `_trash/Biology (3)` exist → Trash active `Biology`
 → the incoming complete subtree becomes `_trash/Biology (2)`; both earlier trash
 subtrees are untouched. Revisit and Move `Biology (2)` to an existing active
@@ -201,6 +201,13 @@ all learning assertions for a changed basename. Existing `NoteControllerTrashTes
 retain note suffix behavior, including its existing name-length handling.
 Sizing: approximately 5 minutes active work. Name-selection extraction is small
 local work owned by this behavior, not a separately deliverable subsystem.
+
+Delivered learning: numbered suffix iteration is shared without sharing
+note/folder occupancy rules. Folder Trash uses the existing case-sensitive
+folder sibling semantics and 512-character limit, selects holes such as ` (2)`,
+and persists the final name and parent through shared placement. Controller and
+browser proof confirm earlier trash remains untouched, Move conflicts remain
+recoverable, and the visible suffix survives recovery.
 
 ## Proof ownership and verification
 
@@ -260,6 +267,6 @@ story from the backlog, authorize execution, commit, push, or release.
 
 Refinement: after the combined folder-trash slice overran, retained its compatible
 partial implementation and split its two proof loops into the transactional HTTP
-behavior and the mounted/E2E web journey. Four total slices now exist, one done
-and three remaining. The shared-placement and collision designs are unchanged;
-no story promise or North Star direction changed.
+behavior and the mounted/E2E web journey. All four resulting slices are now
+delivered. The shared-placement and collision designs remained unchanged; no
+story promise or North Star direction changed.

@@ -9,9 +9,7 @@ const submitTimeoutMs = 20000
 export type FolderOrganizeForm = {
   selectDestinationNotebook: (notebookName: string) => FolderOrganizeForm
   selectNotebookRootAsDestination: () => FolderOrganizeForm
-  openFolderSearch: () => FolderOrganizeForm
-  searchFolderDestination: (text: string) => FolderOrganizeForm
-  selectFolderSearchResultByName: (folderName: string) => FolderOrganizeForm
+  selectFolderDestinationByName: (folderName: string) => FolderOrganizeForm
   confirmMove: () => void
   tryConfirmMove: () => FolderOrganizeForm
   confirmMerge: () => void
@@ -36,20 +34,14 @@ export function assumeFolderOrganizeForm(): FolderOrganizeForm {
       return assumeFolderOrganizeForm()
     },
 
-    openFolderSearch() {
+    selectFolderDestinationByName(folderName: string) {
       cy.get('[data-testid="folder-selector-more-button"]').click()
       cy.get('[data-testid="folder-selector-search-dialog"]').should(
         'be.visible'
       )
-      return assumeFolderOrganizeForm()
-    },
-
-    searchFolderDestination(text: string) {
-      cy.get('[data-testid="folder-selector-search-input"]').clear().type(text)
-      return assumeFolderOrganizeForm()
-    },
-
-    selectFolderSearchResultByName(folderName: string) {
+      cy.get('[data-testid="folder-selector-search-input"]')
+        .clear()
+        .type(folderName)
       cy.contains(
         '[data-testid="folder-selector-search-result"]',
         folderName
