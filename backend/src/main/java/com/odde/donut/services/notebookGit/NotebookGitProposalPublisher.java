@@ -117,6 +117,11 @@ public class NotebookGitProposalPublisher {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Initial publication requires a nonempty Markdown tree.");
     }
+    if (documents.isEmpty()) {
+      projection.requireMatchingAcceptedTree(
+          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
+      return acceptMatchingProposedTree(state, proposal, publishedAt);
+    }
     if (NotebookGitProposalTreeShape.isAdditionOnly(documents)) {
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);

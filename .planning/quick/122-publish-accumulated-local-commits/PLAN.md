@@ -1,6 +1,6 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 1 done; slice 2 next. Slice 10 awaits the existing
+Status: in progress. Slice 2 done; slice 3 next. Slice 10 awaits the existing
 unanswered deletion/recreation decision and remains non-executable until answered.
 Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
@@ -123,13 +123,16 @@ stale still refuse. Controller helper `ContentEditRange` and E2E
 
 ### 2. Accept new history with an unchanged final tree
 Type: Behavior
-Status: planned
+Status: done
 Behavior: B edits a note and C undoes that edit without deleting it → publish →
 C is accepted with unchanged identities and the original history.
 Proof: Controller plus downloaded bundle observes equal A/C trees and new head C.
 Do not confuse identical trees with identical commits. Deletion/recreation is
 not decided by this content-only example.
 Estimate: 3–5 minutes active work.
+Learnings: Empty tip-vs-accepted document changes now reuse projection match +
+`acceptMatchingProposedTree` instead of refusing “no changed file.” Kept that
+seam separate from addition-only ahead of slice 3. No same-tree identity shortcut.
 
 ### 3. Compose additions with existing-note edits
 Type: Behavior

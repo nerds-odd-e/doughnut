@@ -107,6 +107,52 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
   }
 
   @Test
+  void acceptsContentEditRangeThatRestoresAcceptedTreeWithNewHistory() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note note = makeMe.aNote().notebook(notebook).title("Topic").content(ORIGINAL_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
+    ContentEditRange range =
+        editThenRestoreRangeOn(binding.getBundleBytes(), acceptedHead, ORIGINAL_CONTENT);
+
+    ObjectId acceptedTree;
+    ObjectId restoredTree;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk walk = new RevWalk(proposal)) {
+      GitBundleTestReader.fetchHead(proposal, range.proposalBytes());
+      acceptedTree = walk.parseCommit(acceptedHead).getTree().getId();
+      restoredTree = walk.parseCommit(range.secondEdit()).getTree().getId();
+    }
+    assertThat(restoredTree, equalTo(acceptedTree));
+    assertThat(range.secondEdit().equals(acceptedHead), equalTo(false));
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), range.proposalBytes());
+
+    assertThat(publishedHead, equalTo(range.secondEdit().getName()));
+    NoteRealm view = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
+    assertThat(view.getId(), equalTo(note.getId()));
+    assertThat(view.getNote().getContent(), equalTo(ORIGINAL_CONTENT));
+
+    NotebookGitBinding after =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk walk = new RevWalk(accepted)) {
+      ObjectId head = GitBundleTestReader.fetchHead(accepted, after.getBundleBytes());
+      RevCommit tip = walk.parseCommit(head);
+      assertThat(tip.getId(), equalTo(range.secondEdit()));
+      assertThat(tip.getTree().getId(), equalTo(acceptedTree));
+      assertThat(tip.getId().equals(acceptedHead), equalTo(false));
+      assertThat(tip.getParentCount(), equalTo(1));
+      assertThat(tip.getParent(0), equalTo(range.firstEdit()));
+      RevCommit middle = walk.parseCommit(tip.getParent(0));
+      assertThat(middle.getParentCount(), equalTo(1));
+      assertThat(middle.getParent(0), equalTo(acceptedHead));
+    }
+  }
+
+  @Test
   void acceptsSingleParentRangeWhenAMergeExistsBelowTheAcceptedHead() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote().notebook(notebook).title("Topic").content(ORIGINAL_CONTENT).please();
@@ -180,19 +226,30 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
 
   private ContentEditRange contentEditRangeOn(byte[] baseBundleBytes, ObjectId baseHead)
       throws Exception {
+    return contentEditRangeOn(baseBundleBytes, baseHead, FIRST_EDIT, SECOND_EDIT);
+  }
+
+  private ContentEditRange editThenRestoreRangeOn(
+      byte[] baseBundleBytes, ObjectId baseHead, String restoredContent) throws Exception {
+    return contentEditRangeOn(baseBundleBytes, baseHead, FIRST_EDIT, restoredContent);
+  }
+
+  private ContentEditRange contentEditRangeOn(
+      byte[] baseBundleBytes, ObjectId baseHead, String firstContent, String secondContent)
+      throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, baseBundleBytes);
       ObjectId firstEdit =
           commitOnTopOf(
               repository,
               List.of(baseHead),
-              List.of(new NotebookGitProposalFile("Topic.md", FIRST_EDIT)),
+              List.of(new NotebookGitProposalFile("Topic.md", firstContent)),
               "First edit");
       ObjectId secondEdit =
           commitOnTopOf(
               repository,
               List.of(firstEdit),
-              List.of(new NotebookGitProposalFile("Topic.md", SECOND_EDIT)),
+              List.of(new NotebookGitProposalFile("Topic.md", secondContent)),
               "Second edit");
       return new ContentEditRange(
           firstEdit, secondEdit, bundleBytesForHead(repository, secondEdit));
