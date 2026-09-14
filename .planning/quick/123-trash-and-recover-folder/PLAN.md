@@ -1,6 +1,6 @@
 # Trash and recover a folder
 
-Status: in progress; slice 1 delivered. Execution authorized on 2026-09-14.
+Status: in progress; slices 1–2 delivered. Execution authorized on 2026-09-14.
 Source: [SEED-009 story 33](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33).
 
 Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
@@ -107,7 +107,7 @@ the independent refactor pass.
 
 ### 2. Place an authorized folder subtree in trash
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given an owned active `Research/Biology/Topic` subtree with saved
 Readme/frontmatter, direct and nested notes, learning state, an empty descendant,
 and authored references → invoke folder Trash → the same subtree is placed at
@@ -135,9 +135,16 @@ compensation machinery, or synthetic catch paths solely to test a loud failure.
 Sizing: target 5 minutes active work. The initial combined attempt exceeded the
 10-minute hard limit after implementing the production API and generating the
 client; its new controller test had five compile errors, so no backend proof was
-accepted. Attempt-owned changes are parked in stash
-`c87d9055c1cd52bbcdb422f3e0ad6783b4490173`. This leaf finishes that coherent
-HTTP boundary and proof without repeating completed compatible implementation.
+accepted at that stop. The refined backend leaf then completed from the preserved
+work without repeating compatible implementation.
+
+Delivered learning: note and folder Trash now share one
+`FolderConstructionService` trail-based trash-parent construction path. The
+transactional folder action validates the source before mutation and delegates
+placement without reference rewriting. Controller proof covers mirrored-path
+placement, retained content and identities, unchanged authored spelling,
+ancestry-driven search/wiki/recall exclusion, and no-write source refusals. The
+full backend suite and generated API validation passed after refactoring.
 
 ### 3. Trash and recover the retained subtree through the web
 Type: Behavior

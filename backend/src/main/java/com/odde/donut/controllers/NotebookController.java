@@ -6,6 +6,7 @@ import com.odde.donut.controllers.dto.FolderListing;
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.controllers.dto.FolderRealm;
 import com.odde.donut.controllers.dto.FolderRenameRequest;
+import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteTopology;
@@ -204,6 +205,28 @@ class NotebookController {
     Notebook destinationNotebook = resolveDestinationNotebookForFolderMove(request);
     User user = authorizationService.getCurrentUser();
     return folderRelocationService.moveFolder(notebook, folder, request, destinationNotebook, user);
+  }
+
+  @Operation(
+      summary = "Trash a folder",
+      description =
+          "Moves an active folder subtree beneath _trash while mirroring its original ancestor"
+              + " path. The subtree and authored content are retained for ordinary Move recovery.")
+  @PostMapping("/{notebook}/folders/{folder}/trash")
+  @Transactional
+  public Folder trashFolder(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("folder") @Schema(type = "integer") Folder folder)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    assertFolderInNotebook(notebook, folder);
+    if (folder.isTrashed()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder is already in trash.");
+    }
+    Folder trashParent =
+        folderConstructionService.ensureTrashParentFor(
+            notebook, FolderTrailSegments.ancestorsFromRootToParent(folder));
+    return folderRelocationService.placeFolderWithinNotebook(notebook, folder, trashParent);
   }
 
   @Operation(

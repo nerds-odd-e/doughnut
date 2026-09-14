@@ -130,7 +130,9 @@ class NoteController {
     User user = authorizationService.getCurrentUser();
     noteService.applyNoteDeleteReferenceHandling(
         note, noteDeleteDTO.getReferenceHandling(), noteDeleteDTO.getSourcePropertyKey(), user);
-    Folder trashParent = folderConstructionService.ensureTrashParentFor(note);
+    Folder trashParent =
+        folderConstructionService.ensureTrashParentFor(
+            note.getNotebook(), FolderTrailSegments.fromRootToContainingFolder(note));
     noteMotionService.executeMoveIntoFolderWithAvailableTitle(note, trashParent);
     return noteRealmService.build(note, user);
   }

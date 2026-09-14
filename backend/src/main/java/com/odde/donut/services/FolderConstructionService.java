@@ -1,7 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
-import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -11,6 +10,7 @@ import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -75,14 +75,13 @@ public class FolderConstructionService {
     return createFolder(notebook, parentFolder, new DisplayName(name));
   }
 
-  public Folder ensureTrashParentFor(Note note) {
-    Notebook notebook = note.getNotebook();
+  public Folder ensureTrashParentFor(Notebook notebook, List<Folder> sourceFolders) {
     Folder parent =
         folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .filter(Folder::isTrashed)
             .findFirst()
             .orElseGet(() -> createFolder(notebook, null, new DisplayName("_trash")));
-    for (Folder sourceFolder : FolderTrailSegments.fromRootToContainingFolder(note)) {
+    for (Folder sourceFolder : sourceFolders) {
       parent = findOrCreateFolder(notebook, parent, new DisplayName(sourceFolder.getName()));
     }
     return parent;

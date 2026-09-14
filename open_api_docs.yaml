@@ -1018,6 +1018,33 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Folder"
+  /api/notebooks/{notebook}/folders/{folder}/trash:
+    post:
+      tags:
+      - notebook-controller
+      summary: Trash a folder
+      description: Moves an active folder subtree beneath _trash while mirroring its
+        original ancestor path. The subtree and authored content are retained for
+        ordinary Move recovery.
+      operationId: trashFolder
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Folder"
   /api/notebooks/{notebook}/folders/{folder}/move:
     post:
       tags:
