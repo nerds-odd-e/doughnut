@@ -4,6 +4,10 @@ Research date: 2026-09-14. Input to Proposed [ADR 0002](adrs/0002-git-native-por
 This is research and architectural advice, not an implementation or an approved
 identity policy.
 
+For the application survey, deletion/recreation experiments, and a concrete
+policy recommendation, see
+[Git range comparisons and notebook identity](notebook-git-range-comparison-research.md).
+
 ## Finding
 
 Inspecting adjacent commits can recover continuity that an accepted-to-tip diff
