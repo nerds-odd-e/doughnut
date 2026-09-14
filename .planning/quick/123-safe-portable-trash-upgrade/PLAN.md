@@ -103,24 +103,61 @@ and the full backend suite pass; `git status` shows only the two new files.
 
 ### 2. Recover the column retirement at the actual Flyway boundary
 Type: Behavior
-Status: planned
+Status: done
 Behavior: A populated note table is in an original or known interrupted 328
 state → run revised 328 through repair/migrate → final schema and retained rows
 are correct, including retry after DDL commit before successful history recording.
-Change: Reproduce the old missing-index failure first; revise only 328. Test
-original schema, index absent/column present, both absent, and completed DDL
-without success history. Assert final index columns/order and column absence;
-already-recorded success stays unchanged. Unknown schema is not silently accepted.
-Proof: One parameterized Flyway boundary check over those states with snapshots
-of preserved rows. Use actual migration resource, not copied SQL. Exercise a
-real connection interruption at the DDL/history boundary in the owned schema.
+Change: Reproduced the old missing-index failure first (MySQL error 1091,
+`Can't DROP 'idx_note_structural_peer'`) against the unmodified file, matching
+story 37's release-audit provenance. Revised only
+`V300000328__drop_note_deleted_at.sql`: a temporary stored procedure branches on
+the actual `information_schema` shape of `note.deleted_at`/`idx_note_structural_peer`
+(original / index-dropped-only / both-dropped / fully-complete), running only the
+remaining ALTERs for that state; an unrecognized shape fails loudly via `SIGNAL
+SQLSTATE '45000'`. MySQL 8.4 does not support `IF [NOT] EXISTS` on `ALTER TABLE
+ADD/DROP COLUMN` or `DROP INDEX` (verified empirically; MariaDB-only extension),
+which is why a guard procedure was needed instead of idempotent ALTER syntax.
+Proof: One parameterized Flyway boundary check
+(`V300000328DropNoteDeletedAtMigrationTest`) over 6 states — the 4 schema shapes
+above, already-recorded-success, and a guard-procedure-left-behind state — with
+row-identity/content snapshots before and after. Uses the actual migration
+resource via `PreUpgradeFixtureSchema` (slice 1, extended with
+`openConnection()`/`jdbcUrl()`/`flywayConfig()`), a real discarded-connection
+interruption (not mocked Flyway internals), and `flyway.repair()`+`migrate()`
+mirroring production startup. Final index columns/order and column absence
+assert correctly; already-recorded success stays unchanged; unknown schema
+fails loudly (exercised via the reproduction, not asserted in the parameterized
+suite).
 Engine hypothesis: production-family MySQL 8.4/InnoDB supports the selected
-ALTER form and its atomicity. Require this isolated proof before broader work;
-record `SELECT VERSION()`, `SHOW CREATE TABLE note`, command and observed result.
-Command: `CURSOR_DEV=true nix develop -c pnpm backend:verify` (new rehearsal is
-included in the normal backend suite). Result: pending; no engine claim verified.
+DDL form and per-statement atomicity — CONFIRMED. `SELECT VERSION()` →
+`8.4.11`. `SHOW CREATE TABLE note` before: `deleted_at datetime DEFAULT NULL`
+present, `idx_note_structural_peer (notebook_id,folder_id,deleted_at,id)`.
+After: `deleted_at` absent, `idx_note_structural_peer (notebook_id,folder_id,id)`.
+Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (used instead
+of the `backend:verify` wrapper during slice execution, per this plan's
+execution-discipline note — the wrapper's extra formatter is the coordinator's
+job). Result: BUILD SUCCESSFUL, full suite green.
 Estimate: 5 minutes active after fixture support; a failed engine assumption
 changes this slice before proceeding, not by adding a fallback framework.
+Learnings: Active time ran far over target — implementation ~60-70 minutes,
+coordinator review ~20 minutes — because this slice legitimately carries the
+engine-proof gate the plan calls out, and because the coordinator's own review
+(the delegated post-change-refactor agent spawn was denied by the harness's
+auto-mode permission classifier for this migration-file content, so the
+coordinator reviewed directly instead) found a genuine retry-safety gap the
+implementation had not tested: `CREATE PROCEDURE` and the trailing `DROP
+PROCEDURE` are each their own DDL auto-commit in MySQL, so an interruption
+between `CREATE PROCEDURE` and `CALL`, or between a successful `CALL` and the
+final `DROP PROCEDURE`, would leave the guard procedure itself behind and make
+any retry fail on "PROCEDURE already exists" before the schema-shape logic ever
+ran — defeating the exact retry-safety promise this slice exists to prove.
+Fixed with a leading `DROP PROCEDURE IF EXISTS` (a distinct, universally
+supported MySQL clause, unlike the ALTER-table `IF EXISTS` forms ruled out
+above) and proved with a new `GUARD_PROCEDURE_LEFT_BEHIND_FROM_INTERRUPTED_ATTEMPT`
+case. Recording this as a real defect caught during required scrutiny, not a
+sizing-only overrun — the original implementation's parameterized states only
+replayed raw ALTER statements directly and never exercised the guard
+procedure's own commit boundaries.
 
 ### 3. Preserve a populated notebook through all three migrations
 Type: Behavior

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationVersion;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 
 /**
  * Owns a disposable MySQL schema for rehearsing the actual registered Flyway migration chain
@@ -42,10 +43,12 @@ final class PreUpgradeFixtureSchema implements AutoCloseable {
   private static final String SCHEMA_SUFFIX = "_v325_fixture";
 
   private final String schemaName;
+  private final String schemaUrl;
   private final Connection connection;
 
-  private PreUpgradeFixtureSchema(String schemaName, Connection connection) {
+  private PreUpgradeFixtureSchema(String schemaName, String schemaUrl, Connection connection) {
     this.schemaName = schemaName;
+    this.schemaUrl = schemaUrl;
     this.connection = connection;
   }
 
@@ -70,7 +73,7 @@ final class PreUpgradeFixtureSchema implements AutoCloseable {
         .migrate();
 
     Connection connection = DriverManager.getConnection(schemaUrl, APP_USER, APP_PASSWORD);
-    return new PreUpgradeFixtureSchema(schemaName, connection);
+    return new PreUpgradeFixtureSchema(schemaName, schemaUrl, connection);
   }
 
   String schemaName() {
@@ -80,6 +83,36 @@ final class PreUpgradeFixtureSchema implements AutoCloseable {
   /** Open raw JDBC connection into the owned schema, for seeding pre-upgrade fixture rows. */
   Connection connection() {
     return connection;
+  }
+
+  /**
+   * Opens a new, independent raw JDBC connection into the owned schema (as the ordinary {@code
+   * doughnut} app user), separate from {@link #connection()}. Callers own its lifecycle. Intended
+   * for reproducing a real interrupted upgrade: execute and commit DDL through the intended
+   * interruption point on one connection, close/discard it, then continue on a fresh connection or
+   * via a fresh {@link Flyway} instance built from {@link #jdbcUrl()} — mirroring how Flyway's own
+   * `repair()`/`migrate()` open their own connections rather than reusing a caller's connection.
+   */
+  Connection openConnection() throws SQLException {
+    return DriverManager.getConnection(schemaUrl, APP_USER, APP_PASSWORD);
+  }
+
+  /** JDBC URL for the owned schema, for building a fresh {@link Flyway} instance against it. */
+  String jdbcUrl() {
+    return schemaUrl;
+  }
+
+  /**
+   * A fresh {@link FluentConfiguration} pointed at the owned schema with the project's actual
+   * migration resources, matching {@link #createAtVersion325}'s configuration. Callers add {@code
+   * target(...)} for a bounded migrate call, or load as-is to reach the latest version; each {@code
+   * load()} yields an independent {@link Flyway} instance with its own connection handling, the
+   * same way the real application's startup migration does.
+   */
+  FluentConfiguration flywayConfig() {
+    return Flyway.configure()
+        .dataSource(schemaUrl, APP_USER, APP_PASSWORD)
+        .locations("classpath:db/migration");
   }
 
   /** Closes the raw connection and drops only this owned schema. */
