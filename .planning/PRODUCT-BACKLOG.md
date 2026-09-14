@@ -14,7 +14,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Publish accumulated local commits without rewriting history](quick/122-publish-accumulated-local-commits/PLAN.md) — SEED-009
 - [Release portable trash without risking notebook data](quick/123-safe-portable-trash-upgrade/PLAN.md) — SEED-009
 
 ## Backlog list
