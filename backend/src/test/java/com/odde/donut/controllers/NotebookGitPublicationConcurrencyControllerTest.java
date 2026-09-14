@@ -65,20 +65,19 @@ class NotebookGitPublicationConcurrencyControllerTest
   @Test
   void webSaveQueuedFirstMakesTheCompetingPublicationStale() throws Exception {
     Fixture fixture = fixture();
-    Proposal proposal = proposal(fixture.acceptedBinding(), PUBLISHED_CONTENT);
+    assertWebSaveBeatsStalePublication(
+        fixture, proposal(fixture.acceptedBinding(), PUBLISHED_CONTENT));
+  }
 
-    NotebookGitConcurrentWriterTestSupport.Result<NoteRealm, PublicationAttempt> race =
-        queuedWriters(
-            fixture.notebook().getId(),
-            () -> saveContent(fixture.note().getId(), FIRST_WEB_CONTENT),
-            () -> publish(fixture, proposal));
-
-    assertThat(race.first().getNote().getContent(), is(FIRST_WEB_CONTENT));
-    assertThat(race.second().acceptedHead(), is((String) null));
-    assertThat(race.second().rejection().getStatusCode(), is(HttpStatus.CONFLICT));
-    assertThat(
-        race.second().rejection().getReason(), containsString("expectedHead no longer matches"));
-    assertAcceptedHistory(fixture, List.of(FIRST_WEB_CONTENT, ACCEPTED_CONTENT), FIRST_WEB_CONTENT);
+  @Test
+  void webSaveQueuedFirstMakesACompetingMultiCommitPublicationStale() throws Exception {
+    Fixture fixture = fixture();
+    assertWebSaveBeatsStalePublication(
+        fixture,
+        multiCommitProposal(
+            fixture.acceptedBinding(),
+            "---\ntype: Note\n---\nfirst local edit",
+            PUBLISHED_CONTENT));
   }
 
   @Test
@@ -112,6 +111,22 @@ class NotebookGitPublicationConcurrencyControllerTest
   private NoteRealm saveContent(Integer noteId, String content) throws Exception {
     Note note = noteRepository.findById(noteId).orElseThrow();
     return textContentController.updateNoteContent(note, contentDto(content));
+  }
+
+  private void assertWebSaveBeatsStalePublication(Fixture fixture, Proposal proposal)
+      throws Exception {
+    NotebookGitConcurrentWriterTestSupport.Result<NoteRealm, PublicationAttempt> race =
+        queuedWriters(
+            fixture.notebook().getId(),
+            () -> saveContent(fixture.note().getId(), FIRST_WEB_CONTENT),
+            () -> publish(fixture, proposal));
+
+    assertThat(race.first().getNote().getContent(), is(FIRST_WEB_CONTENT));
+    assertThat(race.second().acceptedHead(), is((String) null));
+    assertThat(race.second().rejection().getStatusCode(), is(HttpStatus.CONFLICT));
+    assertThat(
+        race.second().rejection().getReason(), containsString("expectedHead no longer matches"));
+    assertAcceptedHistory(fixture, List.of(FIRST_WEB_CONTENT, ACCEPTED_CONTENT), FIRST_WEB_CONTENT);
   }
 
   private PublicationAttempt publish(Fixture fixture, Proposal proposal) throws Exception {
@@ -186,6 +201,26 @@ class NotebookGitPublicationConcurrencyControllerTest
         proposalBundleBytes(binding, List.of(new NotebookGitProposalFile(NOTE_PATH, content)));
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       return new Proposal(bundleBytes, GitBundleTestReader.fetchHead(repository, bundleBytes));
+    }
+  }
+
+  private Proposal multiCommitProposal(
+      NotebookGitBinding binding, String middleContent, String tipContent) throws Exception {
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      ObjectId middle =
+          commitOnTopOf(
+              repository,
+              List.of(acceptedHead),
+              List.of(new NotebookGitProposalFile(NOTE_PATH, middleContent)),
+              "First local edit");
+      ObjectId tip =
+          commitOnTopOf(
+              repository,
+              List.of(middle),
+              List.of(new NotebookGitProposalFile(NOTE_PATH, tipContent)),
+              "Second local edit");
+      return new Proposal(bundleBytesForHead(repository, tip), tip);
     }
   }
 

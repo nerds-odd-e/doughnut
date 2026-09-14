@@ -65,19 +65,6 @@ class NotebookGitProposalFolderRelocationShapeControllerTest
     List<PortableTreeEntry> topicsAndArchive = topicsAndArchive();
     return Stream.of(
         Arguments.of(
-            "mixed",
-            topicsAndArchive,
-            List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("note.md", "edited"),
-                new PortableTreeEntry("Copy.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Topics/README.md", README),
-                new PortableTreeEntry("Archive/Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/Topics/Sub/README.md", README),
-                new PortableTreeEntry("Archive/Topics/Sub/B.md", NOTE)),
-            "note.md"),
-        Arguments.of(
             "multiple",
             withOtherFolder(topicsAndArchive),
             List.of(

@@ -86,7 +86,7 @@ class NotebookGitProposalFolderMaterialization {
     Map<String, Folder> folders = new LinkedHashMap<>();
     for (ExportFolderRow row : liveFolders) {
       String folderPath = NotebookGitAcceptedTree.folderPath(row, folderById);
-      if (NotebookGitAcceptedTree.representedInAccepted(folderPath, accepted)) {
+      if (NotebookGitAcceptedTree.representedInTree(folderPath, accepted)) {
         folders.put(
             folderPath.substring(0, folderPath.length() - 1),
             entityPersister.find(Folder.class, row.id()));

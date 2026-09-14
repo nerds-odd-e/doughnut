@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
@@ -55,8 +56,29 @@ final class NotebookGitAcceptedTree {
     return folderPath + note.getTitle() + ".md";
   }
 
-  static boolean representedInAccepted(String folderPath, List<PortableTreeEntry> accepted) {
-    return accepted.stream().anyMatch(entry -> entry.path().startsWith(folderPath));
+  static boolean representedInTree(String folderPath, List<PortableTreeEntry> entries) {
+    return representedInTree(folderPath, entries, path -> false);
+  }
+
+  static boolean representedInTree(
+      String folderPath, List<PortableTreeEntry> entries, String excludingPath) {
+    return representedInTree(
+        folderPath, entries, path -> excludingPath != null && path.equals(excludingPath));
+  }
+
+  /**
+   * True when some entry under {@code folderPath} is not itself under {@code excludingPrefix} (for
+   * example tip content of a relocated destination must not invent representation for its parent).
+   */
+  static boolean representedInTreeExcludingUnder(
+      String folderPath, List<PortableTreeEntry> entries, String excludingPrefix) {
+    return representedInTree(folderPath, entries, path -> path.startsWith(excludingPrefix));
+  }
+
+  private static boolean representedInTree(
+      String folderPath, List<PortableTreeEntry> entries, Predicate<String> excludedPath) {
+    return entries.stream()
+        .anyMatch(entry -> entry.path().startsWith(folderPath) && !excludedPath.test(entry.path()));
   }
 
   static Map<Integer, ExportFolderRow> indexFoldersById(List<ExportFolderRow> folders) {

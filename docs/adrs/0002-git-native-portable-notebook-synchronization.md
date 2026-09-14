@@ -314,35 +314,35 @@ expansions on the same contract.
 Detailed implementation slices and their delivery order belong in
 `.planning/`, not in this ADR.
 
-The accumulated-publication increment delivers free composition of already
-supported edits: multiple edits within each commit and multiple such commits
-in one publication. It does not promise implementation of this entire ADR,
-general support for every nonrepresentable intermediate draft, or new identity
-inference and owner-assisted resolution capabilities. Necessary history analysis
-for composing supported transitions remains part of that increment. These
-delivery boundaries do not change the final-only projection direction or
-introduce a requirement to validate every historical tree as a Donut notebook.
+Current product behavior already publishes accumulated linear ranges by
+composing already supported edits—multiple edits within each commit and
+multiple such commits in one publication—applying the proposed tip once.
+Confirmed deletion followed by recreation starts a new identity. That delivery
+does not implement this entire ADR, general support for every nonrepresentable
+intermediate draft, or new identity inference and owner-assisted resolution
+capabilities. Broader same-transition rename/edit inference remains separate
+product work. These boundaries do not change the final-only projection
+direction or introduce a requirement to validate every historical tree as a
+Donut notebook.
 
 ## Open decisions for this draft
 
 The owner proposed preserving every original commit while projecting only the
 final revision. The following recommendations and remaining questions need
 human review before this ADR can be accepted; this draft does not authorize
-implementation.
+implementation beyond already delivered bounded behavior.
 
-- **Identity admission:** Which history evidence permits automatic preservation,
-  and which cases require refusal or explicit owner intent? Similarity may help
-  find candidates but is not a correctness guarantee. Specify deterministic
-  settings and a safe outcome when analysis cannot finish within its budget.
-- **Operation composition:** Any combination of already supported operations is
-  the accumulated-publication goal. History analysis needed to compose an exact
-  move followed by an edit belongs to that goal. Broader same-transition
-  rename/edit inference remains separate product work; ambiguity policies must
-  prevent the two scopes from contradicting each other.
-- **Atomic failure and receipts:** Confirm all-or-nothing acceptance including
-  required indexes and durable objects, and the response when a successful
-  publication is retried after later heads have been accepted. Do not confuse
-  a retained ancestor with proof of its previous application to Donut.
+- **Identity admission:** Which history evidence permits automatic preservation
+  beyond already supported exact correspondence, and which cases require
+  refusal or explicit owner intent? Similarity may help find candidates but is
+  not a correctness guarantee. Specify deterministic settings and a safe
+  outcome when analysis cannot finish within its budget. Ambiguity policies
+  must not contradict the delivered composition of supported operations.
+- **Atomic failure and receipts:** Current publication already rolls back on
+  failed binding and recognizes an already-accepted tip on retry; confirm any
+  remaining durable-object and multi-head receipt guarantees still needed
+  before accepting this ADR. Do not confuse a retained ancestor with proof of
+  its previous application to Donut.
 - **Historical representability:** ADR 0004 remains the final Portable-tree
   contract. This draft scopes application validation to publication tips while
   allowing nonrepresentable Git ancestors. Confirm that interpretation of its

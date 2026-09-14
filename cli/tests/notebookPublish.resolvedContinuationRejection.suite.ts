@@ -19,6 +19,7 @@ import {
 } from './notebookPull.conflict.testHelpers.js'
 import { commitPortableFile } from './notebookPull.testHelpers.js'
 import {
+  STALE_HEAD_MESSAGE,
   bundleGetResponse,
   bundleMain,
   postCount,
@@ -27,8 +28,6 @@ import {
   stubFetchWithBundleFile,
 } from './notebookPublish.testHelpers.js'
 
-const STALE_HEAD_MESSAGE =
-  "expectedHead no longer matches the notebook's current accepted head."
 const DRIFT_MESSAGE =
   "The notebook's current Portable content differs from accepted main; refresh the checkout before publishing."
 const INVALID_YAML_MESSAGE = `${SPACED_NOTE_PATH} has invalid YAML frontmatter`
@@ -143,7 +142,7 @@ export function describeNotebookPublishResolvedContinuationRejection(): void {
       ).rejects.toThrow(ProcessExitForTest)
 
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
       expect(postCount(fetchMock)).toBe(0)
       expect(fetchMock.mock.calls).toHaveLength(1)

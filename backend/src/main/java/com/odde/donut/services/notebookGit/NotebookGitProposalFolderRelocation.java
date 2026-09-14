@@ -33,18 +33,41 @@ class NotebookGitProposalFolderRelocation {
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       NotebookGitProposalFolderShape.FolderRelocation relocation) {
+    return apply(state, proposal, acceptedHead, relocation, true);
+  }
+
+  /**
+   * Reparents after the publisher already confirmed the pre-mutation state matched accepted (needed
+   * when a tip parent must be materialized before destination checks).
+   */
+  NotebookGitStateLoader.LockedNotebookState applyAfterMatchedAcceptedTree(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      NotebookGitProposalFolderShape.FolderRelocation relocation) {
+    return apply(state, proposal, acceptedHead, relocation, false);
+  }
+
+  private NotebookGitStateLoader.LockedNotebookState apply(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      NotebookGitProposalFolderShape.FolderRelocation relocation,
+      boolean requireMatchingAcceptedTree) {
     List<ExportFolderRow> folders = state.folders();
     NotebookGitProjection.RepresentedFolderRelocation represented =
         projection.requireRepresentedFolderRelocation(
-            folders, proposal.repository(), acceptedHead, relocation);
+            folders, proposal.repository(), acceptedHead, proposal.mainHead(), relocation);
     projection.requireNoUnrepresentedEmptySourceDescendants(
         folders, proposal.repository(), acceptedHead, represented.sourceFolderId());
     NotebookGitProposalFolderPlacement.requireAllowed(
         represented, entityPersister, folderSiblingNameValidation, relocation.destPrefix());
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
-    projection.requireMatchingAcceptedTree(
-        state.notebook(), folders, state.liveNotes(), proposal.repository(), acceptedHead);
+    if (requireMatchingAcceptedTree) {
+      projection.requireMatchingAcceptedTree(
+          state.notebook(), folders, state.liveNotes(), proposal.repository(), acceptedHead);
+    }
     Folder source = entityPersister.find(Folder.class, represented.sourceFolderId());
     source.setParentFolder(
         represented.destParentFolderId() == null

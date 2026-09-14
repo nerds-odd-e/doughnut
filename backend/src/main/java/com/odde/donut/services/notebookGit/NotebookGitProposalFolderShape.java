@@ -2,16 +2,20 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
 
 /**
  * Recognizes one exact same-name folder relocation from removed and added README paths using
- * complete relative-path/blob correspondence. Inexact README relocations are refused; an exact
- * candidate is returned so the publisher can reparent that source Folder.
+ * complete relative-path/blob correspondence. Adjacent first-parent steps carry that exact mapping
+ * across a range so a later descendant edit still resolves to the accepted source Folder. Inexact
+ * README relocations are refused; residuals outside the relocated prefixes, plus tip concept edits
+ * or additions under the destination after a carried relocate, feed ordinary note admission.
  */
 final class NotebookGitProposalFolderShape {
 
@@ -20,8 +24,28 @@ final class NotebookGitProposalFolderShape {
   record FolderRelocation(String sourcePrefix, String destPrefix) {}
 
   /**
-   * @return the unique exact mapping when the proposal is one complete same-name README relocation
-   *     with no other changes; empty when no README is both removed and added
+   * Accepted→tip mapping carried through adjacent exact relocations when present; otherwise the
+   * tip-exact subtree mapping. Empty when neither an adjacent exact relocation nor tip README
+   * remove/add establishes a unique exact same-name correspondence. Prefer carried first so tip
+   * blob drift after an exact step does not refuse the range.
+   */
+  static Optional<FolderRelocation> requireExactOrCarried(
+      Repository repository,
+      ObjectId acceptedHead,
+      ObjectId proposedHead,
+      List<InspectedRegularFile> tipFiles) {
+    Optional<FolderRelocation> carried =
+        carryExactFolderRelocation(repository, acceptedHead, proposedHead);
+    if (carried.isPresent()) {
+      return carried;
+    }
+    return requireExactOrEmpty(tipFiles);
+  }
+
+  /**
+   * @return the unique exact same-name subtree mapping when complete relative-path/blob
+   *     correspondence holds; empty when no README is both removed and added. Outside residual
+   *     changes are left for the publisher's ordinary note application.
    * @throws org.springframework.web.server.ResponseStatusException when README paths moved but the
    *     correspondence is not a unique exact subtree relocation
    */
@@ -65,17 +89,105 @@ final class NotebookGitProposalFolderShape {
           inexactReason(complete.get(1).sourcePrefix() + "/README.md"));
     }
     if (complete.size() == 1) {
-      FolderRelocation mapping = complete.get(0);
-      String other = firstChangeOutside(files, mapping.sourcePrefix(), mapping.destPrefix());
-      if (other == null) {
-        return Optional.of(mapping);
-      }
-      throw NotebookGitProposalTreeShape.unsupportedTreeShape(inexactReason(other));
+      return Optional.of(complete.get(0));
     }
     if (incompletePath != null) {
       throw NotebookGitProposalTreeShape.unsupportedTreeShape(inexactReason(incompletePath));
     }
     throw NotebookGitProposalTreeShape.unsupportedTreeShape(inexactReason(addedReadmes.get(0)));
+  }
+
+  /**
+   * Composes adjacent exact same-name folder relocations into one accepted→tip prefix mapping.
+   * Incomplete adjacent correspondence still refuses; tip blob drift after an exact step does not.
+   */
+  static Optional<FolderRelocation> carryExactFolderRelocation(
+      Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
+    List<ObjectId> range =
+        NotebookGitProposalAncestry.firstParentRange(repository, acceptedHead, proposedHead);
+    Map<String, String> originByCurrent = new HashMap<>();
+    for (int i = 1; i < range.size(); i++) {
+      List<InspectedRegularFile> stepFiles =
+          NotebookGitProposalTreeShape.inspectRegularFiles(
+              repository, range.get(i - 1), range.get(i));
+      Optional<FolderRelocation> step = requireExactOrEmpty(stepFiles);
+      if (step.isEmpty()) {
+        continue;
+      }
+      FolderRelocation relocation = step.get();
+      String acceptedOrigin =
+          originByCurrent.getOrDefault(relocation.sourcePrefix(), relocation.sourcePrefix());
+      originByCurrent.remove(relocation.sourcePrefix());
+      originByCurrent.put(relocation.destPrefix(), acceptedOrigin);
+    }
+    FolderRelocation composed = null;
+    for (Map.Entry<String, String> entry : originByCurrent.entrySet()) {
+      if (entry.getKey().equals(entry.getValue())) {
+        continue;
+      }
+      if (composed != null) {
+        throw NotebookGitProposalTreeShape.unsupportedTreeShape(
+            inexactReason(entry.getValue() + "/README.md"));
+      }
+      composed = new FolderRelocation(entry.getValue(), entry.getKey());
+    }
+    return Optional.ofNullable(composed);
+  }
+
+  /**
+   * Changed files outside the exact relocated source and destination prefixes, plus tip concept
+   * edits or additions under the destination that are not equal-blob copies of the accepted source
+   * subtree. Unchanged relocated content is omitted so the publisher can reclassify residuals only.
+   */
+  static List<InspectedRegularFile> residualOutside(
+      List<InspectedRegularFile> files, FolderRelocation relocation) {
+    Map<String, ObjectId> acceptedUnderSource = new HashMap<>();
+    for (InspectedRegularFile file : files) {
+      if (file.acceptedBlobId() != null && under(file.path(), relocation.sourcePrefix())) {
+        acceptedUnderSource.put(
+            relative(file.path(), relocation.sourcePrefix()), file.acceptedBlobId());
+      }
+    }
+    List<InspectedRegularFile> residual = new ArrayList<>();
+    for (InspectedRegularFile file : files) {
+      if (under(file.path(), relocation.sourcePrefix()) || sameBlob(file)) {
+        continue;
+      }
+      if (under(file.path(), relocation.destPrefix())) {
+        InspectedRegularFile underDest =
+            residualUnderDestination(file, relocation, acceptedUnderSource);
+        if (underDest != null) {
+          residual.add(underDest);
+        }
+        continue;
+      }
+      residual.add(file);
+    }
+    return residual;
+  }
+
+  private static InspectedRegularFile residualUnderDestination(
+      InspectedRegularFile file,
+      FolderRelocation relocation,
+      Map<String, ObjectId> acceptedUnderSource) {
+    if (file.proposedBlobId() == null || isReadme(file.path())) {
+      return null;
+    }
+    String relative = relative(file.path(), relocation.destPrefix());
+    ObjectId acceptedBlob = acceptedUnderSource.get(relative);
+    if (acceptedBlob == null) {
+      return file;
+    }
+    if (acceptedBlob.equals(file.proposedBlobId())) {
+      return null;
+    }
+    return new InspectedRegularFile(file.path(), acceptedBlob, file.proposedBlobId());
+  }
+
+  private static boolean sameBlob(InspectedRegularFile file) {
+    return file.acceptedBlobId() != null
+        && file.proposedBlobId() != null
+        && file.acceptedBlobId().equals(file.proposedBlobId());
   }
 
   private static String inexactReason(String path) {
@@ -115,23 +227,6 @@ final class NotebookGitProposalFolderShape {
       }
     }
     return null;
-  }
-
-  private static String firstChangeOutside(
-      List<InspectedRegularFile> files, String sourcePrefix, String destPrefix) {
-    for (InspectedRegularFile file : files) {
-      if (unchanged(file) || under(file.path(), sourcePrefix) || under(file.path(), destPrefix)) {
-        continue;
-      }
-      return file.path();
-    }
-    return null;
-  }
-
-  private static boolean unchanged(InspectedRegularFile file) {
-    return file.acceptedBlobId() != null
-        && file.proposedBlobId() != null
-        && file.acceptedBlobId().equals(file.proposedBlobId());
   }
 
   private static List<String> prefixesOf(List<String> readmePaths) {

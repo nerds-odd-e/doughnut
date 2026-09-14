@@ -8,6 +8,19 @@ import {
   initGitRepoWithInitialNote,
 } from './notebookGit.testHelpers.js'
 
+export const STALE_HEAD_MESSAGE =
+  "expectedHead no longer matches the notebook's current accepted head."
+
+export function commitFileChange(
+  dir: string,
+  contents: string,
+  message: string
+): void {
+  fs.writeFileSync(join(dir, 'note.md'), contents)
+  runGit(['add', 'note.md'], dir)
+  runGit(['commit', '--quiet', '-m', message], dir)
+}
+
 // Builds a fetch response object serving the bundle bytes at `bundleFile`, as used for the GET
 // accepted-bundle download (both the clone flow and the publish ancestry check).
 export function bundleGetResponse(bundleFile: string): {

@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 import { dirname, join } from 'node:path'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import {
@@ -13,20 +13,12 @@ import {
   buildSourceRepo,
   bundleMain,
   cloneAsBoundCheckout,
+  commitFileChange,
   postCount,
+  stubFetchForSubmission,
   stubFetchWithBundleFile,
 } from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
-
-function commitFileChange(
-  dir: string,
-  contents: string,
-  message: string
-): void {
-  fs.writeFileSync(join(dir, 'note.md'), contents)
-  runGit(['add', 'note.md'], dir)
-  runGit(['commit', '--quiet', '-m', message], dir)
-}
 
 function commitRelatedNoteChanges(
   dir: string,
@@ -108,7 +100,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(before)
     })
@@ -159,7 +151,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
       expect(postCount(fetchMock)).toBe(0)
       expect(runGit(['rev-parse', 'main'], dir)).toBe(localHead)
@@ -169,9 +161,27 @@ export function describeNotebookPublishAncestry(): void {
       )
     })
 
-    test('local main several commits ahead of the accepted head is rejected with an ancestry error', async () => {
+    test('local main several content-edit commits ahead of the accepted head reaches submission', async () => {
       const workDir = ctx.getWorkDir()
       const sourceRepoDir = buildSourceRepo(workDir)
+      runGit(['checkout', '--quiet', '-b', 'feature'], sourceRepoDir)
+      commitFileChange(
+        sourceRepoDir,
+        '# hello notebook (side)\n',
+        'side commit'
+      )
+      runGit(['checkout', '--quiet', 'main'], sourceRepoDir)
+      runGit(
+        [
+          'merge',
+          '--no-ff',
+          '--quiet',
+          '-m',
+          'merge below accepted',
+          'feature',
+        ],
+        sourceRepoDir
+      )
       const bundleFile = join(workDir, 'accepted.bundle')
       bundleMain(sourceRepoDir, bundleFile)
       stubFetchWithBundleFile(bundleFile)
@@ -184,13 +194,61 @@ export function describeNotebookPublishAncestry(): void {
       )
       commitFileChange(dir, '# hello notebook (edit 1)\n', 'edit note 1')
       commitFileChange(dir, '# hello notebook (edit 2)\n', 'edit note 2')
+      const localHead = runGit(['rev-parse', 'main'], dir)
 
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
+      await run(['notebook', 'publish', dir])
+      expect(runGit(['rev-parse', 'main'], dir)).toBe(localHead)
+    })
+
+    test('retrying when a multi-commit tip is already accepted reports that tip and leaves local chain intact', async () => {
+      const workDir = ctx.getWorkDir()
+      const sourceRepoDir = buildSourceRepo(workDir)
+
+      const dir = cloneAsBoundCheckout(
+        workDir,
+        sourceRepoDir,
+        getApiConfig().apiBaseUrl,
+        'checkout'
       )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
-      )
+      const firstEdit = '# hello notebook (edit 1)\n'
+      const secondEdit = '# hello notebook (edit 2)\n'
+      commitFileChange(dir, firstEdit, 'edit note 1')
+      const middle = runGit(['rev-parse', 'main'], dir)
+      commitFileChange(dir, secondEdit, 'edit note 2')
+      const tip = runGit(['rev-parse', 'main'], dir)
+      const acceptedAtA = runGit(['rev-parse', 'main^^'], dir)
+
+      const alreadyAcceptedBundle = join(workDir, 'already-accepted-tip.bundle')
+      bundleMain(dir, alreadyAcceptedBundle)
+      const fetchMock = stubFetchForSubmission(alreadyAcceptedBundle, {
+        status: 200,
+        ok: true,
+        text: () => Promise.resolve(tip),
+      })
+      const logSpy = vi
+        .spyOn(console, 'log')
+        .mockImplementation(() => undefined)
+      try {
+        await run(['notebook', 'publish', dir])
+
+        expect(logSpy).toHaveBeenCalledWith(
+          `Published notebook. Accepted head: ${tip}`
+        )
+        expect(postCount(fetchMock)).toBe(1)
+        const postCall = fetchMock.mock.calls.find(
+          ([, init]: [unknown, { method?: string } | undefined]) =>
+            init?.method === 'POST'
+        )
+        expect(postCall?.[0]).toContain(
+          `/notebooks/42/git-bundle?expectedHead=${encodeURIComponent(tip)}`
+        )
+        expect(runGit(['rev-parse', 'main'], dir)).toBe(tip)
+        expect(runGit(['rev-parse', 'main^'], dir)).toBe(middle)
+        expect(runGit(['rev-parse', 'main^^'], dir)).toBe(acceptedAtA)
+        expect(fs.readFileSync(join(dir, 'note.md'), 'utf8')).toBe(secondEdit)
+      } finally {
+        logSpy.mockRestore()
+      }
     })
 
     test('local main with unrelated history is rejected with an ancestry error', async () => {
@@ -206,7 +264,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
     })
 
@@ -235,7 +293,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('single direct commit')
+        expect.stringContaining('contiguous single-parent commit range')
       )
     })
   })

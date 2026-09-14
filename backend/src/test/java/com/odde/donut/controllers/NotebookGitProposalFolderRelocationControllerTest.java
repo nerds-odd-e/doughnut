@@ -28,8 +28,9 @@ import org.springframework.http.ResponseEntity;
 
 /**
  * Verifies {@code publishNotebookGitProposal} accepts one exact folder relocation by reparenting
- * the existing source Folder. Shape, destination, placement, and empty-descendant refusals stay in
- * their dedicated classes. Private-association retention is covered in {@link
+ * the existing source Folder, including when an unrelated note is edited in the same proposal.
+ * Shape, destination, placement, and empty-descendant refusals stay in their dedicated classes.
+ * Private-association retention is covered in {@link
  * NotebookGitProposalFolderRelocationPrivateAssociationControllerTest}. Note relocation, including
  * a last-note move that keeps its container, is covered in {@link
  * NotebookGitProposalRelocationControllerTest} and {@link
@@ -93,6 +94,44 @@ class NotebookGitProposalFolderRelocationControllerTest
       assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
       assertThat(downloadedCommit.parent().getName(), equalTo(binding.getAcceptedGitObjectId()));
     }
+  }
+
+  @Test
+  void acceptsAnExactFolderRelocationWithAnUnrelatedNoteEdit() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder archive =
+        makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README_BODY).please();
+    Folder topics =
+        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
+    Folder sub = makeMe.aFolder().parentFolder(topics).name("Sub").please();
+    Note nested = makeMe.aNote().folder(topics).title("A").content(NOTE).please();
+    Note deeper = makeMe.aNote().folder(sub).title("B").content(NOTE).please();
+    Note unrelated = makeMe.aNote().notebook(notebook).title("note").content(NOTE).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    String editedNote = "---\ntype: Note\n---\nedited";
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("note.md", editedNote),
+                new NotebookGitProposalFile("Archive/README.md", README),
+                new NotebookGitProposalFile("Archive/Topics/README.md", README),
+                new NotebookGitProposalFile("Archive/Topics/A.md", NOTE),
+                new NotebookGitProposalFile("Archive/Topics/Sub/B.md", NOTE)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Map<Integer, Folder> folders = foldersById(notebook);
+    assertThat(folders.keySet(), containsInAnyOrder(archive.getId(), topics.getId(), sub.getId()));
+    assertThat(folders.get(topics.getId()).getParentFolderId(), equalTo(archive.getId()));
+    assertThat(folders.get(sub.getId()).getParentFolderId(), equalTo(topics.getId()));
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(
+        notes.stream().map(Note::getId).toList(),
+        containsInAnyOrder(nested.getId(), deeper.getId(), unrelated.getId()));
+    assertThat(
+        noteRepository.findById(unrelated.getId()).orElseThrow().getContent(), equalTo(editedNote));
   }
 
   @ParameterizedTest(name = "{0}")

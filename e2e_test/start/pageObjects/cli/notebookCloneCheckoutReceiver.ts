@@ -50,25 +50,31 @@ function expectCheckoutFileAt(
   })
 }
 
+function readCheckoutStateAt(
+  destinationAlias: CliNotebookCloneDestinationAlias
+): Cypress.Chainable<CliNotebookCheckoutState> {
+  return cy
+    .get<string>(`@${destinationAlias}`)
+    .then((checkoutDir) =>
+      cy.task<CliNotebookCheckoutState>(
+        'readCliNotebookCheckoutState',
+        checkoutDir
+      )
+    )
+}
+
 function expectCleanAcceptedHeadAt(
   destinationAlias: CliNotebookCloneDestinationAlias
 ): Cypress.Chainable<null> {
-  return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
-    cy.get<string>('@cliNotebookPublishHead').then((acceptedHead) =>
-      cy
-        .task<CliNotebookCheckoutState>(
-          'readCliNotebookCheckoutState',
-          checkoutDir
-        )
-        .then((state) => {
-          expect(
-            state.head,
-            `HEAD should equal accepted commit ${acceptedHead}`
-          ).to.equal(acceptedHead)
-          expect(state.status, 'checkout should be clean').to.equal('')
-          return cy.wrap(null)
-        })
-    )
+  return cy.get<string>('@cliNotebookPublishHead').then((acceptedHead) =>
+    readCheckoutStateAt(destinationAlias).then((state) => {
+      expect(
+        state.head,
+        `HEAD should equal accepted commit ${acceptedHead}`
+      ).to.equal(acceptedHead)
+      expect(state.status, 'checkout should be clean').to.equal('')
+      return cy.wrap(null)
+    })
   )
 }
 
@@ -178,6 +184,48 @@ function notebookCloneCheckoutReceiver() {
     },
     expectReceiverAtAcceptedHead(): Cypress.Chainable<null> {
       return expectCleanAcceptedHeadAt('cliCloneReceiverDestination')
+    },
+    /**
+     * After a multi-commit publish, the receiver pull must keep the publisher's
+     * original tip SHA and its first-parent chain (A → B → C), not a rewritten tip.
+     */
+    expectReceiverPreservesPublisherHistory(): Cypress.Chainable<null> {
+      return readCheckoutStateAt('cliCloneDestination').then((publisher) =>
+        readCheckoutStateAt('cliCloneReceiverDestination').then((receiver) => {
+          expect(
+            receiver.head,
+            'receiver HEAD should equal publisher tip C'
+          ).to.equal(publisher.head)
+          expect(
+            receiver.parent,
+            'receiver parent should equal publisher B'
+          ).to.equal(publisher.parent)
+          expect(
+            receiver.grandparent,
+            'receiver grandparent should equal publisher A'
+          ).to.equal(publisher.grandparent)
+          expect(receiver.status, 'receiver checkout should be clean').to.equal(
+            ''
+          )
+          expect(
+            publisher.parent,
+            'publisher should have intermediate commit B'
+          ).to.not.equal('')
+          expect(
+            publisher.grandparent,
+            'publisher should retain original A below B'
+          ).to.not.equal('')
+          expect(
+            publisher.head,
+            'publisher tip C should differ from B'
+          ).to.not.equal(publisher.parent)
+          expect(
+            publisher.parent,
+            'publisher B should differ from A'
+          ).to.not.equal(publisher.grandparent)
+          return cy.wrap(null)
+        })
+      )
     },
     expectReceiverCheckoutFile(
       relativePath: string,

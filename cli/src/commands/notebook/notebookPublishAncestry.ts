@@ -2,17 +2,17 @@ import { downloadAcceptedNotebookHead } from './notebookAcceptedHistory.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 const ANCESTRY_ERROR =
-  'local main cannot be published: only a single direct commit on top of the ' +
+  'local main cannot be published: only a contiguous single-parent commit range on top of the ' +
   "notebook's currently accepted history can be published. Rebase or recreate " +
-  'your change as one commit directly on the accepted head, then try again.'
+  'your change as commits directly on the accepted head, then try again.'
 
 /**
  * Confirms `directory`'s local `main` either matches the notebook's currently accepted history
- * exactly, or is exactly one direct (single-parent) commit ahead of it. Downloads the accepted
+ * exactly, or is a contiguous single-parent commit range ahead of it. Downloads the accepted
  * bundle into command-owned temporary storage, without fetching into or resetting any ref in the
  * user's own `directory`. Throws an actionable error for any other shape (stale/behind, merge
- * commit tip, unrelated history, or several commits ahead). Returns the accepted head SHA so the
- * caller can submit it as the publish request's expected head without re-downloading.
+ * commit tip, unrelated history, or a non-linear unpublished range). Returns the accepted head SHA
+ * so the caller can submit it as the publish request's expected head without re-downloading.
  */
 export async function assertLocalMainFollowsAcceptedHistory(
   directory: string,
@@ -27,16 +27,24 @@ export async function assertLocalMainFollowsAcceptedHistory(
 
   if (localHead === acceptedHead) return acceptedHead
 
-  const parents = runSystemGitOrThrow(
-    ['-C', directory, 'log', '-1', '--format=%P', localHead],
-    (detail, status) =>
-      `failed to inspect local main's history${detail ? `: ${detail}` : ` (exit code ${status})`}`
-  )
-    .trim()
-    .split(/\s+/)
-    .filter((sha) => sha !== '')
+  // Walk only objects present in the checkout: acceptedHead may be absent when
+  // local main is stale or unrelated.
+  let current = localHead
+  while (current !== acceptedHead) {
+    const parents = runSystemGitOrThrow(
+      ['-C', directory, 'log', '-1', '--format=%P', current],
+      (detail, status) =>
+        `failed to inspect local main's history${detail ? `: ${detail}` : ` (exit code ${status})`}`
+    )
+      .trim()
+      .split(/\s+/)
+      .filter((sha) => sha !== '')
 
-  if (parents.length === 1 && parents[0] === acceptedHead) return acceptedHead
+    if (parents.length !== 1) {
+      throw new Error(ANCESTRY_ERROR)
+    }
+    current = parents[0]!
+  }
 
-  throw new Error(ANCESTRY_ERROR)
+  return acceptedHead
 }

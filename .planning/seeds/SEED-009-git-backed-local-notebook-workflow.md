@@ -113,127 +113,6 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Status:** Queued; needs refinement before execution planning. No
   implementation is authorized by this backlog addition.
 
-<a id="story-20"></a>
-
-### 20. Publish accumulated local commits without rewriting history
-
-- **Slice plan:** [Publish accumulated local commits](../quick/122-publish-accumulated-local-commits/PLAN.md).
-  Planning only; the deletion/recreation leaf awaits the identity-policy answer
-  requested during planning. Remaining leaves cover the resolved composition
-  outcome without requiring the full ADR implementation.
-- **Refinement status:** Updated from the owner's 2026-09-14 scope decision.
-  The earlier content-only proposal is replaced by composition of the existing
-  local → Donut publication capabilities. Architecture below is a draft under
-  discussion in [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md),
-  not an approved ADR or authorization to plan/implement.
-- **Goal:** A notebook owner can combine already supported local publication
-  operations across accumulated commits and publish once. Donut shows the final
-  notebook, preserves the original Git history, and retains the correct note and
-  folder identities and their learning data. Any combination of those supported
-  operations should work when the final state is valid and identity is resolved;
-  neither an operation count nor an existing handler's inability to compose is
-  a product reason to reject it.
-- **Delivery boundary clarified by the owner:** Support multiple commits, each
-  of which may itself mix multiple already supported edits. This is composition
-  within commits and across commits, not delivery of the full ADR architecture
-  or all possible histories. The earlier count of three described web → local
-  actions; it is not a limit or an enumeration of local publication operations.
-- **Current evidence:** CLI and backend ancestry guards allow only the same head
-  or one direct child. Single-commit publication already supports content edits,
-  note additions, note deletions, unchanged-content note renames/moves,
-  represented unchanged folder relocations, and creation of folders/Readmes
-  through added content. Clean local pull already receives several accepted
-  commits. Code and test assertions were inspected; this refinement did not run
-  the application test suites.
-- **Why now:** The owner regards timing as reasonable. Preserve the backlog's
-  web-trash detour and new web-folder story, then remove the need to publish
-  after each local commit. Publishing after every operation is a workaround,
-  but interrupts local sessions and does not solve already accumulated work.
-  Keep performance validation and broader identity inference at their selected
-  positions; no newly measured demand or performance claim is made.
-- **Scope:** One bound notebook whose live projection matches accepted history;
-  accepted main is an ancestor of local main. Compose the already supported
-  operations, whether they affect different notes or successive states of the
-  same note. Preserve genuine operation semantics, including permanent removal
-  for a resolved deletion, but do not preserve incidental restrictions on mixing
-  otherwise supported operations as new product rules. Existing Readme editing,
-  newly inferred rename-with-content-change within one ambiguous transition,
-  broader folder operations, and trash-specific compatibility are not silently
-  added here. These are owned by their existing stories.
-- **Intermediate revisions — owner's architecture proposal:** Preserve all
-  original commits reachable through the accepted chain. A full clone receives
-  that history. Only the proposed tip must be representable in Donut;
-  intermediate drafts need not be valid Donut notebooks. Compute and apply the
-  final result once, without replaying each revision through live database
-  mutations. Inspecting intermediate paths/blobs for identity evidence is
-  compatible with this boundary; invalid Markdown is not invalid Git.
-  This is the architectural direction, not a promise to deliver every
-  intermediate-draft case in this story. Only the parts needed to compose
-  already supported edits are this story's delivery responsibility.
-- **Composition and identity:** An unchanged-content rename in B followed by a
-  content edit in C is in this story, even though the base-to-tip bytes differ.
-  Use relevant intermediate evidence to compose supported identity transitions.
-  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md#use-history-as-identity-evidence-without-replaying-it)
-  requires history-informed correspondence. Story 36 owns broader inference
-  and ambiguity-resolution capabilities; it does not own all history inspection
-  and is not an excuse to exclude combinations promised here. Ambiguous intent
-  remains unresolved product input, not automatic permission to delete/create.
-- **Proposed atomic acceptance:** Accept the full range with the final content,
-  resolved identity outcomes, and required derived state, or leave Donut's
-  accepted head and live state unchanged. Retain local work either way. A retry
-  after a lost successful response recognizes the accepted tip without applying
-  operations twice. Concurrent remote advancement fails clearly without
-  overwriting either side. Exact crash/retry guarantees need outside-in proof.
-- **Key examples:**
-  1. B adds a folder represented by content and a note; C edits that note.
-     Publish once: the final folder and note appear in Donut; a receiver gets
-     the original A → B → C chain and final authored files.
-  2. B renames or moves a learned note without changing its bytes; C edits its
-     content. Publish once: the original note and learning history survive at
-     the final path with C's content. Supported folder relocation followed by
-     descendant editing follows the same composition promise.
-  3. A session edits an existing note, adds another, and deletes an unrelated
-     note across commits. Publication applies the final result together;
-     resolved deletion uses existing permanent-removal semantics. Unrelated
-     additions and deletions are not automatically ambiguous merely because
-     endpoint classification currently groups them together.
-  4. B edits two notes and adds a third; C edits that third note and renames
-     another without changing its bytes. One publication accepts the mixed
-     commits together, retaining the original chain and correct identities.
-  5. Edits are fully undone by the tip. The new commits remain publishable even
-     when final file bytes equal the base; identity-sensitive deletion/recreation
-     requires the policy below rather than an automatic same-tree shortcut.
-  6. A failed final validation accepts none of the range. A lost response after
-     success permits a safe retry. A competing accepted web commit preserves
-     both histories and prevents a stale publication.
-- **Open decisions before execution planning:** Resolve only the application,
-  acceptance, and identity decisions needed for this composition outcome;
-  completion of the full ADR design is not a prerequisite. Define identity for a
-  note deleted and recreated within an unpublished range, including at the same
-  path and with identical content; distinguish temporary removal/undo from
-  intended replacement. Define a safe response to unresolved correspondence
-  without requiring history rewriting. Arbitrary ID-free histories cannot
-  guarantee inferred intent, so “any combination” needs those semantics, not
-  silent guessing. Preserve existing supported identity cases as evidence.
-- **Deferred promises:** Independently advanced web/local history reconciliation,
-  history browsing/restoration UI, per-commit application/progress/resume,
-  unrelated live/history drift repair, new operation capabilities owned by
-  sibling stories, and 10,000-note performance targets. No branching, merging,
-  rebasing, or squashing is introduced by this story.
-  General support for nonrepresentable intermediate drafts, new similarity-based
-  identity inference, and owner-assisted ambiguity resolution remain broader
-  architecture or later-story work. Deferral adds no requirement to reject
-  naturally handled cases or validate every intermediate tree as a notebook.
-- **Learning / sizing:** Evaluate a real combined editing session, including
-  rename-then-edit, rather than a content-only demonstration. The former L
-  estimate no longer establishes sizing for this broader outcome. Reassess
-  after identity policies and architecture are settled; split delivery only
-  without silently dropping the owner's combination goal.
-- **Depends on / safe stopping point:** Reuse existing publication, clone, clean
-  pull, and supported operation semantics. No later-story prerequisite is
-  established for basic composition. This workflow remains independently useful
-  if broader rename inference and later stories are cancelled.
-
 <a id="story-36"></a>
 
 ### 36. Publish local renames, moves, and edits across commits while preserving note identity
@@ -285,16 +164,17 @@ data; invalid or ambiguous changes must not silently discard work.
   Define destination-folder scope and interaction with repaired intermediate
   drafts. No similarity threshold, metadata scheme, identity-mapping UI, or
   per-commit replay design is selected by this story.
-- **Boundaries / dependencies:** Story 20 owns combinations of already supported
-  publication operations, including history analysis needed for an exact rename
-  followed by an edit. This story owns broader inference for transitions whose
-  correspondence those existing semantics cannot resolve, such as rename and
-  content change together. Reuse story 20 rather than duplicating range analysis.
-  Independent remote/local divergence and history rewriting remain outside
-  this story. Broader folder-subtree operations remain unselected; story 28
-  retains trash-specific journeys. Any shared identity inference should be
-  cohesive rather than duplicated by story. Its position after story 28 is the
-  owner's priority, not an established technical prerequisite.
+- **Boundaries / dependencies:** Accumulated publication already composes
+  supported operations across a linear range, including history analysis for an
+  exact rename followed by an edit. This story owns broader inference for
+  transitions whose correspondence those existing semantics cannot resolve,
+  such as rename and content change together. Reuse that delivered range
+  composition rather than duplicating it. Independent remote/local divergence
+  and history rewriting remain outside this story. Broader folder-subtree
+  operations remain unselected; story 28 retains trash-specific journeys. Any
+  shared identity inference should be cohesive rather than duplicated by story.
+  Its position after story 28 is the owner's priority, not an established
+  technical prerequisite.
 - **Effort / status:** Queued, unrefined; sizing is unresolved until identity
   evidence and ambiguity policy are understood. Do not claim execution-ready
   scope or authorize implementation from this entry.
@@ -787,8 +667,9 @@ answers and do not supersede the shared agreed contract.
   between Donut and a local notebook with the agreed identity and data semantics.
 - **Status / sizing:** Deliberately broad, unsplit, and unrefined at the owner's
   request. Likely larger than L; no execution-size or readiness claim is made.
-- **Priority:** After the existing Git web-save, rename, accumulated-publication,
-  Readme-edit, and web-move stories, before publication performance validation.
+- **Priority:** After the existing Git web-save, rename, Readme-edit, and
+  web-move stories, before publication performance validation. Accumulated
+  linear publication of already supported local edits is already delivered.
   Exact technical prerequisites remain unassessed until this story is selected.
 - **Boundary:** This story owns new compatibility outcomes. Preserving already
   supported behavior during web restructuring remains each web story's duty;
@@ -858,10 +739,11 @@ the newly selected append-only stories.
 
 - How often do web renames, deletions and moves interrupt actual owner work?
   The order above is a value hypothesis, to revise with use.
-- Story 20 owns composition of supported publication operations. Its final-only
-  projection proposal and unresolved identity/deletion-gap semantics are drafted
-  in ADR 0002; settle them before execution planning without discarding or
-  rewriting work.
+- Broader identity admission beyond already supported exact correspondence,
+  including same-transition rename-with-edit inference, remains open in
+  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
+  and queued story work; confirmed deletion/recreation already starts a new
+  identity.
 - Additional web creation modes and container mutations need concrete owner
   journeys before story selection; this queue is not a completeness claim.
 
