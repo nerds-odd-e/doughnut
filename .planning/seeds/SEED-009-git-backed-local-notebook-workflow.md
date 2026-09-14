@@ -288,10 +288,12 @@ that implementation already satisfies them.
   through ordinary web navigation and Move, with one location rule governing
   visibility and participation. The web Trash/Undo capability established this
   without requiring a local checkout or new Git move/rename support.
-- Direct SQL migration runs with the application release. The owner explicitly
-  does not want a separate rollout plan, opt-in, placeholder gate, or migration
-  approval ceremony. This overrides the default gated-DML guidance for this
-  migration; it does not waive data-preservation proof.
+- The Flyway migration chain runs automatically with ordinary application
+  startup/release: `V300000326` and `V300000327` are Java Flyway migrations,
+  while `V300000328` is SQL. The owner explicitly does not want a separate
+  rollout plan, opt-in, placeholder gate, manual migration gate, or approval
+  ceremony. This overrides the default gated-DML guidance for this migration;
+  it does not waive data-preservation proof.
 - Subsequent owner clarification for story 31: inconsistent server Git history
   may be abandoned entirely. Build one fresh base from current migrated notebook
   data, with no old parent/history. Include permanent removal on accepted Git
@@ -356,133 +358,51 @@ reference handling, and navigation. Refine and split a web story found larger
 than L without introducing a second mechanism. Story 28 is explicitly exempt
 from further splitting/refinement for now, by the owner's instruction.
 
-<a id="story-37"></a>
-
-### 37. Release portable trash without risking notebook data
-
-- **Goal / beneficiary:** Notebook owners keep every retained note, folder,
-  reference, learning preference, and accepted Portable tree when the release
-  converts legacy soft-deleted notes to location-based trash. The release
-  operator can interrupt or retry the upgrade without leaving an unusable
-  schema or allowing an old application instance to write against a partially
-  upgraded database.
-- **Why now:** The 2026-09-14 release-readiness audit found the trash behavior
-  ready but blocked production release on migration and rollout safety. This
-  story must complete before the owner releases the current trash work.
-- **Scope capture:** Make the `V300000326`–`V300000328` upgrade interruption-safe,
-  including the three-step `note.deleted_at` index/column change that currently
-  fails on retry after the first MySQL DDL statement commits. Exclude concurrent
-  old-application traffic and writes while legacy trash is converted and Git
-  baselines are rebuilt, or introduce an equivalent expand/contract release
-  sequence. Preserve Flyway history deliberately; changing an already committed
-  but not production-applied migration requires an explicit human-owned exception
-  to the normal immutability rule.
-- **Evaluation:** Rehearse the complete release path against a populated copy of
-  the pre-upgrade production schema. Interrupt at each non-transactional boundary,
-  retry through the supported operator path, and compare retained row identities,
-  content, folders, authored references, learning data, notebook bindings, and
-  generated Git trees before and after. The normal production deployment must
-  not overlap an old schema-dependent instance with the destructive contract step.
-- **Boundary:** Include the backup, pre/post row-count checks, fresh-checkout
-  communication, and partial-upgrade recovery instructions needed to make this
-  release safe. Do not add later trash UI polish from story 38.
-- **Provenance:** The release audit reproduced MySQL error 1091 when retrying
-  `V300000328` after `idx_note_structural_peer` had already been dropped. The
-  current rolling replacement keeps an old instance available while a new
-  instance migrates the shared database, despite the upgrade test's stated need
-  to exclude concurrent old-app writes.
-
-#### Key examples
-
-1. **Populated upgrade:** A pre-upgrade notebook contains active and legacy
-   soft-deleted notes, nested folders, authored references, learning history and
-   independent tracking preferences. The isolated upgrade puts retained deleted
-   notes in location-based trash, preserves their identities and authored data,
-   and produces a new accepted Git baseline containing the resulting Portable
-   tree. Existing Git commit IDs/history are replaced by this release's baseline
-   rebuild; preservation does not mean an unchanged old Git head.
-2. **Interrupted upgrade:** The operator loses the upgrade process after a
-   committed migration operation, including after the index drop or column drop
-   in `V300000328`, or between notebook baseline rebuilds in `V300000327`.
-   The supported recovery path completes without losing retained data or
-   duplicating trash placement. Traffic stays excluded until verification passes.
-3. **Release isolation:** An old application instance is serving before release.
-   The release excludes its traffic and all schema-dependent writers before
-   conversion begins; replacement and automatic restart cannot reintroduce old
-   writers during the upgrade. Traffic resumes only with the compatible app and
-   verified final schema/data. A failed upgrade leaves a recoverable maintenance
-   state, not an automatic restart of the old binary against the changed schema.
-
-#### Migration implications and evidence
-
-- `V300000328__drop_note_deleted_at.sql`, committed in `2849e01a9c`, contains
-  three separate `ALTER TABLE` statements: drop the structural-peer index,
-  drop `deleted_at`, and recreate the index. A subsequent higher-numbered
-  migration cannot repair a retry that fails before reaching it.
-- Startup calls `flyway.repair()` before `flyway.migrate()`. Repairing migration
-  history does not restore the already-dropped index or column and is not proof
-  of data/schema recovery.
-- `V300000326` delegates to a transaction covering legacy trash conversion;
-  `V300000327` rebuilds one notebook per transaction and can replace completed
-  baselines again on retry. These boundaries require rehearsal, but inspection
-  has not established a need to edit those two committed migration classes.
-- `NotebookUpgradeDataPreservationTest` creates its representative data after
-  startup migrations and manually reruns the baseline rebuild. It supports
-  rebuild preservation, not the complete populated pre-upgrade migration or
-  interruption/recovery promise.
-- Apply ADR 0004, **OKF-compatible notebook Markdown profile**
-  (`docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md`): location-based
-  trash retains ordinary Portable files and note-linked learning data. Apply
-  ADR 0007, **Environments and isolation**
-  (`docs/adrs/0007-environments-and-isolation-accepted.md`): rehearse on an
-  explicitly isolated copy, not persistent Production or Development data.
-
-#### Decisions and bounded follow-up
-
-- Prefer a bounded maintenance release with backup, writer exclusion, verified
-  upgrade/recovery, and fresh-checkout communication. An expand/contract rollout
-  remains an alternative if a maintenance window is unacceptable; zero downtime
-  is not an established promise of this story.
-- On 2026-09-14 Terry Yin explicitly authorized revising the committed migration
-  and confirmed that it has not been deployed to production. This is the
-  human-owned exception to `.cursor/rules/db-migration.mdc` for `V300000328`;
-  it is not general permission to rewrite migration history. Carry the exception
-  into the implementation commit. Production state is owner-confirmed, not
-  independently queried here; release preflight must still inspect actual history
-  and schema, including other long-lived databases and any partially applied state.
-- Rehearse 10,000 legacy soft-deleted notes, including nested paths, existing
-  trash and occupied destinations, plus retained learning/reference data.
-  Compare identities/content and complete final Portable trees; record elapsed
-  time and resource observations. This is a representative one-time safety
-  proof, not a permanent performance SLA or a general scalability project.
-- Use the bounded maintenance-release approach above as the planning assumption
-  following the owner's acceptance. Actual scheduling and release identity are
-  resolved at release time. No zero-downtime subsystem is included.
-- Temporary migration rehearsal code, fixtures, fault injection and release
-  controls have a removal owner: [story 39](#story-39), triggered by verified
-  production migration and successful release. Keep an exact inventory in the
-  execution plan; do not retain a permanent migration framework or benchmark.
-- **Executable plan:** [Safe portable-trash upgrade](../quick/123-safe-portable-trash-upgrade/PLAN.md).
-- Story 38's UI/Undo cleanup and later Restore/Git journeys remain deferred.
-  This refinement does not authorize executing migrations or deploying a release.
-
 <a id="story-39"></a>
 
-### 39. Retire the spent portable-trash upgrade after production success
+### 39. Retire the spent portable-trash migration after production success
 
 - **Goal / beneficiary:** Maintainers can install and upgrade Donut without
-  carrying conversion code, tests or release controls for a legacy state that
+  carrying conversion code or tests for a legacy state that
   production has already left behind.
-- **Trigger / prerequisite:** Story 37's tested release has succeeded; production
-  Flyway history, schema, retained-data checks and application smoke evidence
-  confirm conversion. Verify other long-lived environments have crossed the
-  upgrade before removing their path. A tag or green CI alone is insufficient.
+- **Trigger / prerequisite:** The validated migration has deployed successfully;
+  production Flyway history, schema, retained-data checks and application smoke
+  evidence confirm conversion. Verify other long-lived environments have crossed
+  the upgrade before removing their path. A tag or green CI alone is insufficient.
+- **Validation provenance:** Commit
+  `f38363d3789bec23e5aa5c323ab56f4baf3db554` retains the completed story and
+  `.planning/quick/123-safe-portable-trash-upgrade/PLAN.md` evidence before
+  ordinary story cleanup.
 - **Scope:** Completely remove the spent portable-trash migration files and
   exclusively migration-owned helpers, tests, fixtures, temporary fault injection,
-  rehearsal commands and release controls inventoried by story 37. Retain shared
-  runtime Portable-tree/Git functionality and ordinary trash behavior tests.
+  and rehearsal support listed below. Retain shared runtime Portable-tree/Git
+  functionality and ordinary trash behavior tests.
   Recheck callers before deleting shared helpers; do not retain dead code merely
   because it lives outside the versioned migration directory.
+- **Exact temporary-artifact reminder:** This upgrade is Flyway-owned, not
+  SQL-only. After the trigger above, retire the two Java Flyway migrations
+  `backend/src/main/java/db/migration/V300000326__MigrateLegacyDeletedNotesToTrash.java`
+  and
+  `backend/src/main/java/db/migration/V300000327__RebuildNotebookGitBaselines.java`,
+  plus the SQL Flyway migration
+  `backend/src/main/resources/db/migration/V300000328__drop_note_deleted_at.sql`,
+  using the safe-removal sequence below. Remove their migration-exclusive
+  delegates
+  `backend/src/main/java/com/odde/donut/services/notebookGit/NoteLegacyTrashMigration.java`
+  and
+  `backend/src/main/java/com/odde/donut/services/notebookGit/NotebookGitBaselineRebuild.java`.
+  Remove the migration-only rehearsal tests and fixtures
+  `NoteLegacyTrashMigrationInterruptionTest.java`,
+  `NotebookGitBaselineRebuildFleetInterruptionTest.java`,
+  `NotebookUpgradeAtScaleTest.java`,
+  `NotebookUpgradeDataPreservationTest.java`,
+  `PreUpgradeFixtureRows.java`, `PreUpgradeFixtureSchema.java`,
+  `PreUpgradeFixtureSchemaTest.java`, and
+  `V300000328DropNoteDeletedAtMigrationTest.java`, all under
+  `backend/src/test/java/com/odde/donut/services/notebookGit/`. Also remove the
+  migration-only `NotebookGitBaselineRebuildTest.java` coverage and the
+  migration-only portions of `NotebookGitRebuildTestSupport.java`; retain any
+  support still called by ordinary runtime Git tests after rechecking callers.
 - **Safe removal:** Follow `.cursor/rules/db-migration.mdc`'s baseline/tip squash
   procedure: establish a version above every version ever applied, deploy and
   confirm that no-op tip on long-lived databases before removing older files,
@@ -680,35 +600,29 @@ answers and do not supersede the shared agreed contract.
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The implemented
 web Trash/Undo loop supplies the starting behavior; story 34 adds discovery of
 older trash. The code for migrating and removing the old soft-delete structure
-is complete, but story 37 owns making its first production application safe.
-Neither relies on completing new Git move/rename or trash compatibility.
+is release-ready and runs through normal Flyway startup. Story 39 owns removing
+its temporary migration support after production and other long-lived databases
+have crossed it. Neither relies on completing new Git move/rename or trash
+compatibility.
 
 Folder Trash with ordinary Move now supplies the complete folder round trip.
 The owner moved the Restore shortcut to the very bottom of the backlog, after
-publication performance validation. Story 37 is the release-blocking correction;
-story 38 deliberately follows the release because Move already provides a safe
-recovery path for the remaining UI rough edges.
+publication performance validation. Story 39 is the first post-release cleanup;
+story 38 follows because Move already provides a safe recovery path for the
+remaining UI rough edges.
 
-First, make the portable-trash migration and deployment safe for production
-(story 37), then address the remaining repeated-trash and Undo rough edges
-(story 38) after that release. Next, deliver web-created folders and their notes (story 35),
-then keep remaining Git stories 20, 24, and 25 in relative order. Story 35's
-position reflects the owner's 2026-09-14 addition of basic folder authoring;
-stories 21 and 22 are already delivered. Then queue the single unrefined story 28. Former story 23 is
+After the production release, retire the spent migration support (story 39),
+then address the remaining repeated-trash and Undo rough edges (story 38). Next,
+deliver web-created folders and their notes (story 35), then keep remaining Git
+stories 20, 24, and 25 in relative order. Story 35's position reflects the
+owner's 2026-09-14 addition of basic folder authoring; stories 21 and 22 are
+already delivered. Then queue the single unrefined story 28. Former story 23 is
 absorbed there because its deletion-sync scope overlaps the new trash lifecycle;
 its outcome is retained rather than cancelled. Publication performance remains
 after that combined compatibility item.
 
 ## Refinement Questions and Sizing Risks
 
-- During story 37 refinement, inspect the live production migration boundary and
-  release orchestration so the already implemented migration and retirement
-  preserve supported behavior under interruption. Existing Git consistency must
-  not regress, but no new Git compatibility acceptance journey is to be refined
-  or split out of story 28. If an actual preservation conflict is discovered,
-  surface it rather than silently expanding the web story or retaining old state.
-- Existing user-authored root `_trash` content needs migration inspection so the
-  new reserved meaning does not silently lose or overwrite existing content.
 - Restore uses ordinary conflicts when a required parent path is a non-folder.
 - Check simplicity cumulatively through story 31: fewer product-code lines and
   concepts, one state owner, and removal of duplicated rules. Preserve meaningful

@@ -349,3 +349,9 @@ re-application in the worktree before staging.
     tools do not bind to the worktree from an earlier `cd` used for shell
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
+
+## Retention
+
+- Highest allocated local number: 46
+- Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
+- Occurrence history is partial
