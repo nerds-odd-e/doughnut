@@ -747,52 +747,16 @@ bounded and diagnostic. The focused test passed in ~5.6 seconds, with
 Implementation took ~4 minutes and refactor ~5 minutes. Only the owned local
 test schema was created and dropped; no external or cloud state was touched.
 
-### 11e. Extract the populated upgrade invariant owner
-Type: Structure
-Status: planned
-Change: Extract the populated seed, before/after snapshots and final
-identity/content/count/Portable-tree assertions from the existing 721-line
-`NotebookUpgradeDataPreservationTest` into one package-private fixture owner.
-Keep its current staged V327-before-V328 proof behavior unchanged.
-Proof: The existing populated preservation test passes unchanged in meaning,
-including its intermediate V327 allowlist and final V328 schema assertions.
-Estimate: 5 minutes active; stop and refine rather than weakening or duplicating
-the invariant set.
-
-### 11f. Rehearse populated data through the real task process
-Type: Behavior
-Status: planned
-Behavior: The extracted populated V325 fixture → invoke the fresh task process
-→ its final snapshot preserves the same identities/content/counts and Portable
-trees and reports the exact successful process outcome.
-Change: Reuse the 11d process owner and 11e fixture/assertion owner only.
-Proof: A focused populated-process test observes exit/token, latest Flyway
-history and the extracted final invariant set.
-Estimate: 5 minutes active plus process waiting.
-
-### 11g. Extract one representative interrupted-V328 fixture
-Type: Structure
-Status: planned
-Change: Expose the existing owned setup for one committed partial-DDL V328
-interruption, its before-row snapshot and its final schema/history assertions as
-a package-private fixture owner. Keep the current all-states parameterized
-boundary proof unchanged.
-Proof: `V300000328DropNoteDeletedAtMigrationTest` still passes every existing
-retry state using the extracted owner with no duplicated DDL or assertions.
-Estimate: 5 minutes active.
-
-### 11h. Resume the interrupted schema through the real task process
-Type: Behavior
-Status: planned
-Behavior: The representative committed partial-DDL schema with no successful
-V328 history → invoke the fresh task process → repair/migrate completes, rows
-match the before snapshot, final schema/history are correct, and the process
-exits zero with the exact success token.
-Change: Compose only the 11d process owner and 11g interruption fixture.
-Proof: A focused interrupted-process test observes process result/token and the
-extracted row/schema/history invariants. Then run the full backend suite because
-11a-11h changed production startup/migration behavior.
-Estimate: 5 minutes active plus full-suite waiting.
+Validation conclusion, 2026-09-14: no-go for application release in the current
+state. Existing migration suites already cover populated preservation, restart
+states, scale and Portable trees, while 11d proves the real isolated task can
+upgrade an owned V325 schema to latest with the exact success signal. Repeating
+all large private fixtures through the subprocess would be disproportionate and
+does not change the decisive gap: the real publication script deliberately
+exits non-zero with the serving MIG at zero because slices 12-14 have not yet
+wired the task, compatible template, verified reopen and recovery. Removed the
+proposed 11e-11h duplicate validation work; converge on that missing release
+path before reconsidering readiness.
 
 ### 12. Execute the one-shot task while the serving MIG stays closed
 Type: Behavior
@@ -980,7 +944,7 @@ as did shellcheck for the two production scripts; shellcheck of the rewritten
 test itself remained incomplete because its dynamic sourced helper was not
 resolved.
 
-The refined plan has 25 slices, so story resplit is recommended by the planning
+The reduced plan has 21 slices, so story resplit is still recommended by the planning
 workflow. Do not resplit automatically: the first nine historical slices and
 their correction provenance must remain attributable. Slices 10-14 are locally
 executable under the current execution instruction; slices 15-16 are conditional
@@ -1004,3 +968,7 @@ and three private interruption harnesses cannot be composed directly with a
 latest-version subprocess. Replaced 11c with 11c-11h so startup-strategy
 selection, the real process seam, invariant extraction, populated rehearsal,
 interruption extraction and interrupted rehearsal each have one proof owner.
+The user then capped validation scope: 11e-11h were removed before delivery,
+their partial extraction preserved only in stash
+`4b9b01d860619bad4fc6628a9dfde4441da84643`, and 11d is the final added
+validation boundary.
