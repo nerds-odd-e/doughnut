@@ -293,7 +293,7 @@ against source rather than assumed. This implementation agent, unlike slice
 
 ### 6. Complete the upgrade with 10,000 deleted notes
 Type: Behavior
-Status: planned
+Status: done
 Behavior: One large notebook with 10,000 legacy-deleted notes plus active content,
 and smaller neighboring notebooks → actual full upgrade and one interrupted/retry
 run → complete retained content/identities and correct bound Portable trees.
@@ -306,6 +306,48 @@ of repeating the full matrix at scale. Record rows, elapsed time per migration,
 database version, host resources and observed memory/transaction trouble.
 Estimate: 5 minutes active plus measured run waiting. Unexpected cost or failure
 triggers a bounded reassessment; no invented production latency threshold.
+Learnings: New `NotebookUpgradeAtScaleTest` (2 tests) seeds one "Bulk Notebook"
+with 10 sibling `Docs/Bucket0..9` folders (1,000 legacy-deleted notes each,
+10,000 total), a pre-existing `_trash` subtree with real occupants at 5 of the
+10 buckets, 7 ordinary-length title collisions plus one 150-char
+(`Note.MAX_TITLE_LENGTH`) title collision forcing the truncate-then-suffix
+branch, one note already parked under `_trash` pre-upgrade, a 6-note sample
+each carrying one `memory_tracker` and one `authored_note_reference` row, and
+two smaller neighboring notebooks (bound-live, bound-soft-deleted) — run
+against the actual registered 326→327→328 chain once clean, and once via a
+real direct-outside-Flyway `NoteLegacyTrashMigration.run` interruption (full
+commit, no Flyway history row) followed by real `repair()+migrate()` retry.
+Verified against actual `NoteLegacyTrashMigration` source (not assumed):
+`TRASH_ROOT_NAME`, folder-trail reuse across shared nested parents,
+`availableTitleAt`'s " (2)" suffix and truncate-at-`MAX_TITLE_LENGTH` logic all
+confirmed to match the fixture's expectations before writing assertions.
+Every one of the 10,002 seeded legacy-deleted notes (10,000 bulk + 1 per small
+notebook) is compared by id/content/identity before and after, not counted;
+`memory_tracker`/`authored_note_reference` rows compared byte-for-byte;
+Portable trees verified via `currentPortableTreeFromDb`/`readTreeEntries`
+against real Git bundle content, not a hand-typed expected list (impractical
+at 10,000+ entries). Measured (coordinator-verified by an independent re-run,
+not just the implementer's report): MySQL 8.4.11; clean run 326≈3.8s,
+327≈220ms, 328≈170ms (total ≈4.2s); interrupted-retry direct 326≈3.9s,
+retry repair()+migrate() through 327≈310ms then 328≈170-200ms (total retry
+≈500ms); JVM heap ~150-160MB used of 512MB max before and after, no growth,
+no transaction/lock trouble on either run. Actual throughput was far better
+than the implementer's own pre-measurement estimate (single-digit seconds,
+not tens of seconds to minutes) — local MySQL round-trip cost for the
+per-note query pattern was lower than expected. Post-change-refactor found
+and collapsed a genuine near-duplicate: the new test had reintroduced 9
+raw-JDBC fixture-row builder methods byte-for-byte identical to
+`NotebookUpgradeDataPreservationTest`'s (slice 3) existing copies; extracted
+into a new shared `PreUpgradeFixtureRows` used by both, leaving the
+differently-shaped small fixture helpers in the slice 4/5 interruption tests
+untouched (distinct signatures, not the same duplication). Coordinator
+independently re-verified: cross-checked the fixture's claims against
+`NoteLegacyTrashMigration.java` source directly, re-ran the focused test
+(matching the implementer's and the refactor agent's reported timings), and
+ran the full backend suite twice (before and after the refactor pass) —
+both green. Active time ~35-40 minutes across implementation, refactor and
+coordinator verification; measured run waiting was on the order of seconds,
+not minutes, so no bounded reassessment was triggered.
 
 ### 7. Establish a quiescent maintenance state
 Type: Behavior

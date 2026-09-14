@@ -2,6 +2,13 @@ package com.odde.donut.services.notebookGit;
 
 import static com.odde.donut.services.notebookGit.NotebookGitRebuildTestSupport.currentPortableTreeFromDb;
 import static com.odde.donut.services.notebookGit.NotebookGitRebuildTestSupport.readTreeEntries;
+import static com.odde.donut.services.notebookGit.PreUpgradeFixtureRows.insertBinding;
+import static com.odde.donut.services.notebookGit.PreUpgradeFixtureRows.insertFolder;
+import static com.odde.donut.services.notebookGit.PreUpgradeFixtureRows.insertNote;
+import static com.odde.donut.services.notebookGit.PreUpgradeFixtureRows.insertNotebook;
+import static com.odde.donut.services.notebookGit.PreUpgradeFixtureRows.insertUser;
+import static com.odde.donut.services.notebookGit.PreUpgradeFixtureRows.legacyDeletedAt;
+import static com.odde.donut.services.notebookGit.PreUpgradeFixtureRows.nullableInt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -252,101 +259,6 @@ class NotebookUpgradeDataPreservationTest {
         deletedNotebookDeletedNote);
   }
 
-  private static Timestamp legacyDeletedAt() {
-    return Timestamp.valueOf("2019-01-01 00:00:00");
-  }
-
-  private static Timestamp seedTimestamp() {
-    return Timestamp.valueOf("2020-06-01 00:00:00");
-  }
-
-  private int insertUser(Connection connection, String name, String externalIdentifier)
-      throws SQLException {
-    return insertReturningId(
-        connection,
-        "INSERT INTO user (name, external_identifier) VALUES ('"
-            + name
-            + "', '"
-            + externalIdentifier
-            + "')");
-  }
-
-  private int insertNotebook(Connection connection, int ownerId, String name, boolean deleted)
-      throws SQLException {
-    int ownershipId =
-        insertReturningId(connection, "INSERT INTO ownership (user_id) VALUES (" + ownerId + ")");
-    String deletedAtValue = deleted ? "'" + legacyDeletedAt() + "'" : "NULL";
-    return insertReturningId(
-        connection,
-        "INSERT INTO notebook (ownership_id, creator_id, name, deleted_at, created_at, updated_at)"
-            + " VALUES ("
-            + ownershipId
-            + ", "
-            + ownerId
-            + ", '"
-            + name
-            + "', "
-            + deletedAtValue
-            + ", '"
-            + seedTimestamp()
-            + "', '"
-            + seedTimestamp()
-            + "')");
-  }
-
-  private int insertFolder(
-      Connection connection,
-      int notebookId,
-      Integer parentFolderId,
-      String name,
-      String readmeContent)
-      throws SQLException {
-    return insertReturningId(
-        connection,
-        "INSERT INTO folder (notebook_id, parent_folder_id, name, readme_content, created_at,"
-            + " updated_at) VALUES ("
-            + notebookId
-            + ", "
-            + (parentFolderId == null ? "NULL" : parentFolderId)
-            + ", '"
-            + name
-            + "', "
-            + (readmeContent == null ? "NULL" : "'" + readmeContent + "'")
-            + ", '"
-            + seedTimestamp()
-            + "', '"
-            + seedTimestamp()
-            + "')");
-  }
-
-  private int insertNote(
-      Connection connection,
-      int notebookId,
-      Integer folderId,
-      String title,
-      String content,
-      Timestamp deletedAt)
-      throws SQLException {
-    return insertReturningId(
-        connection,
-        "INSERT INTO note (notebook_id, folder_id, title, content, deleted_at, created_at,"
-            + " updated_at) VALUES ("
-            + notebookId
-            + ", "
-            + (folderId == null ? "NULL" : folderId)
-            + ", '"
-            + title
-            + "', '"
-            + content
-            + "', "
-            + (deletedAt == null ? "NULL" : "'" + deletedAt + "'")
-            + ", '"
-            + seedTimestamp()
-            + "', '"
-            + seedTimestamp()
-            + "')");
-  }
-
   private void insertMemoryTracker(
       Connection connection,
       int userId,
@@ -394,29 +306,6 @@ class NotebookUpgradeDataPreservationTest {
               + "', 0, '"
               + wikiNotePortion
               + "')");
-    }
-  }
-
-  private void insertBinding(Connection connection, int notebookId, String gitObjectId)
-      throws SQLException {
-    try (Statement statement = connection.createStatement()) {
-      statement.execute(
-          "INSERT INTO notebook_git_binding (notebook_id, accepted_git_object_id, bundle_bytes,"
-              + " created_at, updated_at) VALUES ("
-              + notebookId
-              + ", '"
-              + gitObjectId
-              + "', X'0102030405', '2024-01-01 00:00:00', '2024-01-01 00:00:00')");
-    }
-  }
-
-  private int insertReturningId(Connection connection, String sql) throws SQLException {
-    try (Statement statement = connection.createStatement()) {
-      statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
-      try (ResultSet keys = statement.getGeneratedKeys()) {
-        keys.next();
-        return keys.getInt(1);
-      }
     }
   }
 
@@ -620,11 +509,6 @@ class NotebookUpgradeDataPreservationTest {
       }
     }
     return rows;
-  }
-
-  private Integer nullableInt(ResultSet rs, String column) throws SQLException {
-    int value = rs.getInt(column);
-    return rs.wasNull() ? null : value;
   }
 
   // ---------------------------------------------------------------------------------------------
