@@ -104,3 +104,4 @@ Behavior: Production is unavailable because instances resolve the unsafe origina
 - Originating checkout/branch: `/Users/terryyin/git/doughnut`, `main`.
 - Execution checkout/branch: `/Users/terryyin/git/doughnut-recover-production-note-title-index`, `codex/recover-production-note-title-index`.
 - Integration target: `main`.
+- CI observer: repository `nerds-odd-e/doughnut`, destination branch `main`, workflow `ci.yml` / `donut CI`, mailbox `/tmp/dough-ci-501/watch-ppHCEN`, PID `10423`, yielded cell `292`, session `52932`.
