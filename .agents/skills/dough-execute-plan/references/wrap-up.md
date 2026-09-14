@@ -6,15 +6,30 @@ same proof and delivery gates.
 ## Accept proof
 
 Apply [proof ownership](../../dough-story-refinement/references/planning.md#own-executable-proof).
-Passing commands, test names, and `proof:` summaries alone are insufficient.
-Return incomplete or contradictory evidence to implementation,
-naming the promise and gap; refactoring cannot supply missing behavior.
+Treat the implementation return as an index, not as accepted evidence. For each
+promise, inspect the actual uncommitted change at its reported product boundary
+and the concrete setup and assertion or signal locations. Confirm that setup
+supplies only the starting precondition and that the product establishes the
+promised outcome. A passing command, test name, `proof:` summary, or assertion
+whose setup supplies the outcome does not establish the promise.
 
-Reuse inspected proof while promises and boundaries remain unchanged. Recover
-literal commands from the original handoff when possible. Rerun only for missing
-or ambiguous proof, boundaries changed during wrap-up, or omitted integration
-proof required by the slice. Do not sample randomly or repeat valid proof to
-manufacture process compliance. Preserve failures under
+Accept only the observations the inspected locations and result support. Retain
+the promise, accepted boundary, inspected locations, and literal command in the
+current slice wrap-up so refactoring can distinguish a proof reference from
+proof already inspected and accepted. Do not routinely load the raw agent trace,
+full command output, or reread unchanged parts of the diff. Expand inspection to
+the smallest relevant underlying callers, setup, assertions, or implementation
+when a location is missing, the boundary is unclear, or evidence contradicts the
+change. Return incomplete or contradictory evidence to implementation, naming
+the promise, inspected locations, and gap; refactoring cannot supply missing
+behavior.
+
+Reuse accepted inspection while its promise, boundary, implementation, setup,
+and observations remain unchanged. Recover literal commands from the original
+handoff when possible. Rerun only for missing or ambiguous proof, a covered
+boundary changed during wrap-up, or omitted integration proof required by the
+slice. Do not sample randomly or repeat valid proof to manufacture process
+compliance. Preserve failures under
 [execution decisions](execution-decisions.md#diagnose-failed-proof).
 
 Require CI-safe work before delivery: no deliberate failing tests or unfinished
@@ -29,18 +44,31 @@ operation; do not let an inherited working directory redirect delivery. This
 slice delivery does not integrate or remove a retained execution branch or
 worktree.
 
+As each obligation finishes, retain the current delivery boundary in the
+execution conversation with the owned unfinished paths, accepted proof and its
+boundary, applicable implementation or refactor return, and exact observer
+identity when present. On recovery, reconcile this focused record with actual
+Git, agent, and observer state under
+[execution-boundary recovery](../SKILL.md#continue-or-recover-at-an-execution-boundary).
+
 1. Spawn a fresh agent to run
    [dough-post-change-refactor](../../dough-post-change-refactor/SKILL.md).
    Supply the execution source, execution checkout and branch, slice,
-   implementation proof, project context, and ownership boundaries; supply the
+   accepted proof with its inspected setup and observation locations, changed
+   paths and boundaries, project context, and ownership boundaries; supply the
    plan path only when one exists. Keep
    formatting and hook-owned lint with the coordinator. Do not
    add instructions contradicting that skill's decide-before-testing contract;
    explicit human verification requests remain authoritative.
 2. Inspect its report, require `## REFACTOR COMPLETE`, and recheck
-   [execution decisions](execution-decisions.md). A refactor stop, missing marker,
-   or unresolved proof gap prevents commit. Report unnecessary test runs as
-   deviations; reuse valid evidence instead of repeating work.
+   [execution decisions](execution-decisions.md). Use the reported changed paths,
+   boundaries, and proof effects to inspect only newly affected implementation
+   and observation locations. Reuse accepted inspection for boundaries reported
+   and confirmed unchanged; when refactoring invalidated a boundary, accept its
+   rerun or replacement proof only after inspecting the new boundary and
+   observation locations under **Accept proof**. A refactor stop, missing marker,
+   contradiction, or unresolved proof gap prevents commit. Report unnecessary
+   test runs as deviations; reuse valid evidence instead of repeating work.
 3. Run this project's generator if its trigger changed and the required output was
    not already regenerated and verified during refactoring. Fix generation at
    source and validate affected consumers.
@@ -49,7 +77,8 @@ worktree.
    staging. Repair mechanical failures and repeat only when the repair
    invalidates preparation. Stop for semantic or design judgment.
 5. For planned execution, update the active plan and any project-required
-   summary with learnings, slice status, and revised remaining slices under
+   summary with learnings, slice status, accepted proof needed for reuse, and
+   revised remaining slices under
    [plan refinement](../../dough-story-refinement/references/planning.md#refine-the-active-plan).
    For stale feature-story understanding, record `awaiting story review` and
    identify the selected story in its seed and the affected field. For stale

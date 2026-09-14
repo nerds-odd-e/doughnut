@@ -122,6 +122,23 @@ Keep only information needed for execution, proof, review, or resume:
 5. **Current decisions** — only choices constraining remaining work.
 6. **Learnings** — only discoveries changing assumptions or remaining slices.
 
+Once planned execution starts, keep durable resume state in this same plan:
+the established execution identity, current decisions, consequential learnings,
+and accepted proof that later work may reuse. For each retained proof, name its
+promise, covered boundary, inspected setup and observation locations, literal
+command, and result. A slice status records the plan's current assessment; it
+does not by itself establish that the corresponding changes were committed or
+pushed.
+
+Keep live operational state in the execution conversation: active agent and
+refactor returns, ownership and paths of unfinished changes, current delivery
+boundary, and the exact CI observer identity and coverage when one exists. Git,
+agent, and observer state remain the evidence of what actually happened. If an
+interruption or changed observation produces a decision that constrains later
+work, retain that decision or learning in the plan and replace stale detail.
+Do not create a checkpoint file, duplicate raw output, or add delivery statuses
+to make this state recoverable.
+
 Use this project's equivalent slice format when supplied; otherwise use:
 
 ```markdown
@@ -185,6 +202,21 @@ and record only learnings that affect remaining work. Apply
 [slice decomposition](../../dough-story-decomposition/references/problem-decomposition.md#decompose-slices)
 and its cumulative design assessment, sizing, and escalation rules before
 declaring execution ready.
+
+When consequential evidence changes an execution assumption, first apply the
+shared [execution
+reassessment](../../dough-execute-plan/references/execution-decisions.md#reassess-before-extending-work).
+Retain from that reassessment only the consequential information later work
+needs; keep raw diagnostics at their evidence location. Replace only the
+affected future slice detail and proof mapping, and record the changed decision
+or learning once.
+Preserve compatible completed slices, accepted proof with unchanged boundaries,
+and still-valid decisions and learnings. Do not refresh unrelated sources or
+rewrite unaffected history merely because replanning occurred.
+
+Do not make a disputed story-scope or Accepted-ADR decision through plan editing.
+Record the affected source and field and keep that path stopped under execution's
+human-decision procedure; independently supported remaining work may continue.
 
 After an execution overrun, record elapsed time, completed evidence, the failure
 or thrash point, and the sizing assumption that proved false. Replace slices

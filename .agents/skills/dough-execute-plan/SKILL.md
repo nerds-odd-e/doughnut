@@ -7,6 +7,7 @@ description: >-
   repair. Use to execute a plan, run a plan, execute slices, or execute a
   canonical story when the caller explicitly skips slice planning; does not
   decide story scope or whether work qualifies for the quick path.
+  `--skip-retro` skips the automatic retrospective after planned execution.
 ---
 
 # Execute planned or quick story work
@@ -41,48 +42,83 @@ from a story's apparent size. A successful quick execution creates no plan,
 completion note, or substitute execution record; retain its scope, decisions,
 progress, and proof in the conversation.
 
-Use [planning scope and
-lifecycle](../dough-story-refinement/references/planning.md) for source ownership
-and proof, and for plan updates when a plan exists. Keep a completed plan and
-its review evidence for retrospective and
+Use [planning level](../dough-story-refinement/references/planning.md#choose-the-planning-level)
+for source ownership,
+[proof ownership](../dough-story-refinement/references/planning.md#own-executable-proof)
+when proof is mapped or accepted, and
+[active-plan refinement](../dough-story-refinement/references/planning.md#refine-the-active-plan)
+for plan updates when a plan exists. Keep a completed plan and its review
+evidence for retrospective and
 [dough-story-wrap-up](../dough-story-wrap-up/SKILL.md); do not delete the
 completed plan or its source history here. For quick execution, retain the
 canonical story and conversation as the later review inputs. Use
 [slice decomposition](../dough-story-decomposition/references/problem-decomposition.md#decompose-slices)
-for Behavior and Structure slices, sizing, and learning escalation.
+for Behavior and Structure slices and
+[slice sizing](../dough-story-decomposition/references/problem-decomposition.md#size-and-escalate-slices)
+for sizing and learning escalation.
 
-Resolve from this project:
+At startup, obtain enough authoritative context to select and delegate the first
+slice. Reuse applicable instructions already read during this execution while
+their source and the assumptions that make them applicable remain unchanged;
+do not reload a reference merely because execution reached another step.
+
+Resolve the following from this project at the boundary that first needs it:
 
 - execution-source kind, slice target, hard limit, and exceptions; for planned
   execution also resolve the plan path, slice-status vocabulary, and whether
   Story Branch Mode applies or the caller selected execution on the current branch;
 - product backlog path and selected entry when this work was selected from
   **Backlog list**;
-- navigation, focused test commands, runtime wrapper, and workflow precedence;
-- selective formatting command, commit hook contract, and authorized push destination;
+- selective formatting command and commit hook contract before taking queued
+  work and creating its Taken-only claim commit;
+- navigation, focused test commands, runtime wrapper, and workflow precedence
+  needed by the selected slice;
+- authorized push destination before delivery;
 - generated-artifact triggers and commands when affected; and
-- context required by [dough-post-change-refactor](../dough-post-change-refactor/SKILL.md).
+- context required by
+  [dough-post-change-refactor](../dough-post-change-refactor/SKILL.md) before
+  delegating refactoring.
 
-Name missing context and stop the affected work before delegation. When another
-execution tool such as GSD invokes this skill, keep the same slice delivery
-contract. Do not treat that tool's phase or task as an alternative to a slice.
+Each item remains required before the boundary it governs. Name missing context
+and stop the affected work; missing context needed by the first slice stops its
+delegation. When another execution tool such as GSD invokes this skill, keep the
+same slice delivery contract. Do not treat that tool's phase or task as an
+alternative to a slice.
 
-Read [execution decisions](references/execution-decisions.md),
-[delegation](references/delegation.md), and [wrap-up](references/wrap-up.md)
-before implementation. Read [CI observation](references/ci-monitor.md) before
-the first push and load only the current host's notification adapter. For a
-bounded investigation, use [disposable research](references/disposable-research.md).
+Before the first implementation delegation, read
+[delegation](references/delegation.md) and apply
+[execution decisions](references/execution-decisions.md): obtain its common
+reassessment and human-judgment rules plus any conditional section triggered by
+the current evidence. Before accepting an implementation return, read
+[proof acceptance](references/wrap-up.md#accept-proof); before delivery, read
+[delivery](references/wrap-up.md#deliver-the-change). Read
+[CI observation](references/ci-monitor.md) before the first push and load only
+the current host's notification adapter. For targeted recovery of an omitted or
+truncated passage, or for a bounded investigation, use
+[targeted retrieval and disposable research](references/disposable-research.md).
 
 ## Take queued work
 
+If an authorized Git operation encounters a product backlog conflict, follow
+[backlog merge conflicts](../dough-product-backlog/references/merge-conflicts.md).
+
 After resolving the execution source and current execution authorization, inspect
 the product backlog before changing plan status, recovering or starting a CI
-observer, delegating, or implementing. When the selected work is under
-**Backlog list**, follow
+observer, delegating, or implementing. Moving a selected entry to **Taken** is
+execution's first project-state change.
+
+When the selected work is under **Backlog list**, before moving it resolve the
+project's selective formatting command and the commit hook contract applicable
+to the Taken-only claim commit. An absent hook or an understood check-only hook
+permits the transition. An unknown, mutating, failing, or disputed hook stops
+the transition with the queue unchanged until its safe handling is resolved
+through the existing execution decision path. Resolution does not run delivery
+formatting or hook-owned lint; do not pull push or CI context forward unless
+another current boundary needs it.
+With a safe contract, follow
 [dough-product-backlog](../dough-product-backlog/SKILL.md#take-queued-work-for-execution)
-to move its existing entry to **Taken**. This backlog update is execution's
-first project-state change. Stop before implementation if the queued entry
-cannot be moved unambiguously.
+to move the existing entry to **Taken**. Stop before implementation if the
+queued entry cannot be moved unambiguously.
 
 An entry already in **Taken** means execution is resuming; do not duplicate or
 reorder it. Work absent from both active lists was not selected from the
@@ -151,13 +187,52 @@ handing work to another agent or host adapter so that a tool's own default
 working directory cannot redirect the execution. For quick execution, pass the
 selected current checkout and branch from the conversation instead.
 
+For checkout-bound runtime work, resolve the installed runtime from that same
+selected execution checkout and use the selected checkout as its working
+directory. Apply the selected-checkout identity and stop rules in
+[runtime setup](references/runtime-setup.md) before arming the runtime; do not
+fall back to the copy that supplied the initially loaded skill.
+
+## Continue or recover at an execution boundary
+
+For planned execution, use the existing plan and conversation according to
+[execution and resume state](../dough-story-refinement/references/planning.md#write-an-executable-plan).
+For quick execution, use its canonical story and retained conversation; never
+create a plan or substitute state artifact for recovery.
+During uninterrupted work, reuse current decisions, accepted proof, and known
+delivery progress while their sources, assumptions, and covered boundaries
+remain unchanged. After a confirmed push, select the next slice from that
+current state and obtain only newly relevant detail; do not perform a full
+recovery read merely because another slice begins.
+
+After an interruption, or when Git, an agent return, observer coverage, or
+another observation signals change, reconcile only the affected state before
+acting. Verify the retained execution identity first, then inspect the relevant
+working tree and index, branch and commits, agent or refactor return, and exact
+observer identity. Preserve unrelated and ambiguously owned work. Use accepted
+proof again only when its promise, boundary, implementation, setup, and
+observations still match.
+
+Resume at the first delivery obligation not established by that evidence. For
+example, an implementation return with owned uncommitted changes still needs
+proof acceptance and refactoring; a completed refactor still needs the
+remaining delivery steps; an edited plan not contained in a commit still needs
+staging and commit; and a local delivery commit absent from the authorized
+destination still needs push. A plan status or compact report alone proves none
+of those later boundaries. Once the pushed commit and retained delivery result
+agree, continue with the next dependency-ready slice. If the execution identity
+is missing or contradictory, use the existing human recovery decision above
+instead of inferring a checkout or completion.
+
 ## Execute the next slice
 
-1. In the selected execution checkout, for planned execution read the plan's
+1. In the selected execution checkout, for planned execution obtain the plan's
    current slice statuses, decisions, learnings, and proof and use it as
    execution and resume state, including the selected existing-solution finding
-   and its evidence when the plan contains one. For quick execution, reread the
-   canonical story and the conversation's current scope,
+   and its evidence when the plan contains one. On initial entry or recovery,
+   read the relevant retained state; during ordinary continuation, reuse its
+   still-valid current reading under the boundary rule above. For quick
+   execution, reread the canonical story and the conversation's current scope,
    decisions, progress, and proof; the story is the only slice. Do not create or
    update a separate state artifact. Confirm the current instruction still
    authorizes execution. Recover an existing CI observer before considering a
@@ -197,17 +272,45 @@ On completion, a stop requiring human judgment, or cancellation, close the CI
 observer through the current host adapter. Handle delivered failures, then
 stop observers without waiting for CI. Report pending CI as unobserved.
 
-When all planned slices are done, leave the completed plan and review evidence
-in place for retrospective and story wrap-up. Retain a planned execution's
-recorded checkout and branch through pauses and completion; do not invoke
-retrospective or story wrap-up automatically and do not remove its worktree or
-branch here. When the quick slice is done,
-leave its story and conversation available instead. Report completed work,
-retained evidence, and observer shutdown. End with `## PLAN EXECUTION COMPLETE`
-for planned execution or `## QUICK EXECUTION COMPLETE` for quick execution only
-after required delivery and shutdown succeed.
+After all planned slices satisfy proof and delivery obligations and required
+observer shutdown succeeds, report completed execution, retained evidence, and
+CI limitations. With `--skip-retro`, report the retrospective skipped and end
+with `## PLAN EXECUTION COMPLETE`. The option applies to this execution only;
+it does not change project preferences or skip proof, delivery, or CI shutdown.
+Explicit instructions to omit or defer retrospective also take precedence.
+Retain the completed plan and evidence for later review and story wrap-up.
+
+Otherwise report `## PLAN EXECUTION COMPLETE`, then invoke
+[dough-execution-retrospective](../dough-execution-retrospective/SKILL.md) for
+that execution without another confirmation. Preserve explicit review
+instructions and project preferences through the receiving skill's review selection; do not
+extend its authority to implement findings or change the backlog.
+
+Continue in the recorded execution project and checkout. Supply retained
+references and context: the source story or bounded-correction contract,
+original plan and approved changes, attributable commits, decisions, proof,
+delivery state, CI limitations, and checkout/branch identity. Include the
+initial attempt when quick execution continued through a remaining-work plan;
+both parts remain one execution. Reuse available context without a new handoff
+artifact or transcript copy; the retrospective validates attribution and fills
+real gaps under its existing recovery rules.
+
+Keep execution completion distinct from review completion. If the retrospective
+stops for missing context, retain completed execution and name the missing
+input without rerunning implementation or claiming review completion. On
+recovery, use retained review state to continue an unfinished retrospective or
+recognize one already completed; ambiguous state requires recovery, not a
+duplicate review or guessed completion.
+
+Leave the completed plan and review evidence in place for story wrap-up. Retain
+the execution checkout, branch, and worktree; do not invoke story wrap-up here.
+A wholly planless quick completion instead retains its story and conversation,
+reports completed work and observer shutdown, and ends with
+`## QUICK EXECUTION COMPLETE` after required delivery and shutdown succeed,
+without automatic retrospective entry.
 
 Otherwise report the execution source, the active plan and next unfinished slice
 or the canonical story and current quick-slice state, preserved work and observer
 state, and the decision or recovery action needed. Do not emit a completion
-marker.
+marker or automatically invoke retrospective for incomplete execution, failed
+delivery or shutdown, cancellation, or a stop requiring human judgment.

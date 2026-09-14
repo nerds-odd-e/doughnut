@@ -1,6 +1,6 @@
 ---
 name: dough-product-backlog
-description: Maintains and reprioritizes a product backlog list of canonical story or bounded-correction references. Use to add, reorder, or complete backlog items. Excludes classroom and workshop exercise backlogs.
+description: Maintains and reprioritizes a product backlog list of canonical story or bounded-correction references. Use to add, take, reorder, or complete backlog items, or resolve product backlog merge conflicts. Excludes classroom and workshop exercise backlogs.
 ---
 
 # Product backlog
@@ -113,6 +113,11 @@ work to the queue requires an explicit backlog-maintenance decision.
 - Standalone maintenance may remove a completed item from either active list
   when the human asks only for backlog maintenance. The applicable seed, plan,
   and proof remain available for later story wrap-up.
+
+## Resolve Git conflicts
+
+When an authorized merge, rebase, or cherry-pick conflicts in the product
+backlog, read [backlog merge conflicts](references/merge-conflicts.md).
 
 ## Check and report
 

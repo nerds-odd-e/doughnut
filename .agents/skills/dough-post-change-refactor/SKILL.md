@@ -85,11 +85,14 @@ source generator and validate consumers; never manually repair generated output.
 
 ## Verify edits
 
-When the caller supplied `proof:` commands, rerun only those whose covered
-behavior or paths the refactor invalidated. If the covered boundary moved,
-explain why the original command no longer applies and run a focused replacement.
-Without supplied proof, run focused tests related to the refactor edits. Use
-this project's literal commands and the shared
+When the caller supplied accepted proof, compare each refactor edit with its
+reported boundary, implementation, setup, and observation locations. Identify
+which accepted proof remains unchanged and which the refactor invalidated;
+unchanged proof requires no rerun. Rerun only commands whose covered behavior or
+paths the refactor invalidated. If the covered boundary moved, explain why the
+original command no longer applies and run a focused replacement. Without
+supplied proof, run focused tests related to the refactor edits. Use this
+project's literal commands and the shared
 [behavioral test guidance](references/refactor-checks.md#tests-as-behavioral-documentation).
 Do not run the full suite. Fix failures caused by the refactor and require
 passing relevant proof before completion. Report other unresolved failures to
@@ -97,9 +100,17 @@ the caller; do not claim success.
 
 ## Return control
 
-On completion, report checks that changed code, files renamed, extracted, split,
-or deleted, passing test commands or `skipped — no refactor edits`, and approximate
-active elapsed time. End with `## REFACTOR COMPLETE`.
+On completion, return a targeted report with the refactor outcome, every path
+and conceptual or product boundary changed by refactoring, and checks that
+changed code. For each relevant accepted proof, name whether its boundary and
+inspected locations stayed unchanged or which edit invalidated them. For
+invalidated or replacement proof, report the literal command, result, and
+concrete setup and assertion or signal locations. Also report files renamed,
+extracted, split, or deleted; unresolved gaps or contradictions; consequential
+learnings; passing test commands or `skipped — no refactor edits`; and
+approximate active elapsed time. Do not attach routine raw traces, full command
+logs, or a duplicate full diff; the caller inspects the reported locations. End
+with `## REFACTOR COMPLETE`.
 
 For a disputed plan restriction, return the shared plan-conflict handoff and end
 with `## REFACTOR JIDOKA STOP`; the caller must resolve it before treating the

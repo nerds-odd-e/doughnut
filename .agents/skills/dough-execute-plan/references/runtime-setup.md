@@ -6,13 +6,22 @@ repository. Detached host adapters also require a POSIX host with `ps` and
 signals. Apply this project's tooling wrapper to launches if needed; hook commands
 must find Node directly without entering a build environment.
 
-Resolve the installed skill directory from the skill you loaded, independently
-of the working directory in this project's checkout. It is normally
+For checkout-bound work, resolve the installed skill directory inside the
+selected execution checkout. It is normally
 `.agents/skills/dough-execute-plan` for Codex/Cursor or
-`.claude/skills/dough-execute-plan` for Claude Code. The runtime derives checkout
-identity four levels above its `scripts/` module; preserve that layout.
-Use canonical filesystem paths, quote paths containing spaces, and replace
-example placeholders before execution.
+`.claude/skills/dough-execute-plan` for Claude Code. Do not reuse the installed
+directory that supplied the initially loaded skill when it belongs to another
+checkout. The runtime derives checkout identity four levels above its
+`scripts/` module; preserve that layout.
+
+Before launch, canonicalize the selected execution checkout and the checkout
+identity implied by the resolved runtime path. Require them to be equal and
+require the selected runtime entry point to exist. A missing runtime or a path
+that identifies another checkout stops observation setup before an observer is
+armed. Report the selected checkout and candidate runtime path or identity for
+recovery; do not search other checkouts or the environment for a replacement.
+Use the selected execution checkout as the launch working directory. Quote
+paths containing spaces and replace example placeholders before execution.
 
 ## Select CI
 

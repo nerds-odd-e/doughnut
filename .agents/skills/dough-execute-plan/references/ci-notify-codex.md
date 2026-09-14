@@ -8,6 +8,11 @@ before the first push. On reentry, use the observer note in the active plan for
 planned execution or in the conversation for quick execution to reuse a running
 cell and terminal `finished` entries to avoid restarting completed observation.
 Recover that note before considering replacement when volatile handles are lost.
+Resolve `/ABSOLUTE/RESOLVED/SKILL` inside
+`/ABSOLUTE/VERIFIED/CHECKOUT_ROOT` by applying the selected-checkout invariant
+and stop rules in [runtime setup](runtime-setup.md) before evaluating the cell.
+Use the verified runtime path and checkout below; do not arm the cell or
+observer when setup stops.
 Substitute verified repository, checkout, and coordinator below:
 
 ```js

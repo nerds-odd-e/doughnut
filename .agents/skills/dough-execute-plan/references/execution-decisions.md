@@ -9,9 +9,24 @@ When corrections accumulate, evidence challenges the premise, or the owner asks
 for simplification, reassess whether the remaining work is necessary before
 adding implementation or slices. State the smallest authorized, evaluable
 outcome and compare the strongest relevant simpler choice. Reuse available
-evidence; make a bounded check only for a decisive uncertainty, stating what it
-establishes and leaves unproved. Drop only obligations the owner has authorized
-removing; preserve compatible completed work and proof.
+evidence. For a decisive uncertainty, retrieve only the missing authoritative
+passage or run a decision-bounded investigation under [targeted retrieval and
+disposable research](disposable-research.md). State the question it answers and
+what it leaves unproved; necessary investigation is not forbidden merely
+because its evidence is unusually large. Refresh only knowledge whose source or
+applicable assumption the new observation calls into question.
+
+When an observation invalidates an assumption for remaining work, identify the
+observation and its source location, the affected assumption, the consequences
+for planned behavior and proof, and the selected authorized decision. Explain
+why that decision changed. Retain unresolved limits needed for a later decision,
+but leave raw diagnostics at their inspectable evidence locations. Align only
+the affected remaining plan through [active-plan
+refinement](../../dough-story-refinement/references/planning.md#refine-the-active-plan),
+replacing invalidated future detail rather than appending an alternative.
+Preserve completed work, proof, decisions, and learnings whose boundaries and
+assumptions remain compatible. Drop only obligations the owner has authorized
+removing.
 
 Carry forward a supported existing-solution finding. Use
 [dough-pfe](../../dough-pfe/SKILL.md) for an unforeseen addition or relocation of
@@ -19,10 +34,11 @@ responsibility, or evidence invalidating the selected candidate or domain fit;
 supply the relevant story, plan finding when present, candidate evidence, and
 new observation. Necessary structure may cross components or process boundaries
 without changing the authorized responsibility. Align the remaining plan, when
-one exists, through [active-plan
-refinement](../../dough-story-refinement/references/planning.md#refine-the-active-plan)
-before resuming affected work. Reassessment does not authorize unrelated cleanup
-or a broader outcome.
+one exists, before resuming affected work. Reassessment does not authorize
+unrelated cleanup or a broader outcome. If the resulting decision changes story
+scope or conflicts with an Accepted ADR, keep only the affected path stopped
+under the human-judgment and recorded-direction procedures below; do not erase
+the observation or revise the remaining plan around the unresolved dispute.
 
 ## Stop for human judgment
 

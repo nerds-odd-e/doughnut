@@ -210,7 +210,9 @@ project's ordinary local merge conventions. Preserve unrelated target work. If t
 safe integration cannot be established, retain the execution resources and
 report the blocker. Do not rebase, delete remote branches, or add CI waiting.
 
-Resolve merge conflicts by understanding the reasoning behind both sides and
+For product backlog conflicts, follow
+[backlog merge conflicts](../dough-product-backlog/references/merge-conflicts.md).
+Resolve other merge conflicts by understanding the reasoning behind both sides and
 reconciling their intended behavior, using the surrounding code, history, and
 available work context. Verify the resolution with appropriate checks and
 complete the merge. Stop conflict resolution only when the available evidence

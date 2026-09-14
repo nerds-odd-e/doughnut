@@ -46,8 +46,22 @@ Give the agent:
 - The [CI pause and resume contract](ci-monitor.md#pause-and-resume-writers).
 
 Require uncommitted changes with passing focused proof, a stop requiring human
-judgment, or an oversized-slice report under execution decisions. An implementation
-return does not establish slice completion.
+judgment, or an oversized-slice report under execution decisions. Require a
+targeted return that gives the coordinator:
+
+- the implemented outcome mapped to the slice promises;
+- owned changed paths and the product or behavior boundaries they change;
+- literal proof commands and concrete observation locations, including the
+  relevant setup and assertions or signals;
+- uncovered promises, contradictions, and other evidence gaps; and
+- only consequential learnings that affect acceptance or remaining work.
+
+Use source paths plus named tests, symbols, assertions, or signals as locations;
+include a bounded excerpt only when the location cannot expose the decisive
+evidence. Do not routinely attach the raw implementation trace, full command
+logs, or a duplicate full diff. The return is an index into inspectable work and
+evidence, not proof that the coordinator has inspected or accepted them. An
+implementation return does not establish slice completion.
 
 For each passing focused command, use:
 
@@ -55,9 +69,15 @@ For each passing focused command, use:
 proof:
   command: <literal complete focused command>
   covers: <observable behavior or paths covered>
+  boundary: <product boundary exercised>
+  observations:
+    - <source/test path and named assertion or signal>: <what it observes>
+  setup: <source/test path and setup supplying only the starting precondition>
   result: pass
 ```
 
 Connect proof to the planned slice's or quick story's promises. Placeholders,
-abbreviations, and paraphrases are ambiguous evidence. Report uncovered behavior
-as incomplete implementation; the refactor pass must not supply missing behavior.
+abbreviations, and paraphrases are ambiguous evidence. When no setup is needed,
+say `none`; do not omit the field or mistake behavior supplied by a fixture for
+product behavior. Report uncovered behavior as incomplete implementation; the
+refactor pass must not supply missing behavior.
