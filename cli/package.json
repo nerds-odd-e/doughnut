@@ -1,6 +1,6 @@
 {
   "name": "donut-cli",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Donut CLI",
   "private": true,
   "type": "module",

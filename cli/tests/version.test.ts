@@ -6,8 +6,8 @@ import {
 } from '../src/commands/version.js'
 
 describe('version', () => {
-  test('reports release version 0.5.4', () => {
-    expect(getVersion()).toBe('0.5.4')
+  test('reports release version 0.5.5', () => {
+    expect(getVersion()).toBe('0.5.5')
   })
 
   test.each([
