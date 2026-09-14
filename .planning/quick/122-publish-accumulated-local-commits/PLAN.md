@@ -1,6 +1,6 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 6 done; slice 7 next. Slice 10 awaits the existing
+Status: in progress. Slice 7 done; slice 8 next. Slice 10 awaits the existing
 unanswered deletion/recreation decision and remains non-executable until answered.
 Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 

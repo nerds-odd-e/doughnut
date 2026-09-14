@@ -25,10 +25,11 @@ import org.springframework.web.server.ResponseStatusException;
  * alone or with same-path edits, and unambiguous equal-content moves with compatible companions.
  * Exact move correspondence is resolved on the tip diff and also carried through adjacent
  * first-parent steps so an unchanged rename followed by a later edit retains accepted origin when
- * tip bytes differ. Mixing unmatched removals with additions is refused when identity
- * correspondence is uncertain. Unsafe paths, non-regular modes, or a changed folder-reserved {@code
- * README.md} are refused. Callers only invoke this once proposal ancestry is confirmed to be a
- * contiguous single-parent range from the accepted commit.
+ * tip bytes differ. Within one adjacent transition, residual removals mixed with additions are
+ * refused when identity correspondence is uncertain. Net tip deletions may compose with later
+ * additions once each adjacent step is admissible. Unsafe paths, non-regular modes, or a changed
+ * folder-reserved {@code README.md} are refused. Callers only invoke this once proposal ancestry is
+ * confirmed to be a contiguous single-parent range from the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -172,8 +173,9 @@ public final class NotebookGitProposalTreeShape {
 
   /**
    * Accepts added and/or modified ordinary-note changes, any number of deletions alone or with
-   * same-path edits, and unambiguous equal-content moves with compatible companions. Refuses
-   * unmatched removal/addition mixtures and ambiguous equal-blob correspondence.
+   * same-path edits or later additions, and unambiguous equal-content moves with compatible
+   * companions. Refuses ambiguous equal-blob correspondence and residual removal/addition mixtures
+   * within one adjacent transition.
    */
   private static List<NoteChange> admitOrdinaryNoteChanges(
       Repository repository,
@@ -185,9 +187,7 @@ public final class NotebookGitProposalTreeShape {
     }
     Map<String, NoteOrigin> originsAtTip =
         carryExactMoveOrigins(repository, acceptedHead, proposedHead);
-    List<NoteChange> resolvedChanges = resolveMoveCorrespondence(changes, originsAtTip);
-    refuseResidualRemovalAndAdditionMixture(resolvedChanges);
-    return resolvedChanges;
+    return resolveMoveCorrespondence(changes, originsAtTip);
   }
 
   /**
@@ -243,6 +243,7 @@ public final class NotebookGitProposalTreeShape {
       }
     }
     List<NoteChange> resolved = resolveEqualBlobMoves(noteChangesFrom(conceptDocuments));
+    refuseResidualRemovalAndAdditionMixture(resolved);
     Map<String, NoteOrigin> next = new HashMap<>(origins);
     for (NoteChange change : resolved) {
       if (change.kind() == ChangeKind.RENAMED) {
@@ -340,6 +341,11 @@ public final class NotebookGitProposalTreeShape {
     return changesByBlob;
   }
 
+  /**
+   * Within one parent→child step, a residual deletion beside an unmatched addition cannot establish
+   * identity (changed-content move vs unrelated remove/add). Tip net deletions composed with later
+   * additions are admitted only when each adjacent step passes this check.
+   */
   private static void refuseResidualRemovalAndAdditionMixture(List<NoteChange> changes) {
     boolean hasDeleted = changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED);
     boolean hasAdded = changes.stream().anyMatch(change -> change.kind() == ChangeKind.ADDED);
