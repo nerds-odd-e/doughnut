@@ -619,7 +619,7 @@ pushes only.
 
 ### 10c. Align the direct deploy-script contract with fail-closed publication
 Type: Structure
-Status: planned
+Status: done
 Change: Update the existing direct deploy shell-test fixture to document the
 same temporary fail-closed behavior as the application-publication boundary,
 without deleting unrelated hash-skip coverage or teaching its fake commands an
@@ -628,6 +628,19 @@ without leaving CI's second deployment boundary contradictory.
 Proof: The direct deploy shell suite and shellcheck pass with its success-route
 expectation replaced only by the zero-size/fail-closed outcome.
 Estimate: 5 minutes active after 10b.
+Learnings: The direct deploy harness still proves missing-jar failure and the
+full unchanged jar/startup-hash skip, then drives no-record, changed-jar,
+changed-startup and forced releases through the real maintenance-entry script.
+Each changed release proves exact describe → OPPORTUNISTIC update → resize zero
+→ empty-list order, jar upload, a non-zero safe stop, and absence of template
+creation/assignment, reopen, rollout, healthcheck and success-record writes.
+The fresh refactor centralized failure-safe temporary-directory cleanup and
+made the fake `bash`/`gcloud` boundaries reject unsupported commands. The direct
+suite, source-aware shellcheck and whitespace checks passed before and after
+the refactor; the single required `format:changed` pass made no edits.
+Implementation took ~6 minutes and refactoring ~10 minutes. No production or
+cloud state changed in this structure-only slice; branch CI is still not
+triggered for this branch.
 
 ### 11. Run a verified upgrade without application writers
 Type: Behavior
