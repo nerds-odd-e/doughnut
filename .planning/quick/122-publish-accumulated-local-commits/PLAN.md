@@ -1,6 +1,6 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 3 done; slice 4 next. Slice 10 awaits the existing
+Status: in progress. Slice 4 done; slice 5 next. Slice 10 awaits the existing
 unanswered deletion/recreation decision and remains non-executable until answered.
 Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
@@ -153,13 +153,17 @@ Readme / rename-into-README refusals preserved.
 
 ### 4. Leave no live entity for a new note removed before publication
 Type: Behavior
-Status: planned
+Status: done
 Behavior: B adds a note, C edits it and D removes it while another edit survives
 → publish → only surviving final notes exist; all original commits remain.
 Proof: Controller and downloaded history observe final absence and surviving
 content. Review the application path to establish that the temporary note was
 never persisted/indexed; final absence alone does not prove this architecture.
 Estimate: 3–5 minutes active work.
+Learnings: No production change. A→T tip comparison already nets add-then-delete
+out of the admitted document set, so Temporary never reaches persist/remove.
+Controller proof covers live absence, tip files, and A→B→C→D with Temporary only
+on intermediate commits.
 
 ### 5. Retain original note correspondence independently of final content
 Type: Structure

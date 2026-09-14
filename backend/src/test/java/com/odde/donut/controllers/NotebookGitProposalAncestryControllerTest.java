@@ -1,7 +1,9 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
@@ -10,6 +12,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
+import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.time.Instant;
 import java.util.List;
@@ -29,10 +32,16 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal.\n";
   private static final String FIRST_EDIT = "---\ntype: Note\n---\nFirst edit.\n";
   private static final String SECOND_EDIT = "---\ntype: Note\n---\nSecond edit.\n";
+  private static final String TEMPORARY_INITIAL = "---\ntype: Note\n---\nTemporary initial.\n";
+  private static final String TEMPORARY_EDITED = "---\ntype: Note\n---\nTemporary edited.\n";
+  private static final String SURVIVING_FINAL = "---\ntype: Note\n---\nSurviving final.\n";
 
   @Autowired NoteController noteController;
 
   private record ContentEditRange(ObjectId firstEdit, ObjectId secondEdit, byte[] proposalBytes) {}
+
+  private record TemporaryNoteRange(
+      ObjectId afterAdd, ObjectId afterEditTemporary, ObjectId tip, byte[] proposalBytes) {}
 
   @Test
   void rejectsStaleExpectedHeadWithoutMutatingTheAcceptedBinding() throws Exception {
@@ -153,6 +162,62 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
   }
 
   @Test
+  void publishesRangeThatAddsEditsAndRemovesTemporaryNoteLeavingOnlySurvivingEdit()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note surviving =
+        makeMe.aNote().notebook(notebook).title("Surviving").content(ORIGINAL_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
+    TemporaryNoteRange range = temporaryNoteRemovedRangeOn(binding.getBundleBytes(), acceptedHead);
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), range.proposalBytes());
+
+    assertThat(publishedHead, equalTo(range.tip().getName()));
+    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(liveNotes, hasSize(1));
+    assertThat(liveNotes.getFirst().getId(), equalTo(surviving.getId()));
+    assertThat(liveNotes.getFirst().getTitle(), equalTo("Surviving"));
+    assertThat(liveNotes.getFirst().getContent(), equalTo(SURVIVING_FINAL));
+
+    NotebookGitBinding after =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk walk = new RevWalk(accepted)) {
+      ObjectId head = GitBundleTestReader.fetchHead(accepted, after.getBundleBytes());
+      RevCommit tip = walk.parseCommit(head);
+      assertThat(tip.getId(), equalTo(range.tip()));
+      assertThat(
+          GitBundleTestReader.pathsIn(accepted, range.tip()), equalTo(List.of("Surviving.md")));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(accepted, range.tip(), "Surviving.md"),
+          equalTo(SURVIVING_FINAL));
+      assertThat(tip.getParentCount(), equalTo(1));
+      assertThat(tip.getParent(0), equalTo(range.afterEditTemporary()));
+
+      RevCommit editTemporary = walk.parseCommit(tip.getParent(0));
+      assertThat(
+          GitBundleTestReader.pathsIn(accepted, range.afterEditTemporary()),
+          containsInAnyOrder("Surviving.md", "Temporary.md"));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(
+              accepted, range.afterEditTemporary(), "Temporary.md"),
+          equalTo(TEMPORARY_EDITED));
+      assertThat(editTemporary.getParentCount(), equalTo(1));
+      assertThat(editTemporary.getParent(0), equalTo(range.afterAdd()));
+
+      RevCommit addTemporary = walk.parseCommit(editTemporary.getParent(0));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(accepted, range.afterAdd(), "Temporary.md"),
+          equalTo(TEMPORARY_INITIAL));
+      assertThat(addTemporary.getParentCount(), equalTo(1));
+      assertThat(addTemporary.getParent(0), equalTo(acceptedHead));
+    }
+  }
+
+  @Test
   void acceptsSingleParentRangeWhenAMergeExistsBelowTheAcceptedHead() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote().notebook(notebook).title("Topic").content(ORIGINAL_CONTENT).please();
@@ -253,6 +318,37 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
               "Second edit");
       return new ContentEditRange(
           firstEdit, secondEdit, bundleBytesForHead(repository, secondEdit));
+    }
+  }
+
+  private TemporaryNoteRange temporaryNoteRemovedRangeOn(byte[] baseBundleBytes, ObjectId baseHead)
+      throws Exception {
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.fetchHead(repository, baseBundleBytes);
+      ObjectId afterAdd =
+          commitOnTopOf(
+              repository,
+              List.of(baseHead),
+              List.of(
+                  new NotebookGitProposalFile("Surviving.md", ORIGINAL_CONTENT),
+                  new NotebookGitProposalFile("Temporary.md", TEMPORARY_INITIAL)),
+              "Add temporary note");
+      ObjectId afterEditTemporary =
+          commitOnTopOf(
+              repository,
+              List.of(afterAdd),
+              List.of(
+                  new NotebookGitProposalFile("Surviving.md", ORIGINAL_CONTENT),
+                  new NotebookGitProposalFile("Temporary.md", TEMPORARY_EDITED)),
+              "Edit temporary note");
+      ObjectId tip =
+          commitOnTopOf(
+              repository,
+              List.of(afterEditTemporary),
+              List.of(new NotebookGitProposalFile("Surviving.md", SURVIVING_FINAL)),
+              "Remove temporary and edit surviving");
+      return new TemporaryNoteRange(
+          afterAdd, afterEditTemporary, tip, bundleBytesForHead(repository, tip));
     }
   }
 }
