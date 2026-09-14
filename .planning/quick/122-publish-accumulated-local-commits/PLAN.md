@@ -200,7 +200,7 @@ entities.
 
 ### 7. Compose resolved removals with edits and additions
 Type: Behavior
-Status: planned
+Status: done
 Behavior: B deletes a learned note and edits another; C adds a different note
 → publish → final content includes the addition and excludes the deleted identity.
 Change: Derive surviving origins/removals from the same correspondence and call
@@ -209,6 +209,10 @@ Proof: Reuse FK-complete deletion fixtures and committed-state assertions for
 the removal closure, surviving learning data, and unchanged authored referrers.
 Ambiguous removed/added pairs within one transition are not newly guessed.
 Estimate: 5 minutes active work.
+Learnings: Residual DELETED+ADDED refusal now runs per adjacent first-parent
+step during origin walk, not on tip A→T net. Tip net deletion + later unrelated
+addition publishes once via existing `permanentlyRemove`. Same-transition
+unmatched remove/add still refused.
 
 ### 8. Allow an exact folder relocation alongside unrelated edits
 Type: Behavior
