@@ -69,16 +69,37 @@ ends green; an unfinished slice is never evidence that production release is saf
 
 ### 1. Isolate a populated pre-upgrade Flyway fixture
 Type: Structure
-Status: planned
-Change: Add minimal migration-only test support that creates an owned disposable
-schema, migrates actual repository resources to version 325, accepts raw-JDBC
-fixtures before 326, and closes/drops only that schema. Reuse existing test
-connection/isolation conventions. This directly enables slice 2.
+Status: done
+Change: Added `PreUpgradeFixtureSchema` (package-private `AutoCloseable`) and
+its lifecycle proof `PreUpgradeFixtureSchemaTest`, both in
+`backend/src/test/java/com/odde/donut/services/notebookGit/`. It derives an
+owned disposable schema name from the enclosing suite's own live schema, grants
+it to the `doughnut` app user by reusing `scripts/backend-test-worktree-owner.sh`'s
+existing grant pattern, runs the actual project Flyway migrations
+(`classpath:db/migration`) up to version `300000325`, and exposes a raw-JDBC
+`connection()`/`schemaName()` for a later slice's pre-326 fixtures. `close()`
+drops only the owned schema.
 Proof: A harness lifecycle check observes version 325 and `note.deleted_at`,
 then cleanup, without changes to the enclosing suite schema. Do not introduce
 a generic schema registry or a new test service.
 Estimate: 5 minutes active; if schema ownership/setup needs another mechanism,
 stop and refine before expanding it.
+Learnings: Actual active time ran ~35-40 minutes (implementation ~25-30,
+refactor ~10), well past the 5-minute target and the 10-minute hard limit,
+because the version boundary and registered migration classes needed tracing
+(`V300000326`/`V300000327` Java migrations live under
+`backend/src/main/java/db/migration/`, distinct from their delegate classes
+`NoteLegacyTrashMigration`/`NotebookGitBaselineRebuild` under
+`com.odde.donut.services.notebookGit`; `V300000325__cascade_note_dependents_on_note_delete.sql`
+confirmed as the correct pre-conversion boundary), and because the suite's
+`doughnut`-authenticated connection could not see a root-created schema until
+it was explicitly granted, mirroring `scripts/backend-test-worktree-owner.sh`'s
+provisioning grant. No fallback mechanism or scope change was needed once that
+was found — recording the failed sizing assumption per this plan's discipline
+rather than re-splitting a slice that already converged. Refactor pass
+extracted a duplicated admin-connection helper (`executeAsAdmin`) within the
+new file only; no other duplication or scope issue found. Both focused proofs
+and the full backend suite pass; `git status` shows only the two new files.
 
 ### 2. Recover the column retirement at the actual Flyway boundary
 Type: Behavior
