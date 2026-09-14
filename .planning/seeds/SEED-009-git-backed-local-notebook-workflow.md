@@ -597,6 +597,8 @@ answers and do not supersede the shared agreed contract.
 
 ### 33. Trash a folder on the web as one recoverable subtree
 
+Executable plan: [Trash and recover a folder](../quick/123-trash-and-recover-folder/PLAN.md).
+
 - **Simplicity decision (2026-09-14):** The owner returned to shared trash paths
   and dropped the proposed per-action event folders and event README metadata.
   Do not queue event grouping as deferred work without a new concrete need.
@@ -633,7 +635,10 @@ answers and do not supersede the shared agreed contract.
   subtree and use existing folder Move to recover it to an owner-selected existing
   active folder or notebook root in the same notebook. Preserve identities,
   authored content, learning history, independent tracking preferences, and the
-  agreed reference-handling choices; participation follows current location.
+  authored references; participation follows current location. Folder Trash
+  preserves reference spelling and offers one confirmation warning, without
+  removing properties or reducing relationship notes. Existing individual-note
+  choices remain unchanged.
 - **Recovery responsibility:** Reuse existing Move behavior and complete any
   necessary gaps in the folder round trip within this story. A working Trash
   button alone is insufficient. Show the recovered location and retained subtree
@@ -659,13 +664,13 @@ answers and do not supersede the shared agreed contract.
   missing active parents, new Git/local compatibility, bulk selection, permanent
   deletion UI, expiry, and empty-trash actions. No separate recovery state or
   timestamp grouping is introduced. Existing supported behavior remains preserved.
-- **Narrow interaction proposal:** Offer Trash on the selected active folder's
+- **Narrow interaction:** Offer Trash on the selected active folder's
   existing page; one confirmation explains that the folder and everything inside
   will leave active use and can be recovered with Move. After success, return to
   its former parent or notebook root. Keep recovery in the existing folder Move
   interaction. Do not add a separate folder Undo mechanism or a new recovery
-  screen to complete this round trip. This presentation is a proposal, not yet
-  an agreed UI contract.
+  screen to complete this round trip. Include that references remain authored
+  but links to trashed notes may no longer resolve in the same confirmation.
 - **Boundary assumptions:** An ordinary empty folder follows the same location
   rule; example note counts do not justify special acceptance gates. Folder
   descriptions and nested empty folders remain part of the retained subtree.
@@ -679,17 +684,12 @@ answers and do not supersede the shared agreed contract.
   follows folder ancestry. Dedicated note Move recovery tests exist. Focused
   inspection has not found dedicated folder-trash round-trip coverage, so this
   seed does not claim that complete folder recovery has already been verified.
-- **Open refinement — references:** The earlier shared contract promises existing
-  deletion-reference choices. Applying them to an entire folder is not yet
-  defined: references can come from inside or outside the subtree, and individual
-  relationship reduction is a content transformation rather than simple trashing.
-  Recommended narrowing, awaiting the owner: preserve authored references and
-  provide one warning that links to trashed notes may no longer resolve. Keep
-  existing individual-note choices available separately; do not run automatic
-  cleanup or a sequence of per-note prompts during folder Trash. This proposal
-  does not yet supersede the shared reference-choice promise. If bulk removal is
-  retained, resolve which referrers it affects and explicitly state that Move
-  recovery does not reconstruct removed properties before execution planning.
+- **Refinement closure (2026-09-14):** Following the owner's no-information-loss
+  direction and assent to update refinement and plan narrowly, folder Trash uses
+  the proposed preserve-references behavior. This narrows the earlier shared
+  reference-choice promise for this folder action only; individual-note Trash
+  retains its existing choices. No bulk reference cleanup, relationship reduction,
+  event folders, event metadata, or operation-based recovery is included.
 - **Effort hypothesis:** M, low confidence around subtree reference handling and
   complete recovery proof. Existing moves are a reuse opportunity, not grounds to
   omit the recovery acceptance journey.
