@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.odde.donut.configs.FlyWayFreeVersionRealMigration;
 import com.odde.donut.configs.SchedulingConfig;
@@ -15,6 +17,7 @@ import com.odde.donut.testability.TestabilitySettings;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.WebApplicationType;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.scheduling.config.TaskManagementConfigUtils;
 
@@ -52,6 +55,21 @@ class DonutApplicationTest {
           is(true));
       assertThat(context.getBeansOfType(FlyWayFreeVersionRealMigration.class), not(anEmptyMap()));
     }
+  }
+
+  @Test
+  void dispatchesPortableTrashUpgradeThroughTheTaskRunner() {
+    ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
+    Flyway flyway = mock(Flyway.class);
+    when(context.getBean(Flyway.class)).thenReturn(flyway);
+
+    int exitCode =
+        DonutApplication.runApplicationTask(context, DonutApplication.PORTABLE_TRASH_UPGRADE_TASK);
+
+    assertThat(exitCode, is(0));
+    verify(flyway).repair();
+    verify(flyway).migrate();
+    verify(context).close();
   }
 
   private AnnotationConfigApplicationContext productionContext(String... additionalProfiles) {

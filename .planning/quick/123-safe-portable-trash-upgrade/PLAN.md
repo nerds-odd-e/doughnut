@@ -672,7 +672,7 @@ was introduced.
 
 ### 11b. Give the one-shot task an explicit migration lifecycle
 Type: Behavior
-Status: planned
+Status: done
 Behavior: The isolated upgrade task receives the configured Flyway owner → it
 runs repair then the actual registered migration chain exactly once → success
 closes the context with a stable success signal and zero exit, while any failure
@@ -683,6 +683,19 @@ copy migration recipes. Story 39 removes this temporary task.
 Proof: A focused task-runner boundary observes repair/migrate order, one call,
 the exact success token and both exit outcomes without requiring a web server.
 Estimate: 5 minutes active after 11a.
+Learnings: The existing task dispatch now routes `upgradePortableTrash` through
+one cohesive `DonutTaskRunner` Flyway recipe: obtain the configured bean, repair,
+migrate, then close the context. Only complete task and close success prints the
+stable `PORTABLE_TRASH_UPGRADE_SUCCESS` token and returns zero; failures while
+obtaining Flyway, repairing, migrating or closing return non-zero, suppress the
+token and still attempt one close. `DonutApplication.main` remains the sole
+process-exit owner, and the existing test-migration/OpenAPI task commands use
+the same lifecycle with their prior success messages. The initial red compile
+proved the absent dispatch/task API; a later red close-failure test exposed and
+closed an escaped-exception gap. Six focused tests, `spotlessJavaCheck` and
+whitespace checks pass after the final fresh refactor; the single required
+`format:changed` pass was a no-op. Implementation took ~10 minutes across the
+initial pass and correction; final refactor passes took ~13 minutes combined.
 
 ### 11c. Rehearse the packaged task against real pre-upgrade data
 Type: Behavior

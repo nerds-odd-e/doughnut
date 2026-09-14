@@ -22,7 +22,10 @@ public class DonutApplication {
     SpringApplication application = applicationForTask(task);
     ConfigurableApplicationContext context = application.run(args);
     logger.info("DonutApplication started successfully");
-    runApplicationTask(context, task);
+    Integer exitCode = runApplicationTask(context, task);
+    if (exitCode != null) {
+      System.exit(exitCode);
+    }
   }
 
   static SpringApplication applicationForTask(String task) {
@@ -34,13 +37,17 @@ public class DonutApplication {
     return application;
   }
 
-  private static void runApplicationTask(ConfigurableApplicationContext context, String task) {
+  static Integer runApplicationTask(ConfigurableApplicationContext context, String task) {
     DonutTaskRunner taskRunner = new DonutTaskRunner(context);
     if ("migrateTestDB".equals(task)) {
-      taskRunner.migrateTestDB();
+      return taskRunner.migrateTestDB();
     }
     if ("generateOpenAPIDocs".equals(task)) {
-      taskRunner.generateOpenAPIDocs();
+      return taskRunner.generateOpenAPIDocs();
     }
+    if (PORTABLE_TRASH_UPGRADE_TASK.equals(task)) {
+      return taskRunner.upgradePortableTrash();
+    }
+    return null;
   }
 }
