@@ -4,7 +4,7 @@
 
 **Date:** 2026-09-04
 
-**Draft revised:** 2026-09-14 — final-revision projection and history-informed identity; pending human review
+**Draft revised:** 2026-09-14 — deletion/recreation policy decided by Terry Yin; remaining questions open
 
 **Decision makers:** Terry Yin
 
@@ -230,8 +230,7 @@ invariant is rejected with an actionable error.
 Git does not store durable file identity. Rename detection compares snapshots
 and may produce plausible but incorrect pairings. Donut must not equate Git's
 reported rename or similarity score with proof that two paths own the same
-learning history. The [research and controlled examples](../notebook-git-identity-research.md)
-show both the value and limits of inspecting intermediate commits.
+learning history.
 
 The identity model must compose supported transitions across the whole range.
 For example, an unambiguous exact-content move followed by a same-path edit
@@ -244,8 +243,8 @@ Use the authoritative identity mapping at A and relevant paths, blobs, and
 parent/child relationships to derive one final mapping at T. Existing
 same-path and unique exact-content correspondence can supply evidence under
 the supported operation semantics, but are not a permanent completeness claim.
-A persistent path alone does not settle deletion and later recreation at that
-path. Folder correspondence likewise requires a domain conclusion, not simply
+Path equality does not preserve identity across a confirmed deletion gap.
+Folder correspondence likewise requires a domain conclusion, not simply
 accepting a set of Git file-rename labels.
 
 An unresolved identity conflict must preserve both sides and block acceptance
@@ -260,9 +259,16 @@ When identity is resolved as a move, update the original entity and retain its
 identity-bound data. Moves into or out of trash follow
 [ADR 0004 — Trash](./0004-okf-compatible-notebook-markdown-accepted.md#trash).
 When final resolution requires permanent deletion, remove the entity and
-its dependent data under the existing deletion semantics; recreating a file
-later does not recover learning data from Git. The meaning of a deletion gap
-wholly inside an unpublished range remains an explicit open decision below.
+its dependent data under the existing deletion semantics. A confirmed committed
+deletion ends the identity; recreation starts a new identity, even at the same
+path with identical bytes and within one publication. Subsequent moves retain
+the new identity. Resolve possible moves before declaring deletion; an invalid
+intermediate notebook alone does not end identity. Publication must make
+replacement and dependent-data removal explicit even when endpoint trees match.
+
+**Recovery limitation:** `git revert` can restore Portable content, but cannot
+recover deleted Donut identities or their dependent data, including learning
+history—even when deletion and revert are published together.
 
 ### Represent every accepted web edit in Git
 
@@ -328,10 +334,6 @@ implementation.
   and which cases require refusal or explicit owner intent? Similarity may help
   find candidates but is not a correctness guarantee. Specify deterministic
   settings and a safe outcome when analysis cannot finish within its budget.
-- **Deletion gaps and path reuse:** Within one unpublished range, does a removal
-  followed by reappearance mean replacement, undo, or unresolved intent? A
-  default must not silently destroy learning data. Separately published
-  permanent deletion has already removed that data; batching cannot undo it.
 - **Operation composition:** Any combination of already supported operations is
   the accumulated-publication goal. History analysis needed to compose an exact
   move followed by an edit belongs to that goal. Broader same-transition
@@ -482,7 +484,6 @@ ambiguity. Not selected.
   - [ADR playbook](./README.md)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
   - [Git objects and trees](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects)
-  - [Identity research](../notebook-git-identity-research.md)
   - [Git diff](https://git-scm.com/docs/git-diff)
   - [Git log](https://git-scm.com/docs/git-log)
   - [Git pack protocol](https://git-scm.com/docs/gitprotocol-pack.html)
