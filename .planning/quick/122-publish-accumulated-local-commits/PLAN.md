@@ -1,8 +1,8 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress — all executable slices done (1–9, 11–13). Slice 10 still
-awaits the unanswered deletion/recreation identity decision and remains
-non-executable until answered. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
+Status: in progress. Slice 10 next — ADR 0002 deletion/recreation decision adopted
+(confirmed deletion ends identity; recreation starts a new one). Slices 1–9 and
+11–13 already done. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
 ## Planned-execution identity
 
@@ -12,9 +12,8 @@ non-executable until answered. Source: [SEED-009 story 20](../../seeds/SEED-009-
   `/Users/terryyin/git/doughnut-worktrees/122-publish-accumulated-local-commits`
   on `quick/122-publish-accumulated-local-commits`
 - Integration target: `main`
-- CI observer: mailbox `/tmp/dough-ci-501/watch-W7emfp`; workflow `ci.yml`
-  (`donut CI`); repo `nerds-odd-e/doughnut`; branch
-  `quick/122-publish-accumulated-local-commits`
+- CI observer: restarting for slice 10; workflow `ci.yml` (`donut CI`); repo
+  `nerds-odd-e/doughnut`; branch `quick/122-publish-accumulated-local-commits`
 
 ## Goal and boundary
 
@@ -252,18 +251,18 @@ excludes the relocated subtree. Controller + CLI mixed-commit history proofs.
 
 ### 10. Settle deletion followed by recreation
 Type: Behavior
-Status: awaiting product answer
-Decision: The previous question remains unanswered: deletion in B followed by
-creation at the same path in C could use a new identity, matching today's
-separately published operations. This remains a recommendation, not a decision.
-Conditional behavior if confirmed: publish → a new note exists and the old
-identity/learning closure is removed, even when final path/bytes equal A.
+Status: planned
+Decision: Adopted from [ADR 0002](../../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
+(2026-09-14, Terry Yin): a confirmed committed deletion ends the identity;
+recreation starts a new identity, even at the same path with identical bytes
+and within one publication. Path equality does not preserve identity across a
+confirmed deletion gap. Resolve possible moves before declaring deletion.
+Behavior: deletion in B followed by creation at the same path in C → publish →
+a new note exists and the old identity/learning closure is removed, even when
+final path/bytes equal A.
 Proof: Controller checks IDs and complete dependent removal, not just tree
 contents. No intermediate entity or inferred undo is introduced.
-Estimate: 3–5 minutes active work after the answer. Do not execute this leaf or
-claim the full composition promise complete while the policy is unresolved.
-The answer may change this leaf; silence authorizes neither deletion nor a new
-preservation/refusal rule.
+Estimate: 3–5 minutes active work after the answer.
 
 ### 11. Preserve atomic rejection of the composed range
 Type: Behavior
