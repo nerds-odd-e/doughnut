@@ -351,7 +351,7 @@ not minutes, so no bounded reassessment was triggered.
 
 ### 7. Establish a quiescent maintenance state
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Old application processes are serving → enter the one-time maintenance
 path → all schema-dependent writers are stopped and verified absent before any
 migration is permitted. Account for background writers, not just incoming HTTP.
@@ -361,6 +361,42 @@ Proof: Existing publication/deployment test fixtures with fake cloud commands
 observe stop, wait and quiescence verification in order. Failed verification
 prevents migration. This path remains opt-in and cannot release by itself yet.
 Estimate: 5 minutes active, reusing existing shell orchestration and test fixtures.
+Learnings: New standalone `infra/gcp/scripts/enter-maintenance-mode.sh` (not
+wired into `publish-application.sh` or `deploy-backend-jar-to-gcp-mig.sh` —
+verified untouched): `gcloud compute instance-groups managed stop-instances
+doughnut-app-group --zone=us-east1-b --all-instances`, a fixed grace sleep,
+then a poll loop against `list-instances --format=value(instanceStatus)`
+until no instance reports `RUNNING|STOPPING|PROVISIONING|STAGING|REPAIRING`
+or a timeout is hit; exit code alone is the signal (0 = migration permitted).
+`doughnut-app-group`/`us-east1-b` and the `stop-instances`/`list-instances`
+verb shapes were confirmed against `create-app-mig.sh`,
+`check-mig-rollout.sh` and `perform-rolling-replace-app-mig.sh` rather than
+invented. Background-writer coverage confirmed against actual source:
+`SchedulingConfig.java` (`@EnableScheduling`, `@Profile("prod")`) plus
+`QuestionGenerationBatchMaintenanceJob`/`EmbeddingMaintenanceJob` run
+`@Scheduled` in-process inside each MIG instance's JVM — no separate worker
+fleet exists, so stopping the MIG's instances excludes both HTTP and
+scheduled-job writers with one primitive. New
+`application-release-maintenance-fixtures.mjs`/`-maintenance.test.mjs` follow
+the existing fake-cloud-command trace pattern from
+`application-release-publication-fixtures.mjs`, asserting stop → poll(s) →
+permit in order, and that a forced-timeout scenario fails with no
+migration-permitted signal and no more than one poll. Post-change-refactor
+checked for reusable poll/trace helpers elsewhere in `infra/gcp/scripts/` and
+the `scripts/ci/application-release-*-fixtures.mjs` family; found none exist
+(each fixture file independently owns its idiom; `check-mig-rollout.sh` uses
+the native `wait-until --version-target-reached`, which has no "stopped"
+equivalent) — no extraction needed, file left as implemented. Coordinator
+independently re-verified: cross-checked MIG name/zone/verb claims and the
+scheduled-job claim directly against source, confirmed via `git status` that
+only the three new files exist (no wiring into ordinary publish scripts),
+and re-ran both new tests, the full existing publication test suite (7/7),
+and `shellcheck` myself — all green, both before and after the formatting
+pass. No backend Java touched, so the full backend suite was not re-run for
+this slice. Active time ~25-30 minutes across implementation, refactor and
+coordinator verification — first slice not gated by the earlier
+migration-file permission-classifier restriction (deployment scripts, not a
+Flyway migration), and no defect found.
 
 ### 8. Keep old writers stopped after replacement or process failure
 Type: Behavior
