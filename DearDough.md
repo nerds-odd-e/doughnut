@@ -486,26 +486,3 @@ re-application in the worktree before staging.
     tools do not bind to the worktree from an earlier `cd` used for shell
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
-
-## DD-042 — In-place slice refinement dropped an unchanged constraint clause
-
-While splitting an oversized Behavior slice, the plan rewrite accidentally
-deleted half of the active-source constraint and left a malformed sentence.
-
-### Occurrences
-
-- Execution: SEED-009 story 33 / quick/123-trash-and-recover-folder / 9d4874d576
-  - Timestamp: 2026-09-14T08:33:03+08:00
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: 0.3.16
-  - Evidence: plan-refinement commit `05de3751be` changed “Root `_trash` and
-    already-trashed folders are not eligible” into the incomplete “Root
-    `_trash`” immediately followed by the collision sentence; the source story,
-    controller guard, and `NotebookFolderTrashControllerTest` still retain the
-    omitted already-trashed-folder constraint.
-  - Observed effect: the retained completed plan became misleading review input;
-    this retrospective had to recover the unchanged constraint from the story,
-    implementation, and tests. Product behavior was not affected.
-  - Inference: a large replacement patch was reviewed mainly for the new slice
-    split, and no check re-read the complete rewritten contract paragraph.
