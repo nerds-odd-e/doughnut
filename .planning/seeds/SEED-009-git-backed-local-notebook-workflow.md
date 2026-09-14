@@ -285,16 +285,17 @@ data; invalid or ambiguous changes must not silently discard work.
   Define destination-folder scope and interaction with repaired intermediate
   drafts. No similarity threshold, metadata scheme, identity-mapping UI, or
   per-commit replay design is selected by this story.
-- **Boundaries / dependencies:** Story 20 owns combinations of already supported
-  publication operations, including history analysis needed for an exact rename
-  followed by an edit. This story owns broader inference for transitions whose
-  correspondence those existing semantics cannot resolve, such as rename and
-  content change together. Reuse story 20 rather than duplicating range analysis.
-  Independent remote/local divergence and history rewriting remain outside
-  this story. Broader folder-subtree operations remain unselected; story 28
-  retains trash-specific journeys. Any shared identity inference should be
-  cohesive rather than duplicated by story. Its position after story 28 is the
-  owner's priority, not an established technical prerequisite.
+- **Boundaries / dependencies:** Accumulated publication already composes
+  supported operations across a linear range, including history analysis for an
+  exact rename followed by an edit. This story owns broader inference for
+  transitions whose correspondence those existing semantics cannot resolve,
+  such as rename and content change together. Reuse that delivered range
+  composition rather than duplicating it. Independent remote/local divergence
+  and history rewriting remain outside this story. Broader folder-subtree
+  operations remain unselected; story 28 retains trash-specific journeys. Any
+  shared identity inference should be cohesive rather than duplicated by story.
+  Its position after story 28 is the owner's priority, not an established
+  technical prerequisite.
 - **Effort / status:** Queued, unrefined; sizing is unresolved until identity
   evidence and ambiguity policy are understood. Do not claim execution-ready
   scope or authorize implementation from this entry.
@@ -787,8 +788,9 @@ answers and do not supersede the shared agreed contract.
   between Donut and a local notebook with the agreed identity and data semantics.
 - **Status / sizing:** Deliberately broad, unsplit, and unrefined at the owner's
   request. Likely larger than L; no execution-size or readiness claim is made.
-- **Priority:** After the existing Git web-save, rename, accumulated-publication,
-  Readme-edit, and web-move stories, before publication performance validation.
+- **Priority:** After the existing Git web-save, rename, Readme-edit, and
+  web-move stories, before publication performance validation. Accumulated
+  linear publication of already supported local edits is already delivered.
   Exact technical prerequisites remain unassessed until this story is selected.
 - **Boundary:** This story owns new compatibility outcomes. Preserving already
   supported behavior during web restructuring remains each web story's duty;
@@ -858,10 +860,11 @@ the newly selected append-only stories.
 
 - How often do web renames, deletions and moves interrupt actual owner work?
   The order above is a value hypothesis, to revise with use.
-- Story 20 owns composition of supported publication operations. Its final-only
-  projection proposal and unresolved identity/deletion-gap semantics are drafted
-  in ADR 0002; settle them before execution planning without discarding or
-  rewriting work.
+- Broader identity admission beyond already supported exact correspondence,
+  including same-transition rename-with-edit inference, remains open in
+  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
+  and queued story work; confirmed deletion/recreation already starts a new
+  identity.
 - Additional web creation modes and container mutations need concrete owner
   journeys before story selection; this queue is not a completeness claim.
 

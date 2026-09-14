@@ -22,10 +22,14 @@ Portable content format follows Accepted ADR 0004. The Git workflow in
 [SEED-009](seeds/SEED-009-git-backed-local-notebook-workflow.md) has delivered
 clone, sequential content publish/pull, additions, ordinary-note deletion
 batches alone or with same-path edits, same-folder identity-preserving rename,
-identity-preserving note relocation, and non-overlapping other-note rebase.
-Overlapping same-note handling is next among notebook-sync stories; worktree
-test isolation currently precedes that in
-[the product backlog](PRODUCT-BACKLOG.md). These bounded deliveries
+identity-preserving note relocation, non-overlapping other-note rebase, and
+publication of an accumulated linear commit range that composes those already
+supported local edits once from the proposed tip (including exact moves with
+later edits, exact folder relocation with companion edits, tip-removed
+temporary notes that never become live entities, and delete-then-recreate as a
+new identity even at the same path). Portable trash remains the near-future
+priority in [the product backlog](PRODUCT-BACKLOG.md); broader rename-with-edit
+inference and Readme editing stay queued separately. These bounded deliveries
 advance the direction in Proposed
 [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
 they do not establish full v1 synchronization. Catalog ZIP download remains
