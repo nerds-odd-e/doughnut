@@ -14,8 +14,6 @@ with reasonable performance.
 
 ## Taken
 
-- [Retire the spent portable-trash migration after production success](quick/125-retire-spent-data-migrations/PLAN.md) — SEED-009
-
 ## Backlog list
 - [Make repeated trash and Undo journeys clean and predictable](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-38) — SEED-009
 - [Receive web-created folders and their notes locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-35) — SEED-009

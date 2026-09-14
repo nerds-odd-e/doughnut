@@ -350,30 +350,6 @@ re-application in the worktree before staging.
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
 
-## DD-048 — Migration verification performs the delivery formatter before refactor
-
-The repository's migration verification entry point runs `spotlessApply` before
-the backend suite, while planned slice delivery assigns selective formatting to
-the coordinator after the fresh post-change refactor pass.
-
-### Occurrences
-
-- Execution: SEED-009 story 39 / quick/125-retire-spent-data-migrations / ee1f2d254a
-  - Timestamp: 2026-09-14T22:05:00+08:00
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: unknown
-  - Evidence: the plan's migration proof used `pnpm backend:verify`; its output
-    shows `scripts/backend-test.sh` invoking `backend/gradlew -p backend
-    spotlessApply` before migration and tests. The post-change refactor report
-    replaced that proof with `pnpm backend:test_only`, then the coordinator ran
-    the required `./scripts/run.sh pnpm format:changed` delivery step.
-  - Observed effect: the implementation proof performed an early formatting
-    pass, and delivery still required the post-refactor formatter pass.
-  - Inference: migration plans need a check-only fresh-schema backend command,
-    or `backend:verify` needs a check-only verification shape, so proof and
-    delivery retain distinct ownership.
-
 ## Retention
 
 - Highest allocated local number: 48

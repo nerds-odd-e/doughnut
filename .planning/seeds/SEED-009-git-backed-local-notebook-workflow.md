@@ -358,39 +358,6 @@ reference handling, and navigation. Refine and split a web story found larger
 than L without introducing a second mechanism. Story 28 is explicitly exempt
 from further splitting/refinement for now, by the owner's instruction.
 
-<a id="story-39"></a>
-
-### 39. Retire the spent portable-trash migration after production success
-
-- **Goal / beneficiary:** Maintainers install and upgrade Donut through current
-  schema and runtime code, with completed legacy conversion code and tests
-  retired.
-- **Trigger / prerequisite:** Production has completed the portable-trash data
-  conversion and schema transition. Production is the sole persistent data
-  installation that required these transformations.
-- **Validation provenance:** Commit
-  `f38363d3789bec23e5aa5c323ab56f4baf3db554` retains the completed story and
-  `.planning/quick/123-safe-portable-trash-upgrade/PLAN.md` evidence before
-  ordinary story cleanup.
-- **Scope:** Retire applied data transformations in Java and SQL, their
-  exclusively owned helpers, and their migration rehearsal tests and fixtures.
-  This includes portable-trash versions `V300000326`–`V300000328`, earlier
-  data-only versions `V300000306`, `V300000311`, `V300000318`, and `V300000320`,
-  and standalone backfills whose product callers have already completed their
-  work. Fold the final portable-trash schema into `V100000000__baseline.sql`.
-  Remove the unused data-migration progress schema. Keep current Flyway startup,
-  schema-changing migrations, runtime Portable notebook tree and trash behavior,
-  and their product-level tests in their existing capability homes.
-- **Key examples:** A fresh isolated database installs the current schema and
-  starts the backend. Ordinary backend, Portable notebook tree, trash, and Git
-  behavior tests pass against that schema. `V300000329` remains the current
-  schema-transition tip above every retired migration version.
-- **Boundary / safe stopping point:** The current migration framework and active
-  operational tasks keep their present responsibilities. Fresh installation and
-  production startup remain usable independently of every later trash story.
-- **Effort hypothesis:** M (1–2 hours active work), medium confidence; deployment
-  confirmation has completed.
-
 <a id="story-38"></a>
 
 ### 38. Make repeated trash and Undo journeys clean and predictable
