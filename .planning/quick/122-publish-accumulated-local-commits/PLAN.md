@@ -1,7 +1,7 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 9 done; slice 10 still awaiting product answer (skipped);
-slice 11 next. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
+Status: in progress. Slice 11 done; slice 10 still awaiting product answer (skipped);
+slice 12 next. Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
 ## Planned-execution identity
 
@@ -266,13 +266,16 @@ preservation/refusal rule.
 
 ### 11. Preserve atomic rejection of the composed range
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Final validation or the existing late binding-save seam fails for a
 mixed range → publish → accepted history and committed application state remain A.
 Proof: Extend the existing atomic controller tests with resolved move/add/delete
 content; observe bundle, IDs, dependent rows and derived state after rejection.
 Reuse the existing transaction, not a new compensation mechanism.
 Estimate: 3–5 minutes active work.
+Learnings: No production change. Existing publish transaction +
+`FAIL_ON_BINDING_SAVE` seam covers mixed move/delete/add multi-commit ranges;
+accepted head A, IDs, dependents, and bundle remain intact after rejection.
 
 ### 12. Retry an accepted range without repeating its effects
 Type: Behavior
