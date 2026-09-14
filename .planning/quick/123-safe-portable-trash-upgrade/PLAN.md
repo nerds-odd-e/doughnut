@@ -699,7 +699,7 @@ initial pass and correction; final refactor passes took ~13 minutes combined.
 
 ### 11c. Keep test-profile startup migration out of task mode
 Type: Structure
-Status: planned
+Status: done
 Change: Make the existing no-op startup Flyway strategy own
 `portable-trash-upgrade` even when the `test` profile supplies the disposable
 schema, and exclude the ordinary test startup migration strategy in that task
@@ -708,6 +708,17 @@ Proof: A focused profile boundary proves ordinary test startup still selects its
 repair/migrate strategy while `test` + `portable-trash-upgrade` selects exactly
 the no-op owner, leaving migration to `DonutTaskRunner`.
 Estimate: 5 minutes active after 11b.
+Learnings: The two existing startup strategy owners now partition profiles
+without overlap: ordinary `test` selects repair/migrate, while non-test and
+`portable-trash-upgrade` select the no-op owner. A red-first focused Spring
+profile test caught the task combination invoking Flyway before dispatch; its
+three scenarios now prove exactly one strategy bean and the expected Flyway
+interactions for prod, test and test-plus-task. The fresh refactor reused the
+central task-profile constant in both annotations. Focused tests,
+`spotlessJavaCheck` and whitespace checks passed; the single required
+`format:changed` pass was a no-op. Implementation and refactor each took ~4
+minutes. No process, database or cloud state was touched by this structural
+slice.
 
 ### 11d. Run the real task process against an owned V325 schema
 Type: Behavior
