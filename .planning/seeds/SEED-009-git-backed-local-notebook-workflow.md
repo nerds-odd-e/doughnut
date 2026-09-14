@@ -174,8 +174,8 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Composition and identity:** An unchanged-content rename in B followed by a
   content edit in C is in this story, even though the base-to-tip bytes differ.
   Use relevant intermediate evidence to compose supported identity transitions.
-  The [research](../../docs/notebook-git-identity-research.md) demonstrates why
-  endpoint matching alone misses such cases. Story 36 owns broader inference
+  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md#use-history-as-identity-evidence-without-replaying-it)
+  requires history-informed correspondence. Story 36 owns broader inference
   and ambiguity-resolution capabilities; it does not own all history inspection
   and is not an excuse to exclude combinations promised here. Ambiguous intent
   remains unresolved product input, not automatic permission to delete/create.
