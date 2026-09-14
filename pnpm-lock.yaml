@@ -96,7 +96,7 @@ importers:
         version: 2.9.4(supports-color@8.1.1)
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
-        version: 1.30.0(supports-color@8.1.1)(zod@4.6.1)
+        version: 1.30.0(supports-color@8.1.1)(zod@4.6.4)
       '@redocly/cli':
         specifier: 2.51.2
         version: 2.51.2
@@ -219,8 +219,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(vite@8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.1)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
       zod:
-        specifier: 4.6.1
-        version: 4.6.1
+        specifier: 4.6.4
+        version: 4.6.4
 
   frontend:
     dependencies:
@@ -399,7 +399,7 @@ importers:
     devDependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
-        version: 1.30.0(supports-color@11.0.0)(zod@4.6.1)
+        version: 1.30.0(supports-color@11.0.0)(zod@4.6.4)
       '@types/node':
         specifier: 26.5.0
         version: 26.5.0
@@ -416,8 +416,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(jsdom@26.1.0(canvas@3.2.3)(supports-color@11.0.0))(vite@8.3.0(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.104.1)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
       zod:
-        specifier: 4.6.1
-        version: 4.6.1
+        specifier: 4.6.4
+        version: 4.6.4
 
   packages/donut-api:
     dependencies:
@@ -6219,8 +6219,8 @@ packages:
     peerDependencies:
       zod: ^3.25.28 || ^4
 
-  zod@4.6.1:
-    resolution: {integrity: sha512-341aRWQsve0rvronKNTqZpjmzdbUDlFuzHaI/XLg/Ej82qffDJRRfBTCuv7+9q/rMjB6LSLyEBnW4InJeMtt/Q==}
+  zod@4.6.4:
+    resolution: {integrity: sha512-AXSD6hvGdvRjajG/l1cC+d6IrhH+sjmPKtYeQdJIK8MFJl3LyClzS+o/YsVC+zQZPupAaeH5skwwm8YqYH7BqA==}
 
 snapshots:
 
@@ -7066,7 +7066,7 @@ snapshots:
 
   '@mixmark-io/domino@2.2.0': {}
 
-  '@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.6.1)':
+  '@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.6.4)':
     dependencies:
       '@hono/node-server': 2.1.1(hono@4.13.7)
       ajv: 8.20.0
@@ -7077,18 +7077,18 @@ snapshots:
       eventsource: 3.0.7
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@11.0.0)
-      express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@11.0.0)
+      express-rate-limit: 8.6.0(express@5.2.1(supports-color@11.0.0))(supports-color@11.0.0)
       hono: 4.13.7
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
-      zod: 4.6.1
-      zod-to-json-schema: 3.25.2(zod@4.6.1)
+      zod: 4.6.4
+      zod-to-json-schema: 3.25.2(zod@4.6.4)
     transitivePeerDependencies:
       - supports-color
 
-  '@modelcontextprotocol/sdk@1.30.0(supports-color@8.1.1)(zod@4.6.1)':
+  '@modelcontextprotocol/sdk@1.30.0(supports-color@8.1.1)(zod@4.6.4)':
     dependencies:
       '@hono/node-server': 2.1.1(hono@4.13.7)
       ajv: 8.20.0
@@ -7105,8 +7105,8 @@ snapshots:
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
-      zod: 4.6.1
-      zod-to-json-schema: 3.25.2(zod@4.6.1)
+      zod: 4.6.4
+      zod-to-json-schema: 3.25.2(zod@4.6.4)
     transitivePeerDependencies:
       - supports-color
 
@@ -9106,10 +9106,10 @@ snapshots:
 
   expect-type@1.4.0: {}
 
-  express-rate-limit@8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@11.0.0):
+  express-rate-limit@8.6.0(express@5.2.1(supports-color@11.0.0))(supports-color@11.0.0):
     dependencies:
       debug: 4.4.3(supports-color@11.0.0)
-      express: 5.2.1(supports-color@8.1.1)
+      express: 5.2.1(supports-color@11.0.0)
       ip-address: 10.4.0
     transitivePeerDependencies:
       - supports-color
@@ -12371,8 +12371,8 @@ snapshots:
 
   zlibjs@0.3.1: {}
 
-  zod-to-json-schema@3.25.2(zod@4.6.1):
+  zod-to-json-schema@3.25.2(zod@4.6.4):
     dependencies:
-      zod: 4.6.1
+      zod: 4.6.4
 
-  zod@4.6.1: {}
+  zod@4.6.4: {}
