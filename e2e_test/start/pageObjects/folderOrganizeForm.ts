@@ -18,6 +18,7 @@ export type FolderOrganizeForm = {
   expectErrorText: (text: string) => FolderOrganizeForm
   dissolveFolder: () => void
   dissolveFolderWithMerge: () => void
+  trashFolder: () => void
 }
 
 /**
@@ -109,6 +110,16 @@ export function assumeFolderOrganizeForm(): FolderOrganizeForm {
         .should('not.be.disabled')
         .click()
       clickPopupConfirmOk()
+      clickPopupConfirmOk()
+      waitUntilAppIsNotBusy()
+    },
+
+    trashFolder() {
+      cy.get('[data-testid="folder-trash-button"]', {
+        timeout: submitTimeoutMs,
+      })
+        .should('not.be.disabled')
+        .click()
       clickPopupConfirmOk()
       waitUntilAppIsNotBusy()
     },

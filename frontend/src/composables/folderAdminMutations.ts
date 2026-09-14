@@ -38,7 +38,7 @@ export function throwIfSdkError(result: {
   throw err
 }
 
-export async function routeAfterFolderDissolve(
+export async function routeAfterFolderRemoval(
   router: Router,
   r: FolderRealm
 ): Promise<void> {
@@ -59,6 +59,31 @@ export async function routeAfterFolderDissolve(
       folderId: String(parent.id),
     },
   })
+}
+
+export async function trashFolderOnPage(options: {
+  folderRealm: FolderRealm
+  router: Router
+  trashError: Ref<string | undefined>
+}): Promise<void> {
+  const r = options.folderRealm
+  options.trashError.value = undefined
+  try {
+    const result = await apiCallWithLoading(() =>
+      NotebookController.trashFolder({
+        path: {
+          notebook: r.notebookRealm.notebook.id,
+          folder: r.folder.id,
+        },
+      })
+    )
+    throwIfSdkError(result)
+    refreshSidebarStructuralListings()
+    await routeAfterFolderRemoval(options.router, r)
+  } catch (e: unknown) {
+    options.trashError.value =
+      toOpenApiError(e).message ?? "Failed to trash folder"
+  }
 }
 
 export function buildFolderMoveBody(options: {
@@ -175,7 +200,7 @@ export async function dissolveFolderOnPage(options: {
     )
     throwIfSdkError(dissolveResult)
     refreshSidebarStructuralListings()
-    await routeAfterFolderDissolve(options.router, r)
+    await routeAfterFolderRemoval(options.router, r)
   } catch (e: unknown) {
     const apiError = toOpenApiError(e)
     if (!options.merge && isFolderNameConflict(apiError)) {

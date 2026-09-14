@@ -60,6 +60,25 @@ When('I reload the folder page', () => {
   folderPage().reload()
 })
 
+When('I expand folder path {string} in the sidebar', (folderPath: string) => {
+  start.noteSidebar().expandFolderPath(folderPath.split('/'))
+})
+
+When('I open the folder page at path {string}', (folderPath: string) => {
+  start.noteSidebar().openFolderPageAtPath(folderPath.split('/'))
+})
+
+When('I trash the current folder', () => {
+  folderPage().openOrganizeForm().trashFolder()
+})
+
+When('I move the current folder to notebook root', () => {
+  folderPage()
+    .openOrganizeForm()
+    .selectNotebookRootAsDestination()
+    .confirmMove()
+})
+
 When('I rename the folder heading to {string}', (name: string) => {
   folderPage().renameHeading(name)
 })

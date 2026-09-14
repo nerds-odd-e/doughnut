@@ -114,6 +114,7 @@ const APPLICATION_ONLY_ACTIVE_SPECS = [
   'e2e_test/features/circles/notebooks_in_circles.feature',
   'e2e_test/features/folder_organization/folder_organization.feature',
   'e2e_test/features/folder_organization/folder_page_readme.feature',
+  'e2e_test/features/folder_organization/folder_trash.feature',
   'e2e_test/features/learning_session/commissioned_learning_session.feature',
   'e2e_test/features/messages/message_center_with_unread_message_count.feature',
   'e2e_test/features/messages/message_for_note.feature',

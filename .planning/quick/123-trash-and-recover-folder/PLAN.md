@@ -1,6 +1,6 @@
 # Trash and recover a folder
 
-Status: in progress; slices 1–2 delivered. Execution authorized on 2026-09-14.
+Status: in progress; slices 1–3 delivered. Execution authorized on 2026-09-14.
 Source: [SEED-009 story 33](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-33).
 
 Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
@@ -148,7 +148,7 @@ full backend suite and generated API validation passed after refactoring.
 
 ### 3. Trash and recover the retained subtree through the web
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Given `Research/Biology/Topic` with saved Readme/frontmatter, a direct
 note, a nested learned note and an empty nested folder, and no conflicting trash
 destination → confirm Trash in Folder Settings, revisit after reload, then Move
@@ -168,6 +168,14 @@ steps. Run the full frontend suite and the focused E2E feature.
 Sizing: target 5 minutes active work. The parked combined attempt already has a
 passing focused mounted-page test; this leaf owns the missing full frontend and
 complete browser-journey proof.
+
+Delivered learning: active and mirrored trash ancestors can legitimately share
+names, so the reusable E2E sidebar lookup now traverses exact root/direct-child
+relationships rather than label-only matches. Mounted proof covers the
+confirmation, cancellation, loading, visibility, refresh, and named navigation;
+the focused browser journey proves reload/browse and ordinary Move recovery with
+the retained subtree. The full frontend suite and generated-client typecheck
+passed after the independent refactor pass.
 
 ### 4. Keep a colliding folder Trash separate from earlier trash
 Type: Behavior
