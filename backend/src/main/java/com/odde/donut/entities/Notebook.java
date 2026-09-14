@@ -74,7 +74,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private NotebookGroup notebookGroup;
 
-  /** Container-owned readme markdown (populated by migration; canonical from 10.15 onward). */
+  /** Container-owned readme markdown. */
   @Column(name = "readme_content", columnDefinition = "mediumtext")
   @Getter
   @Setter

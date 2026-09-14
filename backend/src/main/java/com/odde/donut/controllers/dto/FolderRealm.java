@@ -20,10 +20,7 @@ public record FolderRealm(
             description = "Parent folder id when this folder is nested; omitted at notebook root.")
         Integer parentFolderId,
     @JsonInclude(JsonInclude.Include.NON_NULL)
-        @Schema(
-            description =
-                "Container-owned folder readme markdown (populated by migration from legacy"
-                    + " container note). Omitted when absent.")
+        @Schema(description = "Container-owned folder readme markdown. Omitted when absent.")
         String readmeContent) {
 
   public static FolderRealm of(

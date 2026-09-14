@@ -17,13 +17,12 @@ erDiagram
     circle ||--o{ ownership : "circle_id ON DELETE CASCADE"
     conversation ||--o{ conversation_message : "conversation_id ON DELETE CASCADE"
     folder ||--o{ folder : "parent_folder_id ON DELETE CASCADE"
-    folder ||--o{ "note" : "folder_id ON DELETE SET NULL"
+    folder ||--o{ "note" : "folder_id ON DELETE RESTRICT"
     image ||--o{ "note" : "image_id ON DELETE CASCADE"
     mcq ||--o{ recall_prompt : "mcq_id ON DELETE CASCADE"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ recall_log : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id ON DELETE CASCADE"
-    "note" ||--o{ admin_data_migration_progress : "last_processed_note_id ON DELETE SET NULL"
     "note" ||--o{ assimilation_sequence_skip : "note_id ON DELETE CASCADE"
     "note" ||--o{ authored_note_reference : "source_note_id ON DELETE CASCADE"
     "note" ||--o{ conversation : "note_id ON DELETE CASCADE"
@@ -62,11 +61,6 @@ erDiagram
     "user" ||--o{ question_generation_batch : "user_id ON DELETE CASCADE"
     "user" ||--o{ subscription : "user_id ON DELETE CASCADE"
     "user" ||--o{ user_token : "user_id ON DELETE CASCADE"
-    admin_data_migration_progress {
-        int id PK
-        string step_name UK
-        int last_processed_note_id FK
-    }
     answer {
         int id PK
     }

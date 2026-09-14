@@ -1,12 +1,8 @@
 package com.odde.donut.controllers;
 
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.AuthorizationService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.env.Environment;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 class HealthCheckController {
   @Autowired private Environment environment;
 
-  @Autowired private AuthorizationService authorizationService;
-
   @Autowired private BuildProperties buildProperties;
 
   @GetMapping("/healthcheck")
@@ -26,12 +20,5 @@ class HealthCheckController {
         + String.join(", ", environment.getActiveProfiles())
         + ". Commit: "
         + buildProperties.get("commit");
-  }
-
-  @GetMapping("/data_upgrade")
-  @Transactional(timeout = 200)
-  public List dataUpgrade() throws UnexpectedNoAccessRightException {
-    authorizationService.assertAdminAuthorization();
-    return List.of();
   }
 }

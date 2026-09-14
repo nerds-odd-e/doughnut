@@ -263,7 +263,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Health Check Controller
 
 - `ping`: GET `/api/healthcheck` -> `PingResponse` (request: none; response body: string)
-- `dataUpgrade`: GET `/api/data_upgrade` -> `DataUpgradeResponse` (request: none; response body: Array<unknown>)
 
 ## Books Controller
 

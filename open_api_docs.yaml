@@ -3071,19 +3071,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FailureReportForView"
-  /api/data_upgrade:
-    get:
-      tags:
-      - health-check-controller
-      operationId: dataUpgrade
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items: {}
   /api/daily-probes/today:
     get:
       tags:
@@ -3878,8 +3865,7 @@ components:
           type: boolean
         readmeContent:
           type: string
-          description: Container-owned notebook readme markdown (populated by migration
-            from legacy container note). Omitted when absent.
+          description: Container-owned notebook readme markdown. Omitted when absent.
       required:
       - notebook
     WikiLink:
@@ -5075,8 +5061,7 @@ components:
             root.
         readmeContent:
           type: string
-          description: Container-owned folder readme markdown (populated by migration
-            from legacy container note). Omitted when absent.
+          description: Container-owned folder readme markdown. Omitted when absent.
       required:
       - folder
       - notebookRealm

@@ -22,11 +22,9 @@ import org.springframework.stereotype.Service;
  * snapshot as of a given commit time, commits it as a single parentless root commit under a stable
  * Donut system identity, and persists the accepted binding.
  *
- * <p>Two callers rely on this: the fleet cutover wiring backfills a notebook that predates Git
- * backing, and {@code NotebookService} calls it at creation time so every post-cutover notebook
- * starts Git-backed from an empty tree. Neither path fabricates earlier history or lets an owner
- * opt out: the caller supplies the commit time, and any failure to build a valid tree/bundle
- * propagates rather than persisting a partial binding.
+ * <p>{@code NotebookService} calls this at creation time so every notebook starts Git-backed from
+ * an empty tree. The caller supplies the commit time, and a tree or bundle failure propagates
+ * before a binding is persisted.
  */
 @Service
 public class NotebookGitCutoverService {
@@ -62,12 +60,8 @@ public class NotebookGitCutoverService {
   }
 
   /**
-   * Testability-only: replaces {@code notebook}'s existing accepted Git binding with a fresh
-   * snapshot of its current content, as though cutover had just been re-run. Production now keeps
-   * content bindings current for supported Portable content edits (SEED-009 Story 3), so this hook
-   * remains only for fixture setup involving structural changes that production does not yet keep
-   * in sync (folder moves, renames, and other Stories 4–7 cases). Never call this from a
-   * production/user-facing path.
+   * Testability-only fixture support: replaces {@code notebook}'s accepted Git binding with a fresh
+   * snapshot of its current content for structural-change scenarios.
    */
   public NotebookGitBinding resnapshotForTestability(Notebook notebook, Instant snapshotTime) {
     BundleWriteResult written = buildBundle(notebook, snapshotTime);

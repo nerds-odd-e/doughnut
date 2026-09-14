@@ -14,10 +14,7 @@ public record NotebookRealm(
     @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook,
     boolean readonly,
     @JsonInclude(JsonInclude.Include.NON_NULL)
-        @Schema(
-            description =
-                "Container-owned notebook readme markdown (populated by migration from legacy"
-                    + " container note). Omitted when absent.")
+        @Schema(description = "Container-owned notebook readme markdown. Omitted when absent.")
         String readmeContent) {
 
   public static NotebookRealm of(

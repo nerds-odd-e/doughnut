@@ -1,9 +1,6 @@
 -- Replace note_property_index.target_note_id (a persisted resolved Note) with a nullable relation
 -- to authored_note_reference: the one authored reference selected from that property's value.
--- Old target pointers are not migrated forward — do not CHANGE/rename the column, DROP it and add
--- a fresh one, so no stale note ids are ever misread as authored_note_reference ids. The property
--- index is rebuilt from note Markdown by AuthoredNoteReferenceBackfillTx after this migration runs
--- (see that class's changes in this same slice).
+-- Drop the target column and add the authored-reference relation with fresh identity semantics.
 
 ALTER TABLE `note_property_index`
   DROP FOREIGN KEY `fk_note_property_index_target_note`;

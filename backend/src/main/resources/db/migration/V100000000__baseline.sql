@@ -18,32 +18,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `admin_data_migration_progress`
---
-
-DROP TABLE IF EXISTS `admin_data_migration_progress`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `admin_data_migration_progress` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `step_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `total_count` int NOT NULL DEFAULT '0',
-  `processed_count` int NOT NULL DEFAULT '0',
-  `last_processed_note_id` int unsigned DEFAULT NULL,
-  `last_error` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `completed_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_admin_data_migration_progress_step` (`step_name`),
-  KEY `idx_admin_data_migration_progress_status` (`status`),
-  KEY `fk_admin_data_migration_progress_last_note` (`last_processed_note_id`),
-  CONSTRAINT `fk_admin_data_migration_progress_last_note` FOREIGN KEY (`last_processed_note_id`) REFERENCES `note` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=841 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `answer`
 --
 
@@ -458,7 +432,6 @@ CREATE TABLE `note` (
   `notebook_id` int unsigned DEFAULT NULL,
   `folder_id` int unsigned DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` timestamp(3) NULL DEFAULT NULL,
   `title` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `content` mediumtext,
   `level` tinyint NOT NULL DEFAULT '0',
@@ -468,7 +441,7 @@ CREATE TABLE `note` (
   KEY `fk_note_image_id` (`image_id`),
   KEY `fk_note_notebook_id` (`notebook_id`),
   KEY `idx_note_folder_id` (`folder_id`),
-  KEY `idx_note_structural_peer` (`notebook_id`,`folder_id`,`deleted_at`,`id`),
+  KEY `idx_note_structural_peer` (`notebook_id`,`folder_id`,`id`),
   KEY `idx_note_notebook_id_title` (`notebook_id`,(lower(`title`))),
   CONSTRAINT `fk_note_folder` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_note_image_id` FOREIGN KEY (`image_id`) REFERENCES `image` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,

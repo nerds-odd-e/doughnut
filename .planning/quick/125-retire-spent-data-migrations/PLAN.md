@@ -1,6 +1,15 @@
 # Retire spent data migrations
 
-Status: planned
+Status: done
+
+Execution identity:
+
+- mode: Story Branch Mode
+- originating checkout: `/Users/terryyin/git/doughnut`
+- originating branch: `main`
+- execution checkout: `/Users/terryyin/git/doughnut-worktrees/125-retire-spent-data-migrations`
+- execution branch: `codex/125-retire-spent-data-migrations`
+- integration target: `main`
 
 ## Source
 
@@ -52,7 +61,7 @@ product-level persistence tests remain with their owning capabilities.
 ### 1. Current installations use the compact migration chain
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Fresh isolated database migration, full backend verification, and ERD
 generation through the commands mapped above.
 
@@ -72,3 +81,31 @@ and the current product behavior suite passes using the compact migration chain.
 
 - Caller inspection identified two standalone backfill groups and the
   `admin_data_migration_progress` table as completed migration support.
+- Refactor inspection found the completed authored-reference progress-table
+  create/drop pair, the earlier placeholder, and the empty admin data-upgrade
+  endpoint in the same migration-support lifecycle.
+
+## Accepted proof
+
+- Promise: a fresh isolated database installs the current schema and starts the
+  backend, while current backend behavior remains green.
+  - Boundary: Spring Boot Flyway startup and the full backend test suite.
+  - Setup: `V100000000__baseline.sql` plus the remaining migrations in isolated
+    database `doughnut_wt_431d41f9477b4906a5750c5d9631033b_test`.
+  - Observations: `migrateTestDB` startup and the 2,400-test Gradle result.
+  - Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL; CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+  - Result: pass.
+- Promise: the generated API and frontend consumers match the current backend
+  surface.
+  - Boundary: generated OpenAPI/TypeScript client plus the frontend suite.
+  - Observations: generator completion, OpenAPI lint, and 1,894 frontend tests.
+  - Commands: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`;
+    `CURSOR_DEV=true nix develop -c pnpm openapi:lint`;
+    `CURSOR_DEV=true nix develop -c pnpm frontend:test`.
+  - Result: pass.
+- Promise: maintained schema documentation describes the current relational
+  model.
+  - Boundary: MySQL `information_schema` to `docs/database-erd.md`.
+  - Setup: the isolated database named above.
+  - Command: `DONUT_ERD_SCHEMA=doughnut_wt_431d41f9477b4906a5750c5d9631033b_test CURSOR_DEV=true nix develop -c pnpm export:database-erd`.
+  - Result: pass.

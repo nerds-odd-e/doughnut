@@ -244,7 +244,7 @@ export type NotebookRealm = {
     hasAttachedBook?: boolean;
     readonly?: boolean;
     /**
-     * Container-owned notebook readme markdown (populated by migration from legacy container note). Omitted when absent.
+     * Container-owned notebook readme markdown. Omitted when absent.
      */
     readmeContent?: string;
 };
@@ -892,7 +892,7 @@ export type FolderRealm = {
      */
     parentFolderId?: number;
     /**
-     * Container-owned folder readme markdown (populated by migration from legacy container note). Omitted when absent.
+     * Container-owned folder readme markdown. Omitted when absent.
      */
     readmeContent?: string;
 };
@@ -3940,22 +3940,6 @@ export type ShowFailureReportResponses = {
 };
 
 export type ShowFailureReportResponse = ShowFailureReportResponses[keyof ShowFailureReportResponses];
-
-export type DataUpgradeData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/data_upgrade';
-};
-
-export type DataUpgradeResponses = {
-    /**
-     * OK
-     */
-    200: Array<unknown>;
-};
-
-export type DataUpgradeResponse = DataUpgradeResponses[keyof DataUpgradeResponses];
 
 export type GetDailyProbeTodayData = {
     body?: never;
