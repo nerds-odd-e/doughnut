@@ -362,63 +362,34 @@ from further splitting/refinement for now, by the owner's instruction.
 
 ### 39. Retire the spent portable-trash migration after production success
 
-- **Goal / beneficiary:** Maintainers can install and upgrade Donut without
-  carrying conversion code or tests for a legacy state that
-  production has already left behind.
-- **Trigger / prerequisite:** The validated migration has deployed successfully;
-  production Flyway history, schema, retained-data checks and application smoke
-  evidence confirm conversion. Verify other long-lived environments have crossed
-  the upgrade before removing their path. A tag or green CI alone is insufficient.
+- **Goal / beneficiary:** Maintainers install and upgrade Donut through current
+  schema and runtime code, with completed legacy conversion code and tests
+  retired.
+- **Trigger / prerequisite:** Production has completed the portable-trash data
+  conversion and schema transition. Production is the sole persistent data
+  installation that required these transformations.
 - **Validation provenance:** Commit
   `f38363d3789bec23e5aa5c323ab56f4baf3db554` retains the completed story and
   `.planning/quick/123-safe-portable-trash-upgrade/PLAN.md` evidence before
   ordinary story cleanup.
-- **Scope:** Completely remove the spent portable-trash migration files and
-  exclusively migration-owned helpers, tests, fixtures, temporary fault injection,
-  and rehearsal support listed below. Retain shared runtime Portable-tree/Git
-  functionality and ordinary trash behavior tests.
-  Recheck callers before deleting shared helpers; do not retain dead code merely
-  because it lives outside the versioned migration directory.
-- **Exact temporary-artifact reminder:** This upgrade is Flyway-owned, not
-  SQL-only. After the trigger above, retire the two Java Flyway migrations
-  `backend/src/main/java/db/migration/V300000326__MigrateLegacyDeletedNotesToTrash.java`
-  and
-  `backend/src/main/java/db/migration/V300000327__RebuildNotebookGitBaselines.java`,
-  plus the SQL Flyway migration
-  `backend/src/main/resources/db/migration/V300000328__drop_note_deleted_at.sql`,
-  using the safe-removal sequence below. Remove their migration-exclusive
-  delegates
-  `backend/src/main/java/com/odde/donut/services/notebookGit/NoteLegacyTrashMigration.java`
-  and
-  `backend/src/main/java/com/odde/donut/services/notebookGit/NotebookGitBaselineRebuild.java`.
-  Remove the migration-only rehearsal tests and fixtures
-  `NoteLegacyTrashMigrationInterruptionTest.java`,
-  `NotebookGitBaselineRebuildFleetInterruptionTest.java`,
-  `NotebookUpgradeAtScaleTest.java`,
-  `NotebookUpgradeDataPreservationTest.java`,
-  `PreUpgradeFixtureRows.java`, `PreUpgradeFixtureSchema.java`,
-  `PreUpgradeFixtureSchemaTest.java`, and
-  `V300000328DropNoteDeletedAtMigrationTest.java`, all under
-  `backend/src/test/java/com/odde/donut/services/notebookGit/`. Also remove the
-  migration-only `NotebookGitBaselineRebuildTest.java` coverage and the
-  migration-only portions of `NotebookGitRebuildTestSupport.java`; retain any
-  support still called by ordinary runtime Git tests after rechecking callers.
-- **Safe removal:** Follow `.cursor/rules/db-migration.mdc`'s baseline/tip squash
-  procedure: establish a version above every version ever applied, deploy and
-  confirm that no-op tip on long-lived databases before removing older files,
-  then fold final DDL into the existing baseline version. Freeze schema migrations
-  during that sequence. This may need a follow-up deployment; do not delete
-  files immediately on a success notification and break fresh installation.
-- **Key examples:** An empty disposable database installs the final schema
-  without the legacy conversion; an isolated copy at the confirmed tip starts
-  after removal with all retained rows/bindings unchanged and sound Flyway history.
-  Ordinary trash and Git product tests still pass; no migration-only callers,
-  test entry points or release gates remain.
-- **Boundary / safe stopping point:** No broad migration-framework rewrite or
-  unrelated test cleanup. After closure, fresh installation and supported
-  long-lived upgrades remain usable even if all later trash stories are cancelled.
+- **Scope:** Retire applied data transformations in Java and SQL, their
+  exclusively owned helpers, and their migration rehearsal tests and fixtures.
+  This includes portable-trash versions `V300000326`–`V300000328`, earlier
+  data-only versions `V300000306`, `V300000311`, `V300000318`, and `V300000320`,
+  and standalone backfills whose product callers have already completed their
+  work. Fold the final portable-trash schema into `V100000000__baseline.sql`.
+  Remove the unused data-migration progress schema. Keep current Flyway startup,
+  schema-changing migrations, runtime Portable notebook tree and trash behavior,
+  and their product-level tests in their existing capability homes.
+- **Key examples:** A fresh isolated database installs the current schema and
+  starts the backend. Ordinary backend, Portable notebook tree, trash, and Git
+  behavior tests pass against that schema. `V300000329` remains the current
+  schema-transition tip above every retired migration version.
+- **Boundary / safe stopping point:** The current migration framework and active
+  operational tasks keep their present responsibilities. Fresh installation and
+  production startup remain usable independently of every later trash story.
 - **Effort hypothesis:** M (1–2 hours active work), medium confidence; deployment
-  and confirmation waiting is separate. Refine and plan when the trigger is met.
+  confirmation has completed.
 
 <a id="story-38"></a>
 
