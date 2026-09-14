@@ -76,11 +76,10 @@ data; invalid or ambiguous changes must not silently discard work.
   3. An existing notebook contains an empty nested folder `Science/Biology`.
      Its first Git snapshot and clone retain that path through `.keep`, with
      existing notes and non-blank Readmes preserved.
-- **Why now / order:** Place after Restore and folder Trash to preserve the
-  selected web-trash detour, and before accumulated publication. This completes
-  basic web authoring into a new destination before improving the convenience
-  of publishing a local session. It is a value ordering, not a claim that
-  accumulated content publication technically depends on folder creation.
+- **Why now / order:** Folder Trash is already available, and Restore is not a
+  prerequisite. This completes basic web authoring into a new destination. It
+  is a value ordering, not a claim that accumulated content publication
+  technically depends on folder creation.
 - **Strongest smaller alternative:** Create notes only at the root or in
   already represented folders, or write a non-blank Readme to retain an empty
   folder in a snapshot. Those workarounds constrain ordinary organization or
@@ -593,110 +592,6 @@ merge in `NotebookController`. These are inspected examples and source behavior,
 not newly executed test evidence. Proposals above await the owner's refinement
 answers and do not supersede the shared agreed contract.
 
-<a id="story-33"></a>
-
-### 33. Trash a folder on the web as one recoverable subtree
-
-Executable plan: [Trash and recover a folder](../quick/123-trash-and-recover-folder/PLAN.md).
-
-- **Simplicity decision (2026-09-14):** The owner returned to shared trash paths
-  and dropped the proposed per-action event folders and event README metadata.
-  Do not queue event grouping as deferred work without a new concrete need.
-  Trashing may be frequent; recovery is expected to be less frequent. The core
-  requirement is retaining information with ordinary Move available for recovery,
-  not reconstructing a particular trash operation. Shared ancestor path folders
-  may be reused. An explicitly trashed folder still receives a whole-folder
-  collision suffix, as in the accepted `Biology (2)` example below; it is not
-  merged destructively into earlier trash. Preserve that folder's README,
-  metadata, descendants, note identities, and learning data. Reconstructed path
-  ancestors are not historical copies of the original ancestors' metadata.
-- **Goal:** A notebook owner can set aside one organized subtree through web
-  Trash, then recover it through ordinary Move, with its content and learning
-  history intact. Both directions belong to this delivery.
-- **Priority / why now (2026-09-14):** The owner prefers completing this reversible
-  folder workflow before adding the Restore convenience. Individual note Trash
-  and Move recovery exist; they do not supply a one-action folder Trash operation
-  with full-path placement and whole-folder collision handling. The useful outcome
-  remains available even if Restore is never built.
-- **Value challenge and smaller alternative:** Ordinary folder Move already
-  supplies subtree relocation. An owner could manually arrange a destination
-  beneath `_trash`, preserve the parent path, and resolve a name collision.
-  Trashing individual notes is another workaround, but requires repeated work
-  and does not preserve the folder as one selected unit. The incremental value
-  is a predictable one-action placement of that unit into trash, with a usable
-  way back. Do not justify this story as inventing recovery or as preparation
-  for future Git work. Frequency of real folder-discard operations is unmeasured;
-  priority rests on the owner's selected web workflow, not an established usage
-  metric. The learning is whether owners can set aside and recover an organized
-  topic without managing trash paths themselves.
-- **Scope:** Trash one selected active folder with its descendants, preserving
-  its full path beneath notebook-root `_trash`. Suffix a colliding incoming folder
-  as a whole rather than merging it with earlier trash. Browse the resulting
-  subtree and use existing folder Move to recover it to an owner-selected existing
-  active folder or notebook root in the same notebook. Preserve identities,
-  authored content, learning history, independent tracking preferences, and the
-  authored references; participation follows current location. Folder Trash
-  preserves reference spelling and offers one confirmation warning, without
-  removing properties or reducing relationship notes. Existing individual-note
-  choices remain unchanged.
-- **Recovery responsibility:** Reuse existing Move behavior and complete any
-  necessary gaps in the folder round trip within this story. A working Trash
-  button alone is insufficient. Show the recovered location and retained subtree
-  through the web journey; establish descendant eligibility and learning-data
-  preservation at the appropriate observable boundary.
-- **Key example:** Active `Biology` contains a note and a nested folder with a
-  learned note; `_trash/Biology` already contains earlier trash. Trash active
-  `Biology`, obtaining `_trash/Biology (2)` with the complete selected subtree.
-  Revisit it after reloading, then Move `Biology (2)` to notebook root. The same
-  subtree is active at `Biology (2)`, its learning history remains, and the earlier
-  `_trash/Biology` is untouched. Move does not remove the visible suffix.
-- **Nested selection example:** Trash `Research/Biology/Topic` while its sibling
-  `Research/Biology/Other` remains active. Place only the selected subtree at
-  `_trash/Research/Biology/Topic`, creating missing trash-side path folders.
-  If the active parent path subsequently disappears, recover by Move to notebook
-  root or another existing active folder. Rebuilding the missing active path
-  belongs to postponed Restore, not this story.
-- **Boundary example:** The chosen recovery destination has a conflicting folder
-  name. Preserve ordinary Move conflict handling and its existing explicit merge
-  choice; do not silently overwrite or automatically merge. There is no new
-  recovery-specific conflict policy in this story.
-- **Deferred promises:** Restore-to-derived-path, automatic reconstruction of
-  missing active parents, new Git/local compatibility, bulk selection, permanent
-  deletion UI, expiry, and empty-trash actions. No separate recovery state or
-  timestamp grouping is introduced. Existing supported behavior remains preserved.
-- **Narrow interaction:** Offer Trash on the selected active folder's
-  existing page; one confirmation explains that the folder and everything inside
-  will leave active use and can be recovered with Move. After success, return to
-  its former parent or notebook root. Keep recovery in the existing folder Move
-  interaction. Do not add a separate folder Undo mechanism or a new recovery
-  screen to complete this round trip. Include that references remain authored
-  but links to trashed notes may no longer resolve in the same confirmation.
-- **Boundary assumptions:** An ordinary empty folder follows the same location
-  rule; example note counts do not justify special acceptance gates. Folder
-  descriptions and nested empty folders remain part of the retained subtree.
-  The action targets an active folder, not the notebook itself or reserved root
-  `_trash`; already-trashed folders remain browsable and movable. Cancelling
-  leaves the subtree unchanged. A failed Trash must not leave only part of the
-  selected subtree relocated. No new cross-notebook recovery behavior is promised;
-  existing supported Move behavior is preserved.
-- **Current evidence:** Folder Settings exposes Move even for a trashed folder;
-  `FolderMoveRelocation` reparents the existing subtree, and note availability
-  follows folder ancestry. Dedicated note Move recovery tests exist. Focused
-  inspection has not found dedicated folder-trash round-trip coverage, so this
-  seed does not claim that complete folder recovery has already been verified.
-- **Refinement closure (2026-09-14):** Following the owner's no-information-loss
-  direction and assent to update refinement and plan narrowly, folder Trash uses
-  the proposed preserve-references behavior. This narrows the earlier shared
-  reference-choice promise for this folder action only; individual-note Trash
-  retains its existing choices. No bulk reference cleanup, relationship reduction,
-  event folders, event metadata, or operation-based recovery is included.
-- **Effort hypothesis:** M, low confidence around subtree reference handling and
-  complete recovery proof. Existing moves are a reuse opportunity, not grounds to
-  omit the recovery acceptance journey.
-- **Depends on / safe stopping point:** Existing web note Trash, trash browsing,
-  and folder Move. No dependency on story 32. This complete reversible workflow is
-  useful without Restore or any later trash/Git capability.
-
 ### Deferred combined compatibility story
 
 <a id="story-28"></a>
@@ -733,13 +628,12 @@ older trash; migration and removal of the old soft-delete structure is complete
 before convenience expansion. Neither relies on completing new Git move/rename
 or trash compatibility.
 
-The owner's 2026-09-14 refinement puts folder Trash with Move recovery first
-and moves the Restore shortcut to the very bottom of the backlog, after
-publication performance validation. Move already supplies note recovery, and
-story 33 owns proving the complete folder round trip. No database-, API-, or
-UI-only preparation story is queued.
+Folder Trash with ordinary Move now supplies the complete folder round trip.
+The owner moved the Restore shortcut to the very bottom of the backlog, after
+publication performance validation. No database-, API-, or UI-only preparation
+story is queued.
 
-After folder Trash, deliver web-created folders and their notes (story 35),
+Next, deliver web-created folders and their notes (story 35),
 then keep remaining Git stories 20, 24, and 25 in relative order. Story 35's
 position reflects the owner's 2026-09-14 addition of basic folder authoring;
 stories 21 and 22 are already delivered. Then queue the single unrefined story 28. Former story 23 is
@@ -758,9 +652,6 @@ after that combined compatibility item.
 - Existing user-authored root `_trash` content needs migration inspection so the
   new reserved meaning does not silently lose or overwrite existing content.
 - Restore uses ordinary conflicts when a required parent path is a non-folder.
-- Folder deletion-reference warnings have no existing folder-delete flow to copy;
-  refine the application of existing choices before story 33, without inventing
-  automatic reference removal.
 - Check simplicity cumulatively through story 31: fewer product-code lines and
   concepts, one state owner, and removal of duplicated rules. Preserve meaningful
   external proof even if test coverage increases total repository lines.

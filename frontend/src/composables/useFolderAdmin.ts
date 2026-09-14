@@ -13,6 +13,7 @@ import {
   dissolveFolderOnPage,
   dissolveParentLabelFromChain,
   moveFolderOnPage,
+  trashFolderOnPage,
 } from "@/composables/folderAdminMutations"
 
 /**
@@ -28,6 +29,7 @@ export function useFolderAdmin(
   const processing = ref(false)
   const moveError = ref<string | undefined>(undefined)
   const dissolveError = ref<string | undefined>(undefined)
+  const trashError = ref<string | undefined>(undefined)
   const selectedParentFolder = ref<Folder | null>(null)
   const destinationCatalogItems = ref<NotebookCatalogEntry[] | undefined>(
     undefined
@@ -184,10 +186,30 @@ export function useFolderAdmin(
     }
   }
 
+  const trash = async () => {
+    const r = folderRealm.value
+    if (processing.value) return
+    const ok = await popups.confirm(
+      `Trash folder "${r.folder.name}"? Its complete subtree will leave active use. References remain authored but may no longer resolve until you recover the folder with Move.`
+    )
+    if (!ok) return
+    processing.value = true
+    try {
+      await trashFolderOnPage({
+        folderRealm: r,
+        router,
+        trashError,
+      })
+    } finally {
+      processing.value = false
+    }
+  }
+
   return {
     processing,
     moveError,
     dissolveError,
+    trashError,
     selectedParentFolder,
     destinationNotebooks,
     notebooksLoading,
@@ -199,5 +221,6 @@ export function useFolderAdmin(
     dissolveParentLabel,
     submitMove,
     dissolve,
+    trash,
   }
 }

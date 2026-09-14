@@ -17,6 +17,8 @@ import org.hibernate.annotations.Formula;
 @Table(name = "folder")
 public class Folder extends EntityIdentifiedByIdOnly {
 
+  public static final int MAX_NAME_LENGTH = 512;
+
   @Formula("id in (select tf.id from trashed_folder tf)")
   private boolean trashedInDatabase;
 
@@ -47,7 +49,7 @@ public class Folder extends EntityIdentifiedByIdOnly {
   private DisplayName name = new DisplayName("");
 
   @NotNull
-  @Size(min = 1, max = 512)
+  @Size(min = 1, max = MAX_NAME_LENGTH)
   @JsonProperty("name")
   public String getName() {
     return name.value();

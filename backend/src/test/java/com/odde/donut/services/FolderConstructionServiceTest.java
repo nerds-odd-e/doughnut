@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.controllers.ControllerTestBase;
+import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -26,8 +27,12 @@ class FolderConstructionServiceTest extends ControllerTestBase {
     Folder trash = makeMe.aFolder().notebook(notebook).name("_TrAsH").please();
     Folder mirroredRoot = makeMe.aFolder().parentFolder(trash).name("Research").please();
 
-    Folder destination = folderConstructionService.ensureTrashParentFor(note);
-    Folder repeatedDestination = folderConstructionService.ensureTrashParentFor(note);
+    Folder destination =
+        folderConstructionService.ensureTrashParentFor(
+            notebook, FolderTrailSegments.fromRootToContainingFolder(note));
+    Folder repeatedDestination =
+        folderConstructionService.ensureTrashParentFor(
+            notebook, FolderTrailSegments.fromRootToContainingFolder(note));
 
     assertThat(destination.getName(), equalTo("Physics"));
     assertThat(destination.getParentFolder().getId(), equalTo(mirroredRoot.getId()));

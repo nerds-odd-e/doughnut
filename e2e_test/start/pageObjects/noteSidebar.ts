@@ -27,6 +27,21 @@ function folderRowControls(treeitem: Cypress.Chainable<JQuery<HTMLElement>>) {
   return treeitem.children('.folder-row')
 }
 
+function directChildFolderTreeitem(
+  parentTreeitem: Cypress.Chainable<JQuery<HTMLElement>>,
+  childLabel: string
+) {
+  return parentTreeitem
+    .children('.folder-children')
+    .children('[role="group"].sidebar-tree-list')
+    .children('[role="treeitem"].sidebar-folder-li')
+    .filter(
+      (_index, element) => element.getAttribute('aria-label') === childLabel
+    )
+    .filter(':visible')
+    .last()
+}
+
 /** Deepest visible child folder treeitem under an expanded parent. */
 function folderTreitemUnderOpenParent(parentLabel: string, childLabel: string) {
   return folderTreitemByLabel(parentLabel)
@@ -35,6 +50,27 @@ function folderTreitemUnderOpenParent(parentLabel: string, childLabel: string) {
     })
     .filter(':visible')
     .last()
+}
+
+function folderTreeitemAtPath(folderLabels: string[]) {
+  const [rootLabel, ...childLabels] = folderLabels
+  if (rootLabel == null) throw new Error('folder path must not be empty')
+
+  let treeitem = cy
+    .get('aside')
+    .find('[role="tree"][aria-label="Note tree"]', {
+      timeout: sidebarActionTimeoutMs,
+    })
+    .children('[role="treeitem"].sidebar-folder-li')
+    .filter(
+      (_index, element) => element.getAttribute('aria-label') === rootLabel
+    )
+    .filter(':visible')
+    .last()
+  for (const childLabel of childLabels) {
+    treeitem = directChildFolderTreeitem(treeitem, childLabel)
+  }
+  return treeitem
 }
 
 function expandFolder(label: string) {
@@ -77,6 +113,24 @@ export const noteSidebar = () => {
   return {
     expand(label: string) {
       expandFolder(label)
+      return this
+    },
+
+    expandFolderPath(folderLabels: string[]) {
+      folderLabels.forEach((_label, index) => {
+        const treeitem = folderTreeitemAtPath(folderLabels.slice(0, index + 1))
+        treeitem.then(($el) => {
+          if (($el.attr('aria-expanded') ?? 'false') === 'false') {
+            $el.find('.folder-row .chevron-btn').first()[0].click()
+          }
+        })
+        waitUntilAppIsNotBusy()
+        folderTreeitemAtPath(folderLabels.slice(0, index + 1)).should(
+          'have.attr',
+          'aria-expanded',
+          'true'
+        )
+      })
       return this
     },
 
@@ -138,6 +192,14 @@ export const noteSidebar = () => {
     openFolderPageUnderOpenParent(parentLabel: string, childLabel: string) {
       waitUntilAppIsNotBusy()
       folderRowControls(folderTreitemUnderOpenParent(parentLabel, childLabel))
+        .find('[data-testid="sidebar-folder-open-page-link"]')
+        .click()
+      waitUntilAppIsNotBusy()
+    },
+
+    openFolderPageAtPath(folderLabels: string[]) {
+      waitUntilAppIsNotBusy()
+      folderRowControls(folderTreeitemAtPath(folderLabels))
         .find('[data-testid="sidebar-folder-open-page-link"]')
         .click()
       waitUntilAppIsNotBusy()

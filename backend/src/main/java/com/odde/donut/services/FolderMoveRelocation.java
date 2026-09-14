@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.FolderMoveRequest;
+import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -50,9 +51,7 @@ final class FolderMoveRelocation {
       FolderMoveRequest request,
       Notebook destinationNotebook,
       User viewer) {
-    if (!folder.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
-    }
+    requireFolderInNotebook(folder, notebook);
     if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
       return moveFolderToAnotherNotebook(folder, request, destinationNotebook, viewer);
     }
@@ -62,16 +61,10 @@ final class FolderMoveRelocation {
   private Folder moveFolderWithinNotebook(
       Notebook notebook, Folder folder, FolderMoveRequest request, User viewer) {
     Folder newParent = resolveNewParentFolder(request);
-    if (newParent != null) {
-      requireNewParentInNotebook(newParent, notebook);
-    }
-    FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
-
-    Integer destParentId = newParent == null ? null : newParent.getId();
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Optional<Folder> mergeTarget =
-        folderSiblingNameValidation.mergeTargetOrRejectConflict(
-            notebook.getId(), destParentId, folder, request != null && request.isMerge());
+        validateDestinationAndFindMergeTarget(
+            notebook, folder, newParent, request != null && request.isMerge());
     if (mergeTarget.isPresent()) {
       subtree.mergeInto(folder, mergeTarget.get(), now);
       return mergeTarget.get();
@@ -80,13 +73,42 @@ final class FolderMoveRelocation {
     Set<Integer> movedNoteIds = subtree.collectNoteIdsInSubtree(folder);
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(movedNoteIds, viewer);
+    persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
+    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
+        movedNoteIds, now, inboundReferencesByNoteId);
+    return folder;
+  }
+
+  Folder placeFolderWithinNotebook(
+      Notebook notebook, Folder folder, Folder newParent, Timestamp now) {
+    requireFolderInNotebook(folder, notebook);
+    requireNewParentInNotebook(newParent, notebook);
+    FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
+    DisplayName availableName =
+        folderSiblingNameValidation.firstAvailableSiblingName(
+            notebook.getId(), newParent.getId(), new DisplayName(folder.getName()), folder.getId());
+    return persistFolderPlacement(folder, newParent, availableName, now);
+  }
+
+  private Optional<Folder> validateDestinationAndFindMergeTarget(
+      Notebook notebook, Folder folder, Folder newParent, boolean merge) {
+    if (newParent != null) {
+      requireNewParentInNotebook(newParent, notebook);
+    }
+    FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
+    Integer destParentId = newParent == null ? null : newParent.getId();
+    return folderSiblingNameValidation.mergeTargetOrRejectConflict(
+        notebook.getId(), destParentId, folder, merge);
+  }
+
+  private Folder persistFolderPlacement(
+      Folder folder, Folder newParent, DisplayName name, Timestamp now) {
+    folder.setName(name);
     folder.setParentFolder(newParent);
     folder.setUpdatedAt(now);
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
-    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
-        movedNoteIds, now, inboundReferencesByNoteId);
     return folder;
   }
 
@@ -173,6 +195,12 @@ final class FolderMoveRelocation {
   private void requireNewParentInNotebook(Folder newParent, Notebook notebook) {
     if (!newParent.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not in notebook.");
+    }
+  }
+
+  private void requireFolderInNotebook(Folder folder, Notebook notebook) {
+    if (!folder.getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
   }
 }

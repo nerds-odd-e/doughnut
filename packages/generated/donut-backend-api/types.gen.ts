@@ -2149,6 +2149,25 @@ export type CreateFolderResponses = {
 
 export type CreateFolderResponse = CreateFolderResponses[keyof CreateFolderResponses];
 
+export type TrashFolderData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}/trash';
+};
+
+export type TrashFolderResponses = {
+    /**
+     * OK
+     */
+    200: Folder;
+};
+
+export type TrashFolderResponse = TrashFolderResponses[keyof TrashFolderResponses];
+
 export type MoveFolderData = {
     body?: FolderMoveRequest;
     path: {

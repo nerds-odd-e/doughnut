@@ -86,6 +86,12 @@ profile. Codec round-trips must be lossless for these rules.
 - Trashed notes remain ordinary Portable notebook files. Moving notes or
   folders into or out of trash follows ordinary move and destination-collision
   rules.
+- Folder Trash moves the selected active subtree beneath `_trash/`, mirroring
+  and reusing its ancestor path. If the selected folder name is occupied there,
+  Donut suffixes the incoming folder as a whole instead of merging it with the
+  earlier trash.
+- Folder Trash preserves authored reference spelling. Recovery uses ordinary
+  folder Move, including its destination-conflict choices.
 - Trashed notes are excluded from search results and learning participation.
   Memory trackers remain associated with the same note IDs, preserving
   learning history and independent tracking preferences. Their availability
