@@ -92,9 +92,8 @@ For every file in the current diff and every file proposed for editing:
 wc -l <path>
 ```
 
-Use this project's file-size limits and exemptions for plans, generated artifacts,
-production code, and tests. Split files exceeding their applicable limit.
-Do not impose limits copied from another project's stack.
+Shorten or split every checked file exceeding **250 lines** before claiming
+refactoring complete.
 
 - Split along **cohesive seams** — one concept per module, not arbitrary line
   cuts.

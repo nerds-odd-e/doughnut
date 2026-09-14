@@ -21,8 +21,7 @@ change, report empty scope and use the completion handoff below without edits
 or tests.
 
 For a nonempty change, resolve this project's navigation, domain vocabulary,
-production subsystem boundaries and applicable architectural decisions, file-size
-limits and exemptions, tooling wrapper,
+production subsystem boundaries and applicable architectural decisions, tooling wrapper,
 whitespace check with generated-artifact exclusions, and focused test commands.
 Resolve generation triggers and commands only when affected. If necessary
 context is missing, report it and stop without claiming completion.
@@ -94,7 +93,10 @@ original command no longer applies and run a focused replacement. Without
 supplied proof, run focused tests related to the refactor edits. Use this
 project's literal commands and the shared
 [behavioral test guidance](references/refactor-checks.md#tests-as-behavioral-documentation).
-Do not run the full suite. Fix failures caused by the refactor and require
+Do not run the full suite. Own any verification command that yields a running
+command identity through its terminal result under the shared
+[verification ownership](../dough-execute-plan/references/delegation.md#own-verification-to-its-terminal-result)
+rule. Fix failures caused by the refactor and require
 passing relevant proof before completion. Report other unresolved failures to
 the caller; do not claim success.
 

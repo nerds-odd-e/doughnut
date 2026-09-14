@@ -24,6 +24,17 @@ change. Return incomplete or contradictory evidence to implementation, naming
 the promise, inspected locations, and gap; refactoring cannot supply missing
 behavior.
 
+Judge the return by its substance, not its layout. The `proof:` block under
+[the return contract](delegation.md#return-a-targeted-report-with-focused-proof)
+is an example representation; accept an equivalent layout that carries the same
+inspectable evidence — literal commands, results, owned changes, promise
+coverage, boundaries, and setup and observation locations — without a
+report-only resend. Formatting never substitutes for substance: a
+canonical-looking report missing the terminal result or contradicting inspected
+evidence remains incomplete whatever its layout. Explicit completion markers
+with a separate workflow contract, such as `## REFACTOR COMPLETE`, stay
+verbatim.
+
 Reuse accepted inspection while its promise, boundary, implementation, setup,
 and observations remain unchanged. Recover literal commands from the original
 handoff when possible. Rerun only for missing or ambiguous proof, a covered

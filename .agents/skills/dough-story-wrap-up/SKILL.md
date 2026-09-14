@@ -46,13 +46,9 @@ Resolve from this project, not this skill's location:
   log (`DearDough.md` unless this project sets another canonical location),
   incoming links, and assessment or recognition records.
 
-Do not invent a retrospective artifact or require another review. Do not invent
-a plan path, completion rule, feature-story seed location, or Git convention.
-Planless feature work does not require a plan. Keep the bounded-correction
-identity contract above; do not invent a planless correction format.
-
-If context needed for a closure decision is missing, name the gap, leave
-affected material intact, and do not claim closure.
+Planless feature work needs no plan; corrections retain the plan-based identity
+contract. Missing closure context leaves affected material intact: report the gap
+without inventing conventions, artifacts, or another review, or claiming closure.
 
 Before deleting a plan that carries planned-execution identity, retain the
 resolved mode and checkout, branch, and target values in the coordinator's
@@ -71,11 +67,9 @@ Judge completion from the selected work and available execution evidence.
   the unfinished implementation and stop. Do not delete an unfinished
   correction plan to manufacture a wrap-up.
 
-When retrospective advice is present, apply it under existing authority in the
-closure actions below. When it is absent or empty, perform the same ordinary
-closure using the other available inputs: the story or bounded-work context,
-implementation results, maintained product knowledge, existing follow-ups, and
-coordinator instructions.
+Apply available retrospective advice under existing authority. Absent/empty advice
+still permits ordinary closure from work context, implementation results, maintained
+knowledge, existing follow-ups, and coordinator instructions.
 
 ## Assimilate lasting knowledge
 
@@ -137,12 +131,6 @@ introduces no mandatory question. Ordinary closure continues using the other
 available inputs. Leave unresolved necessary context with active work and
 report the choice; do not invent scope, launch discovery, or start another
 review.
-
-## Leave no extra wrap-up ceremony
-
-Do not launch discovery or another review. Absent or empty retrospective
-advice is valid and changes nothing beyond the supported closure and follow-up
-actions above.
 
 ## Commit closure inputs and preserve Git recovery
 
@@ -208,7 +196,7 @@ Save the committed final-closure tip and integrate it into the recorded target
 branch from its checkout, using the retained execution identity and this
 project's ordinary local merge conventions. Preserve unrelated target work. If target identity or
 safe integration cannot be established, retain the execution resources and
-report the blocker. Do not rebase, delete remote branches, or add CI waiting.
+report the blocker. Do not rebase or add CI waiting.
 
 For product backlog conflicts, follow
 [backlog merge conflicts](../dough-product-backlog/references/merge-conflicts.md).
@@ -232,23 +220,14 @@ push before resource cleanup or claiming completion. If the push fails, retain
 the execution resources and report the push failure separately from successful
 local integration; do not force-push.
 
-## Remove integrated worktree resources safely
+## Remove integrated execution resources safely
 
-After verified integration, remove only the clean execution worktree and local
-execution branch identified by the retained execution context. Confirm their
-current identity and that no unique work, including untracked content or an
-unfinished Git operation, would be lost. Preserve originating and target
-checkouts and caller-owned resources. Missing or changed identity, dirty state,
-or uncertain ownership blocks the affected cleanup; report what remains.
-
-Use non-force removal from a surviving checkout. Do not discard or stash work
-to enable cleanup. Recognize already-removed owned resources on retry without
-selecting substitutes. If cleanup only partly succeeds, retain the remaining
-resources and report integration and partial cleanup separately.
-
-Completion requires the execution directory, its Git worktree registration,
-and its local branch to be absent, with the committed closure still integrated
-in the recorded target. Direct-current-branch mode has no resource cleanup.
+After verified integration and any required target push, remove the clean
+execution worktree and its local and remote branches. Use the retained execution
+identity and non-force operations; preserve unrelated resources and any unique
+work. Delete the remote branch only when its tip is integrated in the remote
+target. Verify removal, accept already-absent resources on retry, and report
+any blocked or partial cleanup. Direct-current-branch mode needs no cleanup.
 
 ## Report
 
@@ -257,18 +236,13 @@ execution mode and retained checkout/branch/target identity when applicable,
 before-cleanup and final-closure commits when deletion happened, assimilated
 knowledge, deleted paths, the saved execution tip and local integration result
 in Story Branch Mode, the push result when the target is `main`, worktree and
-local-branch cleanup results, preserved
+local- and remote-branch cleanup results, preserved
 unsupported material and resources, and any gap that blocked closure.
 Distinguish a new merge from an already-integrated tip, integration success from
 partial or refused cleanup, and local integration from a successful push to
-`origin`. Name unsafe or conflicted state without implying that a remote branch
-was deleted.
+`origin`. Report remote deletion only when its absence has been verified.
 Distinguish a completed wrap-up from a refusal that left files intact.
 
-End a successful closure with:
-
-`## STORY WRAP-UP COMPLETE`
-
-Do not emit that marker when required context, unfinished work, unresolved
-recovery, Story Branch Mode integration or required push, or remaining required worktree cleanup
-blocks closure.
+End successful closure with `## STORY WRAP-UP COMPLETE`. Missing context,
+unfinished work, unresolved recovery/integration, required push, or resource
+cleanup blocks that marker.
