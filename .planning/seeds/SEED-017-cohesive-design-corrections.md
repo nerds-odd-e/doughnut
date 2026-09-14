@@ -34,17 +34,20 @@ preservation decision.
   revisions while receiving structural remote history. Rebase and conflict
   recovery remain possible later directions, outside the current no-rebase
   scope. Do not queue them merely because they were present in the old audit.
-- **Richer identity-preserving organization:** changed-content moves, broader
-  folder-subtree composition, and new-folder destinations. Establish meaningful
-  owner examples and unambiguous identity evidence before selecting a story.
+- **Richer identity-preserving organization:** changed-content note moves and
+  renames across commits are now queued in
+  [SEED-009 story 36](SEED-009-git-backed-local-notebook-workflow.md#story-36),
+  which owns their concerns and refinement. Broader folder-subtree composition
+  remains deferred; destination scope is unresolved in that story.
 - **Earlier projection-drift recovery:** help an owner resume synchronization
   without losing either representation. Canonical framing remains in
   SEED-009; no second recovery story is created here.
 
 ## Ordering and Scope Reduction
 
-The [product backlog](../PRODUCT-BACKLOG.md) owns priority. These directions
-remain unqueued. Example counts alone must not become rejection rules; new
+The [product backlog](../PRODUCT-BACKLOG.md) owns priority. Except for the
+note-identity story linked above, these directions remain unqueued.
+Example counts alone must not become rejection rules; new
 stories should demonstrate a coherent operation rather than admit one more
 hard-coded layout. Preserve identity and work when correspondence is ambiguous.
 

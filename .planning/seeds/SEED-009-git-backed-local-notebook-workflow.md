@@ -44,148 +44,264 @@ are evidence of behavior, never limits on accepted histories or note counts.
 All stories preserve authorization, authored content, note identity and learning
 data; invalid or ambiguous changes must not silently discard work.
 
+<a id="story-35"></a>
+
+### 35. Receive web-created folders and their notes locally
+
+- **Goal / beneficiary:** A notebook owner can organize new material in a folder
+  on the web, then receive that folder and its ordinary notes locally. Creating
+  the folder before writing its first note must also survive clone and pull.
+- **Human direction (2026-09-14):** Keep web folder creation and creating a note
+  in that new folder together in one story. Represent an otherwise empty folder
+  with `.keep`. Include empty folders in initial Git snapshots of existing
+  notebooks as part of the same outcome.
+- **Current evidence:** `PortableTreeSnapshot` emits note files and non-blank
+  container Readmes, but no placeholder for otherwise empty folders.
+  `WebNoteCreationService` advances accepted history only when the starting
+  projection matches and the destination folder is already represented. These
+  are inspected code boundaries, not newly executed acceptance evidence.
+- **Scope:** Web-created folders, including nested folders, and ordinary notes
+  subsequently created in them reach a clean receiving checkout through the
+  existing clone/pull flow. Empty folders use a tracked `.keep` placeholder,
+  not a note or an invented Readme description. Initial snapshots preserve
+  existing empty folders too. Existing note/folder identities, authored content,
+  learning data, and accepted commit IDs remain intact. Subsequent web changes
+  append history; updating support must not rewrite an existing initial commit.
+- **Key examples:**
+  1. A synchronized notebook has no `Biology` folder. Create it on the web,
+     then pull: local `Biology/.keep` preserves the empty folder.
+  2. Create `Cells` in that folder on the web, then pull: local
+     `Biology/Cells.md` contains the new note. Receiving both web changes in one
+     pull also works; no intervening owner synchronization is required.
+  3. An existing notebook contains an empty nested folder `Science/Biology`.
+     Its first Git snapshot and clone retain that path through `.keep`, with
+     existing notes and non-blank Readmes preserved.
+- **Why now / order:** Place after Restore and folder Trash to preserve the
+  selected web-trash detour, and before accumulated publication. This completes
+  basic web authoring into a new destination before improving the convenience
+  of publishing a local session. It is a value ordering, not a claim that
+  accumulated content publication technically depends on folder creation.
+- **Strongest smaller alternative:** Create notes only at the root or in
+  already represented folders, or write a non-blank Readme to retain an empty
+  folder in a snapshot. Those workarounds constrain ordinary organization or
+  require artificial content; they do not deliver the requested empty-folder
+  and new-folder authoring journey.
+- **Highest learning:** Does completing folder creation let an owner organize
+  new material on the web and continue locally without manual folder repair or
+  an inconsistent accepted history?
+- **Deferred promises:** Folder moves/renames, trash synchronization, new local
+  folder-publication capabilities, divergence recovery, and performance targets.
+  Preserve already supported publication when received trees contain `.keep`;
+  deferral does not authorize breaking the next existing local edit/publish.
+- **Architecture context:** [ADR 0004 — OKF-compatible notebook Markdown
+  profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+  requires tracked content to retain empty folders and omits blank Readmes.
+  `.keep` supplies structural tracked content without creating a Markdown
+  concept. Settle shared export/import/lint handling during refinement.
+- **Open refinement questions:** How should already-bound notebooks acquire
+  representation for omitted empty folders through an append-only update?
+  When real content arrives, should the generated `.keep` be removed or retained?
+  Define marker ownership and handling of an existing authored `.keep` without
+  overwriting user content. These decisions belong here, not in a separate
+  baseline-rewrite story.
+- **Effort hypothesis:** L (2–4 hours), low confidence pending marker round-trip
+  and existing-binding analysis. Reassess if this exceeds L; the owner selected
+  the combined outcome, not an implementation plan.
+- **Depends on / safe stopping point:** Existing clone, clean fast-forward pull,
+  ordinary web note creation, and append-only web saves. No new-story technical
+  prerequisite is established. Owners retain useful folder/new-note authoring
+  even if accumulated publication and later organization stories are deferred.
+- **Status:** Queued; needs refinement before execution planning. No
+  implementation is authorized by this backlog addition.
+
 <a id="story-20"></a>
 
 ### 20. Publish accumulated local commits without rewriting history
 
-- **Refinement status:** Refined on 2026-09-13. The narrower delivery and failure
-  policy below are recommendations, not approved product decisions. No execution
-  plan or implementation is authorized by this refinement.
-- **Goal:** A notebook owner can finish a local editing session with several
-  commits, publish once, and continue using those notes in Donut without
-  reconstructing work or losing note identity and learning history. Preserving
-  commit IDs is an existing direction constraint; the user benefit is freedom
-  from publishing after every commit.
-- **Current evidence:** Focused inspection confirms both
-  `cli/src/commands/notebook/notebookPublishAncestry.ts` and
-  `NotebookGitProposalAncestry.java` require the same head or one direct child.
-  Existing CLI and controller tests encode that restriction. This establishes
-  a real capability gap, not its frequency or urgency. Tests were inspected,
-  not run, during refinement.
-- **Purpose and timing challenge:** The owner moved this story below append-only
-  web saves, web rename, and web deletion on 2026-09-13 following refinement.
-  The seed contains no measured frequency of blocked accumulated
-  work. If owners can comfortably publish after each commit, defer this story;
-  meeting a Git direction alone does not establish value now. If web saves
-  commonly overlap local sessions, this narrower delivery may have little
-  practical value: story 21 addresses web history rewriting, but neither story
-  resolves divergence. Reconsider the workflow priority before expanding this
-  story to cover simultaneous editing.
-- **Current-queue challenge (renewed refinement):** The current third position
-  follows Restore and folder Trash; the earlier web-save/rename comparison above
-  is historical rationale, not the current choice. Restore saves manual Move and
-  parent reconstruction; folder Trash adds convenient subtree removal. Neither
-  is an established prerequisite for accumulated publication. If an owner is
-  already blocked by several commits, publication has a stronger immediate case
-  than these conveniences. Without that evidence, the selected web-trash detour
-  remains a reasonable priority. Readme editing and receiving web moves should
-  precede this story if those operations interrupt real sessions more often.
-  Portable-trash Git compatibility should precede it if ordinary trash activity
-  prevents the local workflow from completing. Scale validation has a documented
-  large-notebook failure behind it, but delivered smaller-workload improvements
-  mean current waiting must be checked before asserting it is still the blocker.
-  Unqueued alternatives include recovery of already inconsistent live/history
-  state and gaps in web-authoring synchronization, retained in SEED-017. Either
-  can outrank batching when it prevents an owner from starting or completing the
-  proposed session. Divergence also challenges this session model, but requires
-  a separate product decision compatible with the append-only direction.
-  Backlog order is unchanged; no urgency or new candidate is approved here.
-- **Strongest simpler alternative:** Publish after every local content commit
-  using existing functionality. Try this as a baseline with the owner. It is
-  insufficient when an owner already has accumulated commits or needs to commit
-  without connectivity. Squashing or rebasing conflicts with the stated
-  append-only direction. A new UI or generic synchronization mechanism is not
-  needed to evaluate the selected outcome.
-- **Workaround limitation:** Publishing after each commit is preventive advice,
-  not a recovery path for an already accumulated chain. Reinspection confirms
-  the CLI currently recommends rebasing or recreating one commit after rejecting
-  such a chain, conflicting with the selected history-preservation direction.
-  Whether publishing existing intermediate commits one at a time is a usable
-  history-preserving workaround is unverified; do not promise that procedure.
-- **Proposed delivery scope:** One already bound notebook; Donut's content
-  matches its accepted history; accepted head is an ancestor of local `main`;
-  each intervening commit edits content of existing ordinary notes at unchanged
-  paths. Publish through the existing command and show the final contents in
-  Donut. Retain the original commit chain so a clean receiving checkout obtains
-  the same history and final content. Several edits to the same note are the
-  first example; edits across existing notes follow the same promise. Example
-  commit and note counts are not limits.
-- **Proposed failure simplification:** Accept the complete eligible chain or
-  leave Donut's accepted head and live content unchanged. Preserve local work
-  in either case. After an interrupted response, retry can discover that the
-  tip was already accepted without duplicating work. If the remote advances,
-  fail clearly without overwriting it; automatic recovery is deferred. This
-  replaces the ambiguous partial-progress promise with a proposed atomic
-  outcome, subject to confirming that existing publication supports it.
-- **Deferred promises:** Multi-commit creation, deletion, renaming, moving,
-  container Readme changes, simultaneous web/local editing, recovery of live
-  content already inconsistent with accepted Git history, history UI,
-  per-commit progress/resume, and 10,000-note performance targets. Deferral
-  does not itself require rejecting naturally supported cases or regressing
-  existing single-commit behavior. Branching, merging and rebasing remain
-  outside the explicitly selected linear-history direction.
+- **Slice plan:** [Publish accumulated local commits](../quick/122-publish-accumulated-local-commits/PLAN.md).
+  Planning only; the deletion/recreation leaf awaits the identity-policy answer
+  requested during planning. Remaining leaves cover the resolved composition
+  outcome without requiring the full ADR implementation.
+- **Refinement status:** Updated from the owner's 2026-09-14 scope decision.
+  The earlier content-only proposal is replaced by composition of the existing
+  local → Donut publication capabilities. Architecture below is a draft under
+  discussion in [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md),
+  not an approved ADR or authorization to plan/implement.
+- **Goal:** A notebook owner can combine already supported local publication
+  operations across accumulated commits and publish once. Donut shows the final
+  notebook, preserves the original Git history, and retains the correct note and
+  folder identities and their learning data. Any combination of those supported
+  operations should work when the final state is valid and identity is resolved;
+  neither an operation count nor an existing handler's inability to compose is
+  a product reason to reject it.
+- **Delivery boundary clarified by the owner:** Support multiple commits, each
+  of which may itself mix multiple already supported edits. This is composition
+  within commits and across commits, not delivery of the full ADR architecture
+  or all possible histories. The earlier count of three described web → local
+  actions; it is not a limit or an enumeration of local publication operations.
+- **Current evidence:** CLI and backend ancestry guards allow only the same head
+  or one direct child. Single-commit publication already supports content edits,
+  note additions, note deletions, unchanged-content note renames/moves,
+  represented unchanged folder relocations, and creation of folders/Readmes
+  through added content. Clean local pull already receives several accepted
+  commits. Code and test assertions were inspected; this refinement did not run
+  the application test suites.
+- **Why now:** The owner regards timing as reasonable. Preserve the backlog's
+  web-trash detour and new web-folder story, then remove the need to publish
+  after each local commit. Publishing after every operation is a workaround,
+  but interrupts local sessions and does not solve already accumulated work.
+  Keep performance validation and broader identity inference at their selected
+  positions; no newly measured demand or performance claim is made.
+- **Scope:** One bound notebook whose live projection matches accepted history;
+  accepted main is an ancestor of local main. Compose the already supported
+  operations, whether they affect different notes or successive states of the
+  same note. Preserve genuine operation semantics, including permanent removal
+  for a resolved deletion, but do not preserve incidental restrictions on mixing
+  otherwise supported operations as new product rules. Existing Readme editing,
+  newly inferred rename-with-content-change within one ambiguous transition,
+  broader folder operations, and trash-specific compatibility are not silently
+  added here. These are owned by their existing stories.
+- **Intermediate revisions — owner's architecture proposal:** Preserve all
+  original commits reachable through the accepted chain. A full clone receives
+  that history. Only the proposed tip must be representable in Donut;
+  intermediate drafts need not be valid Donut notebooks. Compute and apply the
+  final result once, without replaying each revision through live database
+  mutations. Inspecting intermediate paths/blobs for identity evidence is
+  compatible with this boundary; invalid Markdown is not invalid Git.
+  This is the architectural direction, not a promise to deliver every
+  intermediate-draft case in this story. Only the parts needed to compose
+  already supported edits are this story's delivery responsibility.
+- **Composition and identity:** An unchanged-content rename in B followed by a
+  content edit in C is in this story, even though the base-to-tip bytes differ.
+  Use relevant intermediate evidence to compose supported identity transitions.
+  The [research](../../docs/notebook-git-identity-research.md) demonstrates why
+  endpoint matching alone misses such cases. Story 36 owns broader inference
+  and ambiguity-resolution capabilities; it does not own all history inspection
+  and is not an excuse to exclude combinations promised here. Ambiguous intent
+  remains unresolved product input, not automatic permission to delete/create.
+- **Proposed atomic acceptance:** Accept the full range with the final content,
+  resolved identity outcomes, and required derived state, or leave Donut's
+  accepted head and live state unchanged. Retain local work either way. A retry
+  after a lost successful response recognizes the accepted tip without applying
+  operations twice. Concurrent remote advancement fails clearly without
+  overwriting either side. Exact crash/retry guarantees need outside-in proof.
 - **Key examples:**
-  1. Donut and local start at A. Locally B edits an existing note and C refines
-     it again. Publish once: Donut shows C's contents, the same learned note
-     remains, and a clean receiver obtains A → B → C with identical commit IDs.
-  2. The response is lost after successful acceptance of C. Retrying reports
-     the accepted C and leaves history and note identity unchanged.
-  3. Donut advances independently from A before publication. Publication fails
-     clearly, preserving both sides; this delivery does not reconcile them.
-- **Learning and stop condition:** Have an owner perform one real local editing
-  session with accumulated content commits, publish once, and continue learning
-  in Donut. Compare with the publish-after-each-commit baseline: did batching
-  remove an actual interruption, and did the no-overlapping-web-edits condition
-  fit the session? Record any unsupported operation that blocked completion.
-  One successful session establishes workflow feasibility, not widespread
-  demand. Use that evidence before adding structural history or more recovery.
-- **What looks easiest:** Reuse the existing publication command, content-edit
-  application and clean receiving flow. The publisher already has a transaction
-  and same-head handling, which makes atomic publication plausible, not proven.
-  Removing the two ancestry guards alone is insufficient evidence of correct
-  history validation, retry behavior or preservation of learning data.
-- **Effort hypothesis:** Retain L (2–4 hours), low confidence, until intermediate
-  history semantics are settled. M (1–2 hours) is plausible only if existing
-  publication and receipt can safely handle the chain without per-commit live
-  application or new recovery machinery. No basis yet for an S estimate.
-  If bounded delivery still exceeds L, revisit the promise rather than quietly
-  adding a general history processor.
-- **Assumptions to validate:**
-  1. Owners actually accumulate commits often enough to prefer this over
-     publishing each commit; demand evidence is missing.
-  2. Existing-note content editing alone is useful before structural changes;
-     a real session should test this.
-  3. Owners can use a session without overlapping web changes; this is a
-     delivery precondition, not an enforced editing lock.
-  4. Donut's live content matches accepted history at session start; repairing
-     an existing mismatch belongs to separately selected recovery work.
-  5. Every intermediate commit in the first example is a valid existing-note
-     content edit. Whether invalid intermediate content repaired at the tip
-     must be accepted is unresolved; the example is not a rejection rule.
-  6. Only the tip must become live Donut content; preserving intermediate Git
-     commits does not require exposing each intermediate state in the app.
-  7. Whole-publication atomicity and retry can reuse existing behavior. The
-     transaction and same-head branch support investigating this, but do not
-     prove all storage and network failure outcomes.
-  8. Existing clone and clean pull can receive the longer accepted history;
-     focused end-to-end evidence is still needed for this publication flow.
-  9. Existing ownership checks, content fidelity, note identity and learning
-     preservation remain applicable; these are obligations, not scope cuts.
-- **Open decisions before execution planning:** Confirm whole-chain acceptance
-  versus partial progress. Decide whether an intermediate invalid or structural
-  state repaired by the tip is merely outside this delivery's promise or must
-  be rejected, with a product reason for any rejection. Confirm value now with
-  an actual blocked session or the owner's stated expected usage.
-- **Intermediate-state challenge:** Requiring every intermediate tree to be a
-  publishable notebook could defeat the goal of committing freely during local
-  work. Proposed answer for discussion: for unchanged-path content edits,
-  validate the final notebook state and retain intermediate commits as history;
-  an invalid draft fixed at the tip should not require rewriting that history.
-  This is not yet a human decision. Structural transitions remain a distinct
-  unresolved identity question, not implicitly covered by this recommendation.
-- **Depends on / safe stopping point:** Existing clone, publication and clean
-  fast-forward pull; no new-story prerequisite is established. This content-only
-  local-session workflow remains useful if all later stories are cancelled.
+  1. B adds a folder represented by content and a note; C edits that note.
+     Publish once: the final folder and note appear in Donut; a receiver gets
+     the original A → B → C chain and final authored files.
+  2. B renames or moves a learned note without changing its bytes; C edits its
+     content. Publish once: the original note and learning history survive at
+     the final path with C's content. Supported folder relocation followed by
+     descendant editing follows the same composition promise.
+  3. A session edits an existing note, adds another, and deletes an unrelated
+     note across commits. Publication applies the final result together;
+     resolved deletion uses existing permanent-removal semantics. Unrelated
+     additions and deletions are not automatically ambiguous merely because
+     endpoint classification currently groups them together.
+  4. B edits two notes and adds a third; C edits that third note and renames
+     another without changing its bytes. One publication accepts the mixed
+     commits together, retaining the original chain and correct identities.
+  5. Edits are fully undone by the tip. The new commits remain publishable even
+     when final file bytes equal the base; identity-sensitive deletion/recreation
+     requires the policy below rather than an automatic same-tree shortcut.
+  6. A failed final validation accepts none of the range. A lost response after
+     success permits a safe retry. A competing accepted web commit preserves
+     both histories and prevents a stale publication.
+- **Open decisions before execution planning:** Resolve only the application,
+  acceptance, and identity decisions needed for this composition outcome;
+  completion of the full ADR design is not a prerequisite. Define identity for a
+  note deleted and recreated within an unpublished range, including at the same
+  path and with identical content; distinguish temporary removal/undo from
+  intended replacement. Define a safe response to unresolved correspondence
+  without requiring history rewriting. Arbitrary ID-free histories cannot
+  guarantee inferred intent, so “any combination” needs those semantics, not
+  silent guessing. Preserve existing supported identity cases as evidence.
+- **Deferred promises:** Independently advanced web/local history reconciliation,
+  history browsing/restoration UI, per-commit application/progress/resume,
+  unrelated live/history drift repair, new operation capabilities owned by
+  sibling stories, and 10,000-note performance targets. No branching, merging,
+  rebasing, or squashing is introduced by this story.
+  General support for nonrepresentable intermediate drafts, new similarity-based
+  identity inference, and owner-assisted ambiguity resolution remain broader
+  architecture or later-story work. Deferral adds no requirement to reject
+  naturally handled cases or validate every intermediate tree as a notebook.
+- **Learning / sizing:** Evaluate a real combined editing session, including
+  rename-then-edit, rather than a content-only demonstration. The former L
+  estimate no longer establishes sizing for this broader outcome. Reassess
+  after identity policies and architecture are settled; split delivery only
+  without silently dropping the owner's combination goal.
+- **Depends on / safe stopping point:** Reuse existing publication, clone, clean
+  pull, and supported operation semantics. No later-story prerequisite is
+  established for basic composition. This workflow remains independently useful
+  if broader rename inference and later stories are cancelled.
+
+<a id="story-36"></a>
+
+### 36. Publish local renames, moves, and edits across commits while preserving note identity
+
+- **Goal / beneficiary:** A notebook owner can rename or move notes while
+  refining their contents locally, then publish the accumulated work into the
+  original Donut notes, retaining their identity and learning history.
+- **Human direction (2026-09-14):** Queue this story second from the bottom,
+  immediately before publication performance validation. The current
+  exact-byte matching behavior may remain useful, but is too specific to serve
+  as the final solution for ordinary local rename-and-edit workflows. It may
+  need to be replaced rather than surrounded with more special cases.
+- **Current evidence / concern:** Publication currently infers a note move from
+  uniquely paired removed/added files with identical blob bytes. Updating a
+  heading, frontmatter, or body along with the filename breaks that match.
+  Existing identity-preservation tests prove only the narrower behavior; they
+  do not establish general rename-and-edit support. Actual file deletion now
+  permanently removes the note and dependent learning data, so misclassifying
+  a move as deletion plus addition would have a material preservation cost.
+- **Scope direction:** Local → Donut within one notebook and the selected
+  append-only history model. Cover content changes combined with note renaming
+  or moving, including changes spread over multiple local commits. Preserve
+  accepted and local commit IDs, final authored content, and the original note's
+  learning associations. The owner should not need an artificial sequence of
+  unchanged-content moves and intervening publications to preserve identity.
+- **Key examples for refinement:**
+  1. Rename `Old.md` to `New.md` and update its heading/body in the same commit.
+     Publishing updates the original Donut note under its new title.
+  2. Starting at accepted A, B edits `Old.md`, C moves/renames it to
+     `Folder/New.md`, and D edits it again. One publication retains the same
+     note and learning history, final D content, and the original commit chain.
+     Intermediate revisions are potential identity evidence even when the
+     accepted and final file contents differ.
+  3. Several similar or identical notes change paths and contents. The product
+     must not silently attach one note's learning history to another; the
+     ambiguity outcome needs refinement. Example counts are not limits.
+- **Approach concern:** Consider history across commits as evidence rather than
+  relying only on the accepted-to-tip diff. This is an investigation direction,
+  not a selected algorithm or a promise that every intent can be inferred.
+  Exact bytes and similarity alone must not be mistaken for proof of user intent.
+- **Strongest smaller alternative:** Rename/move without changing contents,
+  publish, then edit and publish again. This can use the existing narrow path,
+  but interrupts ordinary local editing and does not handle already accumulated
+  rename-and-edit work without reconstructing it.
+- **Highest learning / open decisions:** Establish which realistic histories
+  provide sufficient identity evidence and what happens when they do not.
+  Distinguish a move from intentional copying or deletion/recreation; determine
+  whether unresolved cases need explicit owner confirmation or a clear refusal.
+  Define destination-folder scope and interaction with repaired intermediate
+  drafts. No similarity threshold, metadata scheme, identity-mapping UI, or
+  per-commit replay design is selected by this story.
+- **Boundaries / dependencies:** Story 20 owns combinations of already supported
+  publication operations, including history analysis needed for an exact rename
+  followed by an edit. This story owns broader inference for transitions whose
+  correspondence those existing semantics cannot resolve, such as rename and
+  content change together. Reuse story 20 rather than duplicating range analysis.
+  Independent remote/local divergence and history rewriting remain outside
+  this story. Broader folder-subtree operations remain unselected; story 28
+  retains trash-specific journeys. Any shared identity inference should be
+  cohesive rather than duplicated by story. Its position after story 28 is the
+  owner's priority, not an established technical prerequisite.
+- **Effort / status:** Queued, unrefined; sizing is unresolved until identity
+  evidence and ambiguity policy are understood. Do not claim execution-ready
+  scope or authorize implementation from this entry.
+- **Safe stopping point:** Supported rename-and-edit journeys retain their
+  original notes and learning history even if later organization work is
+  deferred; unsupported ambiguity preserves work without silently guessing.
 
 <a id="story-23"></a>
 
@@ -365,43 +481,221 @@ from further splitting/refinement for now, by the owner's instruction.
 
 ### 32. Restore a trashed item to its visible original path
 
-- **For / why:** A web owner can put a note or folder back without choosing its
-  destination and reconstructing the parent folders manually.
-- **Evaluation:** Restore `_trash/Biology/Cells (2)` while `Biology` is absent;
-  create the parent and move to `Biology/Cells (2)` with retained identity/history.
-  The same prefix-removing action restores a folder and its descendants.
-- **Scope:** Restore toolbar action on trashed notes/folders; reuse existing
-  parents, recursively create missing ones, and apply ordinary destination
-  conflicts. Renames in trash change the visible path used for restoration.
-- **Value / learning:** A small web convenience proves recovery needs no original
-  path journal, timestamp grouping, or separate folder-undo concept.
-- **Effort hypothesis:** M, low confidence around missing parents and references.
-- **Depends on:** Existing web note Trash. Story 31 is higher priority for
-  structural completion, not a technical prerequisite. No new Git compatibility
-  promise is included.
-- **Safe stopping point:** Restore is useful independently of a folder Trash
-  action, permanent deletion UI, or empty-trash capability.
+#### Goal and value challenge
+
+A notebook owner revisiting older trash can return one selected note or folder
+to the location expressed by its current trash path, without selecting a
+destination or manually rebuilding missing parent folders. This preserves the
+owner's organization as well as the item's content, identity, and learning data.
+
+Recovery already exists through Move. The incremental value is a predictable
+shortcut, especially when parents are missing; it is not newly making recovery
+possible. The strongest smaller alternative is to keep Move and manually create
+parents, or recover to notebook root. Deferral is reasonable if that friction is
+rare. Being next in the queue or completing the trash feature is not evidence of
+urgency. The earlier owner decision favors web-first feedback, but frequency and
+cost of this particular recovery problem remain unconfirmed.
+
+The useful learning is whether the visible trash path gives owners the destination
+they expect. The existing decision already excludes a restoration journal; proving
+an internal simplification alone is not the user value of this story.
+
+#### Scope — existing commitments
+
+- A Restore action for one selected trashed note or folder in the web UI. For a
+  folder, the selected subtree moves together; descendants retain their identities.
+- Derive the destination in the same notebook by removing the leading trash
+  component from the **current** path. Retain visible renames and collision
+  suffixes. "Original path" does not mean a remembered historical location.
+- Reuse existing destination parents and recursively create missing parent
+  folders. Recreating a path does not recover an old parent folder's identity,
+  description, or other contents.
+- Apply ordinary destination-conflict rules and preserve authorization, content,
+  note identity, learning history, and independent removed-from-tracking choices.
+  Leaving trash restores location-based eligibility; it does not reset scheduling
+  or promise that every recovered note is immediately due for recall.
+- Preserve existing Move and immediate Undo behavior. Restore does not reconstruct
+  reference properties removed when trashing; ordinary reference behavior remains
+  the baseline, without a new link-repair promise.
+- No new Git/local compatibility journey, folder Trash action, bulk selection,
+  permanent deletion UI, empty-trash action, or historical-version recovery is
+  committed here. Those deferrals do not justify restricting ordinary moves.
+
+#### Key examples
+
+1. **Missing organization:** After revisiting trash in a later session,
+   `_trash/Biology/Cell science/Cells.md` exists and `Biology` does not. Restore
+   recreates `Biology/Cell science` and places the same note at
+   `Biology/Cell science/Cells.md`, retaining content and learning history.
+   The owner explicitly requires recovery even when the entire active parent
+   path is gone: recreate every missing ancestor, not just the immediate parent.
+   For folder `_trash/Research/Biology/Topic`, with `Research` entirely absent,
+   recreate `Research/Biology` and move the retained `Topic` subtree there.
+   This recreates missing path folders; it does not resurrect their old metadata
+   or unrelated contents.
+2. **Existing organization:** The same destination parents already exist.
+   Restore reuses them and leaves their other contents intact. A note directly
+   beneath root `_trash` returns to notebook root.
+3. **Current visible name:** A note is now at `_trash/Biology/Cells (2).md`,
+   whether because of a trash collision or a rename. Restore targets
+   `Biology/Cells (2).md`; it does not infer `Cells.md` from past state.
+4. **One selected subtree:** Restore folder `_trash/Biology/Topic` to
+   `Biology/Topic` with its descendants. Siblings left in trash remain there.
+   This does not depend on adding a folder Trash button.
+5. **Occupied destination — proposed interaction:** The derived destination
+   conflicts with an existing item under ordinary placement rules. Show the
+   conflict and leave the selected item in trash, without overwriting content
+   or partially restoring a subtree. The owner can use existing Rename or Move.
+   Whether Restore also offers the existing explicit folder merge choice remains
+   open; automatic merge or automatic suffixing is not an agreed Restore behavior.
+
+#### UI and assumption challenges
+
+- Proposed wording is **Restore to …**, exposing the derived destination so a
+  renamed item or retained suffix is unsurprising. Avoid promising recovery to a
+  historical path. Exact presentation is not yet selected.
+- Immediate Undo currently receives a prior folder and title; Restore derives
+  its destination from today's trash path. They can legitimately differ. This
+  story does not silently redefine Undo to make their results identical.
+- Restoring a folder is useful even before folder Trash: trash already contains
+  path folders and ordinary folder Move exists. Keep the current note-and-folder
+  commitment unless the owner chooses to defer folder Restore; do not add folder
+  creation/trashing workflows to justify this shortcut.
+- The reserved root `_trash` itself has no item destination after prefix removal;
+  treating it as Restore All would introduce a separate bulk outcome. Also resolve
+  how to present a nested trash path whose derived destination is still beneath
+  root `_trash`, rather than claiming it has left trash. These boundaries must
+  respect the existing location rule, without inventing another trash state.
+
+#### Open decisions and readiness
+
+- **Priority decision (2026-09-14):** The owner explicitly moved Restore to the
+  very bottom of the product backlog, after publication performance validation.
+  Recursively reconstructing a completely missing active parent path remains
+  required, but its incremental value over Move does not justify earlier priority.
+  Restore is retained, not cancelled, and is not a prerequisite for folder Trash
+  with Move recovery or the intervening Git work.
+- **Narrow cut:** Retain notes and folders under one rule (recommended), or
+  explicitly defer the existing folder Restore promise for a note-only delivery?
+- **Conflict interaction:** Recommend reporting the conflict and relying on
+  existing Rename/Move. Decide whether an explicit folder merge choice belongs
+  inside Restore before making a delivery commitment to it.
+- **Effort hypothesis:** M, low confidence. Missing parents and reference behavior
+  remain sizing risks; this refinement is not an executable plan.
+- **Prerequisites and stopping point:** Existing trash browsing and ordinary moves
+  provide the starting journey. No new Git compatibility or folder Trash capability
+  is required. The shortcut remains useful if those later stories are cancelled.
+
+Focused source inspection on 2026-09-14 found existing older-trash Move examples
+in `e2e_test/features/note_creation_and_update/note_deletion.feature`, prior-location
+Undo in `NoteController`, and a default folder collision with optional explicit
+merge in `NotebookController`. These are inspected examples and source behavior,
+not newly executed test evidence. Proposals above await the owner's refinement
+answers and do not supersede the shared agreed contract.
 
 <a id="story-33"></a>
 
 ### 33. Trash a folder on the web as one recoverable subtree
 
-- **For / why:** A web owner can set aside an organized body of notes in one
-  action without mixing it into an earlier trash operation.
-- **Evaluation:** With `_trash/Biology` present, trash active `Biology`; place the
-  whole subtree in `_trash/Biology (2)`. Browse and move it out with every note's
-  identity/history retained and participation following location.
-- **Scope:** Folder Trash action, recursive eligibility, full-path placement and
-  whole-folder collision suffixing. Preserve the existing trash subtree and
-  ordinary editing/Move. Use Restore when available from story 32.
-- **Value / learning:** Extends the demonstrated web move model to a subtree
-  without inventing timestamp-based group recovery.
-- **Effort hypothesis:** M, low confidence, assuming reuse of existing subtree
-  moves and the common eligibility rules.
-- **Depends on:** Existing web note Trash. Story 32 supplies convenience, not
-  required recovery. No new Git compatibility promise is included.
-- **Safe stopping point:** The folder workflow is useful without web permanent
-  deletion, automatic expiry, or empty-trash actions.
+- **Simplicity decision (2026-09-14):** The owner returned to shared trash paths
+  and dropped the proposed per-action event folders and event README metadata.
+  Do not queue event grouping as deferred work without a new concrete need.
+  Trashing may be frequent; recovery is expected to be less frequent. The core
+  requirement is retaining information with ordinary Move available for recovery,
+  not reconstructing a particular trash operation. Shared ancestor path folders
+  may be reused. An explicitly trashed folder still receives a whole-folder
+  collision suffix, as in the accepted `Biology (2)` example below; it is not
+  merged destructively into earlier trash. Preserve that folder's README,
+  metadata, descendants, note identities, and learning data. Reconstructed path
+  ancestors are not historical copies of the original ancestors' metadata.
+- **Goal:** A notebook owner can set aside one organized subtree through web
+  Trash, then recover it through ordinary Move, with its content and learning
+  history intact. Both directions belong to this delivery.
+- **Priority / why now (2026-09-14):** The owner prefers completing this reversible
+  folder workflow before adding the Restore convenience. Individual note Trash
+  and Move recovery exist; they do not supply a one-action folder Trash operation
+  with full-path placement and whole-folder collision handling. The useful outcome
+  remains available even if Restore is never built.
+- **Value challenge and smaller alternative:** Ordinary folder Move already
+  supplies subtree relocation. An owner could manually arrange a destination
+  beneath `_trash`, preserve the parent path, and resolve a name collision.
+  Trashing individual notes is another workaround, but requires repeated work
+  and does not preserve the folder as one selected unit. The incremental value
+  is a predictable one-action placement of that unit into trash, with a usable
+  way back. Do not justify this story as inventing recovery or as preparation
+  for future Git work. Frequency of real folder-discard operations is unmeasured;
+  priority rests on the owner's selected web workflow, not an established usage
+  metric. The learning is whether owners can set aside and recover an organized
+  topic without managing trash paths themselves.
+- **Scope:** Trash one selected active folder with its descendants, preserving
+  its full path beneath notebook-root `_trash`. Suffix a colliding incoming folder
+  as a whole rather than merging it with earlier trash. Browse the resulting
+  subtree and use existing folder Move to recover it to an owner-selected existing
+  active folder or notebook root in the same notebook. Preserve identities,
+  authored content, learning history, independent tracking preferences, and the
+  agreed reference-handling choices; participation follows current location.
+- **Recovery responsibility:** Reuse existing Move behavior and complete any
+  necessary gaps in the folder round trip within this story. A working Trash
+  button alone is insufficient. Show the recovered location and retained subtree
+  through the web journey; establish descendant eligibility and learning-data
+  preservation at the appropriate observable boundary.
+- **Key example:** Active `Biology` contains a note and a nested folder with a
+  learned note; `_trash/Biology` already contains earlier trash. Trash active
+  `Biology`, obtaining `_trash/Biology (2)` with the complete selected subtree.
+  Revisit it after reloading, then Move `Biology (2)` to notebook root. The same
+  subtree is active at `Biology (2)`, its learning history remains, and the earlier
+  `_trash/Biology` is untouched. Move does not remove the visible suffix.
+- **Nested selection example:** Trash `Research/Biology/Topic` while its sibling
+  `Research/Biology/Other` remains active. Place only the selected subtree at
+  `_trash/Research/Biology/Topic`, creating missing trash-side path folders.
+  If the active parent path subsequently disappears, recover by Move to notebook
+  root or another existing active folder. Rebuilding the missing active path
+  belongs to postponed Restore, not this story.
+- **Boundary example:** The chosen recovery destination has a conflicting folder
+  name. Preserve ordinary Move conflict handling and its existing explicit merge
+  choice; do not silently overwrite or automatically merge. There is no new
+  recovery-specific conflict policy in this story.
+- **Deferred promises:** Restore-to-derived-path, automatic reconstruction of
+  missing active parents, new Git/local compatibility, bulk selection, permanent
+  deletion UI, expiry, and empty-trash actions. No separate recovery state or
+  timestamp grouping is introduced. Existing supported behavior remains preserved.
+- **Narrow interaction proposal:** Offer Trash on the selected active folder's
+  existing page; one confirmation explains that the folder and everything inside
+  will leave active use and can be recovered with Move. After success, return to
+  its former parent or notebook root. Keep recovery in the existing folder Move
+  interaction. Do not add a separate folder Undo mechanism or a new recovery
+  screen to complete this round trip. This presentation is a proposal, not yet
+  an agreed UI contract.
+- **Boundary assumptions:** An ordinary empty folder follows the same location
+  rule; example note counts do not justify special acceptance gates. Folder
+  descriptions and nested empty folders remain part of the retained subtree.
+  The action targets an active folder, not the notebook itself or reserved root
+  `_trash`; already-trashed folders remain browsable and movable. Cancelling
+  leaves the subtree unchanged. A failed Trash must not leave only part of the
+  selected subtree relocated. No new cross-notebook recovery behavior is promised;
+  existing supported Move behavior is preserved.
+- **Current evidence:** Folder Settings exposes Move even for a trashed folder;
+  `FolderMoveRelocation` reparents the existing subtree, and note availability
+  follows folder ancestry. Dedicated note Move recovery tests exist. Focused
+  inspection has not found dedicated folder-trash round-trip coverage, so this
+  seed does not claim that complete folder recovery has already been verified.
+- **Open refinement — references:** The earlier shared contract promises existing
+  deletion-reference choices. Applying them to an entire folder is not yet
+  defined: references can come from inside or outside the subtree, and individual
+  relationship reduction is a content transformation rather than simple trashing.
+  Recommended narrowing, awaiting the owner: preserve authored references and
+  provide one warning that links to trashed notes may no longer resolve. Keep
+  existing individual-note choices available separately; do not run automatic
+  cleanup or a sequence of per-note prompts during folder Trash. This proposal
+  does not yet supersede the shared reference-choice promise. If bulk removal is
+  retained, resolve which referrers it affects and explicitly state that Move
+  recovery does not reconstruct removed properties before execution planning.
+- **Effort hypothesis:** M, low confidence around subtree reference handling and
+  complete recovery proof. Existing moves are a reuse opportunity, not grounds to
+  omit the recovery acceptance journey.
+- **Depends on / safe stopping point:** Existing web note Trash, trash browsing,
+  and folder Move. No dependency on story 32. This complete reversible workflow is
+  useful without Restore or any later trash/Git capability.
 
 ### Deferred combined compatibility story
 
@@ -439,11 +733,16 @@ older trash; migration and removal of the old soft-delete structure is complete
 before convenience expansion. Neither relies on completing new Git move/rename
 or trash compatibility.
 
-Defer folder Trash first, then the Restore shortcut; Move already supplies
-recovery. No database-, API-, or UI-only preparation story is queued.
+The owner's 2026-09-14 refinement puts folder Trash with Move recovery first
+and moves the Restore shortcut to the very bottom of the backlog, after
+publication performance validation. Move already supplies note recovery, and
+story 33 owns proving the complete folder round trip. No database-, API-, or
+UI-only preparation story is queued.
 
-After those web stories, keep existing Git stories 21, 22, 20, 24, and 25 in
-relative order. Then queue the single unrefined story 28. Former story 23 is
+After folder Trash, deliver web-created folders and their notes (story 35),
+then keep remaining Git stories 20, 24, and 25 in relative order. Story 35's
+position reflects the owner's 2026-09-14 addition of basic folder authoring;
+stories 21 and 22 are already delivered. Then queue the single unrefined story 28. Former story 23 is
 absorbed there because its deletion-sync scope overlaps the new trash lifecycle;
 its outcome is retained rather than cancelled. Publication performance remains
 after that combined compatibility item.
@@ -476,7 +775,8 @@ Keep these outside the current queue rather than cancelling them:
 - Recovery for notebooks whose live projection already differs from accepted
   history. Establish the owner's blocked journey and a deliberate preservation
   policy before selecting recovery work.
-- Wider folder operations and rename-with-content-edit identity decisions.
+- Wider folder operations. Rename-with-content-edit and multi-commit note
+  identity preservation are now queued together in [story 36](#story-36).
   All trash-related Git/local work is retained together in deferred story 28.
 - Native standard Git transport, notebook binding within a project subdirectory,
   attachments, and history browsing or revision restoration.
@@ -490,9 +790,10 @@ the newly selected append-only stories.
 
 - How often do web renames, deletions and moves interrupt actual owner work?
   The order above is a value hypothesis, to revise with use.
-- Story 20 owns the proposed atomic publication policy and unresolved
-  intermediate-history semantics; settle those decisions before its execution
-  planning, without discarding or rewriting work.
+- Story 20 owns composition of supported publication operations. Its final-only
+  projection proposal and unresolved identity/deletion-gap semantics are drafted
+  in ADR 0002; settle them before execution planning without discarding or
+  rewriting work.
 - Additional web creation modes and container mutations need concrete owner
   journeys before story selection; this queue is not a completeness claim.
 
