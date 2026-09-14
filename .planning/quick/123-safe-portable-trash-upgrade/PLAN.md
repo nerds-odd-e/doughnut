@@ -722,7 +722,7 @@ slice.
 
 ### 11d. Run the real task process against an owned V325 schema
 Type: Behavior
-Status: planned
+Status: done
 Behavior: A fresh owned V325 schema and the application test artifact → start a
 fresh `upgradePortableTrash` process pointed at that schema → the process exits
 zero with the exact success token and Flyway history reaches latest exactly
@@ -734,6 +734,18 @@ Proof: A focused integration test observes the child process result/token and
 queries the owned schema's latest successful Flyway history. The structural
 writer-exclusion proof remains owned by 11a.
 Estimate: 5 minutes active plus process waiting.
+Learnings: Added one package-private process owner that launches the real
+`DonutApplication` main on the current test runtime artifact with the task and
+owned datasource selected, drains combined output continuously, and bounds
+both execution and forced termination. The focused integration test creates a
+real V325 schema, observes child exit zero and exactly one exact success-token
+line, then confirms latest successful Flyway version `300000328` occurs once.
+The fresh refactor moved datasource credentials out of visible JVM arguments
+into the child environment and made output/interrupt/cleanup failure paths
+bounded and diagnostic. The focused test passed in ~5.6 seconds, with
+`spotlessJavaCheck` and whitespace checks green; `format:changed` was a no-op.
+Implementation took ~4 minutes and refactor ~5 minutes. Only the owned local
+test schema was created and dropped; no external or cloud state was touched.
 
 ### 11e. Extract the populated upgrade invariant owner
 Type: Structure
