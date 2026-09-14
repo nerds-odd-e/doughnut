@@ -12,6 +12,12 @@ the already-selected baseline rebuild intentionally replaces prior Git history.
 Owners need fresh checkouts and instructions to preserve unpublished local work
 before replacing a checkout. This release does not implement local-history merge.
 
+Execution identity: originating checkout `/Users/terryyin/git/doughnut` on
+`main`; execution checkout
+`/Users/terryyin/git/doughnut-worktrees/123-safe-portable-trash-upgrade` on
+`quick/123-safe-portable-trash-upgrade`; integration target `main`; delivery
+destination `origin/quick/123-safe-portable-trash-upgrade`.
+
 Terry Yin, 2026-09-14: production has not deployed this migration; explicitly
 revise committed `V300000328` as a one-time exception to migration immutability.
 Record that exception in its implementation commit. Do not edit other committed
@@ -51,6 +57,18 @@ PFE assessment (migration, product and deployment boundaries):
   Release workflow and release runbook own rollout. Add only the one-time
   maintenance path/guard needed there; ordinary rolling replacement does not
   prove writer exclusion. No parallel release orchestrator.
+- Execution correction after slice 9: keep that same release owner, but replace
+  the unsafe stop/start assumption with GCP's existing durable MIG controls and
+  the application's existing one-shot `DonutTaskRunner` seam. The live MIG is
+  `PROACTIVE`; Google documents that a template change then rolls out to existing
+  VMs automatically, so `set-instance-template` cannot precede quiescence.
+  Stable gcloud 535 also requires explicit instance names for `stop-instances`
+  and `start-instances`; the implemented `--all-instances` form is unsupported.
+  Use an opportunistic policy plus a zero-sized MIG as the durable closed state,
+  run and verify the upgrade in a non-serving/non-scheduling one-shot process,
+  and create serving instances only after that proof. Change the existing
+  deployment/task ownership; do not add a second release orchestrator or a
+  permanent migration service.
 
 Accepted ADR 0004 (`docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md`)
 requires location-based trash with retained Portable files and learning identity.
@@ -352,6 +370,10 @@ not minutes, so no bounded reassessment was triggered.
 ### 7. Establish a quiescent maintenance state
 Type: Behavior
 Status: done
+Correction status: The local fake proof and implementation were later
+invalidated by stable gcloud command shape and the live MIG's PROACTIVE update
+policy. Slices 10-13 replace the unsafe mechanics while preserving this slice's
+writer-exclusion outcome; this historical result is not release evidence.
 Behavior: Old application processes are serving → enter the one-time maintenance
 path → all schema-dependent writers are stopped and verified absent before any
 migration is permitted. Account for background writers, not just incoming HTTP.
@@ -401,6 +423,10 @@ Flyway migration), and no defect found.
 ### 8. Keep old writers stopped after replacement or process failure
 Type: Behavior
 Status: done
+Correction status: The claim that `set-instance-template` does not replace
+running instances is false for this MIG's PROACTIVE policy. Slices 10-13 replace
+the mechanism and own this outcome before release; this historical result is
+not release evidence.
 Behavior: Maintenance has been entered and migration is interrupted → lifecycle
 replacement, autohealing or an operator retry occurs → old binaries cannot
 resume writing. The maintenance state survives loss of the invoking process.
@@ -457,6 +483,11 @@ autohealing/update-policy semantics), refactor and coordinator verification.
 ### 9. Route normal publication through the protected upgrade
 Type: Behavior
 Status: done
+Correction status: The publication route reaches the intended scripts, but the
+route is not protected: it uses unsupported `--all-instances`, can start a
+proactive replacement before quiescence, and starts HTTP/background writers
+before the external verification step. Slices 10-14 correct the actual entry
+point; this historical result is not release evidence.
 Behavior: Application Release selects the portable-trash artifact → publication
 → maintenance protections precede every schema-dependent rollout and routing
 cannot reopen early. Ordinary rolling replacement cannot bypass the protection.
@@ -527,35 +558,119 @@ ordinary rolling-replace route is structurally unreachable in this script —
 it cannot and does not prove real GCP-side behavior (actual instance
 stop/start timing, autohealing, update-policy convergence).
 
-### 10. Recover a failed release without reopening an unsafe application
+### 10. Close the MIG before changing its template
 Type: Behavior
 Status: planned
-Behavior: Backup/preflight, migration or verification fails in the maintenance
-path → operator follows recovery → writes remain excluded until either the
-verified new state or a verified backup restoration with compatible app exists.
+Behavior: The production-family MIG has running old instances and a PROACTIVE
+replace policy → enter maintenance → the policy becomes opportunistic, the
+MIG's original target size is retained for recovery, its target size becomes
+zero, and no instance remains before any template or migration change occurs.
+Proof: Extend the publication/maintenance fake-cloud boundary to assert the
+actual order and durable zero target; process loss after each command leaves
+either the unchanged old service or a zero-sized service, never a mixed-version
+rollout. Assert stable gcloud command forms rather than teaching the fake to
+accept unsupported `--all-instances`.
+Estimate: 5 minutes active. Reuse native update-policy, resize, describe and
+list-instances commands; do not add a maintenance state service.
+
+### 11. Run a verified upgrade without application writers
+Type: Behavior
+Status: planned
+Behavior: A populated pre-326 schema and the selected compatible jar → invoke a
+one-shot upgrade task with no web server and no scheduler → the actual
+repair/migrate chain and pre/post schema/identity/count invariants pass, the task
+exits with an explicit success signal, and no application writer exists.
+Change: Extend the existing `DonutTaskRunner`/`odd-e.donut.task` seam only as
+needed for this temporary production-family task. Reuse the existing migration
+and Portable-tree verification owners; do not create another Flyway runner or
+copy the migration recipes. Story 39 removes the temporary task.
+Proof: Drive the packaged task against `PreUpgradeFixtureSchema` with the same
+populated and interrupted states already owned by slices 2-6. Observe process
+exit, schema/history, retained identities/content/counts and trees; prove the
+task mode exposes neither HTTP nor scheduled jobs. Run the full backend suite
+because production Java/migration startup changes.
+Estimate: 5 minutes active plus full-suite waiting. If the existing task seam
+cannot start without writer surfaces, stop and refine before adding a second
+application bootstrap.
+
+### 12. Execute the one-shot task while the serving MIG stays closed
+Type: Behavior
+Status: planned
+Behavior: The MIG is durably zero-sized and the compatible artifact is uploaded
+→ the release owner runs the one-shot task on an isolated transient GCP VM →
+only its explicit verified-success result permits continuation; failure,
+timeout, process loss or ambiguous output leaves the serving MIG at zero.
+Change: Keep orchestration inside the existing backend deployment script and
+reuse its template/startup-script/service-account/network knowledge. The
+transient VM is not a backend-service member and is removed deterministically;
+it is a one-release resource, not a staging platform or durable service.
+Proof: Publication-boundary fakes cover success, task failure, timeout and
+invoker loss, including cleanup ownership and no serving-MIG resize/template
+advance on any missing success. The task command is the packaged slice-11 entry,
+not copied SQL or a mocked Flyway call.
+Estimate: 5 minutes active. Missing permission for a transient VM is a slice-12
+Jidoka stop, not authority to run the task inside a serving application.
+
+### 13. Reopen only the verified compatible application
+Type: Behavior
+Status: planned
+Behavior: The one-shot task has emitted verified success and the serving MIG is
+still zero-sized → assign the compatible serving template, restore the retained
+target size and intended update policy, wait for rollout and health → only the
+compatible application can write; a failure before verified success cannot
+reach any reopening command.
+Proof: Publication-boundary tests assert the success token is the sole gate to
+template assignment/resize, all failure permutations remain closed, and the
+successful path restores the prior target size rather than a hard-coded fleet
+size. Preserve selected artifacts, frontend/CLI publication and release-record
+semantics from slice 9.
+Estimate: 5 minutes active after slices 10-12.
+
+### 14. Recover a failed release without reopening an unsafe application
+Type: Behavior
+Status: planned
+Behavior: Backup/preflight, one-shot migration or verification fails → operator
+follows recovery → the serving MIG stays zero until either the verified new
+state or a verified backup restoration with a compatible app exists.
 Change: Add a short one-time section to the canonical release runbook with
 backup identification and restore rehearsal, pre/post identity/content checks,
 actual Flyway/schema preflight, retry states and fresh-checkout communication
-that protects unpublished local work. No automatic schema rollback.
-Proof: Same publication boundary tests observe failure stays closed and only
-successful verification permits reopening; walk its commands against the owned
-fixture including restoring backup. Document exact operator inputs and evidence.
-Estimate: 5 minutes active plus restore waiting; reuse slices 2–9 observations.
+that protects unpublished local work. Correctly distinguish Cloud SQL backup
+NAME restore-to-new from backup ID restore semantics. No automatic schema
+rollback.
+Proof: The corrected publication boundary from slices 10-13 observes failure
+stays closed and only verified success permits reopening; walk the documented
+commands against owned disposable fixtures and record what remains cloud-only.
+Document exact operator inputs and evidence.
+Estimate: 5 minutes active plus restore waiting; reuse slices 2-6 and 10-13.
 
-### 11. Rehearse the supported release path on an isolated populated copy
+### 15. Rehearse backup restoration on a disposable Cloud SQL target
+Type: Behavior
+Status: planned
+Behavior: A named pre-maintenance backup and a fresh disposable target → run the
+documented Cloud SQL restore path and identity/content preflight → the restored
+target is verified before any compatible application is allowed to use it.
+Proof: Use only an explicitly authorized disposable Cloud SQL instance, retain
+sanitized backup-name/target/version/timing and row comparison evidence, and
+delete only the rehearsal-owned target afterward. Never restore into or mutate
+`doughnut-db-instance` or adopt an ambiguously owned instance.
+Estimate: 5 minutes active orchestration plus external waiting. Missing explicit
+ownership of a disposable target blocks this proof only.
+
+### 16. Rehearse the supported release path on an isolated populated copy
 Type: Behavior
 Status: planned
 Behavior: A production-shaped pre-upgrade copy and old/new release processes →
-run the documented maintenance sequence with interruption/retry → only the
-compatible app serves the verified retained notebook data after reopening.
+run the documented zero-MIG/one-shot/reopen sequence with interruption/retry →
+only the compatible app serves verified retained notebook data after reopening.
 Proof: Use the real release/migration entry points on an explicitly disposable
-environment. Observe writer exclusion including replacement/autohealing, full
-upgrade/restore recovery and final application/Portable-tree checks; retain
-sanitized exact commands, versions, row comparisons and timing in this plan.
-Use an authorized isolated pre-upgrade production copy when available; if only
-synthetic data or fake cloud exists, label that limitation and leave the missing
-release proof pending. Do not access or mutate production under this plan.
-Estimate: 5 minutes active orchestration after slices 7–10, external waiting
+environment. Observe zero-size writer exclusion, task-process isolation,
+replacement/autohealing behavior, full upgrade/restore recovery and final
+application/Portable-tree checks; retain sanitized exact commands, versions,
+row comparisons and timing in this plan. If only synthetic data or fake cloud
+exists, label that limitation and leave the missing release proof pending. Do
+not access or mutate production under this plan.
+Estimate: 5 minutes active orchestration after slices 10-15, external waiting
 separate. Missing disposable cloud/copy access blocks only this proof; do not
 build a general staging platform to get around it.
 
@@ -568,8 +683,8 @@ build a general staging platform to get around it.
 | Authored data, folders, references, learning/preferences and bindings retained | 3 |
 | Interruption recovery for conversion and per-notebook rebuild | 4–5 |
 | Thousands of deleted notes, complete trees, measured operating cost | 6 |
-| Old writers excluded; failures remain in maintenance | 7–10; real observation 11 |
-| Backup/restore, row/content comparisons, fresh-checkout guidance | 10–11 |
+| Old writers excluded; failures remain in maintenance | Historical 7–9 replaced by 10–14; real observation 16 |
+| Backup/restore, row/content comparisons, fresh-checkout guidance | 11, 14–16 |
 | Remove all migration-only additions after production success | Story 39; inventory below |
 
 Production release is separate from this implementation plan: use the existing
@@ -591,8 +706,9 @@ Update exact paths as each slice lands; this is a deletion list, not a framework
   callers before removing helpers used by other still-required tests.
 - New fixture schema support, historical fixtures, scale case, interruption
   instrumentation and any dedicated task/command (slices 1–6).
-- Temporary maintenance guard/path, its migration-only publication tests and
-  one-time runbook instructions (slices 7–11); remove after safe retirement.
+- Temporary maintenance guard/path, one-shot task, transient migration runner,
+  migration-only publication tests and one-time runbook instructions (slices
+  7–16); remove after safe retirement.
 
 Story 39 must safely fold final DDL into the existing baseline and deploy/confirm
 a new tip above all ever-applied versions before removing old migrations. Fresh
@@ -618,23 +734,43 @@ unconfigured primary, first run `CURSOR_DEV=true nix develop -c backend/gradlew 
 command runs slice 2's engine proof. Regenerate the ERD per database-erd guidance
 if schema migrations change. No frontend/API change is expected.
 
-Planning inspected code only; all proof results remain pending. The common model
-is the existing conversion transaction, per-notebook rebuild transaction, one
-schema reconciliation and one maintenance release owner. No per-case production
-pipeline.
+The original planning pass inspected code only; subsequent slice learnings above
+contain executed proof. The common model remains the existing conversion
+transaction, per-notebook rebuild transaction, one schema reconciliation and one
+maintenance release owner. No per-case production pipeline.
 
-Refinement: the original rollout slice 7 combined establishing quiescence,
+Historical refinement: the original rollout slice 7 combined establishing quiescence,
 lifecycle protection and publication wiring. Replaced it with slices 7–9 and
 renumbered recovery/rehearsal to 10–11, preserving all proof owners. Result:
 11 slices, no completed work replaced, no story resplit recommended. The smaller
 manual alternative remains preferred where existing cloud controls suffice;
 these slices do not require a product maintenance UI or permanent infrastructure.
 
-Slices 1–10 have one bounded proof loop after this refinement and are ready for
-direct execution under a separate execution instruction. Slice 2 still carries
-the explicit engine-proof gate before broader implementation. Slice 11 is
-conditional on a proven disposable environment/copy; its access has not been
-established here. Execution has not started and the complete release cannot be
-certified safe until all applicable real-environment observations are present.
-Sizing exceptions cover test/rehearsal waiting only; active integration overruns
-remain subject to the 10-minute refinement limit.
+Execution correction, 2026-09-14: slices 7-9 delivered local fake-cloud changes,
+but their central safety premise was disproved before slice 10 delivery. The
+live MIG is PROACTIVE; official GCP behavior automatically applies a changed
+template to existing VMs. Stable gcloud 535 requires explicit `--instances` for
+stop/start, so the implemented `--all-instances` path would fail. Starting the
+new app before external verification also starts production `@Scheduled` jobs;
+a `publishing` release record is not writer exclusion. The blocked slice-10
+draft and its two passing local checks are preserved in stash
+`ffea5685ac96f33ffa387bdc09d46028e1c6478a`; reuse only the still-valid wording
+or fixture pieces after the corrected path exists. Its 3m22s active attempt was
+within target and produced no deliverable proof for the invalidated promise.
+
+PFE reassessment selects one coherent correction: change the existing
+Application Release/backend-deploy owner, use native opportunistic-policy and
+zero-size MIG state for durable exclusion, and extend the existing
+`DonutTaskRunner` one-shot seam for migration/verification. This keeps one
+release owner and one Flyway entry rather than adding a parallel orchestrator.
+ADR 0004's retained Portable data and ADR 0007's isolation remain satisfied; no
+ADR conflict or exception was found.
+
+The refined plan has 16 slices, so story resplit is recommended by the planning
+workflow. Do not resplit automatically: the first nine historical slices and
+their correction provenance must remain attributable. Slices 10-14 are locally
+executable under the current execution instruction; slices 15-16 are conditional
+on an explicitly owned disposable Cloud SQL/application environment, whose
+access is still unestablished. No production resource was mutated while finding
+this contradiction. Sizing exceptions cover full-suite/rehearsal waiting only;
+active integration remains subject to the 10-minute hard refinement limit.
