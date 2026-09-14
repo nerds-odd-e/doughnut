@@ -1,6 +1,6 @@
 # Publish accumulated local commits without rewriting history
 
-Status: in progress. Slice 7 done; slice 8 next. Slice 10 awaits the existing
+Status: in progress. Slice 8 done; slice 9 next. Slice 10 awaits the existing
 unanswered deletion/recreation decision and remains non-executable until answered.
 Source: [SEED-009 story 20](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-20).
 
@@ -216,7 +216,7 @@ unmatched remove/add still refused.
 
 ### 8. Allow an exact folder relocation alongside unrelated edits
 Type: Behavior
-Status: planned
+Status: done
 Behavior: A commit moves a complete unchanged same-name subtree and edits an
 unrelated note → publish → both changes appear with Folder/Note IDs retained.
 Change: Separate exact subtree correspondence from the current no-other-changes
@@ -226,6 +226,10 @@ Proof: Controller extends current relocation tests with companion edits; retain
 partial-subtree, ambiguous mapping and invalid final-destination refusals.
 Estimate: 5 minutes active work; this is narrower than the old combined
 folder-refactor-plus-history work.
+Learnings: Exact subtree correspondence no longer requires exclusivity;
+`residualOutside` feeds companion edits through `requireAdmittedResidualShape`
+after relocation. Partial-subtree / ambiguous / invalid-destination refusals
+kept; obsolete mixed-change refusal removed.
 
 ### 9. Compose folder relocation across a mixed commit range
 Type: Behavior

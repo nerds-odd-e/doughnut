@@ -124,19 +124,28 @@ public class NotebookGitProposalPublisher {
     }
     Optional<NotebookGitProposalFolderShape.FolderRelocation> relocation =
         NotebookGitProposalFolderShape.requireExactOrEmpty(files);
+    NotebookGitStateLoader.LockedNotebookState published;
+    final NotebookGitProposalTreeShape.AdmittedShape admitted;
     if (relocation.isPresent()) {
-      return acceptMatchingProposedTree(
-          folderRelocation.apply(state, proposal, acceptedHead, relocation.get()), proposal);
+      published = folderRelocation.apply(state, proposal, acceptedHead, relocation.get());
+      documents =
+          NotebookGitProposalTreeShape.classifyChangedDocuments(
+              NotebookGitProposalFolderShape.residualOutside(files, relocation.get()));
+      if (documents.isEmpty()) {
+        return acceptMatchingProposedTree(published, proposal);
+      }
+      admitted = NotebookGitProposalTreeShape.requireAdmittedResidualShape(documents);
+    } else {
+      admitted =
+          NotebookGitProposalTreeShape.requireAdmittedShape(
+              proposal.repository(), acceptedHead, proposal.mainHead(), documents);
+      NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
+          proposal.repository(), proposal.mainHead());
+      projection.requireMatchingAcceptedTree(
+          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
+      published =
+          new NotebookGitStateLoader.LockedNotebookState(binding, notebook, folders, liveNotes);
     }
-    NotebookGitProposalTreeShape.AdmittedShape admitted =
-        NotebookGitProposalTreeShape.requireAdmittedShape(
-            proposal.repository(), acceptedHead, proposal.mainHead(), documents);
-    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-        proposal.repository(), proposal.mainHead());
-    projection.requireMatchingAcceptedTree(
-        notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-    NotebookGitStateLoader.LockedNotebookState published =
-        new NotebookGitStateLoader.LockedNotebookState(binding, notebook, folders, liveNotes);
     if (!admitted.additions().isEmpty()) {
       published = documentApplication.apply(published, proposal, admitted.additions(), publishedAt);
     }

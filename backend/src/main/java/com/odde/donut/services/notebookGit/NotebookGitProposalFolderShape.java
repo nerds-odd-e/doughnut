@@ -11,7 +11,8 @@ import org.eclipse.jgit.lib.ObjectId;
 /**
  * Recognizes one exact same-name folder relocation from removed and added README paths using
  * complete relative-path/blob correspondence. Inexact README relocations are refused; an exact
- * candidate is returned so the publisher can reparent that source Folder.
+ * candidate is returned so the publisher can reparent that source Folder and apply any residual
+ * changes outside the relocated prefixes through ordinary note admission.
  */
 final class NotebookGitProposalFolderShape {
 
@@ -20,8 +21,9 @@ final class NotebookGitProposalFolderShape {
   record FolderRelocation(String sourcePrefix, String destPrefix) {}
 
   /**
-   * @return the unique exact mapping when the proposal is one complete same-name README relocation
-   *     with no other changes; empty when no README is both removed and added
+   * @return the unique exact same-name subtree mapping when complete relative-path/blob
+   *     correspondence holds; empty when no README is both removed and added. Outside residual
+   *     changes are left for the publisher's ordinary note application.
    * @throws org.springframework.web.server.ResponseStatusException when README paths moved but the
    *     correspondence is not a unique exact subtree relocation
    */
@@ -65,17 +67,36 @@ final class NotebookGitProposalFolderShape {
           inexactReason(complete.get(1).sourcePrefix() + "/README.md"));
     }
     if (complete.size() == 1) {
-      FolderRelocation mapping = complete.get(0);
-      String other = firstChangeOutside(files, mapping.sourcePrefix(), mapping.destPrefix());
-      if (other == null) {
-        return Optional.of(mapping);
-      }
-      throw NotebookGitProposalTreeShape.unsupportedTreeShape(inexactReason(other));
+      return Optional.of(complete.get(0));
     }
     if (incompletePath != null) {
       throw NotebookGitProposalTreeShape.unsupportedTreeShape(inexactReason(incompletePath));
     }
     throw NotebookGitProposalTreeShape.unsupportedTreeShape(inexactReason(addedReadmes.get(0)));
+  }
+
+  /**
+   * Changed files outside the exact relocated source and destination prefixes. Unchanged context
+   * and the relocated subtree itself are omitted so the publisher can reclassify residuals only.
+   */
+  static List<InspectedRegularFile> residualOutside(
+      List<InspectedRegularFile> files, FolderRelocation relocation) {
+    List<InspectedRegularFile> residual = new ArrayList<>();
+    for (InspectedRegularFile file : files) {
+      if (under(file.path(), relocation.sourcePrefix())
+          || under(file.path(), relocation.destPrefix())
+          || sameBlob(file)) {
+        continue;
+      }
+      residual.add(file);
+    }
+    return residual;
+  }
+
+  private static boolean sameBlob(InspectedRegularFile file) {
+    return file.acceptedBlobId() != null
+        && file.proposedBlobId() != null
+        && file.acceptedBlobId().equals(file.proposedBlobId());
   }
 
   private static String inexactReason(String path) {
@@ -115,23 +136,6 @@ final class NotebookGitProposalFolderShape {
       }
     }
     return null;
-  }
-
-  private static String firstChangeOutside(
-      List<InspectedRegularFile> files, String sourcePrefix, String destPrefix) {
-    for (InspectedRegularFile file : files) {
-      if (unchanged(file) || under(file.path(), sourcePrefix) || under(file.path(), destPrefix)) {
-        continue;
-      }
-      return file.path();
-    }
-    return null;
-  }
-
-  private static boolean unchanged(InspectedRegularFile file) {
-    return file.acceptedBlobId() != null
-        && file.proposedBlobId() != null
-        && file.acceptedBlobId().equals(file.proposedBlobId());
   }
 
   private static List<String> prefixesOf(List<String> readmePaths) {

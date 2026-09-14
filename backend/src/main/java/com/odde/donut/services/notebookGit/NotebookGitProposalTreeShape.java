@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
@@ -45,6 +46,26 @@ public final class NotebookGitProposalTreeShape {
       ObjectId acceptedHead,
       ObjectId proposedHead,
       List<ChangedDocument> documents) {
+    return admitShape(
+        documents,
+        conceptDocuments ->
+            admitOrdinaryNoteChanges(
+                repository, acceptedHead, proposedHead, noteChangesFrom(conceptDocuments)));
+  }
+
+  /**
+   * Admits residual documents after an exact folder relocation already consumed the relocated
+   * subtree. Skips range origin walking so equal-blob notes that moved with the folder are not
+   * re-interpreted as ambiguous note correspondence.
+   */
+  static AdmittedShape requireAdmittedResidualShape(List<ChangedDocument> documents) {
+    return admitShape(
+        documents, conceptDocuments -> resolveEqualBlobMoves(noteChangesFrom(conceptDocuments)));
+  }
+
+  private static AdmittedShape admitShape(
+      List<ChangedDocument> documents,
+      Function<List<ChangedDocument>, List<NoteChange>> admitConcepts) {
     List<ChangedDocument> containerAdditions = new ArrayList<>();
     List<ChangedDocument> conceptDocuments = new ArrayList<>();
     for (ChangedDocument document : documents) {
@@ -59,9 +80,7 @@ public final class NotebookGitProposalTreeShape {
     }
     List<NoteChange> noteChanges = List.of();
     if (!conceptDocuments.isEmpty()) {
-      noteChanges =
-          admitOrdinaryNoteChanges(
-              repository, acceptedHead, proposedHead, noteChangesFrom(conceptDocuments));
+      noteChanges = admitConcepts.apply(conceptDocuments);
     }
     if (!containerAdditions.isEmpty()
         && noteChanges.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)) {
