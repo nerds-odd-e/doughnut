@@ -350,8 +350,31 @@ re-application in the worktree before staging.
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
 
+## DD-050 — CI observer bridge readiness is not surfaceable from the coordinator's Shell tool, leaving pushes unobserved
+
+During planned execution, the coordinator could not establish CI observer
+readiness. `node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
+and the `start ... --execution nerds-odd-e/doughnut <branch>` launch, run from
+the execution checkout via the Shell tool, both produced no `CI_OBSERVER`
+receipt on stdout. Per `ci-notify-hosts.md`, observation proceeds only when the
+host hook adds separate `CI_MONITOR_READY` context; that context is delivered
+through Cursor hook invocation, not through the coordinator's Shell tool, so
+the coordinator has no supported way to confirm readiness or obtain the
+mailbox handle. No observer was armed; both slice pushes went unobserved.
+
+### Occurrences
+
+- Execution: SEED-009 story 24 / quick/099-publish-existing-readme-edits / 20bac4cb5d
+  - Timestamp: unknown (bounded by slice 1 push commit 20bac4cb5d at 2026-09-15T12:17:05+08:00, immediately after the probe/start attempts)
+  - Tool: Cursor
+  - Model: GLM 5.2
+  - Open Dough release: unknown
+  - Evidence: `node .../ci-mailbox.mjs probe` and `node .../ci-mailbox.mjs start --execution nerds-odd-e/doughnut 099-publish-existing-readme-edits` each exited 0 with empty stdout (no `CI_OBSERVER` receipt); no `CI_MONITOR_READY` context reached the coordinator; no observer was armed before `git push` of `20bac4cb5d` and `19a53c39fc`.
+  - Observed effect: no CI monitoring coverage for the execution; both pushes were reported as `pendingCi: unobserved` and closed without observer shutdown (none was armed).
+  - Inference: when the coordinator must arm observation outside a hook-delivered context (e.g. no prior hook fired with `CI_MONITOR_READY`), the Shell tool cannot establish the bridge, so this environment silently loses CI coverage on every execution unless a hook has already surfaced readiness.
+
 ## Retention
 
-- Highest allocated local number: 49
+- Highest allocated local number: 50
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
