@@ -132,7 +132,7 @@ retained there; this anchor remains for existing references.
   `NotebookGitProposalTreeShape.admitShape` rejects any changed container
   document that is not an addition; classification includes both root and folder
   `README.md`. `NotebookGitProposalTreeShapeControllerTest` records rejection
-  of root edits and a valid typed folder Readme edit alongside a note edit.
+  of root edits and a valid typed folder Readme edit alongside a note addition.
   Existing document application already stores notebook Readme content and
   resolves represented folders before storing their Readme content. The gap
   appears bounded to admitting and applying modifications through publication;
