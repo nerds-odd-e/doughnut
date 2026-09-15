@@ -128,3 +128,46 @@ Feature: CLI notebook web note moves
     Then the installed CLI reports the committed change as the accepted head
     And I open the original note route
     And the note content on the current page should be "Inheritance and variation"
+
+  @mockBrowserTime
+  Scenario: Pulling a linked note move receives the rewritten in-notebook reference
+    Given I have a note "Cells" under notebook "CLI Clone Notebook" in folder "Biology" with content:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes
+      """
+    And I have a note "Reading" under notebook "CLI Clone Notebook" with content:
+      """
+      ---
+      type: Note
+      related: "[[Biology/Cells|shown]]"
+      ---
+      See [[Biology/Cells|shown]] for details.
+      """
+    And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I route to the note "Cells"
+    And I move the current note under folder "Study" in notebook "CLI Clone Notebook"
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | README.md         |
+      | Overview.md       |
+      | Reading.md        |
+      | Biology/README.md |
+      | Study/README.md   |
+      | Study/Cells.md    |
+    And the cloned checkout file "Reading.md" is:
+      """
+      ---
+      type: Note
+      related: '[[Study/Cells|shown]]'
+      ---
+      See [[Study/Cells|shown]] for details.
+      """

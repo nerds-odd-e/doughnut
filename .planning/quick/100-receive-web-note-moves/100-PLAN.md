@@ -188,7 +188,7 @@ Safe stop: existing root and nested placement uses the same supported loop.
 
 ### 4. Receive a linked note move with its in-notebook reference updates
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: A referrer in the same notebook contains an exact path to the moved
 note in body and frontmatter. Move and pull receive the relocated file and the
@@ -377,4 +377,22 @@ only path/parent + accepted-tree delta. Full backend suite passed. E2E
 extended with a folder-to-root scenario (Genetics in Biology → UI Move to
 notebook root → pull → `Genetics.md` at root → commit/publish → original note
 route shows new content). E2E: 2 passing, 0 failing. Cross-notebook regression
-preserved.
+preserved. Cross-notebook referrer Git synchronization is
+explicitly out of scope (slice 4 makes no claim and does not touch those paths).
+
+### Slice 4 — done (2026-09-15)
+
+No production code changed — capture-before-placement and
+rewrite-after-placement already run inside slice 2's `edit` SERIALIZABLE
+transaction; `PortableTreeSnapshot.build` after the mutation captures the
+rewritten referrer content.
+
+Proof: new `NotebookGitWebNoteMoveLinkedReferrerControllerTest` (1 test):
+seeds a same-notebook referrer "Reading" with `[[Biology/Cells|shown]]` in
+both frontmatter and body; moves Cells to Study; asserts B's tree has
+`Study/Cells.md` + `Reading.md` (rewritten to `[[Study/Cells|shown]]` in
+both locations, preserving the visible label), no `Biology/Cells.md`, B
+single parent A. Full backend suite passed (2420 tests). E2E extended with a
+linked-move variant asserting the pulled checkout's `Reading.md` shows the
+rewritten reference. E2E: 3 passing, 0 failing. Existing shorthand/unrelated
+link tests retained; cross-notebook rewrites untouched.
