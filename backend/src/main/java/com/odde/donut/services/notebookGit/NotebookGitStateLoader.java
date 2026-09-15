@@ -46,12 +46,16 @@ public class NotebookGitStateLoader {
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found."));
     List<ExportFolderRow> folders = foldersOf(notebook);
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebookId);
+    List<Note> liveNotes = liveNotesOf(notebook);
     return new LockedNotebookState(binding, notebook, folders, liveNotes);
   }
 
   List<ExportFolderRow> foldersOf(Notebook notebook) {
     return NotebookExportRows.folders(folderRepository, notebook);
+  }
+
+  List<Note> liveNotesOf(Notebook notebook) {
+    return noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
   }
 
   public record LockedNotebookState(

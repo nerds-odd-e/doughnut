@@ -15,6 +15,7 @@ import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.WikiLinkRewriteService;
+import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.services.notebookExport.NotebookExportRows;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
@@ -149,15 +150,23 @@ public class WebNoteEditService {
       if (!acceptedTreeMatchedBeforeSave) {
         return note;
       }
-      if (acceptedTreeMatches(state, accepted)) {
+      entityPersister.flush();
+      List<ExportFolderRow> currentFolders = notebookGitStateLoader.foldersOf(state.notebook());
+      List<Note> currentLiveNotes = notebookGitStateLoader.liveNotesOf(state.notebook());
+      if (projection.matchesAcceptedTree(
+          state.notebook(),
+          currentFolders,
+          currentLiveNotes,
+          accepted.repository(),
+          accepted.mainHead())) {
         return note;
       }
 
       List<PortableTreeEntry> entries =
           PortableTreeSnapshot.build(
               state.notebook().getReadmeContent(),
-              state.folders(),
-              NotebookExportRows.notes(state.liveNotes()));
+              currentFolders,
+              NotebookExportRows.notes(currentLiveNotes));
       acceptedSnapshotPersistence.persist(
           accepted, entries, binding, updatedAt, commitMessage.apply(note));
     }

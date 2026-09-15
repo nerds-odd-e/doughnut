@@ -185,7 +185,7 @@ Accepted proof:
 
 ### 2. Read one complete final projection for accepted note changes
 Type: Structure
-Status: planned
+Status: done
 
 Keep existing content/title and same-notebook Move on one accepted edit owner.
 Make its final snapshot/no-op comparison use current folders and authored notes
@@ -200,6 +200,24 @@ representation and the upcoming Trash recipe can finish before it is read.
 Safe stop: all currently supported web behavior remains unchanged.
 Sizing: 3–5 minutes plus required suite; low-medium confidence. Limit structural
 work to the current projection/transaction owner, not a generic mutation framework.
+
+Accepted proof:
+- Promise: after-mutation no-op and snapshot use current persisted folders and
+  live notes; before-state eligibility stays on the locked tree; existing
+  edit/move/undo/creation behavior unchanged.
+- Boundary: `WebNoteEditService.edit` (SERIALIZABLE + writer lock).
+- Setup: existing controller fixtures; no new Trash Git scenario.
+- Observations:
+  - `acceptedTreeMatches(state, accepted)` still uses `LockedNotebookState`
+    folders/liveNotes before `mutation.accept`.
+  - `entityPersister.flush()` then one `foldersOf` + `liveNotesOf` pair feeds
+    both `projection.matchesAcceptedTree` and `PortableTreeSnapshot.build`
+    + `NotebookExportRows.notes`.
+  - Mutation completes before that reread, so Trash can construct parents first.
+  - `WebNoteCreationService` / `WebFolderCreationService` unchanged.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. Newly created trash folders in the accepted tree remain slice 3.
 
 ### 3. Accept a web Trash with newly constructed parents
 Type: Behavior
@@ -404,3 +422,6 @@ plan rather than add special paths. No new product-scope decision is pending.
 - Same-notebook Undo orchestration lives in `NoteTrashUndoService` so
   `NoteController` stays under the file-size limit; it is not a second Git
   snapshot owner.
+- Exposing `NotebookGitStateLoader.liveNotesOf` and flushing before the
+  reread is enough for the edit owner. Folder creation still rereads folders
+  only; do not merge those writers into one mutation framework.
