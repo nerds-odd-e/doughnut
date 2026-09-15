@@ -72,11 +72,44 @@ overlapping scenarios, including unit tests, only when their meaningful behavior
 coverage and important integration proof survive at lower cost.
 
 Use this project's preferred test style when supplied. Otherwise assert
-observable black-box behavior rather than internal structure. Use stable
-boundaries, real lower layers, and crafted data; mock external services rather
-than internal collaborators. An E2E test is not automatically a better boundary
-than a unit test. Replace tests of internal structure with behavioral coverage,
-not merely fewer assertions.
+observable black-box behavior in the following "small test" style. Small means
+fast, focused proof through a stable boundary, not one isolated test per class:
+
+- Drive the public surface or an intentional domain-stable contract, such as a
+  mounted component, command entry, controller, or independent algorithm.
+  Exercise real lower-level production code with crafted preconditions. Do not
+  widen exports for tests or create thin tests for each internal collaborator.
+- Mock true external dependencies relative to that boundary, not internal
+  collaborators. Prefer real persistence and rendering when they are part of
+  the behavior being proved; apply the project's explicit exceptions. A mocked
+  service response cannot also prove that service or its transport works.
+- Give each test one behavior and a descriptive name. Assert the canonical
+  result shape once; sibling cases assert their distinguishing outcome. Omit a
+  repeated assertion only when it is independent of the changed precondition.
+  Prefer a positive distinguishing signal when sufficient; retain absence or
+  negative assertions when absence is the actual promise.
+- Assert the result of a loop, retry, or threshold scenario without repeatedly
+  checking unrelated intermediate state. Keep intermediate observations when
+  ordering, progress, or transient behavior is itself the contract.
+- Parameterize cases when only data changes and the behavior and assertion
+  focus stay the same. Keep distinct behaviors visible; do not turn unrelated
+  tests into a branching scenario or one long journey to reduce the test count.
+- Use the project's builders and meaningful defaults for concise fixtures.
+  Specify only data affecting the behavior or observation. Prefer builder
+  operations to post-construction mutation and domain-shaped helpers to repeated
+  field lists. Extend an existing builder for recurring setup rather than
+  introducing a parallel fixture framework. Share construction, not mutable
+  state that makes tests depend on order.
+- Preserve fixture completeness for destructive operations: exercise every
+  relevant relationship in the deletion or cascade path. For relational data,
+  include rows throughout the affected foreign-key/cascade closure. A bare
+  target record proves selection, not the effects on related records. Minimal
+  setup must not erase this protection.
+
+An E2E test is not automatically a better boundary than a unit test. Replace
+tests of internal structure with behavioral coverage, not merely fewer
+assertions. Scenarios should show precondition, trigger, and observable result;
+setup must not supply the very outcome the test claims the product establishes.
 
 Identify the surviving proof for each proposed consolidation and establish
 replacement unit coverage before removing or narrowing detailed E2E cases.

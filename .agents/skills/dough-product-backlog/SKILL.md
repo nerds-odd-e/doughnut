@@ -117,7 +117,11 @@ work to the queue requires an explicit backlog-maintenance decision.
 ## Resolve Git conflicts
 
 When an authorized merge, rebase, or cherry-pick conflicts in the product
-backlog, read [backlog merge conflicts](references/merge-conflicts.md).
+backlog (often `PRODUCT-BACKLOG.md`), read and apply
+[backlog merge conflicts](references/merge-conflicts.md) before editing or staging
+its resolution. Complete its staged-result verification before continuing the Git
+operation. If the reference is unavailable, preserve the conflict and report the
+missing guidance.
 
 ## Check and report
 

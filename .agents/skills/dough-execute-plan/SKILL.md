@@ -69,8 +69,12 @@ for omitted/truncated passages or bounded investigations; another step alone nee
 
 ## Take queued work
 
-For product backlog conflicts during authorized Git operations, follow
-[backlog merge conflicts](../dough-product-backlog/references/merge-conflicts.md).
+If an authorized Git operation reports conflicts, inspect the unmerged paths
+for this project's product backlog (often `PRODUCT-BACKLOG.md`). Before editing
+or staging its resolution, read and apply
+[backlog merge conflicts](../dough-product-backlog/references/merge-conflicts.md),
+including its staged-result verification before continuing the Git operation.
+If the reference is unavailable, preserve the conflict and report the missing guidance.
 
 After resolving execution source and authority, inspect the backlog before plan-status
 changes, observer recovery/startup, delegation, or implementation. Moving a selected
@@ -189,7 +193,7 @@ before a dependent slice starts.
 ## Finish or stop
 
 On completion, human-judgment stop, or cancellation, close the observer through the current
-host adapter: handle delivered failures, then stop without waiting for CI. Report pending CI
+host adapter: handle delivered failures, then stop observers without waiting for CI. Report pending CI
 as unobserved.
 
 After all planned slices satisfy proof/delivery and required observer shutdown succeeds,
