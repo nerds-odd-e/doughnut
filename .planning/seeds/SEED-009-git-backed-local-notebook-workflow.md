@@ -559,8 +559,9 @@ answers and do not supersede the shared agreed contract.
 The owner requested a narrower first delivery for feedback, superseding the
 earlier instruction to leave this item broad and unrefined. The owner selected
 **receive a web note's trash and recovery locally**, using existing web Move
-for recovery. The backlog title and anchors
-continue to retain the broader compatibility ambition.
+for recovery. The owner subsequently required a cohesive consistency boundary
+shared with ordinary Move, rather than a Trash-specific Git integration. The
+backlog title and anchors continue to retain the broader compatibility ambition.
 
 #### Goal
 
@@ -598,6 +599,25 @@ It remains useful even if local-originated trash work is never delivered.
   reference choices and collision handling remain preservation obligations;
   synchronizing cross-notebook reference effects remains with story 40.
 
+#### Architectural acceptance
+
+Follow [One complete accepted web change](../NORTH-STAR.md#one-complete-accepted-web-change).
+From synchronized state, destination construction, reference handling, placement,
+and the complete accepted snapshot form one transaction. Ordinary Move and Trash
+use the same consistency responsibility; Git sees a changed Portable tree, not
+special trash deletion. Final projection must include newly created parents and
+all changed in-notebook referrers. Preserve the existing content/title and Move
+callers when improving that responsibility. No snapshot per helper, independent
+trash synchronization path, or new persisted lifecycle/identity state.
+
+The existing same-notebook immediate Undo must participate in that boundary too:
+once Trash advances Git, a database-only Undo would itself introduce drift.
+This is required continuity for an existing recovery route, not a promise of
+new Undo UI, folder Undo, or repeated-journey cleanup. Existing reference and
+collision choices remain distinct domain rules inside the shared operation.
+Cross-notebook synchronization and repair of already-drifted notebooks remain
+deferred; do not silently adopt their changes.
+
 #### Key examples
 
 1. **Trash received locally:** Learned `Biology/Cells.md` exists in Donut and a
@@ -612,10 +632,20 @@ It remains useful even if local-originated trash work is never delivered.
    absent. Donut opens the same note and its learning preferences/history remain
    intact, with eligibility again derived from its active location.
 
+3. **Existing immediate recovery stays consistent:** From a synchronized
+   notebook, Trash appends B to A; immediate Undo appends C to B. Pull receives
+   the recovered file and the same note retains its learning data. A local
+   checkout may skip B; no requirement to pull after every web action is added.
+4. **Whole-operation consistency:** Existing reference choices and collision
+   suffixes are reflected in the same accepted result as placement. If an
+   existing permission or destination rule rejects recovery, the note and
+   accepted bundle remain unchanged. New trash parents are represented together
+   with the note, including canonical empty-folder markers where required.
+
 #### Retained, deferred promises
 
 The broader story still owns local-originated trash and recovery publication,
-folder-subtree compatibility, Git synchronization of immediate Undo, and
+folder-subtree compatibility, broader Undo journeys, and
 additional migrated-trash compatibility gaps. These are retained for later
 selection and refinement, not cancelled or newly rejected by the product.
 Editing/renaming in trash, mixed local move-and-edit histories, and divergent
@@ -638,16 +668,22 @@ remain traceable through this section and its existing anchors.
   constructing the trash parent, and moving the same note. The inspected method
   does not coordinate accepted Git history. This is a concrete integration gap,
   not a complete implementation audit or an executed test result.
-- Story 25's in-progress web-move work is related to the recovery half. Reassess
-  its delivered behavior before execution planning so this story reuses it;
-  completion of all local rename/move support is not a prerequisite.
-- Effort hypothesis: M–L (1–4 hours), low confidence, assuming web-move receipt
-  can be reused and no new identity inference is needed. Check that assumption
-  during planning; do not expand to the full compatibility ambition if it fails.
-- Scope choice resolved: the owner selected web-originated trash and recovery
-  received locally. No product-scope questions remain for this first journey;
-  implementation effort and reuse remain to be assessed during planning. No
-  executable plan or implementation is authorized by this refinement.
+- Story 25's move work is now merged in `337a360f3e`. Its real controller and
+  CLI E2E proofs establish ordinary Move → pull → edit → publish. Reuse it;
+  neither ordinary move implementation nor new local identity inference is a
+  prerequisite still to build. The earlier main-only inspection missed the
+  then-separate worktree; this current evidence supersedes that assumption.
+- The gap is total bundle omission, not partial deletion: Trash leaves both
+  the accepted head and old file untouched. Subsequent ordinary Move cannot be
+  assumed to heal drift because the current shared edit boundary preserves the
+  pre-existing-drift fallback. Prevent that drift at the originating operation.
+- Effort hypothesis: M–L (1–4 hours), medium-low confidence. Reuse established
+  mutation and snapshot owners; assess cumulative cohesion, transaction scope,
+  and fresh final-state reads as part of the work, not after endpoint wiring.
+- Scope and architectural direction are settled by this discussion. Planning
+  is authorized; implementation is not. The selected first delivery is planned
+  in [127 — consistent web trash and recovery](../quick/127-consistent-web-trash/PLAN.md).
+  The broader retained compatibility ambition remains unfinished after that plan.
 
 ## Ordering and Scope Reduction
 
