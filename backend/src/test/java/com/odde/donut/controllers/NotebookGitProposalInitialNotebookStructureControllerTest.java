@@ -126,10 +126,10 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
   }
 
   @Test
-  void publishesNotebookAndFolderReadmesWithoutAdoptingAnUnrelatedEmptyLiveFolder()
+  void publishesNotebookAndFolderReadmesWhileDissolvingAnUnrepresentedLiveFolder()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Folder existing = makeMe.aFolder().notebook(notebook).name("Existing").please();
+    makeMe.aFolder().notebook(notebook).name("Existing").please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
         proposalBundleBytes(
@@ -144,10 +144,7 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
     Notebook after = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(after.getReadmeContent(), equalTo(NOTEBOOK_README));
     List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(folders, hasSize(2));
-    Folder reloadedExisting = folderRepository.findById(existing.getId()).orElseThrow();
-    assertThat(reloadedExisting.getName(), equalTo("Existing"));
-    assertThat(reloadedExisting.getReadmeContent(), nullValue());
+    assertThat(folders, hasSize(1));
     Folder created =
         folders.stream()
             .filter(folder -> folder.getName().equals("Field Notes"))

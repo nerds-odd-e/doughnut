@@ -3,6 +3,7 @@
 **Status:** Accepted  
 **Date:** 2026-09-01
 **Amended:** 2026-09-13 — portable trash rules, decided by Terry Yin
+**Amended:** 2026-09-15 — canonical empty-folder representation, decided by Terry Yin
 **Decision makers:** Terry Yin  
 **Consulted:** None 
 
@@ -53,8 +54,9 @@ profile. Codec round-trips must be lossless for these rules.
   warns on create/rename (PathNameEditor, notebook health); save succeeds.
   Filename-as-title applies: an insisted title is exported as that
   basename. That tree is a profile exception to OKF §3.1 / §11.
-- Empty folders exist in the tree only via tracked content (typically
-  `README.md` when a readme is present).
+- An otherwise-empty non-root folder is represented by a zero-byte `.keep`.
+  A note, non-blank `README.md`, or tracked descendant removes that marker.
+  `.keep` is structural, not a concept.
 
 ### Titles, filenames, body
 

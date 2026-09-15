@@ -123,7 +123,10 @@ No dependency on Restore or trash cleanup justifies expanding this story.
   local marker editing/removal, authored nonempty `.keep` files, and arbitrary
   non-Markdown-file support are not delivery promises; this does not authorize
   silently overwriting or discarding authored content.
-- **Keep separate:** Folder rename/move/dissolve, trash synchronization (story
+- **Local omission:** Publishing a tree that omits a folder's last tracked
+  representation dissolves that Folder; Donut does not retain invisible
+  server-only folders or rewrite the owner's commit.
+- **Keep separate:** Other folder rename/move/dissolve behavior, trash synchronization (story
   28), local creation/publication of new empty folders, Readme editing (story
   24), relationship/Wikidata creation journeys, dirty/divergent checkout
   recovery, repair of unrelated live/history drift, and performance targets.
@@ -168,25 +171,23 @@ establish round-trip support. These are source observations, not a newly run
 failure reproduction or acceptance test.
 
 [ADR 0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-is Accepted: empty folders require tracked content, blank Readmes are omitted,
-and export/import/lint share a lossless codec contract. It does not prescribe
-`.keep` cleanup or Git identity handling. Proposed ADR 0002 is not a binding
-implementation design. No ADR change is proposed here.
+is Accepted: empty folders use canonical structural `.keep` files, blank
+Readmes are omitted, and export/import/lint share a lossless codec contract.
+Proposed ADR 0002 records that omission of a folder's last represented path
+dissolves its server projection.
 
 - **Resolved scope and representation:** No legacy recovery; `.keep` only in
-  otherwise empty folders, removed when tracked content represents the folder.
-  These owner decisions replace the previous deferral and retention proposals.
+  otherwise empty folders, removed when tracked content represents the folder;
+  publishing its final represented path's omission dissolves the Folder.
 - **Highest learning:** Can an owner complete web folder → web note → local
   receipt → ordinary local edit/publish without a workaround or broken history?
 - **Effort hypothesis:** Retain L (2–4 hours), low confidence pending assessment
   of empty-only marker round-tripping and web history updates. Legacy bundle
   compatibility no longer contributes scope. Reassess during planning.
 - **Plan:** [Receive web-created folders](../quick/126-receive-web-created-folders/PLAN.md).
-  Planning is authorized; implementation is not. The plan records a source-derived
-  concern about already-supported local deletion/move leaving a folder newly
-  empty. Resolve that future-operation boundary without reintroducing legacy
-  recovery or silently changing folder identity/commit preservation. Existing
-  clone/pull and ordinary note authoring supply the prerequisites; no other
+  Execution is authorized. The owner resolved the baseline concern: an
+  unrepresented folder dissolves without rewriting the commit. Existing clone,
+  pull, and ordinary note authoring supply the prerequisites; no other
   queued story is an established dependency.
 
 <a id="story-36"></a>

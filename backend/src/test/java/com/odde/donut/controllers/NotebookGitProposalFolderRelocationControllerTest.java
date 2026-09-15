@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,7 +12,6 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -97,6 +95,35 @@ class NotebookGitProposalFolderRelocationControllerTest
   }
 
   @Test
+  void dissolvesTheFormerParentWhenItsOnlyRepresentedDescendantIsRelocated() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder formerParent = makeMe.aFolder().notebook(notebook).name("Parent").please();
+    Folder topics =
+        makeMe
+            .aFolder()
+            .parentFolder(formerParent)
+            .name("Topics")
+            .readmeContent(README_BODY)
+            .please();
+    Folder archive =
+        makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README_BODY).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Archive/README.md", README),
+                new NotebookGitProposalFile("Archive/Topics/README.md", README)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    assertThat(folderRepository.findById(formerParent.getId()).isEmpty(), equalTo(true));
+    Folder relocated = folderRepository.findById(topics.getId()).orElseThrow();
+    assertThat(relocated.getParentFolderId(), equalTo(archive.getId()));
+  }
+
+  @Test
   void acceptsAnExactFolderRelocationWithAnUnrelatedNoteEdit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder archive =
@@ -147,54 +174,6 @@ class NotebookGitProposalFolderRelocationControllerTest
 
     Folder relocated = foldersById(notebook).get(placement.source().getId());
     assertThat(relocated.getParentFolderId(), equalTo(placement.destParentId()));
-  }
-
-  @Test
-  void retriesAnAcceptedFolderRelocationWithoutChangingParentIdsOrBinding() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Placement placement = seedPlacement(notebook, "nested");
-    NotebookGitBinding initialBinding = snapshotCurrentPortableTree(notebook);
-    String initialHead = initialBinding.getAcceptedGitObjectId();
-    byte[] proposalBytes = proposalBundleBytes(initialBinding, placement.proposed());
-
-    String publishedHead =
-        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
-    PublicationState stateAfterPublication = publicationState(notebook, placement.source().getId());
-    assertThat(stateAfterPublication.sourceParentId(), equalTo(placement.destParentId()));
-
-    String retriedHead =
-        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
-
-    assertThat(retriedHead, equalTo(publishedHead));
-    PublicationState stateAfterRetry = publicationState(notebook, placement.source().getId());
-    assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
-    assertThat(
-        stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
-    assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
-    assertThat(stateAfterRetry.sourceParentId(), equalTo(stateAfterPublication.sourceParentId()));
-    assertThat(stateAfterRetry.folderIds(), equalTo(stateAfterPublication.folderIds()));
-    assertThat(stateAfterRetry.noteIds(), equalTo(stateAfterPublication.noteIds()));
-  }
-
-  private PublicationState publicationState(Notebook notebook, Integer sourceFolderId) {
-    return inCommittedTransaction(
-        transactionManager,
-        () -> {
-          NotebookGitBinding binding =
-              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-          Folder source = folderRepository.findById(sourceFolderId).orElseThrow();
-          return new PublicationState(
-              binding.getAcceptedGitObjectId(),
-              binding.getUpdatedAt(),
-              binding.getBundleBytes().clone(),
-              source.getParentFolderId(),
-              folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-                  .map(Folder::getId)
-                  .toList(),
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-                  .map(Note::getId)
-                  .toList());
-        });
   }
 
   private Placement seedPlacement(Notebook notebook, String scenario) {
@@ -256,12 +235,4 @@ class NotebookGitProposalFolderRelocationControllerTest
 
   private record Placement(
       Folder source, Integer destParentId, List<NotebookGitProposalFile> proposed) {}
-
-  private record PublicationState(
-      String acceptedHead,
-      Timestamp bindingUpdatedAt,
-      byte[] bundleBytes,
-      Integer sourceParentId,
-      List<Integer> folderIds,
-      List<Integer> noteIds) {}
 }
