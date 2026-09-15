@@ -1,10 +1,13 @@
 # CI runtime setup
 
-Read this before launching observation. Use Node 20+ (standard library only),
-Git, and authenticated `gh` with read access to the selected GitHub Actions
-repository. Detached host adapters also require a POSIX host with `ps` and
-signals. Apply this project's tooling wrapper to launches if needed; hook commands
-must find Node directly without entering a build environment.
+Read this before launching observation. Use Node 20+ (standard library only)
+and Git. The GitHub Actions default also requires authenticated `gh` with read
+access to the selected repository. A configured project command instead requires
+that command and its endpoint credentials to work from the execution checkout;
+the observer does not acquire or manage credentials. Detached host adapters also
+require a POSIX host with `ps` and signals. Apply this project's tooling wrapper
+to launches if needed; hook commands must find Node directly without entering a
+build environment.
 
 For checkout-bound work, resolve the installed skill directory inside the
 selected execution checkout. It is normally
@@ -25,27 +28,40 @@ paths containing spaces and replace example placeholders before execution.
 
 ## Select CI
 
-Resolve repository and branch from the authorized push destination. Verify the
-branch has a push-triggered CI workflow. This observer handles one CI workflow
-per execution; it does not support pull-request-only CI or observe deployment.
-If this project needs an unsupported mode, report missing monitoring coverage and
+Resolve repository and branch from the authorized push destination. Read
+`.planning/open-dough.json` to select the source before checking provider
+requirements. The observer reads that configuration once when it starts; do not
+change it during the observer's lifetime.
+
+- An absent `ciAdapter`, an absent file, or `ciAdapter: []` selects GitHub
+  Actions. Verify the branch has a push-triggered workflow and verify the
+  workflow selector and display name below. This mode requires `gh`.
+- A nonempty `ciAdapter` argument array selects the project's command. Verify
+  the command can run directly from the execution checkout and that its selected
+  check observes pushes to the resolved repository and branch. Do not require
+  `gh` or GitHub workflow identity for this mode. Adapter authentication and
+  endpoint access remain project-owned.
+
+This observer handles one selected CI check per execution. It does not support
+pull-request-only CI, aggregate multiple checks, or observe deployment. If this
+project needs an unsupported mode, report missing monitoring coverage and
 continue execution without claiming CI observation.
 
-Set these environment variables on the observer launch (and preserve them in
-any project tooling wrapper):
+Set the applicable environment variables on the observer launch (and preserve
+them in any project tooling wrapper):
 
 | Variable | Meaning |
 | --- | --- |
-| `DOUGH_CI_WORKFLOW` | Workflow filename or ID accepted by `gh run list --workflow`; default `ci.yml` must be verified |
-| `DOUGH_CI_WORKFLOW_NAME` | Exact workflow display name; default `CI` must be verified |
+| `DOUGH_CI_WORKFLOW` | GitHub default only: workflow filename or ID accepted by `gh run list --workflow`; default `ci.yml` must be verified |
+| `DOUGH_CI_WORKFLOW_NAME` | GitHub default only: exact workflow display name; default `CI` must be verified |
 | `DOUGH_CI_MAILBOX_ROOT` | Optional private shared mailbox directory; default `/tmp/dough-ci-$UID` |
 
 The branch is a required positional argument, never an inferred `main`.
-Record the verified workflow selector/name with the observer identity in the
-active plan for planned execution or in the conversation for quick execution.
-Do not create a plan or separate record for that quick context. Do not change
-configuration during an observer's lifetime. A new coordinator must recover
-and close the old observer before replacing it.
+Record the selected source and, for GitHub, the verified workflow selector/name
+with the observer identity in the active plan for planned execution or in the
+conversation for quick execution.
+Do not create a plan or separate record for that quick context. A new
+coordinator must recover and close the old observer before replacing it.
 When overriding the mailbox directory, provide the same absolute value to both
 launcher and hooks; a per-process `TMPDIR` does not establish shared identity.
 
@@ -54,6 +70,13 @@ Example after resolving the values and applying this project's tooling wrapper i
 ```sh
 DOUGH_CI_WORKFLOW=checks.yml DOUGH_CI_WORKFLOW_NAME='Project checks' \
   node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' \
+  start --execution OWNER/REPO BRANCH
+```
+
+For a configured command, omit the GitHub workflow variables:
+
+```sh
+node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' \
   start --execution OWNER/REPO BRANCH
 ```
 

@@ -111,7 +111,15 @@ Git, agent, and observer state under
    contract before committing. Fix mechanical findings; stop for semantic or
    design judgment. Do not run hook-owned lint independently. If hook repairs
    invalidate preparation, rerun formatting before restaging and retrying.
-8. Push to the authorized destination. Success completes routine delivery; a
-   post-slice decision stop occurs after safe work is delivered. Keep the
+8. Immediately before pushing, resolve and retain the full revision SHA being
+   delivered. Push that revision to the authorized destination. After confirmed
+   success, register the retained SHA with the existing observer by running
+   `node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' register-push
+   OBSERVER_DIRECTORY SHA`. Use the observer directory and checkout-bound runtime
+   retained for this execution. Apply the same registration after a repair push;
+   do not read a later moving `HEAD` or start another observer. Registration
+   failure is lost coverage: report it and do not claim the revision was observed.
+   Success completes routine delivery; a post-slice decision stop occurs after
+   safe work is delivered. Keep the
    [CI observer](ci-monitor.md) running and handle delivered failures through its
    repair protocol. Never wait for CI or deployment after a normal or repair push.
