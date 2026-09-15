@@ -44,152 +44,6 @@ are evidence of behavior, never limits on accepted histories or note counts.
 All stories preserve authorization, authored content, note identity and learning
 data; invalid or ambiguous changes must not silently discard work.
 
-<a id="story-35"></a>
-
-### 35. Receive web-created folders and their notes locally
-
-#### Goal and why-now challenge
-
-A notebook owner who creates a folder and ordinary notes on the web can pull
-that material into the existing local notebook and continue editing there,
-without recreating folders, copying notes, or adding artificial descriptions.
-An empty folder must also arrive before its first note is written.
-
-**Existing human direction (2026-09-14):** Keep web folder creation and creating
-a note in that new folder together. Use `.keep` for otherwise empty folders;
-include existing empty folders in a notebook's first Git snapshot. These are
-retained commitments, not new proposals from this refinement.
-
-**Owner clarification (2026-09-15):** All production notebooks will have their
-initial bundles reset, so legacy omitted-folder recovery and compatibility with
-those old bundles are not requirements for this story. This is the supplied
-rollout assumption, not a claim that the reset has happened or an instruction
-to perform it during refinement. Only empty folders have `.keep`; folders
-represented by notes, a non-blank README, or tracked descendants do not.
-
-The useful change is continuity of an existing authoring journey. Folder
-creation already exists on the web; this story does not need a new folder UI.
-The strongest smaller alternative is to author at notebook root or in an
-already represented folder, postponing organization. A non-blank Readme can
-retain a folder in a snapshot, but an artificial description is not an adequate
-substitute for the explicitly requested empty folder. That snapshot workaround
-also does not establish that subsequent web changes reach accepted history.
-
-**Why now:** The selected journey closes a concrete gap between existing web
-creation and local continuation. It retains value even if later folder moves,
-trash compatibility, and broader publication work are cancelled. Being first
-in the backlog, having delivered Folder Trash, or “completing basic authoring”
-does not establish urgency. Frequency and actual owner cost remain unmeasured;
-deferral is reasonable if owners are content with root/existing-folder authoring.
-No dependency on Restore or trash cleanup justifies expanding this story.
-
-#### Scope — narrow delivery
-
-- In one notebook whose live content matches accepted Git history, create a
-  folder on the web at root or beneath an existing folder, then create ordinary
-  notes there. Receive the results through existing clone and clean
-  fast-forward pull. Nested folders follow the same rule; example depth and
-  note counts are not product limits.
-- Owners may pull while the folder is empty, or after creating its notes,
-  without an intermediate synchronization step. Preserve the folder path and
-  authored note content in both cases.
-- The first Git snapshot of an unbound notebook retains existing empty folders,
-  including nested empty paths, using `.keep`. This stays with the selected
-  outcome under the explicit owner decision. The production bundle reset is
-  the supplied rollout prerequisite; this refinement does not execute it.
-- Use `.keep` as structural tracked content, never as a Donut note or a generated
-  Readme description. Generate it only for an otherwise empty folder: no
-  notes, non-blank README, or child folders. A nested empty leaf gets `.keep`;
-  its ancestors are represented by that tracked descendant. Remove the generated
-  marker when content or a child folder represents the directory. A blank
-  Readme still emits no README and does not make the folder nonempty.
-  Export, import, and lint must agree on this representation. A received tree must support the next already-supported local
-  note edit and publish; this is necessary continuity, not a new local folder
-  authoring feature.
-- Preserve existing note/folder identities, learning data, authored content,
-  authorization, and, after the planned baseline reset, accepted/local commit
-  IDs. Subsequent web changes append history without amending earlier commits.
-  The planned production reset is distinct from ordinary synchronization.
-
-#### Scope challenges and deferred promises
-
-- **Legacy omitted folders:** No backfill, legacy snapshot comparison, or old
-  bundle compatibility machinery is required under the owner's production-reset
-  assumption. Do not carry the previous hypothetical recovery concern into
-  execution planning.
-- **Marker lifecycle:** Empty-only generation and removal of a generated marker
-  when the folder becomes represented are required behavior, not optional
-  cleanup. Do not add a provenance journal or marker-management UI. Deliberate
-  local marker editing/removal, authored nonempty `.keep` files, and arbitrary
-  non-Markdown-file support are not delivery promises; this does not authorize
-  silently overwriting or discarding authored content.
-- **Local omission:** Publishing a tree that omits a folder's last tracked
-  representation dissolves that Folder; Donut does not retain invisible
-  server-only folders or rewrite the owner's commit.
-- **Keep separate:** Other folder rename/move/dissolve behavior, trash synchronization (story
-  28), local creation/publication of new empty folders, Readme editing (story
-  24), relationship/Wikidata creation journeys, dirty/divergent checkout
-  recovery, repair of unrelated live/history drift, and performance targets.
-  These are deferred delivery promises, not new rejection rules for naturally
-  supported cases. No exhaustive folder-operation compatibility matrix is
-  required merely because the tree representation is shared.
-
-#### Key examples
-
-1. **Empty, then populated:** Starting with a synchronized notebook, create
-   `Biology` on the web and pull into its clean checkout. `Biology/.keep` exists
-   locally without becoming a note or Readme. Create ordinary note `Cells` in
-   that folder on the web and pull again. `Biology/Cells.md` contains its
-   authored content and `Biology/.keep` is gone; earlier commits remain unchanged.
-2. **No intervening pull:** From the same starting state, create nested folders
-   `Science/Biology` and note `Cells` on the web before pulling. One pull
-   receives `Science/Biology/Cells.md` and the hierarchy without manual repair.
-   Neither folder contains `.keep`, because the note represents both paths.
-3. **First snapshot:** An unbound notebook already contains empty nested folder
-   `Science/Biology`, alongside existing notes and non-blank Readmes. First
-   clone includes `Science/Biology/.keep`, with no `Science/.keep`, and preserves
-   the existing content. A folder with a non-blank README has no `.keep`; a
-   folder with only a blank Readme and no children or notes does. This applies
-   equally to the fresh snapshots after the planned production reset.
-4. **Continue locally:** After receiving the new folder/note, edit `Cells.md`
-   locally, commit, and publish through the existing workflow. Donut shows the
-   change on the same note, retaining its learning associations. Structural
-   markers neither become concepts nor prevent this ordinary continuation.
-
-#### Evidence, constraints, and readiness
-
-Focused source inspection on 2026-09-15 found that `PortableTreeSnapshot`
-emits note files and non-blank Readmes without empty-folder markers;
-`NotebookController.createFolder` uses the existing folder construction path;
-`WebNoteCreationService` advances history only for a matching projection and
-represented destination. `NotebookGitProjection` compares the full generated
-snapshot with the accepted tree. The owner's subsequent production-reset
-clarification removes the older-binding compatibility concern from this story.
-Markdown validation skips non-Markdown files, while publication has additional
-shape admission checks: skipping `.keep` in Markdown validation alone does not
-establish round-trip support. These are source observations, not a newly run
-failure reproduction or acceptance test.
-
-[ADR 0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-is Accepted: empty folders use canonical structural `.keep` files, blank
-Readmes are omitted, and export/import/lint share a lossless codec contract.
-Proposed ADR 0002 records that omission of a folder's last represented path
-dissolves its server projection.
-
-- **Resolved scope and representation:** No legacy recovery; `.keep` only in
-  otherwise empty folders, removed when tracked content represents the folder;
-  publishing its final represented path's omission dissolves the Folder.
-- **Highest learning:** Can an owner complete web folder → web note → local
-  receipt → ordinary local edit/publish without a workaround or broken history?
-- **Effort hypothesis:** Retain L (2–4 hours), low confidence pending assessment
-  of empty-only marker round-tripping and web history updates. Legacy bundle
-  compatibility no longer contributes scope. Reassess during planning.
-- **Plan:** [Receive web-created folders](../quick/126-receive-web-created-folders/PLAN.md).
-  Execution is authorized. The owner resolved the baseline concern: an
-  unrepresented folder dissolves without rewriting the commit. Existing clone,
-  pull, and ordinary note authoring supply the prerequisites; no other
-  queued story is an established dependency.
-
 <a id="story-36"></a>
 
 ### 36. Publish local renames, moves, and edits across commits while preserving note identity
@@ -458,10 +312,7 @@ trip.
 The owner previously placed these rough edges after the migration-safe release;
 this item is now first in the backlog. That ordering does not establish urgency.
 Fixing a reproduced surprise in a recently delivered journey is a reasonable
-reason to act now, but frequency and actual owner cost are unmeasured. If this
-rare naming inconvenience takes substantial lifecycle machinery to resolve,
-deferral in favor of web-created folders (story 35) is preferable. No technical
-dependency makes this correction a prerequisite for that story or Git work.
+reason to act now, but frequency and actual owner cost are unmeasured.
 
 #### Scope — recommended cut
 
@@ -708,11 +559,9 @@ story 38 follows because Move already provides a safe recovery path for the
 remaining UI rough edges.
 
 After the production release, retire the spent migration support (story 39),
-then address the remaining repeated-trash and Undo rough edges (story 38). Next,
-deliver web-created folders and their notes (story 35), then keep remaining Git
-stories 20, 24, and 25 in relative order. Story 35's position reflects the
-owner's 2026-09-14 addition of basic folder authoring; stories 21 and 22 are
-already delivered. Then queue the single unrefined story 28. Former story 23 is
+then address the remaining repeated-trash and Undo rough edges (story 38), then
+keep remaining Git stories 20, 24, and 25 in relative order. Then queue the
+single unrefined story 28. Former story 23 is
 absorbed there because its deletion-sync scope overlaps the new trash lifecycle;
 its outcome is retained rather than cancelled. Publication performance remains
 after that combined compatibility item.

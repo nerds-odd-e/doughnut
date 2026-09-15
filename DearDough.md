@@ -350,28 +350,6 @@ re-application in the worktree before staging.
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
 
-## DD-049 — Oversized proof seams turned small behavior slices into long mandatory refactors
-
-Three behavior slices touched already-oversized tests or E2E seams. The required
-post-change file-size cleanup then expanded each slice into cohesive splitting
-and registry or step-definition rewiring after its product behavior was proven.
-
-### Occurrences
-
-- Execution: SEED-009 story 35 / quick/126-receive-web-created-folders / c7eb59bef9
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: 0.3.18
-  - Evidence: plan 126 lines 377–389 records about 11, 32, and 35 active minutes
-    for the slice 2, 3, and 8 refactors; the latter two split feature/runner or
-    E2E observation seams while preserving and rerunning their consumers.
-  - Observed effect: three small behavior slices acquired substantial
-    proof-structure work; two refactors exceeded the 10-minute hard limit.
-  - Inference: likely proof files and registries should be size-checked during
-    slice planning so necessary cohesive cleanup can be shaped explicitly,
-    instead of first appearing after behavior and proof are complete.
-
 ## Retention
 
 - Highest allocated local number: 49
