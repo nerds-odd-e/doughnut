@@ -136,7 +136,7 @@ structure directly enables slice 2's ordinary same-notebook movement.
 
 ### 2. Move a learned note between folders and continue local editing
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: With synchronized A, a learned `Biology/Cells.md` and represented
 `Study` folder, use web Move. It appends B; a clean clone at A pulls the exact
@@ -313,3 +313,39 @@ Learning for Slice 2: `RelationController` move methods carry a controller-level
 letting `edit` own the SERIALIZABLE transaction (e.g. removing the
 controller-level `@Transactional` on the move path), since an outer
 default-isolation transaction would mask `edit`'s SERIALIZABLE boundary.
+
+### Slice 2 — done (2026-09-15)
+
+Change: same-notebook web Moves route through `WebNoteEditService.edit` so the
+moved tree appends to accepted history under a SERIALIZABLE transaction.
+Cross-notebook moves keep existing behavior (no Git snapshot) via a new
+`NoteMoveService` (`@Transactional` default isolation, separate bean so the
+proxy is honored). Controller-level `@Transactional` removed from the three
+move endpoints so `edit` owns the SERIALIZABLE boundary. `RelationController`
+now dispatches same-vs-cross and delegates orchestration to `NoteMoveService`
+(`sameNotebookMoveIntoFolder`/`sameNotebookMoveToRoot` Consumer factories run
+inside `edit`; `moveCrossNotebookToFolder`/`moveCrossNotebookToNotebookRoot`
+for cross-notebook). Dead dependencies removed from `RelationController`.
+
+Proof: full backend suite `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+→ BUILD SUCCESSFUL, 2416 tests, 0 failures. New
+`NotebookGitWebNoteMoveControllerTest` (3 Git-history tests) +
+`NotebookGitWebNoteMoveGuardControllerTest` (4 guard tests) +
+`NotebookGitWebNoteMoveTestBase` (shared fixture). Key test
+`webMoveAppendsAcceptedChildAndLocalPublicationRetainsLearningHistory`
+observes B single parent A, exact moved content at `Study/Cells.md`, absence
+of `Biology/Cells.md`, accepted C via `publishNotebookGitProposal`, retained
+note/tracker/recall IDs + due state + tracking preference
+(`assertShownContentAndRetainedLearning`). Variants: destination collision,
+denied access, no-op, queued save-after-move (parent order), projection-drift
+refusal, non-Git behavior. Existing relation-controller suites remain green.
+
+Learnings for later slices: `NotebookGitBundleControllerTestBase` is
+`@Transactional(NOT_SUPPORTED)` — use `noteRepository.findById` or
+`inCommittedTransaction` for post-action reloads, not `makeMe.refresh()`. The
+shared `proposalBundleBytes` drops inherited accepted files; proposals that
+must preserve folder READMEs need a tree-preserving builder
+(`proposalModifyingPath`). `edit` reloads the note from `lockedState` and
+`noteMotionService` mutates that same managed instance, so the snapshot
+reflects the new placement without an extra reload. E2E journey pending
+(separate delegation).
