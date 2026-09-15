@@ -25,6 +25,7 @@ class NotebookGitWebTrashLinkedReferrerControllerTest
   static final String REFERRER_BODY =
       "---\ntype: Note\nrelated: \"[[Biology/Cells|shown]]\"\n---\nSee [[Biology/Cells|shown]] for "
           + "details.";
+  static final String PROPERTY_REFERRER_BODY = "---\ntarget: \"[[Target]]\"\n---\nBody";
 
   @Test
   void leaveDeadLinksTrashRetainsAuthoredReferrerSpellingInAcceptedTree() throws Exception {
@@ -49,6 +50,33 @@ class NotebookGitWebTrashLinkedReferrerControllerTest
     }
   }
 
+  @Test
+  void removeFromPropertiesTrashMatchesAuthoredReferrerAndTrashedTargetInAcceptedTree()
+      throws Exception {
+    PropertyReferrerTrashFixture f = seedTargetWithPropertyReferrer();
+    testabilitySettings.timeTravelTo(Timestamp.from(TRASH_AT));
+
+    noteController.trashNote(f.target(), removeFromProperties());
+
+    String authoredReferrer =
+        inCommittedTransaction(
+            transactionManager,
+            () -> noteRepository.findById(f.referrer().getId()).orElseThrow().getContent());
+    try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId downloadedHead =
+          GitBundleTestReader.fetchHead(
+              repo,
+              controller
+                  .downloadNotebookGitBundle(
+                      notebookRepository.findById(f.notebook().getId()).orElseThrow())
+                  .getBody());
+      assertThat(GitBundleTestReader.pathsIn(repo, downloadedHead), hasItem("_trash/Target.md"));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Referrer.md"),
+          equalTo(authoredReferrer));
+    }
+  }
+
   ReferrerTrashFixture seedCellsWithLinkedReferrer() throws UnexpectedNoAccessRightException {
     Notebook notebook = createGitBackedNotebook();
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
@@ -64,4 +92,20 @@ class NotebookGitWebTrashLinkedReferrerControllerTest
   }
 
   record ReferrerTrashFixture(Notebook notebook, Note cells) {}
+
+  PropertyReferrerTrashFixture seedTargetWithPropertyReferrer()
+      throws UnexpectedNoAccessRightException {
+    Notebook notebook = createGitBackedNotebook();
+    Note target = makeMe.aNote("Target").notebook(notebook).please();
+    Note referrer = makeMe.aNote("Referrer").notebook(notebook).please();
+    inCommittedTransaction(
+        transactionManager,
+        () ->
+            authorReferencingContent(
+                noteRepository.findById(referrer.getId()).orElseThrow(), PROPERTY_REFERRER_BODY));
+    snapshotCurrentPortableTree(notebook);
+    return new PropertyReferrerTrashFixture(notebook, target, referrer);
+  }
+
+  record PropertyReferrerTrashFixture(Notebook notebook, Note target, Note referrer) {}
 }

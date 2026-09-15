@@ -178,10 +178,8 @@ class NoteControllerTrashTests extends ControllerTestBase {
     NoteUpdateContentDTO content = new NoteUpdateContentDTO();
     content.setContent("---\ntarget: \"[[Target]]\"\n---\nBody");
     textContentController.updateNoteContent(referrer, content);
-    NoteDeleteDTO request = new NoteDeleteDTO();
-    request.setReferenceHandling(NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES);
 
-    controller.trashNote(target, request);
+    controller.trashNote(target, removeFromProperties());
 
     assertThat(referrer.getContent(), equalTo("---\ntype: Note\n---\nBody"));
     assertThat(target.isTrashed(), equalTo(true));

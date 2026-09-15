@@ -48,6 +48,12 @@ public abstract class ControllerTestBase {
     return request;
   }
 
+  protected NoteDeleteDTO removeFromProperties() {
+    NoteDeleteDTO request = new NoteDeleteDTO();
+    request.setReferenceHandling(NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES);
+    return request;
+  }
+
   protected NoteTrashUndoDTO undoTo(String title, Folder folder) {
     NoteTrashUndoDTO request = new NoteTrashUndoDTO();
     request.setPriorTitle(title);

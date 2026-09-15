@@ -334,7 +334,7 @@ Accepted proof:
 
 ### 6. Accept the chosen removal from reference properties
 Type: Behavior
-Status: planned
+Status: done
 
 Trash with REMOVE_FROM_PROPERTIES removes the selected target from referring
 properties under existing semantics, retaining body text/dead links. The same
@@ -345,6 +345,20 @@ Git binding and download after the real action; compare resulting authored
 referrer content to the database. No snapshot between mutation and observation.
 Safe stop: no reference edit is left outside the accepted result.
 Sizing: 3–5 minutes plus suite; preserve current domain reference owner.
+
+Accepted proof:
+- Promise: REMOVE_FROM_PROPERTIES Trash puts the rewritten referrer and
+  `_trash/Target.md` in the same accepted tree; download matches DB.
+- Boundary: `NoteController.trashNote(..., removeFromProperties())` → download.
+- Setup: `seedTargetWithPropertyReferrer` snapshots `PROPERTY_REFERRER_BODY`
+  before Trash.
+- Observations: `removeFromPropertiesTrashMatchesAuthoredReferrerAndTrashedTargetInAcceptedTree`
+  downloaded `Referrer.md` equals post-Trash DB content; paths include
+  `_trash/Target.md`. Existing `trashAppliesRemoveFromPropertiesReferenceChoice`
+  still owns the DB shape (`---\ntype: Note\n---\nBody`).
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. No production change.
 
 ### 7. Accept existing relationship reduction as part of Trash
 Type: Behavior
