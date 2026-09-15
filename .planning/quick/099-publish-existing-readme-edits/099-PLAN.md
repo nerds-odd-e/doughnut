@@ -1,6 +1,6 @@
 # Publish edits to existing Readmes
 
-Status: planned
+Status: in progress (slice 1 delivered)
 Source: [SEED-009 story 24](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24)
 Authority: planning only; no implementation or backlog claim yet.
 
@@ -95,7 +95,7 @@ backlog placement and GSD STATE unchanged.
 
 ### 1. Publish an existing notebook description and receive it locally
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Accepted A has a represented root `README.md`. The owner edits its
 body and author-owned YAML, retaining `type: Readme`, commits B directly after A
@@ -166,4 +166,44 @@ scope. Reassess if either requires a larger change than described.
 
 ## Execution evidence
 
-Pending; neither slice has been implemented or verified.
+### Slice 1 — delivered (branch `099-publish-existing-readme-edits`)
+Production: `NotebookGitProposalTreeShape.admitShape` now admits `CONTAINER`
+`MODIFIED` (in addition to `ADDED`); `DELETED` stays reserved. `AdmittedShape`
+renamed `additions` → `documents` (carries additions + container modifications);
+deletion-mix guard now keys on `ADDED` kind only, so container *additions*
+mixed with concept *removals* stay reserved while `MODIFIED` containers may
+compose with note deletions. `NotebookGitProposalPublisher` callers updated to
+`admitted.documents()` (`applyAdditionsUnderRelocatedDestination` →
+`applyDocumentsUnderRelocatedDestination`); behavior preserved.
+`NotebookGitProposalDocumentApplication` already overwrites root Readme content
+unconditionally, so no application-path change was needed (javadoc only).
+
+Accepted proof (inspected):
+- `NotebookGitProposalTreeShapeControllerTest.acceptsAValidRootReadmeEditAsTheExactAuthoredCommit`
+  — original notebook ID, exact stored `readmeContent`, accepted B via downloaded
+  bundle head/tree equality.
+- `NotebookGitProposalTreeShapeControllerTest.rejectsAnInvalidRootReadmeEditWithACompanionNoteEditWithoutMutatingAcceptedContent`
+  — invalid typed Markdown + valid companion note edit → BAD_REQUEST, unchanged
+  readme and note content.
+- `NotebookGitProposalTreeShapeControllerTest.acceptsAValidRootReadmeEditAsTheSoleNotebookReadme`
+  — root Readme edit, no notes.
+- `NotebookGitProposalTreeShapeControllerTest.acceptsAValidFolderReadmeEditAlongsideANoteAdditionWithoutMutatingFolderIdentity`
+  — folder Readme MODIFIED + note ADDED (naturally supported; folder proof proper
+  remains slice 2).
+- E2E `cli_notebook_clone.feature` "Publishing a committed root readme edit
+  updates the notebook description and round-trips" — clones both checkouts,
+  commits typed Readme edit, publishes via installed CLI, observes readme body
+  in Donut, pulls receiver, asserts clean head + exact authored bytes.
+Verification: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (2406
+tests, 0 failures) and `CURSOR_DEV=true nix develop -c pnpm cy:run --spec
+e2e_test/features/cli/cli_notebook_clone.feature` (11 scenarios, 0 failing).
+Refactor: `none — already clean`. Formatter: `./scripts/run.sh pnpm
+format:changed` (spotlessApply + biome; mechanical javadoc reformat only).
+
+Learning: `ExportReadmeMarkdown.assemble` wraps untyped `readmeContent` with
+`type: Readme` frontmatter when building the portable tree, so a notebook
+seeded with raw `readmeContent("readme original")` produces a typed accepted
+`README.md` blob — making a subsequent typed proposal a MODIFIED (not ADDED)
+container. This is why the only production gap was the `admitShape` guard.
+
+Slice 2 remains planned.

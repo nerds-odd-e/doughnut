@@ -14,7 +14,9 @@ import java.util.stream.Stream;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
 
-/** Applies admitted folder, README and concept additions from classified proposal documents. */
+/**
+ * Applies admitted folder, README and concept documents (additions and container modifications).
+ */
 @Service
 class NotebookGitProposalDocumentApplication {
 

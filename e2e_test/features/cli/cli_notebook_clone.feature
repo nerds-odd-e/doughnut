@@ -105,6 +105,33 @@ Feature: CLI notebook clone
 
       """
 
+  Scenario: Publishing a committed root readme edit updates the notebook description and round-trips
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I commit the following edit to "README.md" in the cloned checkout:
+      """
+      ---
+      type: Readme
+      author: owner
+      ---
+      Updated notebook landing
+      """
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I open the notebook "CLI Clone Notebook" from the notebook catalog
+    Then the notebook readme body includes "Updated notebook landing"
+    When I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout is a clean checkout of the accepted head
+    And the second cloned checkout file "README.md" is:
+      """
+      ---
+      type: Readme
+      author: owner
+      ---
+      Updated notebook landing
+
+      """
+
   Scenario: Publishing a committed note edit updates the same Donut note
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I commit the following edit to "Recipes/Pasta.md" in the cloned checkout:

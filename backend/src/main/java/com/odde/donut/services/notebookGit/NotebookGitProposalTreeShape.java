@@ -13,13 +13,13 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit.
  * Changed documents are classified once by operation and container/concept role; unchanged accepted
- * files remain context. Publication admission partitions added container Readmes from ordinary-note
- * changes so folder Readmes can accompany note edits. Ordinary-note admission permits added and/or
- * modified ordinary Markdown notes at regular file modes, any number of ordinary-note deletions
- * alone or with same-path edits, and unambiguous equal-content moves with compatible companions.
- * Exact move correspondence and confirmed deletion-gap recreation (DELETED+ADDED, including
- * identical tip bytes) are settled by {@link NotebookGitProposalNoteCorrespondence}. Within one
- * adjacent transition, residual removals mixed with additions are refused when identity
+ * files remain context. Publication admission partitions container Readmes (added or modified) from
+ * ordinary-note changes so folder Readmes can accompany note edits. Ordinary-note admission permits
+ * added and/or modified ordinary Markdown notes at regular file modes, any number of ordinary-note
+ * deletions alone or with same-path edits, and unambiguous equal-content moves with compatible
+ * companions. Exact move correspondence and confirmed deletion-gap recreation (DELETED+ADDED,
+ * including identical tip bytes) are settled by {@link NotebookGitProposalNoteCorrespondence}.
+ * Within one adjacent transition, residual removals mixed with additions are refused when identity
  * correspondence is uncertain. Net tip deletions may compose with later additions once each
  * adjacent step is admissible. Unsafe paths, non-regular modes, or a changed folder-reserved {@code
  * README.md} are refused. Structural {@code .keep} changes are not note changes. Callers only
@@ -31,9 +31,9 @@ public final class NotebookGitProposalTreeShape {
   private NotebookGitProposalTreeShape() {}
 
   /**
-   * Admits container README additions alongside ordinary-note changes. Non-added container changes
-   * stay reserved. Container additions mixed with concept removals stay reserved until that
-   * composition is supported.
+   * Admits container README additions and modifications alongside ordinary-note changes. Container
+   * removals stay reserved. Container additions mixed with concept removals stay reserved until
+   * that composition is supported.
    */
   static AdmittedShape requireAdmittedShape(
       Repository repository,
@@ -63,14 +63,14 @@ public final class NotebookGitProposalTreeShape {
   private static AdmittedShape admitShape(
       List<ChangedDocument> documents,
       Function<List<ChangedDocument>, List<NoteChange>> admitConcepts) {
-    List<ChangedDocument> containerAdditions = new ArrayList<>();
+    List<ChangedDocument> containerDocuments = new ArrayList<>();
     List<ChangedDocument> conceptDocuments = new ArrayList<>();
     for (ChangedDocument document : documents) {
       if (document.role() == DocumentRole.CONTAINER) {
-        if (document.kind() != ChangeKind.ADDED) {
+        if (document.kind() != ChangeKind.ADDED && document.kind() != ChangeKind.MODIFIED) {
           throw reservedFolderReadme(document.path());
         }
-        containerAdditions.add(document);
+        containerDocuments.add(document);
       } else {
         conceptDocuments.add(document);
       }
@@ -78,9 +78,11 @@ public final class NotebookGitProposalTreeShape {
     // Empty tip diffs still run concept admission so deletion-gap replacements that leave endpoint
     // trees equal can surface as DELETED+ADDED.
     List<NoteChange> noteChanges = admitConcepts.apply(conceptDocuments);
-    if (!containerAdditions.isEmpty()
+    boolean hasContainerAddition =
+        containerDocuments.stream().anyMatch(document -> document.kind() == ChangeKind.ADDED);
+    if (hasContainerAddition
         && noteChanges.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)) {
-      throw reservedFolderReadme(containerAdditions.getFirst().path());
+      throw reservedFolderReadme(containerDocuments.getFirst().path());
     }
     Set<String> addedPaths = new HashSet<>();
     for (NoteChange change : noteChanges) {
@@ -88,11 +90,11 @@ public final class NotebookGitProposalTreeShape {
         addedPaths.add(change.path());
       }
     }
-    List<ChangedDocument> additions = new ArrayList<>(containerAdditions);
+    List<ChangedDocument> documentsToApply = new ArrayList<>(containerDocuments);
     Set<String> additionPathsFromDocuments = new HashSet<>();
     for (ChangedDocument document : conceptDocuments) {
       if (document.kind() == ChangeKind.ADDED && addedPaths.contains(document.path())) {
-        additions.add(document);
+        documentsToApply.add(document);
         additionPathsFromDocuments.add(document.path());
       }
     }
@@ -102,13 +104,13 @@ public final class NotebookGitProposalTreeShape {
       if (change.kind() != ChangeKind.ADDED || additionPathsFromDocuments.contains(change.path())) {
         continue;
       }
-      additions.add(
+      documentsToApply.add(
           new ChangedDocument(
               new InspectedRegularFile(change.path(), null, change.blobId()),
               ChangeKind.ADDED,
               DocumentRole.CONCEPT));
     }
-    return new AdmittedShape(noteChanges, additions);
+    return new AdmittedShape(noteChanges, documentsToApply);
   }
 
   private static ResponseStatusException reservedFolderReadme(String path) {
@@ -172,10 +174,10 @@ public final class NotebookGitProposalTreeShape {
   }
 
   /**
-   * Ordinary-note changes plus the addition documents (container Readmes and residual concept
-   * additions) ready for document application.
+   * Ordinary-note changes plus the container and concept documents (additions and container
+   * modifications) ready for document application.
    */
-  record AdmittedShape(List<NoteChange> noteChanges, List<ChangedDocument> additions) {}
+  record AdmittedShape(List<NoteChange> noteChanges, List<ChangedDocument> documents) {}
 
   /**
    * Accepted-tree path and blob that established note identity. Carried separately from the
