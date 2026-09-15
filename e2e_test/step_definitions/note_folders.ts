@@ -43,6 +43,18 @@ When(
   }
 )
 
+When(
+  'I create a folder named {string} under folder {string} in notebook {string}',
+  (folderName: string, parentFolder: string, notebook: string) => {
+    start.jumpToNotebookPage(notebook)
+    start
+      .noteSidebar()
+      .activateFolderByLabel(parentFolder)
+      .addingNewFolderFromToolbar()
+      .createFolderWithName(folderName)
+  }
+)
+
 Then('I should see sidebar folder {string}', (folderLabel: string) => {
   start.noteSidebar().expectSidebarFolderVisible(folderLabel)
 })

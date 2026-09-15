@@ -1,6 +1,6 @@
 # Receive web-created folders and their notes locally
 
-Status: executing; slices 1–6 done, slice 7 ready
+Status: executing; slices 1–7 done, slice 8 ready
 
 ## Execution identity
 
@@ -279,9 +279,14 @@ Sizing: approximately 5 minutes active work, medium confidence plus suite wait.
 ### 7. Receive nested web authoring without intermediate pulls
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Web-created-note feature command; backend command only if production
 changes are needed. Extend the real web-authoring/installed-CLI scenario.
+
+Accepted proof: the focused web-created-note feature passed 6/6 scenarios. The
+new real web-action scenario receives `Science/Biology/Cells.md` in one clean
+pull, retains the original head as ancestor, and its exact listing proves both
+folders have no `.keep`. No product or backend change was needed.
 
 Behavior: Given a clean receiving checkout, create `Science`, child `Biology`,
 and ordinary `Cells` on the web before the next pull. One pull receives

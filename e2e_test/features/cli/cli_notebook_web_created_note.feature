@@ -79,6 +79,21 @@ Feature: CLI notebook web note changes
 
       """
 
+  Scenario: Pulling nested web authoring with one pull
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I create a folder named "Science" while viewing note "Overview"
+    And I create a folder named "Biology" under folder "Science" in notebook "CLI Clone Notebook"
+    And I create a note with title "Cells" under the folder "Biology" in the notebook "CLI Clone Notebook"
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | README.md                   |
+      | Overview.md                 |
+      | Science/Biology/Cells.md    |
+      | Kitchen/README.md           |
+      | Recipes/README.md           |
+      | Recipes/Pasta.md            |
+
   Scenario: Pulling a web note rename into a clean checkout
     Given I have a note "Cells" under notebook "CLI Clone Notebook" in folder "Biology" with content:
       """
