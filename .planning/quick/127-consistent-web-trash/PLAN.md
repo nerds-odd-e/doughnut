@@ -1,6 +1,6 @@
 # Receive web trash and recovery through one consistent accepted change
 
-Status: in progress
+Status: done
 Source: [SEED-009 story 28, first delivery](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28)
 Direction: [One complete accepted web change](../../NORTH-STAR.md#one-complete-accepted-web-change)
 Authority: 2026-09-15 — `/dough-execute-plan 127` (planned Story Branch Mode).
@@ -479,7 +479,7 @@ Accepted proof:
 
 ### 11. Reject a proposal based on the pre-Trash head
 Type: Behavior
-Status: planned
+Status: done
 
 An owner has a proposal based on A. Web Trash advances accepted history to B;
 publication still expecting A is rejected by the existing stale-head rule,
@@ -490,6 +490,19 @@ fixtures/assertions with the new trigger. Observe unchanged B and note location
 from committed state. Do not repeat queue scheduling already proved in slice 10.
 Safe stop: all selected promises are proved, subject to required delivery/review.
 Sizing: 3–5 minutes plus suite.
+
+Accepted proof:
+- Promise: a proposal expecting pre-Trash A is rejected CONFLICT; accepted B
+  and the complete Trash tree remain (`Biology/.keep`, `_trash/Biology/Cells.md`).
+- Boundary: `noteController.trashNote` then `controller.publishNotebookGitProposal`.
+- Setup: `NotebookGitWebTrashStaleProposalControllerTest.seedLiveCellsInBiology`
+  then Trash; proposal files built on current binding with expected head A.
+- Observations: `proposalOnStalePreTrashHeadIsRejectedAfterTrash` — 409;
+  committed `inCommittedTransaction` still B, Cells trashed under `_trash`,
+  bundle paths and original Cells bytes unchanged.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. No production change — Trash already advances accepted history.
 
 ## Sizing, delivery and verification
 
