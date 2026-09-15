@@ -347,5 +347,17 @@ shared `proposalBundleBytes` drops inherited accepted files; proposals that
 must preserve folder READMEs need a tree-preserving builder
 (`proposalModifyingPath`). `edit` reloads the note from `lockedState` and
 `noteMotionService` mutates that same managed instance, so the snapshot
-reflects the new placement without an extra reload. E2E journey pending
-(separate delegation).
+reflects the new placement without an extra reload.
+
+E2E journey done (2026-09-15): added
+`e2e_test/features/cli/cli_notebook_web_note_moves.feature` (one
+`@mockBrowserTime` Scenario: clone before web Move → pull moved tree B →
+assert `Study/Cells.md` present / `Biology/Cells.md` absent → commit/publish
+local edit C → read new content on original note route). Registered in
+`ACTIVE_CLI_SPECS` (`scripts/isolated-cypress-active-specs.mjs`). Two thin
+step definitions in `e2e_test/step_definitions/cli_notebook_web_note_moves.ts`
+(capture note id before move; reopen `noteShow` by id after CLI publication,
+ADR 0005 named route). E2E passed: `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix
+develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_note_moves.feature`
+→ 1 passing, 0 failing. Learning: the web Move interaction depends on
+`cy.tick`, so CLI-journey features reusing it must carry `@mockBrowserTime`.
