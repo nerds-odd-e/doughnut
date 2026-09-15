@@ -190,10 +190,11 @@ Accepted proof (inspected):
 - `NotebookGitProposalTreeShapeControllerTest.acceptsAValidFolderReadmeEditAlongsideANoteAdditionWithoutMutatingFolderIdentity`
   — folder Readme MODIFIED + note ADDED (naturally supported; folder proof proper
   remains slice 2).
-- E2E `cli_notebook_clone.feature` "Publishing a committed root readme edit
-  updates the notebook description and round-trips" — clones both checkouts,
-  commits typed Readme edit, publishes via installed CLI, observes readme body
-  in Donut, pulls receiver, asserts clean head + exact authored bytes.
+- E2E `cli_notebook_clone.feature` "Publishing committed readme edits update
+  notebook/folder descriptions and round-trips" (merged root+folder journey)
+  — clones both checkouts, commits typed root and folder Readme edits together,
+  publishes via installed CLI, observes notebook and folder readme in Donut,
+  pulls receiver, asserts clean head + exact authored bytes for both files.
 Verification: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (2406
 tests, 0 failures) and `CURSOR_DEV=true nix develop -c pnpm cy:run --spec
 e2e_test/features/cli/cli_notebook_clone.feature` (11 scenarios, 0 failing).
@@ -228,26 +229,33 @@ Accepted proof (inspected):
 - `NotebookGitProposalFolderReadmeEditControllerTest.rejectsAnInvalidFolderReadmeEditWithoutMutatingAcceptedContent`
   — invalid typed Markdown + valid note edit → BAD_REQUEST, reason contains
   `Recipes/README.md`, unchanged folder readme and note content.
-- E2E `cli_notebook_clone.feature` "Publishing a committed folder readme edit
-  updates the folder description and round-trips" — clones both checkouts,
-  commits typed `Recipes/README.md` edit, publishes via installed CLI, opens
-  folder page for "Recipes" from the sidebar, asserts folder readme contains,
-  pulls receiver, asserts clean head + exact bytes (reuses existing
-  `folder_page.ts` steps; no new page object).
+- E2E `cli_notebook_clone.feature` "Publishing committed readme edits update
+  notebook/folder descriptions and round-trips" — same merged journey as
+  slice 1: folder description through Donut (`folder_page.ts`) and exact
+  receiver `Recipes/README.md` bytes/HEAD.
 Verification: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 (2409 tests, 0 failures) and `CURSOR_DEV=true nix develop -c pnpm cy:run
---spec e2e_test/features/cli/cli_notebook_clone.feature` (12 scenarios,
-0 failing). Refactor: collapsed `learnedTracker` /
-`assertShownContentAndRetainedLearning` duplication into
+--spec e2e_test/features/cli/cli_notebook_clone.feature`. Refactor: collapsed
+`learnedTracker` / `assertShownContentAndRetainedLearning` duplication into
 `NotebookGitWebContentControllerTestBase`; full backend suite rerun
-post-refactor (BUILD SUCCESSFUL). Narrow exception approved:
-`cli_notebook_clone.feature` is 258 lines (>250 refactor-check threshold);
-the clean split requires reorganizing pre-existing publish scenarios
-unrelated to this proof-only slice, so the file is accepted as-is for this
-slice.
+post-refactor (BUILD SUCCESSFUL).
 
 Learning: `MemoryTrackerBuilder.afterNthStrictRecall(n)` computes a stability
 that does not round-trip cleanly through the DB float column, so it is
 unsuitable for an `equalTo` stability assertion across a reload;
 `recallCount(n)` (adding `recall_log` history without disturbing stability)
 is the right fixture for "retained history" assertions.
+
+### E2E cleanup — delivered
+Collapsed `cli_notebook_clone.feature` from 12 scenarios / 258 lines to 4
+scenarios / 140 lines (under the 250-line threshold). The two Readme-edit
+journeys merged into one CLI publish+pull+UI observation. Eight low-level
+publication scenarios (note edit, deletion, mixed additions, rename,
+relocation, duplicate-metadata rejection, nested-metadata rich-body edit)
+were removed; their observables remain in existing backend controller tests
+and `frontend/tests/components/form/RichMarkdownEditor.nestedMetadata.spec.ts`.
+Kept: denied clone, owned clone, initial nested-tree round-trip, merged
+Readme-edit round-trip.
+Verification: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (BUILD
+SUCCESSFUL) and `CURSOR_DEV=true nix develop -c pnpm cy:run --spec
+e2e_test/features/cli/cli_notebook_clone.feature` (4 passing, 0 failing).

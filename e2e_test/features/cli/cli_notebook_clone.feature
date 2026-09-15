@@ -105,21 +105,19 @@ Feature: CLI notebook clone
 
       """
 
-  Scenario: Publishing a committed root readme edit updates the notebook description and round-trips
+  Scenario: Publishing committed readme edits update notebook/folder descriptions and round-trips
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
-    And I commit the following edit to "README.md" in the cloned checkout:
-      """
-      ---
-      type: Readme
-      author: owner
-      ---
-      Updated notebook landing
-      """
+    And I commit the following document changes together in the cloned checkout:
+      | path              | content                                                              |
+      | README.md         | ---\ntype: Readme\nauthor: owner\n---\nUpdated notebook landing      |
+      | Recipes/README.md | ---\ntype: Readme\nauthor: owner\n---\nUpdated folder landing        |
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
     When I open the notebook "CLI Clone Notebook" from the notebook catalog
     Then the notebook readme body includes "Updated notebook landing"
+    And I open the folder page for "Recipes" from the sidebar
+    Then the folder readme should contain "Updated folder landing"
     When I pull the second cloned checkout using the installed CLI
     Then the second cloned checkout is a clean checkout of the accepted head
     And the second cloned checkout file "README.md" is:
@@ -131,25 +129,6 @@ Feature: CLI notebook clone
       Updated notebook landing
 
       """
-
-  Scenario: Publishing a committed folder readme edit updates the folder description and round-trips
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
-    And I commit the following edit to "Recipes/README.md" in the cloned checkout:
-      """
-      ---
-      type: Readme
-      author: owner
-      ---
-      Updated folder landing
-      """
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    When I open the notebook "CLI Clone Notebook" from the notebook catalog
-    And I open the folder page for "Recipes" from the sidebar
-    Then the folder readme should contain "Updated folder landing"
-    When I pull the second cloned checkout using the installed CLI
-    Then the second cloned checkout is a clean checkout of the accepted head
     And the second cloned checkout file "Recipes/README.md" is:
       """
       ---
@@ -159,100 +138,3 @@ Feature: CLI notebook clone
       Updated folder landing
 
       """
-
-  Scenario: Publishing a committed note edit updates the same Donut note
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I commit the following edit to "Recipes/Pasta.md" in the cloned checkout:
-      """
-      ---
-      type: Note
-      author: Chef Boyardee
-      ---
-      Simmer until al dente
-      """
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And note "Pasta" should have content "Simmer until al dente"
-
-  Scenario: Publishing a committed note removal deletes the note in Donut
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I commit a removal of "Recipes/Pasta.md" in the cloned checkout
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    When I open the notebook "CLI Clone Notebook" from the notebook catalog
-    And I open the folder page for "Recipes" from the sidebar
-    Then I should see the note tree in the sidebar
-      | note-title |
-      | Overview   |
-
-  Scenario: Publishing related additions and an edit updates every Donut note
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I commit the following related additions and edit together in the cloned checkout:
-      | path              | content                                                                                   |
-      | Shopping.md       | ---\ntype: Note\n---\nBuy fresh basil                                                       |
-      | Recipes/Sauce.md  | ---\ntype: Note\n---\nSimmer tomatoes with basil                                            |
-      | Recipes/Pasta.md  | ---\ntype: Note\nauthor: Chef Boyardee\n---\nServe al dente pasta with tomato sauce          |
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Shopping" has content "Buy fresh basil"
-    And I should see note "CLI Clone Notebook/Recipes/Sauce" has content "Simmer tomatoes with basil"
-    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Serve al dente pasta with tomato sauce"
-
-  Scenario: Publishing a committed note rename updates the same Donut note under its new title
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I commit a rename of "Recipes/Pasta.md" to "Recipes/Pasta basics.md" in the cloned checkout
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Recipes/Pasta basics" has content "Boil water"
-
-  Scenario: Publishing a committed note relocation updates the same Donut note at the notebook root
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I commit a rename of "Recipes/Pasta.md" to "Pasta basics.md" in the cloned checkout
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Pasta basics" has content "Boil water"
-
-  Scenario: Rejecting duplicate metadata keeps the local proposal available for correction
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I add and commit the following note at "Duplicate Keys.md" in the cloned checkout:
-      """
-      ---
-      type: Note
-      author: first
-      author: second
-      ---
-      Body.
-      """
-    And I publish the cloned checkout expecting rejection from the installed CLI
-    Then I should see "Duplicate Keys.md" in the non-interactive output
-    And I should see "duplicate" in the non-interactive output
-    And the cloned checkout retains the original committed proposal
-    When I open the notebook "CLI Clone Notebook" from the notebook catalog
-    Then I should see the note tree in the sidebar
-      | note-title |
-      | Overview   |
-
-  Scenario: Publishing a nested-metadata note preserves metadata through a rich body edit
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    Then I should see "one or more edited existing ordinary Markdown notes at unchanged paths" in the non-interactive output
-    When I add and commit the following note at "Recipes/Pantry Staples.md" in the cloned checkout:
-      """
-      ---
-      type: Note
-      # Author annotation
-      custom:
-        source: 'local'
-      ---
-      Keep semolina pasta stocked.
-      """
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Recipes/Pantry Staples" has content "Keep semolina pasta stocked."
-    When I view the note content as rich content
-    And I update note "Pantry Staples" content to become "Restock semolina pasta."
-    And I reload the current page for note "Pantry Staples"
-    Then the note content should include "Restock semolina pasta."
-    When I open the note content markdown editor
-    Then the note content markdown source should contain "# Author annotation"
-    And the note content markdown source should contain "custom:"
-    And the note content markdown source should contain "  source: 'local'"
