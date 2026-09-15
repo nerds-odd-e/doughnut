@@ -1,6 +1,6 @@
 # Receive web-created folders and their notes locally
 
-Status: executed; slices 1–8 done, retrospective pending
+Status: executed; slices 1–8 done, retrospective complete
 
 ## Execution identity
 
@@ -8,9 +8,8 @@ Status: executed; slices 1–8 done, retrospective pending
 - Execution checkout: `/Users/terryyin/git/doughnut-126-receive-web-created-folders`, branch `codex/126-receive-web-created-folders`
 - Integration target: `main`
 - Authorized push destination: `origin`, execution branch
-- CI observer: coordinator `root`, workflow `ci.yml` / `donut CI`; initial
-  observer cell `52` stopped, repair observer cell `140`, session `98996`, PID
-  `19985`, directory `/tmp/dough-ci-501/watch-xxDypC`
+- CI observer: coordinator `root`, workflow `ci.yml` / `donut CI`; initial and
+  repair observers stopped, final coverage `pendingCi: unobserved`
 
 ## Source and authority
 
