@@ -1,5 +1,4 @@
-# test optimization profiles (local only)
-ongoing/*-profile-results.json
+# local raw test profiles (dough-test-optimization evidence; never commit)
 .planning/*-profile-results.json
 .planning/quick/**/*-profile-results.json
 

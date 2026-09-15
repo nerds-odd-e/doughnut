@@ -54,6 +54,12 @@ Useful focused checks:
 - Lint all: `CURSOR_DEV=true nix develop -c pnpm lint:all`
 - Format all: `CURSOR_DEV=true nix develop -c pnpm format:all`
 
+For `dough-test-optimization`, measure the applicable testing rule's ordinary
+stack command as the local feedback path. Runner-specific per-test profiling
+commands and parsing notes live in `frontend-testing.mdc`,
+`backend-testing.mdc`, `cli.mdc`, `mcp-server.mdc`, or `e2e-authoring.mdc`.
+Raw profiles are local evidence and must not be committed.
+
 **Development vs E2E:** For manual product feedback from the unconfigured primary,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
 `doughnut_development`, `dev.log` / `dev.pid`; restart with `pnpm dev:restart`;
@@ -71,4 +77,4 @@ after normal code changes; backend and frontend auto-reload.
 
 ## Ignored Reference Material
 
-`docs/` and leftover `ongoing/` files are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD `phases/`, `quick/`, `STATE`, … — see `gsd-coexistence.mdc`). Test-optimization candidates: `.planning/test-optimization-blacklist.md`. Read `docs/` explicitly when the user asks for docs, a rule points to a document, or an ADR check is required (`docs/adrs/`).
+`docs/` and leftover `ongoing/` files are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD `phases/`, `quick/`, `STATE`, … — see `gsd-coexistence.mdc`). Test-optimization candidates: `.planning/test-optimization-candidates.md`. Read `docs/` explicitly when the user asks for docs, a rule points to a document, or an ADR check is required (`docs/adrs/`).

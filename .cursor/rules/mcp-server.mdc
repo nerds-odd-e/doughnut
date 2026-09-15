@@ -56,6 +56,11 @@ The MCP server has Vitest unit tests under `tests/` (not mixed with `src/`). **S
 CURSOR_DEV=true nix develop -c pnpm mcp-server:test
 ```
 
+For `dough-test-optimization`, measure that command as the ordinary feedback
+path. Obtain per-test Vitest durations with
+`CURSOR_DEV=true nix develop -c pnpm -C mcp-server exec vitest run --reporter=json`;
+the JSON run is profiling evidence and does not replace normal verification.
+
 ### Test Organization
 
 - **Production code**: `src/`

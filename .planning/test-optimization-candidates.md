@@ -1,9 +1,13 @@
-# Test optimization blacklist
+# Test optimization candidates
 
-**Candidates** are proposals from optimization runs (hard-to-improve after a
-serious attempt). Permanent exclusion from profiling is done by tagging the
-Scenario or Feature with `@skipOptimizationDueToKnownNecessarySlowness` — that
-is a developer decision after review, not an automatic move from this list.
+This is Donut's candidate record for the public `dough-test-optimization` skill.
+Candidates are hard-to-improve costs retained after a serious measured
+experiment. Each entry remains eligible for later profiling until it is resolved.
+
+Permanent E2E profile exclusion uses
+`@skipOptimizationDueToKnownNecessarySlowness` on the narrowest Scenario or
+Feature. That is a developer decision after review except where an explicit
+`--resolve` pass is authorized by the public skill.
 
 Profile E2E with:
 
@@ -13,7 +17,7 @@ Profile E2E with:
 
 ## Candidates
 
-<!-- file path — test/scenario name — duration — why hard — proposed YYYY-MM-DD -->
+<!-- location — measured cost — unique protection — attempted alternatives/evidence — date — decision needed -->
 
 - `frontend/tests/pages/BookReadingPage.snap.budgets.spec.ts` — marking READ clears snap reminder: block no longer snaps when re-visited — ~17.6ms baseline — full PDF mount + snap budget lifecycle + mark-as-read; no cheaper remount preserves behavior — 2026-08-20
 - `frontend/tests/pages/BookReadingPage.snap.budgets.spec.ts` — different unread blocks get independent snap budgets — dual-block PDF geometry with multi-crossing budgets; inherent viewer cost — 2026-08-20

@@ -16,7 +16,7 @@ Planning lives under `.planning/` (GSD + local). Canonical coexistence:
 `.cursor/rules/gsd-coexistence.mdc`. Decomposition and slice quality:
 `.cursor/rules/problem-decomposition.mdc`; planning artifacts and lifecycle:
 `.cursor/rules/planning.mdc`.
-Do not put new plans under `ongoing/`. Test-optimization candidates live in `.planning/test-optimization-blacklist.md`.
+Do not put new plans under `ongoing/`. Test-optimization candidates live in `.planning/test-optimization-candidates.md`.
 
 ## Principles
 
@@ -41,5 +41,5 @@ Portable digest (details live in the cited always-applied rules — keep `AGENTS
 - **Plan refinement:** use **dough-slice-plan-refinement** in place when an existing PLAN is complex, sizing confidence is low, or execution overruns. Skip the extra pass when dough-slice-planning already produced clear commit-sized leaves.
 - **Execution retrospective:** review a completed or in-progress plan with **dough-execution-retrospective**; it may plan bounded corrections but never executes them. Close completed story history afterward with **dough-story-wrap-up**.
 - **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); for one selected ad-hoc story use **dough-slice-planning** → optional **dough-slice-plan-refinement** → **dough-execute-plan** under `.planning/quick/`.
-- **Test optimization:** `test-optimization` skill — plans under `.planning/phases/` or `quick/`, run via dough-execute-plan.
+- **Test optimization:** `dough-test-optimization` — use the public Open Dough workflow; plans live under `.planning/phases/` or `quick/` and run via dough-execute-plan. Donut-specific commands and profile exclusions live in `.cursor/agent-map.md` and the applicable stack testing rules.
 - **Non-compatible local overlays** (must keep): documented in `.cursor/rules/gsd-coexistence.mdc`.

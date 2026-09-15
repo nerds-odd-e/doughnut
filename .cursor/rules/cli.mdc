@@ -35,6 +35,12 @@ Keep each module’s **public surface small**: `export` only what other modules 
 | Format | `pnpm cli:format` |
 | Lint | `pnpm cli:lint` |
 
+For `dough-test-optimization`, measure `pnpm cli:test` as the complete ordinary
+feedback path, including the Python tests. For per-test Vitest durations, use
+`CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run --reporter=json`;
+that narrower profile does not replace verification or timing of the complete
+CLI command.
+
 ## Architecture notes
 
 CLI architecture guidance lives in this rule and in `cli/` code layout. New planning artifacts go under `.planning/phases/` or `.planning/quick/` — see `gsd-coexistence.mdc`.

@@ -49,6 +49,14 @@ The test file path is relative to `frontend/`. Do not use `pnpm ... test -- test
 
 In most situations, run all unit tests instead of a selected file only. Use a single test file when actively debugging or iterating on a specific component.
 
+For `dough-test-optimization`, `frontend:test` remains the ordinary local
+feedback measurement because it runs Chromium browser mode. When per-test JSON
+durations are needed for investigation, use
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run --reporter=json`.
+That plain Vitest run is profiling evidence only; verify retained changes with
+the normal browser-mode command and do not compare its wall time directly with
+`frontend:test`.
+
 ## Component Behavior
 
 - Drive the mounted component / page ("small test" style per `unit-testing.mdc`); cover lower layers with realistic `makeMe` props/state, not by testing internal helpers in isolation.
