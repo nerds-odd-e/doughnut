@@ -15,11 +15,11 @@ with reasonable performance.
 ## Taken
 
 ## Backlog list
-- [Make repeated trash and Undo journeys clean and predictable](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-38) — SEED-009
 - [Receive web-created folders and their notes locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-35) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009
 - [Use portable trash across Donut and local Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28) — SEED-009
 - [Publish local renames, moves, and edits across commits while preserving note identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-36) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
+- [Make repeated trash and Undo journeys clean and predictable](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-38) — SEED-009
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009

@@ -48,70 +48,146 @@ data; invalid or ambiguous changes must not silently discard work.
 
 ### 35. Receive web-created folders and their notes locally
 
-- **Goal / beneficiary:** A notebook owner can organize new material in a folder
-  on the web, then receive that folder and its ordinary notes locally. Creating
-  the folder before writing its first note must also survive clone and pull.
-- **Human direction (2026-09-14):** Keep web folder creation and creating a note
-  in that new folder together in one story. Represent an otherwise empty folder
-  with `.keep`. Include empty folders in initial Git snapshots of existing
-  notebooks as part of the same outcome.
-- **Current evidence:** `PortableTreeSnapshot` emits note files and non-blank
-  container Readmes, but no placeholder for otherwise empty folders.
-  `WebNoteCreationService` advances accepted history only when the starting
-  projection matches and the destination folder is already represented. These
-  are inspected code boundaries, not newly executed acceptance evidence.
-- **Scope:** Web-created folders, including nested folders, and ordinary notes
-  subsequently created in them reach a clean receiving checkout through the
-  existing clone/pull flow. Empty folders use a tracked `.keep` placeholder,
-  not a note or an invented Readme description. Initial snapshots preserve
-  existing empty folders too. Existing note/folder identities, authored content,
-  learning data, and accepted commit IDs remain intact. Subsequent web changes
-  append history; updating support must not rewrite an existing initial commit.
-- **Key examples:**
-  1. A synchronized notebook has no `Biology` folder. Create it on the web,
-     then pull: local `Biology/.keep` preserves the empty folder.
-  2. Create `Cells` in that folder on the web, then pull: local
-     `Biology/Cells.md` contains the new note. Receiving both web changes in one
-     pull also works; no intervening owner synchronization is required.
-  3. An existing notebook contains an empty nested folder `Science/Biology`.
-     Its first Git snapshot and clone retain that path through `.keep`, with
-     existing notes and non-blank Readmes preserved.
-- **Why now / order:** Folder Trash is already available, and Restore is not a
-  prerequisite. This completes basic web authoring into a new destination. It
-  is a value ordering, not a claim that accumulated content publication
-  technically depends on folder creation.
-- **Strongest smaller alternative:** Create notes only at the root or in
-  already represented folders, or write a non-blank Readme to retain an empty
-  folder in a snapshot. Those workarounds constrain ordinary organization or
-  require artificial content; they do not deliver the requested empty-folder
-  and new-folder authoring journey.
-- **Highest learning:** Does completing folder creation let an owner organize
-  new material on the web and continue locally without manual folder repair or
-  an inconsistent accepted history?
-- **Deferred promises:** Folder moves/renames, trash synchronization, new local
-  folder-publication capabilities, divergence recovery, and performance targets.
-  Preserve already supported publication when received trees contain `.keep`;
-  deferral does not authorize breaking the next existing local edit/publish.
-- **Architecture context:** [ADR 0004 — OKF-compatible notebook Markdown
-  profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-  requires tracked content to retain empty folders and omits blank Readmes.
-  `.keep` supplies structural tracked content without creating a Markdown
-  concept. Settle shared export/import/lint handling during refinement.
-- **Open refinement questions:** How should already-bound notebooks acquire
-  representation for omitted empty folders through an append-only update?
-  When real content arrives, should the generated `.keep` be removed or retained?
-  Define marker ownership and handling of an existing authored `.keep` without
-  overwriting user content. These decisions belong here, not in a separate
-  baseline-rewrite story.
-- **Effort hypothesis:** L (2–4 hours), low confidence pending marker round-trip
-  and existing-binding analysis. Reassess if this exceeds L; the owner selected
-  the combined outcome, not an implementation plan.
-- **Depends on / safe stopping point:** Existing clone, clean fast-forward pull,
-  ordinary web note creation, and append-only web saves. No new-story technical
-  prerequisite is established. Owners retain useful folder/new-note authoring
-  even if accumulated publication and later organization stories are deferred.
-- **Status:** Queued; needs refinement before execution planning. No
-  implementation is authorized by this backlog addition.
+#### Goal and why-now challenge
+
+A notebook owner who creates a folder and ordinary notes on the web can pull
+that material into the existing local notebook and continue editing there,
+without recreating folders, copying notes, or adding artificial descriptions.
+An empty folder must also arrive before its first note is written.
+
+**Existing human direction (2026-09-14):** Keep web folder creation and creating
+a note in that new folder together. Use `.keep` for otherwise empty folders;
+include existing empty folders in a notebook's first Git snapshot. These are
+retained commitments, not new proposals from this refinement.
+
+**Owner clarification (2026-09-15):** All production notebooks will have their
+initial bundles reset, so legacy omitted-folder recovery and compatibility with
+those old bundles are not requirements for this story. This is the supplied
+rollout assumption, not a claim that the reset has happened or an instruction
+to perform it during refinement. Only empty folders have `.keep`; folders
+represented by notes, a non-blank README, or tracked descendants do not.
+
+The useful change is continuity of an existing authoring journey. Folder
+creation already exists on the web; this story does not need a new folder UI.
+The strongest smaller alternative is to author at notebook root or in an
+already represented folder, postponing organization. A non-blank Readme can
+retain a folder in a snapshot, but an artificial description is not an adequate
+substitute for the explicitly requested empty folder. That snapshot workaround
+also does not establish that subsequent web changes reach accepted history.
+
+**Why now:** The selected journey closes a concrete gap between existing web
+creation and local continuation. It retains value even if later folder moves,
+trash compatibility, and broader publication work are cancelled. Being first
+in the backlog, having delivered Folder Trash, or “completing basic authoring”
+does not establish urgency. Frequency and actual owner cost remain unmeasured;
+deferral is reasonable if owners are content with root/existing-folder authoring.
+No dependency on Restore or trash cleanup justifies expanding this story.
+
+#### Scope — narrow delivery
+
+- In one notebook whose live content matches accepted Git history, create a
+  folder on the web at root or beneath an existing folder, then create ordinary
+  notes there. Receive the results through existing clone and clean
+  fast-forward pull. Nested folders follow the same rule; example depth and
+  note counts are not product limits.
+- Owners may pull while the folder is empty, or after creating its notes,
+  without an intermediate synchronization step. Preserve the folder path and
+  authored note content in both cases.
+- The first Git snapshot of an unbound notebook retains existing empty folders,
+  including nested empty paths, using `.keep`. This stays with the selected
+  outcome under the explicit owner decision. The production bundle reset is
+  the supplied rollout prerequisite; this refinement does not execute it.
+- Use `.keep` as structural tracked content, never as a Donut note or a generated
+  Readme description. Generate it only for an otherwise empty folder: no
+  notes, non-blank README, or child folders. A nested empty leaf gets `.keep`;
+  its ancestors are represented by that tracked descendant. Remove the generated
+  marker when content or a child folder represents the directory. A blank
+  Readme still emits no README and does not make the folder nonempty.
+  Export, import, and lint must agree on this representation. A received tree must support the next already-supported local
+  note edit and publish; this is necessary continuity, not a new local folder
+  authoring feature.
+- Preserve existing note/folder identities, learning data, authored content,
+  authorization, and, after the planned baseline reset, accepted/local commit
+  IDs. Subsequent web changes append history without amending earlier commits.
+  The planned production reset is distinct from ordinary synchronization.
+
+#### Scope challenges and deferred promises
+
+- **Legacy omitted folders:** No backfill, legacy snapshot comparison, or old
+  bundle compatibility machinery is required under the owner's production-reset
+  assumption. Do not carry the previous hypothetical recovery concern into
+  execution planning.
+- **Marker lifecycle:** Empty-only generation and removal of a generated marker
+  when the folder becomes represented are required behavior, not optional
+  cleanup. Do not add a provenance journal or marker-management UI. Deliberate
+  local marker editing/removal, authored nonempty `.keep` files, and arbitrary
+  non-Markdown-file support are not delivery promises; this does not authorize
+  silently overwriting or discarding authored content.
+- **Keep separate:** Folder rename/move/dissolve, trash synchronization (story
+  28), local creation/publication of new empty folders, Readme editing (story
+  24), relationship/Wikidata creation journeys, dirty/divergent checkout
+  recovery, repair of unrelated live/history drift, and performance targets.
+  These are deferred delivery promises, not new rejection rules for naturally
+  supported cases. No exhaustive folder-operation compatibility matrix is
+  required merely because the tree representation is shared.
+
+#### Key examples
+
+1. **Empty, then populated:** Starting with a synchronized notebook, create
+   `Biology` on the web and pull into its clean checkout. `Biology/.keep` exists
+   locally without becoming a note or Readme. Create ordinary note `Cells` in
+   that folder on the web and pull again. `Biology/Cells.md` contains its
+   authored content and `Biology/.keep` is gone; earlier commits remain unchanged.
+2. **No intervening pull:** From the same starting state, create nested folders
+   `Science/Biology` and note `Cells` on the web before pulling. One pull
+   receives `Science/Biology/Cells.md` and the hierarchy without manual repair.
+   Neither folder contains `.keep`, because the note represents both paths.
+3. **First snapshot:** An unbound notebook already contains empty nested folder
+   `Science/Biology`, alongside existing notes and non-blank Readmes. First
+   clone includes `Science/Biology/.keep`, with no `Science/.keep`, and preserves
+   the existing content. A folder with a non-blank README has no `.keep`; a
+   folder with only a blank Readme and no children or notes does. This applies
+   equally to the fresh snapshots after the planned production reset.
+4. **Continue locally:** After receiving the new folder/note, edit `Cells.md`
+   locally, commit, and publish through the existing workflow. Donut shows the
+   change on the same note, retaining its learning associations. Structural
+   markers neither become concepts nor prevent this ordinary continuation.
+
+#### Evidence, constraints, and readiness
+
+Focused source inspection on 2026-09-15 found that `PortableTreeSnapshot`
+emits note files and non-blank Readmes without empty-folder markers;
+`NotebookController.createFolder` uses the existing folder construction path;
+`WebNoteCreationService` advances history only for a matching projection and
+represented destination. `NotebookGitProjection` compares the full generated
+snapshot with the accepted tree. The owner's subsequent production-reset
+clarification removes the older-binding compatibility concern from this story.
+Markdown validation skips non-Markdown files, while publication has additional
+shape admission checks: skipping `.keep` in Markdown validation alone does not
+establish round-trip support. These are source observations, not a newly run
+failure reproduction or acceptance test.
+
+[ADR 0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+is Accepted: empty folders require tracked content, blank Readmes are omitted,
+and export/import/lint share a lossless codec contract. It does not prescribe
+`.keep` cleanup or Git identity handling. Proposed ADR 0002 is not a binding
+implementation design. No ADR change is proposed here.
+
+- **Resolved scope and representation:** No legacy recovery; `.keep` only in
+  otherwise empty folders, removed when tracked content represents the folder.
+  These owner decisions replace the previous deferral and retention proposals.
+- **Highest learning:** Can an owner complete web folder → web note → local
+  receipt → ordinary local edit/publish without a workaround or broken history?
+- **Effort hypothesis:** Retain L (2–4 hours), low confidence pending assessment
+  of empty-only marker round-tripping and web history updates. Legacy bundle
+  compatibility no longer contributes scope. Reassess during planning.
+- **Plan:** [Receive web-created folders](../quick/126-receive-web-created-folders/PLAN.md).
+  Planning is authorized; implementation is not. The plan records a source-derived
+  concern about already-supported local deletion/move leaving a folder newly
+  empty. Resolve that future-operation boundary without reintroducing legacy
+  recovery or silently changing folder identity/commit preservation. Existing
+  clone/pull and ordinary note authoring supply the prerequisites; no other
+  queued story is an established dependency.
 
 <a id="story-36"></a>
 
@@ -362,31 +438,112 @@ from further splitting/refinement for now, by the owner's instruction.
 
 ### 38. Make repeated trash and Undo journeys clean and predictable
 
-- **Goal / beneficiary:** A notebook owner can repeatedly trash, undo, and
-  re-trash related notes and folders without a failed nested recovery or a
-  surprising collision suffix caused only by empty recovery scaffolding.
-- **Why later:** Move already provides recovery and the main trash journeys are
-  green. The owner explicitly placed this cleanup after the migration-safe
-  production release.
-- **Scope capture:** Repair the ignored child-then-parent trash/Undo journey;
-  decide and implement coherent cleanup for empty mirrored trash folders left by
-  note Undo so a later folder Trash is not unnecessarily renamed; and remove the
-  Vue extraneous-attribute warnings emitted whenever trash confirmation modals
-  open. Preserve real occupied-trash collision suffixing and ordinary Move
-  recovery from ADR 0004.
-- **Evaluation:** Trash a child note and its parent, then undo both and observe
-  the complete active structure restored. Separately trash and undo a note in an
-  otherwise empty mirrored path, then trash its original folder and observe the
-  unsuffixed name when no retained trash content occupies it. Note and folder
-  confirmations still support Cancel and confirmation and emit no browser
-  warnings.
-- **Boundary:** Do not add the Restore shortcut, bulk empty-trash behavior,
-  permanent-delete UI, or change collision handling when retained trash content
-  genuinely occupies the destination.
-- **Provenance:** The 2026-09-14 audit confirmed the main menu journeys manually,
-  found the nested Undo scenario still tagged `@ignore`, observed four identical
-  modal warnings, and reproduced an empty `_trash/Research` folder causing a
-  later active `Research` subtree to become `Research (2)`.
+#### Goal and why-now challenge
+
+**Recommended narrow outcome (2026-09-15 refinement):** A notebook owner can
+trash a note, immediately undo that action, and later trash its containing
+folder without gaining a collision suffix solely because the first operation
+left an unused mirrored path. The visible result is a predictable folder name
+in trash. This is not a promise to make every trash/recovery journey clean.
+
+The 2026-09-14 audit recorded an empty `_trash/Research` causing a later
+`Research` subtree to become `Research (2)`. This is evidence of confusing
+organization, not lost content or unavailable recovery. Ordinary Move already
+provides recovery. Doing nothing is safe under the existing collision rule;
+accepting the suffix is the strongest smaller alternative. Its cost is an
+unexpected name which the owner must understand or change, not a broken round
+trip.
+
+The owner previously placed these rough edges after the migration-safe release;
+this item is now first in the backlog. That ordering does not establish urgency.
+Fixing a reproduced surprise in a recently delivered journey is a reasonable
+reason to act now, but frequency and actual owner cost are unmeasured. If this
+rare naming inconvenience takes substantial lifecycle machinery to resolve,
+deferral in favor of web-created folders (story 35) is preferable. No technical
+dependency makes this correction a prerequisite for that story or Git work.
+
+#### Scope — recommended cut
+
+- Own the web note Trash → immediate Undo → containing-folder Trash journey
+  above, in one notebook with available Undo history and no intervening authored
+  changes to the mirrored trash path. Existing note Undo and folder Trash are
+  the entry points; no additional controls are needed.
+- A path introduced solely to hold the undone note must not by itself force a
+  suffix on that later folder Trash. Specify this observable outcome, not a
+  general empty-folder deletion policy or a prescribed cleanup mechanism.
+- Preserve content, folder and note identities belonging to the owner, learning
+  history, permissions, existing reference choices, and ordinary Move recovery.
+  Undo does not promise to recover reference properties deliberately removed at
+  trash time. Location continues to govern trash eligibility.
+- Preserve occupied-destination suffixing of the incoming subtree as a whole
+  under [ADR 0004 — Trash](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash).
+  Do not merge into, overwrite, or discard earlier trash to obtain a nicer name.
+  An intentionally retained empty folder is still an item; a folder with a
+  Readme is not disposable merely because it contains no notes.
+- Limit the delivery commitment to the operation's leftover path. No scan or
+  cleanup of old trash, new provenance journal, folder Undo capability,
+  cross-session Undo, arbitrary recovery order, Restore shortcut (story 32),
+  permanent-delete UI, or new Git/local compatibility (story 28) is promised.
+  These are deferrals, not rules rejecting naturally supported behavior.
+
+#### Key examples
+
+1. **Unused path:** Active `Research/Cells.md` exists and `_trash/Research`
+   does not. Trash `Cells`, immediately Undo, then trash folder `Research`.
+   The same folder and note appear at `_trash/Research/Cells.md`, without
+   `Research (2)` caused by the first operation's leftover path. The recovered
+   note retains its content and learning history.
+2. **Earlier trash remains:** `_trash/Research/Older.md` already exists. Trash
+   and undo active `Research/Cells.md`, then trash active `Research`. Earlier
+   trash stays intact; the incoming folder receives the first available suffix
+   under the existing rule. The correction must not reinterpret this as an
+   empty destination or merge the two folders.
+3. **Empty does not mean disposable:** `_trash/Research` was already an
+   intentionally retained empty folder, or contains an authored Readme. The
+   same journey preserves it and applies ordinary collision handling. Counting
+   notes alone cannot establish that a path is disposable scaffolding.
+
+#### Other captured work — retained for explicit deferral
+
+- **Ignored nested Undo example:** The earlier scope promised repair of the
+  child-then-parent journey. Source inspection on 2026-09-15 found the ignored
+  scenario in `e2e_test/features/note_creation_and_update/note_deletion.feature`
+  trashes notes `TDD` and `tech`, then undoes them in reverse order. It does not
+  trash the containing folder. A nearby active scenario explicitly preserves
+  structural descendants when a note is trashed. An ignored test is not proof
+  of a current product failure; confirm its intended observable behavior before
+  retaining a repair commitment. Recommend deferring this separate outcome;
+  do not invent folder Undo or revive timestamp-based restoration to satisfy it.
+- **Modal warnings:** The audit recorded four identical Vue extraneous-attribute
+  warnings. Removing those warnings is independent of the naming outcome.
+  Recommend deferring it unless it prevents the selected journey from working.
+  Preserve working Cancel and confirmation behavior, without adding a
+  browser-wide no-warnings acceptance commitment.
+
+These earlier promises remain recorded here; the recommended cut does not
+silently cancel them, queue new stories, or change sibling scope or backlog order.
+
+#### Open decisions and readiness
+
+- **Scope proposal:** Recommend selecting only the spurious-suffix outcome and
+  deferring the other two captured outcomes. This is a refinement recommendation,
+  not a claim of an already confirmed owner decision.
+- **Safety assumption:** The original capture assumed empty mirrored paths can
+  be cleaned safely. Inspection found path creation can reuse existing folders,
+  while Undo currently carries a prior folder and title. It has not established
+  how to distinguish disposable scaffolding from intentional retained folders.
+  Resolve that distinction before execution planning; if the narrow journey
+  cannot be supported safely without broader state, revisit its value rather
+  than silently widen the story or weaken preservation.
+- **Evidence:** The reproduction and warnings above come from the retained
+  2026-09-14 audit. This refinement inspected current source and scenarios but
+  did not rerun the application or establish a failing test. Confirm the defect
+  at the current revision before implementation; if already absent, reassess
+  remaining work rather than manufacture a repair.
+- **Effort hypothesis:** S–M, low confidence, assuming a local correction to the
+  existing journey. Safe ownership of leftover paths is the main uncertainty.
+  The outcome remains useful if all later trash work is cancelled. No executable
+  plan or implementation is authorized by this refinement.
 
 <a id="story-32"></a>
 
