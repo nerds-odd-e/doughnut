@@ -23,6 +23,11 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only
 
 Always run all backend unit tests instead of a selected file or test case.
 
+For `dough-test-optimization`, use `backend:test_only` as both the ordinary
+feedback measurement and profiling run. Per-test timings are the `time`
+attributes in `backend/build/test-results/test/TEST-*.xml`; keep any derived raw
+profile outside committed files.
+
 ## Core Principles
 
 Backend application of the "small test" style (`unit-testing.mdc`):

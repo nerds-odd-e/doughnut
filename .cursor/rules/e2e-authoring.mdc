@@ -48,9 +48,30 @@ Important notes:
 
 - Do not use `cypress run -- --spec`; the empty `--` causes the `--spec` parameter to be ignored.
 - The default tag filter is `expose.tags` in `e2e_test/config/ci.ts`, for example `not @ignore`. Override per run with `--expose tags='...'` (`-x`), not `--env tags=...` (ignored by `@badeball/cypress-cucumber-preprocessor` v27 on Cypress >= 15.17).
-- `@skipOptimizationDueToKnownNecessarySlowness` on a Scenario or Feature marks known-necessary slowness. Test-optimization profiles exclude it with `--expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'`. Normal CI/dev runs still execute these scenarios. Do not add this tag without developer review.
+- `@skipOptimizationDueToKnownNecessarySlowness` is Donut's profile-only
+  exclusion for known-necessary slowness. `dough-test-optimization` profiles
+  exclude it with
+  `--expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'`.
+  Normal CI/dev runs still execute these scenarios. Do not add this tag without
+  developer review, except when an explicit `dough-test-optimization --resolve`
+  pass makes an evident exclusion under the public skill's candidate-resolution
+  rules.
 - `@focus` and `@only` are local debugging aids only. Do not commit them; CI runs `./scripts/check_focus_tags.sh` on `.feature` files to block `@focus`, and `@only` should be treated the same.
 - If any node in a feature file is tagged `@focus` or `@only`, `@badeball/cypress-cucumber-preprocessor` filters scenarios in that file to `@focus or @only` only.
+
+### Test-optimization profiling
+
+For per-scenario timing, run the selected feature scope through the owning
+wrapper, tee reporter output to a local file, and keep the profile-only exclusion:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec '<feature selection>' --reporter json --expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness' 2>&1 | tee /tmp/donut-e2e-profile.log
+```
+
+The JSON reporter prints one `stats`/`tests` object per spec. Associate each
+object with the preceding `Running: <feature>` line; do not assume reporter file
+output works. If mirroring CI, also exclude `@wip`. This filter is profiling-only
+and must not narrow normal verification.
 
 ## Debugging
 

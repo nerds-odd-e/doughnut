@@ -110,8 +110,8 @@
 - Improvement path: Re-bump `@vue/test-utils` once https://github.com/vuejs/test-utils/pull/2830 ships; keep avoiding `getByRole` (slow visibility) per `.cursor/rules/frontend-testing.mdc`.
 
 **External OpenAI E2E is intentionally expensive:**
-- Problem: Real OpenAI transcription feature is blacklisted from test-optimization and is slow/flaky by nature.
-- Files: `e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature`, `.planning/test-optimization-blacklist.md`
+- Problem: The real OpenAI transcription feature is excluded from optimization profiles and is slow/flaky by nature; normal CI/dev still runs it.
+- File: `e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature`
 - Cause: Live network + polling
 - Improvement path: Keep mocked coverage in `record_live_audio.feature`; run real-service spec sparingly outside the hot path.
 
