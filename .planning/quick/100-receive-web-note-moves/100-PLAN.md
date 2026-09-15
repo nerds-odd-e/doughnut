@@ -168,7 +168,7 @@ unproved promises until their slices finish.
 
 ### 3. Receive moves between root and existing nested folders
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: A root note moves into an existing nested folder, or a folder note
 moves to root; pull receives the correct full path and local publication can
@@ -361,3 +361,20 @@ ADR 0005 named route). E2E passed: `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix
 develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_note_moves.feature`
 → 1 passing, 0 failing. Learning: the web Move interaction depends on
 `cy.tick`, so CLI-journey features reusing it must carry `@mockBrowserTime`.
+
+### Slice 3 — done (2026-09-15)
+
+No production code changed — Slice 2 already routed all three same-notebook
+move endpoints through `edit`. Slice 3 added proof for root/nested variants.
+
+Proof: new `NotebookGitWebNoteMoveRootNestedControllerTest` (3 tests):
+root-to-nested (`Study/Cells.md` present, `Cells.md` absent, parent Study, B
+single parent A); nested-to-root via bare endpoint
+(`moveNoteToNotebookRoot`, `Cells.md` at root, `Biology/Cells.md` absent,
+folder null); nested-to-root via explicit target notebook endpoint
+(`moveNoteToNotebookRootInNotebook`, same assertions). Each variant asserts
+only path/parent + accepted-tree delta. Full backend suite passed. E2E
+extended with a folder-to-root scenario (Genetics in Biology → UI Move to
+notebook root → pull → `Genetics.md` at root → commit/publish → original note
+route shows new content). E2E: 2 passing, 0 failing. Cross-notebook regression
+preserved.

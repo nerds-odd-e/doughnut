@@ -74,3 +74,57 @@ Feature: CLI notebook web note moves
     Then the installed CLI reports the committed change as the accepted head
     And I open the original note route
     And the note content on the current page should be "Membranes and walls"
+
+  @mockBrowserTime
+  Scenario: Pulling a web note move from a folder to root and continuing local editing at the root path
+    Given I have a note "Genetics" under notebook "CLI Clone Notebook" in folder "Biology" with content:
+      """
+      ---
+      author: Mendel
+      type: Note
+      ---
+      Genetics
+      ========
+
+      Inheritance
+      """
+    And I assimilate the note "Genetics"
+    And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
+    And I capture the note id of "Genetics"
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I route to the note "Genetics"
+    And I move the current note to notebook "CLI Clone Notebook" root
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | README.md           |
+      | Overview.md         |
+      | Biology/README.md   |
+      | Study/README.md     |
+      | Genetics.md         |
+    And the cloned checkout file "Genetics.md" is:
+      """
+      ---
+      author: Mendel
+      type: Note
+      ---
+      Genetics
+      ========
+
+      Inheritance
+      """
+    When I commit the following edit to "Genetics.md" in the cloned checkout:
+      """
+      ---
+      author: Mendel
+      type: Note
+      ---
+      Genetics
+      ========
+
+      Inheritance and variation
+      """
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I open the original note route
+    And the note content on the current page should be "Inheritance and variation"
