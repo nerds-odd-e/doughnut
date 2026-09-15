@@ -1,6 +1,6 @@
 # Receive web-created folders and their notes locally
 
-Status: executing; slices 1–3 done, slice 4 ready
+Status: executing; slices 1–4 done, slice 5 ready
 
 ## Execution identity
 
@@ -213,10 +213,15 @@ implementation phase outside this estimate.
 ### 4. Failed folder creation leaves accepted notebook state intact
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Backend command; follow
 `NotebookGitNoteCreationAtomicControllerTest`'s real committed-transaction and
 late binding-save failure seam, asserting folder rows and accepted binding.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+2,404 tests. `NotebookGitFolderCreationAtomicControllerTest` observes the loud
+late-save failure, rolled-back folder count, and unchanged accepted head,
+bundle, and timestamp across committed transactions.
 
 Behavior: Given a synchronized notebook, when a web folder creation cannot
 persist its accepted bundle, neither the new folder nor a partial history
