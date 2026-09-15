@@ -392,7 +392,7 @@ Accepted proof:
 
 ### 8. Preserve existing trash when choosing a collision suffix
 Type: Behavior
-Status: planned
+Status: done
 
 Earlier `_trash/Biology/Cells.md` and `Cells (3).md` exist. Trash another active
 Cells: the new accepted file uses `Cells (2).md`; earlier trash is unchanged.
@@ -403,6 +403,19 @@ Proof: real Trash → download asserts incoming selected path and earlier bytes;
 reuse existing web collision tests for UI behavior.
 Safe stop: a valid collision cannot overwrite retained trash in either store.
 Sizing: 3–5 minutes plus suite; expected data variation of slice 3's rule.
+
+Accepted proof:
+- Promise: colliding Trash uses `_trash/Biology/Cells (2).md`; earlier
+  `Cells.md` and `Cells (3).md` bytes unchanged; emptied Biology has `.keep`.
+- Boundary: `noteController.trashNote` → accepted bundle download.
+- Setup: `NotebookGitWebTrashCollisionControllerTest.seedActiveCellsWithEarlierTrashGap`
+  (already-represented earlier trash + active Cells; snapshot before Trash).
+- Observations: `trashOfActiveCellsUsesFirstFreeTrashTitleWithoutChangingEarlierTrashBytes`
+  paths containInAnyOrder `.keep` + three trash files; earlier bytes unchanged;
+  `(2)` has active bytes.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. No production change.
 
 ### 9. Keep rejected actions from changing accepted or live state
 Type: Behavior
