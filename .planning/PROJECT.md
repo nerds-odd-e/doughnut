@@ -27,9 +27,14 @@ publication of an accumulated linear commit range that composes those already
 supported local edits once from the proposed tip (including exact moves with
 later edits, exact folder relocation with companion edits, tip-removed
 temporary notes that never become live entities, and delete-then-recreate as a
-new identity even at the same path). Portable trash remains the near-future
-priority in [the product backlog](PRODUCT-BACKLOG.md); broader rename-with-edit
-inference and Readme editing stay queued separately. These bounded deliveries
+new identity even at the same path). Existing notebook and folder `README.md`
+files at unchanged paths publish in place onto the original container rows
+when they remain valid `type: Readme` Markdown; invalid typed Markdown is
+rejected without advancing accepted history or partially applying the
+proposal. Companion same-path note edits keep note identity and learning
+associations. Portable trash remains the near-future priority in
+[the product backlog](PRODUCT-BACKLOG.md); broader rename-with-edit inference
+stays queued separately. These bounded deliveries
 advance the direction in Proposed
 [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
 they do not establish full v1 synchronization. Catalog ZIP download remains

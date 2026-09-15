@@ -12,9 +12,10 @@ existing domain owners. No event log, persisted shadow notebook, second
 identity service, or dispatch mode per story.
 
 Evidence: accumulated linear ranges already publish by composing supported tip
-correspondence once; remaining work still needs this shared final-only path for
-broader identity inference, existing-Readme editing, and trash-compatible
-publication. Exact endpoint matching alone is not enough for rename-then-edit
+correspondence once, including in-place existing notebook and folder Readme
+edits applied through the existing container content owners. Remaining work
+still needs this shared final-only path for broader identity inference and
+trash-compatible publication. Exact endpoint matching alone is not enough for rename-then-edit
 continuity when correspondence must be inferred beyond already supported
 transitions. This topic follows the owner's final-only application direction in
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md#apply-one-final-projection-atomically)
