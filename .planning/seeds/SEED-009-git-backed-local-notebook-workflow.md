@@ -121,54 +121,6 @@ Merged into [Use portable trash across Donut and local Git](#story-28) by the
 owner's web-first reprioritization. Its web-deletion synchronization outcome is
 retained there; this anchor remains for existing references.
 
-<a id="story-24"></a>
-
-### 24. Publish edits to existing notebook and folder Readmes
-
-- **Goal:** A notebook owner can edit an existing notebook or folder description
-  locally, publish it, and read the updated description in Donut. A receiving
-  checkout gets the same authored content through the existing pull workflow.
-- **Current evidence (2026-09-15):** This is an explicit publication limitation.
-  `NotebookGitProposalTreeShape.admitShape` rejects any changed container
-  document that is not an addition; classification includes both root and folder
-  `README.md`. `NotebookGitProposalTreeShapeControllerTest` records rejection
-  of root edits and a valid typed folder Readme edit alongside a note addition.
-  Existing document application already stores notebook Readme content and
-  resolves represented folders before storing their Readme content. The gap
-  appears bounded to admitting and applying modifications through publication;
-  it does not call for a new synchronization mechanism. This assessment is from
-  code and test inspection, not a fresh runtime reproduction.
-- **Scope:** Edit valid content in existing represented `README.md` files at
-  unchanged paths within one notebook. Keep `type: Readme`, preserve authored
-  bytes and notebook/folder identities, and leave note identity and learning
-  data intact. A Readme-only publication must work; ordinary same-path note
-  edits may accompany it. Use the existing publish and clean fast-forward pull
-  workflows with their existing authorization and validation rules.
-- **Key examples:**
-  1. From synchronized accepted commit A, edit the body of root `README.md`
-     without changing its valid frontmatter and commit B directly after A.
-     Publish B: the existing notebook displays the new description, and a
-     receiving checkout pulling from A gets B and the exact authored file.
-  2. Edit `Topics/README.md` in place, alone or alongside a body edit to an
-     existing note. Publish: the existing Topics folder displays the new
-     description, the companion note edit is applied when present, and neither
-     container nor note identities or learning history are replaced.
-  3. Change a Readme to invalid typed Markdown and publish: existing validation
-     rejects it without advancing accepted history or partially applying work.
-- **Deferred promises:** Container creation, deletion, renaming/movement, trash,
-  divergent reconciliation, and broad import behavior. No new accumulated-history
-  or mixed structural-operation acceptance matrix belongs here; reuse existing
-  history handling. The direct-child examples set the minimum demonstration,
-  not a new restriction on otherwise supported histories or file counts.
-- **Effort hypothesis:** S (30–60 minutes), medium confidence: storage and
-  represented-container lookup already exist. Publication and receiving-checkout
-  verification may reveal additional wiring; reassess if the work grows beyond
-  this content-edit outcome.
-- **Depends on:** Existing clone, publication and clean fast-forward pull; no dependency on another new story is assumed.
-- **Safe stopping point:** This workflow remains independently usable if later stories are cancelled, with work and learning data preserved.
-- **Status / open decisions:** Refined; no unresolved product decision for this
-  narrow scope. Execution planning and implementation are not part of this refinement.
-
 <a id="story-25"></a>
 
 ### 25. Receive a web note move locally without losing learning history
@@ -779,7 +731,7 @@ remaining UI rough edges.
 
 After the production release, retire the spent migration support (story 39),
 then address the remaining repeated-trash and Undo rough edges (story 38), then
-keep remaining Git stories 20, 24, and 25 in relative order. Then queue the
+keep remaining Git stories 20 and 25 in relative order. Then queue the
 single unrefined story 28. Former story 23 is
 absorbed there because its deletion-sync scope overlaps the new trash lifecycle;
 its outcome is retained rather than cancelled. Publication performance remains

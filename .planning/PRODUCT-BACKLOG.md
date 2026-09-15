@@ -13,7 +13,6 @@ Owners of notebooks with 10,000 notes can publish to the remote quickly,
 with reasonable performance.
 
 ## Taken
-- [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009 — [099-PLAN](quick/099-publish-existing-readme-edits/099-PLAN.md)
 
 ## Backlog list
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009
