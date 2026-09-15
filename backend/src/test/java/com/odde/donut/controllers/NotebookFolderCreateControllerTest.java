@@ -12,7 +12,6 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.ApiException;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,7 +30,7 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
   }
 
   @Test
-  void createsNestedFolderUnderContextNotesFolder() throws UnexpectedNoAccessRightException {
+  void createsNestedFolderUnderContextNotesFolder() throws Exception {
     Notebook nb = ownedNotebook();
     Folder scope = makeMe.aFolder().notebook(nb).name("Scope").please();
     Note noteInScope = makeMe.aNote("Inside").folder(scope).please();
@@ -44,7 +43,7 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
   }
 
   @Test
-  void createsNestedFolderUnderUnderFolderId() throws UnexpectedNoAccessRightException {
+  void createsNestedFolderUnderUnderFolderId() throws Exception {
     Notebook nb = ownedNotebook();
     Folder scope = makeMe.aFolder().notebook(nb).name("Scope").please();
 
@@ -56,7 +55,7 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
   }
 
   @Test
-  void rejectsDuplicateSiblingFolderName() throws UnexpectedNoAccessRightException {
+  void rejectsDuplicateSiblingFolderName() throws Exception {
     Notebook nb = ownedNotebook();
     controller.createFolder(nb, folderCreate("Same"));
 

@@ -1,6 +1,6 @@
 # Receive web-created folders and their notes locally
 
-Status: executing; slices 1–2 done, slice 3 ready
+Status: executing; slices 1–3 done, slice 4 ready
 
 ## Execution identity
 
@@ -188,9 +188,15 @@ policy is cohesive; C1, not data-case count, is the material uncertainty.
 ### 3. Receive a web-created empty folder
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Backend command and web-created-note feature command. Add a folder
 creation controller case and one real web-create/CLI-pull scenario.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+2,403 tests. The two split focused features passed 10/10 scenarios together;
+the new scenario observes zero-byte `Biology/.keep`, a clean accepted head, and
+the original clone head as its ancestor. Isolated-spec registry tests passed
+14/14 after the feature split.
 
 Behavior: Given a synchronized notebook and clean clone, when the owner creates
 `Biology` on the web then pulls, the checkout contains `Biology/.keep` at an
@@ -342,6 +348,13 @@ Slice 1 owns this behavior before shared marker generation activates in slice 2.
 - Required refactoring split two pre-existing oversized proof files along
   cohesive seams. It took about 11 active minutes; the one-minute hard-limit
   overrun was accepted as bounded cleanup without implementation thrash.
+- Web folder history belongs in `WebFolderCreationService`: lock and verify the
+  starting projection, construct through the existing owner, then persist the
+  reloaded canonical snapshot within the controller transaction.
+- Slice 3 refactoring took about 32 active minutes because preserving all
+  scenarios exposed two spec registries and required a cohesive registry split.
+  An extra non-gating profiling run found the pre-existing `note.deleted_at`
+  harness failure; profiling scenarios and their launcher stayed unchanged.
 - Planning inspected current source and named proof setups, but ran no product
   tests and changed no product code.
 - Empty `.planning/quick/074-*` and `098-*` directories are remnants; Git history

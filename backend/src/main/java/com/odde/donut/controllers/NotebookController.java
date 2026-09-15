@@ -36,6 +36,7 @@ import com.odde.donut.services.WikidataService;
 import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
+import com.odde.donut.services.notebookGit.WebFolderCreationService;
 import com.odde.donut.services.notebookGit.WebNoteCreationService;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
@@ -72,6 +73,7 @@ class NotebookController {
   private final FolderRepository folderRepository;
   private final NotebookCatalogService notebookCatalogService;
   private final NoteService noteService;
+  private final WebFolderCreationService webFolderCreationService;
   private final WebNoteCreationService webNoteCreationService;
   private final WikidataService wikidataService;
   private final FolderConstructionService folderConstructionService;
@@ -93,6 +95,7 @@ class NotebookController {
       FolderRepository folderRepository,
       NotebookCatalogService notebookCatalogService,
       NoteService noteService,
+      WebFolderCreationService webFolderCreationService,
       WebNoteCreationService webNoteCreationService,
       WikidataService wikidataService,
       FolderConstructionService folderConstructionService,
@@ -112,6 +115,7 @@ class NotebookController {
     this.folderRepository = folderRepository;
     this.notebookCatalogService = notebookCatalogService;
     this.noteService = noteService;
+    this.webFolderCreationService = webFolderCreationService;
     this.webNoteCreationService = webNoteCreationService;
     this.wikidataService = wikidataService;
     this.folderConstructionService = folderConstructionService;
@@ -176,13 +180,13 @@ class NotebookController {
               + " underFolderId when set; otherwise nested under the context note's folder when"
               + " underNoteId is set (underFolderId takes precedence when both are set).")
   @PostMapping("/{notebook}/folders")
-  @Transactional
+  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public Folder createFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody FolderCreationRequest request)
-      throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException, IOException {
     authorizationService.assertAuthorization(notebook);
-    return folderConstructionService.createFolder(notebook, request);
+    return webFolderCreationService.createFolder(notebook, request);
   }
 
   @Operation(

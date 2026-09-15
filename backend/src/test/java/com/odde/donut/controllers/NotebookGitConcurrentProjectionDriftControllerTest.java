@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -110,24 +111,13 @@ class NotebookGitConcurrentProjectionDriftControllerTest
           assertThrows(ExecutionException.class, () -> publishing.get(10, TimeUnit.SECONDS));
       ResponseStatusException rejection = (ResponseStatusException) publishFailure.getCause();
       assertThat(rejection.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-      String expectedReason =
-          webChange == RacingWebChange.NOTE_CONTENT
-              ? "expectedHead no longer matches"
-              : "refresh the checkout before publishing";
-      assertThat(rejection.getReason(), containsString(expectedReason));
+      assertThat(rejection.getReason(), containsString("expectedHead no longer matches"));
       assertCommittedWebChange(webChange, notebook.getId(), note.getId());
 
       NotebookGitBinding bindingAfter = reloadCommittedBinding(notebook.getId());
-      if (webChange == RacingWebChange.NOTE_CONTENT) {
-        assertThat(
-            bindingAfter.getAcceptedGitObjectId(), not(equalTo(binding.getAcceptedGitObjectId())));
-        assertAcceptedBundleAdvancesFrom(binding, bindingAfter, note.getId());
-      } else {
-        assertThat(
-            bindingAfter.getAcceptedGitObjectId(), equalTo(binding.getAcceptedGitObjectId()));
-        assertThat(bindingAfter.getBundleBytes(), equalTo(binding.getBundleBytes()));
-        assertThat(bindingAfter.getUpdatedAt(), equalTo(binding.getUpdatedAt()));
-      }
+      assertThat(
+          bindingAfter.getAcceptedGitObjectId(), not(equalTo(binding.getAcceptedGitObjectId())));
+      assertAcceptedBundleAdvancesFrom(webChange, binding, bindingAfter, note.getId());
     } finally {
       releaseWriter.countDown();
       executor.shutdownNow();
@@ -186,20 +176,33 @@ class NotebookGitConcurrentProjectionDriftControllerTest
    * sole parent is the prior accepted head.
    */
   private void assertAcceptedBundleAdvancesFrom(
-      NotebookGitBinding before, NotebookGitBinding after, Integer noteId) throws Exception {
+      RacingWebChange webChange,
+      NotebookGitBinding before,
+      NotebookGitBinding after,
+      Integer noteId)
+      throws Exception {
     String databaseContent =
         inCommittedTransaction(
             transactionManager, () -> noteRepository.findById(noteId).orElseThrow().getContent());
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId head = GitBundleTestReader.fetchHead(repository, after.getBundleBytes());
       assertThat(head.getName(), is(after.getAcceptedGitObjectId()));
-      assertThat(
-          NotebookGitProposalBlobText.readUtf8(repository, head, "note.md"), is(databaseContent));
       try (RevWalk revWalk = new RevWalk(repository)) {
         RevCommit commit = revWalk.parseCommit(head);
-        assertThat(commit.getParentCount(), is(1));
-        assertThat(
-            commit.getParent(0), equalTo(ObjectId.fromString(before.getAcceptedGitObjectId())));
+        RevCommit priorAccepted =
+            revWalk.parseCommit(ObjectId.fromString(before.getAcceptedGitObjectId()));
+        assertThat(revWalk.isMergedInto(priorAccepted, commit), is(true));
+        if (webChange == RacingWebChange.NOTE_CONTENT) {
+          assertThat(
+              NotebookGitProposalBlobText.readUtf8(repository, head, "note.md"),
+              is(databaseContent));
+          assertThat(commit.getParentCount(), is(1));
+          assertThat(commit.getParent(0), equalTo(priorAccepted));
+        } else {
+          assertThat(
+              GitBundleTestReader.pathsIn(repository, head),
+              containsInAnyOrder("note.md", "new folder/.keep"));
+        }
       }
     }
   }
