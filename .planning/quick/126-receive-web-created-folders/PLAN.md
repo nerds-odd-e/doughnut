@@ -8,8 +8,9 @@ Status: executed; slices 1–8 done, retrospective pending
 - Execution checkout: `/Users/terryyin/git/doughnut-126-receive-web-created-folders`, branch `codex/126-receive-web-created-folders`
 - Integration target: `main`
 - Authorized push destination: `origin`, execution branch
-- CI observer: coordinator `root`, workflow `ci.yml` / `donut CI`, cell `52`,
-  session `98333`, PID `76888`, directory `/tmp/dough-ci-501/watch-O7IzRI`
+- CI observer: coordinator `root`, workflow `ci.yml` / `donut CI`; initial
+  observer cell `52` stopped, repair observer cell `140`, session `98996`, PID
+  `19985`, directory `/tmp/dough-ci-501/watch-xxDypC`
 
 ## Source and authority
 
@@ -389,6 +390,10 @@ Slice 1 owns this behavior before shared marker generation activates in slice 2.
 - During slice 7 delivery, Apple Git became unavailable with no selected Command
   Line Tools. A cached Nix Git provided isolated formatting and delivery without
   changing the host; this did not affect product proof.
+- Observer shutdown exposed a failed recall E2E shard from slice 4. Deterministic
+  delay proof found generated SDK calls racing queued Cypress time travel;
+  deferring those calls with `cy.then` repaired the failure, and the focused
+  spaced-repetition feature passed 3/3 after independent refactoring.
 - Planning inspected current source and named proof setups, but ran no product
   tests and changed no product code.
 - Empty `.planning/quick/074-*` and `098-*` directories are remnants; Git history
