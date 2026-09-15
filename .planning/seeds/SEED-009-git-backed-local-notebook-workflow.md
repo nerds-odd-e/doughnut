@@ -173,13 +173,137 @@ retained there; this anchor remains for existing references.
 
 ### 25. Receive a web note move locally without losing learning history
 
-- **For / why:** An owner can organize a note between existing folders in Donut and continue local refinement at its new path.
-- **Evaluation:** Given synchronized state and a clean local checkout, a web move within the notebook appends accepted history; pull receives the new location and subsequent local editing keeps the original note's learning data.
-- **Value / learning:** Completes another common organizational step in the same editing loop, independently useful after rename synchronization.
-- **Scope:** Existing represented destinations within one notebook; no new-folder or folder-subtree move promise, cross-notebook transfer, or divergent reconciliation.
-- **Effort hypothesis:** M, low confidence pending focused refinement.
-- **Depends on:** Existing clone, publication and clean fast-forward pull; no dependency on another new story is assumed.
-- **Safe stopping point:** This workflow remains independently usable if later stories are cancelled, with work and learning data preserved.
+- **Goal:** A notebook owner can move an existing note on the web, receive its
+  new path locally, and publish subsequent content edits into the same Donut
+  note without losing learning history.
+- **Feasibility assessment (2026-09-15):** Feasible as a bounded extension of
+  the existing web-save and clean-pull workflow. The missing responsibility is
+  recording the web move in accepted history. The web already knows the note
+  ID being moved, so this outcome does not require the local rename-and-edit
+  inference owned by [story 36](#story-36).
+- **Recommended delivery commitment:** Start with an ordinary `type: Note`,
+  unchanged title, and existing represented source/destination locations in
+  one synchronized Git-backed notebook. Include folder-to-folder, root-to-folder,
+  and folder-to-root placement through the existing Move interaction. The
+  checkout is clean and at an ancestor of accepted main when receiving; local
+  editing begins after pull. Preserve exact authored note content except for
+  rewrites already required by ordinary move semantics. Record affected
+  references within this notebook and canonical folder markers in the same
+  accepted result. Retain the note ID, memory trackers, recall records,
+  scheduling state, and independent removed-from-tracking preferences through
+  the move and subsequent content publication.
+- **Required boundaries:** Reuse existing authorization, destination-name
+  conflicts, publication validation, and checkout-readiness behavior. An actual
+  supported move appends to accepted main; it does not replace earlier commits.
+  A rejected move changes neither location nor accepted history. A no-op move
+  needs no new commit. Database changes and accepted history must agree after
+  successful completion. Pre-existing unsynchronized web changes are outside
+  this story's starting condition and must not be silently overwritten or
+  absorbed as part of the move. Examples set demonstration commitments, not
+  limits on otherwise supported note counts or accumulated linear history.
+- **Key examples:**
+  1. At accepted A, learned `Biology/Cells.md` and destination `Study` already
+     exist. Move Cells to Study on the web, producing child B. Pull the clean
+     checkout from A: `Study/Cells.md` has the original authored bytes,
+     `Biology/Cells.md` is absent, and A remains an ancestor. Edit the body at
+     the new path, commit C, and publish. Donut displays the new body on the
+     original note, with the same tracker and recall history.
+  2. Biology contained only Cells and Study was represented by `Study/.keep`.
+     After that move, pull receives `Biology/.keep` and `Study/Cells.md`, with
+     no leftover `Study/.keep`. Both existing folders retain their identities;
+     no new-folder creation or folder deletion is implied.
+  3. A note in this notebook refers to `[[Biology/Cells|shown]]`, including in
+     frontmatter. Pull receives the normal move rewrite to
+     `[[Study/Cells|shown]]` together with the relocated note. Unqualified
+     references that ordinary move leaves unchanged retain that behavior.
+  4. Move a note to the notebook root or into an existing nested folder. The
+     same receive/edit/publish outcome applies. If the destination is occupied
+     by another note with the same title, the existing conflict leaves both
+     notes and accepted history intact.
+- **Deferred promises:** Folder-subtree moves; cross-notebook note transfer;
+  creation of destinations as part of Move; Git synchronization of trash/Undo
+  journeys ([story 28](#story-28)); special relationship-note publication;
+  local rename/move combined with content editing; divergent reconciliation;
+  repair of pre-existing projection drift; and 10,000-note performance targets.
+  These are delivery deferrals, not new rejection rules for existing behavior.
+- **Reference boundary needing explicit attention:** Ordinary inbound-reference
+  capture can include notes in other visible notebooks. Synchronizing rewrites
+  into those notebooks' separate Git histories is a proposed deferral, even
+  though existing web reference behavior must remain intact. The main example
+  uses referrers inside the moved note's notebook. Do not infer that a same-
+  notebook move can never modify another notebook, or claim those other
+  checkouts are synchronized. If that guarantee is wanted now, reconsider the
+  boundary before execution planning.
+- **Existing solutions and concrete gaps:**
+  - `RelationController` performs placement and reference rewrites in a
+    transaction through `NoteMotionService`, retaining the same note row,
+    but does not update the Git binding. `NotebookGitBundleDownloadService`
+    serves the stored accepted bundle, so downloading cannot repair this gap.
+  - `WebNoteEditService` already coordinates locked notebook state, mutation,
+    projection checks and append-only snapshot persistence for web content and
+    title changes. Reuse that responsibility coherently for eligible movement,
+    with `AcceptedSnapshotPersistence` and `PortableTreeSnapshot`, rather than
+    introducing a second Git history or identity mechanism. The whole move,
+    including reference rewrites, must be represented after mutation.
+  - Existing snapshot construction handles empty-folder `.keep` changes.
+    Accepted ADR 0004, **OKF-compatible notebook Markdown profile**
+    (`docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md`), requires
+    those markers and keeps server note IDs out of portable addresses. ADR
+    0001 distinguishes portable paths from stable note identity; ADR 0003
+    distinguishes retained recall records from current scheduling state.
+    ADR 0002 remains Proposed and supplies no binding architecture requirement.
+  - The CLI fast-forward path installs the accepted tree without needing to
+    infer which file moved. After receipt, ordinary same-path publication uses
+    the live note at that accepted path. The complete web-move-to-publication
+    journey still needs its own proof; independent component tests do not
+    establish it.
+  - The web UI uses the explicit-target-notebook endpoint for moving to root;
+    the backend also has a current-notebook-root endpoint. Scope follows the
+    actual source/destination notebooks, not which endpoint spelling was used.
+- **Research evidence:** At repository revision `3ad1d460d1`, ran
+  `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts -t 'accepted history fast-forward'`:
+  six tests passed, 92 unrelated tests skipped. This includes receipt of a
+  relocation followed by an edit, exact final bytes, old-path removal, clean
+  checkout and preserved ancestry. Its accepted bundle is constructed by the
+  test, so it proves CLI receipt, not web commit production or learning-data
+  preservation. Also ran
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only` with a temporary
+  `NotebookGitWebMoveFeasibilityProbeTest`: all 2,406 backend tests passed in
+  1m 14s, including the probe. The probe used a learned note in Source and an
+  existing empty Destination, called `RelationController.moveNoteToFolder`, then downloaded
+  the bundle and attempted publication. It observed the same note and tracker
+  association, retained removed-from-tracking preference, unchanged accepted
+  head, and stale downloaded paths `Source/Cells.md` and `Destination/.keep`.
+  Publication against that old tree returned conflict without changing the
+  binding. The diagnostic was removed after the run; no product code changed.
+  Existing backend tests also cover move reference rewrites, web-rename
+  append-only history with recall records, and local relocation preserving
+  private associations. None replaces the missing complete web-move journey.
+- **Smaller alternative:** Keep using web Move alone, or manually reproduce
+  the new layout locally. Web Move already preserves the note row, but the
+  accepted bundle remains stale; copying paths manually does not establish the
+  continuous accepted-history workflow. Connecting the existing move to
+  accepted history is the smallest useful complete outcome.
+- **Split recommendation:** Keep one story for the receive/edit/publish loop.
+  Splitting web commit production, CLI receipt, and learning preservation would
+  split the proof of one user outcome. Root/nested paths and empty-folder
+  markers are variations of that same move, not separate user stories. If
+  broader support becomes important, synchronization of referrers across
+  notebooks and receiving whole-folder moves are independently useful later
+  stories; neither is added to the backlog by this research.
+- **Effort hypothesis:** M (1–2 hours), medium-low confidence, assuming reuse of
+  current transaction/snapshot ownership and existing CLI/E2E fixtures. The
+  principal uncertainty is coherent integration and complete round-trip proof,
+  rather than Git move inference. Reassess if multi-notebook synchronization,
+  drift repair, or a new identity mechanism enters the work.
+- **Depends on:** Existing clone, publication and clean fast-forward pull; no
+  dependency on completing another queued story is established.
+- **Safe stopping point:** The owner can organize an ordinary note and resume
+  local content editing with work and learning data intact even if broader
+  organization stories are cancelled.
+- **Status:** Feasibility researched; the ordinary-note demonstration and
+  cross-notebook-reference deferral above are recommendations for discussion.
+  No executable plan or production implementation is supplied by this refinement.
 
 <a id="story-26"></a>
 <a id="story-27"></a>
