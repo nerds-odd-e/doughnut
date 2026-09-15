@@ -22,14 +22,14 @@ policy for pre-existing projection drift; this direction does not authorize
 silently adopting unsynchronized work. No new trash state, identity map, event
 journal, endpoint-specific snapshot algorithm, or story-shaped dispatch modes.
 
-Evidence and application: ordinary web moves now append accepted history, while
-Trash and immediate Undo still mutate only the database. The current edit
-snapshot also retains pre-mutation folder rows; web folder creation already
-demonstrates reading newly constructed folders for its final snapshot. The owner
-identified this coherence gap on 2026-09-15. This direction governs
-[story 28](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28) and later
-web-organization work; the current delivery proves one note's trash/recovery
-journey and preserves existing callers. It follows
+Evidence and application: note editing, ordinary movement, note trash, and
+same-notebook immediate Undo append one accepted commit after the complete
+mutation. The snapshot is built from the current persisted tree, so newly
+constructed parents are included. Pre-existing projection drift remains
+unsynchronized. This direction governs remaining portable-trash Git
+compatibility in
+[story 28](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28)
+and later web-organization work. It follows
 [Accepted ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash)
 and keeps publication's final-result direction below intact.
 

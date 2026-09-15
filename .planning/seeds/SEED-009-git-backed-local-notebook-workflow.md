@@ -706,29 +706,18 @@ remain traceable through this section and its existing anchors.
 
 #### Evidence, dependencies, and readiness
 
-- Existing `note_deletion.feature` demonstrates web trash browsing followed by
-  Move into an existing active folder after a reload. This establishes an
-  existing journey to extend; it is not proof of Git synchronization.
-- Source inspection found `NoteController.trashNote` applying reference choices,
-  constructing the trash parent, and moving the same note. The inspected method
-  does not coordinate accepted Git history. This is a concrete integration gap,
-  not a complete implementation audit or an executed test result.
-- Story 25's move work is now merged in `337a360f3e`. Its real controller and
-  CLI E2E proofs establish ordinary Move → pull → edit → publish. Reuse it;
-  neither ordinary move implementation nor new local identity inference is a
-  prerequisite still to build. The earlier main-only inspection missed the
-  then-separate worktree; this current evidence supersedes that assumption.
-- The gap is total bundle omission, not partial deletion: Trash leaves both
-  the accepted head and old file untouched. Subsequent ordinary Move cannot be
-  assumed to heal drift because the current shared edit boundary preserves the
-  pre-existing-drift fallback. Prevent that drift at the originating operation.
-- Effort hypothesis: M–L (1–4 hours), medium-low confidence. Reuse established
-  mutation and snapshot owners; assess cumulative cohesion, transaction scope,
-  and fresh final-state reads as part of the work, not after endpoint wiring.
-- Scope and architectural direction are settled by this discussion. Planning
-  is authorized; implementation is not. The selected first delivery is planned
-  in [127 — consistent web trash and recovery](../quick/127-consistent-web-trash/PLAN.md).
-  The broader retained compatibility ambition remains unfinished after that plan.
+- A Git-backed notebook's web note Trash, ordinary Move recovery, and
+  same-notebook immediate Undo append one accepted commit. Pull receives
+  `_trash/` locations and restored active paths. CLI E2E
+  `e2e_test/features/cli/cli_notebook_web_trash.feature` covers the note
+  trash-then-Move journey. Controller Git tests cover constructed parents,
+  reference choices, collisions, rejected actions, writer order, and stale-head
+  publication.
+- Remaining work is local-originated trash publication, folder-subtree
+  compatibility, and other Git/local gaps beyond that note journey.
+- The first-delivery plan is
+  [127 — consistent web trash and recovery](../quick/127-consistent-web-trash/PLAN.md).
+  The broader retained compatibility ambition remains unfinished.
 
 ## Ordering and Scope Reduction
 
