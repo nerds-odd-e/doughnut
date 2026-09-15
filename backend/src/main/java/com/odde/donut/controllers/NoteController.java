@@ -7,10 +7,10 @@ import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.FolderConstructionService;
 import com.odde.donut.services.NoteMotionService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteService;
+import com.odde.donut.services.NoteTrashService;
 import com.odde.donut.services.NoteTrashUndoService;
 import com.odde.donut.services.PortablePathAuthoring;
 import com.odde.donut.services.UserService;
@@ -44,8 +44,8 @@ class NoteController {
   private final RecallLogRepository recallLogRepository;
   private final AssimilationSequenceSkipRepository skipRepository;
   private final PortablePathAuthoring portablePathAuthoring;
-  private final FolderConstructionService folderConstructionService;
   private final NoteMotionService noteMotionService;
+  private final NoteTrashService noteTrashService;
   private final NoteTrashUndoService noteTrashUndoService;
 
   public NoteController(
@@ -59,8 +59,8 @@ class NoteController {
       RecallLogRepository recallLogRepository,
       AssimilationSequenceSkipRepository skipRepository,
       PortablePathAuthoring portablePathAuthoring,
-      FolderConstructionService folderConstructionService,
       NoteMotionService noteMotionService,
+      NoteTrashService noteTrashService,
       NoteTrashUndoService noteTrashUndoService) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
@@ -72,8 +72,8 @@ class NoteController {
     this.recallLogRepository = recallLogRepository;
     this.skipRepository = skipRepository;
     this.portablePathAuthoring = portablePathAuthoring;
-    this.folderConstructionService = folderConstructionService;
     this.noteMotionService = noteMotionService;
+    this.noteTrashService = noteTrashService;
     this.noteTrashUndoService = noteTrashUndoService;
   }
 
@@ -121,20 +121,18 @@ class NoteController {
   }
 
   @PostMapping(value = "/{note}/trash")
-  @Transactional
   public NoteRealm trashNote(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteDeleteDTO noteDeleteDTO)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    User user = authorizationService.getCurrentUser();
-    noteService.applyNoteDeleteReferenceHandling(
-        note, noteDeleteDTO.getReferenceHandling(), noteDeleteDTO.getSourcePropertyKey(), user);
-    Folder trashParent =
-        folderConstructionService.ensureTrashParentFor(
-            note.getNotebook(), FolderTrailSegments.fromRootToContainingFolder(note));
-    noteMotionService.executeMoveIntoFolderWithAvailableTitle(note, trashParent);
-    return noteRealmService.build(note, user);
+    return noteRealmService.build(
+        noteTrashService.trash(
+            note.getId(),
+            note.getNotebook().getId(),
+            noteDeleteDTO.getReferenceHandling(),
+            noteDeleteDTO.getSourcePropertyKey()),
+        authorizationService.getCurrentUser());
   }
 
   @PatchMapping(value = "/{note}/undo-trash")

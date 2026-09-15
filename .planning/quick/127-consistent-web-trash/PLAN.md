@@ -50,11 +50,12 @@ local rename/identity mechanism for receiving already accepted web history.
   an import/check/snapshot/persist block into Trash or Undo.
   `NoteTrashUndoService` now owns same-notebook Undo placement inside that
   owner; cross-notebook Undo stays on `NoteMotionService` only.
-- `NoteController.trashNote` currently applies reference choices, calls
-  `FolderConstructionService.ensureTrashParentFor`, then shared placement.
-  Neither it nor `undoTrashNote` writes the bundle. Reuse those recipes inside
-  the shared accepted-change boundary. Keep ordinary move reference rewriting
-  distinct from trash reference choices and Undo's existing placement behavior.
+  `NoteTrashService` now owns the existing Trash recipe inside the same owner.
+- `NoteController.trashNote` authorizes then `NoteTrashService.trash`, which
+  applies reference choices, `FolderConstructionService.ensureTrashParentFor`,
+  and shared placement inside `WebNoteEditService.edit`. Keep ordinary move
+  reference rewriting distinct from trash reference choices and Undo's existing
+  placement behavior.
 - `NotebookGitStateLoader` loads folder DTO rows before mutation. Those rows
   cannot describe newly created folders. `WebFolderCreationService` already
   rereads folders after construction; `NotebookExportRows` and
@@ -221,7 +222,7 @@ Accepted proof:
 
 ### 3. Accept a web Trash with newly constructed parents
 Type: Behavior
-Status: planned
+Status: done
 
 Synchronized A has learned `Biology/Cells.md`, no `_trash`, and no referrers.
 Trash uses its existing recipe inside the shared boundary and appends B once.
@@ -237,6 +238,28 @@ Safe stop: web trash is represented completely; remaining recovery proofs stay
 open. Keep current recovery behavior callable without a story-based restriction.
 Sizing: 4–5 minutes plus suite, medium-low confidence; existing placement,
 construction and snapshot owners are reused.
+
+Accepted proof:
+- Promise: Trash of learned nested `Biology/Cells.md` with no `_trash` appends
+  one child B of A; downloaded tree has constructed `_trash/Biology/Cells.md`
+  (original bytes), no active file, and `Biology/.keep`; note/tracker identity
+  and recall survive; independently removed tracker stays removed; eligibility
+  follows location.
+- Boundary: `POST /api/notes/{note}/trash` → `NoteTrashService.trash` →
+  `WebNoteEditService.edit` → existing reference/parent/placement recipe.
+- Setup: `NotebookGitWebTrashControllerTest.seedLearnedCellsInBiologyOnlyWithoutTrash`
+  (Biology with only Cells, no Readme, no `_trash`; learned tracker with
+  recallCount 1; spelling tracker removedFromTracking; snapshot before Trash;
+  `leaveDeadLinks`; no Git repair after).
+- Observations: `trashOfLearnedNestedNoteAppendsAcceptedChildWithConstructedParents`
+  downloaded head == B; parentCount == 1 and parent == A;
+  paths containInAnyOrder `Biology/.keep`, `_trash/Biology/Cells.md`;
+  trash bytes == CELLS_BODY; `.keep` empty; committed reload: same note id,
+  isTrashed, learned tracker inactive, removed tracker still removed,
+  recall_log count unchanged.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. Recovery composition remains slice 4.
 
 ### 4. Receive Trash and ordinary Move recovery locally
 Type: Behavior
@@ -425,3 +448,5 @@ plan rather than add special paths. No new product-scope decision is pending.
 - Exposing `NotebookGitStateLoader.liveNotesOf` and flushing before the
   reread is enough for the edit owner. Folder creation still rereads folders
   only; do not merge those writers into one mutation framework.
+- Keep note Trash and Undo as sibling recipes on the shared accepted-change
+  owner. Folder trash stays on `NotebookController` until a later story.
