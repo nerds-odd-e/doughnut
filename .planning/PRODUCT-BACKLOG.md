@@ -13,9 +13,9 @@ Owners of notebooks with 10,000 notes can publish to the remote quickly,
 with reasonable performance.
 
 ## Taken
+- [Receive web-created folders and their notes locally](quick/126-receive-web-created-folders/PLAN.md) — SEED-009
 
 ## Backlog list
-- [Receive web-created folders and their notes locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-35) — SEED-009
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009
 - [Receive a web note move locally without losing learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-25) — SEED-009
 - [Use portable trash across Donut and local Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28) — SEED-009
