@@ -1,6 +1,6 @@
 # Receive web-created folders and their notes locally
 
-Status: executing; slices 1–5 done, slice 6 ready
+Status: executing; slices 1–6 done, slice 7 ready
 
 ## Execution identity
 
@@ -259,9 +259,14 @@ Sizing: approximately 5 minutes active work, medium confidence plus suite/stack 
 ### 6. A nested empty folder replaces its ancestor marker
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Backend command; a controller-created parent and child followed by a
 bundle download. Use existing path/ancestry observations.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+2,405 tests. `NotebookGitFolderCreationControllerTest` observes the exact lone
+`Science/Biology/.keep` path, retained parent Folder identity, and both prior
+commits in ancestry.
 
 Behavior: Given accepted `Science/.keep`, create child folder `Biology` on the
 web. The next accepted tree contains `Science/Biology/.keep` and no

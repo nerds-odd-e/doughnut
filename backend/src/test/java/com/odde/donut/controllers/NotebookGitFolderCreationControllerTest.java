@@ -49,4 +49,42 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
       }
     }
   }
+
+  @Test
+  void nestedEmptyFolderReplacesParentMarkerWithoutLosingHistory() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    ObjectId originalHead =
+        ObjectId.fromString(
+            notebookGitBindingRepository
+                .findByNotebook_Id(notebook.getId())
+                .orElseThrow()
+                .getAcceptedGitObjectId());
+    FolderCreationRequest parentRequest = new FolderCreationRequest();
+    parentRequest.setName("Science");
+    Folder science = controller.createFolder(notebook, parentRequest);
+    ObjectId parentHead =
+        ObjectId.fromString(
+            notebookGitBindingRepository
+                .findByNotebook_Id(notebook.getId())
+                .orElseThrow()
+                .getAcceptedGitObjectId());
+    FolderCreationRequest childRequest = new FolderCreationRequest();
+    childRequest.setName("Biology");
+    childRequest.setUnderFolderId(science.getId());
+
+    Folder biology = controller.createFolder(notebook, childRequest);
+
+    assertThat(biology.getParentFolder().getId(), equalTo(science.getId()));
+    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, downloaded);
+      assertThat(
+          GitBundleTestReader.pathsIn(repository, acceptedHead), contains("Science/Biology/.keep"));
+      try (RevWalk revWalk = new RevWalk(repository)) {
+        RevCommit acceptedCommit = revWalk.parseCommit(acceptedHead);
+        assertThat(acceptedCommit.getParent(0).getId(), equalTo(parentHead));
+        assertThat(revWalk.parseCommit(parentHead).getParent(0).getId(), equalTo(originalHead));
+      }
+    }
+  }
 }
