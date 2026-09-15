@@ -116,7 +116,7 @@ this planning turn; all new acceptance proof is pending.
 
 ### 1. Share the existing accepted web-note edit boundary
 Type: Structure
-Status: planned
+Status: done
 
 Structure: Make the existing locked note-edit/mutation/snapshot operation
 reusable by the ordinary location edit in the immediately following slice.
@@ -291,4 +291,25 @@ been created by planning. Backlog entry remains queued; GSD STATE is unchanged.
 
 ## Execution evidence
 
-Pending. No slice has been implemented, verified, committed or delivered.
+### Slice 1 — done (2026-09-15)
+
+Change: `WebNoteEditService.edit(...)` changed from `private` to `public` and
+annotated `@Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor =
+Exception.class)`. `saveTitle`/`saveContent` keep their own SERIALIZABLE
+annotations; via Spring self-invocation `edit`'s new annotation is inert on
+that path and only takes effect for a new external caller (Slice 2's move).
+No Git move behavior introduced.
+
+Proof: full backend suite `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+→ BUILD SUCCESSFUL in 1m 7s. Retained existing web content/title history,
+no-op, rejection, drift and queued-writer observations in
+`NotebookGitWebContentHistoryExposureControllerTest` and
+`NotebookGitPublicationConcurrencyControllerTest`. Caller inspection confirms
+only `TextContentController` calls `saveTitle`/`saveContent`; both remain on
+the one shared `edit` operation.
+
+Learning for Slice 2: `RelationController` move methods carry a controller-level
+`@Transactional` (default isolation). Routing a move through `edit` requires
+letting `edit` own the SERIALIZABLE transaction (e.g. removing the
+controller-level `@Transactional` on the move path), since an outer
+default-isolation transaction would mask `edit`'s SERIALIZABLE boundary.
