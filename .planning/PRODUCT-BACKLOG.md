@@ -12,7 +12,10 @@ either the remote or local repository may be multiple commits behind.
 Owners of notebooks with 10,000 notes can publish to the remote quickly,
 with reasonable performance.
 
+## Taken
+
 ## Backlog list
+- [Hide trashed notes from incoming references](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-41) — SEED-009
 - [Use portable trash across Donut and local Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28) — SEED-009
 - [Publish local renames, moves, and edits across commits while preserving note identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-36) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018

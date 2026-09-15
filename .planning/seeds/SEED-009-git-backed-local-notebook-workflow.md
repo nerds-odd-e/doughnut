@@ -44,6 +44,37 @@ are evidence of behavior, never limits on accepted histories or note counts.
 All stories preserve authorization, authored content, note identity and learning
 data; invalid or ambiguous changes must not silently discard work.
 
+<a id="story-41"></a>
+
+### 41. Hide trashed notes from incoming references
+
+- **Goal / beneficiary:** A notebook owner reading an active note sees incoming
+  references only from active notes, so the list describes references they can
+  meaningfully follow in the active notebook.
+- **Observed bug:** Note A references note B, so B lists A as an incoming
+  reference. After A is trashed, B still lists A even though A is no longer
+  active.
+- **Evaluation:** Given active A references active B and B lists A, when the
+  owner trashes A and revisits B, A is absent from B's incoming-reference list.
+  This is an observable correction to the existing contract that inactive
+  referrers are omitted; it does not change A's authored reference content.
+- **Value / learning:** Remove a misleading stale navigation result from the
+  newly prioritized trash journey and verify that incoming-reference visibility
+  follows location-derived activity rather than the former soft-delete model.
+- **Strongest smaller alternative:** The owner can ignore the stale entry or
+  remove A's reference before trashing it, but both leave the page misleading
+  and the latter needlessly changes authored content.
+- **Boundaries:** This story owns incoming-reference visibility after trashing
+  the referring note. It does not add reference deletion, link rewriting,
+  cross-notebook Git synchronization, or new trash navigation behavior.
+- **Effort / status:** Queued bug correction; S (30–60 minutes), medium
+  confidence because the parent contract and evaluation signal are already
+  established, while the failing path still needs diagnosis before planning.
+- **Depends on / safe stopping point:** No unfinished product prerequisite.
+  Active note pages stop advertising trashed referrers even if broader portable
+  trash and Git work is deferred.
+- **Human priority (2026-09-15):** First story in the product backlog.
+
 <a id="story-36"></a>
 
 ### 36. Publish local renames, moves, and edits across commits while preserving note identity
@@ -694,6 +725,10 @@ is release-ready and runs through normal Flyway startup. Story 39 owns removing
 its temporary migration support after production and other long-lived databases
 have crossed it. Neither relies on completing new Git move/rename or trash
 compatibility.
+
+The owner placed the incoming-reference correction in story 41 first on
+2026-09-15. It restores an already agreed visibility rule and has no unfinished
+product prerequisite, so it precedes the broader portable-trash Git journey.
 
 Folder Trash with ordinary Move now supplies the complete folder round trip.
 The owner moved the Restore shortcut to the very bottom of the backlog, after
