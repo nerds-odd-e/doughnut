@@ -4,20 +4,18 @@ import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.NoteMotionService;
+import com.odde.donut.services.NoteMoveService;
 import com.odde.donut.services.NoteRealmService;
-import com.odde.donut.services.WikiLinkRelocationRewrite;
-import com.odde.donut.services.WikiLinkRewriteService;
+import com.odde.donut.services.notebookGit.WebNoteEditService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,92 +24,73 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/relations")
 class RelationController {
-  private final NoteMotionService noteMotionService;
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
-  private final WikiLinkRewriteService wikiLinkRewriteService;
-  private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final TestabilitySettings testabilitySettings;
+  private final WebNoteEditService webNoteEditService;
+  private final NoteMoveService noteMoveService;
 
   public RelationController(
-      NoteMotionService noteMotionService,
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
-      WikiLinkRewriteService wikiLinkRewriteService,
-      WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
-      TestabilitySettings testabilitySettings) {
-    this.noteMotionService = noteMotionService;
+      TestabilitySettings testabilitySettings,
+      WebNoteEditService webNoteEditService,
+      NoteMoveService noteMoveService) {
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
-    this.wikiLinkRewriteService = wikiLinkRewriteService;
-    this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.testabilitySettings = testabilitySettings;
+    this.webNoteEditService = webNoteEditService;
+    this.noteMoveService = noteMoveService;
   }
 
   @PostMapping(value = "/move-to-folder/{sourceNote}/{targetFolder}")
-  @Transactional
   public List<NoteRealm> moveNoteToFolder(
       @PathVariable @Schema(type = "integer") Note sourceNote,
       @PathVariable @Schema(type = "integer") Folder targetFolder)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(targetFolder.getNotebook());
-    Notebook oldNotebook = sourceNote.getNotebook();
-    Notebook targetNotebook = targetFolder.getNotebook();
-    User user = authorizationService.getCurrentUser();
-    Map<Integer, List<String>> inboundReferences =
-        wikiLinkRewriteService.captureLiveResolvedInboundReferences(sourceNote, user);
-    noteMotionService.executeMoveIntoFolder(sourceNote, targetFolder);
-    rewriteWikiLinksAfterNoteMove(sourceNote, oldNotebook, targetNotebook, user, inboundReferences);
-    return List.of(noteRealmService.build(sourceNote, user));
+    if (Objects.equals(sourceNote.getNotebook().getId(), targetFolder.getNotebook().getId())) {
+      return List.of(
+          webMove(
+              sourceNote,
+              now -> noteMoveService.sameNotebookMoveIntoFolder(targetFolder.getId(), now)));
+    }
+    return List.of(noteMoveService.moveCrossNotebookToFolder(sourceNote, targetFolder));
   }
 
   @PostMapping(value = "/move-to-notebook-root/{sourceNote}")
-  @Transactional
   public List<NoteRealm> moveNoteToNotebookRoot(
       @PathVariable @Schema(type = "integer") Note sourceNote)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(sourceNote.getNotebook());
-    Notebook notebook = sourceNote.getNotebook();
-    User user = authorizationService.getCurrentUser();
-    Map<Integer, List<String>> inboundReferences =
-        wikiLinkRewriteService.captureLiveResolvedInboundReferences(sourceNote, user);
-    noteMotionService.executeMoveToNotebookRoot(sourceNote, notebook);
-    rewriteWikiLinksAfterNoteMove(sourceNote, notebook, notebook, user, inboundReferences);
-    return List.of(noteRealmService.build(sourceNote, user));
+    return List.of(webMove(sourceNote, noteMoveService::sameNotebookMoveToRoot));
   }
 
   @PostMapping(value = "/move-to-notebook-root/{sourceNote}/{targetNotebook}")
-  @Transactional
   public List<NoteRealm> moveNoteToNotebookRootInNotebook(
       @PathVariable @Schema(type = "integer") Note sourceNote,
       @PathVariable @Schema(type = "integer") Notebook targetNotebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(targetNotebook);
-    Notebook oldNotebook = sourceNote.getNotebook();
-    User user = authorizationService.getCurrentUser();
-    Map<Integer, List<String>> inboundReferences =
-        wikiLinkRewriteService.captureLiveResolvedInboundReferences(sourceNote, user);
-    noteMotionService.executeMoveToNotebookRoot(sourceNote, targetNotebook);
-    rewriteWikiLinksAfterNoteMove(sourceNote, oldNotebook, targetNotebook, user, inboundReferences);
-    return List.of(noteRealmService.build(sourceNote, user));
+    if (Objects.equals(sourceNote.getNotebook().getId(), targetNotebook.getId())) {
+      return List.of(webMove(sourceNote, noteMoveService::sameNotebookMoveToRoot));
+    }
+    return List.of(noteMoveService.moveCrossNotebookToNotebookRoot(sourceNote, targetNotebook));
   }
 
-  private void rewriteWikiLinksAfterNoteMove(
-      Note movedNote,
-      Notebook oldNotebook,
-      Notebook targetNotebook,
-      User user,
-      Map<Integer, List<String>> inboundReferences) {
+  private NoteRealm webMove(Note sourceNote, Function<Timestamp, Consumer<Note>> mutationFactory)
+      throws UnexpectedNoAccessRightException {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    if (Objects.equals(oldNotebook.getId(), targetNotebook.getId())) {
-      wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
-          movedNote, now, inboundReferences);
-    } else {
-      wikiLinkRelocationRewrite.rewriteWikiLinksForCrossNotebookMove(
-          movedNote, oldNotebook, targetNotebook, now, user, inboundReferences);
-    }
+    Note moved =
+        webNoteEditService.edit(
+            sourceNote.getId(),
+            sourceNote.getNotebook().getId(),
+            mutationFactory.apply(now),
+            note -> "Move note: " + note.getTitle(),
+            now);
+    return noteRealmService.build(moved, authorizationService.getCurrentUser());
   }
 }

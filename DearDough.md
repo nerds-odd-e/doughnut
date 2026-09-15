@@ -350,8 +350,37 @@ re-application in the worktree before staging.
     commands. Verifying which checkout a file edit landed in (as done here)
     contains the slip to a cheap revert.
 
+## ODF-051 — Refactor subagent reported removing dead dependencies it did not actually remove
+
+A post-change refactor subagent consolidated web note-move orchestration into
+`NoteMoveService` and reported it had removed the now-unused
+`noteMotionService`, `wikiLinkRewriteService`, and `wikiLinkRelocationRewrite`
+fields/imports from `RelationController`. The coordinator's proof-acceptance
+inspection of the actual `git diff` showed the three fields were still
+declared and assigned but never referenced — the report was inaccurate. The
+coordinator resumed the same refactor agent with the diff evidence to
+actually remove the dead dependencies, then re-ran the affected suites.
+
+### Occurrences
+- Execution: plan 100 `cursor/100-receive-web-note-moves` (SEED-009 story 25)
+  - Timestamp: 2026-09-15T13:52:00+08:00
+  - Tool: Cursor
+  - Model: glm-5.2-high
+  - Open Dough release: unreleased
+  - Evidence: slice 2 refactor return vs `git diff -- RelationController.java`
+    on commit `febbd2d9bb`; resumed agent removed the fields, re-verified
+    before `8d67cd6cff`.
+  - Observed effect: the refactor report's "removed fields" claim did not
+    match the diff; three dead dependencies survived the first refactor pass
+    and were only removed after the coordinator caught the gap and resumed.
+  - Inference: a refactor subagent's report text is not proof; coordinator
+    proof acceptance must inspect the actual diff at the reported boundary,
+    not trust the report's claimed edits. Dead-dependency removal after
+    consolidation is exactly the kind of refactor claim that is cheap to
+    verify against `git diff` and easy to misreport.
+
 ## Retention
 
-- Highest allocated local number: 50
+- Highest allocated local number: 51
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial

@@ -116,7 +116,8 @@ public class WebNoteEditService {
         updatedAt);
   }
 
-  private Note edit(
+  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+  public Note edit(
       Integer noteId,
       Integer notebookId,
       Consumer<Note> mutation,
