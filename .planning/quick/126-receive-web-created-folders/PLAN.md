@@ -1,6 +1,6 @@
 # Receive web-created folders and their notes locally
 
-Status: executing; slices 1–4 done, slice 5 ready
+Status: executing; slices 1–5 done, slice 6 ready
 
 ## Execution identity
 
@@ -235,10 +235,16 @@ Sizing: approximately 5 minutes active work, medium confidence plus suite wait.
 ### 5. Receive the first note in a previously empty web folder
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Backend command and web-created-note feature command. Extend
 `NotebookGitNoteCreationFolderControllerTest` through actual controller creation,
 not a fabricated accepted folder; reuse bundle ancestry assertions.
+
+Accepted proof: after refactoring, `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed 2,404 tests and the focused web-created-note feature
+passed 5/5 scenarios. The backend observes the same Folder identity and exact
+baseline → marker → note ancestry; E2E observes `.keep` after the first pull and
+only `Biology/Cells.md` after the second clean pull.
 
 Behavior: Given `Biology/.keep` was received from web folder creation, when the
 owner creates ordinary note `Cells` in that folder and pulls, the checkout has
