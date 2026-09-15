@@ -51,9 +51,19 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Goal / beneficiary:** A notebook owner reading an active note sees incoming
   references only from active notes, so the list describes references they can
   meaningfully follow in the active notebook.
-- **Observed bug:** Note A references note B, so B lists A as an incoming
-  reference. After A is trashed, B still lists A even though A is no longer
-  active.
+- **Production report:** The owner previously saw note A remain in note B's
+  incoming-reference list after A was trashed. The exact production revision is
+  unknown, and the behavior may already have been fixed by the portable-trash
+  changes.
+- **Manual reproduction — 2026-09-15:** Not reproducible on current HEAD
+  `4dc53bb603`. In a fresh development notebook, B initially listed A when A
+  referred to B through either a `parent: [[Target B]]` relationship or an
+  ordinary Markdown `[[Target B]]` wiki link. After A was trashed and B was
+  revisited, B showed no References section in both variants.
+- **Current assessment:** Probably already fixed. Current source filters an
+  incoming referrer through note availability, which now derives from whether
+  the note is under trash. Do not plan or implement a correction without a new
+  reproducible case or evidence from the affected production revision.
 - **Evaluation:** Given active A references active B and B lists A, when the
   owner trashes A and revisits B, A is absent from B's incoming-reference list.
   This is an observable correction to the existing contract that inactive
@@ -67,13 +77,15 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Boundaries:** This story owns incoming-reference visibility after trashing
   the referring note. It does not add reference deletion, link rewriting,
   cross-notebook Git synchronization, or new trash navigation behavior.
-- **Effort / status:** Queued bug correction; S (30–60 minutes), medium
-  confidence because the parent contract and evaluation signal are already
-  established, while the failing path still needs diagnosis before planning.
+- **Effort / status:** Queued but not reproducible; probably already fixed.
+  S (30–60 minutes) remains only a historical hypothesis and is not an
+  execution-ready estimate.
 - **Depends on / safe stopping point:** No unfinished product prerequisite.
   Active note pages stop advertising trashed referrers even if broader portable
   trash and Git work is deferred.
-- **Human priority (2026-09-15):** First story in the product backlog.
+- **Human priority (2026-09-15):** Initially placed first, then moved to the
+  bottom after the current build could not reproduce the production report and
+  the behavior was assessed as probably already fixed.
 
 <a id="story-36"></a>
 
@@ -198,7 +210,7 @@ retained there; this anchor remains for existing references.
   across notebook boundaries. Defer the broader work until its actual demand
   justifies addressing these uncertainties.
 - **Priority:** After the queued core Git, publication-performance, and repeated
-  trash/Undo work; before Restore, preserving the owner's Restore-last choice.
+  trash/Undo work; before Restore and the later non-reproducible story 41.
   This order favors the narrow working loop and established priorities.
   No technical dependency on performance or UI cleanup is asserted.
 - **Dependencies / safe stopping point:** Build on story 25 and existing
@@ -559,7 +571,9 @@ an internal simplification alone is not the user value of this story.
   Recursively reconstructing a completely missing active parent path remains
   required, but its incremental value over Move does not justify earlier priority.
   Restore is retained, not cancelled, and is not a prerequisite for folder Trash
-  with Move recovery or the intervening Git work.
+  with Move recovery or the intervening Git work. On 2026-09-15, the owner moved
+  the non-reproducible story 41 below Restore; that later direction supersedes
+  only Restore's last-place position.
 - **Narrow cut:** Retain notes and folders under one rule (recommended), or
   explicitly defer the existing folder Restore promise for a note-only delivery?
 - **Conflict interaction:** Recommend reporting the conflict and relying on
@@ -726,15 +740,15 @@ its temporary migration support after production and other long-lived databases
 have crossed it. Neither relies on completing new Git move/rename or trash
 compatibility.
 
-The owner placed the incoming-reference correction in story 41 first on
-2026-09-15. It restores an already agreed visibility rule and has no unfinished
-product prerequisite, so it precedes the broader portable-trash Git journey.
+The owner initially placed the incoming-reference correction in story 41 first,
+then moved it to the bottom on 2026-09-15 after manual testing could not
+reproduce the production report and the behavior appeared already fixed.
 
 Folder Trash with ordinary Move now supplies the complete folder round trip.
-The owner moved the Restore shortcut to the very bottom of the backlog, after
-publication performance validation. Story 39 is the first post-release cleanup;
-story 38 follows because Move already provides a safe recovery path for the
-remaining UI rough edges.
+Restore remains after the higher-priority delivery work and immediately before
+the non-reproducible story 41. Story 39 is the first post-release cleanup; story
+38 follows because Move already provides a safe recovery path for the remaining
+UI rough edges.
 
 After the production release, retire the spent migration support (story 39),
 then address the remaining repeated-trash and Undo rough edges (story 38), then
