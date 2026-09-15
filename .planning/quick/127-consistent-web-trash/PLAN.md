@@ -306,7 +306,7 @@ Accepted proof:
 
 ### 5. Retain authored dead links when accepting Trash
 Type: Behavior
-Status: planned
+Status: done
 
 An in-notebook referrer points to a note. Trash with leave-dead-links retains
 its authored spelling in the downloaded tree while moving the target under
@@ -316,6 +316,21 @@ Proof: real Trash → download using the existing referrer fixture; assert the
 referrer bytes, with target placement/parent shape already owned by slice 3.
 Safe stop: sharing consistency has preserved the distinct Trash reference rule.
 Sizing: 3–5 minutes plus suite; use the same production rule, not a new handler.
+
+Accepted proof:
+- Promise: leave-dead-links Trash keeps authored `[[Biology/Cells|shown]]` in
+  the downloaded referrer while the target is under `_trash`; Move rewrite
+  does not leak.
+- Boundary: `NoteController.trashNote(..., leaveDeadLinks())` → bundle download.
+- Setup: `NotebookGitWebTrashLinkedReferrerControllerTest.seedCellsWithLinkedReferrer`
+  (`authorReferencingContent` with `REFERRER_BODY` before snapshot).
+- Observations: `leaveDeadLinksTrashRetainsAuthoredReferrerSpellingInAcceptedTree`
+  downloaded `Reading.md` equals `REFERRER_BODY`; paths include
+  `_trash/Biology/Cells.md`.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. No production change (`LEAVE_DEAD_LINKS` is a no-op; Trash
+  places without Move's capture/rewrite).
 
 ### 6. Accept the chosen removal from reference properties
 Type: Behavior
@@ -474,3 +489,6 @@ plan rather than add special paths. No new product-scope decision is pending.
   owner. Folder trash stays on `NotebookController` until a later story.
 - Existing Move already composes with actual accepted Trash without a
   resnapshot. Slice 4 needed proof, not a second recovery owner.
+- Keep later reference-choice Git proofs beside
+  `NotebookGitWebTrashLinkedReferrerControllerTest` so the learned-trash
+  class stays under the file-size limit.
