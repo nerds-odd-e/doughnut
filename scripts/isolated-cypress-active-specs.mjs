@@ -8,6 +8,7 @@ export const ACTIVE_CLI_SPECS = [
   'e2e_test/features/cli/cli_notebook_existing_note_edits.feature',
   'e2e_test/features/cli/cli_notebook_folder_relocation.feature',
   'e2e_test/features/cli/cli_notebook_web_local_reconciliation.feature',
+  'e2e_test/features/cli/cli_notebook_web_note_renames.feature',
 ]
 
 /** Active feature files without a declared external resource requirement. */

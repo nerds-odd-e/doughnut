@@ -49,15 +49,17 @@ Feature: CLI notebook web note changes
 
       """
 
-  Scenario: Pulling a web-created empty folder and then its first note
+  Scenario: Publishing an edit to a received folder note retains an empty sibling folder
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I create a folder named "Biology" while viewing note "Overview"
+    And I create a folder named "Chemistry" while viewing note "Overview"
     And I pull the cloned checkout using the installed CLI
     Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
     And the cloned checkout contains exactly:
       | README.md          |
       | Overview.md        |
       | Biology/.keep      |
+      | Chemistry/.keep    |
       | Kitchen/README.md  |
       | Recipes/README.md  |
       | Recipes/Pasta.md   |
@@ -68,6 +70,7 @@ Feature: CLI notebook web note changes
       | README.md          |
       | Overview.md        |
       | Biology/Cells.md   |
+      | Chemistry/.keep    |
       | Kitchen/README.md  |
       | Recipes/README.md  |
       | Recipes/Pasta.md   |
@@ -78,6 +81,17 @@ Feature: CLI notebook web note changes
       ---
 
       """
+    When I commit the following edit to "Biology/Cells.md" in the cloned checkout:
+      """
+      ---
+      type: Note
+      ---
+      Cells have membranes
+      """
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I should see note "CLI Clone Notebook/Biology/Cells" has content "Cells have membranes"
+    And the cloned checkout file "Chemistry/.keep" is unchanged from its parent
 
   Scenario: Pulling nested web authoring with one pull
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
@@ -93,94 +107,6 @@ Feature: CLI notebook web note changes
       | Kitchen/README.md           |
       | Recipes/README.md           |
       | Recipes/Pasta.md            |
-
-  Scenario: Pulling a web note rename into a clean checkout
-    Given I have a note "Cells" under notebook "CLI Clone Notebook" in folder "Biology" with content:
-      """
-      ---
-      author: Linnaeus
-      type: Note
-      ---
-      Cells
-      =====
-
-      Membranes
-      """
-    And I assimilate the note "Cells"
-    And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I update note title "Cells" to become "Cell structure"
-    And I pull the cloned checkout using the installed CLI
-    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
-    And the cloned checkout contains exactly:
-      | README.md                   |
-      | Overview.md                 |
-      | Biology/Cell structure.md   |
-      | Kitchen/README.md           |
-      | Recipes/README.md           |
-      | Recipes/Pasta.md            |
-    And the cloned checkout file "Biology/Cell structure.md" is:
-      """
-      ---
-      author: Linnaeus
-      type: Note
-      ---
-      Cells
-      =====
-
-      Membranes
-      """
-
-  Scenario Outline: Pulling a web note rename and its selected reference rewrite into a clean checkout
-    Given I have a note "Cells" under notebook "CLI Clone Notebook" in folder "Biology" with content:
-      """
-      ---
-      type: Note
-      ---
-      Cells
-      """
-    And I have a note "Cell guide" under notebook "CLI Clone Notebook" with content:
-      """
-      ---
-      type: Note
-      related: "[[Cells]]"
-      ---
-      See [[Cells]].
-      """
-    And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I route to the note "Cells"
-    And I set the note title to "Cell structure" using <referenceChoice> reference handling
-    And I pull the cloned checkout using the installed CLI
-    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
-    And the cloned checkout contains exactly:
-      | README.md                   |
-      | Overview.md                 |
-      | Cell guide.md               |
-      | Biology/Cell structure.md   |
-      | Kitchen/README.md           |
-      | Recipes/README.md           |
-      | Recipes/Pasta.md            |
-    And the cloned checkout file "Biology/Cell structure.md" is:
-      """
-      ---
-      type: Note
-      ---
-      Cells
-      """
-    And the cloned checkout file "Cell guide.md" is:
-      """
-      ---
-      type: Note
-      related: '<expectedReference>'
-      ---
-      See <expectedReference>.
-      """
-
-    Examples:
-      | referenceChoice    | expectedReference                |
-      | KEEP_VISIBLE_TEXT  | [[Cell structure\|Cells]]        |
-      | UPDATE_VISIBLE_TEXT | [[Cell structure]]               |
 
   @publicationProfile
   Scenario: Measuring a small publication on an owned disposable backend

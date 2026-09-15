@@ -7,13 +7,18 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.controllers.dto.FolderCreationRequest;
+import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteRecallInfo;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
@@ -28,28 +33,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Verifies that a local content proposal publishes onto a real web-created note after a later
- * ordinary web body save, retaining that identity and its learning state.
+ * Verifies that a local content proposal publishes onto a real web-created folder note while
+ * retaining its identity, learning state, and empty sibling folder.
  */
 class NotebookGitWebCreatedNotePublicationControllerTest
     extends NotebookGitWebContentControllerTestBase {
 
   private static final String EXISTING_PATH = "Existing.md";
-  private static final String CREATED_PATH = "Created.md";
+  private static final String CREATED_PATH = "Biology/Cells.md";
+  private static final String EMPTY_FOLDER_MARKER = "Chemistry/.keep";
   private static final String EXISTING_CONTENT = "---\ntype: Note\n---\nexisting content";
   private static final String WEB_CONTENT = "---\ntype: Note\n---\nweb body";
   private static final String LOCAL_CONTENT = "---\ntype: Note\n---\nlocal refinement";
 
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
+  @Autowired FolderRepository folderRepository;
 
   @Test
-  void publishesLocalContentOntoTheSameWebCreatedNoteAfterAnAcceptedWebSave() throws Exception {
+  void publishesLocalContentOntoTheSameWebCreatedFolderNoteAndRetainsEmptySibling()
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note existing =
         makeMe.aNote().notebook(notebook).title("Existing").content(EXISTING_CONTENT).please();
     snapshotCurrentPortableTree(notebook);
 
-    NoteRealm createdRealm = controller.createNoteAtNotebookRoot(notebook, titleOnly("Created"));
+    Folder biology = controller.createFolder(notebook, folderRequest("Biology"));
+    Folder chemistry = controller.createFolder(notebook, folderRequest("Chemistry"));
+    NoteCreationDTO noteCreation = titleOnly("Cells");
+    noteCreation.setFolderId(biology.getId());
+    NoteRealm createdRealm = controller.createNoteAtNotebookRoot(notebook, noteCreation);
     Integer createdId = createdRealm.getId();
     ObjectId creationHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     MemoryTracker tracker =
@@ -67,13 +79,19 @@ class NotebookGitWebCreatedNotePublicationControllerTest
     NotebookGitBinding afterWebSave = binding(notebook);
     ObjectId webSaveHead = ObjectId.fromString(afterWebSave.getAcceptedGitObjectId());
     assertThat(webSaveHead, not(equalTo(creationHead)));
+    ObjectId acceptedMarkerBlob;
+    try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.fetchHead(accepted, afterWebSave.getBundleBytes());
+      acceptedMarkerBlob = GitBundleTestReader.blobIdAt(accepted, webSaveHead, EMPTY_FOLDER_MARKER);
+    }
 
     byte[] proposalBytes =
         proposalBundleBytes(
             afterWebSave,
             List.of(
                 new NotebookGitProposalFile(EXISTING_PATH, EXISTING_CONTENT),
-                new NotebookGitProposalFile(CREATED_PATH, LOCAL_CONTENT)));
+                new NotebookGitProposalFile(CREATED_PATH, LOCAL_CONTENT),
+                new NotebookGitProposalFile(EMPTY_FOLDER_MARKER, "")));
     GitBundleTestReader.SingleParentGitCommit proposedCommit;
     try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
       proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
@@ -100,6 +118,10 @@ class NotebookGitWebCreatedNotePublicationControllerTest
     assertThat(retained.getRecallCount(), equalTo(1));
     assertThat(reloadedExisting.getId(), equalTo(existing.getId()));
     assertThat(reloadedExisting.getContent(), equalTo(EXISTING_CONTENT));
+    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(2));
+    assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(2));
+    Folder retainedChemistry = folderRepository.findById(chemistry.getId()).orElseThrow();
+    assertThat(retainedChemistry.getReadmeContent(), nullValue());
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
 
     ResponseEntity<byte[]> downloaded =
@@ -121,6 +143,15 @@ class NotebookGitWebCreatedNotePublicationControllerTest
       assertThat(
           NotebookGitProposalBlobText.readUtf8(readBack, downloadedCommit.head(), EXISTING_PATH),
           equalTo(EXISTING_CONTENT));
+      assertThat(
+          GitBundleTestReader.blobIdAt(readBack, downloadedCommit.head(), EMPTY_FOLDER_MARKER),
+          equalTo(acceptedMarkerBlob));
     }
+  }
+
+  private static FolderCreationRequest folderRequest(String name) {
+    FolderCreationRequest request = new FolderCreationRequest();
+    request.setName(name);
+    return request;
   }
 }

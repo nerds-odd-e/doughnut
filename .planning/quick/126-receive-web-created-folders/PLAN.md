@@ -1,6 +1,6 @@
 # Receive web-created folders and their notes locally
 
-Status: executing; slices 1–7 done, slice 8 ready
+Status: executed; slices 1–8 done, retrospective pending
 
 ## Execution identity
 
@@ -301,10 +301,17 @@ Sizing: approximately 5 minutes active work, medium confidence plus focused stac
 ### 8. Publish a local edit while retaining received empty folders
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Backend command and web-created-note feature command. Extend
 `NotebookGitWebCreatedNotePublicationControllerTest`'s real web-created note,
 tracker, proposed-head equality, and downloaded-tree observations.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+2,405 tests. After refactoring, runner tests passed 17/17 and five affected CLI
+features passed 21/21 scenarios. The controller proof retains Note/tracker and
+Folder identities, accepts the exact proposed head, and downloads the identical
+`Chemistry/.keep` blob; E2E publishes the received note edit and observes the
+same sibling marker blob as its parent.
 
 Behavior: Given received `Biology/Cells.md` and an empty sibling `Chemistry/.keep`,
 edit `Cells.md` locally, commit, and publish. The same Donut note and tracker
@@ -376,6 +383,12 @@ Slice 1 owns this behavior before shared marker generation activates in slice 2.
   scenarios exposed two spec registries and required a cohesive registry split.
   An extra non-gating profiling run found the pre-existing `note.deleted_at`
   harness failure; profiling scenarios and their launcher stayed unchanged.
+- Slice 8 needed no production change. Its approximately 35-minute refactor
+  split three oversized E2E proof seams and reran all five consumers; the
+  overrun was bounded scenario-preserving cleanup, not implementation thrash.
+- During slice 7 delivery, Apple Git became unavailable with no selected Command
+  Line Tools. A cached Nix Git provided isolated formatting and delivery without
+  changing the host; this did not affect product proof.
 - Planning inspected current source and named proof setups, but ran no product
   tests and changed no product code.
 - Empty `.planning/quick/074-*` and `098-*` directories are remnants; Git history
