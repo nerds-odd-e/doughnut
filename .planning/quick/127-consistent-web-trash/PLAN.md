@@ -419,7 +419,7 @@ Accepted proof:
 
 ### 9. Keep rejected actions from changing accepted or live state
 Type: Behavior
-Status: planned
+Status: done
 
 Existing authorization rejection for Trash and occupied-destination rejection
 for recovery preserve note location/content and bundle/head. Exercise ordinary
@@ -433,6 +433,22 @@ actual shared transaction boundary and that all side effects are inside it.
 No mock-induced tests of arbitrary loud infrastructure failures (ADR 0006).
 Safe stop: rejected business operations preserve the accepted/live state.
 Sizing: 3–5 minutes plus suite; reuse existing guard fixture patterns.
+
+Accepted proof:
+- Promise: unauthorized Trash and occupied-destination Move/Undo recovery leave
+  location, content, and accepted head/bundle unchanged.
+- Boundary: `noteController.trashNote`, `relationController.moveNoteToFolder`,
+  `noteController.undoTrashNote`.
+- Setup: `NotebookGitWebTrashGuardControllerTest` committed snapshots via
+  `inCommittedTransaction` (`seedLiveCellsInBiology`,
+  `seedGitTrashedCellsWithOccupiedBiology`).
+- Observations: `unauthorizedTrashLeavesLocationContentAndAcceptedBindingUnchanged`;
+  `occupiedMoveRecoveryOfGitTrashedNoteLeavesNoteInTrashAndAcceptedBindingUnchanged`;
+  `occupiedUndoOfGitTrashedNoteLeavesNoteInTrashAndAcceptedBindingUnchanged`.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. No production change — Git persist already follows mutation
+  inside `WebNoteEditService.edit` (`SERIALIZABLE`, `rollbackFor = Exception`).
 
 ### 10. Serialize Trash with the next accepted writer
 Type: Behavior
