@@ -181,7 +181,7 @@ retained there; this anchor remains for existing references.
   recording the web move in accepted history. The web already knows the note
   ID being moved, so this outcome does not require the local rename-and-edit
   inference owned by [story 36](#story-36).
-- **Recommended delivery commitment:** Start with an ordinary `type: Note`,
+- **Scope (confirmed for planning, 2026-09-15):** Start with an ordinary `type: Note`,
   unchanged title, and existing represented source/destination locations in
   one synchronized Git-backed notebook. Include folder-to-folder, root-to-folder,
   and folder-to-root placement through the existing Move interaction. The
@@ -228,7 +228,7 @@ retained there; this anchor remains for existing references.
   These are delivery deferrals, not new rejection rules for existing behavior.
 - **Reference boundary needing explicit attention:** Ordinary inbound-reference
   capture can include notes in other visible notebooks. Synchronizing rewrites
-  into those notebooks' separate Git histories is a proposed deferral, even
+  into those notebooks' separate Git histories is deferred to [story 40](#story-40), even
   though existing web reference behavior must remain intact. The main example
   uses referrers inside the moved note's notebook. Do not infer that a same-
   notebook move can never modify another notebook, or claim those other
@@ -290,7 +290,7 @@ retained there; this anchor remains for existing references.
   markers are variations of that same move, not separate user stories. If
   broader support becomes important, synchronization of referrers across
   notebooks and receiving whole-folder moves are independently useful later
-  stories; neither is added to the backlog by this research.
+  outcomes, captured together in [story 40](#story-40) at the owner's request.
 - **Effort hypothesis:** M (1–2 hours), medium-low confidence, assuming reuse of
   current transaction/snapshot ownership and existing CLI/E2E fixtures. The
   principal uncertainty is coherent integration and complete round-trip proof,
@@ -301,9 +301,68 @@ retained there; this anchor remains for existing references.
 - **Safe stopping point:** The owner can organize an ordinary note and resume
   local content editing with work and learning data intact even if broader
   organization stories are cancelled.
-- **Status:** Feasibility researched; the ordinary-note demonstration and
-  cross-notebook-reference deferral above are recommendations for discussion.
-  No executable plan or production implementation is supplied by this refinement.
+- **Status:** Refined and selected for slice planning on 2026-09-15. The owner
+  accepted the narrow outcome and requested one combined later story for the
+  deferred organization work. Execution is not requested by this planning turn.
+- **Slice plan:** [100-PLAN](../quick/100-receive-web-note-moves/100-PLAN.md).
+
+<a id="story-40"></a>
+
+### 40. Continue local editing after broader web organization changes
+
+- **Goal / beneficiary:** A notebook owner can reorganize a larger collection
+  on the web and continue editing the affected local notebooks with content,
+  references, note identity, and learning history intact.
+- **Human direction (2026-09-15):** Keep the organization work deferred from
+  [story 25](#story-25) together in one queued story for now. This is a deliberate
+  broad capture, not a claim that these outcomes fit one execution-sized story.
+- **Scope to refine:** Receive whole-folder/subtree moves; receive transfers
+  between notebooks; and receive the ordinary reference rewrites in other
+  notebooks' Git histories, including when the target note moved within just
+  one notebook. Continue local content publication after receiving the new
+  organization. New destination creation during organization, special
+  relationship-note cases, and recovery from previously unsynchronized web
+  changes remain questions to assess here rather than additions to story 25.
+- **Evaluation direction:** From synchronized affected notebooks and clean
+  checkouts, move a learned subtree on the web and pull its resulting layout.
+  For a cross-notebook transfer, pull both source and destination plus a
+  referring notebook, then publish an edit at the destination. The owner sees
+  the same notes and learning records, the intended layout, and usable updated
+  references. These examples are refinement hypotheses; partial-failure and
+  cross-notebook ownership policies still need investigation.
+- **Existing scope owners:** [Story 28](#story-28) remains the single owner of
+  portable trash/recovery compatibility, including receiving web trash and
+  restoration locally. [Story 38](#story-38) owns repeated trash/Undo usability;
+  [story 32](#story-32) owns the Restore shortcut. Reuse those outcomes in this
+  broader organization journey without duplicating their backlog promises.
+  [Story 36](#story-36) owns identity inference for local rename/move with edits;
+  the performance story owns 10,000-note targets.
+- **Divergent editing capture:** Retain it as a future question from this
+  discussion, not a current delivery promise. The existing near-future
+  direction requires one append-only history with no branching or rebasing.
+  Supporting independent edits on both sides would require an explicit change
+  to that direction and further refinement; queueing this story does not make
+  that decision or remove already-supported behavior.
+- **Value / highest learning:** Extend the working single-note loop to larger
+  reorganizations. First establish how several affected notebook histories can
+  remain consistent while retaining the existing permission and identity rules.
+- **Smaller alternative:** Move individual notes within their current notebooks
+  using story 25, keeping cross-notebook organization manual. That remains
+  useful but does not deliver subtree organization or synchronize references
+  across notebook boundaries. Defer the broader work until its actual demand
+  justifies addressing these uncertainties.
+- **Priority:** After the queued core Git, publication-performance, and repeated
+  trash/Undo work; before Restore, preserving the owner's Restore-last choice.
+  This order favors the narrow working loop and established priorities.
+  No technical dependency on performance or UI cleanup is asserted.
+- **Dependencies / safe stopping point:** Build on story 25 and existing
+  notebook synchronization. Assess any real prerequisites during refinement.
+  The narrower workflow remains useful if this story is cancelled; completion
+  must preserve content and learning data without requiring further stories
+  to repair partially synchronized organization.
+- **Status / sizing:** Queued, deliberately combined and unrefined. Likely
+  larger than L (2–4 hours), low confidence. Revisit its boundaries when selected;
+  the owner's instruction here is to retain one follow-up, not split it now.
 
 <a id="story-26"></a>
 <a id="story-27"></a>
