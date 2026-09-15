@@ -74,16 +74,13 @@ const recallPage = () => {
       const { finished, toRepeatCount, totalAssimilated } =
         recallProgressFromTriple(numberOfRecalls)
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-      cy.wrap(
-        RecallsController.recalling({ query: { timezone, dueindays: 0 } }),
-        {
-          log: false,
-        }
+      cy.then(() =>
+        RecallsController.recalling({ query: { timezone, dueindays: 0 } })
       ).then((dueMemoryTrackers) => {
         return cy
-          .wrap(RecallsController.previouslyAnswered({ query: { timezone } }), {
-            log: false,
-          })
+          .then(() =>
+            RecallsController.previouslyAnswered({ query: { timezone } })
+          )
           .then((previouslyAnswered) => {
             expect(
               previouslyAnswered?.length ?? 0,

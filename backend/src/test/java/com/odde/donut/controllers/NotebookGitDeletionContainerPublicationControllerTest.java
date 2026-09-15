@@ -23,9 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
-/**
- * Verifies last-note deletion keeps the Donut notebook/folder and does not manufacture a README.
- */
+/** Verifies last-note deletion keeps the Donut notebook without invisible folder structure. */
 class NotebookGitDeletionContainerPublicationControllerTest
     extends NotebookGitBundleControllerTestBase {
 
@@ -35,7 +33,7 @@ class NotebookGitDeletionContainerPublicationControllerTest
 
   @ParameterizedTest
   @MethodSource("lastNotePlacements")
-  void publishesIsolatedDeletionOfTheLastNoteWithoutRemovingItsContainer(
+  void publishesIsolatedDeletionOfTheLastNoteAndDissolvesItsUnrepresentedFolder(
       String folderName, String deletedPath) throws Exception {
     Notebook notebook = createGitBackedNotebook();
     placeLastNote(notebook, folderName);
@@ -57,14 +55,7 @@ class NotebookGitDeletionContainerPublicationControllerTest
         hasSize(1));
     assertThat(remaining.getReadmeContent(), nullValue());
     assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(remaining.getId()), empty());
-    List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(remaining.getId());
-    if (folderName == null) {
-      assertThat(folders, empty());
-    } else {
-      assertThat(folders, hasSize(1));
-      assertThat(folders.getFirst().getName(), equalTo(folderName));
-      assertThat(folders.getFirst().getReadmeContent(), nullValue());
-    }
+    assertThat(folderRepository.findByNotebookIdOrderByIdAsc(remaining.getId()), empty());
 
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(remaining);
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {

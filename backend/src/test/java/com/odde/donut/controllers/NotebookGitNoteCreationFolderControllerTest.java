@@ -1,10 +1,13 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
@@ -16,6 +19,8 @@ import com.odde.donut.testability.GitBundleTestReader;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,22 +30,34 @@ class NotebookGitNoteCreationFolderControllerTest
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void unrepresentedEmptyFolderKeepsExistingWebCreationAndAcceptedHead() throws Exception {
+  void firstNoteInWebCreatedEmptyFolderReplacesMarkerAndRetainsHistory() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Folder folder = makeMe.aFolder().notebook(notebook).name("Box").please();
-    NotebookGitBinding accepted = binding(notebook);
-    NoteCreationDTO creation = titleOnly("Nested");
+    ObjectId originalHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+    FolderCreationRequest folderCreation = new FolderCreationRequest();
+    folderCreation.setName("Biology");
+    Folder folder = controller.createFolder(notebook, folderCreation);
+    ObjectId folderHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+    NoteCreationDTO creation = titleOnly("Cells");
     creation.setFolderId(folder.getId());
 
     NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
 
     Note created = noteRepository.findById(result.getId()).orElseThrow();
     assertThat(created.getFolder().getId(), is(folder.getId()));
-    Folder preserved = folderRepository.findById(folder.getId()).orElseThrow();
-    assertThat(preserved.getName(), is("Box"));
-    assertThat(preserved.getReadmeContent(), nullValue());
-    assertThat(preserved.getParentFolder(), nullValue());
-    assertBindingUnchanged(notebook, accepted);
+
+    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId noteHead = GitBundleTestReader.fetchHead(repository, downloaded);
+      assertThat(GitBundleTestReader.pathsIn(repository, noteHead), contains("Biology/Cells.md"));
+      try (RevWalk revWalk = new RevWalk(repository)) {
+        RevCommit noteCommit = revWalk.parseCommit(noteHead);
+        assertThat(noteCommit.getParentCount(), is(1));
+        assertThat(noteCommit.getParent(0).getId(), equalTo(folderHead));
+        RevCommit folderCommit = revWalk.parseCommit(folderHead);
+        assertThat(folderCommit.getParentCount(), is(1));
+        assertThat(folderCommit.getParent(0).getId(), equalTo(originalHead));
+      }
+    }
   }
 
   @Test

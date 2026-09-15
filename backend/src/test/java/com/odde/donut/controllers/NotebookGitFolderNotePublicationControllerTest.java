@@ -2,19 +2,17 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.exceptions.ApiException;
-import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
@@ -24,6 +22,8 @@ import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 /** Verifies note creation inside folders represented by accepted Portable content. */
 class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleControllerTestBase {
@@ -131,23 +131,19 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleCo
   }
 
   @Test
-  void refusesToAdoptAnUnrepresentedLiveFolderWhenAddingANote() throws Exception {
+  void rejectsAProposalWhenAnEmptyFolderAppearedOutsideAcceptedHistory() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    makeMe.aFolder().notebook(notebook).name("Physics").please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    makeMe.aFolder().notebook(notebook).name("Physics").please();
     byte[] proposal =
         proposalBundleBytes(
             binding, List.of(new NotebookGitProposalFile("Physics/Inertia.md", CREATED_CONTENT)));
 
-    ApiException exception =
+    ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, ApiException.class);
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
 
-    assertThat(
-        exception.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
-    assertThat(
-        exception.getErrorBody().getMessage(),
-        equalTo(FolderSiblingNameValidation.DUPLICATE_SIBLING_NAME_HERE));
+    assertThat(exception.getReason(), containsString("differs from accepted main"));
     assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
   }
 }

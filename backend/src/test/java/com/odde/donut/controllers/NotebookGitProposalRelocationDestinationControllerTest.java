@@ -3,7 +3,6 @@ package com.odde.donut.controllers;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Verifies relocation rejects destinations that are missing or unrepresented in accepted Portable
  * content, and still accepts a represented ancestor with no own README. Placement identity is
- * covered in {@link NotebookGitProposalRelocationControllerTest}. Emptied-source retention is
+ * covered in {@link NotebookGitProposalRelocationControllerTest}. Emptied-source dissolution is
  * covered in {@link NotebookGitProposalRelocationContainerControllerTest}. Addition parent
  * eligibility is covered in {@link NotebookGitFolderNotePublicationControllerTest}.
  */
@@ -64,20 +63,20 @@ class NotebookGitProposalRelocationDestinationControllerTest
   }
 
   @Test
-  void rejectsRelocationIntoAnExistingUnrepresentedFolder() throws Exception {
+  void rejectsRelocationWhenAnEmptyDestinationAppearedOutsideAcceptedHistory() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Folder physics = makeMe.aFolder().notebook(notebook).name("Physics").please();
     makeMe.aNote().notebook(notebook).title("note").content(TYPED_NOTE_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    Folder physics = makeMe.aFolder().notebook(notebook).name("Physics").please();
     byte[] proposal =
         proposalBundleBytes(
             binding, List.of(new NotebookGitProposalFile("Physics/note.md", TYPED_NOTE_CONTENT)));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
 
-    assertThat(exception.getReason(), containsString("Physics/note.md"));
+    assertThat(exception.getReason(), containsString("differs from accepted main"));
     inCommittedTransaction(
         transactionManager,
         () ->
@@ -89,7 +88,7 @@ class NotebookGitProposalRelocationDestinationControllerTest
   }
 
   @Test
-  void rejectsRelocationIntoAFolderEmptiedByAnAcceptedMove() throws Exception {
+  void rejectsRelocationIntoAFolderDissolvedByAnAcceptedMove() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder source = makeMe.aFolder().notebook(notebook).name("Source").please();
     Folder destination = makeMe.aFolder().notebook(notebook).name("Dest").please();
@@ -126,7 +125,7 @@ class NotebookGitProposalRelocationDestinationControllerTest
                 folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
                     .map(Folder::getId)
                     .toList(),
-                containsInAnyOrder(source.getId(), destination.getId())));
+                contains(destination.getId())));
   }
 
   @Test

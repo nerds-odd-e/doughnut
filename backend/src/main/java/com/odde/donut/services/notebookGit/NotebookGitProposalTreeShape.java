@@ -22,8 +22,9 @@ import org.springframework.web.server.ResponseStatusException;
  * adjacent transition, residual removals mixed with additions are refused when identity
  * correspondence is uncertain. Net tip deletions may compose with later additions once each
  * adjacent step is admissible. Unsafe paths, non-regular modes, or a changed folder-reserved {@code
- * README.md} are refused. Callers only invoke this once proposal ancestry is confirmed to be a
- * contiguous single-parent range from the accepted commit.
+ * README.md} are refused. Structural {@code .keep} changes are not note changes. Callers only
+ * invoke this once proposal ancestry is confirmed to be a contiguous single-parent range from the
+ * accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -127,6 +128,9 @@ public final class NotebookGitProposalTreeShape {
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {
+      if (document.path().endsWith("/.keep")) {
+        continue;
+      }
       if (document.role() == DocumentRole.CONTAINER) {
         throw reservedFolderReadme(document.path());
       }

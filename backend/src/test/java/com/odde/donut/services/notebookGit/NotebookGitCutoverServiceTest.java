@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.not;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.services.notebookExport.ExportNoteRow;
@@ -40,6 +41,7 @@ class NotebookGitCutoverServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
+  @Autowired FolderRepository folderRepository;
 
   @Test
   void createsOneRootCommitBindingCapturingTheNotebooksCanonicalTree() throws Exception {
@@ -52,6 +54,8 @@ class NotebookGitCutoverServiceTest {
             .readmeContent("# Recipes readme")
             .please();
     makeMe.aNote("Pasta").folder(folder).content("Boil water").please();
+    Folder emptyFolder = makeMe.aFolder().notebook(notebook).name("Ideas").please();
+    Integer emptyFolderId = emptyFolder.getId();
     makeMe.entityPersister.flush();
 
     Instant cutoverTime = Instant.parse("2026-09-04T10:15:30Z");
@@ -64,8 +68,13 @@ class NotebookGitCutoverServiceTest {
     List<PortableTreeEntry> expectedEntries =
         PortableTreeSnapshot.build(
             "# Notebook readme",
-            List.of(new ExportFolderRow(folder.getId(), null, "Recipes", "# Recipes readme")),
+            List.of(
+                new ExportFolderRow(folder.getId(), null, "Recipes", "# Recipes readme"),
+                new ExportFolderRow(emptyFolderId, null, "Ideas", null)),
             List.of(new ExportNoteRow(folder.getId(), "Pasta", "Boil water")));
+
+    assertThat(
+        folderRepository.findById(emptyFolderId).orElseThrow().getId(), equalTo(emptyFolderId));
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, binding.getBundleBytes());

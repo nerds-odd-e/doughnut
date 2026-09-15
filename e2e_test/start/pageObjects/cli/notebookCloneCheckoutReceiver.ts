@@ -1,6 +1,5 @@
 /**
- * Second-clone checkout: pull accepted history, then commit and publish
- * from the checkout that received it.
+ * Second-clone checkout: pull accepted history, then commit and publish from the receiver.
  */
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 
@@ -246,5 +245,6 @@ export {
   expectCheckoutFileAt,
   expectCleanAcceptedHeadAt,
   notebookCloneCheckoutReceiver,
+  readCheckoutStateAt,
   runInstalledOn,
 }

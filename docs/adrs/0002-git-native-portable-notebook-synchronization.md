@@ -4,7 +4,7 @@
 
 **Date:** 2026-09-04
 
-**Draft revised:** 2026-09-14 — deletion/recreation policy decided by Terry Yin; remaining questions open
+**Draft revised:** 2026-09-15 — folder omission policy decided by Terry Yin; remaining questions open
 
 **Decision makers:** Terry Yin
 
@@ -224,6 +224,10 @@ Donut does not silently rewrite a proposed tree. Derived indexes may be rebuilt,
 but Portable content changes, including web-authored link rewrites, must be
 represented in the published commit. A final tree that violates a required
 invariant is rejected with an actionable error.
+
+A non-root folder exists in the final projection only while the proposed tip
+represents it with tracked content under ADR 0004. Omitting its last represented
+path dissolves the Folder; Donut does not preserve invisible server-only folders.
 
 ### Use history as identity evidence without replaying it
 

@@ -352,6 +352,6 @@ re-application in the worktree before staging.
 
 ## Retention
 
-- Highest allocated local number: 48
+- Highest allocated local number: 49
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial

@@ -13,7 +13,6 @@ Owners of notebooks with 10,000 notes can publish to the remote quickly,
 with reasonable performance.
 
 ## Taken
-- [Receive web-created folders and their notes locally](quick/126-receive-web-created-folders/PLAN.md) — SEED-009
 
 ## Backlog list
 - [Publish edits to existing notebook and folder Readmes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24) — SEED-009

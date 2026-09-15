@@ -20,11 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Verifies relocating a folder's last tracked note keeps the Donut source container and does not
- * manufacture a README. Placement is covered in {@link
- * NotebookGitProposalRelocationControllerTest}. Relocating back into that emptied folder is
- * rejected in {@link NotebookGitProposalRelocationDestinationControllerTest}. Last-note deletion
- * containers are covered in {@link NotebookGitDeletionContainerPublicationControllerTest}.
+ * Verifies relocating a folder's last tracked note dissolves the unrepresented source container.
+ * Placement is covered in {@link NotebookGitProposalRelocationControllerTest}. Relocating back into
+ * that emptied folder is rejected in {@link
+ * NotebookGitProposalRelocationDestinationControllerTest}. Last-note deletion containers are
+ * covered in {@link NotebookGitDeletionContainerPublicationControllerTest}.
  */
 class NotebookGitProposalRelocationContainerControllerTest
     extends NotebookGitBundleControllerTestBase {
@@ -34,7 +34,7 @@ class NotebookGitProposalRelocationContainerControllerTest
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void publishesRelocationOfTheLastNoteWithoutRemovingItsSourceContainer() throws Exception {
+  void publishesRelocationOfTheLastNoteAndDissolvesItsSourceContainer() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder source = makeMe.aFolder().notebook(notebook).name("Source").please();
     Folder destination = makeMe.aFolder().notebook(notebook).name("Dest").please();
@@ -58,18 +58,13 @@ class NotebookGitProposalRelocationContainerControllerTest
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(folders, hasSize(2));
-    Folder remainingSource =
-        folders.stream()
-            .filter(folder -> folder.getId().equals(source.getId()))
-            .findFirst()
-            .orElseThrow();
+    assertThat(folders, hasSize(1));
     Folder remainingDestination =
         folders.stream()
             .filter(folder -> folder.getId().equals(destination.getId()))
             .findFirst()
             .orElseThrow();
-    assertThat(remainingSource.getReadmeContent(), nullValue());
+    assertThat(folderRepository.findById(source.getId()).isEmpty(), equalTo(true));
     assertThat(remainingDestination.getReadmeContent(), nullValue());
 
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();

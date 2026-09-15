@@ -28,11 +28,14 @@ export const assimilation = () => {
     expectAssimilationDueFromTriple(toAssimilateAndTotal: string) {
       const expectedDue = assimilationDueFromTriple(toAssimilateAndTotal)
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-      cy.wrap(UserController.getMenuData({ query: { timezone } }), {
-        log: false,
-      }).then((menuData: MenuDataDto) => {
-        expect(menuData.assimilationCount?.dueCount ?? 0).to.eq(expectedDue)
-      })
+      cy.then(() => UserController.getMenuData({ query: { timezone } })).then(
+        (menuData: MenuDataDto) => {
+          expect(
+            menuData.assimilationCount?.dueCount ?? 0,
+            `assimilation due for ${toAssimilateAndTotal}`
+          ).to.eq(expectedDue)
+        }
+      )
       return this
     },
     startAssimilationFromMenu() {
