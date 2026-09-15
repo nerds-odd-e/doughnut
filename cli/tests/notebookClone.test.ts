@@ -83,7 +83,7 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        'A Folder that contains concepts does not require a README.md; an empty Folder is represented by its README.md'
+        'A Folder that contains concepts does not require a README.md; an empty Folder is represented by a .keep file'
       )
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
