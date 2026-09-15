@@ -171,3 +171,46 @@ Feature: CLI notebook web note moves
       ---
       See [[Study/Cells|shown]] for details.
       """
+
+  @mockBrowserTime
+  Scenario: Pulling a web note move preserves empty-folder markers when the moved note changes which folders are empty
+    Given I have a notebook "CLI Empty Folder Move Notebook"
+    And the notebook "CLI Empty Folder Move Notebook" has an empty folder "Biology"
+    And the notebook "CLI Empty Folder Move Notebook" has an empty folder "Study"
+    And I have a note "Cells" under notebook "CLI Empty Folder Move Notebook" in folder "Biology" with content:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes
+      """
+    And I assimilate the note "Cells"
+    And the notebook "CLI Empty Folder Move Notebook"'s Git binding reflects its current content
+    And I capture the note id of "Cells"
+    When I clone the notebook "CLI Empty Folder Move Notebook" into a temporary destination using the installed CLI
+    And I route to the note "Cells"
+    And I move the current note under folder "Study" in notebook "CLI Empty Folder Move Notebook"
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | Biology/.keep |
+      | Study/Cells.md |
+    When I commit the following edit to "Study/Cells.md" in the cloned checkout:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes and walls
+      """
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I open the original note route
+    And the note content on the current page should be "Membranes and walls"

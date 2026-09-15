@@ -209,7 +209,7 @@ Safe stop: owners receive a self-consistent linked move within this notebook.
 
 ### 5. Preserve existing folders when a moved note changes which are empty
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Biology contains only Cells, and Study is an existing empty folder
 represented by `Study/.keep`. Move and pull receive `Biology/.keep` and
@@ -396,3 +396,30 @@ single parent A. Full backend suite passed (2420 tests). E2E extended with a
 linked-move variant asserting the pulled checkout's `Reading.md` shows the
 rewritten reference. E2E: 3 passing, 0 failing. Existing shorthand/unrelated
 link tests retained; cross-notebook rewrites untouched.
+
+### Slice 5 — done (2026-09-15)
+
+No production code changed — the existing `PortableTreeSnapshot.build` rule
+already emits `.keep` for empty folders and omits it for non-empty ones; only
+behavioral evidence was added.
+
+Proof: new `NotebookGitWebNoteMoveEmptyFolderControllerTest` (1 test): seeds
+Biology with ONLY Cells (no Readme) and Study as an empty folder; moves
+Cells Biology→Study; asserts B's exact paths (`Biology/.keep` present,
+`Study/Cells.md` present, `Study/.keep` absent, `Biology/Cells.md` absent,
+`Biology/.keep` content empty); publishes a same-path local edit C and
+asserts both original folder IDs retained, note still under Study, learning
+history retained. Full backend suite passed. E2E extended with an empty-folder
+variant (separate "CLI Empty Folder Move Notebook" with empty Biology/Study;
+move → pull → assert `Biology/.keep` + `Study/Cells.md` no `Study/.keep` →
+commit/publish → read new content on original note route). E2E: 4 passing,
+0 failing. Refactor trimmed 2 redundant positive `hasItem` assertions already
+implied by `containsInAnyOrder`; retained the `not(hasItem(...))` absence
+assertions that document the empty-folder marker flip.
+
+## All slices complete
+
+All five slices are done, verified, and delivered. The execution branch
+`cursor/100-receive-web-note-moves` contains the delivered commits. CI
+observation bridge was unavailable (no `CI_MONITOR_READY` context from the
+host hook); CI status is unobserved.
