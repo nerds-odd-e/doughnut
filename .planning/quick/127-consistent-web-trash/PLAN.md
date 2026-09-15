@@ -1,10 +1,19 @@
 # Receive web trash and recovery through one consistent accepted change
 
-Status: planned
+Status: in progress
 Source: [SEED-009 story 28, first delivery](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28)
 Direction: [One complete accepted web change](../../NORTH-STAR.md#one-complete-accepted-web-change)
-Authority: 2026-09-15 — update refinement, plan, and refine slices as needed; no execution.
+Authority: 2026-09-15 — `/dough-execute-plan 127` (planned Story Branch Mode).
 Baseline inspected: `337a360f3e` (ordinary web moves merged into main).
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut`
+- Originating branch: `main`
+- Claim commit: `4dc53bb603`
+- Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/127-consistent-web-trash`
+- Execution branch: `quick/127-consistent-web-trash`
+- Integration target: `main`
 
 ## Outcome and boundaries
 
@@ -39,6 +48,8 @@ local rename/identity mechanism for receiving already accepted web history.
   projection, no-op detection and append. Move domain orchestration out of a
   controller when needed to keep transaction ownership coherent; do not copy
   an import/check/snapshot/persist block into Trash or Undo.
+  `NoteTrashUndoService` now owns same-notebook Undo placement inside that
+  owner; cross-notebook Undo stays on `NoteMotionService` only.
 - `NoteController.trashNote` currently applies reference choices, calls
   `FolderConstructionService.ensureTrashParentFor`, then shared placement.
   Neither it nor `undoTrashNote` writes the bundle. Reuse those recipes inside
@@ -133,7 +144,7 @@ structure; existing natural generality stays enabled throughout.
 
 ### 1. Keep existing immediate Undo on the accepted-change boundary
 Type: Behavior
-Status: planned
+Status: done
 
 A synchronized notebook already contains a trashed note at B (for example from
 its current baseline). Existing same-notebook Undo appends C and restores its selected
@@ -151,6 +162,26 @@ before advancing Git on Trash, so the existing shortcut remains consistent as
 soon as slice 3 introduces that change. Slice 4 adds an actual Trash → Undo
 continuation check without reseeding the binding between operations.
 Sizing: 3–5 minutes plus suite.
+
+Accepted proof:
+- Promise: same-notebook Undo of already-represented trash appends C with
+  parent B; downloaded tree has recovered path/bytes; former trash path absent.
+- Boundary: `PATCH /api/notes/{note}/undo-trash` →
+  `NoteTrashUndoService.undoSameNotebook` → `WebNoteEditService.edit` →
+  `NoteMotionService.executePlacement`; accepted bundle download.
+- Setup: `NotebookGitWebTrashUndoControllerTest.seedAlreadyRepresentedTrashUnderBiology`
+  (Biology + `_trash/Biology/Cells.md`, `snapshotCurrentPortableTree` before
+  Undo; no production Trash, no intermediate Git repair).
+- Observations:
+  `undoOfAlreadyRepresentedTrashAppendsAcceptedChildWithRecoveredPath`
+  downloaded head == stored C; parentCount == 1 and parent == B;
+  paths contain `Biology/Cells.md`; not `_trash/Biology/Cells.md`;
+  blob bytes equal `CELLS_BODY`.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass (worktree unit DB; suite ~1m 10s). Existing
+  `NoteControllerTrashTests` and `NoteTrashRecoveryLearningPreferencesTest`
+  remain the identity/authorization coverage.
 
 ### 2. Read one complete final projection for accepted note changes
 Type: Structure
@@ -362,5 +393,14 @@ minutes on the inspected structure. Timing remains a hypothesis, especially
 slice 2's extraction and slice 4's E2E adaptation; required backend/E2E runtime
 waits are explicit exceptions above. If those assumptions fail, refine the same
 plan rather than add special paths. No new product-scope decision is pending.
-No product code changed and no tests were run in this planning turn. Prior
-committed proof supports reuse only; every new slice remains planned.
+
+## Current decisions and learnings
+
+- Undo to an existing prior folder does not create trash parents, so the
+  current pre-mutation folder list is enough for slice 1. Slice 2 still owns
+  rereading folders/notes after mutation for newly constructed Trash ancestry.
+- Cross-notebook Undo stays outside `WebNoteEditService.edit`, matching
+  ordinary Move.
+- Same-notebook Undo orchestration lives in `NoteTrashUndoService` so
+  `NoteController` stays under the file-size limit; it is not a second Git
+  snapshot owner.
