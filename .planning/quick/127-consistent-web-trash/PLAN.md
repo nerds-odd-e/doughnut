@@ -263,7 +263,7 @@ Accepted proof:
 
 ### 4. Receive Trash and ordinary Move recovery locally
 Type: Behavior
-Status: planned
+Status: done
 
 Continue from actual accepted Trash B; ordinary Move to the existing active
 folder appends C with parent B, without any resnapshot between actions. Download
@@ -281,6 +281,28 @@ selection. Assert clean accepted checkout and ancestry after each pull.
 Safe stop: selected feedback journey works end to end.
 Sizing: 4–5 minutes plus suite/E2E; reuse existing browser and CLI steps. A new
 harness or protocol is not within this estimate and triggers reassessment.
+
+Accepted proof:
+- Promise: actual Trash B then ordinary Move (and sibling Undo) append C with
+  parent B; recovered path/bytes; no intermediate Git repair; learning identity
+  retained; CLI pull receives both trees cleanly.
+- Boundary: production Trash then `RelationController.moveNoteToFolder` /
+  `undoTrashNote`; CLI clone/pull + web trash browsing/Move; original note route.
+- Setup: `seedLearnedCellsInBiologyOnlyWithoutTrash` then production Trash;
+  E2E clone of synchronized Biology/Cells (`cli_notebook_web_trash.feature`).
+- Observations:
+  - `ordinaryMoveAfterActualTrashAppendsAcceptedChildWithRecoveredPath`:
+    C parent B; `Biology/Cells.md` + `_trash/Biology/.keep`; no trash file;
+    bytes CELLS_BODY; committed note/tracker identity and eligibility.
+  - `undoAfterActualTrashAppendsAcceptedChildWithRecoveredPath`: C parent B;
+    recovered path/bytes; trash file absent.
+  - E2E: first pull `_trash/Biology/Cells.md`; revisit in trash; Move; second
+    pull `Biology/Cells.md`; original route not in trash with Membranes.
+- Commands:
+  - `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+    `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — pass
+  - `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_trash.feature` — pass
+- Result: pass. No production change; existing owners already composed.
 
 ### 5. Retain authored dead links when accepting Trash
 Type: Behavior
@@ -450,3 +472,5 @@ plan rather than add special paths. No new product-scope decision is pending.
   only; do not merge those writers into one mutation framework.
 - Keep note Trash and Undo as sibling recipes on the shared accepted-change
   owner. Folder trash stays on `NotebookController` until a later story.
+- Existing Move already composes with actual accepted Trash without a
+  resnapshot. Slice 4 needed proof, not a second recovery owner.
