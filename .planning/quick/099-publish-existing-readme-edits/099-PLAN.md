@@ -1,6 +1,6 @@
 # Publish edits to existing Readmes
 
-Status: in progress (slice 1 delivered)
+Status: done
 Source: [SEED-009 story 24](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-24)
 Authority: planning only; no implementation or backlog claim yet.
 
@@ -119,7 +119,7 @@ Safe stop: owners can update notebook descriptions; folder proof remains pending
 
 ### 2. Publish an existing folder description, alone or with a note edit
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Accepted A has `Recipes/README.md` and an existing note with learning
 history. Publish an in-place folder Readme edit, alone or with a body edit to the
@@ -207,3 +207,47 @@ seeded with raw `readmeContent("readme original")` produces a typed accepted
 container. This is why the only production gap was the `admitShape` guard.
 
 Slice 2 remains planned.
+
+### Slice 2 — delivered (branch `099-publish-existing-readme-edits`)
+Proof-only: no production change was needed. Slice 1's `admitShape`
+MODIFIED admission + the pre-existing represented-folder lookup
+(`NotebookGitProposalFolderMaterialization.materialize` →
+`folder.setReadmeContent`) and in-place note persistence
+(`NotebookGitProposalOrdinaryNoteApplication.applyModificationsAndRenames`
+→ `authoredNoteDocumentPersistence.persist`, which never touches
+`memory_tracker`/`recall_log`) already compose correctly.
+
+Accepted proof (inspected):
+- `NotebookGitProposalFolderReadmeEditControllerTest.acceptsAValidFolderReadmeEditAsTheSoleFolderDescriptionWithoutMutatingFolderIdentity`
+  — original folder ID, exact stored `readmeContent`, accepted B via
+  downloaded bundle head/tree equality, exact `Recipes/README.md` blob bytes.
+- `NotebookGitProposalFolderReadmeEditControllerTest.acceptsAValidFolderReadmeEditAlongsideACompanionExistingNoteEditRetainingLearning`
+  — folder id + new readme, note ID retained, all tracker fields equal
+  (difficulty/stability/lastRecalledAt/nextRecallAt/assimilatedAt/removedFromTracking/type/propertyKey),
+  2 recall logs survive, changed note body.
+- `NotebookGitProposalFolderReadmeEditControllerTest.rejectsAnInvalidFolderReadmeEditWithoutMutatingAcceptedContent`
+  — invalid typed Markdown + valid note edit → BAD_REQUEST, reason contains
+  `Recipes/README.md`, unchanged folder readme and note content.
+- E2E `cli_notebook_clone.feature` "Publishing a committed folder readme edit
+  updates the folder description and round-trips" — clones both checkouts,
+  commits typed `Recipes/README.md` edit, publishes via installed CLI, opens
+  folder page for "Recipes" from the sidebar, asserts folder readme contains,
+  pulls receiver, asserts clean head + exact bytes (reuses existing
+  `folder_page.ts` steps; no new page object).
+Verification: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+(2409 tests, 0 failures) and `CURSOR_DEV=true nix develop -c pnpm cy:run
+--spec e2e_test/features/cli/cli_notebook_clone.feature` (12 scenarios,
+0 failing). Refactor: collapsed `learnedTracker` /
+`assertShownContentAndRetainedLearning` duplication into
+`NotebookGitWebContentControllerTestBase`; full backend suite rerun
+post-refactor (BUILD SUCCESSFUL). Narrow exception approved:
+`cli_notebook_clone.feature` is 258 lines (>250 refactor-check threshold);
+the clean split requires reorganizing pre-existing publish scenarios
+unrelated to this proof-only slice, so the file is accepted as-is for this
+slice.
+
+Learning: `MemoryTrackerBuilder.afterNthStrictRecall(n)` computes a stability
+that does not round-trip cleanly through the DB float column, so it is
+unsuitable for an `equalTo` stability assertion across a reload;
+`recallCount(n)` (adding `recall_log` history without disturbing stability)
+is the right fixture for "retained history" assertions.

@@ -1,19 +1,14 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.controllers.dto.NoteRecallInfo;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.entities.repositories.MemoryTrackerRepository;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
@@ -21,7 +16,6 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -40,8 +34,6 @@ class NotebookGitExistingNoteBatchPublicationControllerTest
           + "reviewed: false\n"
           + "---\n"
           + "Precisely preserved authored bytes linking [[Reference Target|the target]].\n";
-
-  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
   void publishesEditsOnlyRevisionOnOriginalLearnedNotesAndMakesItDownloadable() throws Exception {
@@ -159,36 +151,5 @@ class NotebookGitExistingNoteBatchPublicationControllerTest
     NoteRealm nestedView = noteController.showNote(nested);
     assertThat(nestedView.getId(), equalTo(nested.getId()));
     assertThat(nestedView.getNote().getContent(), equalTo(ORIGINAL_CONTENT));
-  }
-
-  private MemoryTracker learnedTracker(Note note, float difficulty) {
-    return inCommittedTransaction(
-        transactionManager,
-        () ->
-            makeMe
-                .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
-                .difficulty(difficulty)
-                .please());
-  }
-
-  private void assertShownContentAndRetainedLearning(
-      Note original, MemoryTracker tracker, String expectedContent)
-      throws UnexpectedNoAccessRightException {
-    Note reloaded = noteRepository.findById(original.getId()).orElseThrow();
-    NoteRealm view = noteController.showNote(reloaded);
-    assertThat(view.getId(), equalTo(original.getId()));
-    assertThat(view.getNote().getContent(), equalTo(expectedContent));
-    NoteRecallInfo recallInfo = noteController.getNoteInfo(reloaded);
-    assertThat(recallInfo.getMemoryTrackers(), hasSize(1));
-    assertThat(recallInfo.getMemoryTrackers().getFirst().getId(), equalTo(tracker.getId()));
-    MemoryTracker retained = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
-    assertThat(retained.getDifficulty(), equalTo(tracker.getDifficulty()));
-    assertThat(retained.getStability(), equalTo(tracker.getStability()));
-    assertThat(retained.getLastRecalledAt(), equalTo(tracker.getLastRecalledAt()));
-    assertThat(retained.getNextRecallAt(), equalTo(tracker.getNextRecallAt()));
-    assertThat(retained.getAssimilatedAt(), equalTo(tracker.getAssimilatedAt()));
-    assertThat(retained.getRemovedFromTracking(), equalTo(tracker.getRemovedFromTracking()));
-    assertThat(retained.getType(), equalTo(tracker.getType()));
-    assertThat(retained.getPropertyKey(), equalTo(tracker.getPropertyKey()));
   }
 }
