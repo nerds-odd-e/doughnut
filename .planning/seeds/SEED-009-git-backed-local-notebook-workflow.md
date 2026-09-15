@@ -188,9 +188,11 @@ retained there; this anchor remains for existing references.
   the same notes and learning records, the intended layout, and usable updated
   references. These examples are refinement hypotheses; partial-failure and
   cross-notebook ownership policies still need investigation.
-- **Existing scope owners:** [Story 28](#story-28) remains the single owner of
-  portable trash/recovery compatibility, including receiving web trash and
-  restoration locally. [Story 38](#story-38) owns repeated trash/Undo usability;
+- **Existing scope owners:** [Story 28](#story-28) remains the owner of
+  remaining portable trash Git/local compatibility, including local-originated
+  trash publication and folder-subtree journeys. Receiving a web note's trash,
+  Move recovery, and same-notebook Undo is existing product behavior.
+  [Story 38](#story-38) owns repeated trash/Undo usability;
   [story 32](#story-32) owns the Restore shortcut. Reuse those outcomes in this
   broader organization journey without duplicating their backlog promises.
   [Story 36](#story-36) owns identity inference for local rename/move with edits;
@@ -363,8 +365,8 @@ local move/rename support; it is not a foundation for the web trash stories.
 Each story below is non-executable planning input. S = 30–60 minutes,
 M = 1–2 hours, L = 2–4 hours. Estimates assume reuse of existing web moves,
 reference handling, and navigation. Refine and split a web story found larger
-than L without introducing a second mechanism. Story 28 is explicitly exempt
-from further splitting/refinement for now, by the owner's instruction.
+than L without introducing a second mechanism. Remaining [story 28](#story-28)
+Git/local compatibility is queued unrefined; refine it when selected.
 
 <a id="story-38"></a>
 
@@ -599,125 +601,39 @@ answers and do not supersede the shared agreed contract.
 
 ### 28. Use portable trash across Donut and local Git
 
-#### Refinement direction — 2026-09-15
-
-The owner requested a narrower first delivery for feedback, superseding the
-earlier instruction to leave this item broad and unrefined. The owner selected
-**receive a web note's trash and recovery locally**, using existing web Move
-for recovery. The owner subsequently required a cohesive consistency boundary
-shared with ordinary Move, rather than a Trash-specific Git integration. The
-backlog title and anchors continue to retain the broader compatibility ambition.
-
-#### Goal
-
-A notebook owner using Donut and a local checkout can trash a learned note in
-Donut, recover it through the existing web Move action, and receive each change
-locally without losing the note's content, identity, or learning history.
-
-The feedback question is whether this small, recoverable web-to-local journey
-makes switching between Donut and local tools understandable and trustworthy.
-It remains useful even if local-originated trash work is never delivered.
-
-#### Scope of the agreed first delivery
-
-- Start with an ordinary note in one synchronized Git-backed notebook and a
-  clean local checkout at an ancestor of accepted main. Use an existing active
-  folder as the recovery destination. Local work does not independently advance
-  while these web changes are being received.
-- Web Trash places the note beneath notebook-root `_trash`, using the existing
-  path and collision rules. Pull receives that location and removes the old
-  active file, preserving authored content. Any required trash folders are part
-  of this outcome; the owner need not prepare them manually.
-- After revisiting the note in web trash, ordinary Move returns it to an
-  existing active folder. Pull receives that recovery and removes the former
-  trash file. This journey uses existing browsing and Move interactions.
-- Preserve the same Donut note, trackers, recall history, scheduling state, and
-  independent removed-from-tracking preferences throughout. Existing
-  location-based eligibility applies while in trash and after recovery.
-- Keep accepted history append-only and the accepted tree consistent with the
-  successful web operation. Reuse existing access checks, destination conflicts,
-  checkout-readiness rules, and web reference-handling behavior. Narrow examples
-  do not authorize regressing other supported web behavior or silently losing
-  local changes.
-- The main feedback example has no incoming references and no path collision.
-  These are demonstration preconditions, not new rejection rules. Existing
-  reference choices and collision handling remain preservation obligations;
-  synchronizing cross-notebook reference effects remains with story 40.
-
-#### Architectural acceptance
-
-Follow [One complete accepted web change](../NORTH-STAR.md#one-complete-accepted-web-change).
-From synchronized state, destination construction, reference handling, placement,
-and the complete accepted snapshot form one transaction. Ordinary Move and Trash
-use the same consistency responsibility; Git sees a changed Portable tree, not
-special trash deletion. Final projection must include newly created parents and
-all changed in-notebook referrers. Preserve the existing content/title and Move
-callers when improving that responsibility. No snapshot per helper, independent
-trash synchronization path, or new persisted lifecycle/identity state.
-
-The existing same-notebook immediate Undo must participate in that boundary too:
-once Trash advances Git, a database-only Undo would itself introduce drift.
-This is required continuity for an existing recovery route, not a promise of
-new Undo UI, folder Undo, or repeated-journey cleanup. Existing reference and
-collision choices remain distinct domain rules inside the shared operation.
-Cross-notebook synchronization and repair of already-drifted notebooks remain
-deferred; do not silently adopt their changes.
-
-#### Key examples
-
-1. **Trash received locally:** Learned `Biology/Cells.md` exists in Donut and a
-   synchronized checkout; `_trash` is absent. Trash Cells on the web, then pull.
-   Locally, its content is now at `_trash/Biology/Cells.md` and the active file
-   is absent. Donut still opens the original note in trash, with retained learning
-   data and the existing trash eligibility rules. Earlier Git commits remain
-   ancestors of the received commit.
-2. **Recovery received locally:** Continue from that received state, revisit
-   Cells in web trash, and Move it to the existing `Biology` folder. Pull again.
-   `Biology/Cells.md` contains the retained content; the former trash file is
-   absent. Donut opens the same note and its learning preferences/history remain
-   intact, with eligibility again derived from its active location.
-
-3. **Existing immediate recovery stays consistent:** From a synchronized
-   notebook, Trash appends B to A; immediate Undo appends C to B. Pull receives
-   the recovered file and the same note retains its learning data. A local
-   checkout may skip B; no requirement to pull after every web action is added.
-4. **Whole-operation consistency:** Existing reference choices and collision
-   suffixes are reflected in the same accepted result as placement. If an
-   existing permission or destination rule rejects recovery, the note and
-   accepted bundle remain unchanged. New trash parents are represented together
-   with the note, including canonical empty-folder markers where required.
-
-#### Retained, deferred promises
-
-The broader story still owns local-originated trash and recovery publication,
-folder-subtree compatibility, broader Undo journeys, and
-additional migrated-trash compatibility gaps. These are retained for later
-selection and refinement, not cancelled or newly rejected by the product.
-Editing/renaming in trash, mixed local move-and-edit histories, and divergent
-history recovery are outside this first delivery's demonstration commitments.
-
-Reuse story 31's fresh Git baseline and permanent file deletion/recreation
-semantics; do not rebuild or claim new completion of them here. Story 36 owns
-broader local rename/move-and-edit identity preservation. Story 38 retains
-repeated Trash/Undo usability; story 32 retains the Restore shortcut. No new
-Restore UI, permanent-delete UI, performance target, or migration is promised.
-Former stories 28 and 30 and story 23's web-deletion synchronization outcome
-remain traceable through this section and its existing anchors.
-
-#### Evidence, dependencies, and readiness
-
-- A Git-backed notebook's web note Trash, ordinary Move recovery, and
-  same-notebook immediate Undo append one accepted commit. Pull receives
-  `_trash/` locations and restored active paths. CLI E2E
-  `e2e_test/features/cli/cli_notebook_web_trash.feature` covers the note
-  trash-then-Move journey. Controller Git tests cover constructed parents,
-  reference choices, collisions, rejected actions, writer order, and stale-head
-  publication.
-- Remaining work is local-originated trash publication, folder-subtree
-  compatibility, and other Git/local gaps beyond that note journey.
-- The first-delivery plan is
-  [127 — consistent web trash and recovery](../quick/127-consistent-web-trash/PLAN.md).
-  The broader retained compatibility ambition remains unfinished.
+- **Goal / beneficiary:** A notebook owner can originate trash and recovery in
+  a local checkout and publish those changes, and can receive folder-subtree
+  trash the same way a single web note's trash is already received, without
+  losing content, identity, or learning history.
+- **Remaining scope:** Local-originated trash and recovery publication;
+  folder-subtree Git/local compatibility; additional migrated-trash
+  compatibility gaps beyond a single web note. Editing or renaming in trash,
+  mixed local move-and-edit histories, and divergent-history recovery stay
+  outside this item. [Story 38](#story-38) owns repeated Trash/Undo usability;
+  [story 32](#story-32) owns Restore; [story 36](#story-36) owns local
+  rename/move-and-edit identity; [story 40](#story-40) owns broader web
+  organization and cross-notebook references.
+- **Current product:** In a synchronized Git-backed notebook, web note Trash,
+  ordinary Move recovery, and same-notebook immediate Undo share one
+  accepted-change boundary. Pull receives `_trash/` locations and restored
+  active paths, including newly constructed parents and canonical empty-folder
+  markers. Git sees a changed Portable tree, not a separate trash protocol.
+- **Architectural acceptance:** Follow
+  [One complete accepted web change](../NORTH-STAR.md#one-complete-accepted-web-change).
+  No second trash snapshot path, identity map, or silently adopted
+  unsynchronized work. Former stories 28 and 30 and story 23's web-deletion
+  synchronization outcome remain traceable through this section and its
+  existing anchors.
+- **Evaluation direction:** From a synchronized checkout, trash a note locally
+  and publish so Donut shows it under `_trash` with learning data intact; trash
+  a folder subtree on the web and pull the portable `_trash/` tree. These are
+  refinement hypotheses, not an execution-ready cut.
+- **Effort / status:** Queued, unrefined remaining Git/local compatibility.
+  Do not claim execution-ready scope or authorize implementation from this
+  entry.
+- **Depends on / safe stopping point:** Reuse the existing accepted-change
+  owner and story 31's Git baseline. The web note trash/recovery loop remains
+  useful if this remaining work is deferred.
 
 ## Ordering and Scope Reduction
 
@@ -741,8 +657,9 @@ UI rough edges.
 
 After the production release, retire the spent migration support (story 39),
 then address the remaining repeated-trash and Undo rough edges (story 38), then
-keep remaining Git stories 20 and 25 in relative order. Then queue the
-story 28, whose agreed first feedback journey is refined above. Former story 23 is
+keep remaining Git stories 20 and 25 in relative order. Remaining
+[story 28](#story-28) Git/local compatibility stays queued after that note
+journey. Former story 23 is
 absorbed there because its deletion-sync scope overlaps the new trash lifecycle;
 its outcome is retained rather than cancelled. Publication performance remains
 after that combined compatibility item.
@@ -766,8 +683,7 @@ Keep these outside the current queue rather than cancelling them:
   policy before selecting recovery work.
 - Wider folder operations. Rename-with-content-edit and multi-commit note
   identity preservation are now queued together in [story 36](#story-36).
-  Story 28 retains the remaining trash-related Git/local work beyond its agreed
-  first feedback journey.
+  Story 28 retains remaining trash-related Git/local work.
 - Native standard Git transport, notebook binding within a project subdirectory,
   attachments, and history browsing or revision restoration.
 
