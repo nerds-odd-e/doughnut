@@ -1,6 +1,6 @@
 # Receive web-created folders and their notes locally
 
-Status: executing; slice 1 done, slice 2 ready
+Status: executing; slices 1–2 done, slice 3 ready
 
 ## Execution identity
 
@@ -161,10 +161,16 @@ Sizing: 5–10 minutes active work, medium confidence plus suite wait.
 ### 2. First snapshots retain only otherwise empty folders
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Backend command; extend `PortableTreeSnapshotTest`, the existing cutover
 proof, and `NotebookExportControllerTest`/bundle download assertions only for
 these distinct consuming boundaries. Reuse existing content-preservation cases.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+2,402 tests. `cli_notebook_clone.feature` passed 12 scenarios, including the
+installed-clone `Ideas/.keep` observation. After proof-file refactoring, the
+full backend suite passed again and `cli_notebook_existing_note_edits.feature`
+passed its 6 relocated scenarios.
 
 Behavior: Given notebook content with an empty leaf, a blank-Readme leaf, a
 README-only folder, and a note-bearing folder, when its Portable snapshot and
@@ -331,6 +337,11 @@ Slice 1 owns this behavior before shared marker generation activates in slice 2.
 - Final proposed-tree reconciliation belongs in `NotebookGitProposalAcceptance`
   so deletion, note relocation, folder relocation, no-document acceptance, and
   retry share one authoritative folder-existence rule.
+- Marker classification may skip `.keep` as a note document because final
+  exact-tree matching still rejects noncanonical marker additions or contents.
+- Required refactoring split two pre-existing oversized proof files along
+  cohesive seams. It took about 11 active minutes; the one-minute hard-limit
+  overrun was accepted as bounded cleanup without implementation thrash.
 - Planning inspected current source and named proof setups, but ran no product
   tests and changed no product code.
 - Empty `.planning/quick/074-*` and `098-*` directories are remnants; Git history

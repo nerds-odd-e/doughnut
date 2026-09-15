@@ -39,4 +39,29 @@ class PortableTreeSnapshotTest {
             new PortableTreeEntry("README.md", README_FENCE + "# Notebook readme"),
             new PortableTreeEntry("My Note.md", "body")));
   }
+
+  @Test
+  void representsOnlyOtherwiseEmptyNonRootLeavesWithKeepFiles() {
+    ExportFolderRow empty = new ExportFolderRow(10, null, "Empty", null);
+    ExportFolderRow blankReadme = new ExportFolderRow(11, null, "Blank", " \n");
+    ExportFolderRow readmeOnly = new ExportFolderRow(12, null, "Documented", "About");
+    ExportFolderRow noteBearing = new ExportFolderRow(13, null, "Notes", null);
+    ExportFolderRow nestedParent = new ExportFolderRow(14, null, "Parent", null);
+    ExportFolderRow nestedLeaf = new ExportFolderRow(15, 14, "Leaf", null);
+
+    List<PortableTreeEntry> entries =
+        PortableTreeSnapshot.build(
+            null,
+            List.of(empty, blankReadme, readmeOnly, noteBearing, nestedParent, nestedLeaf),
+            List.of(new ExportNoteRow(13, "Existing", "body")));
+
+    assertThat(
+        entries,
+        contains(
+            new PortableTreeEntry("Empty/.keep", ""),
+            new PortableTreeEntry("Blank/.keep", ""),
+            new PortableTreeEntry("Documented/README.md", README_FENCE + "About"),
+            new PortableTreeEntry("Notes/Existing.md", "body"),
+            new PortableTreeEntry("Parent/Leaf/.keep", "")));
+  }
 }

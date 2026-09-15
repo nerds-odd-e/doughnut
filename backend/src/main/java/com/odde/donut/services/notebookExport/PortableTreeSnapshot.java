@@ -46,6 +46,7 @@ public final class PortableTreeSnapshot {
       List<ExportNoteRow> notesHere,
       Map<Integer, List<ExportFolderRow>> childFoldersByParent,
       Map<Integer, List<ExportNoteRow>> notesByFolder) {
+    int firstEntryIndex = entries.size();
     if (readmeContentOrNull != null && !readmeContentOrNull.isBlank()) {
       entries.add(
           new PortableTreeEntry(
@@ -67,6 +68,10 @@ public final class PortableTreeSnapshot {
           notesByFolder.getOrDefault(folder.id(), List.of()),
           childFoldersByParent,
           notesByFolder);
+    }
+
+    if (!pathPrefix.isEmpty() && entries.size() == firstEntryIndex) {
+      entries.add(new PortableTreeEntry(pathPrefix + ".keep", ""));
     }
   }
 }

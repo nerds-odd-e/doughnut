@@ -63,20 +63,20 @@ class NotebookGitProposalRelocationDestinationControllerTest
   }
 
   @Test
-  void rejectsRelocationIntoAnExistingUnrepresentedFolder() throws Exception {
+  void rejectsRelocationWhenAnEmptyDestinationAppearedOutsideAcceptedHistory() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Folder physics = makeMe.aFolder().notebook(notebook).name("Physics").please();
     makeMe.aNote().notebook(notebook).title("note").content(TYPED_NOTE_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    Folder physics = makeMe.aFolder().notebook(notebook).name("Physics").please();
     byte[] proposal =
         proposalBundleBytes(
             binding, List.of(new NotebookGitProposalFile("Physics/note.md", TYPED_NOTE_CONTENT)));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
 
-    assertThat(exception.getReason(), containsString("Physics/note.md"));
+    assertThat(exception.getReason(), containsString("differs from accepted main"));
     inCommittedTransaction(
         transactionManager,
         () ->
