@@ -452,7 +452,7 @@ Accepted proof:
 
 ### 10. Serialize Trash with the next accepted writer
 Type: Behavior
-Status: planned
+Status: done
 
 Queue a web edit behind Trash on the same notebook: the edit's accepted commit
 has the Trash commit as parent and both results survive in the final tree.
@@ -463,6 +463,19 @@ Proof: `NotebookGitConcurrentWriterTestSupport` with real committed calls;
 inspect resulting tree, parents and database state.
 Safe stop: concurrent accepted changes keep both results in parent order.
 Sizing: 4–5 minutes plus suite; reuse existing queued-writer harness.
+
+Accepted proof:
+- Promise: a save queued behind Trash has the Trash commit as parent; both
+  results survive (`_trash/Biology/Cells.md` original + edited `Chemistry/Atoms.md`).
+- Boundary: `noteController.trashNote` then `textContentController.updateNoteContent`
+  via `NotebookGitConcurrentWriterTestSupport.runInQueuedOrder`.
+- Setup: `NotebookGitWebTrashQueuedWriterControllerTest.seedCellsInBiologyAndAtomsInChemistry`.
+- Observations: `queuedSaveAfterTrashAppendsBothRevisionsInParentOrder` —
+  head parent = Trash; Trash parent = pre-trash A; both trees keep Cells in
+  trash; save tree has edited Atoms.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. No production change — Trash already uses `WebNoteEditService.edit`.
 
 ### 11. Reject a proposal based on the pre-Trash head
 Type: Behavior
