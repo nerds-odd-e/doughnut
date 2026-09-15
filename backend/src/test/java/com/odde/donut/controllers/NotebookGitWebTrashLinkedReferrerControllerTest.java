@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 
@@ -77,6 +78,32 @@ class NotebookGitWebTrashLinkedReferrerControllerTest
     }
   }
 
+  @Test
+  void reduceToSourcePropertyTrashIncludesReducedSourceAndTrashedRelationshipInAcceptedTree()
+      throws Exception {
+    RelationshipReduceTrashFixture f = seedMoonEarthRelationshipForReduceToSource();
+    testabilitySettings.timeTravelTo(Timestamp.from(TRASH_AT));
+
+    noteController.trashNote(f.relation(), reduceToSourceProperty("a part of"));
+
+    try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId downloadedHead =
+          GitBundleTestReader.fetchHead(
+              repo,
+              controller
+                  .downloadNotebookGitBundle(
+                      notebookRepository.findById(f.notebook().getId()).orElseThrow())
+                  .getBody());
+      String downloadedSource =
+          NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Moon.md");
+      assertThat(downloadedSource, containsString("a part of"));
+      assertThat(downloadedSource, containsString("[[Earth]]"));
+      assertThat(
+          GitBundleTestReader.pathsIn(repo, downloadedHead),
+          hasItem("_trash/" + f.relation().getTitle() + ".md"));
+    }
+  }
+
   ReferrerTrashFixture seedCellsWithLinkedReferrer() throws UnexpectedNoAccessRightException {
     Notebook notebook = createGitBackedNotebook();
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
@@ -108,4 +135,21 @@ class NotebookGitWebTrashLinkedReferrerControllerTest
   }
 
   record PropertyReferrerTrashFixture(Notebook notebook, Note target, Note referrer) {}
+
+  RelationshipReduceTrashFixture seedMoonEarthRelationshipForReduceToSource()
+      throws UnexpectedNoAccessRightException {
+    Notebook notebook = createGitBackedNotebook();
+    Note source = makeMe.aNote("Moon").notebook(notebook).please();
+    Note target = makeMe.aNote("Earth").underSameNotebookAs(source).please();
+    Note relation =
+        makeMe
+            .aNote()
+            .underSameNotebookAs(source)
+            .asRelationship("a part of", source, target)
+            .please();
+    snapshotCurrentPortableTree(notebook);
+    return new RelationshipReduceTrashFixture(notebook, relation);
+  }
+
+  record RelationshipReduceTrashFixture(Notebook notebook, Note relation) {}
 }

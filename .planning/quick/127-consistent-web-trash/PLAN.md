@@ -362,7 +362,7 @@ Accepted proof:
 
 ### 7. Accept existing relationship reduction as part of Trash
 Type: Behavior
-Status: planned
+Status: done
 
 The existing eligible relationship Trash choice reduces it to the chosen source
 property and retains the relationship in trash. Its source document and trash
@@ -375,6 +375,20 @@ retained relationship file in the downloaded tree. Existing type/eligibility
 rules remain with the domain operation.
 Safe stop: all existing reference choices use the same complete snapshot rule.
 Sizing: 3–5 minutes plus suite; no new relationship inference.
+
+Accepted proof:
+- Promise: REDUCE_TO_SOURCE_PROPERTY Trash puts reduced source property and
+  the relationship file under `_trash` in the same accepted tree.
+- Boundary: `noteController.trashNote(..., reduceToSourceProperty("a part of"))`
+  → bundle download.
+- Setup: `seedMoonEarthRelationshipForReduceToSource` (Moon/Earth relationship;
+  snapshot before Trash).
+- Observations: `reduceToSourcePropertyTrashIncludesReducedSourceAndTrashedRelationshipInAcceptedTree`
+  downloaded `Moon.md` contains `a part of` and `[[Earth]]`; paths include
+  `_trash/{relation title}.md`. Existing DB test still owns eligibility/shape.
+- Command: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL` then
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. No production change.
 
 ### 8. Preserve existing trash when choosing a collision suffix
 Type: Behavior

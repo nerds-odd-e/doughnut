@@ -54,6 +54,13 @@ public abstract class ControllerTestBase {
     return request;
   }
 
+  protected NoteDeleteDTO reduceToSourceProperty(String sourcePropertyKey) {
+    NoteDeleteDTO request = new NoteDeleteDTO();
+    request.setReferenceHandling(NoteDeleteReferenceHandling.REDUCE_TO_SOURCE_PROPERTY);
+    request.setSourcePropertyKey(sourcePropertyKey);
+    return request;
+  }
+
   protected NoteTrashUndoDTO undoTo(String title, Folder folder) {
     NoteTrashUndoDTO request = new NoteTrashUndoDTO();
     request.setPriorTitle(title);

@@ -8,8 +8,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
-import com.odde.donut.controllers.dto.NoteDeleteDTO;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.Folder;
@@ -197,11 +195,8 @@ class NoteControllerTrashTests extends ControllerTestBase {
             .asRelationship("a part of", source, target)
             .please();
     noteReferenceService.refreshDerivedIndexesForNote(relation);
-    NoteDeleteDTO request = new NoteDeleteDTO();
-    request.setReferenceHandling(NoteDeleteReferenceHandling.REDUCE_TO_SOURCE_PROPERTY);
-    request.setSourcePropertyKey("a part of");
 
-    controller.trashNote(relation, request);
+    controller.trashNote(relation, reduceToSourceProperty("a part of"));
 
     assertThat(source.getContent(), containsString("a part of"));
     assertThat(source.getContent(), containsString("[[Earth]]"));
