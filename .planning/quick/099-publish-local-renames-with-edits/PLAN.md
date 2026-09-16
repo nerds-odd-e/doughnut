@@ -1,6 +1,6 @@
 # Publish local renames and edits with note continuity
 
-Status: planned
+Status: done
 Source: [SEED-009 story 36](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-36)
 Authority: refinement and planning requested 2026-09-16; no execution requested.
 
