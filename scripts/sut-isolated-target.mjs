@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import {
   loadCompleteIsolatedE2eAllocation,
@@ -45,6 +46,19 @@ export function resolveSutCheckoutTarget({ checkoutRoot, runtimeTarget } = {}) {
     isolated: false,
     target: resolveSutRuntimeTarget({ runtimeTarget }),
   }
+}
+
+const SHARED_E2E_DATABASE = 'doughnut_e2e_test'
+
+export function e2eObservationDatabase({ isolated, target } = {}) {
+  if (!isolated) return SHARED_E2E_DATABASE
+  assert.ok(target?.database, 'Allocated isolated database is required')
+  assert.notEqual(
+    target.database,
+    SHARED_E2E_DATABASE,
+    'Isolated checkout must not observe the shared E2E database'
+  )
+  return target.database
 }
 
 export function refuseConflictingSutOverrides(env, target) {

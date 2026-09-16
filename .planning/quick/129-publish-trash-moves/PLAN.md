@@ -17,7 +17,7 @@ refinement are authorized. Execution started 2026-09-16.
 - Authorized push destination: `origin` (`git@github.com:nerds-odd-e/doughnut.git`)
 - CI: GitHub Actions workflow `ci.yml` display name `donut CI`
 - Observer mailbox: `/tmp/dough-ci-501/watch-aUvKRw`
-- Slice 1 delivered SHA: `473550c16e0e8b0a970fbef9538b6448c7535e53`
+- Slice 2 delivered SHA: `b4f0e60a0d70b5436f59b2373000a54aa50e127f`
 
 ## Goal and boundaries
 
@@ -203,6 +203,15 @@ Proof: B; existing initial-folder, folder-creation, folder-note publication and
 `NotebookGitProposalFolderPublicationSafetyControllerTest` keep accepted content,
 retry behavior and drift refusal. Inspect that there is one ancestry walker.
 Sizing: 3–5 minutes active work; no new persistence representation.
+
+CI repair (slice 3 still planned; implementation stashed as
+`8af0185b64ca86e5f3bb9c5646cc069c66fe5911`): runs 35072853614 (SHA 473550c16e)
+and 35074963239 (SHA b4f0e60a0d) failed
+`cli_notebook_web_folder_moves` “Pulling successive web folder moves receives
+both accepted heads” because `queryIsolatedSut` refused unconfigured CI’s
+shared `doughnut_e2e_test`. Repair observes that shared DB when not isolated
+and keeps isolated checkouts off it. Proof:
+`CURSOR_DEV=true nix develop -c node --test scripts/sut-e2e-observation-database.test.mjs`.
 
 ### 4. Publish note moves into missing parents
 Type: Behavior
