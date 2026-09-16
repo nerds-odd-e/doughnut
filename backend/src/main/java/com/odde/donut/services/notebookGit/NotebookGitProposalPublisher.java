@@ -169,8 +169,14 @@ public class NotebookGitProposalPublisher {
       proposedLiveNotes = new ArrayList<>(published.liveNotes());
       proposedFolders = published.folders();
     }
-    ordinaryNoteApplication.applyModificationsAndRenames(
-        admitted, proposedFolders, proposal, acceptedHead, proposedLiveNotes, publishedAt);
+    proposedFolders =
+        ordinaryNoteApplication.applyModificationsAndRenames(
+            admitted,
+            proposedFolders,
+            published.notebook(),
+            proposal,
+            proposedLiveNotes,
+            publishedAt);
     return proposalAcceptance.acceptMatchingProposedTree(
         new NotebookGitStateLoader.LockedNotebookState(
             published.binding(), published.notebook(), proposedFolders, proposedLiveNotes),

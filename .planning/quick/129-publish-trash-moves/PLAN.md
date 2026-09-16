@@ -213,22 +213,24 @@ shared `doughnut_e2e_test` when not isolated.
 
 ### 4. Publish note moves into missing parents
 Type: Behavior
-Status: planned
-Behavior: a detected local move into `_trash/Biology/Cells.md` when that ancestry
-is absent creates its required parents and retains the original note.
+Status: done
 
-Use admitted final destinations with slice 3's constructor after the original
-projection/drift check, before final placement and acceptance. Resolve sources
-against their original correspondence; construction must not change identity.
+Admitted note-rename destinations construct missing parents via `ensureAncestry`
+inside ordinary-note application after `requireMatchingAcceptedTree`, then
+`assignPlacement`. Source identity stays on the original note. Missing
+`_trash/Biology` and new active `Research/` work without dummy Readmes. Source
+`.keep` is retained. Unsynchronized empty-destination drift still conflicts.
 
-Proof: B at `publishNotebookGitProposal`, then download the accepted bundle.
-Use the same boundary as slice 2 with missing-parent data; assert created ancestry,
-same note, inactive eligibility and exact canonical tree. A recovery variant into
-new active ancestry verifies the same rule without dummy content. Include retained
-source `.keep` where required by the Portable tree. Change obsolete missing-parent
-refusal expectations, preserving pre-existing drift refusal.
-Sizing: 5–8 minutes active work; parent visibility and source-path lookup ordering
-are the concrete integration concerns. No second path-construction loop.
+Proof: B `CURSOR_DEV=true nix develop -c pnpm backend:test_only` pass
+(post-refactor ~1m5s). Setup: Git-backed `Biology/Cells` then proposal with missing
+destination ancestry; download accepted bundle for exact tree.
+- `NotebookGitProposalMissingParentNoteMoveControllerTest.publishesAMoveIntoMissingTrashAncestryCreatingParentsAndRetainingTheNote`
+- `.publishesARecoveryIntoMissingActiveAncestryWithoutDummyContent`
+- `NotebookGitProposalRelocationDestinationControllerTest.relocatesIntoAMissingFolderCreatingRequiredParents`
+- `.rejectsRelocationWhenAnEmptyDestinationAppearedOutsideAcceptedHistory` (preserved)
+
+Refactor: ancestry call moved from publisher into
+`NotebookGitProposalOrdinaryNoteApplication`; live folders seed construction.
 
 ### 5. Share existing folder placement
 Type: Structure
@@ -337,7 +339,7 @@ transaction helpers. No exception swallowing or partial acceptance.
 | Source promise | Owning slices and observations |
 | --- | --- |
 | Existing dependency recovery and alternate active destination | 2 done: controller state/reference outcomes and original-route installed-CLI journey |
-| Local trash/recovery with required parents and canonical retained folders | 4: controller publication and downloaded exact tree |
+| Local trash/recovery with required parents and canonical retained folders | 4 done: controller publication and downloaded exact tree |
 | Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement`; 3 done: `ensureAncestry`; 5 remaining |
 | Retained subtree, learning and empty descendants | 6–7: identity/ancestry and exact Portable tree through publication/pull |
 | Existing web operation received locally | 8: real web Trash/Move followed by installed pull, one accepted child per operation |
@@ -345,7 +347,7 @@ transaction helpers. No exception swallowing or partial acceptance.
 | Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
 | Preserve ordinary moves, authored Git bytes and web reference choices | 1, 5: existing rename/folder referrer, Move, Trash/Undo and cross-notebook caller coverage |
 
-Slices 1–3 are delivered. Remaining required observations must be covered before
+Slices 1–4 are delivered. Remaining required observations must be covered before
 story closure. At each green boundary, retain the
 specific evidence here; do not substitute a green command for a missing promised
 observation. If existing code proves a behavior, close its proof without adding
