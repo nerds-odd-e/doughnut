@@ -314,21 +314,22 @@ Proof: B + W.
   - Scenario: Pulling a web folder trash then recovering it by ordinary move
 
 Refactor: shared `applyLiveFolderChange` with in-notebook move; tests split.
+
 ### 9. Preserve identity across accumulated trash moves
 Type: Behavior
-Status: planned
-Behavior: a linear local range moves a retained note into trash and then to a
-different active path before publication; the same note and dependencies appear
-at the final path, with the original committed history retained.
+Status: done
 
-Proof: B using existing composed-range helpers and the publication/download
-boundary. Observe identity and final placement/content, unchanged dependent
-records, and accepted intermediate-commit ancestry. A return to the original
-endpoint must not fabricate recreation; existing deletion-gap recreation tests
-retain their contrasting new-identity semantics. Reuse the single-commit final
-application; no intermediate live mutation or new history journal.
-Sizing: 3–5 minutes active work; if correspondence needs a new inference policy,
-stop for source-scope reassessment instead of broadening this story.
+Existing range composition already carries exact-move identity through a local
+trash hop and a later active destination. No production Java/CLI change. No
+new correspondence policy. Deletion-gap recreation tests were not changed.
+
+Proof: B `CURSOR_DEV=true nix develop -c pnpm backend:test_only` BUILD SUCCESSFUL
+(~1m12s).
+- Setup: Git-backed `Biology/Cells` with learned closure; one `publishNotebookGitProposal`
+  of a two-commit range via `commitOnTopOf` / `bundleBytesForHead`; download accepted bundle
+- `NotebookGitComposedTrashMoveIdentityControllerTest.publishesTrashThenAlternateActivePathRetainingIdentityDependentsAndAncestry`
+- `.publishesTrashThenReturnToOriginalPathRetainingIdentityNotRecreation`
+- Contrasting new-identity coverage remains in `NotebookGitDeletionThenRecreationControllerTest`
 
 ### 10. Roll back constructed parents with rejected publication
 Type: Behavior
@@ -355,11 +356,11 @@ transaction helpers. No exception swallowing or partial acceptance.
 | Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement`; 3 done: `ensureAncestry`; 5 done: folder `assignPlacement` |
 | Retained subtree, learning and empty descendants | 6–7 done: identity/ancestry and exact Portable tree through publication/pull |
 | Existing web operation received locally | 8 done: real web Trash/Move followed by installed pull, one accepted child per operation |
-| Linear histories, final-only application, deletion-gap distinction | 9: composed publication, dependencies and original Git ancestry |
+| Linear histories, final-only application, deletion-gap distinction | 9 done: composed publication, dependencies and original Git ancestry |
 | Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
 | Preserve ordinary moves, authored Git bytes and web reference choices | 1, 5: existing rename/folder referrer, Move, Trash/Undo and cross-notebook caller coverage |
 
-Slices 1–8 are delivered. Remaining required observations must be covered before
+Slices 1–9 are delivered. Remaining required observations must be covered before
 story closure. At each green boundary, retain the
 specific evidence here; do not substitute a green command for a missing promised
 observation. If existing code proves a behavior, close its proof without adding
