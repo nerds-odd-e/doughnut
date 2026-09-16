@@ -27,7 +27,7 @@
     "@inkjs/ui": "2.0.0",
     "chalk": "^6.0.0",
     "donut-api": "workspace:*",
-    "markdansi": "0.3.3",
+    "markdansi": "0.3.4",
     "react": "^19.3.0",
     "string-width": "^8.2.2",
     "turndown": "^7.2.4",
