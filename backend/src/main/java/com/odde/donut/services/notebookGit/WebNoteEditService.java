@@ -5,7 +5,6 @@ import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.ApiException;
@@ -15,56 +14,41 @@ import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.WikiLinkRewriteService;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.NotebookExportRows;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class WebNoteEditService {
-  private final NotebookGitStateLoader notebookGitStateLoader;
+  private final AcceptedWebChangeService acceptedWebChangeService;
   private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
-  private final NotebookGitProjection projection;
-  private final AcceptedSnapshotPersistence acceptedSnapshotPersistence;
   private final EntityPersister entityPersister;
   private final NoteReferenceService noteReferenceService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
 
   public WebNoteEditService(
-      NotebookGitStateLoader notebookGitStateLoader,
+      AcceptedWebChangeService acceptedWebChangeService,
       NoteRepository noteRepository,
       AuthorizationService authorizationService,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
-      NotebookGitProjection projection,
-      AcceptedSnapshotPersistence acceptedSnapshotPersistence,
       EntityPersister entityPersister,
       NoteReferenceService noteReferenceService,
       WikiLinkRewriteService wikiLinkRewriteService) {
-    this.notebookGitStateLoader = notebookGitStateLoader;
+    this.acceptedWebChangeService = acceptedWebChangeService;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
-    this.projection = projection;
-    this.acceptedSnapshotPersistence = acceptedSnapshotPersistence;
     this.entityPersister = entityPersister;
     this.noteReferenceService = noteReferenceService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
   }
 
-  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public Note saveTitle(
       Integer noteId, Integer notebookId, NoteUpdateTitleDTO titleDTO, Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
@@ -105,7 +89,6 @@ public class WebNoteEditService {
     throw new ApiException(apiError);
   }
 
-  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public Note saveContent(
       Integer noteId, Integer notebookId, AuthoredNoteDocument document, Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
@@ -117,7 +100,6 @@ public class WebNoteEditService {
         updatedAt);
   }
 
-  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public Note edit(
       Integer noteId,
       Integer notebookId,
@@ -125,63 +107,22 @@ public class WebNoteEditService {
       Function<Note, String> commitMessage,
       Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
-    var lockedState = notebookGitStateLoader.findByNotebookIdForUpdate(notebookId);
-    Note note =
-        lockedState.map(state -> findNote(state, noteId)).orElseGet(() -> requireNote(noteId));
-    if (!notebookId.equals(note.getNotebook().getId())) {
-      throw noteNotFound();
-    }
-    authorizationService.assertAuthorization(note);
-    if (lockedState.isEmpty()) {
-      mutation.accept(note);
-      return note;
-    }
-
-    NotebookGitStateLoader.LockedNotebookState state = lockedState.orElseThrow();
-    NotebookGitBinding binding = state.binding();
-    ObjectId persistedAcceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    try (NotebookGitBundleImporter.ImportedBundle accepted =
-        NotebookGitBundleImporter.importMainHead(binding.getBundleBytes(), "accepted-bundle")) {
-      if (!accepted.mainHead().equals(persistedAcceptedHead)) {
-        throw new IllegalStateException("Accepted bundle main does not match its persisted head");
-      }
-      boolean acceptedTreeMatchedBeforeSave = acceptedTreeMatches(state, accepted);
-      mutation.accept(note);
-      if (!acceptedTreeMatchedBeforeSave) {
-        return note;
-      }
-      entityPersister.flush();
-      List<ExportFolderRow> currentFolders = notebookGitStateLoader.foldersOf(state.notebook());
-      List<Note> currentLiveNotes = notebookGitStateLoader.liveNotesOf(state.notebook());
-      if (projection.matchesAcceptedTree(
-          state.notebook(),
-          currentFolders,
-          currentLiveNotes,
-          accepted.repository(),
-          accepted.mainHead())) {
-        return note;
-      }
-
-      List<PortableTreeEntry> entries =
-          PortableTreeSnapshot.build(
-              state.notebook().getReadmeContent(),
-              currentFolders,
-              NotebookExportRows.notes(currentLiveNotes));
-      acceptedSnapshotPersistence.persist(
-          accepted, entries, binding, updatedAt, commitMessage.apply(note));
-    }
-    return note;
-  }
-
-  private boolean acceptedTreeMatches(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitBundleImporter.ImportedBundle accepted) {
-    return projection.matchesAcceptedTree(
-        state.notebook(),
-        state.folders(),
-        state.liveNotes(),
-        accepted.repository(),
-        accepted.mainHead());
+    return acceptedWebChangeService.apply(
+        notebookId,
+        lockedState -> {
+          Note note =
+              lockedState
+                  .map(state -> findNote(state, noteId))
+                  .orElseGet(() -> requireNote(noteId));
+          if (!notebookId.equals(note.getNotebook().getId())) {
+            throw noteNotFound();
+          }
+          authorizationService.assertAuthorization(note);
+          mutation.accept(note);
+          return note;
+        },
+        commitMessage,
+        updatedAt);
   }
 
   private Note findNote(NotebookGitStateLoader.LockedNotebookState state, Integer noteId) {

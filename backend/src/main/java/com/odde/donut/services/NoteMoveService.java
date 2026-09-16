@@ -17,11 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Web note-move orchestration: capture inbound references, place the note via {@link
- * NoteMotionService}, then rewrite wiki links. Same-notebook moves run inside the accepted-history
- * edit transaction ({@code WebNoteEditService.edit}, SERIALIZABLE) so the moved tree appends to
- * accepted history; the {@link Consumer} factories here supply the capture-place-rewrite recipe for
- * that boundary. Cross-notebook moves keep a separate DEFAULT-isolation transaction and are not
- * Git-synchronized in the current slice.
+ * NoteMotionService}, then rewrite wiki links. Same-notebook moves run through {@code
+ * WebNoteEditService.edit} so the moved tree appends to accepted history; the {@link Consumer}
+ * factories here supply the capture-place-rewrite recipe for that boundary. Cross-notebook moves
+ * keep a separate DEFAULT-isolation transaction and are not Git-synchronized in the current slice.
  */
 @Service
 public class NoteMoveService {

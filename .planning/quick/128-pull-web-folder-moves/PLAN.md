@@ -1,7 +1,14 @@
 # Pull web folder moves into a local notebook
 
-Status: planned — planning only; execution not authorized by this request.
+Status: in progress
 Source: [SEED-009 story 40](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-40).
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main` (claim `e51bc97c5c`)
+- Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/128-pull-web-folder-moves`
+- Execution branch: `quick/128-pull-web-folder-moves`
+- Integration target: `main`
 
 ## Goal and boundaries
 
@@ -25,11 +32,12 @@ Inspected current source at ce4b7fd252; no behavioral tests executed during plan
 - `NotebookController.moveFolder` and `FolderRelocationService` already own the
   public operation. `FolderMoveRelocation` owns placement and delegates existing
   reference rewriting. Reuse them rather than rebuild a Git-specific move.
-- `WebNoteEditService.edit` owns lock/load, pre-change drift comparison, complete
-  mutation, final persisted-tree projection and accepted commit in one SERIALIZABLE
-  transaction. Its current subject is a Note; modularize the notebook acceptance
-  responsibility so folders can use it without manufacturing a representative note.
-  Preserve authorization and reload the actual subject/destination under the lock.
+- `AcceptedWebChangeService.apply` owns lock/load, pre-change drift comparison,
+  complete mutation, final persisted-tree projection and accepted commit in one
+  SERIALIZABLE transaction. `WebNoteEditService` keeps note authorization and
+  domain recipes, then delegates. Folder moves still use `FolderRelocationService`
+  directly until slice 2. Preserve authorization and reload the actual
+  subject/destination under the lock.
 - Affected existing callers: content/title saves, `RelationController` same-notebook
   note moves, `NoteTrashService` and `NoteTrashUndoService`. Preserve all on the same
   owner. Creation services also use `AcceptedSnapshotPersistence`; their creation
@@ -51,7 +59,7 @@ ADR 0002 remains Proposed. No North Star or ADR change is needed.
 
 ### 1. Share the complete accepted-change boundary with folder operations
 Type: Structure
-Status: planned
+Status: done
 
 Modularize the notebook-level acceptance responsibility currently in
 `WebNoteEditService`, keeping note authorization/domain recipes at their owners.
@@ -65,6 +73,22 @@ Proof: existing backend controller coverage for web content/title history, note
 moves and linked referrers, trash/Undo, queued writers, non-Git behavior and drift
 continues to pass. Inspect those assertions before accepting their coverage.
 Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+Accepted: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(`BUILD SUCCESSFUL in 1m 8s`, worktree DB
+`doughnut_wt_206029a6befd45a58f2b83f5cde2e888_test`). Inspected setup is Git-backed
+fixtures (`snapshotCurrentPortableTree` / `createGitBackedNotebook`), non-Git
+without bindings, and queued races via `NotebookGitConcurrentWriterTestSupport`.
+Inspected observations: controller save/move/trash/Undo/drift tests through
+`TextContentController`, `RelationController`, and `NoteController` into
+`WebNoteEditService` → `AcceptedWebChangeService` (see
+`NotebookGitWebContentSaveControllerTest`,
+`NotebookGitWebNoteMoveControllerTest`,
+`NotebookGitWebNoteMoveLinkedReferrerControllerTest`,
+`NotebookGitWebNoteMoveGuardControllerTest`,
+`NotebookGitWebTrashControllerTest`,
+`NotebookGitWebTrashUndoControllerTest`,
+`NotebookGitWebTrashQueuedWriterControllerTest`,
+`NotebookGitProjectionDriftControllerTest`). Folder callers remain unwired.
 Safe stopping point: existing product behavior unchanged; folder integration is next.
 Sizing: approximately 5 minutes active work; full backend suite has an explicit
 verification-time exception. If extraction itself exceeds 10 minutes, stop and
@@ -155,22 +179,21 @@ No new multi-commit algorithm is expected; a discovered need triggers reassessme
 
 ## Delivery and assessment
 
-Execution uses dough-execute-plan, including Jidoka, independent fresh
-post-change-refactor agent, API regeneration only if signatures/types change,
-coordinator `./scripts/run.sh pnpm format:changed` once, plan update, commit with
-check-only lint hook, push and asynchronous CI observation. Do not run these gates
-for this planning-only change. Preserve unrelated staged and unstaged work.
+Execution uses dough-execute-plan. Slice 1 extracted `AcceptedWebChangeService`;
+slice 2 must call `apply` as the SERIALIZABLE root (do not wrap it in a DEFAULT
+controller/service transaction). Reload folder and destination under the lock
+inside `CompleteOperation`; reuse `FolderMoveRelocation`, then let this owner
+project once.
 
-All slices are planned; no passing proof or runtime reproduction is claimed.
 Target ~5 minutes including ordinary verification; >5 merits scrutiny and >10
 requires finer decomposition unless the stated suite/runtime wait exception applies.
 Record actual waits separately; the exception does not cover implementation thrash.
 
-Cumulative assessment: one acceptance owner, one existing folder domain recipe,
-one final Portable snapshot and ordinary CLI fast-forward. No successive case
-recognizers are intended. The shared transaction extraction and slice 2 integration
-are the main sizing uncertainties; no unresolved product or ADR decision blocks
-this plan. 
+## Learnings
+
+Moving `@Transactional(SERIALIZABLE)` onto `AcceptedWebChangeService.apply` is
+required so `saveTitle` / `saveContent` self-calls of `edit` still join the
+serializable transaction. 
 
 ## Plan-refinement assessment — 2026-09-16
 
@@ -187,5 +210,5 @@ folder domain behavior bound the change, but transaction integration is the conc
 sizing concern. Keep the 10-minute active-work stop; do not disguise backend suite or
 CLI startup latency as implementation work. Slices 3 and 4 now have single proof loops.
 No resplit recommendation (four slices). No open product decision or known technical
-blocker remains; execution is not started. Timing estimates remain hypotheses, with
+blocker remains. Timing estimates remain hypotheses, with
 slice 2's integration concern explicitly retained rather than certifying its duration.
