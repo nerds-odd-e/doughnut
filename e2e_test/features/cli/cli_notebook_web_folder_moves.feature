@@ -1,8 +1,8 @@
 @bundleCliE2eInstall
 @withCliConfig
 Feature: CLI notebook web folder moves
-  As a notebook owner, I want to pull a folder move I made on the web into my local Git checkout so
-  the folder exists exactly once at its new path.
+  As a notebook owner, I want to pull a folder move or trash I made on the web into my local Git
+  checkout so the folder exists exactly once at its new path.
 
   Background:
     Given the backend is serving the CLI and install script
@@ -59,3 +59,65 @@ Feature: CLI notebook web folder moves
     And the cloned checkout contains exactly:
       | Biology/Cells.md |
       | Study/.keep |
+
+  @mockBrowserTime
+  Scenario: Pulling a web folder trash then recovering it by ordinary move
+    Given I have a notebook "CLI Web Folder Trash Notebook"
+    And I have a note "Cells" under notebook "CLI Web Folder Trash Notebook" in folder "Research/Biology" with content:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes
+      """
+    And the notebook "CLI Web Folder Trash Notebook" has a folder "Empty" under note "Cells"
+    And I open the folder page for "Biology" in notebook "CLI Web Folder Trash Notebook"
+    And I type and save the folder readme with text "Biology landing"
+    And the notebook "CLI Web Folder Trash Notebook"'s Git binding reflects its current content
+    When I clone the notebook "CLI Web Folder Trash Notebook" into a temporary destination using the installed CLI
+    And I open the folder page for "Biology" in notebook "CLI Web Folder Trash Notebook"
+    And I trash the current folder
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | Research/.keep |
+      | _trash/Research/Biology/README.md |
+      | _trash/Research/Biology/Cells.md |
+      | _trash/Research/Biology/Empty/.keep |
+    And the cloned checkout file "_trash/Research/Biology/Cells.md" is:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes
+      """
+    When I expand folder path "_trash/Research" in the sidebar
+    And I open the folder page at path "_trash/Research/Biology"
+    And I move the current folder to notebook root
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | Research/.keep |
+      | Biology/README.md |
+      | Biology/Cells.md |
+      | Biology/Empty/.keep |
+      | _trash/Research/.keep |
+    And the cloned checkout file "Biology/Cells.md" is:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes
+      """

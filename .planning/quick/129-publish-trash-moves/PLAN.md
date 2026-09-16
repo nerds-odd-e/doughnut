@@ -292,27 +292,28 @@ Proof: B `CURSOR_DEV=true nix develop -c pnpm backend:test_only` pass
 - `.rejectsAnExactFolderRelocationIntoAnExistingUnrepresentedParent`
 
 Refactor: dest-parent prefix/lookup shared; recovery asserts only the new parent.
+
 ### 8. Receive an existing web folder trash operation locally
 Type: Behavior
-Status: planned
-Behavior: web Trash of a folder in a synchronized notebook appends one complete
-accepted change; installed CLI pull receives its retained subtree, and ordinary
-web Move recovery followed by pull receives the active location.
+Status: done
 
-Bring `NotebookController.trashFolder`'s complete mutation under the existing
-accepted-change owner: reload/authorize, create parents, select collision name,
-place, then snapshot. Keep existing non-Git behavior and projection-drift policy.
-Do not commit each created ancestor independently.
+`trashFolderWithinNotebook` runs the complete mutation inside
+`AcceptedWebChangeService.apply`. Ancestors are not committed separately.
+Installed CLI pull receives the subtree; ordinary web Move recovers it.
 
-Proof: B + W. Start from actual web Trash, not a pre-seeded trashed state. Assert
-one accepted child contains constructed parents, Readme, descendants and `.keep`;
-pull observes exact files and original-head ancestry. Reuse ordinary Move for
-the return. Focused controller variants preserve occupied trash-name suffixing,
-authorization, drift and atomic failure at the accepted-change boundary.
-Sizing: 5–8 minutes active work; existing note Trash and web folder Move provide
-the transaction recipe and installed-CLI helpers. Transaction propagation is the
-remaining integration concern.
+Proof: B + W.
+- B: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` pass (post-refactor ~1m13s)
+  - Setup: real `controller.trashFolder` on Git-backed Research/Biology subtree
+  - `NotebookGitWebFolderTrashControllerTest.trashOfFolderSubtreeAppendsAcceptedChildWithConstructedParentsReadmeDescendantsAndKeep`
+  - `.ordinaryMoveAfterActualFolderTrashAppendsAcceptedChildWithRecoveredPath`
+  - `NotebookGitWebFolderTrashCollisionControllerTest.occupiedTrashNameSuffixingLeavesEarlierTrashBytesUnchanged`
+  - `NotebookGitWebFolderTrashGuardControllerTest.unauthorizedTrashLeavesFolderAndAcceptedBindingUnchanged`
+  - `.preExistingPortableDriftKeepsTheFolderTrashAndAcceptedHistoryUnchanged`
+  - `NotebookGitWebFolderTrashAtomicControllerTest.lateBindingSaveFailureRollsBackConstructedParentsPlacementAndAcceptedBinding`
+- W: `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_folder_moves.feature`
+  - Scenario: Pulling a web folder trash then recovering it by ordinary move
 
+Refactor: shared `applyLiveFolderChange` with in-notebook move; tests split.
 ### 9. Preserve identity across accumulated trash moves
 Type: Behavior
 Status: planned
@@ -353,12 +354,12 @@ transaction helpers. No exception swallowing or partial acceptance.
 | Local trash/recovery with required parents and canonical retained folders | 4 done: controller publication and downloaded exact tree |
 | Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement`; 3 done: `ensureAncestry`; 5 done: folder `assignPlacement` |
 | Retained subtree, learning and empty descendants | 6–7 done: identity/ancestry and exact Portable tree through publication/pull |
-| Existing web operation received locally | 8: real web Trash/Move followed by installed pull, one accepted child per operation |
+| Existing web operation received locally | 8 done: real web Trash/Move followed by installed pull, one accepted child per operation |
 | Linear histories, final-only application, deletion-gap distinction | 9: composed publication, dependencies and original Git ancestry |
 | Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
 | Preserve ordinary moves, authored Git bytes and web reference choices | 1, 5: existing rename/folder referrer, Move, Trash/Undo and cross-notebook caller coverage |
 
-Slices 1–6 are delivered. Remaining required observations must be covered before
+Slices 1–8 are delivered. Remaining required observations must be covered before
 story closure. At each green boundary, retain the
 specific evidence here; do not substitute a green command for a missing promised
 observation. If existing code proves a behavior, close its proof without adding
