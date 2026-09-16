@@ -4,7 +4,8 @@
 
 For a synchronized Git-backed notebook, a successful web change must leave the
 database and accepted Portable tree describing the same result. Note editing,
-ordinary movement, trash, and recovery share the accepted-change boundary:
+ordinary note and same-notebook folder movement, trash, and recovery share the
+accepted-change boundary:
 lock and load current state, apply the complete domain operation, read its
 final projection, and append one accepted commit in the same transaction.
 Trash is a move into a location, not Git deletion or a separate synchronization
@@ -16,20 +17,21 @@ low-level placement or folder creation separately.
 Keep placement, folder construction, reference choices, and Portable encoding
 with their existing owners. Different domain recipes use one consistency owner;
 controllers must not independently reproduce Git history coordination. Existing
-web content/title edits and ordinary moves stay on that owner as trash and its
-existing recovery routes join it. Preserve non-Git behavior and the existing
-policy for pre-existing projection drift; this direction does not authorize
-silently adopting unsynchronized work. No new trash state, identity map, event
-journal, endpoint-specific snapshot algorithm, or story-shaped dispatch modes.
+web content/title edits, ordinary note moves, and same-notebook folder moves
+stay on that owner as trash and its existing recovery routes join it. Preserve
+non-Git behavior and the existing policy for pre-existing projection drift;
+this direction does not authorize silently adopting unsynchronized work. No new
+trash state, identity map, event journal, endpoint-specific snapshot algorithm,
+or story-shaped dispatch modes.
 
-Evidence and application: note editing, ordinary movement, note trash, and
-same-notebook immediate Undo append one accepted commit after the complete
-mutation. The snapshot is built from the current persisted tree, so newly
-constructed parents are included. Pre-existing projection drift remains
-unsynchronized. This direction governs remaining portable-trash Git
-compatibility in
-[story 28](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28)
-and later web-organization work. It follows
+Evidence and application: note editing, ordinary note and same-notebook folder
+movement, note trash, and same-notebook immediate Undo append one accepted
+commit after the complete mutation. The snapshot is built from the current
+persisted tree, so newly constructed parents are included. Pre-existing
+projection drift remains unsynchronized. This direction governs remaining
+portable-trash Git compatibility in
+[story 28](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28).
+It follows
 [Accepted ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash)
 and keeps publication's final-result direction below intact.
 

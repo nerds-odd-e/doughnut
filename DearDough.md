@@ -379,8 +379,34 @@ actually remove the dead dependencies, then re-ran the affected suites.
     consolidation is exactly the kind of refactor claim that is cheap to
     verify against `git diff` and easy to misreport.
 
+## DD-054 — New When step in a Then-only Cucumber file failed first load for a missing import
+
+A slice that added a `When` step to an existing checkout-observation step file
+that previously imported only `Then` failed its first Cypress load; the file
+compiled after importing `When`, then the scenarios passed.
+
+### Occurrences
+- Execution: SEED-009 story 40 / quick/128-pull-web-folder-moves / 04333f26c5
+  - Timestamp: unknown
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: unknown
+  - Evidence: execution process notes for slice 4; current
+    `e2e_test/step_definitions/cli_notebook_checkout_observations.ts` imports
+    `{ Then, When }` and defines `When('I record the accepted head of notebook {string}', ...)`;
+    accepted Cypress for
+    `e2e_test/features/cli/cli_notebook_web_folder_moves.feature` (`2 passing`)
+    after the import fix, then again after observation-helper cleanup
+    (`cf10f9d3f1`).
+  - Observed effect: one extra failing Cypress load before the intended green
+    proof; a later refactor reran the same spec (~25 min refactor elapsed
+    reported, Cypress wait not separated).
+  - Inference: adding a `When` to a step file that historically only bound
+    `Then` needs the matching Cucumber import in the same change; the extra
+    load is a one-off clerical miss, not a product defect.
+
 ## Retention
 
-- Highest allocated local number: 53
+- Highest allocated local number: 54
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial

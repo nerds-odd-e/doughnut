@@ -584,13 +584,14 @@ answers and do not supersede the shared agreed contract.
   compatibility gaps beyond a single web note. Editing or renaming in trash,
   mixed local move-and-edit histories, and divergent-history recovery stay
   outside this item. [Story 38](#story-38) owns repeated-trash refinement; new Undo work is deferred;
-  [story 32](#story-32) owns Restore; [story 40](#story-40) owns broader web
-  organization and cross-notebook references.
+  [story 32](#story-32) owns Restore. Broader web organization and
+  cross-notebook references remain deferred.
 - **Current product:** In a synchronized Git-backed notebook, web note Trash,
-  ordinary Move recovery, and same-notebook immediate Undo share one
-  accepted-change boundary. Pull receives `_trash/` locations and restored
-  active paths, including newly constructed parents and canonical empty-folder
-  markers. Git sees a changed Portable tree, not a separate trash protocol.
+  ordinary note Move, same-notebook folder Move, ordinary Move recovery, and
+  same-notebook immediate Undo share one accepted-change boundary. Pull
+  receives `_trash/` locations and restored active paths, including newly
+  constructed parents and canonical empty-folder markers. Git sees a changed
+  Portable tree, not a separate trash protocol.
 - **Architectural acceptance:** Follow
   [One complete accepted web change](../NORTH-STAR.md#one-complete-accepted-web-change).
   No second trash snapshot path, identity map, or silently adopted
@@ -662,9 +663,10 @@ Keep these outside the current queue rather than cancelling them:
 - Recovery for notebooks whose live projection already differs from accepted
   history. Establish the owner's blocked journey and a deliberate preservation
   policy before selecting recovery work.
-- Wider folder operations. Rename-with-content-edit and multi-commit note
-  identity preservation are supported; broader folder-subtree composition
-  remains deferred. Story 28 retains remaining trash-related Git/local work.
+- Wider folder operations. Same-notebook web folder moves, rename-with-content-edit,
+  and multi-commit note identity preservation are supported. Cross-notebook
+  folder-move Git histories and further subtree composition remain deferred.
+  Story 28 retains remaining trash-related Git/local work.
 - Native standard Git transport, notebook binding within a project subdirectory,
   attachments, and history browsing or revision restoration.
 
