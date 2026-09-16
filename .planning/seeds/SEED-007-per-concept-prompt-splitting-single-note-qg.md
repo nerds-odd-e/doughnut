@@ -2,7 +2,7 @@
 id: SEED-007
 status: dormant
 planted: 2026-08-21
-planted_during: /gsd-explore on focus-note retrieval structure for OKF / LLM Wiki
+planted_during: focus-note retrieval exploration for OKF / LLM Wiki
 trigger_when: when QG quality plateaus, or when redesigning the retrieval→prompt pipeline (FocusContextMarkdownRenderer / question-generation prompt)
 scope: medium
 ---
@@ -40,4 +40,4 @@ Key risk: Savaal's per-concept win **scales with document length**. At single-no
 
 ## Notes
 
-Captured during `/gsd-explore` on focus-note retrieval structure. The seed is dormant until QG quality becomes a measured concern or the prompt pipeline is redesigned. Savaal's AI-judge was unaligned with human experts — any spike needs human evaluation, not auto-evaluation.
+Captured while exploring focus-note retrieval structure. The seed is dormant until QG quality becomes a measured concern or the prompt pipeline is redesigned. Savaal's AI-judge was unaligned with human experts — any spike needs human evaluation, not auto-evaluation.

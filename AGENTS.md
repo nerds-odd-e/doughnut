@@ -8,12 +8,11 @@ Consult `.cursor/agent-map.md` when you need repository entry points, generated 
 
 Run repo tooling with `CURSOR_DEV=true nix develop -c …` unless documented otherwise (e.g. Cloud VM). **Git commands do not need the Nix prefix** — run `git` directly.
 
-Repo conventions live in `.cursor/rules/`. Cursor injects `alwaysApply: true` rules automatically. **Codex / Claude Code:** read these always-applied rules before coding — `general.mdc`, `unit-testing.mdc`, `problem-decomposition.mdc`, `planning.mdc`, `gsd-coexistence.mdc`, `architecture-decisions.mdc` — then the stack file for the area you touch: frontend → `frontend.mdc`; backend → `backend.mdc`; E2E → `e2e-authoring.mdc`; lint → `linting_formating.mdc`; migrations → `db-migration.mdc`; MCP → `mcp-server.mdc`; CLI → `cli.mdc`. Do not search for other names first. Cursor auto-attaches globbed detail files when matching files are in context.
+Repo conventions live in `.cursor/rules/`. Cursor injects `alwaysApply: true` rules automatically. **Codex / Claude Code:** read these always-applied rules before coding — `general.mdc`, `unit-testing.mdc`, `problem-decomposition.mdc`, `planning.mdc`, `architecture-decisions.mdc` — then the stack file for the area you touch: frontend → `frontend.mdc`; backend → `backend.mdc`; E2E → `e2e-authoring.mdc`; lint → `linting_formating.mdc`; migrations → `db-migration.mdc`; MCP → `mcp-server.mdc`; CLI → `cli.mdc`. Do not search for other names first. Cursor auto-attaches globbed detail files when matching files are in context.
 
 For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log`; the Nix shell setup is defined by `process-compose.yaml` and `scripts/shell_setup.sh`.
 
-Planning lives under `.planning/` (GSD + local). Canonical coexistence:
-`.cursor/rules/gsd-coexistence.mdc`. Decomposition and slice quality:
+Planning lives under `.planning/`. Decomposition and slice quality:
 `.cursor/rules/problem-decomposition.mdc`; planning artifacts and lifecycle:
 `.cursor/rules/planning.mdc`.
 Do not put new plans under `ongoing/`. Test-optimization candidates live in `.planning/test-optimization-candidates.md`.
@@ -24,25 +23,24 @@ Portable digest (details live in the cited always-applied rules — keep `AGENTS
 
 1. High cohesion — one concept, one place (`general.mdc`)
 2. Keep it simple — minimum code; no defensive programming (`general.mdc`)
-3. Capability naming — no GSD phase numbers in product artifacts (`general.mdc`, `planning.mdc`)
+3. Capability naming — no planning sequence numbers in product artifacts (`general.mdc`, `planning.mdc`)
 4. Test observables via high-level entry points (`unit-testing.mdc`)
 5. Failure handling — fail loudly is legitimate; catch for a business outcome or a clearer message (ADR 0006)
 6. Prefer committing all changes and leaving none local; partial commits are deliberate exceptions, not forbidden
 
 ## Planning and slice delivery
 
-- **Layout (GSD-aligned):** non-executable story decompositions under `.planning/seeds/`; executable work under `.planning/phases/NN-slug/` or `.planning/quick/NNN-slug/`, plus GSD `PROJECT` / `ROADMAP` / `STATE` / `codebase/` and the ordered story queue `.planning/PRODUCT-BACKLOG.md`. See `planning.mdc` and `gsd-coexistence.mdc`.
-- **Hard decomposition grammar:** problem → 3V story → Behavior/Structure execution leaf; stop-safe, one evaluable outcome at the current resolution (`problem-decomposition.mdc`) — applies to GSD PLANs too.
+- **Layout:** non-executable story decompositions under `.planning/seeds/`; executable plans under `.planning/quick/NNN-slug/`; the ordered story queue in `.planning/PRODUCT-BACKLOG.md`; short-term architectural direction in `.planning/NORTH-STAR.md`. See `planning.mdc`.
+- **Hard decomposition grammar:** problem → 3V story → Behavior/Structure execution leaf; stop-safe, one evaluable outcome at the current resolution (`problem-decomposition.mdc`).
 - **Time budget (self-enforced):** story hypotheses are roughly 30 minutes to a few hours; execution leaves target ~5 min including tests; >5 min → scrutinize; >10 min → hard finer-decompose unless a stated good reason (`problem-decomposition.mdc`).
 - **History:** keep resume-useful planning artifacts while a plan is in progress; **clean up** spent history when the plan is fully executed into code/permanent docs.
-- **Execution wrap-up (required):** Jidoka → fresh dough-post-change-refactor agent → API generation when needed → coordinator runs `./scripts/run.sh pnpm format:changed` once → update plan without a second routine formatting pass → commit (independent check-only lint hook) → push (**dough-execute-plan**; also `/gsd-execute-phase`). `format-changed` remains on-demand; implementers/refactorers run neither it nor standalone `lint:changed`.
+- **Execution wrap-up (required):** Jidoka → fresh dough-post-change-refactor agent → API generation when needed → coordinator runs `./scripts/run.sh pnpm format:changed` once → update plan without a second routine formatting pass → commit (independent check-only lint hook) → push (**dough-execute-plan**). `format-changed` remains on-demand; implementers/refactorers run neither it nor standalone `lint:changed`.
 - **Story shaping:** use **dough-story-decomposition** for broad or unclear requirements; one non-executable decomposition seed contains ordered candidate stories. Queue and reprioritize unfinished stories with **dough-product-backlog**; details stay in the home seed.
 - **Story refinement:** use `.agents/skills/dough-story-refinement/SKILL.md` to clarify selected stories' goal, scope, and key examples in their home seeds before slice planning. Apply conservative scope and post-implementation cleanup from `planning.mdc`.
 - **Plan refinement:** use **dough-slice-plan-refinement** in place when an existing PLAN is complex, sizing confidence is low, or execution overruns. Skip the extra pass when dough-slice-planning already produced clear commit-sized leaves.
 - **Execution retrospective:** review a completed or in-progress plan with **dough-execution-retrospective**; it may plan bounded corrections but never executes them. Close completed story history afterward with **dough-story-wrap-up**.
-- **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); for one selected ad-hoc story use **dough-slice-planning** → optional **dough-slice-plan-refinement** → **dough-execute-plan** under `.planning/quick/`.
-- **Test optimization:** `dough-test-optimization` — use the public Open Dough workflow; plans live under `.planning/phases/` or `quick/` and run via dough-execute-plan. Donut-specific commands and profile exclusions live in `.cursor/agent-map.md` and the applicable stack testing rules.
-- **Non-compatible local overlays** (must keep): documented in `.cursor/rules/gsd-coexistence.mdc`.
+- **Selected story delivery:** use **dough-slice-planning** → optional **dough-slice-plan-refinement** → **dough-execute-plan** under `.planning/quick/`.
+- **Test optimization:** `dough-test-optimization` — use the public Open Dough workflow; plans live under `.planning/quick/` and run via dough-execute-plan. Donut-specific commands and profile exclusions live in `.cursor/agent-map.md` and the applicable stack testing rules.
 
 ## Cursor Cloud specific instructions
 

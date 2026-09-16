@@ -55,8 +55,8 @@ Resolve project context at the first boundary that needs it:
 - [refactor context](../dough-post-change-refactor/SKILL.md) before refactor delegation.
 
 Missing context stops its affected boundary, including first-slice delegation when
-needed there. Other invoking tools, including GSD, retain this slice delivery contract;
-a phase or task cannot replace a slice.
+needed there. Other invoking tools retain this slice delivery contract; a task cannot
+replace a slice.
 
 Before first implementation delegation, read [delegation](references/delegation.md)
 and the common reassessment/human-judgment rules plus currently triggered sections of

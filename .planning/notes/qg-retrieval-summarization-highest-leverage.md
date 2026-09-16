@@ -1,7 +1,7 @@
 ---
 title: QG retrieval — summarization is the highest-leverage step
 date: 2026-08-21
-context: /gsd-explore on retrieval algorithm and structure for OKF / LLM Wiki focus-note context
+context: exploration of retrieval algorithm and structure for OKF / LLM Wiki focus-note context
 ---
 
 # QG retrieval — summarization is the highest-leverage step

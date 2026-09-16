@@ -43,7 +43,7 @@ CLI command.
 
 ## Architecture notes
 
-CLI architecture guidance lives in this rule and in `cli/` code layout. New planning artifacts go under `.planning/phases/` or `.planning/quick/` — see `gsd-coexistence.mdc`.
+CLI architecture guidance lives in this rule and in `cli/` code layout.
 
 Apply architectural changes when a feature needs them; challenge the fit first.
 

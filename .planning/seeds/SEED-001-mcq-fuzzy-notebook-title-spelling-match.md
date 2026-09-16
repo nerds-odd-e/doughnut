@@ -11,29 +11,26 @@ scope: unknown
 
 ## Why This Matters
 
-_To be filled in. Run `/gsd-capture --seed --enrich SEED-001` to add context._
+_To be refined when this story is selected._
 
-Deferred follow-ons from shipped v1.1 spelling accidental-match + overlap loop (listed in `.planning/PROJECT.md` Next Milestone Goals / Out of Scope).
+Deferred follow-ons from the shipped spelling accidental-match and overlap loop.
 
 ## When to Surface
 
 **Trigger:** when relevant
 
-This seed will surface during `/gsd-new-milestone` when the milestone scope matches.
+Surface this seed when spelling-match follow-ons become a product priority.
 
 Intended pause: resume after the current detour milestone completes (or when consciously choosing spelling follow-ons as the next milestone).
 
 ## Scope Estimate
 
-**Unknown** — run `/gsd-capture --seed --enrich SEED-001` to estimate effort.
+**Unknown** — refine the selected story before estimating execution.
 
 Likely a full milestone covering some or all of: MCQ accidental-match, fuzzy/partial/substring matching, cross-notebook `Notebook:Title` typing.
 
 ## Breadcrumbs
 
-- `.planning/PROJECT.md` — Next Milestone Goals / Out of Scope (MCQ, fuzzy, `Notebook:Title`)
-- `.planning/milestones/v1.1-ROADMAP.md` — deferred v2 line: MCQ accidental-match, fuzzy matching, Notebook:Title typing
-- `.planning/MILESTONES.md` — v1.1 shipped record
 - `backend/src/main/java/com/odde/donut/entities/AnswerOutcome.java`
 - `backend/src/main/java/com/odde/donut/entities/Answer.java`
 - `backend/src/main/java/com/odde/donut/controllers/dto/AnsweredQuestion.java`

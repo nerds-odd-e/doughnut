@@ -1,8 +1,7 @@
 # Delegate a slice
 
-Assign each planned slice, or the one quick slice, to a fresh implementation
-agent. Use a general-purpose agent, or `gsd-executor` when this project uses
-`/gsd-execute-phase`. Implement locally only for a single interactive slice.
+Assign each planned slice, or the one quick slice, to a fresh general-purpose
+implementation agent. Implement locally only for a single interactive slice.
 The coordinator retains
 [wrap-up](wrap-up.md); an execution tool does not take over that responsibility.
 

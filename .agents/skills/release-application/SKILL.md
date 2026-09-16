@@ -3,7 +3,7 @@ name: release-application
 description: >-
   Release the Donut application from an authorized immutable stable tag, or
   inspect application deployment status. Use for application releases, not
-  independent cli-* releases or gsd-ship PR delivery.
+  independent cli-* releases or PR delivery.
 ---
 
 # Release Application
@@ -17,8 +17,7 @@ this skill.
 
 - An application release publishes the SPA, bundled CLI, routing, and any
   required backend rollout through the Application Release workflow. A `cli-*`
-  release is independent. `gsd-ship` delivers a PR; it does not release the
-  application.
+  release and PR delivery are independent.
 - A status-only request is read-only. Inspect existing tags, workflow runs,
   publication jobs, and smoke evidence without creating a tag or rerunning a
   workflow.
