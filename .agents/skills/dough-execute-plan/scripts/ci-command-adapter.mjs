@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ciAttemptKey } from "./ci-failures.mjs";
+import { isFullGitRevision } from "./ci-revisions.mjs";
 
 const configurationPath = ".planning/open-dough.json";
 const defaultAdapterTimeoutMs = 20_000;
@@ -129,7 +130,7 @@ function normalizeAttempt(attempt, branch) {
     !attempt ||
     !["string", "number"].includes(typeof attempt.runId) ||
     !["string", "number"].includes(typeof attempt.attemptId) ||
-    typeof attempt.sha !== "string" ||
+    !isFullGitRevision(attempt.sha) ||
     !["pending", "success", "failure", "incomplete"].includes(attempt.outcome)
   )
     throw new Error("CI adapter returned an invalid attempt");

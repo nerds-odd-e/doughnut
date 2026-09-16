@@ -1,13 +1,14 @@
 ---
 name: dough-slice-planning
 description: >-
-  Plans one understood, bounded story or retrospective correction as an
-  executable sequence of Behavior/Structure slices with outside-in proof and
-  safe stopping points. Use when a selected story is ready for implementation
-  planning or an execution retrospective has one bounded correction to plan.
-  Stays within the triggering instruction's execution authority: finish after
-  writing and reporting the plan unless that instruction explicitly also
-  requests execution.
+  Plans one understood, bounded story, retrospective correction, or remaining
+  work from an understood instruction as an executable sequence of
+  Behavior/Structure slices with outside-in proof and safe stopping points. Use
+  when a selected story is ready for implementation planning, an execution
+  retrospective has one bounded correction to plan, or authorized remaining
+  work from a sufficient instruction needs an ordinary plan. Stays within the
+  triggering instruction's execution authority: finish after writing and
+  reporting the plan unless that instruction explicitly also requests execution.
   Reports remaining slice-specific concerns or a limited no-concerns finding;
   does not prescribe the next workflow action or certify execution readiness.
   Concern evidence does not authorize execution.
@@ -15,21 +16,24 @@ description: >-
 
 # Slice planning
 
-Write one sufficient executable plan for one understood story or a bounded
-retrospective correction as described below. Stay within the
-triggering human or parent-agent instruction's explicit execution authority.
-Do not implement product code or invoke execution unless that instruction
-explicitly also requests execution after planning.
+Write one sufficient executable plan for one understood story, a bounded
+retrospective correction, or remaining work from an understood instruction as
+described below. Stay within the triggering human or parent-agent
+instruction's explicit execution authority. Do not implement product code or
+invoke execution unless that instruction explicitly also requests execution
+after planning.
 
 ## Require understood planning input
 
 Require one user or stakeholder outcome, its value, evaluable key examples, and
-boundaries from later stories. Use
-[dough-story-refinement](../dough-story-refinement/SKILL.md) when the selected
+boundaries from later work. Name the missing field and stop; do not invent a
+story, seed, or completed plan slices. Use
+[dough-story-refinement](../dough-story-refinement/SKILL.md) when a selected
 story's goal, scope, or examples are unresolved. Use
 [dough-story-decomposition](../dough-story-decomposition/SKILL.md) when the
 parent problem, candidate selection, or story ordering is unresolved. Never
-turn a decomposition seed directly into an execution plan.
+turn a decomposition seed directly into an execution plan. An understood
+instruction may be the source without a story.
 
 For a correction handed off by
 [dough-execution-retrospective](../dough-execution-retrospective/SKILL.md#reconcile-findings-with-current-truth),
@@ -50,8 +54,9 @@ so later refinement and execution do not need a seed.
 
 Before writing, identify from the user's instructions and this project's guidance:
 
-- the selected story and its seed, when one exists, or the retrospective
-  correction input and its source execution;
+- the selected story and its seed, when one exists, the retrospective
+  correction input and its source execution, or the understood remaining-work
+  instruction and any retained execution identity;
 - the executable-plan root, filename layout, format additions, status
   vocabulary, and lifecycle;
 - any supplied slice target and hard limit, including their permitted
@@ -62,8 +67,8 @@ Before writing, identify from the user's instructions and this project's guidanc
 - any phase or quick-task conventions that own the plan.
 
 Resolve these from this project, not this skill's location. First reuse a plan
-that is active under this project's status vocabulary and identifies the
-selected story or correction. Honor the retrospective's unfinished-plan
+that is active under this project's status vocabulary and identifies that
+source. Honor the retrospective's unfinished-plan
 amendment destination. Otherwise, inspect the established plan entries in the known
 root: use the number after the highest allocated entry, preserving its numeric
 padding and path layout rather than filling an old gap. Immediately before
@@ -80,7 +85,7 @@ or merely inferred location.
 ## Write the plan
 
 Record the source, goal, included scope, material exclusions, assumptions, and
-key examples without enlarging the story or bounded correction. Read and apply:
+key examples without enlarging that source. Read and apply:
 
 - [architectural thinking](references/architectural-thinking.md) to carry
   PFE findings, relevant accepted decisions, and only warranted short-term

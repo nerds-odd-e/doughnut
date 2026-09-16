@@ -45,7 +45,7 @@ the observation or revise the remaining plan around the unresolved dispute.
 Stop only the affected path when a consequential decision remains unresolved:
 user value, domain meaning or fit, structure constraining later work or
 architecture, credentials or permissions, or ambiguity that could waste a
-commit. For a change to the story or correction's beneficiary, outcome, proof
+commit. For a change to the story, correction, or instruction's beneficiary, outcome, proof
 or evaluation, scope, or story order, apply a change already authorized by the
 human; otherwise name the affected source and field, evidence, and specific
 decision needed, then wait.
@@ -83,7 +83,7 @@ North Star direction to work around the ADR.
 ## Resolve a disputed plan restriction
 
 Use [examples and constraints](../../dough-story-refinement/references/planning.md#examples-and-constraints)
-when a plan or quick story requires rejection that appears supported only by
+when a plan, quick story, or instruction requires rejection that appears supported only by
 fixture counts or arrangements. Cite the exact source contract and the
 conflicting story examples, deferred promises, or domain evidence. State what
 behavior the proposed change would alter and ask the human to resolve the
@@ -119,6 +119,14 @@ for human judgment. A recorded explanation never waives required proof or the
 CI repair protocol; an infrastructure finding cannot excuse a separate assertion
 failure.
 
+## Choose replanning permission
+
+Resolve this at entry and retain it for [delegation](delegation.md) and resume.
+`--replan` and `--no-replan`, or a clear current instruction, grant or deny overrun
+replanning independently of whether the source is a plan, story, or instruction.
+Otherwise preserve existing planning authority. Neither option authorizes new
+scope, destructive action, or missing execution.
+
 ## Refine an oversized slice
 
 Use this project's target, hard limit, exceptions, and repeated-overrun threshold
@@ -129,7 +137,25 @@ failure to converge also calls for refinement.
 
 Inventory tracked and untracked changes owned by the attempt and preserve
 pre-existing work. Never use broad `git checkout .` or `git clean -fd`. Unclear
-ownership requires human judgment. For planned execution, safely park or revert
+ownership requires [human judgment](#stop-for-human-judgment); do not guess,
+silently revert unrelated work, or continue cleanup. Apply the same ownership
+stop as [delivery staging](wrap-up.md#deliver-the-change) and
+[resume](../SKILL.md#continue-or-recover-at-an-execution-boundary). A verified-result
+[delivery](wrap-up.md#deliver-the-change) failure or
+[integration](../../dough-story-wrap-up/SKILL.md#integrate-committed-story-branch-mode-closure)
+failure is ordinary recovery, not this overrun.
+
+When replanning is disabled, do not plan, refine, or retry. First write useful
+evidence under this project's executable-plan root, resolved from this project
+as in [slice planning](../../dough-slice-planning/SKILL.md#resolve-execution-context).
+Do not invent a location or write a plan. Evidence may be prose, snippets, or a
+patch; it need not run. Then remove only current attempt-owned unfinished changes
+outside that folder. Leave no abandoned incomplete code or test work elsewhere.
+Preserve unrelated work and earlier delivered slices; do not undo delivered
+work. Existing Taken entries stay Taken; invent no story, plan, or backlog
+entry. Report the stop under [Finish or stop](../SKILL.md#finish-or-stop).
+
+When replanning is allowed, continue as follows. For planned execution, safely park or revert
 only attempt-owned changes, then record elapsed time, completed proof, and the
 failed sizing assumption in the same plan. Invoke
 [dough-slice-plan-refinement](../../dough-slice-plan-refinement/SKILL.md) only
@@ -138,33 +164,34 @@ pushes the updated plan. Report `reverted and refined`, elapsed time, and
 whether the hard limit applied, then restart from the plan on disk.
 
 For quick execution, first make a safe stop in the conversation. Identify the
-canonical story, elapsed time, the failed sizing assumption, completed compatible
+source, elapsed time, the failed sizing assumption, completed compatible
 work and proof, and every incomplete attempt-owned change. Keep completed
 compatible work and proof in place. Safely park or revert only incomplete
 attempt-owned changes; do not discard completed work merely to give later slices
-a clean starting point. Keep backlog placement under
-[Take queued work](../SKILL.md#take-queued-work). Unclear ownership stops
+a clean starting point. Keep the same execution identity and backlog placement
+under [Take queued work](../SKILL.md#take-queued-work). Unclear ownership stops
 disposition and the dependent planning path for human judgment.
 
-After that stop, use this project's
-[ordinary story planning workflow](../../dough-slice-planning/SKILL.md) for the
-remaining work when the story goal, scope, examples, and constraints are still
-understood and the triggering instruction authorizes planning and continued
-execution. Transfer the canonical story, relevant chat evidence, completed work
-and proof, incomplete-change disposition, elapsed time, and failed sizing
-assumption into the ordinary plan as source, decisions, or learnings needed for
-resume. Plan only the remaining work. Do not fabricate completed planned slices,
-repeat already satisfied promises, create a substitute quick-execution record,
-or treat the plan as a second execution. Restart execute-plan from that plan;
-ordinary plan refinement remains available before delegation. Reuse preserved
-proof while its boundary remains unchanged.
+After that stop, when the triggering instruction authorizes planning and
+continued execution, use this project's
+[ordinary slice planning](../../dough-slice-planning/SKILL.md) for remaining
+work from the established source — the selected story or the sufficient
+instruction. Replanning permission grants neither missing scope nor execution
+authority. Transfer the source, relevant chat evidence, completed work and
+proof, incomplete-change disposition, elapsed time, failed sizing assumption,
+and retained identity into the ordinary plan as source, decisions, or
+learnings needed for resume. Plan only the remaining work. Do not fabricate a
+story, completed planned slices, already satisfied promises, a substitute
+quick-execution record, or a second execution. Restart execute-plan from that
+plan in the same checkout; ordinary plan refinement remains available before
+delegation. Reuse preserved proof while its boundary remains unchanged.
 
-If planning or continued execution is not authorized, report the safe stop and
-the exact next authorization needed without creating the plan. If evidence
-changes the story scope or exposes a disputed constraint, use the existing human
+If planning or continued execution is not authorized, or ordinary planning
+returns a missing field or disputed decision, report the safe stop and that
+exact need without creating the plan or fabricating a story. If evidence
+changes the source scope or exposes a disputed constraint, use the existing human
 decision path before planning the affected work; complexity alone does not
-authorize a scope change. Once that decision is resolved, refine the canonical
-story as required before ordinary planning.
+authorize a scope change.
 
 ## Handle an implementation commit
 

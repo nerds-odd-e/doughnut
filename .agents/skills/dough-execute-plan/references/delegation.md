@@ -1,15 +1,15 @@
 # Delegate a slice
 
-Assign each planned slice, or the one quick slice, to a fresh general-purpose
-implementation agent. Implement locally only for a single interactive slice.
+Assign each planned slice, or the one quick slice, to a fresh implementation
+agent. Use a general-purpose agent, or `gsd-executor` when this project uses
+`/gsd-execute-phase`. Implement locally only for a single interactive slice.
 The coordinator retains
 [wrap-up](wrap-up.md); an execution tool does not take over that responsibility.
 
 Give the agent:
 
-- The selected execution checkout and branch. For planned execution, pass the
-  complete retained execution identity; for quick execution, pass the location
-  retained in the conversation. Require all implementation commands and edits
+- The selected execution checkout and branch. Pass the complete retained
+  execution identity. Require all implementation commands and edits
   to run there rather than relying on the agent's inherited working directory.
 - The execution source and current slice with mapped promises and observations,
   including replacement and lifecycle obligations. For planned execution, pass
@@ -19,10 +19,11 @@ Give the agent:
   a still-valid search merely because delegation occurred. For a correction,
   pass its complete plan-owned
   [correction input](../../dough-story-refinement/references/planning.md#choose-the-planning-level)
-  rather than requiring a seed. For quick execution, pass the canonical story,
-  the explicit instruction to execute without slice planning, and the relevant
-  conversation context; require no plan or substitute execution record. Omit
-  unrelated plan or conversation history.
+  rather than requiring a seed. For quick execution, pass the established
+  source — the canonical story and skip-planning instruction, or the contextual
+  instruction — plus relevant conversation context; require no plan, fabricated
+  story, or substitute execution record. Omit unrelated plan or conversation
+  history.
 - Any North Star topic cited by the delegated work and the evidence supporting
   it. Require the agent to return contrary evidence through [execution
   decisions](execution-decisions.md#resolve-conflicting-recorded-direction),
@@ -33,10 +34,14 @@ Give the agent:
   not to repeat completed compatible work or its unchanged proof. Treat the
   quick attempt and planned continuation as one execution, not two handoffs with
   independent histories.
-- [Execution decisions](execution-decisions.md), this project's slice budget and
-  exceptions, workflow precedence, and literal focused commands with the runtime
-  wrapper. Require relevant proof; broaden testing only when the slice, project
-  workflow, or human requires it.
+- [Execution decisions](execution-decisions.md), the resolved
+  [replanning permission](execution-decisions.md#choose-replanning-permission), this
+  project's slice budget and exceptions, workflow precedence, and literal
+  focused commands with the runtime wrapper. Require relevant proof; broaden
+  testing only when the slice, project workflow, or human requires it.
+  When replanning is disabled, an oversized stop returns the incomplete attempt in
+  place; do not plan, retry, invent backlog work, or clean up. The coordinator
+  applies the overrun branch.
 - Ownership of the slice's changes. State that other agents may share the
   execution checkout and their work must be preserved.
 - A stop before coordinator delivery: no commit, push, marking a planned slice
@@ -121,7 +126,7 @@ proof:
   result: pass
 ```
 
-Connect proof to the planned slice's or quick story's promises. Placeholders,
+Connect proof to the planned slice's, quick story's, or instruction's promises. Placeholders,
 abbreviations, and paraphrases are ambiguous evidence. When no setup is needed,
 say `none`; do not omit the field or mistake behavior supplied by a fixture for
 product behavior. Report uncovered behavior as incomplete implementation; the
