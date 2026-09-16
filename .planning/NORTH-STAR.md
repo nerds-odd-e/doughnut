@@ -87,9 +87,8 @@ note ID and do not need heuristic inference. Cohesion means shared domain owners
 and consistent existing outcomes, not replacing explicit identity with inference.
 
 Evidence: backend JGit dependency, current exact-move history composition, and
-existing publication/reference controller tests. This direction governs
-[story 36](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-36) and shared
+existing publication/reference controller tests. This direction governs shared
 ordinary-note inference reused by later Git/trash work; it adds no new folder or
 trash delivery promise. It preserves Accepted ADRs 0004 and 0005 and clarifies
 the history-inspection/final-application distinction in Proposed ADR 0002
-without changing its status. Convention sources are retained in the story.
+without changing its status.
