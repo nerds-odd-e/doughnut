@@ -91,6 +91,22 @@ When(
 )
 
 When(
+  'I commit a rename of {string} to {string} and an empty keep at {string} together in the cloned checkout',
+  (
+    fromRelativePath: string,
+    toRelativePath: string,
+    keepRelativePath: string
+  ) =>
+    cli
+      .notebookCloneCheckout()
+      .commitRenameAndEmptyKeep(
+        fromRelativePath,
+        toRelativePath,
+        keepRelativePath
+      )
+)
+
+When(
   'I commit a rename of {string} to {string} and the following unrelated edit to {string} together in the cloned checkout:',
   (
     fromRelativePath: string,

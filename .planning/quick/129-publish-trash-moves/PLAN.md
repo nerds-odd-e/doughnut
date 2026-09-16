@@ -256,19 +256,24 @@ mysql now uses E2E SUT credentials doughnut/doughnut. Proof:
 
 ### 6. Publish a retained subtree trash round trip
 Type: Behavior
-Status: planned
-Behavior: move a uniquely corresponding unchanged folder subtree into an existing
-trash parent, publish, then move it back and publish; descendants retain their
-identities and follow the final ancestry.
+Status: done
 
-Proof: B + F. Use an existing exact-subtree fixture with Readme, distinct-content
-notes and a tracked empty descendant. Observe retained folder/note/tracker IDs,
-Readme and note bytes, eligibility and `.keep`; a second clean checkout receives
-the accepted tree through installed pull. Do not seed new identities at the
-destination or substitute mocked publication for the journey. Reuse dependency
-details already proved in slice 2 rather than repeat its full assertion set.
-Sizing: 5–8 minutes active work; canonical empty descendants distinguish real
-compatibility from the existing unrepresented-descendant refusal fixture.
+Existing publication already retains the exact subtree across an existing
+`_trash` parent and back. No production Java/CLI change. Tests observe
+canonical tracked `Empty/.keep` (distinct from the unrepresented-descendant
+refusal). Slice 2 dependency schedule/reference assertions are not repeated.
+
+- B: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` BUILD SUCCESSFUL (~1m11s)
+  - Setup: Git-backed `Biology` with Readme, distinct `Cells`/`Nucleus`, tracked
+    empty descendant, existing `_trash`; two real `publishNotebookGitProposal`
+    calls
+  - `NotebookGitProposalFolderRelocationTrashRoundTripControllerTest.publishesASubtreeTrashRoundTripRetainingIdentitiesEligibilityAndCanonicalKeep`
+- F: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_folder_relocation.feature`
+  pass (5 scenarios, ~24s)
+  - Setup: `Recipes` Readme, Pasta/Sauce, `Empty` under Pasta, existing `_trash`;
+    clone twice; rename+remove `_trash/.keep`; publish; rename back+empty keep;
+    publish; installed pull
+  - Scenario: Publishing a folder subtree trash round trip is received by a later pull
 
 ### 7. Publish subtree moves into missing ancestry
 Type: Behavior
@@ -347,13 +352,13 @@ transaction helpers. No exception swallowing or partial acceptance.
 | Existing dependency recovery and alternate active destination | 2 done: controller state/reference outcomes and original-route installed-CLI journey |
 | Local trash/recovery with required parents and canonical retained folders | 4 done: controller publication and downloaded exact tree |
 | Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement`; 3 done: `ensureAncestry`; 5 done: folder `assignPlacement` |
-| Retained subtree, learning and empty descendants | 6–7: identity/ancestry and exact Portable tree through publication/pull |
+| Retained subtree, learning and empty descendants | 6 done: identity/eligibility/.keep and installed pull; 7 remaining |
 | Existing web operation received locally | 8: real web Trash/Move followed by installed pull, one accepted child per operation |
 | Linear histories, final-only application, deletion-gap distinction | 9: composed publication, dependencies and original Git ancestry |
 | Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
 | Preserve ordinary moves, authored Git bytes and web reference choices | 1, 5: existing rename/folder referrer, Move, Trash/Undo and cross-notebook caller coverage |
 
-Slices 1–5 are delivered. Remaining required observations must be covered before
+Slices 1–6 are delivered. Remaining required observations must be covered before
 story closure. At each green boundary, retain the
 specific evidence here; do not substitute a green command for a missing promised
 observation. If existing code proves a behavior, close its proof without adding

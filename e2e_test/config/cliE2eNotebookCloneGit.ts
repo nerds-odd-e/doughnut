@@ -76,6 +76,16 @@ export function stageNoteRename(
   git(checkoutDir, 'mv', fromRelativePath, toRelativePath)
 }
 
+export function stageEmptyKeep(
+  checkoutDir: string,
+  relativePath: string
+): void {
+  const filePath = join(checkoutDir, relativePath)
+  mkdirSync(dirname(filePath), { recursive: true })
+  writeFileSync(filePath, '')
+  git(checkoutDir, 'add', '--', relativePath)
+}
+
 export function continueRebaseNoninteractively(checkoutDir: string): void {
   const result = spawnSync(
     'git',

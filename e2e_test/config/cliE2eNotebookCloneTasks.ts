@@ -15,6 +15,7 @@ import {
   git,
   listCheckoutFilesRecursively,
   rebaseMergeExists,
+  stageEmptyKeep,
   stageNoteChanges,
   stageNoteRemoval,
   stageNoteRename,
@@ -180,6 +181,24 @@ export function createCliE2eNotebookCloneTasks() {
       return commitCheckout(
         checkoutDir,
         'Rename cloned notebook note and remove a path'
+      )
+    },
+    commitCliNotebookCheckoutNoteRenameAndEmptyKeep({
+      checkoutDir,
+      fromRelativePath,
+      toRelativePath,
+      keepRelativePath,
+    }: {
+      checkoutDir: string
+      fromRelativePath: string
+      toRelativePath: string
+      keepRelativePath: string
+    }): string {
+      stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
+      stageEmptyKeep(checkoutDir, keepRelativePath)
+      return commitCheckout(
+        checkoutDir,
+        'Rename cloned notebook note and add an empty keep'
       )
     },
     commitCliNotebookCheckoutNoteRenameAndEdit({
