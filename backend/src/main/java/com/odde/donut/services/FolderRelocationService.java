@@ -9,7 +9,10 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
+import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
+import com.odde.donut.services.notebookGit.NotebookGitStateLoader;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -30,6 +34,7 @@ public class FolderRelocationService {
   private final TestabilitySettings testabilitySettings;
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
+  private final AcceptedWebChangeService acceptedWebChangeService;
   private final FolderSubtree subtree;
   private final FolderMoveRelocation folderMoveRelocation;
 
@@ -40,7 +45,8 @@ public class FolderRelocationService {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       WikiLinkRewriteService wikiLinkRewriteService,
-      WikiLinkRelocationRewrite wikiLinkRelocationRewrite) {
+      WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
+      AcceptedWebChangeService acceptedWebChangeService) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
@@ -48,6 +54,7 @@ public class FolderRelocationService {
     this.testabilitySettings = testabilitySettings;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
+    this.acceptedWebChangeService = acceptedWebChangeService;
     this.subtree = new FolderSubtree(folderRepository, noteRepository, entityPersister);
     this.folderMoveRelocation =
         new FolderMoveRelocation(
@@ -60,6 +67,7 @@ public class FolderRelocationService {
             subtree);
   }
 
+  @Transactional
   public Folder moveFolder(
       Notebook notebook,
       Folder folder,
@@ -67,6 +75,27 @@ public class FolderRelocationService {
       Notebook destinationNotebook,
       User viewer) {
     return folderMoveRelocation.moveFolder(notebook, folder, request, destinationNotebook, viewer);
+  }
+
+  public Folder moveFolderWithinNotebook(
+      Notebook notebook, Folder folder, FolderMoveRequest request, User viewer)
+      throws UnexpectedNoAccessRightException {
+    Integer folderId = folder.getId();
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    return acceptedWebChangeService.apply(
+        notebook.getId(),
+        locked -> {
+          Notebook liveNotebook =
+              locked.map(NotebookGitStateLoader.LockedNotebookState::notebook).orElse(notebook);
+          Folder liveFolder =
+              folderRepository
+                  .findById(folderId)
+                  .orElseThrow(
+                      () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
+          return folderMoveRelocation.moveFolder(liveNotebook, liveFolder, request, null, viewer);
+        },
+        result -> "Move folder: " + result.getName(),
+        now);
   }
 
   public Folder placeFolderWithinNotebook(Notebook notebook, Folder folder, Folder newParent) {

@@ -35,9 +35,11 @@ Inspected current source at ce4b7fd252; no behavioral tests executed during plan
 - `AcceptedWebChangeService.apply` owns lock/load, pre-change drift comparison,
   complete mutation, final persisted-tree projection and accepted commit in one
   SERIALIZABLE transaction. `WebNoteEditService` keeps note authorization and
-  domain recipes, then delegates. Folder moves still use `FolderRelocationService`
-  directly until slice 2. Preserve authorization and reload the actual
-  subject/destination under the lock.
+  domain recipes, then delegates. Same-notebook folder moves go through
+  `FolderRelocationService.moveFolderWithinNotebook` → `apply`, reloading the
+  moving folder under the lock; `FolderMoveRelocation` still owns placement and
+  destination parent resolution. Cross-notebook `moveFolder` stays on its
+  DEFAULT `@Transactional` path.
 - Affected existing callers: content/title saves, `RelationController` same-notebook
   note moves, `NoteTrashService` and `NoteTrashUndoService`. Preserve all on the same
   owner. Creation services also use `AcceptedSnapshotPersistence`; their creation
@@ -96,7 +98,7 @@ refine this slice around observed coupling before extending it.
 
 ### 2. Pull a web folder move without leaving a second copy
 Type: Behavior
-Status: planned
+Status: done
 
 From a synchronized notebook and clean checkout with Biology/Cells.md and Study/,
 move Biology under Study on the web, then pull. Exactly one Cells file exists at
@@ -124,6 +126,9 @@ existing proof only where it reaches this folder caller.
 Commands: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` and
 `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_folder_moves.feature`
 (adjust the feature path if extending an existing feature).
+Accepted:
+- `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL INPUT_DB_URL; CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed (`BUILD SUCCESSFUL in 1m 4s`). Setup: `seedLearnedCellsInBiologyWithEmptyStudy` / `snapshotCurrentPortableTree`; occupying Biology under Study **before** snapshot for collision; unsynchronized note **after** snapshot for drift. Observations: `NotebookGitWebFolderMoveControllerTest.webFolderMoveAppendsAcceptedChildAndRetainsNoteAndLearningIdentity` (`Study/Biology/Cells.md` once, not `Biology/Cells.md`, one parented commit, note/tracker/recall retained); `destinationCollisionLeavesPlacementAndAcceptedHeadUnchanged`; `nonGitNotebookFolderMoveCreatesNoBinding`; `preExistingPortableDriftKeepsTheFolderMoveAndAcceptedHistoryUnchanged`.
+- Isolated `pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_folder_moves.feature` passed (`1 passing`). Setup: Git binding snapshot in Background before clone, never refreshed after the folder-page move. Observations: exact checkout `[Study/Biology/Cells.md]`, Cells bytes unchanged, original head ancestor and clean accepted head. No local edit/publish.
 Safe stopping point: core journey and preserved boundaries green, no deliberate
 failing test committed. Sizing: 5–10 minutes active work, low confidence; mandated
 backend-suite and installed-CLI startup time excepted. At 10 active minutes stop
@@ -179,11 +184,11 @@ No new multi-commit algorithm is expected; a discovered need triggers reassessme
 
 ## Delivery and assessment
 
-Execution uses dough-execute-plan. Slice 1 extracted `AcceptedWebChangeService`;
-slice 2 must call `apply` as the SERIALIZABLE root (do not wrap it in a DEFAULT
-controller/service transaction). Reload folder and destination under the lock
-inside `CompleteOperation`; reuse `FolderMoveRelocation`, then let this owner
-project once.
+Execution uses dough-execute-plan. Same-notebook folder moves hit
+`AcceptedWebChangeService.apply` with no outer DEFAULT transaction. Reload the
+moving folder under the lock; destination parent reload already lives in
+`FolderMoveRelocation`. Slice 3 extends the same rule with complete subtree
+projection; slice 4 extends the installed pull with accumulated accepted heads.
 
 Target ~5 minutes including ordinary verification; >5 merits scrutiny and >10
 requires finer decomposition unless the stated suite/runtime wait exception applies.
@@ -193,7 +198,9 @@ Record actual waits separately; the exception does not cover implementation thra
 
 Moving `@Transactional(SERIALIZABLE)` onto `AcceptedWebChangeService.apply` is
 required so `saveTitle` / `saveContent` self-calls of `edit` still join the
-serializable transaction. 
+serializable transaction. Same-notebook folder move must not sit in a DEFAULT
+controller/service transaction around `apply`. Destination `findById` in the
+service lambda duplicated `FolderMoveRelocation.resolveNewParentFolder`. 
 
 ## Plan-refinement assessment — 2026-09-16
 

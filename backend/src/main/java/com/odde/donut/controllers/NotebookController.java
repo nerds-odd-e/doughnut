@@ -199,7 +199,6 @@ class NotebookController {
               + " FOLDER_NAME_CONFLICT unless merge=true, in which case the source subtree is"
               + " merged into the existing folder (including cross-notebook moves).")
   @PostMapping("/{notebook}/folders/{folder}/move")
-  @Transactional
   public Folder moveFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("folder") @Schema(type = "integer") Folder folder,
@@ -208,7 +207,11 @@ class NotebookController {
     authorizationService.assertAuthorization(notebook);
     Notebook destinationNotebook = resolveDestinationNotebookForFolderMove(request);
     User user = authorizationService.getCurrentUser();
-    return folderRelocationService.moveFolder(notebook, folder, request, destinationNotebook, user);
+    if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
+      return folderRelocationService.moveFolder(
+          notebook, folder, request, destinationNotebook, user);
+    }
+    return folderRelocationService.moveFolderWithinNotebook(notebook, folder, request, user);
   }
 
   @Operation(
