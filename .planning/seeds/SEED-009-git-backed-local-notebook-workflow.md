@@ -97,62 +97,96 @@ retained there; this anchor remains for existing references.
 
 <a id="story-40"></a>
 
-### 40. Continue local editing after broader web organization changes
+### 40. Pull web folder moves into a local notebook
 
-- **Goal / beneficiary:** A notebook owner can reorganize a larger collection
-  on the web and continue editing the affected local notebooks with content,
-  references, note identity, and learning history intact.
-- **Human direction (2026-09-15):** Keep the organization work deferred from
-  story 25 together in one queued story for now. This is a deliberate
-  broad capture, not a claim that these outcomes fit one execution-sized story.
-- **Scope to refine:** Receive whole-folder/subtree moves; receive transfers
-  between notebooks; and receive the ordinary reference rewrites in other
-  notebooks' Git histories, including when the target note moved within just
-  one notebook. Continue local content publication after receiving the new
-  organization. New destination creation during organization, special
-  relationship-note cases, and recovery from previously unsynchronized web
-  changes remain questions to assess here rather than additions to story 25.
-- **Evaluation direction:** From synchronized affected notebooks and clean
-  checkouts, move a learned subtree on the web and pull its resulting layout.
-  For a cross-notebook transfer, pull both source and destination plus a
-  referring notebook, then publish an edit at the destination. The owner sees
-  the same notes and learning records, the intended layout, and usable updated
-  references. These examples are refinement hypotheses; partial-failure and
-  cross-notebook ownership policies still need investigation.
-- **Existing scope owners:** [Story 28](#story-28) remains the owner of
-  remaining portable trash Git/local compatibility, including local-originated
-  trash publication and folder-subtree journeys. Receiving a web note's trash,
-  Move recovery, and same-notebook Undo is existing product behavior.
-  [Story 38](#story-38) owns repeated trash/Undo usability;
-  [story 32](#story-32) owns the Restore shortcut. Reuse those outcomes in this
-  broader organization journey without duplicating their backlog promises.
-  The performance story owns 10,000-note targets.
-- **Divergent editing capture:** Retain it as a future question from this
-  discussion, not a current delivery promise. The existing near-future
-  direction requires one append-only history with no branching or rebasing.
-  Supporting independent edits on both sides would require an explicit change
-  to that direction and further refinement; queueing this story does not make
-  that decision or remove already-supported behavior.
-- **Value / highest learning:** Extend the working single-note loop to larger
-  reorganizations. First establish how several affected notebook histories can
-  remain consistent while retaining the existing permission and identity rules.
-- **Smaller alternative:** Move individual notes within their current notebooks
-  using story 25, keeping cross-notebook organization manual. That remains
-  useful but does not deliver subtree organization or synchronize references
-  across notebook boundaries. Defer the broader work until its actual demand
-  justifies addressing these uncertainties.
-- **Priority:** After the queued core Git, publication-performance, and repeated
-  trash/Undo work; before Restore and the later non-reproducible story 41.
-  This order favors the narrow working loop and established priorities.
-  No technical dependency on performance or UI cleanup is asserted.
-- **Dependencies / safe stopping point:** Build on story 25 and existing
-  notebook synchronization. Assess any real prerequisites during refinement.
-  The narrower workflow remains useful if this story is cancelled; completion
-  must preserve content and learning data without requiring further stories
-  to repair partially synchronized organization.
-- **Status / sizing:** Queued, deliberately combined and unrefined. Likely
-  larger than L (2–4 hours), low confidence. Revisit its boundaries when selected;
-  the owner's instruction here is to retain one follow-up, not split it now.
+#### Goal and value
+
+A notebook owner moves a folder on the web and pulls the resulting organization
+into a clean local checkout, without manually reconstructing the layout or
+creating duplicate notes. The web and local representations agree, while Donut
+retains the original notes and learning state.
+
+On 2026-09-16 the owner selected this concrete example for refinement and slice
+planning, explicitly requiring a move rather than a copy and excluding subsequent
+local editing/publication. It stays first in the existing queue. This is a bounded
+extension of receiving web changes; no measured frequency or dependency requiring
+it before all portable-trash work is claimed. Moving individual notes is a smaller
+workaround but does not carry a folder's Readme and empty descendants as a unit.
+
+#### Scope
+
+- Receive an ordinary web folder/subtree move within one synchronized notebook,
+  into an existing non-conflicting folder or to notebook root, through the
+  installed CLI's existing pull workflow. The checkout is clean and has no
+  unpublished commits; it may be several accepted commits behind.
+- Each moved note exists only at its new local path. Preserve authored content,
+  folder Readmes, empty descendants, and the ordinary affected in-notebook
+  reference rewrites in the same accepted result. Preserve server note identity,
+  learning history, and tracking preferences.
+- Reuse existing permissions, destination validation, non-Git behavior, and
+  pre-existing projection-drift policy. The complete supported web operation and
+  its accepted Git result share one transaction; no partial accepted layout.
+- Local editing and publication after pull are excluded from this story's
+  delivery and acceptance journey. Existing publication remains preserved behavior.
+- Cross-notebook transfers/reference histories, folder merges, new destination
+  construction during the move, special relationship transformations, trash and
+  recovery extensions, new Undo work, drift repair, divergence reconciliation,
+  and performance targets are deferred promises, not new runtime rejection rules.
+  The selected examples have no external referrers. Preserve existing external
+  reference handling without claiming synchronization of those other histories.
+  One note in the core example is not a product limit on subtree size.
+
+#### Key examples
+
+1. **Moved, not copied:** A synchronized notebook and clean checkout contain
+   `Biology/Cells.md` and an existing `Study/` folder. Move the whole `Biology`
+   folder under `Study` on the web, then pull. The checkout contains exactly one
+   Cells note at `Study/Biology/Cells.md`, with identical content, and no
+   `Biology/Cells.md`. Readmes are separate folder documents, not duplicate notes.
+   Donut retains Cells' note ID and learning records. No local edit/publish follows.
+2. **Complete subtree:** Biology has a Readme, a nested learned note, an empty
+   descendant, and an in-notebook referrer with an exact path in body/frontmatter.
+   Moving Biology and pulling receives the whole final tree and ordinary rewritten
+   references together; no descendant is left at its former path.
+3. **Accumulated moves:** Move Biology under Study, then back to root before
+   pulling. The clean checkout advances across both accepted commits to the final
+   layout without duplicate notes. This does not impose a one-commit pull limit.
+4. **Preserved boundaries:** An occupied destination is rejected without changing
+   placement or accepted history. Pre-existing drift is not silently accepted;
+   ordinary non-Git moves remain usable without creating a Git binding.
+
+#### Evidence and architecture
+
+Source inspection at `ce4b7fd252` traced ordinary folder moves through
+`NotebookController.moveFolder` → `FolderRelocationService.moveFolder` →
+`FolderMoveRelocation`, without accepted Git snapshot persistence.
+`NotebookGitBundleDownloadService.select` returns the stored accepted bundle;
+`notebookPull.ts` treats equal accepted/local heads as unchanged. Thus the core
+example currently leaves the old local path. This is source evidence, not a
+runtime reproduction; execution must establish the failing observation first.
+
+Use the [complete accepted web change direction](../NORTH-STAR.md#one-complete-accepted-web-change):
+reuse the existing acceptance owner, folder placement/reference owners and
+Portable projection. Accepted ADRs 0004, 0005 and 0003 govern format/references,
+identity-based routes and retained learning state. No new protocol or identity map.
+
+#### Deferred broader organization capture
+
+The former broad story also retained cross-notebook transfers and receiving
+reference rewrites in other notebooks' Git histories, even when the target only
+moves within one notebook. These remain future outcomes, not cancelled or included
+in this selected delivery. Their refinement must address affected owners and
+permissions, unsynchronized histories and partial failure. New destination creation,
+special relationship cases and recovery of already-unsynchronized organization
+also remain deferred. Story 28 retains trash Git compatibility; story 32 retains
+Restore; performance remains separately owned. No new sibling is queued here.
+
+#### Readiness
+
+No open product question blocks the selected same-notebook outcome. Broader
+organization decisions remain deferred. Effort hypothesis: M (1–2 hours), low
+confidence until the shared transaction boundary and focused verification are
+exercised. [Slice plan](../quick/128-pull-web-folder-moves/PLAN.md).
 
 <a id="story-26"></a>
 <a id="story-27"></a>
@@ -300,111 +334,121 @@ Git/local compatibility is queued unrefined; refine it when selected.
 
 <a id="story-38"></a>
 
-### 38. Make repeated trash and Undo journeys clean and predictable
+### 38. Make repeated trash journeys clean and predictable
 
-#### Goal and why-now challenge
+#### Goal and human direction — 2026-09-16
 
-**Recommended narrow outcome (2026-09-15 refinement):** A notebook owner can
-trash a note, immediately undo that action, and later trash its containing
-folder without gaining a collision suffix solely because the first operation
-left an unused mirrored path. The visible result is a predictable folder name
-in trash. This is not a promise to make every trash/recovery journey clean.
+A notebook owner should be able to repeat web trash operations without confusing
+organization or losing retained work. “Clean and predictable” is a provisional
+label: refinement must identify a concrete unwanted result and its desired
+replacement before this becomes an executable story.
 
-The 2026-09-14 audit recorded an empty `_trash/Research` causing a later
-`Research` subtree to become `Research (2)`. This is evidence of confusing
-organization, not lost content or unavailable recovery. Ordinary Move already
-provides recovery. Doing nothing is safe under the existing collision rule;
-accepting the suffix is the strongest smaller alternative. Its cost is an
-unexpected name which the owner must understand or change, not a broken round
-trip.
+The owner moved publication-scale validation to the bottom of the backlog,
+initially leaving this story first, and explicitly postponed all Undo work. Undo is removed
+from this story's goal, scope, and acceptance examples. This defers improvements
+and repairs; it does not request removal of already-working product behavior.
 
-The owner previously placed these rough edges after the migration-safe release;
-this item is now first in the backlog. That ordering does not establish urgency.
-Fixing a reproduced surprise in a recently delivered journey is a reasonable
-reason to act now, but frequency and actual owner cost are unmeasured.
+#### Backlog decision — 2026-09-16
 
-#### Scope — recommended cut
+Removed from the active backlog at the owner's request; retained here for future
+reconsideration. The clarified journey is trash a note, create a new note with
+the same title at the original location, and trash the replacement without Undo.
+Current implementation retains distinct notes and gives the incoming note the
+first available numbered suffix. The existing controller test
+`repeatedTrashAfterNameReuseKeepsDistinctNotesAndUsesTheFirstFreeTrashTitle` in
+`backend/src/test/java/com/odde/donut/controllers/NoteControllerTrashTests.java`
+asserts distinct identities, the same trash folder, and titles `Reusable` and
+`Reusable (2)`. Source and test were inspected, not rerun.
 
-- Own the web note Trash → immediate Undo → containing-folder Trash journey
-  above, in one notebook with available Undo history and no intervening authored
-  changes to the mirrored trash path. Existing note Undo and folder Trash are
-  the entry points; no additional controls are needed.
-- A path introduced solely to hold the undone note must not by itself force a
-  suffix on that later folder Trash. Specify this observable outcome, not a
-  general empty-folder deletion policy or a prescribed cleanup mechanism.
-- Preserve content, folder and note identities belonging to the owner, learning
-  history, permissions, existing reference choices, and ordinary Move recovery.
-  Undo does not promise to recover reference properties deliberately removed at
-  trash time. Location continues to govern trash eligibility.
-- Preserve occupied-destination suffixing of the incoming subtree as a whole
-  under [ADR 0004 — Trash](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash).
-  Do not merge into, overwrite, or discard earlier trash to obtain a nicer name.
-  An intentionally retained empty folder is still an item; a folder with a
-  Readme is not disposable merely because it contains no notes.
-- Limit the delivery commitment to the operation's leftover path. No scan or
-  cleanup of old trash, new provenance journal, folder Undo capability,
-  cross-session Undo, arbitrary recovery order, Restore shortcut (story 32),
-  permanent-delete UI, or new Git/local compatibility (story 28) is promised.
-  These are deferrals, not rules rejecting naturally supported behavior.
+This journey provides no demonstrated missing behavior or information-loss
+problem requiring the story now. With all new Undo work postponed, resurface
+only when a concrete non-Undo problem and worthwhile correction are identified.
+The probes below remain unselected refinement possibilities, not queued work.
 
-#### Key examples
+#### Purpose and why-now challenge
 
-1. **Unused path:** Active `Research/Cells.md` exists and `_trash/Research`
-   does not. Trash `Cells`, immediately Undo, then trash folder `Research`.
-   The same folder and note appear at `_trash/Research/Cells.md`, without
-   `Research (2)` caused by the first operation's leftover path. The recovered
-   note retains its content and learning history.
-2. **Earlier trash remains:** `_trash/Research/Older.md` already exists. Trash
-   and undo active `Research/Cells.md`, then trash active `Research`. Earlier
-   trash stays intact; the incoming folder receives the first available suffix
-   under the existing rule. The correction must not reinterpret this as an
-   empty destination or merge the two folders.
-3. **Empty does not mean disposable:** `_trash/Research` was already an
-   intentionally retained empty folder, or contains an authored Readme. The
-   same journey preserves it and applies ordinary collision handling. Counting
-   notes alone cannot establish that a path is disposable scaffolding.
+The previous narrow example was note Trash → immediate Undo → containing-folder
+Trash, where an empty mirrored `_trash/Research` led to `Research (2)`. The
+2026-09-14 audit recorded confusing naming, not lost content or unavailable
+recovery. With Undo postponed, that example no longer justifies this delivery.
+There is no demonstrated non-Undo defect in the retained evidence.
 
-#### Other captured work — retained for explicit deferral
+The near-future direction prioritizes portable trash, so this story aligns with
+that direction. Alignment and queue position alone do not establish urgency.
+Act now only if an owner encounters a concrete repeated-trash problem whose
+cost warrants a correction. Frequency, practical cost, and a current failing
+non-Undo journey remain unknown. There is no established prerequisite requiring
+this cleanup before portable Git trash or broader web organization work.
 
-- **Ignored nested Undo example:** The earlier scope promised repair of the
-  child-then-parent journey. Source inspection on 2026-09-15 found the ignored
-  scenario in `e2e_test/features/note_creation_and_update/note_deletion.feature`
-  trashes notes `TDD` and `tech`, then undoes them in reverse order. It does not
-  trash the containing folder. A nearby active scenario explicitly preserves
-  structural descendants when a note is trashed. An ignored test is not proof
-  of a current product failure; confirm its intended observable behavior before
-  retaining a repair commitment. Recommend deferring this separate outcome;
-  do not invent folder Undo or revive timestamp-based restoration to satisfy it.
-- **Modal warnings:** The audit recorded four identical Vue extraneous-attribute
-  warnings. Removing those warnings is independent of the naming outcome.
-  Recommend deferring it unless it prevents the selected journey from working.
-  Preserve working Cancel and confirmation behavior, without adding a
-  browser-wide no-warnings acceptance commitment.
+The strongest smaller alternative is to retain ordinary collision suffixes and
+use existing Move recovery. Suffixes distinguish retained items and can be the
+correct, predictable result. If the complaint is merely that a legitimate
+collision has a suffix, the current behavior may already meet the useful goal.
+The owner has now dropped this item from the active backlog because the
+clarified journey already works. Do not invent replacement work to fill the story.
 
-These earlier promises remain recorded here; the recommended cut does not
-silently cancel them, queue new stories, or change sibling scope or backlog order.
+#### Scope — proposed narrow boundary
+
+- Select one demonstrated web repeated-trash journey in one notebook and one
+  observable correction. The exact correction is still unresolved; no generic
+  cleanup or naming redesign is promised.
+- Preserve retained content, note/folder identity, learning history, permissions,
+  reference-handling choices, and ordinary Move recovery. Keep location-derived
+  trash eligibility and existing occupied-destination collision rules.
+- Do not merge, overwrite, or discard earlier trash to obtain a nicer name.
+  An empty folder can be intentionally retained; a folder Readme is authored
+  content. Emptiness alone does not justify deletion.
+- Exclude all Undo work, including reverse-order/nested recovery repairs, folder
+  Undo, and cross-session Undo. Also defer historical trash cleanup, automatic
+  empty-folder pruning, provenance tracking, bulk operations, permanent-delete
+  UI, Restore (story 32), and new Git/local compatibility (story 28).
+- Modal warning cleanup is independent unless a warning exposes a failure of
+  the chosen user journey. No browser-wide no-warnings requirement is selected.
+  These exclusions are deferred promises, not new product rejection rules.
+
+#### Key examples — refinement probes, not agreed new acceptance
+
+1. **Repeated items and a real collision:** An earlier subtree already occupies
+   `_trash/Research`. Trash another active `Research` subtree. Preserve the
+   earlier subtree and suffix the incoming one as a whole with the first
+   available number. This is existing intended behavior; identify what actually
+   fails before treating it as new work.
+2. **Possible non-Undo leftover-path journey:** Start with active
+   `Research/Cells.md` and no `_trash/Research`. Trash `Cells`, recover it through
+   ordinary Move, then trash active `Research`. Investigate only if the owner
+   selects this journey. Whether retaining the empty mirrored path and producing
+   `Research (2)` is unacceptable remains a product question. Do not substitute
+   this journey for Undo silently or promise automatic cleanup.
+3. **Preservation boundary:** An empty `_trash/Research` was intentionally
+   retained, or contains a Readme. Later trash operations must preserve it and
+   follow ordinary conflicts. A nicer name cannot take precedence over work.
+
+#### Evidence and critical risks
+
+Source inspection on 2026-09-16 found existing scenarios in
+`e2e_test/features/folder_organization/folder_trash.feature` covering retained
+subtree recovery and whole-folder collision suffixing. The Move-recovery scenario
+in `e2e_test/features/cli/cli_notebook_web_trash.feature` explicitly expects
+`_trash/Biology/.keep` after the note leaves trash. Thus an empty mirrored folder
+is currently represented as retained portable content in that example. Removing
+it would change an observed contract, not merely tidy invisible UI scaffolding.
+These scenarios were read, not run; they establish intended coverage, not fresh
+proof that the current application passes or that repeated operations fail.
+
+Before choosing cleanup, establish whether a disposable path can be distinguished
+from intentionally retained content without introducing disproportionate state.
+Do not solve a naming inconvenience with a new lifecycle/provenance mechanism.
+If the safe correction is larger than the owner benefit, defer the correction.
 
 #### Open decisions and readiness
 
-- **Scope proposal:** Recommend selecting only the spurious-suffix outcome and
-  deferring the other two captured outcomes. This is a refinement recommendation,
-  not a claim of an already confirmed owner decision.
-- **Safety assumption:** The original capture assumed empty mirrored paths can
-  be cleaned safely. Inspection found path creation can reuse existing folders,
-  while Undo currently carries a prior folder and title. It has not established
-  how to distinguish disposable scaffolding from intentional retained folders.
-  Resolve that distinction before execution planning; if the narrow journey
-  cannot be supported safely without broader state, revisit its value rather
-  than silently widen the story or weaken preservation.
-- **Evidence:** The reproduction and warnings above come from the retained
-  2026-09-14 audit. This refinement inspected current source and scenarios but
-  did not rerun the application or establish a failing test. Confirm the defect
-  at the current revision before implementation; if already absent, reassess
-  remaining work rather than manufacture a repair.
-- **Effort hypothesis:** S–M, low confidence, assuming a local correction to the
-  existing journey. Safe ownership of leftover paths is the main uncertainty.
-  The outcome remains useful if all later trash work is cancelled. No executable
-  plan or implementation is authorized by this refinement.
+- Which non-Undo journey causes a concrete problem: repeated distinct items,
+  ordinary Move recovery followed by more trash, or another owner example?
+- What visible result is wrong, what result should replace it, and why is the
+  existing suffix/Move workaround insufficient now?
+- Once a journey is chosen, confirm the gap at the current revision before
+  implementation. No new acceptance outcome, effort estimate, executable plan,
+  or implementation is established by this refinement.
 
 <a id="story-32"></a>
 
@@ -539,7 +583,7 @@ answers and do not supersede the shared agreed contract.
   folder-subtree Git/local compatibility; additional migrated-trash
   compatibility gaps beyond a single web note. Editing or renaming in trash,
   mixed local move-and-edit histories, and divergent-history recovery stay
-  outside this item. [Story 38](#story-38) owns repeated Trash/Undo usability;
+  outside this item. [Story 38](#story-38) owns repeated-trash refinement; new Undo work is deferred;
   [story 32](#story-32) owns Restore; [story 40](#story-40) owns broader web
   organization and cross-notebook references.
 - **Current product:** In a synchronized Git-backed notebook, web note Trash,
@@ -581,12 +625,12 @@ reproduce the production report and the behavior appeared already fixed.
 Folder Trash with ordinary Move now supplies the complete folder round trip.
 Restore remains after the higher-priority delivery work and immediately before
 the non-reproducible story 41. Story 39 is the first post-release cleanup; story
-38 follows because Move already provides a safe recovery path for the remaining
-UI rough edges.
+38 is retained in this seed but was removed from the backlog on 2026-09-16
+because the clarified repeated-trash journey already works and Undo is deferred.
 
 After the production release, retire the spent migration support (story 39),
-then address the remaining repeated-trash and Undo rough edges (story 38), then
-keep remaining Git stories 20 and 25 in relative order. Remaining
+then keep remaining Git stories 20 and 25 in relative order. Story 38 is no
+longer selected for delivery. Remaining
 [story 28](#story-28) Git/local compatibility stays queued after that note
 journey. Former story 23 is
 absorbed there because its deletion-sync scope overlaps the new trash lifecycle;
@@ -603,6 +647,14 @@ after that combined compatibility item.
 ## Deferred Directions
 
 Keep these outside the current queue rather than cancelling them:
+
+- All new Undo work is postponed by the owner on 2026-09-16. This includes the
+  former story 38 Trash → Undo → parent-folder Trash leftover-path outcome and
+  the ignored reverse-order Undo scenario in
+  `e2e_test/features/note_creation_and_update/note_deletion.feature` (notes `TDD`
+  and `tech`, not folder Trash). The ignored test does not establish a current
+  failure. Reassess purpose and reproduce any gap before selecting future work;
+  no Undo repair or extension remains a commitment of story 38.
 
 - Broader reconciliation of independently advanced local and remote histories,
   including multiple local commits, structural changes, and conflict recovery.

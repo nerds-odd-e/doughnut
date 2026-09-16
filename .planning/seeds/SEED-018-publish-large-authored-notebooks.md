@@ -197,9 +197,8 @@ simplification if it achieves the required gain with less machinery.
 
 #### Soft deletion and title reuse — separate product work
 
-The owner has deferred
-[Portable trash](SEED-009-git-backed-local-notebook-workflow.md#story-26)
-to the end of the backlog. That combined idea owns deletion/trash semantics,
+The owner previously deferred portable trash; the current
+[product backlog](../PRODUCT-BACKLOG.md) instead prioritizes that detour. That combined idea owns deletion/trash semantics,
 production migration, and future title reuse. It is not a prerequisite for this
 performance story.
 
@@ -221,8 +220,8 @@ merely to improve speed. No schema or deletion-policy change is selected.
 ## Ordering and Scope Reduction
 
 The product backlog owns current priority: the addition-optimization story is
-delivered (see story 4's evidence above), so story 4's scale validation is next,
-with the combined deletion/trash idea still last. Story 4 still needs
+delivered (see story 4's evidence above). On 2026-09-16 the owner moved story 4's
+scale validation from first to last, prioritizing repeated-trash refinement. Story 4 still needs
 refinement of its workload and acceptable waiting time. It remains a
 non-executable planning input. The user explicitly authorizes temporary code
 experiments, measurement, and profiling during its future refinement,
