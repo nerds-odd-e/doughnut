@@ -72,41 +72,43 @@ public class NotebookGitProjection {
   record RepresentedFolderRelocation(int sourceFolderId, Integer destParentFolderId) {}
 
   /**
-   * Resolves the source Folder and destination parent of an exact folder relocation. The source
-   * must be represented in the accepted tree. Notebook root is a valid destination parent. Nested
-   * parents must exist as folder rows and be represented in the accepted tree or by tip content so
-   * a parent added earlier in the range can receive the relocated source.
+   * Resolves the source Folder of an exact folder relocation. The source must be represented in the
+   * accepted tree.
    */
-  RepresentedFolderRelocation requireRepresentedFolderRelocation(
+  int requireRepresentedRelocationSource(
       List<ExportFolderRow> folders,
       Repository repository,
       ObjectId acceptedHead,
-      ObjectId tipHead,
       NotebookGitProposalFolderShape.FolderRelocation relocation) {
-    Integer sourceFolderId =
-        requireRepresentedFolderPath(
-            folders,
-            repository,
-            acceptedHead,
-            relocation.sourcePrefix() + "/",
-            relocation.sourcePrefix() + "/README.md");
-    Integer destParentFolderId =
-        requireRepresentedDestinationParent(
-            folders, repository, acceptedHead, tipHead, relocation.destPrefix());
-    return new RepresentedFolderRelocation(sourceFolderId, destParentFolderId);
+    return requireRepresentedFolderPath(
+        folders,
+        repository,
+        acceptedHead,
+        relocation.sourcePrefix() + "/",
+        relocation.sourcePrefix() + "/README.md");
   }
 
-  private Integer requireRepresentedDestinationParent(
+  boolean hasFolderAtPath(List<ExportFolderRow> folders, String requiredFolderPath) {
+    return folderRowAtPath(folders, requiredFolderPath) != null;
+  }
+
+  /**
+   * Resolves a destination parent that already exists as a folder row. Notebook root is a valid
+   * destination parent. Nested parents must be represented in the accepted tree or by tip content
+   * so a parent added earlier in the range can receive the relocated source. Callers construct a
+   * dest parent that is absent from live folders.
+   */
+  Integer requireRepresentedDestinationParent(
       List<ExportFolderRow> folders,
       Repository repository,
       ObjectId acceptedHead,
       ObjectId tipHead,
+      String destParentPrefix,
       String destPrefix) {
-    int lastSlash = destPrefix.lastIndexOf('/');
-    if (lastSlash < 0) {
+    if (destParentPrefix.isEmpty()) {
       return null;
     }
-    String parentPath = destPrefix.substring(0, lastSlash + 1);
+    String parentPath = destParentPrefix + "/";
     String pathForError = destPrefix + "/README.md";
     ExportFolderRow folder = requireFolderRowAtPath(folders, parentPath, pathForError);
     if (NotebookGitAcceptedTree.representedInTree(
@@ -136,6 +138,15 @@ public class NotebookGitProjection {
 
   private static ExportFolderRow requireFolderRowAtPath(
       List<ExportFolderRow> folders, String requiredFolderPath, String pathForError) {
+    ExportFolderRow folder = folderRowAtPath(folders, requiredFolderPath);
+    if (folder == null) {
+      throw unrepresentedParentFolder(pathForError);
+    }
+    return folder;
+  }
+
+  private static ExportFolderRow folderRowAtPath(
+      List<ExportFolderRow> folders, String requiredFolderPath) {
     Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
     return folders.stream()
         .filter(
@@ -143,7 +154,7 @@ public class NotebookGitProjection {
                 NotebookGitAcceptedTree.folderPath(candidate, folderById)
                     .equals(requiredFolderPath))
         .findFirst()
-        .orElseThrow(() -> unrepresentedParentFolder(pathForError));
+        .orElse(null);
   }
 
   void requireNoUnrepresentedEmptySourceDescendants(

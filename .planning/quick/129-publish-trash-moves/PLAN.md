@@ -277,21 +277,21 @@ refusal). Slice 2 dependency schedule/reference assertions are not repeated.
 
 ### 7. Publish subtree moves into missing ancestry
 Type: Behavior
-Status: planned
-Behavior: the same exact subtree moved locally under new `_trash/Research`
-ancestry publishes with its identities retained and those parents constructed.
+Status: done
 
-Reuse slice 3's construction and final application, supplying the admitted folder
-destination. Preserve the source mapping before construction and the original
-pre-mutation drift check. Do not infer a new folder identity policy.
+Admitted folder destinations reuse `ensureAncestry` after source mapping and
+the original pre-mutation drift check. Missing `_trash/Research` and active
+`Research/` construct parents; identities stay on the source subtree.
+Unrepresented dest parents and unrepresented descendants still refuse.
 
-Proof: B at the publication controller and downloaded tree. Replace the missing
-parent refusal fixture with a synchronized source and successful constructed
-destination observation; a new active destination exercises recovery by the same
-rule. Retain the separate unrepresented-parent/descendant refusal cases.
-Sizing: 3–5 minutes active work assuming slice 4 settled construction ordering;
-otherwise stop and refine this same plan rather than duplicate orchestration.
+Proof: B `CURSOR_DEV=true nix develop -c pnpm backend:test_only` pass
+(post-refactor ~1m11s).
+- Setup: Git-backed Biology Readme + Cells + tracked Empty; missing dest ancestry
+- `NotebookGitProposalFolderRelocationDestinationControllerTest.publishesAnExactSubtreeMoveIntoMissingTrashAncestryCreatingParentsAndRetainingIdentities`
+- `.publishesAFolderRecoveryIntoMissingActiveAncestryCreatingParents`
+- `.rejectsAnExactFolderRelocationIntoAnExistingUnrepresentedParent`
 
+Refactor: dest-parent prefix/lookup shared; recovery asserts only the new parent.
 ### 8. Receive an existing web folder trash operation locally
 Type: Behavior
 Status: planned
@@ -352,7 +352,7 @@ transaction helpers. No exception swallowing or partial acceptance.
 | Existing dependency recovery and alternate active destination | 2 done: controller state/reference outcomes and original-route installed-CLI journey |
 | Local trash/recovery with required parents and canonical retained folders | 4 done: controller publication and downloaded exact tree |
 | Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement`; 3 done: `ensureAncestry`; 5 done: folder `assignPlacement` |
-| Retained subtree, learning and empty descendants | 6 done: identity/eligibility/.keep and installed pull; 7 remaining |
+| Retained subtree, learning and empty descendants | 6–7 done: identity/ancestry and exact Portable tree through publication/pull |
 | Existing web operation received locally | 8: real web Trash/Move followed by installed pull, one accepted child per operation |
 | Linear histories, final-only application, deletion-gap distinction | 9: composed publication, dependencies and original Git ancestry |
 | Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
