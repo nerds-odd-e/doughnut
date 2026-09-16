@@ -45,6 +45,27 @@ class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControlle
   private static final String TARGET_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String REFERRER_CONTENT =
       "---\n" + "type: Note\n" + "example of: \"[[Target]]\"\n" + "---\n" + "Body [[Target]]\n";
+  // Score-bracketed edits of SUBSTANTIAL_ORIGINAL_BODY: MODERATE_EDIT_BODY scores in [50, 60)
+  // (distinguishes the configured 50% policy from JGit's 60% default); SMALL_EDIT_BODY scores
+  // well above 60.
+  private static final String MODERATE_EDIT_BODY =
+      "---\ntype: Note\n---\n"
+          + "The quick brown fox jumps over the lazy dog near the riverbank.\n"
+          + "She decided to read the ancient manuscript that described the valley.\n"
+          + "Mountains rose in the distance, their peaks covered with fresh snow.\n"
+          + "A small village nestled between them kept its traditions alive for generations.\n"
+          + "Completely rewritten prose about oceans and sailing ships replaces this.\n"
+          + "Sailors navigated by stars across the wide and stormy open waters.\n"
+          + "The harbor master logged each vessel and collected the docking fees.\n";
+  private static final String SMALL_EDIT_BODY =
+      "---\ntype: Note\n---\n"
+          + "The quick brown fox jumps over the lazy dog near the riverbank.\n"
+          + "She decided to read the ancient manuscript that described the valley.\n"
+          + "Mountains rose in the distance, their peaks covered with fresh snow.\n"
+          + "A small village nestled between them kept its traditions alive for generations.\n"
+          + "Travelers came each spring to trade cloth and spices at the market.\n"
+          + "Children played near the fountain while elders discussed the harvest.\n"
+          + "The librarian organized every scroll by region and by season, carefully.\n";
 
   @Autowired ConversationRepository conversationRepository;
   @Autowired McqRepository mcqRepository;
@@ -116,6 +137,92 @@ class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControlle
     assertThat(renamed.getTitle(), equalTo("renamed"));
     assertThat(renamed.getFolder().getId(), equalTo(folder.getId()));
     assertThat(renamed.getContent(), equalTo(TYPED_NOTE_CONTENT));
+  }
+
+  @Test
+  void acceptsASameParentRenameWithEditedContentRetainingNoteAndLearningIdentities()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note note =
+        makeMe.aNote().notebook(notebook).title("note").content(SUBSTANTIAL_ORIGINAL_BODY).please();
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
+                    .nextRecallAt(makeMe.aTimestamp().of(5, 0).please())
+                    .please());
+    RenamedNoteAssociations associations =
+        inCommittedTransaction(
+            transactionManager,
+            () -> {
+              Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
+              Mcq mcq = makeMe.anMcq().forNote(reloaded).please();
+              Conversation conversation =
+                  makeMe.aConversation().forANote(reloaded).from(currentUser.getUser()).please();
+              conversationId = conversation.getId();
+              return new RenamedNoteAssociations(mcq.getId(), conversation.getId());
+            });
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding, List.of(new NotebookGitProposalFile("renamed.md", MODERATE_EDIT_BODY)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Note renamed = noteRepository.findById(note.getId()).orElseThrow();
+    assertThat(renamed.getId(), equalTo(note.getId()));
+    assertThat(renamed.getTitle(), equalTo("renamed"));
+    assertThat(renamed.getContent(), equalTo(MODERATE_EDIT_BODY));
+    MemoryTracker reloadedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+    assertThat(reloadedTracker.getNote().getId(), equalTo(note.getId()));
+    assertThat(reloadedTracker.getNextRecallAt(), equalTo(tracker.getNextRecallAt()));
+    assertThat(
+        mcqRepository.findById(associations.mcqId()).orElseThrow().getNote().getId(),
+        equalTo(note.getId()));
+    assertThat(
+        conversationRepository
+            .findById(associations.conversationId())
+            .orElseThrow()
+            .getSubject()
+            .getNote()
+            .getId(),
+        equalTo(note.getId()));
+  }
+
+  @Test
+  void acceptsAMoveIntoAnExistingFolderWithEditedContentRetainingNoteAndLearningIdentities()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder destination = makeMe.aFolder().notebook(notebook).name("Dest").please();
+    Note note =
+        makeMe.aNote().notebook(notebook).title("note").content(SUBSTANTIAL_ORIGINAL_BODY).please();
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
+                    .nextRecallAt(makeMe.aTimestamp().of(7, 0).please())
+                    .please());
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding, List.of(new NotebookGitProposalFile("Dest/note.md", SMALL_EDIT_BODY)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Note moved = noteRepository.findById(note.getId()).orElseThrow();
+    assertThat(moved.getId(), equalTo(note.getId()));
+    assertThat(moved.getTitle(), equalTo("note"));
+    assertThat(moved.getFolder().getId(), equalTo(destination.getId()));
+    assertThat(moved.getContent(), equalTo(SMALL_EDIT_BODY));
+    MemoryTracker reloadedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+    assertThat(reloadedTracker.getNote().getId(), equalTo(note.getId()));
+    assertThat(reloadedTracker.getNextRecallAt(), equalTo(tracker.getNextRecallAt()));
   }
 
   @Test

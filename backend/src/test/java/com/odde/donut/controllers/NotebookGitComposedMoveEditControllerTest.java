@@ -199,11 +199,12 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitBundleControl
   @Test
   void stillRefusesSameTransitionChangedContentMove() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    makeMe.aNote().notebook(notebook).title("Original").content(ORIGINAL_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("Original").content(SUBSTANTIAL_ORIGINAL_BODY).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
         proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("Renamed.md", EDITED_CONTENT)));
+            binding,
+            List.of(new NotebookGitProposalFile("Renamed.md", SUBSTANTIAL_UNRELATED_BODY)));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(

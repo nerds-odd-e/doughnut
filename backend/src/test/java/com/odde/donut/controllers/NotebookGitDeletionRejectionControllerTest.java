@@ -26,7 +26,6 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
   private static final String ORIGINAL = "---\ntype: Note\n---\noriginal content";
   private static final String OTHER = "---\ntype: Note\n---\nother content";
   private static final String EDITED = "---\ntype: Note\n---\nedited content";
-  private static final String NEW = "---\ntype: Note\n---\nnew";
   private static final String INVALID_EDIT = "---\ncustom: value\n---\nChanged body.\n";
 
   @ParameterizedTest
@@ -87,7 +86,11 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
     NotebookGitProposalFile third = new NotebookGitProposalFile("Third.md", OTHER);
     return Stream.of(
         // unequal-blob removal + addition
-        Arguments.of(List.of(second, third, new NotebookGitProposalFile("Added.md", NEW))),
+        Arguments.of(
+            List.of(
+                second,
+                third,
+                new NotebookGitProposalFile("Added.md", SUBSTANTIAL_UNRELATED_BODY))),
         // one source and two equal-blob destinations
         Arguments.of(
             List.of(
@@ -114,7 +117,7 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
             List.of(
                 second,
                 new NotebookGitProposalFile("Unique.md", OTHER),
-                new NotebookGitProposalFile("Added.md", NEW))));
+                new NotebookGitProposalFile("Added.md", SUBSTANTIAL_UNRELATED_BODY))));
   }
 
   @Test

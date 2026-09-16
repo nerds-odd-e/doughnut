@@ -33,10 +33,11 @@ import org.eclipse.jgit.lib.Repository;
 final class NotebookGitProposalRenameDetector {
 
   /**
-   * Minimum JGit content similarity for an ordinary-note rename match. 100 means only identical
-   * content pairs; lowering this enables changed-content rename inference in later slices.
+   * Minimum JGit content similarity for an ordinary-note rename match. 50 enables changed-content
+   * rename inference (Git's documented {@code -M} default) while staying below JGit's library
+   * default of 60 so the configured policy is distinguishable from the library default.
    */
-  static final int RENAME_SCORE_THRESHOLD = 100;
+  static final int RENAME_SCORE_THRESHOLD = 50;
 
   private NotebookGitProposalRenameDetector() {}
 

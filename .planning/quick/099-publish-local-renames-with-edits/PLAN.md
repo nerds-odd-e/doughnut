@@ -116,7 +116,7 @@ Sizing: ~5 minutes active work plus required suite runtime; medium confidence.
 
 ### 2. Publish a rename or move with edits in the same commit
 Type: Behavior
-Status: planned
+Status: done
 
 Given a learned ordinary note and existing destination folder, when a single
 commit changes its filename/location and authored text with JGit score >=50,
@@ -133,6 +133,20 @@ asserting original note ID and canonical learning associations, final authored
 text/path and accepted submitted commit. Reuse unaffected association assertions;
 backend command. Below-threshold mixed changes remain refused from this slice.
 Sizing: ~5 minutes active work plus suite; medium confidence.
+Done 2026-09-16: lowered `RENAME_SCORE_THRESHOLD` 100 → 50 (only production change).
+`applyRename` already persisted the same note with authored content — unchanged.
+Added same-parent (score ~59, in [50,60)) and existing-folder move-with-edit
+(score ~85) acceptance tests asserting note ID, final content/path, and learning
+associations. Updated the obsolete changed-content rejection fixture to a
+genuinely below-threshold case (substantial unrelated bodies, score ~4). The
+exact-blob ambiguity safeguard is threshold-independent (keys on `ObjectId`
+before scoring) and needed NO adjustment. Shared the fox/quantum below-threshold
+fixture bodies into `NotebookGitBundleControllerTestBase` during refactor. Full
+backend suite green (2436 tests). Learning: short frontmatter-dominated bodies
+score deceptively high (e.g. "original content" vs "new" scored 54); substantial
+multi-line bodies where the body dominates the score are required for below-
+threshold fixtures. Pre-existing `NotebookGitProposalRenameControllerTest` file
+size (466 lines) flagged for retrospective, not split here.
 
 ### 3. Carry detected identity through accumulated edits
 Type: Behavior

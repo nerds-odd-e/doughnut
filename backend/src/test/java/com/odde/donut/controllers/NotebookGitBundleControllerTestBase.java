@@ -55,6 +55,35 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
 
   private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
 
+  /**
+   * Substantial typed-note body used as the original baseline for JGit rename scoring. Multiple
+   * non-trivial prose lines ensure shared frontmatter cannot dominate the similarity score.
+   */
+  static final String SUBSTANTIAL_ORIGINAL_BODY =
+      "---\ntype: Note\n---\n"
+          + "The quick brown fox jumps over the lazy dog near the riverbank.\n"
+          + "She decided to read the ancient manuscript that described the valley.\n"
+          + "Mountains rose in the distance, their peaks covered with fresh snow.\n"
+          + "A small village nestled between them kept its traditions alive for generations.\n"
+          + "Travelers came each spring to trade cloth and spices at the market.\n"
+          + "Children played near the fountain while elders discussed the harvest.\n"
+          + "The librarian organized every scroll by region and by season.\n";
+
+  /**
+   * Substantial typed-note body topically unrelated to {@link #SUBSTANTIAL_ORIGINAL_BODY}; their
+   * JGit similarity is well below the configured 50% threshold, so a removal/addition pair using
+   * these two bodies stays an unresolved mixture rather than a detected rename.
+   */
+  static final String SUBSTANTIAL_UNRELATED_BODY =
+      "---\ntype: Note\n---\n"
+          + "Quantum entanglement links particles across vast distances instantly.\n"
+          + "Researchers measured photon spins in supercooled vacuum chambers.\n"
+          + "The experiment required precision instruments and calm steady hands.\n"
+          + "Equations described probability amplitudes rather than certainties.\n"
+          + "Funding agencies reviewed the proposal for six months before approving.\n"
+          + "Graduate students calibrated lasers late into the quiet night.\n"
+          + "A paper summarizing findings was submitted to a prominent journal.\n";
+
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired PlatformTransactionManager transactionManager;
   @Autowired EntityManager entityManager;
