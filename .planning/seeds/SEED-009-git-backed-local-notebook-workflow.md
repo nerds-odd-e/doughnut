@@ -91,70 +91,117 @@ data; invalid or ambiguous changes must not silently discard work.
 
 ### 36. Publish local renames, moves, and edits across commits while preserving note identity
 
-- **Goal / beneficiary:** A notebook owner can rename or move notes while
-  refining their contents locally, then publish the accumulated work into the
-  original Donut notes, retaining their identity and learning history.
-- **Human direction (2026-09-14):** Queue this story second from the bottom,
-  immediately before publication performance validation. The current
-  exact-byte matching behavior may remain useful, but is too specific to serve
-  as the final solution for ordinary local rename-and-edit workflows. It may
-  need to be replaced rather than surrounded with more special cases.
-- **Current evidence / concern:** Publication currently infers a note move from
-  uniquely paired removed/added files with identical blob bytes. Updating a
-  heading, frontmatter, or body along with the filename breaks that match.
-  Existing identity-preservation tests prove only the narrower behavior; they
-  do not establish general rename-and-edit support. Actual file deletion now
-  permanently removes the note and dependent learning data, so misclassifying
-  a move as deletion plus addition would have a material preservation cost.
-- **Scope direction:** Local → Donut within one notebook and the selected
-  append-only history model. Cover content changes combined with note renaming
-  or moving, including changes spread over multiple local commits. Preserve
-  accepted and local commit IDs, final authored content, and the original note's
-  learning associations. The owner should not need an artificial sequence of
-  unchanged-content moves and intervening publications to preserve identity.
-- **Key examples for refinement:**
-  1. Rename `Old.md` to `New.md` and update its heading/body in the same commit.
-     Publishing updates the original Donut note under its new title.
-  2. Starting at accepted A, B edits `Old.md`, C moves/renames it to
-     `Folder/New.md`, and D edits it again. One publication retains the same
-     note and learning history, final D content, and the original commit chain.
-     Intermediate revisions are potential identity evidence even when the
-     accepted and final file contents differ.
-  3. Several similar or identical notes change paths and contents. The product
-     must not silently attach one note's learning history to another; the
-     ambiguity outcome needs refinement. Example counts are not limits.
-- **Approach concern:** Consider history across commits as evidence rather than
-  relying only on the accepted-to-tip diff. This is an investigation direction,
-  not a selected algorithm or a promise that every intent can be inferred.
-  Exact bytes and similarity alone must not be mistaken for proof of user intent.
-- **Strongest smaller alternative:** Rename/move without changing contents,
-  publish, then edit and publish again. This can use the existing narrow path,
-  but interrupts ordinary local editing and does not handle already accumulated
-  rename-and-edit work without reconstructing it.
-- **Highest learning / open decisions:** Establish which realistic histories
-  provide sufficient identity evidence and what happens when they do not.
-  Distinguish a move from intentional copying or deletion/recreation; determine
-  whether unresolved cases need explicit owner confirmation or a clear refusal.
-  Define destination-folder scope and interaction with repaired intermediate
-  drafts. No similarity threshold, metadata scheme, identity-mapping UI, or
-  per-commit replay design is selected by this story.
-- **Boundaries / dependencies:** Accumulated publication already composes
-  supported operations across a linear range, including history analysis for an
-  exact rename followed by an edit. This story owns broader inference for
-  transitions whose correspondence those existing semantics cannot resolve,
-  such as rename and content change together. Reuse that delivered range
-  composition rather than duplicating it. Independent remote/local divergence
-  and history rewriting remain outside this story. Broader folder-subtree
-  operations remain unselected; story 28 retains trash-specific journeys. Any
-  shared identity inference should be cohesive rather than duplicated by story.
-  Its position after story 28 is the owner's priority, not an established
-  technical prerequisite.
-- **Effort / status:** Queued, unrefined; sizing is unresolved until identity
-  evidence and ambiguity policy are understood. Do not claim execution-ready
-  scope or authorize implementation from this entry.
-- **Safe stopping point:** Supported rename-and-edit journeys retain their
-  original notes and learning history even if later organization work is
-  deferred; unsupported ambiguity preserves work without silently guessing.
+#### Goal and value
+
+A notebook owner can publish an ordinary local editing session containing note
+renames/moves and content edits without reconstructing commits, retaining the
+original Donut notes and learning associations. The strongest smaller workaround
+is a separate unchanged-content rename commit followed by edits; publication
+between those commits is already unnecessary. That workaround constrains natural
+editing and cannot accept already committed rename-and-edit work unchanged.
+Frequency of blocked sessions is unmeasured; the owner selected this item first
+in the canonical backlog. Performance and trash stories are not prerequisites.
+
+#### Scope and decisions — refined with the owner, 2026-09-16
+
+- Local → Donut, ordinary notes within one notebook and its existing linear,
+  append-only history. Accept rename/move with heading, frontmatter, or body
+  edits in the same commit, including later commits before publication.
+- Use the existing Eclipse JGit dependency's rename detector with an explicit
+  50% similarity threshold. Accept the limits of conventional content-based
+  detection; do not build a bespoke similarity or semantic-identity algorithm.
+  This is JGit-based detection at Git's documented default threshold, not a
+  promise of identical outcomes to native Git for every candidate arrangement.
+- Inspect successive history transitions and compose note identity through
+  the range. Apply only the final Portable tree once. A detected rename followed
+  by further edits retains identity even when endpoint similarity falls below
+  the threshold. Commit IDs and authored final content remain unchanged.
+- The narrow relocation example uses existing destination folders. No one-note,
+  one-commit, or fixed-count product restriction follows from this example.
+  Preserve existing supported companion changes and destination creation.
+- Preserve existing refusal of ambiguous identical-file pairings and unresolved
+  removal/addition mixtures; report affected paths without changing the accepted
+  head, notes, or learning data. No owner-confirmation UI is included. A library
+  match is conventional evidence, not certainty about author intent; no new
+  semantic confidence system is required. Existing deletion-gap recreation
+  remains a new identity, and copying does not transfer the source's identity.
+- Reuse the existing rename/move application and reference owners cohesively.
+  Preserve current Git-publication reference semantics: authored link text is
+  retained; path links resolve against the resulting tree. Web reference-rewrite
+  behavior remains intact. Do not silently rewrite the submitted Git tree or
+  introduce a second reference resolver for inferred renames.
+- Preserve learning history and tracking state when identity continues, even if
+  the note's meaning changes completely. Semantic reassessment and automatic
+  learning resets are explicitly out of scope.
+
+#### Key examples
+
+1. A learned `Old.md` is renamed to `New.md` and its heading/body/frontmatter is
+   edited in one commit sufficiently similar for the configured detector.
+   Publication updates the same Donut note and retains its learning associations.
+2. From accepted A, B moves and edits that note into existing `Folder/New.md`;
+   C edits it further at the same path. Publish once: the original identity,
+   final C content and location, and unmodified A → B → C history remain.
+   The A-to-C files need not still meet the similarity threshold.
+3. An ordinary referrer accompanies the move. Unchanged old-path references keep
+   their authored text and follow existing resolution behavior; references the
+   owner updated locally resolve at the new path. No second rename policy.
+4. An unmatched removal/addition mixture or ambiguous identical-file pairing
+   cannot establish correspondence under the supported rules. Publication is
+   refused with affected paths and no partial acceptance or loss of local work.
+5. A copied note leaves the original identity and learning intact. A confirmed
+   deletion followed by recreation does not resurrect the deleted identity,
+   including when the final path/content matches the accepted tree.
+
+#### Deferred promises and constraints
+
+No new folder/subtree behavior, cross-notebook transfer, trash-specific journey,
+branch/rebase reconciliation, history rewriting, performance target, identity
+metadata scheme, or general resolution interface. These are delivery deferrals,
+not restrictions on naturally supported behavior. Existing authorization,
+Portable validation, atomic acceptance, and unsupported-identity protection
+remain constraints. No wider web-organization or reference-repair work is added.
+
+#### Evidence, convention, and architecture
+
+Source and tests inspected on 2026-09-16, not rerun: current
+`NotebookGitProposalNoteCorrespondence` composes unique exact-content moves;
+`NotebookGitComposedMoveEditControllerTest` covers rename then edit and explicitly
+refuses changed-content moves in one transition. The demonstrated gap is blocked
+publication, not demonstrated silent learning loss. Existing reference behavior
+is captured by `NotebookGitProposalRelocationReferrerControllerTest`.
+
+Git stores snapshots rather than authoritative rename events, including when
+using `git mv`. Its documented `-M` default is 50%, and `-M100%` is exact-only.
+History following is established (`git log --follow`, one file), but no stored
+multi-commit identity map exists. JGit supplies `RenameDetector`; its published
+default is 60%, so configure 50 explicitly. Retain the actual dependency version
+as the implementation baseline, and use controller-level examples to establish
+supported behavior rather than claim universal native-Git parity.
+
+Sources: [Pro Git](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository#_moving_files),
+[Git log and rename options](https://git-scm.com/docs/git-log),
+[diffcore](https://git-scm.com/docs/gitdiffcore),
+[JGit RenameDetector](https://github.com/eclipse-jgit/jgit/blob/master/org.eclipse.jgit/src/org/eclipse/jgit/diff/RenameDetector.java).
+
+Follow [one final publication result](../NORTH-STAR.md#one-final-publication-result)
+and [Git rename correspondence](../NORTH-STAR.md#git-rename-correspondence).
+Accepted ADR 0004 owns Portable content and ADR 0005 keeps web note URLs
+identity-based. Proposed ADR 0002 already permits history inspection without
+live replay; this refinement does not approve or amend that ADR.
+
+#### Readiness and stopping point
+
+No outstanding product question blocks the agreed narrow plan. Library adaptation,
+threshold fixtures, and preserving existing ambiguity guards are implementation
+risks to prove, not invitations to invent a different identity policy. If actual
+library behavior requires changing those boundaries, return to the owner.
+Effort hypothesis: M (1–2 hours), medium confidence, with required backend-suite
+and E2E runtime additional uncertainty. The delivered rename/edit loop remains
+useful if all later organization work is cancelled.
+
+Execution plan: [local rename/edit publication](../quick/099-publish-local-renames-with-edits/PLAN.md).
+Planning is authorized; implementation is not requested by this refinement.
 
 <a id="story-23"></a>
 
@@ -696,11 +743,10 @@ the newly selected append-only stories.
 
 - How often do web renames, deletions and moves interrupt actual owner work?
   The order above is a value hypothesis, to revise with use.
-- Broader identity admission beyond already supported exact correspondence,
-  including same-transition rename-with-edit inference, remains open in
+- Ordinary-note rename-with-edit direction is settled in [story 36](#story-36)
+  and the North Star. Wider identity outcomes remain deferred;
   [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
-  and queued story work; confirmed deletion/recreation already starts a new
-  identity.
+  remains Proposed. Confirmed deletion/recreation starts a new identity.
 - Additional web creation modes and container mutations need concrete owner
   journeys before story selection; this queue is not a completeness claim.
 

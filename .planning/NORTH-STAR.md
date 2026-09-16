@@ -53,5 +53,43 @@ continuity when correspondence must be inferred beyond already supported
 transitions. This topic follows the owner's final-only application direction in
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md#apply-one-final-projection-atomically)
 and preserves [Accepted ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md).
-Confirmed deletion/recreation identity is settled in that ADR draft; broader
-admission rules and the proposed ADR itself remain open.
+Confirmed deletion/recreation retains its existing identity semantics. The
+selected ordinary-note rename admission direction is below; the proposed ADR
+itself remains unapproved.
+
+
+## Git rename correspondence
+
+Owner direction, 2026-09-16: use the existing Eclipse JGit library for ordinary
+note rename detection with an explicit 50% similarity threshold, following
+Git's established convention and accepting its limits. Do not maintain a
+parallel hand-written similarity algorithm or add semantic identity inference.
+JGit's published default is 60%; configure the selected policy centrally.
+Identical results to native Git for every ambiguous input are not promised.
+Keep the existing ambiguous exact-pair and unresolved removal/addition refusal
+safeguards; broaden exact-only detection without silently replacing those
+preservation rules with destructive delete/add. A detector limit or inability
+to resolve correspondence is not evidence of intentional deletion.
+
+Use one correspondence owner for pairwise detection and the existing linear
+history composition. Follow parent/child evidence to carry original note
+identities into the final tree, even when accepted-to-tip similarity is low.
+Endpoint matching must not override known deletion gaps or a carried lineage.
+Reuse this detection responsibility across affected Git publication callers;
+folder identity and its existing exact-subtree semantics remain distinct domain
+responsibilities, not an excuse for duplicated ordinary-note detectors. No
+per-story modes, persisted identity journal, or new client-side rename protocol.
+
+Feed resolved moves into existing final publication/application owners. Preserve
+current reference handling and authored Portable bytes; preserve learning state
+regardless of semantic changes. Known web operations already know the affected
+note ID and do not need heuristic inference. Cohesion means shared domain owners
+and consistent existing outcomes, not replacing explicit identity with inference.
+
+Evidence: backend JGit dependency, current exact-move history composition, and
+existing publication/reference controller tests. This direction governs
+[story 36](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-36) and shared
+ordinary-note inference reused by later Git/trash work; it adds no new folder or
+trash delivery promise. It preserves Accepted ADRs 0004 and 0005 and clarifies
+the history-inspection/final-application distinction in Proposed ADR 0002
+without changing its status. Convention sources are retained in the story.
