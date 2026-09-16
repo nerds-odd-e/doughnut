@@ -1,10 +1,21 @@
 # Publish ordinary moves across the trash boundary
 
-Status: planned
+Status: in progress
 Source: [SEED-009 story 28](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28).
 Owner clarification, 2026-09-16: dependency recovery is exactly existing behavior;
 reuse it cohesively, with no special recovery implementation. Planning and plan
-refinement are authorized; execution has not started. The story remains queued.
+refinement are authorized. Execution started 2026-09-16.
+
+## Execution identity
+
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`
+- Claim commit: `a4507e5304`
+- Execution checkout: `/Users/terryyin/git/doughnut-worktrees/story-28`
+- Execution branch: `quick/129-publish-trash-moves`
+- Integration target: `main`
+- Replanning permission: allowed (existing plan-refinement authority)
+- Authorized push destination: `origin` (`git@github.com:nerds-odd-e/doughnut.git`)
+- CI: GitHub Actions workflow `ci.yml` display name `donut CI` (observer not armed until first push)
 
 ## Goal and boundaries
 
@@ -36,7 +47,7 @@ planning. These findings select reuse and proof, not completed slices.
 | --- | --- |
 | Availability and retained learning | `Folder.isTrashed`, `Note.isAvailable`, `MemoryTracker.isActive`, existing repository availability predicates. Reuse unchanged; do not add reactivation writes or copied trash rules. |
 | References | `WikiLinkResolver`, `AuthoredNoteReferenceInboundFacade`, existing reference capture/rewrite owners. Reuse current resolution. Web move rewriting and Git preservation of authored bytes are distinct existing caller purposes. |
-| Note placement | Web Move, note Trash and Undo use `NoteMotionService` / `NoteTitlePlacementRules`; Git rename currently sets title/folder directly. Reuse the domain placement owner without invoking web commit or reference orchestration. Check batch placement/flush behavior before switching the Git caller. |
+| Note placement | Shared: `NoteMotionService.assignPlacement` assigns title/notebook/folder. Web Move, note Trash and Undo still call `executePlacement` (uniqueness + flush/merge). Git `applyRename` uses `assignPlacement` then caller-owned timestamp/save/content persist — not `executePlacement`, because mid-batch uniqueness+flush would collide with still-occupied titles. No web commit/reference orchestration. |
 | Folder placement | `FolderMoveRelocation` owns web validation and persistence; `NotebookGitProposalFolderPlacement` already reuses destination rules but Git relocation reparents directly. Expose the necessary placement responsibility from its existing owner. Preserve explicit merge and trash suffix selection at their current callers; do not make Git choose a different proposed path. |
 | Destination ancestry | `NotebookGitProposalFolderMaterialization` uses `FolderConstructionService` for added-document ancestors. Modularize this existing ancestry construction for admitted move destinations; preserve Readme persistence separately. No second path walker in a trash service. |
 | Correspondence and publication | Existing JGit ordinary-note detector, exact folder correspondence and linear history composition feed `NotebookGitProposalPublisher`. Reuse final application and `proposalAcceptance`; do not replay live mutations for intermediate commits. |
@@ -88,7 +99,11 @@ At each behavior slice, first drive the public boundary with the stated data.
 If it already passes, retain sufficient proof and make no gratuitous product
 change. Reuse sufficient existing observations. Structural changes first run the
 relevant existing coverage as a baseline. Record literal command/results and
-setup/assertion locations here during execution; nothing below is claimed passed.
+setup/assertion locations here during execution.
+
+Slice 1 B (worktree `doughnut_wt_f5e1c98273ff46809f172d4da36df95d_test`): baseline
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` BUILD SUCCESSFUL (~1m3s
+after migrate); post-change same command BUILD SUCCESSFUL (~1m2s).
 
 - **B:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — all backend
   unit tests, per backend rules; use real controller/database collaborators and
@@ -121,20 +136,28 @@ and story wrap-up. This planning turn commits/pushes nothing.
 
 ### 1. Share existing note placement
 Type: Structure
-Status: planned
+Status: done
 Enables: slice 2, local recovery with the same domain placement as web Move.
 
-Replace Git's independent placement mutation with the suitable responsibility
-in `NoteMotionService`, modularizing only if necessary to preserve caller-owned
-timestamp/flush and batch semantics. Keep Git content application and web
-reference rewriting at their existing owners. No new recovery code.
+Git ordinary-note rename no longer mutates title/folder itself.
+`NoteMotionService.assignPlacement` is the shared assignment; `executePlacement`
+keeps uniqueness+flush for web. Git `applyRename` still owns `publishedAt`,
+`entityPersister.save`, and `AuthoredNoteDocumentPersistence.persist`. No recovery
+code and no web rewrite routing.
 
-Proof: B; existing `NotebookGitProposalRenameControllerTest` (including several
-moves regardless of path ordering and private associations), rename referrer and
-rollback tests, `NotebookGitWebNoteMoveControllerTest`, and web trash/Undo tests
-preserve both caller purposes. Inspect affected calls to establish one placement
-owner; a passing test alone cannot prove removal of duplication.
-Sizing: 3–5 minutes active work; batch/flush compatibility is the main concern.
+Proof: B passed before and after the change.
+- Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Owner inspection: `NoteMotionService.assignPlacement` /
+  `executePlacement`; `NotebookGitProposalOrdinaryNoteApplication.applyRename`
+- Setup: none beyond existing controller/DB fixtures
+- Observations reused:
+  - `NotebookGitProposalRenameControllerTest.acceptsSeveralUniqueMovesRegardlessOfPathOrdering`
+  - `NotebookGitProposalRenameControllerTest.preservesPrivateAssociationsOfTheRenamedNoteAndLeavesTheOtherIdenticalTextNoteUntouched`
+  - `NotebookGitProposalRenameReferrerControllerTest.leavesReferringBodyAndPropertyLinksAuthoredWhenPublishingTheTargetsRename`
+  - `NotebookGitProposalRenameRollbackControllerTest.lateBindingSaveFailureRollsBackARenameLeavingTheOldTitleTrackerAndAcceptedBinding`
+  - `NotebookGitWebNoteMoveControllerTest.webMoveAppendsAcceptedChildAndLocalPublicationRetainsLearningHistory`
+  - `NotebookGitWebTrashControllerTest.ordinaryMoveAfterActualTrashAppendsAcceptedChildWithRecoveredPath`
+Refactor: none — already clean. No API generation.
 
 ### 2. Publish recovery of a retained note
 Type: Behavior
@@ -296,7 +319,7 @@ transaction helpers. No exception swallowing or partial acceptance.
 | --- | --- |
 | Existing dependency recovery and alternate active destination | 2: controller state/reference outcomes and original-route installed-CLI journey |
 | Local trash/recovery with required parents and canonical retained folders | 4: controller publication and downloaded exact tree |
-| Shared domain behavior, no duplicate recovery logic | 1, 3, 5: affected call sites, retained caller-specific tests and one owner per responsibility |
+| Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement` owner + retained Git/web tests; 3, 5 remaining |
 | Retained subtree, learning and empty descendants | 6–7: identity/ancestry and exact Portable tree through publication/pull |
 | Existing web operation received locally | 8: real web Trash/Move followed by installed pull, one accepted child per operation |
 | Linear histories, final-only application, deletion-gap distinction | 9: composed publication, dependencies and original Git ancestry |

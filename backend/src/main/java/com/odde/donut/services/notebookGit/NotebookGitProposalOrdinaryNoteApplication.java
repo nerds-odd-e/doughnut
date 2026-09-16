@@ -2,13 +2,13 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
-import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.NoteMotionService;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import java.sql.Timestamp;
@@ -26,6 +26,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final NotebookGitProposalNoteAddition noteAddition;
   private final NotebookGitProposalFilenameTitle filenameTitle;
+  private final NoteMotionService noteMotionService;
   private final EntityPersister entityPersister;
 
   NotebookGitProposalOrdinaryNoteApplication(
@@ -35,6 +36,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       NotebookGitProposalNoteAddition noteAddition,
       NotebookGitProposalFilenameTitle filenameTitle,
+      NoteMotionService noteMotionService,
       EntityPersister entityPersister) {
     this.projection = projection;
     this.noteService = noteService;
@@ -42,6 +44,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.noteAddition = noteAddition;
     this.filenameTitle = filenameTitle;
+    this.noteMotionService = noteMotionService;
     this.entityPersister = entityPersister;
   }
 
@@ -99,8 +102,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
     Folder destinationFolder =
         noteAddition.representedDestinationFolder(
             folders, proposal, acceptedHead, noteChange.path());
-    note.setTitle(new DisplayName(newTitle));
-    note.setFolder(destinationFolder);
+    noteMotionService.assignPlacement(note, note.getNotebook(), destinationFolder, newTitle);
     note.setUpdatedAt(publishedAt);
     entityPersister.save(note);
     if (!noteChange.blobId().equals(noteChange.origin().blobId())) {
