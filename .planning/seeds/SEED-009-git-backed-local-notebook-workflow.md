@@ -95,99 +95,6 @@ Merged into [Use portable trash across Donut and local Git](#story-28) by the
 owner's web-first reprioritization. Its web-deletion synchronization outcome is
 retained there; this anchor remains for existing references.
 
-<a id="story-40"></a>
-
-### 40. Pull web folder moves into a local notebook
-
-#### Goal and value
-
-A notebook owner moves a folder on the web and pulls the resulting organization
-into a clean local checkout, without manually reconstructing the layout or
-creating duplicate notes. The web and local representations agree, while Donut
-retains the original notes and learning state.
-
-On 2026-09-16 the owner selected this concrete example for refinement and slice
-planning, explicitly requiring a move rather than a copy and excluding subsequent
-local editing/publication. It stays first in the existing queue. This is a bounded
-extension of receiving web changes; no measured frequency or dependency requiring
-it before all portable-trash work is claimed. Moving individual notes is a smaller
-workaround but does not carry a folder's Readme and empty descendants as a unit.
-
-#### Scope
-
-- Receive an ordinary web folder/subtree move within one synchronized notebook,
-  into an existing non-conflicting folder or to notebook root, through the
-  installed CLI's existing pull workflow. The checkout is clean and has no
-  unpublished commits; it may be several accepted commits behind.
-- Each moved note exists only at its new local path. Preserve authored content,
-  folder Readmes, empty descendants, and the ordinary affected in-notebook
-  reference rewrites in the same accepted result. Preserve server note identity,
-  learning history, and tracking preferences.
-- Reuse existing permissions, destination validation, non-Git behavior, and
-  pre-existing projection-drift policy. The complete supported web operation and
-  its accepted Git result share one transaction; no partial accepted layout.
-- Local editing and publication after pull are excluded from this story's
-  delivery and acceptance journey. Existing publication remains preserved behavior.
-- Cross-notebook transfers/reference histories, folder merges, new destination
-  construction during the move, special relationship transformations, trash and
-  recovery extensions, new Undo work, drift repair, divergence reconciliation,
-  and performance targets are deferred promises, not new runtime rejection rules.
-  The selected examples have no external referrers. Preserve existing external
-  reference handling without claiming synchronization of those other histories.
-  One note in the core example is not a product limit on subtree size.
-
-#### Key examples
-
-1. **Moved, not copied:** A synchronized notebook and clean checkout contain
-   `Biology/Cells.md` and an existing `Study/` folder. Move the whole `Biology`
-   folder under `Study` on the web, then pull. The checkout contains exactly one
-   Cells note at `Study/Biology/Cells.md`, with identical content, and no
-   `Biology/Cells.md`. Readmes are separate folder documents, not duplicate notes.
-   Donut retains Cells' note ID and learning records. No local edit/publish follows.
-2. **Complete subtree:** Biology has a Readme, a nested learned note, an empty
-   descendant, and an in-notebook referrer with an exact path in body/frontmatter.
-   Moving Biology and pulling receives the whole final tree and ordinary rewritten
-   references together; no descendant is left at its former path.
-3. **Accumulated moves:** Move Biology under Study, then back to root before
-   pulling. The clean checkout advances across both accepted commits to the final
-   layout without duplicate notes. This does not impose a one-commit pull limit.
-4. **Preserved boundaries:** An occupied destination is rejected without changing
-   placement or accepted history. Pre-existing drift is not silently accepted;
-   ordinary non-Git moves remain usable without creating a Git binding.
-
-#### Evidence and architecture
-
-Source inspection at `ce4b7fd252` traced ordinary folder moves through
-`NotebookController.moveFolder` → `FolderRelocationService.moveFolder` →
-`FolderMoveRelocation`, without accepted Git snapshot persistence.
-`NotebookGitBundleDownloadService.select` returns the stored accepted bundle;
-`notebookPull.ts` treats equal accepted/local heads as unchanged. Thus the core
-example currently leaves the old local path. This is source evidence, not a
-runtime reproduction; execution must establish the failing observation first.
-
-Use the [complete accepted web change direction](../NORTH-STAR.md#one-complete-accepted-web-change):
-reuse the existing acceptance owner, folder placement/reference owners and
-Portable projection. Accepted ADRs 0004, 0005 and 0003 govern format/references,
-identity-based routes and retained learning state. No new protocol or identity map.
-
-#### Deferred broader organization capture
-
-The former broad story also retained cross-notebook transfers and receiving
-reference rewrites in other notebooks' Git histories, even when the target only
-moves within one notebook. These remain future outcomes, not cancelled or included
-in this selected delivery. Their refinement must address affected owners and
-permissions, unsynchronized histories and partial failure. New destination creation,
-special relationship cases and recovery of already-unsynchronized organization
-also remain deferred. Story 28 retains trash Git compatibility; story 32 retains
-Restore; performance remains separately owned. No new sibling is queued here.
-
-#### Readiness
-
-No open product question blocks the selected same-notebook outcome. Broader
-organization decisions remain deferred. Effort hypothesis: M (1–2 hours), low
-confidence until the shared transaction boundary and focused verification are
-exercised. [Slice plan](../quick/128-pull-web-folder-moves/PLAN.md).
-
 <a id="story-26"></a>
 <a id="story-27"></a>
 
@@ -624,7 +531,7 @@ then moved it to the bottom on 2026-09-15 after manual testing could not
 reproduce the production report and the behavior appeared already fixed.
 
 Folder Trash with ordinary Move now supplies the complete folder round trip.
-Restore remains after the higher-priority delivery work and immediately before
+Restore remains after remaining Git/local compatibility and immediately before
 the non-reproducible story 41. Story 39 is the first post-release cleanup; story
 38 is retained in this seed but was removed from the backlog on 2026-09-16
 because the clarified repeated-trash journey already works and Undo is deferred.
@@ -632,8 +539,7 @@ because the clarified repeated-trash journey already works and Undo is deferred.
 After the production release, retire the spent migration support (story 39),
 then keep remaining Git stories 20 and 25 in relative order. Story 38 is no
 longer selected for delivery. Remaining
-[story 28](#story-28) Git/local compatibility stays queued after that note
-journey. Former story 23 is
+[story 28](#story-28) Git/local compatibility stays first in the current queue. Former story 23 is
 absorbed there because its deletion-sync scope overlaps the new trash lifecycle;
 its outcome is retained rather than cancelled. Publication performance remains
 after that combined compatibility item.
