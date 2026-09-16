@@ -13,9 +13,9 @@ Owners of notebooks with 10,000 notes can publish to the remote quickly,
 with reasonable performance.
 
 ## Taken
+- [Pull web folder moves into a local notebook](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-40) — SEED-009 — [plan](quick/128-pull-web-folder-moves/PLAN.md)
 
 ## Backlog list
-- [Pull web folder moves into a local notebook](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-40) — SEED-009
 - [Use portable trash across Donut and local Git](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28) — SEED-009
 - [Restore a trashed item to its visible original path](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-32) — SEED-009
 - [Hide trashed notes from incoming references](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-41) — SEED-009
