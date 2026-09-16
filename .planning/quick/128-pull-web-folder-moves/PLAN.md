@@ -136,7 +136,7 @@ and refine if integration remains multi-beat; retain red/green evidence.
 
 ### 3. Receive the complete subtree and rewritten references
 Type: Behavior
-Status: planned
+Status: done
 
 Extend the same folder-move rule with a folder Readme, nested learned note, empty
 folder and an in-notebook body/frontmatter path referrer. Pull receives exactly the
@@ -149,6 +149,7 @@ Proof: a controller test via moveFolder then bundle download inspects complete
 Portable paths/content and referrer rewrite. The installed pull boundary is already
 owned by slice 2; do not duplicate this projection matrix there.
 Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+Accepted: `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL INPUT_DB_URL; CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed (`BUILD SUCCESSFUL in 1m 28s`). Setup: `seedCompleteBiologySubtreeWithReferrer` (Biology Readme, learned Cells, empty Empty, Study, Reading authored `REFERRER_BODY_BEFORE`, then snapshot). Observation: `NotebookGitWebFolderMoveControllerTest.webFolderMoveProjectsCompleteSubtreeAndRewrittenInNotebookReferences` — exact paths `Study/Biology/README.md`, `Study/Biology/Cells.md`, `Study/Biology/Empty/.keep`, `Reading.md`; README assemble bytes; Cells body unchanged; empty `.keep`; `Reading.md` rewritten to `Study/Biology/Cells` in body and frontmatter. Production path unchanged from slice 2.
 Safe stopping point: full subtree projection observed, with the same domain rule.
 Sizing: about 5 minutes active work; full backend-suite time excepted. If projection
 needs another mechanism, stop and reassess rather than add a special-case recognizer.
@@ -187,8 +188,9 @@ No new multi-commit algorithm is expected; a discovered need triggers reassessme
 Execution uses dough-execute-plan. Same-notebook folder moves hit
 `AcceptedWebChangeService.apply` with no outer DEFAULT transaction. Reload the
 moving folder under the lock; destination parent reload already lives in
-`FolderMoveRelocation`. Slice 3 extends the same rule with complete subtree
-projection; slice 4 extends the installed pull with accumulated accepted heads.
+`FolderMoveRelocation`. Slice 3 observed complete subtree projection on that
+same rule (no extra snapshot algorithm). Slice 4 extends the installed pull
+with accumulated accepted heads.
 
 Target ~5 minutes including ordinary verification; >5 merits scrutiny and >10
 requires finer decomposition unless the stated suite/runtime wait exception applies.
@@ -200,7 +202,9 @@ Moving `@Transactional(SERIALIZABLE)` onto `AcceptedWebChangeService.apply` is
 required so `saveTitle` / `saveContent` self-calls of `edit` still join the
 serializable transaction. Same-notebook folder move must not sit in a DEFAULT
 controller/service transaction around `apply`. Destination `findById` in the
-service lambda duplicated `FolderMoveRelocation.resolveNewParentFolder`. 
+service lambda duplicated `FolderMoveRelocation.resolveNewParentFolder`. Complete
+subtree projection is the existing snapshot after placement plus existing wiki-link
+rewrite, not a folder-specific codec. 
 
 ## Plan-refinement assessment — 2026-09-16
 

@@ -19,6 +19,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
@@ -35,6 +36,13 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
 
   static final Instant MOVE_AT = Instant.parse("2026-09-16T06:00:00Z");
   static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";
+  static final String BIOLOGY_README = "Biology readme";
+  static final String REFERRER_BODY_BEFORE =
+      "---\ntype: Note\nrelated: \"[[Biology/Cells|shown]]\"\n---\nSee [[Biology/Cells|shown]] for "
+          + "details.";
+  static final String REFERRER_BODY_AFTER =
+      "---\ntype: Note\nrelated: \"[[Study/Biology/Cells|shown]]\"\n---\nSee"
+          + " [[Study/Biology/Cells|shown]] for details.";
 
   @Autowired FolderRepository folderRepository;
 
@@ -76,6 +84,42 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
       assertThat(
           NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Study/Biology/Cells.md"),
           equalTo(CELLS_BODY));
+    }
+  }
+
+  @Test
+  void webFolderMoveProjectsCompleteSubtreeAndRewrittenInNotebookReferences() throws Exception {
+    CompleteSubtreeFixture f = seedCompleteBiologySubtreeWithReferrer();
+
+    controller.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
+
+    try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId downloadedHead =
+          GitBundleTestReader.fetchHead(
+              repo,
+              controller
+                  .downloadNotebookGitBundle(
+                      notebookRepository.findById(f.notebook().getId()).orElseThrow())
+                  .getBody());
+      assertThat(
+          GitBundleTestReader.pathsIn(repo, downloadedHead),
+          containsInAnyOrder(
+              "Study/Biology/README.md",
+              "Study/Biology/Cells.md",
+              "Study/Biology/Empty/.keep",
+              "Reading.md"));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Study/Biology/README.md"),
+          equalTo(ExportReadmeMarkdown.assemble(BIOLOGY_README)));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Study/Biology/Cells.md"),
+          equalTo(CELLS_BODY));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Study/Biology/Empty/.keep"),
+          equalTo(""));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Reading.md"),
+          equalTo(REFERRER_BODY_AFTER));
     }
   }
 
@@ -132,6 +176,25 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     assertThat(binding(f.notebook()).getBundleBytes(), equalTo(acceptedBundle));
   }
 
+  CompleteSubtreeFixture seedCompleteBiologySubtreeWithReferrer()
+      throws UnexpectedNoAccessRightException {
+    Notebook notebook = createGitBackedNotebook();
+    Folder biology =
+        makeMe.aFolder().notebook(notebook).name("Biology").readmeContent(BIOLOGY_README).please();
+    Folder study = makeMe.aFolder().notebook(notebook).name("Study").please();
+    makeMe.aFolder().parentFolder(biology).name("Empty").please();
+    Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
+    learnedTracker(cells, 0.5f, 1);
+    Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
+    inCommittedTransaction(
+        transactionManager,
+        () ->
+            authorReferencingContent(
+                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY_BEFORE));
+    snapshotCurrentPortableTree(notebook);
+    return new CompleteSubtreeFixture(notebook, biology, study);
+  }
+
   FolderMoveFixture seedLearnedCellsInBiologyWithEmptyStudy()
       throws UnexpectedNoAccessRightException {
     Notebook notebook = createGitBackedNotebook();
@@ -166,4 +229,6 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
       Note cells,
       MemoryTracker tracker,
       long recallCountBefore) {}
+
+  record CompleteSubtreeFixture(Notebook notebook, Folder biology, Folder study) {}
 }
