@@ -44,11 +44,16 @@ public class NoteMotionService {
       Note source, Notebook targetNotebook, Folder targetFolderOrNull, String targetTitle) {
     noteTitlePlacementRules.requireNoOtherNoteTitleAt(
         targetNotebook, targetFolderOrNull, targetTitle, source.getId());
-    source.setTitle(new DisplayName(targetTitle));
-    source.assignNotebook(targetNotebook);
-    source.setFolder(targetFolderOrNull);
+    assignPlacement(source, targetNotebook, targetFolderOrNull, targetTitle);
     entityPersister.flush();
     entityPersister.merge(source);
     entityPersister.flush();
+  }
+
+  public void assignPlacement(
+      Note source, Notebook targetNotebook, Folder targetFolderOrNull, String targetTitle) {
+    source.setTitle(new DisplayName(targetTitle));
+    source.assignNotebook(targetNotebook);
+    source.setFolder(targetFolderOrNull);
   }
 }

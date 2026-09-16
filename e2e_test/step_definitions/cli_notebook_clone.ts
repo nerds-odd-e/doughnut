@@ -1,6 +1,7 @@
 /**
  * CLI notebook clone scenario: keep steps as one-line glue to
  * `e2e_test/start/pageObjects/cli`. Behavior and assertions belong in page objects, not here.
+ * Checkout commit steps live in `cli_notebook_clone_commits.ts`.
  */
 import {
   Given,
@@ -43,111 +44,12 @@ Then('the clone destination does not exist', () =>
   cli.notebookClone().expectDestinationAbsent()
 )
 
-When(
-  'I commit the following edit to {string} in the cloned checkout:',
-  (relativePath: string, content: string) =>
-    cli.notebookCloneCheckout().commitEdit(relativePath, content)
-)
-
-When(
-  'I commit the following edit to {string} in the second cloned checkout:',
-  (relativePath: string, content: string) =>
-    cli.notebookCloneCheckout().commitReceiverEdit(relativePath, content)
-)
-
-When(
-  'I add and commit the following note at {string} in the cloned checkout:',
-  (relativePath: string, content: string) =>
-    cli.notebookCloneCheckout().commitAddition(relativePath, content)
-)
-
 When('I publish the cloned checkout using the installed CLI', () =>
   cli.notebookCloneCheckout().publish()
 )
 
 When('I publish the second cloned checkout using the installed CLI', () =>
   cli.notebookCloneCheckout().publishReceiver()
-)
-
-function relatedNoteChanges(data: DataTable) {
-  return data
-    .hashes()
-    .map(({ path, content }) => ({ relativePath: path, content }))
-}
-
-When(
-  'I author and commit the following initial tree in the cloned checkout:',
-  (data: DataTable) =>
-    cli
-      .notebookCloneCheckout()
-      .commitRelatedNoteChanges(relatedNoteChanges(data))
-)
-
-When(
-  'I commit the following related additions and edit together in the cloned checkout:',
-  (data: DataTable) =>
-    cli
-      .notebookCloneCheckout()
-      .commitRelatedNoteChanges(relatedNoteChanges(data))
-)
-
-When(
-  'I commit the following related edits together in the cloned checkout:',
-  (data: DataTable) =>
-    cli
-      .notebookCloneCheckout()
-      .commitRelatedNoteChanges(relatedNoteChanges(data))
-)
-
-When(
-  'I commit the following document changes together in the cloned checkout:',
-  (data: DataTable) =>
-    cli
-      .notebookCloneCheckout()
-      .commitRelatedNoteChanges(relatedNoteChanges(data))
-)
-
-When(
-  'I commit a removal of {string} in the cloned checkout',
-  (relativePath: string) =>
-    cli.notebookCloneCheckout().commitRemoval(relativePath)
-)
-
-When(
-  'I commit a rename of {string} to {string} in the cloned checkout',
-  (fromRelativePath: string, toRelativePath: string) =>
-    cli.notebookCloneCheckout().commitRename(fromRelativePath, toRelativePath)
-)
-
-When(
-  'I commit a rename of {string} to {string} and the following unrelated edit to {string} together in the cloned checkout:',
-  (
-    fromRelativePath: string,
-    toRelativePath: string,
-    relativePath: string,
-    content: string
-  ) =>
-    cli
-      .notebookCloneCheckout()
-      .commitRenameAndEdit(
-        fromRelativePath,
-        toRelativePath,
-        relativePath,
-        content
-      )
-)
-
-When(
-  'I commit a rename of {string} to {string} and the following edit to the renamed note together in the cloned checkout:',
-  (fromRelativePath: string, toRelativePath: string, content: string) =>
-    cli
-      .notebookCloneCheckout()
-      .commitRenameAndEdit(
-        fromRelativePath,
-        toRelativePath,
-        toRelativePath,
-        content
-      )
 )
 
 When(

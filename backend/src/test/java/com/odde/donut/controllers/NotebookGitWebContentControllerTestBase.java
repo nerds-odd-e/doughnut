@@ -88,4 +88,13 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitBundle
     assertThat(retained.getType(), equalTo(tracker.getType()));
     assertThat(retained.getPropertyKey(), equalTo(tracker.getPropertyKey()));
   }
+
+  long countRecallLogsByTrackerId(Integer trackerId) {
+    return ((Number)
+            entityManager
+                .createNativeQuery("SELECT COUNT(*) FROM recall_log WHERE memory_tracker_id = :id")
+                .setParameter("id", trackerId)
+                .getSingleResult())
+        .longValue();
+  }
 }

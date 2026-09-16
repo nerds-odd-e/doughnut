@@ -1,8 +1,9 @@
 @bundleCliE2eInstall
 @withCliConfig
 Feature: CLI notebook web trash
-  As a notebook owner, I want to pull a web trash and its ordinary Move recovery into my local Git
-  checkout so the accepted tree, note identity, and content stay consistent.
+  As a notebook owner, I want to pull a web trash into my local Git checkout, recover the same note
+  by an ordinary local move and publication, and keep the accepted tree, note identity, and content
+  consistent.
 
   Background:
     Given the backend is serving the CLI and install script
@@ -70,6 +71,38 @@ Feature: CLI notebook web trash
 
       Membranes
       """
+    When I open the original note route
+    Then I should see the current note is not in trash
+    And the note content should include "Membranes"
+
+  @mockBrowserTime
+  Scenario: Publishing a local recovery after pulling a web trash
+    Given I have a notebook "CLI Web Trash Notebook"
+    And the notebook "CLI Web Trash Notebook" has an empty folder "Biology"
+    And I have a note "Cells" under notebook "CLI Web Trash Notebook" in folder "Biology" with content:
+      """
+      ---
+      author: Linnaeus
+      type: Note
+      ---
+      Cells
+      =====
+
+      Membranes
+      """
+    And I assimilate the note "Cells"
+    And the notebook "CLI Web Trash Notebook"'s Git binding reflects its current content
+    And I capture the note id of "Cells"
+    When I clone the notebook "CLI Web Trash Notebook" into a temporary destination using the installed CLI
+    And I trash note "Cells"
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | Biology/.keep           |
+      | _trash/Biology/Cells.md |
+    When I commit a rename of "_trash/Biology/Cells.md" to "Biology/Cells.md" and a removal of "Biology/.keep" together in the cloned checkout
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
     When I open the original note route
     Then I should see the current note is not in trash
     And the note content should include "Membranes"

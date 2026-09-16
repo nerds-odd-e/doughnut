@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.controllers.dto.FolderRenameRequest;
+import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,8 @@ public class FolderRelocationService {
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final AcceptedWebChangeService acceptedWebChangeService;
+  private final FolderConstructionService folderConstructionService;
+  private final AuthorizationService authorizationService;
   private final FolderSubtree subtree;
   private final FolderMoveRelocation folderMoveRelocation;
 
@@ -46,7 +50,10 @@ public class FolderRelocationService {
       TestabilitySettings testabilitySettings,
       WikiLinkRewriteService wikiLinkRewriteService,
       WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
-      AcceptedWebChangeService acceptedWebChangeService) {
+      AcceptedWebChangeService acceptedWebChangeService,
+      FolderConstructionService folderConstructionService,
+      AuthorizationService authorizationService,
+      FolderMoveRelocation folderMoveRelocation) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
@@ -55,16 +62,10 @@ public class FolderRelocationService {
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.acceptedWebChangeService = acceptedWebChangeService;
+    this.folderConstructionService = folderConstructionService;
+    this.authorizationService = authorizationService;
     this.subtree = new FolderSubtree(folderRepository, noteRepository, entityPersister);
-    this.folderMoveRelocation =
-        new FolderMoveRelocation(
-            folderRepository,
-            folderSiblingNameValidation,
-            entityPersister,
-            testabilitySettings,
-            wikiLinkRewriteService,
-            wikiLinkRelocationRewrite,
-            subtree);
+    this.folderMoveRelocation = folderMoveRelocation;
   }
 
   @Transactional
@@ -80,6 +81,43 @@ public class FolderRelocationService {
   public Folder moveFolderWithinNotebook(
       Notebook notebook, Folder folder, FolderMoveRequest request, User viewer)
       throws UnexpectedNoAccessRightException {
+    return applyLiveFolderChange(
+        notebook,
+        folder,
+        result -> "Move folder: " + result.getName(),
+        (liveNotebook, liveFolder, now) ->
+            folderMoveRelocation.moveFolder(liveNotebook, liveFolder, request, null, viewer));
+  }
+
+  public Folder trashFolderWithinNotebook(Notebook notebook, Folder folder)
+      throws UnexpectedNoAccessRightException {
+    return applyLiveFolderChange(
+        notebook,
+        folder,
+        result -> "Trash folder: " + result.getName(),
+        (liveNotebook, liveFolder, now) -> {
+          authorizationService.assertAuthorization(liveNotebook);
+          if (!liveFolder.getNotebook().getId().equals(liveNotebook.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
+          }
+          if (liveFolder.isTrashed()) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Folder is already in trash.");
+          }
+          Folder trashParent =
+              folderConstructionService.ensureTrashParentFor(
+                  liveNotebook, FolderTrailSegments.ancestorsFromRootToParent(liveFolder));
+          return folderMoveRelocation.placeFolderWithinNotebook(
+              liveNotebook, liveFolder, trashParent, now);
+        });
+  }
+
+  private Folder applyLiveFolderChange(
+      Notebook notebook,
+      Folder folder,
+      Function<Folder, String> commitMessage,
+      LiveFolderMutation mutation)
+      throws UnexpectedNoAccessRightException {
     Integer folderId = folder.getId();
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return acceptedWebChangeService.apply(
@@ -92,15 +130,16 @@ public class FolderRelocationService {
                   .findById(folderId)
                   .orElseThrow(
                       () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
-          return folderMoveRelocation.moveFolder(liveNotebook, liveFolder, request, null, viewer);
+          return mutation.run(liveNotebook, liveFolder, now);
         },
-        result -> "Move folder: " + result.getName(),
+        commitMessage,
         now);
   }
 
-  public Folder placeFolderWithinNotebook(Notebook notebook, Folder folder, Folder newParent) {
-    return folderMoveRelocation.placeFolderWithinNotebook(
-        notebook, folder, newParent, testabilitySettings.getCurrentUTCTimestamp());
+  @FunctionalInterface
+  private interface LiveFolderMutation {
+    Folder run(Notebook liveNotebook, Folder liveFolder, Timestamp now)
+        throws UnexpectedNoAccessRightException;
   }
 
   public Folder renameFolder(

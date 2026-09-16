@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
 
 /**
@@ -62,8 +61,6 @@ class NotebookGitProposalDocumentApplication {
         folderMaterialization.materialize(
             state.notebook(),
             state.folders(),
-            proposal.repository(),
-            ObjectId.fromString(state.binding().getAcceptedGitObjectId()),
             Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()).toList(),
             proposal);
     List<ExportFolderRow> folders = stateLoader.foldersOf(state.notebook());

@@ -4,7 +4,6 @@ import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommi
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -20,11 +19,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Verifies relocation rejects destinations that are missing or unrepresented in accepted Portable
- * content, and still accepts a represented ancestor with no own README. Placement identity is
- * covered in {@link NotebookGitProposalRelocationControllerTest}. Emptied-source dissolution is
- * covered in {@link NotebookGitProposalRelocationContainerControllerTest}. Addition parent
- * eligibility is covered in {@link NotebookGitFolderNotePublicationControllerTest}.
+ * Verifies relocation constructs missing destination ancestry for a synchronized source, still
+ * refuses pre-existing projection drift, and accepts a represented ancestor with no own README.
+ * Placement identity is covered in {@link NotebookGitProposalRelocationControllerTest}.
+ * Emptied-source dissolution is covered in {@link
+ * NotebookGitProposalRelocationContainerControllerTest}. Addition parent eligibility is covered in
+ * {@link NotebookGitFolderNotePublicationControllerTest}.
  */
 class NotebookGitProposalRelocationDestinationControllerTest
     extends NotebookGitBundleControllerTestBase {
@@ -35,7 +35,7 @@ class NotebookGitProposalRelocationDestinationControllerTest
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void rejectsRelocationIntoAMissingFolderWithoutCreatingIt() throws Exception {
+  void relocatesIntoAMissingFolderCreatingRequiredParents() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note note =
         makeMe.aNote().notebook(notebook).title("note").content(TYPED_NOTE_CONTENT).please();
@@ -44,22 +44,21 @@ class NotebookGitProposalRelocationDestinationControllerTest
         proposalBundleBytes(
             binding, List.of(new NotebookGitProposalFile("Missing/note.md", TYPED_NOTE_CONTENT)));
 
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
 
-    assertThat(
-        exception.getReason(),
-        equalTo(
-            "Parent folder for path \"Missing/note.md\" is not represented in accepted Portable"
-                + " content; add this note at the notebook root or inside an existing represented"
-                + " folder."));
     NoteRealm shown = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
-    assertThat(shown.getAncestorFolders(), empty());
     assertThat(shown.getNote().getTitle(), equalTo("note"));
+    assertThat(
+        shown.getAncestorFolders().stream().map(Folder::getName).toList(), contains("Missing"));
     inCommittedTransaction(
         transactionManager,
-        () -> assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), empty()));
+        () ->
+            assertThat(
+                folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+                    .map(Folder::getName)
+                    .toList(),
+                contains("Missing")));
   }
 
   @Test
@@ -88,11 +87,12 @@ class NotebookGitProposalRelocationDestinationControllerTest
   }
 
   @Test
-  void rejectsRelocationIntoAFolderDissolvedByAnAcceptedMove() throws Exception {
+  void relocatesIntoAFolderDissolvedByAnAcceptedMoveByRecreatingTheParent() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder source = makeMe.aFolder().notebook(notebook).name("Source").please();
     Folder destination = makeMe.aFolder().notebook(notebook).name("Dest").please();
-    makeMe.aNote().folder(destination).title("other").content(TYPED_NOTE_CONTENT).please();
+    Note other =
+        makeMe.aNote().folder(destination).title("other").content(TYPED_NOTE_CONTENT).please();
     makeMe.aNote().folder(source).title("note").content(TYPED_NOTE_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     controller.publishNotebookGitProposal(
@@ -113,19 +113,20 @@ class NotebookGitProposalRelocationDestinationControllerTest
                 new NotebookGitProposalFile("Dest/note.md", TYPED_NOTE_CONTENT),
                 new NotebookGitProposalFile("Source/other.md", TYPED_NOTE_CONTENT)));
 
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, afterEmptying.getAcceptedGitObjectId(), intoEmptied, HttpStatus.BAD_REQUEST);
+    controller.publishNotebookGitProposal(
+        notebook.getId(), afterEmptying.getAcceptedGitObjectId(), intoEmptied);
 
-    assertThat(exception.getReason(), containsString("Source/other.md"));
+    NoteRealm shown = noteController.showNote(noteRepository.findById(other.getId()).orElseThrow());
+    assertThat(
+        shown.getAncestorFolders().stream().map(Folder::getName).toList(), contains("Source"));
     inCommittedTransaction(
         transactionManager,
         () ->
             assertThat(
                 folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-                    .map(Folder::getId)
+                    .map(Folder::getName)
                     .toList(),
-                contains(destination.getId())));
+                contains("Dest", "Source")));
   }
 
   @Test

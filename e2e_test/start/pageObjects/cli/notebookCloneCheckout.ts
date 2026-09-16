@@ -19,6 +19,8 @@ type PrimaryCheckoutCommitTask =
   | 'commitCliNotebookCheckoutNoteRemoval'
   | 'commitCliNotebookCheckoutNoteRename'
   | 'commitCliNotebookCheckoutNoteRenameAndEdit'
+  | 'commitCliNotebookCheckoutNoteRenameAndEmptyKeep'
+  | 'commitCliNotebookCheckoutNoteRenameAndRemoval'
 
 function notebookCloneCheckout() {
   function commitNoteChanges(
@@ -89,6 +91,34 @@ function notebookCloneCheckout() {
         fromRelativePath,
         toRelativePath,
       })
+    },
+    commitRenameAndRemoval(
+      fromRelativePath: string,
+      toRelativePath: string,
+      removeRelativePath: string
+    ): Cypress.Chainable<null> {
+      return commitPrimaryCheckoutWith(
+        'commitCliNotebookCheckoutNoteRenameAndRemoval',
+        {
+          fromRelativePath,
+          toRelativePath,
+          removeRelativePath,
+        }
+      )
+    },
+    commitRenameAndEmptyKeep(
+      fromRelativePath: string,
+      toRelativePath: string,
+      keepRelativePath: string
+    ): Cypress.Chainable<null> {
+      return commitPrimaryCheckoutWith(
+        'commitCliNotebookCheckoutNoteRenameAndEmptyKeep',
+        {
+          fromRelativePath,
+          toRelativePath,
+          keepRelativePath,
+        }
+      )
     },
     commitRenameAndEdit(
       fromRelativePath: string,

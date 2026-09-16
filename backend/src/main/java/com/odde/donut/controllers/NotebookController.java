@@ -6,7 +6,6 @@ import com.odde.donut.controllers.dto.FolderListing;
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.controllers.dto.FolderRealm;
 import com.odde.donut.controllers.dto.FolderRenameRequest;
-import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteTopology;
@@ -24,7 +23,6 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.BazaarService;
-import com.odde.donut.services.FolderConstructionService;
 import com.odde.donut.services.FolderRelocationService;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.services.NotebookCatalogService;
@@ -76,7 +74,6 @@ class NotebookController {
   private final WebFolderCreationService webFolderCreationService;
   private final WebNoteCreationService webNoteCreationService;
   private final WikidataService wikidataService;
-  private final FolderConstructionService folderConstructionService;
   private final FolderRelocationService folderRelocationService;
   private final NotebookExportService notebookExportService;
   private final NotebookGitBundleDownloadService notebookGitBundleDownloadService;
@@ -98,7 +95,6 @@ class NotebookController {
       WebFolderCreationService webFolderCreationService,
       WebNoteCreationService webNoteCreationService,
       WikidataService wikidataService,
-      FolderConstructionService folderConstructionService,
       FolderRelocationService folderRelocationService,
       NotebookExportService notebookExportService,
       NotebookGitBundleDownloadService notebookGitBundleDownloadService,
@@ -118,7 +114,6 @@ class NotebookController {
     this.webFolderCreationService = webFolderCreationService;
     this.webNoteCreationService = webNoteCreationService;
     this.wikidataService = wikidataService;
-    this.folderConstructionService = folderConstructionService;
     this.folderRelocationService = folderRelocationService;
     this.notebookExportService = notebookExportService;
     this.notebookGitBundleDownloadService = notebookGitBundleDownloadService;
@@ -220,20 +215,12 @@ class NotebookController {
           "Moves an active folder subtree beneath _trash while mirroring its original ancestor"
               + " path. The subtree and authored content are retained for ordinary Move recovery.")
   @PostMapping("/{notebook}/folders/{folder}/trash")
-  @Transactional
   public Folder trashFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("folder") @Schema(type = "integer") Folder folder)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    assertFolderInNotebook(notebook, folder);
-    if (folder.isTrashed()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder is already in trash.");
-    }
-    Folder trashParent =
-        folderConstructionService.ensureTrashParentFor(
-            notebook, FolderTrailSegments.ancestorsFromRootToParent(folder));
-    return folderRelocationService.placeFolderWithinNotebook(notebook, folder, trashParent);
+    return folderRelocationService.trashFolderWithinNotebook(notebook, folder);
   }
 
   @Operation(

@@ -100,3 +100,43 @@ Feature: CLI notebook folder relocation
       Simmer until al dente
 
       """
+
+  Scenario: Publishing a folder subtree trash round trip is received by a later pull
+    Given I have a notebook "CLI Folder Trash Notebook"
+    And the notebook "CLI Folder Trash Notebook" has a readme-only folder "Recipes" with readme "Folder landing"
+    And I have a note "Pasta" under notebook "CLI Folder Trash Notebook" in folder "Recipes" with content:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Boil water
+      """
+    And I have a note "Sauce" under notebook "CLI Folder Trash Notebook" in folder "Recipes" with content:
+      """
+      ---
+      type: Note
+      ---
+      Tomato base
+      """
+    And the notebook "CLI Folder Trash Notebook" has a folder "Empty" under note "Pasta"
+    And the notebook "CLI Folder Trash Notebook" has an empty folder "_trash"
+    And the notebook "CLI Folder Trash Notebook"'s Git binding reflects its current content
+    When I clone the notebook "CLI Folder Trash Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Folder Trash Notebook" into a second temporary destination using the installed CLI
+    And I commit a rename of "Recipes" to "_trash/Recipes" and a removal of "_trash/.keep" together in the cloned checkout
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I commit a rename of "_trash/Recipes" to "Recipes" and an empty keep at "_trash/.keep" together in the cloned checkout
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I should see note "CLI Folder Trash Notebook/Recipes/Pasta" has content "Boil water"
+    And I should see note "CLI Folder Trash Notebook/Recipes/Sauce" has content "Tomato base"
+    When I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout contains exactly:
+      | Recipes/README.md     |
+      | Recipes/Pasta.md      |
+      | Recipes/Sauce.md      |
+      | Recipes/Empty/.keep   |
+      | _trash/.keep          |
+    And the second cloned checkout retains its original head as an ancestor

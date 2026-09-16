@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
-import { resolveSutCheckoutTarget } from '../../scripts/sut-isolated-target.mjs'
+import { queryObservedSut } from '../../scripts/sut-isolated-target.mjs'
 import {
   existingNoteIndex,
   existingNoteTitle,
@@ -8,34 +7,12 @@ import {
   sourceReferenceIndex,
 } from './notebookPublicationFixture'
 
-export function queryIsolatedSut(repoRoot: string, sql: string) {
-  const { isolated, target } = resolveSutCheckoutTarget({
-    checkoutRoot: repoRoot,
-  })
-  assert.ok(isolated, 'Only the allocated isolated database may be observed')
-  return execFileSync(
-    'mysql',
-    [
-      '--protocol=TCP',
-      '-h127.0.0.1',
-      '-P3309',
-      '-uroot',
-      '--batch',
-      '--skip-column-names',
-      target.database,
-      '-e',
-      sql,
-    ],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
-  ).trim()
-}
-
 export function notebookAcceptedGitObjectId(
   repoRoot: string,
   notebookName: string
 ): string {
   const escaped = notebookName.replaceAll("'", "''")
-  const head = queryIsolatedSut(
+  const head = queryObservedSut(
     repoRoot,
     `SELECT b.accepted_git_object_id FROM notebook_git_binding b INNER JOIN notebook n ON n.id = b.notebook_id WHERE n.name = '${escaped}' AND n.deleted_at IS NULL`
   )
@@ -47,7 +24,7 @@ export function notebookAcceptedGitObjectId(
 }
 
 export function publicationPersistedState(repoRoot: string) {
-  const query = (sql: string) => queryIsolatedSut(repoRoot, sql)
+  const query = (sql: string) => queryObservedSut(repoRoot, sql)
   return {
     notes: query('SELECT * FROM note ORDER BY id'),
     noteIdentity: query(

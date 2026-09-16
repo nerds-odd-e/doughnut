@@ -93,7 +93,7 @@ class NotebookGitProposalNoteAddition {
     return addedNote;
   }
 
-  private Folder destinationFolder(Map<String, Folder> materializedFolders, String path) {
+  Folder destinationFolder(Map<String, Folder> materializedFolders, String path) {
     int folderPathEnd = path.lastIndexOf('/');
     if (folderPathEnd < 0) {
       return null;
