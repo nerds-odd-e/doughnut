@@ -238,7 +238,7 @@ behavior introduced.
 
 ### 6. Publish the accumulated session through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 
 Given two clean clones, the owner commits a note rename/move and same-note edit,
 then a further edit, publishes once, and pulls the second clone. The same Donut
@@ -258,6 +258,24 @@ substitute a mocked SDK response or testability-supplied final state.
 Sizing: ~5 minutes active work plus E2E runtime; medium confidence after
 inspection of the existing staging/commit and original-route helpers. Keep the
 end-to-end outcome together; no separate helper-only delivery slice.
+Done 2026-09-16: NO production code change required — the existing
+`commitCliNotebookCheckoutNoteRenameAndEdit` task already stages a rename then
+writes the supplied path before one commit; reused it with `relativePath` equal
+to `toRelativePath` so the rename target receives the same-note edit. Added a
+new Gherkin step ("...and the following edit to the renamed note together in
+the cloned checkout:") that delegates to the existing page-object method with
+`relativePath = toRelativePath`, instead of reusing the "unrelated edit"
+wording. Added one scenario in `cli_notebook_web_local_reconciliation.feature`
+that captures the original "Pasta" note id, commits the rename+same-note edit
+then a further edit, publishes once, pulls the second clone, asserts the
+publisher's A→B→C history, the final `Recipes/Pasta basics.md` bytes, and
+reopens the captured original note route to show identity continuity with the
+final content. No new checkout task or scenario dispatcher. E2E proof green
+(6 passing, including the new scenario). Refactor split the over-250-line
+`cli_notebook_web_local_reconciliation.feature` along its cohesive seam into a
+new `cli_notebook_publish_to_clean_clone.feature` (scenarios 4–6, including the
+new one) and registered it in `scripts/isolated-cypress-active-specs.mjs`; both
+feature files reran green (6 passing total).
 
 ## Promise ownership
 
