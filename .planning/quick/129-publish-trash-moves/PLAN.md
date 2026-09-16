@@ -1,0 +1,330 @@
+# Publish ordinary moves across the trash boundary
+
+Status: planned
+Source: [SEED-009 story 28](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28).
+Owner clarification, 2026-09-16: dependency recovery is exactly existing behavior;
+reuse it cohesively, with no special recovery implementation. Planning and plan
+refinement are authorized; execution has not started. The story remains queued.
+
+## Goal and boundaries
+
+In one synchronized Git-backed notebook, publish unambiguous local note and
+unchanged-subtree moves into or out of root `_trash`, preserving identity,
+authored content and retained dependencies. Receive existing web trash/recovery
+through ordinary pull. Construct parents required by the committed destination.
+Use supported linear history composition and apply one final result atomically.
+
+Availability, learning eligibility, reference resolution and removed-from-tracking
+preferences keep their current domain rules. Retained references resolve again
+only when their authored targets identify eligible destinations. Removed reference
+properties stay removed. Recovery to another path does not reconstruct old links.
+Retain schedules, history, note-ID URLs, folder Readmes and represented empty
+descendants. Preserve canonical `.keep` representation and authored proposal bytes.
+
+No new trash UI, Restore, Undo work, cleanup, deletion policy, migration, identity
+heuristics, cross-notebook sync, divergence/rebase, or performance work. The folder
+example uses the existing exact-subtree correspondence (including a source Readme);
+broader folder identity inference is not promised. Examples do not add rejection
+gates. Existing supported edit/rename histories must remain supported.
+
+## Existing-solution assessment and decisions
+
+Source and tests inspected at `147aed1893`; no runtime checks executed during
+planning. These findings select reuse and proof, not completed slices.
+
+| Responsibility | Existing owner and decision |
+| --- | --- |
+| Availability and retained learning | `Folder.isTrashed`, `Note.isAvailable`, `MemoryTracker.isActive`, existing repository availability predicates. Reuse unchanged; do not add reactivation writes or copied trash rules. |
+| References | `WikiLinkResolver`, `AuthoredNoteReferenceInboundFacade`, existing reference capture/rewrite owners. Reuse current resolution. Web move rewriting and Git preservation of authored bytes are distinct existing caller purposes. |
+| Note placement | Web Move, note Trash and Undo use `NoteMotionService` / `NoteTitlePlacementRules`; Git rename currently sets title/folder directly. Reuse the domain placement owner without invoking web commit or reference orchestration. Check batch placement/flush behavior before switching the Git caller. |
+| Folder placement | `FolderMoveRelocation` owns web validation and persistence; `NotebookGitProposalFolderPlacement` already reuses destination rules but Git relocation reparents directly. Expose the necessary placement responsibility from its existing owner. Preserve explicit merge and trash suffix selection at their current callers; do not make Git choose a different proposed path. |
+| Destination ancestry | `NotebookGitProposalFolderMaterialization` uses `FolderConstructionService` for added-document ancestors. Modularize this existing ancestry construction for admitted move destinations; preserve Readme persistence separately. No second path walker in a trash service. |
+| Correspondence and publication | Existing JGit ordinary-note detector, exact folder correspondence and linear history composition feed `NotebookGitProposalPublisher`. Reuse final application and `proposalAcceptance`; do not replay live mutations for intermediate commits. |
+| Web accepted changes | `AcceptedWebChangeService.apply` owns lock/load, drift check, complete mutation, final snapshot and one accepted child. Note trash/recovery and ordinary folder Move use it. `NotebookController.trashFolder` currently uses a plain transaction and bypasses it: integrate this existing operation. |
+| Portable tree and transport | `PortableTreeSnapshot` owns Readmes and `.keep`. CLI `notebookPublishSubmission` submits a full Git bundle; pull fast-forwards accepted history. Reuse installed CLI and real Git test helpers; no trash protocol or client classifier is indicated. |
+
+Affected callers include same-notebook and cross-notebook web note/folder moves,
+Trash, note Undo, Git rename and folder relocation, and document additions using
+parent construction. Only shared responsibilities change; each caller retains its
+authorization, transaction, content and destination policy. No API/schema change
+is anticipated. Do not add flags for web/Git/trash modes.
+
+Follow [North Star: complete accepted web change](../../NORTH-STAR.md#one-complete-accepted-web-change),
+[final publication result](../../NORTH-STAR.md#one-final-publication-result), and
+[rename correspondence](../../NORTH-STAR.md#git-rename-correspondence). These already
+govern the work; no new direction topic is needed. Accepted
+[ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash),
+[ADR 0005](../../../docs/adrs/0005-web-routes-accepted.md), and
+[ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)
+govern location/Portable data, note URLs and learning state. ADR 0002 is Proposed.
+
+### Current evidence and constraints requiring care
+
+- `NotebookGitWebTrashControllerTest.ordinaryMoveAfterActualTrashAppendsAcceptedChildWithRecoveredPath`
+  performs real web Trash then Move, observes accepted paths and retained trackers,
+  preferences and recall-log count. This covers web recovery, not local publication.
+- `NotebookGitProposalRenameReferrerControllerTest` and
+  `NotebookGitProposalFolderRelocationReferrerControllerTest` explicitly preserve
+  authored referrer bytes during publication. Calling web rewrite orchestration
+  would violate existing behavior even if placement is shared.
+- `NotebookGitProjection.requireRepresentedFolderId` requires an existing row;
+  rename destinations alone do not enter current added-document materialization.
+  `NotebookGitProposalFolderRelocationDestinationControllerTest` explicitly refuses
+  a missing parent. The selected story now promises construction from the final
+  proposed path, so that missing-parent expectation must change. Its separate
+  pre-existing unrepresented-parent/drift safeguard remains required. Never use
+  construction to adopt unsynchronized database state.
+- `.keep` changes are excluded from ordinary note changes. Snapshot generation
+  retains empty folders, so test proposals must represent retained source folders
+  canonically instead of quietly deleting them. A new parent needs no dummy
+  Readme, anchor note or redundant `.keep` beside its content.
+- `NotebookGitProposalFolderRelocationEmptyDescendantControllerTest` creates an
+  unrepresented descendant: that is drift, not evidence that a canonical tracked
+  empty descendant cannot move. Keep that distinction in new examples.
+
+## Verification and delivery contract
+
+At each behavior slice, first drive the public boundary with the stated data.
+If it already passes, retain sufficient proof and make no gratuitous product
+change. Reuse sufficient existing observations. Structural changes first run the
+relevant existing coverage as a baseline. Record literal command/results and
+setup/assertion locations here during execution; nothing below is claimed passed.
+
+- **B:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — all backend
+  unit tests, per backend rules; use real controller/database collaborators and
+  committed reloads for transaction observations, not a helper-class test suite.
+- **N:** `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_trash.feature`
+  — extend this existing spec for the installed-CLI local recovery journey.
+- **F:** `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_folder_relocation.feature`
+  — extend the existing local-folder-publication spec for trash locations.
+- **W:** `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_folder_moves.feature`
+  — extend the existing installed-CLI receipt spec for folder Trash/recovery.
+- If CLI production code changes, also run
+  `CURSOR_DEV=true nix develop -c pnpm cli:test`. API generation is required only
+  if API signatures/types actually change. No manual testing is selected.
+
+Each slice targets about five minutes including proof. Estimates below are
+active-editing hypotheses; mandatory full backend runs and installed-CLI startup
+are explicit test-wait exceptions, with actual elapsed time recorded separately.
+Scrutinize active work above five minutes and stop/finer-decompose above ten.
+Do not hide multiple implementation outcomes inside a test-wait exception.
+
+Execution follows `dough-execute-plan`: select the execution location and take
+the queued story only when execution is authorized; test-first corrections,
+Jidoka, fresh `dough-post-change-refactor` agent, appropriate verification/API
+generation, coordinator `./scripts/run.sh pnpm format:changed` once per delivery,
+plan update without another routine format, commit with check-only hook, push
+and asynchronous CI observation. Keep the plan and evidence for retrospective
+and story wrap-up. This planning turn commits/pushes nothing.
+
+## Ordered slices
+
+### 1. Share existing note placement
+Type: Structure
+Status: planned
+Enables: slice 2, local recovery with the same domain placement as web Move.
+
+Replace Git's independent placement mutation with the suitable responsibility
+in `NoteMotionService`, modularizing only if necessary to preserve caller-owned
+timestamp/flush and batch semantics. Keep Git content application and web
+reference rewriting at their existing owners. No new recovery code.
+
+Proof: B; existing `NotebookGitProposalRenameControllerTest` (including several
+moves regardless of path ordering and private associations), rename referrer and
+rollback tests, `NotebookGitWebNoteMoveControllerTest`, and web trash/Undo tests
+preserve both caller purposes. Inspect affected calls to establish one placement
+owner; a passing test alone cannot prove removal of duplication.
+Sizing: 3–5 minutes active work; batch/flush compatibility is the main concern.
+
+### 2. Publish recovery of a retained note
+Type: Behavior
+Status: planned
+Behavior: actual web Trash followed by a local move to an existing active
+destination and publication restores the same note's existing availability.
+
+Proof: B + N. Extend the existing installed-CLI web-trash journey with local
+commit/publication and the original note route. At the publication controller,
+assert same note/tracker IDs, retained schedule/history, stopped-tracking choice,
+and resolved retained body/property references after return to the matching path.
+Use focused variants for a deliberately removed property staying absent and
+recovery to a free alternative location when a different note owns the old path.
+Observe the occupier unchanged and keep authored path-link semantics. This is
+proof of existing dependency behavior, not a new repair mechanism.
+Sizing: 5–8 minutes active work; reuse existing CLI rename/publish and note-route
+steps. Any unexpected resolver change requires reassessing the evidence first.
+
+### 3. Reuse publication destination construction
+Type: Structure
+Status: planned
+Enables: slice 4, moves whose destination ancestry is absent.
+
+Expose the existing parent-path construction in
+`NotebookGitProposalFolderMaterialization` for callers with admitted destination
+paths. Keep `FolderConstructionService` as creation/validation owner and separate
+Readme writes from ensuring ancestry. Current document additions continue through
+the same solution; do not yet add a new move admission rule or trash branch.
+
+Proof: B; existing initial-folder, folder-creation, folder-note publication and
+`NotebookGitProposalFolderPublicationSafetyControllerTest` keep accepted content,
+retry behavior and drift refusal. Inspect that there is one ancestry walker.
+Sizing: 3–5 minutes active work; no new persistence representation.
+
+### 4. Publish note moves into missing parents
+Type: Behavior
+Status: planned
+Behavior: a detected local move into `_trash/Biology/Cells.md` when that ancestry
+is absent creates its required parents and retains the original note.
+
+Use admitted final destinations with slice 3's constructor after the original
+projection/drift check, before final placement and acceptance. Resolve sources
+against their original correspondence; construction must not change identity.
+
+Proof: B at `publishNotebookGitProposal`, then download the accepted bundle.
+Use the same boundary as slice 2 with missing-parent data; assert created ancestry,
+same note, inactive eligibility and exact canonical tree. A recovery variant into
+new active ancestry verifies the same rule without dummy content. Include retained
+source `.keep` where required by the Portable tree. Change obsolete missing-parent
+refusal expectations, preserving pre-existing drift refusal.
+Sizing: 5–8 minutes active work; parent visibility and source-path lookup ordering
+are the concrete integration concerns. No second path-construction loop.
+
+### 5. Share existing folder placement
+Type: Structure
+Status: planned
+Enables: slice 6, subtree recovery through the same folder placement owner.
+
+Modularize the placement part of `FolderMoveRelocation` so web Move/Trash and
+Git relocation reuse it. Reuse existing destination validations; preserve web
+merge/reference behavior, trash name selection and Git's exact proposed tree.
+Do not route Git through web commit orchestration or add caller-mode switches.
+
+Proof: B; existing folder relocation/placement/referrer/private-association and
+rollback tests plus `NotebookGitWebFolderMoveControllerTest`,
+`NotebookFolderTrashControllerTest`, and cross-notebook folder Move coverage.
+Inspect the final affected call graph for one placement implementation.
+Sizing: 3–5 minutes active work; only the shared placement responsibility moves.
+
+### 6. Publish a retained subtree trash round trip
+Type: Behavior
+Status: planned
+Behavior: move a uniquely corresponding unchanged folder subtree into an existing
+trash parent, publish, then move it back and publish; descendants retain their
+identities and follow the final ancestry.
+
+Proof: B + F. Use an existing exact-subtree fixture with Readme, distinct-content
+notes and a tracked empty descendant. Observe retained folder/note/tracker IDs,
+Readme and note bytes, eligibility and `.keep`; a second clean checkout receives
+the accepted tree through installed pull. Do not seed new identities at the
+destination or substitute mocked publication for the journey. Reuse dependency
+details already proved in slice 2 rather than repeat its full assertion set.
+Sizing: 5–8 minutes active work; canonical empty descendants distinguish real
+compatibility from the existing unrepresented-descendant refusal fixture.
+
+### 7. Publish subtree moves into missing ancestry
+Type: Behavior
+Status: planned
+Behavior: the same exact subtree moved locally under new `_trash/Research`
+ancestry publishes with its identities retained and those parents constructed.
+
+Reuse slice 3's construction and final application, supplying the admitted folder
+destination. Preserve the source mapping before construction and the original
+pre-mutation drift check. Do not infer a new folder identity policy.
+
+Proof: B at the publication controller and downloaded tree. Replace the missing
+parent refusal fixture with a synchronized source and successful constructed
+destination observation; a new active destination exercises recovery by the same
+rule. Retain the separate unrepresented-parent/descendant refusal cases.
+Sizing: 3–5 minutes active work assuming slice 4 settled construction ordering;
+otherwise stop and refine this same plan rather than duplicate orchestration.
+
+### 8. Receive an existing web folder trash operation locally
+Type: Behavior
+Status: planned
+Behavior: web Trash of a folder in a synchronized notebook appends one complete
+accepted change; installed CLI pull receives its retained subtree, and ordinary
+web Move recovery followed by pull receives the active location.
+
+Bring `NotebookController.trashFolder`'s complete mutation under the existing
+accepted-change owner: reload/authorize, create parents, select collision name,
+place, then snapshot. Keep existing non-Git behavior and projection-drift policy.
+Do not commit each created ancestor independently.
+
+Proof: B + W. Start from actual web Trash, not a pre-seeded trashed state. Assert
+one accepted child contains constructed parents, Readme, descendants and `.keep`;
+pull observes exact files and original-head ancestry. Reuse ordinary Move for
+the return. Focused controller variants preserve occupied trash-name suffixing,
+authorization, drift and atomic failure at the accepted-change boundary.
+Sizing: 5–8 minutes active work; existing note Trash and web folder Move provide
+the transaction recipe and installed-CLI helpers. Transaction propagation is the
+remaining integration concern.
+
+### 9. Preserve identity across accumulated trash moves
+Type: Behavior
+Status: planned
+Behavior: a linear local range moves a retained note into trash and then to a
+different active path before publication; the same note and dependencies appear
+at the final path, with the original committed history retained.
+
+Proof: B using existing composed-range helpers and the publication/download
+boundary. Observe identity and final placement/content, unchanged dependent
+records, and accepted intermediate-commit ancestry. A return to the original
+endpoint must not fabricate recreation; existing deletion-gap recreation tests
+retain their contrasting new-identity semantics. Reuse the single-commit final
+application; no intermediate live mutation or new history journal.
+Sizing: 3–5 minutes active work; if correspondence needs a new inference policy,
+stop for source-scope reassessment instead of broadening this story.
+
+### 10. Roll back constructed parents with rejected publication
+Type: Behavior
+Status: planned
+Behavior: a late acceptance failure after constructing move destinations leaves
+the original notebook, dependencies and accepted history unchanged.
+
+Proof: B. Extend the existing late-binding-save-failure controller fixture with
+missing destination ancestry; inspect committed state after rejection for no new
+parents, unchanged note/folder placement and retained dependencies, and unchanged
+accepted head/bundle. Cover note and folder callers only where their application
+paths differ; share observations through existing test support. Reuse existing
+stale-head, unauthorized, ambiguous correspondence, invalid-destination and drift
+tests rather than create another full safety matrix.
+Sizing: 3–5 minutes active work using existing failure injection and committed
+transaction helpers. No exception swallowing or partial acceptance.
+
+## Proof ownership and completion
+
+| Source promise | Owning slices and observations |
+| --- | --- |
+| Existing dependency recovery and alternate active destination | 2: controller state/reference outcomes and original-route installed-CLI journey |
+| Local trash/recovery with required parents and canonical retained folders | 4: controller publication and downloaded exact tree |
+| Shared domain behavior, no duplicate recovery logic | 1, 3, 5: affected call sites, retained caller-specific tests and one owner per responsibility |
+| Retained subtree, learning and empty descendants | 6–7: identity/ancestry and exact Portable tree through publication/pull |
+| Existing web operation received locally | 8: real web Trash/Move followed by installed pull, one accepted child per operation |
+| Linear histories, final-only application, deletion-gap distinction | 9: composed publication, dependencies and original Git ancestry |
+| Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
+| Preserve ordinary moves, authored Git bytes and web reference choices | 1, 5: existing rename/folder referrer, Move, Trash/Undo and cross-notebook caller coverage |
+
+No behavior or delivery is marked complete. At each green boundary, retain the
+specific evidence here; do not substitute a green command for a missing promised
+observation. If existing code proves a behavior, close its proof without adding
+another mechanism. All required observations must be covered before story closure.
+
+## Sizing and cumulative-design assessment
+
+Ten slices. During construction, separate shared ancestry extraction from note
+move integration, then reuse it for subtree integration; keep web acceptance,
+accumulated history and rollback as independent observable outcomes. Structure
+slices immediately precede the Behavior they enable. There is no tests-only
+preparation phase or temporarily broken delivery point.
+
+The cumulative model remains ordinary correspondence → existing ancestry and
+placement → existing location-derived availability → one final acceptance.
+Folder and note correspondence have distinct established identity semantics;
+that distinction does not authorize duplicate placement, recovery or construction.
+
+Remaining slice-specific concerns: slice 1 must preserve batch/flush behavior;
+4 and 7 must construct parents without changing original correspondence or
+adopting drift; 6 must retain canonical empty descendants; 8 must move the whole
+existing mutation inside the accepted boundary. These are integration/sizing
+risks, not new product decisions. Runtime baselines and red/green observations
+belong to execution. No larger-than-15-slices resplit recommendation. No product
+implementation, tests, commit or push occurred while writing this plan.
