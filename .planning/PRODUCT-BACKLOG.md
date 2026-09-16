@@ -13,9 +13,9 @@ Owners of notebooks with 10,000 notes can publish to the remote quickly,
 with reasonable performance.
 
 ## Taken
+- [Publish local renames, moves, and edits across commits while preserving note identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-36) — SEED-009 — [plan](quick/099-publish-local-renames-with-edits/PLAN.md)
 
 ## Backlog list
-- [Publish local renames, moves, and edits across commits while preserving note identity](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-36) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
 - [Make repeated trash and Undo journeys clean and predictable](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-38) — SEED-009
 - [Continue local editing after broader web organization changes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-40) — SEED-009
