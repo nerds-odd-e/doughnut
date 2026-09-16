@@ -1,6 +1,6 @@
 # Publish ordinary moves across the trash boundary
 
-Status: in progress
+Status: executed
 Source: [SEED-009 story 28](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28).
 Owner clarification, 2026-09-16: dependency recovery is exactly existing behavior;
 reuse it cohesively, with no special recovery implementation. Planning and plan
@@ -333,19 +333,18 @@ Proof: B `CURSOR_DEV=true nix develop -c pnpm backend:test_only` BUILD SUCCESSFU
 
 ### 10. Roll back constructed parents with rejected publication
 Type: Behavior
-Status: planned
-Behavior: a late acceptance failure after constructing move destinations leaves
-the original notebook, dependencies and accepted history unchanged.
+Status: done
 
-Proof: B. Extend the existing late-binding-save-failure controller fixture with
-missing destination ancestry; inspect committed state after rejection for no new
-parents, unchanged note/folder placement and retained dependencies, and unchanged
-accepted head/bundle. Cover note and folder callers only where their application
-paths differ; share observations through existing test support. Reuse existing
-stale-head, unauthorized, ambiguous correspondence, invalid-destination and drift
-tests rather than create another full safety matrix.
-Sizing: 3–5 minutes active work using existing failure injection and committed
-transaction helpers. No exception swallowing or partial acceptance.
+Existing late-binding rejection already rolls back constructed missing parents.
+No production Java change. Note and folder callers covered where application
+paths differ.
+
+Proof: B `CURSOR_DEV=true nix develop -c pnpm backend:test_only` pass (~1m8s).
+- Setup: `FAIL_ON_BINDING_SAVE`; missing `_trash/Biology` (note) or `_trash/Research` (folder)
+- `NotebookGitProposalRenameRollbackControllerTest.lateBindingSaveFailureRollsBackAMoveIntoMissingAncestryLeavingOriginalPlacementTrackerAndAcceptedBinding`
+- `NotebookGitProposalFolderRelocationRollbackControllerTest.lateBindingSaveFailureRollsBackAMoveIntoMissingAncestryLeavingOriginalParentsDescendantsAndAcceptedBinding`
+
+Refactor: none — already clean.
 
 ## Proof ownership and completion
 
@@ -357,11 +356,10 @@ transaction helpers. No exception swallowing or partial acceptance.
 | Retained subtree, learning and empty descendants | 6–7 done: identity/ancestry and exact Portable tree through publication/pull |
 | Existing web operation received locally | 8 done: real web Trash/Move followed by installed pull, one accepted child per operation |
 | Linear histories, final-only application, deletion-gap distinction | 9 done: composed publication, dependencies and original Git ancestry |
-| Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
+| Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 done: missing-ancestry late-binding rollback; slice 8 owns web-boundary variants |
 | Preserve ordinary moves, authored Git bytes and web reference choices | 1, 5: existing rename/folder referrer, Move, Trash/Undo and cross-notebook caller coverage |
 
-Slices 1–9 are delivered. Remaining required observations must be covered before
-story closure. At each green boundary, retain the
+All ten slices are delivered. Required observations are covered. At each green boundary, retain the
 specific evidence here; do not substitute a green command for a missing promised
 observation. If existing code proves a behavior, close its proof without adding
 another mechanism. All required observations must be covered before story closure.

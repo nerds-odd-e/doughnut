@@ -8,10 +8,12 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
 import java.sql.Timestamp;
 import java.util.List;
@@ -38,6 +40,7 @@ class NotebookGitProposalFolderRelocationRollbackControllerTest
   private static final String NOTE = "---\ntype: Note\n---\nnote";
 
   @Autowired FolderRepository folderRepository;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @AfterEach
   void resetFailureInjection() {
@@ -97,6 +100,79 @@ class NotebookGitProposalFolderRelocationRollbackControllerTest
                   .map(Note::getId)
                   .toList(),
               containsInAnyOrder(nested.getId(), deeper.getId()));
+          NotebookGitBinding reloadedBinding =
+              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+          assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
+          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
+          assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
+        });
+  }
+
+  @Test
+  void
+      lateBindingSaveFailureRollsBackAMoveIntoMissingAncestryLeavingOriginalParentsDescendantsAndAcceptedBinding()
+          throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder biology =
+        makeMe.aFolder().notebook(notebook).name("Biology").readmeContent(README_BODY).please();
+    Folder empty = makeMe.aFolder().parentFolder(biology).name("Empty").please();
+    Note cells = makeMe.aNote().folder(biology).title("Cells").content(NOTE).please();
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(cells.getId()).orElseThrow())
+                    .removedFromTracking()
+                    .nextRecallAt(makeMe.aTimestamp().of(5, 0).please())
+                    .please());
+    Integer originalSourceParentId = biology.getParentFolderId();
+    snapshotCurrentPortableTree(notebook);
+    NotebookGitBinding binding =
+        inCommittedTransaction(
+            transactionManager,
+            () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
+    byte[] acceptedBundle = binding.getBundleBytes();
+    String acceptedHead = binding.getAcceptedGitObjectId();
+    Timestamp bindingUpdatedAt = binding.getUpdatedAt();
+    Boolean trackerRemovedFromTracking = tracker.getRemovedFromTracking();
+    Timestamp trackerNextRecallAt = tracker.getNextRecallAt();
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("_trash/Research/Biology/README.md", README),
+                new NotebookGitProposalFile("_trash/Research/Biology/Cells.md", NOTE),
+                new NotebookGitProposalFile("_trash/Research/Biology/Empty/.keep", "")));
+
+    NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
+
+    RuntimeException failure =
+        assertThrows(
+            RuntimeException.class,
+            () -> controller.publishNotebookGitProposal(notebook.getId(), acceptedHead, proposal));
+    assertThat(failure.getMessage(), is("forced failure after note projection"));
+
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          Folder reloadedSource = folderRepository.findById(biology.getId()).orElseThrow();
+          assertThat(reloadedSource.getParentFolderId(), is(originalSourceParentId));
+          assertThat(
+              folderRepository.findById(empty.getId()).orElseThrow().getParentFolderId(),
+              is(biology.getId()));
+          assertThat(
+              noteRepository.findById(cells.getId()).orElseThrow().getFolder().getId(),
+              is(biology.getId()));
+          MemoryTracker reloadedTracker =
+              memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+          assertThat(reloadedTracker.getRemovedFromTracking(), is(trackerRemovedFromTracking));
+          assertThat(reloadedTracker.getNextRecallAt(), is(trackerNextRecallAt));
+          assertThat(
+              folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+                  .map(Folder::getId)
+                  .toList(),
+              containsInAnyOrder(biology.getId(), empty.getId()));
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
