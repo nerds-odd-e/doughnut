@@ -150,7 +150,7 @@ size (466 lines) flagged for retrospective, not split here.
 
 ### 3. Carry detected identity through accumulated edits
 Type: Behavior
-Status: planned
+Status: done
 
 Given accepted A, B renames/moves and edits a note, and C further edits its new
 path so A-to-C similarity is below 50, one publication preserves the original
@@ -165,6 +165,18 @@ range atomicity/deletion-recreation regressions through the backend command.
 Intermediate history is evidence, not mandatory current Portable validation.
 Sizing: ~5 minutes active work plus suite; medium confidence. If endpoint and
 range precedence demands another model, stop and reassess rather than patch cases.
+Done 2026-09-16: NO production change required — the existing composition from
+slices 1–2 already carries identity through accumulated edits when the endpoint
+is below 50. `carryExactMoveOrigins` walks the first-parent range, re-keying the
+original origin (A) to each adjacent detected destination (B, then C); the tip
+detector leaves C as ADDED when A→C is below 50, and `resolveMoveCorrespondence`
+pairs C's addition with the carried A origin. Added two tests in a new
+`NotebookGitComposedAccumulatedRenameControllerTest` (split from
+`NotebookGitComposedMoveEditControllerTest` during refactor to respect the
+250-line gate): a range fixture proving original identity, final C content,
+commit chain, and learning schedule, plus a single-shot A→C refusal proving the
+endpoint is genuinely below 50. Full backend suite green (2438 tests). No
+endpoint/range precedence model conflict arose.
 
 ### 4. Explain unresolved correspondence without partial publication
 Type: Behavior
