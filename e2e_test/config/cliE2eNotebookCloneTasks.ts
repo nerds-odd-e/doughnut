@@ -3,16 +3,22 @@
  * temporary destination, and reading back the resulting checkout's file tree.
  */
 
-import { execFileSync, spawnSync } from 'node:child_process'
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  writeFileSync,
-} from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { existsSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join, relative } from 'node:path'
+import { join } from 'node:path'
+import {
+  blobsAt,
+  commitCheckout,
+  continueRebaseNoninteractively,
+  firstParent,
+  git,
+  listCheckoutFilesRecursively,
+  rebaseMergeExists,
+  stageNoteChanges,
+  stageNoteRemoval,
+  stageNoteRename,
+} from './cliE2eNotebookCloneGit'
 
 export interface CliNotebookCheckoutState {
   head: string
@@ -30,110 +36,6 @@ export interface CliNotebookCheckoutState {
 export interface CliNotebookCheckoutConflictState {
   rebaseMerge: boolean
   unmerged: string
-}
-
-const E2E_GIT_IDENTITY_ARGS = [
-  '-c',
-  'user.name=Donut E2E',
-  '-c',
-  'user.email=donut-e2e@example.com',
-] as const
-
-const TEST_OWNED_REBASE_EDITOR_ENV = {
-  GIT_EDITOR: 'true',
-  GIT_SEQUENCE_EDITOR: 'true',
-} as const
-
-function listFilesRecursively(dir: string, base: string): string[] {
-  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const entryPath = join(dir, entry.name)
-    if (entry.name === '.git') return []
-    if (entry.isDirectory()) return listFilesRecursively(entryPath, base)
-    return [relative(base, entryPath)]
-  })
-}
-
-function git(checkoutDir: string, ...args: string[]): string {
-  return execFileSync('git', ['-C', checkoutDir, ...args], {
-    encoding: 'utf8',
-  }).trim()
-}
-
-function commitCheckout(checkoutDir: string, message: string): string {
-  git(checkoutDir, ...E2E_GIT_IDENTITY_ARGS, 'commit', '-m', message)
-  return git(checkoutDir, 'rev-parse', 'HEAD')
-}
-
-function stageNoteChanges(
-  checkoutDir: string,
-  files: { relativePath: string; content: string }[]
-): void {
-  for (const { relativePath, content } of files) {
-    const filePath = join(checkoutDir, relativePath)
-    mkdirSync(dirname(filePath), { recursive: true })
-    writeFileSync(filePath, `${content}\n`)
-  }
-  git(
-    checkoutDir,
-    'add',
-    '--',
-    ...files.map(({ relativePath }) => relativePath)
-  )
-}
-
-function stageNoteRemoval(checkoutDir: string, relativePath: string): void {
-  git(checkoutDir, 'rm', '--', relativePath)
-}
-
-function stageNoteRename(
-  checkoutDir: string,
-  fromRelativePath: string,
-  toRelativePath: string
-): void {
-  git(checkoutDir, 'mv', fromRelativePath, toRelativePath)
-}
-
-function continueRebaseNoninteractively(checkoutDir: string): void {
-  const result = spawnSync(
-    'git',
-    ['-C', checkoutDir, ...E2E_GIT_IDENTITY_ARGS, 'rebase', '--continue'],
-    {
-      encoding: 'utf8',
-      env: { ...process.env, ...TEST_OWNED_REBASE_EDITOR_ENV },
-    }
-  )
-  if (result.status !== 0) {
-    throw new Error(
-      `git rebase --continue failed:\n${result.stdout}\n${result.stderr}`
-    )
-  }
-}
-
-function firstParent(checkoutDir: string, treeish = 'HEAD'): string {
-  const parts = git(
-    checkoutDir,
-    'rev-list',
-    '--parents',
-    '-n',
-    '1',
-    treeish
-  ).split(' ')
-  return parts[1] ?? ''
-}
-
-function blobsAt(checkoutDir: string, treeish: string): Record<string, string> {
-  const output = git(checkoutDir, 'ls-tree', '-r', treeish)
-  if (!output) return {}
-  return Object.fromEntries(
-    output.split('\n').map((line) => {
-      const tab = line.indexOf('\t')
-      if (tab < 0) {
-        throw new Error(`unexpected git ls-tree line: ${line}`)
-      }
-      const hash = line.slice(0, tab).split(' ')[2] ?? ''
-      return [line.slice(tab + 1), hash]
-    })
-  )
 }
 
 export function createCliE2eNotebookCloneTasks() {
@@ -184,7 +86,7 @@ export function createCliE2eNotebookCloneTasks() {
     },
     /** Relative file paths of the checkout, excluding `.git`, for canonical-tree assertions. */
     listNotebookCheckoutEntries(checkoutDir: string): string[] {
-      return listFilesRecursively(checkoutDir, checkoutDir).sort()
+      return listCheckoutFilesRecursively(checkoutDir, checkoutDir).sort()
     },
     /**
      * Whether `ancestor` is an ancestor of `HEAD` (`git merge-base --is-ancestor`).
@@ -211,14 +113,8 @@ export function createCliE2eNotebookCloneTasks() {
     readCliNotebookCheckoutConflictState(
       checkoutDir: string
     ): CliNotebookCheckoutConflictState {
-      const rebaseMergePath = git(
-        checkoutDir,
-        'rev-parse',
-        '--git-path',
-        'rebase-merge'
-      )
       return {
-        rebaseMerge: existsSync(join(checkoutDir, rebaseMergePath)),
+        rebaseMerge: rebaseMergeExists(checkoutDir),
         unmerged: git(checkoutDir, 'ls-files', '-u'),
       }
     },
@@ -267,6 +163,24 @@ export function createCliE2eNotebookCloneTasks() {
     }): string {
       stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
       return commitCheckout(checkoutDir, 'Rename cloned notebook note')
+    },
+    commitCliNotebookCheckoutNoteRenameAndRemoval({
+      checkoutDir,
+      fromRelativePath,
+      toRelativePath,
+      removeRelativePath,
+    }: {
+      checkoutDir: string
+      fromRelativePath: string
+      toRelativePath: string
+      removeRelativePath: string
+    }): string {
+      stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
+      stageNoteRemoval(checkoutDir, removeRelativePath)
+      return commitCheckout(
+        checkoutDir,
+        'Rename cloned notebook note and remove a path'
+      )
     },
     commitCliNotebookCheckoutNoteRenameAndEdit({
       checkoutDir,

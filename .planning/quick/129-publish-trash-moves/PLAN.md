@@ -15,7 +15,9 @@ refinement are authorized. Execution started 2026-09-16.
 - Integration target: `main`
 - Replanning permission: allowed (existing plan-refinement authority)
 - Authorized push destination: `origin` (`git@github.com:nerds-odd-e/doughnut.git`)
-- CI: GitHub Actions workflow `ci.yml` display name `donut CI` (observer not armed until first push)
+- CI: GitHub Actions workflow `ci.yml` display name `donut CI`
+- Observer mailbox: `/tmp/dough-ci-501/watch-aUvKRw`
+- Slice 1 delivered SHA: `473550c16e0e8b0a970fbef9538b6448c7535e53`
 
 ## Goal and boundaries
 
@@ -161,20 +163,30 @@ Refactor: none — already clean. No API generation.
 
 ### 2. Publish recovery of a retained note
 Type: Behavior
-Status: planned
-Behavior: actual web Trash followed by a local move to an existing active
-destination and publication restores the same note's existing availability.
+Status: done
 
-Proof: B + N. Extend the existing installed-CLI web-trash journey with local
-commit/publication and the original note route. At the publication controller,
-assert same note/tracker IDs, retained schedule/history, stopped-tracking choice,
-and resolved retained body/property references after return to the matching path.
-Use focused variants for a deliberately removed property staying absent and
-recovery to a free alternative location when a different note owns the old path.
-Observe the occupier unchanged and keep authored path-link semantics. This is
-proof of existing dependency behavior, not a new repair mechanism.
-Sizing: 5–8 minutes active work; reuse existing CLI rename/publish and note-route
-steps. Any unexpected resolver change requires reassessing the evidence first.
+Existing publication already restores the same note after actual web Trash and
+a local move to an existing active destination. No production Java/CLI change.
+A leftover `Biology/.keep` beside the recovered note is an existing Portable
+conflict; the installed-CLI journey removes it in the same commit as the rename.
+
+Proof: B + N.
+- B: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` pass (post-refactor ~1m7s)
+  - Setup: Git-backed `Biology/Cells` with learned + removed trackers and authored
+    referrer; real `noteController.trashNote`; occupier variant web-creates Cells
+    after trash; then `publishNotebookGitProposal`
+  - `NotebookGitWebTrashLocalRecoveryPublicationControllerTest.localPublicationAfterActualTrashRestoresSameNoteAvailabilityAndRetainedDependencies`
+  - `.localPublicationAfterRemoveFromPropertiesTrashLeavesTheRemovedPropertyAbsent`
+  - `.localPublicationRecoversToAFreePathWhenTheOriginalPathIsOccupied`
+- N: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_trash.feature`
+  pass (post-refactor 2 scenarios)
+  - Setup: trash, pull, commit rename `_trash/Biology/Cells.md` → `Biology/Cells.md`
+    plus remove `Biology/.keep`, installed publish, original note route
+  - Scenario: Publishing a local recovery after pulling a web trash
+
+Refactor: shared `countRecallLogsByTrackerId` on
+`NotebookGitWebContentControllerTestBase`; split `cliE2eNotebookCloneGit.ts` and
+`cli_notebook_clone_commits.ts`. No API generation.
 
 ### 3. Reuse publication destination construction
 Type: Structure
@@ -317,7 +329,7 @@ transaction helpers. No exception swallowing or partial acceptance.
 
 | Source promise | Owning slices and observations |
 | --- | --- |
-| Existing dependency recovery and alternate active destination | 2: controller state/reference outcomes and original-route installed-CLI journey |
+| Existing dependency recovery and alternate active destination | 2 done: controller state/reference outcomes and original-route installed-CLI journey |
 | Local trash/recovery with required parents and canonical retained folders | 4: controller publication and downloaded exact tree |
 | Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement` owner + retained Git/web tests; 3, 5 remaining |
 | Retained subtree, learning and empty descendants | 6–7: identity/ancestry and exact Portable tree through publication/pull |
@@ -326,7 +338,8 @@ transaction helpers. No exception swallowing or partial acceptance.
 | Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
 | Preserve ordinary moves, authored Git bytes and web reference choices | 1, 5: existing rename/folder referrer, Move, Trash/Undo and cross-notebook caller coverage |
 
-No behavior or delivery is marked complete. At each green boundary, retain the
+Slices 1–2 are delivered. Remaining required observations must be covered before
+story closure. At each green boundary, retain the
 specific evidence here; do not substitute a green command for a missing promised
 observation. If existing code proves a behavior, close its proof without adding
 another mechanism. All required observations must be covered before story closure.

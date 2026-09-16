@@ -152,13 +152,4 @@ class NotebookGitProposalFolderReadmeEditControllerTest
         noteRepository.findById(note.getId()).orElseThrow().getContent(),
         equalTo(TYPED_NOTE_CONTENT));
   }
-
-  private long countRecallLogsByTrackerId(Integer trackerId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery("SELECT COUNT(*) FROM recall_log WHERE memory_tracker_id = :id")
-                .setParameter("id", trackerId)
-                .getSingleResult())
-        .longValue();
-  }
 }
