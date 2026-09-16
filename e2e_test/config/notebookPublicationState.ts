@@ -1,36 +1,11 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
-import {
-  e2eObservationDatabase,
-  resolveSutCheckoutTarget,
-} from '../../scripts/sut-isolated-target.mjs'
+import { queryObservedSut } from '../../scripts/sut-isolated-target.mjs'
 import {
   existingNoteIndex,
   existingNoteTitle,
   relatedReferenceIndex,
   sourceReferenceIndex,
 } from './notebookPublicationFixture'
-
-export function queryObservedSut(repoRoot: string, sql: string) {
-  const resolved = resolveSutCheckoutTarget({
-    checkoutRoot: repoRoot,
-  })
-  return execFileSync(
-    'mysql',
-    [
-      '--protocol=TCP',
-      '-h127.0.0.1',
-      '-P3309',
-      '-uroot',
-      '--batch',
-      '--skip-column-names',
-      e2eObservationDatabase(resolved),
-      '-e',
-      sql,
-    ],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
-  ).trim()
-}
 
 export function notebookAcceptedGitObjectId(
   repoRoot: string,

@@ -49,6 +49,12 @@ export function resolveSutCheckoutTarget({ checkoutRoot, runtimeTarget } = {}) {
 }
 
 const SHARED_E2E_DATABASE = 'doughnut_e2e_test'
+const E2E_SUT_MYSQL_CONNECT_ARGS = [
+  '-h127.0.0.1',
+  '-P3309',
+  '-udoughnut',
+  '-pdoughnut',
+]
 
 export function e2eObservationDatabase({ isolated, target } = {}) {
   if (!isolated) return SHARED_E2E_DATABASE
@@ -59,6 +65,24 @@ export function e2eObservationDatabase({ isolated, target } = {}) {
     'Isolated checkout must not observe the shared E2E database'
   )
   return target.database
+}
+
+export function queryObservedSut(repoRoot, sql, { mysqlExecFn } = {}) {
+  const resolved = resolveSutCheckoutTarget({ checkoutRoot: repoRoot })
+  const execFn = mysqlExecFn ?? execFileSync
+  return execFn(
+    'mysql',
+    [
+      '--protocol=TCP',
+      ...E2E_SUT_MYSQL_CONNECT_ARGS,
+      '--batch',
+      '--skip-column-names',
+      e2eObservationDatabase(resolved),
+      '-e',
+      sql,
+    ],
+    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
+  ).trim()
 }
 
 export function refuseConflictingSutOverrides(env, target) {
@@ -111,10 +135,7 @@ function e2eDatabaseExists(database) {
   const stdout = execFileSync(
     'mysql',
     [
-      '-h127.0.0.1',
-      '-P3309',
-      '-udoughnut',
-      '-pdoughnut',
+      ...E2E_SUT_MYSQL_CONNECT_ARGS,
       '-N',
       '-e',
       `SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='${database}'`,

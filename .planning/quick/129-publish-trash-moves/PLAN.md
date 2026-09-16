@@ -248,6 +248,12 @@ rollback tests plus `NotebookGitWebFolderMoveControllerTest`,
 Inspect the final affected call graph for one placement implementation.
 Sizing: 3–5 minutes active work; only the shared placement responsibility moves.
 
+CI repair (slice 5 implementation stashed as `24b6ef0bd0e56d2c1e4c198d1bb8b47418f2bbb5`):
+run 35077284338 (SHA 8e918218ae) still failed the same scenario with
+`Access denied for user 'root'@'172.17.0.1' (using password: NO)`. Observation
+mysql now uses E2E SUT credentials doughnut/doughnut. Proof:
+`CURSOR_DEV=true nix develop -c node --test scripts/sut-e2e-observation-database.test.mjs`.
+
 ### 6. Publish a retained subtree trash round trip
 Type: Behavior
 Status: planned
