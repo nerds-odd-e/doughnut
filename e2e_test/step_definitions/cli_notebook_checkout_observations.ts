@@ -2,7 +2,7 @@
  * Observable Git checkout outcomes shared by clone, pull, publish, and rebase
  * journeys. Step definitions remain one-line glue to the CLI page objects.
  */
-import { Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { cli } from '../start/pageObjects/cli'
 
 Then('the cloned checkout is a clean rebased child of the accepted head', () =>
@@ -50,6 +50,20 @@ Then(
     cli
       .notebookCloneCheckout()
       .expectOriginalHeadIsAncestorAndCleanAcceptedHead()
+)
+
+When(
+  'I record the accepted head of notebook {string}',
+  (notebookName: string) =>
+    cli.notebookCloneCheckout().recordAcceptedHead(notebookName)
+)
+
+Then(
+  'the cloned checkout retains the recorded accepted heads as ancestors and is clean at the accepted head',
+  () =>
+    cli
+      .notebookCloneCheckout()
+      .expectRecordedAcceptedHeadsAreAncestorsAndCleanAcceptedHead()
 )
 
 Then(

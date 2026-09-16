@@ -1,6 +1,6 @@
 # Pull web folder moves into a local notebook
 
-Status: in progress
+Status: completed
 Source: [SEED-009 story 40](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-40).
 
 ## Execution identity
@@ -156,7 +156,7 @@ needs another mechanism, stop and reassess rather than add a special-case recogn
 
 ### 4. Pull accumulated folder moves to the final layout
 Type: Behavior
-Status: planned
+Status: done
 
 From the clean checkout before either change, move Biology under Study and then
 back to notebook root on the web before one pull. Observe both accepted commits
@@ -167,6 +167,7 @@ the advanced history proves pull received the accepted changes.
 Proof: extend the installed-CLI folder-move feature, using existing folder-to-root
 and exact-tree steps. The web operations, rather than setup, must append both heads.
 Command: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_folder_moves.feature`.
+Accepted: isolated `pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_folder_moves.feature` passed (`2 passing`) after observation-helper cleanup. Setup: Background Git snapshot before clone; clone before either web move; snapshot not refreshed. Observations: record accepted head after Biology→Study and after move to root; both recorded heads are ancestors of pulled HEAD; original clone head is ancestor; checkout clean at accepted head; exact tree `Biology/Cells.md` and leftover empty `Study/.keep`. Production pull unchanged (ordinary fast-forward).
 Safe stopping point: root destination and accumulated accepted history proved.
 Sizing: about 5 minutes active work; CLI installation/stack startup wait excepted.
 No new multi-commit algorithm is expected; a discovered need triggers reassessment.
@@ -189,8 +190,10 @@ Execution uses dough-execute-plan. Same-notebook folder moves hit
 `AcceptedWebChangeService.apply` with no outer DEFAULT transaction. Reload the
 moving folder under the lock; destination parent reload already lives in
 `FolderMoveRelocation`. Slice 3 observed complete subtree projection on that
-same rule (no extra snapshot algorithm). Slice 4 extends the installed pull
-with accumulated accepted heads.
+same rule (no extra snapshot algorithm). Slice 4 proved accumulated accepted
+heads via recorded binding SHAs and `git merge-base --is-ancestor` on one pull.
+CI observation: host bridge probe did not attach `CI_MONITOR_READY`; pushes
+were not observed.
 
 Target ~5 minutes including ordinary verification; >5 merits scrutiny and >10
 requires finer decomposition unless the stated suite/runtime wait exception applies.
@@ -204,7 +207,9 @@ serializable transaction. Same-notebook folder move must not sit in a DEFAULT
 controller/service transaction around `apply`. Destination `findById` in the
 service lambda duplicated `FolderMoveRelocation.resolveNewParentFolder`. Complete
 subtree projection is the existing snapshot after placement plus existing wiki-link
-rewrite, not a folder-specific codec. 
+rewrite, not a folder-specific codec. Returning Biology to root leaves empty
+`Study/.keep`. Recording binding heads after each web move proves pull received
+both accepted commits; a final file list alone would not. 
 
 ## Plan-refinement assessment — 2026-09-16
 

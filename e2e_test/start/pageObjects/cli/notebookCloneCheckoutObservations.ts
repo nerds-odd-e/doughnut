@@ -12,6 +12,22 @@ function readCheckoutState(): Cypress.Chainable<CliNotebookCheckoutState> {
   return readCheckoutStateAt('cliCloneDestination')
 }
 
+function expectAncestorOfCheckoutHead(
+  checkoutDir: string,
+  ancestor: string,
+  description: string
+): Cypress.Chainable<null> {
+  return cy
+    .task<boolean>('cliNotebookCheckoutIsAncestorOfHead', {
+      checkoutDir,
+      ancestor,
+    })
+    .then((isAncestor) => {
+      expect(isAncestor, description).to.equal(true)
+      return cy.wrap(null)
+    })
+}
+
 function notebookCloneCheckoutObservations() {
   return {
     expectCheckoutFileUnchangedFromParent(
@@ -60,34 +76,65 @@ function notebookCloneCheckoutObservations() {
             expect(original.status, 'checkout at A should be clean').to.equal(
               ''
             )
-            return cy
-              .task<boolean>('cliNotebookCheckoutIsAncestorOfHead', {
-                checkoutDir,
-                ancestor: original.head,
-              })
-              .then((isAncestor) => ({
-                isAncestor,
-                originalHead: original.head,
-              }))
-          })
-          .then(({ isAncestor, originalHead }) => {
-            expect(
-              isAncestor,
-              `original head ${originalHead} should be an ancestor of HEAD in ${checkoutDir}`
-            ).to.equal(true)
-            return cy
-              .get<CliNotebookCheckoutState>('@cliNotebookRebasedCheckout')
-              .then((pulled) => {
-                expect(
-                  pulled.status,
-                  'received checkout should be clean'
-                ).to.equal('')
-                return nonInteractiveOutput().expectContains(
-                  `Accepted head: ${pulled.head}`
-                )
-              })
+            return expectAncestorOfCheckoutHead(
+              checkoutDir,
+              original.head,
+              `original head ${original.head} should be an ancestor of HEAD in ${checkoutDir}`
+            ).then(() =>
+              cy
+                .get<CliNotebookCheckoutState>('@cliNotebookRebasedCheckout')
+                .then((pulled) => {
+                  expect(
+                    pulled.status,
+                    'received checkout should be clean'
+                  ).to.equal('')
+                  return nonInteractiveOutput().expectContains(
+                    `Accepted head: ${pulled.head}`
+                  )
+                })
+            )
           })
       )
+    },
+    recordAcceptedHead(notebookName: string): Cypress.Chainable<null> {
+      return cy
+        .task<string>('readNotebookAcceptedGitObjectId', notebookName)
+        .then((head) =>
+          cy.then(function (this: { webAcceptedHeads?: string[] }) {
+            const previous = this.webAcceptedHeads ?? []
+            expect(
+              previous,
+              `accepted head ${head} should be a new web-accepted commit`
+            ).to.not.include(head)
+            cy.wrap([...previous, head]).as('webAcceptedHeads')
+            return cy.wrap(null)
+          })
+        )
+    },
+    expectRecordedAcceptedHeadsAreAncestorsAndCleanAcceptedHead(): Cypress.Chainable<null> {
+      return cy
+        .get<string>('@cliCloneDestination')
+        .then((checkoutDir) =>
+          cy
+            .get<string[]>('@webAcceptedHeads')
+            .then((heads) =>
+              heads
+                .reduce(
+                  (chain, ancestor) =>
+                    chain.then(() =>
+                      expectAncestorOfCheckoutHead(
+                        checkoutDir,
+                        ancestor,
+                        `web-accepted head ${ancestor} should be an ancestor of HEAD in ${checkoutDir}`
+                      )
+                    ),
+                  cy.wrap(null) as Cypress.Chainable<null>
+                )
+                .then(() =>
+                  this.expectOriginalHeadIsAncestorAndCleanAcceptedHead()
+                )
+            )
+        )
     },
     expectCheckoutParentFile(
       relativePath: string,

@@ -13,6 +13,7 @@ import {
 } from './cliE2eInstalledCli'
 import { createCliE2ePluginConfigDirTasks } from './cliE2ePluginConfigDirTasks'
 import { createCliE2eNotebookCloneTasks } from './cliE2eNotebookCloneTasks'
+import { notebookAcceptedGitObjectId } from './notebookPublicationState'
 import {
   bundleCliE2eInstall,
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
@@ -74,6 +75,9 @@ export function createCliE2ePluginTasks(
   return {
     ...createCliE2ePluginConfigDirTasks(),
     ...createCliE2eNotebookCloneTasks(),
+    readNotebookAcceptedGitObjectId(notebookName: string): string {
+      return notebookAcceptedGitObjectId(repoRoot, notebookName)
+    },
     getMineruE2eMockSitePath(): string {
       return join(repoRoot, 'e2e_test', 'python_stubs', 'mineru_site')
     },

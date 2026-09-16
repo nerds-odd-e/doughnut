@@ -30,6 +30,22 @@ export function queryIsolatedSut(repoRoot: string, sql: string) {
   ).trim()
 }
 
+export function notebookAcceptedGitObjectId(
+  repoRoot: string,
+  notebookName: string
+): string {
+  const escaped = notebookName.replaceAll("'", "''")
+  const head = queryIsolatedSut(
+    repoRoot,
+    `SELECT b.accepted_git_object_id FROM notebook_git_binding b INNER JOIN notebook n ON n.id = b.notebook_id WHERE n.name = '${escaped}' AND n.deleted_at IS NULL`
+  )
+  assert.ok(
+    head && !head.includes('\n'),
+    `No single accepted Git head for notebook: ${notebookName}`
+  )
+  return head
+}
+
 export function publicationPersistedState(repoRoot: string) {
   const query = (sql: string) => queryIsolatedSut(repoRoot, sql)
   return {

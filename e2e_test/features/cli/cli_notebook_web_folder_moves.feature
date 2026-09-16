@@ -45,3 +45,17 @@ Feature: CLI notebook web folder moves
 
       Membranes
       """
+
+  @mockBrowserTime
+  Scenario: Pulling successive web folder moves receives both accepted heads
+    When I clone the notebook "CLI Web Folder Move Notebook" into a temporary destination using the installed CLI
+    And I open the folder page for "Biology" in notebook "CLI Web Folder Move Notebook"
+    And I move the current folder to notebook "CLI Web Folder Move Notebook" folder "Study"
+    And I record the accepted head of notebook "CLI Web Folder Move Notebook"
+    And I move the current folder to notebook root
+    And I record the accepted head of notebook "CLI Web Folder Move Notebook"
+    And I pull the cloned checkout using the installed CLI
+    Then the cloned checkout retains the recorded accepted heads as ancestors and is clean at the accepted head
+    And the cloned checkout contains exactly:
+      | Biology/Cells.md |
+      | Study/.keep |
