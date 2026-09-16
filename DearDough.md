@@ -379,8 +379,79 @@ actually remove the dead dependencies, then re-ran the affected suites.
     consolidation is exactly the kind of refactor claim that is cheap to
     verify against `git diff` and easy to misreport.
 
+## DD-055 — CI repair of E2E observation parked in-progress slice work via stash/restore
+
+During planned execution, GitHub CI failed an installed-CLI successive-head
+pull because E2E publication-state SQL assumed an isolated database, then
+(after that repair) used passwordless MySQL root. Two in-progress Structure
+slices were stashed so those harness repairs could land, then restored.
+
+### Occurrences
+
+- Execution: SEED-009 story 28 / quick/129-publish-trash-moves / 473550c16e
+  - Timestamp: 2026-09-16T17:03:55+08:00
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.22
+  - Evidence: PLAN.md slice 3 (runs 35072853614 and 35074963239; repair
+    `8e918218ae`); slice 5 stash
+    `24b6ef0bd0e56d2c1e4c198d1bb8b47418f2bbb5` and repair `9fd0a0b446`
+    (2026-09-16T17:45:28+08:00); CI_FAILURE on ancestor `48349e9920`
+    before those repairs.
+  - Observed effect: two stash/restore cycles between product slices 3 and
+    5; CI harness commits interleaved with story delivery.
+  - Inference: execute-plan CI attention treated a red run on a prior SHA as
+    blocking while a later slice was already in progress; the failing
+    scenario was harness observation (shared `doughnut_e2e_test`, then
+    SUT credentials), not the trash-move product change.
+
+## DD-056 — Delegated implementers edited PLAN.md that the coordinator must re-own
+
+Delegated slice implementers wrote PLAN.md updates. The coordinator
+re-applied or re-owned those updates before delivery, so the plan stayed
+coordinator-owned but with extra edit traffic.
+
+### Occurrences
+
+- Execution: SEED-009 story 28 / quick/129-publish-trash-moves / 473550c16e
+  - Timestamp: unknown
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.22
+  - Evidence: coordinator process notes for this execution (Story Branch
+    Mode worktree `doughnut-worktrees/story-28`); PLAN.md appears in
+    product and CI-repair commits throughout `a4507e5304..1c790376e4`.
+  - Observed effect: extra coordinator re-ownership of plan status and
+    evidence before staging; no contaminated product commit identified.
+  - Inference: the execute-plan split (implementer owns code/proof,
+    coordinator owns PLAN.md) is not enforced at the agent-edit boundary
+    when implementers can write the same path.
+
+## DD-057 — Post-change refactor elapsed well above the ~5-minute leaf target
+
+Some post-change refactor passes ran about 12–25 minutes of active work
+against the ~5-minute execution-leaf target (scrutinize above five minutes;
+finer-decompose above ten).
+
+### Occurrences
+
+- Execution: SEED-009 story 28 / quick/129-publish-trash-moves / 473550c16e
+  - Timestamp: unknown
+  - Tool: Cursor
+  - Model: Cursor Grok 4.6
+  - Open Dough release: 0.3.22
+  - Evidence: coordinator process notes for this execution; PLAN.md
+    records refactor outcomes for slices 2, 4, 5, 7, and 8 without
+    per-refactor elapsed minutes.
+  - Observed effect: refactor duration was reported as several times the
+    leaf target while product slices still completed.
+  - Inference: qualified — the 12–25 minute range is coordinator-reported,
+    not a per-slice measured log; backend suite waits (~1m) are already
+    treated as test-wait exceptions and do not explain a 12–25 minute
+    refactor.
+
 ## Retention
 
-- Highest allocated local number: 54
+- Highest allocated local number: 57
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial

@@ -25,13 +25,14 @@ trash state, identity map, event journal, endpoint-specific snapshot algorithm,
 or story-shaped dispatch modes.
 
 Evidence and application: note editing, ordinary note and same-notebook folder
-movement, note trash, and same-notebook immediate Undo append one accepted
-commit after the complete mutation. The snapshot is built from the current
-persisted tree, so newly constructed parents are included. Pre-existing
-projection drift remains unsynchronized. This direction governs remaining
-portable-trash Git compatibility in
-[story 28](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-28).
-It follows
+movement, note trash, same-notebook folder Trash, and same-notebook immediate
+Undo append one accepted commit after the complete mutation. The snapshot is
+built from the current persisted tree, so newly constructed parents are
+included. Pre-existing projection drift remains unsynchronized. Local Git
+moves of notes and unchanged folder subtrees into or out of `_trash` are
+ordinary moves; publication that resolves them keeps the same identities and
+retained learning, and constructs destination parents through ordinary folder
+ownership. Recovery uses existing location and availability rules. It follows
 [Accepted ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash)
 and keeps publication's final-result direction below intact.
 
@@ -48,9 +49,10 @@ identity service, or dispatch mode per story.
 
 Evidence: accumulated linear ranges already publish by composing supported tip
 correspondence once, including in-place existing notebook and folder Readme
-edits applied through the existing container content owners. Remaining work
-still needs this shared final-only path for broader identity inference and
-trash-compatible publication. Exact endpoint matching alone is not enough for rename-then-edit
+edits applied through the existing container content owners. Trash-boundary
+note and exact-subtree folder moves use that same final-only path, including
+constructed destination parents. Remaining work still needs this shared
+final-only path for broader identity inference. Exact endpoint matching alone is not enough for rename-then-edit
 continuity when correspondence must be inferred beyond already supported
 transitions. This topic follows the owner's final-only application direction in
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md#apply-one-final-projection-atomically)
@@ -90,7 +92,7 @@ and consistent existing outcomes, not replacing explicit identity with inference
 
 Evidence: backend JGit dependency, current exact-move history composition, and
 existing publication/reference controller tests. This direction governs shared
-ordinary-note inference reused by later Git/trash work; it adds no new folder or
-trash delivery promise. It preserves Accepted ADRs 0004 and 0005 and clarifies
+ordinary-note inference for later Git work. Folder identity keeps existing
+exact-subtree semantics. It preserves Accepted ADRs 0004 and 0005 and clarifies
 the history-inspection/final-application distinction in Proposed ADR 0002
 without changing its status.
