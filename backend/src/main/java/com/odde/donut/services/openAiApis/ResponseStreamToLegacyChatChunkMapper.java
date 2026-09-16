@@ -63,10 +63,11 @@ public final class ResponseStreamToLegacyChatChunkMapper {
       }
     } else if (event.isFunctionCallArgumentsDone()) {
       var done = event.asFunctionCallArgumentsDone();
-      String name = done.name() != null ? done.name() : activeToolName;
       String args = done.arguments();
       if (!toolCallOpened) {
-        out.add(toolArgumentsChunk(Optional.ofNullable(name), args != null ? args : "", true));
+        out.add(
+            toolArgumentsChunk(
+                Optional.ofNullable(activeToolName), args != null ? args : "", true));
         toolCallOpened = true;
       }
       out.add(finishToolCallsChunk());

@@ -16,8 +16,8 @@ plugins {
   id 'java'
   id 'org.springframework.boot' version '4.1.1'
   // Spotless for the code style
-  id "com.diffplug.spotless" version "8.10.1"
-  id "io.github.ben-manes.versions" version "0.61.0"
+  id "com.diffplug.spotless" version "8.10.2"
+  id "io.github.ben-manes.versions" version "0.63.1"
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -70,8 +70,8 @@ repositories {
 def jdkUnsafeMemoryAccessJvmArgs = ['--sun-misc-unsafe-memory-access=allow']
 
 dependencies {
-  implementation platform('com.google.cloud:libraries-bom:26.87.0')
-  implementation 'com.google.cloud:google-cloud-storage:2.72.0'
+  implementation platform('com.google.cloud:libraries-bom:26.88.1')
+  implementation 'com.google.cloud:google-cloud-storage:2.73.0'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.2'
   implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -84,16 +84,16 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.1.0'
-  implementation 'com.openai:openai-java:4.52.0'
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.1.1'
+  implementation 'com.openai:openai-java:4.63.3'
   implementation 'org.yaml:snakeyaml:2.6'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
-  implementation 'net.javacrumbs.shedlock:shedlock-spring:7.9.0'
-  implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.9.0'
+  implementation 'net.javacrumbs.shedlock:shedlock-spring:7.10.1'
+  implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.10.1'
   implementation 'org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r'
-  compileOnly 'org.projectlombok:lombok:1.18.46'
-  annotationProcessor 'org.projectlombok:lombok:1.18.46'
+  compileOnly 'org.projectlombok:lombok:1.18.48'
+  annotationProcessor 'org.projectlombok:lombok:1.18.48'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   runtimeOnly 'com.mysql:mysql-connector-j:26.7.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
