@@ -45,36 +45,66 @@ class NotebookGitProposalFolderMaterialization {
       ObjectId acceptedHead,
       List<String> documentPaths,
       NotebookGitProposalImporter.ImportedProposal proposal) {
-    Map<String, Folder> folders = representedFolders(liveFolders, repository, acceptedHead);
-    for (String documentPath : documentPaths) {
-      Folder parent = null;
-      int componentStart = 0;
-      int separator = documentPath.indexOf('/');
-      while (separator >= 0) {
-        String folderPath = documentPath.substring(0, separator);
-        Folder folder = folders.get(folderPath);
-        if (folder == null) {
-          folder =
-              folderConstructionService.createFolder(
-                  notebook,
-                  validFolderRequest(
-                      documentPath,
-                      documentPath.substring(componentStart, separator),
-                      parent == null ? null : parent.getId()));
-          folders.put(folderPath, folder);
-        }
-        parent = folder;
-        componentStart = separator + 1;
-        separator = documentPath.indexOf('/', componentStart);
-      }
-      if (documentPath.endsWith("/README.md")) {
-        Folder folder = folders.get(documentPath.substring(0, documentPath.lastIndexOf('/')));
-        folder.setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, documentPath));
-        entityPersister.save(folder);
-      }
-    }
+    Map<String, Folder> folders =
+        ensureAncestry(notebook, liveFolders, repository, acceptedHead, documentPaths);
+    persistFolderReadmes(folders, documentPaths, proposal);
     entityPersister.flush();
     return folders;
+  }
+
+  /**
+   * Ensures parent folders for admitted destination paths, creating any ancestry absent from the
+   * accepted represented tree. {@link FolderConstructionService} remains the creation owner.
+   */
+  Map<String, Folder> ensureAncestry(
+      Notebook notebook,
+      List<ExportFolderRow> liveFolders,
+      Repository repository,
+      ObjectId acceptedHead,
+      List<String> destinationPaths) {
+    Map<String, Folder> folders = representedFolders(liveFolders, repository, acceptedHead);
+    for (String destinationPath : destinationPaths) {
+      ensureAncestry(notebook, folders, destinationPath);
+    }
+    return folders;
+  }
+
+  private void ensureAncestry(
+      Notebook notebook, Map<String, Folder> folders, String destinationPath) {
+    Folder parent = null;
+    int componentStart = 0;
+    int separator = destinationPath.indexOf('/');
+    while (separator >= 0) {
+      String folderPath = destinationPath.substring(0, separator);
+      Folder folder = folders.get(folderPath);
+      if (folder == null) {
+        folder =
+            folderConstructionService.createFolder(
+                notebook,
+                validFolderRequest(
+                    destinationPath,
+                    destinationPath.substring(componentStart, separator),
+                    parent == null ? null : parent.getId()));
+        folders.put(folderPath, folder);
+      }
+      parent = folder;
+      componentStart = separator + 1;
+      separator = destinationPath.indexOf('/', componentStart);
+    }
+  }
+
+  private void persistFolderReadmes(
+      Map<String, Folder> folders,
+      List<String> documentPaths,
+      NotebookGitProposalImporter.ImportedProposal proposal) {
+    for (String documentPath : documentPaths) {
+      if (!documentPath.endsWith("/README.md")) {
+        continue;
+      }
+      Folder folder = folders.get(documentPath.substring(0, documentPath.lastIndexOf('/')));
+      folder.setReadmeContent(NotebookGitProposalTypedPath.requireReadme(proposal, documentPath));
+      entityPersister.save(folder);
+    }
   }
 
   private Map<String, Folder> representedFolders(
