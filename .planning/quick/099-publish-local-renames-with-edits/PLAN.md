@@ -208,7 +208,7 @@ Full backend suite green (2439 tests). No confirmation UI or confidence policy a
 
 ### 5. Preserve references through inferred rename and relocation
 Type: Behavior
-Status: planned
+Status: done
 
 Given references to a note, a changed-content inferred move uses existing
 publication reference semantics. Unchanged old-path text is preserved and
@@ -222,6 +222,19 @@ signals. Observe the same note ID via the current note controller boundary.
 Backend command. Existing web reference behavior remains regression coverage;
 no new web implementation is prescribed.
 Sizing: ~5 minutes active work plus suite; medium confidence.
+Done 2026-09-16: NO production change required — the existing reference
+resolution path keys on resolved note identity, not the raw rename kind, so
+inferred (changed-content) moves preserve referrer authored bytes and stop
+resolving the old path exactly as exact-content moves do, while the moved note
+retains its original ID. Added two tests:
+`leavesReferringBodyAuthoredWhenPublishingAnInferredRenameWithEditedContent`
+(rename) and `leavesPathQualifiedReferringBodyAuthoredWhenPublishingAnInferredRelocationWithEditedContent`
+(relocation), both using the shared `MODERATE_EDIT_BODY` ([50,60) score bracket)
+extracted to `NotebookGitBundleControllerTestBase`. Refactor extracted
+`NotebookGitProposalRenameReferrerControllerTest` for the referrer-preservation
+concept and trimmed the rename acceptance test file (503 → 407 lines). Full
+backend suite green (2441 tests). No new resolver, Git-tree rewrite, or web
+behavior introduced.
 
 ### 6. Publish the accumulated session through the installed CLI
 Type: Behavior

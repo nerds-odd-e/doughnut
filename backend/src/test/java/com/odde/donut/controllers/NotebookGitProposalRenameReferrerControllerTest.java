@@ -9,7 +9,6 @@ import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiLink;
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -18,36 +17,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Verifies Git publication of a filename-preserving relocation leaves path-qualified referrer bytes
- * exact and stops resolving the old Portable path. Unqualified same-parent rename referrers are
- * covered in {@link NotebookGitProposalRenameControllerTest}. Placement is covered in {@link
- * NotebookGitProposalRelocationControllerTest}. Web folder-move rewrite is out of scope.
+ * Verifies Git publication of an ordinary-note rename leaves unqualified referrer bytes exact and
+ * stops resolving the renamed target, whether the rename is detected by path alone or inferred from
+ * changed content. Path-qualified relocation referrers are covered in {@link
+ * NotebookGitProposalRelocationReferrerControllerTest}. Rename acceptance and identity preservation
+ * are covered in {@link NotebookGitProposalRenameControllerTest}.
  */
-class NotebookGitProposalRelocationReferrerControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRenameReferrerControllerTest extends NotebookGitBundleControllerTestBase {
 
-  private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
   private static final String TARGET_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String REFERRER_CONTENT =
-      """
-      ---
-      type: Note
-      example of: "[[Inbox/Cell]]"
-      ---
-      Body [[Inbox/Cell]]
-      """;
+      "---\n" + "type: Note\n" + "example of: \"[[Target]]\"\n" + "---\n" + "Body [[Target]]\n";
 
   @Autowired NoteController noteController;
 
   @Test
-  void leavesPathQualifiedReferringBodyAndPropertyLinksAuthoredWhenPublishingRelocation()
+  void leavesReferringBodyAndPropertyLinksAuthoredWhenPublishingTheTargetsRename()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Folder inbox = makeMe.aFolder().notebook(notebook).name("Inbox").please();
-    Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
-    makeMe.aNote().folder(inbox).title("keep").content(TYPED_NOTE_CONTENT).please();
-    makeMe.aNote().folder(biology).title("other").content(TYPED_NOTE_CONTENT).please();
-    makeMe.aNote().folder(inbox).title("Cell").content(TARGET_CONTENT).please();
+    Note target =
+        makeMe.aNote().notebook(notebook).title("Target").content(TARGET_CONTENT).please();
     Note referrer =
         makeMe.aNote().notebook(notebook).title("Referrer").content(REFERRER_CONTENT).please();
     inCommittedTransaction(
@@ -57,7 +46,7 @@ class NotebookGitProposalRelocationReferrerControllerTest
                 noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_CONTENT));
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     List<WikiLink.Resolution> resolutionsBeforePublish =
-        inboxCellResolutions(
+        targetResolutions(
             noteController.showNote(noteRepository.findById(referrer.getId()).orElseThrow()));
     assertThat(resolutionsBeforePublish, not(empty()));
     assertThat(resolutionsBeforePublish, everyItem(equalTo(WikiLink.Resolution.RESOLVED)));
@@ -65,9 +54,7 @@ class NotebookGitProposalRelocationReferrerControllerTest
         proposalBundleBytes(
             binding,
             List.of(
-                new NotebookGitProposalFile("Inbox/keep.md", TYPED_NOTE_CONTENT),
-                new NotebookGitProposalFile("Biology/other.md", TYPED_NOTE_CONTENT),
-                new NotebookGitProposalFile("Biology/Cell.md", TARGET_CONTENT),
+                new NotebookGitProposalFile("Target Renamed.md", TARGET_CONTENT),
                 new NotebookGitProposalFile("Referrer.md", REFERRER_CONTENT)));
 
     controller.publishNotebookGitProposal(
@@ -76,19 +63,22 @@ class NotebookGitProposalRelocationReferrerControllerTest
     NoteRealm shown =
         noteController.showNote(noteRepository.findById(referrer.getId()).orElseThrow());
     assertThat(shown.getNote().getContent(), equalTo(REFERRER_CONTENT));
-    assertThat(inboxCellResolutions(shown), empty());
+    assertThat(targetResolutions(shown), empty());
+    Note renamedTarget = noteRepository.findById(target.getId()).orElseThrow();
+    assertThat(renamedTarget.getTitle(), equalTo("Target Renamed"));
   }
 
   @Test
-  void leavesPathQualifiedReferringBodyAuthoredWhenPublishingAnInferredRelocationWithEditedContent()
+  void leavesReferringBodyAuthoredWhenPublishingAnInferredRenameWithEditedContent()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Folder inbox = makeMe.aFolder().notebook(notebook).name("Inbox").please();
-    Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
-    makeMe.aNote().folder(inbox).title("keep").content(TYPED_NOTE_CONTENT).please();
-    makeMe.aNote().folder(biology).title("other").content(TYPED_NOTE_CONTENT).please();
-    Note cell =
-        makeMe.aNote().folder(inbox).title("Cell").content(SUBSTANTIAL_ORIGINAL_BODY).please();
+    Note target =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .title("Target")
+            .content(SUBSTANTIAL_ORIGINAL_BODY)
+            .please();
     Note referrer =
         makeMe.aNote().notebook(notebook).title("Referrer").content(REFERRER_CONTENT).please();
     inCommittedTransaction(
@@ -98,7 +88,7 @@ class NotebookGitProposalRelocationReferrerControllerTest
                 noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_CONTENT));
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     List<WikiLink.Resolution> resolutionsBeforePublish =
-        inboxCellResolutions(
+        targetResolutions(
             noteController.showNote(noteRepository.findById(referrer.getId()).orElseThrow()));
     assertThat(resolutionsBeforePublish, not(empty()));
     assertThat(resolutionsBeforePublish, everyItem(equalTo(WikiLink.Resolution.RESOLVED)));
@@ -106,9 +96,7 @@ class NotebookGitProposalRelocationReferrerControllerTest
         proposalBundleBytes(
             binding,
             List.of(
-                new NotebookGitProposalFile("Inbox/keep.md", TYPED_NOTE_CONTENT),
-                new NotebookGitProposalFile("Biology/other.md", TYPED_NOTE_CONTENT),
-                new NotebookGitProposalFile("Biology/Cell.md", MODERATE_EDIT_BODY),
+                new NotebookGitProposalFile("Target Renamed.md", MODERATE_EDIT_BODY),
                 new NotebookGitProposalFile("Referrer.md", REFERRER_CONTENT)));
 
     controller.publishNotebookGitProposal(
@@ -117,17 +105,16 @@ class NotebookGitProposalRelocationReferrerControllerTest
     NoteRealm shown =
         noteController.showNote(noteRepository.findById(referrer.getId()).orElseThrow());
     assertThat(shown.getNote().getContent(), equalTo(REFERRER_CONTENT));
-    assertThat(inboxCellResolutions(shown), empty());
-    Note movedCell = noteRepository.findById(cell.getId()).orElseThrow();
-    assertThat(movedCell.getId(), equalTo(cell.getId()));
-    assertThat(movedCell.getTitle(), equalTo("Cell"));
-    assertThat(movedCell.getFolder().getId(), equalTo(biology.getId()));
-    assertThat(movedCell.getContent(), equalTo(MODERATE_EDIT_BODY));
+    assertThat(targetResolutions(shown), empty());
+    Note renamedTarget = noteRepository.findById(target.getId()).orElseThrow();
+    assertThat(renamedTarget.getId(), equalTo(target.getId()));
+    assertThat(renamedTarget.getTitle(), equalTo("Target Renamed"));
+    assertThat(renamedTarget.getContent(), equalTo(MODERATE_EDIT_BODY));
   }
 
-  private static List<WikiLink.Resolution> inboxCellResolutions(NoteRealm shown) {
+  private static List<WikiLink.Resolution> targetResolutions(NoteRealm shown) {
     return shown.getWikiLinks().stream()
-        .filter(link -> "Inbox/Cell".equals(link.getTarget()))
+        .filter(link -> "Target".equals(link.getTarget()))
         .map(WikiLink::getResolution)
         .toList();
   }

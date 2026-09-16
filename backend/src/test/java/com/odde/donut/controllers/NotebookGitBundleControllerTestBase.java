@@ -84,6 +84,22 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
           + "Graduate students calibrated lasers late into the quiet night.\n"
           + "A paper summarizing findings was submitted to a prominent journal.\n";
 
+  /**
+   * Substantial typed-note body edited from {@link #SUBSTANTIAL_ORIGINAL_BODY} so the JGit
+   * similarity score lands in [50, 60): distinguishes the configured 50% rename policy from JGit's
+   * 60% default while genuinely changing content. Shared by inferred move-and-edit reference
+   * fixtures across rename and relocation referrer controller tests.
+   */
+  static final String MODERATE_EDIT_BODY =
+      "---\ntype: Note\n---\n"
+          + "The quick brown fox jumps over the lazy dog near the riverbank.\n"
+          + "She decided to read the ancient manuscript that described the valley.\n"
+          + "Mountains rose in the distance, their peaks covered with fresh snow.\n"
+          + "A small village nestled between them kept its traditions alive for generations.\n"
+          + "Completely rewritten prose about oceans and sailing ships replaces this.\n"
+          + "Sailors navigated by stars across the wide and stormy open waters.\n"
+          + "The harbor master logged each vessel and collected the docking fees.\n";
+
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired PlatformTransactionManager transactionManager;
   @Autowired EntityManager entityManager;
