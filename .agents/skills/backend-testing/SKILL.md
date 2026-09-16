@@ -1,11 +1,12 @@
 ---
-description: Backend Java tests, controller-level stable-boundary tests, JUnit, @Nested, MakeMe builders, @Transactional, parameterized tests
-globs: backend/src/test/**/*.java
-alwaysApply: false
+name: backend-testing
+description: "Backend Java tests, controller-level stable-boundary tests, JUnit, @Nested, MakeMe builders, @Transactional, parameterized tests. Use when writing or changing backend JUnit tests."
+paths:
+  - "backend/src/test/**/*.java"
 ---
 # Backend Testing Rules
 
-**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** always-applied `unit-testing.mdc` — follow that first.
+**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** the `unit-testing` skill — follow that first.
 
 ## Commands
 
@@ -30,7 +31,7 @@ profile outside committed files.
 
 ## Core Principles
 
-Backend application of the "small test" style (`unit-testing.mdc`):
+Backend application of the "small test" style (`unit-testing` skill):
 
 1. Prefer **controller** (or other HTTP-stable-boundary) tests for behavior users see through HTTP. These tests often do not reference the internal class you edited; cover services/repos via realistic `makeMe` preconditions and the real DB.
 2. Test services and algorithms directly only when they are an independent, intentional domain-stable contract (pure logic or algorithms).
@@ -81,7 +82,7 @@ class RestNoteControllerTests {
 ## MakeMe Builders
 
 - Use the central `makeMe` factory; chain methods; end with `please()` (or `please(boolean)` for persistence control).
-- Builders handle relationships and defaults — see `unit-testing.mdc` for when to extend them vs set fields in the test.
+- Builders handle relationships and defaults — see `unit-testing` skill for when to extend them vs set fields in the test.
 - Ownership: prefer `notebookOwnedBy(user)` so `aMemoryTrackerFor(note)` inherits the owner.
 
 ```java
@@ -96,9 +97,9 @@ Note note = makeMe.aNote()
 
 - Group related tests with `@Nested`.
 - Use `@BeforeEach` for common setup, keeping setup minimal and relevant to the group.
-- Mocking policy: `unit-testing.mdc`. Backend exception: external services only — mock `OpenAIClient` structured Responses output with `OpenAiStructuredResponseMock` in controller tests.
+- Mocking policy: `unit-testing` skill. Backend exception: external services only — mock `OpenAIClient` structured Responses output with `OpenAiStructuredResponseMock` in controller tests.
 
 ## Assertions
 
 - Use `assertThat` with descriptive matchers; `assertThrows` for exceptions; `@ParameterizedTest` when inputs vary but the assertion focus stays the same.
-- Assertion **scope** and avoiding cross-test redundancy: `unit-testing.mdc`.
+- Assertion **scope** and avoiding cross-test redundancy: `unit-testing` skill.

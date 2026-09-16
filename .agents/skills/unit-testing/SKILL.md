@@ -1,13 +1,12 @@
 ---
-description: "small test" style for unit tests — stable boundary, data over mocks, focused assertions, concise makeMe (all packages)
-alwaysApply: true
+name: unit-testing
+description: Small-test style for unit tests — stable boundary, data over mocks, focused assertions, concise makeMe (all packages). Use when writing or changing unit tests in any package.
 ---
-
 # "Small test" style
 
 This repo’s automated tests are **E2E** or **unit tests** — nothing in between. Write unit tests in the **"small test"** style below.
 
-A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …) that drives a **stable boundary** with crafted data/`makeMe`, exercises real lower-level production code, and mocks only external dependencies. Stack commands, entry points, and tooling stay in the package rules (`frontend.mdc` / `frontend-testing.mdc`, `backend.mdc` / `backend-testing.mdc`, `cli.mdc`, `mcp-server.mdc`).
+A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …) that drives a **stable boundary** with crafted data/`makeMe`, exercises real lower-level production code, and mocks only external dependencies. Stack commands, entry points, and tooling stay in the package skills (`frontend` / `frontend-testing`, `backend` / `backend-testing`, `cli`, `mcp-server`).
 
 ## Stable boundary
 

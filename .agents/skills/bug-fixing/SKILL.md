@@ -23,7 +23,7 @@ Output: Passing focused tests + short summary ending with `## BUG FIX COMPLETE`.
 **Test level choice:**
 - Bug matches an **existing E2E scenario** (same feature, same user interaction)
   → extend or add an E2E test.
-- Otherwise → a **unit test** in the **"small test"** style per `unit-testing.mdc`
+- Otherwise → a **unit test** in the **"small test"** style per the `unit-testing` skill
   (stable-boundary JUnit/Vitest/…): drive a **stable boundary** (controller, mounted
   component, CLI `run`/`runInteractive`), cover lower layers with crafted data/`makeMe`,
   mock only externals.
@@ -109,6 +109,6 @@ Report a short summary to the caller, then the completion marker:
 <out_of_scope>
 - Do not run the full E2E suite unless explicitly requested.
 - Do not add tests that only exercise internal helpers when a stable boundary
-  entry point is available (see `unit-testing.mdc`).
+  entry point is available (see the `unit-testing` skill).
 - Do not skip the failing-test confirmation step.
 </out_of_scope>

@@ -1,11 +1,12 @@
 ---
-description: Backend Java production code, Spring Boot controllers/services/repositories, controller return values, imports, schema ERD pointer
-globs: backend/src/main/**/*.java
-alwaysApply: false
+name: backend-code
+description: Backend Java production code, Spring Boot controllers/services/repositories, controller return values, imports, schema ERD pointer. Use when editing backend production Java.
+paths:
+  - "backend/src/main/**/*.java"
 ---
 # Backend Code Rules
 
-Migrations: `db-migration.mdc`.
+Migrations: `db-migration` skill.
 
 ## Commands
 

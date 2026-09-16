@@ -1,7 +1,9 @@
 ---
-description: related to donut CLI
-globs: cli/**, e2e_test/features/cli/**
-alwaysApply: false
+name: cli
+description: related to donut CLI. Use when working on donut-cli.
+paths:
+  - "cli/**"
+  - "e2e_test/features/cli/**"
 ---
 # donut-cli
 
@@ -24,7 +26,7 @@ cli/
 
 ## TypeScript module exports
 
-Keep each module’s **public surface small**: `export` only what other modules actually use. Prefer leaving helpers, constants, and types **unexported** when they are implementation details. Do not add exports “for tests” or “maybe later” — if only tests need a symbol, test through a stable-boundary entry point when possible (`unit-testing.mdc`; see **Vitest: observable behavior** below). Avoid widening the export list when a single import site could instead live next to the code.
+Keep each module’s **public surface small**: `export` only what other modules actually use. Prefer leaving helpers, constants, and types **unexported** when they are implementation details. Do not add exports “for tests” or “maybe later” — if only tests need a symbol, test through a stable-boundary entry point when possible (`unit-testing` skill; see **Vitest: observable behavior** below). Avoid widening the export list when a single import site could instead live next to the code.
 
 ## Commands
 
@@ -61,11 +63,11 @@ Apply architectural changes when a feature needs them; challenge the fit first.
 
 ## Vitest: observable behavior
 
-**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** always-applied `unit-testing.mdc` — follow that first.
+**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** the `unit-testing` skill — follow that first.
 
-For **interactive** behavior, prefer **`runInteractive`** (from `interactive.js`, implemented in `interactiveInkSession.ts`) with a **mock TTY** stdin and assert **stdout** / visible output — the test may **not import** the module you changed; coverage through the CLI surface is enough. For **argv routing** (`version`, `help`, interactive fallback), use **`run`** from `run.js` (see `cli/tests/index.test.ts`). E2E vs unit-test layering for slices: `dough-slice-planning` skill; write unit tests in the "small test" style (`unit-testing.mdc`).
+For **interactive** behavior, prefer **`runInteractive`** (from `interactive.js`, implemented in `interactiveInkSession.ts`) with a **mock TTY** stdin and assert **stdout** / visible output — the test may **not import** the module you changed; coverage through the CLI surface is enough. For **argv routing** (`version`, `help`, interactive fallback), use **`run`** from `run.js` (see `cli/tests/index.test.ts`). E2E vs unit-test layering for slices: `dough-slice-planning` skill; write unit tests in the "small test" style (`unit-testing` skill).
 
-**Mocking Donut HTTP from unit tests** — The Donut backend is an **external** dependency (`unit-testing.mdc` exception). Use **`vi.spyOn`** on **`donut-api`** controller static methods (e.g. `RecallsController.recalling`, `MemoryTrackerController.showMemoryTracker`) and **`mockResolvedValue`** with the SDK success shape (`{ data: … }`, cast as **`Awaited<ReturnType<typeof Controller.method>>`** when needed). Build **`data`** values that match backend / SDK types with **`makeMe`** from **`donut-test-fixtures/makeMe`** (e.g. `makeMe.aMemoryTracker`, `makeMe.aNoteRealm`, `makeMe.aDueMemoryTrackersList`) instead of ad hoc object literals — and keep those fixtures concise per `unit-testing.mdc`. Do **not** use **`http.createServer`** to fake `/api/…` for ordinary command behavior. Reserve a real local HTTP server for tests whose subject is transport or error classification (e.g. status codes), not for happy-path recall or token flows.
+**Mocking Donut HTTP from unit tests** — The Donut backend is an **external** dependency (`unit-testing` skill exception). Use **`vi.spyOn`** on **`donut-api`** controller static methods (e.g. `RecallsController.recalling`, `MemoryTrackerController.showMemoryTracker`) and **`mockResolvedValue`** with the SDK success shape (`{ data: … }`, cast as **`Awaited<ReturnType<typeof Controller.method>>`** when needed). Build **`data`** values that match backend / SDK types with **`makeMe`** from **`donut-test-fixtures/makeMe`** (e.g. `makeMe.aMemoryTracker`, `makeMe.aNoteRealm`, `makeMe.aDueMemoryTrackersList`) instead of ad hoc object literals — and keep those fixtures concise per `unit-testing` skill. Do **not** use **`http.createServer`** to fake `/api/…` for ordinary command behavior. Reserve a real local HTTP server for tests whose subject is transport or error classification (e.g. status codes), not for happy-path recall or token flows.
 
 **No fixed-time waits in unit tests** — Do not use `sleep`, `setTimeout(…, N)` with a duration, or similar wall-clock delays to “let Ink/React catch up.” Prefer driving the real async surface: `setImmediate` / microtask turns in a loop until an **observable** condition holds (e.g. `frames` or stdout contains the expected text), with a **turn-count** cap and a clear failure message if the condition never becomes true. E2E may still use bounded retries where appropriate; Vitest unit tests under `cli/tests/` should stay deterministic without arbitrary milliseconds.
 

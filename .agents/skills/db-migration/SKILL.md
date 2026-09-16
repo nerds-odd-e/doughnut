@@ -1,6 +1,9 @@
 ---
-description: Database migration, Flyway, SQL migrations, schema changes, database versioning, migration files, squashing historical migrations
-alwaysApply: false
+name: db-migration
+description: Database migration, Flyway, SQL migrations, schema changes, database versioning, migration files, squashing historical migrations. Use when adding or changing Flyway migrations or schema.
+paths:
+  - "backend/src/main/resources/db/**"
+  - "backend/src/main/java/db/migration/**"
 ---
 # Database Migration Guidelines
 

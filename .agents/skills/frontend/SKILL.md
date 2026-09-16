@@ -1,12 +1,14 @@
 ---
-description: Vue frontend — components, Vitest, generated API client, apiCallWithLoading, DaisyUI. Read this first for any frontend work.
-alwaysApply: false
+name: frontend
+description: Vue frontend — components, Vitest, generated API client, apiCallWithLoading, DaisyUI. Read this first for any frontend work. Use when working on the Vue frontend.
+paths:
+  - "frontend/**"
 ---
 # Frontend
 
 Vue 3 + TypeScript in `frontend/src/`. Tests in `frontend/tests/`. Import the backend client from `@generated/donut-backend-api/sdk.gen`.
 
-Cursor auto-attaches `frontend-component.mdc`, `frontend-testing.mdc`, `frontend-api.mdc`, and `frontend-storybook.mdc` when matching files are in context — do not fetch them up front. Lint: `linting_formating.mdc`.
+Matching `frontend-component`, `frontend-testing`, `frontend-api`, and `frontend-storybook` skills attach via `paths` when those files are in context — do not fetch them up front. Lint: `linting_formating` skill.
 
 ## Commands
 

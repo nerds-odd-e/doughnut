@@ -1,7 +1,9 @@
 ---
-description: Shell script development and unit testing guidelines
+name: script
+description: Shell script development and unit testing guidelines. Use when writing or testing shell scripts under scripts/.
+paths:
+  - "scripts/**"
 ---
-
 # Shell Script Development
 
 ## Script Location

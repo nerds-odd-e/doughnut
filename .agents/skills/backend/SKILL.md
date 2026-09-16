@@ -1,12 +1,14 @@
 ---
-description: Backend Java — Spring Boot controllers/services, JUnit controller tests, MakeMe. Read this first for any backend work.
-alwaysApply: false
+name: backend
+description: Backend Java — Spring Boot controllers/services, JUnit controller tests, MakeMe. Read this first for any backend work. Use when working on the Java Spring backend.
+paths:
+  - "backend/**"
 ---
 # Backend
 
-Java/Spring in `backend/src/main/java/com/odde/donut/`. Tests under `backend/src/test/`. Schema changes: `db-migration.mdc`.
+Java/Spring in `backend/src/main/java/com/odde/donut/`. Tests under `backend/src/test/`. Schema changes: `db-migration` skill.
 
-Cursor auto-attaches `backend-code.mdc` (production Java) and `backend-testing.mdc` (tests) when matching files are in context — do not fetch them up front.
+Matching `backend-code` (production Java) and `backend-testing` (tests) skills attach via `paths` when those files are in context — do not fetch them up front.
 
 ## Commands
 
@@ -30,6 +32,6 @@ Always run all backend unit tests, not a selected file or test case.
 
 ## Tests
 
-Small-test style (`unit-testing.mdc`): prefer **controller** (HTTP-stable-boundary) tests; cover services/repos via realistic `makeMe` preconditions and the real DB (`@Transactional`). Test a service/algorithm directly only when it is an intentional domain-stable contract.
+Small-test style (`unit-testing` skill): prefer **controller** (HTTP-stable-boundary) tests; cover services/repos via realistic `makeMe` preconditions and the real DB (`@Transactional`). Test a service/algorithm directly only when it is an intentional domain-stable contract.
 
 Mock only external services — `OpenAIClient` via `OpenAiStructuredResponseMock`. Ownership: `notebookOwnedBy(user)` so trackers inherit the owner. Group with `@Nested`.

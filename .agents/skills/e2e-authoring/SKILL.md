@@ -1,11 +1,13 @@
 ---
-description: E2E testing with Cypress and Cucumber, feature files, step definitions, page objects, fluent interface, assertions, data-app-busy / waitUntilAppIsNotBusy pairing, test execution
-globs: e2e_test/**/*.{feature,ts}
-alwaysApply: false
+name: e2e-authoring
+description: E2E testing with Cypress and Cucumber, feature files, step definitions, page objects, fluent interface, assertions, data-app-busy / waitUntilAppIsNotBusy pairing, test execution. Use when writing Cypress/Cucumber E2E tests.
+paths:
+  - "e2e_test/**/*.feature"
+  - "e2e_test/**/*.ts"
 ---
 # E2E Authoring Rules
 
-Use this rule when writing or modifying E2E tests, Cypress/Cucumber feature files, step definitions, page objects, or E2E assertions. For OCR-specific canvas assertions, use `e2e-ocr.mdc`.
+Use this skill when writing or modifying E2E tests, Cypress/Cucumber feature files, step definitions, page objects, or E2E assertions. For OCR-specific canvas assertions, use the `e2e-ocr` skill.
 
 ## Environment Assumption
 
@@ -81,7 +83,7 @@ Use the canonical log-tail command for backend E2E log inspection:
 CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e
 ```
 
-Frontend Vite checker terminal errors still matter even though the browser overlay is disabled for E2E stability. For canonical lint and format commands, use `linting_formating.mdc`.
+Frontend Vite checker terminal errors still matter even though the browser overlay is disabled for E2E stability. For canonical lint and format commands, use the `linting_formating` skill.
 
 ## Technology And Structure
 
@@ -170,7 +172,7 @@ Then("I should see {string} in the non-interactive output", (expected: string) =
 
 ## Waiting until the app is not busy
 
-Product loading UI that means unfinished work marks itself with `data-app-busy` (`LoadingThinBar` from `apiCallWithLoading`, `ContentLoader` for pending page data, `LoadingModal` for `blockUi`). See `.cursor/rules/frontend.mdc`.
+Product loading UI that means unfinished work marks itself with `data-app-busy` (`LoadingThinBar` from `apiCallWithLoading`, `ContentLoader` for pending page data, `LoadingModal` for `blockUi`). See `.agents/skills/frontend/SKILL.md`.
 
 E2E waits with `waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts` (also `start.waitUntilAppIsNotBusy()`):
 

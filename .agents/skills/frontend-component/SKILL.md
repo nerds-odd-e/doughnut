@@ -1,7 +1,10 @@
 ---
-description: Vue component structure, styling, derived state, modals, icons, DaisyUI/Tailwind frontend component conventions
-globs: frontend/src/**/*.{vue,ts,scss}
-alwaysApply: false
+name: frontend-component
+description: Vue component structure, styling, derived state, modals, icons, DaisyUI/Tailwind frontend component conventions. Use when editing Vue components, SCSS, or frontend src TypeScript.
+paths:
+  - "frontend/src/**/*.vue"
+  - "frontend/src/**/*.ts"
+  - "frontend/src/**/*.scss"
 ---
 # Frontend Component Rules
 

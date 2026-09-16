@@ -1,12 +1,11 @@
 ---
-description: Routes problem and story decomposition to installed Open Dough guidance
-alwaysApply: true
+name: problem-decomposition
+description: Routes problem and story decomposition to installed Open Dough guidance. Use when decomposing problems or splitting stories.
 ---
-
 # Problem Decomposition
 
 Read and follow the installed
-[Open Dough problem-decomposition reference](../../.agents/skills/dough-story-decomposition/references/problem-decomposition.md)
+[Open Dough problem-decomposition reference](../dough-story-decomposition/references/problem-decomposition.md)
 for problem framing, story splitting, sizing, ordering, and learning escalation.
 
 Use `dough-story-decomposition` for unresolved parent problems or candidate

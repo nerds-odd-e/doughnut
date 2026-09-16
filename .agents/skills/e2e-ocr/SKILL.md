@@ -1,11 +1,12 @@
 ---
-description: E2E OCR assertions with Tesseract.js for canvas-only UI such as PDF pages in Cypress page objects
-globs: e2e_test/start/pageObjects/**/*.ts
-alwaysApply: false
+name: e2e-ocr
+description: E2E OCR assertions with Tesseract.js for canvas-only UI such as PDF pages in Cypress page objects. Use when asserting canvas-only E2E text with OCR.
+paths:
+  - "e2e_test/start/pageObjects/**/*.ts"
 ---
 # E2E OCR Rules
 
-Use this rule when asserting text that is not in the DOM, such as PDF content drawn only to `<canvas>`. Keep OCR in test infrastructure, not product code.
+Use this skill when asserting text that is not in the DOM, such as PDF content drawn only to `<canvas>`. Keep OCR in test infrastructure, not product code.
 
 ## Tesseract Setup
 

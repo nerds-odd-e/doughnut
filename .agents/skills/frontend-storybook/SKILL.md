@@ -1,11 +1,12 @@
 ---
-description: Frontend Storybook stories for Vue components, story format, story variants, makeMe builders, Storybook aliases
-globs: frontend/src/**/*.stories.ts
-alwaysApply: false
+name: frontend-storybook
+description: Frontend Storybook stories for Vue components, story format, story variants, makeMe builders, Storybook aliases. Use when writing Storybook stories for Vue components.
+paths:
+  - "frontend/src/**/*.stories.ts"
 ---
 # Frontend Storybook Rules
 
-Vue naming, styling, icons, and derived-state also auto-attach from `frontend-component.mdc` (`*.stories.ts` is `*.ts`).
+Vue naming, styling, icons, and derived-state also come from the `frontend-component` skill (`*.stories.ts` is `*.ts`).
 
 ## Running Storybook
 

@@ -64,7 +64,7 @@ Fix any broken frontend code that used the old API signatures.
 <step name="openapi_lint_failures">
 If `pnpm openapi:lint` fails: **do not** edit `open_api_docs.yaml` (it is
 generated). Fix Java controllers, regenerate, then re-lint. Playbook details:
-`.cursor/rules/linting_formating.mdc` → **OpenAPI Linting**.
+`.agents/skills/linting_formating/SKILL.md` → **OpenAPI Linting**.
 </step>
 
 </process>

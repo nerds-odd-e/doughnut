@@ -4,7 +4,7 @@
  * **Assertions:** `currentGuidance`, **`whenCurrentGuidanceContainsThen`**, `pastCliAssistantMessages`,
  * `answeredQuestions`, and **`pastUserMessages.expectDisplayed`** all use **`cliAssert`**:
  * the plugin delegates to `tty-assert` managed-session `assert` (retry + replay in Node). Surfaces
- * differ — see `.cursor/rules/cli.mdc` terminology.
+ * differ — see the `cli` skill terminology.
  */
 import {
   answeredQuestions,

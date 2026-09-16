@@ -13,7 +13,7 @@ supersedes_direction: GCS downloadable mcp-server.bundle.mjs (dropped)
 
 ## Why This Matters
 
-MCP today is stdio + a local `mcp-server/dist/mcp-server.bundle.mjs` (IDE config in `.cursor/rules/mcp-server.mdc`). CLI already has a production story: CI uploads a versioned binary to GCS and the HTTPS LB serves `/doughnut-cli-latest/doughnut`. An earlier idea was to mirror that for MCP (upload the `.mjs` bundle and restore `/mcp-server.bundle.mjs`). That orphan LB route was removed (2026-08-06) because CI never uploaded the artifact.
+MCP today is stdio + a local `mcp-server/dist/mcp-server.bundle.mjs` (IDE config in `.agents/skills/mcp-server/SKILL.md`). CLI already has a production story: CI uploads a versioned binary to GCS and the HTTPS LB serves `/doughnut-cli-latest/doughnut`. An earlier idea was to mirror that for MCP (upload the `.mjs` bundle and restore `/mcp-server.bundle.mjs`). That orphan LB route was removed (2026-08-06) because CI never uploaded the artifact.
 
 **Chosen direction (2026-08-07):** do **not** ship a downloadable MCP bundle. Instead, expose MCP as an **HTTPS endpoint** so IDEs connect by URL (remote / streamable HTTP transport) to the live site — same class of “install from prod” UX as CLI, without requiring users to download or run a Node process locally.
 
@@ -38,7 +38,7 @@ Also surface when changing MCP transport (stdio → HTTP), Package-artifacts / p
 ## Breadcrumbs
 
 - `mcp-server/src/index.ts` — stdio transport today (`StdioServerTransport`)
-- `.cursor/rules/mcp-server.mdc` — IDE config is local `node …/mcp-server.bundle.mjs` only
+- `.agents/skills/mcp-server/SKILL.md` — IDE config is local `node …/mcp-server.bundle.mjs` only
 - `infra/gcp/path-routing/doughnut-routing.json` — MCP download rule removed 2026-08-06 (do not restore for static bundle)
 - `infra/gcp/scripts/upload-cli-binary-to-gcs.sh` — CLI download pattern (contrast; not the MCP model)
 - `docs/gcp/prod-frontend-static-lb.md` — SPA/CLI static release model

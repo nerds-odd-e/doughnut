@@ -1,8 +1,9 @@
 ---
-description: donut-mcp-server — structure, build, tests, Cursor/IDE configuration
-alwaysApply: false
+name: mcp-server
+description: donut-mcp-server — structure, build, tests, Cursor/IDE configuration. Use when changing the Donut MCP server.
+paths:
+  - "mcp-server/**"
 ---
-
 # donut-mcp-server MCP Server
 
 A Model Context Protocol server for Donut.
@@ -50,7 +51,7 @@ Note: Rebuild the bundle before running the e2e `mcp_services.feature`.
 
 ### Running Unit Tests
 
-The MCP server has Vitest unit tests under `tests/` (not mixed with `src/`). **Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** always-applied `unit-testing.mdc`.
+The MCP server has Vitest unit tests under `tests/` (not mixed with `src/`). **Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** the `unit-testing` skill.
 
 ```sh
 CURSOR_DEV=true nix develop -c pnpm mcp-server:test
@@ -87,7 +88,7 @@ The unit tests cover:
 ## CI/CD Integration
 
 - Unit tests run as part of the "Other Unit Tests" job in GitHub Actions
-- Formatting is included in the workspace format command; see `.cursor/rules/linting_formating.mdc`
+- Formatting is included in the workspace format command; see `.agents/skills/linting_formating/SKILL.md`
 - Tests are automatically executed on every push to main branch
 
 ## How to use this MCP Server

@@ -1,6 +1,6 @@
 ---
-description: Linting, formatting, code quality, Biome (2.4.x), Redocly, OpenAPI validation, code style, fix formatting errors, biome.json config, Vue SFC project-domain rule limitation, multi-file analysis (MFA)
-alwaysApply: false
+name: linting_formating
+description: Linting, formatting, code quality, Biome (2.4.x), Redocly, OpenAPI validation, code style, fix formatting errors, biome.json config, Vue SFC project-domain rule limitation, multi-file analysis (MFA). Use when linting, formatting, Biome, or OpenAPI validation.
 ---
 # Linting and Formatting in Donut Project
 

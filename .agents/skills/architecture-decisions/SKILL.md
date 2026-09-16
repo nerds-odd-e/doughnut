@@ -1,8 +1,7 @@
 ---
-description: Architectural Decision Records — agent consume/cite/conflict; humans approve
-alwaysApply: true
+name: architecture-decisions
+description: Architectural Decision Records — agent consume/cite/conflict; humans approve. Use for architecture-shaped work and ADRs.
 ---
-
 # Architecture Decisions (ADRs)
 
 - **Human playbook** (propose / discuss / approve): `docs/adrs/README.md`

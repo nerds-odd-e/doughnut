@@ -82,7 +82,7 @@ The setup script is designed to be idempotent - you can run it multiple times sa
 
 ### Test Types
 
-The backend has **unit tests** only (written in the "small test" style — `unit-testing.mdc`). Some need MySQL; some do not:
+The backend has **unit tests** only (written in the "small test" style — `unit-testing` skill). Some need MySQL; some do not:
 
 1. **No database** — Use `MakeMeWithoutDB` for test data; can run without MySQL. Example: `QuestionEvaluationTest`.
 
@@ -163,7 +163,7 @@ whoami  # Should show "ubuntu" or similar non-root user
 ### File Locations
 
 - Setup script: `/workspace/scripts/cloud_agent_setup.sh`
-- Cursor rules: `/workspace/.cursor/rules/backend.mdc` (detail: `backend-code.mdc`, `backend-testing.mdc`)
+- Backend skills: `/workspace/.agents/skills/backend/SKILL.md` (detail: `backend-code`, `backend-testing`)
 - Init SQL: `/workspace/scripts/sql/init_doughnut_db.sql`
 - This documentation: `/workspace/docs/cloud_agent_backend_testing.md`
 
@@ -178,8 +178,8 @@ Potential enhancements:
 
 ## Related Documentation
 
-- Backend stack: `/workspace/.cursor/rules/backend.mdc`
-- Backend Code Guidelines: `/workspace/.cursor/rules/backend-code.mdc`
-- Backend Testing Guidelines: `/workspace/.cursor/rules/backend-testing.mdc`
-- Database Migration: `/workspace/.cursor/rules/db-migration.mdc`
+- Backend stack: `/workspace/.agents/skills/backend/SKILL.md`
+- Backend Code Guidelines: `/workspace/.agents/skills/backend-code/SKILL.md`
+- Backend Testing Guidelines: `/workspace/.agents/skills/backend-testing/SKILL.md`
+- Database Migration: `/workspace/.agents/skills/db-migration/SKILL.md`
 - Local Development Setup: `/workspace/docs/dev_vm.md`

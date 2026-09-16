@@ -1,11 +1,13 @@
 ---
-description: Frontend Vitest browser-mode tests, Testing Library queries, mockSdkService, makeMe builders, deterministic Vue component testing
-globs: frontend/tests/**/*.ts, frontend/src/**/*.spec.ts
-alwaysApply: false
+name: frontend-testing
+description: Frontend Vitest browser-mode tests, Testing Library queries, mockSdkService, makeMe builders, deterministic Vue component testing. Use when writing or changing frontend Vitest tests.
+paths:
+  - "frontend/tests/**/*.ts"
+  - "frontend/src/**/*.spec.ts"
 ---
 # Frontend Testing Rules
 
-**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** always-applied `unit-testing.mdc` — follow that first.
+**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** the `unit-testing` skill — follow that first.
 
 ## Test Commands
 
@@ -59,7 +61,7 @@ the normal browser-mode command and do not compare its wall time directly with
 
 ## Component Behavior
 
-- Drive the mounted component / page ("small test" style per `unit-testing.mdc`); cover lower layers with realistic `makeMe` props/state, not by testing internal helpers in isolation.
+- Drive the mounted component / page ("small test" style per `unit-testing` skill); cover lower layers with realistic `makeMe` props/state, not by testing internal helpers in isolation.
 - Test through user interactions; assert observable DOM outcomes.
 - Use `data-testid` for test selectors.
 - Use Vitest browser mode and prefer real browser rendering over mocking sibling components or internal modules; stop using jsdom.
@@ -83,7 +85,7 @@ and `useRoute` stubs with `path: "/"` are not a second screen dialect
 
 ## Mock SDK Services
 
-The backend HTTP API is an **external** dependency from the frontend’s perspective (`unit-testing.mdc` mocking exception).
+The backend HTTP API is an **external** dependency from the frontend’s perspective (`unit-testing` skill mocking exception).
 
 - Use `mockSdkService` from `@tests/helpers` for type-safe mocking: pass the generated **controller class** and the **method name** (same static methods as `@generated/donut-backend-api/sdk.gen`).
 - It automatically wraps responses in the standard format `{ data, error, request, response }`.
@@ -138,7 +140,7 @@ await wrapper.setProps({ value: newValue })
 
 - Use `makeMe` for API-shaped test data; implementation lives in `packages/donut-test-fixtures`.
 - Import `donut-test-fixtures/makeMe` only. Do not import the bare package name or deep paths into `src/`.
-- Concise setup, defaults, and extending builders: `unit-testing.mdc`.
+- Concise setup, defaults, and extending builders: `unit-testing` skill.
 
 ```typescript
 const note = makeMe.aNoteRealm.title("Dummy Title").content("Description").please()

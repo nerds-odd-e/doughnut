@@ -1,7 +1,9 @@
 ---
-description: Frontend API integration — generated SDK, apiCallWithLoading, blockUi, wrapped responses, toOpenApiError
-globs: frontend/src/**/*.{vue,ts}
-alwaysApply: false
+name: frontend-api
+description: Frontend API integration — generated SDK, apiCallWithLoading, blockUi, wrapped responses, toOpenApiError. Use when calling the generated backend API from the frontend.
+paths:
+  - "frontend/src/**/*.vue"
+  - "frontend/src/**/*.ts"
 ---
 # Frontend API Rules
 

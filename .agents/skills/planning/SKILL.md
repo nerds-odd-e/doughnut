@@ -1,12 +1,11 @@
 ---
-description: Routes planning scope and lifecycle to installed Open Dough guidance
-alwaysApply: true
+name: planning
+description: Routes planning scope and lifecycle to installed Open Dough guidance. Use for planning, story delivery, and .planning/ work.
 ---
-
 # Planning
 
 Read and follow the installed
-[Open Dough planning reference](../../.agents/skills/dough-story-refinement/references/planning.md)
+[Open Dough planning reference](../dough-story-refinement/references/planning.md)
 for scope discipline, story-home ownership, refinement lifecycle, and cleanup.
 
 Use `dough-story-decomposition` when the parent problem or candidate selection

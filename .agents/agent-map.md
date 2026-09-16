@@ -56,8 +56,8 @@ Useful focused checks:
 
 For `dough-test-optimization`, measure the applicable testing rule's ordinary
 stack command as the local feedback path. Runner-specific per-test profiling
-commands and parsing notes live in `frontend-testing.mdc`,
-`backend-testing.mdc`, `cli.mdc`, `mcp-server.mdc`, or `e2e-authoring.mdc`.
+commands and parsing notes live in the `frontend-testing`,
+`backend-testing`, `cli`, `mcp-server`, or `e2e-authoring` skills.
 Raw profiles are local evidence and must not be committed.
 
 **Development vs E2E:** For manual product feedback from the unconfigured primary,
@@ -73,7 +73,7 @@ after normal code changes; backend and frontend auto-reload.
 
 - Human propose / discuss / approve: `docs/adrs/README.md`
 - Current recommendations: `docs/adrs/*-accepted.md` (read explicitly — under `docs/`)
-- Rule pointer: `.cursor/rules/architecture-decisions.mdc`
+- Skill pointer: `.agents/skills/architecture-decisions/SKILL.md`
 
 ## Ignored Reference Material
 
