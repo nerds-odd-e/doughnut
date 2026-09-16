@@ -27,8 +27,8 @@ import org.eclipse.jgit.lib.Repository;
  * runs before scoring so non-unique content correspondence is refused rather than silently paired
  * by the library, which would otherwise greedily pick one candidate from a 1:N / N:N same-blob
  * group. Uncertain-identity refusal is delegated to {@link
- * NotebookGitProposalNoteCorrespondence#refuseUncertainIdentityCorrespondence()} so the one
- * safeguard message keeps a single home.
+ * NotebookGitProposalIdentityRefusal#refuseUncertainIdentityCorrespondence(java.util.List)} so the
+ * one safeguard message keeps a single home.
  */
 final class NotebookGitProposalRenameDetector {
 
@@ -94,7 +94,10 @@ final class NotebookGitProposalRenameDetector {
         continue;
       }
       if (removalGroup.getValue().size() != 1 || additionGroup.size() != 1) {
-        NotebookGitProposalNoteCorrespondence.refuseUncertainIdentityCorrespondence();
+        List<String> affectedPaths = new ArrayList<>();
+        removalGroup.getValue().forEach(change -> affectedPaths.add(change.path()));
+        additionGroup.forEach(change -> affectedPaths.add(change.path()));
+        NotebookGitProposalIdentityRefusal.refuseUncertainIdentityCorrespondence(affectedPaths);
       }
     }
   }

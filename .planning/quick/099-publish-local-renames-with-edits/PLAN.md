@@ -180,7 +180,7 @@ endpoint/range precedence model conflict arose.
 
 ### 4. Explain unresolved correspondence without partial publication
 Type: Behavior
-Status: planned
+Status: done
 
 Given a genuinely below-threshold unmatched removal/addition or existing
 ambiguous identical-file pairing, publication fails with affected paths and
@@ -194,6 +194,17 @@ and preserved head/note/learning state through committed rollback observations.
 Reuse existing copy and deletion-gap tests to distinguish intentional supported
 operations. Backend command; avoid repeated unrelated preservation assertions.
 Sizing: ~5 minutes active work plus suite; medium confidence.
+Done 2026-09-16: `refuseUncertainIdentityCorrespondence` now takes affected paths
+and appends `; affected paths: <sorted, joined>` to the unchanged message prefix;
+the single `unsupportedTreeShape` failure outcome and atomic rollback are retained.
+`refuseResidualRemovalAndAdditionMixture` and `refuseAmbiguousBlobCorrespondence`
+thread their affected paths; the both-present guard is preserved (deletion-only
+and addition-only stay admitted). Extended `NotebookGitDeletionRejectionControllerTest`
+with per-case expected affected paths and a new committed-rollback learning-state
+test. Refactor extracted the shared refusal into `NotebookGitProposalIdentityRefusal`
+(named for its responsibility) and split reserved-file rejection tests into
+`NotebookGitReservedFileRejectionControllerTest` to respect the 250-line gate.
+Full backend suite green (2439 tests). No confirmation UI or confidence policy added.
 
 ### 5. Preserve references through inferred rename and relocation
 Type: Behavior

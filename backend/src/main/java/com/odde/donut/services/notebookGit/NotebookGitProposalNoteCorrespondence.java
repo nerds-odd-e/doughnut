@@ -29,7 +29,8 @@ import org.eclipse.jgit.treewalk.TreeWalk;
  * including carried adjacent steps), and confirmed deletion gaps that recreate a path as
  * DELETED+ADDED even when tip bytes match the accepted blob. JGit scoring lives in {@link
  * NotebookGitProposalRenameDetector}; Donut admission safeguards — ambiguous blob correspondence
- * and unresolved removal/addition mixtures — are kept there and here, outside JGit scoring.
+ * and unresolved removal/addition mixtures — live in {@link NotebookGitProposalIdentityRefusal},
+ * outside JGit scoring.
  */
 final class NotebookGitProposalNoteCorrespondence {
 
@@ -150,7 +151,7 @@ final class NotebookGitProposalNoteCorrespondence {
     List<NoteChange> resolved =
         resolveEqualBlobMoves(
             repository, NotebookGitProposalTreeShape.noteChangesFrom(conceptDocuments));
-    refuseResidualRemovalAndAdditionMixture(resolved);
+    NotebookGitProposalIdentityRefusal.refuseResidualRemovalAndAdditionMixture(resolved);
     Map<String, NoteOrigin> next = new HashMap<>(origins);
     for (NoteChange change : resolved) {
       if (change.kind() == ChangeKind.RENAMED) {
@@ -184,7 +185,8 @@ final class NotebookGitProposalNoteCorrespondence {
         continue;
       }
       if (!deletionsByPath.containsKey(carried.path())) {
-        refuseUncertainIdentityCorrespondence();
+        NotebookGitProposalIdentityRefusal.refuseUncertainIdentityCorrespondence(
+            List.of(change.path(), carried.path()));
       }
       composedOriginsByDestination.put(change.path(), carried);
     }
@@ -210,23 +212,6 @@ final class NotebookGitProposalNoteCorrespondence {
       }
     }
     return resolved;
-  }
-
-  private static void refuseResidualRemovalAndAdditionMixture(List<NoteChange> changes) {
-    boolean hasDeleted = changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED);
-    boolean hasAdded = changes.stream().anyMatch(change -> change.kind() == ChangeKind.ADDED);
-    if (!hasDeleted || !hasAdded) {
-      return;
-    }
-    refuseUncertainIdentityCorrespondence();
-  }
-
-  /** Shared uncertain-identity refusal used by both JGit scoring and composed-move admission. */
-  static void refuseUncertainIdentityCorrespondence() {
-    throw unsupportedTreeShape(
-        "identity correspondence is uncertain: unchanged-content moves may have compatible"
-            + " companions, but changed-content moves and unmatched removals mixed with additions"
-            + " are not supported");
   }
 
   private static String basename(String path) {
