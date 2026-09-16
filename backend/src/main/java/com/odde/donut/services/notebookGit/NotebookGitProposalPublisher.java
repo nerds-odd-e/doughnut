@@ -115,7 +115,9 @@ public class NotebookGitProposalPublisher {
         published = folderRelocation.apply(state, proposal, acceptedHead, relocation.get());
         return proposalAcceptance.acceptMatchingProposedTree(published, proposal);
       }
-      admitted = NotebookGitProposalTreeShape.requireAdmittedResidualShape(documents);
+      admitted =
+          NotebookGitProposalTreeShape.requireAdmittedResidualShape(
+              proposal.repository(), documents);
       List<NotebookGitProposalTreeShape.ChangedDocument> beforeRelocation = new ArrayList<>();
       List<NotebookGitProposalTreeShape.ChangedDocument> afterRelocation = new ArrayList<>();
       partitionAroundRelocation(

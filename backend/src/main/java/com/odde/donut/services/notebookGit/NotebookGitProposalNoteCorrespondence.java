@@ -24,9 +24,12 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 /**
- * Resolves ordinary-note identity across an accepted→proposed range: exact equal-content moves
- * (including carried adjacent steps), and confirmed deletion gaps that recreate a path as
- * DELETED+ADDED even when tip bytes match the accepted blob.
+ * Resolves ordinary-note identity across an accepted→proposed range: JGit-scored content moves
+ * (initially exact-only at {@link NotebookGitProposalRenameDetector#RENAME_SCORE_THRESHOLD},
+ * including carried adjacent steps), and confirmed deletion gaps that recreate a path as
+ * DELETED+ADDED even when tip bytes match the accepted blob. JGit scoring lives in {@link
+ * NotebookGitProposalRenameDetector}; Donut admission safeguards — ambiguous blob correspondence
+ * and unresolved removal/addition mixtures — are kept there and here, outside JGit scoring.
  */
 final class NotebookGitProposalNoteCorrespondence {
 
@@ -40,28 +43,17 @@ final class NotebookGitProposalNoteCorrespondence {
     Map<String, NoteOrigin> originsAtTip =
         carryExactMoveOrigins(repository, acceptedHead, proposedHead);
     List<NoteChange> resolved =
-        changes.isEmpty() ? List.of() : resolveMoveCorrespondence(changes, originsAtTip);
+        changes.isEmpty()
+            ? List.of()
+            : resolveMoveCorrespondence(repository, changes, originsAtTip);
     return settleDeletionGapReplacements(
         repository, acceptedHead, proposedHead, resolved, originsAtTip);
   }
 
-  /** Tip residual / adjacent-step equal-blob moves without range origin walking. */
-  static List<NoteChange> resolveEqualBlobMoves(List<NoteChange> changes) {
-    Map<ObjectId, List<NoteChange>> removalsByBlob = changesByBlob(changes, ChangeKind.DELETED);
-    Map<ObjectId, List<NoteChange>> additionsByBlob = changesByBlob(changes, ChangeKind.ADDED);
-    Map<String, NoteOrigin> originsByDestination = new HashMap<>();
-    for (Map.Entry<ObjectId, List<NoteChange>> removalGroup : removalsByBlob.entrySet()) {
-      List<NoteChange> additionGroup = additionsByBlob.get(removalGroup.getKey());
-      if (additionGroup == null) {
-        continue;
-      }
-      if (removalGroup.getValue().size() != 1 || additionGroup.size() != 1) {
-        refuseUncertainIdentityCorrespondence();
-      }
-      NoteChange source = removalGroup.getValue().getFirst();
-      NoteChange destination = additionGroup.getFirst();
-      originsByDestination.put(destination.path(), new NoteOrigin(source.path(), source.blobId()));
-    }
+  /** Tip residual / adjacent-step JGit-scored moves without range origin walking. */
+  static List<NoteChange> resolveEqualBlobMoves(Repository repository, List<NoteChange> changes) {
+    Map<String, NoteOrigin> originsByDestination =
+        NotebookGitProposalRenameDetector.detectRenames(repository, changes);
     return replaceMatchedAdditionsWithRenames(changes, originsByDestination);
   }
 
@@ -156,7 +148,8 @@ final class NotebookGitProposalNoteCorrespondence {
       }
     }
     List<NoteChange> resolved =
-        resolveEqualBlobMoves(NotebookGitProposalTreeShape.noteChangesFrom(conceptDocuments));
+        resolveEqualBlobMoves(
+            repository, NotebookGitProposalTreeShape.noteChangesFrom(conceptDocuments));
     refuseResidualRemovalAndAdditionMixture(resolved);
     Map<String, NoteOrigin> next = new HashMap<>(origins);
     for (NoteChange change : resolved) {
@@ -173,8 +166,8 @@ final class NotebookGitProposalNoteCorrespondence {
   }
 
   private static List<NoteChange> resolveMoveCorrespondence(
-      List<NoteChange> changes, Map<String, NoteOrigin> originsAtTip) {
-    List<NoteChange> equalBlobResolved = resolveEqualBlobMoves(changes);
+      Repository repository, List<NoteChange> changes, Map<String, NoteOrigin> originsAtTip) {
+    List<NoteChange> equalBlobResolved = resolveEqualBlobMoves(repository, changes);
     Map<String, NoteChange> deletionsByPath = new HashMap<>();
     for (NoteChange change : equalBlobResolved) {
       if (change.kind() == ChangeKind.DELETED) {
@@ -219,17 +212,6 @@ final class NotebookGitProposalNoteCorrespondence {
     return resolved;
   }
 
-  private static Map<ObjectId, List<NoteChange>> changesByBlob(
-      List<NoteChange> changes, ChangeKind kind) {
-    Map<ObjectId, List<NoteChange>> changesByBlob = new HashMap<>();
-    for (NoteChange change : changes) {
-      if (change.kind() == kind) {
-        changesByBlob.computeIfAbsent(change.blobId(), ignored -> new ArrayList<>()).add(change);
-      }
-    }
-    return changesByBlob;
-  }
-
   private static void refuseResidualRemovalAndAdditionMixture(List<NoteChange> changes) {
     boolean hasDeleted = changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED);
     boolean hasAdded = changes.stream().anyMatch(change -> change.kind() == ChangeKind.ADDED);
@@ -239,7 +221,8 @@ final class NotebookGitProposalNoteCorrespondence {
     refuseUncertainIdentityCorrespondence();
   }
 
-  private static void refuseUncertainIdentityCorrespondence() {
+  /** Shared uncertain-identity refusal used by both JGit scoring and composed-move admission. */
+  static void refuseUncertainIdentityCorrespondence() {
     throw unsupportedTreeShape(
         "identity correspondence is uncertain: unchanged-content moves may have compatible"
             + " companions, but changed-content moves and unmatched removals mixed with additions"

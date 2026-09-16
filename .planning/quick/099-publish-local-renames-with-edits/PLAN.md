@@ -87,7 +87,7 @@ story wrap-up. No API change or migration is expected.
 
 ### 1. One library-backed exact correspondence path
 Type: Structure
-Status: planned
+Status: done
 
 Replace hand-written exact matching mechanics with JGit-backed detection at 100
 initially, preserving existing ambiguity and unresolved-mixture safeguards.
@@ -103,6 +103,15 @@ Proof: existing exact rename, composed move/edit, ambiguous exact-pair,
 folder-residual/private-association and deletion-gap controller assertions stay
 green with the backend command. If library tie behavior differs, preserve the
 existing guard explicitly; do not infer broader authority from its pairing.
+Done 2026-09-16: JGit `RenameDetector` at 100 is behaviorally equivalent to the
+prior blob-`ObjectId` pairing (content-addressed storage ⇒ identical content ⇒
+score 100). Detector extracted to `NotebookGitProposalRenameDetector` owning
+`RENAME_SCORE_THRESHOLD`, `detectRenames`, the ambiguous-blob safeguard, and the
+`NoteChangeDiffEntry` JGit adapter (protected-constructor subclass; `DiffEntry`
+factories are package-private). Package-level API unchanged; Publisher passes
+`proposal.repository()` to `requireAdmittedResidualShape`. Full backend suite
+green (2434 tests). Slice 2 lowers only the threshold constant; the exact-blob
+ambiguity safeguard may need revisiting when content-similarity pairing is enabled.
 Sizing: ~5 minutes active work plus required suite runtime; medium confidence.
 
 ### 2. Publish a rename or move with edits in the same commit

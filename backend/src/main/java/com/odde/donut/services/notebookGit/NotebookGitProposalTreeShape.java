@@ -50,14 +50,17 @@ public final class NotebookGitProposalTreeShape {
   /**
    * Admits residual documents after an exact folder relocation already consumed the relocated
    * subtree. Skips range origin walking so equal-blob notes that moved with the folder are not
-   * re-interpreted as ambiguous note correspondence.
+   * re-interpreted as ambiguous note correspondence. Uses the same JGit-backed detector as the
+   * ordinary publication path, so residual candidates stay limited to the already-computed
+   * outside-subtree set.
    */
-  static AdmittedShape requireAdmittedResidualShape(List<ChangedDocument> documents) {
+  static AdmittedShape requireAdmittedResidualShape(
+      Repository repository, List<ChangedDocument> documents) {
     return admitShape(
         documents,
         conceptDocuments ->
             NotebookGitProposalNoteCorrespondence.resolveEqualBlobMoves(
-                noteChangesFrom(conceptDocuments)));
+                repository, noteChangesFrom(conceptDocuments)));
   }
 
   private static AdmittedShape admitShape(
