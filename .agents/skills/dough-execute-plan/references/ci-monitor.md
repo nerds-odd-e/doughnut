@@ -14,8 +14,7 @@ closes routine delivery without waiting for CI or deployment.
 
 Bind the observer to the selected execution location. Observe that branch and
 use that checkout for every pause, stash, repair, delivery, and restoration
-operation. For planned execution, verify the binding against the retained
-execution identity; for quick execution, retain it in the conversation.
+operation. Verify the binding against the retained execution identity.
 
 The observer uses no AI calls. It emits failure, incomplete, and lost-coverage
 records incrementally. It never dispatches or retries a check, observes

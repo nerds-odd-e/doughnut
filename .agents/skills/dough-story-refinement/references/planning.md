@@ -103,8 +103,8 @@ use one plan for the work, avoiding deprecated locations.
 
 Keep execution, proof, review, and resume information:
 
-1. **Source** — selected story or decision link, or retrospective findings and
-   execution provenance for a correction.
+1. **Source** — selected story, remaining-work instruction, or decision link;
+   or retrospective findings and execution provenance for a correction.
 2. **Goal and scope** — one selected outcome, material exclusions, and
    assumptions.
 3. **Outside-in proof** — key examples and their observable test or
@@ -149,8 +149,8 @@ code, tests, and enduring documentation remain capability-named.
 
 ## Own executable proof
 
-Map every checkable final-state promise in the selected story or bounded
-retrospective correction and current decisions to an owning slice and observable proof. Inline links or a compact table
+Map every checkable final-state promise in the plan's source and current
+decisions to an owning slice and observable proof. Inline links or a compact table
 are sufficient. Include applicable promises, not broader aspirations. Passing
 commands without the promised observation does not establish completion.
 

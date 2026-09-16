@@ -1,21 +1,22 @@
 ---
 name: dough-story-wrap-up
 description: >-
-  Closes one completed feature story or bounded retrospective correction using
-  available execution context. Assimilates lasting product knowledge, handles
-  existing follow-ups and authorized product decisions, removes that work's spent
-  plan and history so Git can recover it, and reports truthfully when required
-  inputs are missing or unfinished. Use to wrap up a story or correction, close
+  Closes one completed feature story, bounded retrospective correction, or
+  context-only planless execution using available execution context. Assimilates
+  lasting product knowledge, handles existing follow-ups and authorized product
+  decisions, removes that work's spent plan and history so Git can recover it,
+  and reports truthfully when required inputs are missing or unfinished. Use to
+  wrap up a story, correction, or completed contextual instruction, close
   completed work, or delete spent plan and execution history.
 ---
 
 # Story wrap-up
 
-Close one selected feature story or bounded retrospective correction when the
-coordinator invokes wrap-up. Use available execution context and optional
-retrospective advice. Leave this project with maintained product knowledge and
-no spent source or plan history in the current snapshot. Do not invent
-findings, records, or a requirement for another conversation.
+Close one selected feature story, bounded retrospective correction, or
+contextual instruction when the coordinator invokes wrap-up. Use available
+execution context and optional retrospective advice. Leave this project with
+maintained product knowledge and no spent source or plan history in the current
+snapshot. Do not invent findings, records, or a requirement for another conversation.
 
 ## Resolve this project's context
 
@@ -23,8 +24,12 @@ Require one selected work identity. Use a canonical feature story only when it
 is explicitly supplied as that work's active home. Otherwise use the bounded
 correction plan itself when it satisfies the correction-input contract defined by
 [planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level).
-Do not require or create a seed for that correction. Name any missing required
-field, leave the affected work intact, and stop before closure.
+Do not require or create a seed for that correction. When the source is neither
+a story nor a correction plan, use a contextual instruction with retained
+execution identity, changes, and proof; do not require or create a story, plan,
+or queue entry. Name any missing required field, leave the affected work intact,
+and stop before closure. Do not invent conventions, artifacts, another review, or
+claim closure.
 
 Resolve from this project, not this skill's location:
 
@@ -33,22 +38,17 @@ Resolve from this project, not this skill's location:
   for a selected feature story;
 - for planned work: executable-plan location, status vocabulary, and the
   selected work's plan identity;
-- for planless feature work: the story, its changes, and available execution
-  results;
-- optional retrospective advice when it is present, including an empty
-  result;
+- for planless work: the supplied story or instruction, its changes, available
+  execution results, and retained execution identity;
+- optional retrospective advice when present, including an empty result;
 - Git commit conventions used to preserve a recoverable revision;
-- for planned execution, its selected mode and available originating checkout,
-  execution checkout and branch, and integration-target identity;
+- selected mode and available originating checkout, execution checkout and
+  branch, and integration-target identity;
 - the product backlog path when a **Taken** or **Backlog list** entry points
   at the selected work; and
 - shared records that name the selected work: its seed when applicable, process
   log (`DearDough.md` unless this project sets another canonical location),
-  incoming links, and assessment or recognition records.
-
-Planless feature work needs no plan; corrections retain the plan-based identity
-contract. Missing closure context leaves affected material intact: report the gap
-without inventing conventions, artifacts, or another review, or claiming closure.
+  incoming links, and assessment records.
 
 Before deleting a plan that carries planned-execution identity, retain the
 resolved mode and checkout, branch, and target values in the coordinator's
@@ -61,8 +61,8 @@ that action instead of reconstructing or guessing it after plan deletion.
 Judge completion from the selected work and available execution evidence.
 
 - Planned work is complete when every slice is done.
-- Planless feature work is complete when the supplied story, changes, and
-  execution results show the promised outcome is delivered.
+- Planless work is complete when the supplied story or instruction, changes, and
+  execution results show the promised outcome, including evidenced no-change.
 - Incomplete implementation leaves the affected active work intact. Report
   the unfinished implementation and stop. Do not delete an unfinished
   correction plan to manufacture a wrap-up.
@@ -156,9 +156,9 @@ spent history:
 
 - its executable plan and owned proof, evidence, and assessment records, even
   when the plan was retained at execution completion;
-- its canonical story section, and its seed only when every remaining section
-  is spent;
-- its **Taken** or **Backlog list** entry;
+- its canonical story section when one exists, and its seed only when every
+  remaining section is spent;
+- its **Taken** or **Backlog list** entry when one exists;
 - its process-log occurrences, and issues or containers left empty; and
 - links whose sole purpose is preserving that history.
 
@@ -233,13 +233,13 @@ any blocked or partial cleanup. Direct-current-branch mode needs no cleanup.
 
 ## Report
 
-Report the selected work and its canonical identity, completion judgment,
-execution mode and retained checkout/branch/target identity when applicable,
-before-cleanup and final-closure commits when deletion happened, assimilated
-knowledge, deleted paths, the saved execution tip and local integration result
-in Story Branch Mode, the push result when the target is `main`, worktree and
-local- and remote-branch cleanup results, preserved
-unsupported material and resources, and any gap that blocked closure.
+Report the selected work and its identity (canonical story, correction plan, or
+contextual instruction), completion judgment, execution mode and retained
+checkout/branch/target identity when applicable, before-cleanup and final-closure
+commits when deletion happened, assimilated knowledge, deleted paths, the saved
+execution tip and local integration result in Story Branch Mode, the push result
+when the target is `main`, worktree and local- and remote-branch cleanup results,
+preserved unsupported material and resources, and any gap that blocked closure.
 Distinguish a new merge from an already-integrated tip, integration success from
 partial or refused cleanup, and local integration from a successful push to
 `origin`. Report remote deletion only when its absence has been verified.

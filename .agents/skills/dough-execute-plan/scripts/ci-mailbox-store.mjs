@@ -9,6 +9,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
+import { isFullGitRevision } from "./ci-revisions.mjs";
 
 const eventFilePattern = /^(\d{12})\.json$/;
 const terminalResultDeadlineMs = 5_000;
@@ -25,7 +26,7 @@ function publishJson(directory, name, value) {
 const revisionDirectory = (directory) => join(directory, "coverage");
 
 function revisionPath(directory, sha) {
-  if (!/^[0-9a-f]{40}$/i.test(sha))
+  if (!isFullGitRevision(sha))
     throw new Error("Expected a full Git revision SHA");
   return join(revisionDirectory(directory), `${sha.toLowerCase()}.json`);
 }
@@ -49,7 +50,11 @@ export function readRevisionCoverage(directory) {
   const coverage = revisionDirectory(directory);
   if (!existsSync(coverage)) return [];
   return readdirSync(coverage)
-    .filter((name) => /^[0-9a-f]{40}\.json$/i.test(name))
+    .filter(
+      (name) =>
+        name.toLowerCase().endsWith(".json") &&
+        isFullGitRevision(name.slice(0, -5)),
+    )
     .sort()
     .map((name) => JSON.parse(readFileSync(join(coverage, name), "utf8")));
 }

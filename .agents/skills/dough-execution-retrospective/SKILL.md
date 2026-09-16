@@ -63,7 +63,7 @@ File absence establishes none of these. Recover original intent before judging i
   available proof. Use current chat when sufficient, otherwise supplied transcript; invent no
   historical plan or substitute execution record.
 - **Quick-to-planned:** recover conversational quick selection/attempt and the ordinary
-  same-story remaining-work plan. Preserve compatible attributable quick work/proof as such,
+  same-source remaining-work plan. Preserve compatible attributable quick work/proof as such,
   not earlier planned slices; recover later slices/changes normally. Both parts form one execution.
 
 Completion requires every planned slice done (history proves deleted plans), or quick
