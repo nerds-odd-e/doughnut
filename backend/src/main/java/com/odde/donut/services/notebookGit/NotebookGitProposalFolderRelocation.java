@@ -1,7 +1,9 @@
 package com.odde.donut.services.notebookGit;
 
+import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.factoryServices.EntityPersister;
+import com.odde.donut.services.FolderMoveRelocation;
 import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import java.util.List;
@@ -16,16 +18,19 @@ class NotebookGitProposalFolderRelocation {
   private final EntityPersister entityPersister;
   private final NotebookGitStateLoader notebookGitStateLoader;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
+  private final FolderMoveRelocation folderMoveRelocation;
 
   NotebookGitProposalFolderRelocation(
       NotebookGitProjection projection,
       EntityPersister entityPersister,
       NotebookGitStateLoader notebookGitStateLoader,
-      FolderSiblingNameValidation folderSiblingNameValidation) {
+      FolderSiblingNameValidation folderSiblingNameValidation,
+      FolderMoveRelocation folderMoveRelocation) {
     this.projection = projection;
     this.entityPersister = entityPersister;
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
+    this.folderMoveRelocation = folderMoveRelocation;
   }
 
   NotebookGitStateLoader.LockedNotebookState apply(
@@ -69,10 +74,11 @@ class NotebookGitProposalFolderRelocation {
           state.notebook(), folders, state.liveNotes(), proposal.repository(), acceptedHead);
     }
     Folder source = entityPersister.find(Folder.class, represented.sourceFolderId());
-    source.setParentFolder(
+    Folder destParent =
         represented.destParentFolderId() == null
             ? null
-            : entityPersister.find(Folder.class, represented.destParentFolderId()));
+            : entityPersister.find(Folder.class, represented.destParentFolderId());
+    folderMoveRelocation.assignPlacement(source, destParent, new DisplayName(source.getName()));
     entityPersister.save(source);
     entityPersister.flush();
     return new NotebookGitStateLoader.LockedNotebookState(

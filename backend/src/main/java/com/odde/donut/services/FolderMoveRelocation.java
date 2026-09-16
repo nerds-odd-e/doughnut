@@ -7,6 +7,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -15,10 +16,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Folder move (within a notebook, and cross-notebook) for {@link FolderRelocationService}. */
-final class FolderMoveRelocation {
+/** Folder placement and move (within a notebook, and cross-notebook). */
+@Service
+public class FolderMoveRelocation {
 
   private final FolderRepository folderRepository;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
@@ -28,21 +31,21 @@ final class FolderMoveRelocation {
   private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final FolderSubtree subtree;
 
-  FolderMoveRelocation(
+  public FolderMoveRelocation(
       FolderRepository folderRepository,
+      NoteRepository noteRepository,
       FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       WikiLinkRewriteService wikiLinkRewriteService,
-      WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
-      FolderSubtree subtree) {
+      WikiLinkRelocationRewrite wikiLinkRelocationRewrite) {
     this.folderRepository = folderRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
-    this.subtree = subtree;
+    this.subtree = new FolderSubtree(folderRepository, noteRepository, entityPersister);
   }
 
   Folder moveFolder(
@@ -79,6 +82,11 @@ final class FolderMoveRelocation {
     return folder;
   }
 
+  public void assignPlacement(Folder folder, Folder newParent, DisplayName name) {
+    folder.setName(name);
+    folder.setParentFolder(newParent);
+  }
+
   Folder placeFolderWithinNotebook(
       Notebook notebook, Folder folder, Folder newParent, Timestamp now) {
     requireFolderInNotebook(folder, notebook);
@@ -103,8 +111,7 @@ final class FolderMoveRelocation {
 
   private Folder persistFolderPlacement(
       Folder folder, Folder newParent, DisplayName name, Timestamp now) {
-    folder.setName(name);
-    folder.setParentFolder(newParent);
+    assignPlacement(folder, newParent, name);
     folder.setUpdatedAt(now);
     entityPersister.flush();
     entityPersister.merge(folder);
@@ -151,11 +158,7 @@ final class FolderMoveRelocation {
     }
 
     subtree.reassignToNotebook(subtreeFolders, destinationNotebook, now);
-    folder.setParentFolder(newParent);
-    folder.setUpdatedAt(now);
-    entityPersister.flush();
-    entityPersister.merge(folder);
-    entityPersister.flush();
+    persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
     rewriteAndRefreshWikiLinksForFolderNotebookMove(
         movedNoteIds,
         sourceNotebook,

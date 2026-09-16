@@ -46,7 +46,8 @@ public class FolderRelocationService {
       TestabilitySettings testabilitySettings,
       WikiLinkRewriteService wikiLinkRewriteService,
       WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
-      AcceptedWebChangeService acceptedWebChangeService) {
+      AcceptedWebChangeService acceptedWebChangeService,
+      FolderMoveRelocation folderMoveRelocation) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
@@ -56,15 +57,7 @@ public class FolderRelocationService {
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.acceptedWebChangeService = acceptedWebChangeService;
     this.subtree = new FolderSubtree(folderRepository, noteRepository, entityPersister);
-    this.folderMoveRelocation =
-        new FolderMoveRelocation(
-            folderRepository,
-            folderSiblingNameValidation,
-            entityPersister,
-            testabilitySettings,
-            wikiLinkRewriteService,
-            wikiLinkRelocationRewrite,
-            subtree);
+    this.folderMoveRelocation = folderMoveRelocation;
   }
 
   @Transactional

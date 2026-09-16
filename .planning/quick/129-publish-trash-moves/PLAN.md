@@ -234,19 +234,19 @@ Refactor: ancestry call moved from publisher into
 
 ### 5. Share existing folder placement
 Type: Structure
-Status: planned
+Status: done
 Enables: slice 6, subtree recovery through the same folder placement owner.
 
-Modularize the placement part of `FolderMoveRelocation` so web Move/Trash and
-Git relocation reuse it. Reuse existing destination validations; preserve web
-merge/reference behavior, trash name selection and Git's exact proposed tree.
-Do not route Git through web commit orchestration or add caller-mode switches.
+Git and web share `FolderMoveRelocation.assignPlacement`. Web Move/Trash keep
+merge, wiki rewrite, trash-name selection, and flush/merge via
+`persistFolderPlacement`. Git keeps `requireAllowed` and save/flush with the
+proposed name. No Git-through-web commit orchestration.
 
-Proof: B; existing folder relocation/placement/referrer/private-association and
-rollback tests plus `NotebookGitWebFolderMoveControllerTest`,
-`NotebookFolderTrashControllerTest`, and cross-notebook folder Move coverage.
-Inspect the final affected call graph for one placement implementation.
-Sizing: 3–5 minutes active work; only the shared placement responsibility moves.
+Proof: B `CURSOR_DEV=true nix develop -c pnpm backend:test_only` pass before
+and after (~1m15s / ~1m10s). Setup: existing folder relocation/Trash/Move
+controller fixtures. Call sites: `NotebookGitProposalFolderRelocation`,
+`persistFolderPlacement`, cross-notebook persist. Refactor: cross-notebook
+web persist uses `persistFolderPlacement`.
 
 CI repair (slice 5 implementation stashed as `24b6ef0bd0e56d2c1e4c198d1bb8b47418f2bbb5`):
 run 35077284338 (SHA 8e918218ae) still failed the same scenario with
@@ -346,14 +346,14 @@ transaction helpers. No exception swallowing or partial acceptance.
 | --- | --- |
 | Existing dependency recovery and alternate active destination | 2 done: controller state/reference outcomes and original-route installed-CLI journey |
 | Local trash/recovery with required parents and canonical retained folders | 4 done: controller publication and downloaded exact tree |
-| Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement`; 3 done: `ensureAncestry`; 5 remaining |
+| Shared domain behavior, no duplicate recovery logic | 1 done: `assignPlacement`; 3 done: `ensureAncestry`; 5 done: folder `assignPlacement` |
 | Retained subtree, learning and empty descendants | 6–7: identity/ancestry and exact Portable tree through publication/pull |
 | Existing web operation received locally | 8: real web Trash/Move followed by installed pull, one accepted child per operation |
 | Linear histories, final-only application, deletion-gap distinction | 9: composed publication, dependencies and original Git ancestry |
 | Atomic failure including new folders; existing access/ambiguity/drift safeguards | 10 and existing guards run with B at each affected slice; slice 8 owns web-boundary variants |
 | Preserve ordinary moves, authored Git bytes and web reference choices | 1, 5: existing rename/folder referrer, Move, Trash/Undo and cross-notebook caller coverage |
 
-Slices 1–4 are delivered. Remaining required observations must be covered before
+Slices 1–5 are delivered. Remaining required observations must be covered before
 story closure. At each green boundary, retain the
 specific evidence here; do not substitute a green command for a missing promised
 observation. If existing code proves a behavior, close its proof without adding
