@@ -226,7 +226,15 @@ names.
 ### 5. Refused cross-notebook reduction leaves both notebooks unchanged
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof:
+`NotebookGitWebRelationReduceControllerTest.refusedReduceIntoReadOnlySourceNotebookLeavesBothNotebooksUnchanged`
+(Astronomy shared read-only via bazaar; 400, both bindings' accepted heads
+unchanged, relation note present); failed when the editability check was
+temporarily disabled. Refactor rerun `*NotebookGit*ControllerTest*` plus
+`CommittedUserCleanup` callers green (437 tests). Elapsed ~15 min (over the
+hard limit; see Learnings) — completed and proven, so kept rather than
+reverted.
 Proof: same test class green with the refusal test.
 
 Behavior: "Astronomy" is owned by another user and not editable by the
@@ -270,3 +278,11 @@ pre-match against silently committing a drifted notebook.
   reduction could only hit it via a concurrent move of the relationship note,
   so slice 4's moved-note guard must check the relationship note's notebook
   as well as the source's.
+- Slice 5 overran (~15 min): a subscription-based "read-only" fixture
+  passed even with the editability check disabled, because in this
+  `NOT_SUPPORTED` test class `User.canReferTo` compares a detached
+  subscription notebook with a Hibernate proxy (`EntityIdentifiedByIdOnly.equals`
+  checks `getClass()`), so the source never resolved. Judged a fixture
+  artifact (request-scoped users share the session) but not verified at
+  request level — candidate follow-up if subscribers report unresolvable
+  cross-notebook links. The test uses a bazaar-shared notebook instead.

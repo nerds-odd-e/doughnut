@@ -5,8 +5,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -20,6 +22,8 @@ import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 class NotebookGitWebRelationReduceControllerTest extends NotebookGitWebContentControllerTestBase {
   @Autowired RelationController relationController;
@@ -50,19 +54,7 @@ class NotebookGitWebRelationReduceControllerTest extends NotebookGitWebContentCo
     Notebook spaceTopics = createGitBackedNotebook("Space topics");
     Notebook astronomy = createGitBackedNotebook("Astronomy");
     Note moon = makeMe.aNote("Moon").notebook(astronomy).please();
-    makeMe.aNote("Earth").notebook(spaceTopics).please();
-    Note relation =
-        makeMe
-            .aNote("Moon a part of Earth")
-            .notebook(spaceTopics)
-            .content(
-                "---\n"
-                    + "type: Relationship\n"
-                    + "relation: a-part-of\n"
-                    + "source: \"[[Astronomy:Moon]]\"\n"
-                    + "target: \"[[Earth]]\"\n"
-                    + "---\n")
-            .please();
+    Note relation = astronomyMoonAPartOfEarthRelationshipIn(spaceTopics);
     MemoryTracker tracker = learnedTracker(relation, 0.3f);
     String spaceTopicsHeadBefore =
         snapshotCurrentPortableTree(spaceTopics).getAcceptedGitObjectId();
@@ -92,10 +84,50 @@ class NotebookGitWebRelationReduceControllerTest extends NotebookGitWebContentCo
     assertThat(moved.getPropertyKey(), equalTo("a part of"));
   }
 
+  @Test
+  void refusedReduceIntoReadOnlySourceNotebookLeavesBothNotebooksUnchanged() throws Exception {
+    Notebook astronomy = createGitBackedNotebook("Astronomy");
+    makeMe.aNote("Moon").notebook(astronomy).please();
+    makeMe.aBazaarNotebook(astronomy).please();
+    currentUser.setUser(createFixtureUser());
+    Notebook spaceTopics = createGitBackedNotebook("Space topics");
+    Note relation = astronomyMoonAPartOfEarthRelationshipIn(spaceTopics);
+    String spaceTopicsHeadBefore =
+        snapshotCurrentPortableTree(spaceTopics).getAcceptedGitObjectId();
+    String astronomyHeadBefore = snapshotCurrentPortableTree(astronomy).getAcceptedGitObjectId();
+
+    ResponseStatusException refused =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> relationController.reduceToSourceProperty(relation));
+
+    assertThat(refused.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    assertThat(refused.getReason(), equalTo("Could not resolve the relationship source note."));
+    assertThat(binding(spaceTopics).getAcceptedGitObjectId(), equalTo(spaceTopicsHeadBefore));
+    assertThat(binding(astronomy).getAcceptedGitObjectId(), equalTo(astronomyHeadBefore));
+    assertThat(noteRepository.findById(relation.getId()).isPresent(), is(true));
+  }
+
   byte[] downloadedBundle(Notebook notebook) throws UnexpectedNoAccessRightException {
     return controller
         .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
         .getBody();
+  }
+
+  /** Earth plus a relationship note in {@code spaceTopics} whose source is Astronomy's Moon. */
+  Note astronomyMoonAPartOfEarthRelationshipIn(Notebook spaceTopics) {
+    makeMe.aNote("Earth").notebook(spaceTopics).please();
+    return makeMe
+        .aNote("Moon a part of Earth")
+        .notebook(spaceTopics)
+        .content(
+            "---\n"
+                + "type: Relationship\n"
+                + "relation: a-part-of\n"
+                + "source: \"[[Astronomy:Moon]]\"\n"
+                + "target: \"[[Earth]]\"\n"
+                + "---\n")
+        .please();
   }
 
   RelationshipReduceFixture seedMoonEarthRelationshipForReduceToSource()
