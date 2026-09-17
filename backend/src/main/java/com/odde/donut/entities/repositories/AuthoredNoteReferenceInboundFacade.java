@@ -1,7 +1,6 @@
 package com.odde.donut.entities.repositories;
 
 import com.odde.donut.algorithms.AuthoredNoteReference;
-import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.NoteReferenceResolution;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
@@ -165,7 +164,7 @@ public class AuthoredNoteReferenceInboundFacade {
     String notebookName = target.getNotebook().getName();
     String lowerCaseTitle = target.getTitle().toLowerCase(Locale.ROOT);
     List<String> titleAndAliasLookupKeys = new ArrayList<>();
-    titleAndAliasLookupKeys.add(FrontmatterAliases.normalizedLookupKey(target.getTitle()));
+    titleAndAliasLookupKeys.add(lowerCaseTitle);
     for (var aliasRow : noteAliasIndexRepository.findByNote_IdOrderByIdAsc(target.getId())) {
       titleAndAliasLookupKeys.add(aliasRow.getAliasLookupKey());
     }

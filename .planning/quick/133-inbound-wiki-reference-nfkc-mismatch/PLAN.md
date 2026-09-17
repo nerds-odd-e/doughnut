@@ -1,6 +1,6 @@
 # Make inbound wiki-link matching consistent with outgoing resolution
 
-Status: planned
+Status: done
 Source: [SEED-021 story 1](../../seeds/SEED-021-inbound-wiki-reference-nfkc-mismatch.md#story-1),
 refined 2026-09-17. Reported and diagnosed live against the running dev app/DB
 (notebook "jp7", notes n102472/n102466). The owner authorized planning, not
@@ -76,9 +76,16 @@ schema or ERD change.
 ### 1. Inbound wiki-link matching recognizes titles containing NFKC-foldable characters
 
 Type: Behavior
-Status: planned
-Proof: `CURSOR_DEV=true nix develop -c pnpm backend:verify` green, including
-the new `AuthoredNoteReferenceInboundFacadeTest` case.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:verify` green (2469
+tests, 0 failures), including the new
+`matchesAWikiReferenceAuthoredAgainstATitleContainingAnNfkcFoldableCharacter`
+case in `AuthoredNoteReferenceInboundFacadeTest`, confirmed failing before the
+fix (empty referrer list) and passing after. Focused rerun:
+`CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test
+-Dspring.profiles.active=test --build-cache --parallel --tests
+"*AuthoredNoteReferenceInboundFacadeTest*" --tests "*WikiLinkResolver*Test*"`
+green.
 
 Behavior: Given a target note whose title contains a character NFKC
 compatibility normalization would fold (e.g. "how 手段／方法", fullwidth
