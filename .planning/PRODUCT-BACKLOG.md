@@ -12,9 +12,9 @@ a single, append-only sequence of commits, with no branching or rebasing;
 either the remote or local repository may be multiple commits behind.
 
 ## Taken
+- [Manually validate the complete append-only notebook workflow](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-42) — SEED-009 — [plan](quick/131-manually-validate-append-only-notebook-workflow/PLAN.md)
 
 ## Backlog list
 - [Rebaseline every existing notebook from current Donut content](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-43) — SEED-009
 - [Retire the spent notebook rebaseline migration](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-44) — SEED-009
-- [Manually validate the complete append-only notebook workflow](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-42) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
