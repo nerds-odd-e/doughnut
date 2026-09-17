@@ -339,8 +339,64 @@ full subagent turn (~6 minutes, ~86k tokens) with no usable output.
     concurrently-running subagent reading the same files and burn a full
     subagent turn on a stop neither side could have avoided once started.
 
+## DD-064 — A general "skip EnterWorktree" session instruction was misapplied to skip Story Branch Mode's required execution worktree, then had to be recovered mid-execution by a concurrent session
+
+The session's own system-level guidance said "this session is configured to
+work in place rather than isolating into a worktree. Skip EnterWorktree
+unless the user explicitly asks to work in a worktree," worded for ordinary
+non-plan coding requests. Executing plan 136 under `dough-execute-plan`
+(Story Branch Mode), the coordinator read that general instruction as
+covering the plan's own execution-branch requirement too, and created the
+execution branch with a plain `git checkout -b 136-trash-vocabulary` inside
+the shared main checkout instead of a dedicated `git worktree add` per
+[execution location](../.claude/skills/dough-execute-plan/references/execution-location.md).
+All five slices were implemented, tested, and the first backlog/plan commits
+made there before a concurrent session (executing plan 137 in its own
+worktree) noticed the shared checkout was left on a feature branch with
+uncommitted plan-136 work, and unilaterally moved that work into a new
+`.claude/worktrees/136-trash-vocabulary` worktree and returned the shared
+checkout to `main`, coordinating with this session mid-turn over a
+cross-session message before either side committed anything further.
+
+### Occurrences
+
+- Execution: SEED-020 story 1 / quick/136-trash-vocabulary
+  - Timestamp: 2026-09-17, between the `git checkout -b` at the start of
+    execution and the cross-session message received mid-turn confirming the
+    move; both sessions' exact wall-clock times are not in this transcript
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: this session's own reasoning cited the session-specific
+    "Edit files directly in your working directory... Skip EnterWorktree" note
+    as grounds for using `git checkout -b` instead of a worktree; cross-session
+    message from "dough plan 137 execution" describing that it "stashed and
+    moved that uncommitted plan-136 work into a new worktree at
+    .claude/worktrees/136-trash-vocabulary..., returned the main checkout to
+    `main`"; this session's working directory changed mid-turn from
+    `/Users/terryyin/git/doughnut` to
+    `/Users/terryyin/git/doughnut/.claude/worktrees/136-trash-vocabulary` with
+    all uncommitted renames intact.
+  - Observed effect: no work was lost and no unrelated commit was
+    contaminated (unlike DD-061), because the other session intervened before
+    this session's next commit; but the shared main checkout was left on a
+    non-`main` branch mid-execution, which could have collided with any other
+    concurrent session's own backlog-claim commit on `main` in that window,
+    and required a second session's manual detection and recovery rather than
+    this session's own process catching it.
+  - Inference: a session-level instruction scoped to ordinary ad hoc coding
+    ("skip worktree isolation for this session") does not state whether it is
+    meant to override a project workflow's own explicit execution-location
+    contract (Story Branch Mode's required dedicated worktree); without an
+    explicit precedence rule, the more general, more recently stated
+    instruction won out over the more specific, project-defined one. A
+    prompt-time check of "does the current action fall under a project
+    skill's own location contract" before applying a broad session-level
+    default would have caught this before the first commit in the shared
+    checkout.
+
 ## Retention
 
-- Highest allocated local number: 63
+- Highest allocated local number: 64
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
