@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/** A parsed recall or qualifier fragment: {@code stem} plus an optional cloze suffix marker. */
+/** A parsed recall fragment: {@code stem} plus an optional cloze suffix marker. */
 record TitleFragment(boolean suffixMarker, String stem) {
   public static TitleFragment from(String content) {
     String normalizedContent = normalizeWhitespace(content);

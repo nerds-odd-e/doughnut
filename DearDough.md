@@ -291,8 +291,56 @@ whether to retry, revert, or finish the work itself.
     the partial edit, or complete it directly) and must improvise from raw
     diff inspection every time this occurs.
 
+## DD-063 — Coordinator kept editing the shared execution checkout while a delegated refactor subagent was inspecting the same files, forcing a wasted stop
+
+[Delivery](../dough-execute-plan/references/wrap-up.md#deliver-the-change) step
+1 spawns a fresh post-change-refactor subagent against "the execution
+checkout" but does not say the coordinator must stop editing that same
+checkout until the subagent returns. Story Branch Mode has one execution
+checkout per plan, not one per slice, so a subagent delegated to review only
+slice 1's diff and the coordinator's own slice 2 edits land in the same
+working tree with no isolation between them. Here the coordinator delegated a
+slice-1-only refactor review, then immediately continued in-place with slice
+2 production and test edits in the same checkout instead of waiting. The
+subagent's own file reads/edits then intermittently disagreed with the
+concurrently-changing tree, one of its edit attempts failed with "File has
+been modified since read," and after re-reading it correctly detected the
+scope had moved past what it was briefed on and stopped with `## REFACTOR
+JIDOKA STOP` rather than reviewing stale or moving-target content — costing a
+full subagent turn (~6 minutes, ~86k tokens) with no usable output.
+
+### Occurrences
+
+- Execution: SEED-022 story 1 / quick/134-literal-note-title-recall
+  - Timestamp: 2026-09-17, between approximately 17:29 and 17:37 +08:00 (the
+    subagent was launched right after the slice-1 `pnpm backend:test_only`
+    run completed and stopped before the slice-2 run, timestamped
+    17:37:42+08:00 in that run's Spring Boot startup log; the subagent's own
+    elapsed time was reported as ~6 minutes)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: subagent hand-back report titled "Refactor outcome: STOPPED —
+    working tree diverged mid-task from the briefed slice-1-only scope,"
+    describing a failed edit ("File has been modified since read"), a
+    re-read showing `RecallTitleSegments.java`/Test already deleted and
+    `NoteTitle`/test files already carrying slice-2 content the coordinator
+    was actively writing, and ending `## REFACTOR JIDOKA STOP`; task-notification
+    usage for that run reported `subagent_tokens: 85655`, `duration_ms: 241361`.
+  - Observed effect: no refactor findings were produced for slice 1; the
+    coordinator had to re-run one consolidated post-change-refactor pass
+    later, after all three slices were implemented and stable, to get a
+    usable review.
+  - Inference: the delivery sequence's "spawn a fresh agent" step, combined
+    with Story Branch Mode's one-checkout-per-plan (not per-slice) layout,
+    has no explicit rule that the coordinator must pause its own edits to
+    that checkout until the delegated subagent returns; without that rule, a
+    coordinator eager to keep moving to the next slice will race a
+    concurrently-running subagent reading the same files and burn a full
+    subagent turn on a stop neither side could have avoided once started.
+
 ## Retention
 
-- Highest allocated local number: 62
+- Highest allocated local number: 63
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial

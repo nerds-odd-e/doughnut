@@ -3,7 +3,6 @@ package com.odde.donut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class NoteTitleTest {
@@ -15,23 +14,19 @@ class NoteTitleTest {
   }
 
   @Test
-  void with_qualifier() {
-    NoteTitle noteTitle = new NoteTitle("cat (animal)");
-    assertThat(noteTitle.getQualifier().map(TitleFragment::stem), is(Optional.of("animal")));
-  }
-
-  @Test
-  void qualifier_does_not_split_on_fullwidth_slash() {
-    NoteTitle noteTitle = new NoteTitle("cat (a／b)");
-    assertThat(noteTitle.getQualifier().map(TitleFragment::stem), is(Optional.of("a／b")));
-  }
-
-  @Test
-  void recallTitleFragments_includeMarkedTildeSuffixFragments() {
-    NoteTitle noteTitle = new NoteTitle("~logy／~logical");
+  void recallTitleFragments_treatsTrailingBracketAsLiteralTitleText() {
+    NoteTitle noteTitle = new NoteTitle("cat(animal)");
     assertThat(
         noteTitle.getRecallTitleFragments().stream().map(TitleFragment::stem).toList(),
-        containsInAnyOrder("logy", "logical"));
+        contains("cat(animal)"));
+  }
+
+  @Test
+  void recallTitleFragments_treatsLaterTildeAsLiteralTitleText() {
+    NoteTitle noteTitle = new NoteTitle("word／~logical");
+    assertThat(
+        noteTitle.getRecallTitleFragments().stream().map(TitleFragment::stem).toList(),
+        contains("word／~logical"));
   }
 
   @Test
@@ -53,9 +48,24 @@ class NoteTitleTest {
   }
 
   @Test
-  void matchesForRecall_acceptsMarkedSuffixFragments() {
+  void matchesForRecall_treatsLaterSlashAndTildeAsLiteralTitleText() {
     NoteTitle noteTitle = new NoteTitle("word／~logical");
-    assertThat(noteTitle.matchesForRecall("word"), is(true));
+    assertThat(noteTitle.matchesForRecall("word／~logical"), is(true));
+    assertThat(noteTitle.matchesForRecall("word"), is(false));
+    assertThat(noteTitle.matchesForRecall("logical"), is(false));
+  }
+
+  @Test
+  void matchesForRecall_retainsLeadingTildeSuffixBehavior() {
+    NoteTitle noteTitle = new NoteTitle("~logical");
     assertThat(noteTitle.matchesForRecall("logical"), is(true));
+  }
+
+  @Test
+  void matchesForRecall_treatsTrailingBracketAsLiteralTitleText() {
+    NoteTitle noteTitle = new NoteTitle("cat(animal)");
+    assertThat(noteTitle.matchesForRecall("cat(animal)"), is(true));
+    assertThat(noteTitle.matchesForRecall("cat"), is(false));
+    assertThat(noteTitle.matchesForRecall("animal"), is(false));
   }
 }

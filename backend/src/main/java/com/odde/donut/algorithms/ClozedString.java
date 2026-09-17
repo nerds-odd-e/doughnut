@@ -28,8 +28,7 @@ public class ClozedString {
         new ClozeReplacement(
             "<mark title='Hidden text that is partially matching the answer'>[..~]</mark>",
             "<mark title='Hidden text that is matching the answer'>[...]</mark>",
-            "<mark title='Hidden pronunciation'>/.../</mark>",
-            "<mark title='Hidden qualifier that is matching the answer'>(...)</mark>");
+            "<mark title='Hidden pronunciation'>/.../</mark>");
     return new ClozedString(clozeReplacement, markdownContent);
   }
 

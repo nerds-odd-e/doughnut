@@ -8,7 +8,6 @@ a single, append-only sequence of commits, with no branching or rebasing;
 either the remote or local repository may be multiple commits behind.
 
 ## Taken
-- [Treat the whole note title as one recall value](seeds/SEED-022-reconsider-slash-title-alias-removal.md#story-1) — SEED-022 — [plan](quick/134-literal-note-title-recall/PLAN.md)
 
 ## Backlog list
 - [Reduce a relationship note into its source in one irreversible action](seeds/SEED-024-atomic-relationship-note-reduction.md#story-1) — SEED-024

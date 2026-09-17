@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 class ClozeDescriptionTest {
-  ClozeReplacement clozeReplacement = new ClozeReplacement("[..~]", "[...]", "/.../", "<...>");
+  ClozeReplacement clozeReplacement = new ClozeReplacement("[..~]", "[...]", "/.../");
 
   @ParameterizedTest
   @CsvSource({
@@ -48,14 +48,14 @@ class ClozeDescriptionTest {
     "にとっては,       「にとっては」と,                      「[...]」と",
     "〜にとっては,       「〜にとっては」と,                    「〜[...]」と",
     "～によると,        名詞＋によると　名詞＋によれば,        名詞＋[...]　名詞＋によれば",
-    "cat(animal),      cat is an animal,                  [...] is an <...>",
-    "cat（animal),      cat is an animal,                  [...] is an <...>",
+    "cat(animal),      cat is an animal,                  cat is an animal",
+    "cat（animal),      cat is an animal,                  cat is an animal",
     "cat(animal) dog,  cat is an animal,                  cat is an animal",
     "「いい和悪い」,      然后,                               然后",
     "олет,             Это самолет,                        Это самолет",
     "不客气,            😃不客气,                           😃[...]",
     "ignore (complex (brackets)), ignore complex brackets,  ignore complex brackets",
-    "dog(animal／weather), dog day is a hot weather,   [...] day is a hot weather",
+    "dog(animal／weather), dog day is a hot weather,   dog day is a hot weather",
     "6,               6year,                              [...]year",
     "cat,             <p class='cat'>a cat</p>,           <p class='cat'>a [...]</p>",
     "～かたわら,        彼女は猫を可愛がる*かたわら*、犬に対してはなぜか冷たい。,  [...]",
@@ -107,7 +107,7 @@ class ClozeDescriptionTest {
 
   @Test
   void theReplacementsShouldNotInterfereEachOther() {
-    ClozeReplacement clozeReplacement = new ClozeReplacement("/..~/", "/.../", "(...)", "<...>");
+    ClozeReplacement clozeReplacement = new ClozeReplacement("/..~/", "/.../", "(...)");
     assertThat(
         new ClozedString(clozeReplacement, "abc")
             .hide(new NoteTitle("abc"))
@@ -233,12 +233,12 @@ class ClozeDescriptionTest {
   }
 
   @Test
-  void clozeQualifierAndSuffixFragmentsStillComeFromTitleOnly() {
+  void clozeTreatsBracketedTitleAsLiteralTextNotASeparateQualifier() {
     String result =
         new ClozedString(clozeReplacement, "kitten is an animal")
             .hide(new NoteTitle("cat(animal)"))
             .hideAliases(List.of("kitten"))
             .maskedContentAsMarkdown();
-    assertThat(result, containsString("[...] is an <...>"));
+    assertThat(result, containsString("[...] is an animal"));
   }
 }
