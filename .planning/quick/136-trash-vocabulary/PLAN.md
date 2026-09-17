@@ -137,6 +137,23 @@ historical migrations and the excluded unrelated concepts named above;
   `REDUCE_TO_SOURCE_PROPERTY`/`sourcePropertyKey`, which the unexecuted,
   already-taken SEED-024 story 1 (plan 135) will later delete outright. Plan
   135 has been updated to re-target its slice 6 at the renamed identifiers.
+- Update (2026-09-17, plan 135 wrap-up): SEED-024 story 1 (plan 135) is now
+  complete and its history removed. Its slice 6 already deleted
+  `REDUCE_TO_SOURCE_PROPERTY`/`sourcePropertyKey` outright — `NoteDeleteDTO`
+  and `NoteDeleteReferenceHandling` now only carry `LEAVE_DEAD_LINKS`/
+  `REMOVE_FROM_PROPERTIES`, so this story's rename applies to that simplified
+  two-value shape with no reduce-to-source-property coordination needed. Two
+  scope items above are stale and need re-verification before executing this
+  plan's Included frontend-rename slice: `ControllerTestBase.reduceToSourceProperty`
+  was deleted (no longer exists to keep its name through the DTO/enum rename);
+  `qualifyRelationNoteForReduceOnDelete`/`RelationNoteReduceOnDeleteQualification`
+  were replaced by a simplified `isRelationshipNote(noteRealm): boolean` in
+  `relationNoteReduceOnDelete.ts` (still that filename) — re-check its current
+  export name/shape before renaming it to `relationNoteReduceOnTrash.ts`. The
+  dedicated reduce endpoint (`RelationController.reduceToSourceProperty`,
+  `RelationReduceService`, `StoredApiCollection.reduceRelationNoteToSourceProperty`)
+  is a separate, unrelated, already-shipped feature and keeps its name — it is
+  not part of this trash-vocabulary rename.
 - The shared reference-handling enum takes the trash-flavored name because it
   is exposed to API/frontend consumers exclusively through the trash
   endpoint; `permanentlyRemove`'s own method name already carries the
