@@ -13,7 +13,6 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 - [Manually validate the complete append-only notebook workflow](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-42) — SEED-009 — [plan](quick/131-manually-validate-append-only-notebook-workflow/PLAN.md)
-- [Rebaseline every existing notebook from current Donut content](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-43) — SEED-009 — [plan](quick/132-rebaseline-existing-notebooks/PLAN.md)
 
 ## Backlog list
 - [Retire the spent notebook rebaseline migration](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-44) — SEED-009
