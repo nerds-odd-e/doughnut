@@ -8,9 +8,9 @@ a single, append-only sequence of commits, with no branching or rebasing;
 either the remote or local repository may be multiple commits behind.
 
 ## Taken
+- [Reduce a relationship note into its source in one irreversible action](seeds/SEED-024-atomic-relationship-note-reduction.md#story-1) — SEED-024 — [plan](quick/135-irreversible-relationship-reduction/PLAN.md)
 
 ## Backlog list
-- [Reduce a relationship note into its source in one irreversible action](seeds/SEED-024-atomic-relationship-note-reduction.md#story-1) — SEED-024
 - [Reduce a relationship into a source note in another notebook](seeds/SEED-025-cross-notebook-relationship-reduction.md#story-1) — SEED-025
 - [Use trash vocabulary for recoverable note removal](seeds/SEED-020-trash-vocabulary.md#story-1) — SEED-020
 - [Retire the spent notebook rebaseline migration](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-44) — SEED-009
