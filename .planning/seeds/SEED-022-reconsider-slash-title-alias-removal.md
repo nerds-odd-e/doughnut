@@ -3,107 +3,95 @@ id: SEED-022
 status: dormant
 planted: 2026-09-17
 planted_during: Refining SEED-021 (inbound wiki-link NFKC-normalization bug)
-trigger_when: when the owner is ready to decide whether to supersede ADR 0004's Portable-path shorthand matching
-scope: L
+trigger_when: when the owner is ready to remove the remaining recall semantics embedded in note titles
+scope: M
 ---
 
-# SEED-022: Reconsider slash-based title/alias (Portable path) matching
+# SEED-022: Make note titles literal in recall
 
 ## Why This Matters
 
-While diagnosing SEED-021 (a note's References panel omitting an incoming
-reference whose shared title contains a fullwidth slash), the owner stated:
+The earlier version of this seed incorrectly treated slash-shaped wiki-link
+paths from Accepted ADR 0004 as if they required recall aliases embedded in a
+note title. They are separate concepts. ADR 0004 makes the stored title the
+display name and uses `/` inside authored wiki links as Portable-path syntax;
+it does not require a title containing the fullwidth character `／` to be split
+into recall alternatives.
 
-> "The aliases using slash in title is a legacy behavior and is supposed to be
-> completely removed, as per my understanding. Looks like it's not the case in
-> the code."
-
-Investigation (reading `DisplayNamePathSeparators.java`, `FrontmatterAliases.java`,
-Accepted ADR 0004, and `git log` on the relevant files) found the opposite of
-that understanding:
-
-- Accepted [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md),
-  lines 101–107, explicitly specifies unqualified `[[Title-or-Alias]]` wiki
-  links as shorthand **Portable path** resolution — a note title containing a
-  path separator is current, deliberate, documented design, not a leftover.
-- A raw ASCII `/` cannot be authored directly into a note title at all:
-  `DisplayNamePathSeparators.replaceOsInvalidChars` substitutes the fullwidth
-  `／` for it on write, specifically so titles stay filesystem-safe for the
-  Git-native notebook binding (ADR 0002). That substitution is why the SEED-021
-  title literally contains `／` — it is filesystem-safety behavior, not a
-  removable "alias" feature.
-- `FrontmatterAliases`'s explicit `aliases:` frontmatter list has always
-  outright forbidden slash characters (`INVALID_ALIAS_CHARACTERS`); there is
-  no slash-based alias behavior in that mechanism to remove either.
-- Recent commit history (e.g. `9aac14d029` "author /Title for notebook-root
-  collisions", `c8338072f0` "write the full folder path when repairing
-  ambiguity", `f72b5d64ac` "introduce new plan for portable path ambiguity
-  follow-up") shows this system under active, ongoing extension, not wind-down.
-  No commit message or planning artifact anywhere proposes removing it.
-
-So SEED-021 was kept narrowly scoped to the NFKC-normalization bug only, with
-no removal work. This seed exists to hold the owner's original removal intent
-separately, in case the owner still wants to pursue it as a deliberate,
-informed decision to supersede ADR 0004 — not to re-litigate the finding above
-without new grounds.
+The remaining recall implementation still gives two positions inside a title
+special meaning: a fullwidth-slash segment beginning with a tilde becomes an
+additional answer/masking fragment, and a trailing bracket pair becomes a
+separately masked qualifier. This makes visually ordinary title characters
+change learning behavior. The owner has confirmed that these semantics should
+be removed: a title is one value, with only a tilde at the actual beginning of
+the whole title retaining its existing suffix behavior. Alternative spellings
+belong in YAML `aliases:` frontmatter.
 
 ## Alternatives and Decision
 
-Unresolved. Two directions, neither selected yet:
+Selected: interpret the whole note title as one recall value. A leading
+`~`, `〜`, or `～` on that whole value keeps the established suffix-matching
+behavior. Fullwidth slashes, later tildes, and brackets anywhere in the title
+are literal characters. Keep explicit frontmatter aliases as the separate
+source of alternative answers and masks.
 
-1. **Keep current design.** Portable-path shorthand resolution (slash-shaped
-   `[[Folder/Title]]` wiki links, and the filesystem-safe fullwidth
-   substitution it depends on) stays as Accepted ADR 0004 describes it. No
-   further action beyond SEED-021's normalization fix.
-2. **Supersede ADR 0004's Portable-path shorthand.** Remove slash-shaped
-   wiki-link/path matching and the title-to-filename slash substitution
-   outright, product-code-and-tests-and-docs, as if the behavior never
-   existed — no negated tests, no "used to support X" documentation. This
-   would need: an explicit ADR amendment/supersession (not a silent code
-   change against an Accepted ADR), a decision on what a note whose title the
-   user wants to type with a `/` should do instead, and an assessment of
-   impact on the Git-native notebook sync feature (ADR 0002) that Portable
-   paths serve. Materially larger than SEED-021; not attempted without the
-   owner first confirming this direction with fresh justification.
+The compatibility alternative—keep parsing slash-delimited suffix fragments
+and trailing qualifiers—was rejected because those implicit alternatives are
+the behavior the owner intends to retire. Existing stored titles are not
+rewritten, and no migration invents frontmatter aliases for them.
 
 ## Story Decomposition
 
-No story is decomposed yet. A beneficiary and evaluable outcome for direction
-2 above are not yet established — the owner's original justification ("legacy
-behavior") did not hold up against ADR 0004 and active development history.
-Decomposing a removal story requires either a new justification for
-superseding ADR 0004, or an explicit owner decision to proceed anyway knowing
-the current design is intentional. Route to
-[dough-story-decomposition](../../.claude/skills/dough-story-decomposition/SKILL.md)
-once that decision is made, since the parent problem (why remove it, and what
-replaces the shorthand) is still unresolved.
+### Story 1: Treat the whole note title as one recall value
+
+- **Goal:** A learner can predict spelling verification and recall masking from
+  the displayed title: the entire title is literal, except for an actual
+  leading tilde marker on the whole title.
+- **Scope:** Apply the rule to spelling-answer matching and recall-question
+  cloze masking. Remove fullwidth-slash suffix-fragment parsing and trailing
+  bracket-qualifier parsing. Preserve whole-title leading-tilde behavior and
+  explicit YAML `aliases:` behavior. Leave stored titles unchanged.
+- **Key examples:** `word／~logical` accepts and masks only the whole literal
+  title, not `word` or `logical` separately; `cat(animal)` accepts and masks
+  only the whole literal title, not `cat` or `animal` separately; `~logical`
+  still accepts `logical` and masks suffix occurrences; a frontmatter alias
+  still works as an alternative answer and mask.
+- **Rejection constraints:** Do not change ASCII `/` Portable-path parsing in
+  wiki links, fullwidth-slash filename safety, title storage, or frontmatter
+  alias rules. Do not fold the separately fixed inbound-reference bug or other
+  whole-token NFKC/deduplication concerns into this story.
+- **Value / learning:** Removes hidden title grammar while preserving the one
+  explicit title marker and the explicit alias mechanism the learner already
+  relies on.
+- **Effort hypothesis:** M — high confidence in the owning backend boundary;
+  moderate test-update breadth because the removed grammar is represented in
+  both answer-matching and cloze-masking cases.
+- **Depends on:** none.
+- **Safe stopping point:** Spelling and masking agree on the one-value title
+  rule, initial-tilde and frontmatter-alias behavior remain covered, and no
+  stored title or Portable-path behavior changes.
 
 ## Ordering and Scope Reduction
 
-Placed last in the product backlog: it is speculative, disputed against an
-Accepted ADR, and has no confirmed beneficiary today. It should not block or
-compete with any currently justified story.
+This seed has one story because answer matching and cloze masking are two
+observable uses of the same title rule; delivering only one would leave recall
+internally inconsistent. The NFKC/deduplication concern is independent and is
+not needed to achieve this outcome.
 
 ## Open Decisions
 
-- Does the owner still want to pursue removing slash-based title/Portable-path
-  matching, now knowing it is Accepted-ADR-0004 design under active
-  development — and if so, on what new grounds, and what should replace the
-  `[[Title-or-Alias]]` shorthand for notebook owners who rely on it today?
-  Blocks any decomposition or planning of this seed.
+None.
 
 ## When to Surface
 
-When the owner explicitly wants to revisit this decision — not automatically
-triggered by any other story.
+Now: the owner confirmed the literal-title rule and requested an executable
+slice plan.
 
 ## Breadcrumbs
 
-- SEED-021 — inbound wiki-link NFKC-normalization bug (the investigation that
-  produced this finding); completed and spent, see
-  `.planning/seeds/SEED-021-inbound-wiki-reference-nfkc-mismatch.md` at commit
-  `52c5b93e55`
-- [ADR 0002 — Git-native portable notebook synchronization](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
-- [ADR 0004 — OKF-compatible notebook markdown](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-- `backend/src/main/java/com/odde/donut/validators/DisplayNamePathSeparators.java`
-- `backend/src/main/java/com/odde/donut/algorithms/FrontmatterAliases.java`
+- [ADR 0001 — Ubiquitous language](../../docs/adrs/0001-ubiquitous-language.md)
+  (`Remember spelling` verifies the note title or alias)
+- [ADR 0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+  (the title column is the display-name source of truth; Portable paths are a
+  wiki-link concern)
+- SEED-021 — inbound wiki-reference NFKC mismatch, completed separately
