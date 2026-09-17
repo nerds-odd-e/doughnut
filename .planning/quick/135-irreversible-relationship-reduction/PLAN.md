@@ -133,13 +133,16 @@ Interim: the trash path still supplies the client key and still trashes; slice
 ### 2. Git-backed reduction records one commit without trash
 
 Type: Behavior
-Status: planned
-Proof: focused Gradle run of the replaced Git reduction test green.
-
-Given a Git-backed notebook with the relationship snapshotted, when the owner
-reduces it through the new endpoint, then the downloaded accepted head
-contains the reduced `Moon.md`, no relationship file, and no `_trash/` entry.
-Expected to pass with slice 1's code; fix only if the snapshot disagrees.
+Status: done, test-only. Replaced
+`reduceToSourcePropertyTrashIncludesReducedSourceAndTrashedRelationshipInAcceptedTree`
+(and its now-unused fixture/record) in `NotebookGitWebTrashLinkedReferrerControllerTest`
+with a new standalone `NotebookGitWebRelationReduceControllerTest`, whose
+`reduceToSourcePropertyRecordsReducedSourceWithNoRelationshipOrTrashInAcceptedTree`
+exercises the slice 1 endpoint directly and asserts the reduced `Moon.md`, no
+relationship file, and no `_trash/` entry anywhere in the downloaded tree.
+Passed against slice 1's code unchanged, as predicted; no production code
+touched. Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --tests '*NotebookGitWebRelationReduceControllerTest*' --tests '*NotebookGitWebTrashLinkedReferrerControllerTest*'`
+green. Post-change refactor: no candidates, already clean.
 
 ### 3. Every learner's understanding learning moves to the property
 
