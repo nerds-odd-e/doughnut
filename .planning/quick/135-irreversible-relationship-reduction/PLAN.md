@@ -147,7 +147,19 @@ green. Post-change refactor: no candidates, already clean.
 ### 3. Every learner's understanding learning moves to the property
 
 Type: Behavior
-Status: planned
+Status: done. Rewrote `rehomeNoteLevelMemoryTrackerToSourceProperty` in
+`NoteReferenceHandling` to move every tracker matching `isUnderstanding() &&
+isNoteLevelTracker()` regardless of `removedFromTracking` or owning user
+(dropped the old viewer-only/`findFirst()` filter); non-matching trackers
+(spelling/commissioned/property-level) are explicitly detached so Hibernate's
+persistence context doesn't hold a managed reference into the relationship
+note's later cascade delete (added `EntityPersister.detach`, mirroring its
+existing thin wrappers) — this fixes a previously-latent `TransientPropertyValueException`
+gap, untested until this slice combined `permanentlyRemove` with a
+`MemoryTracker` fixture. Fixed a stale javadoc on `NoteService.reduceRelationNoteToSourceProperty`
+during refactor. New test `movesEveryLearnersUnderstandingTrackerAndDropsTheSpellingTracker`
+in `RelationControllerReduceToSourcePropertyTests` covers two learners (one
+removed from recall) plus a spelling tracker.
 Proof: focused Gradle run of `*RelationControllerReduceToSourceProperty*` green
 with the new learning case; existing `NoteControllerTrashTests` still green.
 
@@ -208,4 +220,16 @@ that only covered reduce-via-trash. Trash behavior stays unchanged.
 
 ## Learnings
 
-None yet.
+- Fetching a note's `MemoryTracker` rows via `memoryTrackerRepository.findByNote_IdIn`
+  makes every returned row a managed JPA entity for the rest of the transaction,
+  even ones the caller doesn't otherwise touch. If that note is later permanently
+  removed in the same transaction (`NoteService.permanentlyRemove` →
+  `EntityPersister.remove`), any still-managed tracker referencing it trips
+  Hibernate's pre-flush transient-dependency check (`TransientPropertyValueException`),
+  because Hibernate doesn't know about the DB-level `ON DELETE CASCADE`. This
+  was latent and untested before slice 3 (no prior test combined `permanentlyRemove`
+  with a `MemoryTracker` fixture on the same note); fixed locally in slice 3 by
+  detaching every non-moved tracker before the removal flush. Other
+  `permanentlyRemove` call sites that load related entities without detaching
+  untouched ones were not audited and may share this latent gap — out of this
+  plan's scope, flagged for awareness only.
