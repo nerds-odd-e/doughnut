@@ -10,4 +10,6 @@ either the remote or local repository may be multiple commits behind.
 ## Taken
 
 ## Backlog list
+- [Process the rejected report from proven commissioned session items](seeds/SEED-027-process-rejected-commissioned-learning-report.md#story-1) — SEED-027
+- [Profile and optimize getting the assimilation queue for large notebooks](seeds/SEED-026-fast-assimilation-queue-for-large-notebooks.md#story-1) — SEED-026
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
