@@ -99,8 +99,10 @@ triggered by any other story.
 
 ## Breadcrumbs
 
-- [SEED-021 — inbound wiki-link NFKC-normalization bug](SEED-021-inbound-wiki-reference-nfkc-mismatch.md)
-  (the investigation that produced this finding)
+- SEED-021 — inbound wiki-link NFKC-normalization bug (the investigation that
+  produced this finding); completed and spent, see
+  `.planning/seeds/SEED-021-inbound-wiki-reference-nfkc-mismatch.md` at commit
+  `52c5b93e55`
 - [ADR 0002 — Git-native portable notebook synchronization](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
 - [ADR 0004 — OKF-compatible notebook markdown](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
 - `backend/src/main/java/com/odde/donut/validators/DisplayNamePathSeparators.java`
