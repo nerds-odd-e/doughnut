@@ -28,6 +28,19 @@ Preserve completed work, proof, decisions, and learnings whose boundaries and
 assumptions remain compatible. Drop only obligations the owner has authorized
 removing.
 
+When the current slice source is a `dough-test-optimization` plan, check its
+Current decisions for a decisive-checkpoint obligation before [selecting the
+next slice](../SKILL.md#execute-the-next-slice). A recorded, unresolved
+obligation is unresolved reassessment under this rule, not an ordinary
+dependency-ready slice: apply its selected authorized decision — continue only
+the supported strategy, continue only the explicitly retained independently
+valuable work, or stop for the developer — before another dependent experiment
+slice is selected or dispatched. Do not recompute, restate, or second-guess the
+remaining-gap comparison here; `dough-test-optimization` alone owns that
+judgment and the checkpoint's measurement, invalidated assumption, and
+consequences it records. A plan with no recorded obligation, or one whose
+obligation is already resolved, proceeds like any other dependency-ready slice.
+
 Carry forward a supported existing-solution finding. Use
 [dough-pfe](../../dough-pfe/SKILL.md) for an unforeseen addition or relocation of
 responsibility, or evidence invalidating the selected candidate or domain fit;

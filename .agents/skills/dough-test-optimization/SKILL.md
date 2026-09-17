@@ -89,8 +89,24 @@ following loop explicit in the plan and each experiment slice:
    finding rather than deliver a change merely because its tests pass.
 4. **Reassess:** use the result to reconsider the family's bottleneck and strategy.
    When a time target is supplied, compare the remaining gap with realistically
-   removable cost. If the remaining experiments cannot plausibly close it,
-   change the strategy before continuing. Update the same plan.
+   removable cost. A checkpoint whose recorded remaining experiments still offer a
+   plausible route to the target continues to the next experiment without an extra
+   record; do not invent a stop merely because a target exists.
+   A decisive checkpoint — one whose recorded remaining experiments cannot
+   plausibly close the remaining gap — is an explicit decision obligation: before
+   another dependent experiment is dispatched, record in the plan's Current
+   decisions (the [executable plan
+   format](../dough-story-refinement/references/planning.md#write-an-executable-plan))
+   the checkpoint's measurement, the remaining-gap comparison, the invalidated
+   strategy assumption, the consequence for the remaining experiments, and the
+   selected authorized decision — a supported different strategy within existing
+   authority, explicitly retained independently valuable work, or a stop for the
+   developer when continuing would change the target, outcome, or scope. Update
+   the same plan and keep the obligation mapped to its owning slice under [own
+   executable proof](../dough-story-refinement/references/planning.md#own-executable-proof),
+   so [execution
+   decisions](../dough-execute-plan/references/execution-decisions.md#reassess-before-extending-work)
+   must honor it before selecting another dependent experiment slice.
 
 Stop experimenting when no credible further saving remains within scope; record
 what was tried and the remaining cost as a candidate. An unresolved product,

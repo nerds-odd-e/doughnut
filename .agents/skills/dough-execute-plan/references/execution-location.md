@@ -4,11 +4,13 @@ Planned and planless work default to Story Branch Mode: one execution branch and
 Git worktree for the selected work. Explicit `--trunk` uses Trunk Mode: still
 one retained local execution branch and worktree, with claim and increment
 publication as in [trunk publication](trunk-publication.md). Explicit caller selection uses the
-current branch instead. After the claim is established for the selected mode,
-create the branch/worktree from that revision before delegation. When no claim
-applies, including authorized contextual planless work, use verified current
-HEAD and create no story, plan, or queue entry; still create the local
-execution workspace from that HEAD unless the caller selected the current
+current branch instead. Establish any queue claim first under
+[Take queued work](../SKILL.md#take-queued-work). After that commit succeeds,
+Story Branch and Trunk modes create their branch/worktree from that revision
+before delegation; caller-selected current-branch work continues from that same
+committed revision. When no claim applies, including authorized contextual
+planless work, use verified current HEAD and create no story, plan, or queue
+entry; still create the local execution workspace from that HEAD unless the caller selected the current
 branch. Resolve names and safe location from project conventions and ordinary
 host Git facilities. Missing conventions, unsafe location, or creation failure
 stops setup; preserve and report the claim and created resources. Use no
@@ -17,10 +19,12 @@ parallel registry, configuration format, or worktree manager.
 After successful setup and before delegation, retain one execution identity in
 the existing plan when one exists, and in the conversation:
 
-- originating checkout and branch, where the claim was recorded if any;
+- originating checkout and resolved integration branch, where the claim was
+  recorded if any;
 - execution checkout and branch for implementation and delivery;
-- integration checkout and branch, and the authorized remote target, defaulting
-  the branch to `main` only when neither caller nor project supplies one;
+- integration checkout and branch for later integration or publication, and the
+  authorized remote target, defaulting the branch to `main` only when neither
+  caller nor project supplies one;
 - selected mode;
 - retained published revisions when Trunk Mode has published any — this
   execution's review attribution in the existing plan or conversation, not a
@@ -46,9 +50,16 @@ and CI repair from the selected execution location. Story Branch Mode pushes
 its execution branch to the authorized destination. Trunk Mode publishes each
 verified increment through [trunk publication](trunk-publication.md) and
 does not push the execution branch. That rule's exclusive-turn and target
-cleanliness checks apply only to shared-target mutation, not to
-execution-checkout commits. Pass identity/location explicitly to agents and
-host adapters.
+cleanliness checks apply only to shared-target mutation — any operation that
+advances the authorized target branch's ref, including a same-command SHA
+push issued from the execution worktree — and not to execution-checkout
+commits, proof, or formatting, which stay ungated. Which checkout's shell
+issues that push does not change the mutation target: the target branch's
+ref and the integration checkout that tracks it are still gated, so the
+inspection and fast-forward named in
+[publish the candidate](trunk-publication.md#publish-the-candidate) still
+apply and are not satisfied by a push alone. Pass identity/location
+explicitly to agents and host adapters.
 
 Resolve checkout-bound installed runtime from the selected execution checkout
 and use it as working directory. Before arming, apply

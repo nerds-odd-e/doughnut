@@ -58,6 +58,7 @@ Resolve project context at the first boundary that needs it:
 
 - execution-source kind, slice target, hard limit, and exceptions;
   [replanning permission](references/execution-decisions.md#choose-replanning-permission);
+  integration checkout and branch for a queue claim, using the project's configured integration branch or `main` when none is supplied;
   execution mode and location: default Story Branch Mode; `--trunk` or a clear
   equivalent selects Trunk Mode; explicit caller selection uses the current
   branch. Resolve contradictions before changing state. Mode never creates
@@ -99,7 +100,11 @@ If the reference is unavailable, preserve the conflict and report the missing gu
 
 After resolving execution source and authority, inspect the backlog before plan-status
 changes, observer recovery/startup, delegation, or implementation. Moving a selected
-**Backlog list** entry to **Taken** is execution's first project-state change.
+**Backlog list** entry to **Taken** is execution's first project-state change. In
+every mode, commit only that backlog change on the resolved integration branch
+(`main` when the project supplies no other integration branch) before creating or
+using an execution branch or worktree; mode affects only later workspace and
+publication behavior.
 
 Before moving it, resolve selective formatting and the Taken-only commit's hook contract.
 An absent or understood check-only hook permits the transition. An unknown, mutating,
@@ -113,14 +118,15 @@ Already **Taken** means resume: preserve its position without duplication. Work 
 from both active lists needs no fabricated entry. Planning/refinement never takes work.
 Leave taken work through pauses, failures, completion, and retrospective; wrap-up removes it.
 
-For a queue claim, preflight read-only in the originating checkout before moving
-the entry: verify branch, backlog path, tracked/staged changes, and ownership of
-an isolated claim commit. Ambiguous branch or ownership leaves the queue
-unchanged; preserve existing work without stashing, resetting, overwriting, or
-silently unstaging it.
+For a queue claim, preflight the originating integration checkout: verify the
+resolved integration branch, backlog path, tracked/staged changes, and ownership
+of an isolated claim commit. Ambiguous branch or ownership leaves the queue
+unchanged; preserve existing work without stashing, resetting, overwriting, or silently unstaging it. Queued current-branch
+execution requires the resolved integration branch; otherwise stop before changing
+the backlog.
 
 After moving, stage only the backlog path, inspect the staged diff, and commit the claim
-locally on the originating branch. Claim setup may record provisional identity;
+locally on the integration branch. Claim setup may record provisional identity;
 complete it before dispatch. Staging/commit failure stops isolated execution:
 preserve and report backlog/index state. No-change cases produce no empty claim
 commit.

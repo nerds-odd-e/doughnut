@@ -13,12 +13,12 @@ exists; retain its published SHA and register it after the observer is armed.
 
 ## Publish a queue claim
 
-After the local Taken claim commit succeeds on the originating branch, publish
-that claim with the steps below, then create the local execution
-branch/worktree from the published revision. Do not start implementation from
-an unpublished claim. An unavailable destination or failed publication leaves
-the exact remaining state and does not authorize starting unclaimed queued
-work.
+After [Take queued work](../SKILL.md#take-queued-work) commits the local Taken
+claim on the resolved integration branch, publish it with the steps below, then
+create the local execution branch/worktree from the published revision. Do not
+start implementation from an unpublished claim. An unavailable destination or
+failed publication leaves the exact remaining state and does not authorize
+starting unclaimed queued work.
 
 ## Publish a verified increment
 
@@ -99,16 +99,30 @@ same execution worktree; a claim may have none yet.
    the combined changes affect; reverify that behavior and reuse the rest.
    Do not treat rebase success as behavioral proof, rerun unrelated checks,
    or wait for CI.
-5. Fast-forward the local target to the exact candidate. Do not merge.
+5. Fast-forward the local target to the exact candidate by running
+   `git -C <integration-checkout> merge --ff-only <candidate>` on the
+   integration checkout named in [execution location](execution-location.md),
+   not on the execution checkout. Do not substitute a same-command SHA push
+   from the execution worktree (for example `git push origin <candidate>:main`),
+   `git update-ref`, or `git branch -f` on that branch: none of these move the
+   integration checkout's `HEAD` or working tree, so it would still report a
+   stale `main` after the remote moved. Do not merge with any strategy other
+   than `--ff-only`.
 6. Immediately before pushing, retain the full candidate SHA and the
-   previously published base. Push that exact candidate to the authorized
-   remote target. After confirmed success, append that SHA to this
-   execution's retained published revisions in the existing plan or
-   conversation. Do not drop earlier published SHAs of this execution, add a
-   pre-rebase unpublished SHA, or treat a later moving `HEAD` as that
-   publication. When an observer is already bound to the execution checkout,
-   register that SHA with it. Registration failure is lost coverage: report
-   it and do not claim the revision was observed. Do not wait for CI.
+   previously published base. Push that exact candidate from the integration
+   checkout to the authorized remote target, then fetch again on that
+   checkout to refresh its view of the target. After confirmed success,
+   append that SHA to this execution's retained published revisions in the
+   existing plan or conversation. Do not drop earlier published SHAs of this
+   execution, add a pre-rebase unpublished SHA, or treat a later moving
+   `HEAD` as that publication. When an observer is already bound to the
+   execution checkout, register that SHA with it. Registration failure is
+   lost coverage: report it and do not claim the revision was observed. Do
+   not wait for CI. Do not report or register success until local `main`,
+   the freshly fetched remote, the retained SHA, and the execution branch
+   all agree on the candidate SHA and `main...origin/main` is `0	0` on the
+   integration checkout; a mismatch among those four identities is an
+   unfinished publication, not a completed one.
 
 ## Publish wrap-up closure
 
