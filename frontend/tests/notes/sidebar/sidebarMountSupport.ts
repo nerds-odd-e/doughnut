@@ -34,7 +34,7 @@ const sidebarRouterLinkStub = defineComponent({
 export function isBefore(node1: Node, node2: Node) {
   return !!(
     // eslint-disable-next-line no-bitwise
-    (node1.compareDocumentPosition(node2) & Node.DOCUMENT_POSITION_FOLLOWING)
+    node1.compareDocumentPosition(node2) & Node.DOCUMENT_POSITION_FOLLOWING
   )
 }
 
