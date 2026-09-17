@@ -67,13 +67,24 @@ generated-client surface, and callers.
 - Reduction is its own backend operation, separate from trash. The backend
   reads the relationship note and derives the source note, target, and property
   key from its content. It does not trust a client-computed key or source ID.
+- The backend refuses reduction when the relationship note has body text
+  (any non-blank content after the leading frontmatter), with a message and no
+  change. Donut-created relationship notes have an empty body unless details
+  were preserved.
 - In one transaction the backend adds the property to the source note
-  (suffixing the key on collision, as today), moves the viewer's note-level
-  memory tracker to that property (as today), and permanently deletes the
-  relationship note through the existing permanent-deletion owner, the same one
-  Git publication uses. Inbound wiki links to the relationship note are left as
-  dead links, matching Git-published deletion.
-- For a Git-backed notebook, the change produces one accepted commit containing
+  (suffixing the key on collision, as today), moves learning to that property,
+  and permanently deletes the relationship note through the existing
+  permanent-deletion owner, the same one Git publication uses. Inbound wiki
+  links to the relationship note are left as dead links, matching Git-published
+  deletion. Attachments are lost with the note.
+- Learning is kept: every learner's note-level understanding memory tracker on
+  the relationship note, active or removed from recall, becomes that learner's
+  property memory tracker for the resolved key on the source note, keeping its
+  schedule, recall history, and state. Today only the reducing viewer's active
+  tracker moves. Spelling and commissioned trackers have no property form. They
+  test or tutor the relationship note itself, so they are permanently deleted
+  with it (assumption, 2026-09-17).
+- For a Git-backed notebook containing both notes, the change produces one accepted commit containing
   the source-note edit and the removed relationship file, with nothing under
   `_trash/` (NORTH-STAR "One complete accepted web change").
 - Any failure (unresolvable source, missing relation, authorization, persistence)
@@ -98,6 +109,14 @@ generated-client surface, and callers.
   reducing relationship notes from anywhere other than the existing
   note-options trash flow.
 - SEED-020 vocabulary renames beyond the removed reduce surface.
+- A source note in another notebook:
+  [SEED-025](SEED-025-cross-notebook-relationship-reduction.md#story-1). This
+  story neither enables nor constrains that case; whatever the natural behavior
+  is stays unchanged.
+- Hiding the reduce choice for relationship notes with body text; the backend
+  refusal message is the promised signal.
+- Authored frontmatter properties beyond the structural relationship keys are
+  discarded with the note, like attachments (assumption, 2026-09-17).
 
 #### Key examples
 
@@ -105,16 +124,19 @@ generated-client surface, and callers.
    topics", when the owner chooses "Reduce to a property of the source", then
    "Moon" contains `a part of: '[[Earth]]'`, the relationship note is absent from
    active notes and from trash, no undo is offered, and the owner lands on
-   "Moon".
+   "Moon". An attachment on the relationship note is gone.
 2. **Git-backed notebook.** Given the same notebook is Git-backed, reduction
    appends one accepted commit that modifies `Moon.md` and deletes the
    relationship file. No file appears under `_trash/`.
 3. **Key collision (existing).** When "Moon" already has `a part of: "[[Mars]]"`,
    the new property is `a part of 2: '[[Earth]]'`.
-4. **Tracked relationship (existing).** The viewer's assimilated tracker on the
-   relationship note becomes a property tracker for "a part of" on "Moon".
-5. **Authored body is discarded.** The relationship note's body "Observations
-   from orbit." is permanently gone after reduction (see Open Decision 1).
+4. **Learning moves.** Two learners each assimilated "Moon a part of Earth" and
+   recalled it; one later removed it from recall. After reduction, each learner
+   has a property memory tracker for "a part of" on "Moon" with the same next
+   recall time, recall history, and removed-from-recall state as before.
+5. **Body text refuses reduction.** Given the relationship note's body is
+   "Observations from orbit.", reduction is refused with a message; the
+   relationship note, "Moon", and Git history are unchanged.
 6. **Failure is atomic.** If the relationship's `source` link no longer resolves
    to a note the owner can edit, reduction is refused with a message, and both
    notes, the tracker, and Git history are unchanged.
@@ -140,23 +162,13 @@ cannot be delivered separately without recreating the invalid intermediate
 state. The strongest cheaper alternative, removing the reduction feature
 entirely and letting owners edit the source property themselves, was
 considered. It is not proposed because the owner kept reduction as a product
-capability, but it remains the fallback if Open Decision 2 turns out costly.
+capability, but it remains a fallback.
 
 ## Open Decisions
 
-1. **Authored body and other dependent data.** Permanent deletion discards the
-   relationship note's body, attachments, conversations, other learners'
-   trackers and recall history on it, and the viewer's non-note-level trackers.
-   *Proposed:* accept, per ADR 0001's definition of permanent deletion, and
-   state "permanently deletes" in the choice label. Alternative: refuse
-   reduction when the body is non-empty.
-2. **Source note in another notebook.** Today the source is resolved through a
-   wiki link and may belong to a different notebook. The accepted-change
-   boundary commits only the relationship note's notebook, so the source edit
-   would bypass its own notebook's Git history. *Proposed:* offer and accept
-   reduction only when the source is in the same notebook, and refuse otherwise
-   (justification: NORTH-STAR "One complete accepted web change"). Alternative:
-   defer cross-notebook correctness and keep today's behavior for that case.
+None. Owner decisions, 2026-09-17: keep this story first; learning moves to
+the source property; body text refuses reduction; losing attachments is
+acceptable; cross-notebook sources move to SEED-025.
 
 ## When to Surface
 
