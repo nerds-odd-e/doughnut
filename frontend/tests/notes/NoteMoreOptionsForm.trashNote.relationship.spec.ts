@@ -8,26 +8,26 @@ import {
 import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "donut-test-fixtures/makeMe"
 import {
-  deleteNoteButton,
+  trashNoteButton,
   loadingModalMask,
-  mountDeleteFormReady,
-  mountDeleteFormWithNotePropChange,
-  qualifyingRelationRealmForDelete,
+  mountTrashFormReady,
+  mountTrashFormWithNotePropChange,
+  qualifyingRelationRealmForTrash,
   relationNotesForPropChangeTest,
   seedRelationRealmWithInboundReferences,
-  setupNoteMoreOptionsDeleteFormTests,
-  awaitDeleteSideEffects,
-} from "./noteMoreOptionsDeleteTestSupport"
+  setupNoteMoreOptionsTrashFormTests,
+  awaitTrashSideEffects,
+} from "./noteMoreOptionsTrashTestSupport"
 
-setupNoteMoreOptionsDeleteFormTests()
+setupNoteMoreOptionsTrashFormTests()
 
-describe("NoteMoreOptionsForm delete relationship note", () => {
+describe("NoteMoreOptionsForm trash relationship note", () => {
   it("shows LoadingModal while reducing relationship note to source property", async () => {
     let resolveReduce: () => void
     const reduceHeld = new Promise<void>((r) => {
       resolveReduce = r
     })
-    const { moonId, relationRealm } = qualifyingRelationRealmForDelete()
+    const { moonId, relationRealm } = qualifyingRelationRealmForTrash()
     mockSdkServiceWithImplementation(
       RelationController,
       "reduceToSourceProperty",
@@ -37,9 +37,9 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
       }
     )
     seedRelationRealmWithInboundReferences(relationRealm)
-    const wrapper = await mountDeleteFormReady(relationRealm.note)
+    const wrapper = await mountTrashFormReady(relationRealm.note)
 
-    ;(deleteNoteButton(wrapper).element as HTMLButtonElement).click()
+    ;(trashNoteButton(wrapper).element as HTMLButtonElement).click()
 
     usePopups().popups.done("REDUCE")
     await flushPromises()
@@ -50,7 +50,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     )
 
     resolveReduce!()
-    await awaitDeleteSideEffects()
+    await awaitTrashSideEffects()
 
     expect(loadingModalMask()).toBeNull()
   })
@@ -63,12 +63,12 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
       "reduceToSourceProperty",
       makeMe.aNoteRealm.id(moonId).title("Moon").please()
     )
-    const wrapper = await mountDeleteFormWithNotePropChange(
+    const wrapper = await mountTrashFormWithNotePropChange(
       moonNote,
       relationNote
     )
 
-    ;(deleteNoteButton(wrapper).element as HTMLButtonElement).click()
+    ;(trashNoteButton(wrapper).element as HTMLButtonElement).click()
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)

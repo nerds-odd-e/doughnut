@@ -1,7 +1,7 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -69,7 +69,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
               proposedFolders, proposedLiveNotes, noteChange.path());
       noteService.permanentlyRemove(
           deletedNote,
-          NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS,
+          NoteTrashReferenceHandling.LEAVE_DEAD_LINKS,
           authorizationService.getCurrentUser());
       proposedLiveNotes.remove(deletedNote);
     }

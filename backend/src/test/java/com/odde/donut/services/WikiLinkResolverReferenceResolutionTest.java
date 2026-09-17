@@ -99,7 +99,7 @@ class WikiLinkResolverReferenceResolutionTest {
   }
 
   @Test
-  void resolveReference_returnsMissing_whenNoteIdUrlTargetIsSoftDeleted() {
+  void resolveReference_returnsMissing_whenNoteIdUrlTargetIsTrashed() {
     User owner = makeMe.aUser().please();
     Note target = makeMe.aNote().notebookOwnedBy(owner).trashed().please();
     Note source = makeMe.aNote().underSameNotebookAs(target).please();

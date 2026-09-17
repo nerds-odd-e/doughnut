@@ -64,11 +64,11 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void omits_target_when_target_note_is_soft_deleted() {
+  void omits_target_when_target_note_is_trashed() {
     Note target = makeMe.aNote().title("Target").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Target]]").please();
 
-    softDelete(target);
+    trashNote(target);
 
     assertThat(noteRealmService.build(carrier, user).getWikiLinks(), empty());
   }
@@ -98,7 +98,7 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_omit_soft_deleted_relation() {
+  void references_omit_trashed_relation() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note subject = makeMe.aNote().notebook(notebook).please();
     Note relation = makeMe.aNote().notebook(notebook).please();
@@ -107,7 +107,7 @@ class NoteRealmServiceTest {
         RelationshipNoteMarkdown.forEndpoints(
             relation, "a specialization of", subject, focal, null));
 
-    softDelete(relation);
+    trashNote(relation);
 
     assertThat(noteRealmService.build(subject, user).getReferences(), empty());
   }
@@ -138,12 +138,12 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_omit_soft_deleted_carrier() {
+  void references_omit_trashed_carrier() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).please();
     makeMe.authorReferencingContent(carrier, "[[Focal]]");
 
-    softDelete(carrier);
+    trashNote(carrier);
 
     assertThat(noteRealmService.build(focal, user).getReferences(), empty());
   }
@@ -157,7 +157,7 @@ class NoteRealmServiceTest {
     assertThat(noteRealmService.build(focal, user).getReferences(), hasSize(1));
   }
 
-  private void softDelete(Note note) {
+  private void trashNote(Note note) {
     Folder trash = makeMe.aFolder().notebook(note.getNotebook()).name("_trash").please();
     note.setFolder(trash);
     makeMe.entityPersister.merge(note);

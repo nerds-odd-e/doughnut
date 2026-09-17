@@ -1,9 +1,9 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.NoteContentMarkdown;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.NoteImageUploadDTO;
 import com.odde.donut.controllers.dto.NoteImageUploadResult;
+import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
@@ -137,13 +137,13 @@ public class NoteService {
    * note-owned dependents (memory_tracker, recall_prompt, mcq, image, conversation, and
    * authored_note_reference source rows) are removed by their ON DELETE CASCADE foreign keys. The
    * reference-handling contract is applied first so authored inbound text in referrer notes is
-   * preserved for {@link NoteDeleteReferenceHandling#LEAVE_DEAD_LINKS}. Used by Git publication of
-   * a file deletion.
+   * preserved for {@link NoteTrashReferenceHandling#LEAVE_DEAD_LINKS}. Used by Git publication of a
+   * file deletion.
    */
   public void permanentlyRemove(
-      Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
+      Note note, NoteTrashReferenceHandling referenceHandling, User viewer) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    applyNoteDeleteReferenceHandling(note, referenceHandling, viewer, currentUTCTimestamp);
+    applyNoteReferenceHandling(note, referenceHandling, viewer, currentUTCTimestamp);
     entityPersister.remove(note);
   }
 
@@ -159,15 +159,15 @@ public class NoteService {
         relationNote, viewer, updatedAt);
   }
 
-  public void applyNoteDeleteReferenceHandling(
-      Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
-    applyNoteDeleteReferenceHandling(
+  public void applyNoteReferenceHandling(
+      Note note, NoteTrashReferenceHandling referenceHandling, User viewer) {
+    applyNoteReferenceHandling(
         note, referenceHandling, viewer, testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  private void applyNoteDeleteReferenceHandling(
-      Note note, NoteDeleteReferenceHandling referenceHandling, User viewer, Timestamp updatedAt) {
-    if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
+  private void applyNoteReferenceHandling(
+      Note note, NoteTrashReferenceHandling referenceHandling, User viewer, Timestamp updatedAt) {
+    if (referenceHandling == NoteTrashReferenceHandling.REMOVE_FROM_PROPERTIES) {
       noteReferenceHandling.removeNoteLinksFromReferrerProperties(note, viewer, updatedAt);
     }
   }

@@ -69,7 +69,7 @@ class OkfIncompatibleTitleHealthRuleTest {
   }
 
   @Test
-  void excludesSoftDeletedNotes() {
+  void excludesTrashedNotes() {
     makeMe.aNote("index").notebook(notebook).trashed().please();
     Note live = makeMe.aNote("log").notebook(notebook).please();
 

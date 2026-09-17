@@ -25,12 +25,12 @@ vi.mock("vue-toastification", () => ({
   useToast: () => mockToast,
 }))
 
-export const noteMoreOptionsDeleteFormNoteRealm = makeMe.aNoteRealm.please()
-export const noteMoreOptionsDeleteFormNote =
-  noteMoreOptionsDeleteFormNoteRealm.note
-export let deleteNoteSpy: ReturnType<typeof mockSdkService>
+export const noteMoreOptionsTrashFormNoteRealm = makeMe.aNoteRealm.please()
+export const noteMoreOptionsTrashFormNote =
+  noteMoreOptionsTrashFormNoteRealm.note
+export let trashNoteSpy: ReturnType<typeof mockSdkService>
 
-export const noteMoreOptionsDeleteFormRouter = createRouter({
+export const noteMoreOptionsTrashFormRouter = createRouter({
   history: createMemoryHistory(),
   routes: dummyRouteRecordsFromMetadata,
 })
@@ -38,16 +38,16 @@ export const noteMoreOptionsDeleteFormRouter = createRouter({
 export const loadingModalMask = () =>
   document.querySelector(".loading-modal-mask")
 
-export function deleteNoteButton(wrapper: VueWrapper) {
+export function trashNoteButton(wrapper: VueWrapper) {
   return wrapper.find('button[title="Trash note (d)"]')
 }
 
-export async function clickDeleteNote(wrapper: VueWrapper) {
-  await deleteNoteButton(wrapper).trigger("click")
+export async function clickTrashNote(wrapper: VueWrapper) {
+  await trashNoteButton(wrapper).trigger("click")
   await flushPromises()
 }
 
-export async function mountDeleteFormReady(note: Note) {
+export async function mountTrashFormReady(note: Note) {
   const wrapper = renderer.withProps({ note }).mount()
   await flushPromises()
   return wrapper
@@ -72,7 +72,7 @@ export let renderer: RenderingHelper<
   typeof NoteMoreOptionsFormWithGlobalLoading
 >
 
-export function setupNoteMoreOptionsDeleteFormTests() {
+export function setupNoteMoreOptionsTrashFormTests() {
   afterEach(async () => {
     await flushPromises()
     document.body.innerHTML = ""
@@ -84,22 +84,22 @@ export function setupNoteMoreOptionsDeleteFormTests() {
     usePopups().popups.register({ popupInfo: [] })
     mockToast.error.mockClear()
     mockToast.warning.mockClear()
-    deleteNoteSpy = mockSdkService(
+    trashNoteSpy = mockSdkService(
       NoteController,
       "trashNote",
-      noteMoreOptionsDeleteFormNoteRealm
+      noteMoreOptionsTrashFormNoteRealm
     )
     renderer = helper
       .component(NoteMoreOptionsFormWithGlobalLoading)
-      .withRouter(noteMoreOptionsDeleteFormRouter)
+      .withRouter(noteMoreOptionsTrashFormRouter)
       .withCleanStorage()
     useStorageAccessor().value.refreshNoteRealm(
-      noteMoreOptionsDeleteFormNoteRealm
+      noteMoreOptionsTrashFormNoteRealm
     )
   })
 }
 
-export function qualifyingRelationRealmForDelete(options?: {
+export function qualifyingRelationRealmForTrash(options?: {
   moonId?: number
   earthId?: number
   relationId?: number
@@ -145,7 +145,7 @@ export function relationNotesForPropChangeTest(options?: {
   const moonId = options?.moonId ?? 501
   const relationId = options?.relationId ?? 503
   const moonNote = makeMe.aNote.id(moonId).title("Moon").please()
-  const { relationRealm } = qualifyingRelationRealmForDelete({
+  const { relationRealm } = qualifyingRelationRealmForTrash({
     moonId,
     relationId,
   })
@@ -158,7 +158,7 @@ export function relationNotesForPropChangeTest(options?: {
   return { moonId, relationId, moonNote, relationNote }
 }
 
-export async function mountDeleteFormWithNotePropChange(
+export async function mountTrashFormWithNotePropChange(
   moonNote: Note,
   relationNote: Note
 ) {
@@ -168,7 +168,7 @@ export async function mountDeleteFormWithNotePropChange(
   return wrapper
 }
 
-export async function awaitDeleteSideEffects() {
+export async function awaitTrashSideEffects() {
   await flushPromises()
-  await noteMoreOptionsDeleteFormRouter.isReady()
+  await noteMoreOptionsTrashFormRouter.isReady()
 }

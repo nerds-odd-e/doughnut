@@ -21,8 +21,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Reduces a relationship note into a property of its resolved source note, and applies the
- * note-delete reference policy that removes referrer property links (used for {@link
- * com.odde.donut.controllers.dto.NoteDeleteReferenceHandling#REMOVE_FROM_PROPERTIES}).
+ * reference-handling policy, shared by note trash and permanent removal, that removes referrer
+ * property links (used for {@link
+ * com.odde.donut.controllers.dto.NoteTrashReferenceHandling#REMOVE_FROM_PROPERTIES}).
  */
 final class NoteReferenceHandling {
   private static final String RELATIONSHIP_NOTE_TYPE = "relationship";

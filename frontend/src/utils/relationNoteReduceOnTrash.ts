@@ -7,7 +7,7 @@ import {
 const RELATIONSHIP_NOTE_TYPE = "relationship"
 
 /**
- * Whether delete may offer reducing this relation note to a source property.
+ * Whether trash may offer reducing this relation note to a source property.
  * The backend derives the property key and resolves+authorizes the source
  * itself, so this only gates on note type.
  */

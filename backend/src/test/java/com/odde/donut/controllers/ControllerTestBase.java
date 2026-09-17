@@ -2,8 +2,8 @@ package com.odde.donut.controllers;
 
 import com.odde.donut.controllers.currentUser.CurrentUser;
 import com.odde.donut.controllers.currentUser.ThreadLocalCurrentUser;
-import com.odde.donut.controllers.dto.NoteDeleteDTO;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.donut.controllers.dto.NoteTrashDTO;
+import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.controllers.dto.NoteTrashUndoDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -42,15 +42,15 @@ public abstract class ControllerTestBase {
     makeMe.authorReferencingContent(note, content);
   }
 
-  protected NoteDeleteDTO leaveDeadLinks() {
-    NoteDeleteDTO request = new NoteDeleteDTO();
-    request.setReferenceHandling(NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS);
+  protected NoteTrashDTO leaveDeadLinks() {
+    NoteTrashDTO request = new NoteTrashDTO();
+    request.setReferenceHandling(NoteTrashReferenceHandling.LEAVE_DEAD_LINKS);
     return request;
   }
 
-  protected NoteDeleteDTO removeFromProperties() {
-    NoteDeleteDTO request = new NoteDeleteDTO();
-    request.setReferenceHandling(NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES);
+  protected NoteTrashDTO removeFromProperties() {
+    NoteTrashDTO request = new NoteTrashDTO();
+    request.setReferenceHandling(NoteTrashReferenceHandling.REMOVE_FROM_PROPERTIES);
     return request;
   }
 

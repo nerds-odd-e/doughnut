@@ -4,7 +4,7 @@ export type ShortcutAction =
   | "note-new"
   | "note-toggle-edit-mode"
   | "note-export"
-  | "note-delete"
+  | "note-trash"
   | "note-search"
   | "wiki-link-or-relationship"
 
@@ -39,7 +39,7 @@ const bindings: Record<ShortcutAction, ShortcutBinding> = {
     matches: (e) => plainLetterKey(e, "KeyE"),
     guardEditable: true,
   },
-  "note-delete": {
+  "note-trash": {
     matches: (e) => plainLetterKey(e, "KeyD"),
     guardEditable: true,
   },
