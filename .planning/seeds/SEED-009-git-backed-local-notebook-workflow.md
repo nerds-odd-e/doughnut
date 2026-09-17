@@ -51,23 +51,40 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Goal / beneficiary:** A notebook owner reading an active note sees incoming
   references only from active notes, so the list describes references they can
   meaningfully follow in the active notebook.
-- **Production report:** The owner previously saw note A remain in note B's
-  incoming-reference list after A was trashed. The exact production revision is
-  unknown, and the behavior may already have been fixed by the portable-trash
-  changes.
-- **Manual reproduction — 2026-09-15:** Not reproducible on current HEAD
+- **Production report:** The owner confirmed on 2026-09-17 that the problem is
+  still present in production and development. Concrete development data:
+  trashed note `電話を掛ける` (`85420`) is under
+  `_trash/misc/電話について` and directly authors
+  `an application of: "[[掛ける]]"`; active note `掛ける` (`93508`) still
+  lists `電話を掛ける` in its References section and fresh API response.
+- **Earlier manual reproduction — 2026-09-15:** Not reproducible on HEAD
   `4dc53bb603`. In a fresh development notebook, B initially listed A when A
   referred to B through either a `parent: [[Target B]]` relationship or an
   ordinary Markdown `[[Target B]]` wiki link. After A was trashed and B was
-  revisited, B showed no References section in both variants.
-- **Current assessment:** Probably already fixed. Current source filters an
-  incoming referrer through note availability, which now derives from whether
-  the note is under trash. Do not plan or implement a correction without a new
-  reproducible case or evidence from the affected production revision.
-- **Evaluation:** Given active A references active B and B lists A, when the
-  owner trashes A and revisits B, A is absent from B's incoming-reference list.
-  This is an observable correction to the existing contract that inactive
-  referrers are omitted; it does not change A's authored reference content.
+  revisited, B showed no References section in both variants. Those fresh notes
+  were at notebook root or only one folder below it before trashing; the check
+  did not cover a referrer nested two or more folders deep.
+- **Controlled reproduction — 2026-09-17:** Reproduced on current HEAD
+  `5a221da58e` with an ordinary body wiki link and no relationship note. A
+  referrer in `Depth One/Depth Two` authored `[[Target A]]`; after trash it was
+  at `_trash/Depth One/Depth Two`, and a fresh API response for Target A still
+  included the referrer. The same direct-reference check passed when the
+  referrer started at notebook root or only one folder deep.
+- **Current assessment:** Confirmed and depth-dependent for direct authored
+  references. Source inspection strongly indicates that `Folder.isTrashed()`
+  walks lazy parent-folder fields directly and can stop before reaching the
+  root `_trash` folder when the note is nested deeply; the database
+  `trashed_folder` view correctly identifies the same folder chain as trashed.
+- **Key example:** Given active B is two folders deep and directly references
+  active A in its body or frontmatter, when the owner trashes B with **Leave as
+  dead links** and reloads A, A no longer lists B as an incoming reference.
+  B's authored content remains governed by the selected reference-handling
+  choice; this story changes visibility, not authored bytes.
+- **Boundary example:** An active referrer continues to appear. If a
+  relationship note itself is trashed, it follows the same referrer rule. An
+  otherwise-active relationship note whose source or target endpoint was
+  trashed remains governed by the existing relationship/reference-preservation
+  behavior and is not a new promise of this story.
 - **Value / learning:** Remove a misleading stale navigation result from the
   newly prioritized trash journey and verify that incoming-reference visibility
   follows location-derived activity rather than the former soft-delete model.
@@ -75,17 +92,31 @@ data; invalid or ambiguous changes must not silently discard work.
   remove A's reference before trashing it, but both leave the page misleading
   and the latter needlessly changes authored content.
 - **Boundaries:** This story owns incoming-reference visibility after trashing
-  the referring note. It does not add reference deletion, link rewriting,
-  cross-notebook Git synchronization, or new trash navigation behavior.
-- **Effort / status:** Queued but not reproducible; probably already fixed.
-  S (30–60 minutes) remains only a historical hypothesis and is not an
-  execution-ready estimate.
+  the referring note while preserving its authored links, including nested
+  trash paths. It does not reinterpret the lifecycle of a separate active
+  relationship note, add reference deletion or link rewriting, change Git
+  synchronization, or add trash navigation behavior.
+- **Architecture / soft design goal:** Follow Accepted
+  [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash):
+  only location beneath the case-insensitive notebook-root `_trash` determines
+  membership. Reuse the existing split of responsibilities: database selection
+  uses the recursive `trashed_folder` view, while object checks use current
+  folder ancestry so an in-transaction move is immediately visible. Correct
+  the shared object-level owner rather than adding an incoming-reference-only
+  trash test, eager folder loading, cache, or second state. Prefer a clearer,
+  smaller production implementation with a net production-line reduction;
+  line count is a supporting signal, not an acceptance gate or a reason to
+  compress useful tests.
+- **Effort / status:** Queued, reproducible, and refined. S (30–60 minutes),
+  moderate confidence: one shared domain rule and one existing controller
+  boundary appear sufficient, with the full backend suite as the main wait.
 - **Depends on / safe stopping point:** No unfinished product prerequisite.
   Active note pages stop advertising trashed referrers even if broader portable
   trash and Git work is deferred.
-- **Human priority (2026-09-15):** Initially placed first, then moved to the
-  bottom after the current build could not reproduce the production report and
-  the behavior was assessed as probably already fixed.
+- **Human priority:** Moved to the bottom on 2026-09-15 after the direct-reference
+  check could not reproduce it; restored to first on 2026-09-17 after the owner,
+  the concrete nested production-like example, and the controlled deep-folder
+  reproduction established the current defect.
 
 <a id="story-23"></a>
 

@@ -1,51 +1,5 @@
 # DearDough Process Findings
 
-## ODF-007 — Implementation subagent ends its turn "waiting" on its own background test instead of blocking for the result
-
-Former local code: DD-001.
-
-An implementation subagent launched its own long-running test command
-asynchronously and then ended its turn reporting that it was "waiting" or
-"pausing" for the background result, instead of blocking until the command
-finished and reporting the actual pass/fail outcome, despite explicit
-instructions to do so before reporting.
-
-### Occurrences
-
-- Execution: SEED-017 Story 1 / quick-099-receive-compatible-accepted-history / 5ed11cd8e0
-  - Tool: Claude Code
-  - Open Dough release: 0.3.8
-  - Evidence: slice 4 implementation agent's first report ("I've started the
-    vitest run and am waiting for its completion notification before
-    evaluating results. Pausing here.") and, after being resent the same
-    request, its second report ("Pausing for the background run to
-    complete."), before the coordinator ran the focused test command directly
-    to obtain the actual result (95/95 passed).
-  - Observed effect: two extra coordinator round-trips (one resend, one
-    direct verification run) before slice 4's wrap-up could proceed.
-
-- Execution: SEED-018 story 3 / quick/108-publish-notebook-edits-faster / a6fcddacad
-  - Tool: Claude Code
-  - Model: claude-sonnet-5
-  - Open Dough release: 0.3.13
-  - Evidence: the slice 1 implementation agent's first two reports ("I'll
-    wait for the background smoke-test run to finish before continuing." and,
-    after one resend, "Waiting for baseline run 1 (1000/1000) to finish.")
-    before a second resend produced its real final report; separately, the
-    slice 2 post-change-refactor agent's first report ("I've queued a focused
-    Cypress verification run ... and I'm waiting for it to complete before
-    finalizing the report") even though that agent's initial delegation
-    prompt already contained an explicit instruction not to stop and wait
-    mid-verification.
-  - Observed effect: three extra coordinator round-trips across the
-    execution (two resends for the slice 1 agent, one for the slice 2
-    refactor agent) before each returned a real final report with actual
-    results.
-  - Inference: giving the anti-pattern instruction directly in the initial
-    delegation prompt (done for the slice 2 refactor agent) did not prevent
-    the same pause-and-wait behavior from recurring, suggesting an inline
-    instruction alone is not a reliable mitigation for this pattern.
-
 ## ODF-030 — One-off profile capture treated as durable runner plumbing
 
 Former local code: DD-013.
@@ -154,43 +108,6 @@ originating branch before the worktree was created.
     local-only commit should create the worktree with plain `git worktree add`
     rather than `EnterWorktree`, whenever either constraint applies.
 
-## ODF-036 — Delegated implementation agent's own background watches kept notifying the coordinator after its final report
-
-Former local code: DD-019.
-
-An implementation subagent that ran several sequential long-running background
-benchmark commands during one delegated slice appears to have armed a
-watch/monitor for each one. After the agent returned its complete final report
-to the coordinator, each of those watches individually timed out afterward and
-fired its own separate "stale, already complete" task-notification back to the
-coordinator, one at a time.
-
-### Occurrences
-
-- Execution: SEED-018 story 5 / quick/112-publish-additions-with-simpler-title-check / 691e7be961
-  - Tool: Claude Code
-  - Model: claude-sonnet-5
-  - Open Dough release: 0.3.14
-  - Evidence: after the implementation agent (delegated task for this slice)
-    returned its full final report (baseline/candidate benchmark numbers,
-    proof log), the coordinator received seven further separate
-    task-notifications for the same already-completed task, each one
-    self-described in its own result text as a "stale monitor timeout" for one
-    specific already-reported benchmark run (baseline runs 1-3, candidate runs
-    1-3, and the small acceptance/rejection run), arriving individually over
-    the following several minutes while a second delegated agent (the
-    post-change-refactor pass) was concurrently running.
-  - Observed effect: seven extra coordinator turns, each requiring inspection
-    of the notification and a one-line "no action needed" acknowledgment,
-    interleaved with the unrelated in-progress refactor-agent notification the
-    coordinator was actually waiting on.
-  - Inference: each notification's own text confirmed it added no information
-    beyond the agent's already-received final report, so the cost was purely
-    coordinator attention; a subagent that arms one watch per background
-    command it launches, without stopping or consolidating those watches once
-    it has already produced its own synchronous final report, generates this
-    kind of post-completion notification noise.
-
 ## ODF-042 — Coordinator pre-filtered grep results for a test-only representation slice, missing sites the later field-removal slice had to fix
 
 Former local code: DD-037.
@@ -229,33 +146,6 @@ test fixes outside its primary schema-removal scope.
     misses, but shifting that work to the later slice blurs the slice's
     intended boundary.
 
-## ODF-043 — Noncanonical proof handoffs force report-only coordinator round-trips
-
-Former local code: DD-038.
-
-Delegated slice work completed with the requested tests and evidence, but the
-agent returned proof in prose or near-matching YAML instead of the exact
-lower-case proof schema required by execution. The coordinator had to request
-report-only reformats after the substantive work was already complete.
-
-### Occurrences
-
-- Execution: SEED-009 story 29 / quick/115-web-note-trash-and-undo / 2be6138738
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: 0.3.16
-  - Evidence: slice 6 required two report-only follow-ups after first returning
-    custom Command/Result/Focused-proof fields and then title-cased YAML keys;
-    slice 7 required one report-only follow-up after returning a custom report
-    rather than the required proof block. Each final handoff described the same
-    already-completed tests and changes.
-  - Observed effect: three extra coordinator-agent round-trips produced no new
-    implementation or verification evidence.
-  - Inference: exact proof serialization is not reliably enforced at the agent
-    boundary even when a literal template is supplied; structured validation
-    before accepting the handoff would remove this clerical loop.
-
 ## ODF-044 — Hard-limit refinement after completed work creates bookkeeping without a smaller remaining leaf
 
 Former local code: DD-039.
@@ -284,35 +174,6 @@ delivery shape.
     compatible outcome: record the overrun once during final plan update when
     no implementation or proof remains, while retaining escalation for actual
     unfinished work.
-
-## ODF-045 — Shared query classified by dominant purpose hid an incompatible production caller
-
-Former local code: DD-040.
-
-The plan correctly preserved a live-note query for Git/export retention, but its
-consumer assessment treated that method as if all callers shared the same
-storage meaning. A production commissioned-learning caller also used it and
-therefore retained trashed notes in report matching.
-
-### Occurrences
-
-- Execution: SEED-009 story 29 / quick/115-web-note-trash-and-undo / 2be6138738
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: GPT-5
-  - Open Dough release: 0.3.16
-  - Evidence: plan 115's consumer table explicitly says
-    `findLiveNotesByNotebookIdOrderByIdAsc` serves Git state loading and must
-    retain legacy content inclusion; current caller search also finds
-    `LearningSessionService.record`, which matches commissioned report titles
-    from that query without a later `Note.isAvailable()` or tracker-activity
-    check.
-  - Observed effect: all planned suites passed while a trashed commissioned note
-    remained gradeable by report; retrospective correction plan 116 was needed.
-  - Inference: when one shared query has mixed production callers, consumer
-    inventory must classify each call site by domain purpose rather than assign
-    the method one dominant category; focused proof should cover every
-    incompatible category.
 
 ## ODF-046 — Coordinator applied a plan update to the main checkout instead of the Story Branch Mode worktree
 
@@ -379,33 +240,9 @@ actually remove the dead dependencies, then re-ran the affected suites.
     consolidation is exactly the kind of refactor claim that is cheap to
     verify against `git diff` and easy to misreport.
 
-## DD-055 — CI repair of E2E observation parked in-progress slice work via stash/restore
+## ODF-054 — Delegated implementers edited PLAN.md that the coordinator must re-own
 
-During planned execution, GitHub CI failed an installed-CLI successive-head
-pull because E2E publication-state SQL assumed an isolated database, then
-(after that repair) used passwordless MySQL root. Two in-progress Structure
-slices were stashed so those harness repairs could land, then restored.
-
-### Occurrences
-
-- Execution: SEED-009 story 28 / quick/129-publish-trash-moves / 473550c16e
-  - Timestamp: 2026-09-16T17:03:55+08:00
-  - Tool: Cursor
-  - Model: Cursor Grok 4.6
-  - Open Dough release: 0.3.22
-  - Evidence: PLAN.md slice 3 (runs 35072853614 and 35074963239; repair
-    `8e918218ae`); slice 5 stash
-    `24b6ef0bd0e56d2c1e4c198d1bb8b47418f2bbb5` and repair `9fd0a0b446`
-    (2026-09-16T17:45:28+08:00); CI_FAILURE on ancestor `48349e9920`
-    before those repairs.
-  - Observed effect: two stash/restore cycles between product slices 3 and
-    5; CI harness commits interleaved with story delivery.
-  - Inference: execute-plan CI attention treated a red run on a prior SHA as
-    blocking while a later slice was already in progress; the failing
-    scenario was harness observation (shared `doughnut_e2e_test`, then
-    SUT credentials), not the trash-move product change.
-
-## DD-056 — Delegated implementers edited PLAN.md that the coordinator must re-own
+Former local code: DD-056.
 
 Delegated slice implementers wrote PLAN.md updates. The coordinator
 re-applied or re-owned those updates before delivery, so the plan stayed
@@ -427,7 +264,9 @@ coordinator-owned but with extra edit traffic.
     coordinator owns PLAN.md) is not enforced at the agent-edit boundary
     when implementers can write the same path.
 
-## DD-057 — Post-change refactor elapsed well above the ~5-minute leaf target
+## ODF-055 — Post-change refactor elapsed well above the ~5-minute leaf target
+
+Former local code: DD-057.
 
 Some post-change refactor passes ran about 12–25 minutes of active work
 against the ~5-minute execution-leaf target (scrutinize above five minutes;
