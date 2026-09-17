@@ -222,6 +222,49 @@ ended up stale and empty, later deleted with nothing to deliver.
     this; a repeated `git status` check before delivery in the wrong
     checkout would also have surfaced it earlier.
 
+## DD-061 — Delegation guidance has no protocol for a subagent that dies mid-edit from an infrastructure error, leaving a silent partial change
+
+[Delegation](../dough-execute-plan/references/delegation.md) and
+[refactor return](../dough-post-change-refactor/SKILL.md#return-control) both
+assume a delegated agent either finishes and returns a report, or returns an
+explicit incomplete stop. Neither covers a subagent that is killed outright by
+a host/API error mid-edit: it produces no report at all, and the coordinator's
+only signal is a task-notification with `status: failed` and an API error
+message. The coordinator had to independently discover, via `git status`/`git
+diff` in the execution checkout, that the dead agent had already made a
+partial, non-functional edit (two unused imports added to a file, with the
+intended method body and its call sites never written) before it could decide
+whether to retry, revert, or finish the work itself.
+
+### Occurrences
+
+- Execution: SEED-009 story 43 / quick/132-rebaseline-existing-notebooks / 301184431f
+  - Timestamp: unknown (task-notification received 2026-09-17, exact time not
+    captured; the error stated a session-limit reset at 4:50pm Asia/Singapore)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.24
+  - Evidence: task-notification for the post-change-refactor subagent reported
+    `status: failed`, summary "Agent terminated early due to an API error:
+    You've hit your session limit ... (error type rate_limit, HTTP 429)", with
+    `result` showing its last action was "Now let's implement the shared
+    helper in GitBundleTestReader." `git diff` in the execution checkout then
+    showed `GitBundleTestReader.java` with two new unused imports
+    (`PortableTreeEntry`, `ObjectLoader`, `StandardCharsets`) and no new method
+    — the helper it had announced was never written.
+  - Observed effect: the coordinator spent one extra investigation round
+    (inspecting `git status`/`git diff` to reconstruct what the dead agent
+    intended and how far it got) before deciding to complete the interrupted
+    refactor directly rather than re-delegating, since a second delegation
+    risked hitting the same session-wide rate limit immediately. No corrupted
+    or lost work resulted; the partial edit was strictly additive (unused
+    imports) and safe to build on.
+  - Inference: neither the delegation contract nor the refactor skill's return
+    contract names "the subagent's process was killed before it could report"
+    as a case, so a coordinator has no documented default (retry once, revert
+    the partial edit, or complete it directly) and must improvise from raw
+    diff inspection every time this occurs.
+
 ## Retention
 
 - Highest allocated local number: 61

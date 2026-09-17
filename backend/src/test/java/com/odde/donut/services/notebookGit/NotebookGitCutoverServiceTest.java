@@ -16,17 +16,13 @@ import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.MakeMe;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.TreeWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -86,17 +82,8 @@ class NotebookGitCutoverServiceTest {
         assertThat(commit.getAuthorIdent().getName(), equalTo("Donut System"));
         assertThat(commit.getAuthorIdent().getEmailAddress(), equalTo("system@donut.local"));
 
-        List<PortableTreeEntry> foundEntries = new ArrayList<>();
-        try (TreeWalk treeWalk = new TreeWalk(readBack)) {
-          treeWalk.addTree(commit.getTree());
-          treeWalk.setRecursive(true);
-          while (treeWalk.next()) {
-            ObjectId blobId = treeWalk.getObjectId(0);
-            ObjectLoader loader = readBack.open(blobId);
-            String content = new String(loader.getBytes(), StandardCharsets.UTF_8);
-            foundEntries.add(new PortableTreeEntry(treeWalk.getPathString(), content));
-          }
-        }
+        List<PortableTreeEntry> foundEntries =
+            GitBundleTestReader.readTreeEntries(readBack, commit);
 
         List<PortableTreeEntry> sortedExpected =
             expectedEntries.stream().sorted((a, b) -> a.path().compareTo(b.path())).toList();
@@ -158,17 +145,8 @@ class NotebookGitCutoverServiceTest {
       try (RevWalk revWalk = new RevWalk(readBack)) {
         RevCommit commit = revWalk.parseCommit(headObjectId);
 
-        List<PortableTreeEntry> foundEntries = new ArrayList<>();
-        try (TreeWalk treeWalk = new TreeWalk(readBack)) {
-          treeWalk.addTree(commit.getTree());
-          treeWalk.setRecursive(true);
-          while (treeWalk.next()) {
-            ObjectId blobId = treeWalk.getObjectId(0);
-            ObjectLoader loader = readBack.open(blobId);
-            String content = new String(loader.getBytes(), StandardCharsets.UTF_8);
-            foundEntries.add(new PortableTreeEntry(treeWalk.getPathString(), content));
-          }
-        }
+        List<PortableTreeEntry> foundEntries =
+            GitBundleTestReader.readTreeEntries(readBack, commit);
 
         List<PortableTreeEntry> sortedExpected =
             expectedEntries.stream().sorted((a, b) -> a.path().compareTo(b.path())).toList();
