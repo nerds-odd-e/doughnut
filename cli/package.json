@@ -43,7 +43,7 @@
     "ink-testing-library": "^4.0.0",
     "tsx": "4.23.13",
     "typescript": "6.0.3",
-    "vitest": "5.0.0",
+    "vitest": "5.0.1",
     "zod": "4.6.5"
   }
 }
