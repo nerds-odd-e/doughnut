@@ -333,7 +333,7 @@ export type SpellingVerificationResult = {
     correct?: boolean;
 };
 
-export type NoteDeleteDto = {
+export type NoteTrashDto = {
     referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS' | 'REDUCE_TO_SOURCE_PROPERTY';
     sourcePropertyKey?: string;
 };
@@ -1870,7 +1870,7 @@ export type VerifySpellingResponses = {
 export type VerifySpellingResponse = VerifySpellingResponses[keyof VerifySpellingResponses];
 
 export type TrashNoteData = {
-    body: NoteDeleteDto;
+    body: NoteTrashDto;
     path: {
         note: number;
     };

@@ -689,7 +689,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NoteDeleteDTO"
+              $ref: "#/components/schemas/NoteTrashDTO"
         required: true
       responses:
         "200":
@@ -4061,7 +4061,7 @@ components:
       properties:
         correct:
           type: boolean
-    NoteDeleteDTO:
+    NoteTrashDTO:
       type: object
       properties:
         referenceHandling:

@@ -69,7 +69,7 @@ describe("storedApiCollection", () => {
       })
     })
 
-    it("uses the recoverable trash path with LEAVE_DEAD_LINKS instead of soft-delete", async () => {
+    it("uses the recoverable trash path with LEAVE_DEAD_LINKS when undoing note creation", async () => {
       const trashSpy = mockSdkService(NoteController, "trashNote", note)
       const noteEditingHistory = new NoteEditingHistory()
       storageAccessor.value = createNoteStorage(noteEditingHistory)

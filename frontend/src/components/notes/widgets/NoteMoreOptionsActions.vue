@@ -231,7 +231,7 @@ useKeyboardShortcut(
   shortcutsEnabled
 )
 
-useKeyboardShortcut("note-delete", trashNote, shortcutsEnabled)
+useKeyboardShortcut("note-trash", trashNote, shortcutsEnabled)
 
 const noteHasContent = computed(() => hasNoteContent(props.note.content))
 const showRefineNoteModal = ref(false)

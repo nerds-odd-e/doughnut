@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
-import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
+import { qualifyRelationNoteForReduceOnTrash } from "@/utils/relationNoteReduceOnTrash"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
 
-describe("qualifyRelationNoteForReduceOnDelete", () => {
+describe("qualifyRelationNoteForReduceOnTrash", () => {
   const moonId = 101
   const earthId = 102
 
@@ -17,7 +17,7 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
       ])
       .please()
 
-    expect(qualifyRelationNoteForReduceOnDelete(realm)).toEqual({
+    expect(qualifyRelationNoteForReduceOnTrash(realm)).toEqual({
       sourcePropertyKey: "a part of",
       sourceNoteId: moonId,
     })
@@ -25,7 +25,7 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
 
   it("returns undefined for a normal note", () => {
     expect(
-      qualifyRelationNoteForReduceOnDelete(
+      qualifyRelationNoteForReduceOnTrash(
         makeMe.aNoteRealm.content("Just a note").please()
       )
     ).toBeUndefined()
@@ -37,7 +37,7 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
       .wikiLinks([wikiLinkFromAuthoredToken("Earth", earthId)])
       .please()
 
-    expect(qualifyRelationNoteForReduceOnDelete(realm)).toBeUndefined()
+    expect(qualifyRelationNoteForReduceOnTrash(realm)).toBeUndefined()
   })
 
   it("returns undefined when relation label cannot be derived", () => {
@@ -51,6 +51,6 @@ target: "[[Earth]]"
       .wikiLinks([wikiLinkFromAuthoredToken("Moon", moonId)])
       .please()
 
-    expect(qualifyRelationNoteForReduceOnDelete(realm)).toBeUndefined()
+    expect(qualifyRelationNoteForReduceOnTrash(realm)).toBeUndefined()
   })
 })

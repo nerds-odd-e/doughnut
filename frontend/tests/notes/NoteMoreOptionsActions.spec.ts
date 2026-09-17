@@ -20,7 +20,7 @@ function dispatchNoteExportShortcut() {
   )
 }
 
-function dispatchNoteDeleteShortcut() {
+function dispatchNoteTrashShortcut() {
   document.dispatchEvent(
     new KeyboardEvent("keydown", {
       key: "d",
@@ -80,7 +80,7 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
         (document.querySelector("dialog") as HTMLDialogElement)?.open
       ).toBe(true)
 
-      dispatchNoteDeleteShortcut()
+      dispatchNoteTrashShortcut()
       await flushPromises()
 
       expect(usePopups().popups.peek()).toHaveLength(0)
@@ -91,14 +91,14 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
   )
 
   it.each(["toolbar", "menu"] as const)(
-    "starts the delete flow when d is pressed (layout=%s)",
+    "starts the trash flow when d is pressed (layout=%s)",
     async (layout) => {
       mountActionsWithStorage(layout)
 
       await flushPromises()
       expect(usePopups().popups.peek()).toHaveLength(0)
 
-      dispatchNoteDeleteShortcut()
+      dispatchNoteTrashShortcut()
       await flushPromises()
 
       const popups = usePopups().popups.peek()
@@ -124,7 +124,7 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
 
       await flushPromises()
       dispatchNoteExportShortcut()
-      dispatchNoteDeleteShortcut()
+      dispatchNoteTrashShortcut()
       await flushPromises()
 
       expect(document.querySelector("dialog")).toBeNull()

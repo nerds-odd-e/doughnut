@@ -20,7 +20,10 @@ import java.util.function.Consumer;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Applies note-delete reference policies (reduce-to-source / remove-from-properties). */
+/**
+ * Applies reference-handling policies (reduce-to-source / remove-from-properties) shared by note
+ * trash and permanent removal.
+ */
 final class NoteReferenceHandling {
   private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
 

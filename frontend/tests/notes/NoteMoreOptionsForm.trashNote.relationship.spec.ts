@@ -7,36 +7,36 @@ import {
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  deleteNoteButton,
-  deleteNoteSpy,
+  trashNoteButton,
+  trashNoteSpy,
   loadingModalMask,
-  mountDeleteFormReady,
-  mountDeleteFormWithNotePropChange,
-  qualifyingRelationRealmForDelete,
+  mountTrashFormReady,
+  mountTrashFormWithNotePropChange,
+  qualifyingRelationRealmForTrash,
   relationNotesForPropChangeTest,
   seedRelationRealmWithInboundReferences,
-  setupNoteMoreOptionsDeleteFormTests,
-  awaitDeleteSideEffects,
-} from "./noteMoreOptionsDeleteTestSupport"
+  setupNoteMoreOptionsTrashFormTests,
+  awaitTrashSideEffects,
+} from "./noteMoreOptionsTrashTestSupport"
 
-setupNoteMoreOptionsDeleteFormTests()
+setupNoteMoreOptionsTrashFormTests()
 
-describe("NoteMoreOptionsForm delete relationship note", () => {
+describe("NoteMoreOptionsForm trash relationship note", () => {
   it("shows LoadingModal while reducing relationship note to source property", async () => {
-    let resolveDelete: () => void
-    const deleteHeld = new Promise<void>((r) => {
-      resolveDelete = r
+    let resolveTrash: () => void
+    const trashHeld = new Promise<void>((r) => {
+      resolveTrash = r
     })
     mockSdkServiceWithImplementation(NoteController, "trashNote", async () => {
-      await deleteHeld
-      return qualifyingRelationRealmForDelete().relationRealm
+      await trashHeld
+      return qualifyingRelationRealmForTrash().relationRealm
     })
 
-    const { relationRealm } = qualifyingRelationRealmForDelete()
+    const { relationRealm } = qualifyingRelationRealmForTrash()
     seedRelationRealmWithInboundReferences(relationRealm)
-    const wrapper = await mountDeleteFormReady(relationRealm.note)
+    const wrapper = await mountTrashFormReady(relationRealm.note)
 
-    ;(deleteNoteButton(wrapper).element as HTMLButtonElement).click()
+    ;(trashNoteButton(wrapper).element as HTMLButtonElement).click()
 
     usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
     await flushPromises()
@@ -46,8 +46,8 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
       "Reducing to source property..."
     )
 
-    resolveDelete!()
-    await awaitDeleteSideEffects()
+    resolveTrash!()
+    await awaitTrashSideEffects()
 
     expect(loadingModalMask()).toBeNull()
   })
@@ -55,17 +55,17 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
   it("offers reduce-to-property using the current note after prop change without remount", async () => {
     const { relationId, moonNote, relationNote } =
       relationNotesForPropChangeTest()
-    deleteNoteSpy.mockResolvedValue(
+    trashNoteSpy.mockResolvedValue(
       wrapSdkResponse(
-        qualifyingRelationRealmForDelete({ relationId }).relationRealm
+        qualifyingRelationRealmForTrash({ relationId }).relationRealm
       )
     )
-    const wrapper = await mountDeleteFormWithNotePropChange(
+    const wrapper = await mountTrashFormWithNotePropChange(
       moonNote,
       relationNote
     )
 
-    ;(deleteNoteButton(wrapper).element as HTMLButtonElement).click()
+    ;(trashNoteButton(wrapper).element as HTMLButtonElement).click()
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
@@ -83,7 +83,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
     await flushPromises()
 
-    expect(deleteNoteSpy).toHaveBeenCalledWith({
+    expect(trashNoteSpy).toHaveBeenCalledWith({
       path: { note: relationId },
       body: {
         referenceHandling: "REDUCE_TO_SOURCE_PROPERTY",

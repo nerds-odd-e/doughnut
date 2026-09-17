@@ -1,7 +1,7 @@
 import type {
   NoteContentCompletion,
   NoteCreationDto,
-  NoteDeleteDto,
+  NoteTrashDto,
   NoteRealm,
   NoteUpdateTitleDto,
 } from "@generated/donut-backend-api"
@@ -24,10 +24,10 @@ import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
 
-export type NoteDeleteReferenceHandling = NoteDeleteDto["referenceHandling"]
+export type NoteTrashReferenceHandling = NoteTrashDto["referenceHandling"]
 
-export type NoteDeleteOptions = {
-  referenceHandling: NoteDeleteReferenceHandling
+export type NoteTrashOptions = {
+  referenceHandling: NoteTrashReferenceHandling
   sourcePropertyKey?: string
   sourceNoteId?: number
 }
@@ -115,7 +115,7 @@ export interface StoredApi {
   trashNote(
     router: Router,
     noteId: Donut.ID,
-    options: NoteDeleteOptions
+    options: NoteTrashOptions
   ): Promise<NoteRealm | undefined>
 
   moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID): Promise<void>
@@ -126,8 +126,8 @@ export interface StoredApi {
   ): Promise<void>
 }
 
-function noteReferenceHandlingBody(options: NoteDeleteOptions): NoteDeleteDto {
-  const body: NoteDeleteDto = {
+function noteReferenceHandlingBody(options: NoteTrashOptions): NoteTrashDto {
+  const body: NoteTrashDto = {
     referenceHandling: options.referenceHandling,
   }
   if (options.sourcePropertyKey !== undefined) {
@@ -486,11 +486,7 @@ export default class StoredApiCollection implements StoredApi {
     return noteRealm
   }
 
-  async trashNote(
-    router: Router,
-    noteId: Donut.ID,
-    options: NoteDeleteOptions
-  ) {
+  async trashNote(router: Router, noteId: Donut.ID, options: NoteTrashOptions) {
     const { referenceHandling, sourceNoteId } = options
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")

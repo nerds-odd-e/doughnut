@@ -12,15 +12,15 @@ import { wikiLinkNoteIdLookup } from "@/utils/wikiLinkMarkup"
 
 const RELATIONSHIP_NOTE_TYPE = "relationship"
 
-export type RelationNoteReduceOnDeleteQualification = {
+export type RelationNoteReduceOnTrashQualification = {
   sourcePropertyKey: string
   sourceNoteId: number
 }
 
-/** Whether delete may offer reducing this relation note to a source property. */
-export function qualifyRelationNoteForReduceOnDelete(
+/** Whether trash may offer reducing this relation note to a source property. */
+export function qualifyRelationNoteForReduceOnTrash(
   noteRealm: NoteRealm | undefined
-): RelationNoteReduceOnDeleteQualification | undefined {
+): RelationNoteReduceOnTrashQualification | undefined {
   const content = noteRealm?.note.content
   if (!content) return
   const parsed = parseNoteContentMarkdown(content)

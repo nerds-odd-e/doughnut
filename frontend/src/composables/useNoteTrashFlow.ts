@@ -2,10 +2,10 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import type {
-  NoteDeleteOptions,
-  NoteDeleteReferenceHandling,
+  NoteTrashOptions,
+  NoteTrashReferenceHandling,
 } from "@/store/StoredApiCollection"
-import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
+import { qualifyRelationNoteForReduceOnTrash } from "@/utils/relationNoteReduceOnTrash"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
 import { toValue, type MaybeRefOrGetter } from "vue"
 import { useRouter } from "vue-router"
@@ -18,7 +18,7 @@ const REDUCE_TO_PROPERTY_LOADING_MESSAGE = "Reducing to source property..."
 const TRASH_LOADING_MESSAGE = "Trashing note..."
 
 function trashLoadingMessageFor(
-  referenceHandling: NoteDeleteReferenceHandling
+  referenceHandling: NoteTrashReferenceHandling
 ): string {
   return referenceHandling === "REDUCE_TO_SOURCE_PROPERTY"
     ? REDUCE_TO_PROPERTY_LOADING_MESSAGE
@@ -39,11 +39,11 @@ export function useNoteTrashFlow(
   const noteHasReferences = () => (noteRealm()?.references?.length ?? 0) > 0
 
   const chooseTrashReferenceHandling =
-    async (): Promise<NoteDeleteOptions | null> => {
+    async (): Promise<NoteTrashOptions | null> => {
       const id = toValue(noteId)
       const title = toValue(noteTitle)
       const label = quotedNoteLabel(title, id)
-      const reduceQualification = qualifyRelationNoteForReduceOnDelete(
+      const reduceQualification = qualifyRelationNoteForReduceOnTrash(
         storageAccessor.value.refOfNoteRealm(id).value
       )
       if (reduceQualification) {
@@ -89,7 +89,7 @@ export function useNoteTrashFlow(
             value: "LEAVE_DEAD_LINKS",
           },
         ]
-      )) as NoteDeleteReferenceHandling | null
+      )) as NoteTrashReferenceHandling | null
       return referenceHandling ? { referenceHandling } : null
     }
 
