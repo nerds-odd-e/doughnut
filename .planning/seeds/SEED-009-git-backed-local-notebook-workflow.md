@@ -48,35 +48,65 @@ data; invalid or ambiguous changes must not silently discard work.
 
 ### 44. Retire the spent notebook rebaseline migration
 
-- **Goal / beneficiary:** Donut maintainers work with a migration chain and
-  notebook-Git implementation that no longer carry one-time rebaseline code,
-  fixtures, and tests after the target environment has completed the reset.
-- **Scope:** After production, and any other deliberately retained long-lived
-  target environment, confirms successful application of story 43's migration,
-  remove the spent Flyway migration and all production/test support whose
-  caller graph ends in that migration. Preserve current notebook creation,
-  accepted Git history after the new root, Portable-tree encoding, Flyway
-  startup/repair, and product-level behavior tests. No cleanup toggle or
-  permanent migration framework is added.
-- **Key example:** Given production has recorded and successfully completed the
-  rebaseline migration, when maintainers install a fresh database or restart an
-  already-upgraded database after cleanup, Flyway succeeds and current notebook
-  Git behavior remains green without the rebaseline migration, its raw-JDBC
-  helpers, or migration-only tests in the product tree.
-- **Boundary:** Production confirmation is a genuine prerequisite; do not take
-  or execute this story beforehand. Manual deployment and confirmation are not
-  product implementation scope. Do not remove shared runtime Portable-tree or
-  notebook-creation owners merely because the migration reused them.
-- **Value / learning:** The migration is intentionally temporary. Removing it
-  after its only target has crossed the conversion prevents a destructive reset
-  recipe and its duplicate JDBC projection code from becoming permanent
-  product complexity.
-- **Effort / status:** Queued immediately after story 43 and not yet planned. S
-  (30–60 minutes), moderate confidence based on the earlier spent-migration
-  cleanup precedent.
-- **Depends on / safe stopping point:** Production confirmation that story 43's
-  migration completed successfully. Cleanup leaves the new root and all commits
-  appended after it untouched.
+- **Goal:** Donut maintainers work with a migration chain and notebook-Git
+  code that no longer carry the one-time rebaseline. After the only target has
+  crossed the reset, the destructive rebuild recipe and its duplicate raw-JDBC
+  projection of notebook content stop being permanent product complexity.
+  Owners see no change.
+- **Scope (required):**
+  - Delete `V300000330__RebaselineExistingNotebookGitBindings` and everything
+    whose caller graph ends in it. Inspection on 2026-09-17 found:
+    `NotebookGitBaselineRebuild`, `NotebookGitRows`, and
+    `RebaselineExistingNotebookGitBindingsMigrationTest`. Re-check callers at
+    execution time; delete only what is still migration-only.
+  - Keep the migration-chain guidance truthful. The db-migration skill must
+    name `V300000329__ReplaceNoteTitleFunctionalIndex.java` as the newest
+    remaining file, and must say new migrations exceed **`300000330`**,
+    because long-lived `flyway_schema_history` tables still own that version.
+    The current guidance says "exceed `300000329`" and uses a `V300000330`
+    example, which already invites reuse.
+  - Rely on the existing `flyway.repair()`-before-`migrate()` startup, as the
+    earlier "Retire spent data migrations" cleanup did. No squash, no new
+    placeholder, no cleanup toggle, no `ignoreMigrationPatterns` change.
+- **Scope (preserve):** notebook creation and its cutover root, accepted Git
+  history appended after the rebaselined root, Portable-tree encoding and bundle
+  building, export row types, Flyway startup/repair, and product-level
+  notebook-Git behavior tests. Do not remove shared owners such as
+  `NotebookGitCutoverService`, `NotebookGitBundleBuilder`, or
+  `notebookExport` types merely because the migration used them.
+- **Deferred / not promised:** re-verifying or re-running the rebaseline;
+  squashing the baseline; generalizing a spent-migration retirement mechanism.
+- **Key examples:**
+  1. Given production recorded version `300000330` as successful, when the
+     cleaned-up build starts against that database, Flyway starts without error,
+     does not rebuild any notebook, and each notebook keeps its current accepted
+     head.
+  2. Given an empty database, when the cleaned-up build migrates it, the schema
+     installs through `300000329` and the backend suite passes.
+  3. Given a maintainer adds the next migration, when they follow the
+     db-migration skill, they choose a version above `300000330`.
+  4. Given a notebook created or edited after cleanup, when its Git history is
+     read or appended to, behavior matches before cleanup (existing notebook-Git
+     tests stay green).
+  5. Given the product tree after cleanup, a search for the rebaseline
+     migration, `NotebookGitBaselineRebuild`, or `NotebookGitRows` finds
+     nothing outside planning history.
+- **Prerequisite (genuine constraint):** production, and any other
+  deliberately retained long-lived environment, must confirm that version
+  `300000330` is recorded as successful in `flyway_schema_history`. Deleting it
+  earlier would leave unconverted notebooks on their abandoned history
+  permanently. As of 2026-09-17, release tag `v1.3.7` contains the migration;
+  successful production application is **not yet confirmed**. Do not take or
+  execute this story before that confirmation. Deployment and confirmation are
+  manual owner actions, not implementation scope.
+- **Value / learning:** The migration is intentionally temporary; removal keeps
+  the notebook-Git service surface limited to live runtime paths.
+- **Effort / status:** Refined 2026-09-17; not yet planned. S (30–60 minutes),
+  moderate-high confidence: the caller graph is three files plus guidance, and
+  the earlier cleanup is a direct precedent.
+- **Depends on / safe stopping point:** the production confirmation above.
+  Cleanup is one deletion commit; it leaves the new roots and all later commits
+  untouched.
 
 ## Ordering and Scope Reduction
 
