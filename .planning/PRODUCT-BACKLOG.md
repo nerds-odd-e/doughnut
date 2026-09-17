@@ -12,7 +12,6 @@ a single, append-only sequence of commits, with no branching or rebasing;
 either the remote or local repository may be multiple commits behind.
 
 ## Taken
-- [Hide trashed notes from incoming references](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-41) — SEED-009 — [plan](quick/130-hide-trashed-incoming-references/PLAN.md)
 
 ## Backlog list
 - [Manually validate the complete append-only notebook workflow](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-42) — SEED-009
