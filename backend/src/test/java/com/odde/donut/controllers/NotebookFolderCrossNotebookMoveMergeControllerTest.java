@@ -40,7 +40,7 @@ class NotebookFolderCrossNotebookMoveMergeControllerTest
   }
 
   @Test
-  void mergesAcrossNotebooksWhenNoSoftDeletedTitleConflictAtDestination()
+  void mergesAcrossNotebooksWhenNoTrashedTitleConflictAtDestination()
       throws UnexpectedNoAccessRightException {
     Notebook nbA = ownedNotebook();
     Notebook nbB = ownedNotebook();

@@ -5,41 +5,41 @@ import { wrapSdkResponse } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
-  noteMoreOptionsDeleteFormNote as note,
-  noteMoreOptionsDeleteFormNoteRealm,
-  clickDeleteNote,
-  deleteNoteSpy,
+  noteMoreOptionsTrashFormNote as note,
+  noteMoreOptionsTrashFormNoteRealm,
+  clickTrashNote,
+  trashNoteSpy,
   renderer,
-  setupNoteMoreOptionsDeleteFormTests,
-  awaitDeleteSideEffects,
-} from "./noteMoreOptionsDeleteTestSupport"
+  setupNoteMoreOptionsTrashFormTests,
+  awaitTrashSideEffects,
+} from "./noteMoreOptionsTrashTestSupport"
 
-setupNoteMoreOptionsDeleteFormTests()
+setupNoteMoreOptionsTrashFormTests()
 
-describe("NoteMoreOptionsForm delete note", () => {
-  it("calls deleteNote when confirmed and skips when cancelled", async () => {
-    deleteNoteSpy.mockResolvedValue(
-      wrapSdkResponse(noteMoreOptionsDeleteFormNoteRealm)
+describe("NoteMoreOptionsForm trash note", () => {
+  it("calls trashNote when confirmed and skips when cancelled", async () => {
+    trashNoteSpy.mockResolvedValue(
+      wrapSdkResponse(noteMoreOptionsTrashFormNoteRealm)
     )
     const wrapper = renderer.withProps({ note }).mount()
 
     await flushPromises()
-    await clickDeleteNote(wrapper)
+    await clickTrashNote(wrapper)
 
     expect(usePopups().popups.peek()?.[0]?.type).toBe("confirm")
     usePopups().popups.done(false)
     await flushPromises()
-    expect(deleteNoteSpy).not.toHaveBeenCalled()
+    expect(trashNoteSpy).not.toHaveBeenCalled()
 
-    await clickDeleteNote(wrapper)
+    await clickTrashNote(wrapper)
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
     expect(popups?.[0]?.message).toBe('Confirm to trash "Note1.1.1"?')
 
     usePopups().popups.done(true)
-    await awaitDeleteSideEffects()
+    await awaitTrashSideEffects()
 
-    expect(deleteNoteSpy).toHaveBeenCalledWith({
+    expect(trashNoteSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: { referenceHandling: "LEAVE_DEAD_LINKS" },
     })
@@ -47,7 +47,7 @@ describe("NoteMoreOptionsForm delete note", () => {
 
   it("asks how to handle references when the note has inbound references", async () => {
     const noteRealm = makeMe.aNoteRealm.please()
-    deleteNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
+    trashNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
     useStorageAccessor().value.refreshNoteRealm({
       ...noteRealm,
       references: [makeMe.aNoteRealm.please().note.noteTopology],
@@ -55,7 +55,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     const wrapper = renderer.withProps({ note: noteRealm.note }).mount()
 
     await flushPromises()
-    await clickDeleteNote(wrapper)
+    await clickTrashNote(wrapper)
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
@@ -72,7 +72,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     usePopups().popups.done("REMOVE_FROM_PROPERTIES")
     await flushPromises()
 
-    expect(deleteNoteSpy).toHaveBeenCalledWith({
+    expect(trashNoteSpy).toHaveBeenCalledWith({
       path: { note: noteRealm.id },
       body: { referenceHandling: "REMOVE_FROM_PROPERTIES" },
     })

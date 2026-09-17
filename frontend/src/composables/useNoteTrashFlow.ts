@@ -2,10 +2,10 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import type {
-  NoteDeleteOptions,
-  NoteDeleteReferenceHandling,
+  NoteTrashOptions,
+  NoteTrashReferenceHandling,
 } from "@/store/StoredApiCollection"
-import { isRelationshipNote } from "@/utils/relationNoteReduceOnDelete"
+import { isRelationshipNote } from "@/utils/relationNoteReduceOnTrash"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
 import { toValue, type MaybeRefOrGetter } from "vue"
 import { useRouter } from "vue-router"
@@ -19,7 +19,7 @@ const TRASH_LOADING_MESSAGE = "Trashing note..."
 
 type TrashFlowChoice =
   | { action: "reduce" }
-  | { action: "trash"; options: NoteDeleteOptions }
+  | { action: "trash"; options: NoteTrashOptions }
 
 function loadingMessageFor(flowChoice: TrashFlowChoice): string {
   return flowChoice.action === "reduce"
@@ -94,7 +94,7 @@ export function useNoteTrashFlow(
             value: "LEAVE_DEAD_LINKS",
           },
         ]
-      )) as NoteDeleteReferenceHandling | null
+      )) as NoteTrashReferenceHandling | null
       return referenceHandling
         ? { action: "trash", options: { referenceHandling } }
         : null

@@ -8,7 +8,6 @@ a single, append-only sequence of commits, with no branching or rebasing;
 either the remote or local repository may be multiple commits behind.
 
 ## Taken
-- [Use trash vocabulary for recoverable note removal](seeds/SEED-020-trash-vocabulary.md#story-1) — SEED-020 — [plan](quick/136-trash-vocabulary/PLAN.md)
 
 ## Backlog list
 - [Reduce a relationship into a source note in another notebook](seeds/SEED-025-cross-notebook-relationship-reduction.md#story-1) — SEED-025

@@ -4,6 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NoteDeleteDTO {
-  @Getter @Setter @NotNull private NoteDeleteReferenceHandling referenceHandling;
+public class NoteTrashDTO {
+  @Getter @Setter @NotNull private NoteTrashReferenceHandling referenceHandling;
 }

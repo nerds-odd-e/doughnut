@@ -113,10 +113,10 @@ public class AuthoredNoteReferenceInboundFacade {
   }
 
   /**
-   * A soft-deleted referrer is never inbound, regardless of viewer. Otherwise, checks the
-   * referrer's own visibility (distinct from {@link #resolvesToTarget}'s target-side readability
-   * check): same notebook as {@code target} is always visible; a different notebook requires {@code
-   * viewer} to own or subscribe to the referrer's own notebook ({@link User#canReferTo}).
+   * A trashed referrer is never inbound, regardless of viewer. Otherwise, checks the referrer's own
+   * visibility (distinct from {@link #resolvesToTarget}'s target-side readability check): same
+   * notebook as {@code target} is always visible; a different notebook requires {@code viewer} to
+   * own or subscribe to the referrer's own notebook ({@link User#canReferTo}).
    */
   private boolean referrerVisibleToViewer(Note sourceNote, Note target, User viewer) {
     if (!sourceNote.isAvailable()) {

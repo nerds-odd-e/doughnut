@@ -1,7 +1,7 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -59,7 +59,7 @@ public class RelationReduceService {
               authorizationService.assertAuthorization(note);
               Note sourceNote = noteService.reduceRelationNoteToSourceProperty(note, viewer, now);
               noteService.permanentlyRemove(
-                  note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, viewer);
+                  note, NoteTrashReferenceHandling.LEAVE_DEAD_LINKS, viewer);
               return sourceNote;
             },
             ignored -> commitMessage,

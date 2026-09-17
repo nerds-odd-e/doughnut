@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
-import { isRelationshipNote } from "@/utils/relationNoteReduceOnDelete"
+import { isRelationshipNote } from "@/utils/relationNoteReduceOnTrash"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
 

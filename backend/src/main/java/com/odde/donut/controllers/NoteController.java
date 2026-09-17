@@ -123,12 +123,12 @@ class NoteController {
   @PostMapping(value = "/{note}/trash")
   public NoteRealm trashNote(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody NoteDeleteDTO noteDeleteDTO)
+      @Valid @RequestBody NoteTrashDTO noteTrashDTO)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     return noteRealmService.build(
         noteTrashService.trash(
-            note.getId(), note.getNotebook().getId(), noteDeleteDTO.getReferenceHandling()),
+            note.getId(), note.getNotebook().getId(), noteTrashDTO.getReferenceHandling()),
         authorizationService.getCurrentUser());
   }
 

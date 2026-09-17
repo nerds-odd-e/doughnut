@@ -1,7 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.FolderTrailSegments;
-import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -35,14 +35,14 @@ public class NoteTrashService {
   }
 
   public Note trash(
-      Integer noteId, Integer notebookId, NoteDeleteReferenceHandling referenceHandling)
+      Integer noteId, Integer notebookId, NoteTrashReferenceHandling referenceHandling)
       throws UnexpectedNoAccessRightException {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return webNoteEditService.edit(
         noteId,
         notebookId,
         note -> {
-          noteService.applyNoteDeleteReferenceHandling(
+          noteService.applyNoteReferenceHandling(
               note, referenceHandling, authorizationService.getCurrentUser());
           Folder trashParent =
               folderConstructionService.ensureTrashParentFor(
