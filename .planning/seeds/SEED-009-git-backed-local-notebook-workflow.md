@@ -606,11 +606,6 @@ its temporary migration support after production and other long-lived databases
 have crossed it. Neither relies on completing new Git move/rename or trash
 compatibility.
 
-The owner initially placed the incoming-reference correction in story 41 first,
-then moved it to the bottom on 2026-09-15 after manual testing could not
-reproduce the production report. The deeper-folder reproduction on 2026-09-17
-made it actionable again, and it is now Taken with a slice plan.
-
 The owner placed story 43 first on 2026-09-17. This explicit priority is
 preserved even though a destructive root reset appears to conflict with the
 append-only near-future direction; refinement must resolve whether old accepted
@@ -619,10 +614,10 @@ planning.
 
 Folder Trash with ordinary Move now supplies the complete folder round trip.
 The 2026-09-16 direction ends additional trash feature development: Restore is
-no longer selected. Story 42 is now the first queued item and owns the one-hour
-manual validation of the completed append-only local/web workflow; publication-
-scale validation remains after it. Story 39 was identified as the first post-
-release cleanup; story
+no longer selected. Story 43 is now the first queued item; story 42 follows and
+owns the one-hour manual validation of the completed append-only local/web
+workflow. Publication-scale validation remains after it. Story 39 was
+identified as the first post-release cleanup; story
 38 is retained in this seed but was removed from the backlog on 2026-09-16
 because the clarified repeated-trash journey already works and Undo is deferred.
 
