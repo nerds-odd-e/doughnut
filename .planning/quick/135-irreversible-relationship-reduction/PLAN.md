@@ -190,4 +190,9 @@ that only covered reduce-via-trash. Trash behavior stays unchanged.
 
 ## Learnings
 
-None yet.
+Owner decision (2026-09-17): SEED-020 executed its trash-vocabulary rename
+before this plan, ahead of the ordering this plan's source seed recommended.
+Slice 6 now removes `REDUCE_TO_SOURCE_PROPERTY`/`sourcePropertyKey` from their
+renamed identifiers (`NoteTrashReferenceHandling`/`NoteTrashDTO` or whatever
+SEED-020 landed as) rather than `NoteDeleteReferenceHandling`/`NoteDeleteDTO`.
+Re-check the current names before executing slice 6.

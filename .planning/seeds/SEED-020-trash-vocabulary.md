@@ -44,18 +44,34 @@ files keep historically accurate terminology.
   data, and the distinction between trash and Git-published permanent deletion.
 - **Key example:** The note Trash endpoint still offers the same reference-handling
   choices and moves the same note beneath `_trash`, while its request type and all
-  maintained callers describe that operation as trash rather than delete.
+  maintained callers describe that operation as trash rather than delete. Confirmed
+  in code (2026-09-17): `NoteController.trashNote` is the only caller that reaches
+  `NoteDeleteDTO`/`NoteDeleteReferenceHandling` through the API, so both rename to
+  trash vocabulary (e.g. `NoteTrashDTO`, `NoteTrashReferenceHandling`). `NoteService
+  .permanentlyRemove`, used only internally by Git-published file deletion, takes
+  the same enum by direct Java reference (no DTO of its own); it keeps using the
+  renamed type because the reference-handling policy (what happens to referrers)
+  is one mechanism-agnostic concept shared by trash and permanent removal — the
+  method name `permanentlyRemove` already carries the permanent-deletion meaning,
+  so its parameter type does not also need to.
 - **Effort hypothesis:** S (30–60 minutes), moderate confidence; generated-client
   propagation is mechanical but crosses backend and frontend compile boundaries.
-- **Depends on:** No unfinished product prerequisite.
+- **Depends on:** No unfinished product prerequisite. SEED-024 story 1 (plan 135,
+  unexecuted) states it should land first "so SEED-020 renames less and does not
+  rename a surface that is about to be deleted" — plan 135 deletes the
+  `REDUCE_TO_SOURCE_PROPERTY` enum value and `sourcePropertyKey` field this story
+  would otherwise rename. Owner decision (2026-09-17): proceed with this story's
+  full scope now anyway, including that surface; plan 135 will re-target its
+  slice 6 deletions at the renamed identifiers when it executes later.
 - **Safe stopping point:** Current behavior is unchanged, all maintained names agree
   with the Accepted glossary, and backend/frontend suites prove the renamed boundary.
 
 ## Ordering and Scope Reduction
 
-This correction is first in the product backlog by owner direction. Keep the
-cross-stack naming boundary together; a partial rename would retain competing
-domain terms.
+This correction is first in the product backlog by owner direction, ahead of the
+already-taken but unexecuted SEED-024 story 1 (owner decision, 2026-09-17: accept
+the resulting rework in plan 135 rather than reorder). Keep the cross-stack naming
+boundary together; a partial rename would retain competing domain terms.
 
 ## Open Decisions
 
