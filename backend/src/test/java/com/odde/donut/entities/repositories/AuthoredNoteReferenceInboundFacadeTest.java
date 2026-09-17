@@ -79,6 +79,26 @@ class AuthoredNoteReferenceInboundFacadeTest {
     assertThat(referrers, empty());
   }
 
+  // Regression test for the inbound title-lookup key NFKC-folding a title that outgoing
+  // resolution matches raw/lowercase — the direct-title-match sibling of the alias branch
+  // covered below.
+  @Test
+  void matchesAWikiReferenceAuthoredAgainstATitleContainingAnNfkcFoldableCharacter() {
+    User owner = makeMe.aUser().please();
+    Note target = makeMe.aNote().title("how 手段／方法").notebookOwnedBy(owner).please();
+    Note source = makeMe.aNote().underSameNotebookAs(target).please();
+    source.replaceContent(
+        new AuthoredNoteDocument(
+            "references [[how 手段／方法]]",
+            List.of(AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("how 手段／方法"))));
+    makeMe.entityPersister.flush();
+
+    List<Note> referrers =
+        authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, owner);
+
+    assertThat(referrers.stream().map(Note::getId).toList(), contains(source.getId()));
+  }
+
   // Only test covering the alias branch of wikiCandidateRowsForTarget (the alias lookup
   // keys fed into findWikiCandidatesForNotebookScope) — keep even though it isn't one of
   // the two behaviors this class otherwise focuses on.

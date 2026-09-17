@@ -108,6 +108,32 @@ originating branch before the worktree was created.
     local-only commit should create the worktree with plain `git worktree add`
     rather than `EnterWorktree`, whenever either constraint applies.
 
+- Execution: SEED-021 story 1 / quick/133-inbound-wiki-reference-nfkc-mismatch / f126e1bdd8
+  - Timestamp: unknown (session date 2026-09-17)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.24
+  - Evidence: `EnterWorktree(name: "inbound-wiki-nfkc-133")` created branch
+    `worktree-inbound-wiki-nfkc-133` checked out at `877a988b59`
+    (`origin/main`'s tip), while local `main` was already one commit ahead at
+    `f8504e98f7` (the backlog "Taken" claim commit made just before). The
+    coordinator detected the mismatch via `git log --oneline -3` /
+    `git status` immediately after entering the worktree.
+  - Observed effect: recovered in place with `git merge --ff-only f8504e98f7`
+    inside the worktree instead of the full remove/recreate round-trip the
+    prior occurrence used, since the worktree's branch was still a clean
+    ancestor with no divergent commits of its own; no lost work or wasted
+    worktree, but still an unplanned diagnostic step the tool's default
+    should not have required.
+  - Inference: same root cause as the original finding — `EnterWorktree`'s
+    `baseRef: "fresh"` default still branches from `origin/<default-branch>`
+    rather than local `HEAD`/the originating checkout's current commit, so any
+    coordinator that commits a claim on the originating branch before calling
+    `EnterWorktree` must independently detect and fast-forward past the gap;
+    a `baseRef: "head"` default, or at least a documented reminder in
+    dough-execute-plan's own execution-location guidance, would remove the
+    need for this recurring manual check.
+
 ## ODF-042 — Coordinator pre-filtered grep results for a test-only representation slice, missing sites the later field-removal slice had to fix
 
 Former local code: DD-037.
