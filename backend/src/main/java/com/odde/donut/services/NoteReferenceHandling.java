@@ -57,12 +57,7 @@ final class NoteReferenceHandling {
    * frontmatter (hyphens become spaces). Returns the source note.
    */
   Note reduceRelationNoteToSourceProperty(Note relationNote, User viewer, Timestamp updatedAt) {
-    RelationshipFrontmatter relationship =
-        parseRelationshipFrontmatter(relationNote.getContent())
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
+    RelationshipFrontmatter relationship = relationshipOf(relationNote);
     if (!NoteContentMarkdown.isBodyContentBlank(relationNote.getContent())) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -73,6 +68,39 @@ final class NoteReferenceHandling {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");
     }
+    Note sourceNote = editableRelationshipSource(relationNote, relationship, viewer);
+    String canonicalPropertyKey =
+        PropertyKeyNaming.canonicalExampleOfFamilyKey(effectivePropertyKey);
+    NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
+        NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
+            sourceNote.getContent(),
+            canonicalPropertyKey,
+            targetAuthoredFromSourceNotebook(
+                relationship.targetScalar(), relationNote, sourceNote, viewer));
+    persistReplacedAuthoredContent(sourceNote, addResult.content(), updatedAt, viewer);
+    rehomeNoteLevelMemoryTrackerToSourceProperty(relationNote, sourceNote, addResult.resolvedKey());
+    return sourceNote;
+  }
+
+  /**
+   * The note {@code relationNote}'s {@code source} resolves to for {@code viewer}. Refuses with 400
+   * when {@code relationNote} is not a relationship note, or the source is unresolvable or not
+   * editable by {@code viewer}.
+   */
+  Note resolveRelationshipSource(Note relationNote, User viewer) {
+    return editableRelationshipSource(relationNote, relationshipOf(relationNote), viewer);
+  }
+
+  private RelationshipFrontmatter relationshipOf(Note relationNote) {
+    return parseRelationshipFrontmatter(relationNote.getContent())
+        .orElseThrow(
+            () ->
+                new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
+  }
+
+  private Note editableRelationshipSource(
+      Note relationNote, RelationshipFrontmatter relationship, User viewer) {
     Note sourceNote =
         resolveRelationshipSourceNote(relationNote, relationship.sourceScalar(), viewer)
             .orElseThrow(
@@ -85,16 +113,6 @@ final class NoteReferenceHandling {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note.");
     }
-    String canonicalPropertyKey =
-        PropertyKeyNaming.canonicalExampleOfFamilyKey(effectivePropertyKey);
-    NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
-        NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
-            sourceNote.getContent(),
-            canonicalPropertyKey,
-            targetAuthoredFromSourceNotebook(
-                relationship.targetScalar(), relationNote, sourceNote, viewer));
-    persistReplacedAuthoredContent(sourceNote, addResult.content(), updatedAt, viewer);
-    rehomeNoteLevelMemoryTrackerToSourceProperty(relationNote, sourceNote, addResult.resolvedKey());
     return sourceNote;
   }
 

@@ -189,7 +189,17 @@ skipped. Single-notebook callers observe no change. Enables slice 4.
 ### 4. Cross-notebook reduction appends one accepted commit to each notebook
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof:
+`NotebookGitWebRelationReduceControllerTest.reduceAcrossNotebooksAppendsOneAcceptedCommitToEachNotebookAndMovesTheTracker`
+green (failed first: Astronomy head unchanged); broader `*NotebookGitWeb*` +
+`*RelationController*` green (93 tests); refactor rerun green (36 tests incl.
+tests using the split fixtures `NoteDependentRowsControllerTestBase`,
+`NotebookGitRenameScoringBodies`). The 409 guard checks both the relationship
+note's and the source's notebook ("The relationship or its source note moved
+to another notebook; retry."); unproved by design. Source is resolved before
+locking, so an unresolvable source now refuses before body/key checks (still
+400, no change). Elapsed ~8 min (over target, under hard limit).
 Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests '*NotebookGitWebRelationReduceControllerTest*' -Dspring.profiles.active=test --build-cache`
 green with the new both-notebook test.
 

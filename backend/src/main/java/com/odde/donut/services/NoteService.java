@@ -148,6 +148,14 @@ public class NoteService {
   }
 
   /**
+   * The note {@code relationNote}'s relationship source resolves to for {@code viewer}; refuses
+   * with 400 when it is unresolvable or not editable.
+   */
+  public Note resolveRelationshipSource(Note relationNote, User viewer) {
+    return noteReferenceHandling.resolveRelationshipSource(relationNote, viewer);
+  }
+
+  /**
    * Adds {@code relationNote}'s relationship as a property on its resolved source note, deriving
    * the property key from the note's own {@code relation} frontmatter, and rehomes every learner's
    * note-level understanding tracker onto that property. Returns the source note; does not remove

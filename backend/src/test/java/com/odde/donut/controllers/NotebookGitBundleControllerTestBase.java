@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
-import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
@@ -18,7 +17,6 @@ import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
-import jakarta.persistence.EntityManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -51,58 +49,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 /** Shared notebook/bundle-crafting fixtures for notebook Git controller tests. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTestBase {
+abstract class NotebookGitBundleControllerTestBase extends NoteDependentRowsControllerTestBase {
 
   private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
 
-  /**
-   * Substantial typed-note body used as the original baseline for JGit rename scoring. Multiple
-   * non-trivial prose lines ensure shared frontmatter cannot dominate the similarity score.
-   */
-  static final String SUBSTANTIAL_ORIGINAL_BODY =
-      "---\ntype: Note\n---\n"
-          + "The quick brown fox jumps over the lazy dog near the riverbank.\n"
-          + "She decided to read the ancient manuscript that described the valley.\n"
-          + "Mountains rose in the distance, their peaks covered with fresh snow.\n"
-          + "A small village nestled between them kept its traditions alive for generations.\n"
-          + "Travelers came each spring to trade cloth and spices at the market.\n"
-          + "Children played near the fountain while elders discussed the harvest.\n"
-          + "The librarian organized every scroll by region and by season.\n";
-
-  /**
-   * Substantial typed-note body topically unrelated to {@link #SUBSTANTIAL_ORIGINAL_BODY}; their
-   * JGit similarity is well below the configured 50% threshold, so a removal/addition pair using
-   * these two bodies stays an unresolved mixture rather than a detected rename.
-   */
-  static final String SUBSTANTIAL_UNRELATED_BODY =
-      "---\ntype: Note\n---\n"
-          + "Quantum entanglement links particles across vast distances instantly.\n"
-          + "Researchers measured photon spins in supercooled vacuum chambers.\n"
-          + "The experiment required precision instruments and calm steady hands.\n"
-          + "Equations described probability amplitudes rather than certainties.\n"
-          + "Funding agencies reviewed the proposal for six months before approving.\n"
-          + "Graduate students calibrated lasers late into the quiet night.\n"
-          + "A paper summarizing findings was submitted to a prominent journal.\n";
-
-  /**
-   * Substantial typed-note body edited from {@link #SUBSTANTIAL_ORIGINAL_BODY} so the JGit
-   * similarity score lands in [50, 60): distinguishes the configured 50% rename policy from JGit's
-   * 60% default while genuinely changing content. Shared by inferred move-and-edit reference
-   * fixtures across rename and relocation referrer controller tests.
-   */
-  static final String MODERATE_EDIT_BODY =
-      "---\ntype: Note\n---\n"
-          + "The quick brown fox jumps over the lazy dog near the riverbank.\n"
-          + "She decided to read the ancient manuscript that described the valley.\n"
-          + "Mountains rose in the distance, their peaks covered with fresh snow.\n"
-          + "A small village nestled between them kept its traditions alive for generations.\n"
-          + "Completely rewritten prose about oceans and sailing ships replaces this.\n"
-          + "Sailors navigated by stars across the wide and stormy open waters.\n"
-          + "The harbor master logged each vessel and collected the docking fees.\n";
-
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired PlatformTransactionManager transactionManager;
-  @Autowired EntityManager entityManager;
 
   private String testFixturePrefix;
 
@@ -140,8 +92,12 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
   }
 
   Notebook createGitBackedNotebook() throws UnexpectedNoAccessRightException {
+    return createGitBackedNotebook("Git Backed Notebook For Bundle");
+  }
+
+  Notebook createGitBackedNotebook(String title) throws UnexpectedNoAccessRightException {
     NotebookCreationRequest request = new NotebookCreationRequest();
-    request.setNewTitle("Git Backed Notebook For Bundle");
+    request.setNewTitle(title);
     NotebookRealm response = controller.createNotebook(request);
     return notebookRepository.findById(response.notebook().getId()).orElseThrow();
   }
@@ -275,66 +231,6 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
     return List.of(
         new PortableTreeEntry("note.md", "---\ntype: Note\n---\noriginal content"),
         new PortableTreeEntry("README.md", "---\ntype: Readme\n---\nreadme original"));
-  }
-
-  /** Counts rows in {@code table} that reference the given note via {@code note_id}. */
-  protected long countRowsByNoteId(String table, Integer noteId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery("SELECT COUNT(*) FROM " + table + " WHERE note_id = :id")
-                .setParameter("id", noteId)
-                .getSingleResult())
-        .longValue();
-  }
-
-  /** Counts recall prompts whose memory tracker belongs to the given note. */
-  protected long countRecallPromptsByNoteId(Integer noteId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery(
-                    "SELECT COUNT(*) FROM recall_prompt rp "
-                        + "JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
-                        + "WHERE mt.note_id = :id")
-                .setParameter("id", noteId)
-                .getSingleResult())
-        .longValue();
-  }
-
-  /** Counts conversation_message rows belonging to any conversation of the given note. */
-  protected long countConversationMessagesByNoteId(Integer noteId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery(
-                    "SELECT COUNT(*) FROM conversation_message cm "
-                        + "JOIN conversation c ON cm.conversation_id = c.id "
-                        + "WHERE c.note_id = :id")
-                .setParameter("id", noteId)
-                .getSingleResult())
-        .longValue();
-  }
-
-  /** Aggregates the complete note-dependent closure counts for absence/survival assertions. */
-  protected DependentCounts dependentCounts(Note note) {
-    return new DependentCounts(
-        countRowsByNoteId("memory_tracker", note.getId()),
-        countRecallPromptsByNoteId(note.getId()),
-        countRowsByNoteId("mcq", note.getId()),
-        countRowsByNoteId("image", note.getId()),
-        countRowsByNoteId("conversation", note.getId()),
-        countConversationMessagesByNoteId(note.getId()));
-  }
-
-  /** Snapshot of the complete note-dependent row counts used by deletion/retry proofs. */
-  protected record DependentCounts(
-      long memoryTracker,
-      long recallPrompt,
-      long mcq,
-      long image,
-      long conversation,
-      long conversationMessage) {
-    static DependentCounts allAbsent() {
-      return new DependentCounts(0, 0, 0, 0, 0, 0);
-    }
   }
 
   private <T> T committed(java.util.function.Supplier<T> action) {
