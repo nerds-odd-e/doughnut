@@ -36,8 +36,10 @@ whose tree changed, all in one transaction. The touched set is known before
 locking (for relationship reduction: the relationship note's notebook and the
 resolved source's notebook) and re-verified under the lock; a mismatch is
 refused, not silently committed elsewhere. Pre-existing drift keeps its
-per-notebook policy. Evidence: cross-notebook relationship reduction
-(SEED-025, plan 138). Cross-notebook move and cross-notebook referrer rewrites
+per-notebook policy. Evidence: relationship reduction already uses this
+set form (`AcceptedWebChangeService.apply(Set<Integer>, …)`), re-authoring the
+target link from the source note's notebook with the same outgoing-link rule as
+cross-notebook move. Cross-notebook move and cross-notebook referrer rewrites
 stay outside the owner until selected as stories.
 
 ## One final publication result
