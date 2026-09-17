@@ -80,10 +80,8 @@ public class Folder extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean isTrashed() {
-    Folder root = this;
-    while (root.parentFolder != null) {
-      root = root.parentFolder;
-    }
-    return root.getName().equalsIgnoreCase("_trash");
+    return getParentFolder() == null
+        ? getName().equalsIgnoreCase("_trash")
+        : getParentFolder().isTrashed();
   }
 }

@@ -8,8 +8,10 @@ import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class NoteControllerShowTests extends ControllerTestBase {
   @Autowired NoteController controller;
   @Autowired TextContentController textContentController;
+  @Autowired NoteRepository noteRepository;
+  @Autowired EntityManager entityManager;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -112,5 +116,24 @@ class NoteControllerShowTests extends ControllerTestBase {
     // The source's own authored content/entry is unchanged (still the same authored token).
     NoteRealm sourceRealm = controller.showNote(source);
     assertThat(sourceRealm.getId(), equalTo(source.getId()));
+  }
+
+  @Test
+  void deeplyTrashedReferrerDisappearsFromTargetAfterFreshReload()
+      throws UnexpectedNoAccessRightException {
+    Note target = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("A").please();
+    Folder depthOne = makeMe.aFolder().notebook(target.getNotebook()).name("Depth One").please();
+    Folder depthTwo = makeMe.aFolder().parentFolder(depthOne).name("Depth Two").please();
+    Note referrer = makeMe.aNote().folder(depthTwo).title("B").please();
+    authorWikiLinkTo(referrer, "A");
+
+    controller.trashNote(referrer, leaveDeadLinks());
+    entityManager.flush();
+    entityManager.clear();
+
+    Note reloadedTarget = noteRepository.findById(target.getId()).orElseThrow();
+    NoteRealm targetRealm = controller.showNote(reloadedTarget);
+
+    assertThat(targetRealm.getReferences(), hasSize(0));
   }
 }

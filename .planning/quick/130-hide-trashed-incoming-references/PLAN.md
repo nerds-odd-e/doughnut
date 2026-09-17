@@ -1,6 +1,6 @@
 # Hide trashed referrers from incoming references
 
-Status: planned
+Status: executed
 Source: [SEED-009 story 41](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-41),
 refined 2026-09-17. The owner authorized slice planning, but not execution.
 
@@ -72,9 +72,34 @@ rule. No API generation or database migration is anticipated.
 ### 1. A deeply trashed referrer disappears after reload
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the controller example above fails before the change and passes afterward;
 the full backend unit suite remains green.
+
+Delivered: `Folder.isTrashed()` (`backend/src/main/java/com/odde/donut/entities/Folder.java`)
+now traverses ancestry through the mapped `getParentFolder()`/`getName()`
+accessors instead of the raw `parentFolder` field, so every lazy ancestor
+proxy initializes during traversal after a persistence-context clear. Root-only,
+case-insensitive `_trash` semantics and in-transaction membership are
+unchanged; the rewrite is a net reduction from an imperative loop to a short
+recursive expression. `AuthoredNoteReferenceInboundFacade` reused unchanged as
+planned. Post-change refactor review found `Note.isTrashed()`,
+`FolderConstructionService`, and `FolderRelocationService` already call
+`Folder.isTrashed()` via method dispatch (not the raw field), so they inherit
+the fix automatically; `FolderMoveDestinationRules.folderIsStrictDescendantOf`
+and `FolderSubtreeLiveNotes.folderDepth` already traverse via
+`getParentFolder()` and share no defect. No other production edit was needed.
+
+Proof: new regression test
+`NoteControllerShowTests.deeplyTrashedReferrerDisappearsFromTargetAfterFreshReload`
+(`backend/src/test/java/com/odde/donut/controllers/NoteControllerShowTests.java`)
+builds active target A and active referrer B two folders deep
+(`Depth One/Depth Two`) with B directly authoring `[[A]]`, trashes B with
+`leaveDeadLinks()`, flushes and clears the persistence context, reloads A via
+`NoteRepository`, and asserts `NoteController.showNote(A).getReferences()` has
+size 0. Confirmed failing (`hasSize<1>`) against the original implementation
+and passing after the fix. Full suite:
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` — green.
 
 Behavior: Given an active note B two folders deep directly references active A,
 when B is trashed with authored links preserved and A is freshly reloaded, A no
