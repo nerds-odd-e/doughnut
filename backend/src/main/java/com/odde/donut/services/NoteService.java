@@ -143,33 +143,31 @@ public class NoteService {
   public void permanentlyRemove(
       Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    applyNoteDeleteReferenceHandling(note, referenceHandling, null, viewer, currentUTCTimestamp);
+    applyNoteDeleteReferenceHandling(note, referenceHandling, viewer, currentUTCTimestamp);
     entityPersister.remove(note);
   }
 
+  /**
+   * Adds {@code relationNote}'s relationship as a property on its resolved source note, deriving
+   * the property key from the note's own {@code relation} frontmatter, and rehomes every learner's
+   * note-level understanding tracker onto that property. Returns the source note; does not remove
+   * {@code relationNote} itself.
+   */
+  public Note reduceRelationNoteToSourceProperty(
+      Note relationNote, User viewer, Timestamp updatedAt) {
+    return noteReferenceHandling.reduceRelationNoteToSourceProperty(
+        relationNote, viewer, updatedAt);
+  }
+
   public void applyNoteDeleteReferenceHandling(
-      Note note,
-      NoteDeleteReferenceHandling referenceHandling,
-      String sourcePropertyKey,
-      User viewer) {
+      Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
     applyNoteDeleteReferenceHandling(
-        note,
-        referenceHandling,
-        sourcePropertyKey,
-        viewer,
-        testabilitySettings.getCurrentUTCTimestamp());
+        note, referenceHandling, viewer, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   private void applyNoteDeleteReferenceHandling(
-      Note note,
-      NoteDeleteReferenceHandling referenceHandling,
-      String sourcePropertyKey,
-      User viewer,
-      Timestamp updatedAt) {
-    if (referenceHandling == NoteDeleteReferenceHandling.REDUCE_TO_SOURCE_PROPERTY) {
-      noteReferenceHandling.reduceRelationNoteToSourceProperty(
-          note, sourcePropertyKey, viewer, updatedAt);
-    } else if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
+      Note note, NoteDeleteReferenceHandling referenceHandling, User viewer, Timestamp updatedAt) {
+    if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
       noteReferenceHandling.removeNoteLinksFromReferrerProperties(note, viewer, updatedAt);
     }
   }

@@ -28,8 +28,6 @@ export type NoteDeleteReferenceHandling = NoteDeleteDto["referenceHandling"]
 
 export type NoteDeleteOptions = {
   referenceHandling: NoteDeleteReferenceHandling
-  sourcePropertyKey?: string
-  sourceNoteId?: number
 }
 
 export type TitleRenameReferenceHandling = NonNullable<
@@ -118,6 +116,15 @@ export interface StoredApi {
     options: NoteDeleteOptions
   ): Promise<NoteRealm | undefined>
 
+  /**
+   * Permanently reduces a relationship note into a property of its source.
+   * Records no undo and drops the relationship note from cache.
+   */
+  reduceRelationNoteToSourceProperty(
+    router: Router,
+    relationNoteId: Donut.ID
+  ): Promise<NoteRealm | undefined>
+
   moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID): Promise<void>
 
   moveNoteToNotebookRoot(
@@ -127,13 +134,7 @@ export interface StoredApi {
 }
 
 function noteReferenceHandlingBody(options: NoteDeleteOptions): NoteDeleteDto {
-  const body: NoteDeleteDto = {
-    referenceHandling: options.referenceHandling,
-  }
-  if (options.sourcePropertyKey !== undefined) {
-    body.sourcePropertyKey = options.sourcePropertyKey
-  }
-  return body
+  return { referenceHandling: options.referenceHandling }
 }
 
 export default class StoredApiCollection implements StoredApi {
@@ -491,7 +492,6 @@ export default class StoredApiCollection implements StoredApi {
     noteId: Donut.ID,
     options: NoteDeleteOptions
   ) {
-    const { referenceHandling, sourceNoteId } = options
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")
     const body = noteReferenceHandlingBody(options)
@@ -511,19 +511,34 @@ export default class StoredApiCollection implements StoredApi {
       originalFolderId
     )
     const destination =
-      referenceHandling === "REDUCE_TO_SOURCE_PROPERTY" &&
-      sourceNoteId !== undefined
-        ? noteShowLocation(sourceNoteId)
-        : originalFolderId != null
-          ? {
-              name: "folderPage",
-              params: { notebookId, folderId: originalFolderId },
-            }
-          : { name: "notebookPage", params: { notebookId } }
+      originalFolderId != null
+        ? {
+            name: "folderPage",
+            params: { notebookId, folderId: originalFolderId },
+          }
+        : { name: "notebookPage", params: { notebookId } }
     await router.replace(destination)
     this.storage.refreshNoteRealm(trashedRealm)
     refreshSidebarStructuralListings()
     return trashedRealm
+  }
+
+  async reduceRelationNoteToSourceProperty(
+    router: Router,
+    relationNoteId: Donut.ID
+  ) {
+    const { data: sourceRealm, error } = await apiCallWithLoading(() =>
+      RelationController.reduceToSourceProperty({
+        path: { relationNote: relationNoteId },
+      })
+    )
+    if (error || !sourceRealm) return
+
+    await router.replace(noteShowLocation(sourceRealm.id))
+    this.storage.removeNoteRealm(relationNoteId)
+    this.storage.refreshNoteRealm(sourceRealm)
+    refreshSidebarStructuralListings()
+    return sourceRealm
   }
 
   async moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID) {

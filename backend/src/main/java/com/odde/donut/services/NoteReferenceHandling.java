@@ -4,7 +4,6 @@ import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
-import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
@@ -20,7 +19,11 @@ import java.util.function.Consumer;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Applies note-delete reference policies (reduce-to-source / remove-from-properties). */
+/**
+ * Reduces a relationship note into a property of its resolved source note, and applies the
+ * note-delete reference policy that removes referrer property links (used for {@link
+ * com.odde.donut.controllers.dto.NoteDeleteReferenceHandling#REMOVE_FROM_PROPERTIES}).
+ */
 final class NoteReferenceHandling {
   private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
 
@@ -46,18 +49,29 @@ final class NoteReferenceHandling {
     this.deleteOrphanImages = deleteOrphanImages;
   }
 
-  void reduceRelationNoteToSourceProperty(
-      Note relationNote, String propertyKey, User viewer, Timestamp updatedAt) {
-    if (propertyKey == null || propertyKey.isBlank()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");
-    }
+  /**
+   * Parses {@code relationNote}, adds its relationship as a property on the resolved source note,
+   * and rehomes every learner's note-level understanding tracker onto that property, regardless of
+   * {@code removedFromTracking}. The property key is derived from the note's own {@code relation}
+   * frontmatter (hyphens become spaces). Returns the source note.
+   */
+  Note reduceRelationNoteToSourceProperty(Note relationNote, User viewer, Timestamp updatedAt) {
     RelationshipFrontmatter relationship =
         parseRelationshipFrontmatter(relationNote.getContent())
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
+    if (!NoteContentMarkdown.isBodyContentBlank(relationNote.getContent())) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "This relationship note has body text and cannot be reduced to a property.");
+    }
+    String effectivePropertyKey = propertyKeyFromRelationScalar(relationship.relationScalar());
+    if (effectivePropertyKey == null || effectivePropertyKey.isBlank()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");
+    }
     Note sourceNote =
         resolveRelationshipSourceNote(relationNote, relationship.sourceScalar(), viewer)
             .orElseThrow(
@@ -70,13 +84,23 @@ final class NoteReferenceHandling {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note.");
     }
-    String canonicalPropertyKey = PropertyKeyNaming.canonicalExampleOfFamilyKey(propertyKey);
+    String canonicalPropertyKey =
+        PropertyKeyNaming.canonicalExampleOfFamilyKey(effectivePropertyKey);
     NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
         NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
             sourceNote.getContent(), canonicalPropertyKey, relationship.targetScalar());
     persistReplacedAuthoredContent(sourceNote, addResult.content(), updatedAt, viewer);
-    rehomeNoteLevelMemoryTrackerToSourceProperty(
-        relationNote, sourceNote, addResult.resolvedKey(), viewer);
+    rehomeNoteLevelMemoryTrackerToSourceProperty(relationNote, sourceNote, addResult.resolvedKey());
+    return sourceNote;
+  }
+
+  /** Same rule as frontend {@code relationTypeFromKebab}: hyphens become spaces, trimmed. */
+  private static String propertyKeyFromRelationScalar(String relationScalar) {
+    if (relationScalar == null) {
+      return null;
+    }
+    String derived = relationScalar.replace('-', ' ').trim();
+    return derived.isEmpty() ? null : derived;
   }
 
   void removeNoteLinksFromReferrerProperties(Note target, User viewer, Timestamp updatedAt) {
@@ -102,23 +126,31 @@ final class NoteReferenceHandling {
     noteReferenceService.refreshDerivedIndexesForNote(note);
   }
 
+  /**
+   * Moves every learner's note-level understanding tracker onto the source property. Every other
+   * tracker on {@code relationNote} (spelling, commissioned, or property-level) is left for the DB
+   * {@code ON DELETE CASCADE} to remove with the relationship note; those are detached here so
+   * Hibernate's persistence context does not keep a managed reference to a note about to be removed
+   * (its own pre-flush transient-dependency check does not know about that DB-level cascade).
+   */
   private void rehomeNoteLevelMemoryTrackerToSourceProperty(
-      Note relationNote, Note sourceNote, String propertyKey, User viewer) {
-    memoryTrackerRepository.findByNote_IdIn(List.of(relationNote.getId())).stream()
-        .filter(MemoryTracker::isActive)
-        .filter(mt -> mt.getUser().getId().equals(viewer.getId()))
-        .filter(mt -> !mt.isSpelling())
-        .filter(mt -> mt.getPropertyKey() == null || mt.getPropertyKey().isEmpty())
-        .findFirst()
-        .ifPresent(
+      Note relationNote, Note sourceNote, String propertyKey) {
+    memoryTrackerRepository
+        .findByNote_IdIn(List.of(relationNote.getId()))
+        .forEach(
             tracker -> {
-              tracker.setNote(sourceNote);
-              tracker.setPropertyKey(propertyKey);
-              entityPersister.merge(tracker);
+              if (tracker.isUnderstanding() && tracker.isNoteLevelTracker()) {
+                tracker.setNote(sourceNote);
+                tracker.setPropertyKey(propertyKey);
+                entityPersister.merge(tracker);
+              } else {
+                entityPersister.detach(tracker);
+              }
             });
   }
 
-  private record RelationshipFrontmatter(String sourceScalar, String targetScalar) {}
+  private record RelationshipFrontmatter(
+      String relationScalar, String sourceScalar, String targetScalar) {}
 
   private Optional<RelationshipFrontmatter> parseRelationshipFrontmatter(String content) {
     return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
@@ -136,7 +168,8 @@ final class NoteReferenceHandling {
               if (source.isEmpty() || target.isEmpty()) {
                 return Optional.empty();
               }
-              return Optional.of(new RelationshipFrontmatter(source.get(), target.get()));
+              String relation = fm.getString("relation").map(String::trim).orElse(null);
+              return Optional.of(new RelationshipFrontmatter(relation, source.get(), target.get()));
             });
   }
 

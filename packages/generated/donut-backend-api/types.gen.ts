@@ -334,8 +334,7 @@ export type SpellingVerificationResult = {
 };
 
 export type NoteDeleteDto = {
-    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS' | 'REDUCE_TO_SOURCE_PROPERTY';
-    sourcePropertyKey?: string;
+    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS';
 };
 
 export type SearchTerm = {
@@ -1722,6 +1721,24 @@ export type SetCurrentModelVersionsResponses = {
 };
 
 export type SetCurrentModelVersionsResponse = SetCurrentModelVersionsResponses[keyof SetCurrentModelVersionsResponses];
+
+export type ReduceToSourcePropertyData = {
+    body?: never;
+    path: {
+        relationNote: number;
+    };
+    query?: never;
+    url: '/api/relations/{relationNote}/reduce-to-source-property';
+};
+
+export type ReduceToSourcePropertyResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type ReduceToSourcePropertyResponse = ReduceToSourcePropertyResponses[keyof ReduceToSourcePropertyResponses];
 
 export type MoveNoteToNotebookRootData = {
     body?: never;

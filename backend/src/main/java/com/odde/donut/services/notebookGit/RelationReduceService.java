@@ -1,0 +1,69 @@
+package com.odde.donut.services.notebookGit;
+
+import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.User;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.NoteRealmService;
+import com.odde.donut.services.NoteService;
+import com.odde.donut.testability.TestabilitySettings;
+import java.sql.Timestamp;
+import org.springframework.stereotype.Service;
+
+/**
+ * Reduces a relationship note into a property of its resolved source note, in one accepted web
+ * change, then permanently deletes the relationship note (Git-publication owner via {@link
+ * NoteService#permanentlyRemove}). Unlike {@link WebNoteEditService#edit}, the reduced note no
+ * longer exists afterward, so this service returns the source note's realm instead.
+ */
+@Service
+public class RelationReduceService {
+  private final AcceptedWebChangeService acceptedWebChangeService;
+  private final WebNoteEditService webNoteEditService;
+  private final NoteService noteService;
+  private final AuthorizationService authorizationService;
+  private final NoteRealmService noteRealmService;
+  private final TestabilitySettings testabilitySettings;
+
+  public RelationReduceService(
+      AcceptedWebChangeService acceptedWebChangeService,
+      WebNoteEditService webNoteEditService,
+      NoteService noteService,
+      AuthorizationService authorizationService,
+      NoteRealmService noteRealmService,
+      TestabilitySettings testabilitySettings) {
+    this.acceptedWebChangeService = acceptedWebChangeService;
+    this.webNoteEditService = webNoteEditService;
+    this.noteService = noteService;
+    this.authorizationService = authorizationService;
+    this.noteRealmService = noteRealmService;
+    this.testabilitySettings = testabilitySettings;
+  }
+
+  public NoteRealm reduceToSourceProperty(Note relationNote)
+      throws UnexpectedNoAccessRightException {
+    User viewer = authorizationService.getCurrentUser();
+    Integer notebookId = relationNote.getNotebook().getId();
+    Integer relationNoteId = relationNote.getId();
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    String commitMessage = "Reduce relationship note: " + relationNote.getTitle();
+    Note source =
+        acceptedWebChangeService.apply(
+            notebookId,
+            lockedState -> {
+              Note note =
+                  webNoteEditService.resolveNoteWithinLockedStateOrRepository(
+                      lockedState, relationNoteId);
+              authorizationService.assertAuthorization(note);
+              Note sourceNote = noteService.reduceRelationNoteToSourceProperty(note, viewer, now);
+              noteService.permanentlyRemove(
+                  note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, viewer);
+              return sourceNote;
+            },
+            ignored -> commitMessage,
+            now);
+    return noteRealmService.build(source, viewer);
+  }
+}

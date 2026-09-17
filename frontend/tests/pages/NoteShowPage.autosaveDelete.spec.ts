@@ -1,5 +1,6 @@
 import {
   NoteController,
+  RelationController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -99,7 +100,11 @@ describe("note show autosave before deletion", () => {
           .please()
       }
     )
-    const deleteSpy = mockSdkService(NoteController, "trashNote", relationRealm)
+    const deleteSpy = mockSdkService(
+      RelationController,
+      "reduceToSourceProperty",
+      relationRealm
+    )
     deleteSpy.mockImplementation(async () => {
       mutationOrder.push("delete")
       return wrapSdkError("delete failed")
@@ -108,7 +113,7 @@ describe("note show autosave before deletion", () => {
     const editedRelationship = `${relationRealm.note.content}Edited relationship`
     await renderNoteShowPageWithoutSidebar(router, relationRealm.id)
     const textarea = await editBody(editedRelationship)
-    await startDelete("REDUCE_TO_SOURCE_PROPERTY")
+    await startDelete("REDUCE")
 
     expect(mutationOrder).toEqual(["save-1-start"])
     expect(deleteSpy).not.toHaveBeenCalled()
@@ -123,7 +128,7 @@ describe("note show autosave before deletion", () => {
 
     updateSpy.mockResolvedValueOnce(wrapSdkError("save failed"))
     setBodyValue(textarea, "Second edit")
-    await startDelete("REDUCE_TO_SOURCE_PROPERTY")
+    await startDelete("REDUCE")
 
     expect(updateSpy).toHaveBeenCalledTimes(2)
     expect(deleteSpy).toHaveBeenCalledTimes(1)

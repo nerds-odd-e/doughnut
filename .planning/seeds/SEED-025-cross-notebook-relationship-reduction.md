@@ -17,8 +17,9 @@ source note, but the web accepted-change boundary locks and commits only the
 relationship note's notebook. When the source notebook is Git-backed, its
 Portable tree and accepted history can miss the source edit, and an owner
 editing that notebook in Obsidian or an AI IDE does not see the reduced
-property. [SEED-024](SEED-024-atomic-relationship-note-reduction.md#story-1)
-leaves this case at its natural behavior.
+property. [SEED-024](https://github.com/nerds-odd-e/doughnut/blob/de3bc3b2d7b21ba3b34b5884696a8632daa9a0d5/.planning/seeds/SEED-024-atomic-relationship-note-reduction.md#story-1)
+(delivered; story removed from active planning) leaves this case at its
+natural behavior.
 
 ## Alternatives and Decision
 
@@ -47,7 +48,8 @@ owner is unresolved and needs refinement before planning.
   notebook's accepted history.
 - **Effort hypothesis:** M, low confidence; multi-notebook locking and commit
   ordering are not yet designed.
-- **Depends on:** [SEED-024 story 1](SEED-024-atomic-relationship-note-reduction.md#story-1).
+- **Depends on:** [SEED-024 story 1](https://github.com/nerds-odd-e/doughnut/blob/de3bc3b2d7b21ba3b34b5884696a8632daa9a0d5/.planning/seeds/SEED-024-atomic-relationship-note-reduction.md#story-1)
+  (delivered; story removed from active planning).
 - **Safe stopping point:** Cross-notebook reduction is complete and atomic
   across both notebooks; same-notebook reduction is unchanged.
 

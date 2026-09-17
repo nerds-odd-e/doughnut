@@ -8,6 +8,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteMoveService;
 import com.odde.donut.services.NoteRealmService;
+import com.odde.donut.services.notebookGit.RelationReduceService;
 import com.odde.donut.services.notebookGit.WebNoteEditService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,18 +30,21 @@ class RelationController {
   private final TestabilitySettings testabilitySettings;
   private final WebNoteEditService webNoteEditService;
   private final NoteMoveService noteMoveService;
+  private final RelationReduceService relationReduceService;
 
   public RelationController(
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
       TestabilitySettings testabilitySettings,
       WebNoteEditService webNoteEditService,
-      NoteMoveService noteMoveService) {
+      NoteMoveService noteMoveService,
+      RelationReduceService relationReduceService) {
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.testabilitySettings = testabilitySettings;
     this.webNoteEditService = webNoteEditService;
     this.noteMoveService = noteMoveService;
+    this.relationReduceService = relationReduceService;
   }
 
   @PostMapping(value = "/move-to-folder/{sourceNote}/{targetFolder}")
@@ -79,6 +83,13 @@ class RelationController {
       return List.of(webMove(sourceNote, noteMoveService::sameNotebookMoveToRoot));
     }
     return List.of(noteMoveService.moveCrossNotebookToNotebookRoot(sourceNote, targetNotebook));
+  }
+
+  @PostMapping(value = "/{relationNote}/reduce-to-source-property")
+  public NoteRealm reduceToSourceProperty(@PathVariable @Schema(type = "integer") Note relationNote)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(relationNote);
+    return relationReduceService.reduceToSourceProperty(relationNote);
   }
 
   private NoteRealm webMove(Note sourceNote, Function<Timestamp, Consumer<Note>> mutationFactory)

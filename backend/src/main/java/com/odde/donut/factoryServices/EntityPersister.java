@@ -55,6 +55,10 @@ public class EntityPersister {
     entityManager.refresh(entity);
   }
 
+  public void detach(Object entity) {
+    entityManager.detach(entity);
+  }
+
   public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
     return entityManager.createQuery(qlString, resultClass);
   }
