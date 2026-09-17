@@ -195,12 +195,7 @@ as response latency. No queue, worker, eventual-consistency policy or resolved
 wiki-destination cache is authorized by this note. Prefer the synchronous
 simplification if it achieves the required gain with less machinery.
 
-#### Soft deletion and title reuse — separate product work
-
-The owner previously deferred portable trash; the current
-[product backlog](../PRODUCT-BACKLOG.md) instead prioritizes that detour. That combined idea owns deletion/trash semantics,
-production migration, and future title reuse. It is not a prerequisite for this
-performance story.
+#### Addition title-check baseline
 
 The retained addition observation found 425 of 600 request-thread execution
 samples in flushing reached through `requireNoSoftDeletedTitleAt` (425 of 432
@@ -214,18 +209,16 @@ addressed this check while preserving behavior, reaching a 74.2% reduction at
 1,000/1,000 scale. Use that result as this story's addition baseline; measure
 any remaining check cost at 10,000-note scale separately from derived indexing.
 The owner permits pursuing other improvements when this cost is not dominant.
-Do not duplicate that optimization here or require the broader deletion redesign
-merely to improve speed. No schema or deletion-policy change is selected.
+Do not duplicate that optimization here merely to improve speed.
 
 ## Ordering and Scope Reduction
 
 The product backlog owns current priority: the addition-optimization story is
-delivered (see story 4's evidence above). On 2026-09-16 the owner moved story 4's
-scale validation from first to last, prioritizing repeated-trash refinement. Story 4 still needs
-refinement of its workload and acceptable waiting time. It remains a
-non-executable planning input. The user explicitly authorizes temporary code
-experiments, measurement, and profiling during its future refinement,
-consistent with the earlier authorized work.
+delivered (see story 4's evidence above). Story 4 still needs refinement of its
+workload and acceptable waiting time. It remains a non-executable planning input.
+The user explicitly authorizes temporary code experiments, measurement, and
+profiling during its future refinement, consistent with the earlier authorized
+work.
 
 ## Breadcrumbs
 

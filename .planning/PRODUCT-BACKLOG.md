@@ -2,10 +2,6 @@
 
 ## Near-future direction
 
-No additional trash features are selected. Complete ordinary local Git move
-compatibility with existing trash and recovery behavior, preserving dependencies
-through the same domain code used by the web.
-
 Notebook owners can refine notes in Obsidian or an AI IDE while continuing to
 use them in Donut, preserving their work and learning history. Git history is
 a single, append-only sequence of commits, with no branching or rebasing;

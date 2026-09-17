@@ -43,6 +43,16 @@ execution, and integration identities in this plan before observation begins.
 Story Branch Mode is the development-delivery workspace; it does not introduce
 branches into the notebook product workflow being evaluated.
 
+Resolved execution identity:
+
+- Originating checkout/branch: `/Users/terryyin/git/doughnut` on `main` (claim
+  commit `979a667474`).
+- Execution checkout/branch:
+  `/Users/terryyin/git/doughnut-worktrees/131-manually-validate-append-only-notebook-workflow`
+  on `131-manually-validate-append-only-notebook-workflow`.
+- Integration checkout/branch and authorized remote target: originating
+  checkout, `main`, remote `origin`.
+
 During the slice:
 
 - use `dough-manual-testing` as the authority for coverage, time allocation,
@@ -86,9 +96,9 @@ preserves the accepted sequence, that command alone is not divergent-history
 reconciliation.
 
 Exclude performance measurement, cross-notebook synchronization, projection-
-drift recovery, native Git transport, attachment/history UI, story 41's
-incoming-reference defect, and all repairs. Do not broaden the manual session
-to enumerate every automatically covered path variation.
+drift recovery, native Git transport, attachment/history UI, and all repairs.
+Do not broaden the manual session to enumerate every automatically covered path
+variation.
 
 ## Existing solution and preparation route
 
@@ -180,7 +190,7 @@ publishing that rewritten result as though it were accepted behavior.
 ### 1. Observe the complete append-only owner journey within one hour
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Browser snapshots plus terminal observations establish the three
 outside-in cases within the time budget, or the final report names each
 discrepancy, unresolved expectation, improvement, and material coverage gap
@@ -239,3 +249,54 @@ change or separable delivery boundary.
 - Existing CLI E2E fixtures already express the required notebook, learning,
   Git-binding, access-token, clone, ancestry, path, and original-route setup, so
   a permanent manual-test harness is not justified.
+
+## Manual finding report
+
+Session: 2026-09-17, 12:10:46–12:21:19 (about 11 minutes elapsed of the
+60-minute budget). Isolated worktree stack (`pnpm cy:open`, worktree id
+`wt_c65eddea68f84ad5931d04e3f2260fc9`, browser origin `http://127.0.0.1:58269`),
+one fresh user, notebook "Manual Notebook 131" (id 66871), note "Overview"
+(id 85359, route `/n85359`) assimilated under Understanding, a generated access
+token, and the real installed CLI bundle (`cli/dist/donut-cli.bundle.mjs`) run
+directly with `DONUT_API_BASE_URL`/`DONUT_CONFIG_DIR` against that stack —
+publisher and receiver clones for breadth, a third clean clone for divergence.
+
+- **Local is several commits ahead — matches the oracle.** Two local commits
+  (move `Overview.md` into `Notes/` with an edit, then a further edit) published
+  as the publisher's unchanged tip (accepted head `1bb9119`). The receiver
+  pulled to the same head with the receiver's original head followed by the
+  publisher's two original commits in one single-parent chain, exact final path
+  and bytes, clean status. The browser at `/n85359` showed the final content and
+  the retained Understanding tracker (Recall badge unchanged) at the same route.
+- **Accepted history is several commits ahead — matches the oracle.** Two
+  accepted web changes (a content edit, then a note rename/move) applied to a
+  clean checkout: the checkout fast-forwarded through both recorded accepted
+  heads (`bf4bea0`, `e1f6086`), the final path existed once with the old path
+  absent, bytes matched the web result, and the checkout was clean at the
+  accepted head with the original head as an ancestor. The browser still
+  resolved the same note identity and retained learning state.
+- **Discrepancy — divergent histories are not refused.** From a clean clone at
+  accepted head `e1f6086`, an unpublished local content edit (commit `075e121`)
+  followed by an independent accepted web edit (new accepted head, `cf97ffe`),
+  then `donut notebook pull`: expected a clear refusal leaving the checkout,
+  local head, and accepted head unchanged with both bodies of work intact and
+  no rebase/merge guidance. Actual: the CLI attempted a rebase, left the
+  checkout in a detached-HEAD, mid-rebase state (`.git/rebase-merge` present,
+  `git status` reporting "interactive rebase in progress") with an unresolved
+  native conflict marker in the working-tree file, and printed guidance
+  instructing `git add ... && git rebase --continue` or `git rebase --abort`.
+  The `main` branch ref itself stayed at the unpublished local commit and the
+  accepted commit's content remained recoverable from the object store, so
+  both bodies of work were technically not lost, but the checkout was left in
+  a broken, non-clean, conflict-paused state rather than refused cleanly — the
+  exact known-risk behavior flagged in Learnings above. Evidence: local head
+  `075e121df398e49376c3ce94a5e41f4f2fd1484f`, accepted head `cf97ffe...`,
+  `git status -sb` → `## HEAD (no branch)` / `UU "Notes/Overview renamed.md"`,
+  CLI output beginning `donut: Git paused a rebase with a conflict in
+  "Notes/Overview renamed.md"...`.
+- No coverage gaps: all three outside-in cases and their identity/learning
+  depth checks completed inside the time budget with no automated-repair,
+  diagnosis, or permanent test/runner changes made.
+- No product code was changed by this session (temporary clone destinations,
+  CLI config, and CLI bundle build artifact were removed; the isolated stack
+  was shut down); this plan update is the only tracked change.
