@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -9,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
@@ -52,6 +54,40 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
     assertThat(result.getNote().getId(), equalTo(source.getId()));
     assertThat(source.getContent(), containsString("a part of"));
     assertThat(source.getContent(), containsString("[[Earth]]"));
+    assertThat(noteRepository.findById(relationId).isEmpty(), equalTo(true));
+  }
+
+  @Test
+  void authorsTheTargetFromTheSourceNotebookWhenTheSourceLivesInAnotherNotebook()
+      throws UnexpectedNoAccessRightException {
+    Notebook spaceTopics = ownedNotebook("Space topics");
+    Notebook astronomy = ownedNotebook("Astronomy");
+    Note source = makeMe.aNote("Moon").notebook(astronomy).please();
+    Note target = makeMe.aNote("Earth").notebook(spaceTopics).please();
+    Note relation =
+        makeMe
+            .aNote()
+            .notebook(spaceTopics)
+            .content(
+                "---\n"
+                    + "type: Relationship\n"
+                    + "relation: a-part-of\n"
+                    + "source: \"[[Astronomy:Moon]]\"\n"
+                    + "target: \"[[Earth]]\"\n"
+                    + "---\n")
+            .please();
+    noteReferenceService.refreshDerivedIndexesForNote(relation);
+    Integer relationId = relation.getId();
+
+    NoteRealm result = controller.reduceToSourceProperty(relation);
+
+    assertThat(result.getNote().getId(), equalTo(source.getId()));
+    assertThat(source.getContent(), containsString("a part of: '[[Space topics:Earth|Earth]]'"));
+    assertThat(
+        noteReferenceService.wikiLinksForViewer(source, currentUser.getUser()).stream()
+            .map(link -> link.getDestinationNoteId())
+            .toList(),
+        contains(target.getId()));
     assertThat(noteRepository.findById(relationId).isEmpty(), equalTo(true));
   }
 
@@ -179,5 +215,9 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
     assertThat(noteRepository.findById(relationId).isPresent(), equalTo(true));
     assertThat(relation.getContent(), equalTo(relationContentBefore));
     assertThat(source.getContent(), equalTo(sourceContentBefore));
+  }
+
+  private Notebook ownedNotebook(String name) {
+    return makeMe.aNotebook().name(name).creatorAndOwner(currentUser.getUser()).please();
   }
 }

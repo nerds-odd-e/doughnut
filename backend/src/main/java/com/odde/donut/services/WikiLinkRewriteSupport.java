@@ -145,14 +145,9 @@ final class WikiLinkRewriteSupport {
                 ? linkText
                 : WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(
                     linkText, authoredPortablePath, true);
-      } else if (wikiLinkResolver.classifyToken(linkText, sourceNotebookName, viewer)
-          instanceof WikiLinkResolver.CandidateCardinality.Ambiguous) {
-        // Already ambiguous before the move: don't guess which candidate it meant.
-        newInner = linkText;
       } else {
         newInner =
-            WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
-                linkText, sourceNotebookName);
+            outgoingLinkLeavingNotebook(wikiLinkResolver, linkText, sourceNotebookName, viewer);
       }
       if (newInner.equals(linkText)) {
         continue;
@@ -167,6 +162,36 @@ final class WikiLinkRewriteSupport {
     movedNote.replaceContent(AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin));
     movedNote.setUpdatedAt(updatedAt);
     noteReferenceService.refreshDerivedIndexesForNote(entityPersister.save(movedNote));
+  }
+
+  /** {@code markdown} with each wiki Portable-path link re-authored by the rule below. */
+  static String markdownLeavingNotebook(
+      WikiLinkResolver wikiLinkResolver, String markdown, String oldNotebookName, User viewer) {
+    String authored = markdown;
+    for (var wiki : AuthoredNoteReferences.uniqueWikiPortablePathTargets(markdown)) {
+      authored =
+          WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
+              authored,
+              wiki.authoredLink(),
+              outgoingLinkLeavingNotebook(
+                  wikiLinkResolver, wiki.authoredLink(), oldNotebookName, viewer));
+    }
+    return authored;
+  }
+
+  /**
+   * An outgoing wiki link inner re-authored for a note that no longer lives in {@code
+   * oldNotebookName}: an unqualified link is qualified with the old notebook, unless it was already
+   * ambiguous there (don't guess which candidate it meant).
+   */
+  private static String outgoingLinkLeavingNotebook(
+      WikiLinkResolver wikiLinkResolver, String linkText, String oldNotebookName, User viewer) {
+    if (wikiLinkResolver.classifyToken(linkText, oldNotebookName, viewer)
+        instanceof WikiLinkResolver.CandidateCardinality.Ambiguous) {
+      return linkText;
+    }
+    return WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
+        linkText, oldNotebookName);
   }
 
   /**

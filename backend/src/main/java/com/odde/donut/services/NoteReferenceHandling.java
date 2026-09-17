@@ -89,10 +89,22 @@ final class NoteReferenceHandling {
         PropertyKeyNaming.canonicalExampleOfFamilyKey(effectivePropertyKey);
     NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
         NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
-            sourceNote.getContent(), canonicalPropertyKey, relationship.targetScalar());
+            sourceNote.getContent(),
+            canonicalPropertyKey,
+            targetAuthoredFromSourceNotebook(
+                relationship.targetScalar(), relationNote, sourceNote, viewer));
     persistReplacedAuthoredContent(sourceNote, addResult.content(), updatedAt, viewer);
     rehomeNoteLevelMemoryTrackerToSourceProperty(relationNote, sourceNote, addResult.resolvedKey());
     return sourceNote;
+  }
+
+  private String targetAuthoredFromSourceNotebook(
+      String targetScalar, Note relationNote, Note sourceNote, User viewer) {
+    if (sourceNote.getNotebook().getId().equals(relationNote.getNotebook().getId())) {
+      return targetScalar;
+    }
+    return WikiLinkRewriteSupport.markdownLeavingNotebook(
+        wikiLinkResolver, targetScalar, relationNote.getNotebook().getName(), viewer);
   }
 
   /** Same rule as frontend {@code relationTypeFromKebab}: hyphens become spaces, trimmed. */

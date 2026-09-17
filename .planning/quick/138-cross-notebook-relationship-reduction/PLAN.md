@@ -1,10 +1,26 @@
 # Reduce a relationship into a source note in another notebook
 
-Status: planned
+Status: in progress
 Source: [SEED-025 story 1](../../seeds/SEED-025-cross-notebook-relationship-reduction.md#story-1),
 refined 2026-09-17. Owner decisions: Option B (one accepted commit per
-touched notebook), priority kept. Planning only; execution not yet
-authorized by this plan.
+touched notebook), priority kept. Execution authorized 2026-09-17
+(`/dough-execute-plan 138`).
+
+## Execution identity
+
+- Mode: Story Branch Mode; replanning permission: default (plan refinement
+  allowed under learning escalation).
+- Originating/integration checkout: `/Users/terryyin/git/doughnut`, branch
+  `main`; claim commit `6281a7d0cd` (local, not pushed separately).
+- Execution checkout:
+  `/Users/terryyin/git/doughnut/.claude/worktrees/138-cross-notebook-relationship-reduction`,
+  branch `138-cross-notebook-relationship-reduction`.
+- Push destination: `origin` (`nerds-odd-e/doughnut`), branch
+  `138-cross-notebook-relationship-reduction`.
+- CI observer: GitHub Actions `ci.yml` ("donut CI"), mailbox
+  `/tmp/dough-ci-501/watch-u5BoT7`, runtime
+  `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs` in the execution
+  checkout.
 
 ## Goal and scope
 
@@ -53,7 +69,7 @@ Assumptions:
 - Every production notebook has a Git binding; the owner still tolerates an
   unbound notebook by skipping its commit (existing `Optional` path).
 - Cross-notebook wiki resolution of `source` already works via qualified
-  Portable paths (`[[Astronomy/Moon]]`); the test builder
+  Portable paths (`[[Astronomy:Moon]]`); the test builder
   `RelationshipNoteMarkdown.forEndpoints` qualifies cross-notebook endpoints.
 
 ## Architecture
@@ -95,7 +111,7 @@ loudly on the moved-source race). Proposed ADR 0002 unchanged.
 
 | Promise | Owning slice | Proof |
 | --- | --- | --- |
-| Property value resolves from the source note's notebook | 1 | `RelationControllerReduceToSourcePropertyTests`: relation in "Space topics", source "Moon" in "Astronomy", target "Earth" in "Space topics" → Moon contains `[[Space topics/Earth]]` |
+| Property value resolves from the source note's notebook | 1 | `RelationControllerReduceToSourcePropertyTests`: relation in "Space topics", source "Moon" in "Astronomy", target "Earth" in "Space topics" → Moon contains `[[Space topics:Earth|Earth]]` |
 | Existing single-notebook accepted changes unchanged | 2, 3 | `*NotebookGitWeb*` controller tests and `RelationController*Tests` green after each |
 | One accepted commit in each notebook, relationship file gone, no `_trash/`, tracker on Moon | 4 | `NotebookGitWebRelationReduceControllerTest`: both downloaded bundles advanced by exactly one commit whose parent is the previous head; tracker is a property tracker on Moon |
 | Refusal leaves both heads unchanged | 5 | same class: source notebook not editable → 400, both heads equal to before, relation note present |
@@ -107,14 +123,19 @@ loudly on the moved-source race). Proposed ADR 0002 unchanged.
 ### 1. Reduced property value is authored from the source note's notebook
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `RelationControllerReduceToSourcePropertyTests.authorsTheTargetFromTheSourceNotebookWhenTheSourceLivesInAnotherNotebook`
+(6/6 green after refactor); move caller unchanged
+(`RelationControllerTests`, `NotebookFolderCrossNotebookMove*`,
+`RelationControllerMoveNoteToFolderTests` green). Shared owner:
+`WikiLinkRewriteSupport.markdownLeavingNotebook` / `outgoingLinkLeavingNotebook`.
 Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests '*RelationControllerReduceToSourcePropertyTests*' -Dspring.profiles.active=test --build-cache`
 green with the new cross-notebook example.
 
 Behavior: relationship note in owned notebook "Space topics" with
-`source: "[[Astronomy/Moon]]"` and `target: "[[Earth]]"` (Earth in "Space
+`source: "[[Astronomy:Moon]]"` and `target: "[[Earth]]"` (Earth in "Space
 topics"), Moon in owned notebook "Astronomy" → reduce → Moon's frontmatter
-gains `a part of: '[[Space topics/Earth]]'`; the relationship note is gone.
+gains `a part of: '[[Space topics:Earth|Earth]]'`; the relationship note is gone.
 Same-notebook reduction still writes the target verbatim.
 
 Implementation: in `NoteReferenceHandling.reduceRelationNoteToSourceProperty`,
@@ -169,7 +190,7 @@ green with the new both-notebook test.
 Behavior: Git-backed "Space topics" (relation note, Earth) and Git-backed
 "Astronomy" (Moon), both snapshotted, a learner tracker on the relation note
 → reduce → Astronomy's accepted head advanced by one commit (parent =
-previous head) whose `Moon.md` contains `[[Space topics/Earth]]`; Space
+previous head) whose `Moon.md` contains `[[Space topics:Earth|Earth]]`; Space
 topics' head advanced by one commit with the relationship file absent and
 nothing under `_trash/`; the learner's tracker is now a property tracker on
 Moon (existing rule, observed in the same result).
@@ -222,4 +243,8 @@ pre-match against silently committing a drifted notebook.
 
 ## Learnings
 
-(none yet)
+- Cross-notebook wiki links use `Notebook:Title` (a slash is a folder path in
+  the same notebook), and the qualify rule keeps the visible text, so the
+  reduced value is `'[[Space topics:Earth|Earth]]'`. The plan examples were
+  corrected; the seed's key example 1 still shows slash notation (fix at
+  wrap-up).
