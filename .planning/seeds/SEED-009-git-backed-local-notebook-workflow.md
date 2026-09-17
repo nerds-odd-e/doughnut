@@ -44,6 +44,68 @@ are evidence of behavior, never limits on accepted histories or note counts.
 All stories preserve authorization, authored content, note identity and learning
 data; invalid or ambiguous changes must not silently discard work.
 
+<a id="story-43"></a>
+
+### 43. Rebaseline every existing notebook from current Donut content
+
+- **Goal / beneficiary:** An owner of an existing live notebook can acquire a
+  Git-backed copy whose initial accepted commit exactly represents the
+  notebook's current Donut Portable tree, without stale baseline data left by
+  earlier synchronization development.
+- **Why now:** The owner explicitly prioritized a fleet-wide reset on
+  2026-09-17. Deferring is the strongest smaller alternative because new
+  notebooks already receive a root commit and an earlier migration rebuilt
+  then-existing bindings. It is insufficient if any current production
+  baseline no longer matches the notebook data that owners use today.
+- **Scope:** During the ordinary release migration, replace each live existing
+  notebook's accepted Git object ID and bundle with one fresh parentless commit
+  built from its current canonical Portable notebook tree. Preserve notebook,
+  folder, note, binding, ownership, and learning identities and data. The
+  replacement is atomic per notebook; an unbuildable notebook fails the
+  migration loudly rather than leaving that notebook with a partially replaced
+  head and bundle.
+- **Key example:** Given a live notebook whose current Donut data contains a
+  notebook readme, nested folders and readmes, active notes, and notes beneath
+  `_trash`, when the release migration runs, its accepted bundle contains
+  exactly one root commit whose tree matches that current content under
+  Accepted [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md),
+  while all Donut IDs, authored content, and learning history remain unchanged.
+- **Fleet boundary example:** Given several live notebooks with existing Git
+  bindings, one migration run rebaselines every one; a failure stops startup
+  visibly, and a retry can finish without creating duplicate bindings or mixed
+  head/bundle pairs. Notebooks created after the migration continue to receive
+  their ordinary creation-time root commit.
+- **History consequence — unresolved:** A literal reset abandons every earlier
+  accepted server commit and makes an already downloaded local repository
+  diverge from the replacement root. The current near-future direction instead
+  promises one append-only history in which either side may lag. Confirm
+  whether history abandonment and mandatory fresh local acquisition are
+  intentional, or whether the requested reset must preserve the existing
+  accepted ancestry.
+- **Population — unresolved:** The working interpretation is every live
+  notebook that already has a binding, matching the earlier fleet rebuild.
+  Confirm whether "all existing notebooks" also includes soft-deleted notebooks
+  or requires creating a binding for an anomalous live notebook that has none.
+- **Boundaries:** This story does not change current MySQL notebook content,
+  invent historical commits, reconcile or rewrite an owner's local clone,
+  introduce branching/rebasing, add a new Git transport, or change the
+  creation-time behavior for future notebooks. Accepted ADR 0006 permits the
+  migration to fail loudly; this story still requires an atomic replacement so
+  a failure cannot persist a mismatched object ID and bundle.
+- **Architecture status:** Accepted ADR 0004 governs the rebuilt Portable tree.
+  ADR 0002's fleet-bootstrap and single-mainline text is still Proposed and
+  therefore informative rather than binding. The history reset would conflict
+  with that proposal and with the current backlog direction unless the owner
+  explicitly accepts the fresh-acquisition boundary above.
+- **Effort / status:** Queued first and refinement started. M (1–2 hours), low
+  confidence until the history and population decisions are resolved. A
+  retired fleet-rebuild implementation is useful evidence, not code to restore
+  without rechecking the current schema and migration conventions.
+- **Depends on / safe stopping point:** No unfinished product prerequisite.
+  After the migration, each included notebook has one internally consistent
+  current baseline even if later synchronization or performance work is
+  cancelled.
+
 <a id="story-42"></a>
 
 ### 42. Manually validate the complete append-only notebook workflow
@@ -548,6 +610,12 @@ The owner initially placed the incoming-reference correction in story 41 first,
 then moved it to the bottom on 2026-09-15 after manual testing could not
 reproduce the production report. The deeper-folder reproduction on 2026-09-17
 made it actionable again, and it is now Taken with a slice plan.
+
+The owner placed story 43 first on 2026-09-17. This explicit priority is
+preserved even though a destructive root reset appears to conflict with the
+append-only near-future direction; refinement must resolve whether old accepted
+history and existing local acquisitions may be abandoned before executable
+planning.
 
 Folder Trash with ordinary Move now supplies the complete folder round trip.
 The 2026-09-16 direction ends additional trash feature development: Restore is
