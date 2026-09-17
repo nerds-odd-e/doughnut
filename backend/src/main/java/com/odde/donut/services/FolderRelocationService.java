@@ -124,7 +124,10 @@ public class FolderRelocationService {
         notebook.getId(),
         locked -> {
           Notebook liveNotebook =
-              locked.map(NotebookGitStateLoader.LockedNotebookState::notebook).orElse(notebook);
+              locked
+                  .state(notebook.getId())
+                  .map(NotebookGitStateLoader.LockedNotebookState::notebook)
+                  .orElse(notebook);
           Folder liveFolder =
               folderRepository
                   .findById(folderId)

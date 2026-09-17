@@ -9,8 +9,12 @@ import com.odde.donut.services.notebookExport.NotebookExportRows;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
@@ -37,8 +41,7 @@ public class AcceptedWebChangeService {
 
   @FunctionalInterface
   public interface CompleteOperation<T> {
-    T run(Optional<NotebookGitStateLoader.LockedNotebookState> locked)
-        throws UnexpectedNoAccessRightException;
+    T run(LockedNotebooks locked) throws UnexpectedNoAccessRightException;
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
@@ -48,45 +51,78 @@ public class AcceptedWebChangeService {
       Function<T, String> commitMessage,
       Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
-    var lockedState = notebookGitStateLoader.findByNotebookIdForUpdate(notebookId);
-    if (lockedState.isEmpty()) {
-      return operation.run(lockedState);
-    }
+    return apply(Set.of(notebookId), operation, commitMessage, updatedAt);
+  }
 
-    NotebookGitStateLoader.LockedNotebookState state = lockedState.orElseThrow();
+  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+  public <T> T apply(
+      Set<Integer> notebookIds,
+      CompleteOperation<T> operation,
+      Function<T, String> commitMessage,
+      Timestamp updatedAt)
+      throws UnexpectedNoAccessRightException {
+    Map<Integer, NotebookGitStateLoader.LockedNotebookState> states = new LinkedHashMap<>();
+    List<OpenedNotebook> opened = new ArrayList<>();
+    try {
+      for (Integer notebookId : new TreeSet<>(notebookIds)) {
+        notebookGitStateLoader
+            .findByNotebookIdForUpdate(notebookId)
+            .ifPresent(
+                state -> {
+                  states.put(notebookId, state);
+                  opened.add(open(state));
+                });
+      }
+      T result = operation.run(new LockedNotebooks(states));
+      List<OpenedNotebook> matchedBefore =
+          opened.stream().filter(OpenedNotebook::matchedBefore).toList();
+      if (!matchedBefore.isEmpty()) {
+        entityPersister.flush();
+        String message = commitMessage.apply(result);
+        matchedBefore.forEach(notebook -> commitIfChanged(notebook, message, updatedAt));
+      }
+      return result;
+    } finally {
+      opened.forEach(notebook -> notebook.accepted().close());
+    }
+  }
+
+  private record OpenedNotebook(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitBundleImporter.ImportedBundle accepted,
+      boolean matchedBefore) {}
+
+  private OpenedNotebook open(NotebookGitStateLoader.LockedNotebookState state) {
     NotebookGitBinding binding = state.binding();
     ObjectId persistedAcceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    try (NotebookGitBundleImporter.ImportedBundle accepted =
-        NotebookGitBundleImporter.importMainHead(binding.getBundleBytes(), "accepted-bundle")) {
-      if (!accepted.mainHead().equals(persistedAcceptedHead)) {
-        throw new IllegalStateException("Accepted bundle main does not match its persisted head");
-      }
-      boolean acceptedTreeMatchedBeforeSave = acceptedTreeMatches(state, accepted);
-      T result = operation.run(lockedState);
-      if (!acceptedTreeMatchedBeforeSave) {
-        return result;
-      }
-      entityPersister.flush();
-      List<ExportFolderRow> currentFolders = notebookGitStateLoader.foldersOf(state.notebook());
-      List<Note> currentLiveNotes = notebookGitStateLoader.liveNotesOf(state.notebook());
-      if (projection.matchesAcceptedTree(
-          state.notebook(),
-          currentFolders,
-          currentLiveNotes,
-          accepted.repository(),
-          accepted.mainHead())) {
-        return result;
-      }
-
-      List<PortableTreeEntry> entries =
-          PortableTreeSnapshot.build(
-              state.notebook().getReadmeContent(),
-              currentFolders,
-              NotebookExportRows.notes(currentLiveNotes));
-      acceptedSnapshotPersistence.persist(
-          accepted, entries, binding, updatedAt, commitMessage.apply(result));
-      return result;
+    NotebookGitBundleImporter.ImportedBundle accepted =
+        NotebookGitBundleImporter.importMainHead(binding.getBundleBytes(), "accepted-bundle");
+    if (!accepted.mainHead().equals(persistedAcceptedHead)) {
+      accepted.close();
+      throw new IllegalStateException("Accepted bundle main does not match its persisted head");
     }
+    return new OpenedNotebook(state, accepted, acceptedTreeMatches(state, accepted));
+  }
+
+  private void commitIfChanged(OpenedNotebook notebook, String message, Timestamp updatedAt) {
+    NotebookGitStateLoader.LockedNotebookState state = notebook.state();
+    NotebookGitBundleImporter.ImportedBundle accepted = notebook.accepted();
+    List<ExportFolderRow> currentFolders = notebookGitStateLoader.foldersOf(state.notebook());
+    List<Note> currentLiveNotes = notebookGitStateLoader.liveNotesOf(state.notebook());
+    if (projection.matchesAcceptedTree(
+        state.notebook(),
+        currentFolders,
+        currentLiveNotes,
+        accepted.repository(),
+        accepted.mainHead())) {
+      return;
+    }
+    List<PortableTreeEntry> entries =
+        PortableTreeSnapshot.build(
+            state.notebook().getReadmeContent(),
+            currentFolders,
+            NotebookExportRows.notes(currentLiveNotes));
+    acceptedSnapshotPersistence.persist(accepted, entries, state.binding(), updatedAt, message);
   }
 
   private boolean acceptedTreeMatches(

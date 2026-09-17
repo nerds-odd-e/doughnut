@@ -10,7 +10,12 @@ import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Reduces a relationship note into a property of its resolved source note, in one accepted web
@@ -45,19 +50,29 @@ public class RelationReduceService {
   public NoteRealm reduceToSourceProperty(Note relationNote)
       throws UnexpectedNoAccessRightException {
     User viewer = authorizationService.getCurrentUser();
-    Integer notebookId = relationNote.getNotebook().getId();
+    Set<Integer> notebookIds =
+        Stream.of(
+                relationNote.getNotebook().getId(),
+                noteService.resolveRelationshipSource(relationNote, viewer).getNotebook().getId())
+            .collect(Collectors.toUnmodifiableSet());
     Integer relationNoteId = relationNote.getId();
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     String commitMessage = "Reduce relationship note: " + relationNote.getTitle();
     Note source =
         acceptedWebChangeService.apply(
-            notebookId,
-            lockedState -> {
+            notebookIds,
+            locked -> {
               Note note =
-                  webNoteEditService.resolveNoteWithinLockedStateOrRepository(
-                      lockedState, relationNoteId);
+                  webNoteEditService.resolveNoteWithinLockedNotebooksOrRepository(
+                      locked, relationNoteId);
               authorizationService.assertAuthorization(note);
               Note sourceNote = noteService.reduceRelationNoteToSourceProperty(note, viewer, now);
+              if (!notebookIds.contains(note.getNotebook().getId())
+                  || !notebookIds.contains(sourceNote.getNotebook().getId())) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "The relationship or its source note moved to another notebook; retry.");
+              }
               noteService.permanentlyRemove(
                   note, NoteTrashReferenceHandling.LEAVE_DEAD_LINKS, viewer);
               return sourceNote;

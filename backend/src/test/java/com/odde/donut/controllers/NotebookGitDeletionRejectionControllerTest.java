@@ -1,5 +1,7 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.controllers.NotebookGitRenameScoringBodies.SUBSTANTIAL_ORIGINAL_BODY;
+import static com.odde.donut.controllers.NotebookGitRenameScoringBodies.SUBSTANTIAL_UNRELATED_BODY;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
