@@ -222,7 +222,7 @@ ended up stale and empty, later deleted with nothing to deliver.
     this; a repeated `git status` check before delivery in the wrong
     checkout would also have surfaced it earlier.
 
-## DD-061 — Delegation guidance has no protocol for a subagent that dies mid-edit from an infrastructure error, leaving a silent partial change
+## DD-062 — Delegation guidance has no protocol for a subagent that dies mid-edit from an infrastructure error, leaving a silent partial change
 
 [Delegation](../dough-execute-plan/references/delegation.md) and
 [refactor return](../dough-post-change-refactor/SKILL.md#return-control) both
@@ -267,6 +267,6 @@ whether to retry, revert, or finish the work itself.
 
 ## Retention
 
-- Highest allocated local number: 61
+- Highest allocated local number: 62
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
