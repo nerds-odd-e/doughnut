@@ -28,6 +28,18 @@ is built from the current persisted tree, so newly constructed parents are
 included. Pre-existing projection drift remains unsynchronized and publication's
 final-result direction below remains intact.
 
+Owner direction, 2026-09-17: a web action whose complete domain operation
+touches notes in more than one notebook uses the same owner over the set of
+touched notebooks. Lock their bindings in ascending notebook-id order, apply
+the operation once, and append one accepted commit to each locked notebook
+whose tree changed, all in one transaction. The touched set is known before
+locking (for relationship reduction: the relationship note's notebook and the
+resolved source's notebook) and re-verified under the lock; a mismatch is
+refused, not silently committed elsewhere. Pre-existing drift keeps its
+per-notebook policy. Evidence: cross-notebook relationship reduction
+(SEED-025, plan 138). Cross-notebook move and cross-notebook referrer rewrites
+stay outside the owner until selected as stories.
+
 ## One final publication result
 
 Accumulate supported Git changes into one final correspondence between Portable
