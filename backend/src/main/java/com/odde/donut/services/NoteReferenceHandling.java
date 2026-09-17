@@ -19,7 +19,11 @@ import java.util.function.Consumer;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Applies note-delete reference policies (reduce-to-source / remove-from-properties). */
+/**
+ * Reduces a relationship note into a property of its resolved source note, and applies the
+ * note-delete reference policy that removes referrer property links (used for {@link
+ * com.odde.donut.controllers.dto.NoteDeleteReferenceHandling#REMOVE_FROM_PROPERTIES}).
+ */
 final class NoteReferenceHandling {
   private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
 
@@ -48,12 +52,10 @@ final class NoteReferenceHandling {
   /**
    * Parses {@code relationNote}, adds its relationship as a property on the resolved source note,
    * and rehomes every learner's note-level understanding tracker onto that property, regardless of
-   * {@code removedFromTracking}. {@code propertyKey}, when supplied, is used as-is (the trash
-   * reduce contract's client-computed label); otherwise the key is derived from the note's own
-   * {@code relation} frontmatter (hyphens become spaces). Returns the source note.
+   * {@code removedFromTracking}. The property key is derived from the note's own {@code relation}
+   * frontmatter (hyphens become spaces). Returns the source note.
    */
-  Note reduceRelationNoteToSourceProperty(
-      Note relationNote, String propertyKey, User viewer, Timestamp updatedAt) {
+  Note reduceRelationNoteToSourceProperty(Note relationNote, User viewer, Timestamp updatedAt) {
     RelationshipFrontmatter relationship =
         parseRelationshipFrontmatter(relationNote.getContent())
             .orElseThrow(
@@ -65,10 +67,7 @@ final class NoteReferenceHandling {
           HttpStatus.BAD_REQUEST,
           "This relationship note has body text and cannot be reduced to a property.");
     }
-    String effectivePropertyKey =
-        propertyKey == null || propertyKey.isBlank()
-            ? propertyKeyFromRelationScalar(relationship.relationScalar())
-            : propertyKey;
+    String effectivePropertyKey = propertyKeyFromRelationScalar(relationship.relationScalar());
     if (effectivePropertyKey == null || effectivePropertyKey.isBlank()) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");

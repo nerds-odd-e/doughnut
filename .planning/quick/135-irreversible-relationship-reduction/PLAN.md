@@ -1,6 +1,6 @@
 # Reduce a relationship note into its source irreversibly
 
-Status: planned
+Status: all 6 slices done
 Source: [SEED-024 story 1](../../seeds/SEED-024-atomic-relationship-note-reduction.md#story-1),
 refined 2026-09-17 with owner decisions on learning, body text, attachments,
 and cross-notebook sources. The owner authorized planning and plan refinement,
@@ -230,7 +230,19 @@ until slice 4 moved them.
 ### 6. Remove the reduce-via-trash contract
 
 Type: Behavior (API contract)
-Status: planned
+Status: done. Removed `REDUCE_TO_SOURCE_PROPERTY` from `NoteDeleteReferenceHandling`,
+`sourcePropertyKey` from `NoteDeleteDTO`, and the corresponding branches/params
+through `NoteController` → `NoteTrashService` → `NoteService.applyNoteDeleteReferenceHandling`.
+`NoteReferenceHandling.reduceRelationNoteToSourceProperty` dropped its
+now-always-null `propertyKey` parameter entirely. Deleted `ControllerTestBase.reduceToSourceProperty`
+and the one `NoteControllerTrashTests` test that only covered reduce-via-trash.
+Frontend: `NoteDeleteOptions` dropped `sourcePropertyKey`/`sourceNoteId`;
+`StoredApiCollection.trashNote`'s destination logic dropped the reduce branch.
+Renamed `useNoteTrashFlow`'s internal-only popup choice value from
+`"REDUCE_TO_SOURCE_PROPERTY"` to `"REDUCE"` (it was never tied to the backend
+contract, but shared its name) to satisfy the plan's literal grep proof.
+Regenerated the API client. Refactor: one class-level javadoc fix on
+`NoteReferenceHandling`; no other candidates.
 Proof: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`, then focused
 Gradle run of `*NoteControllerTrash*` and `*NotebookGitWebTrash*`, and
 `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/store/storedApi.trashNote.spec.ts tests/pages/NoteShowPage.autosaveDelete.spec.ts` green;

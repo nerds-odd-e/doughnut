@@ -334,8 +334,7 @@ export type SpellingVerificationResult = {
 };
 
 export type NoteDeleteDto = {
-    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS' | 'REDUCE_TO_SOURCE_PROPERTY';
-    sourcePropertyKey?: string;
+    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS';
 };
 
 export type SearchTerm = {

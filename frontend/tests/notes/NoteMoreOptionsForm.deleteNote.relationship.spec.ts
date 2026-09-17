@@ -41,7 +41,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
 
     ;(deleteNoteButton(wrapper).element as HTMLButtonElement).click()
 
-    usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
+    usePopups().popups.done("REDUCE")
     await flushPromises()
 
     expect(loadingModalMask()).toBeTruthy()
@@ -85,7 +85,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
       `Trash "${relationNote.noteTopology.title}"`
     )
 
-    usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
+    usePopups().popups.done("REDUCE")
     await flushPromises()
 
     expect(reduceSpy).toHaveBeenCalledWith({

@@ -28,8 +28,6 @@ export type NoteDeleteReferenceHandling = NoteDeleteDto["referenceHandling"]
 
 export type NoteDeleteOptions = {
   referenceHandling: NoteDeleteReferenceHandling
-  sourcePropertyKey?: string
-  sourceNoteId?: number
 }
 
 export type TitleRenameReferenceHandling = NonNullable<
@@ -136,13 +134,7 @@ export interface StoredApi {
 }
 
 function noteReferenceHandlingBody(options: NoteDeleteOptions): NoteDeleteDto {
-  const body: NoteDeleteDto = {
-    referenceHandling: options.referenceHandling,
-  }
-  if (options.sourcePropertyKey !== undefined) {
-    body.sourcePropertyKey = options.sourcePropertyKey
-  }
-  return body
+  return { referenceHandling: options.referenceHandling }
 }
 
 export default class StoredApiCollection implements StoredApi {
@@ -500,7 +492,6 @@ export default class StoredApiCollection implements StoredApi {
     noteId: Donut.ID,
     options: NoteDeleteOptions
   ) {
-    const { referenceHandling, sourceNoteId } = options
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")
     const body = noteReferenceHandlingBody(options)
@@ -520,15 +511,12 @@ export default class StoredApiCollection implements StoredApi {
       originalFolderId
     )
     const destination =
-      referenceHandling === "REDUCE_TO_SOURCE_PROPERTY" &&
-      sourceNoteId !== undefined
-        ? noteShowLocation(sourceNoteId)
-        : originalFolderId != null
-          ? {
-              name: "folderPage",
-              params: { notebookId, folderId: originalFolderId },
-            }
-          : { name: "notebookPage", params: { notebookId } }
+      originalFolderId != null
+        ? {
+            name: "folderPage",
+            params: { notebookId, folderId: originalFolderId },
+          }
+        : { name: "notebookPage", params: { notebookId } }
     await router.replace(destination)
     this.storage.refreshNoteRealm(trashedRealm)
     refreshSidebarStructuralListings()

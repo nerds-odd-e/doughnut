@@ -128,10 +128,7 @@ class NoteController {
     authorizationService.assertAuthorization(note);
     return noteRealmService.build(
         noteTrashService.trash(
-            note.getId(),
-            note.getNotebook().getId(),
-            noteDeleteDTO.getReferenceHandling(),
-            noteDeleteDTO.getSourcePropertyKey()),
+            note.getId(), note.getNotebook().getId(), noteDeleteDTO.getReferenceHandling()),
         authorizationService.getCurrentUser());
   }
 

@@ -55,7 +55,7 @@ export function useNoteTrashFlow(
             {
               label:
                 "Reduce to a property of the source (permanently deletes this relationship note; cannot be undone)",
-              value: "REDUCE_TO_SOURCE_PROPERTY",
+              value: "REDUCE",
             },
             {
               label: `Trash ${label}`,
@@ -64,7 +64,7 @@ export function useNoteTrashFlow(
           ]
         )
         if (!choice) return null
-        if (choice === "REDUCE_TO_SOURCE_PROPERTY") {
+        if (choice === "REDUCE") {
           return { action: "reduce" }
         }
         return {

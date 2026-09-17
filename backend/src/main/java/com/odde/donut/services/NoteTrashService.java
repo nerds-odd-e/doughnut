@@ -35,10 +35,7 @@ public class NoteTrashService {
   }
 
   public Note trash(
-      Integer noteId,
-      Integer notebookId,
-      NoteDeleteReferenceHandling referenceHandling,
-      String sourcePropertyKey)
+      Integer noteId, Integer notebookId, NoteDeleteReferenceHandling referenceHandling)
       throws UnexpectedNoAccessRightException {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return webNoteEditService.edit(
@@ -46,7 +43,7 @@ public class NoteTrashService {
         notebookId,
         note -> {
           noteService.applyNoteDeleteReferenceHandling(
-              note, referenceHandling, sourcePropertyKey, authorizationService.getCurrentUser());
+              note, referenceHandling, authorizationService.getCurrentUser());
           Folder trashParent =
               folderConstructionService.ensureTrashParentFor(
                   note.getNotebook(), FolderTrailSegments.fromRootToContainingFolder(note));

@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -16,7 +15,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +25,6 @@ class NoteControllerTrashTests extends ControllerTestBase {
   @Autowired NoteController controller;
   @Autowired MemoryTrackerController memoryTrackerController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
-  @Autowired NoteReferenceService noteReferenceService;
   @Autowired TextContentController textContentController;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
@@ -181,25 +178,5 @@ class NoteControllerTrashTests extends ControllerTestBase {
 
     assertThat(referrer.getContent(), equalTo("---\ntype: Note\n---\nBody"));
     assertThat(target.isTrashed(), equalTo(true));
-  }
-
-  @Test
-  void trashAppliesReduceToSourceReferenceChoiceWithoutSoftDeletingTheRelation()
-      throws UnexpectedNoAccessRightException {
-    Note source = makeMe.aNote("Moon").notebookOwnedBy(currentUser.getUser()).please();
-    Note target = makeMe.aNote("Earth").underSameNotebookAs(source).please();
-    Note relation =
-        makeMe
-            .aNote()
-            .underSameNotebookAs(source)
-            .asRelationship("a part of", source, target)
-            .please();
-    noteReferenceService.refreshDerivedIndexesForNote(relation);
-
-    controller.trashNote(relation, reduceToSourceProperty("a part of"));
-
-    assertThat(source.getContent(), containsString("a part of"));
-    assertThat(source.getContent(), containsString("[[Earth]]"));
-    assertThat(relation.isTrashed(), equalTo(true));
   }
 }
