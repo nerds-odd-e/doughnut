@@ -339,8 +339,57 @@ full subagent turn (~6 minutes, ~86k tokens) with no usable output.
     concurrently-running subagent reading the same files and burn a full
     subagent turn on a stop neither side could have avoided once started.
 
+## DD-064 — ci-mailbox.mjs's CLI dispatch silently no-ops when invoked through the `.claude/skills` symlink instead of its `.agents/skills` realpath
+
+`ci-mailbox.mjs`'s main-module guard
+(`process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href`)
+compares the invoked path against the module's symlink-resolved URL. This
+project's own Nix shell setup (`scripts/shell_setup.sh`) deliberately
+symlinks `.claude/skills/<name>` to `.agents/skills/<name>` in every
+checkout/worktree so Claude Code can discover skills, and
+`references/runtime-setup.md` documents `.claude/skills/dough-execute-plan`
+as the normal Claude Code script path. Invoking
+`node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe` (or
+`start`/`register-push`/`stop`) makes Node resolve `import.meta.url` to the
+real, post-symlink `.agents/skills/...` path while `process.argv[1]` keeps
+the invoked `.claude/skills/...` path, so the strict equality check fails,
+the CLI dispatch branch never runs, and the process exits 0 with zero
+stdout — no error, no `CI_OBSERVER` receipt, no diagnostic. The identical
+command run via the `.agents/skills/...` realpath works correctly and prints
+the expected receipt. The failure mode (silent success-looking no-op, not a
+stop or error) is worse than `runtime-setup.md`'s existing checkout-identity
+guidance anticipates: a coordinator following the documented path literally
+gets nothing, which is easy to mistake for a successful no-op rather than an
+untriggered CLI guard.
+
+### Occurrences
+
+- Execution: SEED-024 story 1 / quick/135-irreversible-relationship-reduction
+  - Timestamp: 2026-09-17, evening +08:00 (during CI-observer arming before
+    slice 1 delegation)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
+    run from the execution worktree root produced no stdout and exit code 0;
+    an inline `node -e` script importing the same file's `probeMailbox` export
+    directly worked and returned a directory; `node .agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
+    then printed `CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-oZWLUN"}`
+    and the PostToolUse hook added `CI_MONITOR_READY` context, confirming the
+    realpath invocation was the fix.
+  - Observed effect: no lost coverage — the silent no-op was caught by testing
+    an inline import before trusting the CLI, and the observer was armed
+    successfully via the realpath before any slice was delegated — but it
+    cost extra diagnostic steps, and a less cautious run could have proceeded
+    believing CI observation was set up when it was not.
+  - Inference: the CLI entry guard should compare canonicalized/realpath forms
+    of `process.argv[1]` and the module path (or otherwise detect direct
+    invocation more robustly than exact string equality against a path that
+    may traverse a project-standard symlink), since this project's own setup
+    deliberately creates that exact symlink in every checkout.
+
 ## Retention
 
-- Highest allocated local number: 63
+- Highest allocated local number: 64
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
