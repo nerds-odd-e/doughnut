@@ -10,8 +10,8 @@ either the remote or local repository may be multiple commits behind.
 ## Taken
 - [Reduce a relationship note into its source in one irreversible action](seeds/SEED-024-atomic-relationship-note-reduction.md#story-1) — SEED-024 — [plan](quick/135-irreversible-relationship-reduction/PLAN.md)
 - [Use trash vocabulary for recoverable note removal](seeds/SEED-020-trash-vocabulary.md#story-1) — SEED-020 — [plan](quick/136-trash-vocabulary/PLAN.md)
+- [Retire the spent notebook rebaseline migration](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-44) — SEED-009 — [plan](quick/137-retire-notebook-rebaseline-migration/PLAN.md)
 
 ## Backlog list
 - [Reduce a relationship into a source note in another notebook](seeds/SEED-025-cross-notebook-relationship-reduction.md#story-1) — SEED-025
-- [Retire the spent notebook rebaseline migration](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-44) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018

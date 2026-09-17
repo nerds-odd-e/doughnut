@@ -95,13 +95,13 @@ data; invalid or ambiguous changes must not silently discard work.
   deliberately retained long-lived environment, must confirm that version
   `300000330` is recorded as successful in `flyway_schema_history`. Deleting it
   earlier would leave unconverted notebooks on their abandoned history
-  permanently. As of 2026-09-17, release tag `v1.3.7` contains the migration;
-  successful production application is **not yet confirmed**. Do not take or
-  execute this story before that confirmation. Deployment and confirmation are
+  permanently. Release tag `v1.3.7` contains the migration, and the owner
+  confirmed successful production application on 2026-09-17. Deployment and confirmation are
   manual owner actions, not implementation scope.
 - **Value / learning:** The migration is intentionally temporary; removal keeps
   the notebook-Git service surface limited to live runtime paths.
-- **Effort / status:** Refined 2026-09-17; not yet planned. S (30–60 minutes),
+- **Effort / status:** Refined and planned 2026-09-17
+  ([plan](../quick/137-retire-notebook-rebaseline-migration/PLAN.md)). S (30–60 minutes),
   moderate-high confidence: the caller graph is three files plus guidance, and
   the earlier cleanup is a direct precedent.
 - **Depends on / safe stopping point:** the production confirmation above.
@@ -112,8 +112,7 @@ data; invalid or ambiguous changes must not silently discard work.
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 
-Story 44 cannot be taken until the target environment confirms story 43's
-migration succeeded. It then removes the spent migration and its migration-only
+Story 44's production prerequisite was confirmed on 2026-09-17. It removes the spent migration and its migration-only
 complexity without changing the replacement root or later accepted history.
 
 Completed stories 20 and 25 supply accumulated local publication and web-note
