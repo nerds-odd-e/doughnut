@@ -206,7 +206,16 @@ wait is an accepted focused-test exception to the slice time target.
 ### 5. Refuse reduction that would lose body text or cannot resolve its source
 
 Type: Behavior
-Status: planned
+Status: done. Added a body-text refusal check in
+`NoteReferenceHandling.reduceRelationNoteToSourceProperty`, right after
+frontmatter parsing and before any other computation or mutation, reusing the
+pre-existing `NoteContentMarkdown.isBodyContentBlank` helper (structurally
+blind to frontmatter keys, so extra frontmatter properties don't trigger it).
+New tests `refusesToReduceARelationshipNoteThatHasBodyText` and
+`refusesToReduceARelationshipNoteWhoseSourceCannotBeResolved` in
+`RelationControllerReduceToSourcePropertyTests`; the latter pins pre-existing
+behavior (no production fix needed — `resolveRelationshipSourceNote` already
+refused an unresolved source). Refactor: no candidates, already clean.
 Proof: focused Gradle run of `*RelationControllerReduceToSourceProperty*` green
 with both refusal cases.
 

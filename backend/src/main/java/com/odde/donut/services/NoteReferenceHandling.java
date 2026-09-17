@@ -60,6 +60,11 @@ final class NoteReferenceHandling {
                 () ->
                     new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
+    if (!NoteContentMarkdown.isBodyContentBlank(relationNote.getContent())) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "This relationship note has body text and cannot be reduced to a property.");
+    }
     String effectivePropertyKey =
         propertyKey == null || propertyKey.isBlank()
             ? propertyKeyFromRelationScalar(relationship.relationScalar())
