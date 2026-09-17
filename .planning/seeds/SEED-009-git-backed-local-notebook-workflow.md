@@ -118,6 +118,85 @@ data; invalid or ambiguous changes must not silently discard work.
   the concrete nested production-like example, and the controlled deep-folder
   reproduction established the current defect.
 
+<a id="story-42"></a>
+
+### 42. Manually validate the complete append-only notebook workflow
+
+- **Goal / beneficiary:** A notebook owner and product owner have current,
+  externally observed evidence that one Git-backed notebook can move between
+  Donut and ordinary local tools without copying work, rewriting accepted
+  or local notebook history, or separating a note from its identity and
+  learning history.
+- **Why now:** The individual append-only capabilities have been delivered and
+  proved automatically, but the complete owner journey has not received one
+  bounded manual evaluation against the current product. Relying only on the
+  component and E2E evidence is the strongest smaller alternative; it does not
+  assess the joined browser, installed CLI, local Git, guidance, and refusal
+  experience as an owner encounters it.
+- **Scope:** Spend at most one hour preparing and manually observing the second
+  paragraph of the backlog's near-future direction in one isolated E2E
+  environment. Use the browser, installed CLI, and ordinary Git from the
+  Story Branch Mode execution worktree. Cover both linear lag directions: a
+  clean local checkout receives several accepted web commits by fast-forward,
+  and the remote accepts several local commits as their original contiguous
+  chain. Exercise representative content editing, rename or movement with
+  content change, stable note identity, and retained learning state. Observe
+  the product's owner-facing guidance as part of the journey.
+- **Append-only boundary:** Independently advanced local and accepted histories
+  are not reconciled. With unpublished local work and a newer accepted head,
+  pull must refuse clearly while leaving the local head, files, index, and
+  accepted history unchanged. No rebase, merge-based reconciliation, replayed
+  replacement commit, or conflict-resolution journey is accepted behavior.
+  The existing source audit predicts contrary rebase/replay behavior; manual
+  execution must observe the product rather than treat that audit as the test
+  result.
+- **Key examples:**
+  1. From a clean clone, make two local commits that rename or move and edit one
+     learned note, publish once, and receive the result in another clean clone.
+     Donut retains the original note route and learning state, the receiver has
+     the exact final bytes, and the original local commits remain the accepted
+     ancestor chain.
+  2. From a clean clone, make several accepted web changes to that notebook,
+     including an ordinary edit and rename or move, then pull once. The checkout
+     fast-forwards through every accepted commit to the final paths and bytes
+     without a second copy or rewritten commit.
+  3. From a clean clone, commit unpublished local work and independently append
+     a web change. Pull refuses without changing either history or starting a
+     Git operation; the owner keeps both bodies of work and receives guidance
+     consistent with the append-only boundary.
+- **Manual-testing contract:** Apply `dough-manual-testing` for the one-hour
+  coverage, evidence, and report policy, and the repository `manual-testing`
+  skill for browser operation. Breadth comes before depth. Reuse existing
+  setup and automated evidence where it is sufficient; do not spend the hour
+  replaying a deterministic matrix. If the planned observations finish with no
+  actionable finding or material uncertainty, report `Good.`; otherwise report
+  only discrepancies, unresolved expectations, improvements, and material
+  coverage gaps with evidence. Do not diagnose or repair findings during this
+  story.
+- **Time budget:** 60 minutes total from manual environment preparation through
+  the observation report: 10 minutes preparation, 25 minutes breadth across the
+  two linear directions and divergence refusal, 15 minutes selective depth on
+  identity/learning/history and any surprise, and 10 minutes confirmation and
+  reporting reserve. Stop at the budget and report unobserved promises as
+  coverage gaps rather than extending the session.
+- **Boundaries:** This is manual evaluation, not another automated acceptance
+  suite, performance validation, a rebase/merge implementation, projection-
+  drift recovery, cross-notebook synchronization, native Git transport, or a
+  repair story. It does not cover the independent incoming-reference defect or
+  the 10,000-note performance story. Temporary setup artifacts must remain
+  isolated and be removed; findings do not authorize product changes.
+- **Execution:** Run the plan through `dough-execute-plan` in its default Story
+  Branch Mode (no `--trunk` and no current-branch override), so the queue claim,
+  isolated worktree, observation, and delivery evidence follow the normal
+  planned-execution lifecycle. [Slice plan](../quick/131-manually-validate-append-only-notebook-workflow/PLAN.md).
+- **Effort / status:** Refined, planned, and queued. One 60-minute manual
+  observation slice; environment startup and coverage selection are bounded by
+  the same testing budget. No product-scope decision remains open.
+- **Depends on / safe stopping point:** The delivered append-only Git-backed
+  workflow and its existing testability/CLI setup. The report remains useful
+  even when it finds discrepancies or later feature work is cancelled; it must
+  not claim unobserved behavior.
+
 <a id="story-23"></a>
 
 ### Former story 23 — Receive a web note deletion locally
@@ -541,19 +620,21 @@ compatibility.
 
 The owner initially placed the incoming-reference correction in story 41 first,
 then moved it to the bottom on 2026-09-15 after manual testing could not
-reproduce the production report and the behavior appeared already fixed.
+reproduce the production report. The deeper-folder reproduction on 2026-09-17
+made it actionable again, and it is now Taken with a slice plan.
 
 Folder Trash with ordinary Move now supplies the complete folder round trip.
 The 2026-09-16 direction ends additional trash feature development: Restore is
-no longer selected. Story 41 remains non-actionable without a new reproduction.
-Recommend performance validation next in the current queue. Story 39
-was identified as the first post-release cleanup; story
+no longer selected. Story 42 is now the first queued item and owns the one-hour
+manual validation of the completed append-only local/web workflow; publication-
+scale validation remains after it. Story 39 was identified as the first post-
+release cleanup; story
 38 is retained in this seed but was removed from the backlog on 2026-09-16
 because the clarified repeated-trash journey already works and Undo is deferred.
 
-After the production release, retire the spent migration support (story 39),
-then keep remaining Git stories 20 and 25 in relative order. Story 38 is no
-longer selected for delivery. Former story 23 is
+Completed stories 20 and 25 supply accumulated local publication and web-note
+movement evidence to story 42; they are not remaining queue items. Story 38 is
+no longer selected for delivery. Former story 23 is
 absorbed into portable-trash Git publication because its deletion-sync scope
 overlaps the trash lifecycle; its outcome is retained rather than cancelled.
 Publication performance remains the next selected Git-scale item.
