@@ -93,10 +93,24 @@ so database-ERD regeneration is not selected.
 ### 1. A migration-capable owner can build one current replacement root
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:verify` keeps current
 backend and Flyway behavior green while the immediate fleet Behavior is added
 next.
+
+Delivered: restored `NotebookGitRows` and `NotebookGitBaselineRebuild` under
+`backend/src/main/java/com/odde/donut/services/notebookGit/`, adapted from the
+code retired at `ee1f2d254aa270d1b830b945754fcc2479ba23bb`. Every query, column
+mapping, and collaborator call site (`PortableTreeSnapshot.build`,
+`NotebookGitBundleBuilder.build`, `NotebookGitBundleWriter.write`,
+`NotebookGitCutoverService`'s system-author/message constants) already matched
+current schema and current APIs byte-for-byte; only Javadoc was reworded to
+drop a reference to the no-longer-existing `NotebookGitFleetCutoverBackfill`
+sibling and to state the no-soft-deletion/trash-inclusion rule explicitly.
+Neither class is wired into any production or migration path yet. Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` — BUILD SUCCESSFUL, full
+backend/Flyway suite green, both classes compile cleanly. Post-change refactor
+pass: `none — already clean`.
 
 Restore the retired raw-JDBC Portable-tree reader and atomic single-notebook
 baseline replacement as migration-owned support. Adapt queries and comments to
@@ -145,6 +159,12 @@ backend verification wait.
 
 ## Current decisions
 
+- Resolved execution identity (Story Branch Mode): originating checkout/branch
+  `/Users/terryyin/git/doughnut` on `main` (claim commit `ea9c1a899f`);
+  execution checkout/branch
+  `/Users/terryyin/git/doughnut-worktrees/132-rebaseline-existing-notebooks`
+  on `132-rebaseline-existing-notebooks`; integration checkout/branch and
+  authorized remote target: originating checkout, `main`, `origin`.
 - Destroy the complete prior accepted Git graph without backup; do not preserve
   even the original root.
 - Select only notebooks with `deleted_at IS NULL` and an existing binding.
@@ -156,9 +176,10 @@ backend verification wait.
   keep migration-only JDBC projection code temporary.
 - Leave cleanup queued as story 44 until the target environment confirms this
   migration completed.
-- Planning stops here. Execution, refactoring, formatting, commit, push, CI,
-  release, production confirmation, cleanup, retrospective, and story wrap-up
-  require their applicable later workflows or explicit authority.
+- Execution authorized and underway via `/dough-execute-plan 132`
+  (Story Branch Mode, branch `132-rebaseline-existing-notebooks`); production
+  confirmation, cleanup, retrospective, and story wrap-up still require their
+  applicable later workflows.
 
 ## Learnings
 
@@ -172,3 +193,20 @@ backend verification wait.
 - Current note persistence no longer has note soft deletion. Raw migration
   reads include every note row, while notebook `deleted_at` still defines the
   selected live fleet.
+- Slice 1 found zero current-schema drift from the retired implementation:
+  every query, column name, and collaborator API (`PortableTreeSnapshot`,
+  `NotebookGitBundleBuilder`, `NotebookGitBundleWriter`,
+  `NotebookGitCutoverService`) still matches exactly.
+- Reused `NotebookGitCutoverService.CUTOVER_COMMIT_MESSAGE` as-is for the
+  rebaseline replacement commit rather than inventing a distinct message.
+  Slice 2 should decide deliberately whether a rebaselined notebook's new root
+  should carry different wording than an ordinary creation-time cutover
+  commit, since right now the two are textually indistinguishable.
+- `notebook_git_binding` also has `amendment_head`, `amendment_note_id`, and
+  `amendment_last_changed_at` columns (added in `V300000321`, after the
+  retired implementation). Neither the historical nor the restored
+  `NotebookGitBaselineRebuild` touches them, so a rebaseline leaves any stale
+  amendment state referencing the abandoned history untouched. The plan's
+  scope does not mention amendment columns; slice 2 should confirm whether
+  this is an intended gap or needs explicit handling before registering the
+  migration.
