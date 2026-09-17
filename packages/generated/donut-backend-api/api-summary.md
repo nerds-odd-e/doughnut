@@ -71,6 +71,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Relation Controller
 
+- `reduceToSourceProperty`: POST `/api/relations/{relationNote}/reduce-to-source-property` -> `ReduceToSourcePropertyResponse` (request: `ReduceToSourcePropertyData`; path: relationNote; response body: NoteRealm)
 - `moveNoteToNotebookRoot`: POST `/api/relations/move-to-notebook-root/{sourceNote}` -> `MoveNoteToNotebookRootResponse` (request: `MoveNoteToNotebookRootData`; path: sourceNote; response body: Array<NoteRealm>)
 - `moveNoteToNotebookRootInNotebook`: POST `/api/relations/move-to-notebook-root/{sourceNote}/{targetNotebook}` -> `MoveNoteToNotebookRootInNotebookResponse` (request: `MoveNoteToNotebookRootInNotebookData`; path: sourceNote, targetNotebook; response body: Array<NoteRealm>)
 - `moveNoteToFolder`: POST `/api/relations/move-to-folder/{sourceNote}/{targetFolder}` -> `MoveNoteToFolderResponse` (request: `MoveNoteToFolderData`; path: sourceNote, targetFolder; response body: Array<NoteRealm>)

@@ -490,6 +490,24 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
+  /api/relations/{relationNote}/reduce-to-source-property:
+    post:
+      tags:
+      - relation-controller
+      operationId: reduceToSourceProperty
+      parameters:
+      - name: relationNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteRealm"
   /api/relations/move-to-notebook-root/{sourceNote}:
     post:
       tags:

@@ -46,18 +46,29 @@ final class NoteReferenceHandling {
     this.deleteOrphanImages = deleteOrphanImages;
   }
 
-  void reduceRelationNoteToSourceProperty(
+  /**
+   * Parses {@code relationNote}, adds its relationship as a property on the resolved source note,
+   * and rehomes the viewer's understanding tracker onto that property. {@code propertyKey}, when
+   * supplied, is used as-is (the trash reduce contract's client-computed label); otherwise the key
+   * is derived from the note's own {@code relation} frontmatter (hyphens become spaces). Returns
+   * the source note.
+   */
+  Note reduceRelationNoteToSourceProperty(
       Note relationNote, String propertyKey, User viewer, Timestamp updatedAt) {
-    if (propertyKey == null || propertyKey.isBlank()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");
-    }
     RelationshipFrontmatter relationship =
         parseRelationshipFrontmatter(relationNote.getContent())
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
+    String effectivePropertyKey =
+        propertyKey == null || propertyKey.isBlank()
+            ? propertyKeyFromRelationScalar(relationship.relationScalar())
+            : propertyKey;
+    if (effectivePropertyKey == null || effectivePropertyKey.isBlank()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");
+    }
     Note sourceNote =
         resolveRelationshipSourceNote(relationNote, relationship.sourceScalar(), viewer)
             .orElseThrow(
@@ -70,13 +81,24 @@ final class NoteReferenceHandling {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note.");
     }
-    String canonicalPropertyKey = PropertyKeyNaming.canonicalExampleOfFamilyKey(propertyKey);
+    String canonicalPropertyKey =
+        PropertyKeyNaming.canonicalExampleOfFamilyKey(effectivePropertyKey);
     NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
         NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
             sourceNote.getContent(), canonicalPropertyKey, relationship.targetScalar());
     persistReplacedAuthoredContent(sourceNote, addResult.content(), updatedAt, viewer);
     rehomeNoteLevelMemoryTrackerToSourceProperty(
         relationNote, sourceNote, addResult.resolvedKey(), viewer);
+    return sourceNote;
+  }
+
+  /** Same rule as frontend {@code relationTypeFromKebab}: hyphens become spaces, trimmed. */
+  private static String propertyKeyFromRelationScalar(String relationScalar) {
+    if (relationScalar == null) {
+      return null;
+    }
+    String derived = relationScalar.replace('-', ' ').trim();
+    return derived.isEmpty() ? null : derived;
   }
 
   void removeNoteLinksFromReferrerProperties(Note target, User viewer, Timestamp updatedAt) {
@@ -118,7 +140,8 @@ final class NoteReferenceHandling {
             });
   }
 
-  private record RelationshipFrontmatter(String sourceScalar, String targetScalar) {}
+  private record RelationshipFrontmatter(
+      String relationScalar, String sourceScalar, String targetScalar) {}
 
   private Optional<RelationshipFrontmatter> parseRelationshipFrontmatter(String content) {
     return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
@@ -136,7 +159,8 @@ final class NoteReferenceHandling {
               if (source.isEmpty() || target.isEmpty()) {
                 return Optional.empty();
               }
-              return Optional.of(new RelationshipFrontmatter(source.get(), target.get()));
+              String relation = fm.getString("relation").map(String::trim).orElse(null);
+              return Optional.of(new RelationshipFrontmatter(relation, source.get(), target.get()));
             });
   }
 

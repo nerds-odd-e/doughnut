@@ -16,6 +16,7 @@ import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.WikiLinkRewriteService;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.springframework.http.HttpStatus;
@@ -110,10 +111,7 @@ public class WebNoteEditService {
     return acceptedWebChangeService.apply(
         notebookId,
         lockedState -> {
-          Note note =
-              lockedState
-                  .map(state -> findNote(state, noteId))
-                  .orElseGet(() -> requireNote(noteId));
+          Note note = resolveNoteWithinLockedStateOrRepository(lockedState, noteId);
           if (!notebookId.equals(note.getNotebook().getId())) {
             throw noteNotFound();
           }
@@ -123,6 +121,16 @@ public class WebNoteEditService {
         },
         commitMessage,
         updatedAt);
+  }
+
+  /**
+   * Resolves the live note by id, preferring the locked Git state's snapshot so callers running
+   * inside {@link AcceptedWebChangeService#apply} mutate the same instance the projection compares
+   * against.
+   */
+  Note resolveNoteWithinLockedStateOrRepository(
+      Optional<NotebookGitStateLoader.LockedNotebookState> lockedState, Integer noteId) {
+    return lockedState.map(state -> findNote(state, noteId)).orElseGet(() -> requireNote(noteId));
   }
 
   private Note findNote(NotebookGitStateLoader.LockedNotebookState state, Integer noteId) {

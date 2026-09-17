@@ -101,7 +101,22 @@ Star change is warranted.
 ### 1. Reduce through a dedicated operation that permanently deletes
 
 Type: Behavior
-Status: planned
+Status: done. Added `POST /api/relations/{relationNote}/reduce-to-source-property`
+(`RelationController`) delegating to new `RelationReduceService`, which runs
+`AcceptedWebChangeService.apply`, calls `NoteService.reduceRelationNoteToSourceProperty`
+(new), then `NoteService.permanentlyRemove(..., LEAVE_DEAD_LINKS, viewer)`, and
+returns the source `NoteRealm`. `NoteReferenceHandling.reduceRelationNoteToSourceProperty`
+now returns the source `Note` and derives the property key from the relationship
+note's own `relation` frontmatter scalar (hyphens → spaces, trimmed) when no
+explicit key is supplied; the trash path's explicit-key behavior is unchanged.
+Extracted `WebNoteEditService.resolveNoteWithinLockedStateOrRepository` (package-private)
+so the new service reuses the same Git-locked-state note lookup as `edit()`.
+Ran `pnpm generateTypeScript`; generated client includes `reduceToSourceProperty`.
+Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --tests '*RelationControllerReduceToSourceProperty*'`
+green (`RelationControllerReduceToSourcePropertyTests`, examples 1 and 3);
+regression-checked `*RelationController*`, `*NoteControllerTrash*`,
+`*NotebookGitWebTrashLinkedReferrerControllerTest*`, and full `pnpm backend:test_only`
+green. Post-change refactor: no candidates, already clean.
 Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --tests '*RelationControllerReduceToSourceProperty*'` green.
 
 Given a same-notebook Moon→Earth "a part of" relationship with empty body (and,

@@ -1723,6 +1723,24 @@ export type SetCurrentModelVersionsResponses = {
 
 export type SetCurrentModelVersionsResponse = SetCurrentModelVersionsResponses[keyof SetCurrentModelVersionsResponses];
 
+export type ReduceToSourcePropertyData = {
+    body?: never;
+    path: {
+        relationNote: number;
+    };
+    query?: never;
+    url: '/api/relations/{relationNote}/reduce-to-source-property';
+};
+
+export type ReduceToSourcePropertyResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type ReduceToSourcePropertyResponse = ReduceToSourcePropertyResponses[keyof ReduceToSourcePropertyResponses];
+
 export type MoveNoteToNotebookRootData = {
     body?: never;
     path: {

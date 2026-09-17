@@ -147,6 +147,18 @@ public class NoteService {
     entityPersister.remove(note);
   }
 
+  /**
+   * Adds {@code relationNote}'s relationship as a property on its resolved source note, deriving
+   * the property key from the note's own {@code relation} frontmatter, and rehomes the viewer's
+   * understanding tracker onto that property. Returns the source note; does not remove {@code
+   * relationNote} itself.
+   */
+  public Note reduceRelationNoteToSourceProperty(
+      Note relationNote, User viewer, Timestamp updatedAt) {
+    return noteReferenceHandling.reduceRelationNoteToSourceProperty(
+        relationNote, null, viewer, updatedAt);
+  }
+
   public void applyNoteDeleteReferenceHandling(
       Note note,
       NoteDeleteReferenceHandling referenceHandling,
