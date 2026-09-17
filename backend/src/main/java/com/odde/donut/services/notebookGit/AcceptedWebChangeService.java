@@ -10,7 +10,7 @@ import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.function.Function;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
@@ -37,8 +37,7 @@ public class AcceptedWebChangeService {
 
   @FunctionalInterface
   public interface CompleteOperation<T> {
-    T run(Optional<NotebookGitStateLoader.LockedNotebookState> locked)
-        throws UnexpectedNoAccessRightException;
+    T run(LockedNotebooks locked) throws UnexpectedNoAccessRightException;
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
@@ -50,7 +49,7 @@ public class AcceptedWebChangeService {
       throws UnexpectedNoAccessRightException {
     var lockedState = notebookGitStateLoader.findByNotebookIdForUpdate(notebookId);
     if (lockedState.isEmpty()) {
-      return operation.run(lockedState);
+      return operation.run(new LockedNotebooks(Map.of()));
     }
 
     NotebookGitStateLoader.LockedNotebookState state = lockedState.orElseThrow();
@@ -62,7 +61,7 @@ public class AcceptedWebChangeService {
         throw new IllegalStateException("Accepted bundle main does not match its persisted head");
       }
       boolean acceptedTreeMatchedBeforeSave = acceptedTreeMatches(state, accepted);
-      T result = operation.run(lockedState);
+      T result = operation.run(new LockedNotebooks(Map.of(notebookId, state)));
       if (!acceptedTreeMatchedBeforeSave) {
         return result;
       }

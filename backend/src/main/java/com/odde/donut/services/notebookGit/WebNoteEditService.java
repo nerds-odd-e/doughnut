@@ -16,7 +16,6 @@ import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.WikiLinkRewriteService;
 import java.sql.Timestamp;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.springframework.http.HttpStatus;
@@ -110,8 +109,8 @@ public class WebNoteEditService {
       throws UnexpectedNoAccessRightException {
     return acceptedWebChangeService.apply(
         notebookId,
-        lockedState -> {
-          Note note = resolveNoteWithinLockedStateOrRepository(lockedState, noteId);
+        locked -> {
+          Note note = resolveNoteWithinLockedNotebooksOrRepository(locked, noteId);
           if (!notebookId.equals(note.getNotebook().getId())) {
             throw noteNotFound();
           }
@@ -124,20 +123,12 @@ public class WebNoteEditService {
   }
 
   /**
-   * Resolves the live note by id, preferring the locked Git state's snapshot so callers running
+   * Resolves the live note by id, preferring the locked notebooks' snapshots so callers running
    * inside {@link AcceptedWebChangeService#apply} mutate the same instance the projection compares
    * against.
    */
-  Note resolveNoteWithinLockedStateOrRepository(
-      Optional<NotebookGitStateLoader.LockedNotebookState> lockedState, Integer noteId) {
-    return lockedState.map(state -> findNote(state, noteId)).orElseGet(() -> requireNote(noteId));
-  }
-
-  private Note findNote(NotebookGitStateLoader.LockedNotebookState state, Integer noteId) {
-    return state.liveNotes().stream()
-        .filter(note -> noteId.equals(note.getId()))
-        .findFirst()
-        .orElseThrow(this::noteNotFound);
+  Note resolveNoteWithinLockedNotebooksOrRepository(LockedNotebooks locked, Integer noteId) {
+    return locked.liveNote(noteId).orElseGet(() -> requireNote(noteId));
   }
 
   private Note requireNote(Integer noteId) {

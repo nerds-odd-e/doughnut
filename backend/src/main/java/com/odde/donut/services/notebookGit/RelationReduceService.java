@@ -52,10 +52,10 @@ public class RelationReduceService {
     Note source =
         acceptedWebChangeService.apply(
             notebookId,
-            lockedState -> {
+            locked -> {
               Note note =
-                  webNoteEditService.resolveNoteWithinLockedStateOrRepository(
-                      lockedState, relationNoteId);
+                  webNoteEditService.resolveNoteWithinLockedNotebooksOrRepository(
+                      locked, relationNoteId);
               authorizationService.assertAuthorization(note);
               Note sourceNote = noteService.reduceRelationNoteToSourceProperty(note, viewer, now);
               noteService.permanentlyRemove(

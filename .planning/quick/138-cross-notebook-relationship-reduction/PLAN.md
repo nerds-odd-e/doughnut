@@ -150,7 +150,10 @@ slice.
 ### 2. Accepted web change operates on a locked notebook set
 
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `*NotebookGitWeb*`, `*RelationController*`,
+`*TextContentController*`, `*NotebookFolder*` green (235 tests) after
+refactor; covers Git-bound (one-entry) and plain (empty) `LockedNotebooks`.
 Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests '*NotebookGitWeb*' --tests '*RelationController*' -Dspring.profiles.active=test --build-cache`
 green; every existing caller still passes one notebook id.
 
@@ -160,7 +163,7 @@ states of the notebooks a web action locked, keyed by notebook id, with
 `Optional<Note> liveNote(noteId)` (a note found in any locked snapshot). The
 `CompleteOperation` receives `LockedNotebooks` instead of one
 `Optional<LockedNotebookState>`. `WebNoteEditService.
-resolveNoteWithinLockedStateOrRepository` becomes "locked snapshot, else
+resolveNoteWithinLockedNotebooksOrRepository` becomes "locked snapshot, else
 repository" through `liveNote`; `edit`'s notebook-id check is unchanged.
 `apply(Integer, …)` still locks exactly one binding. Enables slice 3.
 
@@ -248,3 +251,9 @@ pre-match against silently committing a drifted notebook.
   reduced value is `'[[Space topics:Earth|Earth]]'`. The plan examples were
   corrected; the seed's key example 1 still shows slash notation (fix at
   wrap-up).
+- `LockedNotebooks` snapshots hold every note of the notebook (trash is a
+  folder), so "snapshot, else repository" only reaches a note outside the
+  lock when it lives in another notebook. `edit` refuses that by notebook id;
+  reduction could only hit it via a concurrent move of the relationship note,
+  so slice 4's moved-note guard must check the relationship note's notebook
+  as well as the source's.
