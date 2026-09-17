@@ -1,6 +1,6 @@
 # Treat the whole note title as one recall value
 
-Status: planned
+Status: executed — all slices complete, `pnpm backend:test_only` green
 Source: [SEED-022 story 1](../../seeds/SEED-022-reconsider-slash-title-alias-removal.md#story-1),
 refined 2026-09-17 from the owner's clarified title semantics. The owner
 authorized planning, not execution.
@@ -102,7 +102,7 @@ controller proofs above.
 ### 1. Spelling verifies one whole title value
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` green, including
 the extended `NoteControllerVerifySpellingTests` cases.
 
@@ -116,7 +116,7 @@ path temporarily on its existing parser for slices 2 and 3.
 ### 2. Fullwidth slash and later tildes stay literal while masking
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` green, including
 the new slash/later-tilde and retained-leading-tilde cases in
 `RecallPromptSpellingStemMaskingControllerTest`.
@@ -131,7 +131,7 @@ its retired grammar; retain the trailing-qualifier path until slice 3.
 ### 3. Trailing brackets stay literal while masking
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` green, including
 the new literal-parentheses case in
 `RecallPromptSpellingStemMaskingControllerTest` and retained frontmatter-alias

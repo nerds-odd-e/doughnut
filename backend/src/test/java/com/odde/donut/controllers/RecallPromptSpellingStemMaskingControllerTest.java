@@ -83,4 +83,28 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
     assertThat(question.getStem(), containsString("Other Note"));
     assertThat(question.getStem(), not(containsString("<mark")));
   }
+
+  @Test
+  void spellingQuestionMasksWholeSlashTitleButNotSeparateSegments() {
+    makeMe
+        .theNote(answerNote)
+        .title("word／~logical")
+        .content("The exact word／~logical term differs from a separate word or logical mention.")
+        .please();
+
+    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+
+    assertThat(question.getStem(), not(containsString("word／~logical")));
+    assertThat(question.getStem(), containsString("a separate word or logical mention"));
+  }
+
+  @Test
+  void spellingQuestionStillMasksLeadingTildeSuffix() {
+    makeMe.theNote(answerNote).title("~logical").content("This claim is illogical.").please();
+
+    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+
+    assertThat(question.getStem(), containsString("<mark"));
+    assertThat(question.getStem(), not(containsString("logical.")));
+  }
 }

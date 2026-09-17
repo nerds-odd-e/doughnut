@@ -7,21 +7,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 record ClozeReplacement(
-    String partialMatchReplacement,
-    String fullMatchReplacement,
-    String pronunciationReplacement,
-    String fullMatchQualifierReplacement) {
+    String partialMatchReplacement, String fullMatchReplacement, String pronunciationReplacement) {
 
   private static final Pattern PRONUNCIATION =
       Pattern.compile(
           "/([^\\s/][^/\\n]*)/(?![a-zA-Z0-9_])",
           Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
 
-  private String maskAliasesAndQualifier(
+  private String maskTitleAndAliases(
       String pronunciationMasked, NoteTitle noteTitle, List<TitleFragment> extraAliases) {
     final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
     final String internalFullMatchReplacement = "__f_u_l_l__";
-    final String internalFullMatchReplacementForQualifier = "__f_u_l_l_q_u_a_l__";
 
     var aliases =
         TitleFragment.mergeSortedLongestFirst(noteTitle.getRecallTitleFragments(), extraAliases);
@@ -33,17 +29,9 @@ record ClozeReplacement(
     String step2 =
         replaceFragmentsWithInternalPlaceholder(
             aliases, step1, (p, t) -> t.replaceSimilar(p, internalPartialMatchReplacement));
-    String step3 =
-        noteTitle
-            .getQualifier()
-            .map(
-                qualifier ->
-                    qualifier.replaceLiteralWords(step2, internalFullMatchReplacementForQualifier))
-            .orElse(step2);
-    return step3
+    return step2
         .replace(internalFullMatchReplacement, fullMatchReplacement)
-        .replace(internalPartialMatchReplacement, partialMatchReplacement)
-        .replace(internalFullMatchReplacementForQualifier, fullMatchQualifierReplacement);
+        .replace(internalPartialMatchReplacement, partialMatchReplacement);
   }
 
   private static String replaceFragmentsWithInternalPlaceholder(
@@ -89,7 +77,7 @@ record ClozeReplacement(
     return noteTitles1.stream()
         .reduce(
             spellingRepeatsMasked,
-            (content, noteTitle) -> maskAliasesAndQualifier(content, noteTitle, extraAliases),
+            (content, noteTitle) -> maskTitleAndAliases(content, noteTitle, extraAliases),
             (s, s2) -> s)
         .replace(internalPronunciationReplacement, pronunciationReplacement)
         .replace(internalPronunciationSpellingReplacement, fullMatchReplacement)

@@ -37,6 +37,13 @@ class NoteControllerVerifySpellingTests extends ControllerTestBase {
     "colour／color, colour／color, true",
     "colour／color, color, false",
     "sedition, wrong answer, false",
+    "word／~logical, word／~logical, true",
+    "word／~logical, word, false",
+    "word／~logical, logical, false",
+    "cat(animal), cat(animal), true",
+    "cat(animal), cat, false",
+    "cat(animal), animal, false",
+    "~logical, logical, true",
   })
   void verifiesLiteralTitleSpelling(String title, String answer, boolean expected)
       throws UnexpectedNoAccessRightException {
