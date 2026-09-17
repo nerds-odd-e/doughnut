@@ -8,7 +8,7 @@ a single, append-only sequence of commits, with no branching or rebasing;
 either the remote or local repository may be multiple commits behind.
 
 ## Taken
+- [Reduce a relationship into a source note in another notebook](seeds/SEED-025-cross-notebook-relationship-reduction.md#story-1) — SEED-025 — plan: [138](quick/138-cross-notebook-relationship-reduction/PLAN.md)
 
 ## Backlog list
-- [Reduce a relationship into a source note in another notebook](seeds/SEED-025-cross-notebook-relationship-reduction.md#story-1) — SEED-025
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
