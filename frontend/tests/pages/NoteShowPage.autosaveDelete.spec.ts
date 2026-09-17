@@ -1,5 +1,6 @@
 import {
   NoteController,
+  RelationController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -99,7 +100,11 @@ describe("note show autosave before deletion", () => {
           .please()
       }
     )
-    const deleteSpy = mockSdkService(NoteController, "trashNote", relationRealm)
+    const deleteSpy = mockSdkService(
+      RelationController,
+      "reduceToSourceProperty",
+      relationRealm
+    )
     deleteSpy.mockImplementation(async () => {
       mutationOrder.push("delete")
       return wrapSdkError("delete failed")

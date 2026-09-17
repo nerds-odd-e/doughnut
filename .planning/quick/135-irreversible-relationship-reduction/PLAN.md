@@ -173,9 +173,26 @@ Replace the viewer/active-only filter in
 ### 4. The web client reduces permanently and lands on the source
 
 Type: Behavior
-Status: planned
-Proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts tests/store/storedApi.trashNote.spec.ts tests/pages/NoteShowPage.autosaveDelete.spec.ts tests/utils/relationNoteReduceOnDelete.spec.ts`
-green, then `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/relationships/relationship_edit_and_remove.feature` green.
+Status: done. Added `StoredApiCollection.reduceRelationNoteToSourceProperty`
+(calls `RelationController.reduceToSourceProperty`, navigates to the source,
+drops the relationship note from cache, refreshes the sidebar, no undo).
+`useNoteTrashFlow` now dispatches to it for the "reduce" choice via a
+`TrashFlowChoice` discriminated union; the trash choice keeps calling
+`trashNote` unchanged. Popup label now states permanence: "Reduce to a
+property of the source (permanently deletes this relationship note; cannot be
+undone)". Simplified `qualifyRelationNoteForReduceOnDelete` to a plain
+`isRelationshipNote` boolean gate (type-only; backend now resolves/derives
+everything else) — refactor removed the now-dead
+`relationTypeLabelFromNoteContent`/`relationKebabFromProperties` and their
+spec. E2E reduce scenarios moved onto a separate body-less Moon→Mars
+relationship, added per-scenario alongside the Background's with-body
+Moon→Earth relationship (still used by the relation-type-change scenario);
+page object's reduce-button matcher switched to a prefix regex so the longer
+label still matches. Old trash-based `REDUCE_TO_SOURCE_PROPERTY` contract
+left working and still tested (`storedApi.trashNote.spec.ts`'s last test
+unchanged) — slice 6 removes it.
+Proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts tests/store/storedApi.trashNote.spec.ts tests/pages/NoteShowPage.autosaveDelete.spec.ts tests/utils/relationNoteReduceOnDelete.spec.ts tests/store/storedApi.reduceRelationNoteToSourceProperty.spec.ts`
+green (15 tests), then `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/relationships/relationship_edit_and_remove.feature` green (5/5 scenarios).
 
 Given a relationship note shown in the web app, when the owner chooses
 "Reduce to a property of the source" (label also stating it permanently

@@ -1,14 +1,14 @@
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import { RelationController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import {
+  mockSdkService,
   mockSdkServiceWithImplementation,
-  wrapSdkResponse,
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
+import makeMe from "donut-test-fixtures/makeMe"
 import {
   deleteNoteButton,
-  deleteNoteSpy,
   loadingModalMask,
   mountDeleteFormReady,
   mountDeleteFormWithNotePropChange,
@@ -23,16 +23,19 @@ setupNoteMoreOptionsDeleteFormTests()
 
 describe("NoteMoreOptionsForm delete relationship note", () => {
   it("shows LoadingModal while reducing relationship note to source property", async () => {
-    let resolveDelete: () => void
-    const deleteHeld = new Promise<void>((r) => {
-      resolveDelete = r
+    let resolveReduce: () => void
+    const reduceHeld = new Promise<void>((r) => {
+      resolveReduce = r
     })
-    mockSdkServiceWithImplementation(NoteController, "trashNote", async () => {
-      await deleteHeld
-      return qualifyingRelationRealmForDelete().relationRealm
-    })
-
-    const { relationRealm } = qualifyingRelationRealmForDelete()
+    const { moonId, relationRealm } = qualifyingRelationRealmForDelete()
+    mockSdkServiceWithImplementation(
+      RelationController,
+      "reduceToSourceProperty",
+      async () => {
+        await reduceHeld
+        return makeMe.aNoteRealm.id(moonId).title("Moon").please()
+      }
+    )
     seedRelationRealmWithInboundReferences(relationRealm)
     const wrapper = await mountDeleteFormReady(relationRealm.note)
 
@@ -46,19 +49,19 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
       "Reducing to source property..."
     )
 
-    resolveDelete!()
+    resolveReduce!()
     await awaitDeleteSideEffects()
 
     expect(loadingModalMask()).toBeNull()
   })
 
   it("offers reduce-to-property using the current note after prop change without remount", async () => {
-    const { relationId, moonNote, relationNote } =
+    const { relationId, moonId, moonNote, relationNote } =
       relationNotesForPropChangeTest()
-    deleteNoteSpy.mockResolvedValue(
-      wrapSdkResponse(
-        qualifyingRelationRealmForDelete({ relationId }).relationRealm
-      )
+    const reduceSpy = mockSdkService(
+      RelationController,
+      "reduceToSourceProperty",
+      makeMe.aNoteRealm.id(moonId).title("Moon").please()
     )
     const wrapper = await mountDeleteFormWithNotePropChange(
       moonNote,
@@ -75,7 +78,9 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     expect(popup.message).toBe(
       `"${relationNote.noteTopology.title}" is a relationship. What should happen?`
     )
-    expect(popup.options[0]?.label).toBe("Reduce to a property of the source")
+    expect(popup.options[0]?.label).toMatch(
+      /^Reduce to a property of the source/
+    )
     expect(popup.options[1]?.label).toBe(
       `Trash "${relationNote.noteTopology.title}"`
     )
@@ -83,12 +88,8 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
     await flushPromises()
 
-    expect(deleteNoteSpy).toHaveBeenCalledWith({
-      path: { note: relationId },
-      body: {
-        referenceHandling: "REDUCE_TO_SOURCE_PROPERTY",
-        sourcePropertyKey: "a part of",
-      },
+    expect(reduceSpy).toHaveBeenCalledWith({
+      path: { relationNote: relationId },
     })
   })
 })

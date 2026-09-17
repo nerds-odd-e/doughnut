@@ -118,6 +118,15 @@ export interface StoredApi {
     options: NoteDeleteOptions
   ): Promise<NoteRealm | undefined>
 
+  /**
+   * Permanently reduces a relationship note into a property of its source.
+   * Records no undo and drops the relationship note from cache.
+   */
+  reduceRelationNoteToSourceProperty(
+    router: Router,
+    relationNoteId: Donut.ID
+  ): Promise<NoteRealm | undefined>
+
   moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID): Promise<void>
 
   moveNoteToNotebookRoot(
@@ -524,6 +533,24 @@ export default class StoredApiCollection implements StoredApi {
     this.storage.refreshNoteRealm(trashedRealm)
     refreshSidebarStructuralListings()
     return trashedRealm
+  }
+
+  async reduceRelationNoteToSourceProperty(
+    router: Router,
+    relationNoteId: Donut.ID
+  ) {
+    const { data: sourceRealm, error } = await apiCallWithLoading(() =>
+      RelationController.reduceToSourceProperty({
+        path: { relationNote: relationNoteId },
+      })
+    )
+    if (error || !sourceRealm) return
+
+    await router.replace(noteShowLocation(sourceRealm.id))
+    this.storage.removeNoteRealm(relationNoteId)
+    this.storage.refreshNoteRealm(sourceRealm)
+    refreshSidebarStructuralListings()
+    return sourceRealm
   }
 
   async moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID) {

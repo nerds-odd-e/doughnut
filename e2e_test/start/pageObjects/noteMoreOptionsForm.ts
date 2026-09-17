@@ -47,7 +47,7 @@ export const noteMoreOptions = () => {
       )
     },
     deleteNoteAndReduceToSourceProperty() {
-      trashNoteWithConfirmation('Reduce to a property of the source')
+      trashNoteWithConfirmation(/^Reduce to a property of the source/)
     },
     openQuestionList() {
       clickMoreOption(titles.questions)

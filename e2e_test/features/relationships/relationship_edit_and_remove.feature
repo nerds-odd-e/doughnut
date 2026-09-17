@@ -27,29 +27,32 @@ Feature: Relationship edit and remove
     Then I should see "Moon" has no relationship to "Earth"
 
   Scenario: Reducing a relationship to a source property on delete
-    When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
+    Given there is "a part of" relationship between note "Moon" and "Mars" in notebook "Space topics"
+    When I delete the relationship from "Moon" to "Mars" and reduce it to a property of the source
     And I open the note content markdown editor on note "Moon"
-    Then the note content markdown source should contain "a part of: '[[Earth]]'"
-    And I should see "Moon" has no relationship to "Earth"
+    Then the note content markdown source should contain "a part of: '[[Mars]]'"
+    And I should see "Moon" has no relationship to "Mars"
 
   Scenario: Reducing to source property uses a suffixed key when the property already exists
     Given note "Moon" has content:
       """
       ---
-      a part of: "[[Mars]]"
+      a part of: "[[Earth]]"
       ---
 
       """
-    When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
+    And there is "a part of" relationship between note "Moon" and "Mars" in notebook "Space topics"
+    When I delete the relationship from "Moon" to "Mars" and reduce it to a property of the source
     And I open the note content markdown editor on note "Moon"
-    Then the note content markdown source should contain "a part of 2: '[[Earth]]'"
-    And I should see "Moon" has no relationship to "Earth"
+    Then the note content markdown source should contain "a part of 2: '[[Mars]]'"
+    And I should see "Moon" has no relationship to "Mars"
 
   Scenario: Tracked relationship reduced keeps property memory tracker on source
-    Given the note "Moon a part of Earth" was assimilated on day 1
-    When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
+    Given there is "a part of" relationship between note "Moon" and "Mars" in notebook "Space topics"
+    And the note "Moon a part of Mars" was assimilated on day 1
+    When I delete the relationship from "Moon" to "Mars" and reduce it to a property of the source
     And I open the note content markdown editor on note "Moon"
-    Then the note content markdown source should contain "a part of: '[[Earth]]'"
-    And I should see "Moon" has no relationship to "Earth"
+    Then the note content markdown source should contain "a part of: '[[Mars]]'"
+    And I should see "Moon" has no relationship to "Mars"
     When I am assimilating the note "Moon"
     Then I should see a property memory tracker for "a part of"

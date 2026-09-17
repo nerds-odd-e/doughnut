@@ -5,7 +5,7 @@ import type {
   NoteDeleteOptions,
   NoteDeleteReferenceHandling,
 } from "@/store/StoredApiCollection"
-import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
+import { isRelationshipNote } from "@/utils/relationNoteReduceOnDelete"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
 import { toValue, type MaybeRefOrGetter } from "vue"
 import { useRouter } from "vue-router"
@@ -17,10 +17,12 @@ import {
 const REDUCE_TO_PROPERTY_LOADING_MESSAGE = "Reducing to source property..."
 const TRASH_LOADING_MESSAGE = "Trashing note..."
 
-function trashLoadingMessageFor(
-  referenceHandling: NoteDeleteReferenceHandling
-): string {
-  return referenceHandling === "REDUCE_TO_SOURCE_PROPERTY"
+type TrashFlowChoice =
+  | { action: "reduce" }
+  | { action: "trash"; options: NoteDeleteOptions }
+
+function loadingMessageFor(flowChoice: TrashFlowChoice): string {
+  return flowChoice.action === "reduce"
     ? REDUCE_TO_PROPERTY_LOADING_MESSAGE
     : TRASH_LOADING_MESSAGE
 }
@@ -39,19 +41,20 @@ export function useNoteTrashFlow(
   const noteHasReferences = () => (noteRealm()?.references?.length ?? 0) > 0
 
   const chooseTrashReferenceHandling =
-    async (): Promise<NoteDeleteOptions | null> => {
+    async (): Promise<TrashFlowChoice | null> => {
       const id = toValue(noteId)
       const title = toValue(noteTitle)
       const label = quotedNoteLabel(title, id)
-      const reduceQualification = qualifyRelationNoteForReduceOnDelete(
+      const noteIsRelationship = isRelationshipNote(
         storageAccessor.value.refOfNoteRealm(id).value
       )
-      if (reduceQualification) {
+      if (noteIsRelationship) {
         const choice = await popups.options(
           `${label} is a relationship. What should happen?`,
           [
             {
-              label: "Reduce to a property of the source",
+              label:
+                "Reduce to a property of the source (permanently deletes this relationship note; cannot be undone)",
               value: "REDUCE_TO_SOURCE_PROPERTY",
             },
             {
@@ -62,18 +65,20 @@ export function useNoteTrashFlow(
         )
         if (!choice) return null
         if (choice === "REDUCE_TO_SOURCE_PROPERTY") {
-          return {
-            referenceHandling: "REDUCE_TO_SOURCE_PROPERTY",
-            sourcePropertyKey: reduceQualification.sourcePropertyKey,
-            sourceNoteId: reduceQualification.sourceNoteId,
-          }
+          return { action: "reduce" }
         }
-        return { referenceHandling: "LEAVE_DEAD_LINKS" }
+        return {
+          action: "trash",
+          options: { referenceHandling: "LEAVE_DEAD_LINKS" },
+        }
       }
 
       if (!noteHasReferences()) {
         return (await popups.confirm(`Confirm to trash ${label}?`))
-          ? { referenceHandling: "LEAVE_DEAD_LINKS" }
+          ? {
+              action: "trash",
+              options: { referenceHandling: "LEAVE_DEAD_LINKS" },
+            }
           : null
       }
       const referenceHandling = (await popups.options(
@@ -90,25 +95,33 @@ export function useNoteTrashFlow(
           },
         ]
       )) as NoteDeleteReferenceHandling | null
-      return referenceHandling ? { referenceHandling } : null
+      return referenceHandling
+        ? { action: "trash", options: { referenceHandling } }
+        : null
     }
 
   const trashNote = async () => {
-    const trashChoice = await chooseTrashReferenceHandling()
-    if (!trashChoice) return
+    const flowChoice = await chooseTrashReferenceHandling()
+    if (!flowChoice) return
 
     await runWithBlockingApiLoading(async () => {
       const id = toValue(noteId)
       if (!(await closeAndFlushNoteContentMutations(id))) return
       const storage = storageAccessor.value
       try {
-        await storage.storedApi().trashNote(router, id, trashChoice)
+        if (flowChoice.action === "reduce") {
+          await storage
+            .storedApi()
+            .reduceRelationNoteToSourceProperty(router, id)
+        } else {
+          await storage.storedApi().trashNote(router, id, flowChoice.options)
+        }
       } finally {
         if (storage.refOfNoteRealm(id).value) {
           reopenNoteContentMutations(id)
         }
       }
-    }, trashLoadingMessageFor(trashChoice.referenceHandling))
+    }, loadingMessageFor(flowChoice))
   }
 
   return { trashNote }
