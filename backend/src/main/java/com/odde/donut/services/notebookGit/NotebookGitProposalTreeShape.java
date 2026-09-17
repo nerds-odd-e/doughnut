@@ -68,12 +68,17 @@ public final class NotebookGitProposalTreeShape {
       Function<List<ChangedDocument>, List<NoteChange>> admitConcepts) {
     List<ChangedDocument> containerDocuments = new ArrayList<>();
     List<ChangedDocument> conceptDocuments = new ArrayList<>();
+    List<ChangedDocument> addedEmptyFolderMarkers = new ArrayList<>();
     for (ChangedDocument document : documents) {
       if (document.role() == DocumentRole.CONTAINER) {
         if (document.kind() != ChangeKind.ADDED && document.kind() != ChangeKind.MODIFIED) {
           throw reservedFolderReadme(document.path());
         }
         containerDocuments.add(document);
+      } else if (isEmptyFolderMarker(document.path()) && document.kind() == ChangeKind.ADDED) {
+        // An added .keep marks a new empty Folder; it carries no note identity, so it bypasses
+        // note correspondence entirely rather than being dropped like other .keep changes.
+        addedEmptyFolderMarkers.add(document);
       } else {
         conceptDocuments.add(document);
       }
@@ -94,6 +99,7 @@ public final class NotebookGitProposalTreeShape {
       }
     }
     List<ChangedDocument> documentsToApply = new ArrayList<>(containerDocuments);
+    documentsToApply.addAll(addedEmptyFolderMarkers);
     Set<String> additionPathsFromDocuments = new HashSet<>();
     for (ChangedDocument document : conceptDocuments) {
       if (document.kind() == ChangeKind.ADDED && addedPaths.contains(document.path())) {
@@ -130,10 +136,15 @@ public final class NotebookGitProposalTreeShape {
         repository, acceptedHead, proposedHead);
   }
 
+  /** {@code .keep} marks an empty Folder; it carries no note or README identity. */
+  static boolean isEmptyFolderMarker(String path) {
+    return path.endsWith("/.keep");
+  }
+
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {
-      if (document.path().endsWith("/.keep")) {
+      if (isEmptyFolderMarker(document.path())) {
         continue;
       }
       if (document.role() == DocumentRole.CONTAINER) {

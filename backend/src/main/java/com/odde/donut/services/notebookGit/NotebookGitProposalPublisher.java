@@ -95,8 +95,13 @@ public class NotebookGitProposalPublisher {
     Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
     boolean emptyAcceptedNotebook = isEmptyAcceptedNotebook(folders, liveNotes, files);
     if (emptyAcceptedNotebook
-        && (documents.isEmpty()
-            || documents.stream().anyMatch(document -> !document.path().endsWith(".md")))) {
+        && (documents.stream().noneMatch(document -> document.path().endsWith(".md"))
+            || documents.stream()
+                .anyMatch(
+                    document ->
+                        !document.path().endsWith(".md")
+                            && !NotebookGitProposalTreeShape.isEmptyFolderMarker(
+                                document.path())))) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Initial publication requires a nonempty Markdown tree.");
     }

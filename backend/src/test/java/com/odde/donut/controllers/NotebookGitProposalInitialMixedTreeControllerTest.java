@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,34 @@ class NotebookGitProposalInitialMixedTreeControllerTest
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved folder readme.\n";
 
   @Autowired FolderRepository folderRepository;
+
+  @Test
+  void publishesInitialTreeContainingKeepMarkerAlongsideNotes() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("README.md", NOTEBOOK_README),
+                new NotebookGitProposalFile("Topic/A.md", "---\ntype: Note\n---\nA body.\n"),
+                new NotebookGitProposalFile("Empty/.keep", "")));
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+    }
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
+    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
+    assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(notes, hasSize(1));
+    assertThat(notes.getFirst().getTitle(), equalTo("A"));
+  }
 
   @ParameterizedTest
   @ValueSource(booleans = {false, true})

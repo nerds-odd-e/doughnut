@@ -45,8 +45,11 @@ class NotebookGitProposalDocumentApplication {
     String notebookReadmePath = null;
     List<String> folderReadmePaths = new ArrayList<>();
     List<String> conceptPaths = new ArrayList<>();
+    List<String> emptyFolderMarkerPaths = new ArrayList<>();
     for (ChangedDocument document : documents) {
-      if (document.role() == DocumentRole.CONCEPT) {
+      if (NotebookGitProposalTreeShape.isEmptyFolderMarker(document.path())) {
+        emptyFolderMarkerPaths.add(document.path());
+      } else if (document.role() == DocumentRole.CONCEPT) {
         conceptPaths.add(document.path());
       } else if ("README.md".equals(document.path())) {
         notebookReadmePath = document.path();
@@ -61,7 +64,10 @@ class NotebookGitProposalDocumentApplication {
         folderMaterialization.materialize(
             state.notebook(),
             state.folders(),
-            Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()).toList(),
+            Stream.concat(
+                    Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()),
+                    emptyFolderMarkerPaths.stream())
+                .toList(),
             proposal);
     List<ExportFolderRow> folders = stateLoader.foldersOf(state.notebook());
     List<Note> notes = new ArrayList<>(state.liveNotes());
