@@ -1,6 +1,6 @@
 # Reduce a relationship into a source note in another notebook
 
-Status: in progress
+Status: executed — awaiting retrospective and story wrap-up
 Source: [SEED-025 story 1](../../seeds/SEED-025-cross-notebook-relationship-reduction.md#story-1),
 refined 2026-09-17. Owner decisions: Option B (one accepted commit per
 touched notebook), priority kept. Execution authorized 2026-09-17
@@ -246,7 +246,12 @@ boundary.
 ### 6. Pre-existing drift in the source notebook keeps its per-notebook policy
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof:
+`NotebookGitWebRelationReduceControllerTest.reduceIntoDriftedSourceNotebookCommitsOnlyTheRelationshipNotebook`
+(Space topics one commit on previous head; Astronomy binding head unchanged;
+Moon has the property in the database); failed when drifted notebooks were
+temporarily committed. Refactor rerun green (4 tests).
 Proof: same test class green with the drift test.
 
 Behavior: "Astronomy" drifted before the action (Moon's content changed

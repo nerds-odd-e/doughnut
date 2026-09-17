@@ -51,36 +51,30 @@ class NotebookGitWebRelationReduceControllerTest extends NotebookGitWebContentCo
   @Test
   void reduceAcrossNotebooksAppendsOneAcceptedCommitToEachNotebookAndMovesTheTracker()
       throws Exception {
-    Notebook spaceTopics = createGitBackedNotebook("Space topics");
-    Notebook astronomy = createGitBackedNotebook("Astronomy");
-    Note moon = makeMe.aNote("Moon").notebook(astronomy).please();
-    Note relation = astronomyMoonAPartOfEarthRelationshipIn(spaceTopics);
-    MemoryTracker tracker = learnedTracker(relation, 0.3f);
-    String spaceTopicsHeadBefore =
-        snapshotCurrentPortableTree(spaceTopics).getAcceptedGitObjectId();
-    String astronomyHeadBefore = snapshotCurrentPortableTree(astronomy).getAcceptedGitObjectId();
+    CrossNotebookReduceFixture f = seedAstronomyMoonAPartOfSpaceTopicsEarth();
+    MemoryTracker tracker = learnedTracker(f.relation(), 0.3f);
 
-    relationController.reduceToSourceProperty(relation);
+    relationController.reduceToSourceProperty(f.relation());
 
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.SingleParentGitCommit astronomyCommit =
-          GitBundleTestReader.fetchSingleParentCommit(repo, downloadedBundle(astronomy));
-      assertThat(astronomyCommit.parent().name(), equalTo(astronomyHeadBefore));
+          GitBundleTestReader.fetchSingleParentCommit(repo, downloadedBundle(f.astronomy()));
+      assertThat(astronomyCommit.parent().name(), equalTo(f.astronomyHeadBefore()));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(repo, astronomyCommit.head(), "Moon.md"),
           containsString("[[Space topics:Earth|Earth]]"));
     }
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.SingleParentGitCommit spaceTopicsCommit =
-          GitBundleTestReader.fetchSingleParentCommit(repo, downloadedBundle(spaceTopics));
-      assertThat(spaceTopicsCommit.parent().name(), equalTo(spaceTopicsHeadBefore));
+          GitBundleTestReader.fetchSingleParentCommit(repo, downloadedBundle(f.spaceTopics()));
+      assertThat(spaceTopicsCommit.parent().name(), equalTo(f.spaceTopicsHeadBefore()));
       List<String> paths = GitBundleTestReader.pathsIn(repo, spaceTopicsCommit.head());
       assertThat(paths, hasItem("Earth.md"));
-      assertThat(paths, not(hasItem(relation.getTitle() + ".md")));
+      assertThat(paths, not(hasItem(f.relation().getTitle() + ".md")));
       assertThat(paths, everyItem(not(startsWith("_trash/"))));
     }
     MemoryTracker moved = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
-    assertThat(moved.getNote().getId(), equalTo(moon.getId()));
+    assertThat(moved.getNote().getId(), equalTo(f.moon().getId()));
     assertThat(moved.getPropertyKey(), equalTo("a part of"));
   }
 
@@ -108,11 +102,57 @@ class NotebookGitWebRelationReduceControllerTest extends NotebookGitWebContentCo
     assertThat(noteRepository.findById(relation.getId()).isPresent(), is(true));
   }
 
+  @Test
+  void reduceIntoDriftedSourceNotebookCommitsOnlyTheRelationshipNotebook() throws Exception {
+    CrossNotebookReduceFixture f = seedAstronomyMoonAPartOfSpaceTopicsEarth();
+    f.moon().setContent("Changed without a snapshot");
+    noteRepository.save(f.moon());
+
+    relationController.reduceToSourceProperty(f.relation());
+
+    try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit spaceTopicsCommit =
+          GitBundleTestReader.fetchSingleParentCommit(repo, downloadedBundle(f.spaceTopics()));
+      assertThat(spaceTopicsCommit.parent().name(), equalTo(f.spaceTopicsHeadBefore()));
+      assertThat(
+          GitBundleTestReader.pathsIn(repo, spaceTopicsCommit.head()),
+          not(hasItem(f.relation().getTitle() + ".md")));
+    }
+    assertThat(binding(f.astronomy()).getAcceptedGitObjectId(), equalTo(f.astronomyHeadBefore()));
+    String moonContent = noteRepository.findById(f.moon().getId()).orElseThrow().getContent();
+    assertThat(moonContent, containsString("a part of"));
+    assertThat(moonContent, containsString("[[Space topics:Earth|Earth]]"));
+  }
+
   byte[] downloadedBundle(Notebook notebook) throws UnexpectedNoAccessRightException {
     return controller
         .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
         .getBody();
   }
+
+  /** Snapshotted Space topics and Astronomy notebooks with Moon (Astronomy) a part of Earth. */
+  CrossNotebookReduceFixture seedAstronomyMoonAPartOfSpaceTopicsEarth()
+      throws UnexpectedNoAccessRightException {
+    Notebook spaceTopics = createGitBackedNotebook("Space topics");
+    Notebook astronomy = createGitBackedNotebook("Astronomy");
+    Note moon = makeMe.aNote("Moon").notebook(astronomy).please();
+    Note relation = astronomyMoonAPartOfEarthRelationshipIn(spaceTopics);
+    return new CrossNotebookReduceFixture(
+        spaceTopics,
+        astronomy,
+        moon,
+        relation,
+        snapshotCurrentPortableTree(spaceTopics).getAcceptedGitObjectId(),
+        snapshotCurrentPortableTree(astronomy).getAcceptedGitObjectId());
+  }
+
+  record CrossNotebookReduceFixture(
+      Notebook spaceTopics,
+      Notebook astronomy,
+      Note moon,
+      Note relation,
+      String spaceTopicsHeadBefore,
+      String astronomyHeadBefore) {}
 
   /** Earth plus a relationship note in {@code spaceTopics} whose source is Astronomy's Moon. */
   Note astronomyMoonAPartOfEarthRelationshipIn(Notebook spaceTopics) {
