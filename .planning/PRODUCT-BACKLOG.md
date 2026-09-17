@@ -12,5 +12,6 @@ either the remote or local repository may be multiple commits behind.
 - [Rebaseline every existing notebook from current Donut content](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-43) — SEED-009 — [plan](quick/132-rebaseline-existing-notebooks/PLAN.md)
 
 ## Backlog list
+- [Use trash vocabulary for recoverable note removal](seeds/SEED-020-trash-vocabulary.md#story-1) — SEED-020
 - [Retire the spent notebook rebaseline migration](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-44) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018

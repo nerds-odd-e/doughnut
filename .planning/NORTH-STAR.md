@@ -4,37 +4,29 @@
 
 For a synchronized Git-backed notebook, a successful web change must leave the
 database and accepted Portable tree describing the same result. Note editing,
-ordinary note and same-notebook folder movement, trash, and recovery share the
+ordinary note movement, and same-notebook folder movement share the
 accepted-change boundary:
 lock and load current state, apply the complete domain operation, read its
 final projection, and append one accepted commit in the same transaction.
-Trash is a move into a location, not Git deletion or a separate synchronization
-protocol. Destination construction, collision resolution, placement, and
-reference handling finish before the final snapshot. Newly created folders and
-all affected in-notebook authored content must be included. Do not commit each
+Destination construction, collision resolution, placement, and reference
+handling finish before the final snapshot. Newly created folders and all
+affected in-notebook authored content must be included. Do not commit each
 low-level placement or folder creation separately.
 
 Keep placement, folder construction, reference choices, and Portable encoding
 with their existing owners. Different domain recipes use one consistency owner;
 controllers must not independently reproduce Git history coordination. Existing
 web content/title edits, ordinary note moves, and same-notebook folder moves
-stay on that owner as trash and its existing recovery routes join it. Preserve
-non-Git behavior and the existing policy for pre-existing projection drift;
-this direction does not authorize silently adopting unsynchronized work. No new
-trash state, identity map, event journal, endpoint-specific snapshot algorithm,
-or story-shaped dispatch modes.
+stay on that owner. Preserve non-Git behavior and the existing policy for
+pre-existing projection drift; this direction does not authorize silently
+adopting unsynchronized work. No identity map, event journal, endpoint-specific
+snapshot algorithm, or story-shaped dispatch modes.
 
 Evidence and application: note editing, ordinary note and same-notebook folder
-movement, note trash, same-notebook folder Trash, and same-notebook immediate
-Undo append one accepted commit after the complete mutation. The snapshot is
-built from the current persisted tree, so newly constructed parents are
-included. Pre-existing projection drift remains unsynchronized. Local Git
-moves of notes and unchanged folder subtrees into or out of `_trash` are
-ordinary moves; publication that resolves them keeps the same identities and
-retained learning, and constructs destination parents through ordinary folder
-ownership. Recovery uses existing location and availability rules. It follows
-[Accepted ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash)
-and keeps publication's final-result direction below intact.
+movement append one accepted commit after the complete mutation. The snapshot
+is built from the current persisted tree, so newly constructed parents are
+included. Pre-existing projection drift remains unsynchronized and publication's
+final-result direction below remains intact.
 
 ## One final publication result
 
@@ -49,10 +41,9 @@ identity service, or dispatch mode per story.
 
 Evidence: accumulated linear ranges already publish by composing supported tip
 correspondence once, including in-place existing notebook and folder Readme
-edits applied through the existing container content owners. Trash-boundary
-note and exact-subtree folder moves use that same final-only path, including
-constructed destination parents. Remaining work still needs this shared
-final-only path for broader identity inference. Exact endpoint matching alone is not enough for rename-then-edit
+edits applied through the existing container content owners. Remaining work
+still needs this shared final-only path for broader identity inference. Exact
+endpoint matching alone is not enough for rename-then-edit
 continuity when correspondence must be inferred beyond already supported
 transitions. This topic follows the owner's final-only application direction in
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md#apply-one-final-projection-atomically)

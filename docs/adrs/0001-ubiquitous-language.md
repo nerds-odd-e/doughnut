@@ -2,6 +2,7 @@
 
 **Status:** Accepted  
 **Date:** 2026-09-01
+**Amended:** 2026-09-17 — Trash and permanent deletion terms, decided by Terry Yin
 **Decision makers:** Terry
 **Consulted:** (people / teams asked for advice)
 
@@ -26,6 +27,12 @@ terms here; do not supersede this ADR with a new one.
   of a notebook. Shown in the **notebook catalog**. Distinct from the
   **Readme**.
 - **Folder** — Hierarchical path segment inside a notebook
+- **Trash** — Recoverable removal of a note or folder by moving it beneath the
+  notebook-root `_trash/`. The entity keeps its identity and identity-bound
+  data, including learning history where applicable; moving it out recovers it.
+- **Permanent deletion** — Removal of an entity and its dependent data. It ends
+  that identity; recreating the same content, even at the same path, creates a
+  new identity.
 - **Portable notebook tree** — Canonical OKF-compatible Markdown
   representation of one **notebook** as files and folders. It does not use
   Donut server note IDs or SPA locations as notebook addresses and round-trips

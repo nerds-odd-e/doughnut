@@ -3,7 +3,9 @@
 **Status:** Accepted  
 **Date:** 2026-09-01
 **Amended:** 2026-09-13 — portable trash rules, decided by Terry Yin
+**Amended:** 2026-09-14 — folder trash rules, decided by Terry Yin
 **Amended:** 2026-09-15 — canonical empty-folder representation, decided by Terry Yin
+**Amended:** 2026-09-17 — trash collision wording aligned with delivered behavior, decided by Terry Yin
 **Decision makers:** Terry Yin  
 **Consulted:** None 
 
@@ -12,8 +14,8 @@
 Donut exports and syncs notebooks as a **Portable notebook tree**. That tree
 should follow the
 [Open Knowledge Format (OKF) v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
-so local copies work with OKF tooling, Obsidian-style editing, and future
-Git-native two-way synchronization. Git binding, identity projection, and
+so local copies work with OKF tooling, Obsidian-style editing, and Git-native
+two-way synchronization. Git binding, identity projection, and
 integration behavior are outside this format decision; Proposed
 [ADR 0002](./0002-git-native-portable-notebook-synchronization.md)
 addresses them.
@@ -85,15 +87,10 @@ profile. Codec round-trips must be lossless for these rules.
   matched case-insensitively; Donut creates it as `_trash`.
 - Notes beneath that folder, including all descendants, are trashed. Folder
   location determines trash status.
-- Trashed notes remain ordinary Portable notebook files. Moving notes or
-  folders into or out of trash follows ordinary move and destination-collision
-  rules.
-- Folder Trash moves the selected active subtree beneath `_trash/`, mirroring
-  and reusing its ancestor path. If the selected folder name is occupied there,
-  Donut suffixes the incoming folder as a whole instead of merging it with the
-  earlier trash.
-- Folder Trash preserves authored reference spelling. Recovery uses ordinary
-  folder Move, including its destination-conflict choices.
+- Trashed notes remain ordinary Portable notebook files. Trash mirrors the
+  active path beneath `_trash/` and gives a colliding incoming note or folder
+  the first available numbered name. Folder Trash preserves authored reference
+  spelling. Recovery is an ordinary Move with ordinary destination conflicts.
 - Trashed notes are excluded from search results and learning participation.
   Memory trackers remain associated with the same note IDs, preserving
   learning history and independent tracking preferences. Their availability
