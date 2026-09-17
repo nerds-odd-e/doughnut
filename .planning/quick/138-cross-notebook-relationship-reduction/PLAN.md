@@ -170,7 +170,10 @@ repository" through `liveNote`; `edit`'s notebook-id check is unchanged.
 ### 3. Accepted web change locks several bindings and commits each changed notebook
 
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: same four-pattern command as slice 2 green (235 tests)
+after refactor; single-notebook callers go through the delegating
+`apply(Integer, …)`. The multi-notebook path is first exercised by slice 4.
 Proof: same command as slice 2 green; `apply(Set<Integer>, …)` exists and
 `apply(Integer, …)` delegates to it with a one-element set.
 
