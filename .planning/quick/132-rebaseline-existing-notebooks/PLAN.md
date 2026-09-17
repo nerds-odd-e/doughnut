@@ -130,9 +130,28 @@ time is an external wait.
 ### 2. Startup replaces every live bound notebook's complete old history
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the real-database migration examples and
 `CURSOR_DEV=true nix develop -c pnpm backend:verify` satisfy the mappings above.
+
+Delivered: registered `V300000330__RebaselineExistingNotebookGitBindings` and
+added `RebaselineExistingNotebookGitBindingsMigrationTest`, a real-database
+migration-boundary test with a canonical multi-commit fixture (nested folders,
+an ordinary note, a trashed note, retained memory-tracker/recall-log data) plus
+a second notebook proving fleet iteration, and a sibling test proving a
+soft-deleted notebook's binding stays untouched and an unbound notebook stays
+unbound. Every row of the plan's outside-in proof table is covered (verified by
+the coordinator against the actual assertions, not just the report). Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` — BUILD SUCCESSFUL,
+`migrateTestDB` applied `V300000330` for real, full suite green (independently
+rerun twice by the coordinator: once before and once after the refactor pass
+below). Post-change refactor: extracted a shared
+`GitBundleTestReader.readTreeEntries(repository, commit)` helper (mirroring the
+already-existing `pathsIn` helper's style) and switched
+`NotebookGitCutoverServiceTest`'s two pre-existing inline tree-read loops and
+the new migration test's loop onto it, removing now-duplicated inline
+`TreeWalk`/`ObjectLoader` blocks — proof rerun focused on both affected test
+classes (4 tests, 0 failures) plus a full `backend:verify` rerun, both green.
 
 Behavior: Given several notebooks with current data and accepted histories,
 including later commits after their original roots, when the pending Flyway
@@ -210,3 +229,35 @@ backend verification wait.
   scope does not mention amendment columns; slice 2 should confirm whether
   this is an intended gap or needs explicit handling before registering the
   migration.
+- Slice 2 resolved the commit-message decision: added
+  `NotebookGitBaselineRebuild.REBASELINE_COMMIT_MESSAGE` ("Rebaseline: replace
+  notebook history with a fresh snapshot of current content") and used it
+  instead of `NotebookGitCutoverService.CUTOVER_COMMIT_MESSAGE` for the
+  replacement root. A rebaselined notebook's history destruction is a
+  meaningfully different event from an ordinary creation-time cutover and
+  deserves distinct wording in the Git log.
+- Slice 2 confirmed the amendment-columns gap above is deliberate, not an
+  oversight: the plan's scope explicitly states the migration "updates only
+  the existing binding's accepted object ID, bundle bytes, and update time",
+  so leaving `amendment_head`/`amendment_note_id`/`amendment_last_changed_at`
+  untouched matches the stated scope. No change made; flagged here for
+  whoever eventually reconciles amendment state with abandoned history.
+- Registered `V300000330__RebaselineExistingNotebookGitBindings`
+  (`backend/src/main/java/db/migration/`), an exact structural copy of the
+  retired `V300000327` pattern pointed at the restored
+  `NotebookGitBaselineRebuild.rebuildNotebook`. No toggle or gate.
+- The migration-boundary test
+  (`RebaselineExistingNotebookGitBindingsMigrationTest`) initially failed with
+  `jakarta.persistence.EntityExistsException: Detached entity passed to
+  persist` when building the canonical fixture (memory tracker/recall log)
+  directly under `@Transactional(propagation = Propagation.NOT_SUPPORTED)`,
+  because each `makeMe...please()` call auto-commits its own transaction and
+  previously-saved entities become detached across calls, breaking
+  cross-entity cascades (e.g. `MemoryTracker.user`). Fixed by building all JPA
+  fixture state for one notebook inside a single committed transaction via
+  the existing `CommittedTransactionTestSupport.inCommittedTransaction`
+  helper (already used by other concurrent/committed-transaction tests), then
+  doing the raw-JDBC history rewrite and the migration run afterward against
+  the now-committed rows. Worth remembering for any future migration-boundary
+  test that needs richer JPA fixtures (not just Notebook/Folder/Note) under a
+  non-transactional test method.

@@ -31,6 +31,15 @@ import org.eclipse.jgit.lib.Repository;
  */
 public final class NotebookGitBaselineRebuild {
 
+  /**
+   * Commit message for a rebaselined notebook's new root, deliberately distinct from {@link
+   * NotebookGitCutoverService#CUTOVER_COMMIT_MESSAGE}: this replacement did not create the
+   * notebook's binding, it destroyed and replaced an existing accepted history, so its wording says
+   * so rather than reading like an ordinary creation-time cutover.
+   */
+  static final String REBASELINE_COMMIT_MESSAGE =
+      "Rebaseline: replace notebook history with a fresh snapshot of current content";
+
   private static final String UPDATE_BINDING =
       """
       UPDATE notebook_git_binding
@@ -74,7 +83,7 @@ public final class NotebookGitBaselineRebuild {
             entries,
             NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
             NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,
-            NotebookGitCutoverService.CUTOVER_COMMIT_MESSAGE,
+            REBASELINE_COMMIT_MESSAGE,
             rebuildTime)) {
       NotebookGitBundleWriter.BundleWriteResult written =
           NotebookGitBundleWriter.write(gitRepository);
