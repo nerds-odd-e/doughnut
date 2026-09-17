@@ -55,15 +55,19 @@ data; invalid or ambiguous changes must not silently discard work.
 - **Why now:** The owner explicitly prioritized a fleet-wide reset on
   2026-09-17. Deferring is the strongest smaller alternative because new
   notebooks already receive a root commit and an earlier migration rebuilt
-  then-existing bindings. It is insufficient if any current production
-  baseline no longer matches the notebook data that owners use today.
-- **Scope:** During the ordinary release migration, replace each live existing
-  notebook's accepted Git object ID and bundle with one fresh parentless commit
-  built from its current canonical Portable notebook tree. Preserve notebook,
-  folder, note, binding, ownership, and learning identities and data. The
-  replacement is atomic per notebook; an unbuildable notebook fails the
-  migration loudly rather than leaving that notebook with a partially replaced
-  head and bundle.
+  then-existing bindings. The owner now wants every current production binding
+  reset once before the append-only workflow continues from a known current
+  baseline.
+- **Scope:** A one-time data migration runs automatically through ordinary
+  Flyway application startup, with no toggle, placeholder gate, opt-in, or
+  backup. It selects every live notebook that already has a Git binding and
+  replaces that binding's accepted Git object ID and bundle with one fresh
+  parentless commit built from the notebook's current canonical Portable tree.
+  Preserve notebook, folder, note, binding, ownership, and learning identities
+  and data. The replacement is atomic per notebook; an unbuildable notebook
+  fails startup loudly rather than leaving that notebook with a partially
+  replaced head and bundle. Manual release and deployment are outside this
+  story.
 - **Key example:** Given a live notebook whose current Donut data contains a
   notebook readme, nested folders and readmes, active notes, and notes beneath
   `_trash`, when the release migration runs, its accepted bundle contains
@@ -72,39 +76,71 @@ data; invalid or ambiguous changes must not silently discard work.
   while all Donut IDs, authored content, and learning history remain unchanged.
 - **Fleet boundary example:** Given several live notebooks with existing Git
   bindings, one migration run rebaselines every one; a failure stops startup
-  visibly, and a retry can finish without creating duplicate bindings or mixed
-  head/bundle pairs. Notebooks created after the migration continue to receive
-  their ordinary creation-time root commit.
-- **History consequence — unresolved:** A literal reset abandons every earlier
-  accepted server commit and makes an already downloaded local repository
-  diverge from the replacement root. The current near-future direction instead
-  promises one append-only history in which either side may lag. Confirm
-  whether history abandonment and mandatory fresh local acquisition are
-  intentional, or whether the requested reset must preserve the existing
-  accepted ancestry.
-- **Population — unresolved:** The working interpretation is every live
-  notebook that already has a binding, matching the earlier fleet rebuild.
-  Confirm whether "all existing notebooks" also includes soft-deleted notebooks
-  or requires creating a binding for an anomalous live notebook that has none.
+  visibly without creating duplicate bindings or mixed head/bundle pairs.
+  Notebooks created after the migration continue to receive their ordinary
+  creation-time root commit.
+- **History reset:** The replacement intentionally abandons the complete prior
+  server Git graph: the original root commit and every later commit. No backup,
+  retained ref, or ancestry bridge is required. Any previously downloaded local
+  repository is obsolete and must be freshly acquired before publication.
+- **Population:** Only live notebooks that already have a Git binding are in
+  scope. Soft-deleted notebooks and anomalous live notebooks without a binding
+  are neither selected nor repaired by this migration.
 - **Boundaries:** This story does not change current MySQL notebook content,
   invent historical commits, reconcile or rewrite an owner's local clone,
   introduce branching/rebasing, add a new Git transport, or change the
   creation-time behavior for future notebooks. Accepted ADR 0006 permits the
   migration to fail loudly; this story still requires an atomic replacement so
-  a failure cannot persist a mismatched object ID and bundle.
+  a failure cannot persist a mismatched object ID and bundle. The owner
+  explicitly overrides the repository's default gated-DML guidance for this
+  migration: it must run on the first application startup after release.
 - **Architecture status:** Accepted ADR 0004 governs the rebuilt Portable tree.
   ADR 0002's fleet-bootstrap and single-mainline text is still Proposed and
-  therefore informative rather than binding. The history reset would conflict
-  with that proposal and with the current backlog direction unless the owner
-  explicitly accepts the fresh-acquisition boundary above.
-- **Effort / status:** Queued first and refinement started. M (1–2 hours), low
-  confidence until the history and population decisions are resolved. A
-  retired fleet-rebuild implementation is useful evidence, not code to restore
-  without rechecking the current schema and migration conventions.
+  therefore informative rather than binding. The owner explicitly accepts this
+  one-time break in the backlog's append-only direction; the replacement root
+  becomes the beginning of the next append-only sequence.
+- **Effort / status:** Refined, planned, and queued first. M (1–2 hours),
+  moderate confidence. A retired fleet-rebuild implementation is useful
+  evidence, not code to restore without rechecking the current schema and
+  migration conventions. [Slice plan](../quick/132-rebaseline-existing-notebooks/PLAN.md).
 - **Depends on / safe stopping point:** No unfinished product prerequisite.
   After the migration, each included notebook has one internally consistent
   current baseline even if later synchronization or performance work is
   cancelled.
+
+<a id="story-44"></a>
+
+### 44. Retire the spent notebook rebaseline migration
+
+- **Goal / beneficiary:** Donut maintainers work with a migration chain and
+  notebook-Git implementation that no longer carry one-time rebaseline code,
+  fixtures, and tests after the target environment has completed the reset.
+- **Scope:** After production, and any other deliberately retained long-lived
+  target environment, confirms successful application of story 43's migration,
+  remove the spent Flyway migration and all production/test support whose
+  caller graph ends in that migration. Preserve current notebook creation,
+  accepted Git history after the new root, Portable-tree encoding, Flyway
+  startup/repair, and product-level behavior tests. No cleanup toggle or
+  permanent migration framework is added.
+- **Key example:** Given production has recorded and successfully completed the
+  rebaseline migration, when maintainers install a fresh database or restart an
+  already-upgraded database after cleanup, Flyway succeeds and current notebook
+  Git behavior remains green without the rebaseline migration, its raw-JDBC
+  helpers, or migration-only tests in the product tree.
+- **Boundary:** Production confirmation is a genuine prerequisite; do not take
+  or execute this story beforehand. Manual deployment and confirmation are not
+  product implementation scope. Do not remove shared runtime Portable-tree or
+  notebook-creation owners merely because the migration reused them.
+- **Value / learning:** The migration is intentionally temporary. Removing it
+  after its only target has crossed the conversion prevents a destructive reset
+  recipe and its duplicate JDBC projection code from becoming permanent
+  product complexity.
+- **Effort / status:** Queued immediately after story 43 and not yet planned. S
+  (30–60 minutes), moderate confidence based on the earlier spent-migration
+  cleanup precedent.
+- **Depends on / safe stopping point:** Production confirmation that story 43's
+  migration completed successfully. Cleanup leaves the new root and all commits
+  appended after it untouched.
 
 <a id="story-42"></a>
 
@@ -607,16 +643,18 @@ have crossed it. Neither relies on completing new Git move/rename or trash
 compatibility.
 
 The owner placed story 43 first on 2026-09-17. This explicit priority is
-preserved even though a destructive root reset appears to conflict with the
-append-only near-future direction; refinement must resolve whether old accepted
-history and existing local acquisitions may be abandoned before executable
-planning.
+preserved as a one-time explicit break in the append-only near-future direction:
+all prior server history is abandoned without backup, and owners reacquire
+their local copy from the replacement root. Story 44 follows it but cannot be
+taken until the target environment confirms the migration succeeded; it removes
+the spent migration and its migration-only complexity.
 
 Folder Trash with ordinary Move now supplies the complete folder round trip.
 The 2026-09-16 direction ends additional trash feature development: Restore is
-no longer selected. Story 43 is now the first queued item; story 42 follows and
-owns the one-hour manual validation of the completed append-only local/web
-workflow. Publication-scale validation remains after it. Story 39 was
+no longer selected. Story 43 is now the first queued item; story 44 follows as
+its target-environment-gated cleanup, then story 42 owns the one-hour manual
+validation of the completed append-only local/web workflow. Publication-scale
+validation remains after it. Story 39 was
 identified as the first post-release cleanup; story
 38 is retained in this seed but was removed from the backlog on 2026-09-16
 because the clarified repeated-trash journey already works and Undo is deferred.
