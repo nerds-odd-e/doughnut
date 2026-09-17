@@ -175,8 +175,55 @@ actually remove the dead dependencies, then re-ran the affected suites.
     consolidation is exactly the kind of refactor claim that is cheap to
     verify against `git diff` and easy to misreport.
 
+## DD-061 — Story Branch Mode edits made in the originating checkout got swept into an unrelated concurrent commit
+
+`dough-execute-plan` created a Story Branch Mode execution worktree for plan
+131, but the coordinator's later edits to that plan's own PLAN.md (recording
+resolved execution identity, then the manual-testing finding report) were
+made with the originating checkout's path
+(`/Users/terryyin/git/doughnut/...`) instead of the execution worktree's path
+(`doughnut-worktrees/131-.../...`), leaving those edits uncommitted directly
+on `main` in the shared originating checkout. A concurrent session executing
+a different plan in its own worktree (plan 132) later staged and pushed a
+broad commit from that same shared `main` checkout; because the coordinator's
+stray edits were sitting uncommitted there too, they were swept into that
+unrelated commit and pushed to `origin/main` under a commit message with no
+mention of plan 131. The plan's content landed correctly, but with no
+attribution to its own execution, and the execution's own branch/worktree
+ended up stale and empty, later deleted with nothing to deliver.
+
+### Occurrences
+
+- Execution: SEED-009 story 42 / quick/131-manually-validate-append-only-notebook-workflow
+  - Timestamp: 2026-09-17T12:23:21+08:00
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: claim commit `979a667474` (12:07:35+08:00, correctly on `main`
+    in the originating checkout); PLAN.md edits at 12:16–12:21 targeted the
+    originating checkout's absolute path; concurrent commit `35dfb6072896`
+    (12:23:21+08:00, message "Refine PRODUCT-BACKLOG and update SEED-009
+    documentation") diff includes the plan 131 `PLAN.md` 69-line addition
+    alongside unrelated `SEED-009`/`SEED-018`/`DearDough.md`/
+    `PRODUCT-BACKLOG.md` changes from the concurrent plan-132 execution;
+    execution branch `131-manually-validate-append-only-notebook-workflow`
+    was clean and unchanged at the claim commit when removed.
+  - Observed effect: the manual-testing report and slice-status update
+    reached `origin/main` intact, but with no commit traceable to plan 131's
+    own execution, and the execution's Story Branch Mode delivery path was
+    bypassed entirely.
+  - Inference: when multiple sessions execute plans concurrently against the
+    same shared originating checkout, any coordinator action that writes to
+    a path under that shared checkout (rather than strictly to the resolved
+    execution-checkout path recorded in the plan) risks being staged and
+    committed by a different, unrelated session's next commit in that
+    checkout. Retaining and consistently reusing the resolved execution
+    checkout path for every write after worktree creation would have avoided
+    this; a repeated `git status` check before delivery in the wrong
+    checkout would also have surfaced it earlier.
+
 ## Retention
 
-- Highest allocated local number: 60
+- Highest allocated local number: 61
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
