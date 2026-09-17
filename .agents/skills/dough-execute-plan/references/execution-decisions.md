@@ -168,9 +168,11 @@ source, elapsed time, the failed sizing assumption, completed compatible
 work and proof, and every incomplete attempt-owned change. Keep completed
 compatible work and proof in place. Safely park or revert only incomplete
 attempt-owned changes; do not discard completed work merely to give later slices
-a clean starting point. Keep the same execution identity and backlog placement
-under [Take queued work](../SKILL.md#take-queued-work). Unclear ownership stops
-disposition and the dependent planning path for human judgment.
+a clean starting point. Keep the same execution identity and backlog placement under
+[Take queued work](../SKILL.md#take-queued-work). A quick attempt that becomes
+planned keeps its selected mode and checkout; Trunk Mode stays Trunk Mode in
+the same worktree. Unclear ownership stops disposition and the dependent
+planning path for human judgment.
 
 After that stop, when the triggering instruction authorizes planning and
 continued execution, use this project's
@@ -183,8 +185,9 @@ and retained identity into the ordinary plan as source, decisions, or
 learnings needed for resume. Plan only the remaining work. Do not fabricate a
 story, completed planned slices, already satisfied promises, a substitute
 quick-execution record, or a second execution. Restart execute-plan from that
-plan in the same checkout; ordinary plan refinement remains available before
-delegation. Reuse preserved proof while its boundary remains unchanged.
+plan in the preserved checkout and mode; ordinary plan refinement remains
+available before delegation. Reuse preserved proof while its boundary remains
+unchanged.
 
 If planning or continued execution is not authorized, or ordinary planning
 returns a missing field or disputed decision, report the safe stop and that

@@ -72,11 +72,11 @@ plan plus quick/planned proof covering the original outcome without gaps or assu
 Missing kind, continuity, contract, completion, or proof limits dependent conclusions only.
 Two equally plausible executions need user selection; continue independently supported review.
 
-Manifest each related SHA with a reason from story/plan, message, diff, or transcript; inspect
-nearby/intervening commits to exclude unrelated work. Ambiguous attribution limits claims;
-planning-only commits are provenance. Use a net diff only for an uncontaminated range, otherwise
-selected patches together and files at the last related implementation commit. Review history
-read-only, excluding later work.
+Manifest each related SHA with a reason from story/plan, retained published revisions, message, diff, or transcript. When those published revisions exist, they are the related set; do not attribute a whole-trunk range, interleaved sibling work, or a rewritten unpublished SHA (use its published replacement).
+Inspect nearby/intervening commits and exclude unrelated work with reasons.
+Ambiguous attribution limits claims; planning-only commits are provenance.
+Use a net diff only for an uncontaminated range, otherwise selected patches together and files at the last related implementation commit.
+Review history read-only, excluding later work.
 
 ## Consider near-future direction
 

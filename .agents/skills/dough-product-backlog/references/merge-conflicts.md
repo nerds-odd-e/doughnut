@@ -6,7 +6,9 @@ without asking for confirmation.
 1. Before replacing conflict markers or staging the backlog, read its three Git
    versions: ancestor, current side, and incoming side (available in unmerged
    index stages 1, 2, and 3). Identify the actual branches/commits; during Story
-   Branch integration, distinguish the integration target from the execution tip.
+   Branch integration, distinguish the integration target from the execution tip;
+   during a Trunk Mode publication rebase, distinguish fetched trunk from the
+   unpublished suffix. Git ours/theirs labels during rebase do not name intent.
    Compare each side with the ancestor and retain a brief per-identity account of
    changed membership, links, or ordering in the working context. Include sibling
    work, not just the story being wrapped up. Match established story or correction

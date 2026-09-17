@@ -3,7 +3,8 @@
 Follow [ci-monitor.md](ci-monitor.md) for CI selection and failure recovery.
 
 With `functions.exec`, `yield_control`, `notify`, `tools.exec_command`, and
-`tools.write_stdin`, start one yielded observer before the first push. Reuse the
+`tools.write_stdin`, start one yielded observer before the first publication it
+must cover, using the authorized target as `BRANCH`. Reuse the
 observer note in the active plan (planned) or conversation (quick) and terminal
 `finished` entries; recover that note before replacement when handles are lost.
 Resolve `/ABSOLUTE/RESOLVED/SKILL` inside `/ABSOLUTE/VERIFIED/CHECKOUT_ROOT` with

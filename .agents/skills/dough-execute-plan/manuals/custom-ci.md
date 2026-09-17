@@ -31,6 +31,8 @@ and the command's own runtime and credentials; it does not need `gh`.
 
 The observer starts the configured command separately for each operation, writes
 one JSON request plus a newline to stdin, and reads one JSON value from stdout.
+The discover `check.branch` is the authorized target, which may differ from the
+execution checkout's current branch.
 Write diagnostics to stderr only for human troubleshooting; stdout must contain
 only the response.
 

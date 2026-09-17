@@ -28,7 +28,9 @@ paths containing spaces and replace example placeholders before execution.
 
 ## Select CI
 
-Resolve repository and branch from the authorized push destination. Read
+Resolve repository and branch from the authorized push destination. The
+`BRANCH` launch argument is that target branch; do not infer it from the
+execution checkout's current branch. Read
 `.planning/open-dough.json` to select the source before checking provider
 requirements. The observer reads that configuration once when it starts; do not
 change it during the observer's lifetime.
@@ -56,7 +58,8 @@ them in any project tooling wrapper):
 | `DOUGH_CI_WORKFLOW_NAME` | GitHub default only: exact workflow display name; default `CI` must be verified |
 | `DOUGH_CI_MAILBOX_ROOT` | Optional private shared mailbox directory; default `/tmp/dough-ci-$UID` |
 
-The branch is a required positional argument, never an inferred `main`.
+The branch is a required positional argument for the authorized target, never
+an inferred `main` or the execution branch name.
 Record the selected source and, for GitHub, the verified workflow selector/name
 with the observer identity in the active plan for planned execution or in the
 conversation for quick execution.

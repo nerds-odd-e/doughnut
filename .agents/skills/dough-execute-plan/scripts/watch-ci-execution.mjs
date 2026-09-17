@@ -29,6 +29,7 @@ export async function watchCiExecution({
   now = Date.now,
   root = process.cwd(),
   observeCoverage = () => [],
+  registeredRevisions = async () => [],
   adapterTimeoutMs,
 }) {
   if (typeof branch !== "string" || !branch.trim())
@@ -87,8 +88,17 @@ export async function watchCiExecution({
         continue;
       }
 
+      const registeredShas = (await registeredRevisions()).map((sha) =>
+        String(sha).toLowerCase(),
+      );
+      const actionable =
+        registeredShas.length === 0
+          ? matching
+          : matching.filter((run) =>
+              registeredShas.includes(run.headSha?.toLowerCase()),
+            );
       const { event, observationError, deferredFailureEvent } =
-        await acquireFailure(matching, observationSignal);
+        await acquireFailure(actionable, observationSignal);
       if (event) {
         await emit(event);
       }
@@ -103,7 +113,7 @@ export async function watchCiExecution({
       }
       for (const coverageEvent of await observeCoverage(matching))
         await emit(coverageEvent);
-      const incomplete = matching.find(
+      const incomplete = actionable.find(
         (run) =>
           run.status === "completed" &&
           run.conclusion === "cancelled" &&

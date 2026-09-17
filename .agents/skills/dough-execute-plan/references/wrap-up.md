@@ -1,7 +1,8 @@
 # Slice wrap-up
 
 The coordinator runs this sequence after implementation. CI repairs use the
-same proof and delivery gates.
+same proof and delivery gates, including Trunk Mode
+[verified-increment publication](trunk-publication.md#publish-a-verified-increment).
 
 ## Accept proof
 
@@ -49,18 +50,26 @@ unfinished proof. Do not run full CI before commit unless explicitly required.
 
 ## Deliver the change
 
-Run this sequence in the selected execution location established by the main
-workflow. Pass its checkout to every delegated refactor, generator, and host
-operation; do not let an inherited working directory redirect delivery. This
-slice delivery does not integrate or remove a retained execution branch or
-worktree.
+Run this sequence in the selected execution location established by
+[execution location](execution-location.md). Pass its checkout to every
+delegated refactor, generator, and host operation; do not let an inherited
+working directory redirect delivery. This slice delivery does not integrate
+or remove a retained execution branch or worktree. Trunk Mode never pushes
+the execution branch. After the commit, it publishes the owned unpublished
+increment through
+[trunk publication](trunk-publication.md#publish-a-verified-increment).
 
 As each obligation finishes, retain the current delivery boundary in the
 execution conversation with the owned unfinished paths, accepted proof and its
-boundary, applicable implementation or refactor return, and exact observer
-identity when present. On recovery, reconcile this focused record with actual
+boundary, applicable implementation or refactor return, exact observer
+identity when present, and Trunk Mode unpublished candidate, previously
+published base, and retained published revisions after any rewrite. On recovery,
+reconcile this focused record with actual
 Git, agent, and observer state under
 [execution-boundary recovery](../SKILL.md#continue-or-recover-at-an-execution-boundary).
+Trunk Mode then classifies the increment with
+[interrupted publication](trunk-publication.md#resume-an-interrupted-publication)
+and continues that unfinished obligation only.
 
 1. Spawn a fresh agent to run
    [dough-post-change-refactor](../../dough-post-change-refactor/SKILL.md).
@@ -112,15 +121,29 @@ Git, agent, and observer state under
    contract before committing. Fix mechanical findings; stop for semantic or
    design judgment. Do not run hook-owned lint independently. If hook repairs
    invalidate preparation, rerun formatting before restaging and retrying.
-8. Immediately before pushing, resolve and retain the full revision SHA being
-   delivered. Push that revision to the authorized destination. After confirmed
-   success, register the retained SHA with the existing observer by running
+8. Immediately before publishing, resolve and retain the full revision SHA being
+   delivered. Story Branch Mode and current-branch work push that revision to the
+   authorized destination. Trunk Mode publishes through the increment rule above
+   and retains that rule's candidate SHA after any rewrite onto newer trunk; do
+   not register the pre-rebase unpublished commit.
+   A rejected push after local integration follows
+   [rejected-push recovery](trunk-publication.md#recover-a-rejected-push)
+   and registers only the SHA that path records after a confirmed ordinary
+   push. A [Trunk Mode publication stop](trunk-publication.md#preconditions),
+   [rebase conflict stop](trunk-publication.md#resolve-a-publication-rebase-conflict),
+   or a recovery stop leaves that execution commit unpublished and
+   recoverable; do not register it or treat delivery as complete.
+   After confirmed success, register the
+   retained SHA with the existing observer by running
    `node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' register-push
    OBSERVER_DIRECTORY SHA`. Use the observer directory and checkout-bound runtime
-   retained for this execution. Apply the same registration after a repair push;
-   do not read a later moving `HEAD` or start another observer. Registration
-   failure is lost coverage: report it and do not claim the revision was observed.
-   Success completes routine delivery; a post-slice decision stop occurs after
+   retained for this execution. Apply the same registration after a repair push
+   and after a Trunk Mode claim once that observer is armed; do not register a
+   pre-rebase unpublished SHA or a publication stop. Do not read a later moving
+   `HEAD` or start another observer. Registration failure is lost coverage:
+   report it and do not claim the revision was observed. An unavailable bridge
+   leaves publications unobserved: report that gap and continue. Success
+   completes routine delivery; a post-slice decision stop occurs after
    safe work is delivered. Keep the
    [CI observer](ci-monitor.md) running and handle delivered failures through its
    repair protocol. Never wait for CI or deployment after a normal or repair push.

@@ -42,12 +42,15 @@ After readiness succeeds, launch with the verified runtime setup values:
 node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' start --execution OWNER/REPO BRANCH
 ```
 
-This starts a detached non-AI process and returns immediately. Retain the one
+`BRANCH` is the authorized target from runtime setup, which may differ from
+the execution checkout branch. This starts a detached non-AI process and
+returns immediately. Retain the one
 directory from its `CI_OBSERVER` receipt as the coordinator's execution
 handle. The hook must add `CI observer attached to this coordinator`; absence
 of that labelled context means observation is not connected. Re-entering setup,
-including after a normal or repair push, reuses that directory and must not run
-the launcher again. The observer discovers each later selected branch push itself, so a
+including after a claim, normal, or repair publication, reuses that directory and must not run
+the launcher again. The observer discovers each later selected target-branch
+publication itself, so a
 push changes neither its owner binding nor its process handle. Continue
 delegation and execution immediately.
 
@@ -57,8 +60,12 @@ context. The native hook selects durable records without advancing delivery
 progress, writes the unchanged host JSON, and acknowledges those records only
 after stdout reports a successful write. If the hook process is interrupted
 before that boundary, the next owning invocation can select the records again.
-The mailbox is claimed by checkout, host, conversation, and worker identity;
-Cursor additionally binds to the coordinator's `generation_id` because its
+The mailbox is claimed by checkout, host, conversation, and worker identity.
+A Git worktree of the same repository counts as the same checkout for that
+claim when each path is its Git toplevel and both share
+`git rev-parse --git-common-dir`; an unrelated repository remains another
+checkout. Probe and start still use the execution checkout's own installed
+runtime. Cursor additionally binds to the coordinator's `generation_id` because its
 children can share the conversation ID, and `beforeSubmitPrompt` updates that
 binding on a new user message; arbitrary child tool calls cannot rebind it, and
 missing generation identity fails the readiness probe. Claude Code isolates

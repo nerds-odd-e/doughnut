@@ -7,7 +7,8 @@ description: >-
   asynchronous CI repair. Use to execute a plan, run slices, execute a canonical
   story when the caller explicitly skips slice planning, or execute a small
   instruction from context without a story or plan. Does not decide story scope
-  or quick-path eligibility. `--skip-retro` skips the automatic planned-execution
+  or quick-path eligibility. `--trunk` selects Trunk Mode; omitted mode keeps
+  Story Branch Mode. `--skip-retro` skips the automatic planned-execution
   retrospective. `--replan` and `--no-replan` choose whether an oversized attempt
   may continue through planning.
 ---
@@ -57,12 +58,15 @@ Resolve project context at the first boundary that needs it:
 
 - execution-source kind, slice target, hard limit, and exceptions;
   [replanning permission](references/execution-decisions.md#choose-replanning-permission);
-  Story Branch Mode or caller-selected current branch; for planned work, plan
-  path and status vocabulary;
+  execution mode and location: default Story Branch Mode; `--trunk` or a clear
+  equivalent selects Trunk Mode; explicit caller selection uses the current
+  branch. Resolve contradictions before changing state. Mode never creates
+  execution authority; for planned work, plan path and status vocabulary;
 - backlog path and selected entry for work selected from **Backlog list**;
 - selective formatter and commit hook contract before taking queued work and its claim commit;
 - navigation, focused tests, runtime wrapper, and workflow precedence for the selected slice;
-- authorized push destination before delivery;
+- authorized push destination before delivery, and for Trunk Mode before
+  publishing a queue claim or verified increment;
 - generation triggers and commands when affected; and
 - [refactor context](../dough-post-change-refactor/SKILL.md) before refactor delegation.
 
@@ -76,8 +80,11 @@ permission](references/execution-decisions.md#choose-replanning-permission), plu
 currently triggered sections of [execution decisions](references/execution-decisions.md).
 Before accepting a return, read [proof acceptance](references/wrap-up.md#accept-proof);
 before delivery, read [delivery](references/wrap-up.md#deliver-the-change). Before
-first push, read [CI observation](references/ci-monitor.md) and only the current
-host's notification adapter.
+arming observation, read [CI observation](references/ci-monitor.md) and only the
+current host's notification adapter. Arm from the execution checkout against the
+authorized target branch; do not wait for CI. Before creating the execution workspace, read
+[execution location](references/execution-location.md). Before a Trunk Mode
+claim or increment publication, read [trunk publication](references/trunk-publication.md).
 Use [targeted retrieval and disposable research](references/disposable-research.md)
 for omitted/truncated passages or bounded investigations; another step alone needs no reload.
 
@@ -106,49 +113,29 @@ Already **Taken** means resume: preserve its position without duplication. Work 
 from both active lists needs no fabricated entry. Planning/refinement never takes work.
 Leave taken work through pauses, failures, completion, and retrospective; wrap-up removes it.
 
-For Story Branch Mode with a queue claim, preflight read-only in the originating checkout
-before moving the entry: verify branch, backlog path, tracked/staged changes, and ownership
-of an isolated claim commit. Ambiguous branch or ownership leaves the queue unchanged;
-preserve existing work without stashing, resetting, overwriting, or silently unstaging it.
+For a queue claim, preflight read-only in the originating checkout before moving
+the entry: verify branch, backlog path, tracked/staged changes, and ownership of
+an isolated claim commit. Ambiguous branch or ownership leaves the queue
+unchanged; preserve existing work without stashing, resetting, overwriting, or
+silently unstaging it.
 
 After moving, stage only the backlog path, inspect the staged diff, and commit the claim
-locally on the originating branch. Create the execution branch/worktree from that commit
-only after success; do not push the claim separately. Staging/commit failure stops isolated
-execution: preserve and report backlog/index state. Later setup failure leaves the committed
-entry **Taken** for retry. No-change cases produce no empty claim commit.
+locally on the originating branch. Claim setup may record provisional identity;
+complete it before dispatch. Staging/commit failure stops isolated execution:
+preserve and report backlog/index state. No-change cases produce no empty claim
+commit.
+
+Story Branch Mode creates the execution branch/worktree from that local commit
+only after success; do not push the claim separately. Trunk Mode publishes the
+claim per [trunk publication](references/trunk-publication.md#publish-a-queue-claim)
+before implementation. Later workspace-setup failure leaves the published or
+locally committed **Taken** entry for retry; do not treat that as a new claim.
 
 ## Choose the execution location
 
-Planned and planless work default to Story Branch Mode: one execution branch and Git
-worktree for the selected work. Explicit caller selection uses the current branch instead.
-After committing a claim, create the branch/worktree from it before delegation; when no
-claim applies, use verified current HEAD. Resolve names and safe location from project
-conventions and ordinary host Git facilities. Missing conventions, unsafe location, or
-creation failure stops setup; preserve and report the claim and created resources.
-Use no parallel registry, configuration format, or worktree manager.
-
-After successful setup and before delegation, retain one execution identity in the
-existing plan when one exists, and in the conversation:
-
-- originating checkout and branch, where the claim was recorded if any;
-- execution checkout and branch for implementation and delivery;
-- caller/project integration target, defaulting to `main` only when neither supplies one.
-
-Caller-selected current-branch work records that checkout/branch for both locations and
-creates no worktree.
-
-On resume, verify retained identity against actual branch, HEAD ancestry, and worktree
-state; **Taken** alone supplies no location. Reuse a matching execution checkout. Missing,
-ambiguous, contradictory, unsafe, or partial identity/setup requires an exact recovery
-decision: preserve resources rather than guessing, nesting worktrees, or switching branches.
-
-Run delegation, refactoring, generation, formatting, staging, commits, pushes, and CI repair
-from the selected execution location; Story Branch Mode pushes its execution branch to the
-authorized destination. Pass identity/location explicitly to agents and host adapters.
-
-Resolve checkout-bound installed runtime from the selected execution checkout and use it
-as working directory. Before arming, apply [runtime setup](references/runtime-setup.md)
-identity and stop rules; the initially loaded skill's copy is not a fallback.
+Follow [execution location](references/execution-location.md) for mode,
+workspace creation, retained identity, resume, push destination, and
+checkout-bound runtime.
 
 ## Continue or recover at an execution boundary
 
@@ -169,9 +156,12 @@ Resume at the first delivery obligation not established by evidence. An incomple
 or oversized return still needs [oversized-slice handling](references/execution-decisions.md#refine-an-oversized-slice)
 before proof acceptance. Otherwise implementation returns still need proof
 acceptance/refactoring; completed refactors need remaining delivery;
-uncommitted plan edits need staging/commit; local commits absent from the authorized
-destination need push. Plan status or a compact report proves none of those later boundaries.
-When pushed commit and retained delivery result agree, select the next dependency-ready slice.
+uncommitted plan edits need staging/commit. Classify a Trunk Mode increment with
+[interrupted publication](references/trunk-publication.md#resume-an-interrupted-publication)
+before any further commit or push. Story Branch Mode still pushes local commits
+absent from its authorized destination. Plan status or a compact report proves none
+of those later boundaries. When pushed commit, retained delivery result, and
+required registration agree, select the next dependency-ready slice.
 Missing/contradictory execution identity requires the recovery decision above.
 
 ## Execute the next slice
@@ -193,7 +183,8 @@ Missing/contradictory execution identity requires the recovery decision above.
    [oversized-slice decisions](references/execution-decisions.md#refine-an-oversized-slice).
    A no-replan return stops without planning or retry. When replanning is allowed, use
    [ordinary slice planning](../dough-slice-planning/SKILL.md) for remaining work,
-   and restart as planned execution. Before delegating a change that invalidates a required
+   and restart as planned execution. Before
+   delegating a change that invalidates a required
    pre-change observation, apply [proof ownership](../dough-story-refinement/references/planning.md#own-executable-proof):
    reuse an adequate baseline with known matching revision/environment/selection conditions,
    or obtain it first. Missing/failed prerequisites stop only dependent work. Apply on entry
@@ -202,8 +193,9 @@ Missing/contradictory execution identity requires the recovery decision above.
 4. On return, recheck execution decisions; handle incomplete/oversized work there before
    delivery, including a no-replan overrun. Otherwise [accept proof](references/wrap-up.md#accept-proof) and confirm
    uncommitted work or an explained empty change.
-5. Run [delivery](references/wrap-up.md#deliver-the-change) end to end. After successful
-   push, restart for remaining planned slices; a delivered quick slice has no successor.
+5. Run [delivery](references/wrap-up.md#deliver-the-change) end to end. After
+   successful delivery, restart for remaining planned slices; a delivered
+   quick slice has no successor.
 
 Planned slices may run concurrently only with disjoint file changes, mutable state, and
 plan writes. Quick execution has one slice. Each slice completes coordinator-owned delivery
@@ -228,8 +220,10 @@ review selection; its authority excludes implementing findings or changing the b
 
 Continue in the recorded execution project/checkout. Supply available references/context:
 source contract, original plan and approved changes, attributable commits, decisions, proof,
-delivery state, CI limitations, and checkout/branch identity. Include an initial quick attempt
-and its planned continuation as one execution. Reuse context without another handoff artifact
+delivery state, CI limitations, and checkout/branch identity. Trunk Mode attributable
+commits are that identity's retained published revisions, not another ledger or a
+rewrite's unpublished SHA. Include an initial quick attempt and its planned
+continuation as one execution. Reuse context without another handoff artifact
 or transcript copy; retrospective validates attribution and recovers real gaps.
 
 Execution completion and review completion are distinct. A retrospective context stop leaves
@@ -242,8 +236,8 @@ wrap-up; do not invoke it here. Wholly planless completion retains source, conve
 identity, delivered changes, and proof, reports delivered work and shutdown, and ends with
 `## QUICK EXECUTION COMPLETE` after required delivery/shutdown, without automatic
 retrospective. The coordinator invokes wrap-up after successful branch delivery. Do not
-report integrated completion here; wrap-up owns merge, required target push, and resource
-cleanup.
+report integrated completion here; wrap-up owns Story Branch merge and required
+target push, Trunk Mode closure publication, and resource cleanup.
 
 For incomplete work, failed delivery/shutdown, cancellation, or a human-judgment stop, report
 source, active plan/next slice or quick-slice state, preserved work, observer state,

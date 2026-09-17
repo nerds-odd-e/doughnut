@@ -1,19 +1,20 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
+import { existsSync, watch, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  watch,
-  writeFileSync,
-} from "node:fs";
-import { basename, join, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+  checkoutRoot,
+  createMailbox,
+  mailboxRoot,
+  readMailbox,
+  receiptPrefix,
+} from "./ci-mailbox-location.mjs";
 import {
   publishMailboxEvent,
   readWorkerIdentity,
   registerPushedRevision,
+  readRevisionCoverage,
   observeRevisionCoverage,
   recordLostTerminalResult,
   recordTerminalResult,
@@ -28,6 +29,13 @@ import {
 import { executionBudgetMs, watchCiExecution } from "./watch-ci-execution.mjs";
 
 export {
+  checkoutRoot,
+  createMailbox,
+  mailboxRoot,
+  readMailbox,
+  receiptPrefix,
+} from "./ci-mailbox-location.mjs";
+export {
   publishMailboxEvent,
   readDeliveryProgress,
   readMailboxEvents,
@@ -38,47 +46,7 @@ export {
   registerPushedRevision,
 } from "./ci-mailbox-store.mjs";
 
-export const checkoutRoot = fileURLToPath(
-  new URL("../../../../", import.meta.url),
-);
-// Native hooks and Nix launchers share this directory; it must not follow TMPDIR.
-export const mailboxRoot =
-  process.env.DOUGH_CI_MAILBOX_ROOT ??
-  join("/tmp", `dough-ci-${process.getuid?.() ?? "user"}`);
-export const receiptPrefix = "CI_OBSERVER ";
 const resultPrefix = "CI_OBSERVER_RESULT ";
-export function readMailbox(
-  directory,
-  root = checkoutRoot,
-  storage = mailboxRoot,
-) {
-  if (
-    resolve(directory, "..") !== resolve(storage) ||
-    !/^watch-/.test(basename(directory))
-  ) {
-    throw new Error("CI mailbox is outside the observer directory");
-  }
-  const request = JSON.parse(
-    readFileSync(join(directory, "request.json"), "utf8"),
-  );
-  if (resolve(request.root) !== resolve(root))
-    throw new Error("CI mailbox belongs to another checkout");
-  return request;
-}
-export function createMailbox(
-  request,
-  { root = checkoutRoot, storage = mailboxRoot } = {},
-) {
-  mkdirSync(storage, { recursive: true, mode: 0o700 });
-  const directory = mkdtempSync(join(storage, "watch-"));
-  writeFileSync(
-    join(directory, "request.json"),
-    JSON.stringify({ ...request, root }),
-    { mode: 0o600 },
-  );
-  mkdirSync(join(directory, "events"), { mode: 0o700 });
-  return directory;
-}
 export async function runMailboxWorker(
   directory,
   { observe, onRecord, root = checkoutRoot, storage = mailboxRoot } = {},
@@ -106,6 +74,8 @@ export async function runMailboxWorker(
         emit: recordEvent,
         observeCoverage: (runs) =>
           observeRevisionCoverage(directory, runs, request),
+        registeredRevisions: async () =>
+          readRevisionCoverage(directory).map(({ sha }) => sha),
       });
     status = abort.signal.aborted ? "stopped" : "finished";
     if (!abort.signal.aborted && event) recordEvent(event);
