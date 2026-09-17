@@ -157,6 +157,56 @@ data; invalid or ambiguous changes must not silently discard work.
   even when it finds discrepancies or later feature work is cancelled; it must
   not claim unobserved behavior.
 
+<a id="story-45"></a>
+
+### 45. Refuse to pull when local and accepted notebook history have diverged independently
+
+- **Goal / beneficiary:** A notebook owner never has their local checkout left
+  in a broken, mid-rebase, conflicted state after `donut notebook pull`. When
+  local and accepted history have advanced independently, pull refuses
+  clearly and leaves both histories and the working checkout exactly as they
+  were.
+- **Why now:** Story 42's manual validation (plan 131) directly observed the
+  current implementation rebase the unpublished local commit onto the new
+  accepted head, leaving the checkout in a detached-HEAD, mid-rebase state
+  with an unresolved native Git conflict and CLI guidance instructing
+  `git rebase --continue` / `git rebase --abort`. This violates the settled
+  near-future direction ("no branching or rebasing") and the Deferred
+  Directions entry below, which already excludes ordinary Git rebase for
+  reconciling divergent histories. It is a defect against committed product
+  direction, not new scope.
+- **Scope:** When `donut notebook pull` finds an unpublished local commit that
+  is not an ancestor of the current accepted head, and the accepted head has
+  itself advanced independently of that local commit, refuse the pull with a
+  clear owner-facing message instead of starting a rebase, merge, cherry-pick,
+  or other reconciliation operation. Leave the local branch ref, HEAD, working
+  tree, index, and accepted head exactly as they were; both the unpublished
+  local commit and the newer accepted history remain available and
+  inspectable afterward.
+- **Key example:** Given a clean local clone with one unpublished local
+  commit and an independently advanced accepted head (for example a web edit
+  made after the clone), when the owner runs `donut notebook pull`, the CLI
+  reports a clear refusal naming both heads, the checkout stays on its
+  original branch with a clean working tree and unchanged local head, and no
+  `.git/rebase-merge` state or conflict markers appear.
+- **Boundary:** This story implements refusal only; it does not implement
+  merge, replay, or other reconciliation support for divergent histories,
+  which stays excluded per Deferred Directions below. A genuinely linear
+  unpublished local commit (one that is not itself independently diverging)
+  keeps its already-accepted rebase-free pull/publish behavior from stories
+  20, 25, and 41; do not regress that path.
+- **Value / learning:** Closes the gap between the shipped `pull` behavior and
+  the append-only direction the owner already committed to, and removes the
+  only discrepancy story 42's manual validation found.
+- **Effort / status:** Not yet planned. M (1–2 hours), moderate confidence —
+  likely touches the CLI's `cli/src/commands/notebook/notebookPull*.ts`
+  rebase path and/or the backend pull-eligibility check that currently
+  allows it.
+- **Depends on / safe stopping point:** None; can be taken immediately. Safe
+  to stop once pull refuses on independently advanced histories and existing
+  linear-pull/publish behavior (stories 20, 25, 41, and story 42's
+  non-divergent examples) remains green.
+
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
@@ -168,10 +218,11 @@ their local copy from the replacement root. Story 44 follows it but cannot be
 taken until the target environment confirms the migration succeeded; it removes
 the spent migration and its migration-only complexity.
 
-Story 43 is now the first queued item; story 44 follows as
-its target-environment-gated cleanup, then story 42 owns the one-hour manual
-validation of the completed append-only local/web workflow. Publication-scale
-validation remains after it.
+Story 42's manual validation found one discrepancy against the settled
+append-only direction: `pull` rebases instead of refusing on independently
+advanced histories. The owner placed the resulting fix, story 45, first in
+the queue on 2026-09-17, ahead of story 44's target-environment-gated cleanup
+and publication-scale validation.
 
 Completed stories 20 and 25 supply accumulated local publication and web-note
 movement evidence to story 42; they are not remaining queue items. Publication

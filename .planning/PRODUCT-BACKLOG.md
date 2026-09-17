@@ -11,6 +11,7 @@ either the remote or local repository may be multiple commits behind.
 - [Manually validate the complete append-only notebook workflow](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-42) — SEED-009 — [plan](quick/131-manually-validate-append-only-notebook-workflow/PLAN.md)
 
 ## Backlog list
+- [Refuse to pull when local and accepted notebook history have diverged independently](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-45) — SEED-009
 - [Use trash vocabulary for recoverable note removal](seeds/SEED-020-trash-vocabulary.md#story-1) — SEED-020
 - [Retire the spent notebook rebaseline migration](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-44) — SEED-009
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
