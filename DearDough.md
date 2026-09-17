@@ -339,8 +339,57 @@ full subagent turn (~6 minutes, ~86k tokens) with no usable output.
     concurrently-running subagent reading the same files and burn a full
     subagent turn on a stop neither side could have avoided once started.
 
+## DD-064 — A prior execution left the shared main checkout on its own feature branch with uncommitted work, blocking the next plan's execution setup
+
+[Execution location](../dough-execute-plan/references/execution-location.md)
+requires Story Branch Mode to create one execution branch and worktree per
+plan, distinct from the shared main checkout used for queue claims. Here, a
+prior execution of plan 136 (SEED-020) instead ran `git checkout
+136-trash-vocabulary` directly in the shared main checkout
+(`/Users/terryyin/git/doughnut`) and implemented all 5 of that plan's slices
+there, uncommitted, rather than creating a dedicated
+`.claude/worktrees/136-...` worktree. When this execution was invoked to run
+plan 137 (already claimed and committed on local `main`, one commit ahead of
+that stranded branch), the shared checkout could not be used: it was on the
+wrong branch with someone else's uncommitted 34-file diff in it, and plan
+137's directory was invisible from that branch. The mixup had to be diagnosed
+and repaired (stash the plan-136 work, move it into its own worktree, return
+the shared checkout to `main`, then create plan 137's own worktree) before
+implementation could start, and was independently corroborated by a peer
+session tasked with the same repair.
+
+### Occurrences
+
+- Execution: SEED-009 story 44 / quick/137-retire-notebook-rebaseline-migration
+  - Timestamp: 2026-09-17, unknown exact time (diagnosed and repaired before
+    this execution's delivery commit at 20:10:08 +08:00)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `git branch -vv` and `git worktree list` at session start showed
+    the primary checkout `/Users/terryyin/git/doughnut` on branch
+    `136-trash-vocabulary` (not `main`) with `git status --short` reporting 34
+    changed paths implementing all 5 "done"-marked slices of
+    `.planning/quick/136-trash-vocabulary/PLAN.md`, while local `main` (one
+    commit ahead, `e362217c4f`) already carried plan 137's claim commit and
+    `.planning/quick/137-retire-notebook-rebaseline-migration/PLAN.md`. A peer
+    session named "trash vocabulary recovery" independently confirmed it had
+    been asked to perform the identical repair.
+  - Observed effect: this execution could not start slice delegation until
+    the shared checkout was repaired; required a stash, a new worktree
+    (`.claude/worktrees/136-trash-vocabulary`) to preserve the stranded work,
+    a branch switch of the shared checkout back to `main`, and a fresh
+    worktree/branch creation for plan 137 before any implementation began.
+  - Inference: the prior plan-136 execution's coordinator ran ordinary `git
+    checkout <branch>` on the shared main checkout instead of following
+    Story Branch Mode's create-a-dedicated-worktree step, likely because nothing
+    in [execution location](../dough-execute-plan/references/execution-location.md)
+    warns that checking out an execution branch directly in the shared
+    checkout — rather than creating its own worktree — strands that checkout
+    for every later execution until manually repaired.
+
 ## Retention
 
-- Highest allocated local number: 63
+- Highest allocated local number: 64
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
