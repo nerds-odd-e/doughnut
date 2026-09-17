@@ -289,8 +289,99 @@ finer-decompose above ten).
     treated as test-wait exceptions and do not explain a 12–25 minute
     refactor.
 
+## DD-058 — Delegating `EnterWorktree` to a subagent fails; the coordinator must call it directly
+
+Neither this project's execute-plan guidance nor the harness tool's own
+description warns a coordinator away from delegating worktree creation, so a
+coordinator following "use ordinary host Git facilities" can waste a full
+round trip discovering that `EnterWorktree` must run in the coordinator's own
+session.
+
+### Occurrences
+
+- Execution: SEED-009 story 41 / quick/130-hide-trashed-incoming-references / 5062dbe79e
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.24
+  - Evidence: a `fork` subagent asked to call `EnterWorktree(name:
+    "130-hide-trashed-incoming-references")` returned "EnterWorktree cannot
+    create a worktree from a subagent with a cwd override ... it would mutate
+    the parent session's process-wide working directory. ... spawn an Agent
+    with `cwd` set to it." on 2026-09-17 (date only; exact time unknown).
+  - Observed effect: one wasted subagent launch and `TaskStop`, no worktree or
+    branch created; the coordinator then called `EnterWorktree` itself and
+    succeeded immediately.
+  - Inference: [execution location](../dough-execute-plan/references/execution-location.md)
+    resolves worktree creation as an ordinary coordinator step but does not
+    say the call must happen in the coordinator's own session rather than a
+    delegated agent; on Claude Code that distinction is load-bearing.
+
+## DD-059 — Runtime-setup's `.claude/skills` default path does not exist inside a fresh git worktree on this project
+
+This project's `.gitignore` excludes `.claude/*` except `.claude/settings.json`
+(`.gitignore:143`), so `.claude/skills/dough-execute-plan` — the path
+[runtime setup](../dough-execute-plan/references/runtime-setup.md) names as
+the normal Claude Code location for the installed skill directory — is absent
+from any freshly created worktree. Only `.agents/skills/dough-execute-plan`
+(tracked in Git) resolves there.
+
+### Occurrences
+
+- Execution: SEED-009 story 41 / quick/130-hide-trashed-incoming-references / 5062dbe79e
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.24
+  - Evidence: `git check-ignore -v .claude/skills` in the execution worktree
+    returned `.gitignore:143:.claude/*  .claude/skills`; `ls
+    .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs` failed with "No
+    such file or directory" while the same path under `.agents/skills/`
+    existed and canonicalized to the worktree root as required.
+  - Observed effect: one extra investigation round (gitignore check, path
+    listing) before arming the CI observer with the correct runtime path;
+    no incorrect observer was armed.
+  - Inference: the "normally `.claude/skills/...` for Claude Code" guidance
+    is a same-checkout default that silently breaks the first time this
+    project's execution moves to a new worktree; the runtime-identity
+    canonicalization check caught the mismatch instead of arming against a
+    missing script.
+
+## DD-060 — Trunk publication's "fast-forward the local target" step is unreachable from an `EnterWorktree`-isolated coordinator session
+
+[Trunk publication](../dough-execute-plan/references/trunk-publication.md#publish-the-candidate)
+assumes the coordinator can update and push a local `main` in a shared
+integration checkout. On Claude Code, once `EnterWorktree` has switched the
+session into an execution worktree, the harness refuses any command that
+targets the originating checkout (`git -C <other-checkout>` or `cd` back to
+it), so that literal step cannot run.
+
+### Occurrences
+
+- Execution: SEED-009 story 41 / quick/130-hide-trashed-incoming-references / 5062dbe79e
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.24
+  - Evidence: `git -C /Users/terryyin/git/doughnut status --short` from the
+    execution worktree returned "This session is isolated in the worktree
+    ... Refusing to run it — a worktree-isolated session's git operations
+    must target its own worktree."
+  - Observed effect: the coordinator instead pushed the exact verified
+    candidate SHA straight to the remote branch ref from the execution
+    checkout (`git push origin 5062dbe79e:refs/heads/main`), which Git
+    accepted as an ordinary fast-forward since the candidate's parent was
+    already the fetched `origin/main` tip; no local `main` ref was ever
+    touched.
+  - Inference: the documented sequence (fetch, reconcile, rebase, fast-forward
+    local target, push) is written for a coordinator that shares a working
+    directory with the integration checkout; an `EnterWorktree`-isolated
+    coordinator instead needs a SHA-to-remote-ref push, which is behaviorally
+    equivalent for the already-based-on-current-trunk case but was not named
+    as an option.
+
 ## Retention
 
-- Highest allocated local number: 57
+- Highest allocated local number: 60
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
