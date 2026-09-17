@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { folderIdsWithRowAboveScrollportTop } from "./sidebarActivePathRowsAboveScrollport"
+import { folderIdsWithRowAboveScrollportTop } from "@/components/notes/sidebarActivePathRowsAboveScrollport"
 
 describe("folderIdsWithRowAboveScrollportTop", () => {
   it("returns ids whose row top is strictly above the scrollport top", () => {
