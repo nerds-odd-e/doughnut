@@ -510,26 +510,19 @@ export default class StoredApiCollection implements StoredApi {
       cachedRealm.note.noteTopology.title,
       originalFolderId
     )
-    this.storage.refreshNoteRealm(trashedRealm)
-    refreshSidebarStructuralListings()
-    if (
+    const destination =
       referenceHandling === "REDUCE_TO_SOURCE_PROPERTY" &&
       sourceNoteId !== undefined
-    ) {
-      await router.replace(noteShowLocation(sourceNoteId))
-      return
-    }
-    if (originalFolderId != null) {
-      await router.replace({
-        name: "folderPage",
-        params: { notebookId, folderId: originalFolderId },
-      })
-    } else {
-      await router.replace({
-        name: "notebookPage",
-        params: { notebookId },
-      })
-    }
+        ? noteShowLocation(sourceNoteId)
+        : originalFolderId != null
+          ? {
+              name: "folderPage",
+              params: { notebookId, folderId: originalFolderId },
+            }
+          : { name: "notebookPage", params: { notebookId } }
+    await router.replace(destination)
+    this.storage.refreshNoteRealm(trashedRealm)
+    refreshSidebarStructuralListings()
     return trashedRealm
   }
 

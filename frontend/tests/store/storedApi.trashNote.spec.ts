@@ -126,6 +126,24 @@ describe("storedApiCollection trash note", () => {
     expect(storage.refOfNoteRealm(realm.id).value).toBeTruthy()
   })
 
+  it("navigates away before applying the trashed realm, so a still-mounted sidebar cannot react to the note's new trash ancestry", async () => {
+    const storage = createNoteStorage()
+    const realm = makeMe.aNoteRealm.inFolder(901, "Work").please()
+    storage.refreshNoteRealm(realm)
+    const trashedRealm = makeMe.aNoteRealm.id(realm.id).please()
+    mockSdkService(NoteController, "trashNote", trashedRealm)
+    const refreshSpy = vi.spyOn(storage, "refreshNoteRealm")
+    refreshSpy.mockClear()
+
+    await storage.storedApi().trashNote(router, realm.id, {
+      referenceHandling: "LEAVE_DEAD_LINKS",
+    })
+
+    const navigateOrder = routerReplace.mock.invocationCallOrder[0]!
+    const refreshOrder = refreshSpy.mock.invocationCallOrder[0]!
+    expect(navigateOrder).toBeLessThan(refreshOrder)
+  })
+
   it("refreshes sidebar structural listings after trash", async () => {
     const storage = createNoteStorage()
     const realm = makeMe.aNoteRealm.please()
