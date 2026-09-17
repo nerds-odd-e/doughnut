@@ -1,6 +1,6 @@
 # Retire the spent notebook rebaseline migration
 
-Status: planned
+Status: done
 Source: [SEED-009 story 44](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-44),
 refined 2026-09-17. The owner confirmed on 2026-09-17 that production
 successfully applied version `300000330`, which satisfies the story's
@@ -81,7 +81,7 @@ ADR or North Star change is warranted.
 ### 1. Current installations run without the rebaseline migration
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: with `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL`, first
 `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*RebaselineExistingNotebookGitBindingsMigrationTest*'`
 green **before** deletion (records `300000330` in `doughnut_<id>_test`); then,
@@ -99,7 +99,7 @@ not change behavior. No API generation is needed (no controller changes).
 ### 2. Migration guidance reserves the retired version
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: skill text check above.
 
 Given a maintainer reading the db-migration skill after slice 1, when they
