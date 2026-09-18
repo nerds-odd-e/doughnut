@@ -8,6 +8,20 @@ authorize execution.
 
 Baseline: `52f1fbf2da857ff6b03c467e48a4d1765d02345b` on `main`.
 
+Execution started 2026-09-18. Mode: Story Branch Mode.
+
+- Execution checkout/branch: worktree
+  `.claude/worktrees/143-overlapped-spelling-inline-retry` on branch
+  `143-overlapped-spelling-inline-retry`, created from
+  `d5065f82d7` (Take SEED-032 story 1 for execution) on `main`.
+- Integration: `main` in the originating checkout; remote `origin`
+  (`nerds-odd-e/doughnut`). Push destination for this execution:
+  `origin/143-overlapped-spelling-inline-retry`.
+- CI observer: GitHub Actions, workflow `ci.yml` ("donut CI"), target branch
+  `143-overlapped-spelling-inline-retry`; mailbox `/tmp/dough-ci-501/watch-5LSmbf`.
+  Armed before slice 1 delegation via `.agents/skills/...` (the `.claude/skills/...`
+  path lacks the runtime scripts in this checkout).
+
 ## Goal and scope
 
 When a learner submits a spelling answer that matches a note already declared
