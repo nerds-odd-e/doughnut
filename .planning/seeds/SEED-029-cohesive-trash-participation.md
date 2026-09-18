@@ -57,6 +57,15 @@ existing domain model. A review should be able to establish why each affected
 consumer includes or excludes trash without reconstructing a special local
 rule.
 
+Owner acceptance, 2026-09-18: the resulting architecture must be simpler,
+production code must have a net line-count reduction, and the design must be
+more cohesive. Renaming alone does not satisfy this outcome. Count all changed
+handwritten production code, including any extracted files; report test-code
+changes separately. Do not achieve the reduction through compressed formatting,
+lost coverage, or deletion of required behavior.
+
+Executable plan: [141 — Cohesive trash participation](../quick/141-cohesive-trash-participation/PLAN.md).
+
 #### Scope
 
 - Clarify collection names and contracts, particularly `findLiveNotes...` and
@@ -137,19 +146,21 @@ First in the product backlog by explicit owner instruction. Preserve the
 existing near-future direction and other queued work. The internal improvement
 supports that direction by keeping recoverable Portable content separate from
 learning participation. It remains queued during refinement; no implementation
-or slice plan is authorized by this artifact.
+is authorized by this artifact. The owner subsequently requested slice planning
+and any necessary plan refinement; implementation remains a later instruction.
 
 ## Open Decisions
 
-- Complete the assessment of whether explicit collection contracts and caller
-  alignment suffice, or an additional shared responsibility is justified.
-- Resolve the learning-session diagnostic compatibility only if its removal
-  is proposed; until then preserve the observable behavior of the repaired
-  baseline.
-- The existing next queue entry references SEED-027, but its seed file is
-  absent in this checkout and was not found in available Git history. Its
-  potential overlap cannot be verified. Preserve its entry; recover its
-  canonical scope before deciding to combine, replace, or execute related work.
+- Selected structural direction: explicit stored-note/occupancy collection
+  contracts and direct reuse of Note.isAvailable for already-loaded objects;
+  retain query-level availability for consumers that should fetch only
+  participating notes. No additional service or persisted state is selected.
+- Preserve the existing diagnostic distinction. A single stored-note read can
+  supply recognized titles and available candidates without changing messages;
+  the plan must verify that ancestor loading does not amplify database work.
+- Keep database-view membership, current-object ancestry, and the existing
+  shared frontend helper: they serve different runtimes/state moments. No
+  demonstrated defect requires replacing those representations in this story.
 
 ## When to Surface
 

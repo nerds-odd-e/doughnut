@@ -12,5 +12,4 @@ either the remote or local repository may be multiple commits behind.
 ## Backlog list
 
 - [Make trash participation rules cohesive across note consumers](seeds/SEED-029-cohesive-trash-participation.md#story-1) — SEED-029
-- [Process the rejected report from proven commissioned session items](seeds/SEED-027-process-rejected-commissioned-learning-report.md#story-1) — SEED-027
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
