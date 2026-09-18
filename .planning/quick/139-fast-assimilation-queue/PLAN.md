@@ -1,10 +1,22 @@
 # Get the next item to assimilate quickly for large notebooks
 
-Status: planned
+Status: in progress
 Source: [SEED-026 story 1](../../seeds/SEED-026-fast-assimilation-queue-for-large-notebooks.md#story-1),
 refined 2026-09-18. Owner decisions: gated properties count as unassimilated;
-the migration removes the unusable and dead index/column. Planning only;
-execution not yet authorized by this plan.
+the migration replaces the unusable index. Execution started 2026-09-18.
+
+## Execution identity
+
+- Mode: Story Branch Mode.
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`; claim
+  commit `28aa17d11c` (backlog entry moved to Taken).
+- Execution checkout: `/Users/terryyin/git/doughnut/.claude/worktrees/139-fast-assimilation-queue`
+  on branch `139-fast-assimilation-queue`.
+- Integration: `main` in the originating checkout; remote `origin`
+  (`nerds-odd-e/doughnut`). Push destination for this execution:
+  `origin/139-fast-assimilation-queue`.
+- CI observer: GitHub Actions, workflow `ci.yml` ("donut CI"), target branch
+  `139-fast-assimilation-queue`; mailbox `/tmp/dough-ci-501/watch-xA3zgE`.
 
 ## Goal and scope
 
@@ -27,8 +39,9 @@ Included:
   while scanning ordered property candidates that can still precede the best
   candidate found so far.
 - One migration replaces the functional title index with a plain index on
-  `(notebook_id, title_uniqueness_key)` and drops the unmapped
-  `note_property_index.target_note_id` column with its foreign key and index.
+  `(notebook_id, title_uniqueness_key)`. (The unmapped
+  `note_property_index.target_note_id` column was already removed by
+  `V300000315`; see Learnings.)
 - The Java reserved-key filter in the queue is deleted: rows are excluded at
   write time by `NotePropertyIndexPlanner`. Stale legacy rows, if production
   has any, are removed by a one-time ops statement (recorded under
@@ -93,33 +106,29 @@ PFE results:
 
 | Promise | Owning slice | Proof |
 | --- | --- | --- |
-| Title lookup is an index hit; dead column gone | 1 | test DB migrates; `docs/database-erd.md` regenerated; dev-DB EXPLAIN shows `key: idx_note_notebook_id_title`, `rows: 1` (manual, recorded in learnings) |
+| Title lookup is an index hit | 1 | test DB migrates; `docs/database-erd.md` unchanged or regenerated; dev-DB EXPLAIN shows `key: idx_note_notebook_id_title`, `rows: 1` (manual, recorded in learnings) |
 | Gated property counts as unassimilated; counts need no gate | 2 | `AssimilationServicePropertyReferenceGateTest.gates_list_property_until_all_resolved_targets_are_assimilated` expects total 3; `UnassimilatedPropertyServiceTest` count and subscription-count tests green; stale-key tests deleted with the filter |
 | Queue order and gate semantics unchanged; property scan bounded | 3 | `AssimilationService*Test` classes green; dev-DB digest shows 0 gate evaluations with no trackers (manual, recorded) |
 | Whole request about one second on owner data | 3 | `curl` timing on the dev DB recorded in learnings (manual) |
 
 ## Ordered slices
 
-### 1. Title lookups use an index and the dead target column is gone
+### 1. Title lookups use an index
 
 Type: Structure
-Status: planned
+Status: done (2026-09-18)
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test` migrates the test
 DB and stays green; `CURSOR_DEV=true nix develop -c pnpm export:database-erd`
 updates `docs/database-erd.md`; on the dev DB,
 `EXPLAIN SELECT id FROM note WHERE notebook_id=66879 AND lower(title)=lower('Word')`
 shows `key: idx_note_notebook_id_title`, `rows: 1`.
 
-Internal change: add `V300000331__replace_note_title_index_and_drop_property_target.sql`:
+Internal change: add `V300000331__replace_note_title_index.sql`:
 
 ```sql
 ALTER TABLE note
   DROP INDEX idx_note_notebook_id_title,
   ADD INDEX idx_note_notebook_id_title (notebook_id, title_uniqueness_key);
-ALTER TABLE note_property_index
-  DROP FOREIGN KEY fk_note_property_index_target_note,
-  DROP INDEX idx_note_property_index_target_note,
-  DROP COLUMN target_note_id;
 ```
 
 Unchanged external behavior: every `LOWER(n.title)` query returns the same
@@ -185,4 +194,20 @@ owner's data; this is the plan's last slice.
 
 ## Learnings
 
-(none yet)
+- 2026-09-18, before slice 1: `note_property_index.target_note_id`, its
+  index, and `fk_note_property_index_target_note` do not exist in any local
+  database (dev and test at Flyway version 300000330). Migration
+  `V300000315__replace_note_property_index_target_note_with_authored_reference.sql`
+  already replaced the column; the plan's drop statements came from the
+  pre-V315 text in `V100000000__baseline.sql`. Slice 1 is reduced to the
+  index swap; the "dead column gone" promise was already satisfied.
+- Slice 1 accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test`
+  green (2,475 tests) on a worktree test DB migrated to 300000331;
+  `information_schema.statistics` shows `idx_note_notebook_id_title` =
+  `notebook_id,title_uniqueness_key`; ERD export produced no diff (it lists no
+  indexes). Dev DB (`doughnut_development`, migrated by starting the worktree
+  backend on port 8082): `EXPLAIN SELECT id FROM note WHERE notebook_id=66879
+  AND lower(title)=lower('Word')` → `type: ref, key:
+  idx_note_notebook_id_title, rows: 1`. With only this index, one
+  `GET /api/assimilation/next?timezone=Asia/Singapore` as `old_learner` took
+  110 s (was 143–159 s in the seed measurement).
