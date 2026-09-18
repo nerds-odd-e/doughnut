@@ -2,7 +2,8 @@
 id: SEED-035
 status: dormant
 planted: 2026-09-18
-planted_during: execution retrospective of SEED-034 story 1 (plan 146), owner judged the gap a problem
+planted_during: execution retrospective of permanent deletion of trashed content, owner judged the gap a problem
+predecessor: SEED-034 story 1 and plan 146, recoverable at commit 8b8b83e962
 trigger_when: now, at the head of the product backlog
 scope: medium
 ---

@@ -2,7 +2,8 @@
 id: SEED-036
 status: dormant
 planted: 2026-09-18
-planted_during: execution retrospective of SEED-034 story 1 (plan 146), owner grouped the remaining follow-ups
+planted_during: execution retrospective of permanent deletion of trashed content, owner grouped the remaining follow-ups
+predecessor: SEED-034 story 1 and plan 146, recoverable at commit 8b8b83e962
 trigger_when: after SEED-035, in second place in the product backlog
 scope: small
 ---
