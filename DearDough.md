@@ -702,6 +702,33 @@ create the symlink before the observer is armed.
     failure modes a run hits appears to depend only on whether a Nix shell has
     been entered in that worktree yet, which is not something the guidance
     mentions.
+- Execution: SEED-035 story 1 / quick/148-cohesive-accepted-web-folder-changes / ea903668bb
+  - Timestamp: unknown (during initial CI-observer setup, before the first
+    slice was delegated)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `ls .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs` in
+    the freshly created worktree returned "No such file or directory", and
+    `ls .claude/` there listed only `settings.json`, no `skills/`. The
+    coordinator did not check `.agents/skills` first; `git ls-files
+    .agents/skills | grep dough-execute-plan` (run later, during this
+    retrospective) confirms `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`
+    was already present and git-tracked in that same worktree the whole time.
+  - Observed effect: instead of hitting this entry's documented
+    `MODULE_NOT_FOUND` or discovering the tracked `.agents/skills` realpath,
+    the coordinator ran `cp -R /Users/terryyin/git/doughnut/.claude/skills
+    <worktree>/.claude/skills` to populate the missing path, then armed the
+    observer from that copy. The copy worked and no coverage was lost, but
+    the copy was unnecessary work and leaves the worktree's skill copy able
+    to drift from the main checkout's local, gitignored `.claude/skills`
+    install if either is updated later.
+  - Inference: a third failure mode for the same root cause, beyond the loud
+    error and DD-065's silent no-op: working around the missing path by
+    duplicating a local install rather than using the already-tracked
+    `.agents/skills` realpath this entry already recommends naming in the
+    guidance. Reinforces that the fix, once applied, would avoid this cost
+    too.
 
 ## DD-075 — The product backlog moved on the shared integration branch between the coordinator's read and its queue claim
 
@@ -748,8 +775,57 @@ text; an edit applied from the earlier in-memory reading would have written a
     must be confirmed to be exactly the intended one-entry move, would make
     this independent of how the edit happens to be applied.
 
+## DD-076 — The CI observer's fixed discovery-poll bound reports lost coverage for revisions whose CI run exists and later succeeds
+
+[runtime-setup.md](../dough-execute-plan/references/runtime-setup.md) polls
+30 seconds apart and ends discovery after three consecutive misses (about 90
+seconds) before reporting `CI_COVERAGE_UNAVAILABLE`. On this project's GitHub
+Actions default, a pushed revision's workflow run can take longer than that
+to become visible through `gh run list`/the Actions API, especially across a
+run of several pushes in quick succession where earlier runs are still
+queued or executing. The observer then reports coverage as lost even though
+the run exists, is discoverable moments later, and goes on to succeed.
+
+### Occurrences
+
+- Execution: SEED-035 story 1 / quick/148-cohesive-accepted-web-folder-changes / ea903668bb
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: across five sequential slice pushes to
+    `worktree-148-cohesive-accepted-web-folder-changes`, `register-push` was
+    called immediately after each `git push`. Four of the five (`ea903668bb`,
+    `c8b70f2122`, `12142a4c99`, `622da78f30`) produced a
+    `CI_COVERAGE_UNAVAILABLE` event with reason "No CI attempt for pushed
+    revision after 3 discovery polls." A manual
+    `gh run list --repo nerds-odd-e/doughnut --branch
+    worktree-148-cohesive-accepted-web-folder-changes --json
+    databaseId,status,conclusion,headSha,createdAt`, run during the next
+    slice's proof-acceptance step (minutes later), found each of those four
+    runs already `completed`/`success` (run IDs 35349934027, 35351485386,
+    35352772896, 35353547219). The fifth push's run (35354749201) was still
+    `queued`/`in_progress` when the observer was stopped at plan completion,
+    per the protocol's "never wait for CI."
+  - Observed effect: no coverage was actually lost — every run that
+    completed by the time of manual inspection was green — but the
+    observer's own record shows 4 of 5 revisions as `unproved`/`uncovered`.
+    Following only the documented "record lost coverage once and continue"
+    step, without the extra manual `gh run list` checks this execution added,
+    would have under-reported delivered confidence for every slice but the
+    third, and would have given no signal to distinguish "CI hasn't run yet"
+    from "CI is actually failing and undiscoverable."
+  - Inference: the fixed ~90-second, 3-poll discovery bound appears too tight
+    for this project's observed push-to-visible latency when several pushes
+    happen within roughly ten minutes of each other, plausibly from runner
+    queueing contention. A longer discovery window, a bound expressed as
+    "time since push" rather than "poll count," or an explicit guidance step
+    to manually re-check `gh run list` once before treating
+    `CI_COVERAGE_UNAVAILABLE` as final, would likely have prevented every one
+    of these four false negatives.
+
 ## Retention
 
-- Highest allocated local number: 75
+- Highest allocated local number: 76
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
