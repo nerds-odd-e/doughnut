@@ -256,7 +256,7 @@ backend suite: `BUILD SUCCESSFUL`, no failures.
 
 ### 3. Folder dissolve records promotion and merge as one accepted result
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a synchronized folder contains direct notes and nested subfolders →
 dissolve, optionally requesting existing merge behavior → one accepted child
@@ -282,6 +282,23 @@ subtree/merge and atomic fixtures; suite-runtime exception applies. Proof setup
 is the risk, not extra production recipes. Safe stop: both requested folder
 behaviors work; remaining structural duplication in note creation is still an
 explicit story obligation.
+
+Result: `FolderRelocationService.dissolveFolder` now delegates to
+`applyLiveFolderChange`, mirroring rename; the mutation body moved into a
+private `dissolveFolderRecipe` that returns the dissolved `Folder` internally
+(discarded at the `void` boundary, same pattern `permanentlyDeleteFolderWithinNotebook`
+already used) so the wrapper's commit-message function has something to read.
+`NotebookController.dissolveFolder`'s transaction aligned to
+`Isolation.SERIALIZABLE, rollbackFor = Exception.class`. Confirmed "refusal
+without merge" is specifically the existing sibling-name-conflict-on-promotion
+rule, not a blanket non-empty-folder refusal. Added
+`NotebookGitFolderDissolveControllerTest` (promotion, merge, empty-folder/.keep),
+`NotebookGitFolderDissolveGuardControllerTest` (conflict, unauthorized,
+wrong-notebook, drift, unbound), and `NotebookGitFolderDissolveAtomicControllerTest`
+(late binding-save failure rolls back removed folder, promotion, referrer, and
+binding together) — all under the 250-line check from the start. Refactor pass
+found the recipe shape consistent with rename's and no local duplication to
+collapse. Full backend suite: `BUILD SUCCESSFUL`, no failures.
 
 ### 4. Local note construction and optional enrichment retain distinct responsibilities
 Type: Structure

@@ -213,9 +213,16 @@ public class FolderRelocationService {
     return folder;
   }
 
-  public void dissolveFolder(Notebook notebook, Folder folder, boolean merge, User viewer) {
-    requireFolderInNotebook(folder, notebook);
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+  public void dissolveFolder(Notebook notebook, Folder folder, boolean merge, User viewer)
+      throws UnexpectedNoAccessRightException {
+    applyLiveFolderChange(
+        notebook,
+        folder,
+        result -> "Dissolve folder: " + result.getName(),
+        (liveNotebook, liveFolder, now) -> dissolveFolderRecipe(liveFolder, merge, viewer, now));
+  }
+
+  private Folder dissolveFolderRecipe(Folder folder, boolean merge, User viewer, Timestamp now) {
     Set<Integer> affectedNoteIds = subtree.collectNoteIdsInSubtree(folder);
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(
@@ -223,5 +230,6 @@ public class FolderRelocationService {
     subtree.dissolveInto(folder, merge, now);
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
         affectedNoteIds, now, inboundReferencesByNoteId);
+    return folder;
   }
 }
