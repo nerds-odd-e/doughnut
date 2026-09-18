@@ -77,7 +77,7 @@ class NotebookGitProposalFolderRelocationRetryControllerTest
               folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
                   .map(Folder::getId)
                   .toList(),
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+              noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
                   .map(Note::getId)
                   .toList());
         });

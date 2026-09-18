@@ -58,8 +58,7 @@ class NotebookGitProposalPropertyValidationControllerTest
     inCommittedTransaction(
         transactionManager,
         () -> {
-          assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
+          assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
           assertThat(
               noteRepository.findById(existing.getId()).orElseThrow().getContent(),
               equalTo(originalContent));

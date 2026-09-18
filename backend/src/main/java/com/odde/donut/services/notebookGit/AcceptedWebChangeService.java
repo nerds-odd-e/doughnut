@@ -108,11 +108,11 @@ public class AcceptedWebChangeService {
     NotebookGitStateLoader.LockedNotebookState state = notebook.state();
     NotebookGitBundleImporter.ImportedBundle accepted = notebook.accepted();
     List<ExportFolderRow> currentFolders = notebookGitStateLoader.foldersOf(state.notebook());
-    List<Note> currentLiveNotes = notebookGitStateLoader.liveNotesOf(state.notebook());
+    List<Note> currentStoredNotes = notebookGitStateLoader.storedNotesOf(state.notebook());
     if (projection.matchesAcceptedTree(
         state.notebook(),
         currentFolders,
-        currentLiveNotes,
+        currentStoredNotes,
         accepted.repository(),
         accepted.mainHead())) {
       return;
@@ -121,7 +121,7 @@ public class AcceptedWebChangeService {
         PortableTreeSnapshot.build(
             state.notebook().getReadmeContent(),
             currentFolders,
-            NotebookExportRows.notes(currentLiveNotes));
+            NotebookExportRows.notes(currentStoredNotes));
     acceptedSnapshotPersistence.persist(accepted, entries, state.binding(), updatedAt, message);
   }
 
@@ -131,7 +131,7 @@ public class AcceptedWebChangeService {
     return projection.matchesAcceptedTree(
         state.notebook(),
         state.folders(),
-        state.liveNotes(),
+        state.storedNotes(),
         accepted.repository(),
         accepted.mainHead());
   }

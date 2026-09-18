@@ -6,7 +6,6 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -46,12 +45,12 @@ public class ReadmeOnlyFolderHealthRule implements HealthRule {
   public HealthFindingGroup evaluate(Notebook notebook, HealthRunContext context) {
     List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
     Set<Integer> occupiedFolderIds =
-        new HashSet<>(noteRepository.findLiveNoteFolderIdsByNotebookId(notebook.getId()));
+        noteRepository.findOccupiedFolderIdsByNotebookId(notebook.getId());
 
     HealthFindingGroup group = findingGroup();
     group.setItems(
-        FolderSubtreeLiveNotes.noteEmptyFolderItems(
-            folders, occupiedFolderIds, readme -> !FolderSubtreeLiveNotes.isBlankReadme(readme)));
+        FolderSubtreeOccupancy.noteEmptyFolderItems(
+            folders, occupiedFolderIds, readme -> !FolderSubtreeOccupancy.isBlankReadme(readme)));
     return group;
   }
 }

@@ -96,7 +96,7 @@ class NotebookGitProposalFolderRelocationRollbackControllerTest
                   .toList(),
               containsInAnyOrder(archive.getId(), topics.getId(), sub.getId()));
           assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+              noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
                   .map(Note::getId)
                   .toList(),
               containsInAnyOrder(nested.getId(), deeper.getId()));

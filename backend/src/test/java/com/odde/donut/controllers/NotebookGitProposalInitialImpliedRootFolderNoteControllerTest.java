@@ -68,7 +68,7 @@ class NotebookGitProposalInitialImpliedRootFolderNoteControllerTest
     assertThat(created.getName(), equalTo("New Folder"));
     assertThat(created.getParentFolderId(), nullValue());
     assertThat(created.getReadmeContent(), nullValue());
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(
         notes.stream().map(Note::getTitle).toList(),
         containsInAnyOrder("First note", "Second note"));
@@ -100,7 +100,7 @@ class NotebookGitProposalInitialImpliedRootFolderNoteControllerTest
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note createdNote = notes.getFirst();
     assertThat(createdNote.getTitle(), equalTo("First note"));
@@ -118,7 +118,7 @@ class NotebookGitProposalInitialImpliedRootFolderNoteControllerTest
     List<Note> notesBefore =
         inCommittedTransaction(
             transactionManager,
-            () -> noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()));
+            () -> noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()));
     List<AuthoredNoteReferenceRow> referencesBefore =
         inCommittedTransaction(
             transactionManager, () -> rowsForNotebook(entityManager, notebook.getId()));
@@ -153,7 +153,7 @@ class NotebookGitProposalInitialImpliedRootFolderNoteControllerTest
               folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()),
               equalTo(foldersBefore));
           assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()),
+              noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()),
               equalTo(notesBefore));
           assertThat(rowsForNotebook(entityManager, notebook.getId()), equalTo(referencesBefore));
         });

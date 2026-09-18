@@ -57,7 +57,7 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note created = notes.getFirst();
     NoteRealm shown = noteController.showNote(created);
@@ -101,7 +101,7 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(2));
     Note reloadedExisting = noteRepository.findById(existing.getId()).orElseThrow();
     assertThat(reloadedExisting.getContent(), equalTo(ORIGINAL_CONTENT));
@@ -144,7 +144,7 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
         () -> {
           NotebookGitBinding binding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-          List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+          List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
           return new PublicationState(
               binding.getAcceptedGitObjectId(),
               binding.getUpdatedAt(),

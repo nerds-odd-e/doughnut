@@ -63,7 +63,7 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
     assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(
         notes.stream().map(Note::getTitle).toList(),
         containsInAnyOrder("First note", "Second note", "Third note", "Fourth note"));
@@ -103,7 +103,7 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(2));
     Map<String, Note> byTitle =
         notes.stream().collect(Collectors.toMap(Note::getTitle, Function.identity()));
@@ -125,7 +125,7 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note createdNote = notes.getFirst();
     assertThat(createdNote.getTitle(), equalTo("First note"));
@@ -146,10 +146,7 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     assertThat(
-        noteRepository
-            .findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId())
-            .getFirst()
-            .getContent(),
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).getFirst().getContent(),
         equalTo(content));
     assertThat(
         notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent(),
@@ -176,7 +173,7 @@ class NotebookGitProposalInitialNotebookReadmeControllerTest
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
     assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
 
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);

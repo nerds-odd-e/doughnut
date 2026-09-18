@@ -103,7 +103,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
         reloadedOccupiedDestination.getContent(), equalTo(UNSYNCHRONIZED_RELATIONSHIP_CONTENT));
     assertThat(reloadedOccupiedDestination.getFolder(), nullValue());
     assertThat(
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .map(Note::getId)
             .toList(),
         equalTo(List.of(acceptedNote.getId(), occupiedDestination.getId())));

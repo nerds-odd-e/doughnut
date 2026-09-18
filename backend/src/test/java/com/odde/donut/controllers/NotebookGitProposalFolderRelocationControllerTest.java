@@ -77,7 +77,7 @@ class NotebookGitProposalFolderRelocationControllerTest
     assertThat(folders.get(archive.getId()).getParentFolderId(), nullValue());
     assertThat(folders.get(topics.getId()).getParentFolderId(), equalTo(archive.getId()));
     assertThat(folders.get(sub.getId()).getParentFolderId(), equalTo(topics.getId()));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(
         notes.stream().map(Note::getId).toList(),
         containsInAnyOrder(nested.getId(), deeper.getId()));
@@ -153,7 +153,7 @@ class NotebookGitProposalFolderRelocationControllerTest
     assertThat(folders.keySet(), containsInAnyOrder(archive.getId(), topics.getId(), sub.getId()));
     assertThat(folders.get(topics.getId()).getParentFolderId(), equalTo(archive.getId()));
     assertThat(folders.get(sub.getId()).getParentFolderId(), equalTo(topics.getId()));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(
         notes.stream().map(Note::getId).toList(),
         containsInAnyOrder(nested.getId(), deeper.getId(), unrelated.getId()));

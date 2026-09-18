@@ -63,7 +63,7 @@ class NotebookGitProposalFolderReadmeEditControllerTest
     assertThat(reloaded.getId(), equalTo(folder.getId()));
     assertThat(reloaded.getReadmeContent(), equalTo(EDITED_FOLDER_README));
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
 
     ResponseEntity<byte[]> downloaded =
         controller.downloadNotebookGitBundle(

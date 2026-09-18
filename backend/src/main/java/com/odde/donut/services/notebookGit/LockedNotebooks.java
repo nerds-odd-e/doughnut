@@ -11,9 +11,9 @@ public record LockedNotebooks(Map<Integer, NotebookGitStateLoader.LockedNotebook
     return Optional.ofNullable(states.get(notebookId));
   }
 
-  public Optional<Note> liveNote(Integer noteId) {
+  public Optional<Note> storedNote(Integer noteId) {
     return states.values().stream()
-        .flatMap(state -> state.liveNotes().stream())
+        .flatMap(state -> state.storedNotes().stream())
         .filter(note -> noteId.equals(note.getId()))
         .findFirst();
   }

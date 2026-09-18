@@ -32,8 +32,7 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
   void savesAWebEditOnTheSameLocallyCreatedNote() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     String createdHead = publishLocalCreation(notebook);
-    Note createdNote =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
+    Note createdNote = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
 
     String editedContent = CREATED_PREFIX + "first web edit";
     NoteRealm saved =
@@ -61,7 +60,7 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
     Notebook notebook = createGitBackedNotebook();
     String createdHead = publishLocalCreation(notebook);
     Integer createdNoteId =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst().getId();
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).getFirst().getId();
 
     NotebookGitBinding afterCreation = binding(notebook);
     byte[] editProposal =
@@ -75,8 +74,7 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
     controller.publishNotebookGitProposal(
         notebook.getId(), afterCreation.getAcceptedGitObjectId(), editProposal);
 
-    Note editedNote =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
+    Note editedNote = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
     NotebookGitBinding afterEdit = binding(notebook);
     assertThat(editedNote.getId(), is(createdNoteId));
     assertThat(editedNote.getContent(), is(LOCAL_CONTENT));

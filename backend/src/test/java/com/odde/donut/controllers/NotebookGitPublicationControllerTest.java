@@ -96,7 +96,7 @@ class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTe
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(3));
     for (Note edited : List.of(first, last)) {
       NoteRealm view =
@@ -251,7 +251,7 @@ class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTe
                 new NotebookGitProposalFile("Carrier.md", CARRIER_WITH_PROPERTY_AND_ALIAS))));
 
     Note carrier =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .filter(note -> note.getTitle().equals("Carrier"))
             .findFirst()
             .orElseThrow();

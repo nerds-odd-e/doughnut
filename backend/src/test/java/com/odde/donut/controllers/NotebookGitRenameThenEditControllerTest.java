@@ -57,9 +57,9 @@ class NotebookGitRenameThenEditControllerTest extends NotebookGitBundleControlle
     controller.publishNotebookGitProposal(
         notebook.getId(), afterRename.getAcceptedGitObjectId(), editProposal);
 
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(liveNotes, hasSize(1));
-    Note edited = liveNotes.getFirst();
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(storedNotes, hasSize(1));
+    Note edited = storedNotes.getFirst();
     assertThat(edited.getId(), equalTo(original.getId()));
     assertThat(edited.getTitle(), equalTo("Renamed"));
     assertThat(edited.getContent(), equalTo(EDITED_CONTENT));

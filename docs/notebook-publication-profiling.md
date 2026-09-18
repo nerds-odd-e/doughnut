@@ -32,7 +32,7 @@ notes. It retains the two unchanged control notes and two control folders
 (1,002 notes, 22 folders total), exact authored content, aliases, and references.
 No image attachments are seeded in the timing fixture.
 
-Updates call `NotebookGitProjection.requireOneLiveNoteAtPath` and then
+Updates call `NotebookGitProjection.requireOneNoteAtPath` and then
 `AuthoredNoteDocumentPersistence.persist`. Additions call
 `NotebookGitProposalNoteAddition.apply`, create a note with `NoteFactory`, then
 call that same persistence service. Both therefore run content/reference

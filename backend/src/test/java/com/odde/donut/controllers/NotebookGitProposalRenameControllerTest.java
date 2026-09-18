@@ -86,7 +86,7 @@ class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControlle
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note renamed = notes.getFirst();
     assertThat(renamed.getId(), equalTo(note.getId()));
@@ -294,7 +294,7 @@ class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControlle
                 new NotebookGitProposalFile("Added.md", EDITED_NOTE_CONTENT))));
 
     assertThat(noteRepository.findById(moved.getId()).orElseThrow().getTitle(), equalTo("Moved"));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(3));
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(3));
   }
 
   @Test

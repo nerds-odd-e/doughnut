@@ -133,10 +133,10 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitBundleC
         equalTo(DependentCounts.allAbsent()));
     assertThat(memoryTrackerRepository.findById(tracker.getId()).isPresent(), equalTo(false));
 
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(liveNotes, hasSize(2));
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(storedNotes, hasSize(2));
     Note recreated =
-        liveNotes.stream()
+        storedNotes.stream()
             .filter(note -> "Target".equals(note.getTitle()))
             .findFirst()
             .orElseThrow();

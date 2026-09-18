@@ -12,6 +12,8 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
@@ -91,22 +93,18 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
         containsString("No commissioned memory tracker"));
   }
 
-  @Test
-  void rejectsTrashedCommissionedNoteWithoutChangingItsLearningHistoryOrSchedule()
-      throws UnexpectedNoAccessRightException {
+  @ParameterizedTest
+  @CsvSource({"_trash, ", "_TRASH, ", "_trash, sub"})
+  void rejectsNoteBeneathRootTrashWithoutChangingItsLearningHistoryOrSchedule(
+      String rootFolderName, String childName) throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
-    Notebook notebook =
-        makeMe
-            .aNotebook()
-            .creatorAndOwner(currentUser.getUser())
-            .name("Spanish conversation")
-            .please();
-    Folder trash = makeMe.aFolder().notebook(notebook).name("_trash").please();
-    Note note = makeMe.aNote().folder(trash).title("Hola").content("Hello").please();
-    MemoryTracker tracker =
-        makeMe.aMemoryTrackerFor(note).commissioned().nextRecallAt(dayTwo).please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    Folder root = makeMe.aFolder().notebook(notebook).name(rootFolderName).please();
+    Folder home =
+        childName == null ? root : makeMe.aFolder().parentFolder(root).name(childName).please();
+    MemoryTracker tracker = commissionedNoteIn(home, "Hola", dayTwo);
     TrackerLearningState trackerStateBefore = learningStateOf(tracker);
 
     RecordLearningSessionResponse response =
@@ -114,13 +112,10 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
             recordRequest(notebook, learningSessionReport("Hola", 4)), "Asia/Shanghai");
 
     assertThat(response.getRecordedItems(), empty());
-    assertThat(response.getRejectedEntries(), hasSize(1));
     assertThat(
         response.getRejectedEntries().getFirst().getReason(),
         containsString("No commissioned memory tracker"));
-    assertThat(
-        recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(tracker.getId()),
-        empty());
+    assertThat(recallLogRepository.count(), equalTo(0L));
     assertThat(learningStateOf(tracker), equalTo(trackerStateBefore));
   }
 
@@ -132,7 +127,8 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
     Note availableNote =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("なにしろ").please();
-    makeMe.aNote().notebook(availableNote.getNotebook()).title("なにしろ").trashed().please();
+    makeMe.refresh(
+        makeMe.aNote().notebook(availableNote.getNotebook()).title("なにしろ").trashed().please());
     makeMe.aMemoryTrackerFor(availableNote).commissioned().nextRecallAt(dayTwo).please();
 
     RecordLearningSessionResponse response =
@@ -151,6 +147,53 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
+  void rejectsAmbiguousTitleWhenTwoAvailableNotesInDifferentFoldersShareIt()
+      throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    Folder greetings = makeMe.aFolder().notebook(notebook).name("greetings").please();
+    Folder slang = makeMe.aFolder().notebook(notebook).name("slang").please();
+    MemoryTracker greetingsTracker = commissionedNoteIn(greetings, "Hola", dayTwo);
+    MemoryTracker slangTracker = commissionedNoteIn(slang, "Hola", dayTwo);
+    TrackerLearningState greetingsStateBefore = learningStateOf(greetingsTracker);
+    TrackerLearningState slangStateBefore = learningStateOf(slangTracker);
+
+    RecordLearningSessionResponse response =
+        controller.record(
+            recordRequest(notebook, learningSessionReport("Hola", 4)), "Asia/Shanghai");
+
+    assertThat(response.getRecordedItems(), empty());
+    assertThat(
+        response.getRejectedEntries().getFirst().getReason(),
+        containsString("Ambiguous note title in notebook."));
+    assertThat(recallLogRepository.count(), equalTo(0L));
+    assertThat(learningStateOf(greetingsTracker), equalTo(greetingsStateBefore));
+    assertThat(learningStateOf(slangTracker), equalTo(slangStateBefore));
+  }
+
+  @Test
+  void recordsCommissionedNoteInAFolderNamedTrashBeneathAnOrdinaryRoot()
+      throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    Folder docs = makeMe.aFolder().notebook(notebook).name("docs").please();
+    Folder nestedTrash = makeMe.aFolder().parentFolder(docs).name("_trash").please();
+    MemoryTracker tracker = commissionedNoteIn(nestedTrash, "Hola", dayTwo);
+
+    RecordLearningSessionResponse response =
+        controller.record(
+            recordRequest(notebook, learningSessionReport("Hola", 4)), "Asia/Shanghai");
+
+    assertThat(response.getRejectedEntries(), empty());
+    assertThat(
+        response.getRecordedItems().getFirst().getMemoryTrackerId(), equalTo(tracker.getId()));
+  }
+
+  @Test
   void legacyScoresTagReportRecordsGrades() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
@@ -166,6 +209,11 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     assertThat(response.getRecordedItems().get(0).getGrade(), equalTo(4));
     assertThat(response.getRecordedItems().get(1).getGrade(), equalTo(1));
     assertThat(fixture.holaTracker().getLastRecalledAt(), equalTo(dayTwo));
+  }
+
+  private MemoryTracker commissionedNoteIn(Folder folder, String title, Timestamp dueAt) {
+    Note note = makeMe.aNote().folder(folder).title(title).please();
+    return makeMe.aMemoryTrackerFor(note).commissioned().nextRecallAt(dueAt).please();
   }
 
   private static TrackerLearningState learningStateOf(MemoryTracker tracker) {

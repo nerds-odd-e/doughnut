@@ -176,11 +176,11 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
             notebook.getId(), binding.getAcceptedGitObjectId(), range.proposalBytes());
 
     assertThat(publishedHead, equalTo(range.tip().getName()));
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(liveNotes, hasSize(1));
-    assertThat(liveNotes.getFirst().getId(), equalTo(surviving.getId()));
-    assertThat(liveNotes.getFirst().getTitle(), equalTo("Surviving"));
-    assertThat(liveNotes.getFirst().getContent(), equalTo(SURVIVING_FINAL));
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(storedNotes, hasSize(1));
+    assertThat(storedNotes.getFirst().getId(), equalTo(surviving.getId()));
+    assertThat(storedNotes.getFirst().getTitle(), equalTo("Surviving"));
+    assertThat(storedNotes.getFirst().getContent(), equalTo(SURVIVING_FINAL));
 
     NotebookGitBinding after =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();

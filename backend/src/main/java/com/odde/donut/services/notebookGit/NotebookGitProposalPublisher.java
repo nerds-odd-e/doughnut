@@ -72,7 +72,7 @@ public class NotebookGitProposalPublisher {
     NotebookGitBinding binding = state.binding();
     Notebook notebook = state.notebook();
     List<ExportFolderRow> folders = state.folders();
-    List<Note> liveNotes = state.liveNotes();
+    List<Note> storedNotes = state.storedNotes();
     authorizationService.assertAuthorization(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
     if (proposal.mainHead().equals(acceptedHead)) {
@@ -93,7 +93,7 @@ public class NotebookGitProposalPublisher {
     List<NotebookGitProposalTreeShape.ChangedDocument> documents =
         NotebookGitProposalTreeShape.classifyChangedDocuments(files);
     Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
-    boolean emptyAcceptedNotebook = isEmptyAcceptedNotebook(folders, liveNotes, files);
+    boolean emptyAcceptedNotebook = isEmptyAcceptedNotebook(folders, storedNotes, files);
     if (emptyAcceptedNotebook
         && (documents.stream().noneMatch(document -> document.path().endsWith(".md"))
             || documents.stream()
@@ -130,7 +130,7 @@ public class NotebookGitProposalPublisher {
       published = state;
       if (!beforeRelocation.isEmpty()) {
         projection.requireMatchingAcceptedTree(
-            notebook, folders, liveNotes, proposal.repository(), acceptedHead);
+            notebook, folders, storedNotes, proposal.repository(), acceptedHead);
         published = documentApplication.apply(published, proposal, beforeRelocation, publishedAt);
         published =
             folderRelocation.applyAfterMatchedAcceptedTree(
@@ -149,42 +149,37 @@ public class NotebookGitProposalPublisher {
               proposal.repository(), acceptedHead, proposal.mainHead(), documents);
       if (admitted.noteChanges().isEmpty() && admitted.documents().isEmpty()) {
         projection.requireMatchingAcceptedTree(
-            notebook, folders, liveNotes, proposal.repository(), acceptedHead);
+            notebook, folders, storedNotes, proposal.repository(), acceptedHead);
         return proposalAcceptance.acceptMatchingProposedTree(state, proposal, publishedAt);
       }
       NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
           proposal.repository(), proposal.mainHead());
       projection.requireMatchingAcceptedTree(
-          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
+          notebook, folders, storedNotes, proposal.repository(), acceptedHead);
       published =
-          new NotebookGitStateLoader.LockedNotebookState(binding, notebook, folders, liveNotes);
+          new NotebookGitStateLoader.LockedNotebookState(binding, notebook, folders, storedNotes);
     }
-    List<Note> proposedLiveNotes = new ArrayList<>(published.liveNotes());
+    List<Note> proposedNotes = new ArrayList<>(published.storedNotes());
     List<ExportFolderRow> proposedFolders = published.folders();
     // Deletions before additions so same-path deletion-gap recreation can replace the old identity.
-    ordinaryNoteApplication.applyDeletions(admitted, proposedFolders, proposedLiveNotes);
+    ordinaryNoteApplication.applyDeletions(admitted, proposedFolders, proposedNotes);
     if (relocation.isEmpty() && !admitted.documents().isEmpty()) {
       published =
           documentApplication.apply(
               new NotebookGitStateLoader.LockedNotebookState(
-                  published.binding(), published.notebook(), proposedFolders, proposedLiveNotes),
+                  published.binding(), published.notebook(), proposedFolders, proposedNotes),
               proposal,
               admitted.documents(),
               publishedAt);
-      proposedLiveNotes = new ArrayList<>(published.liveNotes());
+      proposedNotes = new ArrayList<>(published.storedNotes());
       proposedFolders = published.folders();
     }
     proposedFolders =
         ordinaryNoteApplication.applyModificationsAndRenames(
-            admitted,
-            proposedFolders,
-            published.notebook(),
-            proposal,
-            proposedLiveNotes,
-            publishedAt);
+            admitted, proposedFolders, published.notebook(), proposal, proposedNotes, publishedAt);
     return proposalAcceptance.acceptMatchingProposedTree(
         new NotebookGitStateLoader.LockedNotebookState(
-            published.binding(), published.notebook(), proposedFolders, proposedLiveNotes),
+            published.binding(), published.notebook(), proposedFolders, proposedNotes),
         proposal,
         publishedAt);
   }
@@ -218,14 +213,14 @@ public class NotebookGitProposalPublisher {
       List<NotebookGitProposalTreeShape.ChangedDocument> documents,
       Timestamp publishedAt) {
     ObjectId acceptedHead = ObjectId.fromString(published.binding().getAcceptedGitObjectId());
-    List<Note> notes = new ArrayList<>(published.liveNotes());
+    List<Note> proposedNotes = new ArrayList<>(published.storedNotes());
     List<NotebookGitProposalTreeShape.ChangedDocument> containers = new ArrayList<>();
     for (NotebookGitProposalTreeShape.ChangedDocument document : documents) {
       if (document.role() == NotebookGitProposalTreeShape.DocumentRole.CONTAINER) {
         containers.add(document);
         continue;
       }
-      notes.add(
+      proposedNotes.add(
           noteAddition.applyAtRepresentedPath(
               published.notebook(),
               published.folders(),
@@ -236,7 +231,7 @@ public class NotebookGitProposalPublisher {
     }
     NotebookGitStateLoader.LockedNotebookState withNotes =
         new NotebookGitStateLoader.LockedNotebookState(
-            published.binding(), published.notebook(), published.folders(), notes);
+            published.binding(), published.notebook(), published.folders(), proposedNotes);
     if (containers.isEmpty()) {
       return withNotes;
     }
@@ -245,10 +240,10 @@ public class NotebookGitProposalPublisher {
 
   private static boolean isEmptyAcceptedNotebook(
       List<ExportFolderRow> folders,
-      List<Note> liveNotes,
+      List<Note> storedNotes,
       List<NotebookGitProposalTreeShape.InspectedRegularFile> files) {
     return folders.isEmpty()
-        && liveNotes.isEmpty()
+        && storedNotes.isEmpty()
         && files.stream().allMatch(file -> file.acceptedBlobId() == null);
   }
 }

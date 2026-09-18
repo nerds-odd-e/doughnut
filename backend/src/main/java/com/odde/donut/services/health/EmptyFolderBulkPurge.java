@@ -6,7 +6,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -29,10 +28,10 @@ public class EmptyFolderBulkPurge {
   public void apply(Notebook notebook) {
     List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
     Set<Integer> occupiedFolderIds =
-        new HashSet<>(noteRepository.findLiveNoteFolderIdsByNotebookId(notebook.getId()));
+        noteRepository.findOccupiedFolderIdsByNotebookId(notebook.getId());
 
     List<Folder> deletable =
-        FolderSubtreeLiveNotes.cascadeSafeFullyEmptyFolders(folders, occupiedFolderIds);
+        FolderSubtreeOccupancy.cascadeSafeFullyEmptyFolders(folders, occupiedFolderIds);
     for (Folder folder : deletable) {
       detachNotesFromFolder(folder);
       entityPersister.remove(folder);

@@ -90,7 +90,7 @@ class NotebookGitProposalFolderRelocation {
         proposal.repository(), proposal.mainHead());
     if (requireMatchingAcceptedTree) {
       projection.requireMatchingAcceptedTree(
-          state.notebook(), folders, state.liveNotes(), proposal.repository(), acceptedHead);
+          state.notebook(), folders, state.storedNotes(), proposal.repository(), acceptedHead);
     }
     Map<String, Folder> destinationFolders =
         folderMaterialization.ensureAncestry(state.notebook(), folders, List.of(destPrefix));
@@ -107,7 +107,7 @@ class NotebookGitProposalFolderRelocation {
         state.binding(),
         state.notebook(),
         notebookGitStateLoader.foldersOf(state.notebook()),
-        state.liveNotes());
+        state.storedNotes());
   }
 
   private static String destParentPrefix(String destPrefix) {

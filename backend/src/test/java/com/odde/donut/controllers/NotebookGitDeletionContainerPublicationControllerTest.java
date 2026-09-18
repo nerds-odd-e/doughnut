@@ -54,7 +54,7 @@ class NotebookGitDeletionContainerPublicationControllerTest
         notebookRepository.findByOwnership_IdAndDeletedAtIsNull(remaining.getOwnership().getId()),
         hasSize(1));
     assertThat(remaining.getReadmeContent(), nullValue());
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(remaining.getId()), empty());
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(remaining.getId()), empty());
     assertThat(folderRepository.findByNotebookIdOrderByIdAsc(remaining.getId()), empty());
 
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(remaining);

@@ -79,11 +79,10 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
     inCommittedTransaction(
         transactionManager,
         () -> {
-          List<Note> liveNotes =
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-          assertThat(liveNotes.stream().map(Note::getId).toList(), equalTo(originalIds));
+          List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+          assertThat(storedNotes.stream().map(Note::getId).toList(), equalTo(originalIds));
           assertThat(
-              liveNotes.stream().map(Note::getContent).toList(),
+              storedNotes.stream().map(Note::getContent).toList(),
               equalTo(List.of(ORIGINAL, ORIGINAL, OTHER)));
         });
   }
@@ -216,14 +215,14 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
     inCommittedTransaction(
         transactionManager,
         () -> {
-          List<Note> liveNotes =
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-          assertThat(liveNotes.stream().map(Note::getId).toList(), equalTo(originalIds));
+          List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+          assertThat(storedNotes.stream().map(Note::getId).toList(), equalTo(originalIds));
           assertThat(
-              liveNotes.stream().map(Note::getContent).toList(),
+              storedNotes.stream().map(Note::getContent).toList(),
               equalTo(List.of(ORIGINAL, ORIGINAL)));
           assertThat(
-              liveNotes.stream().map(Note::getTitle).toList(), equalTo(List.of("First", "Second")));
+              storedNotes.stream().map(Note::getTitle).toList(),
+              equalTo(List.of("First", "Second")));
         });
   }
 }

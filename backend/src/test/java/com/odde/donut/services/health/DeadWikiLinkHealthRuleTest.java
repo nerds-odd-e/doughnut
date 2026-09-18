@@ -213,16 +213,16 @@ class DeadWikiLinkHealthRuleTest {
     Note source =
         makeMe.aNote().title("Source").notebook(notebook).content("See [[Missing]]").please();
     String contentBefore = source.getContent();
-    int liveCountBefore =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).size();
+    int storedNoteCountBefore =
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).size();
 
     notebookHealthService.lint(notebook, new HealthRunContext(owner));
     makeMe.entityPersister.refresh(source);
 
     assertThat(source.getContent(), equalTo(contentBefore));
     assertThat(
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()),
-        hasSize(liveCountBefore));
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()),
+        hasSize(storedNoteCountBefore));
   }
 
   private HealthFindingGroup deadWikiLinksGroup() {

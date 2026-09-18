@@ -62,7 +62,7 @@ class NotebookGitWebContentHistoryControllerTest
   }
 
   @Test
-  void missingReferenceChoiceKeepsAcceptedHistoryAndLiveNotesUnchanged() throws Exception {
+  void missingReferenceChoiceKeepsAcceptedHistoryAndStoredNotesUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note target = makeMe.aNote().notebook(notebook).title("Target").please();
     Note referrer = makeMe.aNote().notebook(notebook).please();
@@ -85,7 +85,7 @@ class NotebookGitWebContentHistoryControllerTest
   }
 
   @Test
-  void deniedOwnerKeepsAcceptedHistoryAndLiveNotesUnchanged() throws Exception {
+  void deniedOwnerKeepsAcceptedHistoryAndStoredNotesUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note target = makeMe.aNote().notebook(notebook).title("Target").please();
     Note referrer = makeMe.aNote().notebook(notebook).please();

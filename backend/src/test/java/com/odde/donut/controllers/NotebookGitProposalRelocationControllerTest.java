@@ -145,7 +145,7 @@ class NotebookGitProposalRelocationControllerTest extends NotebookGitBundleContr
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note relocated = notes.getFirst();
     assertThat(relocated.getId(), equalTo(note.getId()));

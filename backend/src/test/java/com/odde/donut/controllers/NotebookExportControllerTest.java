@@ -26,6 +26,11 @@ class NotebookExportControllerTest extends NotebookControllerTestBase {
     Notebook nb = topNote.getNotebook();
     Folder emptyFolder = ownedFolder(nb, "Ideas");
     Integer emptyFolderId = emptyFolder.getId();
+    makeMe.aNote().notebook(nb).title("0 later id sorts after").please();
+    Folder nestedTrash =
+        makeMe.aFolder().parentFolder(ownedFolder(nb, "_trash")).name("sub").please();
+    makeMe.aNote().folder(nestedTrash).title("Trashed").please();
+    makeMe.aNote().title("Other notebook").please();
 
     ResponseEntity<byte[]> response = controller.exportNotebook(nb);
 
@@ -45,7 +50,13 @@ class NotebookExportControllerTest extends NotebookControllerTestBase {
         }
       }
     }
-    assertThat(entryPaths, contains(topNote.getTitle() + ".md", "Ideas/.keep"));
+    assertThat(
+        entryPaths,
+        contains(
+            topNote.getTitle() + ".md",
+            "0 later id sorts after.md",
+            "Ideas/.keep",
+            "_trash/sub/Trashed.md"));
     makeMe.entityPersister.flushAndClear();
     assertThat(
         makeMe.entityPersister.find(Folder.class, emptyFolderId).getId(), equalTo(emptyFolderId));

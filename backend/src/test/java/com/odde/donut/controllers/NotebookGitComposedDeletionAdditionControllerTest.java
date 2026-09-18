@@ -124,8 +124,8 @@ class NotebookGitComposedDeletionAdditionControllerTest
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     assertThat(publishedHead, equalTo(tip.getName()));
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(liveNotes, hasSize(3));
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(storedNotes, hasSize(3));
     assertThat(noteRepository.findById(deleted.getId()).isPresent(), equalTo(false));
     assertThat(
         inCommittedTransaction(transactionManager, () -> dependentCounts(deleted)),
@@ -140,7 +140,7 @@ class NotebookGitComposedDeletionAdditionControllerTest
     assertThat(
         retainedRecall.getMemoryTrackers().getFirst().getId(), equalTo(retainedTracker.getId()));
 
-    Note added = noteByTitle(liveNotes, "Added");
+    Note added = noteByTitle(storedNotes, "Added");
     assertThat(added.getContent(), equalTo(ADDED_CONTENT));
     assertThat(added.getId(), not(equalTo(deleted.getId())));
 

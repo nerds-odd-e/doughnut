@@ -62,7 +62,7 @@ abstract class NotebookGitProposalFolderControllerTestBase
     return inCommittedTransaction(
         transactionManager,
         () -> {
-          List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+          List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
           List<Integer> noteIds = notes.stream().map(Note::getId).toList();
           MemoryTracker tracker =
               memoryTrackerRepository.findByNote_IdIn(noteIds).stream().findFirst().orElse(null);

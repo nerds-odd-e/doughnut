@@ -114,8 +114,7 @@ class NotebookGitProposalFolderCreationControllerTest
       assertThat(created.getParentFolderId(), equalTo(nestedParent.getId()));
     }
     Note added =
-        noteByTitle(
-            noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), "Added");
+        noteByTitle(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), "Added");
     assertThat(added.getContent(), equalTo(ADDED_FINAL));
     assertThat(added.getFolder().getId(), equalTo(created.getId()));
     NoteRealm existingView =
@@ -160,7 +159,7 @@ class NotebookGitProposalFolderCreationControllerTest
     assertThat(created.getName(), equalTo("Field Notes"));
     assertThat(created.getParentFolderId(), nullValue());
     assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);

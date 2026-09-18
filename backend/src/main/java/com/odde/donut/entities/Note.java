@@ -50,7 +50,10 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private Folder folder;
 
+  // Persisted membership as loaded; isTrashed follows the current folder ancestry.
   @Formula("coalesce(folder_id in (select tf.id from trashed_folder tf), false)")
+  @JsonIgnore
+  @Getter
   private boolean trashedInDatabase;
 
   @Column(name = "content", columnDefinition = "mediumtext")

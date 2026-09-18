@@ -56,8 +56,7 @@ class NotebookGitProposalFolderContentControllerTest
     assertThat(created.getName(), equalTo("例文"));
     assertThat(created.getParentFolderId(), nullValue());
     assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
-    List<Note> notes =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(fixture.notebook().getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(fixture.notebook().getId());
     assertThat(notes, hasSize(3));
     Note reloadedExisting = noteRepository.findById(fixture.existing().getId()).orElseThrow();
     assertThat(reloadedExisting.getContent(), equalTo(EXISTING_CONTENT));
@@ -129,7 +128,7 @@ class NotebookGitProposalFolderContentControllerTest
         folders.stream().filter(folder -> folder.getName().equals("111")).findFirst().orElseThrow();
     assertThat(created.getParentFolderId(), equalTo(examples.getId()));
     assertThat(created.getReadmeContent(), nullValue());
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     Note noteA = noteByTitle(notes, "A");
     Note related = noteByTitle(notes, "A-related-to-B");
     assertThat(noteA.getFolder().getId(), equalTo(created.getId()));
@@ -161,8 +160,7 @@ class NotebookGitProposalFolderContentControllerTest
     controller.publishNotebookGitProposal(
         fixture.notebook().getId(), fixture.binding().getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(fixture.notebook().getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(fixture.notebook().getId());
     assertThat(notes, hasSize(2));
     assertThat(notes.stream().map(Note::getTitle).toList(), containsInAnyOrder("Existing", "A"));
   }
@@ -183,8 +181,7 @@ class NotebookGitProposalFolderContentControllerTest
     controller.publishNotebookGitProposal(
         fixture.notebook().getId(), fixture.binding().getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(fixture.notebook().getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(fixture.notebook().getId());
     assertThat(notes, hasSize(4));
     assertThat(
         notes.stream().map(Note::getTitle).toList(), containsInAnyOrder("Existing", "A", "B", "C"));

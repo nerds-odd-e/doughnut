@@ -95,7 +95,7 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
     assertThat(returned.getTitle(), equalTo("Cells"));
     assertThat(returned.getFolder().getId(), equalTo(seed.biology().getId()));
     assertThat(
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(seed.notebook().getId()).stream()
+        noteRepository.findAllByNotebookIdOrderByIdAsc(seed.notebook().getId()).stream()
             .map(Note::getId)
             .toList(),
         contains(seed.cells().getId()));
