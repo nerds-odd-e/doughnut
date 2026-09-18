@@ -26,10 +26,10 @@ export function expectAccidentalMatchRevealForNotes(
     .scrollIntoView()
     .should('be.visible')
     .and('contain.text', 'Resolve accidental match')
-  cy.findByText('Note under question').should('be.visible')
-  cy.get('[data-test="note-title"]')
-    .filter(`:contains("${reviewedNoteTitle}")`)
-    .should('have.length.at.least', 1)
+  cy.get('.note-under-question')
+    .should('be.visible')
+    .and('contain.text', 'Note under question')
+    .and('contain.text', reviewedNoteTitle)
   cy.findByTestId('matched-notes-section').should('not.exist')
 
   cy.findByTestId('resolve-accidental-match').click()
@@ -46,7 +46,7 @@ export function expectAccidentalMatchRevealForNotes(
   cy.findByTestId('accidental-match-resolve-dialog').should('not.exist')
 
   expectAccidentalMatchAlert(answer)
-  cy.get('[data-test="note-title"]')
-    .filter(`:contains("${reviewedNoteTitle}")`)
-    .should('have.length.at.least', 1)
+  cy.get('.note-under-question')
+    .should('be.visible')
+    .and('contain.text', reviewedNoteTitle)
 }
