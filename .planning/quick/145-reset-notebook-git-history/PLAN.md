@@ -1,12 +1,22 @@
 # Reset a notebook's Git history
 
-Status: planned
+Status: in progress
 Source: [SEED-030 story 2](../../seeds/SEED-030-folder-ancestry-single-representation.md#2-notebooks-that-gained-repaired-content-can-publish-again).
 Authority: 2026-09-18 owner instruction to refine the story, write and refine a
 slice plan, and commit it. Planning only. The owner executes from another
 thread; this plan does not authorize execution by itself.
 
 Baseline: `7cb6e4da90` on `main`.
+
+## Execution identity
+
+- Originating and integration checkout: `/Users/terryyin/git/doughnut`, integration branch `main`.
+  Queue claim `e86f76566a` recorded there; it remains in `main`'s history.
+- Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/145-reset-notebook-git-history`,
+  branch `145-reset-notebook-git-history`, created from `e86f76566a`.
+- Mode: Story Branch. Authorized push destination: `origin` `145-reset-notebook-git-history`.
+- CI observation: GitHub Actions, workflow `ci.yml`, display name `donut CI`,
+  observer directory `/tmp/dough-ci-501/watch-6PqtuY`.
 
 ## Goal and scope
 
@@ -78,7 +88,7 @@ not grow by more than the lock.
 ### Slice 1 — Resetting replaces accepted history with one commit of the current notebook
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a git-backed notebook whose live content differs from its accepted
 history → someone who can edit it calls the reset endpoint → the accepted
@@ -96,7 +106,22 @@ endpoint because E2E fixtures depend on it. Use a commit message that says the
 history was reset, distinct from the cutover message.
 
 Proof: one new controller test class extending
-`NotebookGitBundleControllerTestBase`, proof examples 1 and 2. Assert the
+`NotebookGitBundleControllerTestBase`, proof examples 1 and 2.
+Accepted proof, 2026-09-18: `NotebookGitHistoryResetControllerTest`.
+`resetRestartsHistoryFromTheCurrentNotebookSoAPlainEditPublishesAgain` builds a
+git-backed notebook, snapshots it, then adds a note after the snapshot, so a
+plain edit is refused 409 with reason containing "refresh the checkout before
+publishing"; after `controller.resetNotebookGitHistory(notebook)` the reloaded
+binding has a new accepted id, `getParentCount() == 0`, a walked history of
+exactly one commit, `readTreeEntries` equal to `note.md` plus `outside.md`, and a
+plain edit on the new head publishes so the note content becomes the edited one.
+`deniedResetLeavesAcceptedHistoryUnchanged` refuses a non-owner with
+`UnexpectedNoAccessRightException` and leaves the accepted id and bundle bytes
+equal to their pre-call values. Commands:
+`unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL && CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookGit*'`
+(99 classes, 320 tests, 0 failures) and the same wrapper with
+`--tests '*NotebookGitCutoverServiceTest*'`.
+ Assert the
 commit count and parentlessness through `GitBundleTestReader`, and the tree
 through `GitBundleTestReader.readTreeEntries` or the existing blob readers.
 Command:
@@ -159,10 +184,43 @@ Omitting that step gives slice 2 a genuinely drifted notebook. The assertions
 ## Current decisions
 
 - One reset operation serves the product endpoint and the testability fixture.
+- Circle-member acceptance is proved by the existing
+  `AuthorizationServiceTest.noteBelongsToACircle.memberCanAccess`, which covers the
+  same `assertAuthorization` rule the endpoint calls. The new controller test
+  therefore proves drift recovery and the refusal of a user who cannot edit,
+  without a bespoke circle fixture. A circle-owned notebook at this controller
+  boundary would need manual `circle_user` and ownership teardown, because
+  `CommittedUserCleanup` only reaches notebooks through `ownership → user`; that
+  fixture growth would prove an already-covered rule.
 - Reset never inspects whether the notebook is drifted.
 - Once the button is released, the owner resets notebooks 4, 26 and 191 by hand. Notebook
   309 is its own owner's to reset. Nothing in this plan touches production data.
 
 ## Learnings
 
-None yet.
+- 2026-09-18: the execution worktree and branch disappeared while the first slice
+  was being implemented, alongside a concurrent session executing plan 146 in
+  `.worktrees/146-permanently-delete-trashed-content`. No implementation work
+  existed yet and the claim commit, the **Taken** entry and this plan were all
+  intact at `main`, so recovery was to recreate the branch and worktree from
+  `e86f76566a`. The detached CI observer survived and was reused rather than
+  relaunched.
+- Slice 1 delivered the shape the plan predicted: no new service and no new
+  class. The service grew by the writer lock and `@Transactional` plus a
+  `RESET_COMMIT_MESSAGE` and a `message` parameter on `buildBundle` — three lines
+  beyond "the lock" — which is the price of keeping the reset and cutover commit
+  messages distinct.
+- The refactor pass collapsed three character-identical private
+  `reloadCommittedBinding` helpers (one newly introduced by this slice) into one
+  on `NotebookGitBundleControllerTestBase`, a net reduction across the change.
+- Declined during refactoring, with reasons: `resetHistory` and
+  `createBindingForNotebook` do not collapse without growth, since a shared
+  writer would leave two wrappers plus a helper and would push the pessimistic
+  lock onto the notebook-creation path where a binding provably cannot exist yet;
+  the plan's stated default therefore stands. Renaming `NotebookGitCutoverService`
+  would touch ten files mechanically without reducing complexity.
+- Naming debt found, not this story's to fix: `CUTOVER_COMMIT_MESSAGE`
+  ("Cutover: snapshot existing notebook content into Git") is now inaccurate at
+  its only remaining call site, notebook creation, where there is no existing
+  content. No test asserts either commit message. "Cutover" in the class name is
+  likewise vestigial.

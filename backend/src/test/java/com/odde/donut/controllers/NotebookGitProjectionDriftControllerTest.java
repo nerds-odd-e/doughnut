@@ -148,12 +148,6 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
     return proposalBundleBytes(binding, List.of());
   }
 
-  private NotebookGitBinding reloadCommittedBinding(Integer notebookId) {
-    return inCommittedTransaction(
-        transactionManager,
-        () -> notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow());
-  }
-
   @FunctionalInterface
   private interface ProposalBundleFactory {
     byte[] create(NotebookGitBinding binding) throws Exception;

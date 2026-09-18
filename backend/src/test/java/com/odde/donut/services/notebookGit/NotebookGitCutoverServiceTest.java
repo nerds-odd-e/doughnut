@@ -102,8 +102,7 @@ class NotebookGitCutoverServiceTest {
   }
 
   @Test
-  void resnapshotForTestabilityReplacesTheExistingBindingWithTheNotebooksCurrentContent()
-      throws Exception {
+  void resetHistoryReplacesTheExistingBindingWithTheNotebooksCurrentContent() throws Exception {
     Notebook notebook = makeMe.aNotebook().please();
     makeMe.entityPersister.flush();
     NotebookGitBinding initialBinding =
@@ -124,7 +123,7 @@ class NotebookGitCutoverServiceTest {
     makeMe.entityPersister.flush();
 
     Instant snapshotTime = Instant.parse("2026-09-04T10:15:30Z");
-    notebookGitCutoverService.resnapshotForTestability(notebook, snapshotTime);
+    notebookGitCutoverService.resetHistory(notebook, snapshotTime);
     makeMe.entityPersister.flushAndClear();
 
     NotebookGitBinding binding =

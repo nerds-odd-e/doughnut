@@ -36,7 +36,7 @@ class NotebookGitTestabilityController {
   /**
    * Testability-only: simulates content changes landing after a notebook's real cutover by
    * replacing its accepted Git binding with a fresh snapshot of its current content. See {@link
-   * NotebookGitCutoverService#resnapshotForTestability}.
+   * NotebookGitCutoverService#resetHistory}.
    */
   @PostMapping("/resnapshot_notebook_git_binding_for_testability")
   @Transactional
@@ -53,7 +53,7 @@ class NotebookGitTestabilityController {
                 () ->
                     new IllegalArgumentException(
                         "No notebook with name: " + request.getNotebookName()));
-    notebookGitCutoverService.resnapshotForTestability(
+    notebookGitCutoverService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
     return "OK";
   }

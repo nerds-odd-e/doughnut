@@ -164,12 +164,6 @@ class NotebookGitConcurrentProjectionDriftControllerTest
     }
   }
 
-  private NotebookGitBinding reloadCommittedBinding(Integer notebookId) {
-    return inCommittedTransaction(
-        transactionManager,
-        () -> notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow());
-  }
-
   /**
    * Verifies the retained bundle after a content drift is one exact linear advance: the new head
    * matches the binding, its note.md agrees with the freshly loaded database projection, and its

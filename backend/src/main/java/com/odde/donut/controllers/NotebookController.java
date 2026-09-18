@@ -32,6 +32,7 @@ import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
 import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
+import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
 import com.odde.donut.services.notebookGit.WebFolderCreationService;
@@ -78,6 +79,7 @@ class NotebookController {
   private final NotebookExportService notebookExportService;
   private final NotebookGitBundleDownloadService notebookGitBundleDownloadService;
   private final NotebookGitProposalPublisher notebookGitProposalPublisher;
+  private final NotebookGitCutoverService notebookGitCutoverService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -98,7 +100,8 @@ class NotebookController {
       FolderRelocationService folderRelocationService,
       NotebookExportService notebookExportService,
       NotebookGitBundleDownloadService notebookGitBundleDownloadService,
-      NotebookGitProposalPublisher notebookGitProposalPublisher) {
+      NotebookGitProposalPublisher notebookGitProposalPublisher,
+      NotebookGitCutoverService notebookGitCutoverService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -118,6 +121,7 @@ class NotebookController {
     this.notebookExportService = notebookExportService;
     this.notebookGitBundleDownloadService = notebookGitBundleDownloadService;
     this.notebookGitProposalPublisher = notebookGitProposalPublisher;
+    this.notebookGitCutoverService = notebookGitCutoverService;
   }
 
   @GetMapping("")
@@ -457,6 +461,19 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     notebookIndexingService.resetNotebookIndex(notebook);
+  }
+
+  @Operation(
+      operationId = "resetNotebookGitHistory",
+      summary = "Restart the notebook's Git history from its current content")
+  @PostMapping("/{notebook}/reset-git-history")
+  @Transactional
+  public void resetNotebookGitHistory(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    notebookGitCutoverService.resetHistory(
+        notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
   }
 
   @Operation(operationId = "exportNotebook", summary = "Export notebook as a Markdown zip")

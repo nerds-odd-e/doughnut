@@ -209,7 +209,12 @@ abstract class NotebookGitBundleControllerTestBase extends NoteDependentRowsCont
   }
 
   NotebookGitBinding snapshotCurrentPortableTree(Notebook notebook) {
-    return notebookGitCutoverService.resnapshotForTestability(notebook, Instant.now());
+    return notebookGitCutoverService.resetHistory(notebook, Instant.now());
+  }
+
+  NotebookGitBinding reloadCommittedBinding(Integer notebookId) {
+    return committed(
+        () -> notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow());
   }
 
   /** A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. */

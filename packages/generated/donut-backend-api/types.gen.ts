@@ -2076,6 +2076,22 @@ export type ResetNotebookIndexResponses = {
     200: unknown;
 };
 
+export type ResetNotebookGitHistoryData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/reset-git-history';
+};
+
+export type ResetNotebookGitHistoryResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type LintData = {
     body?: never;
     path: {

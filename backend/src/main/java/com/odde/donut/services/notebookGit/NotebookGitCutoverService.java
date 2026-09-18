@@ -16,15 +16,17 @@ import java.time.Instant;
 import java.util.List;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Gives one notebook its accepted Git binding: builds the notebook's canonical Portable-tree
  * snapshot as of a given commit time, commits it as a single parentless root commit under a stable
  * Donut system identity, and persists the accepted binding.
  *
- * <p>{@code NotebookService} calls this at creation time so every notebook starts Git-backed from
- * an empty tree. The caller supplies the commit time, and a tree or bundle failure propagates
- * before a binding is persisted.
+ * <p>{@code NotebookService} calls {@link #createBindingForNotebook} at creation time so every
+ * notebook starts Git-backed from an empty tree; {@link #resetHistory} writes the same kind of root
+ * commit over a binding a notebook already has. The caller supplies the commit time, and a tree or
+ * bundle failure propagates before a binding is persisted.
  */
 @Service
 public class NotebookGitCutoverService {
@@ -36,6 +38,8 @@ public class NotebookGitCutoverService {
 
   static final String CUTOVER_COMMIT_MESSAGE =
       "Cutover: snapshot existing notebook content into Git";
+
+  static final String RESET_COMMIT_MESSAGE = "Reset: restart Git history from the current notebook";
 
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
@@ -51,7 +55,7 @@ public class NotebookGitCutoverService {
   }
 
   public NotebookGitBinding createBindingForNotebook(Notebook notebook, Instant cutoverTime) {
-    BundleWriteResult written = buildBundle(notebook, cutoverTime);
+    BundleWriteResult written = buildBundle(notebook, cutoverTime, CUTOVER_COMMIT_MESSAGE);
 
     NotebookGitBinding binding = new NotebookGitBinding();
     binding.setNotebook(notebook);
@@ -60,30 +64,30 @@ public class NotebookGitCutoverService {
   }
 
   /**
-   * Testability-only fixture support: replaces {@code notebook}'s accepted Git binding with a fresh
-   * snapshot of its current content for structural-change scenarios.
+   * Restarts {@code notebook}'s accepted Git history: one parentless commit of the notebook's
+   * current content replaces whatever the binding held, so the notebook can be cloned and published
+   * again whatever state its history was in.
    */
-  public NotebookGitBinding resnapshotForTestability(Notebook notebook, Instant snapshotTime) {
-    BundleWriteResult written = buildBundle(notebook, snapshotTime);
-
+  @Transactional
+  public NotebookGitBinding resetHistory(Notebook notebook, Instant resetTime) {
     NotebookGitBinding binding =
         notebookGitBindingRepository
-            .findByNotebook_Id(notebook.getId())
+            .findByNotebookIdForUpdate(notebook.getId())
             .orElseGet(
                 () -> {
                   NotebookGitBinding created = new NotebookGitBinding();
                   created.setNotebook(notebook);
                   return created;
                 });
-    applyBundle(binding, written, snapshotTime);
+    applyBundle(binding, buildBundle(notebook, resetTime, RESET_COMMIT_MESSAGE), resetTime);
     return notebookGitBindingRepository.save(binding);
   }
 
-  private BundleWriteResult buildBundle(Notebook notebook, Instant commitTime) {
+  private BundleWriteResult buildBundle(Notebook notebook, Instant commitTime, String message) {
     List<PortableTreeEntry> entries = buildPortableTreeEntries(notebook);
     try (Repository gitRepository =
         NotebookGitBundleBuilder.build(
-            entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, CUTOVER_COMMIT_MESSAGE, commitTime)) {
+            entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, message, commitTime)) {
       return NotebookGitBundleWriter.write(gitRepository);
     }
   }
