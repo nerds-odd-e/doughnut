@@ -1,12 +1,25 @@
 # Permanently delete trashed notes and folders
 
-Status: planned
+Status: in progress
 Source: [SEED-034 story 1](../../seeds/SEED-034-permanently-delete-trashed-content.md#story-1).
 Authority: 2026-09-18 owner instruction to refine the story, write a slice plan
 and refine it if needed. Planning only. This plan does not authorize execution
 by itself.
 
 Baseline: `eedaf172eb` on `main`.
+
+## Execution identity
+
+- Mode: Story Branch Mode.
+- Originating checkout: `/Users/terryyin/git/doughnut`, integration branch `main`.
+  The **Taken** claim is commit `c619aba43a` there.
+- Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/146-permanently-delete-trashed-content`,
+  branch `146-permanently-delete-trashed-content`, created from that claim.
+- Integration checkout and branch for later wrap-up: `/Users/terryyin/git/doughnut`, `main`.
+- Authorized push destination: `origin` `146-permanently-delete-trashed-content`.
+- CI observer: GitHub Actions, workflow `ci.yml` (display name `donut CI`),
+  repository `nerds-odd-e/doughnut`, target branch `146-permanently-delete-trashed-content`,
+  observer directory `/tmp/dough-ci-501/watch-u2JuvM`.
 
 ## Goal and scope
 
@@ -122,7 +135,7 @@ Commands, run from the execution worktree:
 ### Slice 1 — Permanently deleting a trashed note removes it with its dependent data in one accepted change
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a note located under `_trash` has a memory tracker and a
 conversation, a peer note shares its folder, and a surviving note links to it →
@@ -304,4 +317,35 @@ above.
 
 ## Learnings
 
-None yet.
+### Slice 1
+
+- Delivered: `NoteTrashService.permanentlyDelete(noteId, notebookId)` beside `trash`
+  on the same `WebNoteEditService.edit` accepted-change boundary, and
+  `POST /api/notes/{note}/permanently-delete` in `NoteController` returning no body.
+  The refusal `400 "Note is not in trash."` is evaluated inside the `edit` mutation,
+  on the locked re-resolved note rather than the controller's instance — the same
+  position as `"Folder is already in trash."` in
+  `FolderRelocationService.trashFolderWithinNotebook`.
+- Accepted proof: `NoteControllerPermanentDeleteTests` (three tests) and
+  `NotebookGitWebPermanentDeleteControllerTest` (one test). Promises 1–3 are proved
+  together by `removesTheTrashedNoteWithItsDependentDataAndKeepsTheRestOfTheNotebook`,
+  which shares one heavy fixture; promise 4 by
+  `refusesToPermanentlyDeleteANoteThatIsNotInTrash` and
+  `rejectsPermanentDeleteOfAnotherOwnersTrashedNote`; promise 5 by the Git test's
+  parent count of 1 and its tree of exactly `Atoms.md` + `_trash/Biology/.keep`.
+  Commands: `--tests '*PermanentDelet*'`, `--tests 'com.odde.donut.controllers.NotebookGitWeb*'`,
+  `--tests '*NoteControllerTrash*'` — all green.
+- Fixture idiom for destructive paths: with a note's dependents managed in the same
+  persistence context, Hibernate's flush after removing the note raises
+  `TransientPropertyValueException` from a managed `MemoryTracker` still pointing at
+  it. Real requests never hold those rows in session, so this is a test artifact. The
+  repo's existing remedy is `makeMe.entityPersister.flushAndClear()` after seeding and
+  reloading by id, as `MemoryTrackerDeleteControllerTest` does. **Slice 3 will hit the
+  same thing** when it removes a folder subtree; use the same idiom rather than
+  production-side defensiveness.
+- `FolderBuilder.inTrashOf(Notebook)` now owns the fixture knowledge "a folder is in
+  trash when it sits under `_trash`". Slices 3 and 4 should reuse it instead of
+  re-spelling the parent-folder chain.
+- The TypeScript API client was regenerated: `NoteController.permanentlyDeleteNote`
+  posts to `/api/notes/{note}/permanently-delete`. Slice 2 consumes it.
+- No evidence contradicted the North Star topic "One complete accepted web change".

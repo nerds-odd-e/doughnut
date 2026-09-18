@@ -1940,6 +1940,22 @@ export type SearchForRelationshipTargetWithinResponses = {
 
 export type SearchForRelationshipTargetWithinResponse = SearchForRelationshipTargetWithinResponses[keyof SearchForRelationshipTargetWithinResponses];
 
+export type PermanentlyDeleteNoteData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/permanently-delete';
+};
+
+export type PermanentlyDeleteNoteResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type UploadNoteImageData = {
     body?: NoteImageUploadDto;
     path: {

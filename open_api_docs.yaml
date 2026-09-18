@@ -768,6 +768,20 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RelationshipLiteralSearchHit"
+  /api/notes/{note}/permanently-delete:
+    post:
+      tags:
+      - note-controller
+      operationId: permanentlyDeleteNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/notes/{note}/images:
     post:
       tags:
