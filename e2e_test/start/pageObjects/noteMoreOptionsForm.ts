@@ -12,16 +12,23 @@ const titles = {
   audio: 'Audio tools',
   assimilation: 'Assimilate',
   trash: 'Trash note (d)',
+  permanentDelete: 'Permanently delete note (d)',
   questions: 'Questions for the note',
 } as const
 
 const clickMoreOption = clickToolbarOverflowAction
 
-const trashNoteWithConfirmation = (confirmButtonName: string | RegExp) => {
-  clickMoreOption(titles.trash)
+const clickMoreOptionAndConfirm = (
+  actionTitle: string,
+  confirmButtonName: string | RegExp
+) => {
+  clickMoreOption(actionTitle)
   cy.findByRole('button', { name: confirmButtonName }).click()
   waitUntilAppIsNotBusy()
 }
+
+const trashNoteWithConfirmation = (confirmButtonName: string | RegExp) =>
+  clickMoreOptionAndConfirm(titles.trash, confirmButtonName)
 
 /**
  * Note toolbar more-options actions — on the bar when inline/pinned, otherwise
@@ -33,6 +40,9 @@ export const noteMoreOptions = () => {
   return {
     trashNote() {
       trashNoteWithConfirmation('OK')
+    },
+    permanentlyDeleteNote() {
+      clickMoreOptionAndConfirm(titles.permanentDelete, 'OK')
     },
     /** Remove a relationship note without reducing it to a source property. */
     deleteRelationshipNote() {

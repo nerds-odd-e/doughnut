@@ -117,6 +117,12 @@ export interface StoredApi {
   ): Promise<NoteRealm | undefined>
 
   /**
+   * Permanently deletes a note that is in trash, with everything it owns.
+   * Records no undo and drops the note from cache.
+   */
+  permanentlyDeleteNote(router: Router, noteId: Donut.ID): Promise<void>
+
+  /**
    * Permanently reduces a relationship note into a property of its source.
    * Records no undo and drops the relationship note from cache.
    */
@@ -135,6 +141,13 @@ export interface StoredApi {
 
 function noteReferenceHandlingBody(options: NoteTrashOptions): NoteTrashDto {
   return { referenceHandling: options.referenceHandling }
+}
+
+/** Where a note's reader lands once the note itself is gone. */
+function containingLocation(notebookId: number, folderId: number | null) {
+  return folderId != null
+    ? { name: "folderPage", params: { notebookId, folderId } }
+    : { name: "notebookPage", params: { notebookId } }
 }
 
 export default class StoredApiCollection implements StoredApi {
@@ -506,17 +519,28 @@ export default class StoredApiCollection implements StoredApi {
       cachedRealm.note.noteTopology.title,
       originalFolderId
     )
-    const destination =
-      originalFolderId != null
-        ? {
-            name: "folderPage",
-            params: { notebookId, folderId: originalFolderId },
-          }
-        : { name: "notebookPage", params: { notebookId } }
-    await router.replace(destination)
+    await router.replace(containingLocation(notebookId, originalFolderId))
     this.storage.refreshNoteRealm(trashedRealm)
     refreshSidebarStructuralListings()
     return trashedRealm
+  }
+
+  async permanentlyDeleteNote(router: Router, noteId: Donut.ID) {
+    const cachedRealm = this.storage.refOfNoteRealm(noteId).value
+    if (!cachedRealm) throw new Error("Cannot delete a note that is not loaded")
+    const { error } = await apiCallWithLoading(() =>
+      NoteController.permanentlyDeleteNote({ path: { note: noteId } })
+    )
+    if (error) return
+
+    await router.replace(
+      containingLocation(
+        cachedRealm.notebookRealm.notebook.id,
+        realmLeafFolder(cachedRealm)?.id ?? null
+      )
+    )
+    this.storage.removeNoteRealm(noteId)
+    refreshSidebarStructuralListings()
   }
 
   async reduceRelationNoteToSourceProperty(

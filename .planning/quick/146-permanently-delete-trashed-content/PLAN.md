@@ -78,7 +78,7 @@ Assumptions:
 | Know whether content is in trash | Backend `Note.isTrashed()` and `Folder.isTrashed()`; frontend `isLocationInTrash` in `utils/folderTrash.ts`, used by `NoteShow.vue`, `FolderPage.vue` and `FolderSettings.vue` | Reuse. Move the note-realm form of the check from `NoteShow.vue` into `folderTrash.ts` so the toolbar and the page share one rule. |
 | Frontend handling of a note that no longer exists after the call | `StoredApiCollection.reduceRelationNoteToSourceProperty`: `removeNoteRealm`, route away, `refreshSidebarStructuralListings` | Same pattern. Land on the note's containing folder page, as Trash does. No undo entry. |
 | Frontend handling after a folder is gone | `routeAfterFolderRemoval` in `folderAdminMutations.ts`, used by trash and dissolve | Reuse. |
-| Confirmation | `popups.confirm` in `useNoteTrashFlow.ts` and `useFolderAdmin.ts` | Reuse. No new component. |
+| Confirmation | `popups.confirm` in `useNoteRemovalFlow.ts` (named `useNoteTrashFlow.ts` before slice 2) and `useFolderAdmin.ts` | Reuse. No new component. |
 
 Routes: `DELETE /api/notebooks/{notebook}/folders/{folder}` is already Dissolve,
 so use explicit routes beside the trash routes, for example
@@ -96,7 +96,8 @@ trash membership.
 
 Expected production shape: two controller methods, one method in
 `NoteTrashService`, one in `FolderRelocationService`, a state-dependent branch
-in `useNoteTrashFlow.ts` with one store method, and a state-dependent block in
+in `NoteMoreOptionsActions.vue` over `useNoteRemovalFlow.ts` with one store method,
+and a state-dependent block in
 `FolderSettings.vue` with one mutation function.
 
 ### Direction and decisions carried
@@ -172,7 +173,7 @@ Safe stopping point: yes. The endpoint works without the button.
 ### Slice 2 — A trashed note offers Permanently delete behind a confirmation
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: the owner opens a note that is in trash → the toolbar button, the
 menu item and the `d` shortcut read "Permanently delete note (d)" → confirming
@@ -182,7 +183,7 @@ Cancelling sends no request. No undo entry is recorded. An active note still
 runs today's trash flow.
 
 Move the note-realm trash check into `utils/folderTrash.ts`. In
-`useNoteTrashFlow.ts`, branch once at the top on that check: trashed →
+the note-removal composable, branch once on that check: trashed →
 `popups.confirm` then a new `StoredApiCollection` method following
 `reduceRelationNoteToSourceProperty`; otherwise the existing flow untouched.
 Title comes from `noteMoreOptionsTitles.ts`. Confirmation wording, to keep or
@@ -349,3 +350,32 @@ above.
 - The TypeScript API client was regenerated: `NoteController.permanentlyDeleteNote`
   posts to `/api/notes/{note}/permanently-delete`. Slice 2 consumes it.
 - No evidence contradicted the North Star topic "One complete accepted web change".
+
+### Slice 2
+
+- Delivered: `utils/folderTrash.isNoteRealmInTrash` is the one note-realm trash rule;
+  `StoredApiCollection.permanentlyDeleteNote(router, noteId)` calls the endpoint, routes
+  to the containing folder through a new shared `containingLocation` helper (now also
+  used by `trashNote`), drops the note from cache and refreshes the sidebar, recording
+  **no** `noteEditingHistory` entry.
+- The branch landed in `NoteMoreOptionsActions.vue` rather than inside the composable:
+  the component now reads `noteIsTrashed` once for both the label (`noteDeleteTitle`)
+  and the action (`deleteNote`), and the toolbar button, the menu item and the `d`
+  shortcut all go through that one handler. The composable was renamed
+  `useNoteTrashFlow.ts` → `useNoteRemovalFlow.ts` so that `trashNote` no longer
+  sometimes permanently deletes, keeping ADR 0001's distinction between "Trash" and
+  "Permanent deletion". The plan text above was updated to match.
+- Accepted proof: E2E scenario "Permanently delete a note that is in trash" in
+  `e2e_test/features/note_creation_and_update/note_deletion.feature` (12 passing,
+  rerun green after the refactor), and
+  `frontend/tests/notes/NoteMoreOptionsForm.permanentlyDeleteNote.spec.ts` for the
+  label, the exact confirmation wording and the cancel path.
+- Removed as dead: `NoteShow.vue`'s `ancestorFolders` and `showBreadcrumb` props, the
+  `effectiveAncestorFolders` fallback and the unreachable breadcrumb block. Verified
+  independently: none of the three mount sites (`NoteShowPage.vue`,
+  `MemoryTrackerAsync.vue`, `ConversationComponent.vue`) binds either prop.
+- The keyboard shortcut id stays `note-trash`; plan 136 renamed it to trash vocabulary
+  under ADR 0001 and it has no user-visible effect. Left for the owner.
+- Reported for later, not acted on: `StoredApiCollection.ts` (613 lines) and
+  `NoteMoreOptionsActions.vue` (272 lines) both exceed the 250-line rule and did so
+  before this story.

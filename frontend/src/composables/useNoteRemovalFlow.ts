@@ -6,8 +6,9 @@ import type {
   NoteTrashReferenceHandling,
 } from "@/store/StoredApiCollection"
 import { isRelationshipNote } from "@/utils/relationNoteReduceOnTrash"
+import { isNoteRealmInTrash } from "@/utils/folderTrash"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
-import { toValue, type MaybeRefOrGetter } from "vue"
+import { computed, toValue, type MaybeRefOrGetter } from "vue"
 import { useRouter } from "vue-router"
 import {
   closeAndFlushNoteContentMutations,
@@ -16,6 +17,10 @@ import {
 
 const REDUCE_TO_PROPERTY_LOADING_MESSAGE = "Reducing to source property..."
 const TRASH_LOADING_MESSAGE = "Trashing note..."
+const PERMANENT_DELETE_LOADING_MESSAGE = "Permanently deleting note..."
+
+const permanentDeleteWarning = (label: string) =>
+  `Permanently delete ${label}? Its learning history, questions, conversations and images are deleted too, and this cannot be undone. Earlier Git history of this notebook still contains its text.`
 
 type TrashFlowChoice =
   | { action: "reduce" }
@@ -27,7 +32,7 @@ function loadingMessageFor(flowChoice: TrashFlowChoice): string {
     : TRASH_LOADING_MESSAGE
 }
 
-export function useNoteTrashFlow(
+export function useNoteRemovalFlow(
   noteId: MaybeRefOrGetter<number>,
   noteTitle: MaybeRefOrGetter<string>
 ) {
@@ -39,6 +44,19 @@ export function useNoteTrashFlow(
     storageAccessor.value.refOfNoteRealm(toValue(noteId)).value
 
   const noteHasReferences = () => (noteRealm()?.references?.length ?? 0) > 0
+
+  const noteIsTrashed = computed(() => isNoteRealmInTrash(noteRealm()))
+
+  const permanentlyDeleteNote = async () => {
+    const id = toValue(noteId)
+    const label = quotedNoteLabel(toValue(noteTitle), id)
+    if (!(await popups.confirm(permanentDeleteWarning(label)))) return
+
+    await runWithBlockingApiLoading(async () => {
+      if (!(await closeAndFlushNoteContentMutations(id))) return
+      await storageAccessor.value.storedApi().permanentlyDeleteNote(router, id)
+    }, PERMANENT_DELETE_LOADING_MESSAGE)
+  }
 
   const chooseTrashReferenceHandling =
     async (): Promise<TrashFlowChoice | null> => {
@@ -124,5 +142,5 @@ export function useNoteTrashFlow(
     }, loadingMessageFor(flowChoice))
   }
 
-  return { trashNote }
+  return { trashNote, permanentlyDeleteNote, noteIsTrashed }
 }

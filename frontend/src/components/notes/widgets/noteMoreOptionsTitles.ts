@@ -6,6 +6,14 @@ export const noteToolbarEditTitles = {
 export const noteToolbarEditTitle = (asMarkdown?: boolean) =>
   asMarkdown ? noteToolbarEditTitles.rich : noteToolbarEditTitles.markdown
 
+export const noteDeleteTitles = {
+  trash: "Trash note (d)",
+  permanent: "Permanently delete note (d)",
+} as const
+
+export const noteDeleteTitle = (trashed: boolean) =>
+  trashed ? noteDeleteTitles.permanent : noteDeleteTitles.trash
+
 export const noteMoreOptionsTitles = {
   new: "New note (n)",
   wiki: "Wiki link or relationship (Ctrl+Shift+F / Cmd+Shift+F)",
@@ -15,7 +23,7 @@ export const noteMoreOptionsTitles = {
   refine: "Refine note",
   audio: "Audio tools",
   assimilation: "Assimilate",
-  delete: "Trash note (d)",
+  delete: noteDeleteTitles.trash,
   overflowMenu: "more options",
 } as const
 
@@ -25,7 +33,8 @@ export type NoteMoreOptionsActionId =
 
 export const noteToolbarOverflowTitles = (
   id: NoteMoreOptionsActionId
-): readonly string[] =>
-  id === "edit"
-    ? Object.values(noteToolbarEditTitles)
-    : [noteMoreOptionsTitles[id]]
+): readonly string[] => {
+  if (id === "edit") return Object.values(noteToolbarEditTitles)
+  if (id === "delete") return Object.values(noteDeleteTitles)
+  return [noteMoreOptionsTitles[id]]
+}

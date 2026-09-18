@@ -1,4 +1,4 @@
-import type { Folder } from "@generated/donut-backend-api"
+import type { Folder, NoteRealm } from "@generated/donut-backend-api"
 
 const TRASH_ROOT_NAME = "_trash"
 
@@ -14,4 +14,9 @@ export function isLocationInTrash(
 ): boolean {
   const root = ancestorFolders[0] ?? currentFolder
   return root?.name.toLowerCase() === TRASH_ROOT_NAME
+}
+
+/** A note is in trash when its own folder chain starts at the trash root. */
+export function isNoteRealmInTrash(noteRealm: NoteRealm | undefined): boolean {
+  return isLocationInTrash(noteRealm?.ancestorFolders ?? [], undefined)
 }

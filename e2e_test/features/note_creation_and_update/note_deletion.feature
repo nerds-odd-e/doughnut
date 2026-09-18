@@ -156,3 +156,20 @@ Feature: Note trash
     And I should see folder "Recovery suite/Origin" containing these notes:
       | note-title |
       | Old        |
+
+  Scenario: Permanently delete a note that is in trash
+    Given I have a notebook "Biology study" with notes:
+      | Title  | Folder         |
+      | Cells  | _trash/Biology |
+      | Tissue | _trash/Biology |
+    When I jump to the notebook "Biology study"
+    And I reload the notebook page
+    And I expand the children of note "_trash" in the sidebar
+    And I open the folder page for "Biology" under open parent "_trash"
+    And I open the note "Cells" from the sidebar
+    Then I should see the current note is in trash
+    When I permanently delete the current note
+    Then I should be on a notebook folder page
+    And I should see sidebar folder "Biology" containing these notes:
+      | note-title |
+      | Tissue     |
