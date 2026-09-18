@@ -1,7 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.NoteReferenceResolution;
-import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.Subscription;
@@ -32,44 +31,27 @@ public class UnassimilatedPropertyService {
   }
 
   public int countUnassimilatedPropertiesForUser(User user) {
-    return countAssimilable(
-        notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
-            user.getId(), user.getOwnership().getId()),
-        user);
+    return notePropertyIndexRepository.countUnassimilatedPropertiesForOwnership(
+        user.getId(), user.getOwnership().getId());
   }
 
   public int countUnassimilatedPropertiesForSubscription(Subscription subscription) {
-    return countAssimilable(
-        notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
-            subscription.getUser().getId(), subscription.getNotebook().getId()),
-        subscription.getUser());
+    return notePropertyIndexRepository.countUnassimilatedPropertiesForNotebook(
+        subscription.getUser().getId(), subscription.getNotebook().getId());
   }
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForUser(User user) {
-    return streamAssimilable(
-        notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
-            user.getId(), user.getOwnership().getId()),
-        user);
+    return notePropertyIndexRepository
+        .streamUnassimilatedPropertiesForOwnership(user.getId(), user.getOwnership().getId())
+        .filter(unit -> !isGated(unit, user));
   }
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForSubscription(
       Subscription subscription) {
-    return streamAssimilable(
-        notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
-            subscription.getUser().getId(), subscription.getNotebook().getId()),
-        subscription.getUser());
-  }
-
-  private int countAssimilable(Stream<AssimilationUnit> unfiltered, User viewer) {
-    try (Stream<AssimilationUnit> stream = streamAssimilable(unfiltered, viewer)) {
-      return (int) stream.count();
-    }
-  }
-
-  private Stream<AssimilationUnit> streamAssimilable(
-      Stream<AssimilationUnit> unfiltered, User viewer) {
-    return unfiltered
-        .filter(unit -> !PropertyKeyNaming.isReservedStructuralKey(unit.propertyKey()))
+    User viewer = subscription.getUser();
+    return notePropertyIndexRepository
+        .streamUnassimilatedPropertiesForNotebook(
+            viewer.getId(), subscription.getNotebook().getId())
         .filter(unit -> !isGated(unit, viewer));
   }
 

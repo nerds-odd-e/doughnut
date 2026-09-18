@@ -110,39 +110,6 @@ class UnassimilatedPropertyServiceTest {
   }
 
   @Test
-  void does_not_count_stale_reserved_structural_keys_for_subscription() {
-    User owner = makeMe.aUser().please();
-    User subscriber = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    makeMe.aSubscription().forNotebook(notebook).forUser(subscriber).please();
-    Note note = noteWithExampleOfAndUrl(notebook);
-    insertAdditionalIndexRow(note, "url", 0);
-    makeMe.refresh(subscriber);
-
-    Subscription subscription = subscriber.getSubscriptions().stream().findFirst().orElseThrow();
-    List<AssimilationUnit> pending =
-        unassimilatedPropertyService
-            .streamUnassimilatedPropertiesForSubscription(subscription)
-            .toList();
-    assertThat(pending, hasSize(1));
-    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
-  }
-
-  @Test
-  void does_not_count_stale_reserved_structural_keys_for_owner() {
-    User user = makeMe.aUser().please();
-    Note note =
-        noteWithContent(
-            user, "---\nexample of: \"[[Word]]\"\nurl: https://example.com\n---\n\nbody");
-    insertAdditionalIndexRow(note, "url", 0);
-
-    List<AssimilationUnit> pending =
-        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList();
-    assertThat(pending, hasSize(1));
-    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
-  }
-
-  @Test
   void emits_one_property_unit_when_multiple_index_rows_share_exact_key() {
     User user = makeMe.aUser().please();
     Note note = noteWithContent(user, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
@@ -189,17 +156,6 @@ class UnassimilatedPropertyServiceTest {
     assertThat(
         unassimilatedPropertyService.countUnassimilatedPropertiesForSubscription(subscription),
         equalTo(1));
-  }
-
-  private Note noteWithExampleOfAndUrl(Notebook notebook) {
-    Note note =
-        makeMe
-            .aNote()
-            .notebook(notebook)
-            .content("---\nexample of: \"[[Word]]\"\nurl: https://example.com\n---\n\nbody")
-            .please();
-    notePropertyIndexService.refreshForNote(note);
-    return note;
   }
 
   private void insertAdditionalIndexRow(Note note, String propertyKey, int itemIndex) {

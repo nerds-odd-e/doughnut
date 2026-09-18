@@ -50,7 +50,7 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
             targetA,
             "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - \"[[B]]\"\n" + "---\n\nbody");
 
-    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(2));
+    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(3));
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(next.note(), equalTo(targetA));
     assertThat(next.propertyKey(), nullValue());

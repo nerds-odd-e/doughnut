@@ -138,7 +138,7 @@ title lookup drops from about 15 ms to well under 1 ms).
 ### 2. Counts include gated properties and never evaluate the gate
 
 Type: Behavior
-Status: planned
+Status: done (2026-09-18)
 Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests '*UnassimilatedPropertyServiceTest*' --tests '*AssimilationServicePropertyReferenceGateTest*' --tests '*AssimilationServicePropertyUnitsTest*' --tests '*AssimilationServiceDailyCapTest*' -Dspring.profiles.active=test --build-cache`
 green, with the gate test's total changed from 2 to 3.
 
@@ -211,3 +211,14 @@ owner's data; this is the plan's last slice.
   idx_note_notebook_id_title, rows: 1`. With only this index, one
   `GET /api/assimilation/next?timezone=Asia/Singapore` as `old_learner` took
   110 s (was 143–159 s in the seed measurement).
+- Slice 2 accepted proof: the six `AssimilationService*Test` /
+  `UnassimilatedPropertyServiceTest` classes green on the worktree test DB
+  (`gates_list_property_until_all_resolved_targets_are_assimilated` asserts
+  total 3 with next unit A). Kept
+  `UnassimilatedPropertyServiceTest.does_not_count_reserved_keys_not_in_index`
+  (it observes the planner's write-time exclusion through the SQL count);
+  deleted only the two tests that inserted stale reserved-key rows. Refactor
+  folded `unassimilatedDedupeByExactKey` into `unassimilatedWhereClause` and
+  inlined the one-line stream wrapper; production delta so far −3 lines in
+  `UnassimilatedPropertyService`, +21 in the repository (two count queries and
+  shared FROM fragments).
