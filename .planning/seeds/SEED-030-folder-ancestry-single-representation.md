@@ -1,6 +1,6 @@
 ---
 id: SEED-030
-status: needs-refinement
+status: refined
 planted: 2026-09-18
 planted_during: Portable-path representation repair after a publication NullPointerException
 trigger_when: a notebook owner cannot publish, or a publication reorganizes folders while placing content
@@ -13,7 +13,8 @@ scope: M
 > commit `92af81eadab9b509ffcdf5d1f0c52e51516c3aaf`
 > (`.planning/seeds/SEED-030-folder-ancestry-single-representation.md` and
 > `.planning/quick/142-live-folder-ancestry-materialization/PLAN.md`).
-> Story 2 is an unrefined candidate awaiting an owner decision.
+> Story 2 is refined and planned in
+> [145-reset-notebook-git-history](../quick/145-reset-notebook-git-history/PLAN.md).
 
 ## Why This Matters
 
@@ -45,42 +46,63 @@ change for pairs 12→4 and 4→26.
 
 ### 2. Notebooks that gained repaired content can publish again
 
-Unrefined candidate. After the repair migration, production notebooks 4, 26,
-191 and 309 hold live content their accepted Git trees lack.
-`requireMatchingAcceptedTree` answers 409 projection drift, and
-`AcceptedWebChangeService` commits nothing for a notebook that did not match
-before a change, so web changes stop reaching Git. No recovery path exists.
-A test confirmed the 409 for a gaining notebook. Notebooks 26, 191 and 309
-publish today, so for them this is a regression the release introduces;
-notebook 309 belongs to another user. A notebook that only loses rows publishes
-normally after the repair.
+**Executable plan:**
+[145-reset-notebook-git-history](../quick/145-reset-notebook-git-history/PLAN.md).
 
-- **Owner decision needed:** how an accepted head adopts the repaired content.
-  Appending one system commit keeps existing clones valid. Rebaselining, as the
-  retired 2026-09-17 fleet migration did, abandons history and orphans local
-  unpublished commits, including the owner's pending notebook 4 proposal.
-  NORTH-STAR currently says drift is not silently adopted, so either choice is
-  a stated exception.
-- **Open question:** how to select only the notebooks the repair touched, since
-  the SQL migration leaves no record of them.
+After the repair migration, production notebooks 4, 26, 191 and 309 hold live
+content their accepted Git trees lack. `requireMatchingAcceptedTree` answers
+409 projection drift, and `AcceptedWebChangeService` commits nothing for a
+notebook that did not match before a change, so web changes stop reaching Git.
+No recovery path exists. A test confirmed the 409 for a gaining notebook.
+
+**Owner decision, 2026-09-18:** recover by resetting, not by appending. The
+owner expects resets to be needed more often than is known today, because
+information not yet in the Portable format may have to enter it later.
+
+- **Goal:** someone who can edit a notebook can reset its Git history from the
+  notebook settings. The accepted history is replaced by one initial commit of
+  the entire current notebook, so the notebook can be cloned and published
+  again whatever state its history was in.
+- **Scope:** one reset operation, its endpoint, and a settings button guarded
+  by a warning. Reset is allowed in any state, drifted or not. It reuses the
+  snapshot replacement that today exists only for test fixtures.
+- **Key examples:**
+  - A notebook holds a note its accepted history lacks, and publishing a plain
+    edit is refused as projection drift. After a reset the accepted history is
+    a single parentless commit whose tree equals the current notebook,
+    including that note, and the same kind of edit publishes on top of it.
+  - From the notebook settings the owner presses "Reset Git history", reads a
+    warning that the history is discarded and existing clones must be cloned
+    again, and confirms. A fresh `donut notebook clone` then contains the whole
+    notebook in one commit. Cancelling the warning changes nothing.
+  - Any member of the circle that owns a notebook can reset it.
+- **Rejection constraint:** a user who cannot edit the notebook is refused and
+  the accepted history is unchanged.
+- **Already true, reused:** a clone made before the reset no longer shares
+  history. `donut notebook pull` already answers that the checkout does not
+  share Git history and says to clone again
+  (`cli/tests/notebookPull.localCandidate.suite.ts`). No CLI change.
+- **Deferred, owner direction, not in scope:**
+  - Reconciling an existing clone that has unpublished commits with the new
+    initial commit. Git can replay those commits onto the new root.
+  - When a Portable-format change drifts every notebook at once, refusing to
+    clone a drifted notebook with a message that says to reset its Git history
+    first.
+  - Any admin reset of another user's notebook. Notebook 309's owner resets it.
+- **Stated exception:** the Proposed ADR 0002 says v1 rejects deletion or
+  rewind of accepted `main`, and the backlog direction calls history
+  append-only. The owner chose this reset knowingly and left that text as is.
 - **Refinement evidence, 2026-09-18:**
-  - Appending an accepted commit already exists:
-    `AcceptedWebChangeService.commitIfChanged` builds the live snapshot and
-    calls `AcceptedSnapshotPersistence.persist`. Adoption is that same step
-    without the "matched before the change" gate.
-  - At Flyway time only JDBC is available. The retired fleet migration used a
-    static JDBC helper, `NotebookGitBaselineRebuild`, deleted with plan 137
-    (see commit `301184431f`). A startup migration would need its like again.
-  - CLI pull rebases one unpublished commit only when accepted history advanced
-    by note saves or note additions into already represented folders. An
-    adoption commit that adds folders may fall outside that, so a clone with
-    unpublished work may need a fresh clone.
+  - `NotebookGitCutoverService.resnapshotForTestability` already replaces a
+    binding with a fresh parentless snapshot. It reads the binding without the
+    writer lock that download and publish take.
+  - The settings page already has a confirm-then-call pattern: "reset index".
   - Nothing reports drift today, so whether other production notebooks are
     already drifted is unknown.
-- **Effort hypothesis:** S to M once decided.
+- **Effort hypothesis:** S.
 - **Release gate, owner decision 2026-09-18:** the release that carries
   `V300000333__notebook_follows_folder_containment.sql` waits until this story
-  is completed.
+  is completed. After that release the owner resets notebooks 4, 26 and 191.
 - **Carried obligation:** `NotebookFollowsFolderContainmentMigrationTest` is
   migration-only. Remove it after production has applied `V300000333`.
 
