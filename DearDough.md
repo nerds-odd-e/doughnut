@@ -485,6 +485,36 @@ untriggered CLI guard.
     evidence for fixing the CLI guard rather than relying on operators to
     recall this log entry.
 
+- Execution: SEED-033 story 1 / quick/144-compact-spelling-results / 55fc4ba255
+  - Timestamp: 2026-09-18 (session date)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
+    run from the execution worktree root (with both a bare relative path and
+    an absolute path) produced no stdout and exit code 0, with no
+    `CI_MONITOR_READY` PostToolUse context added; a standalone inline script
+    confirmed `pathToFileURL` resolution matched in isolation, so the silence
+    was not an obvious invocation mistake. `node '.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
+    then printed `CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-mAT38C"}`
+    and the hook added `CI_MONITOR_READY`.
+  - Observed effect: same false-unavailable pattern as the second occurrence —
+    this coordinator concluded the bridge was unavailable for this
+    non-interactive/background-job session, reported that limitation, and had
+    already pushed slice 1's commit unobserved before reaching the
+    retrospective's process review, which is what surfaced this log's
+    existing DD-065 entry and prompted retrying via the realpath. The
+    observer's startup snapshot still discovered the already-pushed commit's
+    run once armed and the SHA was registered after the fact, so no coverage
+    was permanently lost, but two independent coordinators have now reached
+    the same wrong "unavailable" conclusion from the same silent no-op before
+    reading this log.
+  - Inference: same root cause and fix as the prior occurrences. The repeat
+    across three separate executions (two different coordinators reaching the
+    false-unavailable conclusion) strengthens the case that this needs the
+    CLI guard fixed rather than continuing to rely on retrospective review to
+    catch it after the fact.
+
 ## Retention
 
 - Highest allocated local number: 71
