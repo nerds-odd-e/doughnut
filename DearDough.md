@@ -72,6 +72,24 @@ the observer to see, regardless of how long it watches.
     trigger-condition check is still absent; the recurrence confirms the
     anti-pattern persists across releases.
 
+- Execution: SEED-031 story 1 / quick/147-resolve-deleted-failure-reports
+  - Timestamp: 2026-09-18, ~20:00–22:00 +08:00 (all four slice deliveries)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.25
+  - Evidence: the CI observer's own diagnostic context reported
+    `{"type":"CI_COVERAGE_UNAVAILABLE","repo":"nerds-odd-e/doughnut","branch":"worktree-147-resolve-deleted-failure-reports",...,"reason":"No CI attempt for pushed revision after 3 discovery polls."}`
+    after every one of the four slice pushes to that execution branch; final
+    `stop` call reported all four pushed SHAs as `"state":"uncovered"` or
+    `"unchecked"`.
+  - Observed effect: identical to the prior two occurrences — the observer
+    ran for the whole execution watching a branch this repo's `ci.yml` cannot
+    trigger CI for, and every single push repeated the same
+    `CI_COVERAGE_UNAVAILABLE` diagnostic rather than the setup catching it once.
+  - Inference: still unfixed as of release 0.3.25; the runtime-setup
+    trigger-condition check named in the original finding would have avoided
+    four repeated no-op discovery-poll cycles in this one execution alone.
+
 ## ODF-035 — `EnterWorktree`'s default base ref and branch-name sanitization conflict with this project's worktree/branch convention
 
 Former local code: DD-018.
@@ -612,6 +630,35 @@ against that code.
     the project's own gate. Either the focused frontend proof command should
     include the typecheck, or delegation should name the typecheck as part of
     frontend proof rather than leaving it to coordinator wrap-up.
+
+- Execution: SEED-031 story 1 / quick/147-resolve-deleted-failure-reports
+  - Timestamp: unknown (2026-09-18, during slice 3 proof acceptance, before
+    the coordinator's `format:changed` step)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: 0.3.25
+  - Evidence: implementation agent's accepted `proof:` block for slice 3
+    reported `pnpm frontend:test tests/components/admin/FailureReportList.spec.ts`
+    passing (9 tests) and `pnpm frontend:test` (full suite, 1901 tests)
+    passing, with no typecheck run. The coordinator independently ran
+    `pnpm -C frontend exec vue-tsc --noEmit` before accepting the proof and
+    got two real errors at `FailureReportList.vue:219`
+    (`TS2322`/`TS18048`) from assigning the new generated
+    `FailureReportDeletionResultDto.unresolvedGithubIssueUrls?: Array<string>`
+    field (optional) directly to a non-optional `ref<string[]>`.
+  - Observed effect: caught only because the coordinator proactively ran the
+    typecheck as an extra verification step outside the delegated proof
+    commands, not because any routine gate required it at that point; a
+    follow-up agent applied a one-line `data?.unresolvedGithubIssueUrls ?? []`
+    fix. Had the coordinator not run it early, this would have surfaced later
+    at `format:changed`, exactly as in the first occurrence.
+  - Inference: same root cause as the first occurrence, recurring on a
+    different project/slice — the delegated frontend proof command still does
+    not typecheck. The coordinator's own initiative substituted for a missing
+    protocol step; nothing in `delegation.md`'s proof-acceptance guidance
+    named the typecheck as a required check for a slice that consumes a
+    newly-regenerated, optional-by-default SDK field.
+
 ## DD-074 — The documented `.claude/skills` runtime path did not exist at all in a freshly created execution worktree
 
 [runtime-setup.md](../dough-execute-plan/references/runtime-setup.md) documents
