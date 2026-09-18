@@ -13,7 +13,7 @@ final class NotebookGitLivePortablePath {
   }
 
   /** Notebook root ({@code folder == null}) has an empty prefix. */
-  private static String folderPath(Folder folder) {
+  static String folderPath(Folder folder) {
     return folder == null ? "" : folderPath(folder.getParentFolder()) + folder.getName() + "/";
   }
 }

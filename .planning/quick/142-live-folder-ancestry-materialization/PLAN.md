@@ -1,6 +1,6 @@
 # Folder ancestry stays inside one notebook, with one live representation
 
-Status: in progress
+Status: executed, awaiting retrospective and wrap-up
 Source: [SEED-030 story 1](../../seeds/SEED-030-folder-ancestry-single-representation.md#1-publishing-notebook-4s-proposal-succeeds-and-folder-ancestry-has-one-representation).
 Authority: 2026-09-18 owner instruction, after the production diagnosis: follow
 containment, deliver the repair as an ungated SQL migration applied on release,
@@ -105,8 +105,9 @@ Completion requires all three:
   the new characterization test passes both before and after the structural
   change.
 
-Production delta evidence:
-`git diff --numstat 7259de0e50179c1a9e2d8065510dc2a8ce7d34ac -- backend/src/main/java`
+Production delta evidence, measured from the structural slice's base because an
+unrelated commit landed after the original baseline:
+`git diff --numstat 243a4ab555 -- backend/src/main/java`
 
 ## Existing solutions and selected design
 
@@ -222,7 +223,7 @@ already exists and already asserts the decisive placement, so that slice was
 removed rather than duplicating coverage.
 
 Type: Structure
-Status: planned
+Status: done
 
 Change `NotebookGitProposalFolderMaterialization`:
 
@@ -255,6 +256,14 @@ the production `--numstat` delta and require it negative.
 
 Safe stopping point: yes, once green and committed.
 
+Accepted proof: `NotebookGitComposedFolderRelocationControllerTest` green before
+and after the change; the full `NotebookGit*` controller suite 98 classes / 318
+tests, 0 failures, rerun after the refactor pass; the containment migration test
+still green unedited. Production delta +17 / −24, net −7. No branch or guard
+added; three folder-row parameters removed; one repository dependency added. A
+fourth call site the plan had not listed, the publisher's call to
+`applyModificationsAndRenames`, lost its now-unused argument and two dead stores.
+
 ## Current decisions
 
 - Do not touch `ExportFolderRow`, `NotebookGitAcceptedTree.folderPath(row, map)`,
@@ -271,3 +280,11 @@ Safe stopping point: yes, once green and committed.
 - A notebook that **loses** stray rows publishes straight after the repair with
   no drift: its accepted tree never held them. This matches the diagnosis. The
   gaining notebook was not exercised here; story 2 owns it.
+- Materialization no longer fails on a parent in another notebook: the entity
+  walk follows it. Loud failure for cross-notebook ancestry now comes only from
+  the snapshot-row walk in `reconcileUnrepresentedFolders`. The repair migration
+  removes such rows, so no guard was added.
+- The folder rows on the state passed into
+  `NotebookGitProposalDocumentApplication.apply` are now inert input, since
+  `apply` re-reads them. Dropping them is a `LockedNotebookState` shape change
+  this plan excludes.

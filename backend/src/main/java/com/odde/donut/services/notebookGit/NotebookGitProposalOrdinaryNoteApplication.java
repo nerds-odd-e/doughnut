@@ -72,7 +72,6 @@ class NotebookGitProposalOrdinaryNoteApplication {
 
   List<ExportFolderRow> applyModificationsAndRenames(
       NotebookGitProposalTreeShape.AdmittedShape admitted,
-      List<ExportFolderRow> proposedFolders,
       Notebook notebook,
       NotebookGitProposalImporter.ImportedProposal proposal,
       List<Note> proposedNotes,
@@ -83,7 +82,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
             .map(NotebookGitProposalTreeShape.NoteChange::path)
             .toList();
     Map<String, Folder> destinationFolders =
-        folderMaterialization.ensureAncestry(notebook, proposedFolders, renameDestinations);
+        folderMaterialization.ensureAncestry(notebook, renameDestinations);
     for (NotebookGitProposalTreeShape.NoteChange noteChange : admitted.noteChanges()) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document =

@@ -160,23 +160,21 @@ public class NotebookGitProposalPublisher {
           new NotebookGitStateLoader.LockedNotebookState(binding, notebook, folders, storedNotes);
     }
     List<Note> proposedNotes = new ArrayList<>(published.storedNotes());
-    List<ExportFolderRow> proposedFolders = published.folders();
     // Deletions before additions so same-path deletion-gap recreation can replace the old identity.
     ordinaryNoteApplication.applyDeletions(admitted, proposedNotes);
     if (relocation.isEmpty() && !admitted.documents().isEmpty()) {
       published =
           documentApplication.apply(
               new NotebookGitStateLoader.LockedNotebookState(
-                  published.binding(), published.notebook(), proposedFolders, proposedNotes),
+                  published.binding(), published.notebook(), published.folders(), proposedNotes),
               proposal,
               admitted.documents(),
               publishedAt);
       proposedNotes = new ArrayList<>(published.storedNotes());
-      proposedFolders = published.folders();
     }
-    proposedFolders =
+    List<ExportFolderRow> proposedFolders =
         ordinaryNoteApplication.applyModificationsAndRenames(
-            admitted, proposedFolders, published.notebook(), proposal, proposedNotes, publishedAt);
+            admitted, published.notebook(), proposal, proposedNotes, publishedAt);
     return proposalAcceptance.acceptMatchingProposedTree(
         new NotebookGitStateLoader.LockedNotebookState(
             published.binding(), published.notebook(), proposedFolders, proposedNotes),

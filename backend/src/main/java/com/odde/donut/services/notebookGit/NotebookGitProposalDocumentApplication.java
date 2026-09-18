@@ -63,7 +63,6 @@ class NotebookGitProposalDocumentApplication {
     Map<String, Folder> materializedFolders =
         folderMaterialization.materialize(
             state.notebook(),
-            state.folders(),
             Stream.concat(
                     Stream.concat(folderReadmePaths.stream(), conceptPaths.stream()),
                     emptyFolderMarkerPaths.stream())
