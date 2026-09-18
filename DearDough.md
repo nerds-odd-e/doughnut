@@ -134,6 +134,28 @@ originating branch before the worktree was created.
     dough-execute-plan's own execution-location guidance, would remove the
     need for this recurring manual check.
 
+- Execution: SEED-028 story 1 / quick/140-admin-job-status-local-time / 5d89d2e286
+  - Timestamp: 2026-09-18 (session date)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `EnterWorktree(name: "140-admin-job-status-local-time")`
+    (no `/` in the requested name, so no sanitization applied this time)
+    created branch `worktree-140-admin-job-status-local-time` at `e2c55efa75`
+    (`origin/main`'s tip), while local `main` was already two commits ahead
+    at `e39d945a48` (plan-write commit `5d89d2e286` plus the backlog "Taken"
+    claim commit). Detected via `git merge-base --is-ancestor HEAD main` /
+    `git log --oneline -3` immediately after entering the worktree.
+  - Observed effect: recovered in place with `git reset --hard main` (the
+    worktree branch had no commits of its own yet, confirmed a clean
+    ancestor first) followed by `git branch -m` to rename off the
+    `worktree-` prefix onto the project's literal `NNN-slug` convention; no
+    lost work, one extra diagnostic-and-fix round trip.
+  - Inference: same root cause as the two prior occurrences, now observed a
+    third time with a literal (non-`/`-containing) requested name, confirming
+    the base-ref gap is independent of the branch-name-sanitization half of
+    this finding.
+
 ## ODF-042 — Coordinator pre-filtered grep results for a test-only representation slice, missing sites the later field-removal slice had to fix
 
 Former local code: DD-037.
@@ -436,6 +458,32 @@ untriggered CLI guard.
     invocation more robustly than exact string equality against a path that
     may traverse a project-standard symlink), since this project's own setup
     deliberately creates that exact symlink in every checkout.
+
+- Execution: SEED-028 story 1 / quick/140-admin-job-status-local-time / 1694c122d9
+  - Timestamp: 2026-09-18 (session date)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `node '.claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
+    run from the execution worktree root produced no stdout and exit code 0,
+    with no `CI_MONITOR_READY` PostToolUse context added. `node '.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
+    then printed `CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-mL5Kzr"}`
+    and the hook added `CI_MONITOR_READY`.
+  - Observed effect: worse than the prior occurrence — this coordinator
+    concluded CI observation was genuinely unavailable from the silent no-op
+    alone, reported that limitation to the user, and had already pushed
+    slice 1's commit unobserved before checking this log's existing DD-065
+    entry, recognizing the exact match, retrying via the realpath, and
+    starting the observer late (after the push it should have covered).
+    No coverage was permanently lost (the observer's startup snapshot still
+    discovered the already-pushed commit's run), but the sequence shows the
+    silent-no-op failure mode reliably reproduces a false "unavailable"
+    conclusion for a coordinator that does not already know to check this
+    log before trusting the probe's silence.
+  - Inference: same root cause and same fix as the original finding; the
+    false-unavailable conclusion this occurrence reached is itself further
+    evidence for fixing the CLI guard rather than relying on operators to
+    recall this log entry.
 
 ## Retention
 
