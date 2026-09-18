@@ -9,7 +9,8 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 
+- [Make trash participation rules cohesive across note consumers](seeds/SEED-029-cohesive-trash-participation.md#story-1) — SEED-029 — plan: [141](quick/141-cohesive-trash-participation/PLAN.md)
+
 ## Backlog list
 
-- [Make trash participation rules cohesive across note consumers](seeds/SEED-029-cohesive-trash-participation.md#story-1) — SEED-029
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
