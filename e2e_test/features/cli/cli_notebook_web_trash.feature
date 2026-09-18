@@ -7,7 +7,7 @@ Feature: CLI notebook web trash
 
   Background:
     Given the backend is serving the CLI and install script
-    And I install the CLI from localhost without affecting my system
+    And the CLI is installed from localhost
     And I am logged in as an existing user
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 

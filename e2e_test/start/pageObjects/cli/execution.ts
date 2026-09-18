@@ -13,6 +13,14 @@ function installation() {
         .and('not.be.empty')
         .as('donutPath')
     },
+    // For scenarios where a working CLI is incidental setup rather than the
+    // behavior under test; reuses an already-verified install for this base URL.
+    ensureInstalledFromLocalhost() {
+      cy.task<string>('ensureCliInstalled', e2eAppBaseUrl())
+        .should('be.a', 'string')
+        .and('not.be.empty')
+        .as('donutPath')
+    },
     runVersion() {
       cy.get<string>('@donutPath').then((donutPath) => {
         cy.task<null>('runInstalledCli', {

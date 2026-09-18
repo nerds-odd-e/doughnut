@@ -12,6 +12,9 @@ Given('the backend is serving the CLI and install script', () =>
 When('I install the CLI from localhost without affecting my system', () =>
   cli.installation().installFromLocalhost()
 )
+Given('the CLI is installed from localhost', () =>
+  cli.installation().ensureInstalledFromLocalhost()
+)
 When('I run the installed donut version command', () =>
   cli.installation().runVersion()
 )

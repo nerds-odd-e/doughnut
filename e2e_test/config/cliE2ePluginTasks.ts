@@ -72,6 +72,39 @@ export function createCliE2ePluginTasks(
     appBaseUrl: options.appBaseUrl,
   })
 
+  async function performCliInstall(baseUrl: string): Promise<string> {
+    pty.dispose()
+    const installDir = mkdtempSync(join(tmpdir(), 'cypress-donut-cli-'))
+    const installScriptPath = join(installDir, 'install.sh')
+    const response = await fetch(`${baseUrl}/install`)
+    if (!response.ok) {
+      throw new Error(
+        `installCli: failed to fetch install script from ${baseUrl}/install: ${response.status}`
+      )
+    }
+    const script = await response.text()
+    writeFileSync(installScriptPath, script, { mode: 0o755 })
+    runShellCommandSync(`bash ${installScriptPath}`, {
+      env: {
+        ...process.env,
+        INSTALL_PREFIX: installDir,
+        BASE_URL: baseUrl,
+      },
+    })
+    const donutPath = join(installDir, 'bin', 'donut')
+    if (!existsSync(donutPath)) {
+      throw new Error(
+        `installCli: donut binary not found at ${donutPath} after install. Check that ${baseUrl}/doughnut-cli-latest/doughnut is served.`
+      )
+    }
+    return donutPath
+  }
+
+  // Reused only by scenarios where installation is incidental setup for otherwise
+  // unrelated CLI/notebook behavior (`ensureCliInstalled` task), not by scenarios that
+  // test installation itself (`installCli`, always a fresh install).
+  let cachedInstall: { baseUrl: string; donutPath: string } | null = null
+
   return {
     ...createCliE2ePluginConfigDirTasks(),
     ...createCliE2eNotebookCloneTasks(),
@@ -110,30 +143,17 @@ export function createCliE2ePluginTasks(
       return null
     },
     async installCli(baseUrl: string) {
-      pty.dispose()
-      const installDir = mkdtempSync(join(tmpdir(), 'cypress-donut-cli-'))
-      const installScriptPath = join(installDir, 'install.sh')
-      const response = await fetch(`${baseUrl}/install`)
-      if (!response.ok) {
-        throw new Error(
-          `installCli: failed to fetch install script from ${baseUrl}/install: ${response.status}`
-        )
+      return performCliInstall(baseUrl)
+    },
+    // Setup-only scenarios need a working `donut` binary, not proof that installing
+    // it is itself correct; reusing an already-verified install for the same base
+    // URL skips a redundant fetch-and-subprocess-install per scenario.
+    async ensureCliInstalled(baseUrl: string) {
+      if (cachedInstall?.baseUrl === baseUrl) {
+        return cachedInstall.donutPath
       }
-      const script = await response.text()
-      writeFileSync(installScriptPath, script, { mode: 0o755 })
-      runShellCommandSync(`bash ${installScriptPath}`, {
-        env: {
-          ...process.env,
-          INSTALL_PREFIX: installDir,
-          BASE_URL: baseUrl,
-        },
-      })
-      const donutPath = join(installDir, 'bin', 'donut')
-      if (!existsSync(donutPath)) {
-        throw new Error(
-          `installCli: donut binary not found at ${donutPath} after install. Check that ${baseUrl}/doughnut-cli-latest/doughnut is served.`
-        )
-      }
+      const donutPath = await performCliInstall(baseUrl)
+      cachedInstall = { baseUrl, donutPath }
       return donutPath
     },
     runInstalledCli(task: RunInstalledCliTask) {

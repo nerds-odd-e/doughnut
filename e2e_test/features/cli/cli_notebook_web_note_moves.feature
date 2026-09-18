@@ -6,7 +6,7 @@ Feature: CLI notebook web note moves
 
   Background:
     Given the backend is serving the CLI and install script
-    And I install the CLI from localhost without affecting my system
+    And the CLI is installed from localhost
     And I am logged in as an existing user
     And I have a notebook "CLI Clone Notebook"
     And I have a note "Overview" under notebook "CLI Clone Notebook" with content:
