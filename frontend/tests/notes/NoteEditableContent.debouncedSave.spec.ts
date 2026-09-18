@@ -6,6 +6,7 @@ import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
+  mountNoteEditableContent,
   mountMarkdownTextarea,
   setTextareaValue,
   setupPopupsMock,
@@ -86,6 +87,30 @@ describe("NoteEditableContent debounced save", () => {
       path: { note: noteId },
       body: { content: "Hello world" },
     })
+
+    wrapper.unmount()
+  })
+
+  it("does not save escaped inline asterisks when navigating to a note in rich mode", async () => {
+    vi.useFakeTimers()
+    const noteContent = String.raw`---
+topic: Japanese
+---
+
+使い分けのコツ（1行ルール） \\\* 「細かいことはいいから今すぐ！」→ とにかく \\\* 「Aはいったん置いといて、まずB」→ ともかく`
+
+    const wrapper = mountNoteEditableContent({
+      noteId: 2,
+      noteContent: "Other note",
+      asMarkdown: false,
+      readonly: false,
+    })
+    await flushPromises()
+    await wrapper.setProps({ noteId: 1, noteContent })
+    await flushPromises()
+    await advanceNoteContentSaveDebounce()
+
+    expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })

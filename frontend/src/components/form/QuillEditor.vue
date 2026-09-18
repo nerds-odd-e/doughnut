@@ -40,14 +40,19 @@ const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
 const isPasting = ref(false)
 const lastRange = ref<{ index: number; length: number } | null>(null)
+let updatingQuillFromModel = false
 
 const onBlurTextField = () => {
   emits("blur")
 }
 
-const updateQuillContent = (content: string | undefined) => {
+const syncQuillFromModel = (content: string | undefined) => {
   if (quill.value) {
+    updatingQuillFromModel = true
     quill.value.root.innerHTML = content ?? ""
+    queueMicrotask(() => {
+      updatingQuillFromModel = false
+    })
   }
 }
 
@@ -112,10 +117,8 @@ onMounted(async () => {
   if (editor.value) {
     quill.value = new Quill(editor.value, options)
 
-    // Set initial content
-    updateQuillContent(localValue.value)
+    syncQuillFromModel(localValue.value)
 
-    // Wait for next tick to ensure Quill is fully initialized
     await nextTick()
 
     if (!props.readonly && quill.value) {
@@ -180,10 +183,10 @@ onMounted(async () => {
       true
     )
 
-    // Listen for text changes
     quill.value.on("text-change", () => {
       const content = quill.value!.root.innerHTML
       localValue.value = content
+      if (updatingQuillFromModel) return
       onUpdateContent()
       if (isPasting.value) {
         isPasting.value = false
@@ -210,13 +213,12 @@ onMounted(async () => {
   }
 })
 
-// Watch for changes in modelValue prop
 watch(
   () => props.modelValue,
   (newValue) => {
     if (quill.value && localValue.value !== newValue) {
       localValue.value = newValue
-      updateQuillContent(newValue)
+      syncQuillFromModel(newValue)
     }
   }
 )
