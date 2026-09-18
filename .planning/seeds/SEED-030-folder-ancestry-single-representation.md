@@ -63,6 +63,20 @@ normally after the repair.
   a stated exception.
 - **Open question:** how to select only the notebooks the repair touched, since
   the SQL migration leaves no record of them.
+- **Refinement evidence, 2026-09-18:**
+  - Appending an accepted commit already exists:
+    `AcceptedWebChangeService.commitIfChanged` builds the live snapshot and
+    calls `AcceptedSnapshotPersistence.persist`. Adoption is that same step
+    without the "matched before the change" gate.
+  - At Flyway time only JDBC is available. The retired fleet migration used a
+    static JDBC helper, `NotebookGitBaselineRebuild`, deleted with plan 137
+    (see commit `301184431f`). A startup migration would need its like again.
+  - CLI pull rebases one unpublished commit only when accepted history advanced
+    by note saves or note additions into already represented folders. An
+    adoption commit that adds folders may fall outside that, so a clone with
+    unpublished work may need a fresh clone.
+  - Nothing reports drift today, so whether other production notebooks are
+    already drifted is unknown.
 - **Effort hypothesis:** S to M once decided.
 - **Release gate, owner decision 2026-09-18:** the release that carries
   `V300000333__notebook_follows_folder_containment.sql` waits until this story
