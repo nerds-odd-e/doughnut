@@ -60,10 +60,40 @@ describe("QuillEditor.vue", () => {
     expect(document.querySelector(".ql-editor code")).toHaveTextContent("foo")
   })
 
-  it("emits softbreak HTML when pasting Hello<br>World", async () => {
-    await mountEditor()
+  it("preserves Donut rich markup when the model changes", async () => {
+    await mountEditor({ modelValue: "<p>Other note</p>" })
+
+    await wrapper.setProps({
+      modelValue:
+        '<p><a href="/n1" class="donut-wiki-link" data-portable-path="First note" data-display-text="First" data-note-id="1">First</a><br class="softbreak"><mark>answer</mark></p><hr><table><tbody><tr><td>cell</td></tr></tbody></table>',
+    })
+    await nextTick()
+
+    const wikiLink = document.querySelector(
+      ".ql-editor a.donut-wiki-link"
+    ) as HTMLAnchorElement
+    expect(wikiLink).toHaveAttribute("href", "/n1")
+    expect(wikiLink).toHaveAttribute("data-portable-path", "First note")
+    expect(wikiLink).toHaveAttribute("data-display-text", "First")
+    expect(wikiLink).toHaveAttribute("data-note-id", "1")
+    expect(document.querySelector(".ql-editor br.softbreak")).not.toBeNull()
+    expect(document.querySelector(".ql-editor mark")).toHaveTextContent(
+      "answer"
+    )
+    expect(document.querySelector(".ql-editor hr")).not.toBeNull()
+    expect(document.querySelector(".ql-editor table td")).toHaveTextContent(
+      "cell"
+    )
+    expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
+  })
+
+  it("emits pasted content after the model is cleared", async () => {
+    await mountEditor({ modelValue: "<p>Other note</p>" })
+    await wrapper.setProps({ modelValue: "" })
     await vi.waitUntil(() => document.querySelector(".ql-editor"))
     const editor = document.querySelector(".ql-editor") as HTMLElement
+    expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
+
     editor.focus()
     await nextTick()
 
