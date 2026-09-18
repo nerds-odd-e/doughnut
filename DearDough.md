@@ -11,7 +11,7 @@ kept product change.
 
 ### Occurrences
 
-- Execution: SEED-018 story 3 / quick/106-publish-large-notebooks-under-one-minute / 78c24f31bb
+- Execution: quick/106-publish-large-notebooks-under-one-minute / 78c24f31bb
   - Tool: Cursor
   - Model: Cursor Grok 4.6
   - Open Dough release: 0.3.12
@@ -37,7 +37,7 @@ the observer to see, regardless of how long it watches.
 
 ### Occurrences
 
-- Execution: SEED-018 story 3 / quick/108-publish-notebook-edits-faster / a6fcddacad
+- Execution: quick/108-publish-notebook-edits-faster / a6fcddacad
   - Tool: Claude Code
   - Model: claude-sonnet-5
   - Open Dough release: 0.3.13
@@ -86,7 +86,7 @@ originating branch before the worktree was created.
 
 ### Occurrences
 
-- Execution: SEED-018 story 5 / quick/112-publish-additions-with-simpler-title-check / 691e7be961
+- Execution: quick/112-publish-additions-with-simpler-title-check / 691e7be961
   - Tool: Claude Code
   - Model: claude-sonnet-5
   - Open Dough release: 0.3.14
@@ -252,7 +252,7 @@ ended up stale and empty, later deleted with nothing to deliver.
     originating checkout's absolute path; concurrent commit `35dfb6072896`
     (12:23:21+08:00, message "Refine PRODUCT-BACKLOG and update SEED-009
     documentation") diff includes the plan 131 `PLAN.md` 69-line addition
-    alongside unrelated `SEED-009`/`SEED-018`/`DearDough.md`/
+    alongside unrelated `SEED-009`/`DearDough.md`/
     `PRODUCT-BACKLOG.md` changes from the concurrent plan-132 execution;
     execution branch `131-manually-validate-append-only-notebook-workflow`
     was clean and unchanged at the claim commit when removed.

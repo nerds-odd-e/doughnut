@@ -33,8 +33,8 @@ Keeping a hidden or configurable spelling embed would not deliver the removal.
 
 ## Story Decomposition
 
-Effort bands follow SEED-018: S = 30–60 minutes, M = 1–2 hours,
-L = 2–4 hours. These are hypotheses including delivery, not commitments.
+S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. These are hypotheses
+including delivery, not commitments.
 
 <a id="story-2"></a>
 
