@@ -1,0 +1,106 @@
+package com.odde.donut.controllers;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+
+import com.odde.donut.controllers.dto.RecordLearningSessionResponse;
+import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import jakarta.persistence.EntityManager;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import org.hibernate.Session;
+import org.hibernate.stat.Statistics;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * Temporary slice-1 diagnostic (plan 141, cohesive trash participation): cold-context Hibernate
+ * statistics for one learning-session record call. Not product instrumentation.
+ */
+class LearningSessionRecordQueryBaselineDiagnostic extends LearningSessionControllerTestBase {
+  @Autowired EntityManager em;
+
+  @Test
+  void fixtureA_sixNotesInOneRootFolder() throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    Folder root = makeMe.aFolder().notebook(notebook).name("root").please();
+    for (int i = 1; i <= 5; i++) {
+      makeMe.aNote().folder(root).title("Other" + i).please();
+    }
+    Note hola = makeMe.aNote().folder(root).title("Hola").please();
+    makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayTwo).please();
+
+    recordColdAndReport("A: 6 notes, 1 root folder, depth 1", notebook);
+  }
+
+  @Test
+  void fixtureB_sixNotesAcrossSiblingAndNestedFoldersWithNestedTrash()
+      throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    Folder a = makeMe.aFolder().notebook(notebook).name("a").please();
+    Folder b = makeMe.aFolder().notebook(notebook).name("b").please();
+    Folder c = makeMe.aFolder().notebook(notebook).name("c").please();
+    Folder bChild = makeMe.aFolder().parentFolder(b).name("b-child").please();
+    Folder bGrandchild = makeMe.aFolder().parentFolder(bChild).name("b-grandchild").please();
+    Folder trash = makeMe.aFolder().notebook(notebook).name("_trash").please();
+    Folder trashSub = makeMe.aFolder().parentFolder(trash).name("sub").please();
+    makeMe.aNote().folder(a).title("Other1").please();
+    makeMe.aNote().folder(b).title("Other2").please();
+    makeMe.aNote().folder(c).title("Other3").please();
+    makeMe.aNote().folder(bGrandchild).title("Other4").please();
+    makeMe.aNote().folder(trashSub).title("Other5").please();
+    Note hola = makeMe.aNote().folder(bChild).title("Hola").please();
+    makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayTwo).please();
+
+    recordColdAndReport("B: 6 notes, 7 folders (3 sibling roots + _trash), depth 3", notebook);
+  }
+
+  private void recordColdAndReport(String fixture, Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    em.flush();
+    em.clear();
+    Statistics stats = em.unwrap(Session.class).getFactory().getStatistics();
+    boolean wasEnabled = stats.isStatisticsEnabled();
+    stats.setStatisticsEnabled(true);
+    stats.clear();
+    try {
+      RecordLearningSessionResponse response =
+          controller.record(
+              recordRequest(notebook, learningSessionReport("Hola", 4)), "Asia/Shanghai");
+      System.out.println("=== LearningSessionService.record cold baseline, fixture " + fixture);
+      System.out.println("prepareStatementCount=" + stats.getPrepareStatementCount());
+      System.out.println("queryExecutionCount=" + stats.getQueryExecutionCount());
+      System.out.println("entityLoadCount=" + stats.getEntityLoadCount());
+      System.out.println("entityFetchCount=" + stats.getEntityFetchCount());
+      System.out.println("collectionFetchCount=" + stats.getCollectionFetchCount());
+      System.out.println("entityInsertCount=" + stats.getEntityInsertCount());
+      System.out.println("entityUpdateCount=" + stats.getEntityUpdateCount());
+      Arrays.stream(stats.getQueries())
+          .forEach(
+              q ->
+                  System.out.println(
+                      "query x" + stats.getQueryStatistics(q).getExecutionCount() + ": " + q));
+      Arrays.stream(stats.getEntityNames())
+          .filter(e -> stats.getEntityStatistics(e).getLoadCount() > 0 || e.endsWith(".Folder"))
+          .forEach(
+              e ->
+                  System.out.println(
+                      "entity "
+                          + e
+                          + " load="
+                          + stats.getEntityStatistics(e).getLoadCount()
+                          + " fetch="
+                          + stats.getEntityStatistics(e).getFetchCount()));
+      assertThat(response.getRecordedItems(), hasSize(1));
+    } finally {
+      stats.setStatisticsEnabled(wasEnabled);
+    }
+  }
+}

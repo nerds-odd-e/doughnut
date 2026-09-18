@@ -1,6 +1,6 @@
 # Cohesive trash participation
 
-Status: planned
+Status: in progress
 Source: [SEED-029 story 1](../../seeds/SEED-029-cohesive-trash-participation.md#story-1).
 Authority: 2026-09-18 owner request for a slice plan, refined if needed, with
 simpler architecture, fewer lines of code, and greater cohesion. Planning only.
@@ -97,7 +97,7 @@ Tests are under `backend/src/test/java/com/odde/donut/`.
 ### 1. Establish the learning-participation preservation baseline
 
 Type: Structure
-Status: planned
+Status: done
 Outcome: close the missing controller-level participation proof and obtain the
 matching query baseline required to evaluate retrieval simplification.
 
@@ -126,11 +126,72 @@ only dependent work for diagnosis.
 Sizing: ~5 minutes including the suite, medium confidence. Safe stop: stronger
 behavioral coverage and recoverable measurement evidence; production unchanged.
 
+Execution record, 2026-09-18, revision `7de4fd470c` (production unchanged):
+
+- Added controller observations in `controllers/LearningSessionRecordTests`:
+  `rejectsAmbiguousTitleWhenTwoAvailableNotesInDifferentFoldersShareIt` (two
+  available commissioned `Hola` notes in `greetings` and `slang`; rejected as
+  "Ambiguous note title in notebook.", no recall log, both trackers' learning
+  state unchanged), parameterized
+  `rejectsNoteBeneathRootTrashWithoutChangingItsLearningHistoryOrSchedule`
+  (rows `_trash`, `_TRASH`, `_trash/sub`; each rejected "No commissioned
+  memory tracker" with no recall log and unchanged tracker learning state; the
+  former trash-only test is its `_trash` row, same scenario and assertions),
+  and `recordsCommissionedNoteInAFolderNamedTrashBeneathAnOrdinaryRoot`
+  (`docs/_trash`; recorded with the fixture tracker id). FolderRepositoryTest
+  already proves the repository-level membership rules; nothing duplicated.
+- Post-change refactor merged the pre-existing trash-only test into that
+  parameterized test and re-ran
+  `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.LearningSessionRecordTests'`:
+  10 tests, 0 failures. The full-suite proof above stands for all other paths.
+- Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` after
+  `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL`, in the execution
+  worktree's isolated database: BUILD SUCCESSFUL, 2481 tests, 0 failures.
+- Cold-context baseline (Hibernate Statistics, `em.flush(); em.clear();` then
+  one `controller.record` of the one-line report `Hola: 4`), diagnostic source
+  retained as `query-baseline-diagnostic.java.txt` in this directory and removed
+  from `backend/src/test` before commit. Both fixtures hold six notes and one
+  commissioned `Hola` tracker. Fixture A: one root folder, depth 1. Fixture B:
+  roots `a`, `b`, `c`, `_trash`; nested `b/b-child` (holds `Hola`),
+  `b/b-child/b-grandchild`, `_trash/sub` (holds a trashed note); seven folders,
+  depth 3. Result for both fixtures, identical: prepareStatementCount 5,
+  queryExecutionCount 3, entityLoadCount 10, entityFetchCount 0, Folder
+  loads 0. The three HQL/native executions are the stored-notes list, the
+  available-notes list, and one `MemoryTrackerRepository.findByUserAndNote`;
+  the other two statements are the RecallLog insert and the notebook/user
+  resolution after clearing. The current two-query design therefore has no
+  folder-dependent growth: the trash predicate is evaluated in SQL through the
+  `trashed_folder` view.
+
 ### 2. Derive learning participation from shared note availability
 
 Type: Structure
-Status: planned
+Status: awaiting story review
 Depends on: slice 1's passing behavior and query baseline.
+
+Reassessment, 2026-09-18, from slice 1's baseline: `Note.folder` and
+`Folder.parentFolder` are both lazy and `selectFromNote` has no fetch join, so
+deriving candidates through `Note.isAvailable` over the single stored-notes
+read would initialize one proxy per distinct folder and ancestor reached
+(about +1 select on fixture A, about +7 on fixture B) while removing exactly one
+bounded query. That is the per-folder/per-depth growth this slice names as its
+stop condition, so the retrieval choice below must be revised before editing.
+The invalidated assumption is the seed's selected structural direction "direct
+reuse of Note.isAvailable for already-loaded objects" (SEED-029 story 1, Open
+Decisions) and this plan's "Do not substitute a stale formula value" in the
+existing-solutions table. Candidate revisions, none authorized yet:
+
+- Filter the single stored-notes read by the row's already-loaded persisted
+  membership (`Note.trashedInDatabase`, the same value `Note.JPA_AVAILABLE`
+  tests in SQL). In `record` no folder moves precede the read, so this is not
+  stale here; it keeps one query, removes the second list, and keeps the
+  diagnostic distinction. It adds an object-level accessor for persisted
+  membership beside `Note.isTrashed` (current ancestry), which the plan's
+  cohesion gate must accept explicitly.
+- Keep the existing two query-level reads (the plan's stated fallback). That
+  leaves acceptance gate 1 unmet, so the story would be incomplete.
+- Fetch-join folders in the stored read. Ancestor proxies still load per
+  depth, so growth remains; not recommended.
 Outcome: eliminate the duplicate note-list retrieval and use the shared
 object-domain predicate for already-loaded note participation.
 
@@ -207,6 +268,19 @@ meet the gate.
 
 Sizing: ~5 minutes, one occupancy contract and one proof loop. Safe stop:
 occupied recoverable content cannot become an empty-folder deletion candidate.
+
+## Execution identity
+
+- Mode: Story Branch. Replanning: no `--replan`/`--no-replan` flag; the plan's
+  own overrun guidance (stop/redecompose at ten minutes) applies.
+- Originating checkout `/Users/terryyin/git/doughnut` on integration branch
+  `main`; claim commit `7de4fd470c` moved SEED-029 to Taken.
+- Execution checkout `/Users/terryyin/git/doughnut/.claude/worktrees/cohesive-trash-participation`
+  on branch `cohesive-trash-participation`, created from the claim commit.
+- Push destination `origin` (`nerds-odd-e/doughnut`) branch
+  `cohesive-trash-participation`; later integration target `main`.
+- CI observer: GitHub Actions `ci.yml` (display name `donut CI`) on branch
+  `cohesive-trash-participation`; mailbox `/tmp/dough-ci-501/watch-wePcZd`.
 
 ## Execution and delivery constraints
 
