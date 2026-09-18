@@ -3,40 +3,27 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.NoteConstructionService;
-import com.odde.donut.services.notebookExport.NotebookExportRows;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import com.odde.donut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.donut.testability.TestabilitySettings;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
 
 @Service
 public class WebNoteCreationService {
-  private final NotebookGitStateLoader notebookGitStateLoader;
+  private final AcceptedWebChangeService acceptedWebChangeService;
   private final NoteConstructionService noteConstructionService;
-  private final NotebookGitProjection projection;
-  private final AcceptedSnapshotPersistence acceptedSnapshotPersistence;
   private final TestabilitySettings testabilitySettings;
 
   public WebNoteCreationService(
-      NotebookGitStateLoader notebookGitStateLoader,
+      AcceptedWebChangeService acceptedWebChangeService,
       NoteConstructionService noteConstructionService,
-      NotebookGitProjection projection,
-      AcceptedSnapshotPersistence acceptedSnapshotPersistence,
       TestabilitySettings testabilitySettings) {
-    this.notebookGitStateLoader = notebookGitStateLoader;
+    this.acceptedWebChangeService = acceptedWebChangeService;
     this.noteConstructionService = noteConstructionService;
-    this.projection = projection;
-    this.acceptedSnapshotPersistence = acceptedSnapshotPersistence;
     this.testabilitySettings = testabilitySettings;
   }
 
@@ -45,62 +32,22 @@ public class WebNoteCreationService {
       NoteCreationDTO noteCreation,
       User user,
       WikidataIdWithApi wikidataIdWithApi)
-      throws InterruptedException, IOException {
+      throws InterruptedException, IOException, UnexpectedNoAccessRightException {
     if (wikidataIdWithApi != null || !NoteConceptType.isOrdinary(noteCreation.getContent())) {
       return noteConstructionService.createRootNoteWithWikidataService(
           notebook, noteCreation, user, wikidataIdWithApi);
     }
-    var lockedState = notebookGitStateLoader.findByNotebookIdForUpdate(notebook.getId());
-    if (lockedState.isEmpty()) {
-      return noteConstructionService.createRootNote(notebook, noteCreation, user);
-    }
-
-    NotebookGitStateLoader.LockedNotebookState state = lockedState.orElseThrow();
-    NotebookGitBinding binding = state.binding();
-    ObjectId persistedAcceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    try (NotebookGitBundleImporter.ImportedBundle accepted =
-        NotebookGitBundleImporter.importMainHead(binding.getBundleBytes(), "accepted-bundle")) {
-      if (!accepted.mainHead().equals(persistedAcceptedHead)) {
-        throw new IllegalStateException("Accepted bundle main does not match its persisted head");
-      }
-      boolean eligible =
-          acceptedTreeMatches(state, accepted)
-              && projection.isRepresentedFolder(
-                  noteCreation.getFolderId(),
-                  state.folders(),
-                  accepted.repository(),
-                  accepted.mainHead());
-      NoteRealm realm =
-          noteConstructionService.createRootNote(state.notebook(), noteCreation, user);
-      if (!eligible) {
-        return realm;
-      }
-
-      List<Note> proposedNotes = new ArrayList<>(state.storedNotes());
-      proposedNotes.add(realm.getNote());
-      List<PortableTreeEntry> entries =
-          PortableTreeSnapshot.build(
-              state.notebook().getReadmeContent(),
-              state.folders(),
-              NotebookExportRows.notes(proposedNotes));
-      acceptedSnapshotPersistence.persist(
-          accepted,
-          entries,
-          binding,
-          testabilitySettings.getCurrentUTCTimestamp(),
-          "Add note: " + realm.getNote().getTitle());
-      return realm;
-    }
-  }
-
-  private boolean acceptedTreeMatches(
-      NotebookGitStateLoader.LockedNotebookState state,
-      NotebookGitBundleImporter.ImportedBundle accepted) {
-    return projection.matchesAcceptedTree(
-        state.notebook(),
-        state.folders(),
-        state.storedNotes(),
-        accepted.repository(),
-        accepted.mainHead());
+    return acceptedWebChangeService.apply(
+        notebook.getId(),
+        locked -> {
+          Notebook liveNotebook =
+              locked
+                  .state(notebook.getId())
+                  .map(NotebookGitStateLoader.LockedNotebookState::notebook)
+                  .orElse(notebook);
+          return noteConstructionService.createRootNote(liveNotebook, noteCreation, user);
+        },
+        realm -> "Add note: " + realm.getNote().getTitle(),
+        testabilitySettings.getCurrentUTCTimestamp());
   }
 }

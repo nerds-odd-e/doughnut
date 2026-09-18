@@ -350,7 +350,7 @@ failures.
 
 ### 5. Ordinary-note creation shares the same accepted-change owner
 Type: Structure
-Status: planned
+Status: done
 
 Structure: remove the remaining documented duplicate accepted-change sequence
 from `WebNoteCreationService`. This directly completes the approved structural
@@ -385,6 +385,39 @@ reassessment rather than another special-case branch.
 Safe stop: all functional and structural obligations are covered, subject to
 their execution evidence, delivery and retrospective. This is not a completion
 claim for work that has not run.
+
+Result: `WebNoteCreationService.createRootNote`'s ordinary branch now delegates
+to `AcceptedWebChangeService.apply`, mirroring `WebFolderCreationService`
+exactly; caller-owned proposed-note lists and direct
+`PortableTreeSnapshot.build`/`acceptedSnapshotPersistence.persist` calls are
+gone. `NotebookGitProjection.isRepresentedFolder` removed after real
+characterization evidence (new `driftedDestinationFolderKeepsWebCreationAndAcceptedHeadUnchanged`,
+`absentDestinationFolderIsRefusedBeforeAnyAcceptedChange`,
+`foreignNotebookDestinationFolderIsRefusedBeforeAnyAcceptedChange` tests)
+confirmed the design section's equivalence: `PortableTreeSnapshot.collectDirectory`
+walks every live folder unconditionally, so a drifted destination already fails
+`apply`'s whole-tree match before any folder-specific eligibility check would
+matter; absent/foreign destinations are independently refused by
+`NoteConstructionService.buildNote`'s own folder resolution. No counterexample
+found. Structural-completion final review: `grep` confirms exactly one
+`acceptedSnapshotPersistence.persist` call site (inside
+`AcceptedWebChangeService`) and zero `isRepresentedFolder` references left;
+all five production callers of `AcceptedWebChangeService.apply`
+(`WebFolderCreationService`, `WebNoteCreationService`, `FolderRelocationService`'s
+five mutations via `applyLiveFolderChange`, `WebNoteEditService`,
+`RelationReduceService`) are small delegating adapters with real domain-recipe
+ownership; `AcceptedWebChangeService` itself gained no mutation-specific
+branch across all five slices. Publication/cutover/proposal-import code and
+multi-notebook reduction's existing set owner are untouched. Full backend
+suite: `BUILD SUCCESSFUL`, no failures.
+
+## Plan complete
+
+All five slices delivered. One authoritative accepted-web-change policy
+(`AcceptedWebChangeService.apply`) now serves folder creation, rename,
+dissolve, move, trash, permanent-delete, note creation, note edit, and
+relation reduction, each through a small delegating adapter owning its own
+domain recipe. Retained for retrospective and story wrap-up.
 
 ## Verification and delivery contract
 
