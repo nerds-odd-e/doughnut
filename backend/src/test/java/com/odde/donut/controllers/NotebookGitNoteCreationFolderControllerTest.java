@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
@@ -23,6 +24,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
 
 class NotebookGitNoteCreationFolderControllerTest
     extends NotebookGitNoteCreationControllerTestSupport {
@@ -129,5 +131,48 @@ class NotebookGitNoteCreationFolderControllerTest
           GitBundleTestReader.blobIdAt(repository, newHead, "Box/README.md"),
           is(GitBundleTestReader.blobIdAt(repository, acceptedHead, "Box/README.md")));
     }
+  }
+
+  @Test
+  void driftedDestinationFolderKeepsWebCreationAndAcceptedHeadUnchanged() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding accepted = binding(notebook);
+    Folder unsynchronized = makeMe.aFolder().notebook(notebook).name("Unsynchronized").please();
+    NoteCreationDTO creation = titleOnly("Inside Drifted Folder");
+    creation.setFolderId(unsynchronized.getId());
+
+    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
+
+    Note created = noteRepository.findById(result.getId()).orElseThrow();
+    assertThat(created.getFolder().getId(), is(unsynchronized.getId()));
+    assertBindingUnchanged(notebook, accepted);
+  }
+
+  @Test
+  void absentDestinationFolderIsRefusedBeforeAnyAcceptedChange() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding accepted = binding(notebook);
+    NoteCreationDTO creation = titleOnly("Nowhere");
+    creation.setFolderId(-1);
+
+    assertThrows(
+        ResponseStatusException.class,
+        () -> controller.createNoteAtNotebookRoot(notebook, creation));
+    assertBindingUnchanged(notebook, accepted);
+  }
+
+  @Test
+  void foreignNotebookDestinationFolderIsRefusedBeforeAnyAcceptedChange() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Notebook otherNotebook = createGitBackedNotebook("Other Git Backed Notebook");
+    Folder foreignFolder = makeMe.aFolder().notebook(otherNotebook).name("Foreign").please();
+    NotebookGitBinding accepted = binding(notebook);
+    NoteCreationDTO creation = titleOnly("Wrong Notebook");
+    creation.setFolderId(foreignFolder.getId());
+
+    assertThrows(
+        ResponseStatusException.class,
+        () -> controller.createNoteAtNotebookRoot(notebook, creation));
+    assertBindingUnchanged(notebook, accepted);
   }
 }

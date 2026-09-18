@@ -21,9 +21,10 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitFolderDissolveAtomicControllerTest extends NotebookGitBundleControllerTestBase {
 
   static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";
+  static final String REFERRER_BODY_BEFORE = "See [[Outer/Biology/Cells|shown]] for details.";
 
   @Autowired FolderRepository folderRepository;
 
@@ -33,12 +34,18 @@ class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleCon
   }
 
   @Test
-  void lateBindingSaveFailureRollsBackConstructedParentsPlacementAndAcceptedBinding()
+  void lateBindingSaveFailureRollsBackRemovedFolderPromotionReferrerAndAcceptedBinding()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Folder research = makeMe.aFolder().notebook(notebook).name("Research").please();
-    Folder biology = makeMe.aFolder().parentFolder(research).name("Biology").please();
+    Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
+    Folder biology = makeMe.aFolder().parentFolder(outer).name("Biology").please();
     Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
+    Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
+    inCommittedTransaction(
+        transactionManager,
+        () ->
+            authorReferencingContent(
+                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY_BEFORE));
     snapshotCurrentPortableTree(notebook);
     NotebookGitBinding binding =
         inCommittedTransaction(
@@ -47,13 +54,12 @@ class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleCon
     byte[] acceptedBundle = binding.getBundleBytes();
     String acceptedHead = binding.getAcceptedGitObjectId();
     var bindingUpdatedAt = binding.getUpdatedAt();
-    long originalFolderCount =
-        inCommittedTransaction(transactionManager, () -> countFoldersForNotebook(notebook.getId()));
 
     NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
 
     RuntimeException failure =
-        assertThrows(RuntimeException.class, () -> controller.trashFolder(notebook, biology));
+        assertThrows(
+            RuntimeException.class, () -> controller.dissolveFolder(notebook, biology, false));
     assertThat(failure.getMessage(), is("forced failure after note projection"));
 
     inCommittedTransaction(
@@ -61,12 +67,12 @@ class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleCon
         () -> {
           Folder reloadedBiology = folderRepository.findById(biology.getId()).orElseThrow();
           Note reloadedCells = noteRepository.findById(cells.getId()).orElseThrow();
+          Note reloadedReferrer = noteRepository.findById(referrer.getId()).orElseThrow();
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-          assertThat(countFoldersForNotebook(notebook.getId()), is(originalFolderCount));
-          assertThat(reloadedBiology.getParentFolder().getId(), equalTo(research.getId()));
-          assertThat(reloadedBiology.isTrashed(), is(false));
+          assertThat(reloadedBiology.getName(), is("Biology"));
           assertThat(reloadedCells.getFolder().getId(), equalTo(biology.getId()));
+          assertThat(reloadedReferrer.getContent(), is(REFERRER_BODY_BEFORE));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));

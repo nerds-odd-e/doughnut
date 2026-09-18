@@ -1,0 +1,112 @@
+package com.odde.donut.controllers;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.odde.donut.controllers.dto.ApiError;
+import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.exceptions.ApiException;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import org.eclipse.jgit.lib.ObjectId;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
+
+class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContentControllerTestBase {
+
+  static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";
+
+  @Autowired FolderRepository folderRepository;
+
+  @Test
+  void conflictingSiblingNameWithoutMergeLeavesFolderAndAcceptedHistoryUnchanged()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
+    makeMe.aFolder().parentFolder(outer).name("Inner").please();
+    Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
+    makeMe.aFolder().parentFolder(mid).name("Inner").please();
+    snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+
+    ApiException conflict =
+        assertThrows(ApiException.class, () -> controller.dissolveFolder(notebook, mid, false));
+
+    assertThat(
+        conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+    assertThat(folderRepository.findById(mid.getId()).isPresent(), is(true));
+    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
+
+  @Test
+  void unauthorizedDissolveLeavesFolderAndAcceptedHistoryUnchanged() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
+    snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+    User otherUser = createFixtureUser();
+    currentUser.setUser(otherUser);
+
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controller.dissolveFolder(notebook, biology, false));
+
+    assertThat(folderRepository.findById(biology.getId()).isPresent(), is(true));
+    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
+
+  @Test
+  void wrongNotebookDissolveLeavesFolderAndAcceptedHistoryUnchanged() throws Exception {
+    Notebook owningNotebook = createGitBackedNotebook("Owning Notebook");
+    Notebook otherNotebook = createGitBackedNotebook("Other Notebook");
+    Folder biology = makeMe.aFolder().notebook(owningNotebook).name("Biology").please();
+    snapshotCurrentPortableTree(owningNotebook);
+    ObjectId acceptedA = ObjectId.fromString(binding(owningNotebook).getAcceptedGitObjectId());
+
+    ResponseStatusException ex =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> controller.dissolveFolder(otherNotebook, biology, false));
+
+    assertThat(ex.getReason(), equalTo("Folder not in notebook."));
+    assertThat(folderRepository.findById(biology.getId()).isPresent(), is(true));
+    assertThat(
+        ObjectId.fromString(binding(owningNotebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
+
+  @Test
+  void preExistingPortableDriftKeepsTheFolderDissolveAndAcceptedHistoryUnchanged()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
+    Folder biology = makeMe.aFolder().parentFolder(outer).name("Biology").please();
+    snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+    byte[] acceptedBundle = binding(notebook).getBundleBytes();
+    makeMe.aNote().notebook(notebook).title("Unsynchronized").content(CELLS_BODY).please();
+
+    controller.dissolveFolder(notebook, biology, false);
+
+    assertThat(folderRepository.findById(biology.getId()).isPresent(), is(false));
+    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+    assertThat(binding(notebook).getBundleBytes(), equalTo(acceptedBundle));
+  }
+
+  @Test
+  void nonGitNotebookFolderDissolveCreatesNoBinding() throws UnexpectedNoAccessRightException {
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
+    Folder biology = makeMe.aFolder().parentFolder(outer).name("Biology").please();
+
+    controller.dissolveFolder(notebook, biology, false);
+
+    assertThat(folderRepository.findById(biology.getId()).isPresent(), is(false));
+    assertThat(
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).isPresent(), is(false));
+  }
+}

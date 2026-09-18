@@ -183,7 +183,7 @@ class NotebookController {
   public Folder createFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody FolderCreationRequest request)
-      throws UnexpectedNoAccessRightException, IOException {
+      throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     return webFolderCreationService.createFolder(notebook, request);
   }
@@ -248,7 +248,7 @@ class NotebookController {
           "Changes the folder display name under its current parent. Sibling name conflicts are"
               + " rejected.")
   @PatchMapping("/{notebook}/folders/{folder}")
-  @Transactional
+  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public Folder renameFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("folder") @Schema(type = "integer") Folder folder,
@@ -268,7 +268,7 @@ class NotebookController {
               + " subfolder. When merge=true, clashing promoted subfolders are merged into the"
               + " existing same-name sibling instead of returning 409.")
   @DeleteMapping("/{notebook}/folders/{folder}")
-  @Transactional
+  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public void dissolveFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("folder") @Schema(type = "integer") Folder folder,

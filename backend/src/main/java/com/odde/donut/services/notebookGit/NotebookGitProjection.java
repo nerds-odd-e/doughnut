@@ -18,29 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class NotebookGitProjection {
   /**
-   * Whether {@code folderId} is already represented in the accepted Portable tree. Notebook root
-   * ({@code folderId == null}) is represented. A live folder row with no accepted descendant or
-   * README is not; callers that must keep unsynchronized web behavior should not throw.
-   */
-  boolean isRepresentedFolder(
-      Integer folderId,
-      List<ExportFolderRow> folders,
-      Repository repository,
-      ObjectId acceptedHead) {
-    if (folderId == null) {
-      return true;
-    }
-    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
-    ExportFolderRow folder = folderById.get(folderId);
-    if (folder == null) {
-      return false;
-    }
-    return NotebookGitAcceptedTree.representedInTree(
-        NotebookGitAcceptedTree.folderPath(folder, folderById),
-        NotebookGitAcceptedTree.readEntries(repository, acceptedHead));
-  }
-
-  /**
    * Resolves the destination Folder for placing {@code notePath}. Root paths return {@code null}.
    * The parent must already be a Folder row and must be represented either in the accepted tree or
    * by other tip content (excluding the note's own path), so a relocation cannot invent

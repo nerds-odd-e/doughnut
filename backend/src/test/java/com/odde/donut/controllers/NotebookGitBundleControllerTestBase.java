@@ -217,6 +217,15 @@ abstract class NotebookGitBundleControllerTestBase extends NoteDependentRowsCont
         () -> notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow());
   }
 
+  long countFoldersForNotebook(Integer notebookId) {
+    return ((Number)
+            entityManager
+                .createNativeQuery("SELECT COUNT(*) FROM folder WHERE notebook_id = :notebookId")
+                .setParameter("notebookId", notebookId)
+                .getSingleResult())
+        .longValue();
+  }
+
   /** A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. */
   byte[] proposalBundleBytes(
       NotebookGitBinding binding, List<NotebookGitProposalFile> proposedFiles) throws Exception {

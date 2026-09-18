@@ -178,8 +178,18 @@ public class FolderRelocationService {
   }
 
   public Folder renameFolder(
-      Notebook notebook, Folder folder, FolderRenameRequest request, User viewer) {
-    requireFolderInNotebook(folder, notebook);
+      Notebook notebook, Folder folder, FolderRenameRequest request, User viewer)
+      throws UnexpectedNoAccessRightException {
+    return applyLiveFolderChange(
+        notebook,
+        folder,
+        result -> "Rename folder: " + result.getName(),
+        (liveNotebook, liveFolder, now) ->
+            renameFolderRecipe(liveNotebook, liveFolder, request, viewer, now));
+  }
+
+  private Folder renameFolderRecipe(
+      Notebook notebook, Folder folder, FolderRenameRequest request, User viewer, Timestamp now) {
     DisplayName displayName = new DisplayName(request.getName());
     String oldName = folder.getName();
     if (displayName.value().equals(oldName)) {
@@ -194,7 +204,6 @@ public class FolderRelocationService {
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(
             noteIdsInSubtree, viewer);
     folder.setName(displayName);
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     folder.setUpdatedAt(now);
     entityPersister.flush();
     entityPersister.merge(folder);
@@ -204,9 +213,16 @@ public class FolderRelocationService {
     return folder;
   }
 
-  public void dissolveFolder(Notebook notebook, Folder folder, boolean merge, User viewer) {
-    requireFolderInNotebook(folder, notebook);
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+  public void dissolveFolder(Notebook notebook, Folder folder, boolean merge, User viewer)
+      throws UnexpectedNoAccessRightException {
+    applyLiveFolderChange(
+        notebook,
+        folder,
+        result -> "Dissolve folder: " + result.getName(),
+        (liveNotebook, liveFolder, now) -> dissolveFolderRecipe(liveFolder, merge, viewer, now));
+  }
+
+  private Folder dissolveFolderRecipe(Folder folder, boolean merge, User viewer, Timestamp now) {
     Set<Integer> affectedNoteIds = subtree.collectNoteIdsInSubtree(folder);
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(
@@ -214,5 +230,6 @@ public class FolderRelocationService {
     subtree.dissolveInto(folder, merge, now);
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
         affectedNoteIds, now, inboundReferencesByNoteId);
+    return folder;
   }
 }
