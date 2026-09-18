@@ -15,7 +15,8 @@ settings. The accepted history is replaced by one initial commit of the entire
 current notebook, so the notebook can be cloned and published again whatever
 state its history was in. This is the recovery path for the projection drift
 that `V300000333__notebook_follows_folder_containment.sql` leaves in the
-notebooks that gain rows, and the release carrying that migration waits for it.
+notebooks that gain rows. By owner decision it does not block the release
+carrying that migration; those notebooks refuse publication until they are reset.
 
 Included: one reset operation, its endpoint, a settings button with a warning.
 Reset is allowed in any state; do not special-case "only when drifted".
@@ -159,7 +160,7 @@ Omitting that step gives slice 2 a genuinely drifted notebook. The assertions
 
 - One reset operation serves the product endpoint and the testability fixture.
 - Reset never inspects whether the notebook is drifted.
-- After the release, the owner resets notebooks 4, 26 and 191 by hand. Notebook
+- Once the button is released, the owner resets notebooks 4, 26 and 191 by hand. Notebook
   309 is its own owner's to reset. Nothing in this plan touches production data.
 
 ## Learnings

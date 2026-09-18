@@ -100,9 +100,12 @@ information not yet in the Portable format may have to enter it later.
   - Nothing reports drift today, so whether other production notebooks are
     already drifted is unknown.
 - **Effort hypothesis:** S.
-- **Release gate, owner decision 2026-09-18:** the release that carries
-  `V300000333__notebook_follows_folder_containment.sql` waits until this story
-  is completed. After that release the owner resets notebooks 4, 26 and 191.
+- **Release, owner decision 2026-09-18:** this story does not block the release
+  that carries `V300000333__notebook_follows_folder_containment.sql`. Until
+  this story ships and each notebook is reset, notebooks 4, 26, 191 and 309
+  refuse publication with 409 projection drift. No data is lost: the reset
+  snapshots the entire current notebook, including web edits made meanwhile.
+  Once the button is released the owner resets notebooks 4, 26 and 191.
 - **Carried obligation:** `NotebookFollowsFolderContainmentMigrationTest` is
   migration-only. Remove it after production has applied `V300000333`.
 
@@ -119,4 +122,5 @@ information not yet in the Portable format may have to enter it later.
 
 ## When to Surface
 
-Before the next application release.
+Next in the queue after the release that applies the containment repair, so the
+drifted notebooks can publish again.
