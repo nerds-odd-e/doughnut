@@ -72,13 +72,4 @@ class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleCon
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
   }
-
-  private long countFoldersForNotebook(Integer notebookId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery("SELECT COUNT(*) FROM folder WHERE notebook_id = :notebookId")
-                .setParameter("notebookId", notebookId)
-                .getSingleResult())
-        .longValue();
-  }
 }

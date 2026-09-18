@@ -183,7 +183,7 @@ class NotebookController {
   public Folder createFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody FolderCreationRequest request)
-      throws UnexpectedNoAccessRightException, IOException {
+      throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     return webFolderCreationService.createFolder(notebook, request);
   }

@@ -167,7 +167,7 @@ through a fixture after the operation. Add observations only where missing.
 
 ### 1. Folder creation shares accepted-web-change coordination
 Type: Structure
-Status: planned
+Status: done
 
 Structure: remove the documented duplicate coordination from
 `WebFolderCreationService`, using the shared owner and existing folder
@@ -188,6 +188,26 @@ projection comparison, tree build or accepted persistence in this adapter.
 Sizing: approximately 5 minutes active work plus required backend-suite runtime;
 one adapter replacement with established atomic proof. Safe stop: creation is
 cohesive and behavior is preserved; rename/dissolve remain explicitly unfinished.
+
+Result: `WebFolderCreationService.createFolder` now delegates to
+`AcceptedWebChangeService.apply` using the same
+`locked.state(id).map(...notebook).orElse(notebook)` fallback as
+`FolderRelocationService`; no mutation-specific branch was needed in the shared
+owner. `NotebookController.createFolder` dropped its now-unused `throws
+IOException` (nothing in the call chain throws it; consistent with sibling
+endpoints that only declare `IOException` where they actually do IO). Added
+`nonGitNotebookFolderCreationCreatesNoBinding` and
+`driftedNotebookFolderCreationKeepsMutationAndAcceptedHistoryUnchanged` to
+`NotebookGitFolderCreationControllerTest` for the missing unbound/drift
+characterization. Refactor pass consolidated a newly-duplicated
+`countFoldersForNotebook` native-query helper (already duplicated in two
+sibling atomic test classes) into `NotebookGitBundleControllerTestBase` as the
+one authoritative home. Full backend suite: `CURSOR_DEV=true nix develop -c
+pnpm backend:test_only` — `BUILD SUCCESSFUL`, no failures. Learning: this push
+`NotebookGitBundleControllerTestBase.java` to 257 lines, just past this
+project's 250-line file-size check; flagged but not split, since splitting a
+62-caller shared fixture base is unrelated restructuring outside this slice's
+concept.
 
 ### 2. Folder rename records the complete accepted result
 Type: Behavior

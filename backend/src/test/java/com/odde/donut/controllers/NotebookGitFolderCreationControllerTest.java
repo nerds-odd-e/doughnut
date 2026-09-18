@@ -51,6 +51,47 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
   }
 
   @Test
+  void nonGitNotebookFolderCreationCreatesNoBinding() throws Exception {
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    FolderCreationRequest request = new FolderCreationRequest();
+    request.setName("Biology");
+
+    Folder created = controller.createFolder(notebook, request);
+
+    assertThat(created.getName(), is("Biology"));
+    assertThat(countFoldersForNotebook(notebook.getId()), is(1L));
+    assertThat(
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).isPresent(), is(false));
+  }
+
+  @Test
+  void driftedNotebookFolderCreationKeepsMutationAndAcceptedHistoryUnchanged() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding before =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    String acceptedHeadBefore = before.getAcceptedGitObjectId();
+    byte[] acceptedBundleBefore = before.getBundleBytes().clone();
+    makeMe
+        .aNote()
+        .notebook(notebook)
+        .title("Unsynchronized")
+        .content("---\ntype: Note\n---\nbody")
+        .please();
+    long originalFolderCount = countFoldersForNotebook(notebook.getId());
+    FolderCreationRequest request = new FolderCreationRequest();
+    request.setName("Biology");
+
+    Folder created = controller.createFolder(notebook, request);
+
+    assertThat(created.getName(), is("Biology"));
+    assertThat(countFoldersForNotebook(notebook.getId()), is(originalFolderCount + 1));
+    NotebookGitBinding after =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    assertThat(after.getAcceptedGitObjectId(), is(acceptedHeadBefore));
+    assertThat(after.getBundleBytes(), equalTo(acceptedBundleBefore));
+  }
+
+  @Test
   void nestedEmptyFolderReplacesParentMarkerWithoutLosingHistory() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     ObjectId originalHead =
