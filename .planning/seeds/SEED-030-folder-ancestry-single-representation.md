@@ -1,6 +1,6 @@
 ---
 id: SEED-030
-status: needs-refinement
+status: refined
 planted: 2026-09-18
 planted_during: Portable-path representation repair after a publication NullPointerException
 trigger_when: a notebook owner cannot publish, or a publication reorganizes folders while placing content
@@ -9,11 +9,9 @@ scope: M
 
 # SEED-030: Folder ancestry during publication — finish the fix and keep one representation
 
-> **Unrefined.** This seed was assembled at the end of a long session so nothing
-> would be lost. Goal and scope below are carried evidence, not an agreed story.
-> Refine before planning further. The existing plan
-> [142-live-folder-ancestry-materialization](../quick/142-live-folder-ancestry-materialization/PLAN.md)
-> covers only the structural half and remains valid on its own terms.
+> Story 1 is refined and planned in
+> [142-live-folder-ancestry-materialization](../quick/142-live-folder-ancestry-materialization/PLAN.md).
+> Story 2 is an unrefined candidate awaiting an owner decision.
 
 ## Why This Matters
 
@@ -131,22 +129,13 @@ folder id alone (`findNotesInFolderOrderByIdAsc`,
 under the *containing* folder's notebook. Containment is the representation in
 use; the stray `notebook_id` is the stale copy.
 
-**Proposed fix (for refinement, not agreed):**
+**Fix. Owner decisions, 2026-09-18:**
 
-1. Repair the affected rows once (16 at most), as an application operation inside
-   `AcceptedWebChangeService.apply` over both notebooks of each pair. **Not a
-   SQL migration:** whichever direction is chosen, one notebook gains content
-   its accepted tree lacks, and an accepted head only advances through that
-   service. A notebook drifted by raw SQL stays drifted, because the service
-   commits only for notebooks that matched before the change.
-   **Owner decision, direction of the repair:**
-   - *Follow containment* (the row joins its container's notebook). Matches
-     what the tree shows today. For pairs 12→4 and 4→26 it changes who can
-     read the notes: five circle notes become private, three private notes
-     become circle-visible.
-   - *Keep the notebook* (the row detaches to its own notebook's root). Nobody
-     gains or loses access. Root-level name collisions are unchecked.
-   The same-owner pairs (86→191, 56→309) are safe either way.
+1. Repair the rows once, following containment: the row joins its container's
+   notebook. The owner accepts that five circle notes become private and three
+   private notes become circle-visible. Deliver it as a plain SQL Flyway
+   migration, not gated, applied by the next release. The drift this leaves in
+   the gaining notebooks is carried by story 2.
 2. No null guard in `folderPath` and no tolerant skip: once the invariant
    holds, the code that assumes it is correct, and a guard would hide the next
    violation the way the top-down walker hid this one.
@@ -196,25 +185,47 @@ Reuse it; do not duplicate it.
 
 ### 1. Publishing notebook 4's proposal succeeds, and folder ancestry has one representation
 
-**Executable plan (structural half only):**
-[142-live-folder-ancestry-materialization](../quick/142-live-folder-ancestry-materialization/PLAN.md)
-— status `planned`, one Structure slice, not taken.
+**Executable plan:**
+[142-live-folder-ancestry-materialization](../quick/142-live-folder-ancestry-materialization/PLAN.md).
 
-- **Goal (carried, unrefined):** the owner who reports publication failing on
-  notebook 4 can publish; and folder ancestry inside the one final application
-  is resolved from live entity state only, so the failure class cannot recur
-  through a stale snapshot.
-- **Split found at diagnosis:** the production failure is a data-invariant
-  repair (see Diagnosis); the structural cleanup is independent and fixes
-  nothing the owner sees. Expect two stories, repair first.
-- **First evaluable step:** the owner chooses the repair direction (see
-  Diagnosis). Production rows are already collected and confirm the diagnosis.
-- **Effort hypothesis:** structural half S (one class, three call sites,
-  mirrors a change already made). Repair half S to M: one
-  application-level repair of at most 16 known rows through the accepted web change
-  path, plus a regression test built from the experiment.
-- **Safe stopping point:** the structural half can ship alone; the existing
-  relocation test already states the guarantee it protects.
+- **Goal:** no notebook's publication crashes because a folder's ancestry
+  leaves the notebook, and folder ancestry inside the one final application is
+  resolved from live entity state only.
+- **Scope:** an ungated SQL migration that makes `notebook_id` follow
+  containment for folders and notes; then the structural change that drops the
+  row→entity round trip in folder materialization. No null guard, no composite
+  foreign key, no removal of the stored `notebook_id`.
+- **Key examples:**
+  - A bound notebook owns a folder whose parent belongs to another notebook.
+    Publishing a plain note edit throws `NullPointerException` today. After the
+    migration the folder and its notes belong to the container's notebook and
+    the same publish succeeds.
+  - A folder nested under a stray folder, and a note inside it, follow the root
+    ancestor's notebook in the same run.
+  - A notebook without stray rows is untouched, and a second run changes nothing.
+  - Relocating `Topics/` under `Archive/` and adding `Archive/Topics/Extra.md`
+    in one publication still lands the note in the relocated folder.
+- **Deferred promise:** notebook 4 itself gains five notes and two folders from
+  notebook 12, so after the migration its publication is refused as projection
+  drift instead of crashing. Story 2 owns making it publish.
+
+### 2. Notebooks that gained repaired content can publish again
+
+Unrefined candidate. After story 1's migration, production notebooks 4, 26, 191
+and 309 hold live content their accepted Git trees lack. Publication answers
+409 projection drift, web changes stop reaching Git, and no recovery path
+exists. Notebooks 26, 191 and 309 publish today, so for them this is a
+regression the release introduces; notebook 309 belongs to another user.
+
+- **Owner decision needed:** how an accepted head adopts the repaired content.
+  Appending one system commit keeps existing clones valid. Rebaselining, as the
+  retired 2026-09-17 fleet migration did, abandons history and orphans local
+  unpublished commits, including the owner's pending notebook 4 proposal.
+  NORTH-STAR currently says drift is not silently adopted, so either choice is
+  a stated exception.
+- **Open question:** how to select only the notebooks the repair touched, since
+  the SQL migration leaves no record of them.
+- **Effort hypothesis:** S to M once decided.
 
 ## Constraints carried
 

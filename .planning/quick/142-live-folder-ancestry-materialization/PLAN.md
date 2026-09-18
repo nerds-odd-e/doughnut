@@ -1,20 +1,77 @@
-# Live folder ancestry during materialization
+# Folder ancestry stays inside one notebook, with one live representation
 
 Status: planned
 Source: [SEED-030 story 1](../../seeds/SEED-030-folder-ancestry-single-representation.md#1-publishing-notebook-4s-proposal-succeeds-and-folder-ancestry-has-one-representation).
-This plan covers only the **structural half** of that story. The story also
-carries an unresolved production failure the owner still reports; diagnosing
-it is not planned here.
-Authority: 2026-09-18 owner request to refine the first backlog item and, if
-scope is clear, write a slice plan. Planning only — this plan does not
-authorize execution.
+Authority: 2026-09-18 owner instruction, after the production diagnosis: follow
+containment, deliver the repair as an ungated SQL migration applied on release,
+update this plan, refine if needed, then execute it.
 
-Baseline: `7259de0e50179c1a9e2d8065510dc2a8ce7d34ac` on `main`.
-Note: a short ADR 0002 addition stating this constraint is committed but
-**unpushed**, bundled into another session's commit `f31cf631ee`. Not part of
-this plan; the owner has not yet accepted it.
+Baseline: `7259de0e50179c1a9e2d8065510dc2a8ce7d34ac` on `main` for the
+structural delta. The repair slice starts from current `main`.
 
-## Goal and acceptance
+## Repair goal and acceptance
+
+Production holds 16 legacy rows whose folder ancestry crosses notebooks (see the
+seed's Diagnosis). Any notebook owning a stray **folder** cannot publish at all:
+every publication walks every folder row bottom-up and dereferences a parent
+that is not in the notebook's rows.
+
+After the repair migration, every folder carries its root ancestor's
+`notebook_id` and every note carries its folder's. Notebooks 4, 12 and 86 stop
+crashing on publication.
+
+**Owner decisions, 2026-09-18:**
+
+- Direction: follow containment. The row joins its container's notebook. The
+  owner accepts the visibility change for pairs 12→4 and 4→26.
+- Mechanism: a plain SQL Flyway migration, **not gated**, applied by the next
+  release. This overrides the `db-migration` skill's placeholder-gate default
+  for one-off DML. It is safe ungated because it is a no-op on any database
+  without stray rows and idempotent where they exist.
+
+**Known consequence, accepted with the mechanism and not solved here.** A
+notebook that *gains* rows (4, 26, 191, 309 in production) will hold live
+content its accepted Git tree lacks. `requireMatchingAcceptedTree` then refuses
+publication with 409 projection drift, and `AcceptedWebChangeService` commits
+nothing for a notebook that did not match before a change. No recovery path for
+drift exists today, and NORTH-STAR says drift is not silently adopted. So this
+plan ends notebook 4's crash but does not by itself make notebook 4 publish.
+Adoption of the repaired content into those accepted heads is queued as SEED-030
+story 2 for an owner decision. Do not add adoption to this plan.
+
+### Storage proof already run (planning, 2026-09-18)
+
+Assumption: MySQL accepts `WITH RECURSIVE … UPDATE folder JOIN <cte>` on the
+table the CTE reads, repairs nested stray folders in one statement, and leaves
+`updated_at` alone when it is assigned to itself.
+
+Result on local MySQL 8.4.11, scratch database with `CREATE TABLE … LIKE` copies
+of `folder` and `note`, then dropped: a stray folder, a consistent folder nested
+under it, a note inside the nested folder and a directly stray note all took the
+container's notebook. A healthy folder, its note and a root note were unchanged.
+Every `updated_at` was preserved. A second run changed 0 rows. Production runs
+MySQL 8.4.10.
+
+```sql
+WITH RECURSIVE rooted AS (
+  SELECT id, notebook_id AS root_notebook_id FROM folder WHERE parent_folder_id IS NULL
+  UNION ALL
+  SELECT child.id, rooted.root_notebook_id
+  FROM folder child JOIN rooted ON child.parent_folder_id = rooted.id
+)
+UPDATE folder JOIN rooted ON rooted.id = folder.id
+SET folder.notebook_id = rooted.root_notebook_id, folder.updated_at = folder.updated_at
+WHERE folder.notebook_id <> rooted.root_notebook_id;
+
+UPDATE note JOIN folder ON folder.id = note.folder_id
+SET note.notebook_id = folder.notebook_id, note.updated_at = note.updated_at
+WHERE note.notebook_id <> folder.notebook_id;
+```
+
+`note` and `folder` are the only tables that store a notebook id per row of the
+tree. Production showed no title or folder-name collision for this direction.
+
+## Structural goal and acceptance
 
 Folder ancestry used to resolve a materialization destination is derived from
 live `Folder` entities instead of `ExportFolderRow` snapshot rows, so a
@@ -105,15 +162,47 @@ boundary (`controller.publishNotebookGitProposal`):
 
 ## Ordered slices
 
+### Slice 1 — Stray folder ancestry follows its containing notebook
+
+Type: Behavior
+Status: planned
+
+Behavior: a bound notebook owns a folder whose parent belongs to another
+notebook, a note inside that folder, and a note placed directly in a folder of
+the other notebook → the repair migration runs → each row carries its
+container's notebook, and publishing a plain note edit to the first notebook
+succeeds instead of throwing `NullPointerException`.
+
+Add `backend/src/main/resources/db/migration/V300000333__notebook_follows_folder_containment.sql`
+holding exactly the two statements proven above. Highest version ever used is
+`300000332` (files and git history checked). No placeholder, no profile change.
+
+Proof: one temporary migration test extending `NotebookGitBundleControllerTestBase`.
+Build the rows with `makeMe` and corrupt them with native SQL inside
+`inCommittedTransaction`, because the builders refuse inconsistent folders.
+Snapshot the notebook, confirm the publish throws the production
+`NullPointerException` before the migration, execute the migration file's
+statements through JDBC, then assert the three rows' notebook ids and that the
+same publish returns the proposed head. Follow the retired
+`QuestionGenerationBatchFailedRequestPurgeMigrationTest` for loading and running
+a migration resource (`git show 9948260f55^:backend/src/test/java/com/odde/donut/services/QuestionGenerationBatchFailedRequestPurgeMigrationTest.java`).
+The test is migration-only and is removed after production applies the
+migration, per the `db-migration` skill.
+
+Command:
+`unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL && CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*NotebookFollowsFolderContainmentMigrationTest*'`
+
+Safe stopping point: yes. The migration ships alone.
+
+### Slice 2 — Materialize folder ancestry from live folders
+
 Planning refinement: an earlier draft opened with a slice to write a
 characterization test for example 1. Inspecting the suite showed that test
 already exists and already asserts the decisive placement, so that slice was
-removed rather than duplicating coverage. One slice remains.
-
-### Slice 1 — Materialize folder ancestry from live folders
+removed rather than duplicating coverage.
 
 Type: Structure
-Status: not started
+Status: planned
 
 Change `NotebookGitProposalFolderMaterialization`:
 
@@ -155,7 +244,7 @@ Safe stopping point: yes, once green and committed.
   `parentFolder` chain initializes. If a caller outside a transaction is found,
   stop for human judgment rather than adding a guard (ADR 0006: fail loudly).
 - Nothing publication accepts today may stop being accepted. A scenario failing
-  after slice 1 is a regression, not a new constraint.
+  after the structural slice is a regression, not a new constraint.
 
 ## Learnings
 
