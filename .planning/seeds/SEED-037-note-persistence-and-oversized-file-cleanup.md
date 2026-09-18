@@ -75,6 +75,26 @@ cause.
   - `NotebookGitBundleControllerTestBase.java` and `NotebookController.java`
     are at or under this project's file-size guidance, or the owner has
     explicitly accepted their size.
-- **Open decisions:** whether `NotebookController.java`'s split (shared with
-  SEED-036 item d) is small enough for this story or needs its own sizing
-  pass first.
+- **Open decisions:** resolved below.
+
+## Resolution
+
+**(a) Resolved.** `NoteConstructionService.createNoteFromExtractedSuggestion` now
+delegates each note's save to `AuthoredNoteDocumentPersistence.persist`, the
+same class other callers (`WebNoteEditService`,
+`NotebookGitProposalNoteAddition`, `NotebookGitProposalOrdinaryNoteApplication`)
+already use, instead of hand-rolling the save-then-cleanup pair. The
+save/finalize sequence for AI-extracted notes now has one representation.
+
+**(b) `NotebookController.java` — declined for this story.** It is coupled to
+[SEED-036](SEED-036-permanent-deletion-loose-ends.md#story-1) item (d), a
+separate, not-yet-taken story that groups this file with two other oversized
+files (`StoredApiCollection.ts`, `NoteMoreOptionsActions.vue`) needing one
+coherent split design. Splitting it here in isolation would duplicate or
+fragment that design decision. It stays tracked only under SEED-036 item (d).
+
+**(b) `NotebookGitBundleControllerTestBase.java` — declined.** Plan 148
+deliberately grew it from 248 to 257 lines by consolidating a test helper
+duplicated across 62 callers into this one shared base. Splitting it now to
+land under 250 lines would recreate the duplication that consolidation just
+removed, trading a line-count rule for less cohesion. Accepted as-is.

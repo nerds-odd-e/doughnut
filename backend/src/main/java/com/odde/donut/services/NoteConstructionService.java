@@ -34,6 +34,7 @@ public class NoteConstructionService {
   private final NoteService noteService;
   private final NoteFactory noteFactory;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
+  private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
 
   @Autowired
   public NoteConstructionService(
@@ -45,7 +46,8 @@ public class NoteConstructionService {
       NoteReferenceService noteReferenceService,
       NoteService noteService,
       NoteFactory noteFactory,
-      CanonicalDonutOrigin canonicalDonutOrigin) {
+      CanonicalDonutOrigin canonicalDonutOrigin,
+      AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
@@ -55,6 +57,7 @@ public class NoteConstructionService {
     this.noteService = noteService;
     this.noteFactory = noteFactory;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
+    this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
   }
 
   private Note persistNoteContent(Note note, String content) {
@@ -135,14 +138,16 @@ public class NoteConstructionService {
     Note newNote =
         noteFactory.create(
             originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
-    persistNoteContent(newNote, newNoteContent);
-    originalNote = persistNoteContent(originalNote, aiResult.updatedOriginalNoteContent);
-
-    noteService.deleteOrphanImagesForPersistedContent(newNote);
-    noteService.deleteOrphanImagesForPersistedContent(originalNote);
-    noteReferenceService.refreshDerivedIndexesForNote(newNote);
-    noteReferenceService.refreshDerivedIndexesForNote(originalNote);
+    persistAuthoredContent(newNote, newNoteContent);
+    persistAuthoredContent(originalNote, aiResult.updatedOriginalNoteContent);
 
     return noteRealmService.build(newNote, user);
+  }
+
+  private void persistAuthoredContent(Note note, String content) {
+    AuthoredNoteDocument document =
+        AuthoredNoteContent.prepareDocumentForSave(content, canonicalDonutOrigin);
+    authoredNoteDocumentPersistence.persist(
+        note, document, testabilitySettings.getCurrentUTCTimestamp());
   }
 }
