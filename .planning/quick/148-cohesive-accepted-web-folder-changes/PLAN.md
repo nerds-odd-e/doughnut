@@ -211,7 +211,7 @@ concept.
 
 ### 2. Folder rename records the complete accepted result
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a synchronized notebook contains a folder, a nested learned note,
 folder README and an in-notebook referrer → rename through the web endpoint →
@@ -235,6 +235,24 @@ the boundary has missing Git observations. All cases exercise the one endpoint
 change; do not split off a later tests-only slice or deliver without its guards.
 Backend-suite runtime exception applies. Safe stop: rename is complete; existing
 dissolve limitation remains visible, without a temporary mode in production.
+
+Result: `FolderRelocationService.renameFolder` now delegates to the existing
+`applyLiveFolderChange` (already used by move/trash/permanent-delete), with the
+mutation body extracted into a private `renameFolderRecipe`; no new branch was
+needed in `AcceptedWebChangeService`. `NotebookController.renameFolder`'s
+transaction aligned to `Isolation.SERIALIZABLE, rollbackFor = Exception.class`.
+Added `NotebookGitFolderRenameControllerTest` (complete result, subtree/reference
+projection, no-op incl. whitespace-normalized, unbound notebook, rename-then-edit
+history chaining) and `NotebookGitFolderRenameGuardControllerTest` (conflict,
+unauthorized, wrong-notebook, drift — split out by the refactor pass to respect
+the 250-line file-size check) plus `NotebookGitFolderRenameAtomicControllerTest`
+(late binding-save failure rolls back folder name, rewritten referrer, and
+accepted binding together). Controller-level `assertAuthorization`/
+`assertFolderInNotebook` pre-checks on `renameFolder` remain redundant with the
+shared owner's re-validation — pre-existing, not introduced by this slice;
+flagged as a cross-cutting concern if a future pass wants controller pre-checks
+consolidated across all folder-mutation endpoints, not acted on here. Full
+backend suite: `BUILD SUCCESSFUL`, no failures.
 
 ### 3. Folder dissolve records promotion and merge as one accepted result
 Type: Behavior

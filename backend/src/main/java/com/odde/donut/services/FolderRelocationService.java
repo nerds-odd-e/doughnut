@@ -178,8 +178,18 @@ public class FolderRelocationService {
   }
 
   public Folder renameFolder(
-      Notebook notebook, Folder folder, FolderRenameRequest request, User viewer) {
-    requireFolderInNotebook(folder, notebook);
+      Notebook notebook, Folder folder, FolderRenameRequest request, User viewer)
+      throws UnexpectedNoAccessRightException {
+    return applyLiveFolderChange(
+        notebook,
+        folder,
+        result -> "Rename folder: " + result.getName(),
+        (liveNotebook, liveFolder, now) ->
+            renameFolderRecipe(liveNotebook, liveFolder, request, viewer, now));
+  }
+
+  private Folder renameFolderRecipe(
+      Notebook notebook, Folder folder, FolderRenameRequest request, User viewer, Timestamp now) {
     DisplayName displayName = new DisplayName(request.getName());
     String oldName = folder.getName();
     if (displayName.value().equals(oldName)) {
@@ -194,7 +204,6 @@ public class FolderRelocationService {
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(
             noteIdsInSubtree, viewer);
     folder.setName(displayName);
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     folder.setUpdatedAt(now);
     entityPersister.flush();
     entityPersister.merge(folder);

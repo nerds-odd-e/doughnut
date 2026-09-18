@@ -248,7 +248,7 @@ class NotebookController {
           "Changes the folder display name under its current parent. Sibling name conflicts are"
               + " rejected.")
   @PatchMapping("/{notebook}/folders/{folder}")
-  @Transactional
+  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public Folder renameFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("folder") @Schema(type = "integer") Folder folder,
