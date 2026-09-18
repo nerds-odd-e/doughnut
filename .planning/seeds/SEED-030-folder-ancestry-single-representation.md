@@ -78,6 +78,9 @@ unrelated. Only live-entity-against-snapshot mixing is in scope.
 
 ### 1. A publication that reparents a folder still places content correctly under it
 
+**Executable plan:** [142-live-folder-ancestry-materialization](../quick/142-live-folder-ancestry-materialization/PLAN.md)
+— status `planned`, one Structure slice, not yet taken for execution.
+
 - **Goal:** for the notebook owner who reorganizes folders and places content
   in one publication, keep content landing under the folder the proposal shows,
   and make that guarantee a property of the code rather than of caller
