@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.odde.donut.controllers.dto.FailureReportDeletionResultDTO;
 import com.odde.donut.entities.FailureReport;
 import com.odde.donut.entities.repositories.FailureReportRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -67,19 +68,23 @@ class FailureReportControllerTest extends ControllerTestBase {
     @Test
     void adminCanDeleteAllListedReports()
         throws UnexpectedNoAccessRightException, IOException, InterruptedException {
-      controller.deleteFailureReports(List.of(first.getId(), second.getId()));
+      FailureReportDeletionResultDTO result =
+          controller.deleteFailureReports(List.of(first.getId(), second.getId()));
 
       assertThat(remainingReports(), empty());
+      assertThat(result.getUnresolvedGithubIssueUrls(), empty());
     }
 
     @Test
     void adminCanDeleteOneFailureReport()
         throws UnexpectedNoAccessRightException, IOException, InterruptedException {
-      controller.deleteFailureReports(List.of(first.getId()));
+      FailureReportDeletionResultDTO result =
+          controller.deleteFailureReports(List.of(first.getId()));
 
       List<FailureReport> remaining = remainingReports();
       assertThat(remaining, hasSize(1));
       assertThat(remaining.getFirst().getId(), equalTo(second.getId()));
+      assertThat(result.getUnresolvedGithubIssueUrls(), empty());
     }
 
     @Test

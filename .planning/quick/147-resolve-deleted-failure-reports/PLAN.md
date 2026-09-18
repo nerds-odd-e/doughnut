@@ -122,7 +122,7 @@ it without a warning. This is not the final failure policy or story completion.
 
 ### 3. Carry deletion warnings through the existing API and screen
 Type: Structure
-Status: planned
+Status: done
 Estimate: about 5 minutes active change/proof work; medium confidence.
 
 Prepare the immediately following best-effort behavior: replace the void
@@ -257,3 +257,21 @@ Do not absorb the unrelated modified SEED-035 file into this story.
   frontend suites pass. Refactor pass removed one redundant
   already-resolved-success test that duplicated the linked-issue case without
   adding observable proof.
+- Slice 3 delivered: new `FailureReportDeletionResultDTO` (`List<String>
+  unresolvedGithubIssueUrls`) replaces the `void` response on
+  `deleteFailureReports`; always empty on success in this slice (no catching
+  added yet — slice 2's interim propagation is unchanged). API client
+  regenerated (`FailureReportDeletionResultDto`); `FailureReportList.vue`
+  keeps the URLs in their own ref, set only from the delete response and
+  never touched by refetch, rendered as a `daisy-alert-warning` block outside
+  the report-list/empty-state branches so it survives a refetch to an empty
+  list. A follow-up fix was needed: the generated field is optional and
+  `apiCallWithLoading`'s `data` can be undefined, so the assignment uses
+  `data?.unresolvedGithubIssueUrls ?? []` (`vue-tsc --noEmit` initially
+  failed on the unguarded form; now passes clean). Proof:
+  `FailureReportControllerTest`'s two success tests assert an empty result;
+  `FailureReportList.spec.ts` adds tests for a warning surviving refetch and
+  for no warning on an empty result. Full backend suite, targeted frontend
+  suite, `vue-tsc --noEmit`, and `openapi:lint` all pass. Refactor pass found
+  nothing to change (inline per-block DaisyUI alerts are this codebase's
+  existing convention, not a gap).

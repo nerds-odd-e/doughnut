@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.controllers.dto.FailureReportDeletionResultDTO;
 import com.odde.donut.entities.FailureReport;
 import com.odde.donut.entities.repositories.FailureReportRepository;
 import java.io.IOException;
@@ -22,7 +23,8 @@ public class FailureReportService {
     return failureReportRepository.findAll();
   }
 
-  public void deleteFailureReports(List<Integer> ids) throws IOException, InterruptedException {
+  public FailureReportDeletionResultDTO deleteFailureReports(List<Integer> ids)
+      throws IOException, InterruptedException {
     for (Integer id : ids) {
       Optional<FailureReport> failureReport = failureReportRepository.findById(id);
       if (failureReport.isEmpty()) {
@@ -34,5 +36,6 @@ public class FailureReportService {
       }
       failureReportRepository.delete(report);
     }
+    return new FailureReportDeletionResultDTO(List.of());
   }
 }

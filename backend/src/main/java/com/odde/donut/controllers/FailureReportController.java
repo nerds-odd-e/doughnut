@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.controllers.dto.FailureReportDeletionResultDTO;
 import com.odde.donut.entities.FailureReport;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
@@ -58,11 +59,11 @@ class FailureReportController {
   }
 
   @DeleteMapping("/delete")
-  public void deleteFailureReports(@RequestBody List<Integer> ids)
+  public FailureReportDeletionResultDTO deleteFailureReports(@RequestBody List<Integer> ids)
       throws UnexpectedNoAccessRightException, IOException, InterruptedException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
-    failureReportService.deleteFailureReports(ids);
+    return failureReportService.deleteFailureReports(ids);
   }
 
   @PostMapping("/trigger")

@@ -176,7 +176,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `triggerFailure`: POST `/api/failure-reports/trigger` -> `TriggerFailureResponse` (request: none; response body: string)
 - `failureReports`: GET `/api/failure-reports` -> `FailureReportsResponse` (request: none; response body: object)
 - `showFailureReport`: GET `/api/failure-reports/{failureReport}` -> `ShowFailureReportResponse` (request: `ShowFailureReportData`; path: failureReport; response body: FailureReportForView)
-- `deleteFailureReports`: DELETE `/api/failure-reports/delete` -> `DeleteFailureReportsResponse` (request: `DeleteFailureReportsData`; body: Array<number>; response body: void)
+- `deleteFailureReports`: DELETE `/api/failure-reports/delete` -> `DeleteFailureReportsResponse` (request: `DeleteFailureReportsData`; body: Array<number>; response body: FailureReportDeletionResultDto)
 
 ## Daily Probe Controller
 
