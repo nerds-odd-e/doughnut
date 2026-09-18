@@ -85,6 +85,14 @@ When(
   }
 )
 
+When(
+  'I reset the Git history of notebook {string} from its settings',
+  (notebookName: string) => {
+    start.navigateToNotebookPage(notebookName)
+    notebookPage().resetGitHistory()
+  }
+)
+
 When('I save notebook readme {string}', (body: string) => {
   notebookPage().saveNotebookReadme(body)
 })

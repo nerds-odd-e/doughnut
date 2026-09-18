@@ -89,37 +89,21 @@
             <span>{{ NOTEBOOK_EXPORT_BUTTON_LABEL }}</span>
           </div>
         </button>
+        <button
+          class="daisy-btn daisy-btn-outline daisy-btn-sm"
+          type="button"
+          data-testid="notebook-settings-reset-git-history"
+          @click="resetGitHistory()"
+        >
+          <div class="flex items-center gap-2">
+            <History class="w-6 h-6" />
+            <span>Reset Git history</span>
+          </div>
+        </button>
       </div>
     </section>
 
-    <section class="bg-base-100 border border-base-300 rounded-lg p-6 mb-6">
-      <div class="mb-5">
-        <h4 class="text-lg font-semibold mb-2 text-base-content">
-          Notebook Indexing
-        </h4>
-        <p class="text-sm text-base-content/70 leading-normal">
-          Manage the search index for this notebook. Reset to rebuild from scratch, or update to index new content.
-        </p>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <button
-          class="daisy-btn daisy-btn-outline daisy-btn-sm"
-          @click="reindexNotebook"
-          :disabled="isIndexing"
-        >
-          <span v-if="isIndexing">Working...</span>
-          <span v-else>Reset notebook index</span>
-        </button>
-        <button
-          class="daisy-btn daisy-btn-outline daisy-btn-sm"
-          @click="updateIndexNotebook"
-          :disabled="isIndexing"
-        >
-          <span v-if="isIndexing">Working...</span>
-          <span v-else>Update index</span>
-        </button>
-      </div>
-    </section>
+    <NotebookIndexingSection :notebook-id="notebook.id" />
   </div>
 </template>
 
@@ -138,11 +122,12 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { GitMerge, Share2, Download } from "@lucide/vue"
+import { GitMerge, Share2, Download, History } from "@lucide/vue"
 import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
+import NotebookIndexingSection from "@/components/notebook/NotebookIndexingSection.vue"
 import {
   downloadNotebookExport,
   NOTEBOOK_EXPORT_BUTTON_LABEL,
@@ -168,7 +153,6 @@ const { popups } = usePopups()
 const errors = ref({
   skipMemoryTrackingEntirely: undefined as string | undefined,
 })
-const isIndexing = ref(false)
 
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
@@ -179,6 +163,23 @@ const shareNotebook = async () => {
     )
     if (!error) {
       await router.push({ name: "notebooks" })
+    }
+  }
+}
+
+const resetGitHistory = async () => {
+  if (
+    await popups.confirm(
+      `Reset Git history? The current history is permanently discarded and replaced by one commit of this notebook. Existing clones stop working and have to be cloned again.`
+    )
+  ) {
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.resetNotebookGitHistory({
+        path: { notebook: props.notebook.id },
+      })
+    )
+    if (!error) {
+      showSuccessToast("Notebook Git history reset")
     }
   }
 }
@@ -206,31 +207,5 @@ const saveDescription = async () => {
 const onSkipMemoryTrackingChange = async (checked: boolean) => {
   props.settingsBody.skipMemoryTrackingEntirely = checked
   await persistSettings("Memory tracking setting updated")
-}
-
-const reindexNotebook = async () => {
-  isIndexing.value = true
-  const { error } = await apiCallWithLoading(() =>
-    NotebookController.resetNotebookIndex({
-      path: { notebook: props.notebook.id },
-    })
-  )
-  if (!error) {
-    showSuccessToast("Notebook index reset successfully")
-  }
-  isIndexing.value = false
-}
-
-const updateIndexNotebook = async () => {
-  isIndexing.value = true
-  const { error } = await apiCallWithLoading(() =>
-    NotebookController.updateNotebookIndex({
-      path: { notebook: props.notebook.id },
-    })
-  )
-  if (!error) {
-    showSuccessToast("Notebook index updated successfully")
-  }
-  isIndexing.value = false
 }
 </script>

@@ -1,6 +1,6 @@
 # Reset a notebook's Git history
 
-Status: in progress
+Status: done
 Source: [SEED-030 story 2](../../seeds/SEED-030-folder-ancestry-single-representation.md#2-notebooks-that-gained-repaired-content-can-publish-again).
 Authority: 2026-09-18 owner instruction to refine the story, write and refine a
 slice plan, and commit it. Planning only. The owner executes from another
@@ -121,14 +121,6 @@ equal to their pre-call values. Commands:
 `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL && CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookGit*'`
 (99 classes, 320 tests, 0 failures) and the same wrapper with
 `--tests '*NotebookGitCutoverServiceTest*'`.
- Assert the
-commit count and parentlessness through `GitBundleTestReader`, and the tree
-through `GitBundleTestReader.readTreeEntries` or the existing blob readers.
-Command:
-`unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL && CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*NotebookGitHistoryReset*'`
-then the feature suite, which must stay green because the testability fixture
-path changed:
-`unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL && CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookGit*'`
 
 Wrap-up for this slice regenerates the TypeScript API client, because a
 controller signature was added (`generate-api-client` skill).
@@ -138,7 +130,7 @@ Safe stopping point: yes. The endpoint works without the button.
 ### Slice 2 — The owner resets Git history from notebook settings behind a warning
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: the owner opens notebook settings → presses "Reset Git history" and
 confirms a warning that the history is permanently discarded and existing
@@ -158,6 +150,21 @@ since the reset is what makes the notes clonable. Then one mounted-component tes
 `e2e-authoring`, `frontend` and `unit-testing` skills for commands and tags.
 
 Safe stopping point: yes. Story complete.
+
+Accepted proof, 2026-09-18: the button lives in the Notebook Management section
+of `NotebookSettings.vue` as `data-testid="notebook-settings-reset-git-history"`,
+warning that the history is permanently discarded and existing clones have to be
+cloned again.
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_git_history_reset.feature`
+passes: the scenario deliberately omits the Git-binding sync step, so after the
+settings reset the clone is a clean single-commit checkout on `main` containing
+exactly `README.md` and `Overview.md`, and the page object asserts the dialog
+contains "permanently discarded" before confirming. A negative control with the
+reset step deleted failed with an empty checkout, so the scenario is not vacuous.
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/notebook/NotebookSettings.resetGitHistory.spec.ts`
+passes: cancelling leaves the `resetNotebookGitHistory` spy uncalled. The whole
+frontend suite (345 files, 1893 tests) was run as a gate on the component
+extraction below and passed.
 
 ## Refinement assessment
 
@@ -224,3 +231,18 @@ Omitting that step gives slice 2 a genuinely drifted notebook. The assertions
   its only remaining call site, notebook creation, where there is no existing
   content. No test asserts either commit message. "Cutover" in the class name is
   likewise vestigial.
+- Slice 2's button pushed `NotebookSettings.vue` past the 250-line file check, so
+  the refactor pass extracted the unrelated "Notebook Indexing" section into
+  `NotebookIndexingSection.vue`, following the sibling `NotebookAttachedBookSection`
+  prop idiom. `NotebookSettings.vue` ends the story at 211 lines, 25 fewer than
+  before the story started, despite gaining a feature.
+- The button sits in Notebook Management rather than beside the index buttons,
+  because the "Notebook Indexing" heading describes its body as managing the
+  search index; a Git-history reset there would be labelled as a search-index
+  action.
+- `popups.confirm` guarding an action is a product-wide idiom in 14 files under
+  `frontend/src` with no shared wrapper. Giving it one home is its own piece of
+  work; this story did not aggravate it.
+- The E2E notebook's accepted history before the reset is the empty creation
+  tree rather than a populated drifted one, so an unsynced notebook clones to
+  zero files. The populated-drift case is covered by the slice 1 controller test.
