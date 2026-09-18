@@ -2201,6 +2201,23 @@ export type TrashFolderResponses = {
 
 export type TrashFolderResponse = TrashFolderResponses[keyof TrashFolderResponses];
 
+export type PermanentlyDeleteFolderData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}/permanently-delete';
+};
+
+export type PermanentlyDeleteFolderResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type MoveFolderData = {
     body?: FolderMoveRequest;
     path: {

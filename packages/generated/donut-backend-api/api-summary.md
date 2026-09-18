@@ -115,6 +115,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `publishNotebookGitProposal`: POST `/api/notebooks/{notebook}/git-bundle` -> `PublishNotebookGitProposalResponse` (request: `PublishNotebookGitProposalData`; path: notebook; query: expectedHead; body: string; response body: string)
 - `createFolder`: POST `/api/notebooks/{notebook}/folders` -> `CreateFolderResponse` (request: `CreateFolderData`; path: notebook; body: FolderCreationRequest; response body: Folder)
 - `trashFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/trash` -> `TrashFolderResponse` (request: `TrashFolderData`; path: notebook, folder; response body: Folder)
+- `permanentlyDeleteFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/permanently-delete` -> `PermanentlyDeleteFolderResponse` (request: `PermanentlyDeleteFolderData`; path: notebook, folder; response body: void)
 - `moveFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/move` -> `MoveFolderResponse` (request: `MoveFolderData`; path: notebook, folder; body: FolderMoveRequest; response body: Folder)
 - `createNoteAtNotebookRoot`: POST `/api/notebooks/{notebook}/create-note` -> `CreateNoteAtNotebookRootResponse` (request: `CreateNoteAtNotebookRootData`; path: notebook; body: NoteCreationDto; response body: NoteRealm)
 - `createNotebook`: POST `/api/notebooks/create` -> `CreateNotebookResponse` (request: `CreateNotebookData`; body: NotebookCreationRequest; response body: NotebookRealm)

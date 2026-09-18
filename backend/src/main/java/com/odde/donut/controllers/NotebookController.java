@@ -224,6 +224,21 @@ class NotebookController {
   }
 
   @Operation(
+      summary = "Permanently delete a trashed folder",
+      description =
+          "Removes a folder that is in trash with its README, every nested folder, every note"
+              + " inside the subtree and each note's dependent data, in one accepted change."
+              + " A folder that is not in trash is refused with 400.")
+  @PostMapping("/{notebook}/folders/{folder}/permanently-delete")
+  public void permanentlyDeleteFolder(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("folder") @Schema(type = "integer") Folder folder)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    folderRelocationService.permanentlyDeleteFolderWithinNotebook(notebook, folder);
+  }
+
+  @Operation(
       summary = "Rename a folder",
       description =
           "Changes the folder display name under its current parent. Sibling name conflicts are"

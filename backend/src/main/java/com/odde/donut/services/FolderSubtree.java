@@ -16,27 +16,36 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/** Walks a folder tree and applies subtree reassignment and merge. */
+/** Walks a folder tree and applies subtree reassignment, merge, dissolve and removal. */
 final class FolderSubtree {
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
+  private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final EntityPersister entityPersister;
 
   FolderSubtree(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
+      FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
+    this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
+  }
+
+  List<Note> collectNotes(List<Folder> subtreeFolders) {
+    List<Note> notes = new ArrayList<>();
+    for (Folder subtreeFolder : subtreeFolders) {
+      notes.addAll(noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId()));
+    }
+    return notes;
   }
 
   Set<Integer> collectNoteIds(List<Folder> subtreeFolders) {
     Set<Integer> noteIds = new LinkedHashSet<>();
-    for (Folder subtreeFolder : subtreeFolders) {
-      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
-        noteIds.add(note.getId());
-      }
+    for (Note note : collectNotes(subtreeFolders)) {
+      noteIds.add(note.getId());
     }
     return noteIds;
   }
@@ -71,6 +80,55 @@ final class FolderSubtree {
         entityPersister.merge(note);
       }
     }
+  }
+
+  /**
+   * Reassigns {@code folder}'s direct subfolders and notes to its parent and removes the folder
+   * itself. A subfolder whose name already exists at the destination is merged into that sibling
+   * when {@code merge} is set, and refused otherwise.
+   */
+  void dissolveInto(Folder folder, boolean merge, Timestamp now) {
+    Folder destination = folder.getParentFolder();
+    Integer destinationId = destination == null ? null : destination.getId();
+
+    List<Folder> directSubfolders =
+        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId());
+
+    for (Folder child : directSubfolders) {
+      Optional<Folder> existingSibling =
+          folderSiblingNameValidation.findConflictingSibling(
+              folder.getNotebook().getId(),
+              destinationId,
+              new DisplayName(child.getName()),
+              folder.getId());
+      if (existingSibling.isEmpty()) {
+        continue;
+      }
+      if (merge) {
+        mergeInto(child, existingSibling.get(), now);
+      } else {
+        FolderSiblingNameValidation.throwFolderNameConflict(
+            FolderSiblingNameValidation.dissolveSiblingClashAtDestination(child.getName()));
+      }
+    }
+
+    List<Folder> remainingSubfolders =
+        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId());
+    for (Folder child : remainingSubfolders) {
+      child.setParentFolder(destination);
+      child.setUpdatedAt(now);
+      entityPersister.merge(child);
+    }
+
+    List<Note> directNotes = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
+    for (Note note : directNotes) {
+      note.setFolder(destination);
+      entityPersister.merge(note);
+    }
+
+    entityPersister.flush();
+    entityPersister.remove(folder);
+    entityPersister.flush();
   }
 
   void mergeInto(Folder source, Folder target, Timestamp now) {

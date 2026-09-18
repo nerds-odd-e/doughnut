@@ -208,7 +208,7 @@ Dissolve in trash, as today.
 ### Slice 3 — Permanently deleting a trashed folder removes its whole subtree in one accepted change
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a folder under `_trash` holds a README, a note with a memory tracker,
 and a nested folder with another note; a sibling folder with a note sits beside
@@ -379,3 +379,45 @@ above.
 - Reported for later, not acted on: `StoredApiCollection.ts` (613 lines) and
   `NoteMoreOptionsActions.vue` (272 lines) both exceed the 250-line rule and did so
   before this story.
+
+### Slice 3
+
+- Delivered: `FolderRelocationService.permanentlyDeleteFolderWithinNotebook(Notebook, Folder)`
+  beside `trashFolderWithinNotebook`, through the same private `applyLiveFolderChange`,
+  and `POST /api/notebooks/{notebook}/folders/{folder}/permanently-delete` in
+  `NotebookController`, returning no body. The `_trash` root and an empty trashed
+  folder need no code of their own, as the plan intended.
+- Removal order: every note through `NoteService.permanentlyRemove` with
+  `LEAVE_DEAD_LINKS`, then folders deepest first via `subtreeFolders.reversed()`.
+  The explicit `entityPersister.flush()` between the loops was **removed** as
+  redundant: `EntityPersister.remove` already does merge + remove + flush per call,
+  so every note's DELETE reaches the database before the first folder removal. The
+  reason the order matters (`fk_note_folder` is `ON DELETE SET NULL`) is now a comment
+  on the loop it constrains, not only plan text.
+- Accepted proof: `NotebookFolderPermanentDeleteControllerTest` (4 tests) and
+  `NotebookGitWebFolderPermanentDeleteControllerTest` (1 test). The guard for the
+  ordering is `rootNoteTitles(notebook)`, which reads the product's own
+  `findNotesInNotebookRootFolderScopeByNotebookId` listing — a note missed by the
+  collector would surface there. **Do not weaken it.**
+- Refactor consolidated the seam the new operation duplicated: `assertAuthorization`
+  and the "folder belongs to this notebook" 404 moved into `applyLiveFolderChange`
+  (three callers, all within-notebook; cross-notebook move bypasses that seam through
+  `FolderMoveRelocation` and keeps its own check), and the four in-file copies of the
+  404 became one `requireFolderInNotebook`. `dissolveFolder`'s subtree surgery moved
+  verbatim into `FolderSubtree.dissolveInto`, keeping `FolderRelocationService` at 218
+  lines — shorter than the 228 it had before this story, with one more operation in it.
+  Reproof: `--tests '*Folder*'` → 260 tests, 0 failures.
+- The note and folder refusals stay as two statements. The knowledge of what "in trash"
+  means already has one home (`Folder.isTrashed()` walking to `_trash`, ADR 0004, with
+  `Note.isTrashed()` delegating to its folder); only a one-line precondition repeats, on
+  two different accepted-change seams.
+- For slice 4: deleting the `_trash` root removes the `_trash` row itself, so there is no
+  parent folder to land on — the "notebook page for `_trash` itself" routing is
+  required, not optional. `FolderBuilder.inTrashOf(notebook)` creates a fresh `_trash`
+  per call, so reach a sibling or the root with `folder.getParentFolder()` rather than a
+  second `inTrashOf(...)`.
+- Reported, not acted on: `NotebookController.java` is 545 lines (530 before this
+  story) and exceeds the 250-line rule; `"Folder not in notebook."` still has copies in
+  `FolderMoveRelocation`, `FolderConstructionService` and `NoteConstructionService`;
+  and `renameFolder` / `dissolveFolder` do not go through the accepted-web-change lock
+  while move, trash and permanent delete do — a product question, not a refactoring one.

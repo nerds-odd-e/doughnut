@@ -45,7 +45,9 @@ public class FolderMoveRelocation {
     this.testabilitySettings = testabilitySettings;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
-    this.subtree = new FolderSubtree(folderRepository, noteRepository, entityPersister);
+    this.subtree =
+        new FolderSubtree(
+            folderRepository, noteRepository, folderSiblingNameValidation, entityPersister);
   }
 
   Folder moveFolder(
