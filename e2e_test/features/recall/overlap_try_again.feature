@@ -40,9 +40,7 @@ Feature: Overlap try again
     When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means a hue" from notebook "Overlap practice"
     When I type my answer "<overlap>"
-    Then I should see an overlap try-again alert for spelling
-    When I try the spelling question again
-    Then I should be asked spelling question "means a hue" from notebook "Overlap practice"
+    Then I should see spelling question "means a hue" with an overlap explanation and an empty, focused answer input
     When I type my answer "<answer>"
     Then I should see that my last answer to spelling question is correct
 

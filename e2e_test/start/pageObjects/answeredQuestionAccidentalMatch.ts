@@ -50,14 +50,3 @@ export function expectAccidentalMatchRevealForNotes(
     .filter(`:contains("${reviewedNoteTitle}")`)
     .should('have.length.at.least', 1)
 }
-
-export function expectOverlapTryAgainAlert() {
-  cy.findByTestId('overlap-try-again-alert')
-    .scrollIntoView()
-    .should('be.visible')
-    .and(
-      'contain.text',
-      "Correct, but we're looking for another answer — try again."
-    )
-  cy.findByTestId('overlap-try-again').scrollIntoView().should('be.visible')
-}

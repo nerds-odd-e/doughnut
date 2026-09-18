@@ -1,10 +1,19 @@
-import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  MemoryTrackerController,
+  RecallPromptController,
+} from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
+import { focusDirective } from "@tests/helpers/softKeyboardPrimerTestSupport"
+import {
+  captureRequestAnimationFrame,
+  flushCapturedAnimationFrames,
+} from "@tests/components/recall/spellingQuestionDisplayTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { nextTick } from "vue"
 import {
   createMemoryTrackerLite,
   createUseRecallDataMock,
@@ -23,7 +32,7 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-describe("overlap try-again stay and retry", () => {
+describe("overlap try-again stays on the active spelling question", () => {
   const memoryTrackerId = 123
   const ctx = useRecallPageSpecContext({ fakeTimers: true })
   let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
@@ -55,39 +64,56 @@ describe("overlap try-again stay and retry", () => {
     )
   })
 
-  it("stays on the same tracker, skips threshold, and remounts spelling on Try again", async () => {
+  it("keeps the current tracker, shows the overlap explanation, and refocuses an emptied input", async () => {
     const overlapResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .overlap("Shared Title")
       .withMemoryTrackerId(memoryTrackerId)
       .please()
+    const answerSpellingSpy = mockSdkService(
+      RecallPromptController,
+      "answerSpelling",
+      overlapResult
+    )
+    const rafCallbacks = captureRequestAnimationFrame()
 
-    const wrapper = await ctx.mountPage()
+    const wrapper = ctx.renderer.currentRoute({ name: "recall" }).mount({
+      attachTo: document.body,
+      global: { directives: { focus: focusDirective } },
+    })
+    await flushPromises()
+    await nextTick()
+    flushCapturedAnimationFrames(rafCallbacks)
+    await flushPromises()
 
     type ExposedVM = { currentIndex: number }
     const vm = wrapper.vm as unknown as ExposedVM
-    wrapper
-      .findComponent({ name: "RecallPromptCard" })
-      .vm.$emit("answered", overlapResult)
+    const getRecallPromptCallsBeforeAnswer =
+      getRecallPromptSpy.mock.calls.length
+
+    await wrapper.find("input#memory_tracker-answer").setValue("Shared Title")
+    await wrapper.find("form").trigger("submit")
+    await flushPromises()
+    await nextTick()
+    flushCapturedAnimationFrames(rafCallbacks)
     await flushPromises()
 
-    expect(vm.currentIndex).toBe(0)
+    expect(answerSpellingSpy).toHaveBeenCalled()
     expect(getThresholdExceededSpy).not.toHaveBeenCalled()
-
-    const getRecallPromptCallsBeforeRetry = getRecallPromptSpy.mock.calls.length
-    await wrapper.find('[data-testid="overlap-try-again"]').trigger("click")
-    await flushPromises()
-
-    expect(
-      wrapper.findComponent({ name: "AnsweredSpellingQuestion" }).exists()
-    ).toBe(false)
     expect(vm.currentIndex).toBe(0)
-    expect(
-      wrapper
-        .findComponent({ name: "RecallPromptCard" })
-        .props("spellingRetryNonce")
-    ).toBe(1)
     expect(getRecallPromptSpy.mock.calls.length).toBeGreaterThan(
-      getRecallPromptCallsBeforeRetry
+      getRecallPromptCallsBeforeAnswer
     )
+
+    expect(
+      wrapper.find('[data-testid="spelling-overlap-feedback"]').text()
+    ).toContain(
+      "Your answer matches an overlapped note, but that's different from the expected answer"
+    )
+
+    const spellingInput = document.querySelector(
+      "input#memory_tracker-answer"
+    ) as HTMLInputElement
+    expect(spellingInput.value).toBe("")
+    expect(document.activeElement).toBe(spellingInput)
   })
 })

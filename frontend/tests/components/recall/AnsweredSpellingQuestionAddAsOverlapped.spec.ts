@@ -25,7 +25,7 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     document.body.innerHTML = ""
   })
 
-  it("adds as overlapped note via wiki-link content update without try-again", async () => {
+  it("adds as overlapped note via wiki-link content update", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
     mockSdkService(NoteController, "authoredPortablePath", {
@@ -73,10 +73,6 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     expect(callArgs.body.content).toMatch(/overlaps:/)
     expect(callArgs.body.content).toContain("[[")
     expect(callArgs.body.content).not.toMatch(/aliases:/)
-    expect(wrapper.find('[data-testid="overlap-try-again"]').exists()).toBe(
-      false
-    )
-    expect(wrapper.emitted("retry")).toBeUndefined()
   })
 
   it("disables add as overlapped when overlaps already names the destination via a folder-qualified wiki link", async () => {

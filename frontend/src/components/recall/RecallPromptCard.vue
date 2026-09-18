@@ -8,6 +8,7 @@
         v-bind="{
           memoryTrackerId: currentMemoryTrackerId!,
           nextIsSpelling,
+          overlapFeedback: spellingOverlapFeedback,
         }"
         @answer="onSpellingAnswer($event)"
         :key="`spelling-${currentMemoryTrackerId}-${props.spellingRetryNonce ?? 0}`"
@@ -63,6 +64,7 @@ interface RecallPromptCardProps {
   eagerFetchCount: number
   nextIsSpelling?: boolean
   spellingRetryNonce?: number
+  spellingOverlapFeedback?: string
 }
 
 const props = defineProps<RecallPromptCardProps>()

@@ -7,18 +7,21 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { Ref } from "vue"
 
+const OVERLAP_RETRY_FEEDBACK =
+  "Your answer matches an overlapped note, but that's different from the expected answer"
+
 type RecallAnswerHandlingDeps = {
   previousAnsweredQuestions: Ref<(AnsweredQuestion | undefined)[]>
-  previousAnsweredQuestionCursor: Ref<number | undefined>
   spellingRetryNonce: Ref<number>
+  spellingOverlapFeedback: Ref<string | undefined>
   moveToNextMemoryTracker: () => void
   viewLastAnsweredQuestion: (cursor: number | undefined) => void
 }
 
 export function useRecallAnswerHandling({
   previousAnsweredQuestions,
-  previousAnsweredQuestionCursor,
   spellingRetryNonce,
+  spellingOverlapFeedback,
   moveToNextMemoryTracker,
   viewLastAnsweredQuestion,
 }: RecallAnswerHandlingDeps) {
@@ -38,11 +41,12 @@ export function useRecallAnswerHandling({
 
   const onAnswered = async (answerResult: AnsweredQuestion) => {
     if (answerResult.answer?.outcome === "OVERLAP") {
-      previousAnsweredQuestions.value.push(answerResult)
-      viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
+      spellingOverlapFeedback.value = OVERLAP_RETRY_FEEDBACK
+      spellingRetryNonce.value += 1
       return
     }
 
+    spellingOverlapFeedback.value = undefined
     moveToNextMemoryTracker()
     previousAnsweredQuestions.value.push(answerResult)
     if (!answerResult.answer?.correct) {
@@ -61,15 +65,10 @@ export function useRecallAnswerHandling({
     }
   }
 
-  const onOverlapRetry = () => {
-    previousAnsweredQuestionCursor.value = undefined
-    spellingRetryNonce.value += 1
-  }
-
   const onJustReviewed = () => {
     moveToNextMemoryTracker()
     previousAnsweredQuestions.value.push(undefined)
   }
 
-  return { onAnswered, onOverlapRetry, onJustReviewed }
+  return { onAnswered, onJustReviewed }
 }

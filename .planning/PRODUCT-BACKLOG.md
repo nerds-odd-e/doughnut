@@ -9,7 +9,6 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 
-- [Retry an overlapped spelling match without revealing the answer](seeds/SEED-032-retry-overlapped-spelling-match.md#story-1) — SEED-032 — plan: [143](quick/143-overlapped-spelling-inline-retry/PLAN.md)
 - [Publishing notebook 4's proposal succeeds, and folder ancestry has one representation](seeds/SEED-030-folder-ancestry-single-representation.md#1-publishing-notebook-4s-proposal-succeeds-and-folder-ancestry-has-one-representation) — SEED-030 — plan: [142](quick/142-live-folder-ancestry-materialization/PLAN.md)
 
 ## Backlog list

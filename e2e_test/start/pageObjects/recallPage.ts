@@ -70,6 +70,22 @@ const recallPage = () => {
         .click()
       waitUntilAppIsNotBusy()
     },
+    expectOverlapRetryForSpelling(stem: string) {
+      waitUntilAppIsNotBusy()
+      assumeQuestionPage(stem)
+      cy.get('[data-test="question-section"]:visible').within(() => {
+        cy.findByTestId('spelling-overlap-feedback')
+          .should('be.visible')
+          .and(
+            'contain.text',
+            "Your answer matches an overlapped note, but that's different from the expected answer"
+          )
+        cy.get('input[placeholder="put your answer here"]')
+          .should('have.value', '')
+          .and('be.focused')
+      })
+      return this
+    },
     expectRecallProgressFromTriple(numberOfRecalls: string) {
       const { finished, toRepeatCount, totalAssimilated } =
         recallProgressFromTriple(numberOfRecalls)
