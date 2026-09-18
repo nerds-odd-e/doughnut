@@ -178,13 +178,10 @@ public class NotebookGitProjection {
     }
   }
 
-  public Note requireOneNoteAtPath(
-      List<ExportFolderRow> folders, List<Note> notes, String changedPath) {
-    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
+  public Note requireOneNoteAtPath(List<Note> notes, String changedPath) {
     List<Note> matches =
         notes.stream()
-            .filter(
-                note -> NotebookGitAcceptedTree.portablePath(note, folderById).equals(changedPath))
+            .filter(note -> NotebookGitLivePortablePath.ofNote(note).equals(changedPath))
             .toList();
     if (matches.size() != 1) {
       throw new IllegalStateException("Expected exactly one Note at Portable path " + changedPath);

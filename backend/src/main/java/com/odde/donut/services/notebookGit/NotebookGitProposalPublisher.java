@@ -162,7 +162,7 @@ public class NotebookGitProposalPublisher {
     List<Note> proposedNotes = new ArrayList<>(published.storedNotes());
     List<ExportFolderRow> proposedFolders = published.folders();
     // Deletions before additions so same-path deletion-gap recreation can replace the old identity.
-    ordinaryNoteApplication.applyDeletions(admitted, proposedFolders, proposedNotes);
+    ordinaryNoteApplication.applyDeletions(admitted, proposedNotes);
     if (relocation.isEmpty() && !admitted.documents().isEmpty()) {
       published =
           documentApplication.apply(

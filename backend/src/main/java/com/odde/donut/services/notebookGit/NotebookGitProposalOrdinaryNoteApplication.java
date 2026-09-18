@@ -55,17 +55,13 @@ class NotebookGitProposalOrdinaryNoteApplication {
     this.notebookGitStateLoader = notebookGitStateLoader;
   }
 
-  void applyDeletions(
-      NotebookGitProposalTreeShape.AdmittedShape admitted,
-      List<ExportFolderRow> proposedFolders,
-      List<Note> proposedNotes)
+  void applyDeletions(NotebookGitProposalTreeShape.AdmittedShape admitted, List<Note> proposedNotes)
       throws UnexpectedNoAccessRightException {
     for (NotebookGitProposalTreeShape.NoteChange noteChange : admitted.noteChanges()) {
       if (noteChange.kind() != NotebookGitProposalTreeShape.ChangeKind.DELETED) {
         continue;
       }
-      Note deletedNote =
-          projection.requireOneNoteAtPath(proposedFolders, proposedNotes, noteChange.path());
+      Note deletedNote = projection.requireOneNoteAtPath(proposedNotes, noteChange.path());
       noteService.permanentlyRemove(
           deletedNote,
           NoteTrashReferenceHandling.LEAVE_DEAD_LINKS,
@@ -88,31 +84,26 @@ class NotebookGitProposalOrdinaryNoteApplication {
             .toList();
     Map<String, Folder> destinationFolders =
         folderMaterialization.ensureAncestry(notebook, proposedFolders, renameDestinations);
-    // Reread after materialization so every path resolves against the same folders the live notes
-    // are placed in, including the folders this publication just created.
-    List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(notebook);
     for (NotebookGitProposalTreeShape.NoteChange noteChange : admitted.noteChanges()) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document =
             noteAddition.readValidatedDocument(proposal, noteChange.path());
-        Note changedNote =
-            projection.requireOneNoteAtPath(folders, proposedNotes, noteChange.path());
+        Note changedNote = projection.requireOneNoteAtPath(proposedNotes, noteChange.path());
         authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.RENAMED) {
-        applyRename(folders, destinationFolders, proposal, proposedNotes, noteChange, publishedAt);
+        applyRename(destinationFolders, proposal, proposedNotes, noteChange, publishedAt);
       }
     }
-    return folders;
+    return notebookGitStateLoader.foldersOf(notebook);
   }
 
   private void applyRename(
-      List<ExportFolderRow> folders,
       Map<String, Folder> destinationFolders,
       NotebookGitProposalImporter.ImportedProposal proposal,
       List<Note> proposedNotes,
       NotebookGitProposalTreeShape.NoteChange noteChange,
       Timestamp publishedAt) {
-    Note note = projection.requireOneNoteAtPath(folders, proposedNotes, noteChange.origin().path());
+    Note note = projection.requireOneNoteAtPath(proposedNotes, noteChange.origin().path());
     String newTitle = filenameTitle.requireValid(noteChange.path());
     Folder destinationFolder =
         noteAddition.destinationFolder(destinationFolders, noteChange.path());

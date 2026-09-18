@@ -1,7 +1,5 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.entities.Folder;
-import com.odde.donut.entities.Note;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import java.io.IOException;
@@ -20,7 +18,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
-/** Reads accepted Portable paths and folder ancestry from a Git commit. */
+/** Reads accepted Portable tree entries from a Git commit and folder-row Portable paths. */
 final class NotebookGitAcceptedTree {
 
   private NotebookGitAcceptedTree() {}
@@ -47,13 +45,6 @@ final class NotebookGitAcceptedTree {
 
   static List<PortableTreeEntry> sorted(List<PortableTreeEntry> entries) {
     return entries.stream().sorted(Comparator.comparing(PortableTreeEntry::path)).toList();
-  }
-
-  static String portablePath(Note note, Map<Integer, ExportFolderRow> folderById) {
-    Folder folder = note.getFolder();
-    String folderPath =
-        folder == null ? "" : folderPath(folderById.get(folder.getId()), folderById);
-    return folderPath + note.getTitle() + ".md";
   }
 
   static boolean representedInTree(String folderPath, List<PortableTreeEntry> entries) {
