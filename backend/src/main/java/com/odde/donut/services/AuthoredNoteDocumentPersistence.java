@@ -25,8 +25,12 @@ public class AuthoredNoteDocumentPersistence {
   public void persist(Note note, AuthoredNoteDocument document, Timestamp updatedAt) {
     note.setUpdatedAt(updatedAt);
     note.replaceContent(document);
-    entityPersister.save(note);
-    noteService.deleteOrphanImagesForPersistedContent(note);
-    noteReferenceService.refreshDerivedIndexesForNote(note);
+    // `save` merges an already-existing note rather than mutating `note` in place, so the
+    // returned, managed instance is the one later steps must operate on. Using the original
+    // reference here throws EntityExistsException from a still-detached note (e.g. one loaded
+    // via a Spring MVC @PathVariable converter outside this method's transaction).
+    Note managed = entityPersister.save(note);
+    noteService.deleteOrphanImagesForPersistedContent(managed);
+    noteReferenceService.refreshDerivedIndexesForNote(managed);
   }
 }
