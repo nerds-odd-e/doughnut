@@ -129,6 +129,13 @@ Then(
   }
 )
 
+Then(
+  'I should see spelling question {string} with an overlap explanation and an empty, focused answer input',
+  (stem: string) => {
+    start.recall().assumeRecallPage().expectOverlapRetryForSpelling(stem)
+  }
+)
+
 Then('I should see that my last answer to spelling question is correct', () => {
   start
     .assumeAnsweredQuestionPage()

@@ -37,17 +37,6 @@
     :note-id="answeredQuestion.recalledNote.noteTopology.id"
     :expand-children="false"
   />
-  <button
-    v-if="isOverlap"
-    type="button"
-    class="daisy-btn daisy-btn-secondary daisy-btn-sm mt-6"
-    data-testid="overlap-try-again"
-    title="Try again"
-    aria-label="Try again"
-    @click="emit('retry')"
-  >
-    Try again
-  </button>
 </template>
 
 <script setup lang="ts">
@@ -67,14 +56,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const emit = defineEmits<{
-  (e: "retry"): void
-}>()
-
-const isOverlap = computed(
-  () => props.answeredQuestion.answer.outcome === "OVERLAP"
-)
 
 const isAccidentalMatch = computed(
   () => props.answeredQuestion.answer.outcome === "ACCIDENTAL_MATCH"
@@ -97,22 +78,17 @@ const uniqueAccidentalMatch = computed(() => {
 })
 
 const alertClass = computed(() => {
-  if (isOverlap.value) return "daisy-alert-warning"
   if (props.answeredQuestion.answer.correct) return "daisy-alert-success"
   return "daisy-alert-error"
 })
 
 const alertTestId = computed(() => {
-  if (isOverlap.value) return "overlap-try-again-alert"
   if (isAccidentalMatch.value) return "accidental-match-alert"
   return undefined
 })
 
 const alertMessage = computed(() => {
   const { answer } = props.answeredQuestion
-  if (isOverlap.value) {
-    return "Correct, but we're looking for another answer — try again."
-  }
   if (answer.correct) {
     return "Correct!"
   }

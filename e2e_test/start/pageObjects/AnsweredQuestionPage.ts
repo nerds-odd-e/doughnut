@@ -1,8 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
-import {
-  expectAccidentalMatchRevealForNotes,
-  expectOverlapTryAgainAlert,
-} from './answeredQuestionAccidentalMatch'
+import { expectAccidentalMatchRevealForNotes } from './answeredQuestionAccidentalMatch'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
 const assumeAnsweredQuestionPage = () => {
@@ -42,15 +39,6 @@ const assumeAnsweredQuestionPage = () => {
         reviewedNoteTitle,
         matchedNoteTitle
       )
-      return self
-    },
-    expectOverlapTryAgainForSpelling() {
-      expectOverlapTryAgainAlert()
-      return self
-    },
-    trySpellingQuestionAgain() {
-      cy.findByTestId('overlap-try-again').scrollIntoView().click()
-      waitUntilAppIsNotBusy()
       return self
     },
     viewMemoryTracker() {

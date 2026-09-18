@@ -37,6 +37,7 @@
         :next-is-spelling="nextIsSpelling"
         :eager-fetch-count="eagerFetchCount ?? 5"
         :spelling-retry-nonce="spellingRetryNonce"
+        :spelling-overlap-feedback="spellingOverlapFeedback"
         @answered="onAnswered"
         @just-reviewed="onJustReviewed"
       />
@@ -47,7 +48,6 @@
       <AnsweredSpellingQuestion
         v-if="currentAnsweredSpelling"
         :answered-question="currentAnsweredSpelling"
-        @retry="onOverlapRetry"
       />
       <template v-else-if="toRepeatCount === 0 && previousAnsweredQuestionCursor === undefined">
         <div class="daisy-alert daisy-alert-success">
@@ -129,6 +129,7 @@ const currentIndex = ref(0)
 const previousAnsweredQuestions = ref<(AnsweredQuestion | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const spellingRetryNonce = ref(0)
+const spellingOverlapFeedback = ref<string | undefined>(undefined)
 const recallPageRoot = ref<HTMLElement | null>(null)
 
 watch(
@@ -178,10 +179,10 @@ const viewLastAnsweredQuestion = (cursor: number | undefined) => {
   previousAnsweredQuestionCursor.value = cursor
 }
 
-const { onAnswered, onOverlapRetry, onJustReviewed } = useRecallAnswerHandling({
+const { onAnswered, onJustReviewed } = useRecallAnswerHandling({
   previousAnsweredQuestions,
-  previousAnsweredQuestionCursor,
   spellingRetryNonce,
+  spellingOverlapFeedback,
   moveToNextMemoryTracker,
   viewLastAnsweredQuestion,
 })

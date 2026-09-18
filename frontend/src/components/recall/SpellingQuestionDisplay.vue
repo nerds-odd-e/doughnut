@@ -9,6 +9,13 @@
         </div>
         <QuestionStem :stem="stem" />
       </div>
+      <div
+        v-if="overlapFeedback"
+        class="daisy-alert daisy-alert-warning mb-2"
+        data-testid="spelling-overlap-feedback"
+      >
+        {{ overlapFeedback }}
+      </div>
       <form @submit.prevent="submitAnswer" class="sticky bottom-0 bg-base-100 pt-4 pb-4">
         <TextInput
           scope-name="memory_tracker"
@@ -50,6 +57,10 @@ const props = defineProps({
   nextIsSpelling: {
     type: Boolean,
     default: false,
+  },
+  overlapFeedback: {
+    type: String,
+    default: undefined,
   },
 })
 

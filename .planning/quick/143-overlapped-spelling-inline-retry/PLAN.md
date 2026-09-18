@@ -1,6 +1,6 @@
 # Inline retry for overlapped spelling matches
 
-Status: planned
+Status: executed, pending delivery
 Source: [SEED-032 story 1](../../seeds/SEED-032-retry-overlapped-spelling-match.md#story-1).
 Authority: 2026-09-18 owner request to record the removal constraint and write,
 then refine if necessary, a slice plan. Planning only — this plan does not
@@ -107,7 +107,7 @@ resolve UI is missing.
 ### Slice 1 — Continue the active spelling question after an overlap
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given a spelling question with a declared overlapping note, when the
 learner submits the overlap's title or alias, the same question is ready for
@@ -156,17 +156,46 @@ The slice is one coherent proof loop. Its focused E2E startup may exceed the
 five-minute target, but splitting UI deletion from the new behavior would create
 an unsafe intermediate state or separate tests from the behavior they prove.
 
+Accepted proof (implementation, coordinator-inspected changes against these
+results; two commands independently re-run by the coordinator with matching
+results):
+
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPageOverlap.spec.ts`
+  — 1/1 pass. Drives the real submit flow (mocked `answerSpelling` returning
+  `OVERLAP`), asserts unchanged tracker index, a fresh `getRecallPrompt` fetch,
+  the feedback alert text, and an empty/focused `input#memory_tracker-answer`.
+  Re-run by the coordinator with matching result.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test` — 344 files / 1892 tests,
+  all pass. Re-run by the coordinator with matching result.
+- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/overlap_try_again.feature`
+  — 2/2 scenarios pass (`Partner`→`colour` and `hue`→`color`), exercising the
+  new `Then` step's active-question signals and the final correct-credit step.
+  `pnpm cy:run` used instead of the plan's literal `pnpm cypress run` because
+  this execution checkout is a linked Git worktree, which requires the
+  documented isolated allocation in `docs/worktree-browser-tests.md`; same
+  spec/scenarios, worktree-safe invocation.
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — full backend suite
+  green; `RecallPromptOverlapTryAgainTests` unchanged and passing, confirming
+  the scheduling/memory-state policy holds with zero backend changes.
+
+Post-change refactor: one coherence fix — renamed
+`AnsweredSpellingQuestionAddAsOverlapped.spec.ts`'s test title from "...without
+try-again" to "..." (text-only) because the deleted absence assertions left
+that qualifier dangling. No production files touched; the implemented design
+(feedback threaded composable → RecallPage → RecallPromptCard →
+SpellingQuestionDisplay) was already cohesive. No API generation was needed.
+
 ## Completion gates for later authorized execution
 
 - Apply the required post-change refactor pass to the implicated answer-flow and
   presentation concepts; it must preserve the single active-question behavior
-  and the explicit deletion constraint.
+  and the explicit deletion constraint. — done, see above.
 - No API generation is expected because the backend contract is unchanged. If
   execution discovers that the contract must change, stop and refine this plan
-  before generating the client.
+  before generating the client. — confirmed unchanged; no generation run.
 - The coordinator runs `./scripts/run.sh pnpm format:changed` once after edits
   and refactoring, then follows the repository's commit, push, CI observation,
-  and repair workflow.
+  and repair workflow. — done.
 
 ## Current decisions
 
