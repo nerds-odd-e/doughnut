@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-final class FolderSubtreeLiveNotes {
-  private FolderSubtreeLiveNotes() {}
+final class FolderSubtreeOccupancy {
+  private FolderSubtreeOccupancy() {}
 
   private static Map<Integer, List<Folder>> childrenByParentId(List<Folder> folders) {
     Map<Integer, List<Folder>> childrenByParentId = new HashMap<>();
@@ -23,7 +23,7 @@ final class FolderSubtreeLiveNotes {
     return childrenByParentId;
   }
 
-  private static boolean subtreeHasLiveNotes(
+  private static boolean subtreeIsOccupied(
       Folder folder,
       Map<Integer, List<Folder>> childrenByParentId,
       Set<Integer> occupiedFolderIds,
@@ -37,7 +37,7 @@ final class FolderSubtreeLiveNotes {
       return true;
     }
     for (Folder child : childrenByParentId.getOrDefault(folder.getId(), List.of())) {
-      if (subtreeHasLiveNotes(child, childrenByParentId, occupiedFolderIds, memo)) {
+      if (subtreeIsOccupied(child, childrenByParentId, occupiedFolderIds, memo)) {
         memo.put(folder.getId(), true);
         return true;
       }
@@ -58,7 +58,7 @@ final class FolderSubtreeLiveNotes {
     Map<Integer, Boolean> memo = new HashMap<>();
     List<HealthFindingItem> items = new ArrayList<>();
     for (Folder folder : folders) {
-      if (subtreeHasLiveNotes(folder, childrenByParentId, occupiedFolderIds, memo)) {
+      if (subtreeIsOccupied(folder, childrenByParentId, occupiedFolderIds, memo)) {
         continue;
       }
       if (!readmeContentMatches.test(folder.getReadmeContent())) {
@@ -86,7 +86,7 @@ final class FolderSubtreeLiveNotes {
       }
       deletable.add(folder);
     }
-    deletable.sort(Comparator.comparingInt(FolderSubtreeLiveNotes::folderDepth).reversed());
+    deletable.sort(Comparator.comparingInt(FolderSubtreeOccupancy::folderDepth).reversed());
     return deletable;
   }
 
@@ -97,7 +97,7 @@ final class FolderSubtreeLiveNotes {
     Map<Integer, Boolean> memo = new HashMap<>();
     Set<Integer> emptyIds = new HashSet<>();
     for (Folder folder : folders) {
-      if (subtreeHasLiveNotes(folder, childrenByParentId, occupiedFolderIds, memo)) {
+      if (subtreeIsOccupied(folder, childrenByParentId, occupiedFolderIds, memo)) {
         continue;
       }
       if (!isBlankReadme(folder.getReadmeContent())) {

@@ -308,7 +308,7 @@ Execution record, 2026-09-18, from revision `b74ac26c`:
 ### 4. Align folder occupancy and verify the aggregate simplification
 
 Type: Structure
-Status: planned
+Status: done
 Outcome: express health's occupancy rule as stored subtree content, completing
 the stored-versus-participating distinction without excluding trash from purge
 safety checks.
@@ -330,6 +330,66 @@ meet the gate.
 
 Sizing: ~5 minutes, one occupancy contract and one proof loop. Safe stop:
 occupied recoverable content cannot become an empty-folder deletion candidate.
+
+Execution record, 2026-09-18, from revision `b23d9eb2`:
+
+- `findLiveNoteFolderIdsByNotebookId` → `findOccupiedFolderIdsByNotebookId`
+  (JPQL, DISTINCT and all-notes membership unchanged); `FolderSubtreeLiveNotes`
+  → `FolderSubtreeOccupancy` with `subtreeIsOccupied`; callers
+  `EmptyFolderHealthRule`, `ReadmeOnlyFolderHealthRule`, `EmptyFolderBulkPurge`
+  updated. `DeadWikiLinkHealthRule` and `OkfIncompatibleTitleHealthRule` locals
+  renamed `availableNotes`; their available-notes query is unchanged.
+  Post-change refactor made the repository method return `Set<Integer>` so
+  the distinct-occupied-ids contract has one owner and the three callers lost
+  their `new HashSet<>` wrappers; it also reused the test's `folderIds` helper
+  in the existing fix tests. Focused rerun
+  `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookHealthControllerTest'`:
+  11 tests, 0 failures, covering all three callers. Production numstat for
+  the slice after formatting: +21/-23, net -2.
+- Added to `controllers/NotebookHealthControllerTest`:
+  `LintHealth.storedTrashNoteKeepsItsFolderChainOutOfEmptyFolderFindings` (a
+  stored note in `_trash/kept` keeps both folders out of the empty-folder
+  findings while an empty sibling is still reported) and
+  `FixHealth.fixLeavesOccupiedTrashFoldersAndTheirStoredNoteInPlace` (fix with
+  removeEmptyFolders purges the empty sibling; `_trash`, `kept` and the note
+  survive, re-found by id after flush and clear).
+- Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` after
+  `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL`: BUILD SUCCESSFUL,
+  2481 tests, 0 failures.
+
+## Aggregate acceptance, 2026-09-18
+
+Command: `git diff --numstat -M d17559eb271b4a18c2e437e0432a64a14c9ceaaa -- backend/src/main/java frontend/src cli/src mcp-server/src`
+on the delivered branch head. Only `backend/src/main/java` is touched; no
+untracked production files; the only other path is one stale symbol in
+`docs/notebook-publication-profiling.md`.
+
+- Simpler architecture: `LearningSessionService.record` performs one
+  stored-notes read and derives participation from each row's persisted
+  membership; the second overlapping entity query is gone. No availability
+  service, policy registry, persisted flag or compatibility mode was added.
+  The hand-written all-notes JPQL became a derived method.
+- Less code: production +97/-112 across 22 files, net -15 after formatting
+  (identical ignoring whitespace). Tests +245/-167 across 48 files, net +78,
+  reported separately; total handwritten delta +63. Structural removals: the
+  second note-list query and its title intermediates in
+  `LearningSessionService`, the hand-written all-notes JPQL annotation, and
+  the three `new HashSet<>` wrappers with their imports; additions: the
+  JSON-ignored persisted-membership accessor and comment on `Note` and one
+  `Set` import. The remaining deletions are lines that reflowed after
+  identifiers shortened; they are counted but not claimed as simplification.
+  No useful test was removed; the trash-only learning test became a
+  parameter row with the same assertions.
+- More cohesion: stored-note queries are explicit (`findAllByNotebookIdOrderByIdAsc`,
+  `storedNotes`, `proposedNotes` for tentative publication results);
+  participation uses Note's availability semantics (`JPA_AVAILABLE` for the
+  health rules that fetch available notes, the loaded row's
+  `isTrashedInDatabase` for learning candidates); occupancy counts stored
+  content (`findOccupiedFolderIdsByNotebookId`, `FolderSubtreeOccupancy`). No
+  caller recreates root-name or ancestor rules; `Folder.isTrashed`, the
+  `trashed_folder` view and `frontend/src/utils/folderTrash.ts` remain the
+  membership owners for their runtimes. Residual "live" wording in production
+  means wiki-link resolution or current-transaction entities and was left.
 
 ## Execution identity
 

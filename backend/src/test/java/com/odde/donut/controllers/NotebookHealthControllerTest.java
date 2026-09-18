@@ -57,6 +57,18 @@ class NotebookHealthControllerTest extends ControllerTestBase {
         .orElseThrow();
   }
 
+  private Note storedNoteInTrashSubfolder(Notebook notebook) {
+    Folder trash = makeMe.aFolder().notebook(notebook).name("_trash").please();
+    Folder kept = makeMe.aFolder().parentFolder(trash).name("kept").please();
+    return makeMe.aNote().folder(kept).please();
+  }
+
+  private Set<Integer> folderIds(Notebook notebook) {
+    return folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+        .map(Folder::getId)
+        .collect(Collectors.toSet());
+  }
+
   private NotebookHealthFixRequest fixRequest(Boolean removeEmptyFolders) {
     NotebookHealthFixRequest request = new NotebookHealthFixRequest();
     request.setRemoveEmptyFolders(removeEmptyFolders);
@@ -102,8 +114,7 @@ class NotebookHealthControllerTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       Notebook notebook = ownedNotebook();
       Folder emptyFolder = makeMe.aFolder().notebook(notebook).name("Empty Shell").please();
-      int folderCountBefore =
-          folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).size();
+      Set<Integer> folderIdsBefore = folderIds(notebook);
 
       HealthFindingGroup group = emptyFoldersGroup(controller.lint(notebook));
       assertThat(
@@ -113,8 +124,24 @@ class NotebookHealthControllerTest extends ControllerTestBase {
           group.getItems().stream().map(HealthFindingItem::getLabel).toList(),
           hasItem("Empty Shell"));
 
-      List<Folder> foldersAfter = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
-      assertThat(foldersAfter, hasSize(folderCountBefore));
+      assertThat(folderIds(notebook), equalTo(folderIdsBefore));
+    }
+
+    @Test
+    void storedTrashNoteKeepsItsFolderChainOutOfEmptyFolderFindings()
+        throws UnexpectedNoAccessRightException {
+      Notebook notebook = ownedNotebook();
+      Folder kept = storedNoteInTrashSubfolder(notebook).getFolder();
+      Folder emptySibling = makeMe.aFolder().notebook(notebook).name("Empty Shell").please();
+
+      List<Integer> reportedFolderIds =
+          emptyFoldersGroup(controller.lint(notebook)).getItems().stream()
+              .map(HealthFindingItem::getFolderId)
+              .toList();
+
+      assertThat(reportedFolderIds, contains(emptySibling.getId()));
+      assertThat(reportedFolderIds, not(hasItem(kept.getId())));
+      assertThat(reportedFolderIds, not(hasItem(kept.getParentFolder().getId())));
     }
 
     @Test
@@ -142,12 +169,25 @@ class NotebookHealthControllerTest extends ControllerTestBase {
 
       controller.fix(notebook, fixRequest(true));
 
-      Set<Integer> remainingIds =
-          folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-              .map(Folder::getId)
-              .collect(Collectors.toSet());
-      assertThat(remainingIds, not(hasItem(emptyFolder.getId())));
-      assertThat(remainingIds, hasItem(readmeOnly.getId()));
+      assertThat(folderIds(notebook), not(hasItem(emptyFolder.getId())));
+      assertThat(folderIds(notebook), hasItem(readmeOnly.getId()));
+    }
+
+    @Test
+    void fixLeavesOccupiedTrashFoldersAndTheirStoredNoteInPlace()
+        throws UnexpectedNoAccessRightException {
+      Notebook notebook = ownedNotebook();
+      Note storedNote = storedNoteInTrashSubfolder(notebook);
+      Integer keptId = storedNote.getFolder().getId();
+      Integer trashId = storedNote.getFolder().getParentFolder().getId();
+      makeMe.aFolder().notebook(notebook).name("Empty Shell").please();
+
+      controller.fix(notebook, fixRequest(true));
+      makeMe.entityPersister.flushAndClear();
+
+      assertThat(folderIds(notebook), containsInAnyOrder(trashId, keptId));
+      Note refound = makeMe.entityPersister.find(Note.class, storedNote.getId());
+      assertThat(refound.getFolder().getId(), equalTo(keptId));
     }
 
     @ParameterizedTest
@@ -162,11 +202,7 @@ class NotebookHealthControllerTest extends ControllerTestBase {
               ResponseStatusException.class,
               () -> controller.fix(notebook, fixRequest(removeEmptyFolders)));
       assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
-      assertThat(
-          folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-              .map(Folder::getId)
-              .toList(),
-          hasItem(emptyFolder.getId()));
+      assertThat(folderIds(notebook), hasItem(emptyFolder.getId()));
     }
 
     @Test
