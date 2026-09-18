@@ -18,7 +18,6 @@ import com.odde.donut.controllers.dto.FailureReportDeletionResultDTO;
 import com.odde.donut.entities.FailureReport;
 import com.odde.donut.entities.repositories.FailureReportRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.GithubService;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -26,12 +25,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class FailureReportControllerTest extends ControllerTestBase {
   @Autowired FailureReportRepository failureReportRepository;
   @Autowired FailureReportController controller;
-  @MockitoBean GithubService githubService;
 
   @Test
   void nonAdminCannotShowFailureReport() {
