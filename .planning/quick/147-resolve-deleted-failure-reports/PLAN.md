@@ -97,7 +97,7 @@ Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
 
 ### 2. Selected deletion resolves associated issues
 Type: Behavior
-Status: planned
+Status: done
 Estimate: about 5 minutes active change/proof work; medium confidence.
 
 Behavior: an administrator confirms deletion of selected reports, with GitHub
@@ -242,3 +242,18 @@ Do not absorb the unrelated modified SEED-035 file into this story.
   change (`none — already clean`).
 - `closeIssueAsCompleted` has no production caller yet; slice 2 is expected to
   wire it into deletion.
+- Slice 2 delivered: `FailureReportService.deleteFailureReports` now takes
+  `GithubService` and, per selected id, resolves the report's linked issue
+  (when `issueNumber` is non-null) via `closeIssueAsCompleted` before deleting
+  it; no-link reports delete without a GitHub call. The controller's
+  `deleteFailureReports` now declares `throws IOException, InterruptedException`
+  (propagated, per this slice's interim stopping point — a closure failure
+  still aborts before slice 4 adds best-effort handling). The confirm-deletion
+  dialog now also states GitHub issues will be resolved. Proof:
+  `FailureReportControllerTest::DeleteFailureReports` (linked issue closed,
+  no-link skips the call, unselected report/issue untouched, non-admin denial
+  has no GitHub interaction) and `FailureReportList.spec.ts`'s confirm/cancel
+  test now also asserts the new dialog wording. Full backend and targeted
+  frontend suites pass. Refactor pass removed one redundant
+  already-resolved-success test that duplicated the linked-issue case without
+  adding observable proof.

@@ -6,6 +6,7 @@ import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.FailureReportService;
 import com.odde.donut.services.GithubService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.IOException;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,7 +59,7 @@ class FailureReportController {
 
   @DeleteMapping("/delete")
   public void deleteFailureReports(@RequestBody List<Integer> ids)
-      throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException, IOException, InterruptedException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
     failureReportService.deleteFailureReports(ids);

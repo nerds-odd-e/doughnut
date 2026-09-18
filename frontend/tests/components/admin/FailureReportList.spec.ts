@@ -90,6 +90,7 @@ describe("FailureReportList", () => {
       await deleteSelectedButton(wrapper).trigger("click")
       expect(deleteModalIsOpen(wrapper)).toBe(true)
       expect(wrapper.text()).toContain("Confirm Deletion")
+      expect(wrapper.text()).toContain("resolve any linked GitHub issues")
       expect(wrapper.text()).toContain("This action cannot be undone")
 
       await deleteCancelButton(wrapper).trigger("click")

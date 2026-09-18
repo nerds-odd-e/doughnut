@@ -100,8 +100,8 @@
         <h3 class="font-bold text-lg">Confirm Deletion</h3>
         <p class="py-4">
           Are you sure you want to delete {{ selectedFailureReports.length }}
-          failure report{{ selectedFailureReports.length > 1 ? "s" : "" }}? This
-          action cannot be undone.
+          failure report{{ selectedFailureReports.length > 1 ? "s" : "" }} and
+          resolve any linked GitHub issues? This action cannot be undone.
         </p>
         <div class="daisy-modal-action">
           <button
