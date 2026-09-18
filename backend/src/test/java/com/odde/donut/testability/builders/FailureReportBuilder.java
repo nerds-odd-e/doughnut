@@ -11,6 +11,11 @@ public class FailureReportBuilder extends EntityBuilder<FailureReport> {
     entity.setErrorDetail("errorDetail");
   }
 
+  public FailureReportBuilder withIssueNumber(int issueNumber) {
+    entity.setIssueNumber(issueNumber);
+    return this;
+  }
+
   @Override
   protected void beforeCreate(boolean needPersist) {}
 }

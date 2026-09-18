@@ -16,4 +16,6 @@ public interface GithubService {
   List<Map<String, Object>> getOpenIssues() throws IOException, InterruptedException;
 
   void closeAllOpenIssues() throws IOException, InterruptedException;
+
+  void closeIssueAsCompleted(Integer issueNumber) throws IOException, InterruptedException;
 }

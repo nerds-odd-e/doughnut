@@ -1275,6 +1275,10 @@ export type UserListingPage = {
     totalPages?: number;
 };
 
+export type FailureReportDeletionResultDto = {
+    unresolvedGithubIssueUrls?: Array<string>;
+};
+
 export type SubscriptionWritable = {
     name?: string;
     id: number;
@@ -4296,5 +4300,7 @@ export type DeleteFailureReportsResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: FailureReportDeletionResultDto;
 };
+
+export type DeleteFailureReportsResponse = DeleteFailureReportsResponses[keyof DeleteFailureReportsResponses];

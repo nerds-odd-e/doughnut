@@ -9,7 +9,6 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 
-- [Delete Failure reports and resolve their GitHub issues, warning on closure failure](seeds/SEED-031-delete-failure-report-github-issue.md#story-1) — SEED-031 — plan: `.planning/quick/147-resolve-deleted-failure-reports/PLAN.md`
 - [Web folder rename and dissolve keep the accepted Git tree in step](seeds/SEED-035-web-folder-rename-dissolve-accepted-tree.md#story-1) — SEED-035 — plan: `.planning/quick/148-cohesive-accepted-web-folder-changes/PLAN.md`
 
 ## Backlog list

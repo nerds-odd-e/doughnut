@@ -65,7 +65,7 @@ describe("FailureReportList", () => {
       const deleteSpy = mockSdkService(
         FailureReportController,
         "deleteFailureReports",
-        undefined
+        { unresolvedGithubIssueUrls: [] }
       )
       const wrapper = await mountFailureReportList([
         aFailureReport(1),
@@ -90,6 +90,7 @@ describe("FailureReportList", () => {
       await deleteSelectedButton(wrapper).trigger("click")
       expect(deleteModalIsOpen(wrapper)).toBe(true)
       expect(wrapper.text()).toContain("Confirm Deletion")
+      expect(wrapper.text()).toContain("resolve any linked GitHub issues")
       expect(wrapper.text()).toContain("This action cannot be undone")
 
       await deleteCancelButton(wrapper).trigger("click")
@@ -102,6 +103,44 @@ describe("FailureReportList", () => {
       expect(deleteSpy).toHaveBeenCalledWith({
         body: [1, 2],
       })
+    })
+
+    it("keeps a warning for unresolved GitHub issues visible after the list refreshes", async () => {
+      mockSdkService(FailureReportController, "deleteFailureReports", {
+        unresolvedGithubIssueUrls: ["https://github.com/org/repo/issues/42"],
+      })
+      const wrapper = await mountFailureReportList([aFailureReport(1)])
+
+      const rowChecks = rowSelectEls(wrapper)
+      await rowChecks[0]!.setValue(true)
+      await flushPromises()
+
+      mockFailureReportsList([])
+      await deleteSelectedButton(wrapper).trigger("click")
+      await deleteConfirmButton(wrapper).trigger("click")
+      await flushPromises()
+
+      expect(deleteModalIsOpen(wrapper)).toBe(false)
+      expect(wrapper.text()).toContain("No failure reports found")
+      expect(wrapper.find(".daisy-alert-warning").exists()).toBe(true)
+      expect(wrapper.text()).toContain("https://github.com/org/repo/issues/42")
+    })
+
+    it("renders no warning when deletion resolves with no unresolved issues", async () => {
+      mockSdkService(FailureReportController, "deleteFailureReports", {
+        unresolvedGithubIssueUrls: [],
+      })
+      const wrapper = await mountFailureReportList([aFailureReport(1)])
+
+      const rowChecks = rowSelectEls(wrapper)
+      await rowChecks[0]!.setValue(true)
+      await flushPromises()
+
+      await deleteSelectedButton(wrapper).trigger("click")
+      await deleteConfirmButton(wrapper).trigger("click")
+      await flushPromises()
+
+      expect(wrapper.find(".daisy-alert-warning").exists()).toBe(false)
     })
   })
 

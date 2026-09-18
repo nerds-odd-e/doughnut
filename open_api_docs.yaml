@@ -3438,6 +3438,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FailureReportDeletionResultDTO"
 components:
   schemas:
     BookBlockReadingRecordPutRequest:
@@ -5955,3 +5959,10 @@ components:
         totalPages:
           type: integer
           format: int32
+    FailureReportDeletionResultDTO:
+      type: object
+      properties:
+        unresolvedGithubIssueUrls:
+          type: array
+          items:
+            type: string

@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RealGithubService implements GithubService {
+  // Package-private so tests can substitute a fake transport without a new abstraction.
+  HttpClient httpClient = HttpClient.newBuilder().build();
+
   @Value("${spring.github_for_issues.repo}")
   private String githubForIssuesRepo;
 
@@ -68,6 +71,19 @@ public class RealGithubService implements GithubService {
         builder -> builder.POST(BodyPublishers.ofString("{\"state\":\"closed\"}")));
   }
 
+  @Override
+  public void closeIssueAsCompleted(Integer issueNumber) throws IOException, InterruptedException {
+    // GitHub's "Update an issue" API needs PATCH with state_reason=completed to record a
+    // resolved meaning, not just closed:
+    // https://docs.github.com/en/rest/issues/issues#update-an-issue
+    apiRequest(
+        "issues/" + issueNumber,
+        builder ->
+            builder.method(
+                "PATCH",
+                BodyPublishers.ofString("{\"state\":\"closed\",\"state_reason\":\"completed\"}")));
+  }
+
   private List<Map<String, Object>> apiRequestWithArrayAsResult(
       String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback)
       throws IOException, InterruptedException {
@@ -102,7 +118,7 @@ public class RealGithubService implements GithubService {
             .build();
     HttpResponse.BodyHandler<String> bodyHandler =
         HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
-    HttpResponse<String> response = HttpClient.newBuilder().build().send(request, bodyHandler);
+    HttpResponse<String> response = httpClient.send(request, bodyHandler);
     int statusCode = response.statusCode();
     if (statusCode < 200 || statusCode >= 300) {
       throw new IOException("GitHub API returned HTTP " + statusCode + ": " + response.body());

@@ -29,4 +29,7 @@ public class NullGithubService implements GithubService {
 
   @Override
   public void closeAllOpenIssues() throws IOException, InterruptedException {}
+
+  @Override
+  public void closeIssueAsCompleted(Integer issueNumber) throws IOException, InterruptedException {}
 }

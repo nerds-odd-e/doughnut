@@ -90,6 +90,35 @@
       </div>
     </div>
 
+    <div
+      v-if="unresolvedGithubIssueUrls.length > 0"
+      class="daisy-alert daisy-alert-warning mt-4"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+        />
+      </svg>
+      <div>
+        <p>
+          The following linked GitHub issues could not be confirmed resolved:
+        </p>
+        <ul>
+          <li v-for="url in unresolvedGithubIssueUrls" :key="url">
+            <a :href="url" target="_blank" rel="noopener">{{ url }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <dialog
       ref="deleteDialogRef"
       class="daisy-modal"
@@ -100,8 +129,8 @@
         <h3 class="font-bold text-lg">Confirm Deletion</h3>
         <p class="py-4">
           Are you sure you want to delete {{ selectedFailureReports.length }}
-          failure report{{ selectedFailureReports.length > 1 ? "s" : "" }}? This
-          action cannot be undone.
+          failure report{{ selectedFailureReports.length > 1 ? "s" : "" }} and
+          resolve any linked GitHub issues? This action cannot be undone.
         </p>
         <div class="daisy-modal-action">
           <button
@@ -140,6 +169,7 @@ import FailureReportListEntries from "./FailureReportListEntries.vue"
 const failureReports = ref<FailureReport[] | null>(null)
 const errorMessage = ref<string | null>(null)
 const selectedFailureReports = ref<number[]>([])
+const unresolvedGithubIssueUrls = ref<string[]>([])
 const showDeleteModal = ref(false)
 const deleteDialogRef = ref<HTMLDialogElement | null>(null)
 useDaisyDialog(showDeleteModal, deleteDialogRef)
@@ -179,12 +209,14 @@ const deleteSelected = async () => {
     return
   }
 
-  const { error } = await apiCallWithLoading(() =>
+  unresolvedGithubIssueUrls.value = []
+  const { data, error } = await apiCallWithLoading(() =>
     FailureReportController.deleteFailureReports({
       body: selectedFailureReports.value,
     })
   )
   if (!error) {
+    unresolvedGithubIssueUrls.value = data?.unresolvedGithubIssueUrls ?? []
     showDeleteModal.value = false
     await fetchData()
     selectedFailureReports.value = []
