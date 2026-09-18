@@ -485,8 +485,74 @@ untriggered CLI guard.
     evidence for fixing the CLI guard rather than relying on operators to
     recall this log entry.
 
+## DD-070 — Plan selected an object-level membership check whose per-folder query cost was visible in the entity mappings, forcing a mid-execution owner decision
+
+Plan 141 (SEED-029 story 1) selected "reuse `Note.isAvailable` directly for
+already-loaded notes" and forbade the persisted `@Formula` value as "stale",
+while `Note.folder` and `Folder.parentFolder` were both declared
+`@ManyToOne(fetch = LAZY)` with no fetch join on the stored-notes query. The
+plan's own refinement flagged lazy ancestor loading as the main concern and
+scheduled a measurement slice, which then confirmed one select per distinct
+folder and ancestor. Execution had to stop for the owner to authorize the
+persisted-membership alternative that a planning-time read of the two mappings
+could have surfaced as the primary option.
+
+### Occurrences
+- Execution: SEED-029 story 1 / quick/141-cohesive-trash-participation / 4c9bf87f50
+  - Timestamp: unknown (plan refinement dated 2026-09-18; decision stop after the 2026-09-18T04:24:29Z push of 4c9bf87f50)
+  - Tool: Claude Code
+  - Model: claude-fable-5-1
+  - Open Dough release: unknown
+  - Evidence: plan 141 "Existing solutions" row "Membership of loaded objects"
+    and slice 2 stop condition; slice 1 execution record (both cold fixtures 5
+    statements, 0 folder loads under the two-query design; predicted +1 and +7
+    selects under `Note.isAvailable`); `Note.java` / `Folder.java` LAZY
+    mappings; owner reply "1" selecting persisted-membership filtering; seed
+    Open Decisions updated in b74ac26cf9.
+  - Observed effect: the measurement slice worked as designed and no
+    known-bad retrieval was implemented, but the story paused at a
+    human-judgment stop for the retrieval choice, the observer was stopped
+    and restarted around it, and the plan and seed needed a design revision
+    before slice 2 could start.
+  - Inference: when a plan chooses between an object-level and a query-level
+    rule for a loaded collection, planning should read the fetch strategy of
+    the traversed associations before fixing the mechanism; a lazy chain is a
+    static signal that the object-level path multiplies queries. The
+    measurement slice remains valuable as evidence, but the owner decision
+    could have been taken at planning time.
+
+## DD-071 — Observer shutdown rule applied to an in-session decision stop briefly dropped coverage of a just-pushed commit
+
+dough-execute-plan's finish/stop rule closes the CI observer on "completion,
+human-judgment stop, or cancellation". At a decision stop inside a live
+session, the coordinator stopped the observer with the just-pushed slice 1
+commit still unproved, the owner answered within minutes, and the coordinator
+had to start a new observer and re-register that commit. The stop rule treats
+an in-session wait like a session-ending stop.
+
+### Occurrences
+- Execution: SEED-029 story 1 / quick/141-cohesive-trash-participation / 4c9bf87f50
+  - Timestamp: 2026-09-18T12:26+08:00 (approximate; immediately after the 2026-09-18T04:24:29Z push of 4c9bf87f50)
+  - Tool: Claude Code
+  - Model: claude-fable-5-1
+  - Open Dough release: unknown
+  - Evidence: `ci-mailbox.mjs stop /tmp/dough-ci-501/watch-wePcZd` returned
+    `pendingCi: unobserved` with `4c9bf87f50` `unchecked`; after the owner's
+    reply, `ci-mailbox.mjs start` created `/tmp/dough-ci-501/watch-WRGdrv` and
+    `register-push` re-registered `4c9bf87f50`; plan 141 execution identity
+    records both mailboxes.
+  - Observed effect: no coverage was lost in the end (the new observer's
+    startup snapshot found the run, which passed), but the stop and restart
+    were pure churn for a wait that lasted minutes, and a slower CI run would
+    have been unobserved during the gap.
+  - Inference: the finish/stop rule could distinguish a session-ending stop
+    from an in-session decision wait; keeping the observer armed while the
+    coordinator waits for a reply costs nothing and preserves coverage. If
+    the session does end, the existing recovery from the `CI_OBSERVER`
+    directory already handles the orphaned observer.
+
 ## Retention
 
-- Highest allocated local number: 69
+- Highest allocated local number: 71
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
