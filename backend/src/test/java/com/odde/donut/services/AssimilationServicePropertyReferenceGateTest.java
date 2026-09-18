@@ -38,7 +38,9 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
   }
 
   private List<AssimilationUnit> pendingPropertiesForUser() {
-    return unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList();
+    return unassimilatedPropertyService
+        .streamUnassimilatedPropertiesForUser(user, unit -> true)
+        .toList();
   }
 
   @Test
@@ -50,7 +52,7 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
             targetA,
             "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - \"[[B]]\"\n" + "---\n\nbody");
 
-    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(2));
+    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(3));
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(next.note(), equalTo(targetA));
     assertThat(next.propertyKey(), nullValue());
@@ -199,7 +201,7 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
     Subscription subscription = anotherUser.getSubscriptions().stream().findFirst().orElseThrow();
     List<AssimilationUnit> pending =
         unassimilatedPropertyService
-            .streamUnassimilatedPropertiesForSubscription(subscription)
+            .streamUnassimilatedPropertiesForSubscription(subscription, unit -> true)
             .toList();
     assertThat(pending, hasSize(1));
     assertThat(pending.get(0).propertyKey(), equalTo("example of"));

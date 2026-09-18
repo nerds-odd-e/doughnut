@@ -1,7 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.NoteReferenceResolution;
-import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.Subscription;
@@ -9,6 +8,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
@@ -31,46 +31,45 @@ public class UnassimilatedPropertyService {
     this.notePropertyIndexService = notePropertyIndexService;
   }
 
+  /**
+   * Counts every property family without a tracker, including families whose references are still
+   * gated: they are unassimilated, merely not yet offerable. Counting never resolves references.
+   */
   public int countUnassimilatedPropertiesForUser(User user) {
-    return countAssimilable(
-        notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
-            user.getId(), user.getOwnership().getId()),
-        user);
+    return notePropertyIndexRepository.countUnassimilatedPropertiesForOwnership(
+        user.getId(), user.getOwnership().getId());
   }
 
   public int countUnassimilatedPropertiesForSubscription(Subscription subscription) {
-    return countAssimilable(
-        notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
-            subscription.getUser().getId(), subscription.getNotebook().getId()),
-        subscription.getUser());
+    return notePropertyIndexRepository.countUnassimilatedPropertiesForNotebook(
+        subscription.getUser().getId(), subscription.getNotebook().getId());
   }
 
-  public Stream<AssimilationUnit> streamUnassimilatedPropertiesForUser(User user) {
-    return streamAssimilable(
+  public Stream<AssimilationUnit> streamUnassimilatedPropertiesForUser(
+      User user, Predicate<AssimilationUnit> canStillBeNext) {
+    return assimilable(
         notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
             user.getId(), user.getOwnership().getId()),
+        canStillBeNext,
         user);
   }
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForSubscription(
-      Subscription subscription) {
-    return streamAssimilable(
+      Subscription subscription, Predicate<AssimilationUnit> canStillBeNext) {
+    User viewer = subscription.getUser();
+    return assimilable(
         notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
-            subscription.getUser().getId(), subscription.getNotebook().getId()),
-        subscription.getUser());
+            viewer.getId(), subscription.getNotebook().getId()),
+        canStillBeNext,
+        viewer);
   }
 
-  private int countAssimilable(Stream<AssimilationUnit> unfiltered, User viewer) {
-    try (Stream<AssimilationUnit> stream = streamAssimilable(unfiltered, viewer)) {
-      return (int) stream.count();
-    }
-  }
-
-  private Stream<AssimilationUnit> streamAssimilable(
-      Stream<AssimilationUnit> unfiltered, User viewer) {
-    return unfiltered
-        .filter(unit -> !PropertyKeyNaming.isReservedStructuralKey(unit.propertyKey()))
-        .filter(unit -> !isGated(unit, viewer));
+  /** The gate is evaluated only for ordered candidates that can still be the next unit. */
+  private Stream<AssimilationUnit> assimilable(
+      Stream<AssimilationUnit> candidates,
+      Predicate<AssimilationUnit> canStillBeNext,
+      User viewer) {
+    return candidates.takeWhile(canStillBeNext).filter(unit -> !isGated(unit, viewer));
   }
 
   /**

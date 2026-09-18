@@ -19,19 +19,19 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + " AND mt.type <> com.odde.donut.entities.MemoryTrackerType.SPELLING"
           + " AND mt.propertyKey = i.propertyKey";
 
+  String unassimilatedDedupeByExactKey =
+      " AND i.itemIndex = (SELECT MIN(i2.itemIndex) FROM NotePropertyIndex i2"
+          + " WHERE i2.note = n AND i2.propertyKey = i.propertyKey)";
+
   String unassimilatedWhereClause =
       " WHERE mt IS NULL"
           + " AND "
           + Note.JPA_AVAILABLE
-          + " "
           + " AND "
           + AssimilationSequenceSkip.JPA_NOT_EXISTS_PROPERTY_SKIP
           + " AND "
-          + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING;
-
-  String unassimilatedDedupeByExactKey =
-      " AND i.itemIndex = (SELECT MIN(i2.itemIndex) FROM NotePropertyIndex i2"
-          + " WHERE i2.note = n AND i2.propertyKey = i.propertyKey)";
+          + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING
+          + unassimilatedDedupeByExactKey;
 
   String unassimilatedOrderBy =
       " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id, i.propertyKey";
@@ -39,7 +39,15 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
   String selectUnassimilatedPropertyUnit =
       "SELECT NEW com.odde.donut.services.AssimilationUnit(n, i.propertyKey, "
           + NoteLevelIndex.JPA_LEVEL
-          + ") FROM NotePropertyIndex i";
+          + ")";
+
+  String fromPropertyOfOwnership =
+      " FROM NotePropertyIndex i JOIN i.note n JOIN n.notebook nb ON nb.ownership.id = :ownershipId"
+          + unassimilatedJoinPropertyTracker;
+
+  String fromPropertyOfNotebook =
+      " FROM NotePropertyIndex i JOIN i.note n JOIN n.notebook nb ON nb.id = :notebookId"
+          + unassimilatedJoinPropertyTracker;
 
   List<NotePropertyIndex> findByNote_IdOrderByIdAsc(Integer noteId);
 
@@ -48,27 +56,28 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
   @Query(
       value =
           selectUnassimilatedPropertyUnit
-              + " JOIN i.note n"
-              + " JOIN n.notebook nb ON nb.ownership.id = :ownershipId"
-              + unassimilatedJoinPropertyTracker
+              + fromPropertyOfOwnership
               + NoteLevelIndex.JPA_LEFT_JOIN
               + unassimilatedWhereClause
-              + unassimilatedDedupeByExactKey
               + unassimilatedOrderBy)
   Stream<AssimilationUnit> streamUnassimilatedPropertiesForOwnership(
+      @Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
+
+  @Query(value = "SELECT count(i)" + fromPropertyOfOwnership + unassimilatedWhereClause)
+  int countUnassimilatedPropertiesForOwnership(
       @Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
 
   @Query(
       value =
           selectUnassimilatedPropertyUnit
-              + " JOIN i.note n"
-              + " JOIN n.notebook nb"
-              + unassimilatedJoinPropertyTracker
+              + fromPropertyOfNotebook
               + NoteLevelIndex.JPA_LEFT_JOIN
               + unassimilatedWhereClause
-              + " AND nb.id = :notebookId"
-              + unassimilatedDedupeByExactKey
               + unassimilatedOrderBy)
   Stream<AssimilationUnit> streamUnassimilatedPropertiesForNotebook(
+      @Param("userId") Integer userId, @Param("notebookId") Integer notebookId);
+
+  @Query(value = "SELECT count(i)" + fromPropertyOfNotebook + unassimilatedWhereClause)
+  int countUnassimilatedPropertiesForNotebook(
       @Param("userId") Integer userId, @Param("notebookId") Integer notebookId);
 }

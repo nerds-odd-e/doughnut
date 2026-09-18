@@ -98,6 +98,26 @@ class AssimilationServicePropertyUnitsTest extends AssimilationServiceTestBase {
   }
 
   @Test
+  void property_of_an_earlier_note_is_offered_before_a_later_untracked_note() {
+    Timestamp earlier = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
+    Timestamp later = makeMe.aTimestamp().of(0, 9).fromShanghai().please();
+    Note carrier =
+        makeMe
+            .aNote()
+            .notebookOwnedBy(user)
+            .createdAt(earlier)
+            .content("---\ntopic: physics\n---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(carrier);
+    makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
+    makeMe.aNote("later").notebookOwnedBy(user).createdAt(later).please();
+
+    AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+    assertThat(next.note(), equalTo(carrier));
+    assertThat(next.propertyKey(), equalTo("topic"));
+  }
+
+  @Test
   void multiple_untracked_properties_ordered_by_property_key() {
     Note note =
         makeMe
