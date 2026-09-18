@@ -9,8 +9,6 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 
-- [Publishing notebook 4's proposal succeeds, and folder ancestry has one representation](seeds/SEED-030-folder-ancestry-single-representation.md#1-publishing-notebook-4s-proposal-succeeds-and-folder-ancestry-has-one-representation) — SEED-030 — plan: [142](quick/142-live-folder-ancestry-materialization/PLAN.md)
-
 ## Backlog list
 
 - [Permanently delete trashed notes and folders](seeds/SEED-034-permanently-delete-trashed-content.md#story-1) — SEED-034

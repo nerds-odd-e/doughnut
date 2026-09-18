@@ -3,9 +3,9 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.FolderConstructionService;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.LinkedHashMap;
@@ -22,23 +22,25 @@ class NotebookGitProposalFolderMaterialization {
 
   private final FolderConstructionService folderConstructionService;
   private final EntityPersister entityPersister;
+  private final FolderRepository folderRepository;
   private final Validator validator;
 
   NotebookGitProposalFolderMaterialization(
       FolderConstructionService folderConstructionService,
       EntityPersister entityPersister,
+      FolderRepository folderRepository,
       Validator validator) {
     this.folderConstructionService = folderConstructionService;
     this.entityPersister = entityPersister;
+    this.folderRepository = folderRepository;
     this.validator = validator;
   }
 
   Map<String, Folder> materialize(
       Notebook notebook,
-      List<ExportFolderRow> liveFolders,
       List<String> documentPaths,
       NotebookGitProposalImporter.ImportedProposal proposal) {
-    Map<String, Folder> folders = ensureAncestry(notebook, liveFolders, documentPaths);
+    Map<String, Folder> folders = ensureAncestry(notebook, documentPaths);
     persistFolderReadmes(folders, documentPaths, proposal);
     entityPersister.flush();
     return folders;
@@ -48,9 +50,8 @@ class NotebookGitProposalFolderMaterialization {
    * Ensures parent folders for admitted destination paths, creating any ancestry absent from live
    * folders. {@link FolderConstructionService} remains the creation owner.
    */
-  Map<String, Folder> ensureAncestry(
-      Notebook notebook, List<ExportFolderRow> liveFolders, List<String> destinationPaths) {
-    Map<String, Folder> folders = foldersByPath(liveFolders);
+  Map<String, Folder> ensureAncestry(Notebook notebook, List<String> destinationPaths) {
+    Map<String, Folder> folders = foldersByPath(notebook);
     for (String destinationPath : destinationPaths) {
       ensureAncestry(notebook, folders, destinationPath);
     }
@@ -95,15 +96,11 @@ class NotebookGitProposalFolderMaterialization {
     }
   }
 
-  private Map<String, Folder> foldersByPath(List<ExportFolderRow> liveFolders) {
-    Map<Integer, ExportFolderRow> folderById =
-        NotebookGitAcceptedTree.indexFoldersById(liveFolders);
+  private Map<String, Folder> foldersByPath(Notebook notebook) {
     Map<String, Folder> folders = new LinkedHashMap<>();
-    for (ExportFolderRow row : liveFolders) {
-      String folderPath = NotebookGitAcceptedTree.folderPath(row, folderById);
-      folders.put(
-          folderPath.substring(0, folderPath.length() - 1),
-          entityPersister.find(Folder.class, row.id()));
+    for (Folder folder : folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId())) {
+      String folderPath = NotebookGitLivePortablePath.folderPath(folder);
+      folders.put(folderPath.substring(0, folderPath.length() - 1), folder);
     }
     return folders;
   }

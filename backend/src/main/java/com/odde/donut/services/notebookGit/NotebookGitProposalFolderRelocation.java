@@ -93,7 +93,7 @@ class NotebookGitProposalFolderRelocation {
           state.notebook(), folders, state.storedNotes(), proposal.repository(), acceptedHead);
     }
     Map<String, Folder> destinationFolders =
-        folderMaterialization.ensureAncestry(state.notebook(), folders, List.of(destPrefix));
+        folderMaterialization.ensureAncestry(state.notebook(), List.of(destPrefix));
     Folder destParent =
         destParentPrefix.isEmpty() ? null : destinationFolders.get(destParentPrefix);
     if (constructDestAncestry) {
