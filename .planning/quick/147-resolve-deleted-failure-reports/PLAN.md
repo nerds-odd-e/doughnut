@@ -1,10 +1,11 @@
 # Delete Failure reports and resolve their GitHub issues
 
-Status: planned
+Status: executed — all 4 slices delivered
 Source: [SEED-031 story 1](../../seeds/SEED-031-delete-failure-report-github-issue.md#story-1).
-Authority: owner's 2026-09-18 request for slice planning and refinement if needed.
-Planning only; implementation has not been authorized by this request.
-Baseline: `2169b08f15` on the originating checkout. No execution identity yet.
+Authority: owner's 2026-09-18 request for slice planning and refinement if needed; execution authorized via `/dough-execute-plan 147`.
+Baseline: `2169b08f15` on the originating checkout. Execution branch
+`worktree-147-resolve-deleted-failure-reports`, worktree
+`.claude/worktrees/147-resolve-deleted-failure-reports`, Story Branch Mode.
 Allocation: quick directory is empty apart from `.gitkeep`; Git history's latest
 three-digit sequential plan is 146. Historical date-prefixed entries belong to
 the previous layout. Use 147, preserving the current sequential convention.
@@ -143,7 +144,7 @@ Commands: generation, backend, frontend and OpenAPI checks below.
 
 ### 4. GitHub failure warns while deletion continues
 Type: Behavior
-Status: planned
+Status: done
 Estimate: about 5 minutes active change/proof work; medium confidence.
 
 Behavior: GitHub closure fails for one or more selected reports → Donut still
@@ -275,3 +276,20 @@ Do not absorb the unrelated modified SEED-035 file into this story.
   suite, `vue-tsc --noEmit`, and `openapi:lint` all pass. Refactor pass found
   nothing to change (inline per-block DaisyUI alerts are this codebase's
   existing convention, not a gap).
+- Slice 4 delivered (final slice): `FailureReportService.deleteFailureReports`
+  no longer propagates a GitHub closure failure. It catches
+  `IOException | InterruptedException` only around
+  `closeIssueAsCompleted`, restores the interrupt flag on
+  `InterruptedException`, records `getIssueUrl(issueNumber)` into
+  `unresolvedGithubIssueUrls`, and always proceeds to delete the report; the
+  repository delete stays outside the catch, so a persistence failure still
+  fails loudly. `deleteFailureReports` no longer declares
+  `throws IOException, InterruptedException` on either the service or the
+  controller. Proof: a mixed-result test (one issue fails, one succeeds)
+  shows both reports deleted, both closures attempted, and only the failed
+  issue's URL returned; an interrupted-closure test shows deletion still
+  proceeds and the interrupt flag is restored. Full backend suite passes
+  (2503 tests). Refactor pass merged the two near-duplicate catch blocks
+  into one multi-catch. All 7 rows of "Promise ownership and verification"
+  are now covered end-to-end across the 4 slices. Story complete; ready for
+  wrap-up.

@@ -1,14 +1,18 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.odde.donut.controllers.dto.FailureReportDeletionResultDTO;
 import com.odde.donut.entities.FailureReport;
@@ -66,8 +70,7 @@ class FailureReportControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void adminCanDeleteAllListedReports()
-        throws UnexpectedNoAccessRightException, IOException, InterruptedException {
+    void adminCanDeleteAllListedReports() throws UnexpectedNoAccessRightException {
       FailureReportDeletionResultDTO result =
           controller.deleteFailureReports(List.of(first.getId(), second.getId()));
 
@@ -76,8 +79,7 @@ class FailureReportControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void adminCanDeleteOneFailureReport()
-        throws UnexpectedNoAccessRightException, IOException, InterruptedException {
+    void adminCanDeleteOneFailureReport() throws UnexpectedNoAccessRightException {
       FailureReportDeletionResultDTO result =
           controller.deleteFailureReports(List.of(first.getId()));
 
@@ -125,6 +127,43 @@ class FailureReportControllerTest extends ControllerTestBase {
 
       assertThat(failureReportRepository.findById(untouched.getId()).isPresent(), equalTo(true));
       verify(githubService, never()).closeIssueAsCompleted(99);
+    }
+
+    @Test
+    void closureFailureForOneReportDoesNotStopDeletionOrLaterClosure()
+        throws UnexpectedNoAccessRightException, IOException, InterruptedException {
+      FailureReport failing = makeMe.aFailureReport().withIssueNumber(42).please();
+      FailureReport succeeding = makeMe.aFailureReport().withIssueNumber(99).please();
+      doThrow(new IOException("boom")).when(githubService).closeIssueAsCompleted(42);
+      doNothing().when(githubService).closeIssueAsCompleted(99);
+      when(githubService.getIssueUrl(42)).thenReturn("https://github.com/example/issues/42");
+      when(githubService.getIssueUrl(99)).thenReturn("https://github.com/example/issues/99");
+
+      FailureReportDeletionResultDTO result =
+          controller.deleteFailureReports(List.of(failing.getId(), succeeding.getId()));
+
+      assertThat(failureReportRepository.findById(failing.getId()).isPresent(), equalTo(false));
+      assertThat(failureReportRepository.findById(succeeding.getId()).isPresent(), equalTo(false));
+      verify(githubService).closeIssueAsCompleted(42);
+      verify(githubService).closeIssueAsCompleted(99);
+      assertThat(
+          result.getUnresolvedGithubIssueUrls(), contains("https://github.com/example/issues/42"));
+    }
+
+    @Test
+    void interruptedClosureStillDeletesAndRestoresInterruptFlag()
+        throws UnexpectedNoAccessRightException, IOException, InterruptedException {
+      FailureReport withIssue = makeMe.aFailureReport().withIssueNumber(42).please();
+      doThrow(new InterruptedException("boom")).when(githubService).closeIssueAsCompleted(42);
+      when(githubService.getIssueUrl(42)).thenReturn("https://github.com/example/issues/42");
+
+      FailureReportDeletionResultDTO result =
+          controller.deleteFailureReports(List.of(withIssue.getId()));
+
+      assertThat(failureReportRepository.findById(withIssue.getId()).isPresent(), equalTo(false));
+      assertThat(
+          result.getUnresolvedGithubIssueUrls(), contains("https://github.com/example/issues/42"));
+      assertThat(Thread.interrupted(), equalTo(true));
     }
 
     private List<FailureReport> remainingReports() throws UnexpectedNoAccessRightException {
