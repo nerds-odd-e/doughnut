@@ -1,6 +1,6 @@
 # Cohesive trash participation
 
-Status: in progress
+Status: complete
 Source: [SEED-029 story 1](../../seeds/SEED-029-cohesive-trash-participation.md#story-1).
 Authority: 2026-09-18 owner request for a slice plan, refined if needed, with
 simpler architecture, fewer lines of code, and greater cohesion. Planning only.
