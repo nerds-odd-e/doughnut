@@ -30,8 +30,9 @@ bulk trash-management screen is unnecessary for this selected outcome.
 
 - **Goal / beneficiary:** A notebook owner can permanently remove a discarded
   note or folder and its dependent data through its existing delete/trash action.
-- **Value:** Finish discarding unwanted content without leaving its learning
-  records or other owned dependencies behind.
+- **Value (owner, 2026-09-18):** Mostly removing sensitive content, and peace of
+  mind that discarded content is really gone from Donut rather than piling up in
+  trash, together with its learning records and other owned dependencies.
 - **Scope:**
   - When a note or folder is in trash, its existing delete/trash action becomes
     **Permanently delete**, clearly identifying the irreversible operation.
@@ -70,14 +71,49 @@ bulk trash-management screen is unnecessary for this selected outcome.
 - **Deferred promises:** No bulk Empty trash feature, retention timer, new CLI
   delete command, or erasure of historical Git commits, backups, or external
   copies. Existing notebook publication/history contracts still apply.
-- **Effort hypothesis:** M (1–2 hours), low confidence; assumes reuse of existing
-  permanent note removal. Reassess during planning once folder deletion and
-  complete dependent-data coverage are understood. Bands follow SEED-033.
+- **Effort hypothesis:** M (1–2 hours), medium confidence. Owner assumption,
+  2026-09-18: because deleting on the Git side and publishing already works, the
+  web action should be simple, so notes and folders stay one story. The
+  refinement evidence below supports this. Split into a note story and a folder
+  story only if planning disproves it. Bands follow SEED-033.
+- **Refinement evidence, 2026-09-18:**
+  - Git publication already performs the same removal: each deleted file
+    becomes `NoteService.permanentlyRemove` with dead links left in place
+    (`NotebookGitProposalOrdinaryNoteApplication.applyDeletions`); afterwards
+    folders no longer present in the tree are removed deepest first, and the
+    live data must match the published tree
+    (`NotebookGitProposalAcceptance`). Publishing a deletion of several learned
+    notes, and of the last note in a folder, is covered by controller tests.
+  - Removal order matters. `fk_note_folder` is `ON DELETE SET NULL` and
+    `fk_folder_parent` is `ON DELETE CASCADE`, so removing a folder row while it
+    still holds notes would leave those notes active at the notebook root. The
+    Git path never does this because it removes notes first. The web folder
+    action must follow the same order; this is an implementation rule, not
+    extra product scope.
+  - Web trash already runs inside the accepted-change boundary
+    (`NoteTrashService` → `WebNoteEditService.edit`), and `_trash/...` files are
+    part of the Portable tree, so in a Git-synchronized notebook a permanent
+    deletion appends one accepted commit per NORTH-STAR.
+  - A trashed folder already hides its Trash button (`FolderSettings.vue`); a
+    trashed note still offers "Trash note (d)".
+  - `_trash` is recreated on the next trash
+    (`FolderConstructionService.ensureTrashParentFor`), so permanently deleting
+    the `_trash` folder itself would behave as emptying the trash without
+    special handling.
 - **Depends on:** No known product prerequisite.
 - **Safe stopping point:** Both note and folder actions remove their selected
   content and complete dependency closure without removing surviving content.
-- **Open decisions:** Confirmation versus immediate deletion; the UI proposal
-  above is not yet a human decision.
+- **Open decisions (proposals, not yet human decisions):**
+  - Confirmation versus immediate deletion. Proposal: always confirm, because
+    the `d` keyboard shortcut would otherwise trigger an irreversible action.
+  - Sensitive content in a Git-synchronized notebook stays readable in earlier
+    Git commits and in existing clones, because history is append-only and its
+    erasure is deferred. Proposal: keep that deferral, and have the confirmation
+    say so plainly instead of promising complete erasure.
+  - Whether the `_trash` folder itself may be permanently deleted. Proposal:
+    yes, as the ordinary folder rule with no special handling, even though a
+    dedicated Empty trash feature stays deferred.
+  - Queue position relative to SEED-030 story 2, which gates the next release.
 
 ## Ordering and Scope Reduction
 
