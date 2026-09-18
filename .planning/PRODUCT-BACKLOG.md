@@ -9,8 +9,6 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 
-- [See spelling results without an embedded note](seeds/SEED-033-simplify-note-presentation.md#story-1) — SEED-033
-
 ## Backlog list
 
 - [Permanently delete trashed notes and folders](seeds/SEED-034-permanently-delete-trashed-content.md#story-1) — SEED-034
