@@ -1,6 +1,6 @@
 # Get the next item to assimilate quickly for large notebooks
 
-Status: in progress
+Status: complete (all slices done 2026-09-18; awaiting retrospective and story wrap-up)
 Source: [SEED-026 story 1](../../seeds/SEED-026-fast-assimilation-queue-for-large-notebooks.md#story-1),
 refined 2026-09-18. Owner decisions: gated properties count as unassimilated;
 the migration replaces the unusable index. Execution started 2026-09-18.
@@ -157,7 +157,7 @@ write path never produces. `AssimilationCounter` and the DTO are unchanged.
 ### 3. Head selection scans only property candidates that can still win
 
 Type: Structure
-Status: planned
+Status: done (2026-09-18)
 Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests '*AssimilationService*' --tests '*AssimilationController*' -Dspring.profiles.active=test --build-cache`
 green; on the dev DB after
 `TRUNCATE performance_schema.events_statements_summary_by_digest`, one
@@ -222,3 +222,33 @@ owner's data; this is the plan's last slice.
   inlined the one-line stream wrapper; production delta so far −3 lines in
   `UnassimilatedPropertyService`, +21 in the repository (two count queries and
   shared FROM fragments).
+- Slice 3 deviation: `takeWhile` in `AssimilationService` alone could not
+  bound the gate, because the gate filter is composed inside
+  `UnassimilatedPropertyService`'s stream; the bound (`canStillBeNext`) is
+  passed into the property stream methods and applied before the gate.
+  The refactor then removed `AssimilationUnitSource` and its two one-line
+  forwarding beans: the service asks `UserService`, `SubscriptionService`,
+  and `UnassimilatedPropertyService` directly in the fixed order (owned
+  notes, subscription notes within budget, owned properties, subscription
+  properties), which makes the order a readable fact of the fold instead of
+  an injection-order assumption. Whole branch: −83 production lines versus
+  `main`.
+- Slice 3 accepted proof: `--tests '*AssimilationService*' --tests
+  '*AssimilationController*' --tests '*UnassimilatedPropertyServiceTest*'`
+  green (83 tests) on the worktree test DB, including the new
+  `AssimilationServicePropertyUnitsTest.property_of_an_earlier_note_is_offered_before_a_later_untracked_note`.
+  Dev DB (`old_learner`, no trackers), backend restarted on the slice code:
+  three `GET /api/assimilation/next?timezone=Asia/Singapore` requests took
+  0.60–0.63 s (was 110 s after slice 1 alone, 143–159 s before the story);
+  response `totalUnassimilatedCount` 33,292 as the seed predicted. After
+  `TRUNCATE performance_schema.events_statements_summary_by_digest` (as MySQL
+  root over the local socket; the `doughnut` account cannot read
+  `performance_schema`), one request issued 15 statements: two ordered
+  stream queries at 0.22 s each, the property count at 0.04 s, the note
+  count at 0.01 s, and zero title lookups (no gate evaluations).
+- CI on `2519b829a9` (slice 2): the "End-to-End tests with Database
+  (recall, wikidata, …)" job failed before any test ran, in the MySQL
+  setup action, with a Docker Hub connection reset while pulling the
+  `mysql:8.4` manifest; the matrix cancelled the sibling E2E jobs.
+  Classified as CI infrastructure, not owned by this execution; the slice 3
+  push re-covers E2E on the branch.

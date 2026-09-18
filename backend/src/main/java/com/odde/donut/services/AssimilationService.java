@@ -8,16 +8,16 @@ import com.odde.donut.entities.User;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class AssimilationService {
   private final User user;
   private final UserService userService;
   private final SubscriptionService subscriptionService;
-  private final List<AssimilationUnitSource> unitSources;
+  private final UnassimilatedPropertyService unassimilatedPropertyService;
   private final Timestamp currentUTCTimestamp;
   private final ZoneId timeZone;
 
@@ -25,13 +25,13 @@ public class AssimilationService {
       User user,
       UserService userService,
       SubscriptionService subscriptionService,
-      List<AssimilationUnitSource> unitSources,
+      UnassimilatedPropertyService unassimilatedPropertyService,
       Timestamp currentUTCTimestamp,
       ZoneId timeZone) {
     this.user = user;
     this.userService = userService;
     this.subscriptionService = subscriptionService;
-    this.unitSources = unitSources;
+    this.unassimilatedPropertyService = unassimilatedPropertyService;
     this.currentUTCTimestamp = currentUTCTimestamp;
     this.timeZone = timeZone;
   }
@@ -44,47 +44,49 @@ public class AssimilationService {
     return getNextAssimilationUnit().map(AssimilationUnit::note);
   }
 
+  /** Notes first: the best note bounds how far each gated property scan goes. */
   public Optional<AssimilationUnit> getNextAssimilationUnit() {
-    List<Stream<AssimilationUnit>> ownedStreams =
-        unitSources.stream().map(source -> source.streamForUser(user)).toList();
-    try {
-      List<Optional<AssimilationUnit>> heads = new ArrayList<>();
-      ownedStreams.forEach(stream -> heads.add(headOf(stream)));
+    List<Subscription> subscriptions = subscriptionsWithinBudget();
+    Optional<AssimilationUnit> best =
+        bestOf(Optional.empty(), userService.getUnassimilatedNotes(user));
+    for (Subscription subscription : subscriptions) {
+      best = bestOf(best, subscriptionService.getUnassimilatedNotes(subscription));
+    }
+    best =
+        bestOf(
+            best,
+            unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(
+                user, precedes(best)));
+    for (Subscription subscription : subscriptions) {
+      best =
+          bestOf(
+              best,
+              unassimilatedPropertyService.streamUnassimilatedPropertiesForSubscription(
+                  subscription, precedes(best)));
+    }
+    return best;
+  }
 
-      List<Integer> todaysAssimilatedNoteIds = assimilatedNoteIdsForToday();
-      getSubscriptionStream()
-          .forEach(
-              sub -> {
-                int budget =
-                    subscriptionService.remainingDailyAssimilationTarget(
-                        sub, todaysAssimilatedNoteIds);
-                if (budget > 0) {
-                  heads.add(headOfSubscription(sub));
-                }
-              });
-
-      return minOf(heads);
-    } finally {
-      ownedStreams.forEach(Stream::close);
+  /** {@code best}, or the head of the ordered {@code candidates} when that precedes it. */
+  private static Optional<AssimilationUnit> bestOf(
+      Optional<AssimilationUnit> best, Stream<AssimilationUnit> candidates) {
+    try (candidates) {
+      return candidates.findFirst().filter(precedes(best)).or(() -> best);
     }
   }
 
-  private Optional<AssimilationUnit> headOfSubscription(Subscription sub) {
-    List<Stream<AssimilationUnit>> streams =
-        unitSources.stream().map(source -> source.streamForSubscription(sub)).toList();
-    try {
-      return minOf(streams.stream().map(this::headOf).toList());
-    } finally {
-      streams.forEach(Stream::close);
-    }
+  private static Predicate<AssimilationUnit> precedes(Optional<AssimilationUnit> best) {
+    return unit -> best.map(b -> AssimilationUnit.ORDER.compare(unit, b) < 0).orElse(true);
   }
 
-  private Optional<AssimilationUnit> headOf(Stream<AssimilationUnit> stream) {
-    return stream.findFirst();
-  }
-
-  private Optional<AssimilationUnit> minOf(List<Optional<AssimilationUnit>> heads) {
-    return heads.stream().flatMap(Optional::stream).min(AssimilationUnit.ORDER);
+  private List<Subscription> subscriptionsWithinBudget() {
+    List<Integer> todaysAssimilatedNoteIds = assimilatedNoteIdsForToday();
+    return getSubscriptionStream()
+        .filter(
+            sub ->
+                subscriptionService.remainingDailyAssimilationTarget(sub, todaysAssimilatedNoteIds)
+                    > 0)
+        .toList();
   }
 
   private List<Integer> assimilatedNoteIdsForToday() {
@@ -109,11 +111,13 @@ public class AssimilationService {
   }
 
   private int subscribedUnitCount(Subscription subscription) {
-    return unitSources.stream().mapToInt(source -> source.countForSubscription(subscription)).sum();
+    return subscriptionService.getUnassimilatedNoteCount(subscription)
+        + unassimilatedPropertyService.countUnassimilatedPropertiesForSubscription(subscription);
   }
 
   private int calculateOwnedUnitCount() {
-    return unitSources.stream().mapToInt(source -> source.countForUser(user)).sum();
+    return userService.getUnassimilatedNoteCount(user)
+        + unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user);
   }
 
   private int getAssimilatedCountOfTheDay() {

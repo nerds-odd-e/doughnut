@@ -8,6 +8,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
@@ -40,19 +41,31 @@ public class UnassimilatedPropertyService {
         subscription.getUser().getId(), subscription.getNotebook().getId());
   }
 
-  public Stream<AssimilationUnit> streamUnassimilatedPropertiesForUser(User user) {
-    return notePropertyIndexRepository
-        .streamUnassimilatedPropertiesForOwnership(user.getId(), user.getOwnership().getId())
-        .filter(unit -> !isGated(unit, user));
+  public Stream<AssimilationUnit> streamUnassimilatedPropertiesForUser(
+      User user, Predicate<AssimilationUnit> canStillBeNext) {
+    return assimilable(
+        notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
+            user.getId(), user.getOwnership().getId()),
+        canStillBeNext,
+        user);
   }
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForSubscription(
-      Subscription subscription) {
+      Subscription subscription, Predicate<AssimilationUnit> canStillBeNext) {
     User viewer = subscription.getUser();
-    return notePropertyIndexRepository
-        .streamUnassimilatedPropertiesForNotebook(
-            viewer.getId(), subscription.getNotebook().getId())
-        .filter(unit -> !isGated(unit, viewer));
+    return assimilable(
+        notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
+            viewer.getId(), subscription.getNotebook().getId()),
+        canStillBeNext,
+        viewer);
+  }
+
+  /** The gate is evaluated only for ordered candidates that can still be the next unit. */
+  private Stream<AssimilationUnit> assimilable(
+      Stream<AssimilationUnit> candidates,
+      Predicate<AssimilationUnit> canStillBeNext,
+      User viewer) {
+    return candidates.takeWhile(canStillBeNext).filter(unit -> !isGated(unit, viewer));
   }
 
   /**
