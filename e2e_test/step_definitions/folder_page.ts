@@ -72,6 +72,10 @@ When('I trash the current folder', () => {
   folderPage().openOrganizeForm().trashFolder()
 })
 
+When('I permanently delete the current folder', () => {
+  folderPage().openOrganizeForm().permanentlyDeleteFolder()
+})
+
 When('I move the current folder to notebook root', () => {
   folderPage()
     .openOrganizeForm()

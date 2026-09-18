@@ -35,6 +35,10 @@ When(
   }
 )
 
+When('I permanently delete the current note', () => {
+  start.assumeNotePage().permanentlyDeleteNote()
+})
+
 Then('I should see the note {string} is in trash', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
   cy.findByText('This note is in trash')

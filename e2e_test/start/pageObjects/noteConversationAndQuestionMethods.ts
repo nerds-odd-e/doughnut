@@ -12,6 +12,9 @@ export const noteConversationAndQuestionMethods = () => ({
   trashNote() {
     this.moreOptions().trashNote()
   },
+  permanentlyDeleteNote() {
+    this.moreOptions().permanentlyDeleteNote()
+  },
   deleteRelationshipNote() {
     this.moreOptions().deleteRelationshipNote()
   },

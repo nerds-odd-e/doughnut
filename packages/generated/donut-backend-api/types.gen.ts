@@ -1940,6 +1940,22 @@ export type SearchForRelationshipTargetWithinResponses = {
 
 export type SearchForRelationshipTargetWithinResponse = SearchForRelationshipTargetWithinResponses[keyof SearchForRelationshipTargetWithinResponses];
 
+export type PermanentlyDeleteNoteData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/permanently-delete';
+};
+
+export type PermanentlyDeleteNoteResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type UploadNoteImageData = {
     body?: NoteImageUploadDto;
     path: {
@@ -2200,6 +2216,23 @@ export type TrashFolderResponses = {
 };
 
 export type TrashFolderResponse = TrashFolderResponses[keyof TrashFolderResponses];
+
+export type PermanentlyDeleteFolderData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}/permanently-delete';
+};
+
+export type PermanentlyDeleteFolderResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type MoveFolderData = {
     body?: FolderMoveRequest;

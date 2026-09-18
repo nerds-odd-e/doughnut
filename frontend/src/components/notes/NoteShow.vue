@@ -5,22 +5,13 @@
         <ContentLoader v-if="!noteRealm" />
         <template v-else>
           <template v-if="!isMinimized">
-            <div v-if="showBreadcrumb" class="breadcrumb-wrapper mb-2">
-              <BreadcrumbWithCircle
-                v-bind="{
-                  ancestorFolders,
-                  notebookRealm: noteRealm.notebookRealm,
-                }"
-              />
-            </div>
             <NoteToolbar
               v-if="currentUser"
               v-bind="{
                 note: noteRealm.note,
                 notebookId: noteRealm.notebookRealm.notebook.id,
                 activeNoteRealm: noteRealm,
-                breadcrumbFolders:
-                  effectiveAncestorFolders(noteRealm),
+                breadcrumbFolders: noteRealm.ancestorFolders ?? [],
                 asMarkdown,
                 conversationButton: noConversationButton,
                 readonly: readonly(noteRealm),
@@ -40,7 +31,7 @@
                     wikiLinks: noteRealm.wikiLinks ?? [],
                     isReadmeContext: isReadmeTitle(noteRealm),
                     hasInboundReferences: noteHasInboundWikiReferences(noteRealm),
-                    trashed: noteIsTrashed(noteRealm),
+                    trashed: isNoteRealmInTrash(noteRealm),
                   }"
                   @dead-wiki-link-click="onDeadWikiLinkClick"
                 />
@@ -95,11 +86,10 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, toRef, watch, type PropType, type Ref } from "vue"
+import { inject, ref, toRef, watch, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
-import type { Folder, NoteRealm, User } from "@generated/donut-backend-api"
-import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
+import type { NoteRealm, User } from "@generated/donut-backend-api"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import NoteReferences from "./NoteReferences.vue"
 import ShowImage from "./widgets/ShowImage.vue"
@@ -108,7 +98,7 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
-import { isLocationInTrash } from "@/utils/folderTrash"
+import { isNoteRealmInTrash } from "@/utils/folderTrash"
 import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
@@ -118,12 +108,7 @@ const props = defineProps({
   expandChildren: { type: Boolean, required: true },
   noConversationButton: { type: Boolean, default: false },
   isMinimized: { type: Boolean, default: false },
-  showBreadcrumb: { type: Boolean, default: false },
   ownsShortcuts: { type: Boolean, default: false },
-  ancestorFolders: {
-    type: Array as PropType<Folder[]>,
-    default: () => [],
-  },
 })
 
 provideNoteShortcutScope(() => props.ownsShortcuts)
@@ -138,14 +123,6 @@ const isReadmeTitle = (noteRealm: NoteRealm) =>
 
 const noteHasInboundWikiReferences = (noteRealm: NoteRealm) =>
   (noteRealm.references?.length ?? 0) > 0
-
-const effectiveAncestorFolders = (noteRealm: NoteRealm) =>
-  props.ancestorFolders.length > 0
-    ? props.ancestorFolders
-    : (noteRealm.ancestorFolders ?? [])
-
-const noteIsTrashed = (noteRealm: NoteRealm) =>
-  isLocationInTrash(effectiveAncestorFolders(noteRealm), undefined)
 
 const pendingDeadWikiLink = ref<DeadWikiLinkPayload | null>(null)
 

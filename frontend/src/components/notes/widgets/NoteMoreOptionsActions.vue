@@ -63,9 +63,9 @@
 
     <DropdownMenuItem v-if="showMenuAction('delete')">
       <DropdownMenuActionButton
-        :title="titles.delete"
+        :title="deleteTitle"
         :icon="Trash2"
-        @click="trashNote"
+        @click="deleteNote"
       />
     </DropdownMenuItem>
   </template>
@@ -143,9 +143,9 @@
       v-if="showToolbarAction('delete')"
       type="button"
       :class="toolbarGhostBtnClass"
-      :title="titles.delete"
-      :aria-label="titles.delete"
-      @click="trashNote"
+      :title="deleteTitle"
+      :aria-label="deleteTitle"
+      @click="deleteNote"
     >
       <Trash2 class="w-6 h-6" aria-hidden="true" />
     </button>
@@ -175,12 +175,13 @@ import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import RefineNoteModal from "@/components/recall/RefineNoteModal.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
-import { useNoteTrashFlow } from "@/composables/useNoteTrashFlow"
+import { useNoteRemovalFlow } from "@/composables/useNoteRemovalFlow"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 import NoteMoreOptionsYieldedItems from "./NoteMoreOptionsYieldedItems.vue"
 import {
+  noteDeleteTitle,
   noteMoreOptionsTitles,
   type NoteMoreOptionsActionId,
 } from "./noteMoreOptionsTitles"
@@ -217,7 +218,13 @@ const { toggle, isOpenForNote } = useAssimilationView()
 const { isAudioOpen, toggleAudio } = useNoteToolbarPanel()
 const noteId = computed(() => props.note.id)
 const noteTitle = computed(() => props.note.noteTopology.title)
-const { trashNote } = useNoteTrashFlow(noteId, noteTitle)
+const { trashNote, permanentlyDeleteNote, noteIsTrashed } = useNoteRemovalFlow(
+  noteId,
+  noteTitle
+)
+const deleteTitle = computed(() => noteDeleteTitle(noteIsTrashed.value))
+const deleteNote = () =>
+  noteIsTrashed.value ? permanentlyDeleteNote() : trashNote()
 
 const exportPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
 const shortcutScope = useNoteShortcutScope()
@@ -231,7 +238,7 @@ useKeyboardShortcut(
   shortcutsEnabled
 )
 
-useKeyboardShortcut("note-trash", trashNote, shortcutsEnabled)
+useKeyboardShortcut("note-trash", deleteNote, shortcutsEnabled)
 
 const noteHasContent = computed(() => hasNoteContent(props.note.content))
 const showRefineNoteModal = ref(false)

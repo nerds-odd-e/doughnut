@@ -51,3 +51,19 @@ Feature: Trash and recover a folder
     Then the note content on the current page should be "Earlier trash marker"
     When I route to the note "Later cells"
     Then the note content on the current page should be "Later trash marker"
+
+  Scenario: Permanently delete a folder that is in trash
+    Given I have a notebook "Trash Cleanup NB" with notes:
+      | Title      | Content      | Folder                |
+      | Cells      | Cells marker | _trash/Biology        |
+      | Deep cells | Deep marker  | _trash/Biology/Nested |
+      | Kept cells | Kept marker  | _trash/Chemistry      |
+    When I open the folder page for "Biology" in notebook "Trash Cleanup NB"
+    Then I should see the folder page is in trash
+    When I permanently delete the current folder
+    And I expand folder path "_trash" in the sidebar
+    Then I should not see sidebar folder "Biology"
+    And I should not see sidebar folder "Nested"
+    And I should see sidebar folder "Chemistry" containing these notes:
+      | note-title |
+      | Kept cells |

@@ -8,7 +8,9 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.WebNoteEditService;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class NoteTrashService {
@@ -50,6 +52,25 @@ public class NoteTrashService {
           noteMotionService.executeMoveIntoFolderWithAvailableTitle(note, trashParent);
         },
         note -> "Trash note: " + note.getTitle(),
+        now);
+  }
+
+  public void permanentlyDelete(Integer noteId, Integer notebookId)
+      throws UnexpectedNoAccessRightException {
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    webNoteEditService.edit(
+        noteId,
+        notebookId,
+        note -> {
+          if (!note.isTrashed()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note is not in trash.");
+          }
+          noteService.permanentlyRemove(
+              note,
+              NoteTrashReferenceHandling.LEAVE_DEAD_LINKS,
+              authorizationService.getCurrentUser());
+        },
+        note -> "Permanently delete note: " + note.getTitle(),
         now);
   }
 }

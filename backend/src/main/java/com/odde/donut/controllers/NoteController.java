@@ -132,6 +132,13 @@ class NoteController {
         authorizationService.getCurrentUser());
   }
 
+  @PostMapping(value = "/{note}/permanently-delete")
+  public void permanentlyDeleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    noteTrashService.permanentlyDelete(note.getId(), note.getNotebook().getId());
+  }
+
   @PatchMapping(value = "/{note}/undo-trash")
   public NoteRealm undoTrashNote(
       @PathVariable("note") @Schema(type = "integer") Note note,

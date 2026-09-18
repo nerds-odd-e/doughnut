@@ -67,6 +67,11 @@ public class FolderBuilder extends EntityBuilder<Folder> {
     return notebook(makeMe.aNotebook().creatorAndOwner(user).please());
   }
 
+  /** A folder under the notebook's {@code _trash}, so its ancestry makes it trashed. */
+  public FolderBuilder inTrashOf(Notebook notebook) {
+    return parentFolder(makeMe.aFolder().notebook(notebook).name("_trash").please());
+  }
+
   public FolderBuilder name(String name) {
     entity.setName(new DisplayName(name));
     return this;

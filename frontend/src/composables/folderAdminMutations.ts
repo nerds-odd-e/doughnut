@@ -3,6 +3,7 @@ import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
+import type { FolderRemovalOffer } from "@/composables/folderRemovalOffer"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 
@@ -61,28 +62,27 @@ export async function routeAfterFolderRemoval(
   })
 }
 
-export async function trashFolderOnPage(options: {
+export async function removeFolderOnPage(options: {
   folderRealm: FolderRealm
   router: Router
-  trashError: Ref<string | undefined>
+  offer: FolderRemovalOffer
+  removalError: Ref<string | undefined>
 }): Promise<void> {
   const r = options.folderRealm
-  options.trashError.value = undefined
+  options.removalError.value = undefined
   try {
     const result = await apiCallWithLoading(() =>
-      NotebookController.trashFolder({
-        path: {
-          notebook: r.notebookRealm.notebook.id,
-          folder: r.folder.id,
-        },
+      options.offer.request({
+        notebook: r.notebookRealm.notebook.id,
+        folder: r.folder.id,
       })
     )
     throwIfSdkError(result)
     refreshSidebarStructuralListings()
     await routeAfterFolderRemoval(options.router, r)
   } catch (e: unknown) {
-    options.trashError.value =
-      toOpenApiError(e).message ?? "Failed to trash folder"
+    options.removalError.value =
+      toOpenApiError(e).message ?? options.offer.failureMessage
   }
 }
 

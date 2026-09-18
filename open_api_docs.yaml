@@ -768,6 +768,20 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RelationshipLiteralSearchHit"
+  /api/notes/{note}/permanently-delete:
+    post:
+      tags:
+      - note-controller
+      operationId: permanentlyDeleteNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/notes/{note}/images:
     post:
       tags:
@@ -1078,6 +1092,29 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Folder"
+  /api/notebooks/{notebook}/folders/{folder}/permanently-delete:
+    post:
+      tags:
+      - notebook-controller
+      summary: Permanently delete a trashed folder
+      description: "Removes a folder that is in trash with its README, every nested\
+        \ folder, every note inside the subtree and each note's dependent data, in\
+        \ one accepted change. A folder that is not in trash is refused with 400."
+      operationId: permanentlyDeleteFolder
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/folders/{folder}/move:
     post:
       tags:

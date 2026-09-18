@@ -87,6 +87,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `verifySpelling`: POST `/api/notes/{note}/verify-spelling` -> `VerifySpellingResponse` (request: `VerifySpellingData`; path: note; body: AnswerSpellingDto; response body: SpellingVerificationResult)
 - `trashNote`: POST `/api/notes/{note}/trash` -> `TrashNoteResponse` (request: `TrashNoteData`; path: note; body: NoteTrashDto; response body: NoteRealm)
+- `permanentlyDeleteNote`: POST `/api/notes/{note}/permanently-delete` -> `PermanentlyDeleteNoteResponse` (request: `PermanentlyDeleteNoteData`; path: note; response body: void)
 - `uploadNoteImage`: POST `/api/notes/{note}/images` -> `UploadNoteImageResponse` (request: `UploadNoteImageData`; path: note; body: NoteImageUploadDto; response body: NoteImageUploadResult)
 - `undoTrashNote`: PATCH `/api/notes/{note}/undo-trash` -> `UndoTrashNoteResponse` (request: `UndoTrashNoteData`; path: note; body: NoteTrashUndoDto; response body: NoteRealm)
 - `showNote`: GET `/api/notes/{note}` -> `ShowNoteResponse` (request: `ShowNoteData`; path: note; response body: NoteRealm)
@@ -115,6 +116,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `publishNotebookGitProposal`: POST `/api/notebooks/{notebook}/git-bundle` -> `PublishNotebookGitProposalResponse` (request: `PublishNotebookGitProposalData`; path: notebook; query: expectedHead; body: string; response body: string)
 - `createFolder`: POST `/api/notebooks/{notebook}/folders` -> `CreateFolderResponse` (request: `CreateFolderData`; path: notebook; body: FolderCreationRequest; response body: Folder)
 - `trashFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/trash` -> `TrashFolderResponse` (request: `TrashFolderData`; path: notebook, folder; response body: Folder)
+- `permanentlyDeleteFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/permanently-delete` -> `PermanentlyDeleteFolderResponse` (request: `PermanentlyDeleteFolderData`; path: notebook, folder; response body: void)
 - `moveFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/move` -> `MoveFolderResponse` (request: `MoveFolderData`; path: notebook, folder; body: FolderMoveRequest; response body: Folder)
 - `createNoteAtNotebookRoot`: POST `/api/notebooks/{notebook}/create-note` -> `CreateNoteAtNotebookRootResponse` (request: `CreateNoteAtNotebookRootData`; path: notebook; body: NoteCreationDto; response body: NoteRealm)
 - `createNotebook`: POST `/api/notebooks/create` -> `CreateNotebookResponse` (request: `CreateNotebookData`; body: NotebookCreationRequest; response body: NotebookRealm)
