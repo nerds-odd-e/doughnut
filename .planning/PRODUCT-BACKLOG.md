@@ -9,8 +9,6 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 
-- [Web folder rename and dissolve keep the accepted Git tree in step](seeds/SEED-035-web-folder-rename-dissolve-accepted-tree.md#story-1) — SEED-035 — plan: `.planning/quick/148-cohesive-accepted-web-folder-changes/PLAN.md`
-
 ## Backlog list
 
 - [Clean up note-persistence duplication and oversized files flagged by plan 148](seeds/SEED-037-note-persistence-and-oversized-file-cleanup.md#story-1) — SEED-037
