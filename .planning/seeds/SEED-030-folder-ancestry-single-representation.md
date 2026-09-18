@@ -43,34 +43,110 @@ completed successfully at 2026-09-18 14:20 (+0800):
 Net across both: −9 production lines. The full `NotebookGit*` controller suite
 (98 classes / 318 tests) is green, and CI passed on both commits.
 
-## Unresolved: the owner still reports the failure
+## Diagnosis: notebook 4 holds rows whose folder ancestry crosses notebooks
 
-The fix is demonstrably in the deployed release, so the persisting report needs
-a cause. Candidate explanations, **none investigated**, roughly by likelihood:
+Investigated 2026-09-18 in a second session. **Reproduced by experiment; not yet
+confirmed against production rows.**
 
-1. **A different defect with the same symptom.** The repair covers exactly
-   `folder == null` in `folderPath` reached via `requireOneNoteAtPath`. A
-   different frame, message, or endpoint means a different bug. Obtaining the
-   current stack trace and diffing it against the original is the cheapest
-   discriminator and should come first.
-2. **Wrong code path.** The original report's request line was
-   `/api/notebooks/4/git-bundle?expectedHead=2a473e9a2bda77d18b0b30a568b3023788ecd4ee`,
-   but the attached trace was from `publishNotebookGitProposal`
-   (`NotebookController:505`). That mismatch was noticed and never explained.
-   If the live failure is on the bundle-export path, neither shipped change
-   touches it.
-3. **Stale data on notebook 4.** The fix prevents the bad resolution; it does
-   not repair a projection already left inconsistent by an earlier failed
-   publish. Divergence between the accepted head and the live projection could
-   keep failing, plausibly as projection drift rather than an NPE. Inspecting
-   notebook 4's folder and note rows against its accepted tree would settle it.
-4. **Not actually serving the new jar** — instance rollover or a cached build.
-   Least likely given the successful deploy, but cheap to rule out.
+**Evidence**
 
-**Never reproduced:** the reporter's actual proposal content for notebook 4 is
-unknown. Both shipped changes rest on a mechanism reproduced from the stack
-trace, not on replaying their bundle. This is the main reason a second cause is
-plausible.
+- The deploy script checks the rollout and probes health for the release SHA
+  before succeeding (14:28 +0800). Failure report 856 counted its second
+  occurrence at 14:31, so the recurrence ran on v1.3.10. Stale jar is ruled out.
+- A Failure report only absorbs a recurrence with the same fingerprint:
+  exception class, normalized request, and first application frame. The
+  recurrence therefore still has `NotebookGitAcceptedTree.folderPath` as its
+  first application frame. Only the first occurrence's trace is stored.
+- `POST /api/notebooks/{id}/git-bundle` *is* `publishNotebookGitProposal`. The
+  request-line "mismatch" recorded earlier was not a mismatch.
+- The owner ported notebook 4 to a development notebook through Git and
+  published the same change successfully. The cause is therefore in state the
+  Portable tree does not carry.
+- The original trace has **one** `folderPath` frame, called from
+  `portablePath`, inside the `MODIFIED` branch. So a plain note edit met a
+  note whose own folder was absent from the notebook's folder rows. Folder
+  rows are loaded by `notebook_id` alone, and `fk_note_folder` guarantees the
+  folder exists, so that folder has a different `notebook_id`.
+
+**Mechanism.** Every notebook-tree walker assumes a note's folder and a
+folder's parent share the notebook. Nothing enforces it: the schema has
+single-column foreign keys only. Two walkers treat a violating row differently:
+
+- `PortableTreeSnapshot.build` walks **top-down from the root**. Rows
+  unreachable from this notebook's root silently vanish. ZIP export, cutover,
+  bundle download and `requireMatchingAcceptedTree` all use it, so they
+  succeed and agree with each other, and the stray content never reaches Git,
+  the clone, or a ported copy.
+- `NotebookGitAcceptedTree.folderPath` walks **bottom-up** through an id→row
+  map of this notebook's folders. A foreign ancestor is a missing key and the
+  walk dereferences null.
+
+**Experiment** (temporary worktree, since removed). A bound notebook with one
+root note, plus a row corrupted by native SQL; snapshot, download, then publish
+a plain edit of the root note through `publishNotebookGitProposal`:
+
+| Stray row | Before `07e9ee0434` | Current `main` |
+|---|---|---|
+| Note whose folder is in another notebook | NPE, **frame-for-frame the production trace** (`folderPath:90` ← `portablePath:55` ← `requireOneLiveNoteAtPath:188` ← `applyModificationsAndRenames:99` ← `publish:178`) | publishes; the stray note stays invisible to Git |
+| Folder whose parent is in another notebook | NPE in `reconcileUnrepresentedFolders` | NPE, same message: `folderPath:81` ← `folderPath:83` ← `foldersByPath:103` ← `ensureAncestry:53` ← `applyModificationsAndRenames:86` ← `publish:178` |
+
+Snapshot and download succeeded in every case. The two shipped changes moved
+live-note paths off the row map, which cured the first row of the table only.
+On current `main` every publication computes a path for **every** folder row
+(`foldersByPath`, then `reconcileUnrepresentedFolders`), so one stray folder
+blocks every publication to that notebook. The shipped regression test
+reproduces a different, also real, way to reach the same frames; it was not the
+owner's case if the owner's change had no rename.
+
+**Predicted production data:** notebook 4 has at least one note in a folder of
+another notebook, and at least one folder under a parent of another notebook,
+most simply a foreign folder holding both. Read-only confirmation:
+
+```sql
+SELECT n.id, n.title, n.notebook_id, n.folder_id, f.notebook_id AS folder_notebook_id
+FROM note n JOIN folder f ON f.id = n.folder_id
+WHERE n.notebook_id <> f.notebook_id;
+
+SELECT c.id, c.name, c.notebook_id, c.parent_folder_id, p.notebook_id AS parent_notebook_id
+FROM folder c JOIN folder p ON p.id = c.parent_folder_id
+WHERE c.notebook_id <> p.notebook_id;
+```
+
+Run them without a notebook filter: the row counts decide whether this is one
+owner's legacy debris or a wider repair.
+
+**Origin is unknown.** Current writers (`FolderSubtree.reassignToNotebook`,
+`FolderMoveRelocation`, `NoteMotionService`) keep the ids consistent, so legacy
+data from before folders or from an older cross-notebook move is the likelier
+source. If the queries show recent `updated_at` values, a live writer exists
+and finding it joins the story.
+
+**What the web app already treats as true.** Folder contents are listed by
+folder id alone (`findNotesInFolderOrderByIdAsc`,
+`findChildFoldersByParentFolderIdOrderByIdAsc`), so the owner sees stray rows
+under the *containing* folder's notebook. Containment is the representation in
+use; the stray `notebook_id` is the stale copy.
+
+**Proposed fix (for refinement, not agreed):**
+
+1. Repair the rows once, making `notebook_id` follow containment: a folder
+   takes its parent's notebook, a note takes its folder's. This is what
+   `reassignToNotebook` would have written. Notebook 4's accepted tree never
+   contained the stray rows, so it needs no new snapshot. A receiving notebook
+   that has a Git binding would drift; check that in the same query pass.
+2. No null guard in `folderPath` and no tolerant skip: once the invariant
+   holds, the code that assumes it is correct, and a guard would hide the next
+   violation the way the top-down walker hid this one.
+3. Enforcing the invariant with composite foreign keys is **not** recommended
+   now: `fk_note_folder ... ON DELETE SET NULL` would null `notebook_id` too,
+   and InnoDB checks row by row, which breaks the folder-by-folder
+   cross-notebook move. The deeper cause is that `notebook_id` is stored at
+   every level of a tree that already determines it; removing that redundancy
+   is a separate, larger story.
+4. Plan 142 alone would not fix production. Walking live parent entities
+   removes the NPE in `foldersByPath`, but `reconcileUnrepresentedFolders`
+   still walks rows. A fully live walk would judge the stray folder
+   unrepresented and try to remove it (reasoned from the code, not run).
 
 ## Remaining structural work
 
@@ -115,17 +191,14 @@ Reuse it; do not duplicate it.
   notebook 4 can publish; and folder ancestry inside the one final application
   is resolved from live entity state only, so the failure class cannot recur
   through a stale snapshot.
-- **Likely splits at refinement:** the diagnosis-and-fix of the persisting
-  production failure is a different outcome from the latent structural cleanup,
-  and their evidence differs sharply — one has a live reporter, the other has
-  none. Expect this to become two stories, with the diagnosis first. It is kept
-  as one here only because it was recorded rather than refined.
-- **First evaluable step:** obtain the current production stack trace and
-  compare it to the original. That decides whether this is the same defect and
-  therefore whether hypotheses 2–4 are worth pursuing.
+- **Split found at diagnosis:** the production failure is a data-invariant
+  repair (see Diagnosis); the structural cleanup is independent and fixes
+  nothing the owner sees. Expect two stories, repair first.
+- **First evaluable step:** run the two read-only queries in production. Rows
+  for notebook 4 confirm the diagnosis and size the repair; no rows reopens it.
 - **Effort hypothesis:** structural half S (one class, three call sites,
-  mirrors a change already made). Diagnosis half unknown until the trace is in
-  hand — it may be minutes or a separate investigation.
+  mirrors a change already made). Repair half S once the production rows are
+  seen: one data migration plus a regression test built from the experiment.
 - **Safe stopping point:** the structural half can ship alone; the existing
   relocation test already states the guarantee it protects.
 
