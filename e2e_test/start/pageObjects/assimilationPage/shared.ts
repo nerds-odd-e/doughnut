@@ -96,18 +96,6 @@ export function layoutCheckboxForItem(layoutItemText: string) {
 export const removeRefinementLayoutButton = () =>
   refinementLayoutPanel().find('[data-test-id="remove-refinement-layout"]')
 
-export const waitForExtractNotePreview = () => {
-  cy.contains('p.loading-message', 'AI is generating preview...', {
-    timeout: 15000,
-  }).should('not.exist')
-}
-
-export const waitForExtractNote = () => {
-  cy.contains('p.loading-message', 'AI is creating note...', {
-    timeout: 15000,
-  }).should('not.exist')
-}
-
 export const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title], #main-note-content [data-test="note-title"]'
 

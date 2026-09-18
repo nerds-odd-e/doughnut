@@ -3,8 +3,6 @@ import {
   layoutCheckboxForItem,
   refinementLayoutPanel,
   removeRefinementLayoutButton,
-  waitForExtractNote,
-  waitForExtractNotePreview,
 } from './shared'
 
 type ExtractionPreviewFields = {
@@ -74,7 +72,7 @@ export function assimilationRefinementLayoutExpectations() {
       refinementLayoutPanel().within(() => {
         cy.findByRole('button', { name: 'Extract' }).click()
       })
-      waitForExtractNotePreview()
+      waitUntilAppIsNotBusy()
       extractionPreviewPanel().should('be.visible')
       return this
     },
@@ -139,14 +137,14 @@ export function assimilationRefinementLayoutExpectations() {
       extractionPreviewPanel()
         .find('[data-test-id="extraction-preview-create"]')
         .click()
-      waitForExtractNote()
+      waitUntilAppIsNotBusy()
       return this
     },
     retryExtractionPreview() {
       extractionPreviewPanel()
         .find('[data-test-id="retry-extraction-preview"]')
         .click()
-      waitForExtractNotePreview()
+      waitUntilAppIsNotBusy()
       return this
     },
   }
