@@ -48,15 +48,17 @@ record per-slice deltas as useful evidence, not a quota for each slice.
 
 | Responsibility | Existing owner/evidence | Choice |
 | --- | --- | --- |
-| Membership of loaded objects | Note.isAvailable delegates to Folder.isTrashed; FolderRepositoryTest proves current ancestry before flush | Reuse directly when deriving candidates from loaded notes. Do not substitute a stale formula value. |
+| Membership of loaded objects | Note.isAvailable delegates to Folder.isTrashed (current ancestry, lazy folder walk); Note.trashedInDatabase is the persisted membership every loaded row carries and JPA_AVAILABLE tests in SQL | Owner decision 2026-09-18: in LearningSessionService.record derive candidates from the loaded row's persisted membership through a small Note accessor, because no folder moves precede the read and Note.isAvailable would load one proxy per folder and ancestor (slice 1 baseline). Note.isAvailable stays the owner for current-transaction ancestry. |
 | Query-time participating notes | Note.JPA_AVAILABLE and NATIVE_AVAILABLE, derived from the trashed_folder view; used by search, recall, aliases, semantic search | Retain shared predicates for selective queries. No copy of their SQL in LearningSessionService. |
 | Complete stored tree | NoteRepository.findLiveNotesByNotebookIdOrderByIdAsc; NotebookExportRows; NotebookGitStateLoader | Rename to an explicit all-notes query, and propagate the meaning through snapshot/projection consumers. Preserve trash inclusion. |
 | Stored folder occupancy | findLiveNoteFolderIdsByNotebookId; FolderSubtreeLiveNotes; health and purge callers | Name by occupancy/subtree content, retaining trash as occupied content. |
 | UI location membership | frontend/src/utils/folderTrash.ts, already reused by note/folder screens | Keep; replacing it requires an API change without a demonstrated need. |
 
 In LearningSessionService.record, fetch stored notebook notes once. Derive
-recognized titles from that collection and candidates through Note.isAvailable.
-Ambiguity and tracker lookup use the same available subset. Preserve the
+recognized titles from that collection and candidates by the loaded row's
+persisted membership (`Note.trashedInDatabase`, exposed through one small
+JSON-ignored accessor on Note). Ambiguity and tracker lookup use the same
+available subset. Preserve the
 parser's diagnostic distinction: a stored-but-trashed title is recognized but
 cannot supply a commissioned tracker. Reuse stream/set operations; introduce
 no wrapper class merely to hold these collections.
@@ -166,7 +168,7 @@ Execution record, 2026-09-18, revision `7de4fd470c` (production unchanged):
 ### 2. Derive learning participation from shared note availability
 
 Type: Structure
-Status: awaiting story review
+Status: done
 Depends on: slice 1's passing behavior and query baseline.
 
 Reassessment, 2026-09-18, from slice 1's baseline: `Note.folder` and
@@ -179,36 +181,34 @@ stop condition, so the retrieval choice below must be revised before editing.
 The invalidated assumption is the seed's selected structural direction "direct
 reuse of Note.isAvailable for already-loaded objects" (SEED-029 story 1, Open
 Decisions) and this plan's "Do not substitute a stale formula value" in the
-existing-solutions table. Candidate revisions, none authorized yet:
-
-- Filter the single stored-notes read by the row's already-loaded persisted
-  membership (`Note.trashedInDatabase`, the same value `Note.JPA_AVAILABLE`
-  tests in SQL). In `record` no folder moves precede the read, so this is not
-  stale here; it keeps one query, removes the second list, and keeps the
-  diagnostic distinction. It adds an object-level accessor for persisted
-  membership beside `Note.isTrashed` (current ancestry), which the plan's
-  cohesion gate must accept explicitly.
-- Keep the existing two query-level reads (the plan's stated fallback). That
-  leaves acceptance gate 1 unmet, so the story would be incomplete.
-- Fetch-join folders in the stored read. Ancestor proxies still load per
-  depth, so growth remains; not recommended.
+existing-solutions table. Owner decision, 2026-09-18: filter the single stored-notes read by the row's
+already-loaded persisted membership (`Note.trashedInDatabase`, the same value
+`Note.JPA_AVAILABLE` tests in SQL). In `record` no folder moves precede the
+read, so the value is current; this keeps one query, removes the second list,
+and keeps the diagnostic distinction. Expose it as one small JSON-ignored
+accessor on Note, documented as persisted membership beside `isTrashed`
+(current ancestry). Rejected alternatives: keeping two query-level reads
+(acceptance gate 1 unmet) and fetch-joining folders (ancestor proxies still
+load per depth). The seed's Open Decisions field is aligned with this.
 Outcome: eliminate the duplicate note-list retrieval and use the shared
 object-domain predicate for already-loaded note participation.
 
-Apply the single-read candidate derivation in LearningSessionService. Simplify
-intermediate title variables only where their removal improves readability.
-Keep report parsing, validation order, scheduling, and rejection messages.
+Apply the single-read candidate derivation in LearningSessionService using the
+persisted-membership accessor. Keep the current repository method name; slice
+3 owns its rename. Simplify intermediate title variables only where their
+removal improves readability. Keep report parsing, validation order,
+scheduling, and rejection messages. Verify Note's JSON and generated API
+shape are unchanged (the accessor is JSON-ignored).
 Preserve the mapped controller cases in this slice. They must be green
 before delivery; no separate committed failing-test slice.
 
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, reusing slice 1's
 baseline rather than measuring it again; all backend tests per project rules.
-Compare folder SQL counts on the same cold fixture. If removing the second
-list query introduces per-folder/per-depth query growth, stop this slice and
-revise the retrieval choice. Do not claim fewer database calls merely because
-one repository call was removed, or compensate with a global eager-loading
-change/cache. Existing two-query behavior stays the fallback until a smaller
-safe design is evidenced.
+Compare statement and folder-load counts on the same cold fixtures by
+re-materializing `query-baseline-diagnostic.java.txt` under
+`backend/src/test` temporarily; expected: prepareStatementCount 4,
+queryExecutionCount 2, Folder loads 0 for both fixtures. Remove the live
+diagnostic before delivery. Per-folder/per-depth growth stops this slice.
 
 Sizing: ~5 minutes of edits and one relevant proof loop. The full backend suite
 is an explicit test-duration exception to the 5-minute target if needed, not
@@ -216,6 +216,38 @@ permission for open-ended optimization. If slice 1 establishes that all-note
 ancestry traversal already makes the proposed approach unsuitable, revise this
 slice before editing; do not implement a known-bad retrieval to test it again.
 Safe stop: original diagnostics and correct participation remain intact.
+
+Execution record, 2026-09-18, from revision `4c9bf87f`:
+
+- `Note.trashedInDatabase` gained `@JsonIgnore @Getter` and a one-line comment
+  (persisted membership as loaded; `isTrashed` follows current ancestry).
+  `LearningSessionService.record` reads stored notes once, filters
+  `availableNotes` by `!isTrashedInDatabase()`, and derives recognized titles
+  from stored notes and ambiguity/tracker lookup from available notes. The
+  second repository call and the intermediate title list are gone.
+  Production delta against `4c9bf87f`: Note +3/-0, LearningSessionService
+  +9/-11, net -2 handwritten lines before formatting. No API generation
+  trigger: the accessor is JSON-ignored and `trashedInDatabase` appears in
+  neither `open_api_docs.yaml` nor the generated frontend client.
+- Comparison on slice 1's cold fixtures (diagnostic re-materialized from
+  `query-baseline-diagnostic.java.txt`, then removed again), literal command
+  `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.LearningSessionRecordQueryBaselineDiagnostic'`:
+  both fixtures prepareStatementCount 4 (was 5), queryExecutionCount 2 (was
+  3), entityLoadCount 10, Folder loads 0. The available-notes list query is
+  gone; the remaining executions are the stored-notes list and one
+  `MemoryTrackerRepository.findByUserAndNote`. No folder-dependent growth.
+- Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` after
+  `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL`: BUILD SUCCESSFUL,
+  2479 tests, 0 failures (slice 1's count included the two removed diagnostic
+  cases). Observations: all ten `LearningSessionRecordTests`.
+- Learning: a `@Formula` value is hydrated only when the row is loaded from
+  the database, so an entity persisted earlier in the same persistence context
+  carries the Java default `false`. Production `record` requests load notes
+  cold, which the diagnostic models; the regression test
+  `recordsAvailableNoteWhenATrashedNoteHasTheSameTitle` now refreshes its
+  trashed duplicate (`makeMe.refresh`, the convention already used in
+  `NotebookFolderMoveControllerTest`). The accessor's contract is therefore
+  "persisted membership as loaded", which its comment states.
 
 ### 3. Make the complete stored-note boundary explicit
 
@@ -280,7 +312,9 @@ occupied recoverable content cannot become an empty-folder deletion candidate.
 - Push destination `origin` (`nerds-odd-e/doughnut`) branch
   `cohesive-trash-participation`; later integration target `main`.
 - CI observer: GitHub Actions `ci.yml` (display name `donut CI`) on branch
-  `cohesive-trash-participation`; mailbox `/tmp/dough-ci-501/watch-wePcZd`.
+  `cohesive-trash-participation`; mailbox `/tmp/dough-ci-501/watch-WRGdrv`
+  (restarted after the slice 2 decision stop; the earlier observer
+  `watch-wePcZd` ended with `4c9bf87f` unobserved, now registered again).
 
 ## Execution and delivery constraints
 
@@ -312,8 +346,8 @@ because persisted state and current transaction ancestry differ.
 
 Cumulative model: one meaning for stored content, one meaning for participation,
 and existing membership owners; later slices clarify the same model instead of
-adding recognizers. Main remaining concern is slice 2's lazy ancestor loading;
-slice 1 now provides its prerequisite evidence. Slice 3 also has mechanical
+adding recognizers. Slice 1 evidenced the lazy-ancestor concern for slice 2, and the owner
+selected persisted-membership filtering of the single read in response. Slice 3 also has mechanical
 breadth and file-size-rule risk. No timing or query improvement is claimed from
 this planning inspection alone.
 

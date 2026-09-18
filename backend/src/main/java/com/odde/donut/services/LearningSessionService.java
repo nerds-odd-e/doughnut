@@ -57,17 +57,15 @@ public class LearningSessionService {
   @Transactional
   public RecordLearningSessionResponse record(
       User user, Notebook notebook, String reportMarkdown, Timestamp now) {
-    List<Note> liveNotebookNotes =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    List<Note> availableNotebookNotes =
-        noteRepository.findAvailableNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    List<String> liveNotebookTitleList = liveNotebookNotes.stream().map(Note::getTitle).toList();
-    Set<String> liveNotebookTitles = Set.copyOf(liveNotebookTitleList);
+    List<Note> storedNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> availableNotes =
+        storedNotes.stream().filter(note -> !note.isTrashedInDatabase()).toList();
+    Set<String> storedTitles = Set.copyOf(storedNotes.stream().map(Note::getTitle).toList());
     Set<String> ambiguousTitles =
         LearningSessionReportParser.ambiguousTitles(
-            availableNotebookNotes.stream().map(Note::getTitle).toList());
+            availableNotes.stream().map(Note::getTitle).toList());
     ParseResult parseResult =
-        learningSessionReportParser.parse(reportMarkdown, liveNotebookTitles, ambiguousTitles);
+        learningSessionReportParser.parse(reportMarkdown, storedTitles, ambiguousTitles);
 
     RecordLearningSessionResponse response = new RecordLearningSessionResponse();
     response.setRecordedItems(new ArrayList<>());
@@ -78,7 +76,7 @@ public class LearningSessionService {
     List<MatchedReportEntry> matchedEntries = new ArrayList<>();
     for (ParsedReportEntry entry : parseResult.entries()) {
       Optional<MemoryTracker> tracker =
-          findCommissionedNoteLevelTracker(user, availableNotebookNotes, entry.noteTitle());
+          findCommissionedNoteLevelTracker(user, availableNotes, entry.noteTitle());
       if (tracker.isEmpty()) {
         response
             .getRejectedEntries()
@@ -112,8 +110,8 @@ public class LearningSessionService {
   }
 
   private Optional<MemoryTracker> findCommissionedNoteLevelTracker(
-      User user, List<Note> availableNotebookNotes, String noteTitle) {
-    return availableNotebookNotes.stream()
+      User user, List<Note> availableNotes, String noteTitle) {
+    return availableNotes.stream()
         .filter(note -> note.getTitle().equals(noteTitle))
         .flatMap(note -> userService.getMemoryTrackersFor(user, note).stream())
         .filter(MemoryTracker::isCommissioned)

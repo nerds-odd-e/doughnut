@@ -152,12 +152,17 @@ and any necessary plan refinement; implementation remains a later instruction.
 ## Open Decisions
 
 - Selected structural direction: explicit stored-note/occupancy collection
-  contracts and direct reuse of Note.isAvailable for already-loaded objects;
-  retain query-level availability for consumers that should fetch only
-  participating notes. No additional service or persisted state is selected.
-- Preserve the existing diagnostic distinction. A single stored-note read can
-  supply recognized titles and available candidates without changing messages;
-  the plan must verify that ancestor loading does not amplify database work.
+  contracts; retain query-level availability for consumers that should fetch
+  only participating notes. No additional service or persisted state is
+  selected. Owner decision 2026-09-18, after plan 141 slice 1 measured that
+  Note.isAvailable over a loaded list costs one lazy select per distinct
+  folder and ancestor: learning-session recording derives participation from
+  the loaded row's persisted membership (the `trashedInDatabase` value that
+  `Note.JPA_AVAILABLE` tests in SQL) through one small accessor on Note.
+  Note.isAvailable remains the owner of current-transaction ancestry.
+- Preserve the existing diagnostic distinction. A single stored-note read
+  supplies recognized titles and available candidates without changing
+  messages; plan 141 slice 1 verified the baseline and slice 2 compares.
 - Keep database-view membership, current-object ancestry, and the existing
   shared frontend helper: they serve different runtimes/state moments. No
   demonstrated defect requires replacing those representations in this story.

@@ -127,7 +127,8 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
     Note availableNote =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("なにしろ").please();
-    makeMe.aNote().notebook(availableNote.getNotebook()).title("なにしろ").trashed().please();
+    makeMe.refresh(
+        makeMe.aNote().notebook(availableNote.getNotebook()).title("なにしろ").trashed().please());
     makeMe.aMemoryTrackerFor(availableNote).commissioned().nextRecallAt(dayTwo).please();
 
     RecordLearningSessionResponse response =
