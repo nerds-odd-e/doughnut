@@ -22,9 +22,9 @@ assert_not_file_exists() {
 
 init_deploy_test_logs() {
 	local work=$1
-	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
+	export STORAGE_LOG="$work/storage.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
 	export HEALTHCHECK_LOG="$work/healthcheck.log" ROLLOUT_LOG="$work/rollout.log" STEPS_LOG="$work/steps.log"
-	: >"$GSUTIL_LOG"
+	: >"$STORAGE_LOG"
 	: >"$GCLOUD_LOG"
 	: >"$HEALTHCHECK_LOG"
 	: >"$ROLLOUT_LOG"
@@ -67,44 +67,38 @@ write_fake_bin() {
 		printf '#!%s\n' "$REAL_BASH"
 		cat <<'EOS'
 set -e
-LOG="${GSUTIL_LOG:?}"
-cmd="${1:-}"
-shift || true
-case "$cmd" in
-cat)
-	echo "cat $*" >>"$LOG"
-	if [[ -n "${RECORD_JSON_FILE:-}" && -f "$RECORD_JSON_FILE" ]]; then
-		cat "$RECORD_JSON_FILE"
-		exit 0
-	fi
-	exit 1
-	;;
-cp)
-	if [[ "${1:-}" == "-" ]]; then
-		echo "cp - $2" >>"$LOG"
-		cat >/dev/null
-		exit 0
-	fi
-	echo "cp $*" >>"$LOG"
-	exit 0
-	;;
-*)
-	echo "unexpected gsutil: $cmd $*" >>"$LOG"
-	exit 1
-	;;
-esac
-EOS
-	} >"$fake_bin/gsutil"
-	chmod +x "$fake_bin/gsutil"
-
-	{
-		printf '#!%s\n' "$REAL_BASH"
-		cat <<'EOS'
-set -e
 LOG="${GCLOUD_LOG:?}"
 cmd="${1:-}"
 shift || true
 case "$cmd" in
+storage)
+	LOG="${STORAGE_LOG:?}"
+	sub="${1:-}"
+	shift || true
+	case "$sub" in
+	cat)
+		echo "cat $*" >>"$LOG"
+		if [[ -n "${RECORD_JSON_FILE:-}" && -f "$RECORD_JSON_FILE" ]]; then
+			cat "$RECORD_JSON_FILE"
+			exit 0
+		fi
+		exit 1
+		;;
+	cp)
+		if [[ "${1:-}" == "-" ]]; then
+			echo "cp - $2" >>"$LOG"
+			cat >/dev/null
+			exit 0
+		fi
+		echo "cp $*" >>"$LOG"
+		exit 0
+		;;
+	*)
+		echo "unexpected gcloud storage: $sub $*" >>"$LOG"
+		exit 1
+		;;
+	esac
+	;;
 compute)
 	sub="${1:-}"
 	shift || true
@@ -162,7 +156,7 @@ run_deploy() {
 		cd "$1"
 		PATH="$2:$PATH"
 		export GCS_BUCKET ARTIFACT VERSION GITHUB_SHA
-		export GSUTIL_LOG ROLLING_LOG GCLOUD_LOG HEALTHCHECK_LOG ROLLOUT_LOG STEPS_LOG
+		export STORAGE_LOG ROLLING_LOG GCLOUD_LOG HEALTHCHECK_LOG ROLLOUT_LOG STEPS_LOG
 		export REPO_ROOT="$REPO_ROOT"
 		export DEPLOY_JAR_PATH="${DEPLOY_JAR_PATH:-}"
 		export RECORD_JSON_FILE="${RECORD_JSON_FILE:-}"

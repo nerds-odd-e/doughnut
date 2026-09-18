@@ -40,7 +40,7 @@ new_startup_script_hash=$(sha256sum "$STARTUP_SCRIPT_PATH" | awk '{print $1}')
 
 recorded_hash=""
 recorded_startup_script_hash=""
-if recorded_json=$(gsutil cat "$RECORD_URI" 2>/dev/null); then
+if recorded_json=$(gcloud storage cat "$RECORD_URI" 2>/dev/null); then
   recorded_hash=$(printf '%s' "$recorded_json" | jq -r '.sha256 // empty' 2>/dev/null || true)
   recorded_startup_script_hash=$(
     printf '%s' "$recorded_json" | jq -r '.startup_script_sha256 // empty' 2>/dev/null || true
@@ -60,7 +60,7 @@ if [[ -n "$recorded_hash" &&
 fi
 
 echo "Deploying: jar SHA-256 $new_hash (record had ${recorded_hash:-<none>}); startup script SHA-256 $new_startup_script_hash (record had ${recorded_startup_script_hash:-<none>})."
-gsutil cp "$JAR_PATH" "$JAR_DEST"
+gcloud storage cp "$JAR_PATH" "$JAR_DEST"
 
 bash "$SCRIPT_DIR/update-mig-startup-script.sh"
 
@@ -75,6 +75,6 @@ jq -n \
   --arg git "$GITHUB_SHA" \
   --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   '{sha256: $sha, startup_script_sha256: $startup_script_sha, git_sha: $git, recorded_at: $at}' \
-  | gsutil cp - "$RECORD_URI"
+  | gcloud storage cp - "$RECORD_URI"
 
 echo "Recorded last successful deploy at $RECORD_URI"

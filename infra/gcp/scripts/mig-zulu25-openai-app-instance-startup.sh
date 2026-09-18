@@ -59,7 +59,7 @@ VERSION="0.0.1-SNAPSHOT"
 echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 
 # Download doughnut-app jar
-gsutil cp gs://"${BUCKET}/backend_app_jar/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIFACT}-${VERSION}.jar"
+gcloud storage cp gs://"${BUCKET}/backend_app_jar/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIFACT}-${VERSION}.jar"
 
 # Stop unneeded salt-minion
 systemctl stop salt-minion

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Unit tests for infra/gcp/scripts/upload-cli-binary-to-gcs.sh
-# Uses fake gsutil on PATH (no real GCS).
+# Uses fake gcloud on PATH (no real GCS).
 
 set -euo pipefail
 
@@ -20,11 +20,11 @@ assert_contains() {
 	fi
 }
 
-write_fake_gsutil() {
+write_fake_gcloud() {
 	local fake_bin=$1
 	mkdir -p "$fake_bin"
-	printf '#!%s\nset -e\nLOG="${GSUTIL_LOG:?}"\necho "gsutil $*" >>"$LOG"\nexit 0\n' "$(command -v bash)" >"$fake_bin/gsutil"
-	chmod +x "$fake_bin/gsutil"
+	printf '#!%s\nset -e\nLOG="${STORAGE_LOG:?}"\necho "gcloud $*" >>"$LOG"\nexit 0\n' "$(command -v bash)" >"$fake_bin/gcloud"
+	chmod +x "$fake_bin/gcloud"
 }
 
 test_fails_when_bundle_missing() {
@@ -32,13 +32,13 @@ test_fails_when_bundle_missing() {
 	work=$(mktemp -d)
 	trap "rm -rf '${work}'" EXIT
 	fake_bin="$work/bin"
-	write_fake_gsutil "$fake_bin"
+	write_fake_gcloud "$fake_bin"
 	log="$work/log"
 	touch "$log"
 	(
 		cd "$work"
 		PATH="$fake_bin:$PATH"
-		export GCS_BUCKET=bucket GSUTIL_LOG="$log"
+		export GCS_BUCKET=bucket STORAGE_LOG="$log"
 		if bash "$UPLOAD_SCRIPT" 2>/dev/null; then
 			fail "expected exit non-zero when CLI bundle missing"
 		fi
@@ -50,7 +50,7 @@ test_cp_invoked_with_dest() {
 	work=$(mktemp -d)
 	trap "rm -rf '${work}'" EXIT
 	fake_bin="$work/bin"
-	write_fake_gsutil "$fake_bin"
+	write_fake_gcloud "$fake_bin"
 	log="$work/log"
 	touch "$log"
 	mkdir -p "$work/cli/dist"
@@ -58,12 +58,12 @@ test_cp_invoked_with_dest() {
 	(
 		cd "$work"
 		PATH="$fake_bin:$PATH"
-		export GCS_BUCKET=my-bucket GCS_FRONTEND_BUCKET= GSUTIL_LOG="$log"
+		export GCS_BUCKET=my-bucket GCS_FRONTEND_BUCKET= STORAGE_LOG="$log"
 		bash "$UPLOAD_SCRIPT"
 	)
 	local content
 	content=$(cat "$log")
-	assert_contains "$content" "cp" "gsutil args"
+	assert_contains "$content" "cp" "gcloud storage args"
 	assert_contains "$content" "gs://my-bucket/doughnut-cli-latest/doughnut" "GCS dest"
 }
 
@@ -72,7 +72,7 @@ test_cp_prefers_gcs_frontend_bucket() {
 	work=$(mktemp -d)
 	trap "rm -rf '${work}'" EXIT
 	fake_bin="$work/bin"
-	write_fake_gsutil "$fake_bin"
+	write_fake_gcloud "$fake_bin"
 	log="$work/log"
 	touch "$log"
 	mkdir -p "$work/cli/dist"
@@ -80,7 +80,7 @@ test_cp_prefers_gcs_frontend_bucket() {
 	(
 		cd "$work"
 		PATH="$fake_bin:$PATH"
-		export GCS_BUCKET=legacy GCS_FRONTEND_BUCKET=fe GSUTIL_LOG="$log"
+		export GCS_BUCKET=legacy GCS_FRONTEND_BUCKET=fe STORAGE_LOG="$log"
 		bash "$UPLOAD_SCRIPT"
 	)
 	local content

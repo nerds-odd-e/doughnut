@@ -72,7 +72,7 @@ test('an interrupted release retries the same identity with freshly selected CI 
   const interrupted = fixture.publish(
     release,
     { runId: 42, runAttempt: 3 },
-    { failGsutilMatch: 'doughnut-cli-latest' }
+    { failStorageMatch: 'doughnut-cli-latest' }
   )
 
   assert.notEqual(interrupted.status, 0)
