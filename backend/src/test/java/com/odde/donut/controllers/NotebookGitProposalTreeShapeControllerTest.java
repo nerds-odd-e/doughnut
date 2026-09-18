@@ -103,7 +103,7 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
 
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(acceptedNotebook.getReadmeContent(), equalTo(EDITED_ROOT_README));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), empty());
   }
 
   @Test
@@ -159,7 +159,7 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
 
     Folder reloaded = entityManager.find(Folder.class, folder.getId());
     assertThat(reloaded.getReadmeContent(), equalTo("---\ntype: Readme\n---\nchanged readme"));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     assertThat(notes.getFirst().getTitle(), equalTo("Added"));
   }

@@ -154,7 +154,7 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
         () -> {
           NotebookGitBinding binding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-          List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+          List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
           return new PublicationState(
               binding.getAcceptedGitObjectId(),
               binding.getUpdatedAt(),

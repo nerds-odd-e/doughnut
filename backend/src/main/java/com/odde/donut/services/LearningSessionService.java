@@ -57,7 +57,7 @@ public class LearningSessionService {
   @Transactional
   public RecordLearningSessionResponse record(
       User user, Notebook notebook, String reportMarkdown, Timestamp now) {
-    List<Note> storedNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     List<Note> availableNotes =
         storedNotes.stream().filter(note -> !note.isTrashedInDatabase()).toList();
     Set<String> storedTitles = Set.copyOf(storedNotes.stream().map(Note::getTitle).toList());

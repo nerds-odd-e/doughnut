@@ -58,20 +58,19 @@ class NotebookGitProposalOrdinaryNoteApplication {
   void applyDeletions(
       NotebookGitProposalTreeShape.AdmittedShape admitted,
       List<ExportFolderRow> proposedFolders,
-      List<Note> proposedLiveNotes)
+      List<Note> proposedNotes)
       throws UnexpectedNoAccessRightException {
     for (NotebookGitProposalTreeShape.NoteChange noteChange : admitted.noteChanges()) {
       if (noteChange.kind() != NotebookGitProposalTreeShape.ChangeKind.DELETED) {
         continue;
       }
       Note deletedNote =
-          projection.requireOneLiveNoteAtPath(
-              proposedFolders, proposedLiveNotes, noteChange.path());
+          projection.requireOneNoteAtPath(proposedFolders, proposedNotes, noteChange.path());
       noteService.permanentlyRemove(
           deletedNote,
           NoteTrashReferenceHandling.LEAVE_DEAD_LINKS,
           authorizationService.getCurrentUser());
-      proposedLiveNotes.remove(deletedNote);
+      proposedNotes.remove(deletedNote);
     }
   }
 
@@ -80,7 +79,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
       List<ExportFolderRow> proposedFolders,
       Notebook notebook,
       NotebookGitProposalImporter.ImportedProposal proposal,
-      List<Note> proposedLiveNotes,
+      List<Note> proposedNotes,
       Timestamp publishedAt) {
     List<String> renameDestinations =
         admitted.noteChanges().stream()
@@ -96,17 +95,11 @@ class NotebookGitProposalOrdinaryNoteApplication {
         AuthoredNoteDocument document =
             noteAddition.readValidatedDocument(proposal, noteChange.path());
         Note changedNote =
-            projection.requireOneLiveNoteAtPath(
-                proposedFolders, proposedLiveNotes, noteChange.path());
+            projection.requireOneNoteAtPath(proposedFolders, proposedNotes, noteChange.path());
         authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.RENAMED) {
         applyRename(
-            proposedFolders,
-            destinationFolders,
-            proposal,
-            proposedLiveNotes,
-            noteChange,
-            publishedAt);
+            proposedFolders, destinationFolders, proposal, proposedNotes, noteChange, publishedAt);
       }
     }
     return renameDestinations.isEmpty()
@@ -118,10 +111,10 @@ class NotebookGitProposalOrdinaryNoteApplication {
       List<ExportFolderRow> folders,
       Map<String, Folder> destinationFolders,
       NotebookGitProposalImporter.ImportedProposal proposal,
-      List<Note> liveNotes,
+      List<Note> proposedNotes,
       NotebookGitProposalTreeShape.NoteChange noteChange,
       Timestamp publishedAt) {
-    Note note = projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.origin().path());
+    Note note = projection.requireOneNoteAtPath(folders, proposedNotes, noteChange.origin().path());
     String newTitle = filenameTitle.requireValid(noteChange.path());
     Folder destinationFolder =
         noteAddition.destinationFolder(destinationFolders, noteChange.path());

@@ -85,7 +85,7 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
     assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note relationship = notes.getFirst();
     assertThat(relationship.getTitle(), equalTo("A-related-to-B"));
@@ -127,7 +127,7 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
 
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(
         notes.stream().map(Note::getTitle).toList(),
         containsInAnyOrder("A", "B", "A-related-to-B"));
@@ -171,7 +171,7 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     Map<String, Note> byTitle =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .collect(Collectors.toMap(Note::getTitle, Function.identity()));
     NoteRealm shown = noteController.showNote(byTitle.get("Related"));
     WikiLink source = wikiLink(shown, "Z/First");
@@ -202,7 +202,7 @@ class NotebookGitProposalInitialRootRelationshipControllerTest
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     Note relationship =
         notes.stream().filter(note -> "Related".equals(note.getTitle())).findFirst().orElseThrow();
     NoteRealm shown = noteController.showNote(relationship);

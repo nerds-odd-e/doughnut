@@ -149,11 +149,10 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
         () -> {
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-          List<Note> liveNotes =
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-          assertThat(liveNotes, hasSize(3));
+          List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+          assertThat(storedNotes, hasSize(3));
           assertThat(
-              liveNotes.stream().map(Note::getId).toList(),
+              storedNotes.stream().map(Note::getId).toList(),
               containsInAnyOrder(moved.getId(), deleted.getId(), companion.getId()));
 
           Note reloadedMoved = noteRepository.findById(moved.getId()).orElseThrow();

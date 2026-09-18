@@ -133,8 +133,7 @@ class NotebookGitNoteCreationAtomicControllerTest
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           assertThat(countNotesForNotebook(notebook.getId()), is(originalNoteCount));
-          assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
+          assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(0));
           assertThat(
               countRowsForNotebook("note_creator", "note_id", notebook.getId()),
               is(originalCreatorCount));

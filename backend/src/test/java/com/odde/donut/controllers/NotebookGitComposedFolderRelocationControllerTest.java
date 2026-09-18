@@ -104,7 +104,7 @@ class NotebookGitComposedFolderRelocationControllerTest
     assertThat(archive.getParentFolderId(), nullValue());
     assertThat(folders.keySet(), containsInAnyOrder(archive.getId(), topics.getId(), sub.getId()));
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(
         notes.stream().map(Note::getId).toList(),
         containsInAnyOrder(

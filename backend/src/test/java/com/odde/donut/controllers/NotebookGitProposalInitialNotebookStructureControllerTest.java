@@ -62,7 +62,7 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
     assertThat(created.getName(), equalTo("New Folder"));
     assertThat(created.getParentFolderId(), nullValue());
     assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note createdNote = notes.getFirst();
     assertThat(createdNote.getTitle(), equalTo("First note"));
@@ -108,7 +108,7 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
     assertThat(created.getName(), equalTo("New Folder"));
     assertThat(created.getParentFolderId(), nullValue());
     assertThat(created.getReadmeContent(), equalTo(FOLDER_README));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note createdNote = notes.getFirst();
     assertThat(createdNote.getTitle(), equalTo("First note"));
@@ -170,7 +170,7 @@ class NotebookGitProposalInitialNotebookStructureControllerTest
 
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     assertThat(
         notes.getFirst().getContent(), equalTo("---\ntype: " + documentType + "\n---\nBody.\n"));

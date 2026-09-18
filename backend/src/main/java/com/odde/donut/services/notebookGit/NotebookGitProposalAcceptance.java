@@ -57,7 +57,7 @@ class NotebookGitProposalAcceptance {
     projection.requireMatchingAcceptedTree(
         reconciled.notebook(),
         reconciled.folders(),
-        reconciled.liveNotes(),
+        reconciled.storedNotes(),
         proposal.repository(),
         proposal.mainHead());
     return reconciled;
@@ -91,6 +91,6 @@ class NotebookGitProposalAcceptance {
         published.binding(),
         published.notebook(),
         folders.stream().filter(folder -> !removedIds.contains(folder.id())).toList(),
-        published.liveNotes());
+        published.storedNotes());
   }
 }

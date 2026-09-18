@@ -162,7 +162,7 @@ class NotebookGitProposalInitialPublicationRejectionControllerTest
             new PublicationFootprint(
                 notebookRepository.findById(notebook.getId()).orElseThrow().getReadmeContent(),
                 folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()),
-                noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()),
+                noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()),
                 rowsForNotebook(entityManager, notebook.getId())));
   }
 

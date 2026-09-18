@@ -98,8 +98,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
         () -> {
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-          assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
+          assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
           Note reloadedNote = noteRepository.findById(existing.getId()).orElseThrow();
           assertThat(reloadedNote.getContent(), is(existingContent));
           assertThat(reloadedNote.getUpdatedAt(), is(noteUpdatedAt));

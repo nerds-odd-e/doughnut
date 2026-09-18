@@ -178,17 +178,16 @@ public class NotebookGitProjection {
     }
   }
 
-  public Note requireOneLiveNoteAtPath(
-      List<ExportFolderRow> folders, List<Note> liveNotes, String changedPath) {
+  public Note requireOneNoteAtPath(
+      List<ExportFolderRow> folders, List<Note> notes, String changedPath) {
     Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
     List<Note> matches =
-        liveNotes.stream()
+        notes.stream()
             .filter(
                 note -> NotebookGitAcceptedTree.portablePath(note, folderById).equals(changedPath))
             .toList();
     if (matches.size() != 1) {
-      throw new IllegalStateException(
-          "Expected exactly one live Note at Portable path " + changedPath);
+      throw new IllegalStateException("Expected exactly one Note at Portable path " + changedPath);
     }
     return matches.getFirst();
   }
@@ -196,10 +195,10 @@ public class NotebookGitProjection {
   public void requireMatchingAcceptedTree(
       Notebook notebook,
       List<ExportFolderRow> folders,
-      List<Note> liveNotes,
+      List<Note> storedNotes,
       Repository repository,
       ObjectId acceptedHead) {
-    if (!matchesAcceptedTree(notebook, folders, liveNotes, repository, acceptedHead)) {
+    if (!matchesAcceptedTree(notebook, folders, storedNotes, repository, acceptedHead)) {
       throw projectionDrift();
     }
   }
@@ -207,12 +206,12 @@ public class NotebookGitProjection {
   public boolean matchesAcceptedTree(
       Notebook notebook,
       List<ExportFolderRow> folders,
-      List<Note> liveNotes,
+      List<Note> storedNotes,
       Repository repository,
       ObjectId acceptedHead) {
     List<PortableTreeEntry> currentEntries =
         PortableTreeSnapshot.build(
-            notebook.getReadmeContent(), folders, NotebookExportRows.notes(liveNotes));
+            notebook.getReadmeContent(), folders, NotebookExportRows.notes(storedNotes));
     return NotebookGitAcceptedTree.sorted(currentEntries)
         .equals(
             NotebookGitAcceptedTree.sorted(

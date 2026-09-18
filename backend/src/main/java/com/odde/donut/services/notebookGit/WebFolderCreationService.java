@@ -53,7 +53,7 @@ public class WebFolderCreationService {
           projection.matchesAcceptedTree(
               state.notebook(),
               state.folders(),
-              state.liveNotes(),
+              state.storedNotes(),
               accepted.repository(),
               accepted.mainHead());
       Folder folder = folderConstructionService.createFolder(state.notebook(), request);
@@ -65,7 +65,7 @@ public class WebFolderCreationService {
           PortableTreeSnapshot.build(
               state.notebook().getReadmeContent(),
               notebookGitStateLoader.foldersOf(state.notebook()),
-              NotebookExportRows.notes(state.liveNotes()));
+              NotebookExportRows.notes(state.storedNotes()));
       acceptedSnapshotPersistence.persist(
           accepted,
           entries,

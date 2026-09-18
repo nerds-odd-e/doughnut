@@ -101,9 +101,9 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(liveNotes, hasSize(1));
-    assertThat(liveNotes.getFirst().getId(), equalTo(retained.getId()));
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(storedNotes, hasSize(1));
+    assertThat(storedNotes.getFirst().getId(), equalTo(retained.getId()));
     // Both learned and unlearned deleted notes are permanently gone with their dependents.
     assertPermanentlyRemovedWithDependents(deletedA, deletedATracker);
     assertPermanentlyRemovedWithDependents(deletedB, null);
@@ -152,7 +152,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), empty());
     ResponseEntity<byte[]> downloaded =
         controller.downloadNotebookGitBundle(
             notebookRepository.findById(notebook.getId()).orElseThrow());
@@ -226,7 +226,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
     // The retained note and its container are intact.
     Note reloadedRetained = noteRepository.findById(retained.getId()).orElseThrow();
     assertThat(reloadedRetained.getContent(), equalTo(ORIGINAL_CONTENT));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
   }
 
   @Test

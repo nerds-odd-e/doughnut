@@ -58,7 +58,7 @@ class NotebookGitProposalInitialMixedTreeControllerTest
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(acceptedNotebook.getReadmeContent(), equalTo(NOTEBOOK_README));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     assertThat(notes.getFirst().getTitle(), equalTo("A"));
   }
@@ -115,7 +115,7 @@ class NotebookGitProposalInitialMixedTreeControllerTest
     }
     assertThat(folders, hasSize(expectedFolders.size()));
     assertThat(new TreeSet<>(pathsById.values()), equalTo(expectedFolders));
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     Map<String, String> conceptDocuments = new LinkedHashMap<>();
     for (Note note : notes) {
       String prefix = note.getFolder() == null ? "" : pathsById.get(note.getFolder().getId()) + "/";

@@ -78,13 +78,13 @@ public class WebNoteCreationService {
         return realm;
       }
 
-      List<Note> completeLiveNotes = new ArrayList<>(state.liveNotes());
-      completeLiveNotes.add(realm.getNote());
+      List<Note> proposedNotes = new ArrayList<>(state.storedNotes());
+      proposedNotes.add(realm.getNote());
       List<PortableTreeEntry> entries =
           PortableTreeSnapshot.build(
               state.notebook().getReadmeContent(),
               state.folders(),
-              NotebookExportRows.notes(completeLiveNotes));
+              NotebookExportRows.notes(proposedNotes));
       acceptedSnapshotPersistence.persist(
           accepted,
           entries,
@@ -101,7 +101,7 @@ public class WebNoteCreationService {
     return projection.matchesAcceptedTree(
         state.notebook(),
         state.folders(),
-        state.liveNotes(),
+        state.storedNotes(),
         accepted.repository(),
         accepted.mainHead());
   }

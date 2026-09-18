@@ -118,7 +118,7 @@ class NotebookGitWebCreatedNotePublicationControllerTest
     assertThat(retained.getRecallCount(), equalTo(1));
     assertThat(reloadedExisting.getId(), equalTo(existing.getId()));
     assertThat(reloadedExisting.getContent(), equalTo(EXISTING_CONTENT));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(2));
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(2));
     assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(2));
     Folder retainedChemistry = folderRepository.findById(chemistry.getId()).orElseThrow();
     assertThat(retainedChemistry.getReadmeContent(), nullValue());

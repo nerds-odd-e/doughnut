@@ -59,7 +59,7 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleCo
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(3));
     Map<String, String> additions = Map.of("Inertia", CREATED_CONTENT, "Momentum", SECOND_CONTENT);
     for (var addition : additions.entrySet()) {
@@ -125,8 +125,7 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleCo
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
 
-    Note created =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
+    Note created = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
     assertThat(created.getFolder().getId(), equalTo(nestedPhysics.getId()));
   }
 
@@ -144,6 +143,6 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleCo
             notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
 
     assertThat(exception.getReason(), containsString("differs from accepted main"));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), empty());
   }
 }

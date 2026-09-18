@@ -63,7 +63,7 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerT
     controller.publishNotebookGitProposal(
         notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(2));
     Note reloadedOriginal = noteRepository.findById(original.getId()).orElseThrow();
     Note copy =
@@ -111,9 +111,9 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerT
     controller.publishNotebookGitProposal(
         notebook.getId(), afterDeletion.getAcceptedGitObjectId(), additionProposal);
 
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(liveNotes, hasSize(1));
-    Note copy = liveNotes.getFirst();
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(storedNotes, hasSize(1));
+    Note copy = storedNotes.getFirst();
     NoteRealm copyView = noteController.showNote(copy);
     assertThat(copy.getTitle(), equalTo("Copy"));
     assertThat(copyView.getId(), not(equalTo(original.getId())));
@@ -156,9 +156,9 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerT
     controller.publishNotebookGitProposal(
         notebook.getId(), afterDeletion.getAcceptedGitObjectId(), recreationProposal);
 
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(liveNotes, hasSize(1));
-    Note recreated = liveNotes.getFirst();
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(storedNotes, hasSize(1));
+    Note recreated = storedNotes.getFirst();
     NoteRealm recreatedView = noteController.showNote(recreated);
     assertThat(recreated.getTitle(), equalTo("Original"));
     assertThat(recreatedView.getId(), not(equalTo(original.getId())));

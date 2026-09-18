@@ -143,7 +143,7 @@ class NotebookGitAdvisoryNamePublicationControllerTest extends NotebookGitBundle
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    Note created = liveNoteNamed(notebook, "A|B");
+    Note created = storedNoteNamed(notebook, "A|B");
     assertContentAndReferenceDestinations(created, target, pipeContent);
 
     byte[] downloaded =
@@ -153,7 +153,7 @@ class NotebookGitAdvisoryNamePublicationControllerTest extends NotebookGitBundle
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), downloaded);
     assertThat(reimportedHead, equalTo(publishedHead));
-    Note reimported = liveNoteNamed(notebook, "A|B");
+    Note reimported = storedNoteNamed(notebook, "A|B");
     assertThat(reimported.getId(), equalTo(created.getId()));
     assertContentAndReferenceDestinations(reimported, target, pipeContent);
 
@@ -177,7 +177,7 @@ class NotebookGitAdvisoryNamePublicationControllerTest extends NotebookGitBundle
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
-    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<Note> notes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(notes, hasSize(1));
     Note created = notes.getFirst();
     String displayName = filename.substring(0, filename.length() - ".md".length());
@@ -205,9 +205,9 @@ class NotebookGitAdvisoryNamePublicationControllerTest extends NotebookGitBundle
         .orElseThrow();
   }
 
-  private Note liveNoteNamed(Notebook notebook, String title) {
+  private Note storedNoteNamed(Notebook notebook, String title) {
     List<Note> matches =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .filter(note -> note.getTitle().equals(title))
             .toList();
     assertThat(matches, hasSize(1));

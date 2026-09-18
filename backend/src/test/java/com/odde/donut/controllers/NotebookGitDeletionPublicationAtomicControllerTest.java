@@ -121,11 +121,10 @@ class NotebookGitDeletionPublicationAtomicControllerTest
         () -> {
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-          List<Note> liveNotes =
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-          assertThat(liveNotes, hasSize(3));
+          List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+          assertThat(storedNotes, hasSize(3));
           assertThat(
-              liveNotes.stream().map(Note::getId).toList(),
+              storedNotes.stream().map(Note::getId).toList(),
               hasItems(deletedA.getId(), deletedB.getId(), retained.getId()));
           // The would-be-deleted notes were hard-deleted inside the publication transaction; the
           // binding-save failure rolled that back, so the rows survive.

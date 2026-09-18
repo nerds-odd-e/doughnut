@@ -123,12 +123,12 @@ public class WebNoteEditService {
   }
 
   /**
-   * Resolves the live note by id, preferring the locked notebooks' snapshots so callers running
+   * Resolves the stored note by id, preferring the locked notebooks' snapshots so callers running
    * inside {@link AcceptedWebChangeService#apply} mutate the same instance the projection compares
    * against.
    */
   Note resolveNoteWithinLockedNotebooksOrRepository(LockedNotebooks locked, Integer noteId) {
-    return locked.liveNote(noteId).orElseGet(() -> requireNote(noteId));
+    return locked.storedNote(noteId).orElseGet(() -> requireNote(noteId));
   }
 
   private Note requireNote(Integer noteId) {

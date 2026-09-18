@@ -51,8 +51,7 @@ class NotebookGitProposalAdditionValidationControllerTest
     inCommittedTransaction(
         transactionManager,
         () -> {
-          assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
+          assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
           assertThat(
               noteRepository.findById(existing.getId()).orElseThrow().getContent(),
               equalTo(VALID_CONTENT));
@@ -74,7 +73,7 @@ class NotebookGitProposalAdditionValidationControllerTest
 
     assertThat(exception.getReason(), containsString(path));
     assertThat(exception.getReason(), containsString(expectedReason));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+    assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), empty());
   }
 
   private static Stream<Arguments> invalidAdditions() {

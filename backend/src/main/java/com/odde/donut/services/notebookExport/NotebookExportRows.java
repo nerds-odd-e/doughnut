@@ -7,9 +7,9 @@ import com.odde.donut.entities.repositories.NoteRepository;
 import java.util.List;
 
 /**
- * Fetches a notebook's folders and live notes as the flat {@link ExportFolderRow} / {@link
- * ExportNoteRow} shapes shared by every consumer that builds a Portable-tree snapshot (ZIP export,
- * Git cutover, ...).
+ * Fetches a notebook's folders and stored notes, trash included, as the flat {@link
+ * ExportFolderRow} / {@link ExportNoteRow} shapes shared by every consumer that builds a
+ * Portable-tree snapshot (ZIP export, Git cutover, ...).
  */
 public final class NotebookExportRows {
 
@@ -26,7 +26,7 @@ public final class NotebookExportRows {
   }
 
   public static List<ExportNoteRow> notes(NoteRepository noteRepository, Notebook notebook) {
-    return notes(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()));
+    return notes(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()));
   }
 
   public static List<ExportNoteRow> notes(List<Note> notes) {

@@ -109,8 +109,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
       """)
   List<Integer> findLiveNoteFolderIdsByNotebookId(@Param("notebookId") Integer notebookId);
 
-  @Query(value = selectFromNote + " WHERE n.notebook.id = :notebookId" + " ORDER BY n.id ASC")
-  List<Note> findLiveNotesByNotebookIdOrderByIdAsc(@Param("notebookId") Integer notebookId);
+  List<Note> findAllByNotebookIdOrderByIdAsc(Integer notebookId);
 
   @Query(
       value =

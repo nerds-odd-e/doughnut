@@ -113,12 +113,12 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitBundleControl
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     assertThat(publishedHead, equalTo(tip.getName()));
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(liveNotes, hasSize(2));
+    List<Note> storedNotes = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(storedNotes, hasSize(2));
     Note renamed = noteRepository.findById(original.getId()).orElseThrow();
     assertThat(renamed.getTitle(), equalTo("Renamed"));
     assertThat(renamed.getContent(), equalTo(EDITED_CONTENT));
-    assertThat(noteByTitle(liveNotes, "Companion").getContent(), equalTo(COMPANION_EDITED));
+    assertThat(noteByTitle(storedNotes, "Companion").getContent(), equalTo(COMPANION_EDITED));
 
     MemoryTracker reloadedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
     assertThat(reloadedTracker.getNote().getId(), equalTo(original.getId()));

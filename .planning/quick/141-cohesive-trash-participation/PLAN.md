@@ -252,7 +252,7 @@ Execution record, 2026-09-18, from revision `4c9bf87f`:
 ### 3. Make the complete stored-note boundary explicit
 
 Type: Structure
-Status: planned
+Status: done
 Outcome: replace the misleading all-notes “live” query contract with an explicit
 stored-content contract across repository, export and Git snapshot consumers.
 
@@ -274,6 +274,36 @@ post-change refactor rule; do not turn a rename into unrelated decomposition.
 If compliance requires broad restructuring, return that scope/sizing concern
 before edits instead of hiding it in the rename.
 Safe stop: export/Git retain all stored files and the same accepted results.
+
+Execution record, 2026-09-18, from revision `b74ac26c`:
+
+- `NoteRepository.findLiveNotesByNotebookIdOrderByIdAsc` replaced by the derived
+  `findAllByNotebookIdOrderByIdAsc(Integer notebookId)`; same notebook scoping,
+  id ordering and trash inclusion, no annotation, no forwarding alias. Stored
+  and proposed meaning propagated: `LockedNotebookState.storedNotes`,
+  `NotebookGitStateLoader.storedNotesOf`, `LockedNotebooks.storedNote`,
+  `NotebookGitProjection.requireOneNoteAtPath` (collection-neutral: callers
+  pass proposed lists), `AcceptedWebChangeService.currentStoredNotes`,
+  `proposedNotes` in the publisher, ordinary-note application and web note
+  creation, and stored-note wording in the export and web-edit javadocs.
+  Production delta against `b74ac26c` after refactor and formatting: 15
+  files, +65/-79 (net -14, from reflowed shorter lines; the rename itself was
+  net -1). Refactor also renamed two tentative `notes` locals to
+  `proposedNotes`, a test helper and a test local to stored-note wording, and
+  fixed the stale symbol in `docs/notebook-publication-profiling.md`. Tests:
+  46 files, 45 pure renames; `NotebookExportControllerTest.exportsNotebookAsAttachmentZip`
+  now also creates a later-id root note, a `_trash/sub/Trashed.md` note and a
+  foreign-notebook note and asserts the exact ZIP entry order, observing
+  trash retention, id ordering and notebook scope through the controller.
+- Residual "live" symbols are only slice 4's occupancy names and the health
+  rules' locals. `NotebookGitProposalPublisher` was already 254 lines before
+  this slice and is unchanged in length; not decomposed under a rename.
+- Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` after
+  `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL`: BUILD SUCCESSFUL,
+  2479 tests, 0 failures. Mapped observations: the export test above,
+  `NotebookGitProposalFolderRelocationTrashRoundTripControllerTest`,
+  `NoteTrashRecoveryLearningPreferencesTest`, and the `NotebookGit*ControllerTest`
+  classes, all through real persistence.
 
 ### 4. Align folder occupancy and verify the aggregate simplification
 

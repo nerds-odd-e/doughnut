@@ -70,14 +70,14 @@ class NotebookGitProposalDocumentApplication {
                 .toList(),
             proposal);
     List<ExportFolderRow> folders = stateLoader.foldersOf(state.notebook());
-    List<Note> notes = new ArrayList<>(state.liveNotes());
+    List<Note> proposedNotes = new ArrayList<>(state.storedNotes());
     for (String path : conceptPaths) {
-      notes.add(
+      proposedNotes.add(
           noteAddition.apply(state.notebook(), materializedFolders, proposal, path, publishedAt));
     }
     entityPersister.flush();
     return new NotebookGitStateLoader.LockedNotebookState(
-        state.binding(), state.notebook(), folders, notes);
+        state.binding(), state.notebook(), folders, proposedNotes);
   }
 
   private void storeReadme(
