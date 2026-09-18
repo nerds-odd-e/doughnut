@@ -1,6 +1,6 @@
 # Folder ancestry stays inside one notebook, with one live representation
 
-Status: planned
+Status: in progress
 Source: [SEED-030 story 1](../../seeds/SEED-030-folder-ancestry-single-representation.md#1-publishing-notebook-4s-proposal-succeeds-and-folder-ancestry-has-one-representation).
 Authority: 2026-09-18 owner instruction, after the production diagnosis: follow
 containment, deliver the repair as an ungated SQL migration applied on release,
@@ -8,6 +8,15 @@ update this plan, refine if needed, then execute it.
 
 Baseline: `7259de0e50179c1a9e2d8065510dc2a8ce7d34ac` on `main` for the
 structural delta. The repair slice starts from current `main`.
+
+## Execution identity
+
+- Mode: Story Branch Mode.
+- Originating and integration checkout: `/Users/terryyin/git/doughnut`, branch
+  `main`, remote target `origin/main`. Claim commit `d551a74c90`.
+- Execution checkout: `.claude/worktrees/142-live-folder-ancestry-materialization`,
+  branch `142-live-folder-ancestry-materialization`, pushed to `origin` under
+  the same name.
 
 ## Repair goal and acceptance
 
@@ -165,7 +174,7 @@ boundary (`controller.publishNotebookGitProposal`):
 ### Slice 1 — Stray folder ancestry follows its containing notebook
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a bound notebook owns a folder whose parent belongs to another
 notebook, a note inside that folder, and a note placed directly in a folder of
@@ -193,6 +202,17 @@ Command:
 `unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL && CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*NotebookFollowsFolderContainmentMigrationTest*'`
 
 Safe stopping point: yes. The migration ships alone.
+
+Accepted proof (reusable while the migration file and test are unchanged):
+promise — a stray folder, the note inside it and a note placed directly in a
+foreign folder take the container's notebook, and their former notebook's plain
+note edit publishes instead of throwing `NullPointerException`. Boundary —
+`controller.publishNotebookGitProposal`, with the migration resource run through
+JDBC. Inspected in `NotebookFollowsFolderContainmentMigrationTest`: setup is
+`makeMe` rows plus native corruption and a snapshot; observations are the
+pre-migration `NullPointerException`, the four `notebook_id` assertions and the
+returned proposed head. Result: pass, and it fails on the stray folder's
+notebook id when the migration step is skipped.
 
 ### Slice 2 — Materialize folder ancestry from live folders
 
@@ -248,4 +268,6 @@ Safe stopping point: yes, once green and committed.
 
 ## Learnings
 
-None yet.
+- A notebook that **loses** stray rows publishes straight after the repair with
+  no drift: its accepted tree never held them. This matches the diagnosis. The
+  gaining notebook was not exercised here; story 2 owns it.
