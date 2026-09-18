@@ -13,11 +13,12 @@ import {
   dissolveFolderOnPage,
   dissolveParentLabelFromChain,
   moveFolderOnPage,
-  trashFolderOnPage,
+  removeFolderOnPage,
 } from "@/composables/folderAdminMutations"
+import { folderRemovalOffer } from "@/composables/folderRemovalOffer"
 
 /**
- * Move / dissolve admin state for the folder Settings tab.
+ * Move / dissolve / removal admin state for the folder Settings tab.
  */
 export function useFolderAdmin(
   folderRealm: Ref<FolderRealm>,
@@ -29,7 +30,7 @@ export function useFolderAdmin(
   const processing = ref(false)
   const moveError = ref<string | undefined>(undefined)
   const dissolveError = ref<string | undefined>(undefined)
-  const trashError = ref<string | undefined>(undefined)
+  const removalError = ref<string | undefined>(undefined)
   const selectedParentFolder = ref<Folder | null>(null)
   const destinationCatalogItems = ref<NotebookCatalogEntry[] | undefined>(
     undefined
@@ -186,19 +187,19 @@ export function useFolderAdmin(
     }
   }
 
-  const trash = async () => {
-    const r = folderRealm.value
+  const removalOffer = computed(() => folderRemovalOffer(folderRealm.value))
+
+  const removeFolder = async () => {
     if (processing.value) return
-    const ok = await popups.confirm(
-      `Trash folder "${r.folder.name}"? Its complete subtree will leave active use. References remain authored but may no longer resolve until you recover the folder with Move.`
-    )
-    if (!ok) return
+    const offer = removalOffer.value
+    if (!(await popups.confirm(offer.confirmation))) return
     processing.value = true
     try {
-      await trashFolderOnPage({
-        folderRealm: r,
+      await removeFolderOnPage({
+        folderRealm: folderRealm.value,
         router,
-        trashError,
+        offer,
+        removalError,
       })
     } finally {
       processing.value = false
@@ -209,7 +210,8 @@ export function useFolderAdmin(
     processing,
     moveError,
     dissolveError,
-    trashError,
+    removalError,
+    removalOffer,
     selectedParentFolder,
     destinationNotebooks,
     notebooksLoading,
@@ -221,6 +223,6 @@ export function useFolderAdmin(
     dissolveParentLabel,
     submitMove,
     dissolve,
-    trash,
+    removeFolder,
   }
 }

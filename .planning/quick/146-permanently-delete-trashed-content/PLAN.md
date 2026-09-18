@@ -1,6 +1,6 @@
 # Permanently delete trashed notes and folders
 
-Status: in progress
+Status: done
 Source: [SEED-034 story 1](../../seeds/SEED-034-permanently-delete-trashed-content.md#story-1).
 Authority: 2026-09-18 owner instruction to refine the story, write a slice plan
 and refine it if needed. Planning only. This plan does not authorize execution
@@ -240,7 +240,7 @@ Safe stopping point: yes.
 ### Slice 4 — A trashed folder's settings offer Permanently delete behind a confirmation
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: the owner opens the settings of a folder that is in trash → where an
 active folder shows "Trash folder", a "Permanently delete folder" button is
@@ -421,3 +421,39 @@ above.
   `FolderMoveRelocation`, `FolderConstructionService` and `NoteConstructionService`;
   and `renameFolder` / `dissolveFolder` do not go through the accepted-web-change lock
   while move, trash and permanent delete do — a product question, not a refactoring one.
+
+### Slice 4
+
+- Delivered: the folder Settings tab offers exactly one removal — Trash while the
+  folder is active, **Permanently delete folder** once it is in trash — behind a
+  confirmation, landing on the parent folder page or, for `_trash` itself, the
+  notebook page.
+- `routeAfterFolderRemoval` needed no change for the `_trash` root: a notebook-root
+  folder arrives with empty `ancestorFolders`, which that function already routes to
+  `notebookPage`. The slice-3 concern closed without production code, and a test now
+  pins it through this caller.
+- Accepted proof: E2E scenario "Permanently delete a folder that is in trash" in
+  `e2e_test/features/folder_organization/folder_trash.feature` (3 scenarios passing),
+  seeded under `_trash/Biology`, `_trash/Biology/Nested` and `_trash/Chemistry`, and
+  `frontend/tests/pages/FolderPage.permanentlyDelete.spec.ts` (4 tests) for the
+  wording, the cancel path, both routing destinations, and the absence of the button
+  on an active folder.
+- Refactor introduced `composables/folderRemovalOffer.ts`: one offer per folder state
+  carrying test id, label, description, confirmation, failure message and request.
+  The trashed/active choice was being spelled in three places (two template blocks,
+  two composable actions, two mutation wrappers); it is now one. `folderAdminMutations.ts`
+  had crossed the 250-line rule at 251 lines during the slice and is back to 218.
+  `utils/folderTrash.isFolderRealmInTrash` joins `isNoteRealmInTrash`, both over
+  `isLocationInTrash`, so ADR 0004 case-insensitivity still has a single home.
+- Copy change: the settings paragraph for permanent deletion now reads "Permanently
+  delete folder ..." rather than "Permanently delete ...", because the paragraph and
+  the confirmation are composed from one subject. The confirmation text is unchanged.
+- **Open owner question:** the Trash description and confirmation state the same thing
+  in two different wordings, now adjacent in `folderRemovalOffer.ts`. Unifying them is
+  a one-line change but alters user-visible copy on a flow this story does not own.
+- The note flow and the folder flow were assessed for a shared seam and deliberately
+  left separate: what they share (`refreshSidebarStructuralListings`, `popups.confirm`,
+  `apiCallWithLoading`) already has one home each, while the note flow's content-mutation
+  flush, realm cache eviction and blocking-loading wrapper have no folder counterpart.
+  The rule that *is* shared — trashed state selects the single removal a surface offers,
+  with its label and action — now has one place on each side.

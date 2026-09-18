@@ -58,26 +58,20 @@
           </fieldset>
         </form>
         <div class="daisy-divider my-4">or</div>
-        <template v-if="!folderIsTrashed">
-          <p class="text-sm mb-2">
-            Trash "{{ folderRealm.folder.name }}" with its complete subtree.
-            Its contents leave active use. References remain authored, but may no
-            longer resolve until the folder is recovered with Move.
-          </p>
-          <p v-if="trashError" class="text-error text-sm mt-2">
-            {{ trashError }}
-          </p>
-          <button
-            type="button"
-            class="daisy-btn daisy-btn-error daisy-btn-outline"
-            data-testid="folder-trash-button"
-            :disabled="processing"
-            @click="() => trash()"
-          >
-            Trash folder
-          </button>
-          <div class="daisy-divider my-4">or</div>
-        </template>
+        <p class="text-sm mb-2">{{ removalOffer.description }}</p>
+        <p v-if="removalError" class="text-error text-sm mt-2">
+          {{ removalError }}
+        </p>
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-error daisy-btn-outline"
+          :data-testid="removalOffer.testId"
+          :disabled="processing"
+          @click="() => removeFolder()"
+        >
+          {{ removalOffer.buttonLabel }}
+        </button>
+        <div class="daisy-divider my-4">or</div>
         <p class="text-sm mb-2">
           Dissolve "{{ folderRealm.folder.name }}". Notes and subfolders will move
           to {{ dissolveParentLabel }}.
@@ -101,28 +95,21 @@
 
 <script setup lang="ts">
 import type { FolderRealm } from "@generated/donut-backend-api"
-import { computed, toRef } from "vue"
+import { toRef } from "vue"
 import FolderSelector from "@/components/notes/FolderSelector.vue"
 import { useFolderAdmin } from "@/composables/useFolderAdmin"
-import { isLocationInTrash } from "@/utils/folderTrash"
 
 const props = defineProps<{
   folderRealm: FolderRealm
   fetchFolderPage: () => Promise<void>
 }>()
 
-const folderIsTrashed = computed(() =>
-  isLocationInTrash(
-    props.folderRealm.ancestorFolders ?? [],
-    props.folderRealm.folder
-  )
-)
-
 const {
   processing,
   moveError,
   dissolveError,
-  trashError,
+  removalError,
+  removalOffer,
   selectedParentFolder,
   destinationNotebooks,
   notebooksLoading,
@@ -134,6 +121,6 @@ const {
   dissolveParentLabel,
   submitMove,
   dissolve,
-  trash,
+  removeFolder,
 } = useFolderAdmin(toRef(props, "folderRealm"), props.fetchFolderPage)
 </script>

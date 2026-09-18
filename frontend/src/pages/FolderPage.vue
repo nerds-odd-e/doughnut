@@ -69,7 +69,7 @@ import ReadmeSettingsTabs, {
 } from "@/components/commons/ReadmeSettingsTabs.vue"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { isLocationInTrash } from "@/utils/folderTrash"
+import { isFolderRealmInTrash } from "@/utils/folderTrash"
 
 const props = defineProps<{
   folderRealm: FolderRealm | undefined
@@ -83,10 +83,7 @@ const folderForView = computed((): FolderRealm | undefined => {
 })
 
 const folderIsTrashed = computed(() =>
-  isLocationInTrash(
-    folderForView.value?.ancestorFolders ?? [],
-    folderForView.value?.folder
-  )
+  isFolderRealmInTrash(folderForView.value)
 )
 
 const activeTab = ref<ReadmeSettingsTab>("readme")

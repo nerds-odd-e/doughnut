@@ -17,6 +17,7 @@ export type FolderOrganizeForm = {
   dissolveFolder: () => void
   dissolveFolderWithMerge: () => void
   trashFolder: () => void
+  permanentlyDeleteFolder: () => void
 }
 
 /**
@@ -108,6 +109,16 @@ export function assumeFolderOrganizeForm(): FolderOrganizeForm {
 
     trashFolder() {
       cy.get('[data-testid="folder-trash-button"]', {
+        timeout: submitTimeoutMs,
+      })
+        .should('not.be.disabled')
+        .click()
+      clickPopupConfirmOk()
+      waitUntilAppIsNotBusy()
+    },
+
+    permanentlyDeleteFolder() {
+      cy.get('[data-testid="folder-permanent-delete-button"]', {
         timeout: submitTimeoutMs,
       })
         .should('not.be.disabled')
