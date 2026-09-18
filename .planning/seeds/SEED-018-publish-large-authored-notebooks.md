@@ -97,6 +97,11 @@ Stories below are in priority order; stable story numbers retain their identity.
   result's order of magnitude. Do not use the earlier 73% flush share to claim
   index rebuilding is still dominant. The historical 1,000-existing /
   10,000-addition captures remain unmeasured against these improvements.
+  Since migration `V300000331` the per-notebook title lookup behind
+  `LOWER(n.title)` queries is a one-row index hit (it scanned the whole
+  notebook before, because MySQL rewrites `lower(title)` to the generated
+  `title_uniqueness_key` column); re-profile before attributing any cost to
+  title lookups.
   **Hypothesis for this round (unvalidated):** if the 10,000-note run again
   shows a flush-dominated per-note query as the leading cost, the same
   `EntityPersister`/`FlushModeType.COMMIT`-on-read pattern used for the title

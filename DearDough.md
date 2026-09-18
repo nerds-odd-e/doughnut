@@ -437,8 +437,46 @@ untriggered CLI guard.
     may traverse a project-standard symlink), since this project's own setup
     deliberately creates that exact symlink in every checkout.
 
+## DD-069 — Slice plan scheduled dropping a column that an earlier migration had already removed, because schema facts were read from the baseline DDL text
+
+The SEED-026 refinement and plan 139 stated that
+`note_property_index.target_note_id` was an unmapped leftover column and
+slice 1 included `DROP FOREIGN KEY fk_note_property_index_target_note, DROP
+INDEX idx_note_property_index_target_note, DROP COLUMN target_note_id`. That
+column, index, and constraint exist only in the text of
+`V100000000__baseline.sql`; migration
+`V300000315__replace_note_property_index_target_note_with_authored_reference.sql`
+had already replaced them, and no local database (dev and test at Flyway
+version 300000330, plus every worktree schema) had the column. The
+`db-migration` skill describes the baseline as "the current full application
+DDL", which invites reading it as the live schema even though later
+migrations alter it. Had the slice been delegated as written, the migration
+would have failed on the first test-DB migrate.
+
+### Occurrences
+
+- Execution: SEED-026 story 1 / quick/139-fast-assimilation-queue
+  - Timestamp: 2026-09-18T08:03:57+08:00 (plan commit `a9f1dd3582`);
+    detected 2026-09-18 at about 08:12+08:00 before slice 1 delegation
+  - Tool: Claude Code
+  - Model: claude-fable-5-1
+  - Open Dough release: unknown
+  - Evidence: plan 139 slice 1 "Internal change" block in commit
+    `a9f1dd3582`; `V300000315__replace_note_property_index_target_note_with_authored_reference.sql`;
+    coordinator `information_schema.columns` query for
+    `note_property_index.target_note_id` returning no rows across all
+    schemas; plan Learnings entry dated 2026-09-18 recording the reduction.
+  - Observed effect: the coordinator caught it with one schema query while
+    resolving the ERD proof and reduced slice 1 to the index swap; cost was
+    one plan refinement, no failed delegation.
+  - Inference: refinement and slice planning should confirm a schema fact
+    against the migration chain (grep all migrations for the object) or
+    `information_schema` on a migrated database, not the baseline file; the
+    `db-migration` skill wording could say the baseline is the DDL at squash
+    time and later migrations supersede it.
+
 ## Retention
 
-- Highest allocated local number: 68
+- Highest allocated local number: 69
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial

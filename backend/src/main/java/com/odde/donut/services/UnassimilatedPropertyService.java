@@ -31,6 +31,10 @@ public class UnassimilatedPropertyService {
     this.notePropertyIndexService = notePropertyIndexService;
   }
 
+  /**
+   * Counts every property family without a tracker, including families whose references are still
+   * gated: they are unassimilated, merely not yet offerable. Counting never resolves references.
+   */
   public int countUnassimilatedPropertiesForUser(User user) {
     return notePropertyIndexRepository.countUnassimilatedPropertiesForOwnership(
         user.getId(), user.getOwnership().getId());
