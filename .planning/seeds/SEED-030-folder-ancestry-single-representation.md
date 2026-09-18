@@ -1,6 +1,6 @@
 ---
 id: SEED-030
-status: refined
+status: dormant
 planted: 2026-09-18
 planted_during: Portable-path representation repair after a publication NullPointerException
 trigger_when: a notebook owner cannot publish, or a publication reorganizes folders while placing content
@@ -9,12 +9,11 @@ scope: M
 
 # SEED-030: Folder ancestry during publication
 
-> Story 1 is delivered. Its plan, diagnosis and evidence are recoverable from
-> commit `92af81eadab9b509ffcdf5d1f0c52e51516c3aaf`
-> (`.planning/seeds/SEED-030-folder-ancestry-single-representation.md` and
-> `.planning/quick/142-live-folder-ancestry-materialization/PLAN.md`).
-> Story 2 is refined and planned in
-> [145-reset-notebook-git-history](../quick/145-reset-notebook-git-history/PLAN.md).
+> Both planned stories are delivered. Their plans, diagnoses and evidence are
+> recoverable from commit `92af81eadab9b509ffcdf5d1f0c52e51516c3aaf`
+> (`.planning/quick/142-live-folder-ancestry-materialization/PLAN.md`) and
+> commit `feac68c8b7befc601392278b6154408cfc274724`
+> (`.planning/quick/145-reset-notebook-git-history/PLAN.md`).
 
 ## Why This Matters
 
@@ -27,6 +26,11 @@ those rows were never in any accepted Git tree, clone or export.
 `V300000333__notebook_follows_folder_containment.sql` repairs the rows by
 containment: every folder takes its root ancestor's notebook and every note
 takes its folder's. It is ungated and applies with the next release.
+
+A notebook that gains repaired rows holds live content its accepted Git tree
+lacks, so publication answers 409 projection drift until its history is reset.
+Resetting a notebook's Git history from the notebook settings is the recovery
+path, and it is allowed in any state, drifted or not.
 
 ## Production rows the repair moves
 
@@ -42,72 +46,25 @@ Read-only queries, 2026-09-18 07:27 UTC. Ids only; this repository is public.
 All seven notebooks have a Git binding. The owner accepted the visibility
 change for pairs 12→4 and 4→26.
 
-## Story Decomposition
+## Open acceptance work
 
-### 2. Notebooks that gained repaired content can publish again
+- Once the release carrying the reset button reaches production, the owner
+  resets notebooks 4, 26 and 191 from the notebook settings. Notebook 309 is
+  its own owner's to reset. No data is lost: the reset snapshots the entire
+  current notebook, including web edits made meanwhile.
+- `NotebookFollowsFolderContainmentMigrationTest` is migration-only. Remove it
+  after production has applied `V300000333`.
 
-**Executable plan:**
-[145-reset-notebook-git-history](../quick/145-reset-notebook-git-history/PLAN.md).
+## Deferred, owner direction, not planned
 
-After the repair migration, production notebooks 4, 26, 191 and 309 hold live
-content their accepted Git trees lack. `requireMatchingAcceptedTree` answers
-409 projection drift, and `AcceptedWebChangeService` commits nothing for a
-notebook that did not match before a change, so web changes stop reaching Git.
-No recovery path exists. A test confirmed the 409 for a gaining notebook.
-
-**Owner decision, 2026-09-18:** recover by resetting, not by appending. The
-owner expects resets to be needed more often than is known today, because
-information not yet in the Portable format may have to enter it later.
-
-- **Goal:** someone who can edit a notebook can reset its Git history from the
-  notebook settings. The accepted history is replaced by one initial commit of
-  the entire current notebook, so the notebook can be cloned and published
-  again whatever state its history was in.
-- **Scope:** one reset operation, its endpoint, and a settings button guarded
-  by a warning. Reset is allowed in any state, drifted or not. It reuses the
-  snapshot replacement that today exists only for test fixtures.
-- **Key examples:**
-  - A notebook holds a note its accepted history lacks, and publishing a plain
-    edit is refused as projection drift. After a reset the accepted history is
-    a single parentless commit whose tree equals the current notebook,
-    including that note, and the same kind of edit publishes on top of it.
-  - From the notebook settings the owner presses "Reset Git history", reads a
-    warning that the history is discarded and existing clones must be cloned
-    again, and confirms. A fresh `donut notebook clone` then contains the whole
-    notebook in one commit. Cancelling the warning changes nothing.
-  - Any member of the circle that owns a notebook can reset it.
-- **Rejection constraint:** a user who cannot edit the notebook is refused and
-  the accepted history is unchanged.
-- **Already true, reused:** a clone made before the reset no longer shares
-  history. `donut notebook pull` already answers that the checkout does not
-  share Git history and says to clone again
-  (`cli/tests/notebookPull.localCandidate.suite.ts`). No CLI change.
-- **Deferred, owner direction, not in scope:**
-  - Reconciling an existing clone that has unpublished commits with the new
-    initial commit. Git can replay those commits onto the new root.
-  - When a Portable-format change drifts every notebook at once, refusing to
-    clone a drifted notebook with a message that says to reset its Git history
-    first.
-  - Any admin reset of another user's notebook. Notebook 309's owner resets it.
-- **Stated exception:** the Proposed ADR 0002 says v1 rejects deletion or
-  rewind of accepted `main`, and the backlog direction calls history
-  append-only. The owner chose this reset knowingly and left that text as is.
-- **Refinement evidence, 2026-09-18:**
-  - `NotebookGitCutoverService.resnapshotForTestability` already replaces a
-    binding with a fresh parentless snapshot. It reads the binding without the
-    writer lock that download and publish take.
-  - The settings page already has a confirm-then-call pattern: "reset index".
-  - Nothing reports drift today, so whether other production notebooks are
-    already drifted is unknown.
-- **Effort hypothesis:** S.
-- **Release, owner decision 2026-09-18:** this story does not block the release
-  that carries `V300000333__notebook_follows_folder_containment.sql`. Until
-  this story ships and each notebook is reset, notebooks 4, 26, 191 and 309
-  refuse publication with 409 projection drift. No data is lost: the reset
-  snapshots the entire current notebook, including web edits made meanwhile.
-  Once the button is released the owner resets notebooks 4, 26 and 191.
-- **Carried obligation:** `NotebookFollowsFolderContainmentMigrationTest` is
-  migration-only. Remove it after production has applied `V300000333`.
+- Reconciling an existing clone that has unpublished commits with the new
+  initial commit. Git can replay those commits onto the new root.
+- When a Portable-format change drifts every notebook at once, refusing to
+  clone a drifted notebook with a message that says to reset its Git history
+  first. The owner expects resets to be needed more often than is known today,
+  because information not yet in the Portable format may have to enter it
+  later, which raises this item's value.
+- Any admin reset of another user's notebook.
 
 ## Known residue, not planned
 
@@ -119,8 +76,19 @@ information not yet in the Portable format may have to enter it later.
 - The folder rows on the state passed into
   `NotebookGitProposalDocumentApplication.apply` are unused input, since `apply`
   re-reads them. Dropping them changes `LockedNotebookState`'s shape.
+- The Proposed ADR 0002 says v1 rejects deletion or rewind of accepted `main`,
+  and the backlog's near-future direction calls Git history append-only. The
+  owner chose the reset knowingly as an exception and left both texts as they
+  are; whoever accepts ADR 0002 decides whether to record the exception or
+  change the rule.
+- `CUTOVER_COMMIT_MESSAGE` ("Cutover: snapshot existing notebook content into
+  Git") is now inaccurate at its only remaining call site, notebook creation,
+  where there is no existing content, and "cutover" in
+  `NotebookGitCutoverService`'s name no longer describes a class that also
+  owns history reset. No test asserts either commit message.
 
 ## When to Surface
 
-Next in the queue after the release that applies the containment repair, so the
-drifted notebooks can publish again.
+When a publication reorganizes folders while placing content, when a notebook
+owner cannot publish, or when a Portable-format change drifts notebooks widely
+enough to need the deferred clone-refusal message.

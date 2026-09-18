@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 import { form } from '../forms'
 import bookReadingPage from './bookReadingPage'
 import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
@@ -106,6 +107,17 @@ const notebookPage = () => {
           ).should('be.visible')
         }
       )
+      return this
+    },
+
+    resetGitHistory() {
+      openSettingsTab()
+      cy.get('[data-testid="notebook-settings-reset-git-history"]').click()
+      cy.get('dialog')
+        .filter(':visible')
+        .should('contain.text', 'permanently discarded')
+      clickPopupConfirmOk()
+      waitUntilAppIsNotBusy()
       return this
     },
 

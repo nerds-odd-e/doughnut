@@ -918,6 +918,21 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/reset-git-history:
+    post:
+      tags:
+      - notebook-controller
+      summary: Restart the notebook's Git history from its current content
+      operationId: resetNotebookGitHistory
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/health/lint:
     post:
       tags:
