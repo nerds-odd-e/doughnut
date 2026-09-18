@@ -302,7 +302,7 @@ collapse. Full backend suite: `BUILD SUCCESSFUL`, no failures.
 
 ### 4. Local note construction and optional enrichment retain distinct responsibilities
 Type: Structure
-Status: planned
+Status: done
 
 Structure: expose the existing synchronous construction capability in
 `NoteConstructionService` while keeping optional external enrichment distinct.
@@ -331,6 +331,22 @@ one preservation proof loop. If preserving ordering requires a larger redesign,
 stop and refine rather than invent a general construction pipeline.
 Safe stop: ordinary and enriched construction keep their behavior, and the
 synchronous entry already has its real caller; Git consolidation remains pending.
+
+Result: `NoteConstructionService` split into private `buildNote` (create +
+folder resolution + initial content) and `finalizeAndRespond` (flush, refresh,
+image cleanup, reference indexing, response), shared by a new synchronous
+`createRootNote` and the existing `createRootNoteWithWikidataService`; the old
+`attachWikidataAndRefresh` is gone, no core constructor duplicated. Both of
+`WebNoteCreationService`'s ordinary-branch call sites (guarded upstream by
+`wikidataIdWithApi != null || !NoteConceptType.isOrdinary(...)`) now call the
+synchronous entry; the enriched branch and all Git/accepted-change coordination
+are untouched, left for slice 5. No new test needed — behavior-preserving
+extraction, existing ordinary and Wikidata-enriched controller coverage both
+still pass unchanged. Refactor pass found naming/cohesion, dead code, and
+symmetry already clean; flagged an unrelated pre-existing duplication in
+`createNoteFromExtractedSuggestion`/`AuthoredNoteDocumentPersistence` for a
+future pass, not acted on here. Full backend suite: `BUILD SUCCESSFUL`, no
+failures.
 
 ### 5. Ordinary-note creation shares the same accepted-change owner
 Type: Structure

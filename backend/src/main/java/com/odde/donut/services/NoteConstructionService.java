@@ -70,29 +70,12 @@ public class NoteConstructionService {
     note.replaceContent(document);
   }
 
-  private Note attachWikidataAndRefresh(Note note, WikidataIdWithApi wikidataIdWithApi)
-      throws IOException, InterruptedException {
-    if (wikidataIdWithApi != null) {
-      wikidataIdWithApi
-          .fetchWikidataDescription()
-          .ifPresent(description -> prependAndPersistWikidataDescription(note, description));
-    }
-    entityPersister.flush();
-    entityPersister.refresh(note);
-    return note;
-  }
-
   private void prependAndPersistWikidataDescription(Note note, String description) {
     applyContent(note, NoteLeadingFrontmatter.prependToBody(note.getContent(), description));
     entityPersister.save(note);
   }
 
-  public NoteRealm createRootNoteWithWikidataService(
-      Notebook notebook,
-      NoteCreationDTO noteCreation,
-      User user,
-      WikidataIdWithApi wikidataIdWithApi)
-      throws InterruptedException, IOException {
+  private Note buildNote(Notebook notebook, NoteCreationDTO noteCreation) {
     Folder folder = null;
     if (noteCreation.getFolderId() != null) {
       folder =
@@ -108,10 +91,37 @@ public class NoteConstructionService {
     if (noteCreation.getContent() != null) {
       persistNoteContent(note, noteCreation.getContent());
     }
-    note = attachWikidataAndRefresh(note, wikidataIdWithApi);
+    return note;
+  }
+
+  /** Final refresh, image cleanup, reference indexing and response construction. */
+  private NoteRealm finalizeAndRespond(Note note, User user) {
+    entityPersister.flush();
+    entityPersister.refresh(note);
     noteService.deleteOrphanImagesForPersistedContent(note);
     noteReferenceService.refreshDerivedIndexesForNote(note);
     return noteRealmService.build(note, user);
+  }
+
+  /** Synchronous construction: no external enrichment, so no IO/interruption contract. */
+  public NoteRealm createRootNote(Notebook notebook, NoteCreationDTO noteCreation, User user) {
+    Note note = buildNote(notebook, noteCreation);
+    return finalizeAndRespond(note, user);
+  }
+
+  public NoteRealm createRootNoteWithWikidataService(
+      Notebook notebook,
+      NoteCreationDTO noteCreation,
+      User user,
+      WikidataIdWithApi wikidataIdWithApi)
+      throws InterruptedException, IOException {
+    Note note = buildNote(notebook, noteCreation);
+    if (wikidataIdWithApi != null) {
+      wikidataIdWithApi
+          .fetchWikidataDescription()
+          .ifPresent(description -> prependAndPersistWikidataDescription(note, description));
+    }
+    return finalizeAndRespond(note, user);
   }
 
   public NoteRealm createNoteFromExtractedSuggestion(

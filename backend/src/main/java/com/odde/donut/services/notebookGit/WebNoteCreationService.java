@@ -52,8 +52,7 @@ public class WebNoteCreationService {
     }
     var lockedState = notebookGitStateLoader.findByNotebookIdForUpdate(notebook.getId());
     if (lockedState.isEmpty()) {
-      return noteConstructionService.createRootNoteWithWikidataService(
-          notebook, noteCreation, user, wikidataIdWithApi);
+      return noteConstructionService.createRootNote(notebook, noteCreation, user);
     }
 
     NotebookGitStateLoader.LockedNotebookState state = lockedState.orElseThrow();
@@ -72,8 +71,7 @@ public class WebNoteCreationService {
                   accepted.repository(),
                   accepted.mainHead());
       NoteRealm realm =
-          noteConstructionService.createRootNoteWithWikidataService(
-              state.notebook(), noteCreation, user, wikidataIdWithApi);
+          noteConstructionService.createRootNote(state.notebook(), noteCreation, user);
       if (!eligible) {
         return realm;
       }
