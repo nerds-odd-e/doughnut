@@ -11,6 +11,6 @@ either the remote or local repository may be multiple commits behind.
 
 ## Backlog list
 
-- [A publication that reparents a folder still places content correctly under it](seeds/SEED-030-folder-ancestry-single-representation.md#1-a-publication-that-reparents-a-folder-still-places-content-correctly-under-it) — SEED-030, planned: [142-live-folder-ancestry-materialization](quick/142-live-folder-ancestry-materialization/PLAN.md)
+- [Publishing notebook 4's proposal succeeds, and folder ancestry has one representation](seeds/SEED-030-folder-ancestry-single-representation.md#1-publishing-notebook-4s-proposal-succeeds-and-folder-ancestry-has-one-representation) — SEED-030
 - [Validate publication performance at 10,000-note scale](seeds/SEED-018-publish-large-authored-notebooks.md#story-4) — SEED-018
 - [Delete a Failure report without leaving its GitHub issue open](seeds/SEED-031-delete-failure-report-github-issue.md#story-1) — SEED-031

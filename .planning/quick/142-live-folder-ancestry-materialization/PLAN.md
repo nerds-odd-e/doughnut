@@ -1,15 +1,18 @@
 # Live folder ancestry during materialization
 
 Status: planned
-Source: [SEED-030 story 1](../../seeds/SEED-030-folder-ancestry-single-representation.md#1-a-publication-that-reparents-a-folder-still-places-content-correctly-under-it).
+Source: [SEED-030 story 1](../../seeds/SEED-030-folder-ancestry-single-representation.md#1-publishing-notebook-4s-proposal-succeeds-and-folder-ancestry-has-one-representation).
+This plan covers only the **structural half** of that story. The story also
+carries an unresolved production failure the owner still reports; diagnosing
+it is not planned here.
 Authority: 2026-09-18 owner request to refine the first backlog item and, if
 scope is clear, write a slice plan. Planning only — this plan does not
 authorize execution.
 
 Baseline: `7259de0e50179c1a9e2d8065510dc2a8ce7d34ac` on `main`.
-Note: an unrelated uncommitted edit to
-`docs/adrs/0002-git-native-portable-notebook-synchronization.md` is awaiting
-owner review in the working tree. It is not part of this plan; preserve it.
+Note: a short ADR 0002 addition stating this constraint is committed but
+**unpushed**, bundled into another session's commit `f31cf631ee`. Not part of
+this plan; the owner has not yet accepted it.
 
 ## Goal and acceptance
 
@@ -60,7 +63,7 @@ beforehand — `NotebookGitProposalFolderRelocation` returns state carrying
 `foldersOf(...)` after reparenting, `NotebookGitProposalDocumentApplication`
 re-reads after materializing, and only `applyDeletions` (notes only) runs in
 between. Loading inside is therefore never less current than what is passed
-today. Slice 1 establishes that claim as a test before slice 2 relies on it.
+today, and the existing relocation test below already demonstrates it.
 
 `folders` locals at the call sites are **not** all dead: in
 `NotebookGitProposalFolderRelocation` the same local still feeds
@@ -73,10 +76,10 @@ removed. Remove a local only where it genuinely becomes unused.
 ADR 0002 — Git-native Portable notebook tree synchronization, *Apply one final
 projection atomically*: the single final application is mutating, and Portable
 paths it resolves must come from live entity state. This plan brings the last
-known materialization path into line with that constraint. (The ADR text
-stating this explicitly is the uncommitted edit awaiting owner review; the
-constraint is treated here as the direction already delivered for note paths,
-not as an accepted rule.)
+known materialization path into line with that constraint. The ADR text
+stating it explicitly is drafted but unaccepted, so treat the constraint as the
+direction already delivered for note paths in `83a7434798`, not as an accepted
+rule.
 
 ## Outside-in proof
 
@@ -152,7 +155,7 @@ Safe stopping point: yes, once green and committed.
   `parentFolder` chain initializes. If a caller outside a transaction is found,
   stop for human judgment rather than adding a guard (ADR 0006: fail loudly).
 - Nothing publication accepts today may stop being accepted. A scenario failing
-  after slice 2 is a regression, not a new constraint.
+  after slice 1 is a regression, not a new constraint.
 
 ## Learnings
 
