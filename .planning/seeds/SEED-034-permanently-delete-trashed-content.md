@@ -30,9 +30,11 @@ bulk trash-management screen is unnecessary for this selected outcome.
 
 - **Goal / beneficiary:** A notebook owner can permanently remove a discarded
   note or folder and its dependent data through its existing delete/trash action.
-- **Value (owner, 2026-09-18):** Mostly removing sensitive content, and peace of
-  mind that discarded content is really gone from Donut rather than piling up in
-  trash, together with its learning records and other owned dependencies.
+- **Value (owner, 2026-09-18):** A consistent interface, since a trashed note
+  should not offer Trash again, and peace of mind for people who like to keep
+  their trash clean: discarded content leaves Donut together with its learning
+  records and other owned dependencies. Removing sensitive content is **not**
+  the purpose, because earlier Git history keeps the text.
 - **Scope:**
   - When a note or folder is in trash, its existing delete/trash action becomes
     **Permanently delete**, clearly identifying the irreversible operation.
@@ -103,24 +105,26 @@ bulk trash-management screen is unnecessary for this selected outcome.
 - **Depends on:** No known product prerequisite.
 - **Safe stopping point:** Both note and folder actions remove their selected
   content and complete dependency closure without removing surviving content.
-- **Open decisions (proposals, not yet human decisions):**
-  - Confirmation versus immediate deletion. Proposal: always confirm, because
-    the `d` keyboard shortcut would otherwise trigger an irreversible action.
-  - Sensitive content in a Git-synchronized notebook stays readable in earlier
-    Git commits and in existing clones, because history is append-only and its
-    erasure is deferred. Proposal: keep that deferral, and have the confirmation
-    say so plainly instead of promising complete erasure.
-  - Whether the `_trash` folder itself may be permanently deleted. Proposal:
-    yes, as the ordinary folder rule with no special handling, even though a
-    dedicated Empty trash feature stays deferred.
-  - Queue position relative to SEED-030 story 2, which gates the next release.
+- **Owner decisions, 2026-09-18:**
+  - Always confirm before deleting, because the `d` keyboard shortcut would
+    otherwise trigger an irreversible action. This settles the UI proposal
+    above.
+  - Erasing earlier Git history stays deferred. The confirmation says plainly
+    that earlier Git history still contains the text, instead of promising
+    complete erasure.
+  - The `_trash` folder itself may be permanently deleted under the ordinary
+    folder rule, with no special handling. A dedicated Empty trash feature stays
+    deferred.
+  - The story keeps its first position in the queue. The owner states that
+    SEED-030 story 2 no longer blocks the next release.
+- **Plan:** [146](../quick/146-permanently-delete-trashed-content/PLAN.md).
 
 ## Ordering and Scope Reduction
 
 Queue at the beginning by explicit owner request. A concurrently added first
 item may precede or follow this one; preserve both and all unrelated queue order.
-Keep the near-future direction unchanged. This is one selected story, without
-an executable plan or authorization to implement it.
+Keep the near-future direction unchanged. This is one selected story with an
+executable plan; the plan alone does not authorize implementing it.
 
 ## When to Surface
 
