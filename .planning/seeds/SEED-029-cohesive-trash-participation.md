@@ -24,11 +24,10 @@ existing product contracts, rather than a new UI outcome.
 The motivating report was rejected as an ambiguous `なにしろ` title. Read-only
 development inspection found an available note (4884) and a trashed note (128)
 in notebook 1, Japanese learning. LearningSessionService counted both titles.
-Commit `4ea717b3de88c233fceab5bafc08f0323ad28f0f` on
-`codex/fix-learning-session-ambiguous-note` fixes that regression and has a
-passing controller regression test. At refinement, main is `bedb7517be` and
-does not contain that fix. Reconcile that branch before later execution;
-do not duplicate its repair or assume it is integrated.
+Commit `4ea717b3de88c233fceab5bafc08f0323ad28f0f` fixes that regression and has a
+passing controller regression test and successful CI. The repair is integrated
+into main as this follow-up's baseline; retain its proof and do not duplicate
+the repair during the structural improvement.
 
 ## Alternatives and Decision
 
@@ -104,8 +103,8 @@ plan. Reuse adequate existing proof; add only missing observations for changes.
   which apparent duplicate representations have distinct lifecycle needs.
 - **Effort hypothesis:** M (1–2 hours), low confidence until the caller scope
   and diagnostic contract are settled. Cross-layer redesign is not presumed.
-- **Depends on:** Reconcile the existing bug-fix branch and its regression
-  proof with the execution baseline; no unrelated feature prerequisite.
+- **Depends on:** The integrated bug fix and its regression proof supply the
+  baseline; no unfinished feature prerequisite.
 - **Safe stopping point:** Clear shared boundaries and verified preservation
   of their existing consumers remain useful without later trash redesign.
 

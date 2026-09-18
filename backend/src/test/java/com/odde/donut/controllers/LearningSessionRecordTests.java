@@ -125,6 +125,32 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
+  void recordsAvailableNoteWhenATrashedNoteHasTheSameTitle()
+      throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    Note availableNote =
+        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("なにしろ").please();
+    makeMe.aNote().notebook(availableNote.getNotebook()).title("なにしろ").trashed().please();
+    makeMe.aMemoryTrackerFor(availableNote).commissioned().nextRecallAt(dayTwo).please();
+
+    RecordLearningSessionResponse response =
+        controller.record(
+            recordRequest(
+                availableNote.getNotebook(),
+                sessionItemFeedbackReport(
+                    "なにしろ",
+                    2,
+                    "「とにかく」と言い換えられることは正しく理解でき、自分でも「何しろ時間がないから…」という文を作れました。一方、最後の意味確認では「話のテーマを転換する表現」と捉えてしまい、「特に重要な事情・理由を取り上げて強調する」という核心についてもう一度説明が必要でした。使い方はかなり掴めていますが、意味の定義はまだ少し不安定です。")),
+            "Asia/Shanghai");
+
+    assertThat(response.getRecordedItems(), hasSize(1));
+    assertThat(response.getRecordedItems().getFirst().getNoteTitle(), equalTo("なにしろ"));
+    assertThat(response.getRejectedEntries(), empty());
+  }
+
+  @Test
   void legacyScoresTagReportRecordsGrades() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);

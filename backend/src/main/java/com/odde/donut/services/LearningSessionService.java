@@ -57,13 +57,17 @@ public class LearningSessionService {
   @Transactional
   public RecordLearningSessionResponse record(
       User user, Notebook notebook, String reportMarkdown, Timestamp now) {
-    List<Note> notebookNotes =
+    List<Note> liveNotebookNotes =
         noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    List<String> notebookTitleList = notebookNotes.stream().map(Note::getTitle).toList();
-    Set<String> notebookTitles = Set.copyOf(notebookTitleList);
-    Set<String> ambiguousTitles = LearningSessionReportParser.ambiguousTitles(notebookTitleList);
+    List<Note> availableNotebookNotes =
+        noteRepository.findAvailableNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<String> liveNotebookTitleList = liveNotebookNotes.stream().map(Note::getTitle).toList();
+    Set<String> liveNotebookTitles = Set.copyOf(liveNotebookTitleList);
+    Set<String> ambiguousTitles =
+        LearningSessionReportParser.ambiguousTitles(
+            availableNotebookNotes.stream().map(Note::getTitle).toList());
     ParseResult parseResult =
-        learningSessionReportParser.parse(reportMarkdown, notebookTitles, ambiguousTitles);
+        learningSessionReportParser.parse(reportMarkdown, liveNotebookTitles, ambiguousTitles);
 
     RecordLearningSessionResponse response = new RecordLearningSessionResponse();
     response.setRecordedItems(new ArrayList<>());
@@ -74,7 +78,7 @@ public class LearningSessionService {
     List<MatchedReportEntry> matchedEntries = new ArrayList<>();
     for (ParsedReportEntry entry : parseResult.entries()) {
       Optional<MemoryTracker> tracker =
-          findCommissionedNoteLevelTracker(user, notebookNotes, entry.noteTitle());
+          findCommissionedNoteLevelTracker(user, availableNotebookNotes, entry.noteTitle());
       if (tracker.isEmpty()) {
         response
             .getRejectedEntries()
@@ -108,8 +112,8 @@ public class LearningSessionService {
   }
 
   private Optional<MemoryTracker> findCommissionedNoteLevelTracker(
-      User user, List<Note> notebookNotes, String noteTitle) {
-    return notebookNotes.stream()
+      User user, List<Note> availableNotebookNotes, String noteTitle) {
+    return availableNotebookNotes.stream()
         .filter(note -> note.getTitle().equals(noteTitle))
         .flatMap(note -> userService.getMemoryTrackersFor(user, note).stream())
         .filter(MemoryTracker::isCommissioned)
