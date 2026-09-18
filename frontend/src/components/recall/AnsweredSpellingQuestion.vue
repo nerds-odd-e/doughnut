@@ -33,16 +33,11 @@
   <ViewMemoryTrackerLink
     :memory-tracker-id="answeredQuestion.memoryTrackerId"
   />
-  <NoteShow
-    :note-id="answeredQuestion.recalledNote.noteTopology.id"
-    :expand-children="false"
-  />
 </template>
 
 <script setup lang="ts">
 import { computed, type PropType } from "vue"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
-import NoteShow from "@/components/notes/NoteShow.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"

@@ -10,13 +10,6 @@ import helper from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
-const noteShowStub = {
-  name: "NoteShow",
-  props: ["noteId", "expandChildren"],
-  template:
-    '<div data-testid="note-show-stub" :data-note-id="noteId" :data-expand-children="String(expandChildren)" />',
-}
-
 export function mountAnsweredSpellingQuestion(
   answeredQuestion: AnsweredQuestion,
   options: {
@@ -41,7 +34,6 @@ export function mountAnsweredSpellingQuestion(
     attachTo: document.body,
     global: {
       stubs: {
-        NoteShow: noteShowStub,
         NoteUnderQuestion: true,
         ViewMemoryTrackerLink: true,
       },

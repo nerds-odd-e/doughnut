@@ -53,7 +53,7 @@ not a product dependency requiring backlog reordering.
 ### 1. Read spelling results and follow the note link for details
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given a completed spelling answer, when the learner views its result
 directly or through recall history, the result retains its outcome and linked
@@ -126,4 +126,13 @@ CI repair workflow. Keep this story queued until execution actually begins.
 - No unresolved slice-specific design or sizing concern was identified in
   this planning assessment. Reconcile the explicitly identified shared-file
   overlap work at execution time.
-- Proof commands above are planned, not run. No implementation is complete.
+- Slice 1 executed: `NoteShow` removed from `AnsweredSpellingQuestion.vue`'s
+  spelling-result view; results now rely on the existing
+  `NoteUnderQuestion`/`NoteTitleWithLink` breadcrumb link. Updated
+  `RecallPage.spelling.spec.ts` (both the incorrect-result and the
+  resumed/history-view correct-result cases) to assert the rendered note link
+  instead of internal `NoteShow` props, removed the `NoteShow` stub and its
+  supporting assertions from `answeredSpellingQuestionTestSupport.ts` and
+  `AnsweredSpellingQuestionAccidentalMatch.spec.ts`. Full frontend suite
+  passed (344 files / 1892 tests). A fresh post-change-refactor pass found no
+  candidates — already clean.

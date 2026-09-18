@@ -45,7 +45,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
 
   it("shows compact accidental-match result with Resolve CTA and no stacked matches", async () => {
     const { answeredQuestion } = accidentalMatchWithTwoMatchedNotes()
-    const reviewedId = answeredQuestion.recalledNote.noteTopology.id
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
     await flushPromises()
@@ -56,11 +55,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     expect(wrapper.find('[data-testid="matched-notes-section"]').exists()).toBe(
       false
     )
-    expect(
-      wrapper
-        .findAll('[data-testid="note-show-stub"]')
-        .map((show) => Number(show.attributes("data-note-id")))
-    ).toEqual([reviewedId])
 
     const resolveCta = wrapper.find('[data-testid="resolve-accidental-match"]')
     expect(resolveCta.exists()).toBe(true)
@@ -118,8 +112,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       document.body.querySelector('[data-testid="resolve-match-path-20"]')
         ?.textContent
     ).toContain("Notebook Beta")
-
-    expect(dialog?.querySelector('[data-testid="note-show-stub"]')).toBeNull()
   })
 
   it("omits Resolve CTA when matchedNotes is empty", async () => {

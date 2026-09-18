@@ -4,6 +4,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { focusDirective } from "@tests/helpers/softKeyboardPrimerTestSupport"
@@ -11,7 +12,7 @@ import {
   captureRequestAnimationFrame,
   flushCapturedAnimationFrames,
 } from "@tests/components/recall/spellingQuestionDisplayTestSupport"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { nextTick } from "vue"
 import {
@@ -19,6 +20,13 @@ import {
   createUseRecallDataMock,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
+
+function hasNoteShowLink(wrapper: VueWrapper, noteId: number) {
+  const expectedTo = JSON.stringify(noteShowLocation(noteId))
+  return wrapper
+    .findAll(".router-link")
+    .some((link) => link.attributes("to") === expectedTo)
+}
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/components/commons/Popups/usePopups")
@@ -80,7 +88,7 @@ describe("RecallPage spelling quiz", () => {
     expect(wrapper.find(".daisy-alert-error").text()).toContain(
       "Your answer `test answer` is incorrect."
     )
-    expect(wrapper.findComponent({ name: "NoteShow" }).props("noteId")).toBe(42)
+    expect(hasNoteShowLink(wrapper, 42)).toBe(true)
     expect(
       wrapper
         .findComponent({ name: "ViewMemoryTrackerLink" })
@@ -118,6 +126,11 @@ describe("RecallPage spelling quiz", () => {
     expect(pauseButton.exists()).toBe(true)
     await pauseButton.trigger("click")
     await flushPromises()
+
+    expect(wrapper.text()).toContain("Correct!")
+    expect(
+      hasNoteShowLink(wrapper, previousQuestion.recalledNote.noteTopology.id)
+    ).toBe(true)
 
     const spellingInput = document.querySelector(
       "input#memory_tracker-answer"
