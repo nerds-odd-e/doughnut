@@ -16,16 +16,18 @@ low-level placement or folder creation separately.
 Keep placement, folder construction, reference choices, and Portable encoding
 with their existing owners. Different domain recipes use one consistency owner;
 controllers must not independently reproduce Git history coordination. Existing
-web content/title edits, ordinary note moves, and same-notebook folder moves
-stay on that owner. Preserve non-Git behavior and the existing policy for
-pre-existing projection drift; this direction does not authorize silently
-adopting unsynchronized work. No identity map, event journal, endpoint-specific
+web content/title edits, ordinary note moves, same-notebook folder moves,
+folder creation, rename and dissolve, and ordinary note creation stay on that
+owner. Preserve non-Git behavior and the existing policy for pre-existing
+projection drift; this direction does not authorize silently adopting
+unsynchronized work. No identity map, event journal, endpoint-specific
 snapshot algorithm, or story-shaped dispatch modes.
 
 Evidence and application: note editing, ordinary note and same-notebook folder
-movement append one accepted commit after the complete mutation. The snapshot
-is built from the current persisted tree, so newly constructed parents are
-included. Pre-existing projection drift remains unsynchronized and publication's
+movement, folder creation, rename and dissolve, and ordinary note creation
+append one accepted commit after the complete mutation. The snapshot is built
+from the current persisted tree, so newly constructed parents are included.
+Pre-existing projection drift remains unsynchronized and publication's
 final-result direction below remains intact.
 
 Owner direction, 2026-09-17: a web action whose complete domain operation
