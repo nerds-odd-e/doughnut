@@ -18,4 +18,4 @@ fi
 
 DEST="gs://${DEST_BUCKET}/doughnut-cli-latest/doughnut"
 echo "Uploading CLI from $CLI_SOURCE to $DEST"
-gsutil cp -a public-read "$CLI_SOURCE" "$DEST"
+gcloud storage cp --predefined-acl=publicRead "$CLI_SOURCE" "$DEST"

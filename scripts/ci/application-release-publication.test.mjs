@@ -56,18 +56,18 @@ for (const scenario of [
     const calls = readFileSync(trace, 'utf8').trim().split('\n')
     assert.equal(
       calls[0],
-      'gsutil cp - gs://private-backend/deploy/application-release.json'
+      'gcloud storage cp - gs://private-backend/deploy/application-release.json'
     )
     assert.deepEqual(calls.slice(1, 4), [
-      `gsutil -m rsync -r ${frontend} gs://public-frontend/frontend/${sha}/`,
-      `gsutil -h Cache-Control:public,max-age=60 cp ${frontend}/index.html gs://public-frontend/frontend/${sha}/index.html`,
-      `gsutil cp -a public-read ${cli} gs://public-frontend/doughnut-cli-latest/doughnut`,
+      `gcloud storage rsync -r ${frontend} gs://public-frontend/frontend/${sha}/`,
+      `gcloud storage cp --cache-control=public,max-age=60 ${frontend}/index.html gs://public-frontend/frontend/${sha}/index.html`,
+      `gcloud storage cp --predefined-acl=publicRead ${cli} gs://public-frontend/doughnut-cli-latest/doughnut`,
     ])
     assert.match(calls[4], /^gcloud compute url-maps import /)
     if (forced) {
       assert.ok(
         calls.includes(
-          `gsutil cp ${jar} gs://private-backend/backend_app_jar/donut-0.0.1-SNAPSHOT.jar`
+          `gcloud storage cp ${jar} gs://private-backend/backend_app_jar/donut-0.0.1-SNAPSHOT.jar`
         )
       )
       assert.ok(calls.some((call) => call.includes('rolling-action replace')))
@@ -127,9 +127,9 @@ test('failed publication leaves the admitted application publishing', (t) => {
   assert.equal(calls.length, 2)
   assert.equal(
     calls[0],
-    'gsutil cp - gs://private-backend/deploy/application-release.json'
+    'gcloud storage cp - gs://private-backend/deploy/application-release.json'
   )
-  assert.match(calls[1], /^gsutil -m rsync/)
+  assert.match(calls[1], /^gcloud storage rsync/)
   assert.deepEqual(
     readApplicationRecords(applicationRecords).map((record) => record.outcome),
     ['publishing']

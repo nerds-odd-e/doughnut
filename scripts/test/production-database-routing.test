@@ -37,7 +37,7 @@ case "$*" in
 esac
 EOF
 
-	cat >"$fake_bin/gsutil" <<'EOF'
+	cat >"$fake_bin/gcloud" <<'EOF'
 #!/bin/sh
 exit 0
 EOF
@@ -52,7 +52,7 @@ EOF
 printf 'java-started\n' >>"${JAVA_START_LOG:?}"
 EOF
 
-	chmod +x "$fake_bin/curl" "$fake_bin/gsutil" "$fake_bin/systemctl" "$fake_bin/bash"
+	chmod +x "$fake_bin/curl" "$fake_bin/gcloud" "$fake_bin/systemctl" "$fake_bin/bash"
 }
 
 run_startup() {

@@ -34,7 +34,7 @@ record_application_outcome() {
 		--arg ci_run_attempt "$RELEASE_CI_RUN_ATTEMPT" \
 		--arg outcome "$1" \
 		'{tag: $tag, ref_oid: $ref_oid, sha: $sha, ci_run_id: $ci_run_id, ci_run_attempt: $ci_run_attempt, outcome: $outcome}' \
-		| gsutil cp - "$APPLICATION_RELEASE_RECORD_URI"
+		| gcloud storage cp - "$APPLICATION_RELEASE_RECORD_URI"
 }
 
 record_application_outcome publishing

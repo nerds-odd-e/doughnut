@@ -108,22 +108,22 @@ export function makePublication(t, scenario = 'skip') {
       { mode: 0o755 }
     )
   fake(
-    'gsutil',
-    `echo "gsutil $*" >> "$TRACE"
-if [[ "$1" == cat ]]; then cat "$RECORD"; fi
-if [[ "$1" == -m ]]; then cp "$4/index.html" "$CAPTURED_SPA"; fi
-if [[ "$1" == cp && "$2" == -a ]]; then cp "$4" "$CAPTURED_CLI"; fi
-if [[ -n "\${FAIL_GSUTIL_MATCH:-}" && "$*" == *"$FAIL_GSUTIL_MATCH"* ]]; then exit 37; fi
-if [[ "$1" == cp && "$2" == - && "$3" == */application-release.json ]]; then
-  cat >> "$APP_RECORDS"
-fi
-if [[ "$1" == cp && "$2" == - && "$3" == */last-successful-deploy.json ]]; then
-  cat > "$SAVED_RECORD"
-fi`
-  )
-  fake(
     'gcloud',
     `echo "gcloud $*" >> "$TRACE"
+if [[ "$1" == storage ]]; then
+  shift
+  if [[ "$1" == cat ]]; then cat "$RECORD"; fi
+  if [[ "$1" == rsync ]]; then cp "$3/index.html" "$CAPTURED_SPA"; fi
+  if [[ "$1" == cp && "$2" == --predefined-acl=* ]]; then cp "$3" "$CAPTURED_CLI"; fi
+  if [[ -n "\${FAIL_STORAGE_MATCH:-}" && "$*" == *"$FAIL_STORAGE_MATCH"* ]]; then exit 37; fi
+  if [[ "$1" == cp && "$2" == - && "$3" == */application-release.json ]]; then
+    cat >> "$APP_RECORDS"
+  fi
+  if [[ "$1" == cp && "$2" == - && "$3" == */last-successful-deploy.json ]]; then
+    cat > "$SAVED_RECORD"
+  fi
+  exit 0
+fi
 for arg in "$@"; do
   if [[ "$arg" == --source=* ]]; then cp "\${arg#--source=}" "$CAPTURED_MAP"; fi
   if [[ "$arg" == startup-script=* ]]; then cp "\${arg#startup-script=}" "$CAPTURED_STARTUP"; fi
@@ -141,7 +141,7 @@ printf 200`
   const publish = (
     release = { sha, ref: 'refs/tags/v1.2.3', refOid },
     ci = { runId: 42, runAttempt: 3 },
-    { failGsutilMatch = '' } = {}
+    { failStorageMatch = '' } = {}
   ) =>
     spawnSync('bash', ['-c', publicationCommand], {
       cwd: repositoryRoot,
@@ -173,8 +173,8 @@ printf 200`
         DEPLOY_JAR_PATH: artifacts(ci.runId).jar,
         FORCE_FULL_DEPLOY: '',
         HEALTHCHECK_RETRY_SLEEP_SECONDS: '0',
-        FAIL_GSUTIL_MATCH:
-          failGsutilMatch || (scenario === 'failed-frontend' ? 'rsync' : ''),
+        FAIL_STORAGE_MATCH:
+          failStorageMatch || (scenario === 'failed-frontend' ? 'rsync' : ''),
       },
     })
   return {

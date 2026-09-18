@@ -21,7 +21,7 @@ fi
 
 DEST="gs://${DEST_BUCKET}/frontend/${GITHUB_SHA}/"
 echo "Uploading frontend static from $STATIC_DIR to $DEST"
-gsutil -m rsync -r "$STATIC_DIR" "$DEST"
+gcloud storage rsync -r "$STATIC_DIR" "$DEST"
 
 # SPA shell must not linger in Cloud CDN for an hour: hashed assets are
 # immutable, but index.html is rewritten onto every client deep link and
@@ -33,4 +33,4 @@ if [[ ! -f "$INDEX_SRC" ]]; then
 	exit 1
 fi
 echo "Setting short Cache-Control on $INDEX_DEST"
-gsutil -h "Cache-Control:public,max-age=60" cp "$INDEX_SRC" "$INDEX_DEST"
+gcloud storage cp --cache-control="public,max-age=60" "$INDEX_SRC" "$INDEX_DEST"

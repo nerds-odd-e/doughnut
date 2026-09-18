@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Unit tests for infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh
-# Uses fake gsutil + fake bash on PATH (no real GCS or gcloud).
+# Uses fake gcloud + fake bash on PATH (no real GCS or GCP).
 
 set -euo pipefail
 
@@ -50,12 +50,12 @@ test_skips_upload_and_replace_when_record_matches_jar_hash() {
 	assert_healthcheck_not_invoked "$work/healthcheck.log"
 	assert_rollout_not_invoked "$work/rollout.log"
 	local cp_count cat_count
-	cp_count=$(grep -c '^cp ' "$GSUTIL_LOG" 2>/dev/null || true)
+	cp_count=$(grep -c '^cp ' "$STORAGE_LOG" 2>/dev/null || true)
 	[[ -n "$cp_count" ]] || cp_count=0
-	cat_count=$(grep -c '^cat ' "$GSUTIL_LOG" 2>/dev/null || true)
+	cat_count=$(grep -c '^cat ' "$STORAGE_LOG" 2>/dev/null || true)
 	[[ -n "$cat_count" ]] || cat_count=0
-	assert_equals "0" "$cp_count" "no gsutil cp when skipped"
-	assert_equals "1" "$cat_count" "one gsutil cat when skipped"
+	assert_equals "0" "$cp_count" "no storage cp when skipped"
+	assert_equals "1" "$cat_count" "one storage cat when skipped"
 	trap - EXIT
 	rm -rf "$work"
 }
@@ -78,7 +78,7 @@ test_deploys_when_startup_script_hash_differs() {
 	assert_file_exists "$work/rolling.log"
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked when startup script hash differs"
 	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked when startup script hash differs"
-	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged when startup script differs"
+	grep -q 'cp .*backend_app_jar' "$STORAGE_LOG" || fail "jar upload not logged when startup script differs"
 	trap - EXIT
 	rm -rf "$work"
 }
@@ -101,8 +101,8 @@ test_deploys_when_no_record() {
 	assert_rollout_invoked "$work/rollout.log"
 	assert_healthcheck_invoked "$work/healthcheck.log"
 	grep -q "GITHUB_SHA=$TEST_GIT_SHA" "$work/healthcheck.log" || fail "GITHUB_SHA not passed through to healthcheck"
-	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged"
-	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged"
+	grep -q 'cp .*backend_app_jar' "$STORAGE_LOG" || fail "jar upload not logged"
+	grep -q 'cp - gs://' "$STORAGE_LOG" || fail "record upload (stdin) not logged"
 	trap - EXIT
 	rm -rf "$work"
 }
@@ -122,7 +122,7 @@ test_deploys_when_record_hash_differs() {
 	export DEPLOY_JAR_PATH="$jar"
 	run_deploy "$work" "$fake_bin"
 	assert_file_exists "$work/rolling.log"
-	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged on mismatch"
+	grep -q 'cp .*backend_app_jar' "$STORAGE_LOG" || fail "jar upload not logged on mismatch"
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked on jar mismatch"
 	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked on jar mismatch"
 	trap - EXIT
@@ -148,8 +148,8 @@ test_force_full_deploy_when_record_matches_jar_hash() {
 	assert_file_exists "$work/rolling.log"
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked when forced"
 	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked when forced"
-	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged when forced"
-	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged when forced"
+	grep -q 'cp .*backend_app_jar' "$STORAGE_LOG" || fail "jar upload not logged when forced"
+	grep -q 'cp - gs://' "$STORAGE_LOG" || fail "record upload (stdin) not logged when forced"
 	trap - EXIT
 	rm -rf "$work"
 }
@@ -172,7 +172,7 @@ test_fails_without_writing_record_when_healthcheck_fails() {
 	fi
 	unset HEALTHCHECK_SHOULD_FAIL
 	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked before failure"
-	cp_count=$(grep -c 'cp - gs://' "$GSUTIL_LOG" 2>/dev/null || true)
+	cp_count=$(grep -c 'cp - gs://' "$STORAGE_LOG" 2>/dev/null || true)
 	[[ -n "$cp_count" ]] || cp_count=0
 	assert_equals "0" "$cp_count" "no success record when healthcheck fails"
 	trap - EXIT
@@ -222,7 +222,7 @@ test_fails_without_writing_record_when_rollout_wait_fails() {
 	unset ROLLOUT_SHOULD_FAIL
 	assert_rollout_invoked "$work/rollout.log" "rollout wait not invoked before failure"
 	assert_healthcheck_not_invoked "$work/healthcheck.log" "healthcheck invoked after failed rollout wait"
-	cp_count=$(grep -c 'cp - gs://' "$GSUTIL_LOG" 2>/dev/null || true)
+	cp_count=$(grep -c 'cp - gs://' "$STORAGE_LOG" 2>/dev/null || true)
 	[[ -n "$cp_count" ]] || cp_count=0
 	assert_equals "0" "$cp_count" "no success record when rollout wait fails"
 	trap - EXIT
