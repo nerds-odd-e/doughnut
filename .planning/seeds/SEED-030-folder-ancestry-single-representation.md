@@ -226,6 +226,11 @@ regression the release introduces; notebook 309 belongs to another user.
 - **Open question:** how to select only the notebooks the repair touched, since
   the SQL migration leaves no record of them.
 - **Effort hypothesis:** S to M once decided.
+- **Release gate, owner decision 2026-09-18:** the release that carries
+  `V300000333__notebook_follows_folder_containment.sql` waits until this story
+  is completed.
+- **Carried obligation:** `NotebookFollowsFolderContainmentMigrationTest` is
+  migration-only. Remove it after production has applied `V300000333`.
 
 ## Constraints carried
 
