@@ -88,30 +88,23 @@ class NotebookGitProposalOrdinaryNoteApplication {
             .map(NotebookGitProposalTreeShape.NoteChange::path)
             .toList();
     Map<String, Folder> destinationFolders =
-        renameDestinations.isEmpty()
-            ? Map.of()
-            : folderMaterialization.ensureAncestry(notebook, proposedFolders, renameDestinations);
+        folderMaterialization.ensureAncestry(notebook, proposedFolders, renameDestinations);
+    // Reread after materialization so every path resolves against the same folders the live notes
+    // are placed in, including the folders this publication just created.
+    List<ExportFolderRow> folders = notebookGitStateLoader.foldersOf(notebook);
     for (NotebookGitProposalTreeShape.NoteChange noteChange : admitted.noteChanges()) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document =
             noteAddition.readValidatedDocument(proposal, noteChange.path());
         Note changedNote =
-            projection.requireOneLiveNoteAtPath(
-                proposedFolders, proposedLiveNotes, noteChange.path());
+            projection.requireOneLiveNoteAtPath(folders, proposedLiveNotes, noteChange.path());
         authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.RENAMED) {
         applyRename(
-            proposedFolders,
-            destinationFolders,
-            proposal,
-            proposedLiveNotes,
-            noteChange,
-            publishedAt);
+            folders, destinationFolders, proposal, proposedLiveNotes, noteChange, publishedAt);
       }
     }
-    return renameDestinations.isEmpty()
-        ? proposedFolders
-        : notebookGitStateLoader.foldersOf(notebook);
+    return folders;
   }
 
   private void applyRename(
