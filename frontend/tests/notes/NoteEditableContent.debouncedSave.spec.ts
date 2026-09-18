@@ -91,7 +91,7 @@ describe("NoteEditableContent debounced save", () => {
     wrapper.unmount()
   })
 
-  it("does not save escaped inline asterisks when navigating to a note in rich mode", async () => {
+  it("does not save when navigating to a note in rich mode", async () => {
     vi.useFakeTimers()
     const noteContent = String.raw`---
 topic: Japanese

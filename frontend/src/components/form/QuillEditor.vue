@@ -35,25 +35,27 @@ const emits = defineEmits<{
 
 const router = getCurrentInstance()?.appContext.config.globalProperties
   .$router as Router | undefined
-const localValue = ref(props.modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
 const isPasting = ref(false)
 const lastRange = ref<{ index: number; length: number } | null>(null)
-let updatingQuillFromModel = false
+let syncingModel = false
+
+const modelHtml = () => props.modelValue || "<p><br></p>"
 
 const onBlurTextField = () => {
   emits("blur")
 }
 
-const syncQuillFromModel = (content: string | undefined) => {
-  if (quill.value) {
-    updatingQuillFromModel = true
-    quill.value.root.innerHTML = content ?? ""
-    queueMicrotask(() => {
-      updatingQuillFromModel = false
-    })
-  }
+const syncQuillFromModel = () => {
+  if (!quill.value) return
+  const html = modelHtml()
+  if (quill.value.root.innerHTML === html) return
+  syncingModel = true
+  quill.value.root.innerHTML = html
+  queueMicrotask(() => {
+    syncingModel = false
+  })
 }
 
 // Shift+Enter handler for soft line breaks
@@ -117,7 +119,7 @@ onMounted(async () => {
   if (editor.value) {
     quill.value = new Quill(editor.value, options)
 
-    syncQuillFromModel(localValue.value)
+    syncQuillFromModel()
 
     await nextTick()
 
@@ -185,9 +187,9 @@ onMounted(async () => {
 
     quill.value.on("text-change", () => {
       const content = quill.value!.root.innerHTML
-      localValue.value = content
-      if (updatingQuillFromModel) return
-      onUpdateContent()
+      if (!syncingModel && content !== modelHtml()) {
+        emits("update:modelValue", content)
+      }
       if (isPasting.value) {
         isPasting.value = false
         emits("pasteComplete", content)
@@ -213,19 +215,7 @@ onMounted(async () => {
   }
 })
 
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (quill.value && localValue.value !== newValue) {
-      localValue.value = newValue
-      syncQuillFromModel(newValue)
-    }
-  }
-)
-
-const onUpdateContent = () => {
-  emits("update:modelValue", localValue.value ?? "")
-}
+watch(() => props.modelValue, syncQuillFromModel)
 
 function insertTextAtCursor(text: string) {
   if (!quill.value) return
