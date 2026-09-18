@@ -515,8 +515,97 @@ untriggered CLI guard.
     CLI guard fixed rather than continuing to rely on retrospective review to
     catch it after the fact.
 
+## DD-072 — The documented `.claude/skills` runtime path did not exist at all in a freshly created execution worktree
+
+[runtime-setup.md](../dough-execute-plan/references/runtime-setup.md) documents
+`.claude/skills/dough-execute-plan` as the normal Claude Code location of the
+CI observer runtime. In a worktree created by `git worktree add` and used
+immediately, that directory does not exist: `.claude/skills/<name>` is a
+symlink this project's `scripts/shell_setup.sh` creates when a Nix shell is
+entered, and a coordinator that creates the worktree and arms the observer
+without first entering a shell in it has only the tracked `.agents/skills`
+tree. Invoking the documented path therefore fails loudly with
+`MODULE_NOT_FOUND` rather than silently. This is the same documented-path
+problem as DD-065 but not the same cause: DD-065's silent no-op comes from the
+main-module guard comparing an invoked symlink path against a resolved
+realpath, and fixing that guard would not help here, because the file is
+absent. The shared fix is for the guidance to name `.agents/skills` (the
+tracked realpath) as this project's runtime location, or for worktree setup to
+create the symlink before the observer is armed.
+
+### Occurrences
+
+- Execution: SEED-034 story 1 / quick/146-permanently-delete-trashed-content / 6f2a2ff1d8
+  - Timestamp: 2026-09-18T17:06+08:00
+  - Tool: Claude Code
+  - Model: claude-opus-5
+  - Open Dough release: unknown
+  - Evidence: `node '.claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
+    run from the execution worktree root exited non-zero with
+    `Error: Cannot find module` / `code: 'MODULE_NOT_FOUND'`;
+    `ls .claude/skills/dough-execute-plan/scripts/` returned
+    `No such file or directory` while `ls .agents/skills/dough-execute-plan/scripts/`
+    listed the runtime. `node '.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
+    then printed `CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-4CslQR"}`
+    and the PostToolUse hook added `CI_MONITOR_READY`.
+  - Observed effect: no coverage was lost and nothing was misdiagnosed. The
+    hard error was unambiguous, so the realpath was used on the next call and
+    the observer was armed before the first slice was delegated and before any
+    push. Cost was one wasted tool call plus one directory listing.
+  - Inference: the loud failure mode is strictly better than DD-065's silent
+    one — it cannot be mistaken for "bridge unavailable" — but both arise from
+    the same documented path being wrong for this project. Which of the two
+    failure modes a run hits appears to depend only on whether a Nix shell has
+    been entered in that worktree yet, which is not something the guidance
+    mentions.
+
+## DD-073 — The product backlog moved on the shared integration branch between the coordinator's read and its queue claim
+
+`dough-execute-plan`'s [Take queued work](../dough-execute-plan/SKILL.md#take-queued-work)
+requires preflighting the originating checkout for branch, backlog path,
+tracked/staged changes and ownership of an isolated claim commit, but it does
+not say that the backlog's own content may change between the coordinator
+reading it to select an entry and writing the **Taken** move. When two
+executions start close together against the same shared integration branch,
+the second coordinator's picture of the queue can be stale by the time it
+edits: the other execution's claim commit has already moved an entry into
+**Taken** and added a plan link. Correctness here depended on the edit being
+scripted so that it re-read the file from disk and asserted on the exact entry
+text; an edit applied from the earlier in-memory reading would have written a
+**Taken** section that silently dropped or duplicated the concurrent claim.
+
+### Occurrences
+
+- Execution: SEED-034 story 1 / quick/146-permanently-delete-trashed-content / 6f2a2ff1d8
+  - Timestamp: 2026-09-18T17:05:27+08:00
+  - Tool: Claude Code
+  - Model: claude-opus-5
+  - Open Dough release: unknown
+  - Evidence: the coordinator's first read of `.planning/PRODUCT-BACKLOG.md`
+    showed an empty `## Taken` section and five entries under
+    `## Backlog list`. A concurrent execution then committed
+    `e86f76566a` ("Take SEED-030 story 2 for execution through plan 145",
+    2026-09-18T17:04:35+08:00) to `main` in the shared originating checkout,
+    adding SEED-030 to `## Taken` with a `— plan: [145](...)` suffix. The
+    claim edit for this execution ran afterwards and produced a `## Taken`
+    section containing both entries; `git diff` showed only the intended
+    single-line move, and claim commit `c619aba43a`
+    (2026-09-18T17:05:27+08:00) touched only that one line.
+  - Observed effect: no incorrect write and no lost claim, but the stale
+    reading cost three extra verification calls (`git diff`, `git log`,
+    `git reflog` plus `git worktree list`) to establish that the file had
+    changed under the coordinator rather than that its own edit was wrong,
+    and one corrective edit to match the entry formatting the concurrent
+    claim had introduced.
+  - Inference: the safe outcome came from re-reading the backlog at write
+    time and asserting on the exact entry text, not from any rule. Stating in
+    the take-queued-work preflight that the backlog must be re-read
+    immediately before the **Taken** edit, and that the resulting staged diff
+    must be confirmed to be exactly the intended one-entry move, would make
+    this independent of how the edit happens to be applied.
+
 ## Retention
 
-- Highest allocated local number: 71
+- Highest allocated local number: 73
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
