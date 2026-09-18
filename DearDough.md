@@ -515,8 +515,106 @@ untriggered CLI guard.
     CLI guard fixed rather than continuing to rely on retrospective review to
     catch it after the fact.
 
+## DD-072 — A concurrent session deleted an active Story Branch execution worktree and branch while a delegated subagent was mid-slice
+
+`dough-execute-plan` created the Story Branch Mode worktree
+`.worktrees/145-reset-notebook-git-history` (branch of the same name) from
+plan 145's queue claim, armed a CI observer bound to that exact path, and
+delegated slice 1. While that implementation subagent was working, the
+worktree directory and its branch were both removed by something outside this
+execution — a second session was concurrently executing plan 146 in
+`.worktrees/146-permanently-delete-trashed-content` from the same shared
+repository. The subagent had read the plan and sources but had made no edits
+yet; its first edit command failed at `cd` with "no such file or directory",
+and it correctly returned a BLOCKED stop rather than falling back to the
+shared main checkout or recreating the workspace on its own judgement.
+
+The damage was bounded but the diagnosis was not obvious, because the
+subagent's inspection of the shared main checkout caught the other session
+mid-operation and showed `.planning/quick/145-reset-notebook-git-history/PLAN.md`
+and `.planning/seeds/SEED-030-...md` as deleted in the working tree. Both were
+in fact intact at `HEAD`, and a later look showed an entirely different set of
+uncommitted paths, confirming the first reading was a transient view of
+another execution's in-flight tree rather than a teardown of plan 145.
+
+### Occurrences
+
+- Execution: SEED-030 story 2 / quick/145-reset-notebook-git-history
+  - Timestamp: 2026-09-18, ~17:06-17:20 +08:00 (between the plan 146 claim
+    commit `c619aba43a` at 17:05:27 +08:00 and slice 1's delivery at 17:30 +08:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5
+  - Open Dough release: unknown
+  - Evidence: after the subagent's BLOCKED return, `git worktree list` showed
+    only `/Users/terryyin/git/doughnut` and
+    `.worktrees/146-permanently-delete-trashed-content`; `git branch -a --list '*145*'`
+    was empty; the claim commit `e86f76566a` was still an ancestor of `main`
+    and the **Taken** backlog entry plus `PLAN.md` were present at `HEAD`. The
+    detached CI observer (pid 89451, `/tmp/dough-ci-501/watch-6PqtuY`) was
+    still running with its command path pointing into the deleted directory.
+  - Observed effect: no committed or uncommitted work was lost, because the
+    subagent had not yet edited anything. Recovery was to recreate the branch
+    and worktree from `e86f76566a`, re-run `pnpm --frozen-lockfile recursive install`,
+    and resume the same subagent with its already-derived design, which it
+    still held. The surviving observer was reused rather than relaunched, since
+    recreating the worktree at the identical path restored its binding. Cost
+    was roughly one wasted subagent turn plus the reinstall and a verification
+    pass over the shared checkout.
+  - Inference: the removal's owner was never established, so this is recorded
+    as an unexplained concurrent-execution hazard rather than an attributed
+    fault. Two guidance gaps are visible regardless of who removed it. First,
+    nothing in Story Branch Mode makes an active execution worktree evidently
+    in-use to a concurrent session doing worktree cleanup in the same
+    repository. Second, a subagent reading the shared integration checkout to
+    diagnose its own failure can observe another execution's mid-operation
+    working tree and reasonably report it as deletion of its own source
+    documents; delegation guidance tells subagents to stay out of the
+    integration checkout for edits but not that its working-tree state is
+    untrustworthy as evidence.
+
+## DD-073 — The focused frontend proof command does not typecheck, so an implementation agent's green proof still failed the commit gate
+
+This project's focused frontend test command, which `dough-execute-plan`
+delegation passes to implementation agents as the literal proof command, is
+`pnpm frontend:test <spec>` → `pnpm -C frontend test`, which runs Vitest only.
+Type checking lives in a different script: `pnpm -C frontend lint`/`format`
+runs `biome check . && vue-tsc --noEmit`. A slice 2 component test written by
+the implementation agent called
+`mockSdkService(NotebookBooksController, "getBook", null)` where the generated
+SDK type is `BookFull | undefined`. Vitest passed, so the agent returned a
+green `proof:` block in good faith, the coordinator accepted the proof after
+inspecting the assertions, and the type error only surfaced at the
+coordinator's `format:changed` step — after the refactor pass had already run
+against that code.
+
+### Occurrences
+
+- Execution: SEED-030 story 2 / quick/145-reset-notebook-git-history
+  - Timestamp: 2026-09-18, ~17:41 +08:00 (slice 2 delivery, at the selective
+    formatting step before staging)
+  - Tool: Claude Code
+  - Model: claude-opus-5
+  - Open Dough release: unknown
+  - Evidence: `./scripts/run.sh pnpm format:changed` reported
+    `tests/components/notebook/NotebookSettings.resetGitHistory.spec.ts:16:56 - error TS2345: Argument of type 'null' is not assignable to parameter of type 'BookFull | undefined'`
+    and `Command failed with exit code 2`, while
+    `pnpm frontend:test tests/components/notebook/NotebookSettings.resetGitHistory.spec.ts`
+    had passed (1 file, 1 test) both before and after the one-word repair.
+    `package.json` line 31 defines `frontend:test` as the Vitest run and line
+    29 defines `frontend:lint` as the Biome + `vue-tsc` run.
+  - Observed effect: caught before commit by the ordinary wrap-up sequence and
+    repaired mechanically (`null` to `undefined`), costing one repair plus a
+    spec rerun and a second formatting pass. Nothing reached CI broken.
+  - Inference: the accepted-proof gate is weaker than it appears for frontend
+    slices, because the proof command an agent is told to run cannot fail on a
+    type error that will later block the commit. A delegated agent can
+    truthfully report passing focused proof on code that does not compile under
+    the project's own gate. Either the focused frontend proof command should
+    include the typecheck, or delegation should name the typecheck as part of
+    frontend proof rather than leaving it to coordinator wrap-up.
+
 ## Retention
 
-- Highest allocated local number: 71
+- Highest allocated local number: 73
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
