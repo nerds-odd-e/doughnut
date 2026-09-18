@@ -45,8 +45,8 @@ Net across both: −9 production lines. The full `NotebookGit*` controller suite
 
 ## Diagnosis: notebook 4 holds rows whose folder ancestry crosses notebooks
 
-Investigated 2026-09-18 in a second session. **Reproduced by experiment; not yet
-confirmed against production rows.**
+Investigated 2026-09-18 in a second session. **Reproduced by experiment and
+confirmed against production rows** (read-only queries, 07:27 UTC).
 
 **Evidence**
 
@@ -98,28 +98,32 @@ blocks every publication to that notebook. The shipped regression test
 reproduces a different, also real, way to reach the same frames; it was not the
 owner's case if the owner's change had no rename.
 
-**Predicted production data:** notebook 4 has at least one note in a folder of
-another notebook, and at least one folder under a parent of another notebook,
-most simply a foreign folder holding both. Read-only confirmation:
+**Confirmed production data** (ids only; this repository is public). 26,761
+notes and 8,883 folders hold 6 stray notes and 4 stray folders, one level deep,
+in four notebook pairs. Counting the notes inside the stray folders, 12 notes
+and 4 folders sit outside their root ancestor's notebook. None of them is in
+any accepted tree, clone or export today.
 
-```sql
-SELECT n.id, n.title, n.notebook_id, n.folder_id, f.notebook_id AS folder_notebook_id
-FROM note n JOIN folder f ON f.id = n.folder_id
-WHERE n.notebook_id <> f.notebook_id;
+| Row notebook | Container notebook | Stray notes | Stray folders | Notes inside those folders | Owners |
+|---|---|---|---|---|---|
+| 12 | 4 | 2 | 2 | 3 | circle 2 → user 1 |
+| 4 | 26 | 2 | 1 | 1 | user 1 → circle 2 |
+| 86 | 191 | 1 | 1 | 2 | user 1 → user 1 |
+| 56 | 309 | 1 | 0 | 0 | user 3 → user 3 |
 
-SELECT c.id, c.name, c.notebook_id, c.parent_folder_id, p.notebook_id AS parent_notebook_id
-FROM folder c JOIN folder p ON p.id = c.parent_folder_id
-WHERE c.notebook_id <> p.notebook_id;
-```
+- Folder 2543 of notebook 26 holds notes 9949 and 21009 of notebook 4 (the
+  original trace) and is the parent of folder 6623 of notebook 4 (the crash on
+  current `main`). This is exactly the predicted shape.
+- A notebook that owns a stray **folder** cannot publish at all: 4, 12 and 86.
+- All seven notebooks have a Git binding, all cut over on 2026-09-17.
+- A containment repair hits no unique title or folder-name constraint.
 
-Run them without a notebook filter: the row counts decide whether this is one
-owner's legacy debris or a wider repair.
-
-**Origin is unknown.** Current writers (`FolderSubtree.reassignToNotebook`,
-`FolderMoveRelocation`, `NoteMotionService`) keep the ids consistent, so legacy
-data from before folders or from an older cross-notebook move is the likelier
-source. If the queries show recent `updated_at` values, a live writer exists
-and finding it joins the story.
+**Origin: legacy, no live writer.** All four stray folders were created in the
+same second, 2026-04-28 08:26:33, and are named after notes: the one-time
+conversion of parent notes into folders. It faithfully preserved parent-child
+note links that already crossed notebooks in 2021 and 2022. Every stray row's
+`updated_at` falls in a bulk touch (2026-04-30, 2026-08-17), not an edit. That
+conversion is squashed into the baseline, so this is inferred from timestamps.
 
 **What the web app already treats as true.** Folder contents are listed by
 folder id alone (`findNotesInFolderOrderByIdAsc`,
@@ -129,11 +133,20 @@ use; the stray `notebook_id` is the stale copy.
 
 **Proposed fix (for refinement, not agreed):**
 
-1. Repair the rows once, making `notebook_id` follow containment: a folder
-   takes its parent's notebook, a note takes its folder's. This is what
-   `reassignToNotebook` would have written. Notebook 4's accepted tree never
-   contained the stray rows, so it needs no new snapshot. A receiving notebook
-   that has a Git binding would drift; check that in the same query pass.
+1. Repair the affected rows once (16 at most), as an application operation inside
+   `AcceptedWebChangeService.apply` over both notebooks of each pair. **Not a
+   SQL migration:** whichever direction is chosen, one notebook gains content
+   its accepted tree lacks, and an accepted head only advances through that
+   service. A notebook drifted by raw SQL stays drifted, because the service
+   commits only for notebooks that matched before the change.
+   **Owner decision, direction of the repair:**
+   - *Follow containment* (the row joins its container's notebook). Matches
+     what the tree shows today. For pairs 12→4 and 4→26 it changes who can
+     read the notes: five circle notes become private, three private notes
+     become circle-visible.
+   - *Keep the notebook* (the row detaches to its own notebook's root). Nobody
+     gains or loses access. Root-level name collisions are unchecked.
+   The same-owner pairs (86→191, 56→309) are safe either way.
 2. No null guard in `folderPath` and no tolerant skip: once the invariant
    holds, the code that assumes it is correct, and a guard would hide the next
    violation the way the top-down walker hid this one.
@@ -194,11 +207,12 @@ Reuse it; do not duplicate it.
 - **Split found at diagnosis:** the production failure is a data-invariant
   repair (see Diagnosis); the structural cleanup is independent and fixes
   nothing the owner sees. Expect two stories, repair first.
-- **First evaluable step:** run the two read-only queries in production. Rows
-  for notebook 4 confirm the diagnosis and size the repair; no rows reopens it.
+- **First evaluable step:** the owner chooses the repair direction (see
+  Diagnosis). Production rows are already collected and confirm the diagnosis.
 - **Effort hypothesis:** structural half S (one class, three call sites,
-  mirrors a change already made). Repair half S once the production rows are
-  seen: one data migration plus a regression test built from the experiment.
+  mirrors a change already made). Repair half S to M: one
+  application-level repair of at most 16 known rows through the accepted web change
+  path, plus a regression test built from the experiment.
 - **Safe stopping point:** the structural half can ship alone; the existing
   relocation test already states the guarantee it protects.
 
