@@ -1,8 +1,19 @@
 # Display maintenance run timestamps in the admin's local time
 
-Status: planned
+Status: complete (slice done 2026-09-18; awaiting retrospective and story wrap-up)
 Source: [SEED-028 story 1](../../seeds/SEED-028-admin-job-status-local-time.md#story-1),
-refined 2026-09-18.
+refined 2026-09-18. Execution started 2026-09-18.
+
+## Execution identity
+
+- Mode: Story Branch Mode.
+- Originating checkout: `/Users/terryyin/git/doughnut` on `main`; claim
+  commit `e39d945a48` (backlog entry moved to Taken).
+- Execution checkout: `/Users/terryyin/git/doughnut/.claude/worktrees/140-admin-job-status-local-time`
+  on branch `140-admin-job-status-local-time`.
+- Integration: `main` in the originating checkout; remote `origin`
+  (`nerds-odd-e/doughnut`). Push destination for this execution:
+  `origin/140-admin-job-status-local-time`.
 
 ## Goal and scope
 
@@ -66,8 +77,12 @@ shared composable/utility (none exists today).
 ### 1. Format maintenance run timestamps in local time
 
 Type: Behavior
-Status: planned
-Proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test -- questionGenerationBatchStatusText QuestionGenerationBatchStatus` green.
+Status: done (2026-09-18)
+Proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test -- questionGenerationBatchStatusText QuestionGenerationBatchStatus`
+green (345 test files, 1892 tests; new
+`questionGenerationBatchStatusText.spec.ts` covers the local-time conversion
+and the unchanged "never" text; existing `QuestionGenerationBatchStatus.spec.ts`
+and `QuestionGenerationBatchStatusResume.spec.ts` stay green).
 
 Behavior: given a maintenance run with a UTC `startedAt`/`finishedAt` ISO
 string, `formatLastScheduledMaintenanceRun` / `formatLastManualMaintenanceRun`

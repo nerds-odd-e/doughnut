@@ -29,6 +29,9 @@ export const formatMaintenanceSummary = (
   ].join(", ")
 }
 
+const toLocalTime = (isoTimestamp: string): string =>
+  new Date(isoTimestamp).toLocaleString()
+
 const formatMaintenanceRun = (
   label: string,
   startedAt: string | undefined,
@@ -38,8 +41,8 @@ const formatMaintenanceRun = (
   if (!startedAt && !finishedAt) return `${label}: never`
   return [
     `${label}:`,
-    startedAt ? `started ${startedAt}` : undefined,
-    finishedAt ? `finished ${finishedAt}` : undefined,
+    startedAt ? `started ${toLocalTime(startedAt)}` : undefined,
+    finishedAt ? `finished ${toLocalTime(finishedAt)}` : undefined,
     error ? `error ${error}` : undefined,
   ]
     .filter(Boolean)
