@@ -14,6 +14,11 @@ refined 2026-09-18. Execution started 2026-09-18.
 - Integration: `main` in the originating checkout; remote `origin`
   (`nerds-odd-e/doughnut`). Push destination for this execution:
   `origin/140-admin-job-status-local-time`.
+- CI observer: GitHub Actions, workflow `ci.yml` ("donut CI"), target branch
+  `140-admin-job-status-local-time`; mailbox `/tmp/dough-ci-501/watch-3XiIZj`.
+  Armed after the slice 1 push (invoking the probe/launcher via
+  `.claude/skills/...` silently no-ops per DD-069; the `.agents/skills/...`
+  realpath works).
 
 ## Goal and scope
 
