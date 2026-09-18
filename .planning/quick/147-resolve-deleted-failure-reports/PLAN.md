@@ -79,7 +79,7 @@ or architecture abstraction is justified here.
 
 ### 1. Reusable targeted GitHub resolution
 Type: Structure
-Status: planned
+Status: done
 Estimate: about 5 minutes active change/proof work; medium confidence.
 
 Expose targeted completed-issue closure through the existing GitHub owner and
@@ -226,5 +226,19 @@ Do not absorb the unrelated modified SEED-035 file into this story.
   there is no cross-system atomicity promise.
 - Request-method correction and an explicit completed closure reason are
   required in the existing adapter, not merely a call to its old private helper.
-- No implementation, product verification, commit or push has occurred during
-  planning. All slice statuses are planned; there is no retained passing proof.
+- Slice 1 delivered: `GithubService.closeIssueAsCompleted(Integer)` added and
+  implemented in `RealGithubService` via PATCH with
+  `{"state":"closed","state_reason":"completed"}`, reusing the existing
+  `apiRequest` transport. A package-private `httpClient` field on
+  `RealGithubService` is the minimal transport seam (replaces a fresh
+  `HttpClient` built per call), letting `RealGithubServiceTest` (new, plain
+  unit test, no Spring context) assert the real constructed request's path,
+  method, and body without contacting GitHub. `closeAllOpenIssues`/`closeIssue`
+  (POST, no `state_reason`) were deliberately left unchanged and separate to
+  preserve close-all's existing request semantics; `NullGithubService` got a
+  matching no-op override. Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+  — full suite 2501 tests, 0 failures, including 3 new targeted-close tests
+  and unmodified `FailureReportControllerTest`. Refactor pass found nothing to
+  change (`none — already clean`).
+- `closeIssueAsCompleted` has no production caller yet; slice 2 is expected to
+  wire it into deletion.
