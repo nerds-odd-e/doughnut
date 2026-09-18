@@ -207,6 +207,12 @@ accepted. Identity-sensitive deletion/recreation must be resolved even when
 the endpoint tree is unchanged. Paths present only in unpublished intermediate
 revisions require no temporary Note entities or learning/index side effects.
 
+The final application is itself mutating. Any Portable path it resolves must
+come from live entity state, not from a projection snapshot taken before it
+began; a snapshot may only be compared against another snapshot. Mixing them
+fails silently, because a snapshot cannot describe a folder the application
+has just created or reparented.
+
 Git objects must be durable before a head referencing them is advertised. When
 objects and MySQL do not share a transaction, stage immutable objects first and
 make the MySQL-accepted head the publication authority. Unaccepted objects may
@@ -367,6 +373,8 @@ implementation beyond already delivered bounded behavior.
   project repository that binds only one subdirectory.
 - Donut still owns conservative path-to-entity identity projection because Git
   does not record renames as durable identity.
+- Live entities' Portable paths are resolved from live state during the final
+  application, so an earlier structural change cannot strand a later path.
 - Identity analysis may use intermediate commits without materializing them.
   Some rename/edit or copy/delete cases remain ambiguous; the product must
   resolve or refuse them without requiring history rewriting.
