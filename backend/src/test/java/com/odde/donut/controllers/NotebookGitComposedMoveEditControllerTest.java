@@ -188,14 +188,35 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitBundleControl
     Note moved = noteRepository.findById(original.getId()).orElseThrow();
     assertThat(moved.getTitle(), equalTo("note"));
     assertThat(moved.getContent(), equalTo(EDITED_CONTENT));
-    Folder dest =
-        folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-            .filter(folder -> folder.getName().equals("Dest"))
-            .findFirst()
-            .orElseThrow();
-    assertThat(moved.getFolder().getId(), equalTo(dest.getId()));
+    assertThat(moved.getFolder().getId(), equalTo(folderNamed(notebook, "Dest").getId()));
     MemoryTracker reloadedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
     assertThat(reloadedTracker.getNote().getId(), equalTo(original.getId()));
+  }
+
+  @Test
+  void publishesMoveIntoNewlyCreatedFolderAlongsideAnotherNoteEdit() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note moved = makeMe.aNote().notebook(notebook).title("note").content(ORIGINAL_CONTENT).please();
+    Note companion =
+        makeMe.aNote().notebook(notebook).title("other").content(COMPANION_ORIGINAL).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Alpha/note.md", ORIGINAL_CONTENT),
+                new NotebookGitProposalFile("other.md", COMPANION_EDITED)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
+
+    Note reloadedMoved = noteRepository.findById(moved.getId()).orElseThrow();
+    assertThat(reloadedMoved.getTitle(), equalTo("note"));
+    assertThat(reloadedMoved.getContent(), equalTo(ORIGINAL_CONTENT));
+    assertThat(reloadedMoved.getFolder().getId(), equalTo(folderNamed(notebook, "Alpha").getId()));
+    assertThat(
+        noteRepository.findById(companion.getId()).orElseThrow().getContent(),
+        equalTo(COMPANION_EDITED));
   }
 
   @Test
@@ -213,6 +234,13 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitBundleControl
             notebook, binding.getAcceptedGitObjectId(), proposalBytes, HttpStatus.BAD_REQUEST);
 
     assertThat(exception.getReason(), containsString("identity correspondence is uncertain"));
+  }
+
+  private Folder folderNamed(Notebook notebook, String name) {
+    return folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+        .filter(folder -> name.equals(folder.getName()))
+        .findFirst()
+        .orElseThrow();
   }
 
   private static Note noteByTitle(List<Note> notes, String title) {
