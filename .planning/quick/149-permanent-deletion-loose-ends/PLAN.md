@@ -231,10 +231,15 @@ Complexity: about −55 lines.
 
 ### 6. The stored API's public surface is declared once
 Type: Structure (owns retrospective item d directly)
-Status: planned
+Status: done
 Weakness removed: the `StoredApi` interface repeats every public method
 signature of its only implementation, so each new action is declared twice.
-Proof: frontend type check and `frontend/tests/store/*.spec.ts` stay green.
+Proof: `vue-tsc --noEmit` clean; `pnpm frontend:test tests/store
+tests/toolbars` (17 files/108 tests) plus three more `storedApi()` consumer
+specs, all pass. `StoredApi` interface deleted; `createNoteStorage.ts` types
+`storedApi()` as `StoredApiCollection` directly; the class's
+`noteEditingHistory` and `storage` are now constructor-private.
+`StoredApiCollection.ts`: 583 → 516 lines; `createNoteStorage.ts`: 51 → 49.
 
 Internal change: `createNoteStorage.ts` is the only user of the interface and no
 test stubs it. Remove the interface, return the class type, move the three doc

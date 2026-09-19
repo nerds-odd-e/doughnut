@@ -19,7 +19,6 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
-import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
@@ -66,79 +65,6 @@ function throwStoredApiError(
   throw apiError
 }
 
-export interface StoredApi {
-  getNoteRealmRefAndLoadWhenNeeded(noteId: Donut.ID): Ref<NoteRealm | undefined>
-
-  getNoteRealmRef(noteId: Donut.ID): Ref<NoteRealm | undefined>
-
-  /** Loads a note realm into storage (same as navigating to the note-id route). */
-  loadNoteRealm(noteId: Donut.ID): Promise<NoteRealm>
-
-  createRootNoteAtNotebook(
-    router: Router,
-    notebookId: number,
-    data: NoteCreationDto,
-    options?: {
-      folderId?: number | null
-      refreshWikiLinkCacheForNoteIds?: number[]
-      skipNavigation?: boolean
-    }
-  ): Promise<NoteRealm>
-
-  /** Refresh storage, sidebar listings, and navigate to this note (replace route). */
-  focusNoteRealm(router: Router, noteRealm: NoteRealm): Promise<NoteRealm>
-
-  updateTextField(
-    noteId: Donut.ID,
-    field: "edit title" | "edit content",
-    value: string,
-    options?: {
-      titleReferenceHandling?: TitleRenameReferenceHandling
-    }
-  ): Promise<void>
-
-  /** Persists note content without recording undo (e.g. initial body after create). */
-  setNoteContentWithoutUndo(noteId: Donut.ID, content: string): Promise<void>
-
-  completeContent(
-    noteId: Donut.ID,
-    value?: NoteContentCompletion
-  ): Promise<void>
-
-  /** PATCH note content with current stored body so the backend rebuilds the resolved wiki-link index. */
-  refreshWikiLinkCacheForNote(noteId: Donut.ID): Promise<void>
-
-  undo(router: Router): Promise<NoteRealm | undefined>
-
-  trashNote(
-    router: Router,
-    noteId: Donut.ID,
-    options: NoteTrashOptions
-  ): Promise<NoteRealm | undefined>
-
-  /**
-   * Permanently deletes a note that is in trash, with everything it owns.
-   * Records no undo and drops the note from cache.
-   */
-  permanentlyDeleteNote(router: Router, noteId: Donut.ID): Promise<void>
-
-  /**
-   * Permanently reduces a relationship note into a property of its source.
-   * Records no undo and drops the relationship note from cache.
-   */
-  reduceRelationNoteToSourceProperty(
-    router: Router,
-    relationNoteId: Donut.ID
-  ): Promise<NoteRealm | undefined>
-
-  moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID): Promise<void>
-
-  moveNoteToNotebookRoot(
-    sourceId: Donut.ID,
-    targetNotebookId: number
-  ): Promise<void>
-}
-
 function noteReferenceHandlingBody(options: NoteTrashOptions): NoteTrashDto {
   return { referenceHandling: options.referenceHandling }
 }
@@ -150,15 +76,11 @@ function containingLocation(notebookId: number, folderId: number | null) {
     : { name: "notebookPage", params: { notebookId } }
 }
 
-export default class StoredApiCollection implements StoredApi {
-  noteEditingHistory: NoteEditingHistory
-
-  storage: NoteStorage
-
-  constructor(undoHistory: NoteEditingHistory, storage: NoteStorage) {
-    this.noteEditingHistory = undoHistory
-    this.storage = storage
-  }
+export default class StoredApiCollection {
+  constructor(
+    private noteEditingHistory: NoteEditingHistory,
+    private storage: NoteStorage
+  ) {}
 
   // eslint-disable-next-line class-methods-use-this
   private async routerReplaceFocus(router: Router, focusOnNote?: NoteRealm) {
@@ -240,6 +162,7 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
+  /** Loads a note realm into storage (same as navigating to the note-id route). */
   async loadNoteRealm(noteId: Donut.ID): Promise<NoteRealm> {
     return this.loadNote(noteId)
   }
@@ -260,6 +183,7 @@ export default class StoredApiCollection implements StoredApi {
     return focus
   }
 
+  /** Refresh storage, sidebar listings, and navigate to this note (replace route). */
   async focusNoteRealm(router: Router, noteRealm: NoteRealm) {
     const focus = this.storage.refreshNoteRealm(noteRealm)
     return this.navigateToFocusedNote(router, focus)
@@ -379,6 +303,7 @@ export default class StoredApiCollection implements StoredApi {
     )
   }
 
+  /** Persists note content without recording undo (e.g. initial body after create). */
   async setNoteContentWithoutUndo(noteId: Donut.ID, content: string) {
     await this.updateTextContentWithoutUndo(noteId, "edit content", content)
   }
@@ -394,6 +319,7 @@ export default class StoredApiCollection implements StoredApi {
     await this.updateTextField(noteId, "edit content", value.content)
   }
 
+  /** PATCH note content with current stored body so the backend rebuilds the resolved wiki-link index. */
   async refreshWikiLinkCacheForNote(noteId: Donut.ID): Promise<void> {
     let realm = this.storage.refOfNoteRealm(noteId).value
     if (!realm?.note) {
@@ -526,6 +452,10 @@ export default class StoredApiCollection implements StoredApi {
     return trashedRealm
   }
 
+  /**
+   * Permanently deletes a note that is in trash, with everything it owns.
+   * Records no undo and drops the note from cache.
+   */
   async permanentlyDeleteNote(router: Router, noteId: Donut.ID) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot delete a note that is not loaded")
@@ -544,6 +474,10 @@ export default class StoredApiCollection implements StoredApi {
     refreshSidebarStructuralListings()
   }
 
+  /**
+   * Permanently reduces a relationship note into a property of its source.
+   * Records no undo and drops the relationship note from cache.
+   */
   async reduceRelationNoteToSourceProperty(
     router: Router,
     relationNoteId: Donut.ID

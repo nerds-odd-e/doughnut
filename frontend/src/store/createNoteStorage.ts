@@ -2,11 +2,10 @@ import type { HistoryRecord } from "./NoteEditingHistory"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
 import { StorageImplementation } from "./NoteStorage"
-import type { StoredApi } from "./StoredApiCollection"
 import StoredApiCollection from "./StoredApiCollection"
 
 interface StorageAccessor extends NoteStorage {
-  storedApi(): StoredApi
+  storedApi(): StoredApiCollection
   peekUndo(): null | HistoryRecord
   discardUndo(): void
 }
@@ -30,7 +29,7 @@ class AccessorImplementation
     return this.noteEditingHistory.peekUndo() as HistoryRecord
   }
 
-  storedApi(): StoredApi {
+  storedApi(): StoredApiCollection {
     return new StoredApiCollection(this.noteEditingHistory, this)
   }
 
