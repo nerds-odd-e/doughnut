@@ -12,6 +12,8 @@ import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Entity
 @Table(name = "folder")
@@ -83,5 +85,12 @@ public class Folder extends EntityIdentifiedByIdOnly {
     return getParentFolder() == null
         ? getName().equalsIgnoreCase("_trash")
         : getParentFolder().isTrashed();
+  }
+
+  @JsonIgnore
+  public void requireInNotebook(Notebook notebook) {
+    if (!getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
+    }
   }
 }

@@ -164,9 +164,15 @@ Complexity: about −2 lines, two wordings become one.
 
 ### 3. Creating a note in another notebook's folder answers 404
 Type: Behavior
-Status: planned
-Proof: new case in
-`backend/src/test/java/com/odde/donut/controllers/NotebookNoteCreateControllerTest.java`.
+Status: done
+Proof: `NotebookNoteCreateControllerTest.rejectsFolderIdFromAnotherNotebook`
+updated in place (it already covered this exact case, previously pinning
+400) to assert 404, the exact reason text, and that no note is created.
+`./backend/gradlew -p backend test -Dspring.profiles.active=test --tests
+"com.odde.donut.controllers.NotebookNoteCreateControllerTest"`: BUILD
+SUCCESSFUL. `Folder.requireInNotebook(Notebook)` is the new home, used only
+by `NoteConstructionService.buildNote` so far; slice 4 replaces the
+remaining five copies with it.
 
 Behavior: folder F belongs to notebook B → the owner creates a note in notebook
 A with `folderId` = F → 404 "Folder not in notebook.", and no note is created.

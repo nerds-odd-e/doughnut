@@ -126,11 +126,16 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
   void rejectsFolderIdFromAnotherNotebook() {
     Notebook nb1 = ownedNotebook();
     Folder f2 = ownedFolder(ownedNotebook(), "Other");
+    long noteCountBefore = noteRepository.count();
+
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
             () -> controller.createNoteAtNotebookRoot(nb1, noteCreateInFolder("Intruding", f2)));
-    assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+
+    assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    assertThat(ex.getReason(), equalTo("Folder not in notebook."));
+    assertThat(noteRepository.count(), equalTo(noteCountBefore));
   }
 
   @ParameterizedTest

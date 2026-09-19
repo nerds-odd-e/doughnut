@@ -86,9 +86,7 @@ public class NoteConstructionService {
               .findById(noteCreation.getFolderId())
               .orElseThrow(
                   () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
-      if (!folder.getNotebook().getId().equals(notebook.getId())) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder not in notebook.");
-      }
+      folder.requireInNotebook(notebook);
     }
     Note note = noteFactory.create(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
