@@ -73,3 +73,54 @@ against that code.
     protocol step; nothing in `delegation.md`'s proof-acceptance guidance
     named the typecheck as a required check for a slice that consumes a
     newly-regenerated, optional-by-default SDK field.
+
+### Require type checking before accepting frontend proof
+
+Initial evaluation: 2026-09-19.
+
+**Decision: real, worth a small correction; low urgency.** The beneficiaries
+are Donut contributors and execution agents accepting frontend work. The
+problem is delayed feedback and incomplete proof acceptance: passing behavior
+tests does not establish that the changed frontend passes its type checks.
+The two recorded occurrences show actual repair and repeated verification
+costs. Neither establishes a production escape; existing delivery gates caught
+the errors, or would have caught them later.
+
+Current repository inspection confirms the gap still exists:
+
+- Root `package.json` routes `frontend:test` to the frontend package's `test`
+  script; `frontend/package.json` runs Vitest without a typecheck.
+- `frontend/vitest.config.ts` explicitly disables the checker plugin during
+  tests for speed and says type checking should run separately.
+- `.agents/skills/frontend/SKILL.md`,
+  `.agents/skills/frontend-testing/SKILL.md`, and `.agents/agent-map.md`
+  document the behavioral test command without pairing it with type checking
+  at proof acceptance.
+- `frontend/package.json` already runs `vue-tsc --noEmit` in `lint`, `format`,
+  and `build`. Root `frontend:verify` combines tests with a full build.
+  `frontend/tsconfig.json` includes both application and test sources.
+  These existing checks limit the risk and provide reusable verification.
+
+**Recommended outcome:** before frontend work is accepted as proved, its
+behavioral tests and the project's Vue/TypeScript check have both passed on
+the changed revision. Update the project-owned proof guidance to make that
+requirement explicit, reusing the existing typechecker. Keep focused test
+iteration fast. A separate convenient command is optional; do not presume
+that every Vitest invocation needs a full typecheck or production build.
+
+**Alternatives:** relying on the existing commit gate costs no implementation
+but retains the observed late repair loop. Running `frontend:verify` already
+provides tests plus type checking, but also performs a production build that
+is unnecessary solely to close this gap. Prefer the smallest guidance/command
+change that makes the two required observations clear.
+
+**Evaluation signal for a future fix:** a representative type-invalid change
+in a component or test cannot receive complete frontend proof merely because
+its behavioral test passes; after repair, both required checks pass. Preserve
+focused test selection and the existing delivery gates. Exact command design
+and runtime overhead remain to be assessed during implementation.
+
+This is an initial source-based evaluation supported by the two recorded
+occurrences, not a new runtime reproduction or a claim that the current
+frontend contains those historical type errors. Implementation is queued,
+not started.

@@ -13,4 +13,5 @@ either the remote or local repository may be multiple commits behind.
 
 ## Backlog list
 
+- [Require type checking before accepting frontend proof](quick/260920-frontend-proof-type-checking/PLAN.md)
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033

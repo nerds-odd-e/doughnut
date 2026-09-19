@@ -62,7 +62,7 @@ still needs this shared final-only path for broader identity inference. Exact
 endpoint matching alone is not enough for rename-then-edit
 continuity when correspondence must be inferred beyond already supported
 transitions. This topic follows the owner's final-only application direction in
-[Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md#apply-one-final-projection-atomically)
+[Proposed Git publication architecture](../docs/notebook-git-synchronization.md#publication-guarantees)
 and preserves [Accepted ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md).
 Confirmed deletion/recreation retains its existing identity semantics. The
 selected ordinary-note rename admission direction is below; the proposed ADR

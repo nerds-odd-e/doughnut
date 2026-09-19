@@ -1,0 +1,160 @@
+# Notebook Git synchronization architecture
+
+This document details [ADR 0002](./adrs/0002-git-native-portable-notebook-synchronization.md).
+It shares that ADR's **Proposed** status; it is a design contract, not a claim
+that every described capability is implemented. Portable file representation
+and validation belong to [ADR 0004](./adrs/0004-okf-compatible-notebook-markdown-accepted.md).
+
+## Repository and transport boundary
+
+A notebook Git binding is server configuration containing a repository, one
+accepted ref, and a root directory. Portable paths are relative to that root;
+the binding is not a tracked repository file.
+
+V1 uses a Donut-owned dedicated repository for each notebook, with exactly one
+binding, the repository root as the notebook root, and `refs/heads/main` as the
+only accepted remote ref. The Donut CLI may mediate acquisition and
+synchronization. Direct `git clone`, `git fetch`, and `git push` against Donut
+are later capabilities using the same objects, refs, and history.
+
+Synchronization requires no `.donut` directory, manifest, local database,
+extended attributes, or filesystem watcher. Binding and authentication data may
+live in ordinary Git configuration or the normal credential store. Git tree
+object IDs supply tree integrity checks; the commit graph supplies common
+ancestors. Do not introduce a custom tree digest, sync envelope, delta format,
+or three-way merge protocol.
+
+A future binding may select a directory inside a project repository. Git
+operations, permissions, commits, and integration policy then apply to the
+whole repository; Donut validates and projects only the bound subtree. A commit
+outside that subtree advances repository history without changing the notebook.
+A commit touching several bound notebooks changes their projections at the
+same repository-commit boundary. Crossing a binding boundary is deletion from
+one Portable tree and addition to the other. Do not give a bound subtree
+filtered or synthetic commit IDs as part of this contract.
+
+## Cutover and creation
+
+One fleet migration creates a dedicated repository and accepted `main` for
+every existing notebook. Each receives exactly one root commit containing its
+canonical Portable tree at cutover. Do not fabricate commits for earlier MySQL
+history, require owner opt-in, or defer repository creation until local
+acquisition. New notebooks are Git-backed from creation.
+
+After cutover, accepted Git content is authoritative; MySQL is its current
+projection and the authority for private identity-bound data.
+
+## Accepted history
+
+V1 accepts only fast-forward updates to `refs/heads/main`. Every commit has
+exactly one parent except the initial root commit. Reject merge commits,
+non-fast-forward or force pushes, deletion or rewind of `main`, and creation or
+update of other remote branches or tags.
+
+The supported workflow must not require branching, merging, rebasing,
+squashing, or amendment to publish. Local Git branches are possible, but
+publishing a divergent branch is unsupported. If both sides independently
+advance, report the conflict and preserve both histories.
+
+A full clone must receive the entire original history reachable from accepted
+`main`, preserving commit IDs, parents, trees, blobs, and commit metadata.
+Unsubmitted local refs, reflogs, and unreachable objects are outside this
+promise. Do not compact accepted history into equivalent snapshots that change
+commit IDs. Quota, backup, erasure, and garbage-collection policies remain
+separate operational decisions.
+
+Only the publication tip must satisfy
+[ADR 0004 validation](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation)
+and current business invariants. Intermediate trees may contain malformed
+Markdown, temporary files, or structures Donut cannot represent. Git object
+integrity, connectivity, permitted ancestry, authorization, and safe inspection
+still apply to the entire received range. Retention does not authorize rendering
+historical drafts as current application content.
+
+V1 requires no historical-checkout UI, remote-history browser, or Donut revert
+endpoint. Any future restore publishes a new forward commit whose tip meets
+current validation rules; it never rewinds accepted `main`.
+
+## Publication guarantees
+
+A publication proposes tip T against expected accepted head A. Acceptance
+requires A to remain current and the complete range A–T to satisfy the ancestry
+policy. Web edits and local publications compete at this same boundary; only
+one update can replace a given head.
+
+The final MySQL projection, identity outcomes, required derived state, and
+accepted head become visible together or remain unchanged. Intermediate commits
+supply evidence, not temporary application entities, learning updates, or index
+mutations. Apply the resolved final state once. A new commit with the same tree
+as A can still be accepted and can still require identity changes.
+
+Git objects must be durable before advertising a head that references them.
+When objects and MySQL cannot share a transaction, stage immutable objects first
+and use the MySQL-accepted head as publication authority. Unaccepted objects
+may remain unreachable for garbage collection. Every advertised head must have
+accessible objects and its committed projection.
+
+Retrying T while it is the current accepted head succeeds without reapplying
+changes or allocating identities. If the remote has advanced, do not rewind or
+reapply T. Reporting an earlier successful publication requires retained
+publication-boundary evidence: being an ancestor alone is insufficient.
+Otherwise report the advanced head. The receipt surface remains unresolved.
+
+Do not silently rewrite a proposed tree. Derived indexes may be rebuilt, but
+Portable changes, including web-authored link rewrites, must be in the published
+commit. Reject a final tree that violates a required invariant with an
+actionable error. Folder representation follows
+[ADR 0004](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#bundle-and-concepts);
+omitting a folder's last represented path dissolves its projected Folder.
+
+Every accepted web editing batch that changes Portable content appends exactly
+one commit; never amend or coalesce accepted or advertised commits. V1 authors
+directly on `main`. For a future project binding, repository policy determines
+whether Donut commits directly or opens a pull request. In either case, the
+projection changes only when the commit reaches the accepted ref. Autosave
+draft buffering is outside this decision.
+
+## Identity across a publication range
+
+Start with the private identity mapping at A and derive one final mapping at T
+using relevant paths, blobs, and parent/child relationships across the range.
+Git rename labels and similarity scores are candidate evidence, not proof of
+identity. Folder correspondence requires its own domain conclusion.
+
+Supported transitions must compose: an unambiguous exact-content move followed
+by a same-path edit retains the original identity even if A and T have very
+different contents. Same-path and unique exact-content correspondence can
+supply evidence, but do not resolve every copy, rewrite, or recreation. Broader
+admission rules remain open.
+
+Unresolved identity conflicts block publication and preserve both sides.
+Do not silently transfer learning history or treat a possible move as permanent
+delete/add. Owner-assisted resolution remains a future protocol decision; do
+not introduce IDs, manifests, or commit trailers as an implicit solution.
+
+A resolved move updates the original entity and retains its dependent data.
+Trash moves follow [ADR 0004 — Trash](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#trash).
+A confirmed committed deletion removes the entity and its dependent data.
+Recreation starts a new identity, even at the same path with identical bytes
+within one publication; later moves preserve that new identity. Resolve
+possible moves before declaring deletion. An invalid intermediate notebook
+alone does not establish a deletion.
+
+Consequently, deletion followed by recreation must produce replacement and
+dependent-data removal even when A and T have identical trees. `git revert`
+restores Portable content, not deleted identities or learning history, including
+when deletion and revert are published together.
+
+## Unresolved policy
+
+- **Identity admission:** Define evidence for automatic preservation beyond
+  supported exact correspondence, cases requiring refusal or owner intent,
+  deterministic analysis settings, and a safe outcome when analysis exceeds its
+  budget. Preserve composition of supported operations. Owner intent needs
+  defined authority, binding to the proposed range, and transport.
+- **Atomic failure and receipts:** Define remaining durable-object and
+  multi-head receipt guarantees and how prior publication is evidenced.
+- **Historical representability:** Resolve whether tip-only validation satisfies
+  [ADR 0004's durable-write rule](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation)
+  when retained ancestors are not representable. This document does not amend
+  that Accepted ADR.
