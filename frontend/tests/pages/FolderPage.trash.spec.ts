@@ -33,13 +33,19 @@ describe("FolderPage trash", () => {
     const trashSpy = vi.spyOn(NotebookController, "trashFolder")
     await openFolderSettingsTab(wrapper)
 
-    await wrapper.get('[data-testid="folder-trash-button"]').trigger("click")
+    const trashButton = wrapper.get('[data-testid="folder-trash-button"]')
+    const consequence =
+      "Its contents leave active use. References remain authored, but may no longer resolve until the folder is recovered with Move."
+    expect(trashButton.element.previousElementSibling?.textContent).toBe(
+      `Trash folder "Topic" with its complete subtree. ${consequence}`
+    )
+
+    await trashButton.trigger("click")
     const confirmation = usePopups().popups.peek()?.[0]
     expect(confirmation?.type).toBe("confirm")
-    expect(confirmation?.message).toContain("complete subtree")
-    expect(confirmation?.message).toContain("leave active use")
-    expect(confirmation?.message).toContain("References remain authored")
-    expect(confirmation?.message).toContain("recover the folder with Move")
+    expect(confirmation?.message).toBe(
+      `Trash folder "Topic" with its complete subtree? ${consequence}`
+    )
     resolveTopConfirm(false)
     await flushPromises()
 

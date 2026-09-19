@@ -141,8 +141,17 @@ Complexity: about +10 lines, no new concept on the screen.
 
 ### 2. The folder Trash offer states its consequences in one wording
 Type: Behavior
-Status: planned
-Proof: `frontend/tests/pages/FolderPage.trash.spec.ts`.
+Status: done
+Proof: `frontend/tests/pages/FolderPage.trash.spec.ts` pins the identical
+consequence sentence in both description and confirmation
+(`pnpm frontend:test tests/pages/FolderPage.trash.spec.ts`, 4 tests pass).
+The refactor pass introduced `removalMessages(subject, consequence)` in
+`folderRemovalOffer.ts` so the permanent-delete and trash pairs share one
+composition instead of repeating it; `FolderPage.permanentlyDelete.spec.ts`
+stays green (4 tests) proving the permanent-delete strings are unchanged.
+Net line count: `folderRemovalOffer.ts` 55 → 61 lines — one wording became
+one, but the file gained the shared `removalMessages` helper it lacked
+before, which the plan's "-2 lines" estimate did not anticipate.
 
 Behavior: an active folder's Settings tab is open → the owner reads the
 description and then presses Trash → the confirmation shows the same subject and

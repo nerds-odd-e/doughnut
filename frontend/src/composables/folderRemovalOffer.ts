@@ -22,11 +22,16 @@ const permanentDeleteSubject = (name: string) =>
 const permanentDeleteConsequence =
   "All its notes are deleted with their learning history, questions, conversations and images, and this cannot be undone. Earlier Git history of this notebook still contains the text."
 
-const trashDescription = (name: string) =>
-  `Trash "${name}" with its complete subtree. Its contents leave active use. References remain authored, but may no longer resolve until the folder is recovered with Move.`
+const trashSubject = (name: string) =>
+  `Trash folder "${name}" with its complete subtree`
 
-const trashConfirmation = (name: string) =>
-  `Trash folder "${name}"? Its complete subtree will leave active use. References remain authored but may no longer resolve until you recover the folder with Move.`
+const trashConsequence =
+  "Its contents leave active use. References remain authored, but may no longer resolve until the folder is recovered with Move."
+
+const removalMessages = (subject: string, consequence: string) => ({
+  description: `${subject}. ${consequence}`,
+  confirmation: `${subject}? ${consequence}`,
+})
 
 /**
  * The single removal a folder's Settings tab offers: Trash while the folder is
@@ -41,8 +46,10 @@ export function folderRemovalOffer(
     return {
       testId: "folder-permanent-delete-button",
       buttonLabel: "Permanently delete folder",
-      description: `${permanentDeleteSubject(name)}. ${permanentDeleteConsequence}`,
-      confirmation: `${permanentDeleteSubject(name)}? ${permanentDeleteConsequence}`,
+      ...removalMessages(
+        permanentDeleteSubject(name),
+        permanentDeleteConsequence
+      ),
       failureMessage: "Failed to permanently delete folder",
       request: (path) => NotebookController.permanentlyDeleteFolder({ path }),
     }
@@ -50,8 +57,7 @@ export function folderRemovalOffer(
   return {
     testId: "folder-trash-button",
     buttonLabel: "Trash folder",
-    description: trashDescription(name),
-    confirmation: trashConfirmation(name),
+    ...removalMessages(trashSubject(name), trashConsequence),
     failureMessage: "Failed to trash folder",
     request: (path) => NotebookController.trashFolder({ path }),
   }
