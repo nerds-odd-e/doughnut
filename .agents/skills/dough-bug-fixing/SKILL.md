@@ -12,9 +12,9 @@ description: >-
 
 # Resolve a reported discrepancy
 
-Gather the supplied report, then invoke shared execution early for investigation,
-reproduction, and attempted repair unless the report is already known to be
-larger than that bounded attempt. Return an evidence-backed disposition to the
+Gather the supplied report and investigate it without repairing the product.
+Close any standalone exploration workspace before invoking shared execution for
+an authorized bounded repair. Return an evidence-backed disposition to the
 coordinator. Route known larger work and incomplete or inconclusive attempts as
 first-priority backlog stories. Do not invent a defect, dismiss a report for
 lack of confirmation, or treat branch delivery as integration.
@@ -45,16 +45,47 @@ from the established task and repository. If required behavior or tooling
 context is missing, report the gap and stop the affected work rather than
 inventing it.
 
-## Invoke shared execution
+## Investigate in an exploration workspace
+
+If the report is already known to be larger than the bounded repair, skip
+investigation and use [Route remaining work](#route-remaining-work). Do not
+start an investigation solely to justify that route.
+
+Before checkout-bound investigation, read and follow the shared
+[exploration workspace lifecycle](../dough-manual-testing/references/exploration-workspace.md).
+Enter that lifecycle before investigation begins.
+
+Use a session-created workspace only to establish the report's validity,
+evidence, reproduction, and likely size. Do not repair the product there. A
+temporary reproduction test or harness is investigation evidence, not a product
+change or durable planning artifact. Keep the investigation bounded to the
+evidence needed to choose a supported disposition.
+
+If evidence shows that actual behavior already matches intended behavior, close
+any session-created workspace safely and return an explained-no-change
+disposition. Create no story, plan, or execution workspace for that result. If
+the report is known larger, or investigation is incomplete or inconclusive, use
+[Route remaining work](#route-remaining-work). If a repair is supported within
+the ten-minute attempt, first remove owned temporary investigation artifacts
+and safely close any session-created workspace, then invoke shared execution.
+If the lifecycle cannot close safely, return its retained-workspace handoff and
+do not begin repair.
+
+## Invoke shared execution for repair
 
 If the report is already known to be larger than a ten-minute bounded repair,
-skip this handoff and use [Route remaining work](#route-remaining-work). Do not
-start an investigation attempt solely to justify that route.
+skip this handoff and use [Route remaining work](#route-remaining-work).
 
-Otherwise invoke [dough-execute-plan](../dough-execute-plan/SKILL.md) immediately
-as one planless contextual instruction. Pass `--no-replan` and a ten-minute hard
-limit. Carry the gathered expectation, actual behavior, evidence, and gaps. Do
-not plan, invent a story, or start a local implement-and-refactor loop.
+Only after exploration is complete and any session-created workspace has closed
+safely, invoke [dough-execute-plan](../dough-execute-plan/SKILL.md) as one
+planless contextual instruction from the applicable local `main` or other
+already integrated revision. Let execute-plan create its own execution branch
+and worktree; never reuse or nest the exploration workspace. If the established
+checkout already belongs to an active execute-plan repair, return the evidence
+to that owning execution instead of invoking a nested one. Pass `--no-replan`
+and a ten-minute hard limit. Carry the gathered expectation, actual behavior,
+evidence, and gaps. Do not plan, invent a story, or start a local
+implement-and-refactor loop.
 
 Debug with available knowledge as needed. Do not require a separate debugging
 skill.
@@ -103,6 +134,11 @@ defect to have something to repair.
 Use this one rule for known larger work, an incomplete `--no-replan` return, or
 an inconclusive report. Do not invent severity categories.
 
+For checkout-bound routing or artifact changes, continue the shared
+[exploration workspace lifecycle](../dough-manual-testing/references/exploration-workspace.md)
+already entered for the session, or enter it now if investigation did not need
+a checkout.
+
 Do not repeat execute-plan preservation, rollback, or retry. Link the
 execution-preserved evidence already written under this project's
 executable-plan root (see [refine an oversized
@@ -130,6 +166,27 @@ deduplication, and Taken placement. Do not list the same work twice. Do not
 move or interrupt **Taken** work; leave it running and in place, and report any
 contradiction with it to the coordinator.
 
+When a session-created exploration workspace contains an authorized canonical
+story, executable plan, backlog change, or other durable planning evidence,
+remove temporary reproduction and product changes first. Verify that only those
+owned planning artifacts remain, commit only them on the exploration branch,
+and record the commit. Resolve the local integration checkout for `main`; verify
+its branch, cleanliness, and ownership before integrating the artifact commit
+using the project's safe local Git convention. Integrate only the owned planning
+artifacts, not unrelated exploration ancestry, and do not push. Then rebase the
+exploration branch onto the resulting local `main` without carrying unrelated
+ancestry, verify the durable artifacts are integrated and the worktree is clean,
+and close the temporary worktree and branch through the shared
+[exploration workspace lifecycle](../dough-manual-testing/references/exploration-workspace.md).
+If any commit, integration, rebase, verification, or cleanup step is unsafe,
+ambiguous, or incomplete, use the shared lifecycle's retained-workspace handoff
+and add the artifact commit when one exists and the integration evidence state.
+Do not force cleanup or start repair.
+
+An established checkout remains under its owning workflow's delivery and
+cleanup rules; do not impose this temporary-workspace integration sequence or
+create a nested workspace there.
+
 Do not start execution of the queued work. Later refinement or planning reads
 the same linked expectations, evidence, gaps, and examples; do not invent
 another tracker.
@@ -151,8 +208,10 @@ or which remaining-work route was taken.
   for integration to the selected target (default `main`). Reporter
   confirmation on main is pending when a repair needs it; never fabricate
   that confirmation.
-- **Explained no-change:** evidence shows the actual behavior matches the
-  intended behavior. Resolve the report without a repair.
+- **Explained no-change:** exploration evidence or execute-plan's
+  explained-empty-change return shows the actual behavior matches the intended
+  behavior. Resolve the report without a repair. A conclusion reached during
+  exploration creates no execution workspace.
 - **Unresolved:** validity, cause, or scope remains unconfirmed, and the report
   is not known larger and was not an incomplete or inconclusive execution
   return. Do not claim resolution or invent a queue entry.
@@ -165,7 +224,7 @@ or which remaining-work route was taken.
   scope-distortion or ownership decision and return it to the coordinator
   without a guessed queue entry. Do not claim resolution.
 
-Use `## BUG REPORT RESOLVED` only for a repaired or explained-no-change
-disposition after execute-plan has returned that outcome. That marker is not
-main integration and not reporter confirmation. Otherwise report the gap
-without the marker.
+Use `## BUG REPORT RESOLVED` only for a repaired disposition returned by
+execute-plan or an explained-no-change disposition supported by exploration or
+execute-plan evidence. That marker is not main integration and not reporter
+confirmation. Otherwise report the gap without the marker.

@@ -194,10 +194,23 @@ state and report it. Do not loop.
 A conflict while rebasing the owned unpublished suffix is not permission to
 take `--ours` or `--theirs`, skip the commit, or continue Git blindly.
 
-Inspect unmerged paths. For this project's product backlog, apply
-[backlog merge conflicts](../dough-product-backlog/references/merge-conflicts.md)
-before continuing Git. If that reference is unavailable, preserve the
-conflict and report the missing guidance.
+The ordinary rebase in [Publish the candidate](#publish-the-candidate) step 3 is run through this project's
+installed product backlog rebase adapter, not a raw `git rebase`, whenever it touches the product backlog
+(often `PRODUCT-BACKLOG.md`); see [reconcile product backlog Git operations](../dough-product-backlog/references/merge-conflicts.md)
+for how to resolve and run it. Its own `conflict`/`refused`/`blocked` result already identifies the real
+replayed commit, its parent, and the current destination from Git's own rebase state, never from
+ours/theirs labels. Resolve the backlog's own unmerged path following that reference, `git add` it, then
+run the adapter's own `continue` for this same rebase — never a raw `git rebase --continue`. A clean
+replay the adapter reports as `disputed` is not a Git conflict and has nothing staged to resolve the usual
+way: repair the backlog by hand, or decide the current result should stand as is, then run the adapter's
+own `validate` before this section's own revalidation below and before publishing. If neither the adapter
+nor that reference is available, preserve the conflict and report the missing guidance.
+
+[Recover a rejected push](#recover-a-rejected-push)'s two `--onto` rebases are not run through this
+adapter: its CLI has no equivalent for rebasing a range other than the currently checked-out branch onto a
+ref. Until that gap is closed, resolve a conflict touching the backlog on either of those two rebases with
+[the fallback domain knowledge](../dough-product-backlog/references/merge-conflicts.md#fallback-domain-knowledge)
+instead, applied by hand exactly as below.
 
 For other product or code paths, read the three Git versions (ancestor,
 current side, and incoming side; index stages 1, 2, and 3). Identify the

@@ -91,12 +91,12 @@ for omitted/truncated passages or bounded investigations; another step alone nee
 
 ## Take queued work
 
-If an authorized Git operation reports conflicts, inspect the unmerged paths
-for this project's product backlog (often `PRODUCT-BACKLOG.md`). Before editing
-or staging its resolution, read and apply
-[backlog merge conflicts](../dough-product-backlog/references/merge-conflicts.md),
-including its staged-result verification before continuing the Git operation.
-If the reference is unavailable, preserve the conflict and report the missing guidance.
+This section's own backlog change is a same-branch commit on the resolved
+integration checkout, moving an entry to **Taken** with nothing to merge, rebase,
+or cherry-pick from another ref — so it needs none of the installed product
+backlog Git adapters or [reconcile product backlog Git operations](../dough-product-backlog/references/merge-conflicts.md) by itself.
+Only Trunk Mode's later publication of that claim is a real rebase, covered by
+[trunk publication](references/trunk-publication.md#resolve-a-publication-rebase-conflict); Story Branch Mode and current-branch mode never rebase or merge this commit.
 
 After resolving execution source and authority, inspect the backlog before plan-status
 changes, observer recovery/startup, delegation, or implementation. Moving a selected

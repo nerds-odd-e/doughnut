@@ -89,6 +89,9 @@ decisions to fill it; route unresolved framing or candidate selection to
 [dough-story-decomposition](../../dough-story-decomposition/SKILL.md).
 Do not create a separate refinement file.
 
+Preserve the story's anchor and recorded identity when you rename or move its
+seed, updating incoming links instead: relocating a story does not re-identify it.
+
 Discuss goal or scope changes with the human and keep the story in its seed and
 any active plan aligned; discovery alone does not authorize expansion. Do not
 silently cancel remaining scope or change siblings. Preserve compatible work
@@ -104,7 +107,11 @@ use one plan for the work, avoiding deprecated locations.
 Keep execution, proof, review, and resume information:
 
 1. **Source** — selected story, remaining-work instruction, or decision link;
-   or retrospective findings and execution provenance for a correction.
+   or retrospective findings and execution provenance for a correction. Carry
+   the work item's recorded identity into the plan under
+   [work item identity](../../dough-product-backlog/references/identity.md): the
+   link says where the story or plan is now, and renaming or moving either does
+   not change the recorded value.
 2. **Goal and scope** — one selected outcome, material exclusions, and
    assumptions.
 3. **Outside-in proof** — key examples and their observable test or

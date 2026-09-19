@@ -195,18 +195,18 @@ from its checkout using the retained identity and this project's local merge
 conventions. Preserve unrelated target work; unresolved identity or unsafe integration
 leaves execution resources intact with the blocker reported. Do not rebase or wait for CI.
 
-If integration reports conflicts, inspect the unmerged paths for this project's
-product backlog (often `PRODUCT-BACKLOG.md`). Before editing or staging its
-resolution, read and apply [backlog merge conflicts](../dough-product-backlog/references/merge-conflicts.md)
-from the integration checkout's installed guidance. If that reference is unavailable,
-leave the backlog conflict unresolved and report the missing guidance. Complete its
-staged-result verification before committing the merge; selected-work cleanup and
-final-tip ancestry alone do not prove sibling backlog changes survived. Resolve other
-conflicts from both sides' intended behavior, surrounding code, history, and available
-work context. Verify with appropriate checks and complete the merge. When evidence
-cannot justify a coherent resolution, stop and preserve the conflict for a human
-decision; report the incompatible intentions or missing decision, conflicted paths,
-and Git state.
+When the final-closure tip is not already integrated (below), perform this merge through the integration
+checkout's installed product backlog merge adapter, not a raw `git merge`, whenever it touches the product
+backlog (often `PRODUCT-BACKLOG.md`); see [reconcile product backlog Git operations](../dough-product-backlog/references/merge-conflicts.md)
+from the integration checkout's installed guidance for how to resolve and run it. A `conflict`/`refused`/`refused-before-commit`/`blocked` result leaves the unmerged backlog path exactly as
+Git left it. Resolve it following that reference, `git add` it, then run the adapter's own `continue` for
+this same merge — never a raw `git merge --continue`/manual commit — and complete its staged-result
+verification before the merge is committed; selected-work cleanup and final-tip ancestry alone do not prove
+sibling backlog changes survived. If neither the adapter nor that reference is available, leave the backlog
+conflict unresolved and report the missing guidance. Resolve other conflicts from both sides' intended
+behavior, surrounding code, history, and available work context. Verify with appropriate checks and
+complete the merge. When evidence cannot justify a coherent resolution, stop and preserve the conflict for
+a human decision; report the incompatible intentions or missing decision, conflicted paths, and Git state.
 
 Integration requires the saved final-closure tip to be an ancestor of the recorded
 target containing the committed closure. Recognize an integrated tip without merging
