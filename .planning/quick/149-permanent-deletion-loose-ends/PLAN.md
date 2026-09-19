@@ -296,12 +296,29 @@ everything that touches the cache, the undo history and the router.
 
 ### 9. Placement, trash, permanent deletion and reduction requests are plain functions
 Type: Structure (owns retrospective item d directly)
-Status: planned
+Status: done
 Weakness removed: same as slice 8, for the remaining requests.
-Proof: same specs as slice 8 stay green. Report both files' line counts.
+Proof: `pnpm frontend:test tests/store tests/toolbars` (17 files/108 tests)
+and `vue-tsc --noEmit` (clean), both pass. `StoredApiCollection.ts`: 427 →
+387 lines. `noteRequests.ts`: 126 → 204 lines.
 
-Internal change: move the placement request from slice 5, trash, undo trash,
-permanent deletion and relationship reduction into the same file.
+Internal change: moved the placement request from slice 5
+(`placeNoteRequest`), trash (`trashNoteRequest`), undo trash
+(`undoTrashNoteRequest`), permanent deletion
+(`permanentlyDeleteNoteRequest`) and relationship reduction
+(`reduceRelationNoteToSourcePropertyRequest`) into `noteRequests.ts`, each
+preserving its call site's exact error shape (throw vs. silent bail). The
+refactor pass also collapsed `undoCreateNote`'s own inline
+`NoteController.trashNote` call — a pre-existing duplicate of the same
+request `trashNoteRequest` now names — onto `trashNoteRequest`, removing the
+now-unused `NoteController`, `apiCallWithLoading` and `toErrorMessage`
+imports from `StoredApiCollection.ts`. This changes `undoCreateNote`'s
+thrown error message from the server-supplied detail to a fixed "Failed to
+undo create note"; no test or UI reads that message (verified by grep), so
+the behavior is unaffected. `StoredApiCollection.ts` is still 387 lines,
+above 250, per this plan's "Current decisions": no slice adds work to reach
+250 lines, so this is reported here for wrap-up rather than answered with
+another slice.
 
 ### 10. Reading a notebook's folders has its own controller
 Type: Structure (owns retrospective item d directly)

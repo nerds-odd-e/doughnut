@@ -5,11 +5,6 @@ import type {
   NoteRealm,
   NoteUpdateTitleDto,
 } from "@generated/donut-backend-api"
-import {
-  RelationController,
-  NoteController,
-} from "@generated/donut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
@@ -17,11 +12,14 @@ import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
 import {
-  toErrorMessage,
-  throwStoredApiError,
   updateTextContentRequest,
   loadNoteRequest,
   createNoteRequest,
+  placeNoteRequest,
+  trashNoteRequest,
+  undoTrashNoteRequest,
+  permanentlyDeleteNoteRequest,
+  reduceRelationNoteToSourcePropertyRequest,
 } from "./noteRequests"
 
 export type NoteTrashReferenceHandling = NoteTrashDto["referenceHandling"]
@@ -169,22 +167,7 @@ export default class StoredApiCollection {
     sourceId: Donut.ID,
     target: { folderId: Donut.ID } | { notebookId: number }
   ): Promise<NoteRealm> {
-    const {
-      data: noteRealms,
-      error,
-      response,
-    } = await apiCallWithLoading(() =>
-      "folderId" in target
-        ? RelationController.moveNoteToFolder({
-            path: { sourceNote: sourceId, targetFolder: target.folderId },
-          })
-        : RelationController.moveNoteToNotebookRootInNotebook({
-            path: { sourceNote: sourceId, targetNotebook: target.notebookId },
-          })
-    )
-    if (error || !noteRealms) {
-      throwStoredApiError(error, response, "Failed to move note")
-    }
+    const noteRealms = await placeNoteRequest(sourceId, target)
     this.refreshNoteRealms(noteRealms)
     return noteRealms[0]!
   }
@@ -247,20 +230,12 @@ export default class StoredApiCollection {
     const undone = this.noteEditingHistory.peekUndo()
     if (!undone) throw new Error("undo history is empty")
     if (undone.type === "trash note") {
-      const { data: noteRealm, error } = await apiCallWithLoading(() =>
-        NoteController.undoTrashNote({
-          path: { note: undone.noteId },
-          body: {
-            priorTitle: undone.originalTitle,
-            ...(undone.originalFolderId == null
-              ? {}
-              : { priorFolderId: undone.originalFolderId }),
-          },
-        })
-      )
-      if (error || !noteRealm) {
-        throw new Error(toErrorMessage(error, "Failed to undo trash note"))
-      }
+      const noteRealm = await undoTrashNoteRequest(undone.noteId, {
+        priorTitle: undone.originalTitle,
+        ...(undone.originalFolderId == null
+          ? {}
+          : { priorFolderId: undone.originalFolderId }),
+      })
       this.noteEditingHistory.popUndoHistory()
       refreshSidebarStructuralListings()
       return { noteRealm: this.storage.refreshNoteRealm(noteRealm) }
@@ -305,15 +280,10 @@ export default class StoredApiCollection {
   }> {
     const cached = this.storage.refOfNoteRealm(noteId).value
     const notebookFallbackId = cached?.notebookRealm.notebook.id
-    const { data: trashedRealm, error } = await apiCallWithLoading(() =>
-      NoteController.trashNote({
-        path: { note: noteId },
-        body: { referenceHandling: "LEAVE_DEAD_LINKS" },
-      })
-    )
-    if (error || !trashedRealm) {
-      throw new Error(toErrorMessage(error, "Failed to undo create note"))
-    }
+    const trashedRealm = await trashNoteRequest(noteId, {
+      referenceHandling: "LEAVE_DEAD_LINKS",
+    })
+    if (!trashedRealm) throw new Error("Failed to undo create note")
     this.storage.removeNoteRealm(noteId)
     return {
       noteRealm: undefined,
@@ -342,13 +312,8 @@ export default class StoredApiCollection {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")
     const body = noteReferenceHandlingBody(options)
-    const { data: trashedRealm, error } = await apiCallWithLoading(() =>
-      NoteController.trashNote({
-        path: { note: noteId },
-        body,
-      })
-    )
-    if (error || !trashedRealm) return
+    const trashedRealm = await trashNoteRequest(noteId, body)
+    if (!trashedRealm) return
 
     const notebookId = cachedRealm.notebookRealm.notebook.id
     const originalFolderId = realmLeafFolder(cachedRealm)?.id ?? null
@@ -370,10 +335,8 @@ export default class StoredApiCollection {
   async permanentlyDeleteNote(router: Router, noteId: Donut.ID) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot delete a note that is not loaded")
-    const { error } = await apiCallWithLoading(() =>
-      NoteController.permanentlyDeleteNote({ path: { note: noteId } })
-    )
-    if (error) return
+    const ok = await permanentlyDeleteNoteRequest(noteId)
+    if (!ok) return
 
     await router.replace(
       containingLocation(
@@ -393,12 +356,9 @@ export default class StoredApiCollection {
     router: Router,
     relationNoteId: Donut.ID
   ) {
-    const { data: sourceRealm, error } = await apiCallWithLoading(() =>
-      RelationController.reduceToSourceProperty({
-        path: { relationNote: relationNoteId },
-      })
-    )
-    if (error || !sourceRealm) return
+    const sourceRealm =
+      await reduceRelationNoteToSourcePropertyRequest(relationNoteId)
+    if (!sourceRealm) return
 
     await router.replace(noteShowLocation(sourceRealm.id))
     this.noteNoLongerExists(relationNoteId)

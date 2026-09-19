@@ -1,11 +1,14 @@
 import type {
   NoteCreationDto,
   NoteRealm,
+  NoteTrashDto,
+  NoteTrashUndoDto,
   NoteUpdateTitleDto,
 } from "@generated/donut-backend-api"
 import {
   NoteController,
   NotebookController,
+  RelationController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import {
@@ -123,4 +126,79 @@ export async function createNoteRequest(
     })
   }
   return nrwp
+}
+
+/** Sends the one request that places a note at a folder or a notebook root. */
+export async function placeNoteRequest(
+  sourceId: Donut.ID,
+  target: { folderId: Donut.ID } | { notebookId: number }
+): Promise<NoteRealm[]> {
+  const {
+    data: noteRealms,
+    error,
+    response,
+  } = await apiCallWithLoading(() =>
+    "folderId" in target
+      ? RelationController.moveNoteToFolder({
+          path: { sourceNote: sourceId, targetFolder: target.folderId },
+        })
+      : RelationController.moveNoteToNotebookRootInNotebook({
+          path: { sourceNote: sourceId, targetNotebook: target.notebookId },
+        })
+  )
+  if (error || !noteRealms) {
+    throwStoredApiError(error, response, "Failed to move note")
+  }
+  return noteRealms
+}
+
+export async function trashNoteRequest(
+  noteId: Donut.ID,
+  body: NoteTrashDto
+): Promise<NoteRealm | undefined> {
+  const { data: trashedRealm, error } = await apiCallWithLoading(() =>
+    NoteController.trashNote({
+      path: { note: noteId },
+      body,
+    })
+  )
+  if (error || !trashedRealm) return undefined
+  return trashedRealm
+}
+
+export async function undoTrashNoteRequest(
+  noteId: Donut.ID,
+  body: NoteTrashUndoDto
+): Promise<NoteRealm> {
+  const { data: noteRealm, error } = await apiCallWithLoading(() =>
+    NoteController.undoTrashNote({
+      path: { note: noteId },
+      body,
+    })
+  )
+  if (error || !noteRealm) {
+    throw new Error(toErrorMessage(error, "Failed to undo trash note"))
+  }
+  return noteRealm
+}
+
+export async function permanentlyDeleteNoteRequest(
+  noteId: Donut.ID
+): Promise<boolean> {
+  const { error } = await apiCallWithLoading(() =>
+    NoteController.permanentlyDeleteNote({ path: { note: noteId } })
+  )
+  return !error
+}
+
+export async function reduceRelationNoteToSourcePropertyRequest(
+  relationNoteId: Donut.ID
+): Promise<NoteRealm | undefined> {
+  const { data: sourceRealm, error } = await apiCallWithLoading(() =>
+    RelationController.reduceToSourceProperty({
+      path: { relationNote: relationNoteId },
+    })
+  )
+  if (error || !sourceRealm) return undefined
+  return sourceRealm
 }
