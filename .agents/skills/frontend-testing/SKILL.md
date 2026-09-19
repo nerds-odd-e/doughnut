@@ -9,6 +9,9 @@ paths:
 
 **Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** the `unit-testing` skill — follow that first.
 
+These commands cover behavioral testing only. Before accepting frontend proof,
+also pass the typecheck required by the `frontend` skill's "Frontend proof" rule.
+
 ## Test Commands
 
 From the repo root:

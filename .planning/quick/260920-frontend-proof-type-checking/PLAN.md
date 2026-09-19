@@ -1,9 +1,8 @@
 # Require type checking before accepting frontend proof
 
-Status: planned
+Status: executed
 Authority: owner instruction on 2026-09-19 to refine this accepted correction,
 write a slice plan if clear, and remove its retrospective record when fixed.
-Planning only; implementation has not started.
 Source: DD-073 in `DonutRetrospectiveFindings.md` at repository root.
 Historical recovery: commit `bfa6ac0b05` contains the finding and both occurrences.
 Provenance: SEED-030 story 2 / quick/145-reset-notebook-git-history and
@@ -76,9 +75,25 @@ No ADR or North Star change is required. No unresolved scope decisions remain.
 ### 1. Accept frontend proof with both behavior and type evidence
 
 Type: Structure
-Status: planned
+Status: done
 Outcome: correct the evidenced proof-acceptance weakness, preserve the fast
 behavioral test path, and remove the resolved finding after verification.
+
+Delivered: added a "Frontend proof" rule to `.agents/skills/frontend/SKILL.md`
+requiring `pnpm -C frontend exec vue-tsc --noEmit` alongside `frontend:test`
+before accepting frontend proof, with reuse-existing-evidence guidance; pointed
+`.agents/skills/frontend-testing/SKILL.md` and `.agents/agent-map.md` at that
+rule; deleted the DD-073 section from `DonutRetrospectiveFindings.md`. A fresh
+post-change-refactor pass found nothing to change (single-source-plus-pointers
+shape and doc accuracy already matched target).
+
+Proof:
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test` — 339 files / 1901 tests
+  passed.
+- `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` — no
+  errors.
+- Diff inspected: only the three guidance files and the findings file changed;
+  `package.json`, `vitest.config.ts`, and delivery gates untouched.
 
 Update the three project-owned guidance locations above. Require the separate
 Vue/TypeScript command in addition to behavioral proof before acceptance, with
