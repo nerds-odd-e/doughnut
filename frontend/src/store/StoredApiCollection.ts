@@ -311,6 +311,12 @@ export default class StoredApiCollection implements StoredApi {
     refreshSidebarStructuralListings()
   }
 
+  /** This note no longer exists: drop its cached realm and forget its undo entries. */
+  private noteNoLongerExists(noteId: Donut.ID) {
+    this.storage.removeNoteRealm(noteId)
+    this.noteEditingHistory.forgetNote(noteId)
+  }
+
   private placementUndoForNote(sourceId: Donut.ID): {
     folderId: number | null
     notebookId: number
@@ -539,7 +545,7 @@ export default class StoredApiCollection implements StoredApi {
         realmLeafFolder(cachedRealm)?.id ?? null
       )
     )
-    this.storage.removeNoteRealm(noteId)
+    this.noteNoLongerExists(noteId)
     refreshSidebarStructuralListings()
   }
 
@@ -555,7 +561,7 @@ export default class StoredApiCollection implements StoredApi {
     if (error || !sourceRealm) return
 
     await router.replace(noteShowLocation(sourceRealm.id))
-    this.storage.removeNoteRealm(relationNoteId)
+    this.noteNoLongerExists(relationNoteId)
     this.storage.refreshNoteRealm(sourceRealm)
     refreshSidebarStructuralListings()
     return sourceRealm

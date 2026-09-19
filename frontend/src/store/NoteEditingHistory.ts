@@ -57,6 +57,13 @@ export default class NoteEditingHistory {
     this.noteUndoHistories.pop()
   }
 
+  /** Drops every undo entry belonging to a note that no longer exists. */
+  forgetNote(noteId: Donut.ID) {
+    this.noteUndoHistories = this.noteUndoHistories.filter(
+      (entry) => entry.noteId !== noteId
+    )
+  }
+
   trashNote(
     noteId: Donut.ID,
     originalTitle: string,

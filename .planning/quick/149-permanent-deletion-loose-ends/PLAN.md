@@ -118,10 +118,11 @@ Slices 1 to 9 are each one small change with one proof loop.
 
 ### 1. Undo offers nothing for a note that no longer exists
 Type: Behavior
-Status: planned
-Proof: new case in `frontend/tests/toolbars/NoteUndoButton.visibility.spec.ts`;
-`frontend/tests/store/storedApi.reduceRelationNoteToSourceProperty.spec.ts`
-stays green.
+Status: done
+Proof: new cases in `frontend/tests/toolbars/NoteUndoButton.visibility.spec.ts`
+(`pnpm frontend:test tests/toolbars/NoteUndoButton.visibility.spec.ts`, 6
+tests pass); `frontend/tests/store/storedApi.reduceRelationNoteToSourceProperty.spec.ts`
+stays green unchanged, as does the rest of `frontend/tests/store`.
 
 Behavior: a note has an "edit content" entry, another note has an older entry,
 and the first note is then trashed through `storedApi().trashNote` → the owner
@@ -318,4 +319,11 @@ Sizing exception: same as slice 10.
 
 ## Learnings
 
-None yet.
+- Slice 1 added a private `noteNoLongerExists(noteId)` step in
+  `StoredApiCollection.ts` that only touches `this.storage` and
+  `this.noteEditingHistory` (no server request, no router). Slice 9 moves the
+  *request* portions of `permanentlyDeleteNote` and
+  `reduceRelationNoteToSourceProperty` into `noteRequests.ts`, but this
+  cache/undo-history step has no request in it, so it stays in
+  `StoredApiCollection` as the cache/undo-owning collaborator that calls into
+  the moved request functions after they return.
