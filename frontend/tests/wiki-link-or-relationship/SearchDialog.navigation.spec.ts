@@ -72,7 +72,7 @@ describe("Search popup result navigation", () => {
     const activation = new Promise<MouseEvent>((resolve) => {
       link.addEventListener("click", resolve, { once: true })
     })
-    await userEvent.click(link)
+    await fireEvent.click(link)
     await flushPromises()
     expect((await activation).defaultPrevented).toBe(true)
     expect(router.currentRoute.value.fullPath).toBe(
