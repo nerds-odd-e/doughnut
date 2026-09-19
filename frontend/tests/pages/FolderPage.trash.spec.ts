@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { Router } from "vue-router"
@@ -30,7 +30,7 @@ describe("FolderPage trash", () => {
 
   it("cancels without calling the trash action", async () => {
     const { wrapper } = await mountFolderPageReady(router, 20, "Topic")
-    const trashSpy = vi.spyOn(NotebookController, "trashFolder")
+    const trashSpy = vi.spyOn(NotebookFolderController, "trashFolder")
     await openFolderSettingsTab(wrapper)
 
     const trashButton = wrapper.get('[data-testid="folder-trash-button"]')
@@ -62,7 +62,7 @@ describe("FolderPage trash", () => {
       { ancestorFolders: [parent] }
     )
     const push = stubRouterPush(router)
-    vi.spyOn(NotebookController, "trashFolder").mockResolvedValue(
+    vi.spyOn(NotebookFolderController, "trashFolder").mockResolvedValue(
       wrapSdkResponse(folderRealm.folder)
     )
     await openFolderSettingsTab(wrapper)
@@ -89,7 +89,7 @@ describe("FolderPage trash", () => {
     )
     let finishTrash!: () => void
     mockSdkServiceWithImplementation(
-      NotebookController,
+      NotebookFolderController,
       "trashFolder",
       () =>
         new Promise((resolve) => {
@@ -117,7 +117,7 @@ describe("FolderPage trash", () => {
   it("navigates to notebook root and hides Trash within trash", async () => {
     const rootMounted = await mountFolderPageReady(router, 20, "Topic")
     const rootPush = stubRouterPush(router)
-    vi.spyOn(NotebookController, "trashFolder").mockResolvedValue(
+    vi.spyOn(NotebookFolderController, "trashFolder").mockResolvedValue(
       wrapSdkResponse(rootMounted.folderRealm.folder)
     )
     await openFolderSettingsTab(rootMounted.wrapper)

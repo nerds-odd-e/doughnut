@@ -138,10 +138,10 @@ class NotebookGitConcurrentProjectionDriftControllerTest
         case README_BEARING_FOLDER_INSERTION -> {
           FolderCreationRequest request = new FolderCreationRequest();
           request.setName("new folder");
-          Folder folder = controller.createFolder(notebook, request);
+          Folder folder = folderController.createFolder(notebook, request);
           NoteUpdateContentDTO update = new NoteUpdateContentDTO();
           update.setContent(FOLDER_README);
-          controller.updateFolderReadmeContent(notebook, folder, update);
+          folderController.updateFolderReadmeContent(notebook, folder, update);
         }
       }
     } catch (Exception exception) {

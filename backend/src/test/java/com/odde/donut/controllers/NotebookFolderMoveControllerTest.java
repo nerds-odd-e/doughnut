@@ -54,7 +54,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     Integer trackerId = tracker.getId();
     Integer stoppedTrackerId = stoppedTracker.getId();
 
-    controller.moveFolder(notebook, retained, folderMove(null));
+    folderController.moveFolder(notebook, retained, folderMove(null));
 
     makeMe.refresh(retained);
     makeMe.refresh(emptyDescendant);
@@ -84,7 +84,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     Folder parent = ownedFolder(nb, "Parent");
     Folder child = makeMe.aFolder().parentFolder(parent).name("Child").please();
 
-    Folder result = controller.moveFolder(nb, child, folderMove(null));
+    Folder result = folderController.moveFolder(nb, child, folderMove(null));
 
     assertThat(result.getName(), equalTo("Child"));
     assertTrue(listingHasFolder(nb, null, child));
@@ -100,7 +100,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.moveFolder(nb, outer, folderMove(inner.getId())));
+            () -> folderController.moveFolder(nb, outer, folderMove(inner.getId())));
     assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
     assertThat(ex.getReason(), equalTo("Cannot move folder into its descendant."));
   }
@@ -113,7 +113,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.moveFolder(nb, folder, folderMove(folder.getId())));
+            () -> folderController.moveFolder(nb, folder, folderMove(folder.getId())));
     assertThat(ex.getReason(), equalTo("Cannot move folder into itself."));
   }
 
@@ -126,7 +126,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
 
     ApiException ex =
         assertThrows(
-            ApiException.class, () -> controller.moveFolder(nb, nestedDup, folderMove(null)));
+            ApiException.class, () -> folderController.moveFolder(nb, nestedDup, folderMove(null)));
     assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
     assertThat(
         ex.getErrorBody().getMessage(), equalTo("A folder with this name already exists here."));
@@ -144,13 +144,15 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
 
     assertThrows(
         ApiException.class,
-        () -> controller.moveFolder(notebook, trashed, folderMove(occupiedDestination.getId())));
+        () ->
+            folderController.moveFolder(
+                notebook, trashed, folderMove(occupiedDestination.getId())));
 
     makeMe.refresh(trashed);
     assertThat(trashed.getParentFolder().getId(), equalTo(trash.getId()));
     assertThat(trashed.isTrashed(), equalTo(true));
 
-    controller.moveFolder(notebook, trashed, folderMove(freeDestination.getId()));
+    folderController.moveFolder(notebook, trashed, folderMove(freeDestination.getId()));
 
     makeMe.refresh(trashed);
     makeMe.refresh(retained);
@@ -165,7 +167,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.moveFolder(ownedNotebook(), folderInB, folderMove(null)));
+            () -> folderController.moveFolder(ownedNotebook(), folderInB, folderMove(null)));
     assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     assertThat(ex.getReason(), equalTo("Folder not in notebook."));
   }
@@ -178,7 +180,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.moveFolder(nb, folder, folderMove(-99999)));
+            () -> folderController.moveFolder(nb, folder, folderMove(-99999)));
     assertThat(ex.getReason(), equalTo("Parent folder not found."));
   }
 
@@ -191,7 +193,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.moveFolder(nbA, folder, folderMove(parentInB.getId())));
+            () -> folderController.moveFolder(nbA, folder, folderMove(parentInB.getId())));
     assertThat(ex.getReason(), equalTo("Parent folder not in notebook."));
   }
 
@@ -204,7 +206,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
     Note noteInSource = makeMe.aNote("NoteInSource").folder(source).please();
 
-    Folder result = controller.moveFolder(nb, source, folderMerge(null));
+    Folder result = folderController.moveFolder(nb, source, folderMerge(null));
 
     assertThat(result.getId(), equalTo(target.getId()));
     makeMe.refresh(noteInSource);
@@ -224,7 +226,7 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
     Folder innerSource = makeMe.aFolder().parentFolder(source).name("Inner").please();
     Note deepNoteInSource = makeMe.aNote("DeepSource").folder(innerSource).please();
 
-    controller.moveFolder(nb, source, folderMerge(null));
+    folderController.moveFolder(nb, source, folderMerge(null));
 
     makeMe.refresh(deepNoteInTarget);
     makeMe.refresh(deepNoteInSource);

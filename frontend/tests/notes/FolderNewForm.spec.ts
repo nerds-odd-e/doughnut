@@ -1,7 +1,4 @@
-import {
-  NotebookController,
-  NotebookFolderController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import FolderNewForm from "@/components/notes/FolderNewForm.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
@@ -55,7 +52,7 @@ describe("FolderNewForm", () => {
 
   it("navigates to the new folder page after successful create", async () => {
     const createFolderSpy = mockSdkService(
-      NotebookController,
+      NotebookFolderController,
       "createFolder",
       testFolderStub(901, "New Folder")
     )

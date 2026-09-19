@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import type { FolderRealm } from "@generated/donut-backend-api"
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { computed, ref } from "vue"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import FolderSettings from "@/components/folder/FolderSettings.vue"
@@ -91,7 +91,7 @@ const activeTab = ref<ReadmeSettingsTab>("readme")
 const persistFolderName = async (name: string) => {
   const folderRealm = folderForView.value!
   const { error } = await apiCallWithLoading(() =>
-    NotebookController.renameFolder({
+    NotebookFolderController.renameFolder({
       path: {
         notebook: folderRealm.notebookRealm.notebook.id,
         folder: folderRealm.folder.id,

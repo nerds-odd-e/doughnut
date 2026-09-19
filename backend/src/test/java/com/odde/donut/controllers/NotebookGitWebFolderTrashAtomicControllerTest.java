@@ -53,7 +53,7 @@ class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleCon
     NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
 
     RuntimeException failure =
-        assertThrows(RuntimeException.class, () -> controller.trashFolder(notebook, biology));
+        assertThrows(RuntimeException.class, () -> folderController.trashFolder(notebook, biology));
     assertThat(failure.getMessage(), is("forced failure after note projection"));
 
     inCommittedTransaction(

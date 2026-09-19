@@ -1,5 +1,5 @@
 import type { FolderListing } from "@generated/donut-backend-api"
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
@@ -42,7 +42,7 @@ async function findOrCreateChildFolder(
       ? { name: childName }
       : { name: childName, underFolderId: parentFolderId }
   const { data: created, error } = await apiCallWithLoading(() =>
-    NotebookController.createFolder({
+    NotebookFolderController.createFolder({
       path: { notebook: notebookId },
       body,
     })

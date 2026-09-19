@@ -26,7 +26,7 @@ class NotebookFolderDissolveWikiLinkRewriteControllerTest
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
     authorReferencingContent(outsideReferrer, "[[/Outer/Mid/Target]]");
 
-    controller.dissolveFolder(nb, mid, false);
+    folderController.dissolveFolder(nb, mid, false);
 
     makeMe.refresh(insideReferrer);
     makeMe.refresh(outsideReferrer);
@@ -47,7 +47,7 @@ class NotebookFolderDissolveWikiLinkRewriteControllerTest
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
     authorReferencingContent(outsideReferrer, "[[/Outer/Mid/Inner/Target]]");
 
-    controller.dissolveFolder(nb, mid, true);
+    folderController.dissolveFolder(nb, mid, true);
 
     makeMe.refresh(outsideReferrer);
     makeMe.refresh(target);

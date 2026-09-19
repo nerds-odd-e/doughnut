@@ -452,7 +452,7 @@ const testability = () => {
         const body: FolderCreationRequest = { name: folderName }
         const createFolder = () =>
           cy.wrap(
-            NotebookController.createFolder({
+            NotebookFolderController.createFolder({
               path: { notebook: notebookId },
               body,
             }),
@@ -480,7 +480,7 @@ const testability = () => {
           const folder = unwrapData<Folder>(response)
           return this.getNotebookIdByName(notebookName).then((notebookId) =>
             cy.wrap(
-              NotebookController.updateFolderReadmeContent({
+              NotebookFolderController.updateFolderReadmeContent({
                 path: { notebook: notebookId, folder: folder.id },
                 body: { content: readme },
               }),

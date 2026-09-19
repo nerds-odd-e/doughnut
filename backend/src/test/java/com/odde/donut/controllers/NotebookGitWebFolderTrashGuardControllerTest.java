@@ -31,7 +31,7 @@ class NotebookGitWebFolderTrashGuardControllerTest extends NotebookGitWebContent
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.trashFolder(f.notebook(), f.biology()));
+        () -> folderController.trashFolder(f.notebook(), f.biology()));
 
     CommittedFolderAndBinding committed =
         committedFolderAndBinding(f.biology().getId(), f.notebook().getId());
@@ -48,7 +48,7 @@ class NotebookGitWebFolderTrashGuardControllerTest extends NotebookGitWebContent
     byte[] acceptedBundle = binding(f.notebook()).getBundleBytes();
     makeMe.aNote().notebook(f.notebook()).title("Unsynchronized").content(CELLS_BODY).please();
 
-    controller.trashFolder(f.notebook(), f.biology());
+    folderController.trashFolder(f.notebook(), f.biology());
 
     assertThat(
         parentFolderName(parentFolderId(parentFolderId(f.biology().getId()))), equalTo("_trash"));

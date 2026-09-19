@@ -84,7 +84,7 @@ function mockRelationshipCreate(
     folders: [],
   })
   mockSdkService(
-    NotebookController,
+    NotebookFolderController,
     "createFolder",
     testFolderStub(77, "relations")
   )

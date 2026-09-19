@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { Router } from "vue-router"
@@ -30,7 +30,10 @@ describe("FolderPage permanent deletion", () => {
     const { wrapper } = await mountFolderPageReady(router, 20, "Topic", {
       ancestorFolders: [trashRoot()],
     })
-    const deleteSpy = vi.spyOn(NotebookController, "permanentlyDeleteFolder")
+    const deleteSpy = vi.spyOn(
+      NotebookFolderController,
+      "permanentlyDeleteFolder"
+    )
     await openFolderSettingsTab(wrapper)
 
     await wrapper
@@ -63,9 +66,10 @@ describe("FolderPage permanent deletion", () => {
       { ancestorFolders: [trashRoot(), parent] }
     )
     const push = stubRouterPush(router)
-    vi.spyOn(NotebookController, "permanentlyDeleteFolder").mockResolvedValue(
-      wrapSdkResponse(undefined)
-    )
+    vi.spyOn(
+      NotebookFolderController,
+      "permanentlyDeleteFolder"
+    ).mockResolvedValue(wrapSdkResponse(undefined))
     await openFolderSettingsTab(wrapper)
 
     await wrapper
@@ -91,9 +95,10 @@ describe("FolderPage permanent deletion", () => {
       "_trash"
     )
     const push = stubRouterPush(router)
-    vi.spyOn(NotebookController, "permanentlyDeleteFolder").mockResolvedValue(
-      wrapSdkResponse(undefined)
-    )
+    vi.spyOn(
+      NotebookFolderController,
+      "permanentlyDeleteFolder"
+    ).mockResolvedValue(wrapSdkResponse(undefined))
     await openFolderSettingsTab(wrapper)
 
     await wrapper

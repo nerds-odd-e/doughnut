@@ -36,7 +36,7 @@ class NotebookFolderRenameWikiLinkRewriteControllerTest
 
     FolderRenameRequest req = new FolderRenameRequest();
     req.setName("NewFolder");
-    controller.renameFolder(nb, oldFolder, req);
+    folderController.renameFolder(nb, oldFolder, req);
 
     makeMe.refresh(carrier);
     assertThat(carrier.getContent(), equalTo(after));

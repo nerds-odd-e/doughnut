@@ -344,10 +344,16 @@ backend test run are waits that decomposition cannot shorten.
 
 ### 11. Changing a notebook's folders uses the folder controller
 Type: Structure (owns retrospective item d directly)
-Status: planned
+Status: done
 Weakness removed: same as slice 10, for the mutating endpoints.
-Proof: `NotebookFolder*ControllerTest`, `NotebookGit*Folder*ControllerTest`,
-frontend folder specs, and `folder_trash.feature` stay green.
+Proof: `pnpm backend:test_only` (full suite) BUILD SUCCESSFUL; full frontend
+suite (339 files/1903 tests) pass; `vue-tsc --noEmit` clean;
+`e2e_test/features/folder_organization/folder_trash.feature` 3/3 passing.
+`NotebookController.java`: 479 → 319 lines (close to the plan's "about
+350" estimate); `NotebookFolderController.java`: 113 → 287 lines. Both are
+over 250 lines; per decision 3 above and the "Cutting further would be
+arbitrary" note, neither is cut further — each holds one concept
+(the notebook itself; a notebook's folders).
 
 Internal change: move `createFolder`, `moveFolder`, `trashFolder`,
 `permanentlyDeleteFolder`, `renameFolder`, `dissolveFolder`,

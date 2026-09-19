@@ -26,7 +26,7 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
     Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
     Note loose = makeMe.aNote("Loose").folder(mid).please();
 
-    controller.dissolveFolder(nb, mid, false);
+    folderController.dissolveFolder(nb, mid, false);
     makeMe.refresh(loose);
 
     assertThat(loose.getFolder().getId(), equalTo(outer.getId()));
@@ -39,7 +39,7 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
     Folder rootFolder = makeMe.aFolder().notebook(nb).name("Root Folder").please();
     Note inside = makeMe.aNote("Inside").folder(rootFolder).please();
 
-    controller.dissolveFolder(nb, rootFolder, false);
+    folderController.dissolveFolder(nb, rootFolder, false);
     makeMe.refresh(inside);
 
     assertThat(inside.getFolder(), nullValue());
@@ -53,7 +53,7 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
     Folder inner = makeMe.aFolder().parentFolder(mid).name("Inner").please();
     Note deep = makeMe.aNote("Deep").folder(inner).please();
 
-    controller.dissolveFolder(nb, mid, false);
+    folderController.dissolveFolder(nb, mid, false);
     makeMe.refresh(inner);
     makeMe.refresh(deep);
 
@@ -70,7 +70,7 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
     makeMe.aFolder().parentFolder(mid).name("Inner").please();
 
     ApiException ex =
-        assertThrows(ApiException.class, () -> controller.dissolveFolder(nb, mid, false));
+        assertThrows(ApiException.class, () -> folderController.dissolveFolder(nb, mid, false));
     assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
     assertThat(
         ex.getErrorBody().getMessage(),
@@ -84,7 +84,7 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.dissolveFolder(ownedNotebook(), folderInB, false));
+            () -> folderController.dissolveFolder(ownedNotebook(), folderInB, false));
     assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
   }
 
@@ -96,7 +96,8 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
 
     currentUser.setUser(makeMe.aUser().please());
     assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.dissolveFolder(nb, folder, false));
+        UnexpectedNoAccessRightException.class,
+        () -> folderController.dissolveFolder(nb, folder, false));
   }
 
   @Test
@@ -108,7 +109,7 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
     Folder midInner = makeMe.aFolder().parentFolder(mid).name("Inner").please();
     Note midNote = makeMe.aNote("MidNote").folder(midInner).please();
 
-    controller.dissolveFolder(nb, mid, true);
+    folderController.dissolveFolder(nb, mid, true);
 
     makeMe.refresh(midNote);
     assertThat(midNote.getFolder().getId(), equalTo(outerInner.getId()));
@@ -124,7 +125,7 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
     Folder clash = makeMe.aFolder().parentFolder(mid).name("Clash").please();
     Folder unique = makeMe.aFolder().parentFolder(mid).name("Unique").please();
 
-    controller.dissolveFolder(nb, mid, true);
+    folderController.dissolveFolder(nb, mid, true);
 
     makeMe.refresh(unique);
     assertThat(unique.getParentFolder().getId(), equalTo(outer.getId()));

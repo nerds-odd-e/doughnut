@@ -40,7 +40,7 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
     ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     testabilitySettings.timeTravelTo(Timestamp.from(TRASH_AT));
 
-    controller.trashFolder(f.notebook(), f.biology());
+    folderController.trashFolder(f.notebook(), f.biology());
 
     ObjectId acceptedB = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -85,11 +85,11 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
   void ordinaryMoveAfterActualFolderTrashAppendsAcceptedChildWithRecoveredPath() throws Exception {
     SubtreeFixture f = seedBiologySubtreeUnderResearch();
     testabilitySettings.timeTravelTo(Timestamp.from(TRASH_AT));
-    controller.trashFolder(f.notebook(), f.biology());
+    folderController.trashFolder(f.notebook(), f.biology());
     ObjectId acceptedB = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     testabilitySettings.timeTravelTo(Timestamp.from(RECOVER_AT));
 
-    controller.moveFolder(f.notebook(), f.biology(), new FolderMoveRequest());
+    folderController.moveFolder(f.notebook(), f.biology(), new FolderMoveRequest());
 
     ObjectId acceptedC = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -118,7 +118,7 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
 
-    controller.trashFolder(notebook, biology);
+    folderController.trashFolder(notebook, biology);
 
     assertThat(parentFolderName(parentFolderId(biology.getId())), equalTo("_trash"));
     assertThat(

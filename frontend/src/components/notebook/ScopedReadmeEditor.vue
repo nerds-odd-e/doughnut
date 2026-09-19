@@ -24,7 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NotebookController,
+  NotebookFolderController,
+} from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useDebouncedTextAutosave } from "@/composables/useDebouncedTextAutosave"
 import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
@@ -55,7 +58,7 @@ const emit = defineEmits<{
 const persistReadmeContent = async (content: string) => {
   if (props.folderId != null) {
     await apiCallWithLoading(() =>
-      NotebookController.updateFolderReadmeContent({
+      NotebookFolderController.updateFolderReadmeContent({
         path: { notebook: props.notebookId, folder: props.folderId! },
         body: { content },
       })

@@ -40,7 +40,7 @@ class NotebookFolderPermanentDeleteControllerTest extends NoteDependentRowsContr
     Note survivor = trackedNoteIn(sibling, "Survivor");
     makeMe.entityPersister.flushAndClear();
 
-    controller.permanentlyDeleteFolder(reloaded(notebook), reloaded(topic));
+    folderController.permanentlyDeleteFolder(reloaded(notebook), reloaded(topic));
 
     assertThat(folderRepository.findById(topic.getId()).isPresent(), equalTo(false));
     assertThat(folderRepository.findById(nested.getId()).isPresent(), equalTo(false));
@@ -62,7 +62,7 @@ class NotebookFolderPermanentDeleteControllerTest extends NoteDependentRowsContr
     Note cells = trackedNoteIn(topic, "Cells");
     makeMe.entityPersister.flushAndClear();
 
-    controller.permanentlyDeleteFolder(reloaded(notebook), reloaded(trash));
+    folderController.permanentlyDeleteFolder(reloaded(notebook), reloaded(trash));
 
     assertThat(folderRepository.findById(trash.getId()).isPresent(), equalTo(false));
     assertThat(folderRepository.findById(topic.getId()).isPresent(), equalTo(false));
@@ -76,7 +76,7 @@ class NotebookFolderPermanentDeleteControllerTest extends NoteDependentRowsContr
     Notebook notebook = ownedNotebook();
     Folder empty = makeMe.aFolder().inTrashOf(notebook).name("Empty").please();
 
-    controller.permanentlyDeleteFolder(notebook, empty);
+    folderController.permanentlyDeleteFolder(notebook, empty);
 
     assertThat(folderRepository.findById(empty.getId()).isPresent(), equalTo(false));
   }
@@ -90,7 +90,7 @@ class NotebookFolderPermanentDeleteControllerTest extends NoteDependentRowsContr
     ResponseStatusException error =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.permanentlyDeleteFolder(notebook, active));
+            () -> folderController.permanentlyDeleteFolder(notebook, active));
 
     assertThat(error.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
     assertThat(folderRepository.findById(active.getId()).isPresent(), equalTo(true));

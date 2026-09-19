@@ -114,7 +114,7 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     dto.setContent("direct folder readme content");
 
     assertThat(
-        controller.updateFolderReadmeContent(nb, folder, dto).readmeContent(),
+        folderController.updateFolderReadmeContent(nb, folder, dto).readmeContent(),
         equalTo("direct folder readme content"));
   }
 
@@ -126,7 +126,8 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
     dto.setContent("   ");
 
-    assertThat(controller.updateFolderReadmeContent(nb, folder, dto).readmeContent(), nullValue());
+    assertThat(
+        folderController.updateFolderReadmeContent(nb, folder, dto).readmeContent(), nullValue());
   }
 
   @Test
@@ -136,7 +137,7 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.updateFolderReadmeContent(nb, folder, new NoteUpdateContentDTO()));
+        () -> folderController.updateFolderReadmeContent(nb, folder, new NoteUpdateContentDTO()));
   }
 
   @Test
@@ -146,7 +147,9 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.updateFolderReadmeContent(nb, foreign, new NoteUpdateContentDTO()));
+            () ->
+                folderController.updateFolderReadmeContent(
+                    nb, foreign, new NoteUpdateContentDTO()));
     assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
   }
 }

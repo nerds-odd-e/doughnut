@@ -59,7 +59,8 @@ class NotebookGitFolderDissolveAtomicControllerTest extends NotebookGitBundleCon
 
     RuntimeException failure =
         assertThrows(
-            RuntimeException.class, () -> controller.dissolveFolder(notebook, biology, false));
+            RuntimeException.class,
+            () -> folderController.dissolveFolder(notebook, biology, false));
     assertThat(failure.getMessage(), is("forced failure after note projection"));
 
     inCommittedTransaction(

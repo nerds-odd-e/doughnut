@@ -1,5 +1,5 @@
 import type { FolderRealm } from "@generated/donut-backend-api"
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { isFolderRealmInTrash } from "@/utils/folderTrash"
 
 export type FolderPath = { notebook: number; folder: number }
@@ -51,7 +51,8 @@ export function folderRemovalOffer(
         permanentDeleteConsequence
       ),
       failureMessage: "Failed to permanently delete folder",
-      request: (path) => NotebookController.permanentlyDeleteFolder({ path }),
+      request: (path) =>
+        NotebookFolderController.permanentlyDeleteFolder({ path }),
     }
   }
   return {
@@ -59,6 +60,6 @@ export function folderRemovalOffer(
     buttonLabel: "Trash folder",
     ...removalMessages(trashSubject(name), trashConsequence),
     failureMessage: "Failed to trash folder",
-    request: (path) => NotebookController.trashFolder({ path }),
+    request: (path) => NotebookFolderController.trashFolder({ path }),
   }
 }

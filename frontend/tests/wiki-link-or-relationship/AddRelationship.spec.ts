@@ -1,7 +1,4 @@
-import {
-  NotebookController,
-  NotebookFolderController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -37,7 +34,7 @@ describe("AddRelationshipFinalize", () => {
       folders: [],
     })
     mockSdkService(
-      NotebookController,
+      NotebookFolderController,
       "createFolder",
       testFolderStub(77, "relations")
     )

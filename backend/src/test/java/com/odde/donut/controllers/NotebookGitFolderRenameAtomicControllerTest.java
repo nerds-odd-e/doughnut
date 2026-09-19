@@ -60,7 +60,8 @@ class NotebookGitFolderRenameAtomicControllerTest extends NotebookGitBundleContr
 
     RuntimeException failure =
         assertThrows(
-            RuntimeException.class, () -> controller.renameFolder(notebook, biology, request));
+            RuntimeException.class,
+            () -> folderController.renameFolder(notebook, biology, request));
     assertThat(failure.getMessage(), is("forced failure after note projection"));
 
     inCommittedTransaction(

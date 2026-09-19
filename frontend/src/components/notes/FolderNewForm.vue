@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import type { Folder } from "@generated/donut-backend-api"
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
@@ -79,7 +79,7 @@ const processForm = async () => {
   nameError.value = undefined
   try {
     const { data, error } = await apiCallWithLoading(() =>
-      NotebookController.createFolder({
+      NotebookFolderController.createFolder({
         path: { notebook: props.notebookId },
         body: {
           name: name.value,

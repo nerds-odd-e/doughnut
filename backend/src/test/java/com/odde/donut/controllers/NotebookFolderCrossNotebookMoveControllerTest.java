@@ -30,7 +30,7 @@ class NotebookFolderCrossNotebookMoveControllerTest
     Note noteInF = makeMe.aNote("InF").folder(folderF).please();
     Note noteInSub = makeMe.aNote("InSub").folder(subfolder).please();
 
-    Folder result = controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
+    Folder result = folderController.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
 
     assertThat(result.getId(), equalTo(folderF.getId()));
     makeMe.refresh(folderF);
@@ -57,7 +57,7 @@ class NotebookFolderCrossNotebookMoveControllerTest
     currentUser.setUser(owner);
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null)));
+        () -> folderController.moveFolder(nbA, folderF, folderMoveTo(nbB, null)));
   }
 
   @Test
@@ -69,7 +69,7 @@ class NotebookFolderCrossNotebookMoveControllerTest
     Note noteInSub = makeMe.aNote("InSub").folder(subfolder).please();
     Folder parentP = ownedFolder(nbB, "P");
 
-    Folder result = controller.moveFolder(nbA, folderF, folderMoveTo(nbB, parentP.getId()));
+    Folder result = folderController.moveFolder(nbA, folderF, folderMoveTo(nbB, parentP.getId()));
 
     assertThat(result.getId(), equalTo(folderF.getId()));
     makeMe.refresh(folderF);
@@ -92,7 +92,7 @@ class NotebookFolderCrossNotebookMoveControllerTest
     ApiException ex =
         assertThrows(
             ApiException.class,
-            () -> controller.moveFolder(nbA, nestedDup, folderMoveTo(nbB, null)));
+            () -> folderController.moveFolder(nbA, nestedDup, folderMoveTo(nbB, null)));
     assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
     makeMe.refresh(nestedDup);
     assertThat(nestedDup.getNotebook().getId(), equalTo(nbA.getId()));
@@ -109,7 +109,7 @@ class NotebookFolderCrossNotebookMoveControllerTest
     ApiException ex =
         assertThrows(
             ApiException.class,
-            () -> controller.moveFolder(nbA, folderF, folderMoveTo(nbB, parentP.getId())));
+            () -> folderController.moveFolder(nbA, folderF, folderMoveTo(nbB, parentP.getId())));
     assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
     makeMe.refresh(folderF);
     assertThat(folderF.getNotebook().getId(), equalTo(nbA.getId()));
@@ -125,7 +125,7 @@ class NotebookFolderCrossNotebookMoveControllerTest
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.moveFolder(nbA, folderF, folderMoveTo(nbB, folderF.getId())));
+            () -> folderController.moveFolder(nbA, folderF, folderMoveTo(nbB, folderF.getId())));
     assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
     assertThat(ex.getReason(), equalTo("Cannot move folder into itself."));
   }

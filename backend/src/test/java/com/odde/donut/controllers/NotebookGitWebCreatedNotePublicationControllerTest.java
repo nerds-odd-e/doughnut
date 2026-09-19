@@ -57,8 +57,8 @@ class NotebookGitWebCreatedNotePublicationControllerTest
         makeMe.aNote().notebook(notebook).title("Existing").content(EXISTING_CONTENT).please();
     snapshotCurrentPortableTree(notebook);
 
-    Folder biology = controller.createFolder(notebook, folderRequest("Biology"));
-    Folder chemistry = controller.createFolder(notebook, folderRequest("Chemistry"));
+    Folder biology = folderController.createFolder(notebook, folderRequest("Biology"));
+    Folder chemistry = folderController.createFolder(notebook, folderRequest("Chemistry"));
     NoteCreationDTO noteCreation = titleOnly("Cells");
     noteCreation.setFolderId(biology.getId());
     NoteRealm createdRealm = controller.createNoteAtNotebookRoot(notebook, noteCreation);

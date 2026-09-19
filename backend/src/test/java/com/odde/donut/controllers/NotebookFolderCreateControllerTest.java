@@ -22,7 +22,7 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
   void createsRootFolder() throws Exception {
     Notebook nb = ownedNotebook();
     Folder created =
-        controller.createFolder(
+        folderController.createFolder(
             nb, objectMapper.readValue("{\"name\": \"  Inbox  \"}", FolderCreationRequest.class));
 
     assertThat(created.getName(), equalTo("Inbox"));
@@ -37,7 +37,7 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
 
     FolderCreationRequest req = folderCreate("Sub");
     req.setUnderNoteId(noteInScope.getId());
-    Folder created = controller.createFolder(nb, req);
+    Folder created = folderController.createFolder(nb, req);
 
     assertTrue(listingHasFolder(nb, scope.getId(), created));
   }
@@ -49,7 +49,7 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
 
     FolderCreationRequest req = folderCreate("NestedByFolder");
     req.setUnderFolderId(scope.getId());
-    Folder created = controller.createFolder(nb, req);
+    Folder created = folderController.createFolder(nb, req);
 
     assertTrue(listingHasFolder(nb, scope.getId(), created));
   }
@@ -57,10 +57,11 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
   @Test
   void rejectsDuplicateSiblingFolderName() throws Exception {
     Notebook nb = ownedNotebook();
-    controller.createFolder(nb, folderCreate("Same"));
+    folderController.createFolder(nb, folderCreate("Same"));
 
     ApiException ex =
-        assertThrows(ApiException.class, () -> controller.createFolder(nb, folderCreate("Same")));
+        assertThrows(
+            ApiException.class, () -> folderController.createFolder(nb, folderCreate("Same")));
     assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
   }
 
@@ -72,7 +73,7 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
     FolderCreationRequest req = folderCreate("Bad");
     req.setUnderNoteId(noteInB.getId());
     ResponseStatusException ex =
-        assertThrows(ResponseStatusException.class, () -> controller.createFolder(nbA, req));
+        assertThrows(ResponseStatusException.class, () -> folderController.createFolder(nbA, req));
     assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
   }
 
@@ -83,6 +84,6 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
 
     FolderCreationRequest req = folderCreate("Bad");
     req.setUnderFolderId(folderInB.getId());
-    assertThrows(ResponseStatusException.class, () -> controller.createFolder(nbA, req));
+    assertThrows(ResponseStatusException.class, () -> folderController.createFolder(nbA, req));
   }
 }

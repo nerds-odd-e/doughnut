@@ -42,7 +42,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
     CompleteRenameFixture f = seedCompleteBiologySubtreeWithReferrer();
     ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
 
-    Folder renamed = controller.renameFolder(f.notebook(), f.biology(), renameTo("Zoology"));
+    Folder renamed = folderController.renameFolder(f.notebook(), f.biology(), renameTo("Zoology"));
 
     assertThat(renamed.getName(), equalTo("Zoology"));
     assertShownContentAndRetainedLearning(f.cells(), f.tracker(), CELLS_BODY);
@@ -70,7 +70,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
   void webFolderRenameProjectsCompleteSubtreeAndRewrittenInNotebookReferences() throws Exception {
     CompleteRenameFixture f = seedCompleteBiologySubtreeWithReferrer();
 
-    controller.renameFolder(f.notebook(), f.biology(), renameTo("Zoology"));
+    folderController.renameFolder(f.notebook(), f.biology(), renameTo("Zoology"));
 
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId downloadedHead =
@@ -106,7 +106,8 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
     ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     byte[] acceptedBundleA = binding(f.notebook()).getBundleBytes();
 
-    Folder result = controller.renameFolder(f.notebook(), f.biology(), renameTo(requestedName));
+    Folder result =
+        folderController.renameFolder(f.notebook(), f.biology(), renameTo(requestedName));
 
     assertThat(result.getName(), equalTo("Biology"));
     assertThat(
@@ -119,7 +120,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
 
-    Folder renamed = controller.renameFolder(notebook, biology, renameTo("Zoology"));
+    Folder renamed = folderController.renameFolder(notebook, biology, renameTo("Zoology"));
 
     assertThat(renamed.getName(), equalTo("Zoology"));
     assertThat(
@@ -133,7 +134,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
     Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
     snapshotCurrentPortableTree(notebook);
 
-    controller.renameFolder(notebook, biology, renameTo("Zoology"));
+    folderController.renameFolder(notebook, biology, renameTo("Zoology"));
     ObjectId renameHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
 
     Note reloadedCells = noteRepository.findById(cells.getId()).orElseThrow();

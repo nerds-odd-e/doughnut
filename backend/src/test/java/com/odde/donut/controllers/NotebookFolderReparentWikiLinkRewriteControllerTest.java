@@ -26,7 +26,7 @@ class NotebookFolderReparentWikiLinkRewriteControllerTest
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
     authorReferencingContent(outsideReferrer, "[[/Moved/Target]]");
 
-    controller.moveFolder(nb, movedFolder, folderMove(newHome.getId()));
+    folderController.moveFolder(nb, movedFolder, folderMove(newHome.getId()));
 
     makeMe.refresh(insideReferrer);
     makeMe.refresh(outsideReferrer);
