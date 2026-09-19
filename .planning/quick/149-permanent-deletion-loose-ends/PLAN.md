@@ -248,20 +248,32 @@ Complexity: about −80 lines.
 
 ### 7. The plain note actions are declared once as a list
 Type: Structure (owns retrospective item d directly)
-Status: planned
+Status: done
 Weakness removed: `NoteMoreOptionsActions.vue` declares refine, audio,
 assimilation and delete twice, once for the menu and once for the toolbar.
-Proof: `frontend/tests/notes/NoteMoreOptionsActions.spec.ts` (runs every case in
-both layouts) and the `NoteMoreOptionsForm.*.spec.ts` files stay green.
+Proof: `pnpm frontend:test tests/notes/NoteMoreOptionsActions.spec.ts
+tests/notes/NoteToolbar.moreOptions.spec.ts tests/notes/NoteMoreOptionsForm.spec.ts
+tests/notes/NoteMoreOptionsForm.trashNote.spec.ts
+tests/notes/NoteMoreOptionsForm.trashNote.relationship.spec.ts
+tests/notes/NoteMoreOptionsForm.permanentlyDeleteNote.spec.ts` (6 files, 24
+tests) plus the full frontend suite (339 files, 1903 tests) and a clean
+`vue-tsc --noEmit`, all pass. `NoteToolbar.moreOptions.spec.ts` pins the
+exact `aria-pressed="true"/"false"` values on the toolbar's audio button;
+still green.
 
-Internal change: no new component. One computed list holds the four plain
-actions: id, title, icon, what it runs, whether it is available, and whether it
-is switched on. The menu loops over it with `DropdownMenuActionButton`; the
-toolbar loops over it with the existing button markup. One rule covers both
-toggles: an action that is switched on shows as pressed in the toolbar and is
-absent from the menu. Export and questions stay as they are, because their
-pop-up content differs per action.
-Complexity: about −45 lines, no new file.
+Internal change: one computed list holds the four plain actions: id, title,
+icon, what it runs, whether it is available, and whether it is switched on.
+The menu loops over it with `DropdownMenuActionButton`; the toolbar loops
+over it with the existing button markup, rendering `aria-pressed` only for
+the two toggleable actions (audio, assimilation), matching the pinned test.
+Export and questions stay as they are, because their pop-up content differs
+per action. The refactor pass extracted the list's construction into a
+sibling pure-data module, `noteMoreOptionsPlainActions.ts` (68 lines),
+following the same colocated-module pattern as the existing
+`noteMoreOptionsTitles.ts`, once the component's own line count crossed 250
+after the slice's edit.
+Complexity: `NoteMoreOptionsActions.vue` 272 → 225 lines;
+`noteMoreOptionsPlainActions.ts` new, 68 lines.
 
 ### 8. Text, loading and creation requests are plain functions
 Type: Structure (owns retrospective item d directly)
