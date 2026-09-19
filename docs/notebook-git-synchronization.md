@@ -1,7 +1,7 @@
 # Notebook Git synchronization architecture
 
-This document details [ADR 0002](./adrs/0002-git-native-portable-notebook-synchronization.md).
-It shares that ADR's **Proposed** status; it is a design contract, not a claim
+This document details [ADR 0002](./adrs/0002-git-native-portable-notebook-synchronization-accepted.md).
+It shares that ADR's **Accepted** status; it is a design contract, not a claim
 that every described capability is implemented. Portable file representation
 and validation belong to [ADR 0004](./adrs/0004-okf-compatible-notebook-markdown-accepted.md).
 

@@ -62,11 +62,10 @@ still needs this shared final-only path for broader identity inference. Exact
 endpoint matching alone is not enough for rename-then-edit
 continuity when correspondence must be inferred beyond already supported
 transitions. This topic follows the owner's final-only application direction in
-[Proposed Git publication architecture](../docs/notebook-git-synchronization.md#publication-guarantees)
+[Accepted Git publication architecture](../docs/notebook-git-synchronization.md#publication-guarantees)
 and preserves [Accepted ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md).
 Confirmed deletion/recreation retains its existing identity semantics. The
-selected ordinary-note rename admission direction is below; the proposed ADR
-itself remains unapproved.
+selected ordinary-note rename admission direction is below.
 
 
 ## Git rename correspondence
@@ -101,5 +100,5 @@ Evidence: backend JGit dependency, current exact-move history composition, and
 existing publication/reference controller tests. This direction governs shared
 ordinary-note inference for later Git work. Folder identity keeps existing
 exact-subtree semantics. It preserves Accepted ADRs 0004 and 0005 and clarifies
-the history-inspection/final-application distinction in Proposed ADR 0002
+the history-inspection/final-application distinction in Accepted ADR 0002
 without changing its status.

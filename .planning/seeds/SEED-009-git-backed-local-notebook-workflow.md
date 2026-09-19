@@ -85,13 +85,12 @@ the newly selected append-only stories.
   The order above is a value hypothesis, to revise with use.
 - Ordinary-note rename-with-edit direction is settled in the North Star.
   Wider identity outcomes remain deferred;
-  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization.md)
-  remains Proposed. Confirmed deletion/recreation starts a new identity.
+  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
+  is Accepted. Confirmed deletion/recreation starts a new identity.
 - Additional web creation modes and container mutations need concrete owner
   journeys before story selection; this queue is not a completeness claim.
 
 ## Breadcrumbs
 
 - Owner's 2026-09-12 direction clarification and cleanup/backlog request.
-- Accepted ADR 0004 defines Portable content; Proposed ADR 0002 remains a
-  broader, non-binding direction.
+- Accepted ADR 0004 defines Portable content; Accepted ADR 0002 defines the broader synchronization architecture.

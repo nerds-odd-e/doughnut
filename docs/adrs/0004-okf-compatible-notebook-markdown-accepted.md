@@ -16,8 +16,8 @@ should follow the
 [Open Knowledge Format (OKF) v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 so local copies work with OKF tooling, Obsidian-style editing, and Git-native
 two-way synchronization. Git binding, identity projection, and
-integration behavior are outside this format decision; Proposed
-[ADR 0002](./0002-git-native-portable-notebook-synchronization.md)
+integration behavior are outside this format decision; Accepted
+[ADR 0002](./0002-git-native-portable-notebook-synchronization-accepted.md)
 addresses them.
 
 OKF standardizes a small structural floor (concepts as files, path as ID,
@@ -199,7 +199,7 @@ profile. Codec round-trips must be lossless for these rules.
 - Links:
   - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md)
     (**Portable notebook tree**, **Portable path**, **Wiki link**, **Property**)
-  - [ADR 0002 — Git-native Portable notebook tree synchronization](./0002-git-native-portable-notebook-synchronization.md)
+  - [ADR 0002 — Git-native Portable notebook tree synchronization](./0002-git-native-portable-notebook-synchronization-accepted.md)
   - [ADR 0005 — Web routes](./0005-web-routes-accepted.md) (compile to `noteShow` / `noteProperty`)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
   - [Obsidian inline titles](https://obsidian.md/help/settings)

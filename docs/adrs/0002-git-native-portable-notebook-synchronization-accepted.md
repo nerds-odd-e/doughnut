@@ -1,8 +1,10 @@
 # 0002 — Git-native Portable notebook tree synchronization
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Date:** 2026-09-04
+
+**Accepted:** 2026-09-19
 
 **Decision makers:** Terry Yin
 
