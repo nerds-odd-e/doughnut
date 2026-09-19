@@ -178,6 +178,24 @@ originating branch before the worktree was created.
     the base-ref gap is independent of the branch-name-sanitization half of
     this finding.
 
+- Execution: quick/260920-frontend-proof-type-checking / 0d3804b28f
+  - Timestamp: 2026-09-19 (session date)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `EnterWorktree(name: "260920-frontend-proof-type-checking")`
+    (no `/` in the requested name) created branch
+    `worktree-260920-frontend-proof-type-checking` at `419ea6e45b`
+    (`origin/main`'s tip), while local `main` was already one commit ahead at
+    `0d3804b28f` (the backlog "Taken" claim commit made just before). Detected
+    via `git log --oneline -3` immediately after entering the worktree.
+  - Observed effect: recovered in place with `git rebase main` (the worktree
+    branch had no commits of its own yet, a clean ancestor); no lost work,
+    one extra diagnostic-and-fix step.
+  - Inference: fourth occurrence of the same root cause across four different
+    plans/coordinators; continues to support fixing the tool's default base
+    ref rather than relying on per-execution detection.
+
 ## ODF-042 — Coordinator pre-filtered grep results for a test-only representation slice, missing sites the later field-removal slice had to fix
 
 Former local code: DD-037.
@@ -536,6 +554,40 @@ untriggered CLI guard.
     false-unavailable conclusion) strengthens the case that this needs the
     CLI guard fixed rather than continuing to rely on retrospective review to
     catch it after the fact.
+
+- Execution: quick/260920-frontend-proof-type-checking / 7b1d80b4e8
+  - Timestamp: 2026-09-19 (session date)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `node ./.claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs
+    start --execution nerds-odd-e/doughnut worktree-260920-frontend-proof-type-checking`
+    run from the execution worktree root (after this session had already
+    entered a Nix shell there, which creates the `.claude/skills/<name>`
+    symlinks) produced no stdout and exit code 0, with no
+    `CI_OBSERVER`/`CI_MONITOR_READY` context added. Individually reading that
+    same path with `sed`/`grep`/`cp` returned real file content matching
+    `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`, while a bare
+    `ls -la .claude/skills` from the worktree root (no subpath) showed zero
+    entries beside `.` and `..` — the per-file reads and the directory
+    listing disagreed about whether the path existed.
+    `node ./.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs start ...`
+    then printed the expected `CI_OBSERVER {"directory":...}` receipt and the
+    PostToolUse hook added its context.
+  - Observed effect: no lost coverage — diagnosed via an inline import script
+    that printed the module's actual exports before trusting the CLI's
+    silence, then armed and registered the already-pushed commit via the
+    realpath before shutting the observer down — but cost several extra
+    diagnostic tool calls after the branch had already been pushed, during a
+    background/non-interactive session with no live user to consult.
+  - Inference: same root cause and fix as the prior three occurrences. The
+    disagreement between successful individual-file reads and an empty bare
+    directory listing for the same `.claude/skills` path is a new wrinkle
+    worth naming: it means confirming the target file is readable is not
+    sufficient confirmation that the CLI invocation through that path will
+    behave correctly, which makes runtime-setup.md's own "do not reuse the
+    installed directory that supplied the initially loaded skill" caution
+    easy to satisfy on a shallow check while still hitting this failure mode.
 
 ## DD-072 — A concurrent session deleted an active Story Branch execution worktree and branch while a delegated subagent was mid-slice
 
