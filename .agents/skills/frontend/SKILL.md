@@ -18,6 +18,22 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test
 
 Spec paths are relative to `frontend/`. Do not pass `--` before the path (Vitest skips file filtering). Prefer the full frontend unit suite; a single file only while iterating on that file.
 
+## Frontend proof
+
+`frontend:test` runs Vitest only; `frontend/vitest.config.ts` disables
+typechecking there for speed. Passing behavioral tests alone is incomplete
+frontend proof: before accepting a frontend change, also require this
+typecheck to pass against the same working-tree content, including generated
+API types:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
+
+Reuse existing typecheck evidence from a `lint`/`format`/`build` run on
+identical content instead of repeating it. This requirement applies at proof
+acceptance, not to every focused Vitest run while iterating on one file.
+
 ## Components
 
 - `<script setup lang="ts">`. PascalCase `.vue` files; tests `ComponentName.spec.ts`.
