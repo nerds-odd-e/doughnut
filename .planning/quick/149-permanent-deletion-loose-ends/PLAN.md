@@ -277,13 +277,16 @@ Complexity: `NoteMoreOptionsActions.vue` 272 → 225 lines;
 
 ### 8. Text, loading and creation requests are plain functions
 Type: Structure (owns retrospective item d directly)
-Status: planned
+Status: done
 Weakness removed: in `StoredApiCollection`, most of each method is the server
 request and its error handling. That part needs neither the cache, the undo
 history nor the router, yet it sits between them and makes every method long.
-Proof: `frontend/tests/store/*.spec.ts` and
-`frontend/tests/toolbars/NoteUndoButton.*.spec.ts` stay green. They mock the
-generated client, so they do not change.
+Proof: `pnpm frontend:test tests/store tests/toolbars` (17 files/108 tests)
+and `vue-tsc --noEmit` (clean) both pass, unchanged — the mocked generated
+client meant no test needed editing. `StoredApiCollection.ts`: 516 → 427
+lines; new `noteRequests.ts`: 122 lines, holding `toErrorMessage`,
+`throwStoredApiError`, `updateTextContentRequest`, `loadNoteRequest`, and
+`createNoteRequest`.
 
 Internal change: a new file `frontend/src/store/noteRequests.ts` holds plain
 functions. Each one sends one request and returns the data or throws the same

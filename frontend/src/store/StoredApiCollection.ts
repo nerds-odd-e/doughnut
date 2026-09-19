@@ -8,13 +8,7 @@ import type {
 import {
   RelationController,
   NoteController,
-  TextContentController,
-  NotebookController,
 } from "@generated/donut-backend-api/sdk.gen"
-import {
-  toOpenApiError,
-  setErrorObjectForFieldErrors,
-} from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
@@ -22,6 +16,13 @@ import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
+import {
+  toErrorMessage,
+  throwStoredApiError,
+  updateTextContentRequest,
+  loadNoteRequest,
+  createNoteRequest,
+} from "./noteRequests"
 
 export type NoteTrashReferenceHandling = NoteTrashDto["referenceHandling"]
 
@@ -32,38 +33,6 @@ export type NoteTrashOptions = {
 export type TitleRenameReferenceHandling = NonNullable<
   NoteUpdateTitleDto["referenceHandling"]
 >
-
-function toErrorMessage(error: unknown, fallback: string): string {
-  if (typeof error === "string") return error
-  return error ? (toOpenApiError(error).message ?? fallback) : fallback
-}
-
-function throwStoredApiError(
-  error: unknown,
-  response: { status?: number } | undefined,
-  fallback: string,
-  options?: { attachFieldErrors?: boolean }
-): never {
-  const apiError = new Error(fallback) as Error & {
-    body?: unknown
-    status?: number
-    [key: string]: unknown
-  }
-  if (error) {
-    apiError.body = error
-    if (options?.attachFieldErrors) {
-      setErrorObjectForFieldErrors(apiError)
-    }
-    const errorObj = toOpenApiError(error)
-    apiError.message = errorObj.message || fallback
-    if (response?.status !== undefined) {
-      apiError.status = response.status
-    } else if (errorObj.errors) {
-      apiError.status = 400
-    }
-  }
-  throw apiError
-}
 
 function noteReferenceHandlingBody(options: NoteTrashOptions): NoteTrashDto {
   return { referenceHandling: options.referenceHandling }
@@ -97,7 +66,12 @@ export default class StoredApiCollection {
     titleReferenceHandling?: TitleRenameReferenceHandling
   ) {
     const realm = this.storage.refreshNoteRealm(
-      await this.callUpdateApi(noteId, field, content, titleReferenceHandling)
+      await updateTextContentRequest(
+        noteId,
+        field,
+        content,
+        titleReferenceHandling
+      )
     )
     if (field === "edit title") {
       refreshSidebarStructuralListings()
@@ -105,60 +79,8 @@ export default class StoredApiCollection {
     return realm
   }
 
-  private async callUpdateApi(
-    noteId: Donut.ID,
-    field: "edit title" | "edit content",
-    content: string,
-    titleReferenceHandling?: TitleRenameReferenceHandling
-  ) {
-    if (field === "edit title") {
-      const body: NoteUpdateTitleDto = {
-        newTitle: content,
-        ...(titleReferenceHandling != null
-          ? { referenceHandling: titleReferenceHandling }
-          : {}),
-      }
-      const { data, error } = await apiCallWithLoading(() =>
-        TextContentController.updateNoteTitle({
-          path: { note: noteId },
-          body,
-        })
-      )
-      if (error || !data) {
-        const fieldErrors = toOpenApiError(error).errors
-        if (fieldErrors?.newTitle) {
-          throw Object.assign(
-            new Error(toErrorMessage(error, "Failed to update note title")),
-            { title: fieldErrors.newTitle }
-          )
-        }
-        throw new Error(toErrorMessage(error, "Failed to update note title"))
-      }
-      return data
-    }
-    const { data, error } = await apiCallWithLoading(() =>
-      TextContentController.updateNoteContent({
-        path: { note: noteId },
-        body: {
-          content,
-        },
-      })
-    )
-    if (error || !data) {
-      throw new Error(toErrorMessage(error, "Failed to update note content"))
-    }
-    return data
-  }
-
   private async loadNote(noteId: Donut.ID) {
-    const { data: noteRealm, error } = await apiCallWithLoading(() =>
-      NoteController.showNote({
-        path: { note: noteId },
-      })
-    )
-    if (error || !noteRealm) {
-      throw new Error(toErrorMessage(error, "Failed to load note"))
-    }
+    const noteRealm = await loadNoteRequest(noteId)
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
@@ -204,18 +126,7 @@ export default class StoredApiCollection {
       options?.refreshWikiLinkCacheForNoteIds
     const body: NoteCreationDto =
       folderId != null ? { ...data, folderId } : { ...data }
-    const result = await apiCallWithLoading(() =>
-      NotebookController.createNoteAtNotebookRoot({
-        path: { notebook: notebookId },
-        body,
-      })
-    )
-    const { data: nrwp, error, response } = result
-    if (error || !nrwp) {
-      throwStoredApiError(error, response, "Failed to create note", {
-        attachFieldErrors: true,
-      })
-    }
+    const nrwp = await createNoteRequest(notebookId, body)
     const focus = this.storage.refreshNoteRealm(nrwp)
     this.noteEditingHistory.createNote(focus.id)
     if (refreshWikiLinkCacheForNoteIds) {
