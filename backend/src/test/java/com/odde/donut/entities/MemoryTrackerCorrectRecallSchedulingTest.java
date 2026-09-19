@@ -8,6 +8,8 @@ import static org.hamcrest.Matchers.lessThan;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class MemoryTrackerCorrectRecallSchedulingTest extends MemoryTrackerRecallSchedulingTestBase {
   static final float FIRST_GOOD_DIFFICULTY = 2.118104f;
@@ -15,20 +17,31 @@ class MemoryTrackerCorrectRecallSchedulingTest extends MemoryTrackerRecallSchedu
   static final float MAXIMUM_INTERVAL_HOURS = 876000f;
   static final float LEGACY_LADDER_MAX_STABILITY_HOURS = 1_800_600f;
 
-  @Test
-  void firstCorrectRecallUsesS0AndD0Good() {
+  @ParameterizedTest
+  @CsvSource({"EASY, 199, 1", "GOOD, 55, 2.118104", "HARD, 31, 5.1121707"})
+  void firstCorrectRecallUsesS0AndD0OfItsGrade(
+      Grade grade, float stabilityHours, float difficulty) {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime = memoryTracker.getNextRecallAt();
 
-    memoryTracker.applyGrade(gradeTime, Grade.GOOD);
+    memoryTracker.applyGrade(gradeTime, grade);
 
-    assertThat(memoryTracker.getDifficulty(), equalTo(FIRST_GOOD_DIFFICULTY));
-    assertThat(memoryTracker.getStability(), equalTo(FIRST_GOOD_STABILITY_HOURS));
+    assertThat(memoryTracker.getDifficulty(), equalTo(difficulty));
+    assertThat(memoryTracker.getStability(), equalTo(stabilityHours));
     assertThat(
         memoryTracker.getNextRecallAt(),
-        equalTo(
-            TimestampOperations.addHoursToTimestamp(
-                gradeTime, Math.round(FIRST_GOOD_STABILITY_HOURS))));
+        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, Math.round(stabilityHours))));
+  }
+
+  @ParameterizedTest
+  @CsvSource({"EASY, 484", "GOOD, 284", "HARD, 193"})
+  void onTimeSecondCorrectRecallAfterFirstGoodGrowsStability(Grade grade, float stabilityHours) {
+    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
+    memoryTracker.applyGrade(memoryTracker.getNextRecallAt(), Grade.GOOD);
+
+    memoryTracker.applyGrade(onTimeGradeTime(memoryTracker), grade);
+
+    assertThat(memoryTracker.getStability(), equalTo(stabilityHours));
   }
 
   @Test

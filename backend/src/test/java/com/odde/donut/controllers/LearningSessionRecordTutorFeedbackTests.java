@@ -32,4 +32,26 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
             TimestampOperations.addHoursToTimestamp(
                 hola.getLastRecalledAt(), Math.round(hola.getStability()))));
   }
+
+  @Test
+  void aLaterSessionSchedulesFromItsOwnTime() throws UnexpectedNoAccessRightException {
+    Timestamp firstSessionAt = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(firstSessionAt);
+    SpanishNotebookFixture fixture = spanishNotebookFixture(firstSessionAt);
+    controller.record(
+        recordRequest(fixture.notebook(), learningSessionReport("Hola", 3)), "Asia/Shanghai");
+
+    Timestamp secondSessionAt = fixture.holaTracker().getNextRecallAt();
+    testabilitySettings.timeTravelTo(secondSessionAt);
+    controller.record(
+        recordRequest(fixture.notebook(), learningSessionReport("Hola", 3)), "Asia/Shanghai");
+
+    MemoryTracker hola = fixture.holaTracker();
+    assertThat(hola.getLastRecalledAt(), equalTo(secondSessionAt));
+    assertThat(
+        hola.getNextRecallAt(),
+        equalTo(
+            TimestampOperations.addHoursToTimestamp(
+                secondSessionAt, Math.round(hola.getStability()))));
+  }
 }
