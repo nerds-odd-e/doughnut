@@ -2,13 +2,11 @@ package com.odde.donut.controllers;
 
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.controllers.dto.FolderCreationRequest;
-import com.odde.donut.controllers.dto.FolderListing;
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.controllers.dto.FolderRealm;
 import com.odde.donut.controllers.dto.FolderRenameRequest;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.controllers.dto.NoteTopology;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
@@ -16,7 +14,6 @@ import com.odde.donut.controllers.dto.NotebookUpdateRequest;
 import com.odde.donut.controllers.dto.NotebooksViewedByUser;
 import com.odde.donut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.donut.entities.*;
-import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookGroupRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -24,7 +21,6 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.BazaarService;
 import com.odde.donut.services.FolderRelocationService;
-import com.odde.donut.services.NoteService;
 import com.odde.donut.services.NotebookCatalogService;
 import com.odde.donut.services.NotebookExportService;
 import com.odde.donut.services.NotebookGroupService;
@@ -69,9 +65,7 @@ class NotebookController {
   private final NotebookGroupRepository notebookGroupRepository;
   private final NotebookGroupService notebookGroupService;
   private final NotebookRepository notebookRepository;
-  private final FolderRepository folderRepository;
   private final NotebookCatalogService notebookCatalogService;
-  private final NoteService noteService;
   private final WebFolderCreationService webFolderCreationService;
   private final WebNoteCreationService webNoteCreationService;
   private final WikidataService wikidataService;
@@ -91,9 +85,7 @@ class NotebookController {
       NotebookGroupRepository notebookGroupRepository,
       NotebookGroupService notebookGroupService,
       NotebookRepository notebookRepository,
-      FolderRepository folderRepository,
       NotebookCatalogService notebookCatalogService,
-      NoteService noteService,
       WebFolderCreationService webFolderCreationService,
       WebNoteCreationService webNoteCreationService,
       WikidataService wikidataService,
@@ -111,9 +103,7 @@ class NotebookController {
     this.notebookGroupRepository = notebookGroupRepository;
     this.notebookGroupService = notebookGroupService;
     this.notebookRepository = notebookRepository;
-    this.folderRepository = folderRepository;
     this.notebookCatalogService = notebookCatalogService;
-    this.noteService = noteService;
     this.webFolderCreationService = webFolderCreationService;
     this.webNoteCreationService = webNoteCreationService;
     this.wikidataService = wikidataService;
@@ -346,61 +336,6 @@ class NotebookController {
   }
 
   @Operation(
-      summary = "List notes and folders at notebook root or under a parent folder",
-      description =
-          "Without parent: notes with no folder assignment and top-level folders (notebook root"
-              + " scope). With parent: notes assigned to that folder and its immediate child"
-              + " folders. The parent folder must belong to the notebook.")
-  @GetMapping("/{notebook}/folder-listing")
-  public FolderListing listNotebookFolderListing(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @RequestParam(value = "parent", required = false) @Schema(type = "integer")
-          Integer parentFolderId)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(notebook);
-    if (parentFolderId == null) {
-      List<NoteTopology> noteTopologies =
-          noteService.findNotebookRootNotes(notebook.getId()).stream()
-              .map(Note::getNoteTopology)
-              .toList();
-      List<Folder> folders =
-          folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-              .toList();
-      return new FolderListing(noteTopologies, folders);
-    }
-    Folder folder =
-        folderRepository
-            .findById(parentFolderId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
-    folder.requireInNotebook(notebook);
-    List<NoteTopology> noteTopologies =
-        noteService.findNotesInFolderScope(folder.getId()).stream()
-            .map(Note::getNoteTopology)
-            .toList();
-    List<Folder> childFolders =
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
-            .toList();
-    return new FolderListing(noteTopologies, childFolders);
-  }
-
-  @Operation(
-      summary = "Get folder page payload",
-      description =
-          "Notebook chrome, folder metadata, parent folder id when nested, and optional folder"
-              + " readme content when present.")
-  @GetMapping("/{notebook}/folders/{folder}")
-  public FolderRealm getFolderPage(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @PathVariable("folder") @Schema(type = "integer") Folder folder)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(notebook);
-    folder.requireInNotebook(notebook);
-    User user = authorizationService.getCurrentUser();
-    return notebookCatalogService.folderRealmFor(notebook, folder, user);
-  }
-
-  @Operation(
       summary = "Update notebook readme content directly",
       description =
           "Saves the given markdown (with optional YAML frontmatter) as the notebook container's"
@@ -446,18 +381,6 @@ class NotebookController {
     entityPersister.flush();
     User user = authorizationService.getCurrentUser();
     return notebookCatalogService.folderRealmFor(notebook, folder, user);
-  }
-
-  @Operation(
-      description =
-          "Folder rows (including parentFolderId) for building folder trees and paths. Ordered by"
-              + " id.")
-  @GetMapping("/{notebook}/folders/index")
-  public List<Folder> listNotebookFolderIndex(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(notebook);
-    return folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
   }
 
   @PostMapping("/{notebook}/update-index")

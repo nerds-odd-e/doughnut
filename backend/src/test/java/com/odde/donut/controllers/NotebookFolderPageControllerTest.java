@@ -20,7 +20,7 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     Notebook nb = ownedNotebook();
     Folder folder = ownedFolder(nb, "Box");
 
-    FolderRealm realm = controller.getFolderPage(nb, folder);
+    FolderRealm realm = folderController.getFolderPage(nb, folder);
 
     assertThat(realm.sidebar().getNotebookRealm().notebook().getId(), equalTo(nb.getId()));
     assertThat(realm.folder().getId(), equalTo(folder.getId()));
@@ -35,7 +35,8 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     Folder parent = ownedFolder(nb, "Parent");
     Folder nested = makeMe.aFolder().parentFolder(parent).name("Nested").please();
 
-    assertThat(controller.getFolderPage(nb, nested).parentFolderId(), equalTo(parent.getId()));
+    assertThat(
+        folderController.getFolderPage(nb, nested).parentFolderId(), equalTo(parent.getId()));
   }
 
   @Test
@@ -45,7 +46,7 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     Folder parent = ownedFolder(nb, "Parent");
     Folder nested = makeMe.aFolder().parentFolder(parent).name("Nested").please();
 
-    FolderRealm realm = controller.getFolderPage(nb, nested);
+    FolderRealm realm = folderController.getFolderPage(nb, nested);
     assertThat(realm.sidebar().getAncestorFolders(), hasSize(1));
     assertThat(realm.sidebar().getAncestorFolders().get(0).getId(), equalTo(parent.getId()));
   }
@@ -56,7 +57,8 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     Folder foreign = ownedFolder(ownedNotebook(), "Other");
 
     ResponseStatusException ex =
-        assertThrows(ResponseStatusException.class, () -> controller.getFolderPage(nb, foreign));
+        assertThrows(
+            ResponseStatusException.class, () -> folderController.getFolderPage(nb, foreign));
     assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
   }
 
@@ -68,7 +70,7 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     makeMe.aBazaarNotebook(nb).please();
     currentUser.setUser(null);
 
-    FolderRealm realm = controller.getFolderPage(nb, folder);
+    FolderRealm realm = folderController.getFolderPage(nb, folder);
     assertThat(realm.sidebar().getNotebookRealm().readonly(), is(true));
   }
 
@@ -78,7 +80,7 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
     Folder folder = makeMe.aFolder().notebook(nb).name("Private").please();
     currentUser.setUser(makeMe.aUser().please());
     assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.getFolderPage(nb, folder));
+        UnexpectedNoAccessRightException.class, () -> folderController.getFolderPage(nb, folder));
   }
 
   @Test
@@ -93,14 +95,15 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
             .please();
 
     assertThat(
-        controller.getFolderPage(nb, folder).readmeContent(),
+        folderController.getFolderPage(nb, folder).readmeContent(),
         equalTo("---\ntitle_pattern: \"{{date}}\"\n---\n\nFolder notes"));
   }
 
   @Test
   void omitsFolderReadmeContentWhenNonePresent() throws UnexpectedNoAccessRightException {
     Notebook nb = ownedNotebook();
-    assertThat(controller.getFolderPage(nb, ownedFolder(nb, "Empty")).readmeContent(), nullValue());
+    assertThat(
+        folderController.getFolderPage(nb, ownedFolder(nb, "Empty")).readmeContent(), nullValue());
   }
 
   @Test

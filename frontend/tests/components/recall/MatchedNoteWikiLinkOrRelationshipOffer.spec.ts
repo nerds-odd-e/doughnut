@@ -1,6 +1,7 @@
 import {
   NoteController,
   NotebookController,
+  NotebookFolderController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedNoteWikiLinkOrRelationshipOffer.vue"
@@ -79,7 +80,7 @@ function mockRelationshipCreate(
 ) {
   mockSdkService(NoteController, "showNote", sourceRealm)
   mockSdkService(TextContentController, "updateNoteContent", sourceRealm)
-  mockSdkService(NotebookController, "listNotebookFolderListing", {
+  mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
     folders: [],
   })
   mockSdkService(

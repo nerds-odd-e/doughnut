@@ -1,6 +1,7 @@
 import {
   NoteController,
   NotebookController,
+  NotebookFolderController,
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
@@ -44,8 +45,8 @@ export function setupNoteNewFormSdkMocks(): NoteNewFormSdkSpies {
     []
   )
   mockSdkService(NoteController, "getRecentNotes", [])
-  mockSdkService(NotebookController, "listNotebookFolderIndex", [])
-  mockSdkService(NotebookController, "listNotebookFolderListing", {
+  mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [])
+  mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
     folders: [],
   })
   const mockedCreateNoteAtRoot = mockSdkService(

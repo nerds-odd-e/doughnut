@@ -9,7 +9,7 @@ import createNoteStorage from "@/store/createNoteStorage"
 import type { NoteRealm, NotebookRealm } from "@generated/donut-backend-api"
 import {
   NoteController,
-  NotebookController,
+  NotebookFolderController,
 } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
@@ -107,10 +107,10 @@ export function setupDefaultSidebarSdkMocks(fixtures: SidebarTreeFixtures) {
     fixtures.secondGeneration,
   ])
   mockSdkServiceWithImplementation(
-    NotebookController,
+    NotebookFolderController,
     "getFolderPage",
     (options) => {
-      type Opt = Parameters<typeof NotebookController.getFolderPage>[0]
+      type Opt = Parameters<typeof NotebookFolderController.getFolderPage>[0]
       const { path } = options as Opt
       const nameById: Record<number, string> = {
         [FOLDER_TOP_NOTE_CHILDREN_ID]:

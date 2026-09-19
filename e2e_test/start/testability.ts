@@ -17,6 +17,7 @@ import {
   NoteController,
   NotebookBooksController,
   NotebookController,
+  NotebookFolderController,
   TestabilityRestController,
   TextContentController,
 } from '@generated/donut-backend-api/sdk.gen'
@@ -415,7 +416,7 @@ const testability = () => {
     getFolderIdInNotebook(notebookId: number, folderName: string) {
       return cy
         .wrap(
-          NotebookController.listNotebookFolderIndex({
+          NotebookFolderController.listNotebookFolderIndex({
             path: { notebook: notebookId },
           }),
           { log: false }

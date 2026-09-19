@@ -123,13 +123,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `updateNotebookReadmeContent`: PATCH `/api/notebooks/{notebook}/readme-content` -> `UpdateNotebookReadmeContentResponse` (request: `UpdateNotebookReadmeContentData`; path: notebook; body: NoteUpdateContentDto; response body: NotebookRealm)
 - `updateNotebookGroup`: PATCH `/api/notebooks/{notebook}/notebook-group` -> `UpdateNotebookGroupResponse` (request: `UpdateNotebookGroupData`; path: notebook; body: UpdateNotebookGroupRequest; response body: Notebook)
 - `moveToCircle`: PATCH `/api/notebooks/{notebook}/move-to-circle/{circle}` -> `MoveToCircleResponse` (request: `MoveToCircleData`; path: notebook, circle; response body: Notebook)
-- `getFolderPage`: GET `/api/notebooks/{notebook}/folders/{folder}` -> `GetFolderPageResponse` (request: `GetFolderPageData`; path: notebook, folder; response body: FolderRealm)
 - `dissolveFolder`: DELETE `/api/notebooks/{notebook}/folders/{folder}` -> `DissolveFolderResponse` (request: `DissolveFolderData`; path: notebook, folder; query: merge; response body: void)
 - `renameFolder`: PATCH `/api/notebooks/{notebook}/folders/{folder}` -> `RenameFolderResponse` (request: `RenameFolderData`; path: notebook, folder; body: FolderRenameRequest; response body: Folder)
 - `updateFolderReadmeContent`: PATCH `/api/notebooks/{notebook}/folders/{folder}/readme-content` -> `UpdateFolderReadmeContentResponse` (request: `UpdateFolderReadmeContentData`; path: notebook, folder; body: NoteUpdateContentDto; response body: FolderRealm)
 - `myNotebooks`: GET `/api/notebooks` -> `MyNotebooksResponse` (request: none; response body: NotebooksViewedByUser)
-- `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<Folder>)
-- `listNotebookFolderListing`: GET `/api/notebooks/{notebook}/folder-listing` -> `ListNotebookFolderListingResponse` (request: `ListNotebookFolderListingData`; path: notebook; query: parent; response body: FolderListing)
 - `exportNotebook`: GET `/api/notebooks/{notebook}/export` -> `ExportNotebookResponse` (request: `ExportNotebookData`; path: notebook; response body: string)
 
 ## Notebook Health Controller
@@ -245,6 +242,12 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `updateNoteTitle`: PATCH `/api/text_content/{note}/title` -> `UpdateNoteTitleResponse` (request: `UpdateNoteTitleData`; path: note; body: NoteUpdateTitleDto; response body: NoteRealm)
 - `updateNoteContent`: PATCH `/api/text_content/{note}/content` -> `UpdateNoteContentResponse` (request: `UpdateNoteContentData`; path: note; body: NoteUpdateContentDto; response body: NoteRealm)
+
+## Notebook Folder Controller
+
+- `getFolderPage`: GET `/api/notebooks/{notebook}/folders/{folder}` -> `GetFolderPageResponse` (request: `GetFolderPageData`; path: notebook, folder; response body: FolderRealm)
+- `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<Folder>)
+- `listNotebookFolderListing`: GET `/api/notebooks/{notebook}/folder-listing` -> `ListNotebookFolderListingResponse` (request: `ListNotebookFolderListingData`; path: notebook; query: parent; response body: FolderListing)
 
 ## Install Controller
 

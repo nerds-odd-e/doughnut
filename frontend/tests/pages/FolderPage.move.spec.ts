@@ -1,4 +1,7 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NotebookController,
+  NotebookFolderController,
+} from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -41,7 +44,7 @@ describe("FolderPage move", () => {
     const beta = testFolderStub(2, "Beta")
     const realmAtRoot = makeMe.aFolderRealm.folder(2, "Beta").please()
 
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [alpha],
     })
 

@@ -322,12 +322,16 @@ another slice.
 
 ### 10. Reading a notebook's folders has its own controller
 Type: Structure (owns retrospective item d directly)
-Status: planned
+Status: done
 Weakness removed: `NotebookController` mixes the notebook with its folders and
 needs 21 collaborators.
-Proof: the backend tests of the moved endpoints, the frontend specs that mock
-them, and `e2e_test/features/folder_organization/folder_trash.feature` stay
-green. URLs are unchanged, so CLI and MCP are unaffected.
+Proof: full backend suite (13 affected test classes, including every
+`NotebookFolderManagementControllerTestBase` subclass) BUILD SUCCESSFUL;
+full frontend suite (339 files/1903 tests) pass; `vue-tsc --noEmit` clean;
+`pnpm cy:run --spec e2e_test/features/folder_organization/folder_trash.feature`
+3 passing. URLs unchanged; `grep` confirmed no CLI or MCP reference to the
+moved methods. `NotebookController.java`: 556 → 479 lines; new
+`NotebookFolderController.java`: 113 lines.
 
 Internal change: new `NotebookFolderController` on `/api/notebooks`, following
 the sibling-controller pattern. Move `listNotebookFolderListing`,

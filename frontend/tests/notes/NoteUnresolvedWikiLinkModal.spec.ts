@@ -1,6 +1,6 @@
 import {
   NoteController,
-  NotebookController,
+  NotebookFolderController,
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
 import NoteUnresolvedWikiLinkModal from "@/components/notes/NoteUnresolvedWikiLinkModal.vue"
@@ -76,8 +76,8 @@ describe("NoteUnresolvedWikiLinkModal", () => {
     mockSdkService(SearchController, "semanticSearch", [])
     mockSdkService(SearchController, "semanticSearchWithin", [])
     mockSdkService(NoteController, "getRecentNotes", [])
-    mockSdkService(NotebookController, "listNotebookFolderIndex", [])
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [])
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [],
     })
   })

@@ -1,4 +1,7 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NotebookController,
+  NotebookFolderController,
+} from "@generated/donut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -30,7 +33,7 @@ describe("AddRelationshipFinalize", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     routerReplace.mockResolvedValue(undefined)
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [],
     })
     mockSdkService(

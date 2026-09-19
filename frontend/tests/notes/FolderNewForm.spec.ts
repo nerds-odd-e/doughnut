@@ -1,4 +1,7 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NotebookController,
+  NotebookFolderController,
+} from "@generated/donut-backend-api/sdk.gen"
 import FolderNewForm from "@/components/notes/FolderNewForm.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
@@ -20,8 +23,8 @@ describe("FolderNewForm", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     routerPush.mockResolvedValue(undefined)
-    mockSdkService(NotebookController, "listNotebookFolderIndex", [])
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [])
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [],
     })
   })

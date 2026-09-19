@@ -28,6 +28,7 @@ abstract class NotebookControllerTestBase extends ControllerTestBase {
   @Autowired com.odde.donut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
 
   @Autowired NotebookController controller;
+  @Autowired NotebookFolderController folderController;
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookRepository notebookRepository;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;

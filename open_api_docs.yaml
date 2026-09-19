@@ -2155,7 +2155,7 @@ paths:
   /api/notebooks/{notebook}/folders/{folder}:
     get:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Get folder page payload
       description: "Notebook chrome, folder metadata, parent folder id when nested,\
         \ and optional folder readme content when present."
@@ -2759,7 +2759,7 @@ paths:
   /api/notebooks/{notebook}/folders/index:
     get:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       description: Folder rows (including parentFolderId) for building folder trees
         and paths. Ordered by id.
       operationId: listNotebookFolderIndex
@@ -2781,7 +2781,7 @@ paths:
   /api/notebooks/{notebook}/folder-listing:
     get:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: List notes and folders at notebook root or under a parent folder
       description: "Without parent: notes with no folder assignment and top-level\
         \ folders (notebook root scope). With parent: notes assigned to that folder\

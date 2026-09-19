@@ -6,7 +6,7 @@ import type {
 } from "@generated/donut-backend-api"
 import {
   NoteController,
-  NotebookController,
+  NotebookFolderController,
 } from "@generated/donut-backend-api/sdk.gen"
 import {
   mockSdkServiceWithImplementation,
@@ -15,7 +15,7 @@ import {
 import { expect } from "vitest"
 
 type ListNotebookFolderListingOptions = Parameters<
-  typeof NotebookController.listNotebookFolderListing
+  typeof NotebookFolderController.listNotebookFolderListing
 >[0]
 
 type NoteStorageAccessor = ReturnType<
@@ -67,7 +67,7 @@ export function stubNotebookFolderListings(
   defaultTreeFolderListings: Record<string, FolderListing>
 ) {
   return mockSdkServiceWithImplementation(
-    NotebookController,
+    NotebookFolderController,
     "listNotebookFolderListing",
     (options) => folderListingForQueryParent(options, defaultTreeFolderListings)
   )
@@ -129,7 +129,7 @@ export function setupRootPeersWithFolders(options: {
     },
   }
   mockSdkServiceWithImplementation(
-    NotebookController,
+    NotebookFolderController,
     "listNotebookFolderListing",
     (options) => folderListingForQueryParent(options, rootPeersFolderListings)
   )

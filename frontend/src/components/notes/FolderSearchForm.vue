@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import type { Folder } from "@generated/donut-backend-api"
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { Search } from "@lucide/vue"
 import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -145,7 +145,7 @@ onMounted(async () => {
   indexLoadError.value = undefined
   try {
     const { data, error } = await apiCallWithLoading(() =>
-      NotebookController.listNotebookFolderIndex({
+      NotebookFolderController.listNotebookFolderIndex({
         path: { notebook: props.notebookId },
       })
     )

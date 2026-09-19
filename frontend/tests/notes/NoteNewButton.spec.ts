@@ -1,6 +1,6 @@
 import {
   NoteController,
-  NotebookController,
+  NotebookFolderController,
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
 import NoteNewButton from "@/components/notes/core/NoteNewButton.vue"
@@ -44,8 +44,8 @@ describe("NoteNewButton keyboard shortcut", () => {
     mockSdkService(SearchController, "semanticSearch", [])
     mockSdkService(SearchController, "semanticSearchWithin", [])
     mockSdkService(NoteController, "getRecentNotes", [])
-    mockSdkService(NotebookController, "listNotebookFolderIndex", [])
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [])
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [],
     })
   })

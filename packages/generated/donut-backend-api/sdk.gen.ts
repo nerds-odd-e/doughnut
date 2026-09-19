@@ -778,15 +778,6 @@ export class NotebookController {
     }
     
     /**
-     * Get folder page payload
-     *
-     * Notebook chrome, folder metadata, parent folder id when nested, and optional folder readme content when present.
-     */
-    public static getFolderPage<ThrowOnError extends boolean = false>(options: Options<GetFolderPageData, ThrowOnError>): RequestResult<GetFolderPageResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).get<GetFolderPageResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/{folder}', ...options });
-    }
-    
-    /**
      * Rename a folder
      *
      * Changes the folder display name under its current parent. Sibling name conflicts are rejected.
@@ -820,22 +811,6 @@ export class NotebookController {
     
     public static myNotebooks<ThrowOnError extends boolean = false>(options?: Options<MyNotebooksData, ThrowOnError>): RequestResult<MyNotebooksResponses, unknown, ThrowOnError> {
         return (options?.client ?? client).get<MyNotebooksResponses, unknown, ThrowOnError>({ url: '/api/notebooks', ...options });
-    }
-    
-    /**
-     * Folder rows (including parentFolderId) for building folder trees and paths. Ordered by id.
-     */
-    public static listNotebookFolderIndex<ThrowOnError extends boolean = false>(options: Options<ListNotebookFolderIndexData, ThrowOnError>): RequestResult<ListNotebookFolderIndexResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).get<ListNotebookFolderIndexResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/index', ...options });
-    }
-    
-    /**
-     * List notes and folders at notebook root or under a parent folder
-     *
-     * Without parent: notes with no folder assignment and top-level folders (notebook root scope). With parent: notes assigned to that folder and its immediate child folders. The parent folder must belong to the notebook.
-     */
-    public static listNotebookFolderListing<ThrowOnError extends boolean = false>(options: Options<ListNotebookFolderListingData, ThrowOnError>): RequestResult<ListNotebookFolderListingResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).get<ListNotebookFolderListingResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folder-listing', ...options });
     }
     
     /**
@@ -1340,6 +1315,33 @@ export class TextContentController {
                 ...options.headers
             }
         });
+    }
+}
+
+export class NotebookFolderController {
+    /**
+     * Get folder page payload
+     *
+     * Notebook chrome, folder metadata, parent folder id when nested, and optional folder readme content when present.
+     */
+    public static getFolderPage<ThrowOnError extends boolean = false>(options: Options<GetFolderPageData, ThrowOnError>): RequestResult<GetFolderPageResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).get<GetFolderPageResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/{folder}', ...options });
+    }
+    
+    /**
+     * Folder rows (including parentFolderId) for building folder trees and paths. Ordered by id.
+     */
+    public static listNotebookFolderIndex<ThrowOnError extends boolean = false>(options: Options<ListNotebookFolderIndexData, ThrowOnError>): RequestResult<ListNotebookFolderIndexResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).get<ListNotebookFolderIndexResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/index', ...options });
+    }
+    
+    /**
+     * List notes and folders at notebook root or under a parent folder
+     *
+     * Without parent: notes with no folder assignment and top-level folders (notebook root scope). With parent: notes assigned to that folder and its immediate child folders. The parent folder must belong to the notebook.
+     */
+    public static listNotebookFolderListing<ThrowOnError extends boolean = false>(options: Options<ListNotebookFolderListingData, ThrowOnError>): RequestResult<ListNotebookFolderListingResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).get<ListNotebookFolderListingResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folder-listing', ...options });
     }
 }
 
