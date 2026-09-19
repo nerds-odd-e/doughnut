@@ -845,33 +845,6 @@ the run exists, is discoverable moments later, and goes on to succeed.
     `CI_COVERAGE_UNAVAILABLE` as final, would likely have prevented every one
     of these four false negatives.
 
-## DD-077 — Unpaired full-suite timings obscured a real test optimization
-
-The backend test optimization guidance requires comparable ordinary-path
-measurements and repeated doubtful comparisons, but it does not suggest an
-adjacent A/B pair when machine or suite load overwhelms the expected saving.
-This execution's isolated test family consistently became much faster while
-three unpaired whole-suite runs varied enough to contradict that signal.
-
-### Occurrences
-
-- Execution: quick/150-backend-atomic-context-optimization / a711bcd919
-  - Timestamp: 2026-09-19T14:14:49+08:00
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: the plan records an 85.30s same-worktree baseline followed by
-    post-change runs of 88.11s, 146.34s, and 112.66s even though the targeted
-    family repeatedly fell from about 10.4s to about 2.3-2.5s. The final
-    adjacent pair measured original A at 95.76s and context-reuse B at 88.48s,
-    with all 2,535 tests passing in both states.
-  - Observed effect: the first contradictory result triggered a full revert;
-    two more unpaired full-suite runs remained inconclusive, so the same edit
-    was applied a third time before the paired run demonstrated a 7.28s
-    ordinary-path improvement.
-  - Inference: after the first family-versus-wall-time contradiction, an
-    adjacent original/changed A/B pair would have controlled the observed load
-    variation sooner while still honoring the ordinary-path requirement.
-
 ## Retention
 
 - Highest allocated local number: 77
