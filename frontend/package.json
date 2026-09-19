@@ -18,7 +18,7 @@
     "test:ui": "vitest run --browser=chromium",
     "test:watch": "vitest --browser=chromium --ui",
     "pretest": "node scripts/generateStoryList.mjs && playwright install chromium",
-    "test": "CI=true vitest run --browser=chromium"
+    "test": "vitest run --browser=chromium --browser.headless"
   },
   "dependencies": {
     "epubjs": "^0.3.93",

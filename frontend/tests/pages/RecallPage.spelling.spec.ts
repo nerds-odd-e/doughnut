@@ -44,6 +44,12 @@ describe("RecallPage spelling quiz", () => {
   const firstMemoryTrackerId = 123
   const ctx = useRecallPageSpecContext({ fakeTimers: true })
 
+  const mountAttachedToBody = () =>
+    ctx.renderer.currentRoute({ name: "recall" }).mount({
+      attachTo: document.body,
+      global: { directives: { focus: focusDirective } },
+    })
+
   beforeEach(() => {
     mockSdkService(
       MemoryTrackerController,
@@ -111,10 +117,7 @@ describe("RecallPage spelling quiz", () => {
     })
     vi.mocked(useRecallData).mockReturnValue(recallData)
 
-    const wrapper = ctx.renderer.currentRoute({ name: "recall" }).mount({
-      attachTo: document.body,
-      global: { directives: { focus: focusDirective } },
-    })
+    const wrapper = mountAttachedToBody()
     await flushPromises()
     await nextTick()
     flushCapturedAnimationFrames(rafCallbacks)
@@ -147,5 +150,82 @@ describe("RecallPage spelling quiz", () => {
 
     expect(document.activeElement).toBe(spellingInput)
     wrapper.unmount()
+  })
+
+  describe("answer overlapping another note", () => {
+    const memoryTrackerId = firstMemoryTrackerId
+    let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
+    let getRecallPromptSpy: ReturnType<typeof mockSdkService>
+
+    beforeEach(() => {
+      getRecallPromptSpy = mockSdkService(
+        MemoryTrackerController,
+        "getRecallPrompt",
+        makeMe.aRecallPrompt.withSpellingStem("Spell").please()
+      )
+      getThresholdExceededSpy = mockSdkService(
+        MemoryTrackerController,
+        "getThresholdExceeded",
+        { thresholdExceeded: false }
+      )
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          toRepeat: [
+            createMemoryTrackerLite(memoryTrackerId, true),
+            createMemoryTrackerLite(456, true),
+          ],
+        })
+      )
+    })
+
+    it("keeps the current tracker, shows the overlap explanation, and refocuses an emptied input", async () => {
+      const overlapResult: AnsweredQuestion = makeMe.anAnsweredQuestion
+        .overlap("Shared Title")
+        .withMemoryTrackerId(memoryTrackerId)
+        .please()
+      const answerSpellingSpy = mockSdkService(
+        RecallPromptController,
+        "answerSpelling",
+        overlapResult
+      )
+      const rafCallbacks = captureRequestAnimationFrame()
+
+      const wrapper = mountAttachedToBody()
+      await flushPromises()
+      await nextTick()
+      flushCapturedAnimationFrames(rafCallbacks)
+      await flushPromises()
+
+      type ExposedVM = { currentIndex: number }
+      const vm = wrapper.vm as unknown as ExposedVM
+      const getRecallPromptCallsBeforeAnswer =
+        getRecallPromptSpy.mock.calls.length
+
+      await wrapper.find("input#memory_tracker-answer").setValue("Shared Title")
+      await wrapper.find("form").trigger("submit")
+      await flushPromises()
+      await nextTick()
+      flushCapturedAnimationFrames(rafCallbacks)
+      await flushPromises()
+
+      expect(answerSpellingSpy).toHaveBeenCalled()
+      expect(getThresholdExceededSpy).not.toHaveBeenCalled()
+      expect(vm.currentIndex).toBe(0)
+      expect(getRecallPromptSpy.mock.calls.length).toBeGreaterThan(
+        getRecallPromptCallsBeforeAnswer
+      )
+
+      expect(
+        wrapper.find('[data-testid="spelling-overlap-feedback"]').text()
+      ).toContain(
+        "Your answer matches an overlapped note, but that's different from the expected answer"
+      )
+
+      const spellingInput = document.querySelector(
+        "input#memory_tracker-answer"
+      ) as HTMLInputElement
+      expect(spellingInput.value).toBe("")
+      expect(document.activeElement).toBe(spellingInput)
+    })
   })
 })

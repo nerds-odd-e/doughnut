@@ -15,18 +15,30 @@ Profile E2E with:
 --expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'
 ```
 
+## Frontend profiling note
+
+Frontend Vitest has no profile-exclusion mechanism, and it does not need one:
+per-**test** duration is not the frontend cost model. Measured 2026-09-19 on the
+339-file suite, the summed duration of every reported test file was ~7.6s against
+a ~64.5s wall time, so ~88% of the suite is per-**file** cost (browser page setup
+plus module-graph import). The measured marginal cost of one additional spec file
+is ~190–280ms — an order of magnitude more than any individual candidate body
+below ever was (13–34ms).
+
+Consequences for future profiling passes:
+
+- Do not record a frontend test as a candidate because its body is tens of
+  milliseconds. That is inside the noise of the file it lives in.
+- The frontend lever is **file count**: merge sibling specs that share a
+  responsibility, a harness, and a setup block. Merging also deletes the
+  duplicated `vi.mock` / `beforeEach` boilerplate, so it is a design improvement
+  and a speedup at once.
+- Rejected 2026-09-19: `--no-isolate` (reuse one browser page across files).
+  216 of 339 files failed on shared global state and the run took 325s, 5×
+  slower. Per-file isolation is required.
+
 ## Candidates
 
 <!-- location — measured cost — unique protection — attempted alternatives/evidence — date — decision needed -->
 
-- `frontend/tests/pages/BookReadingPage.snap.budgets.spec.ts` — marking READ clears snap reminder: block no longer snaps when re-visited — ~17.6ms baseline — full PDF mount + snap budget lifecycle + mark-as-read; no cheaper remount preserves behavior — 2026-08-20
-- `frontend/tests/pages/BookReadingPage.snap.budgets.spec.ts` — different unread blocks get independent snap budgets — dual-block PDF geometry with multi-crossing budgets; inherent viewer cost — 2026-08-20
-- `frontend/tests/pages/BookReadingPage.snap.spec.ts` — remaining cross-page / disposition / animating / no-bbox snap cases — each needs a distinct PDF mount scenario; further merge would lose unique geometry coverage — 2026-08-20
-- `frontend/tests/pages/RecallPage.spelling.spec.ts` — focuses the spelling answer input when resuming recall — ~14.8ms baseline — already fake-timers + RAF; remaining cost is recall page mount — 2026-08-20
-- `frontend/tests/pages/RecallPageOverlap.spec.ts` — stays on the same tracker, skips threshold, and remounts spelling on Try again — ~16.5ms baseline — single lean mount; overlap retry needs full Quiz remount — 2026-08-20
-- `frontend/tests/pages/FolderPage.moveDestination.spec.ts` — retries cross-notebook folder move with merge after 409 conflict — ~33.8ms baseline — the unique cross-notebook parent selection, conflict confirmation, retry payload, and destination navigation require the mounted page journey; generic conflict retry is covered separately, but replacing this combination with a narrower test would lose its cross-notebook behavioral protection — 2026-09-03
-- `frontend/tests/pages/FolderPage.moveDestination.spec.ts` — sends destinationNotebookId and navigates after cross-notebook root move — ~14.9ms measured focused baseline — the single mounted-page journey uniquely protects destination selection wiring, the root-specific payload without a parent folder, and cross-notebook navigation; a lower-level unit test would lose the UI-to-request connection — 2026-09-03
-- `frontend/tests/components/form/RichMarkdownEditor.propertyAssimilation.spec.ts` — skips the property from its own property panel after confirming — ~16.3ms baseline — the one concise mounted-editor journey uniquely protects property-key routing through the panel, confirmation, and skip request; narrower composable coverage would lose the panel wiring — 2026-09-03
-- `frontend/tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts` — calls moveNoteToNotebookRootInNotebook with notebook id after confirm — ~15.0ms baseline — already uses fake timers and one concise mounted SearchForm journey; it uniquely protects notebook-hit ID routing through confirmation into the move API, which the lower-level slot-rendering and stored-API tests do not cover together — 2026-09-03
-- `frontend/tests/wiki-link-or-relationship/InsertWikiLink.spec.ts` — does not call the inserter when Add a new relationship note is clicked — ~13.4ms baseline — replacing the debounced search journey with direct child selection did not improve measured runtime; the mounted SearchForm branch uniquely protects the relationship transition without accidental wiki-link insertion — 2026-09-03
-- `frontend/tests/commons/Modal.spec.ts` — focuses autofocus target and prefers text controls in a marked autofocus container — ~13.1ms focused baseline — both mounted modal lifecycles uniquely protect the native `autofocus` selector and the marked-container text-control preference; reusing one parent with keyed modal remounts regressed the focused duration to ~16.9ms — 2026-09-03
+_None. Every recorded candidate has been resolved._
