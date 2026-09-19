@@ -87,10 +87,8 @@ the queue readable, accepting that the items do not share a single beneficiary.
     nothing claims to restore a note that no longer exists.
   - A folder's Settings tab states the consequences of Trash once, in one
     wording, in both the description and the confirmation.
-- **Open decisions:** (b)'s surviving wording, and whether (c)'s
-  `NoteConstructionService` status should become 404 or the others 400.
-  Proposed answers, not yet confirmed by the owner, are recorded with their
-  evidence in [plan 149](../quick/149-permanent-deletion-loose-ends/PLAN.md#proposed-decisions-for-the-owner):
-  keep the description's impersonal wording for (b), and 404 everywhere for (c).
-  The plan also proposes declining any further cut of `NotebookController`
-  beyond moving its folder endpoints to their own controller.
+- **Decisions:** confirmed by the owner on 2026-09-19 and recorded with their
+  evidence in [plan 149](../quick/149-permanent-deletion-loose-ends/PLAN.md#owner-decisions).
+  For (b), the description's impersonal wording survives. For (c), the status is
+  404 everywhere. For (d), `NotebookController` is not cut further once its
+  folder endpoints have their own controller.

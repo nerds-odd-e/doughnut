@@ -5,8 +5,10 @@ Source: [SEED-036 story 1](../../seeds/SEED-036-permanent-deletion-loose-ends.md
 Provenance: follow-ups grouped by the owner during the execution retrospective
 of SEED-034 story 1 (plan 146, recoverable at commit `8b8b83e962`).
 Authority: 2026-09-19 owner instruction to evaluate each item, choose an
-approach, and write a slice plan for the items worth doing. Planning only. This
-plan does not authorize execution by itself.
+approach, and write a slice plan for the items worth doing. Later the same day
+the owner accepted the recommendations and asked for a refinement that keeps
+the scope narrow and the design simple. Planning only. This plan does not
+authorize execution by itself.
 
 Baseline: `c70ad55a6a` on `main`.
 
@@ -28,20 +30,24 @@ reach a line count.
 | Item | Value | Cost | Verdict |
 | --- | --- | --- | --- |
 | (a) Undo after permanent deletion | High. User-visible. The failed "trash note" entry is never popped, so Undo stays broken for every older entry until the page reloads. | Very small | Do first (slice 1) |
-| (b) One wording for the folder Trash offer | Low to medium. Two texts say the same thing in different words on one screen. | Very small | Do (slice 2). Surviving wording is a proposed decision. |
-| (c) One home and one status for "Folder not in notebook." | Medium. Seven copies, one of them answers 400 where six answer 404. Some checks run twice in one call. | Small | Do (slices 3 and 4). The status is a proposed decision. |
-| (d) `StoredApiCollection.ts` (613 lines) | Medium to high. About 140 lines are true duplication: the same move request is written five times, one branch can never run, and every public method is declared twice. The rest mixes three responsibilities. | Small for the duplication, medium for the separation | Do (slices 5, 6, 10, 11) |
-| (d) `NoteMoreOptionsActions.vue` (272 lines) | Medium-low. Each of the six note actions is declared twice, once per layout. Every new action pays twice; the permanent-deletion story already did. | Small | Do (slice 7) |
-| (d) `NotebookController.java` (562 lines) | Medium. Ten folder endpoints live in the notebook controller. The tests already treat them as their own concept (`NotebookFolder*ControllerTest`), and sibling controllers under `/api/notebooks` are an existing pattern (`NotebookBooksController`, `NotebookHealthController`, `NotebookGroupController`). | Medium. About 50 client call sites and 33 backend test files are renamed mechanically. URLs do not change. | Do (slices 8 and 9) |
+| (b) One wording for the folder Trash offer | Low to medium. Two texts say the same thing in different words on one screen. | Very small | Do (slice 2) |
+| (c) One home and one status for "Folder not in notebook." | Medium. Seven copies, one of them answers 400 where six answer 404. Some checks run twice in one call. | Small | Do (slices 3 and 4) |
+| (d) `StoredApiCollection.ts` (613 lines) | Medium to high. About 140 lines are true duplication: the same move request is written five times, one branch can never run, and every public method is declared twice. After that, most of each method is request and error handling that needs no state. | Small | Do (slices 5, 6, 8, 9) |
+| (d) `NoteMoreOptionsActions.vue` (272 lines) | Medium-low. The note actions are declared twice, once per layout. Four of the six are plain buttons that differ only in data. Every new action pays twice; the permanent-deletion story already did. | Small | Do (slice 7) |
+| (d) `NotebookController.java` (562 lines) | Medium. Ten folder endpoints live in the notebook controller. The tests already treat them as their own concept (`NotebookFolder*ControllerTest`), and sibling controllers under `/api/notebooks` are an existing pattern (`NotebookBooksController`, `NotebookHealthController`, `NotebookGroupController`). | Medium. About 50 client call sites and 125 backend test call sites are renamed mechanically. No duplication is removed. URLs do not change. | Do last (slices 10 and 11), first to drop |
 
 Considered and declined, with reasons:
 
 - **Moving the three notebook Git endpoints out of `NotebookController`.** It
   would remove about 65 lines but touch 89 backend test files. The cost is far
-  above the value. After slices 8 and 9 the controller is about 350 lines and
+  above the value. After slices 10 and 11 the controller is about 350 lines and
   holds one concept, the notebook itself (catalog, settings, sharing, readme,
-  indexing, export, Git). Cutting further would be arbitrary. This plan treats
-  that remainder as resolved by explicit decline; the owner may overrule.
+  indexing, export, Git). Cutting further would be arbitrary. The owner accepted
+  this decline on 2026-09-19.
+- **A new layout-aware button component for the note actions, and a new
+  cache-aware request layer under the stored API.** Both were in the first
+  version of this plan. The refinement replaced them with a plain list (slice 7)
+  and stateless request functions (slices 8 and 9), which need no new concept.
 - **Forgetting undo entries of notes removed by permanent deletion of a
   folder.** The client does not learn which notes the server removed. The seed
   limits item (a) to the note case. Left out.
@@ -53,22 +59,16 @@ Considered and declined, with reasons:
 - **Merging the note and folder permanent-delete warning texts.** Not one of
   the four items.
 
-## Proposed decisions for the owner
+## Owner decisions
 
-The seed leaves two decisions open. Each has a recommended answer. The slice
-that depends on it executes only after the owner confirms or revises it. All
-other slices are independent of both.
+Confirmed by the owner on 2026-09-19.
 
-1. **Surviving Trash wording (slice 2).** Recommended: keep the description's
-   impersonal wording, because the permanent-delete text beside it is also
-   impersonal ("this cannot be undone").
+1. **Surviving Trash wording (slice 2).** The description's impersonal wording.
    - Subject: `Trash folder "<name>" with its complete subtree`
    - Consequence: `Its contents leave active use. References remain authored, but may no longer resolve until the folder is recovered with Move.`
    - Description is `<subject>. <consequence>`; confirmation is `<subject>? <consequence>`.
-2. **Status for "Folder not in notebook." (slice 3).** Recommended: **404**
-   everywhere. Six of seven copies already answer 404 and four tests pin it. No
-   test pins the 400, and no client reads this status or message. In the same
-   method, a missing folder id already answers 404.
+2. **Status for "Folder not in notebook." (slice 3).** 404 everywhere.
+3. **`NotebookController` beyond its folder endpoints** is not cut further.
 
 ## Architectural notes
 
@@ -89,7 +89,7 @@ Existing solutions were searched before choosing each approach:
 
 No Accepted ADR is affected. ADR 0001 keeps Trash and permanent deletion
 distinct; slices 1 and 2 respect that. The North Star topics concern Git
-consistency owners and are not touched: slices 8 and 9 move endpoints without
+consistency owners and are not touched: slices 10 and 11 move endpoints without
 changing which service owns a change. No new North Star topic is needed.
 
 ## Outside-in proof
@@ -100,7 +100,7 @@ changing which service owns a change. No new North Star topic is needed.
 | Folder Settings states the Trash consequences once, in one wording | 2 | `FolderPage.trash.spec.ts`: description and confirmation contain the identical consequence sentence |
 | One status for "Folder not in notebook." | 3 | `NotebookNoteCreateControllerTest`: creating a note in another notebook's folder answers 404 with that reason |
 | One home for "Folder not in notebook." | 4 | The text exists once in `backend/src/main`; the four tests that pin it stay green |
-| The three oversized files are resolved | 5 to 11 | Existing specs stay green; line counts and the recorded decline above |
+| The three oversized files are resolved | 5 to 11 | Existing specs stay green; each slice reports the resulting line count; the accepted decline above |
 
 Focused commands:
 
@@ -114,6 +114,7 @@ CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/path/to.feat
 
 Order: the user-visible item first, then cheapest maintenance value first. The
 story may stop safely after any slice. First to drop: 10 and 11, then 8 and 9.
+Slices 1 to 9 are each one small change with one proof loop.
 
 ### 1. Undo offers nothing for a note that no longer exists
 Type: Behavior
@@ -139,7 +140,7 @@ Complexity: about +10 lines, no new concept on the screen.
 
 ### 2. The folder Trash offer states its consequences in one wording
 Type: Behavior
-Status: planned, waits for proposed decision 1
+Status: planned
 Proof: `frontend/tests/pages/FolderPage.trash.spec.ts`.
 
 Behavior: an active folder's Settings tab is open → the owner reads the
@@ -153,7 +154,7 @@ Complexity: about −2 lines, two wordings become one.
 
 ### 3. Creating a note in another notebook's folder answers 404
 Type: Behavior
-Status: planned, waits for proposed decision 2
+Status: planned
 Proof: new case in
 `backend/src/test/java/com/odde/donut/controllers/NotebookNoteCreateControllerTest.java`.
 
@@ -210,22 +211,49 @@ test stubs it. Remove the interface, return the class type, move the three doc
 comments onto the methods, and make `noteEditingHistory` and `storage` private.
 Complexity: about −80 lines.
 
-### 7. Each note action is declared once for both layouts
+### 7. The plain note actions are declared once as a list
 Type: Structure (owns retrospective item d directly)
 Status: planned
-Weakness removed: `NoteMoreOptionsActions.vue` declares export, questions,
-refine, audio, assimilation and delete twice, once for the menu and once for the
-toolbar.
+Weakness removed: `NoteMoreOptionsActions.vue` declares refine, audio,
+assimilation and delete twice, once for the menu and once for the toolbar.
 Proof: `frontend/tests/notes/NoteMoreOptionsActions.spec.ts` (runs every case in
 both layouts) and the `NoteMoreOptionsForm.*.spec.ts` files stay green.
 
-Internal change: one small layout-aware button component renders an action as a
-menu item or as a toolbar button. One shared rule covers the two toggles: an
-action that is switched on shows as pressed in the toolbar and is absent from
-the menu. The two pop-up actions (export, questions) get the same treatment.
-Complexity: about −60 lines in the component, one small new component.
+Internal change: no new component. One computed list holds the four plain
+actions: id, title, icon, what it runs, whether it is available, and whether it
+is switched on. The menu loops over it with `DropdownMenuActionButton`; the
+toolbar loops over it with the existing button markup. One rule covers both
+toggles: an action that is switched on shows as pressed in the toolbar and is
+absent from the menu. Export and questions stay as they are, because their
+pop-up content differs per action.
+Complexity: about −45 lines, no new file.
 
-### 8. Reading a notebook's folders has its own controller
+### 8. Text, loading and creation requests are plain functions
+Type: Structure (owns retrospective item d directly)
+Status: planned
+Weakness removed: in `StoredApiCollection`, most of each method is the server
+request and its error handling. That part needs neither the cache, the undo
+history nor the router, yet it sits between them and makes every method long.
+Proof: `frontend/tests/store/*.spec.ts` and
+`frontend/tests/toolbars/NoteUndoButton.*.spec.ts` stay green. They mock the
+generated client, so they do not change.
+
+Internal change: a new file `frontend/src/store/noteRequests.ts` holds plain
+functions. Each one sends one request and returns the data or throws the same
+error as today. It holds no state. Move the two error helpers, the title and
+content update, note loading and note creation. `StoredApiCollection` keeps
+everything that touches the cache, the undo history and the router.
+
+### 9. Placement, trash, permanent deletion and reduction requests are plain functions
+Type: Structure (owns retrospective item d directly)
+Status: planned
+Weakness removed: same as slice 8, for the remaining requests.
+Proof: same specs as slice 8 stay green. Report both files' line counts.
+
+Internal change: move the placement request from slice 5, trash, undo trash,
+permanent deletion and relationship reduction into the same file.
+
+### 10. Reading a notebook's folders has its own controller
 Type: Structure (owns retrospective item d directly)
 Status: planned
 Weakness removed: `NotebookController` mixes the notebook with its folders and
@@ -236,58 +264,57 @@ green. URLs are unchanged, so CLI and MCP are unaffected.
 
 Internal change: new `NotebookFolderController` on `/api/notebooks`, following
 the sibling-controller pattern. Move `listNotebookFolderListing`,
-`listNotebookFolderIndex` and `getFolderPage`. Regenerate the TypeScript client
-and rename the client call sites and test mocks. Backend test base classes gain
-a field for the new controller.
+`listNotebookFolderIndex` and `getFolderPage` unchanged. `NotebookControllerTestBase`
+is the only place tests obtain the controller, so it gains one field for the new
+controller. Regenerate the TypeScript client, then rename call sites and test
+mocks by search and replace.
+Sizing exception: the edit is mechanical, but client regeneration and the
+backend test run are waits that decomposition cannot shorten.
 
-### 9. Changing a notebook's folders uses the folder controller
+### 11. Changing a notebook's folders uses the folder controller
 Type: Structure (owns retrospective item d directly)
 Status: planned
-Weakness removed: same as slice 8, for the mutating endpoints.
+Weakness removed: same as slice 10, for the mutating endpoints.
 Proof: `NotebookFolder*ControllerTest`, `NotebookGit*Folder*ControllerTest`,
 frontend folder specs, and `folder_trash.feature` stay green.
 
 Internal change: move `createFolder`, `moveFolder`, `trashFolder`,
 `permanentlyDeleteFolder`, `renameFolder`, `dissolveFolder`,
-`updateFolderReadmeContent` and `resolveDestinationNotebookForFolderMove`.
-Regenerate the client and rename callers. `NotebookController` drops to about
-350 lines and loses the folder-only collaborators.
-
-### 10. Server requests that keep cached notes current have their own home: text, loading, creation
-Type: Structure (owns retrospective item d directly)
-Status: planned
-Weakness removed: `StoredApiCollection` mixes three responsibilities: asking the
-server and refreshing the cache, recording and running undo, and navigation.
-Undo already needs the first without the second ("update text without undo").
-Proof: `frontend/tests/store/*.spec.ts` and
-`frontend/tests/toolbars/NoteUndoButton.*.spec.ts` stay green.
-
-Internal change: a new module in `frontend/src/store/` owns "ask the server,
-refresh the cached note realms, raise a clear error". It knows nothing about undo
-or the router. Move the text update, note loading and note creation requests and
-the two error helpers there. `StoredApiCollection` keeps user actions: record
-history, call the request, navigate, undo.
-
-### 11. The same home serves placement, trash, permanent deletion and reduction
-Type: Structure (owns retrospective item d directly)
-Status: planned
-Weakness removed: same as slice 10, for the remaining requests.
-Proof: same specs as slice 10 stay green; both files are under 250 lines.
-
-Internal change: move the placement request from slice 5, the trash and undo
-trash requests, permanent deletion and relationship reduction.
+`updateFolderReadmeContent` and `resolveDestinationNotebookForFolderMove`
+unchanged. Regenerate the client and rename callers the same way.
+`NotebookController` drops to about 350 lines and loses the folder-only
+collaborators.
+Sizing exception: same as slice 10.
 
 ## Current decisions
 
 - While slices 1, 5 and 6 edit `StoredApiCollection.ts`, the post-change
-  refactor pass does **not** split the file for size. Slices 10 and 11 own that.
-  The same holds for `NotebookController.java` until slices 8 and 9.
+  refactor pass does **not** split the file for size. Slices 8 and 9 own that.
+  The same holds for `NotebookController.java` until slices 10 and 11.
+- No slice adds work to reach 250 lines. Each slice from 5 on reports the
+  resulting line count. If a file is still above 250 after its last slice, that
+  is reported to the owner at wrap-up, not answered with more slices here.
+- Slices 8 to 11 move code unchanged. They do not rename methods, change error
+  messages, or redesign what they move.
 - Slice 4 changes no status code. Slice 3 owns the only behavior change of
   item (c).
-- The remainder of `NotebookController` after slice 9 is declined as described
-  under "Considered and declined".
 - Report a complexity delta (lines and concepts added or removed) with every
   slice.
+
+## Refinement record
+
+2026-09-19, on the owner's request for narrow scope and simple design:
+
+- Slices 1 to 6: assessed ready, unchanged. Decisions 1 and 2 are confirmed, so
+  slices 2 and 3 no longer wait.
+- Slice 7: replaced. A plain list replaces the planned new component.
+- Former slices 10 and 11 (a cache-aware request layer): replaced by slices 8
+  and 9, stateless request functions in one new file.
+- Former slices 8 and 9 (folder controller): kept, moved last as slices 10 and
+  11, because they are the widest change and remove no duplication. Evidence for
+  their size: all 33 affected backend test files get the controller from one
+  base class, with 125 call sites.
+- Result: 11 slices. No story resplit is needed.
 
 ## Learnings
 
