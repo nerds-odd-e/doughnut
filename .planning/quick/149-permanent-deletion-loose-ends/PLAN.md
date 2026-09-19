@@ -207,13 +207,21 @@ Complexity: about −20 lines, seven copies become one.
 
 ### 5. Moving a note and undoing a move use one placement request
 Type: Structure (owns retrospective item d directly)
-Status: planned
+Status: done
 Weakness removed: `StoredApiCollection` writes the "move note to folder" request
 twice and the "move note to notebook root" request three times. The third root
 variant, without a notebook id, can never run, because a recorded move always
 carries `originalNotebookId`.
 Proof: `frontend/tests/store/storedApi.spec.ts` and
-`frontend/tests/store/storeUndoCommand.spec.ts` stay green.
+`frontend/tests/store/storeUndoCommand.spec.ts` stay green (plus
+`storedApi.trashNote.spec.ts`, `storedApi.reduceRelationNoteToSourceProperty.spec.ts`
+and the `NoteUndoButton` specs — `pnpm frontend:test tests/store tests/toolbars`,
+17 files/108 tests pass). New private `placeNoteAt` in `StoredApiCollection.ts`
+sends the one request; `undoMoveNote`'s unreachable third branch is deleted,
+and its `originalNotebookId` parameter is now a required `number`. Undo-of-move
+failures now use the richer `throwStoredApiError` shape instead of a plain
+`Error`, matching ordinary move failures; no test pinned the old shape.
+`StoredApiCollection.ts`: 619 → 583 lines.
 
 Internal change: one private "place note at (folder or notebook root)" step,
 used by `moveNoteToFolder`, `moveNoteToNotebookRoot` and undo of a move. It keeps

@@ -329,6 +329,31 @@ export default class StoredApiCollection implements StoredApi {
     return { folderId, notebookId }
   }
 
+  /** Sends the one request that places a note at a folder or a notebook root. */
+  private async placeNoteAt(
+    sourceId: Donut.ID,
+    target: { folderId: Donut.ID } | { notebookId: number }
+  ): Promise<NoteRealm> {
+    const {
+      data: noteRealms,
+      error,
+      response,
+    } = await apiCallWithLoading(() =>
+      "folderId" in target
+        ? RelationController.moveNoteToFolder({
+            path: { sourceNote: sourceId, targetFolder: target.folderId },
+          })
+        : RelationController.moveNoteToNotebookRootInNotebook({
+            path: { sourceNote: sourceId, targetNotebook: target.notebookId },
+          })
+    )
+    if (error || !noteRealms) {
+      throwStoredApiError(error, response, "Failed to move note")
+    }
+    this.refreshNoteRealms(noteRealms)
+    return noteRealms[0]!
+  }
+
   async updateTextField(
     noteId: Donut.ID,
     field: "edit title" | "edit content",
@@ -429,42 +454,12 @@ export default class StoredApiCollection implements StoredApi {
   private async undoMoveNote(
     noteId: Donut.ID,
     originalFolderId: Donut.ID | null,
-    originalNotebookId?: number
+    originalNotebookId: number
   ): Promise<NoteRealm> {
     if (originalFolderId != null) {
-      const { data: noteRealms, error } = await apiCallWithLoading(() =>
-        RelationController.moveNoteToFolder({
-          path: { sourceNote: noteId, targetFolder: originalFolderId },
-        })
-      )
-      if (error || !noteRealms) {
-        throw new Error(toErrorMessage(error, "Failed to move note"))
-      }
-      this.refreshNoteRealms(noteRealms)
-      return noteRealms[0]!
+      return this.placeNoteAt(noteId, { folderId: originalFolderId })
     }
-    if (originalNotebookId != null) {
-      const { data: noteRealms, error } = await apiCallWithLoading(() =>
-        RelationController.moveNoteToNotebookRootInNotebook({
-          path: { sourceNote: noteId, targetNotebook: originalNotebookId },
-        })
-      )
-      if (error || !noteRealms) {
-        throw new Error(toErrorMessage(error, "Failed to move note"))
-      }
-      this.refreshNoteRealms(noteRealms)
-      return noteRealms[0]!
-    }
-    const { data: noteRealms, error } = await apiCallWithLoading(() =>
-      RelationController.moveNoteToNotebookRoot({
-        path: { sourceNote: noteId },
-      })
-    )
-    if (error || !noteRealms) {
-      throw new Error(toErrorMessage(error, "Failed to move note"))
-    }
-    this.refreshNoteRealms(noteRealms)
-    return noteRealms[0]!
+    return this.placeNoteAt(noteId, { notebookId: originalNotebookId })
   }
 
   private async undoCreateNote(noteId: Donut.ID): Promise<{
@@ -569,23 +564,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID) {
     const undoPlacement = this.placementUndoForNote(sourceId)
-
-    const {
-      data: noteRealms,
-      error,
-      response,
-    } = await apiCallWithLoading(() =>
-      RelationController.moveNoteToFolder({
-        path: {
-          sourceNote: sourceId,
-          targetFolder: targetFolderId,
-        },
-      })
-    )
-    if (error || !noteRealms) {
-      throwStoredApiError(error, response, "Failed to move note")
-    }
-    this.refreshNoteRealms(noteRealms)
+    await this.placeNoteAt(sourceId, { folderId: targetFolderId })
 
     if (undoPlacement) {
       this.noteEditingHistory.moveNote(sourceId, undoPlacement)
@@ -594,23 +573,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async moveNoteToNotebookRoot(sourceId: Donut.ID, targetNotebookId: number) {
     const undoPlacement = this.placementUndoForNote(sourceId)
-
-    const {
-      data: noteRealms,
-      error,
-      response,
-    } = await apiCallWithLoading(() =>
-      RelationController.moveNoteToNotebookRootInNotebook({
-        path: {
-          sourceNote: sourceId,
-          targetNotebook: targetNotebookId,
-        },
-      })
-    )
-    if (error || !noteRealms) {
-      throwStoredApiError(error, response, "Failed to move note")
-    }
-    this.refreshNoteRealms(noteRealms)
+    await this.placeNoteAt(sourceId, { notebookId: targetNotebookId })
 
     if (undoPlacement) {
       this.noteEditingHistory.moveNote(sourceId, undoPlacement)
