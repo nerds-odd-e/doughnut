@@ -56,7 +56,7 @@ public class FolderMoveRelocation {
       FolderMoveRequest request,
       Notebook destinationNotebook,
       User viewer) {
-    requireFolderInNotebook(folder, notebook);
+    folder.requireInNotebook(notebook);
     if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
       return moveFolderToAnotherNotebook(folder, request, destinationNotebook, viewer);
     }
@@ -91,7 +91,7 @@ public class FolderMoveRelocation {
 
   Folder placeFolderWithinNotebook(
       Notebook notebook, Folder folder, Folder newParent, Timestamp now) {
-    requireFolderInNotebook(folder, notebook);
+    folder.requireInNotebook(notebook);
     requireNewParentInNotebook(newParent, notebook);
     FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
     DisplayName availableName =
@@ -200,12 +200,6 @@ public class FolderMoveRelocation {
   private void requireNewParentInNotebook(Folder newParent, Notebook notebook) {
     if (!newParent.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not in notebook.");
-    }
-  }
-
-  private void requireFolderInNotebook(Folder folder, Notebook notebook) {
-    if (!folder.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
   }
 }

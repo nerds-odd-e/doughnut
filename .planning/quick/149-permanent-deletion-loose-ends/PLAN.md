@@ -182,7 +182,13 @@ and use it in `NoteConstructionService.buildNote`.
 
 ### 4. Every "Folder not in notebook." refusal comes from the one home
 Type: Structure (owns retrospective item c directly)
-Status: planned
+Status: done
+Proof accepted: full backend suite (`pnpm backend:test_only`) BUILD
+SUCCESSFUL, including the four named controller tests; `grep -rn "Folder not
+in notebook" backend/src/main` returns exactly one line, inside
+`Folder.requireInNotebook`. `NotebookController.java` 556→548 lines,
+`FolderRelocationService.java` 236→229, `FolderMoveRelocation.java`
+211→204, `FolderConstructionService.java` 118→111.
 Weakness removed: the same rule and message are written in
 `NotebookController`, `FolderRelocationService`, `FolderMoveRelocation` and
 twice in `FolderConstructionService`, and some calls check twice.
