@@ -12,6 +12,7 @@ pytest = "^9.0.3"
 openai = "^1.35.5"
 pathspec = "^0.12.1"
 idna = ">=3.15"
+anyio = ">=4.14.2"
 
 
 [build-system]
