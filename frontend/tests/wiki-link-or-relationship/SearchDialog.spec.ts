@@ -1,5 +1,6 @@
 import {
   NoteController,
+  RelationController,
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
@@ -12,14 +13,20 @@ import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
 import { describe, expect, it } from "vitest"
 import {
   allSearchResultItems,
+  confirmMovePopup,
   makeNoteHit,
+  makeNotebookHit,
   renderSearchForm,
+  searchAndClickMoveUnder,
   setupSearchDialogFakeTimers,
   setupSearchDialogTests,
   titleEl,
   typeInSearch,
 } from "./searchDialogTestSupport"
-import { deadWikiLinkPayload } from "./searchDialogDeadWikiLinkTestSupport"
+import {
+  deadWikiLinkPayload,
+  pointDeadWikiLinkAndCaptureUpdate,
+} from "./searchDialogDeadWikiLinkTestSupport"
 
 const searchInputId = "searchTerm-searchKey"
 
@@ -159,5 +166,91 @@ describe("SearchForm", () => {
     expect(titleEl("All notebooks")).toHaveClass("text-primary")
     titleEl("All notebooks").click()
     expect(titleEl("All My Circles")).not.toHaveClass("text-primary")
+  })
+
+  describe("move actions", () => {
+    setupSearchDialogFakeTimers()
+
+    it("calls moveNoteToFolder with folder id after confirm", async () => {
+      const note = MakeMe.aNote.please()
+      const targetFolderId = 42
+      const moveNoteToFolderSpy = mockSdkService(
+        RelationController,
+        "moveNoteToFolder",
+        []
+      )
+
+      await searchAndClickMoveUnder(note, targetFolderId)
+      expect(moveNoteToFolderSpy).not.toHaveBeenCalled()
+
+      await confirmMovePopup()
+
+      expect(moveNoteToFolderSpy).toHaveBeenCalledTimes(1)
+      expect(moveNoteToFolderSpy).toHaveBeenCalledWith({
+        path: {
+          sourceNote: note.id,
+          targetFolder: targetFolderId,
+        },
+      })
+    })
+
+    it("calls moveNoteToNotebookRootInNotebook with notebook id after confirm", async () => {
+      const note = MakeMe.aNote.please()
+      const targetNotebookId = 99
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+        makeNotebookHit(targetNotebookId, "Other NB"),
+      ])
+      const spy = mockSdkService(
+        RelationController,
+        "moveNoteToNotebookRootInNotebook",
+        []
+      )
+
+      const searchInput = await renderSearchForm({ note })
+      await typeInSearch(searchInput, "Other")
+
+      expect(spy).not.toHaveBeenCalled()
+
+      fireEvent.click(screen.getByText("Move to notebook root"))
+      await flushPromises()
+      await confirmMovePopup()
+
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy).toHaveBeenCalledWith({
+        path: {
+          sourceNote: note.id,
+          targetNotebook: targetNotebookId,
+        },
+      })
+    })
+  })
+
+  describe("dead wiki link actions", () => {
+    setupSearchDialogFakeTimers()
+
+    it("rewrites a missing wiki link to the backend-authored Portable path when the destination display name collides", async () => {
+      mockSdkService(NoteController, "authoredPortablePath", {
+        portablePath: "folder/A|B#prop:a%20part%20of",
+      })
+      const note = MakeMe.aNote.please()
+      const updateSpy = await pointDeadWikiLinkAndCaptureUpdate({
+        content: "See [[original text|shown\\|text\\\\label]] for details.",
+        payload: {
+          ...deadWikiLinkPayload,
+          displayText: "shown|text\\label",
+        },
+        typeIn: "Selected",
+        searchHits: [makeNoteHit("Selected Note", note.noteTopology.id + 100)],
+      })
+
+      expect(updateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({
+            content:
+              "See [[folder/A\\|B#prop:a%20part%20of|shown\\|text\\\\label]] for details.",
+          }),
+        })
+      )
+    })
   })
 })

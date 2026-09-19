@@ -145,6 +145,7 @@ mb.pid
 .serena/
 frontend/vitest-test-results/
 frontend/.vitest-attachments/
+frontend/.vitest/
 
 tt/
 
