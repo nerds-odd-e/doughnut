@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
@@ -33,7 +33,7 @@ describe("FolderPage rename and dissolve", () => {
       vi.useFakeTimers()
       const { wrapper } = await mountFolderPageReady(router, 10, "Original")
       const renameSpy = vi
-        .spyOn(NotebookController, "renameFolder")
+        .spyOn(NotebookFolderController, "renameFolder")
         .mockResolvedValue(wrapSdkResponse(undefined) as never)
 
       await editFolderPageName(wrapper, "Intermediate", false)
@@ -63,7 +63,7 @@ describe("FolderPage rename and dissolve", () => {
         { fetchFolderPage }
       )
       const renameSpy = vi
-        .spyOn(NotebookController, "renameFolder")
+        .spyOn(NotebookFolderController, "renameFolder")
         .mockResolvedValue(wrapSdkResponse(folderRealm.folder))
 
       await editFolderPageName(wrapper, "  Renamed  ")
@@ -102,7 +102,7 @@ describe("FolderPage rename and dissolve", () => {
       const { wrapper } = await mountFolderPageReady(router, 10, "Original")
 
       const renameSpy = vi
-        .spyOn(NotebookController, "renameFolder")
+        .spyOn(NotebookFolderController, "renameFolder")
         .mockResolvedValue(
           wrapSdkError({
             status: 409,
@@ -139,7 +139,7 @@ describe("FolderPage rename and dissolve", () => {
       const { wrapper } = mountFolderPage(router, 20, "Mid")
 
       const dissolveSpy = vi
-        .spyOn(NotebookController, "dissolveFolder")
+        .spyOn(NotebookFolderController, "dissolveFolder")
         .mockResolvedValue(
           wrapSdkError({
             status: 409,

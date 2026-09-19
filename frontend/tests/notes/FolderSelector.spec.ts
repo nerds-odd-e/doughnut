@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import FolderSelector from "@/components/notes/FolderSelector.vue"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import { mockSdkService, testFolderStub } from "@tests/helpers"
@@ -43,10 +43,10 @@ describe("FolderSelector", () => {
 
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [],
     })
-    mockSdkService(NotebookController, "listNotebookFolderIndex", [
+    mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [
       testFolderStub(7, "Alpha"),
       testFolderStub(8, "Beta"),
     ])
@@ -158,7 +158,7 @@ describe("FolderSelector", () => {
   it("renders neighbour labels after the folder parent context changes", async () => {
     const alpha = testFolderStub(1, "Alpha")
     const beta = testFolderStub(2, "Beta")
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [alpha],
     })
 

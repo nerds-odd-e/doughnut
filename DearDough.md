@@ -664,6 +664,40 @@ create the symlink before the observer is armed.
     `.agents/skills` realpath this entry already recommends naming in the
     guidance. Reinforces that the fix, once applied, would avoid this cost
     too.
+- Execution: SEED-036 story 1 / quick/149-permanent-deletion-loose-ends / a3856444de
+  - Timestamp: 2026-09-19T10:33+08:00 (during this execution's retrospective;
+    the original miss happened at CI-observer setup, before slice 1)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: at setup, `find .claude/skills/dough-execute-plan -type f`
+    from the freshly created worktree errored "No such file or directory",
+    and `ls .claude/` there listed only `settings.json`. The coordinator
+    concluded the CI-observer runtime was unavailable and delivered all 11
+    slices (11 pushes to `worktree-149-permanent-deletion-loose-ends`)
+    unobserved. During the retrospective, `ls
+    .agents/skills/dough-execute-plan/scripts/` in that same worktree listed
+    the runtime, and `node .agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
+    then `start --execution nerds-odd-e/doughnut worktree-149-permanent-deletion-loose-ends`
+    printed `CI_OBSERVER` and the PostToolUse hook added
+    `CI_MONITOR_READY`/"CI observer attached to this coordinator" on the
+    first call.
+  - Observed effect: unlike both prior occurrences, the coordinator did not
+    hit the documented `MODULE_NOT_FOUND` error, did not discover
+    `.agents/skills`, and did not work around it with a copy — it treated
+    the missing `.claude/skills` path alone as proof the bridge was
+    unavailable and reported that once, per the shared skill's own fallback
+    for a genuinely unavailable bridge. Ten of eleven delivered pushes went
+    completely unobserved; the observer was armed only retroactively, for
+    the final revision, after all slices were already delivered.
+  - Inference: a fourth failure mode for the same root cause: the documented
+    path's absence was treated as a terminal "no CI coverage" conclusion
+    instead of a prompt to check the tracked `.agents/skills` realpath this
+    entry already names as the fix. This is the costliest occurrence of the
+    four — real coverage loss across most of an execution, not merely
+    wasted calls or a workaround — and is further evidence the guidance
+    should name `.agents/skills` directly rather than relying on each
+    execution to rediscover it.
 
 ## DD-075 — The product backlog moved on the shared integration branch between the coordinator's read and its queue claim
 

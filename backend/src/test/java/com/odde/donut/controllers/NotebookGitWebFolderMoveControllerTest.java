@@ -52,7 +52,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     testabilitySettings.timeTravelTo(Timestamp.from(MOVE_AT));
 
-    controller.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
+    folderController.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
 
     assertThat(parentFolderId(f.biology().getId()), equalTo(f.study().getId()));
     assertThat(
@@ -91,7 +91,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
   void webFolderMoveProjectsCompleteSubtreeAndRewrittenInNotebookReferences() throws Exception {
     CompleteSubtreeFixture f = seedCompleteBiologySubtreeWithReferrer();
 
-    controller.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
+    folderController.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
 
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId downloadedHead =
@@ -136,7 +136,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     ApiException conflict =
         assertThrows(
             ApiException.class,
-            () -> controller.moveFolder(notebook, biology, folderMove(study.getId())));
+            () -> folderController.moveFolder(notebook, biology, folderMove(study.getId())));
 
     assertThat(
         conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
@@ -154,7 +154,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
     Folder study = makeMe.aFolder().notebook(notebook).name("Study").please();
 
-    controller.moveFolder(notebook, biology, folderMove(study.getId()));
+    folderController.moveFolder(notebook, biology, folderMove(study.getId()));
 
     assertThat(parentFolderId(biology.getId()), equalTo(study.getId()));
     assertThat(
@@ -168,7 +168,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     byte[] acceptedBundle = binding(f.notebook()).getBundleBytes();
     makeMe.aNote().notebook(f.notebook()).title("Unsynchronized").content(CELLS_BODY).please();
 
-    controller.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
+    folderController.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
 
     assertThat(parentFolderId(f.biology().getId()), equalTo(f.study().getId()));
     assertThat(

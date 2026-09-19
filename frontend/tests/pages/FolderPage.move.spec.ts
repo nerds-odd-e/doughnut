@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -41,7 +41,7 @@ describe("FolderPage move", () => {
     const beta = testFolderStub(2, "Beta")
     const realmAtRoot = makeMe.aFolderRealm.folder(2, "Beta").please()
 
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [alpha],
     })
 
@@ -62,7 +62,7 @@ describe("FolderPage move", () => {
     await wrapper.get('[data-testid="folder-move-parent-select"]').setValue("1")
     await flushPromises()
 
-    vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
+    vi.spyOn(NotebookFolderController, "moveFolder").mockResolvedValue(
       wrapSdkResponse(beta) as never
     )
 
@@ -86,7 +86,7 @@ describe("FolderPage move", () => {
       await mountCrossNotebookRootMovePage(router, 10, "Moved")
 
     const moveSpy = vi
-      .spyOn(NotebookController, "moveFolder")
+      .spyOn(NotebookFolderController, "moveFolder")
       .mockResolvedValue(wrapSdkResponse(folderRealm.folder) as never)
     const pushSpy = stubRouterPush(router)
 
@@ -123,7 +123,7 @@ describe("FolderPage move", () => {
       .please()
 
     const moveSpy = vi
-      .spyOn(NotebookController, "moveFolder")
+      .spyOn(NotebookFolderController, "moveFolder")
       .mockResolvedValue(
         wrapSdkError({
           message: folderNameConflictMessage,
@@ -170,7 +170,7 @@ describe("FolderPage move", () => {
     const targetFolder = makeMe.aFolder.folder(99, "Dup").please()
 
     const moveSpy = vi
-      .spyOn(NotebookController, "moveFolder")
+      .spyOn(NotebookFolderController, "moveFolder")
       .mockResolvedValueOnce(
         wrapSdkError({
           status: 409,

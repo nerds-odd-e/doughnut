@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -35,7 +35,7 @@ describe("Sidebar folder listing reload", () => {
   it("does not trigger the global loading indicator for structural folder listing fetches", async () => {
     await withTrackingGlobalApiClient(async (apiStatus) => {
       mockSdkServiceWithImplementation(
-        NotebookController,
+        NotebookFolderController,
         "listNotebookFolderListing",
         (options) =>
           folderListingForQueryParent(
@@ -51,7 +51,7 @@ describe("Sidebar folder listing reload", () => {
 
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {
     const listingSpy = mockSdkServiceWithImplementation(
-      NotebookController,
+      NotebookFolderController,
       "listNotebookFolderListing",
       (options) =>
         folderListingForQueryParent(options, fixtures.defaultTreeFolderListings)

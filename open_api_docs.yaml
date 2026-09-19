@@ -1039,7 +1039,7 @@ paths:
   /api/notebooks/{notebook}/folders:
     post:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Create a folder
       description: Creates a folder at notebook root when no parent is specified;
         as a child of underFolderId when set; otherwise nested under the context note's
@@ -1068,7 +1068,7 @@ paths:
   /api/notebooks/{notebook}/folders/{folder}/trash:
     post:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Trash a folder
       description: Moves an active folder subtree beneath _trash while mirroring its
         original ancestor path. The subtree and authored content are retained for
@@ -1095,7 +1095,7 @@ paths:
   /api/notebooks/{notebook}/folders/{folder}/permanently-delete:
     post:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Permanently delete a trashed folder
       description: "Removes a folder that is in trash with its README, every nested\
         \ folder, every note inside the subtree and each note's dependent data, in\
@@ -1118,7 +1118,7 @@ paths:
   /api/notebooks/{notebook}/folders/{folder}/move:
     post:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Move a folder
       description: "Reparents the folder within the same notebook, or moves the folder\
         \ subtree to another notebook when destinationNotebookId is set. Notes keep\
@@ -2155,7 +2155,7 @@ paths:
   /api/notebooks/{notebook}/folders/{folder}:
     get:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Get folder page payload
       description: "Notebook chrome, folder metadata, parent folder id when nested,\
         \ and optional folder readme content when present."
@@ -2180,7 +2180,7 @@ paths:
                 $ref: "#/components/schemas/FolderRealm"
     delete:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Dissolve a folder
       description: "Removes the folder row. Direct notes and subfolders are promoted\
         \ to the dissolved folder's parent (or notebook root). Deeper descendants\
@@ -2209,7 +2209,7 @@ paths:
           description: OK
     patch:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Rename a folder
       description: Changes the folder display name under its current parent. Sibling
         name conflicts are rejected.
@@ -2241,7 +2241,7 @@ paths:
   /api/notebooks/{notebook}/folders/{folder}/readme-content:
     patch:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: Update folder readme content directly
       description: Saves the given markdown (with optional YAML frontmatter) as the
         folder container's readmeContent field. Blank content clears the field.
@@ -2759,7 +2759,7 @@ paths:
   /api/notebooks/{notebook}/folders/index:
     get:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       description: Folder rows (including parentFolderId) for building folder trees
         and paths. Ordered by id.
       operationId: listNotebookFolderIndex
@@ -2781,7 +2781,7 @@ paths:
   /api/notebooks/{notebook}/folder-listing:
     get:
       tags:
-      - notebook-controller
+      - notebook-folder-controller
       summary: List notes and folders at notebook root or under a parent folder
       description: "Without parent: notes with no folder assignment and top-level\
         \ folders (notebook root scope). With parent: notes assigned to that folder\

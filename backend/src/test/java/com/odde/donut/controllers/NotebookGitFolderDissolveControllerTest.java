@@ -37,7 +37,7 @@ class NotebookGitFolderDissolveControllerTest extends NotebookGitWebContentContr
     CompleteDissolveFixture f = seedBiologyUnderOuterWithReferrer();
     ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
 
-    controller.dissolveFolder(f.notebook(), f.biology(), false);
+    folderController.dissolveFolder(f.notebook(), f.biology(), false);
 
     assertShownContentAndRetainedLearning(f.cells(), f.tracker(), CELLS_BODY);
     assertThat(countRecallPromptsByNoteId(f.cells().getId()), equalTo(f.recallCountBefore()));
@@ -74,7 +74,7 @@ class NotebookGitFolderDissolveControllerTest extends NotebookGitWebContentContr
     snapshotCurrentPortableTree(notebook);
     ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
 
-    controller.dissolveFolder(notebook, mid, true);
+    folderController.dissolveFolder(notebook, mid, true);
     Note reloadedMidNote = noteRepository.findById(midNote.getId()).orElseThrow();
 
     assertThat(reloadedMidNote.getFolder().getId(), equalTo(outerSame.getId()));
@@ -96,7 +96,7 @@ class NotebookGitFolderDissolveControllerTest extends NotebookGitWebContentContr
     Folder empty = makeMe.aFolder().parentFolder(outer).name("Empty").please();
     snapshotCurrentPortableTree(notebook);
 
-    controller.dissolveFolder(notebook, empty, false);
+    folderController.dissolveFolder(notebook, empty, false);
 
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId downloadedHead = fetchDownloadedHead(repo, notebook);

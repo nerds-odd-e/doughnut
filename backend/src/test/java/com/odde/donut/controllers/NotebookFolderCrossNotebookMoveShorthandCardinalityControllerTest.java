@@ -41,7 +41,7 @@ class NotebookFolderCrossNotebookMoveShorthandCardinalityControllerTest
         noteController.showNote(destReferrer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.RESOLVED));
 
-    controller.moveFolder(source, movedFolder, folderMoveTo(destination, null));
+    folderController.moveFolder(source, movedFolder, folderMoveTo(destination, null));
 
     assertThat(
         noteController.showNote(sourceReferrer).getWikiLinks().get(0).getResolution(),

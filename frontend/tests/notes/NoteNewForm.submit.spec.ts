@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { mockSdkService, testFolderStub } from "@tests/helpers"
@@ -77,7 +77,7 @@ describe("NoteNewForm submit", () => {
 
   it("sends folderId when a target folder is pre-selected", async () => {
     wrapper?.unmount()
-    mockSdkService(NotebookController, "listNotebookFolderIndex", [
+    mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [
       testFolderStub(42, "Alpha"),
     ])
     wrapper = mountNoteNewForm({
@@ -98,10 +98,10 @@ describe("NoteNewForm submit", () => {
 
   it("sends folderId after user picks a folder in FolderSelector", async () => {
     wrapper?.unmount()
-    mockSdkService(NotebookController, "listNotebookFolderListing", {
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [testFolderStub(7, "One"), testFolderStub(8, "Two")],
     })
-    mockSdkService(NotebookController, "listNotebookFolderIndex", [
+    mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [
       testFolderStub(7, "One"),
       testFolderStub(8, "Two"),
     ])

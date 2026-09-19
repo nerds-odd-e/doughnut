@@ -28,7 +28,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     FolderCreationRequest request = new FolderCreationRequest();
     request.setName("Biology");
 
-    Folder created = controller.createFolder(notebook, request);
+    Folder created = folderController.createFolder(notebook, request);
 
     assertThat(created.getName(), is("Biology"));
     NotebookGitBinding after =
@@ -56,7 +56,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     FolderCreationRequest request = new FolderCreationRequest();
     request.setName("Biology");
 
-    Folder created = controller.createFolder(notebook, request);
+    Folder created = folderController.createFolder(notebook, request);
 
     assertThat(created.getName(), is("Biology"));
     assertThat(countFoldersForNotebook(notebook.getId()), is(1L));
@@ -81,7 +81,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     FolderCreationRequest request = new FolderCreationRequest();
     request.setName("Biology");
 
-    Folder created = controller.createFolder(notebook, request);
+    Folder created = folderController.createFolder(notebook, request);
 
     assertThat(created.getName(), is("Biology"));
     assertThat(countFoldersForNotebook(notebook.getId()), is(originalFolderCount + 1));
@@ -102,7 +102,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
                 .getAcceptedGitObjectId());
     FolderCreationRequest parentRequest = new FolderCreationRequest();
     parentRequest.setName("Science");
-    Folder science = controller.createFolder(notebook, parentRequest);
+    Folder science = folderController.createFolder(notebook, parentRequest);
     ObjectId parentHead =
         ObjectId.fromString(
             notebookGitBindingRepository
@@ -113,7 +113,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     childRequest.setName("Biology");
     childRequest.setUnderFolderId(science.getId());
 
-    Folder biology = controller.createFolder(notebook, childRequest);
+    Folder biology = folderController.createFolder(notebook, childRequest);
 
     assertThat(biology.getParentFolder().getId(), equalTo(science.getId()));
     byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();

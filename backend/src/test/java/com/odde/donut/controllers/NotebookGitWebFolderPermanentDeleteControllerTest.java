@@ -43,7 +43,7 @@ class NotebookGitWebFolderPermanentDeleteControllerTest
     ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     testabilitySettings.timeTravelTo(Timestamp.from(DELETE_AT));
 
-    controller.permanentlyDeleteFolder(notebook, topic);
+    folderController.permanentlyDeleteFolder(notebook, topic);
 
     ObjectId acceptedB = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {

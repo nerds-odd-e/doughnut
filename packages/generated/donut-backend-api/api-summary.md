@@ -114,28 +114,31 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `resetNotebookGitHistory`: POST `/api/notebooks/{notebook}/reset-git-history` -> `ResetNotebookGitHistoryResponse` (request: `ResetNotebookGitHistoryData`; path: notebook; response body: void)
 - `downloadNotebookGitBundle`: GET `/api/notebooks/{notebook}/git-bundle` -> `DownloadNotebookGitBundleResponse` (request: `DownloadNotebookGitBundleData`; path: notebook; response body: string)
 - `publishNotebookGitProposal`: POST `/api/notebooks/{notebook}/git-bundle` -> `PublishNotebookGitProposalResponse` (request: `PublishNotebookGitProposalData`; path: notebook; query: expectedHead; body: string; response body: string)
-- `createFolder`: POST `/api/notebooks/{notebook}/folders` -> `CreateFolderResponse` (request: `CreateFolderData`; path: notebook; body: FolderCreationRequest; response body: Folder)
-- `trashFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/trash` -> `TrashFolderResponse` (request: `TrashFolderData`; path: notebook, folder; response body: Folder)
-- `permanentlyDeleteFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/permanently-delete` -> `PermanentlyDeleteFolderResponse` (request: `PermanentlyDeleteFolderData`; path: notebook, folder; response body: void)
-- `moveFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/move` -> `MoveFolderResponse` (request: `MoveFolderData`; path: notebook, folder; body: FolderMoveRequest; response body: Folder)
 - `createNoteAtNotebookRoot`: POST `/api/notebooks/{notebook}/create-note` -> `CreateNoteAtNotebookRootResponse` (request: `CreateNoteAtNotebookRootData`; path: notebook; body: NoteCreationDto; response body: NoteRealm)
 - `createNotebook`: POST `/api/notebooks/create` -> `CreateNotebookResponse` (request: `CreateNotebookData`; body: NotebookCreationRequest; response body: NotebookRealm)
 - `updateNotebookReadmeContent`: PATCH `/api/notebooks/{notebook}/readme-content` -> `UpdateNotebookReadmeContentResponse` (request: `UpdateNotebookReadmeContentData`; path: notebook; body: NoteUpdateContentDto; response body: NotebookRealm)
 - `updateNotebookGroup`: PATCH `/api/notebooks/{notebook}/notebook-group` -> `UpdateNotebookGroupResponse` (request: `UpdateNotebookGroupData`; path: notebook; body: UpdateNotebookGroupRequest; response body: Notebook)
 - `moveToCircle`: PATCH `/api/notebooks/{notebook}/move-to-circle/{circle}` -> `MoveToCircleResponse` (request: `MoveToCircleData`; path: notebook, circle; response body: Notebook)
-- `getFolderPage`: GET `/api/notebooks/{notebook}/folders/{folder}` -> `GetFolderPageResponse` (request: `GetFolderPageData`; path: notebook, folder; response body: FolderRealm)
-- `dissolveFolder`: DELETE `/api/notebooks/{notebook}/folders/{folder}` -> `DissolveFolderResponse` (request: `DissolveFolderData`; path: notebook, folder; query: merge; response body: void)
-- `renameFolder`: PATCH `/api/notebooks/{notebook}/folders/{folder}` -> `RenameFolderResponse` (request: `RenameFolderData`; path: notebook, folder; body: FolderRenameRequest; response body: Folder)
-- `updateFolderReadmeContent`: PATCH `/api/notebooks/{notebook}/folders/{folder}/readme-content` -> `UpdateFolderReadmeContentResponse` (request: `UpdateFolderReadmeContentData`; path: notebook, folder; body: NoteUpdateContentDto; response body: FolderRealm)
 - `myNotebooks`: GET `/api/notebooks` -> `MyNotebooksResponse` (request: none; response body: NotebooksViewedByUser)
-- `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<Folder>)
-- `listNotebookFolderListing`: GET `/api/notebooks/{notebook}/folder-listing` -> `ListNotebookFolderListingResponse` (request: `ListNotebookFolderListingData`; path: notebook; query: parent; response body: FolderListing)
 - `exportNotebook`: GET `/api/notebooks/{notebook}/export` -> `ExportNotebookResponse` (request: `ExportNotebookData`; path: notebook; response body: string)
 
 ## Notebook Health Controller
 
 - `lint`: POST `/api/notebooks/{notebook}/health/lint` -> `LintResponse` (request: `LintData`; path: notebook; response body: NotebookHealthLintReport)
 - `fix`: POST `/api/notebooks/{notebook}/health/fix` -> `FixResponse` (request: `FixData`; path: notebook; body: NotebookHealthFixRequest; response body: void)
+
+## Notebook Folder Controller
+
+- `createFolder`: POST `/api/notebooks/{notebook}/folders` -> `CreateFolderResponse` (request: `CreateFolderData`; path: notebook; body: FolderCreationRequest; response body: Folder)
+- `trashFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/trash` -> `TrashFolderResponse` (request: `TrashFolderData`; path: notebook, folder; response body: Folder)
+- `permanentlyDeleteFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/permanently-delete` -> `PermanentlyDeleteFolderResponse` (request: `PermanentlyDeleteFolderData`; path: notebook, folder; response body: void)
+- `moveFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/move` -> `MoveFolderResponse` (request: `MoveFolderData`; path: notebook, folder; body: FolderMoveRequest; response body: Folder)
+- `getFolderPage`: GET `/api/notebooks/{notebook}/folders/{folder}` -> `GetFolderPageResponse` (request: `GetFolderPageData`; path: notebook, folder; response body: FolderRealm)
+- `dissolveFolder`: DELETE `/api/notebooks/{notebook}/folders/{folder}` -> `DissolveFolderResponse` (request: `DissolveFolderData`; path: notebook, folder; query: merge; response body: void)
+- `renameFolder`: PATCH `/api/notebooks/{notebook}/folders/{folder}` -> `RenameFolderResponse` (request: `RenameFolderData`; path: notebook, folder; body: FolderRenameRequest; response body: Folder)
+- `updateFolderReadmeContent`: PATCH `/api/notebooks/{notebook}/folders/{folder}/readme-content` -> `UpdateFolderReadmeContentResponse` (request: `UpdateFolderReadmeContentData`; path: notebook, folder; body: NoteUpdateContentDto; response body: FolderRealm)
+- `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<Folder>)
+- `listNotebookFolderListing`: GET `/api/notebooks/{notebook}/folder-listing` -> `ListNotebookFolderListingResponse` (request: `ListNotebookFolderListingData`; path: notebook; query: parent; response body: FolderListing)
 
 ## Notebook Group Controller
 

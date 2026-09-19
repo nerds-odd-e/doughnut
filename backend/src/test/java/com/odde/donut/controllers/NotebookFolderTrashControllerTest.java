@@ -47,7 +47,7 @@ class NotebookFolderTrashControllerTest extends NotebookControllerTestBase {
     Integer noteId = note.getId();
     String referrerContent = referrer.getContent();
 
-    Folder result = controller.trashFolder(notebook, topic);
+    Folder result = folderController.trashFolder(notebook, topic);
 
     makeMe.refresh(topic);
     makeMe.refresh(empty);
@@ -83,7 +83,7 @@ class NotebookFolderTrashControllerTest extends NotebookControllerTestBase {
     ResponseStatusException error =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.trashFolder(requestedNotebook, foreignFolder));
+            () -> folderController.trashFolder(requestedNotebook, foreignFolder));
 
     assertThat(error.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     assertThat(folderRepository.findAll(), iterableWithSize(originalCount));
@@ -99,7 +99,7 @@ class NotebookFolderTrashControllerTest extends NotebookControllerTestBase {
 
     ResponseStatusException error =
         assertThrows(
-            ResponseStatusException.class, () -> controller.trashFolder(notebook, trashed));
+            ResponseStatusException.class, () -> folderController.trashFolder(notebook, trashed));
 
     assertThat(error.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
     assertThat(folderRepository.findAll(), iterableWithSize(originalCount));
@@ -120,7 +120,7 @@ class NotebookFolderTrashControllerTest extends NotebookControllerTestBase {
     Note incomingNote = makeMe.aNote("Incoming").folder(incoming).please();
     Integer incomingId = incoming.getId();
 
-    Folder result = controller.trashFolder(notebook, incoming);
+    Folder result = folderController.trashFolder(notebook, incoming);
 
     makeMe.refresh(earlierNote);
     makeMe.refresh(laterNote);
@@ -141,7 +141,7 @@ class NotebookFolderTrashControllerTest extends NotebookControllerTestBase {
     Folder trash = ownedFolder(notebook, "_trash");
     makeMe.aFolder().parentFolder(trash).name(longestName).please();
 
-    Folder result = controller.trashFolder(notebook, incoming);
+    Folder result = folderController.trashFolder(notebook, incoming);
 
     assertThat(
         result.getName(),

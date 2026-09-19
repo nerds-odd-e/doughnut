@@ -32,7 +32,7 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nbA).please();
     authorReferencingContent(outsideReferrer, "[[Target]]");
 
-    controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
+    folderController.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
 
     makeMe.refresh(outsideReferrer);
     makeMe.refresh(insideReferrer);
@@ -52,7 +52,8 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     Note referrer = makeMe.aNote("Referrer").notebook(sourceNotebook).please();
     authorReferencingContent(referrer, "[[Target]]");
 
-    controller.moveFolder(sourceNotebook, movedFolder, folderMoveTo(destinationNotebook, null));
+    folderController.moveFolder(
+        sourceNotebook, movedFolder, folderMoveTo(destinationNotebook, null));
 
     makeMe.refresh(referrer);
     assertThat(referrer.getContent(), equalTo("[[Destination:Moved/Target|Target]]"));
@@ -71,7 +72,7 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     makeMe.aNote("Peer").folder(folderF).please();
     makeMe.aNote("Outside").notebook(nbA).please();
 
-    controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
+    folderController.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
 
     makeMe.refresh(insideNote);
     assertThat(insideNote.getContent(), equalTo("[[NbA:Outside|Outside]] and [[F/Peer|Peer]]."));
@@ -87,7 +88,7 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     Note noteA = makeMe.aNote("A").folder(folderF).please();
     Note noteB = makeMe.aNote("B").folder(folderF).content("[[F/A]] and [label](/F/A.md)").please();
 
-    controller.moveFolder(oldNb, folderF, folderMoveTo(newNb, null));
+    folderController.moveFolder(oldNb, folderF, folderMoveTo(newNb, null));
 
     makeMe.refresh(noteB);
     assertThat(noteB.getContent(), equalTo("[[F/A]] and [label](/F/A.md)"));

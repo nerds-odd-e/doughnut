@@ -40,7 +40,7 @@ abstract class NotebookFolderManagementControllerTestBase extends NotebookContro
 
   protected boolean listingHasFolder(Notebook nb, Integer parentFolderId, Folder folder)
       throws UnexpectedNoAccessRightException {
-    return controller.listNotebookFolderListing(nb, parentFolderId).folders().stream()
+    return folderController.listNotebookFolderListing(nb, parentFolderId).folders().stream()
         .anyMatch(f -> f.getId().equals(folder.getId()));
   }
 }

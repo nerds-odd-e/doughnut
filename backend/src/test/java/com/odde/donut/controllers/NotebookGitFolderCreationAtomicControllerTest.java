@@ -43,7 +43,8 @@ class NotebookGitFolderCreationAtomicControllerTest extends NotebookGitBundleCon
     NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
 
     RuntimeException failure =
-        assertThrows(RuntimeException.class, () -> controller.createFolder(notebook, request));
+        assertThrows(
+            RuntimeException.class, () -> folderController.createFolder(notebook, request));
     assertThat(failure.getMessage(), is("forced failure after note projection"));
 
     inCommittedTransaction(

@@ -1,5 +1,5 @@
 import type { Folder, FolderRealm } from "@generated/donut-backend-api"
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
@@ -132,7 +132,7 @@ export async function moveFolderOnPage(options: {
   const r = options.folderRealm
   try {
     const moveResult = await apiCallWithLoading(() =>
-      NotebookController.moveFolder({
+      NotebookFolderController.moveFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
           folder: r.folder.id,
@@ -190,7 +190,7 @@ export async function dissolveFolderOnPage(options: {
   options.dissolveError.value = undefined
   try {
     const dissolveResult = await apiCallWithLoading(() =>
-      NotebookController.dissolveFolder({
+      NotebookFolderController.dissolveFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
           folder: r.folder.id,

@@ -28,7 +28,7 @@ class NotebookGitWebFolderTrashCollisionControllerTest
     CollisionFixture f = seedIncomingBiologyWithOccupiedTrashNames();
     testabilitySettings.timeTravelTo(Timestamp.from(TRASH_AT));
 
-    Folder result = controller.trashFolder(f.notebook(), f.incoming());
+    Folder result = folderController.trashFolder(f.notebook(), f.incoming());
 
     assertThat(result.getName(), equalTo("Biology (2)"));
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {

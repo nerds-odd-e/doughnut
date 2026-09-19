@@ -37,7 +37,7 @@ class NotebookGitNoteCreationFolderControllerTest
     ObjectId originalHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     FolderCreationRequest folderCreation = new FolderCreationRequest();
     folderCreation.setName("Biology");
-    Folder folder = controller.createFolder(notebook, folderCreation);
+    Folder folder = folderController.createFolder(notebook, folderCreation);
     ObjectId folderHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     NoteCreationDTO creation = titleOnly("Cells");
     creation.setFolderId(folder.getId());

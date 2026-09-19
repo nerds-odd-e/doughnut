@@ -26,7 +26,7 @@ class NotebookFolderCrossNotebookMoveMergeControllerTest
     Folder innerSource = makeMe.aFolder().parentFolder(source).name("Inner").please();
     Note deepNoteInSource = makeMe.aNote("DeepSource").folder(innerSource).please();
 
-    Folder result = controller.moveFolder(nbA, source, folderMergeTo(nbB, null));
+    Folder result = folderController.moveFolder(nbA, source, folderMergeTo(nbB, null));
 
     assertThat(result.getId(), equalTo(target.getId()));
     makeMe.refresh(deepNoteInTarget);
@@ -51,7 +51,7 @@ class NotebookFolderCrossNotebookMoveMergeControllerTest
     Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
     Note noteInSource = makeMe.aNote("FromSource").folder(source).please();
 
-    Folder result = controller.moveFolder(nbA, source, folderMergeTo(nbB, parentP.getId()));
+    Folder result = folderController.moveFolder(nbA, source, folderMergeTo(nbB, parentP.getId()));
 
     assertThat(result.getId(), equalTo(target.getId()));
     makeMe.refresh(noteInSource);

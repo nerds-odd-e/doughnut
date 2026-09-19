@@ -1,6 +1,9 @@
 import type { Folder, Notebook } from "@generated/donut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NotebookController,
+  NotebookFolderController,
+} from "@generated/donut-backend-api/sdk.gen"
 import FolderPage from "@/pages/FolderPage.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -21,8 +24,8 @@ export function createFolderPageRouter() {
 export function stubFolderPageListingMocks(
   catalogItems: NotebookCatalogEntry[]
 ) {
-  mockSdkService(NotebookController, "listNotebookFolderIndex", [])
-  mockSdkService(NotebookController, "listNotebookFolderListing", {
+  mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [])
+  mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
     folders: [],
   })
   mockSdkService(NotebookController, "myNotebooks", {
@@ -96,7 +99,7 @@ export async function mountCrossNotebookFolderMovePage(
   const mounted = await mountFolderPageReady(router, folderId, folderName, {
     extraNotebooks: [destinationNotebook],
   })
-  mockSdkService(NotebookController, "listNotebookFolderListing", {
+  mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
     folders: [destParent],
   })
   return { ...mounted, destinationNotebook, destParent }

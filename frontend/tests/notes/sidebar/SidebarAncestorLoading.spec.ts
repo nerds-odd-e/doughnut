@@ -1,6 +1,6 @@
 import {
   NoteController,
-  NotebookController,
+  NotebookFolderController,
 } from "@generated/donut-backend-api/sdk.gen"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import createNoteStorage from "@/store/createNoteStorage"
@@ -41,7 +41,7 @@ describe("Sidebar gradual ancestor population", () => {
 
   it("loads ancestor branches via folder listings, then shows them from cache on remount", async () => {
     const listingSpy = mockSdkServiceWithImplementation(
-      NotebookController,
+      NotebookFolderController,
       "listNotebookFolderListing",
       (options) =>
         folderListingForQueryParent(options, fixtures.defaultTreeFolderListings)
@@ -83,7 +83,7 @@ describe("Sidebar gradual ancestor population", () => {
     wrapper = undefined as unknown as typeof wrapper
 
     mockSdkServiceWithImplementation(
-      NotebookController,
+      NotebookFolderController,
       "listNotebookFolderListing",
       () => neverResolving()
     )

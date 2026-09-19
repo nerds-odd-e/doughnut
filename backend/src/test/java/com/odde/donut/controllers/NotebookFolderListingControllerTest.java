@@ -31,7 +31,7 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     Note elsewhere = makeMe.aNote("Elsewhere").folder(other).please();
     Note atRoot = makeMe.aNote("At Root").notebook(nb).please();
 
-    FolderListing root = controller.listNotebookFolderListing(nb, null);
+    FolderListing root = folderController.listNotebookFolderListing(nb, null);
     assertTrue(
         root.noteTopologies().stream().anyMatch(t -> Objects.equals(t.getId(), atRoot.getId())));
     assertTrue(
@@ -40,7 +40,7 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
         root.noteTopologies().stream()
             .noneMatch(t -> Objects.equals(t.getId(), elsewhere.getId())));
 
-    FolderListing inScope = controller.listNotebookFolderListing(nb, scope.getId());
+    FolderListing inScope = folderController.listNotebookFolderListing(nb, scope.getId());
     assertEquals(
         List.of(inScopeA.getId(), inScopeB.getId()).stream().sorted().toList(),
         inScope.noteTopologies().stream().map(NoteTopology::getId).sorted().toList());
@@ -53,12 +53,12 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     Folder parent = ownedFolder(nb, "Parent");
     makeMe.aFolder().parentFolder(parent).name("Nested").please();
 
-    FolderListing root = controller.listNotebookFolderListing(nb, null);
+    FolderListing root = folderController.listNotebookFolderListing(nb, null);
     assertEquals(2, root.folders().size());
     assertEquals(
         List.of("Inbox", "Parent"), root.folders().stream().map(Folder::getName).sorted().toList());
 
-    FolderListing underParent = controller.listNotebookFolderListing(nb, parent.getId());
+    FolderListing underParent = folderController.listNotebookFolderListing(nb, parent.getId());
     assertEquals(1, underParent.folders().size());
     assertEquals("Nested", underParent.folders().getFirst().getName());
   }
@@ -70,10 +70,10 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.listNotebookFolderListing(nb, null));
+        () -> folderController.listNotebookFolderListing(nb, null));
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.listNotebookFolderListing(nb, folder.getId()));
+        () -> folderController.listNotebookFolderListing(nb, folder.getId()));
   }
 
   @Test
@@ -88,7 +88,7 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     makeMe.aNote("child").notebook(nb).trashed().please();
     makeMe.aNote("Unit Test").folder(fChild).please();
 
-    FolderListing listing = controller.listNotebookFolderListing(nb, fChild.getId());
+    FolderListing listing = folderController.listNotebookFolderListing(nb, fChild.getId());
     assertEquals(1, listing.noteTopologies().size());
     assertEquals("Unit Test", listing.noteTopologies().getFirst().getTitle());
   }
@@ -102,13 +102,13 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
         HttpStatus.NOT_FOUND,
         assertThrows(
                 ResponseStatusException.class,
-                () -> controller.listNotebookFolderListing(nb, -99999))
+                () -> folderController.listNotebookFolderListing(nb, -99999))
             .getStatusCode());
     assertEquals(
         HttpStatus.NOT_FOUND,
         assertThrows(
                 ResponseStatusException.class,
-                () -> controller.listNotebookFolderListing(nb, folderInOther.getId()))
+                () -> folderController.listNotebookFolderListing(nb, folderInOther.getId()))
             .getStatusCode());
   }
 
@@ -119,7 +119,7 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     Folder nested = makeMe.aFolder().parentFolder(parent).name("Nested").please();
     ownedFolder(nb, "SiblingRoot");
 
-    List<Folder> rows = controller.listNotebookFolderIndex(nb);
+    List<Folder> rows = folderController.listNotebookFolderIndex(nb);
     assertEquals(3, rows.size());
     Folder nestedRow =
         rows.stream().filter(r -> r.getId().equals(nested.getId())).findFirst().orElseThrow();
@@ -133,7 +133,7 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     Notebook nb = makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
     currentUser.setUser(makeMe.aUser().please());
     assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.listNotebookFolderIndex(nb));
+        UnexpectedNoAccessRightException.class, () -> folderController.listNotebookFolderIndex(nb));
   }
 
   @Test

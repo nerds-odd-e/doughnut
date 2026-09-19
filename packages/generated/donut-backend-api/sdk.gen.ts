@@ -665,56 +665,6 @@ export class NotebookController {
         });
     }
     
-    /**
-     * Create a folder
-     *
-     * Creates a folder at notebook root when no parent is specified; as a child of underFolderId when set; otherwise nested under the context note's folder when underNoteId is set (underFolderId takes precedence when both are set).
-     */
-    public static createFolder<ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>): RequestResult<CreateFolderResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<CreateFolderResponses, unknown, ThrowOnError>({
-            url: '/api/notebooks/{notebook}/folders',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
-    }
-    
-    /**
-     * Trash a folder
-     *
-     * Moves an active folder subtree beneath _trash while mirroring its original ancestor path. The subtree and authored content are retained for ordinary Move recovery.
-     */
-    public static trashFolder<ThrowOnError extends boolean = false>(options: Options<TrashFolderData, ThrowOnError>): RequestResult<TrashFolderResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<TrashFolderResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/{folder}/trash', ...options });
-    }
-    
-    /**
-     * Permanently delete a trashed folder
-     *
-     * Removes a folder that is in trash with its README, every nested folder, every note inside the subtree and each note's dependent data, in one accepted change. A folder that is not in trash is refused with 400.
-     */
-    public static permanentlyDeleteFolder<ThrowOnError extends boolean = false>(options: Options<PermanentlyDeleteFolderData, ThrowOnError>): RequestResult<PermanentlyDeleteFolderResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<PermanentlyDeleteFolderResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/{folder}/permanently-delete', ...options });
-    }
-    
-    /**
-     * Move a folder
-     *
-     * Reparents the folder within the same notebook, or moves the folder subtree to another notebook when destinationNotebookId is set. Notes keep their folderId pointing at the same folder rows; descendant folders stay under the moved subtree. A same-name folder at the destination returns 409 with FOLDER_NAME_CONFLICT unless merge=true, in which case the source subtree is merged into the existing folder (including cross-notebook moves).
-     */
-    public static moveFolder<ThrowOnError extends boolean = false>(options: Options<MoveFolderData, ThrowOnError>): RequestResult<MoveFolderResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<MoveFolderResponses, unknown, ThrowOnError>({
-            url: '/api/notebooks/{notebook}/folders/{folder}/move',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
-    }
-    
     public static createNoteAtNotebookRoot<ThrowOnError extends boolean = false>(options: Options<CreateNoteAtNotebookRootData, ThrowOnError>): RequestResult<CreateNoteAtNotebookRootResponses, unknown, ThrowOnError> {
         return (options.client ?? client).post<CreateNoteAtNotebookRootResponses, unknown, ThrowOnError>({
             url: '/api/notebooks/{notebook}/create-note',
@@ -768,6 +718,86 @@ export class NotebookController {
         return (options.client ?? client).patch<MoveToCircleResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/move-to-circle/{circle}', ...options });
     }
     
+    public static myNotebooks<ThrowOnError extends boolean = false>(options?: Options<MyNotebooksData, ThrowOnError>): RequestResult<MyNotebooksResponses, unknown, ThrowOnError> {
+        return (options?.client ?? client).get<MyNotebooksResponses, unknown, ThrowOnError>({ url: '/api/notebooks', ...options });
+    }
+    
+    /**
+     * Export notebook as a Markdown zip
+     */
+    public static exportNotebook<ThrowOnError extends boolean = false>(options: Options<ExportNotebookData, ThrowOnError>): RequestResult<ExportNotebookResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).get<ExportNotebookResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/export', ...options });
+    }
+}
+
+export class NotebookHealthController {
+    public static lint<ThrowOnError extends boolean = false>(options: Options<LintData, ThrowOnError>): RequestResult<LintResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<LintResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/health/lint', ...options });
+    }
+    
+    public static fix<ThrowOnError extends boolean = false>(options: Options<FixData, ThrowOnError>): RequestResult<FixResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<FixResponses, unknown, ThrowOnError>({
+            url: '/api/notebooks/{notebook}/health/fix',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+}
+
+export class NotebookFolderController {
+    /**
+     * Create a folder
+     *
+     * Creates a folder at notebook root when no parent is specified; as a child of underFolderId when set; otherwise nested under the context note's folder when underNoteId is set (underFolderId takes precedence when both are set).
+     */
+    public static createFolder<ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>): RequestResult<CreateFolderResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<CreateFolderResponses, unknown, ThrowOnError>({
+            url: '/api/notebooks/{notebook}/folders',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * Trash a folder
+     *
+     * Moves an active folder subtree beneath _trash while mirroring its original ancestor path. The subtree and authored content are retained for ordinary Move recovery.
+     */
+    public static trashFolder<ThrowOnError extends boolean = false>(options: Options<TrashFolderData, ThrowOnError>): RequestResult<TrashFolderResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<TrashFolderResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/{folder}/trash', ...options });
+    }
+    
+    /**
+     * Permanently delete a trashed folder
+     *
+     * Removes a folder that is in trash with its README, every nested folder, every note inside the subtree and each note's dependent data, in one accepted change. A folder that is not in trash is refused with 400.
+     */
+    public static permanentlyDeleteFolder<ThrowOnError extends boolean = false>(options: Options<PermanentlyDeleteFolderData, ThrowOnError>): RequestResult<PermanentlyDeleteFolderResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<PermanentlyDeleteFolderResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/{folder}/permanently-delete', ...options });
+    }
+    
+    /**
+     * Move a folder
+     *
+     * Reparents the folder within the same notebook, or moves the folder subtree to another notebook when destinationNotebookId is set. Notes keep their folderId pointing at the same folder rows; descendant folders stay under the moved subtree. A same-name folder at the destination returns 409 with FOLDER_NAME_CONFLICT unless merge=true, in which case the source subtree is merged into the existing folder (including cross-notebook moves).
+     */
+    public static moveFolder<ThrowOnError extends boolean = false>(options: Options<MoveFolderData, ThrowOnError>): RequestResult<MoveFolderResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<MoveFolderResponses, unknown, ThrowOnError>({
+            url: '/api/notebooks/{notebook}/folders/{folder}/move',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
     /**
      * Dissolve a folder
      *
@@ -818,10 +848,6 @@ export class NotebookController {
         });
     }
     
-    public static myNotebooks<ThrowOnError extends boolean = false>(options?: Options<MyNotebooksData, ThrowOnError>): RequestResult<MyNotebooksResponses, unknown, ThrowOnError> {
-        return (options?.client ?? client).get<MyNotebooksResponses, unknown, ThrowOnError>({ url: '/api/notebooks', ...options });
-    }
-    
     /**
      * Folder rows (including parentFolderId) for building folder trees and paths. Ordered by id.
      */
@@ -836,30 +862,6 @@ export class NotebookController {
      */
     public static listNotebookFolderListing<ThrowOnError extends boolean = false>(options: Options<ListNotebookFolderListingData, ThrowOnError>): RequestResult<ListNotebookFolderListingResponses, unknown, ThrowOnError> {
         return (options.client ?? client).get<ListNotebookFolderListingResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folder-listing', ...options });
-    }
-    
-    /**
-     * Export notebook as a Markdown zip
-     */
-    public static exportNotebook<ThrowOnError extends boolean = false>(options: Options<ExportNotebookData, ThrowOnError>): RequestResult<ExportNotebookResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).get<ExportNotebookResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/export', ...options });
-    }
-}
-
-export class NotebookHealthController {
-    public static lint<ThrowOnError extends boolean = false>(options: Options<LintData, ThrowOnError>): RequestResult<LintResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<LintResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/health/lint', ...options });
-    }
-    
-    public static fix<ThrowOnError extends boolean = false>(options: Options<FixData, ThrowOnError>): RequestResult<FixResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<FixResponses, unknown, ThrowOnError>({
-            url: '/api/notebooks/{notebook}/health/fix',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
     }
 }
 

@@ -44,17 +44,13 @@ public class FolderConstructionService {
     Folder parentFolder = null;
     Integer underFolderId = request.getUnderFolderId();
     if (underFolderId != null) {
-      Folder parent =
+      parentFolder =
           folderRepository
               .findById(underFolderId)
               .orElseThrow(
                   () ->
                       new ResponseStatusException(
                           HttpStatus.NOT_FOUND, "Parent folder not found."));
-      if (!parent.getNotebook().getId().equals(notebook.getId())) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
-      }
-      parentFolder = parent;
     } else {
       Integer underNoteId = request.getUnderNoteId();
       if (underNoteId != null) {
@@ -88,8 +84,8 @@ public class FolderConstructionService {
   }
 
   public Folder createFolder(Notebook notebook, Folder parentFolder, DisplayName displayName) {
-    if (parentFolder != null && !parentFolder.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
+    if (parentFolder != null) {
+      parentFolder.requireInNotebook(notebook);
     }
 
     Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();

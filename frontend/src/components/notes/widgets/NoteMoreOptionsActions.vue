@@ -37,37 +37,17 @@
       </PopButton>
     </DropdownMenuItem>
 
-    <DropdownMenuItem v-if="showMenuAction('refine') && noteHasContent">
-      <DropdownMenuActionButton
-        :title="titles.refine"
-        :icon="Wand2"
-        @click="onRefineOpen"
-      />
-    </DropdownMenuItem>
-
-    <DropdownMenuItem v-if="showMenuAction('audio') && !isAudioOpen">
-      <DropdownMenuActionButton
-        :title="titles.audio"
-        :icon="Mic"
-        @click="onAudioToggle"
-      />
-    </DropdownMenuItem>
-
-    <DropdownMenuItem v-if="showMenuAction('assimilation') && !isAssimilationOpen">
-      <DropdownMenuActionButton
-        :title="titles.assimilation"
-        :icon="CircleCheck"
-        @click="onAssimilationToggle"
-      />
-    </DropdownMenuItem>
-
-    <DropdownMenuItem v-if="showMenuAction('delete')">
-      <DropdownMenuActionButton
-        :title="deleteTitle"
-        :icon="Trash2"
-        @click="deleteNote"
-      />
-    </DropdownMenuItem>
+    <template v-for="action in plainActions" :key="action.id">
+      <DropdownMenuItem
+        v-if="showMenuAction(action.id) && action.available && !action.pressed"
+      >
+        <DropdownMenuActionButton
+          :title="action.title"
+          :icon="action.icon"
+          @click="action.onClick"
+        />
+      </DropdownMenuItem>
+    </template>
   </template>
 
   <template v-else>
@@ -98,57 +78,23 @@
       </template>
     </PopButton>
 
-    <button
-      v-if="showToolbarAction('refine') && noteHasContent"
-      type="button"
-      :class="toolbarGhostBtnClass"
-      :title="titles.refine"
-      :aria-label="titles.refine"
-      @click="onRefineOpen"
-    >
-      <Wand2 class="w-6 h-6" aria-hidden="true" />
-    </button>
-
-    <button
-      v-if="showToolbarAction('audio')"
-      type="button"
-      :class="[
-        toolbarToggleBtnClass(isAudioOpen),
-        { 'shrink-0': isAudioOpen },
-      ]"
-      :title="titles.audio"
-      :aria-label="titles.audio"
-      :aria-pressed="isAudioOpen"
-      @click="onAudioToggle"
-    >
-      <Mic class="w-6 h-6" aria-hidden="true" />
-    </button>
-
-    <button
-      v-if="showToolbarAction('assimilation')"
-      type="button"
-      :class="[
-        toolbarToggleBtnClass(isAssimilationOpen),
-        { 'shrink-0': isAssimilationOpen },
-      ]"
-      :title="titles.assimilation"
-      :aria-label="titles.assimilation"
-      :aria-pressed="isAssimilationOpen"
-      @click="onAssimilationToggle"
-    >
-      <CircleCheck class="w-6 h-6" aria-hidden="true" />
-    </button>
-
-    <button
-      v-if="showToolbarAction('delete')"
-      type="button"
-      :class="toolbarGhostBtnClass"
-      :title="deleteTitle"
-      :aria-label="deleteTitle"
-      @click="deleteNote"
-    >
-      <Trash2 class="w-6 h-6" aria-hidden="true" />
-    </button>
+    <template v-for="action in plainActions" :key="action.id">
+      <button
+        v-if="showToolbarAction(action.id) && action.available"
+        type="button"
+        :class="
+          action.toggleable
+            ? [toolbarToggleBtnClass(action.pressed), { 'shrink-0': action.pressed }]
+            : toolbarGhostBtnClass
+        "
+        :title="action.title"
+        :aria-label="action.title"
+        :aria-pressed="action.toggleable ? action.pressed : undefined"
+        @click="action.onClick"
+      >
+        <component :is="action.icon" class="w-6 h-6" aria-hidden="true" />
+      </button>
+    </template>
   </template>
 
   <RefineNoteModal
@@ -163,14 +109,7 @@ import type { Note } from "@generated/donut-backend-api"
 import { hasNoteContent } from "@/utils/hasNoteContent"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import Mcqs from "@/components/notes/Mcqs.vue"
-import {
-  CircleCheck,
-  MessageCircleQuestion,
-  Mic,
-  Trash2,
-  Upload,
-  Wand2,
-} from "@lucide/vue"
+import { MessageCircleQuestion, Upload } from "@lucide/vue"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import RefineNoteModal from "@/components/recall/RefineNoteModal.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
@@ -185,6 +124,7 @@ import {
   noteMoreOptionsTitles,
   type NoteMoreOptionsActionId,
 } from "./noteMoreOptionsTitles"
+import { plainNoteActions } from "./noteMoreOptionsPlainActions"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { computed, ref } from "vue"
@@ -269,4 +209,17 @@ const onRefineOpen = () => {
   showRefineNoteModal.value = true
   closeDialogIfMenu()
 }
+
+const plainActions = computed(() =>
+  plainNoteActions({
+    noteHasContent: noteHasContent.value,
+    isAudioOpen: isAudioOpen.value,
+    isAssimilationOpen: isAssimilationOpen.value,
+    deleteTitle: deleteTitle.value,
+    onRefineOpen,
+    onAudioToggle,
+    onAssimilationToggle,
+    deleteNote,
+  })
+)
 </script>

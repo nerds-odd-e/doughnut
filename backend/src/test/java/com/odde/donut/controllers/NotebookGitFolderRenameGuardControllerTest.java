@@ -35,7 +35,7 @@ class NotebookGitFolderRenameGuardControllerTest extends NotebookGitWebContentCo
     ApiException conflict =
         assertThrows(
             ApiException.class,
-            () -> controller.renameFolder(notebook, biology, renameTo("Taken")));
+            () -> folderController.renameFolder(notebook, biology, renameTo("Taken")));
 
     assertThat(
         conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
@@ -54,7 +54,7 @@ class NotebookGitFolderRenameGuardControllerTest extends NotebookGitWebContentCo
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.renameFolder(notebook, biology, renameTo("Zoology")));
+        () -> folderController.renameFolder(notebook, biology, renameTo("Zoology")));
 
     assertThat(folderRepository.findById(biology.getId()).orElseThrow().getName(), is("Biology"));
     assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
@@ -71,7 +71,7 @@ class NotebookGitFolderRenameGuardControllerTest extends NotebookGitWebContentCo
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.renameFolder(otherNotebook, biology, renameTo("Zoology")));
+            () -> folderController.renameFolder(otherNotebook, biology, renameTo("Zoology")));
 
     assertThat(ex.getReason(), equalTo("Folder not in notebook."));
     assertThat(folderRepository.findById(biology.getId()).orElseThrow().getName(), is("Biology"));
@@ -88,7 +88,7 @@ class NotebookGitFolderRenameGuardControllerTest extends NotebookGitWebContentCo
     byte[] acceptedBundle = binding(notebook).getBundleBytes();
     makeMe.aNote().notebook(notebook).title("Unsynchronized").content(CELLS_BODY).please();
 
-    Folder renamed = controller.renameFolder(notebook, biology, renameTo("Zoology"));
+    Folder renamed = folderController.renameFolder(notebook, biology, renameTo("Zoology"));
 
     assertThat(renamed.getName(), equalTo("Zoology"));
     assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));

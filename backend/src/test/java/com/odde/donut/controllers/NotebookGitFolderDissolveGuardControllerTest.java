@@ -35,7 +35,8 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
     ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
 
     ApiException conflict =
-        assertThrows(ApiException.class, () -> controller.dissolveFolder(notebook, mid, false));
+        assertThrows(
+            ApiException.class, () -> folderController.dissolveFolder(notebook, mid, false));
 
     assertThat(
         conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
@@ -54,7 +55,7 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.dissolveFolder(notebook, biology, false));
+        () -> folderController.dissolveFolder(notebook, biology, false));
 
     assertThat(folderRepository.findById(biology.getId()).isPresent(), is(true));
     assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
@@ -71,7 +72,7 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.dissolveFolder(otherNotebook, biology, false));
+            () -> folderController.dissolveFolder(otherNotebook, biology, false));
 
     assertThat(ex.getReason(), equalTo("Folder not in notebook."));
     assertThat(folderRepository.findById(biology.getId()).isPresent(), is(true));
@@ -90,7 +91,7 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
     byte[] acceptedBundle = binding(notebook).getBundleBytes();
     makeMe.aNote().notebook(notebook).title("Unsynchronized").content(CELLS_BODY).please();
 
-    controller.dissolveFolder(notebook, biology, false);
+    folderController.dissolveFolder(notebook, biology, false);
 
     assertThat(folderRepository.findById(biology.getId()).isPresent(), is(false));
     assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
@@ -103,7 +104,7 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
     Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
     Folder biology = makeMe.aFolder().parentFolder(outer).name("Biology").please();
 
-    controller.dissolveFolder(notebook, biology, false);
+    folderController.dissolveFolder(notebook, biology, false);
 
     assertThat(folderRepository.findById(biology.getId()).isPresent(), is(false));
     assertThat(

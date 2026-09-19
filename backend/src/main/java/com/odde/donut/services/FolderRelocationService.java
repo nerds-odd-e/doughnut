@@ -158,17 +158,11 @@ public class FolderRelocationService {
                   .orElseThrow(
                       () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
           authorizationService.assertAuthorization(liveNotebook);
-          requireFolderInNotebook(liveFolder, liveNotebook);
+          liveFolder.requireInNotebook(liveNotebook);
           return mutation.run(liveNotebook, liveFolder, now);
         },
         commitMessage,
         now);
-  }
-
-  private static void requireFolderInNotebook(Folder folder, Notebook notebook) {
-    if (!folder.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
-    }
   }
 
   @FunctionalInterface

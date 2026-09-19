@@ -23,7 +23,7 @@ class NotebookFolderRenameControllerTest extends NotebookFolderManagementControl
     Folder folder = makeMe.aFolder().notebook(nb).name("Old").please();
 
     Folder result =
-        controller.renameFolder(
+        folderController.renameFolder(
             nb,
             folder,
             objectMapper.readValue("{\"name\": \"  New  \"}", FolderRenameRequest.class));
@@ -36,7 +36,7 @@ class NotebookFolderRenameControllerTest extends NotebookFolderManagementControl
     Folder folder = makeMe.aFolder().notebook(nb).name("Same").please();
 
     Folder result =
-        controller.renameFolder(
+        folderController.renameFolder(
             nb,
             folder,
             objectMapper.readValue("{\"name\": \"  Same  \"}", FolderRenameRequest.class));
@@ -52,7 +52,7 @@ class NotebookFolderRenameControllerTest extends NotebookFolderManagementControl
     FolderRenameRequest req = new FolderRenameRequest();
     req.setName("Taken");
     ApiException ex =
-        assertThrows(ApiException.class, () -> controller.renameFolder(nb, folder, req));
+        assertThrows(ApiException.class, () -> folderController.renameFolder(nb, folder, req));
     assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
   }
 
@@ -65,7 +65,7 @@ class NotebookFolderRenameControllerTest extends NotebookFolderManagementControl
     ResponseStatusException ex =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.renameFolder(ownedNotebook(), folderInB, req));
+            () -> folderController.renameFolder(ownedNotebook(), folderInB, req));
     assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     assertThat(ex.getReason(), equalTo("Folder not in notebook."));
   }
