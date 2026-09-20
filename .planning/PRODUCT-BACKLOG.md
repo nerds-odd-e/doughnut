@@ -4,9 +4,9 @@
 
 Enable parallel knowledge work with AI IDEs such as Codex in local Git checkouts,
 alongside assimilation and recall in Web Donut, preserving work and learning
-history. Support IDE rules, skills, images, and other attachments as ordinary
-folder files, browsable, downloadable, and deletable in Web Donut without
-treating them as OKF learning notes.
+history. Keep guidance Markdown under ordinary Donut rules and support images
+and other non-Markdown attachments as folder files, browsable, downloadable,
+and deletable in Web Donut.
 
 ## Taken
 
@@ -14,7 +14,9 @@ treating them as OKF learning notes.
 
 ## Backlog list
 
-- [Keep IDE guidance with notes through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-6) — SEED-035#story-6
+- [Keep notebook-root attachments through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-6) — SEED-035#story-6
+- [Skip common AI guidance folders during assimilation](seeds/SEED-035-ai-workspace-supporting-files.md#story-8) — SEED-035#story-8
+- [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [See locally added image files in Web Donut notes](seeds/SEED-035-ai-workspace-supporting-files.md#story-3) — SEED-035#story-3

@@ -1,0 +1,250 @@
+# Keep notebook-root attachments through local and web changes
+
+Status: planned; first story and slice plan refined. No execution performed.
+Work item: **SEED-035#story-6**.
+Source: [refined story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-6).
+This reuses the original plan after its authorized resplit; nothing was delivered
+or discarded. The complete redistribution is recorded below.
+
+## Outcome and safe stopping point
+
+Owners keep non-Markdown files at the notebook root, publish local changes,
+continue ordinary web note work, and recover exact file bytes in another checkout.
+Root files remain independent of referring notes. Existing note/folder operations,
+ZIP export and history reset must preserve these root files. Private note identities
+and learning data, Markdown validation, permissions and accepted-history rules stay
+unchanged. Text and binary files use the same behavior.
+
+Examples: publish `reference.json` and binary `diagram.png`, web-edit a typed note,
+then pull a second clean checkout; its file bytes match. Publish only a file edit,
+rename or removal, including an initial file-only tree; no dummy note is needed.
+Invalid `AGENTS.md` plus a file change rejects the whole proposal. Removing a
+referring note leaves the root file intact.
+
+Nested attachment placement and attachment-bearing folder lifecycles belong to
+[story 9](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-9) and its
+[mapped plan](../003-notebook-folder-attachments/PLAN.md). They are not prerequisites
+for this usable root workflow. Until that story supplies containment safety,
+retain the existing rejection of nested non-Markdown proposals atomically; never
+accept files that later web operations can drop. This is an interim admission
+boundary, removed by story 9, not a new permanent format or attachment type.
+Existing Markdown folders and their operations continue unchanged.
+
+No individual web attachment controls, image rendering/migration, assimilation
+exclusion, AI behavior, new transport or broader rebase assistance is included.
+Cross-notebook publication remains outside the current accepted-change owner's
+coverage. No extension, MIME or IDE allowlist is introduced.
+
+## Architecture and source evidence
+
+Follow the three [North Star decisions](../../NORTH-STAR.md),
+[ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md),
+[ADR 0002](../../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md),
+[ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md),
+[ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md), and
+[ADR 0007](../../../docs/adrs/0007-environments-and-isolation-accepted.md).
+Their index and in-file statuses were checked as Accepted. No new ADR decision
+or North Star topic is needed. The narrower delivery does not redefine Attachment.
+
+PFE findings carried forward and narrowed against current callers:
+
+| Existing responsibility | Decision for this story |
+| --- | --- |
+| `PortableTreeEntry`, `NotebookGitAcceptedTree`, `NotebookGitBundleBuilder`, `NotebookZipBuilder` convert all blobs through String | Use exact byte content with value equality in the existing shared entry; decode Markdown only at its codec. Preserve unchanged blob reuse. |
+| `PortableTreeSnapshot` and `NotebookExportRows` serve projection comparison, web commits, ZIP and cutover/reset | Extend the same snapshot inputs/loaders with root attachments. No per-caller file overlay. |
+| Proposal inspection, note correspondence, document application and acceptance | Classify attachments once, keep them out of note correspondence, apply their final tip once within the existing transaction. Preserve complete raw-tree evidence for existing folder matching. |
+| Existing `Attachment`/`Image`/`AttachmentBlob` own uploads and note images | Do not reuse their note/user ownership or upload routes. A notebook-owned projection is the distinct current responsibility; later image migration will use that model. |
+| `NotebookGitCutoverService.resetHistory` rebuilds from current projection | Include root attachment bytes in that common source before admission ships. No new reset semantics. |
+| CLI publish sends raw bundles; clean clone/pull uses native Git | Reuse these paths; no new client classifier or rebase recognizer. |
+
+Use one small notebook-owned projection (`NotebookAttachment` is a suitable name)
+with complete filename and bytes. Its SQL content is a projection of accepted Git,
+not a second authority. Ordinary notebook ownership/FK cleanup is sufficient now;
+folder containment, folder collision rules and subtree mutation wait for story 9.
+Do not build a separate root-attachment entity/service or optional strategy that
+must be discarded later. Extend this same entity with folder placement when needed.
+No private ID becomes a Portable path, and no attachment identity matching is needed.
+
+The same filename comparison must apply in SQL and the Git projection; distinct
+Git paths must not be silently collapsed by database collation. Use the established
+file path's exact spelling, not note-title normalization. Content-based byte
+comparison must retain no-op detection. `.keep` remains structural under the
+existing rules. All Markdown keeps existing type, Readme and UTF-8 validation.
+
+For every proposal, compare accepted Git against the live projection before any
+mutation; validate the whole tip; apply its final attachment set; compare the
+complete result before persisting the accepted binding. Keep existing locking,
+rollback and authorization. No special attachment transaction or head writer.
+Changes to unrelated Markdown must preserve unchanged root files.
+
+Taken plan 001 may change repository persistence. Reuse its owner if it lands
+first; do not restore bundle-backed storage or create an alternative store.
+
+## Refined slices
+
+Target five active minutes including local cleanup; estimates below are 5–8
+minutes with medium confidence. Over five requires scrutiny; over ten requires
+stopping and finer decomposition. Full required suite/migration/E2E runtime is
+the only elapsed-time exception, not coding or debugging. All slices are planned.
+
+### 1. Preserve file bytes in the shared tree representation
+
+Type: Structure. Status: planned. Estimate: 5–8 active minutes.
+Change the existing entry and its Git/ZIP readers, writers and equality to exact
+bytes; keep Markdown construction/decoding explicit. No admission change. This
+immediately enables slice 2's codec result.
+Proof: full backend suite; existing Markdown bytes, Git object reuse, ZIP output,
+`.keep`, projection comparisons and no-op saves remain unchanged. Adapt fixture
+text accessors without decoding binary observation data.
+
+### 2. Serialize root attachments with the notebook tree
+
+Type: Behavior. Status: planned. Estimate: about 5 active minutes.
+Given note/folder values plus named root attachments, canonical serialization
+retains each complete filename and exact bytes. Extend the snapshot's attachment
+input, with no nested-placement promise or MIME-specific branch.
+Proof: `PortableTreeSnapshotTest` and `NotebookZipBuilderTest` inspect one mixed
+serialized tree, including invalid UTF-8 binary bytes and an empty file. These
+prove the codec only; they do not fabricate successful publication. Full suite.
+
+### 3. Include root files in the existing application projection
+
+Type: Structure. Status: planned. Estimate: 5–8 active minutes.
+Add the minimal notebook-owned row/repository and schema, exact-filename uniqueness,
+notebook-deletion cleanup, and one shared export-row load used by all snapshot
+callers. No folder FK, upload migration, endpoint, or subtree behavior. Immediately
+enables slice 4; root-only ownership removes the former containment uncertainty.
+Proof: `backend:verify`, ERD and existing snapshot/cutover/export/drift tests.
+Extend notebook FK-closure fixtures for the added dependent row. Existing notebooks
+have no attachment rows; existing image uploads keep their behavior.
+
+### 4. Accept root files through the existing publication boundary
+
+Type: Behavior. Status: planned. Estimate: 5–8 active minutes.
+A valid root-file proposal becomes the exact accepted tip and remains intact in
+the next web note save. Add one attachment classification and final-set projection
+inside current acceptance. Remove the initial nonempty-Markdown prerequisite for
+root files. Retain the existing nested-file refusal until story 9.
+Proof: publication controller → web content controller → downloaded blob bytes
+and parent IDs. Test initial file-only acceptance as the same rule. At this same
+boundary, mixed invalid Markdown, stale heads and nested-file proposals must leave
+head/projection unchanged. Extend the existing committed-transaction failure seam
+for rollback after file projection, rather than relying on test rollback. Full suite.
+Existing authorization/mode/path/concurrency tests remain the owning evidence.
+
+### 5. Publish attachment-only edits, renames and removals
+
+Type: Behavior. Status: planned. Estimate: about 5 active minutes.
+Given accepted root files, a local file-only range produces exactly its final
+root-file set; no Markdown edit or attachment rename correspondence is required.
+Use the same final-set rule for edit, rename and removal, including identical-byte
+files and a multi-commit rename/edit. Do not replay commits into live mutations.
+Proof: parameterized publication-controller cases compare final paths/bytes and
+original ancestry. Assert the removed path is absent, not just the new path present.
+No notes or memory trackers are created for attachments. Full backend suite.
+
+### 6. Keep root files independent of note and folder operations
+
+Type: Behavior. Status: planned. Estimate: 5–8 active minutes.
+Existing note changes, including a supported local note relocation and web note
+removal, leave root-file ownership/content unchanged. Existing Markdown-only
+folder placement/dissolve/deletion cannot collect unrelated root attachments.
+This is one independence rule; no new folder-file behavior is implemented.
+Proof: extend existing mixed-editing/private-association and web note/folder
+lifecycle fixtures with an accepted root file. Assert its bytes after the operation;
+retain current note identity/learning assertions where the note survives. Full suite.
+Root files cannot be children of a folder in this increment.
+
+### 7. Export accepted root files in the notebook ZIP
+
+Type: Behavior. Status: planned. Estimate: about 5 active minutes.
+Existing notebook export includes accepted root-file paths and bytes through the
+shared snapshot. Proof: `NotebookExportControllerTest` publishes the fixture via
+the real boundary and reads ZIP entry bytes. No post-publication projection seeding.
+Full backend suite; this owns public export behavior beyond slice 2's codec proof.
+
+### 8. Preserve root files through existing history reset
+
+Type: Behavior. Status: planned. Estimate: about 5 active minutes.
+Existing authorized reset retains current root-file content in its new history.
+Proof: `NotebookGitHistoryResetControllerTest` publishes files, resets, downloads,
+and checks bytes in the new root. Keep current reset authorization/history rules;
+ordinary publication still never rewrites history. Full backend suite.
+
+### 9. Recover files in a real second checkout
+
+Type: Behavior. Status: planned. Estimate: 5–8 active minutes.
+Extend `cli_notebook_publish_to_clean_clone.feature`: installed CLI publication
+of root text/binary files → web note edit → clean receiver pull and fresh clone.
+Observe exact on-disk bytes, filenames, accepted ancestry and clean worktree.
+Include a file-only follow-on edit. Reuse native Git transport and existing tasks;
+use a byte fixture/read where text helpers cannot express the observation.
+Proof: the existing E2E spec with real backend acceptance, not a mocked receipt.
+Run CLI tests if CLI code/tests change. No rebase-recognizer changes.
+
+## Proof coverage and refinement assessment
+
+| Promise | Owner |
+| --- | --- |
+| Exact bytes and complete names, unchanged Markdown codec | 1–2 |
+| Every snapshot caller sees the same root files | 3; external evidence 4, 7, 8 |
+| First file-only acceptance; next web save; atomic refusals | 4 |
+| Local file lifecycle and submitted history | 5 |
+| Private note identity and independent root-file lifetime | 6 |
+| ZIP and existing reset do not drop current files | 7 and 8 respectively |
+| Usable receiver and fresh checkout | 9 |
+
+Refinement replaced the old broad projection slice with root ownership only and
+moved nested materialization/subtree obligations to story 9. It folded the separate
+late rejection slice into admission, so atomicity is proved when files become
+accepted. Byte-codec Structure immediately enables its serialization Behavior;
+projection Structure immediately enables publication. There are no remaining
+low-confidence folder-policy or recursive-merge dependencies in this first plan.
+The nine slices are **ready for direct execution** as planning hypotheses; execution
+still needs separate authorization. No tests or implementation have been run.
+
+The cumulative model remains one attachment concept and one content authority.
+The interim placement admission is removed by story 9, which extends the same
+projection. It must not survive as competing root/nested implementations.
+
+## Redistribution of the original 15 slices
+
+Numbers in this table refer to the original unsplit plan, not current headings.
+No slices were completed and no execution evidence was lost.
+
+| Original slice / promise | New owner |
+| --- | --- |
+| 1 byte representation | This plan 1 |
+| 2 mixed-tree codec | This plan 2 root bytes; plan 003 input 1 nested placement/markers |
+| 3 projection and containment | This plan 3 root ownership; plan 003 input 1 folder ownership |
+| 4 root publish/web continuity and initial file-only tree | This plan 4 |
+| 5 attachment-only folders | Plan 003 input 1 |
+| 6 attachment-only local changes | This plan 5 root lifecycle; plan 003 input 2 nested lifecycle |
+| 7 mixed note/folder correspondence | This plan 6 independent root files; plan 003 input 2 contained files |
+| 8 independence from note removal | This plan 6; plan 003 input 1 retains it for nested files |
+| 9 web folder placement | Plan 003 input 3; this plan 6 preserves unrelated root files |
+| 10 dissolve/merge | Plan 003 input 4 |
+| 11 permanent folder deletion | Plan 003 input 5 |
+| 12 ZIP export | This plan 7; plan 003 input 6 extends to nested files |
+| 13 history reset | This plan 8; plan 003 input 6 extends to nested files |
+| 14 atomic rejection | This plan 4; plan 003 inputs 1–5 add their mutation-specific evidence |
+| 15 installed CLI recovery | This plan 9; plan 003 input 7 extends to nested paths |
+
+## Verification and delivery
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+CURSOR_DEV=true nix develop -c pnpm backend:verify
+CURSOR_DEV=true nix develop -c pnpm export:database-erd
+CURSOR_DEV=true nix develop -c pnpm cli:test
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature
+```
+
+Run the full backend suite for backend leaves, `backend:verify` for schema changes,
+and regenerate the ERD. Tests use disposable environments per ADR 0007. At every
+stop the represented behavior must be green; delivery is incomplete until the
+real checkout loop and current snapshot callers are covered. Shared native-storage
+work may require adapting source locations, not changing these promises.
+Future authorized execution follows Jidoka → fresh post-change-refactor agent →
+conditional API generation → one coordinator format pass → plan update → authorized
+commit/push/CI. This resplit authorizes none of those actions. Leave edits uncommitted.

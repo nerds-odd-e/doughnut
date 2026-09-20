@@ -35,8 +35,10 @@ must be lossless for both concepts and attachment bytes.
 ### Bundle and concepts
 
 - One notebook ↔ one Portable tree containing OKF concepts and attachments.
-- Attachments retain their complete filenames and original bytes, including
-  non-OKF Markdown. Images use the same file representation.
+- All Markdown follows the existing note/container-Readme format and publication rules,
+  including AI guidance. Noncompliant Markdown is rejected on publication, never
+  reclassified as an attachment. Non-Markdown attachments, including images,
+  retain their complete filenames and original bytes.
 - OKF calls a concept's bundle path without `.md` its **Concept ID**. For a
   Donut note, this is the normalized note portion of its **Portable path**.
 - Stored note markdown carries `type` and valid YAML frontmatter.
@@ -165,8 +167,8 @@ must be lossless for both concepts and attachment bytes.
 
 - Import, export, synchronization, and lint share one classification and codec
   contract for notes, container Readmes, attachments, and structural markers.
-  All entries obey safe-path and unambiguous-placement rules; OKF concept
-  validation applies to notes and container Readmes, not attachments.
+  All entries obey safe-path and unambiguous-placement rules. Every Markdown
+  file follows the existing concept validation, regardless of author or purpose.
 - Missing/invalid concept `type` and reserved-name misuse are rejected. Unknown
   valid OKF types remain concepts. A failed note parse must not silently
   reclassify an existing note as an attachment and discard its identity.
@@ -175,7 +177,7 @@ must be lossless for both concepts and attachment bytes.
 - Recommendations (e.g. OKF `tags` shape) may warn; durable write and
   lint succeed.
 
-Admission details and remaining classification decisions live in the
+Attachment integration details live in the
 [synchronization contract](../notebook-git-synchronization.md#attachments-in-the-portable-tree).
 
 ## Consequences
@@ -205,8 +207,7 @@ Admission details and remaining classification decisions live in the
 
 ## Cons
 
-- Strict concept validation still rejects invalid notes; supporting-file
-  classification must distinguish those from attachments.
+- Markdown guidance must meet the same strict format as other Markdown content.
 - Wiki in Donut-authored trees is a profile exception to OKF path-link
   preference.
 

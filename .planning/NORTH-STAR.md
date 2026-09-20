@@ -13,11 +13,11 @@ See the [domain vocabulary](../docs/adrs/0001-ubiquitous-language.md#notebook--n
 
 One classification and codec owner maps the complete tree to domain concepts.
 Import, export, publication, and lint share that contract; browsing uses its
-projection. Preserve attachment bytes and strict note semantics. Never treat a
-failed note parse as permission to discard its identity. Follow
+projection. Every Markdown file uses the existing note/Readme rules, including
+AI guidance; invalid Markdown is rejected, never treated as an attachment.
+Preserve non-Markdown attachment bytes. Follow
 [ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation)
-and resolve the [admission details](../docs/notebook-git-synchronization.md#classification-and-references)
-before implementation.
+and the [integration details](../docs/notebook-git-synchronization.md#classification-and-references).
 
 ## One accepted-change boundary
 

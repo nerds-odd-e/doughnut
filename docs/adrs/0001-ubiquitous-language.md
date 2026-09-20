@@ -21,9 +21,9 @@ Amend domain terms here in place; do not supersede this ADR.
 - **Folder** — Named hierarchical location containing notes, attachments, and
   child folders within a notebook.
 - **Attachment** — A named supporting file owned by a notebook and located at
-  its root or in a folder, with its original bytes preserved. Includes IDE
-  rules, skills, and images; it requires neither a referring note nor OKF
-  frontmatter and is not a learning unit.
+  its root or in a folder, with its original bytes preserved. Covers non-Markdown
+  files, including images; Markdown uses the ordinary note/Readme rules even
+  when it contains AI guidance. An attachment requires no referring note.
 - **Image** — An Attachment with image presentation capabilities.
 - **Attachment reference** — Authored reference to an Attachment, distinct from
   a note/property Wiki link. References do not own the file's lifetime.

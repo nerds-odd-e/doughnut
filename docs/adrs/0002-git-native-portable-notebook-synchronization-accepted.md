@@ -15,11 +15,10 @@
 - **Content authority:** The accepted Git commit is authoritative for the
   Portable notebook tree. MySQL holds its current application projection and
   remains authoritative for private Note/Folder identities and their learning
-  data. Supporting files, including IDE rules, skills, and attachments, belong
-  to Portable content; recall history and other private learning data do not.
+  data. Markdown notes and guidance, and non-Markdown attachments, belong to
+  Portable content; recall history and other private learning data do not.
   The tree format follows [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md);
-  the distinction between learning notes and supporting files must be defined
-  consistently with that profile.
+  Markdown guidance uses the same format and behavior as other Markdown.
 - **One synchronization model:** Use Git objects, refs, and history for two-way
   synchronization. Preserve submitted commit IDs on acceptance and never rewrite
   accepted history; local unpublished commits may be rebased before submission.
