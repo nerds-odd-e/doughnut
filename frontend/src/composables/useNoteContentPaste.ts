@@ -2,13 +2,20 @@ import { nextTick, onMounted, onUnmounted, ref, watch, type Ref } from "vue"
 import type { QuillPasteContext } from "@/components/form/quillPasteContext"
 import type TextArea from "@/components/form/TextArea.vue"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
+import {
+  toPasteChoiceAnchorRect,
+  type PasteChoiceAnchorRect,
+} from "@/composables/pasteChoicePosition"
 import { countMarkdownLinksAndImagesInNoteContent } from "@/utils/stripPastedMarkdownLinks"
 
 type NoteContentUpdate = (noteId: number, newValue: string) => void
 
-/** A just-completed Markdown-converting paste that can still be replaced with the original clipboard text. */
+/** A just-completed Markdown-converting paste that can still be replaced with the original
+ * clipboard text. `anchorRect` is the just-pasted content's own viewport geometry, captured
+ * at paste time, used to keep the action reachable without covering that content. */
 export type PasteChoice = {
   originalText: string
+  anchorRect: PasteChoiceAnchorRect | null
   replace: () => void
 }
 
@@ -21,6 +28,10 @@ export function useNoteContentPaste(options: {
   rootRef: Ref<HTMLElement | null>
   textareaRef: Ref<InstanceType<typeof TextArea> | null>
   replacePastedRange: (context: QuillPasteContext, text: string) => void
+  getRichPasteAnchorRect: (range: {
+    index: number
+    length: number
+  }) => PasteChoiceAnchorRect | null
 }) {
   const { htmlToMarkdown, processContentAfterPaste } =
     usePasteWithLinkImageOptions()
@@ -122,6 +133,7 @@ export function useNoteContentPaste(options: {
     if (originalText && originalText !== markdown) {
       setPasteChoice({
         originalText,
+        anchorRect: toPasteChoiceAnchorRect(textarea.getBoundingClientRect()),
         replace: () => {
           const replacedValue = before + originalText + after
           lastAppliedValue = replacedValue
@@ -166,6 +178,10 @@ export function useNoteContentPaste(options: {
       lastAppliedValue = currentValue
       setPasteChoice({
         originalText: quillContext.originalText,
+        anchorRect: options.getRichPasteAnchorRect({
+          index: quillContext.range.index,
+          length: quillContext.insertedLength,
+        }),
         replace: () => {
           options.replacePastedRange(quillContext, quillContext.originalText)
           clearPasteChoice()

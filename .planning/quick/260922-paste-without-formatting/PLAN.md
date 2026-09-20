@@ -1,6 +1,6 @@
 # Paste without formatting
 
-Status: in progress; slice 1 delivered.
+Status: all 6 slices delivered; execution complete, awaiting wrap-up.
 Source: [SEED-035 story 1](../../seeds/SEED-035-paste-without-formatting.md#story-1).
 Identity: SEED-035#story-1.
 Research revision: `f2dddcb9fa31a70286385a4847beb252a7202110`, 2026-09-20.
@@ -385,10 +385,57 @@ Safe stop: both existing removal and new recovery work together in both modes.
 
 ### 6. Keep the paste action reachable while editing
 Type: Behavior
-Status: planned
+Status: done
 Estimate: about 5 minutes; medium confidence, viewport placement is the risk.
 Proof: mounted-browser tests at a narrow/reduced viewport, DOM geometry and
 pointer/focus observations; keyboard activation and dismissal.
+
+Accepted proof:
+```
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableContent.pasteChoice.spec.ts tests/notes/NoteEditableContent.pasteChoiceLinkRemoval.spec.ts tests/notes/NoteEditableContent.pasteChoiceViewport.spec.ts tests/composables/pasteChoicePosition.spec.ts tests/notes/NoteEditableContent.paste.spec.ts tests/components/form/QuillEditor.spec.ts tests/components/form/QuillEditor.paste.spec.ts tests/components/form/RichMarkdownEditor.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend run build
+```
+54/54 tests pass; no type diagnostics; production build succeeds (3890
+modules). Both action/dismiss buttons are now ≥44 CSS px
+(`min-h-[2.75rem] min-w-[2.75rem]`). A new pure function
+`pasteChoicePosition.ts` (`computePasteChoiceStyle`) places the action bar
+just below the just-pasted content's own viewport geometry (`anchorRect`,
+captured at paste time: the textarea's `getBoundingClientRect()` for Markdown
+mode, `quill.getBounds()` — already viewport-relative — via a new exposed
+`pasteInsertionViewportRect` for rich mode), flips above when it wouldn't fit,
+and clamps horizontally; a small composable `usePasteChoicePosition.ts` wires
+this to real DOM measurement and a resize listener. Position is a one-shot
+snapshot (no continuous re-anchoring via `ResizeObserver`/scroll tracking) —
+a deliberate "minimal local geometry" choice, not a general overlay
+framework. No hidden mirror-textarea was built. Extracted the action bar into
+`PasteChoiceActionBar.vue` (a presentation component) once this slice pushed
+`NoteEditableContent.vue` and `useNoteContentPaste.ts` over this directory's
+250-line convention; `useNoteContentPaste.ts` still sits 3 lines over after
+that extraction, judged not worth forcing a further cut into its unified
+`pasteChoice`-lifecycle-owner concern.
+
+Device-proof limitation (explicitly not claimed as covered): browser-mode
+unit tests in this environment run in real headless Chromium but cannot
+establish genuine iOS/Android on-screen virtual-keyboard behavior; the
+reduced-viewport test simulates a small `window.innerHeight` and a synthetic
+`resize` event, proving the clamp/flip geometry logic, not on-device mobile
+keyboard behavior.
+
+Cumulative design review (final slice, per "Cumulative assessment and
+delivery" below): the promised "one shared `pasteChoice` lifecycle, two
+adapters" design held across all 6 slices — `useNoteContentPaste.ts` is the
+single owner of the choice, its timer, shared invalidation, and the modal
+suspend/resume rule; the only mode-specific code is the inherent difference
+between a Markdown string-offset splice and a Quill Delta swap, exactly as
+the plan's PFE section anticipated. One small cross-adapter duplication
+introduced fresh by this slice (mapping a DOMRect-shaped value into
+`PasteChoiceAnchorRect` at two call sites) was found and collapsed into a
+shared `toPasteChoiceAnchorRect` helper. Pre-existing, out-of-scope finding
+for a possible future story: `QuillEditor.vue` was already over the 250-line
+convention before this slice (toolbar/options config plus paste/anchor
+handling in one file); not touched here since splitting it would mean
+restructuring slices 1-5's already-delivered code, not this slice's own diff.
 
 Behavior: After paste near a visible editor edge, the compact action remains
 reachable without covering the insertion; pointer activation preserves editor

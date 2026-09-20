@@ -212,6 +212,10 @@ function replacePastedRange(context: QuillPasteContext, text: string) {
   quillRef.value?.replacePastedRange(context, text)
 }
 
+function pasteInsertionViewportRect(range: { index: number; length: number }) {
+  return quillRef.value?.pasteInsertionViewportRect(range) ?? null
+}
+
 function addWikiLinkAsProperty(text: string) {
   frontmatterPropertiesRef.value?.addWikiLinkAsProperty(text)
 }
@@ -221,5 +225,6 @@ defineExpose({
   insertTextAtCursor,
   addWikiLinkAsProperty,
   replacePastedRange,
+  pasteInsertionViewportRect,
 })
 </script>

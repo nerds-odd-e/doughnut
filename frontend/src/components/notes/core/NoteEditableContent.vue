@@ -44,42 +44,19 @@
         />
       </template>
     </TextContentWrapper>
-    <div
-      v-if="pasteChoice"
-      class="paste-choice mt-1 flex items-center gap-1 text-sm"
-      data-testid="paste-choice"
-      @mouseenter="pausePasteChoiceExpiry"
-      @mouseleave="resumePasteChoiceExpiry"
-      @focusin="pausePasteChoiceExpiry"
-      @focusout="resumePasteChoiceExpiry"
-    >
-      <button
-        type="button"
-        class="daisy-btn daisy-btn-ghost daisy-btn-xs"
-        data-testid="paste-choice-action"
-        @mousedown.prevent
-        @click="pasteChoice.replace()"
-      >
-        Use original text
-      </button>
-      <button
-        type="button"
-        class="daisy-btn daisy-btn-ghost daisy-btn-xs daisy-btn-square"
-        data-testid="paste-choice-dismiss"
-        aria-label="Dismiss"
-        @mousedown.prevent
-        @click="clearPasteChoice"
-      >
-        <X :size="14" />
-      </button>
-    </div>
+    <PasteChoiceActionBar
+      :paste-choice="pasteChoice"
+      @pause="pausePasteChoiceExpiry"
+      @resume="resumePasteChoiceExpiry"
+      @dismiss="clearPasteChoice"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { X } from "@lucide/vue"
 import { nextTick, onMounted, onUnmounted, ref, type PropType } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
+import PasteChoiceActionBar from "./PasteChoiceActionBar.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
@@ -144,6 +121,8 @@ const {
   textareaRef,
   replacePastedRange: (context, text) =>
     richEditorRef.value?.replacePastedRange(context, text),
+  getRichPasteAnchorRect: (range) =>
+    richEditorRef.value?.pasteInsertionViewportRect(range) ?? null,
 })
 
 const {

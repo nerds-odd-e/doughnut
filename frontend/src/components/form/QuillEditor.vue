@@ -18,6 +18,10 @@ import {
 } from "@/utils/wikiLinkMarkup"
 import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
 import type { QuillPasteContext } from "./quillPasteContext"
+import {
+  toPasteChoiceAnchorRect,
+  type PasteChoiceAnchorRect,
+} from "@/composables/pasteChoicePosition"
 
 registerDonutQuillBlots()
 
@@ -287,5 +291,20 @@ function replacePastedRange(context: QuillPasteContext, text: string) {
   setSelectionSilently(context.range.index + text.length)
 }
 
-defineExpose({ insertTextAtCursor, replacePastedRange })
+/** Viewport geometry of a rich paste's inserted span, for placing the paste-choice
+ * action bar clear of it. Quill's `getBounds()` already returns viewport-relative
+ * coordinates (it delegates to the native DOM `Range`/`Element` `getBoundingClientRect()`). */
+function pasteInsertionViewportRect(range: {
+  index: number
+  length: number
+}): PasteChoiceAnchorRect | null {
+  const bounds = quill.value?.getBounds(range.index, range.length)
+  return bounds ? toPasteChoiceAnchorRect(bounds) : null
+}
+
+defineExpose({
+  insertTextAtCursor,
+  replacePastedRange,
+  pasteInsertionViewportRect,
+})
 </script>
