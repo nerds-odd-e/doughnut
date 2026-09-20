@@ -27,7 +27,6 @@ public class AcceptedWebChangeService {
   private final NotebookGitBindingRepository bindingRepository;
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
-  private final AcceptedSnapshotPersistence acceptedSnapshotPersistence;
   private final EntityPersister entityPersister;
 
   public AcceptedWebChangeService(
@@ -35,13 +34,11 @@ public class AcceptedWebChangeService {
       NotebookGitBindingRepository bindingRepository,
       FolderRepository folderRepository,
       NoteRepository noteRepository,
-      AcceptedSnapshotPersistence acceptedSnapshotPersistence,
       EntityPersister entityPersister) {
     this.projection = projection;
     this.bindingRepository = bindingRepository;
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
-    this.acceptedSnapshotPersistence = acceptedSnapshotPersistence;
     this.entityPersister = entityPersister;
   }
 
@@ -116,8 +113,23 @@ public class AcceptedWebChangeService {
     if (projection.matchesAcceptedTree(entries, notebook.acceptedEntries())) {
       return;
     }
-    acceptedSnapshotPersistence.persist(
-        notebook.accepted(), entries, notebook.binding(), updatedAt, message);
+    NotebookGitBundleImporter.ImportedBundle accepted = notebook.accepted();
+    NotebookGitBundleBuilder.append(
+        accepted.repository(),
+        accepted.mainHead(),
+        notebook.acceptedEntries(),
+        entries,
+        NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
+        NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,
+        message,
+        updatedAt.toInstant());
+    NotebookGitBundleWriter.BundleWriteResult written =
+        NotebookGitBundleWriter.write(accepted.repository());
+    NotebookGitBinding binding = notebook.binding();
+    binding.setAcceptedGitObjectId(written.headObjectId());
+    binding.setBundleBytes(written.bundleBytes());
+    binding.setUpdatedAt(updatedAt);
+    entityPersister.save(binding);
   }
 
   private List<PortableTreeEntry> snapshot(NotebookGitBinding binding) {

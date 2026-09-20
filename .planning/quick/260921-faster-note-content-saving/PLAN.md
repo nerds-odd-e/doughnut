@@ -1,9 +1,7 @@
 # Faster note-content saving
 
-Status: resumed with owner approval: fix property race and pursue profile-supported alternatives.
+Status: slices 1–7 verified; 4× unmet; awaiting story review of design acceptance for the remaining storage direction.
 Source: [SEED-034 story 1](../../seeds/SEED-034-faster-note-content-saving.md#story-1).
-Identity: SEED-034#story-1.
-Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
 
 ## Execution identity
 
@@ -14,6 +12,7 @@ Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
 - Authorized destination: `origin/main`, `nerds-odd-e/doughnut`.
 - Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (claim), `11b76124f07c23f24adac79200cd6a1ebf8794b1` (slice 1).
 - Slice 5 published: `b662f6e8bb1f96293c589a8d64911d78b8522db0`.
+- Slice 6 published: `1bff8ca32022b948feb6a0864dee6c7f64fd2dc1`.
 - Slice 4 published: `83c0232613e7edc1f387e50dc15844e6d4ea51ea`.
 - Slice 2 published: `c3ee401d12f703cf94bda093d2c41a002973e466`; slice 3: `9f5f9b2b09cc0008d1f5781df563f949203e9643`.
 - Product baseline revision: `b5cad203d1d8915b03cbb2353866134979519349`.
@@ -25,14 +24,13 @@ Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
 - Claim CI run `35478855867` and earlier product run `35476646641` have the
   same five MySQL `Too many connections`/context-load failures. Slice 1 run
   `35481168542` and slice 2 run `35481727999` reproduce those five failures.
-  This is an existing test-configuration defect, not passing CI or an outage.
-  Logs `/tmp/donut-save-{claim,prior}-backend.log` and
-  `/tmp/donut-save-slice{1,2}-ci.log`; no retry or unrelated repair performed.
+  Another task fixed test Hikari minimum-idle in `25471a21d1ec8e97781a18dc6c12346d856202f0`,
+  integrated through `63623f41124cc703f16986cef6f99b60a3eb2889`. Prior failures remain failures;
+  logs `/tmp/donut-save-{claim,prior}-backend.log`, `/tmp/donut-save-slice{1,2}-ci.log`.
 
 ## Goal and scope
 
-Authors save changed content in a large notebook, especially wiki-linked
-content, with greater than 4× lower median save-completion latency. Preserve
+Authors save changed wiki-linked content in a large notebook >4× faster. Preserve
 content, live link meaning, editing races, note/learning identity, and complete
 accepted Git changes. The source owns the measurement and design contracts.
 
@@ -71,8 +69,7 @@ Before product edits: rich-editor baseline passed in 3m02s; three workloads ×
 (first save + three warm-ups + 20 changed samples), with
 HTTP 200, dirty-state clearing, exact refreshed link destinations and final
 reload/content/link assertions. No watchdog diagnostics perturbed samples.
-Setup supplies only the starting fixture; real editor typing initiates saves.
-Boundary: request initiation through saved/refreshed state; keep 1s debounce.
+Real editor typing initiates saves; boundary: request initiation to saved/refreshed state.
 
 | Workload | Request median | Visible median | Visible p95 |
 | --- | ---: | ---: | ---: |
@@ -94,22 +91,17 @@ versus 3,288,529 original: a disclosed representativeness limit. Reuse EXACT
 before bundle bytes, same SQL/sequence/runtime and real timers for comparison.
 Keep setup outside timing and first-save observations separate.
 
-Type-completion timing includes ~1s debounce; `cy.type` returns 35–45ms after
-last input. Request-to-visible is the authoritative comparison.
-
-Baseline setup used a bounded 30-active-minute exception. Initial ENOSPC evidence
-remains in `disk-full-attempt/`; no shared database/binlogs deleted. ENOSPC also
-lost the old observer's terminal receipt; its two failures were accounted for,
-PID 18938 is absent, and pending CI in that gap remains unobserved.
+Type-completion includes ~1s debounce; `cy.type` returns 35–45ms after last input.
+Baseline setup: bounded 30-active-minute exception. `disk-full-attempt/` retains ENOSPC;
+no shared data deleted. Old observer PID 18938 absent; two failures accounted for,
+terminal receipt lost and pending CI in that gap unobserved.
 
 ## Evidence-led plan reassessment
 
-Tier-1 JFR has 2676/5362 MySQL/TLS crypto CPU samples; this dominance disappears
-under normal JIT. Raw/deep analyses remain beside their respective recordings.
-CPU categories overlap; truncated stacks and thresholded waits limit attribution.
+Tier-1 JFR: 2676/5362 MySQL/TLS crypto CPU samples; dominance disappears with normal JIT.
+Overlapping CPU categories, truncated stacks and thresholded waits limit attribution.
 
-Persistence remains the supported target; entity counts do not establish 4×.
-No TLS weakening or after-only benchmark runtime change is selected.
+Persistence remains the supported target; no TLS weakening or after-only runtime change.
 BootRun limits JIT to tier 1; production starts the JAR without that limit.
 Additional paired browser runs used `optimizedLaunch=false` identically, exact
 fixture/warmups/samples and verified tier 4 flags. Evidence `normal-jit/` under
@@ -153,8 +145,7 @@ speedups 1.228×/1.152×/1.157×. Whole-notebook loader frames disappeared.
 
 ### 3. Preserve property drafts across a body refresh
 
-Type: Behavior
-Status: done; independent refactor removed unused parser helper; typecheck passed
+Type: Behavior; Status: done; refactor removed unused parser helper; typecheck passed
 Size: ~11 active minutes including bounded diagnostic extension; tests separate.
 PFE: synchronize the existing mutable property draft from immutable incoming
 properties, not unrelated body/YAML syntax changes. No extra queue or stale array.
@@ -166,8 +157,7 @@ This repairs a separate proven draft race; it does not fix the original E2E loss
 
 ### 4. Finish a guarded property edit before editor-mode teardown
 
-Type: Behavior
-Status: done; 7 active minutes, tests separate; independent refactor completed
+Type: Behavior; Status: done; 7 active minutes, tests separate; refactor completed
 The original delayed-note-info E2E still fails after slice 3. Its sole PATCH
 request/response content is identical; no rename PATCH occurs. Switching to
 Markdown unmounts the rich editor before the pending rename emits. Preserve
@@ -180,26 +170,13 @@ note-edit 12/12. Refactor emission helper: focused16/typecheck passed. Evidence
 
 ### 5. Accept one final Portable snapshot with less repeated work
 
-Type: Behavior
-Status: done
-Size hypothesis: about five minutes of edits; final benchmark runtime separate.
-
+Type: Behavior; Status: done
 Implementation passes 2,536 backend tests. Restored exact independently reviewed,
 formatted patch (byte comparison passed); focused editor/wiki E2E now 31/31.
 Log `/tmp/donut-accepted-tree-e2e-fixed.log`. Backend aggregate net −11 lines.
-
-Behavior: saving changed wiki-linked content completes sooner while comparison
-and the appended accepted commit describe the same complete final tree.
-
-Slice 2 already reuses the final snapshot for comparison and persistence.
-Within the existing owner, reuse accepted entries across comparisons. Delete
-redundant construction/decoding, keeping canonical ordering at one boundary.
-Keep no-op, drift, folder/readme/empty-folder representation, and exact authored
-content behavior. Do not introduce changed-note-only Git patching, which could
-miss other notes touched by a complete operation.
-
-Proof: full backend suite plus focused note-edit and wiki-link E2E. Retain the
-measured normal-JIT result above; slice 6 owns the next performance comparison.
+Reuse accepted entries across comparisons; one final complete snapshot serves
+comparison and persistence. Preserve no-op/drift, folders, README, exact content
+and all notes touched by the operation. Normal-JIT evidence retained above.
 
 ### 6. Evaluate binary parameters for persisted Git bundles
 
@@ -217,8 +194,7 @@ Evidence `normal-jit/binary-prepared/`, `current-control/` and `/tmp/donut-binar
 
 ### 7. Reuse unchanged Git blobs while building the complete final tree
 
-Type: Structure; Status: planned; driver experiment rejected.
-Size hypothesis: 5–10 active minutes; full suite/profile runtime separate.
+Type: Structure; Status: done; ~6 active minutes, suite/profile runtime separate.
 PFE: existing accepted Portable entries plus native DirCache retain blob identity.
 Iterate every final entry; unchanged path/content keeps its native parent entry,
 new/changed content inserts a blob, and omitted paths disappear. Native builder
@@ -226,11 +202,34 @@ owns sorting. No persistent cache, custom hash or changed-note-only projection.
 Fold single-caller AcceptedSnapshotPersistence into AcceptedWebChangeService,
 which already owns binding, transaction, bundle lifetime and final snapshot.
 Proof: mixed Unicode/unchanged/edit/add/delete/empty-folder final snapshot has
-same tree ID as fresh complete build and exact prior parent; full backend suite;
-same normal-JIT 72-save/JFR comparison. Preserve bytes, modes, history and no-op.
+same tree ID as fresh complete build and exact prior parent; full backend 2,537
+and editor/wiki E2E 31/31 passed. `/tmp/donut-native-git-blobs-{backend,e2e}.log`.
+Fresh refactor: none — already clean. No generation trigger; aggregate production net −50 lines.
+Both 72-save normal-JIT runs pass persistence/reload/link checks. Median/p95 ms:
+first existing 544.5/606, added 650/1107, plain 562/932; unchanged repeat
+563.5/595, 524.5/566, 492.5/538. Retain both, not only favorable samples.
+Tree-building CPU samples fall 247→52; commit socket waits vary 12.04→7.45s
+across runs (control 5.70s), limiting wall-time attribution. Repeat speedups
+1.411×/1.497×/1.556×; response-to-visible 18–19ms. **4× remains unmet.**
+Evidence `normal-jit/native-blob-reuse/` and `native-blob-reuse-repeat/`.
 Whole-pack reuse rejected: may retain unreachable objects and grow edit history.
-Aggregate gate: >4× both wiki workloads, plain/p95 preservation, no edit loss,
-and net fewer handwritten production lines. Reassess evidence if still missed.
+
+## Remaining architectural decision
+
+No further small supported reuse closes the measured gap. Complete bundle import,
+history serialization and multi-MB SQL replacement remain on every changed save.
+Candidate: durable native Git objects/packs in existing MySQL, one shared repository
+owner across web acceptance, proposal publication, cutover and bundle download;
+create transport bundles on demand. ADR 0002 permits this; SQL head/projection
+stays publication authority and objects must be durable first. No external tier needed.
+Transport importer/writer remain necessary. No credible aggregate net-smaller storage design
+is established; neither 4× nor storage growth is proven. Incremental-bundle chains
+rejected because full replay grows with history. Keep complete drift comparison.
+Selected story field needing review: SEED-034#story-1 **Design acceptance** (net
+fewer production lines). Do not silently relax it or start storage implementation.
+Decision: retain the constraint and current safe increment, or authorize evaluation
+of a larger native-storage design. Performance, correctness and architecture gates
+remain required either way; this plan/story is not complete.
 
 ## Verification and delivery
 

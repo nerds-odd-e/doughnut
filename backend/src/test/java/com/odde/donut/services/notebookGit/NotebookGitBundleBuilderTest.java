@@ -64,4 +64,48 @@ class NotebookGitBundleBuilderTest {
       }
     }
   }
+
+  @Test
+  void appendsCompleteSnapshotWithTheSameTreeAsAFreshBuild() throws IOException {
+    List<PortableTreeEntry> accepted =
+        List.of(
+            new PortableTreeEntry("保持.md", "Unicode 🌙\n"),
+            new PortableTreeEntry("Edit.md", "Before"),
+            new PortableTreeEntry("Delete.md", "Gone"),
+            new PortableTreeEntry("Empty/.keep", ""),
+            new PortableTreeEntry("Emptied/Note.md", "Gone"));
+    List<PortableTreeEntry> entries =
+        List.of(
+            new PortableTreeEntry("保持.md", "Unicode 🌙\n"),
+            new PortableTreeEntry("Edit.md", "After"),
+            new PortableTreeEntry("Add.md", "New"),
+            new PortableTreeEntry("Empty/Note.md", "Occupied"),
+            new PortableTreeEntry("Emptied/.keep", ""));
+    Instant time = Instant.parse("2026-09-04T10:15:30Z");
+    try (Repository repository =
+            NotebookGitBundleBuilder.build(
+                accepted, "Donut", "system@donut.local", "Initial", time);
+        Repository fresh =
+            NotebookGitBundleBuilder.build(entries, "Donut", "system@donut.local", "Fresh", time);
+        RevWalk walk = new RevWalk(repository);
+        RevWalk freshWalk = new RevWalk(fresh)) {
+      ObjectId parent = repository.resolve("refs/heads/main");
+      ObjectId appended =
+          NotebookGitBundleBuilder.append(
+              repository,
+              parent,
+              accepted,
+              entries,
+              "Donut",
+              "system@donut.local",
+              "Edit",
+              time.plusSeconds(1));
+      RevCommit commit = walk.parseCommit(appended);
+      assertThat(
+          commit.getTree().getId(),
+          equalTo(freshWalk.parseCommit(fresh.resolve("refs/heads/main")).getTree().getId()));
+      assertThat(
+          List.of(commit.getParents()).stream().map(RevCommit::getId).toList(), contains(parent));
+    }
+  }
 }
