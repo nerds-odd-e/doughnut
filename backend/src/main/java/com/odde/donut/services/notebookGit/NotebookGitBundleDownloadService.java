@@ -29,6 +29,6 @@ public class NotebookGitBundleDownloadService {
                 () ->
                     new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
-    return repositoryStore.bundleBytes(binding);
+    return repositoryStore.downloadableBundle(binding);
   }
 }

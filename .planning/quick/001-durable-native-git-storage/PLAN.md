@@ -197,7 +197,7 @@ implementation and refactor.
 
 ### 2. Download a bundle from the accepted repository
 
-Type: Behavior. Status: planned.
+Type: Behavior. Status: done.
 
 Given a bound notebook, download under the existing writer lock → a complete,
 cloneable bundle advertising the committed `main` and `HEAD`, without mutating
@@ -209,6 +209,20 @@ through the full backend suite; retain queued-writer and authorization assertion
 Native `git clone`/`git fetch` plus `git fsck --full` against generated local output
 prove interoperability. Size: approximately five active minutes, medium confidence.
 Interim import cost remains until slice 3; this is not a speedup claim.
+
+Delivered: `NotebookGitAcceptedRepositoryStore.bundleBytes` (raw stored-bytes passthrough)
+replaced with `downloadableBundle`, which opens the accepted repository (import + head
+verification via the existing `open`) and re-serializes `main` via `NotebookGitBundleWriter`
+before returning it, decoupling the download/transport contract from the durable storage
+representation ahead of slice 3. `NotebookGitBundleDownloadService.select` delegates to it;
+controller, response contract, authorization and locking are unchanged. Existing
+`NotebookGitBundleControllerTest`/`NotebookGitBundleDownloadControllerTest` assertions
+(reachable object IDs, advertised HEAD, queued-writer, authorization) needed no changes and
+still pass. Interoperability was confirmed with real `git clone`/`git fetch`/`git fsck --full`
+against a generated bundle (git 2.50.1): clone checked out `main`, `fsck --full` reported no
+corruption; this was a one-off manual verification, not a retained test. Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` — `BUILD SUCCESSFUL`, full suite
+green, independently reverified by the coordinator after both implementation and refactor.
 
 ### 3. Save an existing notebook using durable native objects
 

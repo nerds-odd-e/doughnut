@@ -71,8 +71,14 @@ class NotebookGitAcceptedRepositoryStore {
     return written.headObjectId();
   }
 
-  /** Returns {@code binding}'s stored bundle bytes, for transport download. */
-  byte[] bundleBytes(NotebookGitBinding binding) {
-    return binding.getBundleBytes();
+  /**
+   * Opens {@code binding}'s accepted repository and re-serializes its {@code main} head into a
+   * fresh, complete, cloneable bundle for transport download. The download's transport contract is
+   * a reachable, cloneable bundle, not byte-for-byte equality with the stored representation.
+   */
+  byte[] downloadableBundle(NotebookGitBinding binding) {
+    try (OpenedAcceptedRepository accepted = open(binding)) {
+      return NotebookGitBundleWriter.write(accepted.repository()).bundleBytes();
+    }
   }
 }
