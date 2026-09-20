@@ -1,6 +1,6 @@
 # Faster note-content saving
 
-Status: slices 1–7 verified; 4× unmet; awaiting story review of design acceptance for the remaining storage direction.
+Status: completed under owner-approved revised scope on 2026-09-20; retrospective next; wrap-up deferred.
 Source: [SEED-034 story 1](../../seeds/SEED-034-faster-note-content-saving.md#story-1).
 
 ## Execution identity
@@ -13,14 +13,16 @@ Source: [SEED-034 story 1](../../seeds/SEED-034-faster-note-content-saving.md#st
 - Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (claim), `11b76124f07c23f24adac79200cd6a1ebf8794b1` (slice 1).
 - Slice 5 published: `b662f6e8bb1f96293c589a8d64911d78b8522db0`.
 - Slice 6 published: `1bff8ca32022b948feb6a0864dee6c7f64fd2dc1`.
+- Slice 7 published: `fe413d0f3c1425b2dde545098d844401f2f196ca`.
 - Slice 4 published: `83c0232613e7edc1f387e50dc15844e6d4ea51ea`.
 - Slice 2 published: `c3ee401d12f703cf94bda093d2c41a002973e466`; slice 3: `9f5f9b2b09cc0008d1f5781df563f949203e9643`.
 - Product baseline revision: `b5cad203d1d8915b03cbb2353866134979519349`.
 - Replanning: retain existing plan refinement authority within selected story scope.
 - CI source: GitHub Actions, `ci.yml`, display name `donut CI`.
-- CI observer `260921-resume3`: cell 165, session 29441, PID 33737,
-  `/tmp/dough-ci-501/watch-L7rB7G`. Prior resume2 observer stopped with receipt;
-  its three events inspected; pending CI at that shutdown remains unobserved.
+- Observer resume3 stopped; PID 33737 absent. Its four unread failures were
+  triaged: same five connection/context failures, repaired by the other task below.
+  Slice 6 CI passed; slice 7 was pending at shutdown. Completion observer identity
+  and final shutdown receipt remain in the execution conversation.
 - Claim CI run `35478855867` and earlier product run `35476646641` have the
   same five MySQL `Too many connections`/context-load failures. Slice 1 run
   `35481168542` and slice 2 run `35481727999` reproduce those five failures.
@@ -30,9 +32,15 @@ Source: [SEED-034 story 1](../../seeds/SEED-034-faster-note-content-saving.md#st
 
 ## Goal and scope
 
-Authors save changed wiki-linked content in a large notebook >4× faster. Preserve
+Authors save changed wiki-linked content faster and retain property edits. Preserve
 content, live link meaning, editing races, note/learning identity, and complete
 accepted Git changes. The source owns the measurement and design contracts.
+
+Owner explicitly completed this story on 2026-09-20 with measured ~1.4–1.6×
+repeat gains and race repairs. Original >4× promise remains unmet and moves to
+[SEED-034 story 2](../../seeds/SEED-034-faster-note-content-saving.md#story-2),
+queued first with conservative code growth authorized. No retrospective or
+wrap-up outcome is implied by this scope change; retain all review evidence.
 
 The complete handwritten production diff must be net smaller and easier to
 understand. Fewer lines are evidence, not a substitute for cohesive ownership.
@@ -214,22 +222,15 @@ across runs (control 5.70s), limiting wall-time attribution. Repeat speedups
 Evidence `normal-jit/native-blob-reuse/` and `native-blob-reuse-repeat/`.
 Whole-pack reuse rejected: may retain unreachable objects and grow edit history.
 
-## Remaining architectural decision
+## Authorized remaining-work handoff
 
-No further small supported reuse closes the measured gap. Complete bundle import,
-history serialization and multi-MB SQL replacement remain on every changed save.
-Candidate: durable native Git objects/packs in existing MySQL, one shared repository
-owner across web acceptance, proposal publication, cutover and bundle download;
-create transport bundles on demand. ADR 0002 permits this; SQL head/projection
-stays publication authority and objects must be durable first. No external tier needed.
-Transport importer/writer remain necessary. No credible aggregate net-smaller storage design
-is established; neither 4× nor storage growth is proven. Incremental-bundle chains
-rejected because full replay grows with history. Keep complete drift comparison.
-Selected story field needing review: SEED-034#story-1 **Design acceptance** (net
-fewer production lines). Do not silently relax it or start storage implementation.
-Decision: retain the constraint and current safe increment, or authorize evaluation
-of a larger native-storage design. Performance, correctness and architecture gates
-remain required either way; this plan/story is not complete.
+No further small supported reuse closes the gap. Bundle import, history serialization
+and multi-MB SQL replacement remain. Story 2 owns durable native Git storage,
+existing-binding migration, shared lifecycle, transport and original 4× proof.
+The owner permits conservative code growth there; correctness and Accepted ADRs
+remain binding. Indexed-pack versus object-row choice and efficacy remain unproven.
+No implementation starts in this completion ceremony. Current story keeps its
+net −50 production lines and all seven delivered slices; do not perform wrap-up.
 
 ## Verification and delivery
 
