@@ -324,7 +324,7 @@ refactor; ERD diff independently inspected as exactly the new table/edge.
 
 ### 4. Implement a JDBC-backed native Git object store
 
-Type: Structure. Status: planned; depends on 3.
+Type: Structure. Status: done.
 
 Given the schema from slice 3, implement a production JGit `Repository`/
 `ObjectDatabase`/`ObjectInserter`/`ObjectReader`/`RefDatabase` backed by that
@@ -346,6 +346,33 @@ issues one batched existence check rather than one query per tree) through the
 full backend suite. Size: 5–10 active minutes, medium confidence — the spike
 already resolved the hardest unknowns; refine if the batching design needs more
 than one coherent proof loop.
+
+Delivered: new `com.odde.donut.services.notebookGit.objectstore` subpackage —
+`JdbcNotebookGitRepository` (a `Repository` subclass, not `DfsRepository`;
+deliberately bypasses JGit's pack format), `JdbcNotebookObjectDatabase`/
+`JdbcNotebookObjectInserter`/`JdbcNotebookObjectReader` (batched existence-check
++ batched insert on flush against `notebook_git_accepted_object`; every read
+goes straight through the live JDBC connection, no process-local cache), and
+`JdbcNotebookRefDatabase`/`JdbcNotebookRefUpdate` (modeled on JGit's own
+`DfsRefUpdate`; reuses the existing `notebook_git_binding.accepted_git_object_id`
+column as the sole ref authority via a SQL compare-and-swap `UPDATE`, no new ref
+schema). All SQL failures propagate as `IOException` per ADR 0006; nothing is
+swallowed. Not wired into `NotebookGitAcceptedRepositoryStore` or any other
+caller — no observable behavior change. Permanent tests in
+`NotebookGitJdbcObjectStoreTest` (plus extracted `NotebookGitJdbcFixture`,
+`SqlStatementCallLog` test-support classes and an additive
+`GitBundleTestReader.copyAllReachableObjects` helper) prove: round-trip
+close/reopen/append-through-the-adapter/export with exact object-ID/content
+match; a forced transaction abort leaves zero torn state visible from a
+separate connection or freshly reopened instance; and one multi-tree append
+issues exactly one batched existence-check query, confirmed by a proxied
+`Connection` call log — direct evidence the measured `DirCacheBuilder`
+write-amplification is absorbed by this adapter's batching. Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` — `BUILD
+SUCCESSFUL`, full suite green (3/3 new tests, 0 skipped), independently
+reverified by the coordinator three times (initial implementation, after
+refactor, after formatting), including a line-by-line read of every production
+file for ADR-0006 compliance and correctness.
 
 ### 5. Cut an existing binding's save over to native object storage
 
