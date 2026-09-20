@@ -376,7 +376,7 @@ file for ADR-0006 compliance and correctness.
 
 ### 5. Cut an existing binding's save over to native object storage
 
-Type: Behavior. Status: planned; depends on 4.
+Type: Behavior. Status: done.
 
 Given a legacy binding, first ordinary changed save → the same complete accepted
 result durably stored through the slice-4 adapter instead of bundle bytes,
@@ -398,6 +398,49 @@ Run `pnpm backend:verify` through Nix for the schema-bearing change and
 regenerate the ERD if slice 3 left anything unconfirmed. Size: 5–10 active
 minutes, medium confidence; refine further if the actual
 `NotebookGitAcceptedRepositoryStore` change does not stay one coherent swap.
+
+Delivered: `NotebookGitAcceptedRepositoryStore` now backs `open`/`store`/`apply`/
+`downloadableBundle` with the slice-4 JDBC adapter, on a connection obtained via
+`DataSourceUtils.getConnection(dataSource)` so native writes commit/roll back
+with the surrounding Spring transaction. `open` converts a never-touched legacy
+binding (native object count 0) by importing its bundle bytes' reachable
+objects once, without changing its already-correct accepted head. `store`
+distinguishes only "repository is already the native adapter" (an ordinary web
+save/proposal-native append already flushed objects and updated the ref via
+its own `RefUpdate`, so only the JPA entity needs syncing) from "foreign
+source repository" (a proposal's imported repo — copy its reachable objects
+in) — never a caller- or legacy-status-specific branch. `apply`
+(creation/cutover/reset, new `Repository`-accepting signature) persists the
+binding first so a brand-new binding has its FK-required ID before native
+rows reference it, still writes `bundle_bytes` (`NOT NULL` column, a one-time
+creation/reset cost, not an ongoing one), then copies reachable objects in.
+New production `NotebookGitReachableObjectCopier` (walk-and-insert, shared by
+both the legacy-import and foreign-repository-copy paths) supplies the
+production equivalent of slice 4's test-only copy helper.
+`NotebookGitCutoverService` keeps its own `createdAt`-if-null rule and
+persistence call, now a harmless merge onto the already-persisted row.
+`AcceptedWebChangeService`, `NotebookGitProposalAcceptance`, and
+`NotebookGitBundleDownloadService` were not touched — confirmed by inspection.
+Roughly a dozen existing controller tests were adapted to read current
+accepted state through the live download endpoint rather than
+`binding.getBundleBytes()` directly (deliberately stale once a binding is
+native-touched) and to clear native rows when a test seeds binding fields
+directly, preserving the "empty native count ⇒ not yet touched" invariant; one
+byte-for-byte bundle-equality assertion was removed as redundant with slice
+2's already-established contract (reachable object IDs, not byte equality). A
+new test proves the exact "first save converts a legacy binding, second save
+neither loads nor rewrites the legacy payload" promise. Post-change refactor
+deduplicated the two native-store-copy call sites in the store, removed a
+dead import, and split `NotebookGitBundleControllerTestBase`'s raw
+JGit-commit-crafting helpers into `NotebookGitCommitFixtureTestSupport`
+(inherited transitively; zero other files changed). Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` — full suite
+green, 2541 tests, 0 failures, independently reverified by the coordinator
+three times (initial implementation, after refactor, after formatting),
+including a line-by-line read of the production changes and confirmation that
+`NotebookGitBundleBuilder.append`'s existing flush+RefUpdate behavior, the
+`GenerationType.IDENTITY` FK-ordering mechanics, and `NotebookGitProposalImporter`'s
+complete-object-closure contract all support the design as implemented.
 
 ### 6. Preserve atomic acceptance across competing and failed native writes
 

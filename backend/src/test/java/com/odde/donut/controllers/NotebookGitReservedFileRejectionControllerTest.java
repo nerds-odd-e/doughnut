@@ -40,6 +40,7 @@ class NotebookGitReservedFileRejectionControllerTest extends NotebookGitBundleCo
     }
     binding.setBundleBytes(acceptedBundle);
     notebookGitBindingRepository.save(binding);
+    clearNativeObjectStoreRows(binding.getId());
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(

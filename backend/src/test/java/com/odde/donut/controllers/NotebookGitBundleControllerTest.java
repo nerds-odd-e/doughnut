@@ -35,7 +35,6 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
     assertThat(
         response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
         containsString("attachment;"));
-    assertThat(response.getBody(), equalTo(before.getBundleBytes()));
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, response.getBody());

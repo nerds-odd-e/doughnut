@@ -117,7 +117,7 @@ class NotebookGitConcurrentProjectionDriftControllerTest
       NotebookGitBinding bindingAfter = reloadCommittedBinding(notebook.getId());
       assertThat(
           bindingAfter.getAcceptedGitObjectId(), not(equalTo(binding.getAcceptedGitObjectId())));
-      assertAcceptedBundleAdvancesFrom(webChange, binding, bindingAfter, note.getId());
+      assertAcceptedBundleAdvancesFrom(webChange, notebook, binding, bindingAfter, note.getId());
     } finally {
       releaseWriter.countDown();
       executor.shutdownNow();
@@ -171,6 +171,7 @@ class NotebookGitConcurrentProjectionDriftControllerTest
    */
   private void assertAcceptedBundleAdvancesFrom(
       RacingWebChange webChange,
+      Notebook notebook,
       NotebookGitBinding before,
       NotebookGitBinding after,
       Integer noteId)
@@ -178,8 +179,9 @@ class NotebookGitConcurrentProjectionDriftControllerTest
     String databaseContent =
         inCommittedTransaction(
             transactionManager, () -> noteRepository.findById(noteId).orElseThrow().getContent());
+    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId head = GitBundleTestReader.fetchHead(repository, after.getBundleBytes());
+      ObjectId head = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(head.getName(), is(after.getAcceptedGitObjectId()));
       try (RevWalk revWalk = new RevWalk(repository)) {
         RevCommit commit = revWalk.parseCommit(head);

@@ -100,11 +100,10 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
     assertThat(view.getId(), equalTo(note.getId()));
     assertThat(view.getNote().getContent(), equalTo(SECOND_EDIT));
 
-    NotebookGitBinding after =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk walk = new RevWalk(accepted)) {
-      ObjectId head = GitBundleTestReader.fetchHead(accepted, after.getBundleBytes());
+      ObjectId head = GitBundleTestReader.fetchHead(accepted, downloaded);
       RevCommit tip = walk.parseCommit(head);
       assertThat(tip.getId(), equalTo(range.secondEdit()));
       assertThat(tip.getParentCount(), equalTo(1));
@@ -144,11 +143,10 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
     assertThat(view.getId(), equalTo(note.getId()));
     assertThat(view.getNote().getContent(), equalTo(ORIGINAL_CONTENT));
 
-    NotebookGitBinding after =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk walk = new RevWalk(accepted)) {
-      ObjectId head = GitBundleTestReader.fetchHead(accepted, after.getBundleBytes());
+      ObjectId head = GitBundleTestReader.fetchHead(accepted, downloaded);
       RevCommit tip = walk.parseCommit(head);
       assertThat(tip.getId(), equalTo(range.secondEdit()));
       assertThat(tip.getTree().getId(), equalTo(acceptedTree));
@@ -182,11 +180,10 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
     assertThat(storedNotes.getFirst().getTitle(), equalTo("Surviving"));
     assertThat(storedNotes.getFirst().getContent(), equalTo(SURVIVING_FINAL));
 
-    NotebookGitBinding after =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk walk = new RevWalk(accepted)) {
-      ObjectId head = GitBundleTestReader.fetchHead(accepted, after.getBundleBytes());
+      ObjectId head = GitBundleTestReader.fetchHead(accepted, downloaded);
       RevCommit tip = walk.parseCommit(head);
       assertThat(tip.getId(), equalTo(range.tip()));
       assertThat(
@@ -237,6 +234,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
       binding.setAcceptedGitObjectId(acceptedWithMergeBelow.getName());
       binding.setBundleBytes(bundleBytesForHead(repository, acceptedWithMergeBelow));
       notebookGitBindingRepository.save(binding);
+      clearNativeObjectStoreRows(binding.getId());
     }
 
     ContentEditRange range = contentEditRangeOn(binding.getBundleBytes(), acceptedWithMergeBelow);

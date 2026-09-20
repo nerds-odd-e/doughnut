@@ -63,14 +63,14 @@ class NotebookGitWebTrashStaleProposalControllerTest
               return new CommittedTrashState(
                   cells.isTrashed(),
                   cells.getFolder().getParentFolder().getName(),
-                  ObjectId.fromString(binding.getAcceptedGitObjectId()),
-                  binding.getBundleBytes().clone());
+                  ObjectId.fromString(binding.getAcceptedGitObjectId()));
             });
     assertThat(committed.trashed(), is(true));
     assertThat(committed.trashParentName(), equalTo("_trash"));
     assertThat(committed.acceptedHead(), equalTo(acceptedB));
+    byte[] downloaded = controller.downloadNotebookGitBundle(f.notebook()).getBody();
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId head = GitBundleTestReader.fetchHead(repo, committed.bundleBytes());
+      ObjectId head = GitBundleTestReader.fetchHead(repo, downloaded);
       assertThat(head, equalTo(acceptedB));
       assertThat(
           GitBundleTestReader.pathsIn(repo, head),
@@ -92,6 +92,5 @@ class NotebookGitWebTrashStaleProposalControllerTest
 
   record LiveCellsFixture(Notebook notebook, Note cells) {}
 
-  record CommittedTrashState(
-      boolean trashed, String trashParentName, ObjectId acceptedHead, byte[] bundleBytes) {}
+  record CommittedTrashState(boolean trashed, String trashParentName, ObjectId acceptedHead) {}
 }

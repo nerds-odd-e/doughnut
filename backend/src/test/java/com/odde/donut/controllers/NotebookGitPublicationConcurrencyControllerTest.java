@@ -166,13 +166,13 @@ class NotebookGitPublicationConcurrencyControllerTest
                       .findByNotebook_Id(fixture.notebook().getId())
                       .orElseThrow();
               Note note = noteRepository.findById(fixture.note().getId()).orElseThrow();
-              return new AcceptedState(
-                  binding.getAcceptedGitObjectId(), binding.getBundleBytes(), note.getContent());
+              return new AcceptedState(binding.getAcceptedGitObjectId(), note.getContent());
             });
     assertThat(state.databaseContent(), is(expectedDatabaseContent));
 
+    byte[] downloaded = controller.downloadNotebookGitBundle(fixture.notebook()).getBody();
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId head = GitBundleTestReader.fetchHead(repository, state.bundleBytes());
+      ObjectId head = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(head.getName(), is(state.acceptedHead()));
       try (RevWalk revWalk = new RevWalk(repository)) {
         RevCommit commit = revWalk.parseCommit(head);
@@ -231,5 +231,5 @@ class NotebookGitPublicationConcurrencyControllerTest
 
   private record PublicationAttempt(String acceptedHead, ResponseStatusException rejection) {}
 
-  private record AcceptedState(String acceptedHead, byte[] bundleBytes, String databaseContent) {}
+  private record AcceptedState(String acceptedHead, String databaseContent) {}
 }
