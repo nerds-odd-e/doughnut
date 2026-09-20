@@ -15,14 +15,16 @@ import org.eclipse.jgit.revwalk.RevObject;
  * parsed pack stream. {@link NotebookGitAcceptedRepositoryStore} uses this both to convert a
  * not-yet-touched binding's stored bundle bytes into the native object store on first {@code open},
  * and to bring a foreign source repository's history (for example an accepted proposal's imported
- * repository) into the native store on {@code store}.
+ * repository) into the native store on {@code store}. Public so {@code db.migration}'s Flyway
+ * backfill migration - which runs outside Spring context - can reuse this exact copy mechanic
+ * rather than a second implementation.
  */
-final class NotebookGitReachableObjectCopier {
+public final class NotebookGitReachableObjectCopier {
 
   private NotebookGitReachableObjectCopier() {}
 
-  static void copyAllReachableObjects(Repository source, AnyObjectId head, ObjectInserter target)
-      throws IOException {
+  public static void copyAllReachableObjects(
+      Repository source, AnyObjectId head, ObjectInserter target) throws IOException {
     try (ObjectWalk walk = new ObjectWalk(source)) {
       RevCommit start = walk.parseCommit(head);
       walk.markStart(start);

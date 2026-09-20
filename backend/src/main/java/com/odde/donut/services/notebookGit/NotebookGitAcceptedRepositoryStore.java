@@ -76,15 +76,10 @@ class NotebookGitAcceptedRepositoryStore {
 
   private void importBundleIntoNativeStoreOnce(
       NotebookGitBinding binding, Repository repository, ObjectId expectedHead) {
-    NotebookGitBundleImporter.ImportedBundle legacy =
-        NotebookGitBundleImporter.importMainHead(binding.getBundleBytes(), "accepted-bundle");
-    try {
-      if (!legacy.mainHead().equals(expectedHead)) {
-        throw new IllegalStateException("Accepted bundle main does not match its persisted head");
-      }
+    try (NotebookGitBundleImporter.ImportedBundle legacy =
+        NotebookGitBundleImporter.importAndVerifyMainHead(
+            binding.getBundleBytes(), "accepted-bundle", expectedHead)) {
       copyAllReachableObjectsInto(repository, legacy.repository(), legacy.mainHead());
-    } finally {
-      legacy.close();
     }
   }
 

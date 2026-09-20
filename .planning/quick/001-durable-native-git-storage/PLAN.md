@@ -552,9 +552,19 @@ directly to confirm the reported assertions are real, not just claimed.
 
 ### 9. Migrate untouched bindings and retire legacy storage
 
-Type: Behavior. Status: planned; depends on 5–8 (done) and a representative
-real-save performance measurement beyond the architectural-cost gate-3
-microbenchmark already recorded — recorded 2026-09-20 below, gate satisfied.
+Type: Behavior. Status: backfill done; retirement deferred (see below) — depends
+on 5–8 (done) and a representative real-save performance measurement beyond
+the architectural-cost gate-3 microbenchmark already recorded — recorded
+2026-09-20 below, gate satisfied.
+
+**Mandatory scope split (coordinator decision, 2026-09-20):** removing the
+legacy `bundle_bytes` path/column ("retirement") requires running the real
+migration against real production data and proving every binding converted —
+"No fleet operation is authorized by this planning request" explicitly
+forbids that here. This leaf therefore delivers the **backfill mechanism
+only**; retirement is out of scope for this plan and becomes a separate,
+later, explicitly-authorized story once backfill has actually run against
+real data outside this session.
 
 Given existing bindings never opened since upgrade, run the bounded migration →
 every binding retains exact head/history and no longer needs legacy bundle storage.
@@ -589,9 +599,44 @@ unrelated pre-existing bug — a stale `note.deleted_at` column reference in the
 harness left over from an already-merged, unrelated story — committed on this
 branch as its own correction, independent of this plan.)
 
+**Backfill delivered:** `V300000335__BackfillNotebookGitAcceptedObjects` (Flyway
+Java migration, `canExecuteInTransaction()=false`) delegates to plain class
+`NotebookGitAcceptedObjectBackfill`, independently testable outside Spring
+context. Queries every `notebook_git_binding` with zero matching
+`notebook_git_accepted_object` rows and, for each, imports its `bundle_bytes`,
+verifies the imported head against the persisted `accepted_git_object_id`, and
+copies every reachable object into native storage — each binding is its own
+commit/rollback unit, so an interrupted run's retry (simply rerunning the same
+query-and-loop) skips already-converted bindings and is complete and safe.
+Reuses slice 5's exact conversion mechanics (no second importer): widened
+`NotebookGitBundleImporter`/`NotebookGitReachableObjectCopier` from
+package-private to `public` (access modifiers only, no logic change) so the
+Spring-free `db.migration` package can call them directly, and extracted a
+shared `NotebookGitBundleImporter.importAndVerifyMainHead` used by both this
+migration and `NotebookGitAcceptedRepositoryStore`'s existing lazy-conversion
+path (post-change refactor: this consolidated a verify-head-match check that
+had been duplicated, not introduced new duplication). `bundle_bytes` and
+`accepted_git_object_id` are never modified by this migration — only read for
+verification. The migration is a proven no-op against the ordinary
+empty-at-migration-time test schema (no existing bindings to convert at
+schema-migration time in any real environment either); its actual algorithm is
+proven by a dedicated direct test that seeds a genuinely pre-upgrade binding
+row and exercises round-trip, idempotent-second-run, and fresh-connection
+reopen. No real migration was triggered against any dev/production database —
+this only prepares the mechanism; its real activation is a separate,
+later deployment decision, not made here. Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` — full suite
+green, 2544 tests, independently reverified by the coordinator after
+implementation, refactor, and formatting, including a line-by-line read of
+every production file.
+
 ### 10. Meet the visible save-time target with preserved editing behavior
 
-Type: Behavior. Status: planned; depends on gate 1 and 5–9.
+Type: Behavior. Status: planned; depends on gate 1 and 5–9 (9's backfill
+mechanism, done; retirement is not needed here — this slice measures ordinary
+save performance on a fresh matched fixture, which is already fully native
+from slice 5 onward regardless of whether any pre-existing legacy binding has
+been backfilled or retired).
 
 Given the matched large-notebook fixture and normal JIT, ordinary linked-note
 saves → refreshed, no-longer-dirty content with each workload median below one

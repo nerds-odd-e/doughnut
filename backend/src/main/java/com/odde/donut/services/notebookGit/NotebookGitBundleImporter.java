@@ -17,17 +17,22 @@ import org.eclipse.jgit.transport.FetchConnection;
 import org.eclipse.jgit.transport.TransportBundleStream;
 import org.eclipse.jgit.transport.URIish;
 
-final class NotebookGitBundleImporter {
+/**
+ * Public so {@code db.migration}'s Flyway backfill migration - which runs outside Spring context
+ * and cannot depend on any Spring-managed bean - can import a legacy binding's bundle bytes
+ * directly, reusing this exact conversion mechanic rather than a second importer.
+ */
+public final class NotebookGitBundleImporter {
   private NotebookGitBundleImporter() {}
 
-  record ImportedBundle(Repository repository, ObjectId mainHead) implements AutoCloseable {
+  public record ImportedBundle(Repository repository, ObjectId mainHead) implements AutoCloseable {
     @Override
     public void close() {
       repository.close();
     }
   }
 
-  static ImportedBundle importMainHead(byte[] bundleBytes, String sourceName) {
+  public static ImportedBundle importMainHead(byte[] bundleBytes, String sourceName) {
     InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
     try {
       ObjectId mainHead = fetchMainHead(repository, bundleBytes, sourceName);
@@ -39,6 +44,23 @@ final class NotebookGitBundleImporter {
       repository.close();
       throw new IllegalStateException("Could not import " + sourceName, e);
     }
+  }
+
+  /**
+   * {@link #importMainHead} plus the check every caller that imports a stored bundle to recover an
+   * already-persisted head needs: the bundle's {@code main} must equal {@code expectedHead}, since
+   * the bundle bytes are only ever a re-derivable encoding of that already-accepted history, never
+   * an independent source of truth for it.
+   */
+  public static ImportedBundle importAndVerifyMainHead(
+      byte[] bundleBytes, String sourceName, ObjectId expectedHead) {
+    ImportedBundle imported = importMainHead(bundleBytes, sourceName);
+    if (!imported.mainHead().equals(expectedHead)) {
+      imported.close();
+      throw new IllegalStateException(
+          sourceName + "'s bundle main does not match its persisted head");
+    }
+    return imported;
   }
 
   private static ObjectId fetchMainHead(
