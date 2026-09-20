@@ -552,11 +552,9 @@ directly to confirm the reported assertions are real, not just claimed.
 
 ### 9. Migrate untouched bindings and retire legacy storage
 
-Type: Behavior. Status: planned; depends on 5–8 and a representative real-save
-performance measurement beyond the architectural-cost gate-3 microbenchmark
-already recorded (the spike explicitly disclaimed proving fleet-migration-worthy
-performance; slice 5's actual production integration is where that evidence
-comes from).
+Type: Behavior. Status: planned; depends on 5–8 (done) and a representative
+real-save performance measurement beyond the architectural-cost gate-3
+microbenchmark already recorded — recorded 2026-09-20 below, gate satisfied.
 
 Given existing bindings never opened since upgrade, run the bounded migration →
 every binding retains exact head/history and no longer needs legacy bundle storage.
@@ -572,6 +570,24 @@ ordering must prevent an old application writer from restoring bundle authority;
 do not assume mixed-version compatibility. Size unresolved until slice 5 lands;
 split backfill and retirement into separate green leaves if the actual deployment
 path requires it. No fleet operation is authorized by this planning request.
+
+**Real-save performance gate recorded (2026-09-20):** ran this project's existing,
+maintained `scripts/profiling/run-notebook-publication-profile.mjs` HTTP
+publication harness (real Spring app, real MySQL, disposable E2E stack; not a
+spike) at its documented 1,000-existing-notes/1,000-updates comparison workload,
+against the current native-storage code (through the real
+`NotebookGitAcceptedRepositoryStore.store` foreign-repository copy path). Three
+runs: 3,746.782 / 3,328.674 / 3,298.051 ms, median **3,328.674 ms**. The
+already-recorded pre-native-storage baseline for this identical scenario
+(`docs/notebook-publication-profiling.md`) is 3,095.452 ms (its own three
+captures spanned 3,003.783–3,925.398 ms). The fresh median is ~7.5% higher than
+the baseline's headline figure but sits inside the baseline's own run-to-run
+noise band, and two of three fresh runs undercut the baseline's own high
+outlier. **Verdict: roughly equivalent, no regression signal — gate satisfied,
+slice 9 authorized to proceed.** (Separately, this run uncovered and fixed an
+unrelated pre-existing bug — a stale `note.deleted_at` column reference in the
+harness left over from an already-merged, unrelated story — committed on this
+branch as its own correction, independent of this plan.)
 
 ### 10. Meet the visible save-time target with preserved editing behavior
 
