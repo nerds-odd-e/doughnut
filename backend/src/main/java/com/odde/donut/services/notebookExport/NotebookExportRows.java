@@ -17,16 +17,11 @@ public final class NotebookExportRows {
 
   public static List<ExportFolderRow> folders(
       FolderRepository folderRepository, Notebook notebook) {
-    return folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-        .map(
-            f ->
-                new ExportFolderRow(
-                    f.getId(), f.getParentFolderId(), f.getName(), f.getReadmeContent()))
-        .toList();
+    return folderRepository.findExportRowsByNotebookId(notebook.getId());
   }
 
   public static List<ExportNoteRow> notes(NoteRepository noteRepository, Notebook notebook) {
-    return notes(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()));
+    return noteRepository.findExportRowsByNotebookId(notebook.getId());
   }
 
   public static List<ExportNoteRow> notes(List<Note> notes) {

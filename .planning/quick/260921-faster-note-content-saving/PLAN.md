@@ -1,11 +1,31 @@
 # Faster note-content saving
 
-Status: planned; no implementation authorized or started.
+Status: slice 1 verified; ready for slice 2 after publication.
 Source: [SEED-034 story 1](../../seeds/SEED-034-faster-note-content-saving.md#story-1).
 Identity: SEED-034#story-1.
 Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
-Allocation: next number after the highest previously allocated quick directory,
-`260920-frontend-proof-type-checking`; the active quick directory was empty.
+
+## Execution identity
+
+- Mode: Trunk Mode (`--truck` interpreted as `--trunk`).
+- Origin/integration checkout: `/Users/terryyin/git/doughnut`, branch `main`.
+- Execution checkout: `/Users/terryyin/.codex/worktrees/faster-note-content-saving/doughnut`.
+- Execution branch: `codex/faster-note-content-saving`.
+- Authorized destination: `origin/main`, `nerds-odd-e/doughnut`.
+- Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (Taken claim).
+- Product baseline revision: `b5cad203d1d8915b03cbb2353866134979519349`.
+- Replanning: retain existing plan refinement authority within selected story scope.
+- CI source: GitHub Actions, `ci.yml`, display name `donut CI`.
+- CI observer: coordinator `260921-resume1`, yielded cell `57`, session `41042`,
+  process `35912`, directory `/tmp/dough-ci-501/watch-wYpyKS`; runtime is this
+  execution checkout's `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`.
+- Claim backend CI failed: run `35478855867`, job `105992832735` has five
+  failures caused by MySQL `Too many connections`/consequent context-load
+  failures. Earlier product revision `4d06fc052f` run `35476646641`, job
+  `105986915501` has the same five failures and causes. Claim diff changes only
+  this backlog entry; this is an existing test-environment defect, not a
+  passing CI result. Logs: `/tmp/donut-save-claim-backend.log` and
+  `/tmp/donut-save-prior-backend.log`. No retry or unrelated repair performed.
 
 ## Goal and scope
 
@@ -24,124 +44,105 @@ are deferred, while affected shared behavior must remain correct.
 
 ## Research and limits
 
-Read-only inspection of Development notebook 1 found 11,184 notes, 4,046
-folders, 2,887,527 content characters, 17,739 authored-reference rows on 9,809
-notes, and a Git binding containing a 3,288,529-byte bundle. A string search
-found `[[` in 9,815 notes; that is not the parsed-reference count.
-
-The code path is `TextContentWrapper` → `useDebouncedTextAutosave` →
-`StoredApiCollection.updateTextContentWithoutUndo` →
-`TextContentController.updateNoteContent` → `WebNoteEditService` →
-`AcceptedWebChangeService`, followed by `NoteRealmService.build`.
-
-- Ordinary typing has a 1,000 ms debounce; new wiki-link text and blur can
-  flush it immediately. Save requests are serialized. This deliberate delay
-  is distinct from persistence latency.
-- `NotebookGitStateLoader` loads every stored Note and Folder for a bound
-  notebook. `LockedNotebooks.storedNote` searches that whole loaded collection
-  to find the one edited note.
-- `AcceptedWebChangeService` builds a before projection and compares it to
-  decoded accepted blobs. After mutation it loads the rows again, builds and
-  compares the final projection, then builds that final projection again for
-  persistence. Accepted blobs are decoded again for the second comparison.
-- Content persistence already owns reference children and derived indexes.
-  The response live-resolves outgoing and incoming references. Do not remove
-  either responsibility to make the request look faster.
-
-Two local diagnostic experiments used temporary tooling outside the repository:
-
-| Boundary | Observation | Limit |
-| --- | --- | --- |
-| Current Git importer, two tree reads, changed append, bundle writer on a local bundle copy | Five warmed totals 255.7–305.1 ms; first run 877.9 ms; 11,222 tree entries | Excludes SQL, entities, authorization, browser; no timing improvement claimed |
-| Actual content controller plus response serialization against an isolated research database | After compiling current classes: five warmed controller totals 709.3–896.5 ms, median 737.1 ms; 59 prepared statements, 15,269 loaded entities, two flushes; serialization 0.2–0.5 ms | Direct controller, no HTTP/browser; copied notebook/reference data, unrelated tables empty; not acceptance workload |
-| Separately timed equivalent preparation/persistence/realm journey | Five warmed persistence totals 590.5–694.8 ms; realm 54.6–61.3 ms; preparation 0.6–1.0 ms; 15,252 entities already loaded by persistence | Persistence accounts for about 91% of these totals; phase run adds commits to its isolated history |
-
-Reproduction commands used:
-
-```sh
-CURSOR_DEV=true nix develop -c python3 /tmp/donut-note-save-research/profile.py
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend classes --quiet
-CURSOR_DEV=true nix develop -c python3 /tmp/donut-note-save-research/run_journey.py
-```
-
-Local evidence: `/tmp/donut-note-save-research/profile.txt`,
-`controller-profile.log`, `journey.log`, and `journey.jfr`. The standalone probe
-and its isolated database are research resources, not permanent product tooling
-or a repeatable final benchmark. The temporary database is retired after
-research. JFR had too few application samples to establish precise CPU shares.
-SQL-only transfer probes did not establish an expensive trash-view bottleneck;
-the sampled title lookup returned no match and is not useful resolution proof.
-Do not turn those probes into unsupported optimization claims.
-
-No Production requests or mutations were performed. Development was read only.
-The several-second production report and full browser save wait remain unmeasured.
+Read-only Development notebook-1 shape and full original research remain in
+this plan at `b5cad203d1` and `/tmp/donut-note-save-research/`. No Production
+measurement or mutation; research database retired. Controller median 737.1 ms,
+59 statements and 15,269 loaded entities are diagnostic only (different JVM).
+Content saving serializes debounced editor requests through the content
+controller, `WebNoteEditService`, accepted change and realm response owners.
+It hydrates all stored notes/folders and repeats snapshot construction/accepted
+blob decoding. Preserve the 1,000 ms typing debounce, immediate wiki/blur flush,
+content-derived state, complete accepted history and live response resolution.
 
 ## Existing solutions and chosen design
 
-PFE assessment: `NotebookExportRows`, `ExportNoteRow`, `ExportFolderRow`, and
-`PortableTreeSnapshot` already own a complete persisted Portable-tree projection
-including trash. Read those existing row shapes directly for snapshot purposes;
-do not materialize every note as an editable aggregate and then discard it into
-the same row shape. Keep one projection owner shared with export/cutover.
+PFE selected existing `NotebookExportRows`, `ExportNoteRow`, `ExportFolderRow`
+and `PortableTreeSnapshot` as the shared complete persisted tree owner. Query
+these flat shapes directly, preserving trash, instead of hydrating aggregates.
+`AcceptedWebChangeService` remains transaction/lock/acceptance owner: lock
+bindings in notebook-ID order, resolve targets inside that transaction, apply
+the whole operation, flush, then read the final projection. Remove redundant
+whole-notebook target lookup; ORM already owns managed-entity identity.
 
-Keep `AcceptedWebChangeService` as the transaction/lock/acceptance owner. Lock
-bindings in notebook-id order, load the actual mutation targets within that
-transaction, apply the whole operation, flush, and read the final projection.
-The ORM transaction already supplies identity for managed entities; a separate
-whole-notebook search to return the same entity should disappear.
+Publication retains identity-bearing `LockedNotebookState`; inspect its callers.
+Read accepted entries once per opened binding and reuse one final snapshot for
+comparison/persistence. These are operation-local inputs, not a persistent cache.
+Native Git tree comparison is a possible later alternative, not selected work.
+Keep authored persistence, reference replacement/indexing and live resolution
+with existing owners. No speculative batching, memoization or new indexes.
 
-Keep publication's identity-bearing `LockedNotebookState` where publication
-actually needs it. `NotebookGitBundleDownloadService` already demonstrates
-locking the binding without loading all notebook entities. Inspect all callers
-before changing the state loader's contract; do not replace publication's
-identity evidence with export rows.
+Follow Accepted ADRs 0001 (domain), 0002 and
+`docs/notebook-git-synchronization.md` (atomic projection/head, original history),
+0004 (Portable bytes/references), 0005 (destinations), 0006 (visible failures),
+0007 (environment isolation), plus `.planning/NORTH-STAR.md` section
+“One complete accepted web change”. No architectural exception is selected.
 
-Read the accepted tree once per opened binding and reuse its canonical ordered
-entries during that operation. Build the final Portable snapshot once and use
-those exact entries for comparison and commit. This is operation-local input,
-not a persistent cache. Prefer deleting duplicate assembly and adapters over
-adding a new snapshot framework. Native Git tree-identity comparison is a
-possible later alternative, not a preselected extra layer or required slice.
+## Baseline and retained evidence
 
-Preserve `AuthoredNoteDocumentPersistence`, `Note.replaceContent`,
-`NoteReferenceService`, and `WikiLinkResolver` as the existing content/reference
-owners. Measured response work is secondary. No speculative link batching,
-memoization, new derived index, or rewritten resolution policy is planned.
+Before product edits, the owned rich-editor browser baseline passed in 3m02s:
+three workloads × (first save + three warm-ups + 20 changed samples), with
+HTTP 200, dirty-state clearing, exact refreshed link destinations and final
+reload/content/link assertions. No watchdog diagnostics perturbed samples.
+Setup supplies only the starting fixture; real editor typing initiates saves.
+Source boundary is request initiation through saved/refreshed visible state.
 
-Constraints: Accepted ADR [0001](../../../docs/adrs/0001-ubiquitous-language.md)
-(domain names/minimum representations), [0002](../../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
-and its [architecture](../../../docs/notebook-git-synchronization.md)
-(atomic projection/head and append-only original history),
-[0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-(authored references and Portable bytes),
-[0005](../../../docs/adrs/0005-web-routes-accepted.md) (destinations),
-[0006](../../../docs/adrs/0006-failure-handling-accepted.md) (visible failures),
-[0007](../../../docs/adrs/0007-environments-and-isolation-accepted.md)
-(environment ownership). Follow [One complete accepted web change](../../NORTH-STAR.md#one-complete-accepted-web-change).
-No ADR exception or new North Star topic is required by the selected design.
+| Workload | Request median | Visible median | Visible p95 |
+| --- | ---: | ---: | ---: |
+| Existing links | 1434 ms | 1454 ms | 1598 ms |
+| Added links | 1454.5 ms | 1476 ms | 1608 ms |
+| Plain control | 1394.5 ms | 1413.5 ms | 1929 ms |
 
-## Baseline prerequisite and outside-in proof
+Literal command: `CURSOR_DEV=true nix develop -c node scripts/profiling/run-note-save-baseline.mjs`.
+Evidence: `/tmp/donut-note-save-baseline/before/` contains samples, summary,
+JFR, versions, environment, numeric shape, generator/SQL and exact initial
+bundle. `/tmp/donut-note-save-baseline/README.md` owns restoration/invocation
+instructions for the archived temporary harness. Repository scaffolding was
+removed after capture; do not commit unsanitized research `history.git`.
 
-Before any product change, capture the source's 20-sample/three-warm-up browser
-baseline on an owned disposable E2E stack with notebook-1-like size, folder
-depth, content/link distribution, and accepted history. Reuse the existing
-E2E runner and publication profile's ownership/JFR practices; its bulk publish
-timings do not measure this endpoint. Keep setup outside timed intervals and
-retain a reproducible sanitized fixture and exact invocation with the evidence.
-Use the same initial fixture/history for before and after; repeated saves must
-actually change bytes. Record first-save timing separately from warmed samples.
+The sanitized fixture preserves the folder graph (depths 1–12), note/reference
+counts and approximate per-note content lengths. It has 19 changed-history
+commits, head `1204b33d3f48da94ad495e1a0c9beb6054b68aa2`, tree
+`cf2c333f8041a2f08e2aa197cb30796765917bb7`. Synthetic bundle is 4,855,865 bytes
+versus 3,288,529 original: a disclosed representativeness limit. Reuse EXACT
+before bundle bytes, same SQL/sequence/runtime and real timers for comparison.
+Keep setup outside timing and first-save observations separate.
 
-Measure edit/flush, request start/end, and visible completion separately.
-Observe the dirty state clear and refreshed links after successful save, then
-reload to prove persistence. Do not use disappearance of the busy bar alone.
-Cover prose edits with existing links and edits that add/change a link; compare
-plain content as a control. Use normal rich-editor interaction for the timing
-case and existing Markdown-editor proof for preservation. Keep timers real.
+Existing/plain last-type-completion-to-saved medians are 2412.5/2370.5 ms,
+including roughly 956–959 ms debounce. `cy.type` returns about 35–45 ms after
+final input, so immediate added-link flush has a negative apparent debounce;
+this timestamp limitation does not affect request-to-visible duration.
 
-Missing baseline blocks dependent optimization, not unrelated fixture setup.
-If the representative request has a different dominant cost, revise this plan
-before implementing the proposed simplifications. The diagnostic controller
-median above cannot substitute for the browser baseline or prove 4×.
+Initial setup exceeded its estimate: a bounded 30-active-minute exception
+covered inseparable fixture/timing construction, not a profiling-only slice.
+An eager snapshot setup bug was corrected before accepted capture. An edit-22
+stall was caused by MySQL ENOSPC (`mysql/mysql.log:10`, 00:38:15 UTC), also
+blocking Nix. Two-minute recovery instrumentation retained incremental samples
+and JFR. User freed disk (21 GiB), then explicitly resumed; accepted capture
+above followed. Failed evidence stays in `disk-full-attempt/`.
+
+The old CI process 18938 is absent. Disk exhaustion prevented a terminal receipt
+for `/tmp/dough-ci-501/watch-L5kmu0`; its two retained failures were accounted
+for, but pending CI in that gap is unobserved. Only redundant owned
+`initial.bundle` was deleted for shutdown space; shared database/binlogs were
+untouched. New observer identity is above. Remote/main advanced only with
+unrelated paste planning (`c5e36c95e9`), not baseline product changes.
+
+## Evidence-led plan reassessment
+
+Deep JFR: 2676 of 5362 request CPU samples have MySQL/TLS crypto leaves;
+1366 involve collection reads, 452 single-entity reads and 854 entity writes.
+Overlapping stack categories: Hibernate 4180, accepted-web-change 3145, JGit
+898, state-loader 724, realm 17, wiki resolver 10. These are sampled CPU
+observations, not elapsed-time fractions; frame truncation limits exact-query
+attribution. The prior controller median is not comparable acceptance evidence.
+
+Persistence remains the supported target. Transport/encryption weakens the
+hypothesis that selected removals alone exceed 4×, so profile residual cost at
+slice 2/final acceptance and do not infer speedup from entity counts. Keep the
+same cohesive simplification. Link caching and changing debounce do not address
+this evidence. No TLS weakening, runtime-only tuning or new persistence
+architecture is selected. Failure to reach 4× requires evidence-led refinement,
+not a relaxed target or speculative machinery. Source outcome is unchanged.
 
 ## Ordered slices
 
@@ -154,7 +155,10 @@ not excuse an oversized implementation. Every delivered boundary stays green.
 ### 1. Read Portable snapshots through their existing flat representation
 
 Type: Structure
-Status: planned
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed 2,535 tests;
+export controller/service, Portable snapshot and cutover assertions inspected.
+Log: `/tmp/donut-flat-export-backend.log`. Independent refactor: no changes.
 Size hypothesis: about five minutes of edits; required full-suite time separate.
 
 Have the existing export-row owner obtain folder/note scalar projections
@@ -163,6 +167,9 @@ names, complete stored content including trash, and README/empty-folder bytes.
 Remove entity-to-row mapping where no entity is needed. Do not change ordinary
 note query meanings or introduce another export shape. This enables slice 2 to
 compare complete notebooks without managing every note/folder as an entity.
+
+Preserve `DisplayName` conversion and null root IDs in projections, and retain
+`notes(List<Note>)` for publication's identity-bearing callers.
 
 Proof: existing `NotebookExportControllerTest`, `NotebookExportServiceTest`,
 `PortableTreeSnapshotTest`, and Git cutover/controller coverage, through the
@@ -224,41 +231,20 @@ before selecting another change; do not append speculative optimizations.
 
 ## Verification and delivery
 
-Literal established commands (record actual results during execution):
+All slices require `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+Final focused E2E command:
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec 'e2e_test/features/note_creation_and_update/note_edit.feature,e2e_test/features/note_topology/wiki_link.feature,e2e_test/features/note_topology/property_wiki_link.feature'`.
 
-```sh
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
-CURSOR_DEV=true nix develop -c pnpm cy:run --spec 'e2e_test/features/note_creation_and_update/note_edit.feature,e2e_test/features/note_topology/wiki_link.feature,e2e_test/features/note_topology/property_wiki_link.feature'
-```
-
-Frontend preservation evidence includes `TextContentWrapper.spec.ts`,
-`NoteShowPage.autosaveTrash.spec.ts`, and content-undo coverage. If frontend code
+Existing frontend preservation includes `TextContentWrapper.spec.ts`,
+`NoteShowPage.autosaveTrash.spec.ts` and content-undo coverage. If frontend
 changes, run `pnpm frontend:test` and `pnpm -C frontend exec vue-tsc --noEmit`
-through Nix. No API/schema change is selected; if one becomes necessary, revise
-the plan and apply generation/migration guidance. Do not run tests in Development.
+through Nix. API/schema changes are not selected; revise and apply generation/
+migration guidance if needed. Never run tests in Development.
 
-Once implementation is authorized, use dough-execute-plan: Jidoka, fresh
-dough-post-change-refactor agent, API generation when needed, coordinator
-`./scripts/run.sh pnpm format:changed` once, plan update, commit with check-only
-hook, and push/CI ownership. Planning does not move the story to Taken and does
-not authorize commit/push or implementation. Keep this plan for retrospective
-and story wrap-up after execution.
+Coordinator delivery: Jidoka → fresh dough-post-change-refactor agent → API
+regeneration if triggered → `./scripts/run.sh pnpm format:changed` once → plan
+update → commit with check-only hook → Trunk publication/CI registration.
+Retain plan/evidence for automatic retrospective and later story wrap-up.
 
-## Refinement assessment and remaining concerns
-
-Three slices; no completed implementation or accepted performance proof.
-The cumulative rule is one complete persisted projection per state and one
-transactional acceptance owner, not successive endpoint special cases.
-
-The initial broad idea of optimizing wiki-link resolution was not selected:
-measured persistence dominates. The potentially large loader change is split
-into flat-projection Structure immediately followed by its consuming Behavior.
-No separate profiling-only delivery or test-only slice is used.
-
-Slice 2 remains sensitive to callback adaptation and must be further split if
-it exceeds the editing budget; do not split off broken caller changes. Slice 3
-has a material efficacy risk: current evidence does not establish that these
-removals alone can exceed 4× browser-visible improvement. A smaller improvement
-does not authorize relaxing the target or adding complexity. The browser
-baseline prerequisite and this final acceptance gap prevent certifying the
-whole story ready for unconditional execution.
+Slice 2 callback adaptation remains the sizing risk; refine if oversized.
+Final 4× efficacy is unproved until the final comparison passes.
