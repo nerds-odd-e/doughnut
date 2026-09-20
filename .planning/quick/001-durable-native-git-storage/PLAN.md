@@ -120,7 +120,8 @@ is preserved, not generalized into a new history-rewrite capability.
 
 These are decision-bounded prerequisites, not completed product slices or
 permission to execute. Record literal commands, versions, inspected observations,
-results and evidence paths here when executed. No gate currently has a passing result.
+results and evidence paths here when executed. Gates 2–3 have a recorded passing
+result as of 2026-09-20 (below); gate 1 still has none.
 
 1. **Recover a comparable acceptance baseline.** Recover the original safe fixture
    and harness if available. Otherwise reconstruct paired measurements on the
@@ -162,6 +163,68 @@ Gate 1 blocks performance acceptance, not source assessment. Gates 2–3 block
 storage-specific implementation and final sizing. A failed candidate does not
 authorize an open-ended search or speculative framework. Reassess this same plan
 with the evidence before continuing.
+
+### Recorded evidence: gates 2–3 (2026-09-20)
+
+Disposable spike, never committed: a hand-rolled JGit `Repository` (not
+`DfsRepository`) with a JDBC-backed `ObjectDatabase`/`ObjectInserter`/`ObjectReader`
+and `RefDatabase`, one row per Git object keyed by 40-hex object ID, against this
+worktree's own isolated local MySQL 8.4.11 (a throwaway schema, dropped after the
+spike; the worktree's `doughnut` user lacked `CREATE DATABASE` rights, so `root`
+created/dropped the schema and granted/revoked `doughnut`'s access to it — every
+other schema, including `doughnut_test`/`doughnut_e2e_test`, was untouched). This
+is candidate 2 ("native objects keyed by binding and Git object ID"); candidate 1
+(JGit DFS packs) was not built — not needed, since no blocking shortcoming
+surfaced. Spike source and schema were deleted/dropped before finishing; nothing
+from it is on this branch.
+
+**Gate 2 — round-trip, real JGit + real MySQL:** built a 3-commit fixture with
+unmodified `NotebookGitBundleBuilder`/`NotebookGitBundleWriter` (product code,
+read-only reuse), imported its bundle bytes into the JDBC store (`ObjectWalk`
+copy of all 9 reachable objects, ref commit and JDBC transaction committed
+together), closed and reopened a fresh repository instance and confirmed an exact
+head/tree match, appended one more commit *through the store* via unmodified
+`NotebookGitBundleBuilder.append` against the JDBC-backed repository, reopened
+again and confirmed exact parent/content match, then exported via unmodified
+`NotebookGitBundleWriter.write` and fetched the result into a fresh in-memory
+repository with exact object-ID/byte equality throughout. Transaction-abort
+proof: appended a commit on one connection (autocommit off, `READ COMMITTED`),
+confirmed the new object was visible on that connection, then rolled back;
+a separate connection and a freshly reopened repository (no in-process cache)
+both still resolved the old head/tree exactly, and the aborted object was
+genuinely absent (`MissingObjectException`), not merely uncached. MySQL engine:
+`8.4.11`. Test command:
+`CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.donut.services.notebookGit.spike.*"`
+— `BUILD SUCCESSFUL`, 4/4 passed.
+
+**Gate 3 — architectural cost, smaller stand-in fixture (300 notes / 60 leaf
+folders / depth 4 / 86 tree objects; explicitly not gate 1's 11,184-note
+historical shape):** cold full-tree read 387 SQL selects/39 ms, warm read 0 new
+selects; 20 further one-note-changed appends averaged 10.4 ms and, critically,
+only **6 net new durable object rows per append, independent of fixture size or
+history length** — an ordinary save does not scan or rewrite the historical
+object graph. Storage was 1.83× an equivalent packed bundle (no delta
+compression, expected for this design). No new cache/GC/maintenance subsystem
+was needed for correctness: content-addressed dedup is automatic, storage is
+append-only (matches ADR 0002), and a rolled-back write leaves no garbage.
+
+**One real, measured inefficiency to carry into slice 3 (not disqualifying):**
+existing, unmodified `NotebookGitBundleBuilder.append` routes writes through
+JGit's `DirCacheBuilder`, whose `finish()`/`DirCache.replace()` unconditionally
+nulls the *entire* cached `DirCacheTree`, forcing `DirCacheTree.writeTree()` to
+attempt an `ObjectInserter.insert()` for every tree in the whole hierarchy on
+every save (88 insert attempts on this fixture, only 6 producing new rows) —
+each attempt is a real SQL round trip against a per-row JDBC store with no
+batching. Content-addressing makes the other ~82 attempts harmless no-ops for
+correctness, but on the plan's actual historical shape (4,046 folders) this
+would mean thousands of insert-attempt round trips per ordinary save. Slice 3
+should budget for this explicitly (for example, batching existence checks before
+attempting individual inserts) rather than treat "6 new rows per save" as the
+full write cost.
+
+**Verdict:** proceed toward candidate 2 for slice 3. Gates 2–3 are satisfied by
+this evidence; gate 1 (the historical-shape browser-JIT baseline) remains
+unresolved and still blocks only performance acceptance (slice 8), not slice 3.
 
 ## Ordered slices and proof ownership
 
@@ -226,7 +289,13 @@ green, independently reverified by the coordinator after both implementation and
 
 ### 3. Save an existing notebook using durable native objects
 
-Type: Behavior. Status: planned; gated by evidence gates 2–3.
+Type: Behavior. Status: planned; evidence gates 2–3 recorded 2026-09-20 (see
+above) — candidate selected (object-keyed native storage via a JDBC-backed
+JGit `ObjectDatabase`), but not yet split into dispatchable integration beats.
+Design must budget for the recorded `DirCacheBuilder`/`DirCache.replace()`
+write-amplification finding (existing `NotebookGitBundleBuilder.append` attempts
+an insert for every tree in the hierarchy on every save, not just the changed
+path) rather than assume "one changed note" means "one new row."
 
 Given a legacy binding, first ordinary changed save → the same complete accepted
 result durably stored through the selected native adapter, retaining every old
