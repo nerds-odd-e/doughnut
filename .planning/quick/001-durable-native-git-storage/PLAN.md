@@ -293,7 +293,7 @@ green, independently reverified by the coordinator after both implementation and
 
 ### 3. Add native accepted-object storage schema
 
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 
 Given the accepted repository will store individual Git objects instead of one
 bundle blob, add a SQL table keyed by (binding, 40-hex Git object ID) holding
@@ -306,6 +306,21 @@ columns and all current behavior are unchanged. This is preparation for slice
 Proof: migration applies cleanly (`pnpm backend:verify` through Nix), ERD
 regenerated (`pnpm export:database-erd`), full backend suite unaffected since
 no caller references the new table yet. Size: five active minutes.
+
+Delivered: `V300000334__create_notebook_git_accepted_object.sql` — one
+`notebook_git_accepted_object` table, natural composite primary key
+`(notebook_git_binding_id, git_object_id)` (no surrogate id/timestamps, matching
+this project's `note_level_index`-style convention for immutable content-addressed
+rows), `object_type tinyint unsigned` with `CHECK (object_type BETWEEN 1 AND 4)`
+(JGit object type codes), `object_bytes longblob`, `ON DELETE CASCADE` FK to
+`notebook_git_binding`. The primary key leading with `notebook_git_binding_id`
+serves both the dedup guarantee and the per-binding scan/batched existence-check
+access pattern slice 4 needs; no second index. No Java code touches this table
+yet. `docs/database-erd.md` regenerated to include it. Proof:
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` — `BUILD SUCCESSFUL`,
+full suite green (including `migrateTestDB` applying the migration cleanly),
+independently reverified by the coordinator after both implementation and
+refactor; ERD diff independently inspected as exactly the new table/edge.
 
 ### 4. Implement a JDBC-backed native Git object store
 
