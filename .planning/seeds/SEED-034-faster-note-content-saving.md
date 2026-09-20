@@ -35,8 +35,10 @@ or add competing representations. See [current save behavior](../../docs/note-co
 ### 2. Save note content more than four times faster with durable native Git storage
 
 - **Identity:** SEED-034#story-2
-- **Status:** queued first by owner request; needs bounded slice planning;
-  this handoff does not start implementation.
+- **Status:** queued first by owner request;
+  [slice plan](../quick/001-durable-native-git-storage/PLAN.md) written and
+  assessed on 2026-09-20. Storage selection and integration sizing remain gated
+  by bounded evidence; implementation has not started.
 - **Goal / beneficiaries:** Note authors in large synchronized notebooks can
   finish ordinary content saves with substantially less interruption, reaching
   the remaining greater-than-4× target from story 1's original baseline.
@@ -62,6 +64,9 @@ or add competing representations. See [current save behavior](../../docs/note-co
   custom delta protocol, cache-invalidation layer, asynchronous save acceptance,
   new external persistence tier or general storage framework. Review aggregate
   code/operational cost before extending the design; do not expand speculatively.
+  Owner reaffirmed on 2026-09-20 that no negative architectural impact is
+  acceptable, even if a candidate improves timing. Reject an approach that
+  weakens consistency or adds unjustified lifecycle/operational complexity.
 - **Key examples:**
   - A changed wiki-linked note saves durably, refreshes correct destinations and
     appends one complete accepted commit; note/learning identity is retained.
@@ -97,6 +102,11 @@ or add competing representations. See [current save behavior](../../docs/note-co
   for history growth, lookup cost, migration and transaction failure behavior.
   Native storage's 4× efficacy remains unproven. Incremental-bundle replay chains
   and whole-pack reuse were rejected for history-dependent cost/retention risks.
+  Planning inspection on 2026-09-20 found `/tmp/donut-note-save-baseline/`
+  absent on this host. Recover the evidence or reconstruct explicitly labelled,
+  comparable paired original/current measurements before claiming acceptance;
+  the historical summary alone is insufficient. See the plan for gates and
+  preservation obligations, including existing reset and binding cleanup.
 
 ## Ordering and Scope Reduction
 

@@ -30,6 +30,8 @@ Portable digest (details live in the cited always-on skills — keep `AGENTS.md`
 
 ## Planning and slice delivery
 
+- **Plan numbering:** The owner reset `.planning/quick/` numbering to `001` on 2026-09-20. Use three-digit sequential numbers from this reset (`001`, `002`, …); ignore pre-reset allocations in Git history. Story/seed identities are unchanged.
+
 - **Layout:** non-executable story decompositions under `.planning/seeds/`; executable plans under `.planning/quick/NNN-slug/`; the ordered story queue in `.planning/PRODUCT-BACKLOG.md`; short-term architectural direction in `.planning/NORTH-STAR.md`. See the `planning` skill.
 - **Hard decomposition grammar:** problem → 3V story → Behavior/Structure execution leaf; stop-safe, one evaluable outcome at the current resolution (`problem-decomposition` skill).
 - **Time budget (self-enforced):** story hypotheses are roughly 30 minutes to a few hours; execution leaves target ~5 min including tests; >5 min → scrutinize; >10 min → hard finer-decompose unless a stated good reason (`problem-decomposition` skill).
