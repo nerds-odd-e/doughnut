@@ -9,8 +9,7 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 
-- [Save note content more than four times faster with durable native Git storage](seeds/SEED-034-faster-note-content-saving.md#story-2) — SEED-034#story-2 ([plan](quick/001-durable-native-git-storage/PLAN.md))
-
 ## Backlog list
 
+- [Prove and close the four-times-faster save target, and retire legacy bundle storage](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2
