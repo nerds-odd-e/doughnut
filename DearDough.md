@@ -750,6 +750,40 @@ create the symlink before the observer is armed.
     wasted calls or a workaround — and is further evidence the guidance
     should name `.agents/skills` directly rather than relying on each
     execution to rediscover it.
+- Execution: SEED-035 story 1 / quick/260922-paste-without-formatting / 0c5e5725a0
+  - Timestamp: unknown (2026-09-20, during this execution's initial
+    CI-observer setup, before the first slice was delegated)
+  - Tool: Claude Code
+  - Model: claude-sonnet-5
+  - Open Dough release: unknown
+  - Evidence: `node '.claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
+    run from the freshly created execution worktree
+    (`.claude/worktrees/260922-paste-without-formatting`) exited non-zero with
+    `Error: Cannot find module
+    '/Users/terryyin/git/doughnut/.claude/worktrees/260922-paste-without-formatting/.claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs'`,
+    `code: 'MODULE_NOT_FOUND'`. The coordinator did not check `.agents/skills`;
+    it ran `mkdir -p .claude/worktrees/260922-paste-without-formatting/.claude
+    && cp -R .claude/skills .claude/worktrees/260922-paste-without-formatting/.claude/skills`
+    to populate the missing path, then reprobed successfully from that copy
+    (`CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-n4xced"}`). During this
+    retrospective, `git ls-files .agents/skills | grep dough-execute-plan` from
+    the main checkout confirms `.agents/skills/dough-execute-plan/` was already
+    git-tracked, and `ls .claude/worktrees/260922-paste-without-formatting/.agents/skills/dough-execute-plan/scripts/`
+    lists the runtime already present there via the ordinary worktree checkout,
+    the entire time.
+  - Observed effect: the same third failure mode as the SEED-035/148
+    occurrence above: an unnecessary local-install copy instead of using the
+    already-tracked `.agents/skills` realpath. No coverage was lost — the copy
+    worked and the observer was armed before the first slice was delegated —
+    but it cost one wasted probe call, one directory copy, and left the
+    worktree's `.claude/skills` able to drift from the main checkout's local,
+    gitignored install.
+  - Inference: a second confirmed instance of this entry's third failure
+    mode, on a different quick-plan (260922 vs 148) but the same coordinator
+    identity pattern (SEED-035 story 1) — reinforcing that the documented
+    `.claude/skills` path remains the first thing checked, with
+    `.agents/skills` never consulted even though this entry already names it
+    as the fix.
 
 ## DD-075 — The product backlog moved on the shared integration branch between the coordinator's read and its queue claim
 

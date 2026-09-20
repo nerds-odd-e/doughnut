@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { getCurrentInstance, nextTick, ref, onMounted, watch } from "vue"
 import type { Router } from "vue-router"
-import Quill, { type QuillOptions, type Range } from "quill"
+import Quill, { Delta, type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
 import {
@@ -17,6 +17,11 @@ import {
   type DeadWikiLinkPayload,
 } from "@/utils/wikiLinkMarkup"
 import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
+import type { QuillPasteContext } from "./quillPasteContext"
+import {
+  toPasteChoiceAnchorRect,
+  type PasteChoiceAnchorRect,
+} from "@/composables/pasteChoicePosition"
 
 registerDonutQuillBlots()
 
@@ -29,7 +34,7 @@ const props = defineProps({
 const emits = defineEmits<{
   "update:modelValue": [value: string]
   blur: []
-  pasteComplete: [content: string]
+  pasteComplete: [content: string, quillContext: QuillPasteContext | null]
   deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
@@ -39,6 +44,7 @@ const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
 const isPasting = ref(false)
 const lastRange = ref<{ index: number; length: number } | null>(null)
+let pendingPaste: Omit<QuillPasteContext, "insertedLength"> | null = null
 let syncingModel = false
 
 const modelHtml = () => props.modelValue || "<p><br></p>"
@@ -133,6 +139,23 @@ onMounted(async () => {
             event.clipboardData
           )
 
+          // Quill's own getSelection() can throw when the browser's native
+          // selection doesn't map onto a blot (e.g. no real caret was ever
+          // placed); when that happens there is simply no paste context to
+          // capture, matching the existing insertTextAtCursor precedent below.
+          let range: Range | null = null
+          try {
+            range = quill.value?.getSelection(true) ?? null
+          } catch {
+            range = null
+          }
+          pendingPaste = range
+            ? {
+                originalText: originalGetData("text/plain"),
+                range: { index: range.index, length: range.length },
+              }
+            : null
+
           event.clipboardData.getData = (format: string) => {
             if (format === "text/html") {
               const htmlData = originalGetData(format)
@@ -185,14 +208,24 @@ onMounted(async () => {
       true
     )
 
-    quill.value.on("text-change", () => {
+    quill.value.on("text-change", (delta) => {
       const content = quill.value!.root.innerHTML
       if (!syncingModel && content !== modelHtml()) {
         emits("update:modelValue", content)
       }
       if (isPasting.value) {
         isPasting.value = false
-        emits("pasteComplete", content)
+        const context: QuillPasteContext | null = pendingPaste
+          ? {
+              ...pendingPaste,
+              insertedLength:
+                delta.length() -
+                pendingPaste.range.index -
+                pendingPaste.range.length,
+            }
+          : null
+        pendingPaste = null
+        emits("pasteComplete", content, context)
       }
     })
 
@@ -217,6 +250,17 @@ onMounted(async () => {
 
 watch(() => props.modelValue, syncQuillFromModel)
 
+/** Places the caret at `index` without emitting a selection-change event.
+ * Swallows a "DOM not ready" failure: both callers have already applied
+ * their content change, so a caret placement issue must not undo that. */
+function setSelectionSilently(index: number) {
+  try {
+    quill.value?.setSelection(index, 0, Quill.sources.SILENT)
+  } catch {
+    // ignore if editor DOM is not ready
+  }
+}
+
 function insertTextAtCursor(text: string) {
   if (!quill.value) return
   if (lastRange.value === null) {
@@ -227,13 +271,40 @@ function insertTextAtCursor(text: string) {
   const index = lastRange.value.index
   // Tell the caller that we handled it
   quill.value.insertText(index, text, Quill.sources.USER)
-  try {
-    quill.value.setSelection(index + text.length, 0, Quill.sources.SILENT)
-  } catch {
-    // ignore if editor DOM is not ready
-  }
+  setSelectionSilently(index + text.length)
   return true
 }
 
-defineExpose({ insertTextAtCursor })
+/** Swaps the span a rich paste inserted (`context.range.index` for
+ * `context.insertedLength` characters) back to `text`, via a single Delta
+ * retain/delete/insert so undo history and the `text-change` listener above
+ * (which emits `update:modelValue`) both see one ordinary user edit. */
+function replacePastedRange(context: QuillPasteContext, text: string) {
+  if (!quill.value) return
+  quill.value.updateContents(
+    new Delta()
+      .retain(context.range.index)
+      .delete(context.insertedLength)
+      .insert(text),
+    Quill.sources.USER
+  )
+  setSelectionSilently(context.range.index + text.length)
+}
+
+/** Viewport geometry of a rich paste's inserted span, for placing the paste-choice
+ * action bar clear of it. Quill's `getBounds()` already returns viewport-relative
+ * coordinates (it delegates to the native DOM `Range`/`Element` `getBoundingClientRect()`). */
+function pasteInsertionViewportRect(range: {
+  index: number
+  length: number
+}): PasteChoiceAnchorRect | null {
+  const bounds = quill.value?.getBounds(range.index, range.length)
+  return bounds ? toPasteChoiceAnchorRect(bounds) : null
+}
+
+defineExpose({
+  insertTextAtCursor,
+  replacePastedRange,
+  pasteInsertionViewportRect,
+})
 </script>
