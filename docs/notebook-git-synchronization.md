@@ -51,6 +51,58 @@ history during content publication means preserving its server-side associations
 not copying it into the Portable tree. Supporting-file classification remains a
 format concern under ADR 0004.
 
+## Attachments in the Portable tree
+
+[ADR 0001](./adrs/0001-ubiquitous-language.md#notebook--note-structure) defines
+the domain vocabulary; [ADR 0004](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation)
+owns representation and validation. These are architectural contracts, not a
+claim that attachment support is already implemented.
+
+### Placement and ownership
+
+Notes and attachments use the same notebook folder structure and access boundary.
+The notebook root is also a content location; no additional root Folder entity
+is required. Each file path has one role and one content value, so a note and
+attachment cannot occupy the same path. An attachment-only folder remains
+represented and visible, and an attachment counts as content for `.keep`.
+Container Readme and structural markers retain their distinct roles.
+
+An attachment belongs to its notebook independently of any referring note.
+Removing a note or reference does not itself delete the attachment. Deleting an
+attachment does not delete referring notes or their learning data. The user
+experience for remaining references after file removal still needs refinement.
+Images share attachment placement, ownership, publication, and deletion behavior;
+rendering does not introduce another file-management model. A PDF attachment
+does not by itself create a Book or reading record.
+
+These domain distinctions prescribe neither a class hierarchy nor a universal
+file entity, database schema, or new attachment identity service. Attachment
+paths retain the complete filename, including its extension; they are not
+note/property Portable paths or stable identities across moves.
+
+### Classification and references
+
+Use one classification and codec contract across import, export, publication,
+and lint. Web browsing consumes the resulting domain projection rather than
+reclassifying files or maintaining another inventory. Preserve supporting file
+bytes without adding frontmatter or converting IDE instructions into concepts.
+Accept files and authored references through the existing publication boundary,
+with no separate attachment history or mutable content authority.
+
+Before implementing admission, settle the deterministic rule for untyped
+Markdown and tool-owned `README.md`, including collisions with recognized
+concepts and container Readmes. Unknown valid concept types remain concepts;
+a failed parse does not justify silently losing an existing note identity.
+No per-IDE allowlist is prescribed, and ADR 0002 excludes mandatory local
+classification manifests. Check the resulting mixed-tree profile against OKF
+before claiming compatibility for the entire tree.
+
+Before image delivery, settle attachment-reference spelling so the same authored
+destination works locally and in web presentation without private server IDs.
+This does not change semantic Wiki-link or property-reference rules. Existing
+image ownership, sharing, and references must be established before migration;
+preserve image access and note learning identity throughout the transition.
+
 ## Accepted history
 
 V1 accepts only fast-forward updates to `refs/heads/main`. Every commit has
@@ -135,6 +187,39 @@ whether Donut commits directly or opens a pull request. In either case, the
 projection changes only when the commit reaches the accepted ref. Autosave
 draft buffering is outside this decision.
 
+## Domain operation ownership
+
+One accepted-change owner coordinates complete web domain operations. Lock and
+load current state, apply the complete operation, read its final projection,
+then append one accepted commit in the publication transaction. Destination
+construction, collision resolution, placement, and authored reference handling
+finish before that projection; include newly created folders and all affected
+in-notebook content. Do not publish individual low-level placement steps.
+
+Placement, folder construction, reference choices, content persistence, deletion,
+and Portable encoding remain with their domain owners. Controllers do not
+duplicate Git coordination. Preserve existing non-Git behavior and the policy
+for pre-existing projection drift; publication does not silently adopt drift.
+
+An operation touching several notebooks uses the same owner over their set.
+Determine that set before locking, lock bindings in ascending notebook-id order,
+and re-verify the set under lock. Refuse a mismatch. Apply the domain operation
+once and append one accepted commit per changed locked notebook in the same
+transaction, retaining each notebook's drift policy.
+
+Existing coverage includes ordinary note content/title edits, creation and
+movement, same-notebook folder creation, rename, move and dissolve, and
+relationship reduction over its touched-notebook set. Cross-notebook move and
+cross-notebook referrer rewrites remain outside this owner until selected for
+delivery; this contract does not claim that all callers have been integrated.
+
+Git publication accumulates one final correspondence between tree content and
+private identities and applies that result once through the existing domain
+owners. One-commit and multi-commit publication share this path. History
+inspection carries identity evidence rather than replaying live mutations.
+Do not introduce an event log, persisted shadow notebook, second identity
+service, or per-story dispatch mode to coordinate these operations.
+
 ## Identity across a publication range
 
 Start with the private identity mapping at A and derive one final mapping at T
@@ -166,13 +251,32 @@ dependent-data removal even when A and T have identical trees. `git revert`
 restores Portable content, not deleted identities or learning history, including
 when deletion and revert are published together.
 
+### Ordinary-note correspondence
+
+Use the existing Eclipse JGit rename detector with the owner's explicit 50%
+similarity threshold for ordinary notes. Keep the policy in one correspondence
+owner shared by pairwise detection and linear-history composition; do not add a
+parallel handwritten detector or semantic identity inference. Exact equivalence
+to native Git on ambiguous inputs is not promised.
+
+Retain ambiguous exact-pair and unresolved removal/addition refusal safeguards.
+A detector limit or inability to match is not evidence of intentional deletion.
+Carry original identities through parent/child evidence even when accepted-to-tip
+similarity is low. Endpoint matching must not override a known deletion gap or
+carried lineage. Folder identity retains its existing exact-subtree semantics.
+
+Feed correspondence into the existing final application and reference owners,
+preserving authored bytes and learning state regardless of semantic content
+changes. Known web operations already have explicit note identities and do not
+require heuristic inference. No persisted identity journal or client-side
+rename protocol is introduced.
+
 ## Unresolved policy
 
-- **Identity admission:** Define evidence for automatic preservation beyond
-  supported exact correspondence, cases requiring refusal or owner intent,
-  deterministic analysis settings, and a safe outcome when analysis exceeds its
-  budget. Preserve composition of supported operations. Owner intent needs
-  defined authority, binding to the proposed range, and transport.
+- **Identity admission:** Beyond the ordinary-note correspondence policy above,
+  define broader admission and cases requiring owner intent. Preserve composition
+  and the existing ambiguity/analysis-limit refusals. Owner intent needs defined
+  authority, binding to the proposed range, and transport.
 - **Atomic failure and receipts:** Define remaining durable-object and
   multi-head receipt guarantees and how prior publication is evidenced.
 - **Historical representability:** Resolve whether tip-only validation satisfies

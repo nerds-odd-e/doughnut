@@ -65,10 +65,12 @@ separate stories express user journeys, not separate file stores or codecs.
 
 The index and record statuses agree: these ADRs are Accepted. ADR 0001's filename
 lacks the usual `-accepted` suffix; its explicit status remains authoritative.
-ADR 0004's current durable-write rule conflicts with accepting arbitrary
-untyped Markdown as current notebook content. The owner has selected the product
-outcome; the exact note/file boundary and durable ADR clarification remain open.
-This seed neither approves an ADR change nor prescribes the boundary.
+The owner adopted Attachment vocabulary and the mixed-file format direction in
+[ADR 0001](../../docs/adrs/0001-ubiquitous-language.md#notebook--note-structure)
+and [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation).
+“Supporting file” in these stories maps to Attachment. Exact admission rules
+remain to be settled in the [synchronization contract](../../docs/notebook-git-synchronization.md#classification-and-references).
+The [North Star](../NORTH-STAR.md) owns the concise architectural direction.
 
 All stories preserve notebook access permissions, authored bytes, unrelated
 files, and learning history. Existing web operations must not silently drop
@@ -262,8 +264,9 @@ cleanup stays last, as explicitly requested.
   tool-owned `README.md` files, and an existing note whose frontmatter becomes
   invalid. The last case must not silently lose its identity or learning history.
   Apply the agreed distinction consistently to publication, export, and lint;
-  mandatory classification sidecars would conflict with ADR 0002. Record the
-  human-owned ADR 0004 clarification/exception before dependent executable work.
+  mandatory classification sidecars would conflict with ADR 0002. Resolve the
+  admission details in the synchronization contract before dependent executable
+  work; the Attachment concepts are already integrated into ADRs 0001 and 0004.
 - **Existing images:** Determine ownership and reference forms, including any
   sharing, before promising a conversion scope. Refinement owns concrete image
   locations, current display contexts, and an independently usable split if the

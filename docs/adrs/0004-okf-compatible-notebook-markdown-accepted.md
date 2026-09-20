@@ -6,6 +6,7 @@
 **Amended:** 2026-09-14 — folder trash rules, decided by Terry Yin
 **Amended:** 2026-09-15 — canonical empty-folder representation, decided by Terry Yin
 **Amended:** 2026-09-17 — trash collision wording aligned with delivered behavior, decided by Terry Yin
+**Amended:** 2026-09-20 — Attachments alongside OKF concepts, decided by Terry Yin
 **Decision makers:** Terry Yin  
 **Consulted:** None 
 
@@ -27,12 +28,15 @@ the profile this ADR records.
 
 ## Decision
 
-Donut’s **Portable notebook tree** conforms to OKF v0.2 plus this
-profile. Codec round-trips must be lossless for these rules.
+Notes and container Readmes follow OKF v0.2 plus this profile. The **Portable
+notebook tree** also carries attachments as ordinary files. Codec round-trips
+must be lossless for both concepts and attachment bytes.
 
 ### Bundle and concepts
 
-- One notebook ↔ one OKF bundle (directory of `.md` files).
+- One notebook ↔ one Portable tree containing OKF concepts and attachments.
+- Attachments retain their complete filenames and original bytes, including
+  non-OKF Markdown. Images use the same file representation.
 - OKF calls a concept's bundle path without `.md` its **Concept ID**. For a
   Donut note, this is the normalized note portion of its **Portable path**.
 - Stored note markdown carries `type` and valid YAML frontmatter.
@@ -57,8 +61,8 @@ profile. Codec round-trips must be lossless for these rules.
   Filename-as-title applies: an insisted title is exported as that
   basename. That tree is a profile exception to OKF §3.1 / §11.
 - An otherwise-empty non-root folder is represented by a zero-byte `.keep`.
-  A note, non-blank `README.md`, or tracked descendant removes that marker.
-  `.keep` is structural, not a concept.
+  A note, attachment, non-blank `README.md`, or tracked descendant removes that
+  marker. `.keep` is structural, not a concept.
 
 ### Titles, filenames, body
 
@@ -98,6 +102,9 @@ profile. Codec round-trips must be lossless for these rules.
 
 ### Links and attachments
 
+- Attachment references use ordinary file references, preserving authored
+  destinations and local meaning; image embedding adds presentation. They do
+  not become semantic note/property links or require Donut server IDs.
 - Portable inter-note links use wiki `[[portable-path]]` /
   `[[portable-path|display-text]]`. Product insert writes wiki. Unqualified
   `[[Title-or-Alias]]` is a shorthand Portable path whose resolution scope is
@@ -156,29 +163,37 @@ profile. Codec round-trips must be lossless for these rules.
 
 ### Validation
 
-- Durable tree imports/synchronization writes and lint reject trees that break
-  OKF requirements or this profile
-  (missing/invalid `type`, reserved-name misuse of `readme` /
-  `readme.md`, unsafe paths, etc.).
+- Import, export, synchronization, and lint share one classification and codec
+  contract for notes, container Readmes, attachments, and structural markers.
+  All entries obey safe-path and unambiguous-placement rules; OKF concept
+  validation applies to notes and container Readmes, not attachments.
+- Missing/invalid concept `type` and reserved-name misuse are rejected. Unknown
+  valid OKF types remain concepts. A failed note parse must not silently
+  reclassify an existing note as an attachment and discard its identity.
 - Missing listing `index.md` is conformant. Concept files named
   `index.md` / `log.md` warn; durable write and lint succeed.
 - Recommendations (e.g. OKF `tags` shape) may warn; durable write and
   lint succeed.
+
+Admission details and remaining classification decisions live in the
+[synchronization contract](../notebook-git-synchronization.md#attachments-in-the-portable-tree).
 
 ## Consequences
 
 - Export, lint, import, and durable write share one codec contract.
 - Title changes are filename changes; identity preservation across
   renames is outside this format decision.
-- Filename is the display name on the **Portable notebook tree**. Author-owned
-  `title:` is authored YAML; the codec does not wrap `title:` to compensate for
-  a basename that is not the display name. Stored notes use the title column.
+- For notes, filename is the display name on the **Portable notebook tree**.
+  Author-owned `title:` is authored YAML; the codec does not wrap `title:` to
+  compensate for a basename that is not the display name. Stored notes use the
+  title column.
 - Portable inter-note and property links use wiki syntax. Markdown URL handling
   follows ADR 0005. Wiki in Donut-authored YAML is the same profile exception
   as wiki in the body.
-- Obsidian and OKF consumers can open a Donut Portable notebook tree. A note is
-  addressed in the files by its normalized Portable path. A user-insisted
-  concept `index.md` / `log.md` still has that path, but OKF tools may treat it
+- Note concepts follow the profile for OKF/Obsidian-style tools; attachment
+  interpretation depends on the consumer. A note is addressed in the files by
+  its normalized Portable path. A user-insisted concept `index.md` / `log.md`
+  still has that path, but OKF tools may treat it
   as a listing/log or reject it. Tools that do not resolve wiki links will not
   follow Donut-authored `[[…]]`.
 
@@ -190,7 +205,8 @@ profile. Codec round-trips must be lossless for these rules.
 
 ## Cons
 
-- Strict validation rejects some free-form trees until fixed.
+- Strict concept validation still rejects invalid notes; supporting-file
+  classification must distinguish those from attachments.
 - Wiki in Donut-authored trees is a profile exception to OKF path-link
   preference.
 

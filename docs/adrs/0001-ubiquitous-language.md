@@ -3,58 +3,55 @@
 **Status:** Accepted  
 **Date:** 2026-09-01
 **Amended:** 2026-09-17 — Trash and permanent deletion terms, decided by Terry Yin
+**Amended:** 2026-09-20 — Notebook attachments and folder content, decided by Terry Yin
 **Decision makers:** Terry
 **Consulted:** (people / teams asked for advice)
 
 ## Context
 
-Donut’s product vocabulary should be **consistent**: each idea has one name,
-and each name means one thing. Humans, UI copy, APIs, and coding agents then
-share those terms.
-
-This ADR is the **canonical ubiquitous language**. The glossary below is
-the source of truth; prefer these meanings in UI copy, APIs, tests, and
-code identifiers. This glossary is amended in place. Add or change domain
-terms here; do not supersede this ADR with a new one.
+This glossary is Donut's **canonical ubiquitous language**: one name per idea,
+one meaning per name, shared by humans, UI copy, APIs, tests, and code.
+Amend domain terms here in place; do not supersede this ADR.
 
 ## Notebook / note structure
 
-- **Note** — Atomic knowledge document (title, content, markdown / rich
-  content, frontmatter; may be nested under another note)
-- **Notebook** — Top-level collection of notes a user owns or
-  subscribes to
-- **Notebook short description** — One-line short plain-text description
-  of a notebook. Shown in the **notebook catalog**. Distinct from the
-  **Readme**.
-- **Folder** — Hierarchical path segment inside a notebook
+- **Note** — Atomic knowledge document with title, content, and frontmatter,
+  represented as Markdown. Its server-side identity anchors learning data.
+- **Notebook** — Top-level collection of notes, attachments, and folders a user
+  owns or subscribes to. Content can reside at its root or within folders.
+- **Notebook short description** — Short, one-line plain-text description in
+  the **notebook catalog**, distinct from the **Readme**.
+- **Folder** — Named hierarchical location containing notes, attachments, and
+  child folders within a notebook.
+- **Attachment** — A named supporting file owned by a notebook and located at
+  its root or in a folder, with its original bytes preserved. Includes IDE
+  rules, skills, and images; it requires neither a referring note nor OKF
+  frontmatter and is not a learning unit.
+- **Image** — An Attachment with image presentation capabilities.
+- **Attachment reference** — Authored reference to an Attachment, distinct from
+  a note/property Wiki link. References do not own the file's lifetime.
 - **Trash** — Recoverable removal of a note or folder by moving it beneath the
   notebook-root `_trash/`. The entity keeps its identity and identity-bound
   data, including learning history where applicable; moving it out recovers it.
 - **Permanent deletion** — Removal of an entity and its dependent data. It ends
   that identity; recreating the same content, even at the same path, creates a
   new identity.
-- **Portable notebook tree** — Canonical OKF-compatible Markdown
-  representation of one **notebook** as files and folders. It does not use
-  Donut server note IDs or SPA locations as notebook addresses and round-trips
-  under the profile in
-  [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Portable
-  means decoupled from Donut's private and web identities; it does not mean
-  that paths survive rename or that every Markdown tool understands every
-  Donut profile extension.
+- **Portable notebook tree** — A notebook's content as folders, OKF-profile
+  note and container-Readme files, attachments, and structural markers. Private
+  identities and learning data, including recall history, stay outside it.
+  Addresses use no server note IDs or SPA locations. It round-trips under
+  [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Portability
+  promises neither paths stable across rename nor universal Markdown support.
 - **Portable path** — Address of a **note** in a **portable notebook tree**,
-  optionally qualified by **notebook** and optionally extended with a
-  **property** selector. It may have a bundle-root or shorthand form;
-  source-relative forms fit the same model where supported. Its resolution
-  scope is one portable notebook tree: the source notebook unless explicitly
-  notebook-qualified. A shorthand Portable path resolves only when it
-  identifies one destination under the documented resolution scope. Otherwise
-  it is unresolved/ambiguous, and Donut asks for a longer path. A Portable path
-  is not a Donut note ID, SPA location, or stable identity across rename.
-- **Readme** — Markdown body on a notebook or folder (landing content).
-  Also bears YAML frontmatter for that notebook or folder. In the
-  portable tree, maps to that directory’s `README.md` with
-  `type: Readme` (not OKF `index.md`). Distinct from **notebook short
-  description**. Qualified: **notebook readme**, **folder readme**.
+  optionally notebook-qualified or extended with a **property** selector.
+  Bundle-root, shorthand, and supported source-relative forms share this model.
+  Resolution is scoped to the source notebook unless explicitly qualified.
+  Shorthand must identify exactly one destination; otherwise it remains
+  unresolved/ambiguous and Donut asks for a longer path. It is not a note ID,
+  SPA location, or stable identity across rename.
+- **Readme** — Notebook/folder landing Markdown with its YAML frontmatter;
+  maps to that directory's `README.md` with `type: Readme`, not OKF `index.md`.
+  Say **notebook readme** or **folder readme**; distinct from short description.
 - **Notebook catalog** — List of a user’s notebooks (and notebook
   groups). The catalog heading is **Notebooks**. Catalog-wide search is
   **All notebooks**.
@@ -66,14 +63,12 @@ terms here; do not supersede this ADR with a new one.
 - **Bazaar** — Marketplace where notebooks are shared for others to
   browse and subscribe
 - **Wiki link** — Semantic in-content reference to a **note** or a **property**
-  on a note. Its portable form is wiki `[[portable-path]]` /
-  `[[portable-path|display]]` (optionally `Notebook:Title`; a property appends
-  `#prop:<encoded-key>`). A Markdown link whose href is a canonical Donut note
-  URL also participates as a Wiki link by note ID; its label is display only.
-  Spelling and property-key encoding:
-  [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Web
-  destination:
-  [ADR 0005](./0005-web-routes-accepted.md) (`noteProperty`).
+  using `[[portable-path]]` or `[[portable-path|display]]`, with optional
+  `Notebook:Title` or `#prop:<encoded-key>` qualification.
+  A Markdown link to a canonical Donut note URL also participates by note ID;
+  its label is display only. Spelling/encoding follows
+  [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md); web destinations
+  follow [ADR 0005](./0005-web-routes-accepted.md) (`noteShow` / `noteProperty`).
 - **Property** — YAML frontmatter key–value on a note (scalar or
   one-level list). Distinct from a **relationship note**. A value may
   contain **wiki links**. Relation-like keys (`example of`, `a part of`)
@@ -151,15 +146,12 @@ More detailed **Spaced repetition glossary** is in
   **spelling**, **property**, **commissioned**.
 - **Memory tracking** — Creating and maintaining memory trackers.
   Tracker-level opt-out is **Remove from recall**.
-- **Recall** — Spaced retrieval of assimilated material. Donut name
-  for FSRS **review** (recall is better than review). Methods: **recall
-  prompt** or **just review**.
-- **Recall prompt** — One ask during recall for a memory tracker. Kinds:
-  **spelling** (no MCQ) or **MCQ** (the prompt HAS_A an MCQ). An MCQ is
-  not a type of recall prompt.
-- **MCQ** — Multiple-choice content on a note (stem, choices, solution).
-  A recall prompt may have an MCQ; an MCQ is not a type of recall prompt.
-  Origin (AI-generated vs manually added) is how the content was produced,
+- **Recall** — Spaced retrieval of assimilated material; Donut's name for FSRS
+  **review**. Methods: **recall prompt** or **just review**.
+- **Recall prompt** — One ask for a memory tracker: **spelling** (no MCQ) or
+  an **MCQ** prompt containing an MCQ. The MCQ is content, not the prompt itself.
+- **MCQ** — Multiple-choice note content (stem, choices, solution) a recall
+  prompt may contain. AI-generated or manually added describes content origin,
   not a prompt kind.
 - **Contested** — Marks an MCQ as not feasible. Distinct from a kind of
   recall prompt.
@@ -190,11 +182,10 @@ More detailed **Spaced repetition glossary** is in
 
 ## Focus context
 
-- **Focus context** — Bounded neighborhood around a **focus note** (depth
-  0) plus related notes reached by wiki links, inbound references, and
-  sampled folder peers, within a token budget. Used for conversation,
-  recall-prompt generation, note automation, Learning Session Request,
-  and export.
+- **Focus context** — Bounded neighborhood around a **focus note** (depth 0):
+  notes reached through wiki links and inbound references, plus sampled folder
+  peers, within a token budget. Used for conversation, recall-prompt generation,
+  note automation, Learning Session Request, and export.
 - **Focus note** — The center note of a **focus context** (depth 0).
 
 ## Conversation
@@ -209,16 +200,14 @@ More detailed **Spaced repetition glossary** is in
 
 ## Commissioned Learning Session
 
-Vocabulary for Learning Sessions that a Tutor conducts outside Donut, on
-commission from Donut:
+External tutoring commissioned by Donut:
 
 - **Learning Orchestrator** — The Donut component that directs and
   coordinates Learning Sessions
 - **Commissioned memory tracker** — Memory tracker maintained through
   commissioned Learning Sessions rather than ordinary **recall**
-- **Tutor** — Party that conducts a Learning Session from the request and
-  produces a report; may be a person or an AI assistant, and is outside
-  Donut
+- **Tutor** — Person or AI assistant outside Donut who conducts a Learning
+  Session from its request and produces a report.
 - **Learning Session** — One commissioned unit of tutoring, covering the
   due commissioned memory trackers of a single notebook
 - **Potential learning session** — Due commissioned memory trackers that
@@ -249,12 +238,6 @@ commission from Donut:
   prose, UI, or new identifiers.
 - Features, tests, OpenAPI names, and packages follow this glossary.
 - Same nouns in UI, API, and schema, with **minimum DTO**. Do not
-introduce a translation type that wraps one as the other.
-- Agents treat this ADR as binding for naming choices. Spaced-repetition
-  domain concepts follow ADR 0003. Failure handling follows ADR 0006.
-  Humans and agents share an explicit dictionary instead of inferring
-  synonyms.
-
-## Related
-
-- [ADR 0006](./0006-failure-handling-accepted.md) — Failure handling
+  introduce a translation type that wraps one as the other.
+- Agents follow this glossary for naming, ADR 0003 for spaced-repetition domain
+  concepts, and ADR 0006 for failure handling.

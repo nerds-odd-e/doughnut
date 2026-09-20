@@ -108,8 +108,9 @@ Relevant Accepted decisions, checked against the index and in-file status:
   propagate failures; do not introduce fallback acceptance or compensating writes.
 - [ADR 0007 — Isolation](../../../docs/adrs/0007-environments-and-isolation-accepted.md):
   isolated disposable test data; never benchmark by mutating Development/Production.
-- [North Star](../../NORTH-STAR.md), “One complete accepted web change” and
-  “One final publication result”: retain these boundaries and their current scope.
+- [Domain operation ownership](../../../docs/notebook-git-synchronization.md#domain-operation-ownership):
+  retain the complete accepted web-change and final-publication boundaries and
+  their current scope, now documented in the durable synchronization contract.
 
 No ADR exception is selected. ADR 0001's Accepted status agrees with the index
 despite its unsuffixed filename. Existing unresolved historical-validation and
