@@ -11,9 +11,13 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class NotebookGitBundleDownloadService {
   private final NotebookGitBindingRepository bindingRepository;
+  private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
-  public NotebookGitBundleDownloadService(NotebookGitBindingRepository bindingRepository) {
+  public NotebookGitBundleDownloadService(
+      NotebookGitBindingRepository bindingRepository,
+      NotebookGitAcceptedRepositoryStore repositoryStore) {
     this.bindingRepository = bindingRepository;
+    this.repositoryStore = repositoryStore;
   }
 
   @Transactional
@@ -25,6 +29,6 @@ public class NotebookGitBundleDownloadService {
                 () ->
                     new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
-    return binding.getBundleBytes();
+    return repositoryStore.bundleBytes(binding);
   }
 }

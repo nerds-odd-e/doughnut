@@ -173,7 +173,7 @@ Backend proofs below run the full suite, not individual selected classes.
 
 ### 1. Centralize accepted repository persistence
 
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 
 Move existing bundle-backed open/store mechanics behind one repository owner
 used by web acceptance, proposal persistence, cutover/reset and download. Keep
@@ -184,6 +184,16 @@ slice 2 and lets later storage change occur once beneath every caller.
 Proof: full backend suite, preserving current accepted heads, payloads and lock
 behavior; adapt fixtures through the same owner without hiding the write being
 tested. Size: 5–10 active minutes, medium confidence; all callers must remain green.
+
+Delivered: added package-private `NotebookGitAcceptedRepositoryStore` (open/store/apply/
+bundleBytes) and moved all direct `NotebookGitBinding` bundle-field access behind it.
+`AcceptedWebChangeService`, `NotebookGitCutoverService`, and `NotebookGitBundleDownloadService`
+now delegate to it; `NotebookGitProposalBindingPersistence` was inlined into its sole caller
+`NotebookGitProposalAcceptance` (post-change refactor: the wrapper added no behavior beyond
+forwarding to the new store). Bundle bytes remain the sole durable representation; no schema
+or public API change. Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` —
+`BUILD SUCCESSFUL`, full suite green, independently reverified by the coordinator after both
+implementation and refactor.
 
 ### 2. Download a bundle from the accepted repository
 

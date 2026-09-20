@@ -44,14 +44,17 @@ public class NotebookGitCutoverService {
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
   private final NotebookGitBindingRepository notebookGitBindingRepository;
+  private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
   public NotebookGitCutoverService(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
-      NotebookGitBindingRepository notebookGitBindingRepository) {
+      NotebookGitBindingRepository notebookGitBindingRepository,
+      NotebookGitAcceptedRepositoryStore repositoryStore) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.notebookGitBindingRepository = notebookGitBindingRepository;
+    this.repositoryStore = repositoryStore;
   }
 
   public NotebookGitBinding createBindingForNotebook(Notebook notebook, Instant cutoverTime) {
@@ -93,13 +96,11 @@ public class NotebookGitCutoverService {
   }
 
   private void applyBundle(NotebookGitBinding binding, BundleWriteResult written, Instant time) {
-    binding.setAcceptedGitObjectId(written.headObjectId());
-    binding.setBundleBytes(written.bundleBytes());
     Timestamp timestamp = Timestamp.from(time);
     if (binding.getCreatedAt() == null) {
       binding.setCreatedAt(timestamp);
     }
-    binding.setUpdatedAt(timestamp);
+    repositoryStore.apply(binding, written, timestamp);
   }
 
   private List<PortableTreeEntry> buildPortableTreeEntries(Notebook notebook) {
