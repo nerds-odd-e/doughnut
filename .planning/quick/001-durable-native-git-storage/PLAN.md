@@ -1,8 +1,11 @@
 # Faster note saves with durable native Git storage
 
-Status: planned; storage selection and implementation are gated by missing evidence.
+Status: in progress. Slices 1–2 delivered; evidence gates 2–3 recorded and
+passing; slice 3 refined into slices 3–5 (schema, adapter, cutover) and ready
+to dispatch. Gate 1 (browser-JIT baseline) remains unresolved and blocks only
+slice 10's final performance acceptance.
 Source: [SEED-034#story-2](../../seeds/SEED-034-faster-note-content-saving.md#story-2).
-Assessment date: 2026-09-20. This request authorizes assessment and planning only.
+Assessment date: 2026-09-20.
 
 ## Goal and boundaries
 
@@ -208,7 +211,7 @@ compression, expected for this design). No new cache/GC/maintenance subsystem
 was needed for correctness: content-addressed dedup is automatic, storage is
 append-only (matches ADR 0002), and a rolled-back write leaves no garbage.
 
-**One real, measured inefficiency to carry into slice 3 (not disqualifying):**
+**One real, measured inefficiency to carry into slice 4 (not disqualifying):**
 existing, unmodified `NotebookGitBundleBuilder.append` routes writes through
 JGit's `DirCacheBuilder`, whose `finish()`/`DirCache.replace()` unconditionally
 nulls the *entire* cached `DirCacheTree`, forcing `DirCacheTree.writeTree()` to
@@ -217,14 +220,15 @@ every save (88 insert attempts on this fixture, only 6 producing new rows) —
 each attempt is a real SQL round trip against a per-row JDBC store with no
 batching. Content-addressing makes the other ~82 attempts harmless no-ops for
 correctness, but on the plan's actual historical shape (4,046 folders) this
-would mean thousands of insert-attempt round trips per ordinary save. Slice 3
-should budget for this explicitly (for example, batching existence checks before
+would mean thousands of insert-attempt round trips per ordinary save. Slice 4's
+adapter should budget for this explicitly (batching existence checks before
 attempting individual inserts) rather than treat "6 new rows per save" as the
 full write cost.
 
-**Verdict:** proceed toward candidate 2 for slice 3. Gates 2–3 are satisfied by
-this evidence; gate 1 (the historical-shape browser-JIT baseline) remains
-unresolved and still blocks only performance acceptance (slice 8), not slice 3.
+**Verdict:** proceed toward candidate 2 for slices 3–5. Gates 2–3 are satisfied
+by this evidence; gate 1 (the historical-shape browser-JIT baseline) remains
+unresolved and still blocks only performance acceptance (slice 10), not
+slices 3–5.
 
 ## Ordered slices and proof ownership
 
@@ -271,13 +275,13 @@ Proof: `NotebookGitBundleControllerTest` and `NotebookGitBundleDownloadControlle
 through the full backend suite; retain queued-writer and authorization assertions.
 Native `git clone`/`git fetch` plus `git fsck --full` against generated local output
 prove interoperability. Size: approximately five active minutes, medium confidence.
-Interim import cost remains until slice 3; this is not a speedup claim.
+Interim import cost remains until slice 5; this is not a speedup claim.
 
 Delivered: `NotebookGitAcceptedRepositoryStore.bundleBytes` (raw stored-bytes passthrough)
 replaced with `downloadableBundle`, which opens the accepted repository (import + head
 verification via the existing `open`) and re-serializes `main` via `NotebookGitBundleWriter`
 before returning it, decoupling the download/transport contract from the durable storage
-representation ahead of slice 3. `NotebookGitBundleDownloadService.select` delegates to it;
+representation ahead of slice 5. `NotebookGitBundleDownloadService.select` delegates to it;
 controller, response contract, authorization and locking are unchanged. Existing
 `NotebookGitBundleControllerTest`/`NotebookGitBundleDownloadControllerTest` assertions
 (reachable object IDs, advertised HEAD, queued-writer, authorization) needed no changes and
@@ -287,35 +291,75 @@ corruption; this was a one-off manual verification, not a retained test. Proof:
 `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` — `BUILD SUCCESSFUL`, full suite
 green, independently reverified by the coordinator after both implementation and refactor.
 
-### 3. Save an existing notebook using durable native objects
+### 3. Add native accepted-object storage schema
 
-Type: Behavior. Status: planned; evidence gates 2–3 recorded 2026-09-20 (see
-above) — candidate selected (object-keyed native storage via a JDBC-backed
-JGit `ObjectDatabase`), but not yet split into dispatchable integration beats.
-Design must budget for the recorded `DirCacheBuilder`/`DirCache.replace()`
-write-amplification finding (existing `NotebookGitBundleBuilder.append` attempts
-an insert for every tree in the hierarchy on every save, not just the changed
-path) rather than assume "one changed note" means "one new row."
+Type: Structure. Status: planned.
+
+Given the accepted repository will store individual Git objects instead of one
+bundle blob, add a SQL table keyed by (binding, 40-hex Git object ID) holding
+object type and raw bytes, plus whatever index supports a batched
+existence-check lookup and a per-binding scan. No production code reads or
+writes it yet; `NotebookGitBinding`'s existing `bundleBytes`/`acceptedGitObjectId`
+columns and all current behavior are unchanged. This is preparation for slice
+4's adapter and slice 5's cutover — immediately enabling both.
+
+Proof: migration applies cleanly (`pnpm backend:verify` through Nix), ERD
+regenerated (`pnpm export:database-erd`), full backend suite unaffected since
+no caller references the new table yet. Size: five active minutes.
+
+### 4. Implement a JDBC-backed native Git object store
+
+Type: Structure. Status: planned; depends on 3.
+
+Given the schema from slice 3, implement a production JGit `Repository`/
+`ObjectDatabase`/`ObjectInserter`/`ObjectReader`/`RefDatabase` backed by that
+table, informed by the disposable spike's design (see "Recorded evidence:
+gates 2–3" above) but hardened for product use: real failure propagation per
+ADR 0006 (no swallowed SQL exceptions, no defensive fallback), and a batched
+insert path — buffer objects written within one `ObjectInserter` session and,
+on flush, issue one existence-check query for the whole batch before inserting
+only the missing rows, instead of one round trip per `DirCacheBuilder`-triggered
+insert attempt. This directly addresses the measured write-amplification finding
+(88 insert attempts against 6 real new rows on the spike's fixture) as part of
+the adapter's own contract, not a deferred optimization. Not yet wired into
+`NotebookGitAcceptedRepositoryStore`; no observable product behavior change.
+
+Proof: focused unit tests against this adapter directly (no Spring context,
+real isolated MySQL, matching the spike's round-trip/reopen/transaction-abort
+shape as permanent product tests, plus a new assertion that a multi-tree append
+issues one batched existence check rather than one query per tree) through the
+full backend suite. Size: 5–10 active minutes, medium confidence — the spike
+already resolved the hardest unknowns; refine if the batching design needs more
+than one coherent proof loop.
+
+### 5. Cut an existing binding's save over to native object storage
+
+Type: Behavior. Status: planned; depends on 4.
 
 Given a legacy binding, first ordinary changed save → the same complete accepted
-result durably stored through the selected native adapter, retaining every old
-reachable object ID. Under the binding lock, import its legacy payload once,
-append through existing JGit construction, and transactionally replace its storage
-representation. The same owner handles creation and proposal writes; there must
-be no endpoint-specific native mode or dual write. New storage rows/schema and
-their proof belong to this behavior, not independent infrastructure slices.
+result durably stored through the slice-4 adapter instead of bundle bytes,
+retaining every old reachable object ID. Under the binding lock, import its
+legacy payload once, append through existing JGit construction, and
+transactionally replace its storage representation. `NotebookGitAcceptedRepositoryStore`
+is the one place this changes: its `open`/`store`/`apply`/`downloadableBundle`
+methods delegate to the slice-4 adapter instead of bundle-byte mechanics, so
+every existing caller (web acceptance, proposal acceptance, cutover/reset,
+download) moves together — there is no endpoint-specific native mode or dual
+write.
 
 Proof: controller save → commit → close/reopen → download and compare complete
-history, SQL content/references and learning IDs. Also observe that a subsequent
-save neither loads nor rewrites the legacy payload. Use the pinned-engine proof
-from gate 2 where its boundary matches; run `pnpm backend:verify` through Nix for
-schema changes and regenerate the ERD. Size is unresolved until the adapter proof;
-this leaf is NOT ready to dispatch. Split its concrete integration beats in this
-same plan after the gate, preserving one working storage authority at every stop.
+history, SQL content/references and learning IDs; also observe that a
+subsequent save neither loads nor rewrites the legacy bundle payload. Reuse
+slices 1–2's existing full-suite coverage (download, proposal, cutover/reset
+controller tests) to confirm every caller stays green through the same store.
+Run `pnpm backend:verify` through Nix for the schema-bearing change and
+regenerate the ERD if slice 3 left anything unconfirmed. Size: 5–10 active
+minutes, medium confidence; refine further if the actual
+`NotebookGitAcceptedRepositoryStore` change does not stay one coherent swap.
 
-### 4. Preserve atomic acceptance across competing and failed native writes
+### 6. Preserve atomic acceptance across competing and failed native writes
 
-Type: Behavior. Status: planned; depends on 3.
+Type: Behavior. Status: planned; depends on 5.
 
 Given concurrent writers or failure after object insertion, acceptance → either
 one complete durable successor or unchanged committed state, never an advertised
@@ -326,11 +370,12 @@ Proof: reuse committed-transaction assertions in `NotebookGitPublicationAtomicCo
 relation-reduction coverage. Add only missing native-write failure/reopen observation;
 ordinary test rollback is insufficient. Every implementation slice already retains
 existing atomicity proofs; this leaf fills the native durability gap. Approximately
-five active minutes after gate 2 supplies the transaction seam; otherwise refine.
+five active minutes given the transaction seam slice 4 and the spike already proved;
+otherwise refine.
 
-### 5. Publish local history into the same durable repository
+### 7. Publish local history into the same durable repository
 
-Type: Behavior. Status: planned; depends on 3–4.
+Type: Behavior. Status: planned; depends on 5–6.
 
 Given a valid local linear range, publication → exact proposed tip/history and
 the existing final identity/projection outcome, followed by an ordinary web save
@@ -343,9 +388,9 @@ and `NotebookGitMixedEditingControllerTest`; inspect downloaded ancestry, not
 just returned IDs. Change fixtures coupled to stored bundle bytes without
 weakening the assertions. Size: 5–10 active minutes; no second importer algorithm.
 
-### 6. Preserve repository lifecycle outside ordinary edits
+### 8. Preserve repository lifecycle outside ordinary edits
 
-Type: Behavior. Status: planned; depends on 3.
+Type: Behavior. Status: planned; depends on 5.
 
 Given creation, the existing reset operation or binding removal, lifecycle action
 → one consistent repository lifecycle with no abandoned authoritative storage.
@@ -358,14 +403,18 @@ binding removal handles its native dependent rows. Size: 5–10 active minutes;
 refine into operation-specific leaves if the selected adapter requires distinct
 lifecycle mechanisms. These are one storage-lifetime rule, not new domain policies.
 
-### 7. Migrate untouched bindings and retire legacy storage
+### 9. Migrate untouched bindings and retire legacy storage
 
-Type: Behavior. Status: planned; depends on 3–6 and performance evidence from gate 3.
+Type: Behavior. Status: planned; depends on 5–8 and a representative real-save
+performance measurement beyond the architectural-cost gate-3 microbenchmark
+already recorded (the spike explicitly disclaimed proving fleet-migration-worthy
+performance; slice 5's actual production integration is where that evidence
+comes from).
 
 Given existing bindings never opened since upgrade, run the bounded migration →
 every binding retains exact head/history and no longer needs legacy bundle storage.
 Include a retry after interrupted migration; each committed binding is wholly old
-or wholly native until completion. Use the same conversion owner as slice 3, not
+or wholly native until completion. Use the same conversion owner as slice 5, not
 a second importer. Preserve source bytes until each conversion is committed and
 verified; remove the legacy path/column only after all bindings are proven converted.
 
@@ -373,13 +422,13 @@ Proof: real pre-upgrade schema/data → migration → restart → bundle downloa
 compare all reachable object IDs, parent graph, content and private identities.
 Use `pnpm backend:verify` through Nix and the migration/ERD skills. Deployment
 ordering must prevent an old application writer from restoring bundle authority;
-do not assume mixed-version compatibility. Size unresolved until gate 2; split
-backfill and retirement into separate green leaves if the actual deployment path
-requires it. No fleet operation is authorized by this planning request.
+do not assume mixed-version compatibility. Size unresolved until slice 5 lands;
+split backfill and retirement into separate green leaves if the actual deployment
+path requires it. No fleet operation is authorized by this planning request.
 
-### 8. Meet the visible save-time target with preserved editing behavior
+### 10. Meet the visible save-time target with preserved editing behavior
 
-Type: Behavior. Status: planned; depends on gate 1 and 3–7.
+Type: Behavior. Status: planned; depends on gate 1 and 5–9.
 
 Given the matched large-notebook fixture and normal JIT, ordinary linked-note
 saves → refreshed, no-longer-dirty content with each workload median below one
@@ -408,9 +457,9 @@ CURSOR_DEV=true nix develop -c pnpm cy:run --spec 'e2e_test/features/note_creati
 
 Preserve no-op/drift, multi-note complete operations, trash, README and empty-folder
 bytes through existing web-history, folder/movement, trash, relation-reduction and
-projection-drift tests under the full backend suite in slices 1–7. Their storage
+projection-drift tests under the full backend suite in slices 1–9. Their storage
 fixtures must not fabricate the native behavior each new scenario claims to prove.
-Slice 8 owns browser timing and editing preservation. No frontend or API contract
+Slice 10 owns browser timing and editing preservation. No frontend or API contract
 change is selected; if one becomes necessary, revisit scope and applicable proofs.
 
 For future implementation follow required execution wrap-up: Jidoka → fresh
@@ -420,15 +469,28 @@ post-change-refactor agent → API generation if triggered → coordinator
 
 ## Refinement assessment and remaining concerns
 
-The initial storage replacement was separated into transport ownership, first
-durable save, atomicity, proposal continuity, lifecycle, migration and measured
-acceptance. Eight leaves remain. None is completed. No story resplit is currently
-recommended on slice count alone.
+The initial storage replacement was separated into transport ownership,
+schema, adapter, first durable save, atomicity, proposal continuity, lifecycle,
+migration and measured acceptance — ten leaves. Slices 1–2 are delivered
+(committed/pushed/CI-observed). Gates 2–3 have a recorded passing result
+(2026-09-20): a disposable spike proved the selected candidate (object-keyed
+native storage via a JDBC-backed JGit `ObjectDatabase`) round-trips correctly,
+survives transaction abort, and does not require rewriting historical payload
+per save; the recorded `DirCacheBuilder` write-amplification finding is now
+folded into slice 4's batched-insert design rather than left as an open risk.
+Slice 3 (2026-09-20 refinement) was split from the original undersized "slice
+3" into three sequential leaves — schema (3), adapter (4), cutover (5) — each
+with one coherent proof loop; slices 6–10 were renumbered accordingly with
+dependencies updated to point at 5 (the cutover leaf) instead of the original
+slice 3. No story resplit is recommended at ten slices.
 
-Slices 1–2 have bounded source-supported paths. Slices 3 and 7 require concrete
-adapter/migration evidence before honest sizing; 6 may need operation-specific
-subdivision. Gates 2–3 must settle those questions and trigger in-place refinement
-before dispatch. The plan is deliberately not certified ready for full execution.
-Missing baseline assets also prevent final performance acceptance today. No
-passing product test, storage experiment, benchmark or architecture-improvement
-claim is implied by this planning assessment.
+Slices 6 and 9 still carry a sizing caveat until slice 5 actually lands: slice
+6's "approximately five active minutes" assumes slice 4's transaction seam
+transfers directly, and slice 9 (migration) is explicitly unresolved in size
+until slice 5 shows the real integration shape. Slice 8 may need
+operation-specific subdivision if the adapter's lifecycle mechanics turn out
+to differ across creation/reset/removal. Gate 1 (the historical-shape
+browser-JIT baseline) remains unresolved and blocks only slice 10's final
+performance acceptance, not slices 3–9. No passing product test beyond
+slices 1–2, or architecture-improvement claim beyond the recorded gate 2–3
+evidence, is implied by this refinement.
