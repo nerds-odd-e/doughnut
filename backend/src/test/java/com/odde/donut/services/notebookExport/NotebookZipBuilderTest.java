@@ -38,7 +38,8 @@ class NotebookZipBuilderTest {
 
   private byte[] buildZip(
       String notebookReadmeContent, List<ExportFolderRow> folders, List<ExportNoteRow> notes) {
-    return NotebookZipBuilder.build(notebookReadmeContent, folders, notes, List.of());
+    return NotebookZipBuilder.build(
+        PortableTreeSnapshot.build(notebookReadmeContent, folders, notes, List.of()));
   }
 
   @Test
@@ -47,12 +48,13 @@ class NotebookZipBuilderTest {
 
     byte[] zipBytes =
         NotebookZipBuilder.build(
-            null,
-            List.of(),
-            List.of(new ExportNoteRow(null, "My Note", "body")),
-            List.of(
-                new ExportAttachmentRow("diagram.png", invalidUtf8),
-                new ExportAttachmentRow("empty.bin", new byte[0])));
+            PortableTreeSnapshot.build(
+                null,
+                List.of(),
+                List.of(new ExportNoteRow(null, "My Note", "body")),
+                List.of(
+                    new ExportAttachmentRow("diagram.png", invalidUtf8),
+                    new ExportAttachmentRow("empty.bin", new byte[0]))));
 
     Map<String, byte[]> entries = readZipEntryBytes(zipBytes);
 

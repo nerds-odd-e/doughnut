@@ -1,15 +1,11 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
-import com.odde.donut.services.notebookExport.NotebookExportRows;
+import com.odde.donut.services.notebookExport.NotebookLivePortableTree;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,20 +21,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class AcceptedWebChangeService {
   private final NotebookGitProjection projection;
   private final NotebookGitBindingRepository bindingRepository;
-  private final FolderRepository folderRepository;
-  private final NoteRepository noteRepository;
+  private final NotebookLivePortableTree livePortableTree;
   private final EntityPersister entityPersister;
 
   public AcceptedWebChangeService(
       NotebookGitProjection projection,
       NotebookGitBindingRepository bindingRepository,
-      FolderRepository folderRepository,
-      NoteRepository noteRepository,
+      NotebookLivePortableTree livePortableTree,
       EntityPersister entityPersister) {
     this.projection = projection;
     this.bindingRepository = bindingRepository;
-    this.folderRepository = folderRepository;
-    this.noteRepository = noteRepository;
+    this.livePortableTree = livePortableTree;
     this.entityPersister = entityPersister;
   }
 
@@ -133,11 +126,6 @@ public class AcceptedWebChangeService {
   }
 
   private List<PortableTreeEntry> snapshot(NotebookGitBinding binding) {
-    Notebook notebook = binding.getNotebook();
-    return PortableTreeSnapshot.build(
-        notebook.getReadmeContent(),
-        NotebookExportRows.folders(folderRepository, notebook),
-        NotebookExportRows.notes(noteRepository, notebook),
-        List.of());
+    return livePortableTree.entriesOf(binding.getNotebook());
   }
 }

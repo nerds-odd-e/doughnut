@@ -8,7 +8,6 @@ import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.NotebookExportRows;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -51,7 +50,7 @@ public class NotebookGitStateLoader {
   }
 
   List<ExportFolderRow> foldersOf(Notebook notebook) {
-    return NotebookExportRows.folders(folderRepository, notebook);
+    return folderRepository.findExportRowsByNotebookId(notebook.getId());
   }
 
   List<Note> storedNotesOf(Notebook notebook) {

@@ -7,18 +7,12 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/** Writes an ordered Portable tree out as a ZIP archive, one entry per tree entry. */
 public final class NotebookZipBuilder {
 
   private NotebookZipBuilder() {}
 
-  public static byte[] build(
-      String notebookReadmeContent,
-      List<ExportFolderRow> folders,
-      List<ExportNoteRow> notes,
-      List<ExportAttachmentRow> rootAttachments) {
-    List<PortableTreeEntry> entries =
-        PortableTreeSnapshot.build(notebookReadmeContent, folders, notes, rootAttachments);
-
+  public static byte[] build(List<PortableTreeEntry> entries) {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       try (ZipOutputStream zos = new ZipOutputStream(baos)) {

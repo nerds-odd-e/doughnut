@@ -206,7 +206,7 @@ Learnings for later slices:
 
 ### 3. Include root files in the existing application projection
 
-Type: Structure. Status: planned. Estimate: 5–8 active minutes.
+Type: Structure. Status: **done**. Estimate: 5–8 active minutes; actual ~8.
 Add the minimal notebook-owned row/repository and schema, exact-filename uniqueness,
 notebook-deletion cleanup, and one shared export-row load used by all snapshot
 callers. No folder FK, upload migration, endpoint, or subtree behavior. Immediately
@@ -214,6 +214,74 @@ enables slice 4; root-only ownership removes the former containment uncertainty.
 Proof: `backend:verify`, ERD and existing snapshot/cutover/export/drift tests.
 Extend notebook FK-closure fixtures for the added dependent row. Existing notebooks
 have no attachment rows; existing image uploads keep their behavior.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:verify`, pass (schema
+change, so `verify` rather than `test_only`), plus a regenerated `docs/database-erd.md`
+whose diff is additive only. Boundary: notebook ZIP export, notebook Git
+publication/acceptance, cutover/history reset, projection-drift detection.
+
+Delivered design: `notebook_attachment` (migration `V300000335`) holds notebook id,
+filename and `longblob` content, with `UNIQUE KEY (notebook_id, filename)` and the
+filename column in `utf8mb4_bin`. The binary collation is what makes SQL uniqueness
+the same comparison Git uses on path bytes, so `Diagram.png` and `diagram.png`
+remain two rows instead of colliding under the default `utf8mb4_unicode_ci`; the
+table's own default collation is unchanged. FK to `notebook` is `ON DELETE CASCADE`.
+`NotebookAttachment` + `NotebookAttachmentRepository` expose one JPQL constructor
+query returning `ExportAttachmentRow`.
+
+The refactor pass then consolidated the snapshot inputs: `NotebookExportRows` is
+replaced by a `NotebookLivePortableTree` service that owns the three repositories
+and is the single production assembly point for a notebook's live Portable tree.
+Its two `entriesOf` overloads are deliberate — one loads note rows by query, the
+other maps `Note` entities a locked publication already holds, and collapsing them
+would change which query runs. `NotebookZipBuilder.build` now takes the finished
+entry list, so ZIP writing no longer knows about export rows. Places that must
+change when a later slice writes rows or story 9 adds folder placement: 4 → 1.
+
+Plan-versus-reality corrections recorded here:
+
+- **"Extend notebook FK-closure fixtures" had no work to do.**
+  `DeletableEntityFkClosureTest` has no fixtures; it is schema-driven from
+  `information_schema` and walks children of `HARD_DELETABLE_ROOTS`
+  (`memory_tracker`, `note`). `notebook_attachment` is a child of `notebook`,
+  which is a parent of `note`, so it is outside that closure by construction.
+  Verified in the test source. The `ON DELETE CASCADE` cleanup the plan actually
+  wanted is in place. Making `notebook` a declared hard-delete root would be a
+  separate decision — notebook deletion is currently soft (`deletedAt`) — and was
+  not taken.
+- **No product test asserts the new schema behavior yet**, by design: nothing
+  writes rows, so every caller observes an empty attachment set. Uniqueness and
+  collation currently rest on the migration applying plus a one-off catalog query.
+  **Slice 4 must pin the collation with an executable guard** when the first real
+  rows appear.
+
+Learnings for slice 4:
+
+- All four snapshot readers are already wired, so slice 4 only needs to *write*
+  rows. Consequently `matchesAcceptedTree` will start failing drift checks the
+  moment rows exist without a matching accepted tree — the intended coupling, but
+  it means the final attachment set must be projected **before** the post-mutation
+  comparison, inside the same transaction.
+- The repository currently exposes only the read-only export-row projection. Slice 4
+  needs a way to load and replace the live `NotebookAttachment` entities.
+- Uniqueness is enforced in SQL. A final-set projection that inserts before deleting
+  removed rows will hit `uk_notebook_attachment_notebook_filename`; delete-then-insert
+  or flush ordering matters. A rename reusing a filename is a normal case, not a
+  failure case.
+- Rollback seam: `AcceptedWebChangeService.apply` is
+  `@Transactional(isolation = SERIALIZABLE, rollbackFor = Exception.class)` and
+  `commitIfChanged` persists the binding at the end; the committed-transaction
+  failure seam sits around that persistence, after the attachment projection.
+- Removing the initial nonempty-Markdown prerequisite needs no codec work: a
+  file-only initial tree already serializes correctly, and only admission refuses it.
+- Nested-file refusal is untouched; the entity has no folder column, which is what
+  makes story 9 an extension of this row rather than a replacement.
+
+Open naming note (not this story's work): ADR 0001 defines **Attachment** as "a
+named supporting file owned by a notebook", which is what `NotebookAttachment` is,
+but that name is held by the legacy note-image `Attachment` entity. Converging the
+two is a future story, per the NORTH-STAR line about images adding presentation to
+the same attachment model.
 
 ### 4. Accept root files through the existing publication boundary
 

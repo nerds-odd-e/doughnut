@@ -3,9 +3,8 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.NotebookExportRows;
+import com.odde.donut.services.notebookExport.NotebookLivePortableTree;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jgit.lib.ObjectId;
@@ -17,6 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 /** Compares the live MySQL projection with a notebook's accepted Portable tree. */
 @Service
 public class NotebookGitProjection {
+  private final NotebookLivePortableTree livePortableTree;
+
+  public NotebookGitProjection(NotebookLivePortableTree livePortableTree) {
+    this.livePortableTree = livePortableTree;
+  }
+
   /**
    * Resolves the destination Folder for placing {@code notePath}. Root paths return {@code null}.
    * The parent must already be a Folder row and must be represented either in the accepted tree or
@@ -184,8 +189,7 @@ public class NotebookGitProjection {
       Repository repository,
       ObjectId acceptedHead) {
     List<PortableTreeEntry> currentEntries =
-        PortableTreeSnapshot.build(
-            notebook.getReadmeContent(), folders, NotebookExportRows.notes(storedNotes), List.of());
+        livePortableTree.entriesOf(notebook, folders, storedNotes);
     return matchesAcceptedTree(
         currentEntries, NotebookGitAcceptedTree.readEntries(repository, acceptedHead));
   }

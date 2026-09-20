@@ -2,14 +2,9 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.ExportNoteRow;
-import com.odde.donut.services.notebookExport.NotebookExportRows;
+import com.odde.donut.services.notebookExport.NotebookLivePortableTree;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
 import com.odde.donut.services.notebookGit.NotebookGitBundleWriter.BundleWriteResult;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -41,16 +36,13 @@ public class NotebookGitCutoverService {
 
   static final String RESET_COMMIT_MESSAGE = "Reset: restart Git history from the current notebook";
 
-  private final FolderRepository folderRepository;
-  private final NoteRepository noteRepository;
+  private final NotebookLivePortableTree livePortableTree;
   private final NotebookGitBindingRepository notebookGitBindingRepository;
 
   public NotebookGitCutoverService(
-      FolderRepository folderRepository,
-      NoteRepository noteRepository,
+      NotebookLivePortableTree livePortableTree,
       NotebookGitBindingRepository notebookGitBindingRepository) {
-    this.folderRepository = folderRepository;
-    this.noteRepository = noteRepository;
+    this.livePortableTree = livePortableTree;
     this.notebookGitBindingRepository = notebookGitBindingRepository;
   }
 
@@ -84,7 +76,7 @@ public class NotebookGitCutoverService {
   }
 
   private BundleWriteResult buildBundle(Notebook notebook, Instant commitTime, String message) {
-    List<PortableTreeEntry> entries = buildPortableTreeEntries(notebook);
+    List<PortableTreeEntry> entries = livePortableTree.entriesOf(notebook);
     try (Repository gitRepository =
         NotebookGitBundleBuilder.build(
             entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, message, commitTime)) {
@@ -100,11 +92,5 @@ public class NotebookGitCutoverService {
       binding.setCreatedAt(timestamp);
     }
     binding.setUpdatedAt(timestamp);
-  }
-
-  private List<PortableTreeEntry> buildPortableTreeEntries(Notebook notebook) {
-    List<ExportFolderRow> folders = NotebookExportRows.folders(folderRepository, notebook);
-    List<ExportNoteRow> notes = NotebookExportRows.notes(noteRepository, notebook);
-    return PortableTreeSnapshot.build(notebook.getReadmeContent(), folders, notes, List.of());
   }
 }
