@@ -23,7 +23,7 @@ public class NotebookExportService {
   public byte[] exportNotebookAsZip(Notebook notebook) {
     List<ExportFolderRow> folders = NotebookExportRows.folders(folderRepository, notebook);
     List<ExportNoteRow> notes = NotebookExportRows.notes(noteRepository, notebook);
-    return NotebookZipBuilder.build(notebook.getReadmeContent(), folders, notes);
+    return NotebookZipBuilder.build(notebook.getReadmeContent(), folders, notes, List.of());
   }
 
   public String exportFileName(Notebook notebook) {

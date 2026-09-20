@@ -137,6 +137,7 @@ public class AcceptedWebChangeService {
     return PortableTreeSnapshot.build(
         notebook.getReadmeContent(),
         NotebookExportRows.folders(folderRepository, notebook),
-        NotebookExportRows.notes(noteRepository, notebook));
+        NotebookExportRows.notes(noteRepository, notebook),
+        List.of());
   }
 }

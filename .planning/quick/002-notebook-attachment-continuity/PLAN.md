@@ -150,13 +150,59 @@ Learnings for later slices:
 
 ### 2. Serialize root attachments with the notebook tree
 
-Type: Behavior. Status: planned. Estimate: about 5 active minutes.
+Type: Behavior. Status: **done**. Estimate: about 5 active minutes; actual ~5.
 Given note/folder values plus named root attachments, canonical serialization
 retains each complete filename and exact bytes. Extend the snapshot's attachment
 input, with no nested-placement promise or MIME-specific branch.
 Proof: `PortableTreeSnapshotTest` and `NotebookZipBuilderTest` inspect one mixed
 serialized tree, including invalid UTF-8 binary bytes and an empty file. These
 prove the codec only; they do not fabricate successful publication. Full suite.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, pass.
+Boundary: notebook export serialization. Inspected locations:
+`PortableTreeSnapshotTest.keepsCompleteFilenamesAndExactBytesOfRootAttachmentsSortedAfterNotes`
+(attachments supplied out of order, asserted in sorted canonical position between
+notes and the subfolder; `FF FE 00 80` invalid-UTF-8 file and a zero-byte file
+compared by exact bytes) and
+`NotebookZipBuilderTest.writesRootAttachmentBytesUnchangedAlongsideNotes`
+(raw ZIP entry bytes, never the UTF-8-decoding reader).
+
+Delivered design: `ExportAttachmentRow(String filename, byte[] content)` joins the
+`ExportFolderRow`/`ExportNoteRow` family. `PortableTreeSnapshot.build` and
+`NotebookZipBuilder.build` take a fourth `List<ExportAttachmentRow> rootAttachments`.
+Canonical order within a directory is README, notes, attachments sorted by
+filename, then subdirectories; attachments are emitted in the root pass so they
+count toward the otherwise-empty-leaf accounting. Attachment entries are built as
+`new PortableTreeEntry(path, bytes)` — never through `ofText`, so no encode,
+decode, MIME sniffing or extension rule exists anywhere. All four production
+callers pass `List.of()`; no publication is fabricated and no projection seeded.
+The refactor pass turned the static walker into a small instance with the grouped
+maps as fields, cutting `collectDirectory` from 8 parameters to 4 and stating the
+"null folder id means root" rule once.
+
+Learnings for later slices:
+
+- **Slice 3 uniqueness:** the codec does not deduplicate. Two rows with the same
+  filename emit two entries at one path, which the Git side would silently
+  collapse. Exact-filename uniqueness belongs to the schema/projection, with a
+  case-sensitive binary collation per the plan's collation note.
+- **Slice 3 load:** the natural shape is a `NotebookExportRows.attachments(...)`
+  sibling of `folders(...)`/`notes(...)`. The four call sites to switch from
+  `List.of()` are `NotebookExportService`, `NotebookGitProjection.matchesAcceptedTree`,
+  `AcceptedWebChangeService.snapshot` and `NotebookGitCutoverService`. The second
+  `matchesAcceptedTree(currentEntries, acceptedEntries)` overload needs no change.
+  Those three sites fetch folders and notes side by side and will touch attachments
+  too; consolidating that input shape is a cross-subsystem question for slice 3's
+  design, deliberately not done during slice 2's refactor.
+- **Ordering:** the repository query needs no `ORDER BY`; the snapshot sorts by
+  filename and `NotebookGitAcceptedTree.sorted` re-sorts the Git side by path, so
+  only ZIP output observes this order.
+- `ExportAttachmentRow` holds a `byte[]` and so has identity equality. Harmless
+  while only `PortableTreeEntry` is compared; a later slice needing no-op detection
+  must compare entry lists rather than rows.
+- **Story 9 readiness:** `attachmentsHere` is already per-directory with `List.of()`
+  passed into subfolders, so nested placement becomes an `attachmentsByFolder` field
+  symmetric with notes, without structural rework.
 
 ### 3. Include root files in the existing application projection
 

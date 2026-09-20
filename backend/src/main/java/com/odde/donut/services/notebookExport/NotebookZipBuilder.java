@@ -12,9 +12,12 @@ public final class NotebookZipBuilder {
   private NotebookZipBuilder() {}
 
   public static byte[] build(
-      String notebookReadmeContent, List<ExportFolderRow> folders, List<ExportNoteRow> notes) {
+      String notebookReadmeContent,
+      List<ExportFolderRow> folders,
+      List<ExportNoteRow> notes,
+      List<ExportAttachmentRow> rootAttachments) {
     List<PortableTreeEntry> entries =
-        PortableTreeSnapshot.build(notebookReadmeContent, folders, notes);
+        PortableTreeSnapshot.build(notebookReadmeContent, folders, notes, rootAttachments);
 
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();

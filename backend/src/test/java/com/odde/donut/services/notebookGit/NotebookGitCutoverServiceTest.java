@@ -67,7 +67,8 @@ class NotebookGitCutoverServiceTest {
             List.of(
                 new ExportFolderRow(folder.getId(), null, "Recipes", "# Recipes readme"),
                 new ExportFolderRow(emptyFolderId, null, "Ideas", null)),
-            List.of(new ExportNoteRow(folder.getId(), "Pasta", "Boil water")));
+            List.of(new ExportNoteRow(folder.getId(), "Pasta", "Boil water")),
+            List.of());
 
     assertThat(
         folderRepository.findById(emptyFolderId).orElseThrow().getId(), equalTo(emptyFolderId));
@@ -135,7 +136,8 @@ class NotebookGitCutoverServiceTest {
         PortableTreeSnapshot.build(
             "# Notebook readme",
             List.of(new ExportFolderRow(folder.getId(), null, "Recipes", "# Recipes readme")),
-            List.of(new ExportNoteRow(folder.getId(), "Pasta", "Boil water")));
+            List.of(new ExportNoteRow(folder.getId(), "Pasta", "Boil water")),
+            List.of());
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, binding.getBundleBytes());

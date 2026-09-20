@@ -105,6 +105,6 @@ public class NotebookGitCutoverService {
   private List<PortableTreeEntry> buildPortableTreeEntries(Notebook notebook) {
     List<ExportFolderRow> folders = NotebookExportRows.folders(folderRepository, notebook);
     List<ExportNoteRow> notes = NotebookExportRows.notes(noteRepository, notebook);
-    return PortableTreeSnapshot.build(notebook.getReadmeContent(), folders, notes);
+    return PortableTreeSnapshot.build(notebook.getReadmeContent(), folders, notes, List.of());
   }
 }
