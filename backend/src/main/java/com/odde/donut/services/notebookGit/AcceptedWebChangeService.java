@@ -91,6 +91,7 @@ public class AcceptedWebChangeService {
   private record OpenedNotebook(
       NotebookGitBinding binding,
       NotebookGitBundleImporter.ImportedBundle accepted,
+      List<PortableTreeEntry> acceptedEntries,
       boolean matchedBefore) {}
 
   private OpenedNotebook open(NotebookGitBinding binding) {
@@ -101,17 +102,18 @@ public class AcceptedWebChangeService {
       accepted.close();
       throw new IllegalStateException("Accepted bundle main does not match its persisted head");
     }
+    List<PortableTreeEntry> acceptedEntries =
+        NotebookGitAcceptedTree.readEntries(accepted.repository(), accepted.mainHead());
     return new OpenedNotebook(
         binding,
         accepted,
-        projection.matchesAcceptedTree(
-            snapshot(binding), accepted.repository(), accepted.mainHead()));
+        acceptedEntries,
+        projection.matchesAcceptedTree(snapshot(binding), acceptedEntries));
   }
 
   private void commitIfChanged(OpenedNotebook notebook, String message, Timestamp updatedAt) {
     List<PortableTreeEntry> entries = snapshot(notebook.binding());
-    if (projection.matchesAcceptedTree(
-        entries, notebook.accepted().repository(), notebook.accepted().mainHead())) {
+    if (projection.matchesAcceptedTree(entries, notebook.acceptedEntries())) {
       return;
     }
     acceptedSnapshotPersistence.persist(

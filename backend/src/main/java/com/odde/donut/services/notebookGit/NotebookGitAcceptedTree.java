@@ -36,7 +36,7 @@ final class NotebookGitAcceptedTree {
                   repository.open(treeWalk.getObjectId(0)).getBytes(), StandardCharsets.UTF_8);
           entries.add(new PortableTreeEntry(treeWalk.getPathString(), content));
         }
-        return entries;
+        return sorted(entries);
       }
     } catch (IOException e) {
       throw new UncheckedIOException("Could not inspect accepted Portable tree", e);

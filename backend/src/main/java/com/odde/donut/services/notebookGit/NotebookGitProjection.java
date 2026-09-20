@@ -186,15 +186,13 @@ public class NotebookGitProjection {
     List<PortableTreeEntry> currentEntries =
         PortableTreeSnapshot.build(
             notebook.getReadmeContent(), folders, NotebookExportRows.notes(storedNotes));
-    return matchesAcceptedTree(currentEntries, repository, acceptedHead);
+    return matchesAcceptedTree(
+        currentEntries, NotebookGitAcceptedTree.readEntries(repository, acceptedHead));
   }
 
   public boolean matchesAcceptedTree(
-      List<PortableTreeEntry> currentEntries, Repository repository, ObjectId acceptedHead) {
-    return NotebookGitAcceptedTree.sorted(currentEntries)
-        .equals(
-            NotebookGitAcceptedTree.sorted(
-                NotebookGitAcceptedTree.readEntries(repository, acceptedHead)));
+      List<PortableTreeEntry> currentEntries, List<PortableTreeEntry> acceptedEntries) {
+    return NotebookGitAcceptedTree.sorted(currentEntries).equals(acceptedEntries);
   }
 
   private static ResponseStatusException projectionDrift() {

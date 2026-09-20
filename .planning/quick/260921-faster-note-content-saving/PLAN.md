@@ -13,6 +13,7 @@ Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
 - Execution branch: `codex/faster-note-content-saving`.
 - Authorized destination: `origin/main`, `nerds-odd-e/doughnut`.
 - Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (claim), `11b76124f07c23f24adac79200cd6a1ebf8794b1` (slice 1).
+- Slice 4 published: `83c0232613e7edc1f387e50dc15844e6d4ea51ea`.
 - Slice 2 published: `c3ee401d12f703cf94bda093d2c41a002973e466`; slice 3: `9f5f9b2b09cc0008d1f5781df563f949203e9643`.
 - Product baseline revision: `b5cad203d1d8915b03cbb2353866134979519349`.
 - Replanning: retain existing plan refinement authority within selected story scope.
@@ -131,10 +132,8 @@ binary prepared statements and Git object reuse; no new cache or persistence tie
 
 ## Ordered slices
 
-Target five active minutes per leaf. At ten minutes stop and finer-decompose
-unless the extra time is the required full backend suite or the bounded large
-fixture/profile run. Record such external verification time separately; it does
-not excuse an oversized implementation. Every delivered boundary stays green.
+Target five active minutes; at ten stop and finer-decompose. Required full-suite
+and bounded fixture/profile runtime is separate; every delivered boundary stays green.
 
 ### 1. Read Portable snapshots through their existing flat representation
 
@@ -196,12 +195,12 @@ note-edit 12/12. Refactor emission helper: focused16/typecheck passed. Evidence
 ### 5. Accept one final Portable snapshot with less repeated work
 
 Type: Behavior
-Status: planned
+Status: done
 Size hypothesis: about five minutes of edits; final benchmark runtime separate.
 
-Implementation passes 2,536 backend tests; E2E 30/31 (property race). Patch:
-`/tmp/donut-accepted-tree-reuse-formatted.patch`. Required browser proof remains open.
-Fresh refactor/formatter passed. Backend diff net −11 lines; not committed.
+Implementation passes 2,536 backend tests. Restored exact independently reviewed,
+formatted patch (byte comparison passed); focused editor/wiki E2E now 31/31.
+Log `/tmp/donut-accepted-tree-e2e-fixed.log`. Backend aggregate net −11 lines.
 
 Behavior: saving changed wiki-linked content completes sooner while comparison
 and the appended accepted commit describe the same complete final tree.
