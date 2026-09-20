@@ -100,6 +100,7 @@
 
 <script setup lang="ts">
 import { Plus } from "@lucide/vue"
+import { isEqual } from "es-toolkit"
 import { computed, provide, ref, useId, watch } from "vue"
 import RichFrontmatterReadOnlyList from "@/components/form/RichFrontmatterReadOnlyList.vue"
 import RichFrontmatterEditablePropertyList from "@/components/form/RichFrontmatterEditablePropertyList.vue"
@@ -112,9 +113,9 @@ import { useRichFrontmatterPropertyEditing } from "@/composables/useRichFrontmat
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import {
   parseNoteContentMarkdown,
+  sortedPropertyRowsFromNoteProperties,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
-import { richFrontmatterPropertyRowsFromMarkdown } from "@/utils/richFrontmatterPropertyRowsFromMarkdown"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 const props = defineProps<{
@@ -223,10 +224,11 @@ const {
 })
 
 watch(
-  () => props.contentMarkdown,
-  () => {
-    propertyRows.value = parsed.value.ok
-      ? richFrontmatterPropertyRowsFromMarkdown(props.contentMarkdown)
+  () => (parsed.value.ok ? parsed.value.properties : undefined),
+  (properties, previousProperties) => {
+    if (isEqual(properties, previousProperties)) return
+    propertyRows.value = properties
+      ? sortedPropertyRowsFromNoteProperties(properties)
       : []
     insertOpen.value = false
     draftKey.value = ""

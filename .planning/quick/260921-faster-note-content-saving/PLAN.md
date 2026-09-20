@@ -1,6 +1,6 @@
 # Faster note-content saving
 
-Status: slice 1 published; slice 2 verified for delivery; slice 3 next.
+Status: resumed with owner approval: fix property race and pursue profile-supported alternatives.
 Source: [SEED-034 story 1](../../seeds/SEED-034-faster-note-content-saving.md#story-1).
 Identity: SEED-034#story-1.
 Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
@@ -13,19 +13,19 @@ Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
 - Execution branch: `codex/faster-note-content-saving`.
 - Authorized destination: `origin/main`, `nerds-odd-e/doughnut`.
 - Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (claim), `11b76124f07c23f24adac79200cd6a1ebf8794b1` (slice 1).
+- Slice 2 published: `c3ee401d12f703cf94bda093d2c41a002973e466`.
 - Product baseline revision: `b5cad203d1d8915b03cbb2353866134979519349`.
 - Replanning: retain existing plan refinement authority within selected story scope.
 - CI source: GitHub Actions, `ci.yml`, display name `donut CI`.
-- CI observer: coordinator `260921-resume2`, yielded cell `94`, session `90384`,
-  process `61971`, directory `/tmp/dough-ci-501/watch-WZsYXb`; runtime is this
-  execution checkout's `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`.
-- Claim backend CI failed: run `35478855867`, job `105992832735` has five
-  failures caused by MySQL `Too many connections`/consequent context-load
-  failures. Earlier product revision `4d06fc052f` run `35476646641`, job
-  `105986915501` has the same five failures and causes. Claim diff changes only
-  this backlog entry; this is an existing test-environment defect, not a
-  passing CI result. Logs: `/tmp/donut-save-claim-backend.log` and
-  `/tmp/donut-save-prior-backend.log`. No retry or unrelated repair performed.
+- CI observer `260921-resume3`: cell 165, session 29441, PID 33737,
+  `/tmp/dough-ci-501/watch-L7rB7G`. Prior resume2 observer stopped with receipt;
+  its three events inspected; pending CI at that shutdown remains unobserved.
+- Claim CI run `35478855867` and earlier product run `35476646641` have the
+  same five MySQL `Too many connections`/context-load failures. Slice 1 run
+  `35481168542` and slice 2 run `35481727999` reproduce those five failures.
+  This is an existing test-configuration defect, not passing CI or an outage.
+  Logs `/tmp/donut-save-{claim,prior}-backend.log` and
+  `/tmp/donut-save-slice{1,2}-ci.log`; no retry or unrelated repair performed.
 
 ## Goal and scope
 
@@ -43,16 +43,8 @@ revisiting the plan. Title/Readme performance and bulk publication performance
 are deferred, while affected shared behavior must remain correct.
 
 ## Research and limits
-
-Read-only Development notebook-1 shape and full original research remain in
-this plan at `b5cad203d1` and `/tmp/donut-note-save-research/`. No Production
-measurement or mutation; research database retired. Controller median 737.1 ms,
-59 statements and 15,269 loaded entities are diagnostic only (different JVM).
-Content saving serializes debounced editor requests through the content
-controller, `WebNoteEditService`, accepted change and realm response owners.
-It hydrates all stored notes/folders and repeats snapshot construction/accepted
-blob decoding. Preserve the 1,000 ms typing debounce, immediate wiki/blur flush,
-content-derived state, complete accepted history and live response resolution.
+Research: `b5cad203d1`, `/tmp/donut-note-save-research/`; no Production changes.
+Preserve 1,000 ms debounce, immediate wiki/blur flush, complete history and live links.
 
 ## Existing solutions and chosen design
 
@@ -99,47 +91,47 @@ bundle. `/tmp/donut-note-save-baseline/README.md` owns restoration/invocation
 instructions for the archived temporary harness. Repository scaffolding was
 removed after capture; do not commit unsanitized research `history.git`.
 
-The sanitized fixture preserves the folder graph (depths 1–12), note/reference
-counts and approximate per-note content lengths. It has 19 changed-history
-commits, head `1204b33d3f48da94ad495e1a0c9beb6054b68aa2`, tree
+Synthetic fixture: 11,184 notes, 4,046 folders, 17,739 references, depths 1–12,
+approximate content lengths and 19 changed-history commits; head `1204b33d3f48da94ad495e1a0c9beb6054b68aa2`, tree
 `cf2c333f8041a2f08e2aa197cb30796765917bb7`. Synthetic bundle is 4,855,865 bytes
 versus 3,288,529 original: a disclosed representativeness limit. Reuse EXACT
 before bundle bytes, same SQL/sequence/runtime and real timers for comparison.
 Keep setup outside timing and first-save observations separate.
 
-Existing/plain last-type-completion-to-saved medians are 2412.5/2370.5 ms,
-including roughly 956–959 ms debounce. `cy.type` returns about 35–45 ms after
-final input, so immediate added-link flush has a negative apparent debounce;
-this timestamp limitation does not affect request-to-visible duration.
+Type-completion timing includes ~1s debounce; `cy.type` returns 35–45ms after
+last input. Request-to-visible is the authoritative comparison.
 
-Baseline setup used a bounded 30-active-minute fixture/timing exception.
-An initial MySQL ENOSPC stall is retained in `disk-full-attempt/`; user freed
-disk and resumed before accepted capture. No shared database/binlogs deleted.
-Old CI process 18938 is absent; ENOSPC prevented its terminal receipt
-(`/tmp/dough-ci-501/watch-L5kmu0`). Its two failures were accounted for;
-pending CI in that gap is unobserved. Current observer identity is above.
+Baseline setup used a bounded 30-active-minute exception. Initial ENOSPC evidence
+remains in `disk-full-attempt/`; no shared database/binlogs deleted. ENOSPC also
+lost the old observer's terminal receipt; its two failures were accounted for,
+PID 18938 is absent, and pending CI in that gap remains unobserved.
 
 ## Evidence-led plan reassessment
 
-Deep JFR: 2676 of 5362 request CPU samples have MySQL/TLS crypto leaves;
-1366 involve collection reads, 452 single-entity reads and 854 entity writes.
-Overlapping stack categories: Hibernate 4180, accepted-web-change 3145, JGit
-898, state-loader 724, realm 17, wiki resolver 10. These are sampled CPU
-observations, not elapsed-time fractions; frame truncation limits exact-query
-attribution. The prior controller median is not comparable acceptance evidence.
+Tier-1 JFR has 2676/5362 MySQL/TLS crypto CPU samples; this dominance disappears
+under normal JIT. Raw/deep analyses remain beside their respective recordings.
+CPU categories overlap; truncated stacks and thresholded waits limit attribution.
 
-Persistence remains the supported target. Transport/encryption weakens the
-hypothesis that selected removals alone exceed 4×, so profile residual cost at
-slice 2/final acceptance and do not infer speedup from entity counts. Keep the
-same cohesive simplification. Link caching and changing debounce do not address
-this evidence. No TLS weakening, runtime-only tuning or new persistence
-architecture is selected. Failure to reach 4× requires evidence-led refinement,
-not a relaxed target or speculative machinery. Source outcome is unchanged.
+Persistence remains the supported target; entity counts do not establish 4×.
+No TLS weakening or after-only benchmark runtime change is selected.
+BootRun limits JIT to tier 1; production starts the JAR without that limit.
+Additional paired browser runs used `optimizedLaunch=false` identically, exact
+fixture/warmups/samples and verified tier 4 flags. Evidence `normal-jit/` under
+the baseline directory. Existing links: 795→602.5 ms (1.320×); added links:
+785→530 ms (1.481×); plain: 766.5→499.5 ms (1.535×). Final p95 621/579/511 ms
+versus 902/884/851. Both 72-save runs passed reload/link checks without diagnostics.
+This approximates production JIT, not hardware/network/load; 4× is still missed.
+Normal-JIT JFR has 43/997 crypto, 453 Hibernate and 383 JGit CPU samples
+(overlapping, not elapsed fractions). Disposable benchmark resources retired.
+Owner approved property-race repair and further practical solutions on 2026-09-20,
+retaining architecture and smaller-code standards. Visible refresh follows the
+response by median 19 ms; remaining request work includes writeTree 246/997 CPU
+samples and 98 samples escaping bundle bytes into SQL text. Investigate existing
+binary prepared statements and Git object reuse; no new cache or persistence tier.
 
 ## Ordered slices
 
-Target approximately five minutes of implementation, verification, and cleanup
-per leaf. Scrutinize work exceeding five; at ten minutes stop and finer-decompose
+Target five active minutes per leaf. At ten minutes stop and finer-decompose
 unless the extra time is the required full backend suite or the bounded large
 fixture/profile run. Record such external verification time separately; it does
 not excuse an oversized implementation. Every delivered boundary stays green.
@@ -153,20 +145,8 @@ export controller/service, Portable snapshot and cutover assertions inspected.
 Log: `/tmp/donut-flat-export-backend.log`. Independent refactor: no changes.
 Size hypothesis: about five minutes of edits; required full-suite time separate.
 
-Have the existing export-row owner obtain folder/note scalar projections
-directly from the repositories, preserving order, null/root placement, display
-names, complete stored content including trash, and README/empty-folder bytes.
-Remove entity-to-row mapping where no entity is needed. Do not change ordinary
-note query meanings or introduce another export shape. This enables slice 2 to
-compare complete notebooks without managing every note/folder as an entity.
-
-Preserve `DisplayName` conversion and null root IDs in projections, and retain
-`notes(List<Note>)` for publication's identity-bearing callers.
-
-Proof: existing `NotebookExportControllerTest`, `NotebookExportServiceTest`,
-`PortableTreeSnapshotTest`, and Git cutover/controller coverage, through the
-full backend suite. Add only a missing stable-boundary case if inspection finds
-a projection semantic gap. Export bytes must remain unchanged.
+Shared scalar rows preserve order, root IDs, converted names, trash and all
+Portable bytes. Publication retains `notes(List<Note>)` for identity-bearing work.
 
 ### 2. Save a changed note without hydrating the entire notebook as entities
 
@@ -181,35 +161,47 @@ Identical 72-save browser run passed (2m49s), evidence `after-slice2/` under the
 baseline directory: visible median/p95 existing 1184.5/1272 ms, added 1281/1423,
 plain 1222/1642; speedups 1.228×/1.152×/1.157×. Whole-notebook loader frames
 disappeared; 2284/4056 request CPU samples remain JDBC/TLS crypto leaves.
-Size hypothesis: five to ten minutes; cross-caller adaptation is the sizing risk.
+Binding locks plus flat rows replace `LockedNotebooks`; all five clients resolve
+targets transactionally. Content/history, queued movement/trash and reduction
+proof preserves commits, identities, ordered locks and drift; publication retains
+entity loading for identity/application.
 
-Behavior: given a large synchronized notebook, changing one note's content
-persists the complete accepted change while managed-entity loading is confined
-to actual mutation/read needs rather than every stored note and folder.
+### 3. Preserve property drafts across a body refresh
 
-Use binding locks plus the shared flat projection in `AcceptedWebChangeService`.
-Resolve mutation targets through the repository inside its transaction. Remove
-`LockedNotebooks` and snapshot-instance lookup if the inspected callers confirm
-they have no remaining responsibility. Adapt callbacks in web note editing,
-creation, folder creation/relocation, and relationship reduction in the same
-green boundary. Keep multi-notebook locking, under-lock touched-set validation,
-post-mutation flush, fresh final rows, and the existing drift policy.
-Publication still loads entities when needed for identity/application.
+Type: Behavior
+Status: done; independent refactor removed unused parser helper; typecheck passed
+Size: ~11 active minutes including bounded diagnostic extension; tests separate.
+PFE: synchronize the existing mutable property draft from immutable incoming
+properties, not unrelated body/YAML syntax changes. No extra queue or stale array.
+Mounted real-editor regression holds note-info pending, edits a newer value,
+refreshes the body, then requires the final emitted rename/value/new body together.
+RED before repair; full frontend 1,904 tests, typecheck, ordinary note-edit 12/12
+passed. Logs `/tmp/donut-property-draft-{red,frontend-final,e2e-green}.log`.
+This repairs a separate proven draft race; it does not fix the original E2E loss.
 
-Proof: controller save/readback and downloaded bundle show one correct accepted
-commit, retained learning identity, unchanged no-op behavior, and no lost
-concurrent accepted work. Reuse `NotebookGitWebContentSaveControllerTest`,
-`NotebookGitWebContentHistoryControllerTest`, folder/new-note/move and
-`NotebookGitWebRelationReduceControllerTest` coverage. Run all backend tests.
-Re-profile the same workload: report latency and entity counts separately;
-ensure the whole-notebook entity population is gone without counting removal
-of correctness work as an improvement. This slice owns shared-caller preservation.
+### 4. Finish a guarded property edit before editor-mode teardown
 
-### 3. Accept one final Portable snapshot with less repeated work
+Type: Behavior
+Status: next; existing guarded-operation loading selected
+Size hypothesis: five active minutes; required tests separate.
+The original delayed-note-info E2E still fails after slice 3. Its sole PATCH
+request/response content is identical; no rename PATCH occurs. Switching to
+Markdown unmounts the rich editor before the pending rename emits. Preserve
+tracker confirmation/cancellation. Use existing blocking loading for the complete
+rename/removal only; ordinary value edits stay unblocked. Shared hasOpenModal
+recognizes native modal dialogs so M cannot bypass loading. No new operation queue.
+Proof: delayed guard + attempted M, completion/source check; frontend/typecheck/E2E.
+Evidence `/tmp/donut-property-rename-fixed.log` and `-fixed-http.json`.
+
+### 5. Accept one final Portable snapshot with less repeated work
 
 Type: Behavior
 Status: planned
 Size hypothesis: about five minutes of edits; final benchmark runtime separate.
+
+Implementation passes 2,536 backend tests; E2E 30/31 (property race). Patch:
+`/tmp/donut-accepted-tree-reuse-formatted.patch`. Required browser proof remains open.
+Fresh refactor/formatter passed. Backend diff net −11 lines; not committed.
 
 Behavior: saving changed wiki-linked content completes sooner while comparison
 and the appended accepted commit describe the same complete final tree.
@@ -221,18 +213,28 @@ Keep no-op, drift, folder/readme/empty-folder representation, and exact authored
 content behavior. Do not introduce changed-note-only Git patching, which could
 miss other notes touched by a complete operation.
 
-Proof: full backend suite plus focused note-edit and wiki-link E2E. This slice
-owns the final browser comparison and aggregate design acceptance: greater than
-4× for both selected wiki-link workloads, plain-content/p95 regression check,
-no edit-race regression, and net fewer handwritten production lines with fewer
-representations. Inspect the complete diff and explain removed responsibilities.
-If 4× is missed, this story remains incomplete even if this slice's local
-simplification is correct. Capture the remaining cost and refine the same plan
-before selecting another change; do not append speculative optimizations.
+Proof: full backend suite plus focused note-edit and wiki-link E2E. Retain the
+measured normal-JIT result above; slice 6 owns the next performance comparison.
+
+### 6. Persist binary Git bundles through the driver's binary protocol
+
+Type: Structure
+Status: planned
+Size hypothesis: five active minutes; full suite/benchmark separate.
+PFE: Connector/J already supports server-prepared binary parameters. Configure
+`useServerPrepStmts` once in common Hikari data-source properties; verify all
+profiles inherit it, including production's URL override. Preserve TLS, complete
+bundle bytes, atomicity and history. No new cache, storage or URL-specific copies.
+Proof: full backend suite's accepted-bundle round trips; effective driver/profile
+inspection; same normal-JIT 72-save benchmark and JFR show whether text escaping
+is removed and whether latency improves. Revert an ineffective/regressive choice.
+Aggregate gate remains >4× for both wiki workloads, control/p95 preservation,
+no edit loss, and net fewer handwritten production lines. If still missed,
+refine from evidence before selecting Git object reuse or another change.
 
 ## Verification and delivery
 
-All slices require `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+Backend/config slices require `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
 Final focused E2E command:
 `CURSOR_DEV=true nix develop -c pnpm cy:run --spec 'e2e_test/features/note_creation_and_update/note_edit.feature,e2e_test/features/note_topology/wiki_link.feature,e2e_test/features/note_topology/property_wiki_link.feature'`.
 
@@ -245,6 +247,4 @@ migration guidance if needed. Never run tests in Development.
 Coordinator delivery: Jidoka → fresh dough-post-change-refactor agent → API
 regeneration if triggered → `./scripts/run.sh pnpm format:changed` once → plan
 update → commit with check-only hook → Trunk publication/CI registration.
-Retain plan/evidence for automatic retrospective and later story wrap-up.
-
-Final 4× efficacy is unproved until the final comparison passes.
+Retain evidence for retrospective/wrap-up.

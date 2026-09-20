@@ -83,6 +83,10 @@ cache invalidation, background coordination, or parallel representations.
     A canonical no-op does not append a commit. Preserve existing drift policy.
   - Plain content still saves correctly; typing again during an in-flight save
     must not lose the newer edit or mark it saved prematurely.
+  - A property rename awaiting its learning-tracker guard survives an earlier
+    save response and preserves newer edits. Switching to Markdown while the
+    guard is pending must not lose the rename. The owner explicitly included
+    property-race repair in this story on 2026-09-20.
 - **Value / learning:** Reduce editing delays and identify what makes save
   latency grow in large notebooks.
 - **Effort hypothesis:** M–L (roughly 1–4 hours); medium confidence in the
