@@ -478,7 +478,7 @@ genuine (not invented) by direct inspection.
 
 ### 7. Publish local history into the same durable repository
 
-Type: Behavior. Status: planned; depends on 5–6.
+Type: Behavior. Status: done.
 
 Given a valid local linear range, publication → exact proposed tip/history and
 the existing final identity/projection outcome, followed by an ordinary web save
@@ -490,6 +490,29 @@ Proof: `NotebookGitPublicationControllerTest`, `NotebookGitIdempotentPublishCont
 and `NotebookGitMixedEditingControllerTest`; inspect downloaded ancestry, not
 just returned IDs. Change fixtures coupled to stored bundle bytes without
 weakening the assertions. Size: 5–10 active minutes; no second importer algorithm.
+
+Delivered: confirmed by investigation (not assumption) that slice 5 already satisfied
+this promise for three of the four named test classes —
+`NotebookGitPublicationControllerTest`, `NotebookGitProposalAncestryControllerTest`, and
+`NotebookGitMixedEditingControllerTest` already inspect downloaded ancestry (parent
+chains via `RevWalk`, not just returned IDs) and already prove a web save after a local
+publish has that publish's tip as its parent (`NotebookGitMixedEditingControllerTest`'s
+`getParent(0)` chains) — no changes needed, no production code touched anywhere in this
+slice. One real gap in `NotebookGitIdempotentPublishControllerTest`'s multi-commit
+retry test: it checked only the returned head string and DB counts, with a vestigial
+`bundleBytes` equality assertion that could never meaningfully fail (that column is
+deliberately stale once native-touched, per slice 5). Added a downloaded-ancestry
+inspection after the first publish (head, two-commit parent chain, exact surviving
+paths and blob content) and removed the vestigial byte comparison, relying on the
+already-asserted content-addressed `acceptedHead` equality plus the new ancestry proof.
+No second importer/copy mechanism was added; publication continues through
+`NotebookGitAcceptedRepositoryStore.store`'s existing native-vs-foreign-repository
+branch from slice 5. Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree`
+— full suite green, 2542 tests (unchanged count from slice 6 — only assertions changed
+in one existing test), independently reverified by the coordinator after implementation,
+refactor (no changes made), and formatting (no changes made); the "already covered"
+claims for the three untouched classes were independently spot-checked by the
+coordinator via direct grep, not taken on trust.
 
 ### 8. Preserve repository lifecycle outside ordinary edits
 
