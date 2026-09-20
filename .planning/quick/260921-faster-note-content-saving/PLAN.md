@@ -13,6 +13,7 @@ Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
 - Execution branch: `codex/faster-note-content-saving`.
 - Authorized destination: `origin/main`, `nerds-odd-e/doughnut`.
 - Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (claim), `11b76124f07c23f24adac79200cd6a1ebf8794b1` (slice 1).
+- Slice 5 published: `b662f6e8bb1f96293c589a8d64911d78b8522db0`.
 - Slice 4 published: `83c0232613e7edc1f387e50dc15844e6d4ea51ea`.
 - Slice 2 published: `c3ee401d12f703cf94bda093d2c41a002973e466`; slice 3: `9f5f9b2b09cc0008d1f5781df563f949203e9643`.
 - Product baseline revision: `b5cad203d1d8915b03cbb2353866134979519349`.
@@ -43,10 +44,6 @@ selected. Keep existing editor timing and API shape unless evidence requires
 revisiting the plan. Title/Readme performance and bulk publication performance
 are deferred, while affected shared behavior must remain correct.
 
-## Research and limits
-Research: `b5cad203d1`, `/tmp/donut-note-save-research/`; no Production changes.
-Preserve 1,000 ms debounce, immediate wiki/blur flush, complete history and live links.
-
 ## Existing solutions and chosen design
 
 PFE selected existing `NotebookExportRows`, `ExportNoteRow`, `ExportFolderRow`
@@ -60,24 +57,22 @@ whole-notebook target lookup; ORM already owns managed-entity identity.
 Publication retains identity-bearing `LockedNotebookState`; inspect its callers.
 Read accepted entries once per opened binding and reuse one final snapshot for
 comparison/persistence. These are operation-local inputs, not a persistent cache.
-Native Git tree comparison is a possible later alternative, not selected work.
+Native Git object reuse is selected below; the complete snapshot stays authoritative.
 Keep authored persistence, reference replacement/indexing and live resolution
 with existing owners. No speculative batching, memoization or new indexes.
 
-Follow Accepted ADRs 0001 (domain), 0002 and
-`docs/notebook-git-synchronization.md` (atomic projection/head, original history),
-0004 (Portable bytes/references), 0005 (destinations), 0006 (visible failures),
-0007 (environment isolation), plus `.planning/NORTH-STAR.md` section
-“One complete accepted web change”. No architectural exception is selected.
+Follow Accepted ADRs 0001/2/4/5/6/7, `docs/notebook-git-synchronization.md`
+and NORTH-STAR “One complete accepted web change”: atomic complete projection/
+head/history, Portable bytes/references, destinations, failures, isolation. No exception.
 
 ## Baseline and retained evidence
 
-Before product edits, the owned rich-editor browser baseline passed in 3m02s:
-three workloads × (first save + three warm-ups + 20 changed samples), with
+Before product edits: rich-editor baseline passed in 3m02s; three workloads ×
+(first save + three warm-ups + 20 changed samples), with
 HTTP 200, dirty-state clearing, exact refreshed link destinations and final
 reload/content/link assertions. No watchdog diagnostics perturbed samples.
 Setup supplies only the starting fixture; real editor typing initiates saves.
-Source boundary is request initiation through saved/refreshed visible state.
+Boundary: request initiation through saved/refreshed state; keep 1s debounce.
 
 | Workload | Request median | Visible median | Visible p95 |
 | --- | ---: | ---: | ---: |
@@ -137,33 +132,24 @@ and bounded fixture/profile runtime is separate; every delivered boundary stays 
 
 ### 1. Read Portable snapshots through their existing flat representation
 
-Type: Structure
-Status: done
+Type: Structure; Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed 2,535 tests;
 export controller/service, Portable snapshot and cutover assertions inspected.
 Log: `/tmp/donut-flat-export-backend.log`. Independent refactor: no changes.
-Size hypothesis: about five minutes of edits; required full-suite time separate.
-
-Shared scalar rows preserve order, root IDs, converted names, trash and all
+Size: five active minutes; full-suite separate. Shared scalar rows preserve order, root IDs, converted names, trash and all
 Portable bytes. Publication retains `notes(List<Note>)` for identity-bearing work.
 
-### 2. Save a changed note without hydrating the entire notebook as entities
+### 2. Save without hydrating the notebook as entities
 
-Type: Behavior
-Status: done
-Proof: full backend suite passed 2,536 tests (1m03s); controller load regression
-loads fewer than 30 Notes for a notebook with 30 unrelated notes. No-op,
-readback, learning identity, downloaded ancestry, queued saves and cross-notebook
-reduction assertions inspected. Log `/tmp/donut-save-without-hydration-final-backend.log`.
-Active edits ~7 minutes; independent refactor found no changes.
-Identical 72-save browser run passed (2m49s), evidence `after-slice2/` under the
-baseline directory: visible median/p95 existing 1184.5/1272 ms, added 1281/1423,
-plain 1222/1642; speedups 1.228×/1.152×/1.157×. Whole-notebook loader frames
-disappeared; 2284/4056 request CPU samples remain JDBC/TLS crypto leaves.
-Binding locks plus flat rows replace `LockedNotebooks`; all five clients resolve
-targets transactionally. Content/history, queued movement/trash and reduction
-proof preserves commits, identities, ordered locks and drift; publication retains
-entity loading for identity/application.
+Type: Behavior; Status: done; active work ~7 minutes, tests separate.
+Proof: full backend 2,536 passed; controller regression loads fewer than 30 Notes
+with 30 unrelated notes. Commit ancestry, no-op/drift, identity, queued movement/
+trash and cross-notebook reduction proof passed. All five clients resolve targets
+transactionally; publication retains identity-bearing entity loading.
+Log `/tmp/donut-save-without-hydration-final-backend.log`; fresh refactor: no edits.
+Identical 72-save Tier-1 browser run passed; `after-slice2/` retains full evidence.
+Visible median/p95 existing 1184.5/1272, added 1281/1423, plain 1222/1642 ms;
+speedups 1.228×/1.152×/1.157×. Whole-notebook loader frames disappeared.
 
 ### 3. Preserve property drafts across a body refresh
 
@@ -215,21 +201,36 @@ miss other notes touched by a complete operation.
 Proof: full backend suite plus focused note-edit and wiki-link E2E. Retain the
 measured normal-JIT result above; slice 6 owns the next performance comparison.
 
-### 6. Persist binary Git bundles through the driver's binary protocol
+### 6. Evaluate binary parameters for persisted Git bundles
 
-Type: Structure
-Status: planned
-Size hypothesis: five active minutes; full suite/benchmark separate.
-PFE: Connector/J already supports server-prepared binary parameters. Configure
-`useServerPrepStmts` once in common Hikari data-source properties; verify all
-profiles inherit it, including production's URL override. Preserve TLS, complete
-bundle bytes, atomicity and history. No new cache, storage or URL-specific copies.
-Proof: full backend suite's accepted-bundle round trips; effective driver/profile
-inspection; same normal-JIT 72-save benchmark and JFR show whether text escaping
-is removed and whether latency improves. Revert an ineffective/regressive choice.
-Aggregate gate remains >4× for both wiki workloads, control/p95 preservation,
-no edit loss, and net fewer handwritten production lines. If still missed,
-refine from evidence before selecting Git object reuse or another change.
+Type: Structure; Status: done with no product change; rejected setting reverted.
+PFE: common Hikari `useServerPrepStmts` uses the existing driver's binary protocol.
+Full backend 2,536 permanent tests plus temporary diagnostic passed. Spring-bound
+property true in all profiles; actual Unit DB ServerPreparedStatement round-trips
+all 256 bytes. No prod connection; prod URL/pool unchanged. Diagnostic removed.
+Normal-JIT 72-save run passed correctness, but visible median/p95 became existing
+659/1044, added 973.5/1204, plain 583/974 ms. Hex escaping disappeared; measured
+commit-associated socket waits rose 3.41→17.15s. Same-current-code control passed:
+583/637, 520/590, 542/585 ms respectively. No demonstrated benefit; reverted.
+Free disk changed ~10→24 GiB around these runs; causal attribution remains uncertain.
+Evidence `normal-jit/binary-prepared/`, `current-control/` and `/tmp/donut-binary-parameters-*`.
+
+### 7. Reuse unchanged Git blobs while building the complete final tree
+
+Type: Structure; Status: planned; driver experiment rejected.
+Size hypothesis: 5–10 active minutes; full suite/profile runtime separate.
+PFE: existing accepted Portable entries plus native DirCache retain blob identity.
+Iterate every final entry; unchanged path/content keeps its native parent entry,
+new/changed content inserts a blob, and omitted paths disappear. Native builder
+owns sorting. No persistent cache, custom hash or changed-note-only projection.
+Fold single-caller AcceptedSnapshotPersistence into AcceptedWebChangeService,
+which already owns binding, transaction, bundle lifetime and final snapshot.
+Proof: mixed Unicode/unchanged/edit/add/delete/empty-folder final snapshot has
+same tree ID as fresh complete build and exact prior parent; full backend suite;
+same normal-JIT 72-save/JFR comparison. Preserve bytes, modes, history and no-op.
+Whole-pack reuse rejected: may retain unreachable objects and grow edit history.
+Aggregate gate: >4× both wiki workloads, plain/p95 preservation, no edit loss,
+and net fewer handwritten production lines. Reassess evidence if still missed.
 
 ## Verification and delivery
 
