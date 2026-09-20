@@ -444,7 +444,7 @@ complete-object-closure contract all support the design as implemented.
 
 ### 6. Preserve atomic acceptance across competing and failed native writes
 
-Type: Behavior. Status: planned; depends on 5.
+Type: Behavior. Status: done.
 
 Given concurrent writers or failure after object insertion, acceptance → either
 one complete durable successor or unchanged committed state, never an advertised
@@ -457,6 +457,24 @@ ordinary test rollback is insufficient. Every implementation slice already retai
 existing atomicity proofs; this leaf fills the native durability gap. Approximately
 five active minutes given the transaction seam slice 4 and the spike already proved;
 otherwise refine.
+
+Delivered: confirmed slice 5's design (native writes on the connection bound to the
+surrounding Spring transaction) already gives atomic native durability for free — no
+production code changed. Added `lateBindingSaveFailureLeavesNoDurableNativeObjectStoreRows`
+to `NotebookGitPublicationAtomicControllerTest`, reusing that class's pre-existing
+`FAIL_ON_BINDING_SAVE`/`FailableEntityPersister` failure-injection seam (fires in
+`entityPersister.save(binding)`, after native object rows are already flushed) and
+pre-existing `countNativeObjectStoreRows`/`reloadCommittedBinding` committed-transaction
+helpers. Observed: after a forced failure post-native-insertion, the native row count is
+exactly unchanged, the accepted head is unchanged from a separately committed reader, and
+a freshly reopened download resolves the original pre-failure content — full rollback, the
+stronger of the two acceptable outcomes the plan named. Neither existing atomicity test
+class needed behavioral changes. Post-change refactor extracted a shared
+`triggerFailingContentUpdate` helper to remove duplication between the new test and an
+existing one. Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` — full
+suite green, 2542 tests, 0 failures, independently reverified by the coordinator after
+implementation, refactor, and formatting; failure-injection/helper reuse confirmed
+genuine (not invented) by direct inspection.
 
 ### 7. Publish local history into the same durable repository
 
