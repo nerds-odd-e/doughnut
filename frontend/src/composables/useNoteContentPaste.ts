@@ -70,13 +70,20 @@ export function useNoteContentPaste(options: {
     content: string,
     update: NoteContentUpdate
   ) => {
-    if (contentOpensLinkImagePrompt(content)) {
-      clearPasteChoice()
-    }
+    // Suspend the current choice (and its timer) while the modal is open, rather than
+    // discarding it: cancellation below resumes it, removal consumes it.
+    const suspendedChoice = contentOpensLinkImagePrompt(content)
+      ? pasteChoice.value
+      : null
+    if (suspendedChoice) clearPasteChoice()
+
     const processedContent = await processContentAfterPaste(content)
     if (processedContent !== null) {
       lastAppliedValue = processedContent
       update(options.noteId(), processedContent)
+    } else if (suspendedChoice && pasteChoice.value === null) {
+      // Nothing else claimed pasteChoice while the modal was open, so it is still current.
+      setPasteChoice(suspendedChoice)
     }
   }
 

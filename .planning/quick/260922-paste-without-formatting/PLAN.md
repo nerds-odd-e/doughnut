@@ -352,10 +352,29 @@ clears the choice until slice 5 adds its specified cancellation behavior.
 
 ### 5. Retain the choice after cancelling link or image removal
 Type: Behavior
-Status: planned
+Status: done
 Estimate: about 5 minutes; medium confidence.
 Proof: actual clipboard event and real popup UI at the mounted note editor;
 cancel → correction available, removal → no stale correction.
+
+Accepted proof:
+```
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableContent.pasteChoice.spec.ts tests/notes/NoteEditableContent.pasteChoiceLinkRemoval.spec.ts tests/notes/NoteEditableContent.paste.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend run build
+```
+24/24 tests pass; no type diagnostics; production build succeeds cleanly
+(3886 modules, no formatting findings this time). `offerToRemoveLinksAndImages`
+in `useNoteContentPaste.ts` now saves any current `pasteChoice.value` before
+the modal opens, clears it while the modal is up, and either leaves it cleared
+(removal chosen — consumed) or restores it via `setPasteChoice` (cancelled —
+resumed), guarded by `pasteChoice.value === null` so nothing that claimed the
+slot in the meantime gets clobbered. `replace()` still never calls
+`offerToRemoveLinksAndImages`, so applying the alternative never reopens the
+modal (confirmed by both inspection and a new test). New tests extracted to
+their own file, `NoteEditableContent.pasteChoiceLinkRemoval.spec.ts`, since
+`.pasteChoice.spec.ts` is already over this directory's 250-line convention
+from prior slices (pre-existing, not aggravated further).
 
 Behavior: The existing removal modal suspends the current paste choice and
 timer; cancellation resumes it if that paste is still current. Choosing
