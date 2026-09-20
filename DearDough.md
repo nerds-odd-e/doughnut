@@ -785,30 +785,6 @@ create the symlink before the observer is armed.
     `.agents/skills` never consulted even though this entry already names it
     as the fix.
 
-- Execution: SEED-035 story 6 / quick/002-notebook-attachment-continuity / 77328176d2
-  - Timestamp: 2026-09-20T18:50+08:00
-  - Tool: Claude Code
-  - Model: claude-opus-5
-  - Open Dough release: unknown
-  - Evidence: in a worktree created moments earlier with `git worktree add`,
-    `ls .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs` returned
-    "No such file or directory" while `ls .agents/skills/` listed
-    `dough-execute-plan`. `node '<worktree>/.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
-    then printed `CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-aGN5jn"}`
-    and the PostToolUse hook added `{"type":"CI_MONITOR_READY"}`.
-  - Observed effect: one wasted tool call. The realpath was used for every
-    later call (probe, start, nine `register-push` calls, stop), the observer
-    was armed before the first slice was delegated and before any push, and no
-    coverage was lost. No symlink was copied or created, so the worktree's
-    `.claude/` holds only `settings.json` and cannot drift from the main
-    checkout's install.
-  - Inference: a fifth instance, and the first in which the coordinator used
-    `.agents/skills` for the whole execution rather than only after the failure
-    — but it still spent the first call on the documented `.claude/skills`
-    path. The entry's proposed fix (name `.agents/skills` as this project's
-    runtime location in guidance) remains unapplied, so the wasted first call
-    is the stable cost of every fresh worktree.
-
 ## DD-075 — The product backlog moved on the shared integration branch between the coordinator's read and its queue claim
 
 `dough-execute-plan`'s [Take queued work](../dough-execute-plan/SKILL.md#take-queued-work)

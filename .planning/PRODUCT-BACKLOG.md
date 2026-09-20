@@ -11,7 +11,6 @@ and deletable in Web Donut.
 ## Taken
 
 - [Save note content more than four times faster with durable native Git storage](seeds/SEED-034-faster-note-content-saving.md#story-2) — SEED-034#story-2 ([plan](quick/001-durable-native-git-storage/PLAN.md))
-- [Keep notebook-root attachments through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-6) — SEED-035#story-6 ([plan](quick/002-notebook-attachment-continuity/PLAN.md))
 
 ## Backlog list
 

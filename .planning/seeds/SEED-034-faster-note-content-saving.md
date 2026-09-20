@@ -114,13 +114,13 @@ or add competing representations. See [current save behavior](../../docs/note-co
 
 - **Identity:** SEED-034#story-3
 - **Status:** queued. Deliberately deferred by the owner until **both**
-  SEED-034#story-2 and SEED-035#story-6 are delivered, because either one can
-  change the answer. No plan; not refined.
+  SEED-034#story-2 is delivered, because it can change the answer. The
+  notebook-root attachment work it pairs with is already delivered. No plan; not refined.
 - **Goal / beneficiaries:** Note authors in notebooks that also hold sizeable
   attachments keep the save responsiveness story 2 delivers, instead of paying
   for attachment bytes on every note save.
-- **Why now / why deferred:** SEED-035#story-6 made a notebook's root
-  attachments part of its live Portable tree. Every ordinary web note save now
+- **Why now / why deferred:** delivered work made a notebook's root attachments
+  part of its live Portable tree. Every ordinary web note save now
   loads all of that notebook's attachment bytes, byte-compares them to detect a
   no-op, and hashes them again when the tree is rebuilt
   (`AcceptedWebChangeService.commitIfChanged` → `NotebookLivePortableTree.entriesOf`
@@ -143,7 +143,9 @@ or add competing representations. See [current save behavior](../../docs/note-co
   Portable tree and accepted-change owners; it must not introduce a second
   content authority, weaken no-op detection or projection-drift detection, or
   change what a notebook's Portable tree contains.
-- **Depends on:** SEED-034#story-2 and SEED-035#story-6, both delivered.
+- **Depends on:** SEED-034#story-2 delivered. The root-attachment work it pairs
+  with is already delivered; see "Root attachments today" in
+  `docs/notebook-git-synchronization.md`.
 - **Effort hypothesis:** S for the measurement; unknown for any change, which
   is exactly what the measurement decides.
 - **Safe stopping point:** An evidenced answer. A measured "no action needed"
@@ -153,8 +155,7 @@ or add competing representations. See [current save behavior](../../docs/note-co
 
 Queue ahead of the remaining note-presentation cleanup, which was explicitly
 deferred to last. Story 2 remains the first queued item. Story 3 is queued last
-by owner request: it cannot be answered until story 2 and SEED-035#story-6 are
-both delivered. Preserve the near-future
+by owner request: it cannot be answered until story 2 is delivered. Preserve the near-future
 direction and leave implementation to its own bounded plan.
 
 ## When to Surface

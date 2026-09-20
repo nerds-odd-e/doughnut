@@ -3,8 +3,9 @@
 Status: **awaiting story refinement — not ready for slice-plan refinement or execution**.
 Work item: **SEED-035#story-9**.
 Source: [mapped story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-9).
-Depends on [root attachment continuity](../002-notebook-attachment-continuity/PLAN.md)
-(SEED-035#story-6). No implementation or completed evidence is carried over.
+Depends on delivered root attachment continuity, whose plan is recoverable at
+`6b906462dd` in `.planning/quick/002-notebook-attachment-continuity/PLAN.md`.
+No implementation or completed evidence is carried over.
 
 ## Mapped outcome and boundaries
 
@@ -111,7 +112,8 @@ and transport are reused; no new rebase algorithm or mocked acceptance.
 
 ## Evidence, priority and safety
 
-The [original-to-new mapping](../002-notebook-attachment-continuity/PLAN.md#redistribution-of-the-original-15-slices)
+The original-to-new mapping, in the delivered root-attachment plan recoverable at
+`6b906462dd` in `.planning/quick/002-notebook-attachment-continuity/PLAN.md`,
 accounts for all 15 original slices. This plan owns only their nested extensions;
 the root story owns shared mechanics and its final-state proof. No product tests
 were run and no slices are done.

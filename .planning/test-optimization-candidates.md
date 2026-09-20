@@ -46,8 +46,8 @@ Consequences for future profiling passes:
   measured — each class re-implements the same
   "fetch the accepted bundle, walk the tip tree, read entries back" scaffolding
   locally (`InMemoryRepository` + `GitBundleTestReader.fetchHead` +
-  `readTreeEntries`) — found 2026-09-20 while refactoring SEED-035#story-6
-  slice 6; three attachment classes were collapsed where they shared a live
+  `readTreeEntries`) — found 2026-09-20 while refactoring the delivered
+  notebook-root attachment work (recoverable at `6b906462dd`); three attachment classes were collapsed where they shared a live
   projection read, but the bundle-tip read was deliberately left alone: a helper
   shared by 3 of 51 would add a fourth idiom rather than give the concept one
   home. Updated 2026-09-20: the remaining duplication is *proposal crafting and

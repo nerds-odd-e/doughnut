@@ -85,54 +85,6 @@ nested-file outcome after resplitting the original 15-slice plan. Story 8 remain
 the owner's second-priority assimilation outcome. No executable plan
 or implementation is authorized by this seed.
 
-<a id="story-6"></a>
-
-### Keep notebook-root attachments through local and web changes
-
-- **Identity:** SEED-035#story-6
-- **Slice plan:** [Refined root attachment continuity](../quick/002-notebook-attachment-continuity/PLAN.md)
-- **Resplit trace:** Retains the original identity for the narrowed first outcome.
-  Story 9 receives nested placement and attachment-bearing folder operations.
-  The former broad story is replaced by these two outcomes, not completed.
-- **Goal:** Notebook owners carry root-level supporting files through local
-  publication, ordinary web note work and acquisition by another checkout.
-- **Why now:** Root files deliver useful continuity without needing folder-file
-  lifecycle rules first. This tests whether carrying supporting material removes
-  manual copying before undertaking subtree operations. A separate repository
-  remains the strongest workaround but requires manual assembly of the notebook.
-- **Scope:** Ordinary non-Markdown files at the notebook root. Local add, edit,
-  rename and removal, including attachment-only commits and first publication;
-  exact filenames/bytes; preservation through web note work and existing snapshot
-  consumers (ZIP export and history reset). Root files are independent of referring
-  notes and are not affected by unrelated Markdown-folder operations.
-- **Key examples:**
-  - Publish root `reference.json` and `diagram.png` with a typed note, edit the
-    note on the web, then pull another checkout: bytes and filenames match and
-    the surviving note keeps its learning association.
-  - Publish only a root-file edit, rename or removal; the recovered tree reflects
-    the change without an unrelated Markdown edit. The first file can accompany
-    no notes at all.
-  - Remove a referring note: the root file remains. Export or reset the notebook:
-    current file content remains recoverable through those existing operations.
-  - Noncompliant `AGENTS.md` plus a valid file change rejects the entire proposal.
-    Compliant guidance uses the ordinary Markdown path.
-- **Constraints:** One content value per exact path, no silent loss or overwrite,
-  unchanged Markdown/Readme, permission and accepted-history rules. Binary and
-  text files share one behavior. No new AI/refinement or assimilation exception.
-- **Interim boundary:** Nested non-Markdown publication retains its existing
-  rejection until story 9 can preserve contained files through existing folder
-  operations. This explicitly bounded intermediate delivery is not a permanent
-  format rule or a separate root-attachment domain concept.
-- **Deferred promises:** Nested attachment placement/lifecycles belong to story 9;
-  web file controls, image rendering/migration, installed skills, new AI features,
-  new Git transport and automatic conflict resolution remain with later work.
-- **Effort hypothesis:** L (2–4 hours), medium confidence after root-only refinement;
-  nine small slices include real checkout recovery and existing-consumer safety.
-- **Depends on:** No new product story. Taken storage work may change code owners,
-  but not this outcome or the single accepted-content authority.
-- **Safe stopping point:** Owners keep and recover useful root files while ordinary
-  web note and Markdown-folder work continues, even if nested support is deferred.
-
 <a id="story-8"></a>
 
 ### Skip common AI guidance folders during assimilation
@@ -309,7 +261,9 @@ If scope shrinks, nested support can be deferred while root continuity remains
 useful; nested browsing then waits too. Image stories retain their existing goals;
 refinement must identify whether their chosen file placement requires story 9,
 rather than silently narrowing them to root files. All original promises have an
-owner in the [slice redistribution](../quick/002-notebook-attachment-continuity/PLAN.md#redistribution-of-the-original-15-slices).
+owner in the slice redistribution recorded in the delivered root-attachment plan
+(`.planning/quick/002-notebook-attachment-continuity/PLAN.md` at `6b906462dd`,
+section "Redistribution of the original 15 slices").
 
 ## Open Refinement Details
 
