@@ -105,7 +105,7 @@ class NotebookGitRootAttachmentPublicationControllerTest
   void invalidMarkdownBesideAValidFileChangeLeavesTheHeadAndTheFilesUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding accepted = publishNoteAndRootFile(notebook);
-    List<PortableTreeEntry> filesBefore = committedRootFiles(notebook);
+    List<PortableTreeEntry> filesBefore = committedRootAttachments(notebook);
 
     assertProposalRejectedWithoutMutatingBinding(
         notebook,
@@ -117,14 +117,14 @@ class NotebookGitRootAttachmentPublicationControllerTest
                 new NotebookGitProposalFile("reference.json", CHANGED_REFERENCE_JSON))),
         HttpStatus.BAD_REQUEST);
 
-    assertThat(committedRootFiles(notebook), equalTo(filesBefore));
+    assertThat(committedRootAttachments(notebook), equalTo(filesBefore));
   }
 
   @Test
   void aStaleHeadLeavesTheAcceptedFilesUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding accepted = publishNoteAndRootFile(notebook);
-    List<PortableTreeEntry> filesBefore = committedRootFiles(notebook);
+    List<PortableTreeEntry> filesBefore = committedRootAttachments(notebook);
 
     assertProposalRejectedWithoutMutatingBinding(
         notebook,
@@ -136,14 +136,14 @@ class NotebookGitRootAttachmentPublicationControllerTest
                 new NotebookGitProposalFile("reference.json", CHANGED_REFERENCE_JSON))),
         HttpStatus.CONFLICT);
 
-    assertThat(committedRootFiles(notebook), equalTo(filesBefore));
+    assertThat(committedRootAttachments(notebook), equalTo(filesBefore));
   }
 
   @Test
   void aNestedFileIsStillRefusedAndLeavesTheAcceptedFilesUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding accepted = publishNoteAndRootFile(notebook);
-    List<PortableTreeEntry> filesBefore = committedRootFiles(notebook);
+    List<PortableTreeEntry> filesBefore = committedRootAttachments(notebook);
 
     ResponseStatusException refusal =
         assertProposalRejectedWithoutMutatingBinding(
@@ -160,7 +160,7 @@ class NotebookGitRootAttachmentPublicationControllerTest
 
     assertThat(refusal.getReason(), containsString("Topic/diagram.png"));
     assertThat(refusal.getReason(), containsString("not a Markdown note"));
-    assertThat(committedRootFiles(notebook), equalTo(filesBefore));
+    assertThat(committedRootAttachments(notebook), equalTo(filesBefore));
     assertThat(countFoldersForNotebook(notebook.getId()), is(0L));
   }
 
@@ -187,13 +187,9 @@ class NotebookGitRootAttachmentPublicationControllerTest
                 .toList());
   }
 
-  private List<PortableTreeEntry> committedRootFiles(Notebook notebook) {
-    return inCommittedTransaction(
-        transactionManager,
-        () ->
-            notebookAttachmentRepository.findExportRowsByNotebookId(notebook.getId()).stream()
-                .map(row -> new PortableTreeEntry(row.filename(), row.content()))
-                .toList());
+  private List<PortableTreeEntry> committedRootAttachments(Notebook notebook) {
+    return NotebookLiveProjectionTestReader.rootAttachments(
+        transactionManager, notebookAttachmentRepository, notebook.getId());
   }
 
   private AcceptedTip acceptedTip(Notebook notebook) throws Exception {

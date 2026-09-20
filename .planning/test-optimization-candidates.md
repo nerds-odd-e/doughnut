@@ -41,4 +41,17 @@ Consequences for future profiling passes:
 
 <!-- location — measured cost — unique protection — attempted alternatives/evidence — date — decision needed -->
 
-_None. Every recorded candidate has been resolved._
+- `backend/src/test/java/com/odde/donut/controllers/NotebookGit*ControllerTest`
+  (~60 classes) — cost not measured — each class re-implements the same
+  "fetch the accepted bundle, walk the tip tree, read entries back" scaffolding
+  locally (`InMemoryRepository` + `GitBundleTestReader.fetchHead` +
+  `readTreeEntries`) — found 2026-09-20 while refactoring SEED-035#story-6
+  slice 6; three attachment classes were collapsed where they shared a live
+  projection read, but the bundle-tip read was deliberately left alone: a helper
+  shared by 3 of ~60 would add a fourth idiom rather than give the concept one
+  home, and the only genuine shared home,
+  `controllers/NotebookGitBundleControllerTestBase`, is already 258 lines
+  (over the 250 guidance) and is inherited by ~120 test classes, so touching it
+  obliges an infrastructure split — decision needed: whether one
+  `GitBundleTestWriter`/tip-reading seam is worth the sweep across all ~60
+  classes, or whether the local idiom is preferred.

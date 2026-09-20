@@ -460,7 +460,7 @@ removing it would be a plan dispute rather than a refactor.
 
 ### 6. Keep root files independent of note and folder operations
 
-Type: Behavior. Status: planned. Estimate: 5–8 active minutes.
+Type: Behavior. Status: **done**. Estimate: 5–8 active minutes; actual ~7.
 Existing note changes, including a supported local note relocation and web note
 removal, leave root-file ownership/content unchanged. Existing Markdown-only
 folder placement/dissolve/deletion cannot collect unrelated root attachments.
@@ -469,6 +469,56 @@ Proof: extend existing mixed-editing/private-association and web note/folder
 lifecycle fixtures with an accepted root file. Assert its bytes after the operation;
 retain current note identity/learning assertions where the note survives. Full suite.
 Root files cannot be children of a folder in this increment.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, pass
+(2555 tests, 0 failures). Boundary: publication and bundle-download controllers,
+`NoteController.trashNote`/`permanentlyDeleteNote`,
+`NotebookFolderController.moveFolder`/`dissolveFolder`/`trashFolder`/
+`permanentlyDeleteFolder`, and the live attachment projection. All five cases live
+in `controllers/NotebookGitRootAttachmentIndependenceControllerTest`: local note
+relocation, web removal of a note whose body *refers* to the file, web folder
+placement, folder dissolve, folder trash + permanent delete.
+
+**No production change was needed**, as slice 4 predicted: every web note/folder
+operation rebuilds through the single `NotebookLivePortableTree` assembly point.
+
+Proof quality notes:
+
+- `assertRootFilesSurvived` pins the tip's first parent to the head captured
+  immediately before the operation, so a web operation that silently skips its
+  commit cannot pass vacuously.
+- `filesAmong` filters every non-Markdown, non-`/.keep` entry **at any depth**, so
+  a file swept into a folder changes its path and fails, and a dropped file fails.
+  That tree-wide filter, not the mutation check, is what carries the
+  "cannot collect, cannot drop" evidence.
+- Mutation-checked: making `NotebookLivePortableTree` attachment-blind failed all
+  5 cases, restored from a backup copy. The implementer correctly reported this as
+  a *coarse* coupling — it cannot distinguish "dropped by the web operation" from
+  "never projected at all".
+- Where the note survives, the existing shown-content, note-identity and
+  memory-tracker assertions are retained unchanged.
+
+Judgement calls recorded rather than hidden: web *note* move into a folder is not
+separately covered (same rebuild path; slice 4 already proved a web note save
+preserves root files), and trashing is covered only as the first step of the two
+removal cases rather than asserted on its own.
+
+Refactor pass outcome: the live root-attachment projection read had become three
+copies — two verbatim and one, slice 4's, silently missing the sort. It is now one
+`controllers/NotebookLiveProjectionTestReader`, carrying the
+insertion-order-so-sort-by-filename rule in a single documented home, and the
+concept has one name (`committedRootAttachments`) across all three classes. A
+fourth inline user, `NotebookGitPublicationAtomicControllerTest`, was deliberately
+left alone because delegating would nest committed transactions and weaken its
+atomicity proof. Raw lines net +18 (a new file's ceremony) against 3→1 copies of a
+real gotcha — accepted as the better trade.
+
+The bundle-tip-reading scaffolding duplicated across ~60 `NotebookGit*ControllerTest`
+classes was deliberately **not** touched: a helper shared by 3 of ~60 would add a
+fourth idiom, and the only genuine shared home is already over the size guidance
+and inherited by ~120 classes. Recorded in
+`.planning/test-optimization-candidates.md` as its own candidate rather than swept
+into this story.
 
 ### 7. Export accepted root files in the notebook ZIP
 

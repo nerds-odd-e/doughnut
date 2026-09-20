@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -10,14 +9,12 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -178,15 +175,9 @@ class NotebookGitRootAttachmentLocalChangeControllerTest
     assertThat(countMemoryTrackersForNotebook(notebook.getId()), is(0L));
   }
 
-  /** Sorted by filename, because the projection's own row order is insertion order. */
   private List<PortableTreeEntry> committedRootAttachments(Notebook notebook) {
-    return inCommittedTransaction(
-        transactionManager,
-        () ->
-            notebookAttachmentRepository.findExportRowsByNotebookId(notebook.getId()).stream()
-                .map(row -> new PortableTreeEntry(row.filename(), row.content()))
-                .sorted(Comparator.comparing(PortableTreeEntry::path))
-                .toList());
+    return NotebookLiveProjectionTestReader.rootAttachments(
+        transactionManager, notebookAttachmentRepository, notebook.getId());
   }
 
   private List<String> committedRootAttachmentNames(Notebook notebook) {
@@ -194,12 +185,8 @@ class NotebookGitRootAttachmentLocalChangeControllerTest
   }
 
   private List<String> committedNoteTitles(Notebook notebook) {
-    return inCommittedTransaction(
-        transactionManager,
-        () ->
-            noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-                .map(Note::getTitle)
-                .toList());
+    return NotebookLiveProjectionTestReader.noteTitles(
+        transactionManager, noteRepository, notebook.getId());
   }
 
   private long countMemoryTrackersForNotebook(Integer notebookId) {
