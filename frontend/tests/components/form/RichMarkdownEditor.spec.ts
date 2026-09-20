@@ -29,6 +29,20 @@ describe("RichMarkdownEditor", () => {
     expect(h.lastEmittedMarkdown()).toContain("Bold text")
   })
 
+  it("threads the original clipboard text and Quill paste range to pasteComplete", async () => {
+    await h.mountEditor("Hello world", { attachToBody: true })
+    await h.dispatchPasteHtmlToQuill("<p><strong>Earth</strong></p>", {
+      plainText: "Earth",
+      selection: { index: 6, length: 5 },
+    })
+
+    expect(h.lastEmittedPasteContext()).toEqual({
+      originalText: "Earth",
+      range: { index: 6, length: 5 },
+      insertedLength: 5,
+    })
+  })
+
   it("preserves nested bullet indentation when pasting ChatGPT-style HTML", async () => {
     await h.mountEditor("", { attachToBody: true })
     await h.dispatchPasteHtmlToQuill(

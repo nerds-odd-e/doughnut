@@ -20,6 +20,21 @@ import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
 
 registerDonutQuillBlots()
 
+/**
+ * Original clipboard text and the Quill range a rich paste replaced, captured
+ * from `quill.getSelection()` before Quill's own clipboard module mutates the
+ * document (real positions, not re-derived by searching converted Markdown
+ * strings). `insertedLength` is the length of what Quill inserted, taken from
+ * the applied Delta's total length rather than a post-paste selection read,
+ * since Quill moves the selection with a SILENT source that this component's
+ * own selection-change listener does not observe.
+ */
+export type QuillPasteContext = {
+  originalText: string
+  range: { index: number; length: number }
+  insertedLength: number
+}
+
 const props = defineProps({
   modelValue: String,
   readonly: Boolean,
@@ -29,7 +44,7 @@ const props = defineProps({
 const emits = defineEmits<{
   "update:modelValue": [value: string]
   blur: []
-  pasteComplete: [content: string]
+  pasteComplete: [content: string, quillContext: QuillPasteContext | null]
   deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
@@ -39,6 +54,7 @@ const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
 const isPasting = ref(false)
 const lastRange = ref<{ index: number; length: number } | null>(null)
+let pendingPaste: Omit<QuillPasteContext, "insertedLength"> | null = null
 let syncingModel = false
 
 const modelHtml = () => props.modelValue || "<p><br></p>"
@@ -133,6 +149,23 @@ onMounted(async () => {
             event.clipboardData
           )
 
+          // Quill's own getSelection() can throw when the browser's native
+          // selection doesn't map onto a blot (e.g. no real caret was ever
+          // placed); when that happens there is simply no paste context to
+          // capture, matching the existing insertTextAtCursor precedent below.
+          let range: Range | null = null
+          try {
+            range = quill.value?.getSelection(true) ?? null
+          } catch {
+            range = null
+          }
+          pendingPaste = range
+            ? {
+                originalText: originalGetData("text/plain"),
+                range: { index: range.index, length: range.length },
+              }
+            : null
+
           event.clipboardData.getData = (format: string) => {
             if (format === "text/html") {
               const htmlData = originalGetData(format)
@@ -185,14 +218,24 @@ onMounted(async () => {
       true
     )
 
-    quill.value.on("text-change", () => {
+    quill.value.on("text-change", (delta) => {
       const content = quill.value!.root.innerHTML
       if (!syncingModel && content !== modelHtml()) {
         emits("update:modelValue", content)
       }
       if (isPasting.value) {
         isPasting.value = false
-        emits("pasteComplete", content)
+        const context: QuillPasteContext | null = pendingPaste
+          ? {
+              ...pendingPaste,
+              insertedLength:
+                delta.length() -
+                pendingPaste.range.index -
+                pendingPaste.range.length,
+            }
+          : null
+        pendingPaste = null
+        emits("pasteComplete", content, context)
       }
     })
 

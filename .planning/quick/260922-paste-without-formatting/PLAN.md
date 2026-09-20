@@ -207,7 +207,11 @@ methods failing with `ApplicationContext failure threshold exceeded`, traced to
 a single root cause: `Too many connections` from MySQL during Flyway init for
 one Spring context in that CI run. This slice touches no backend files, and
 every other job (frontend tests, lint, E2E, other unit tests) passed. Recorded
-as CI infrastructure flakiness, not a defect; no repair made.
+as CI infrastructure flakiness, not a defect; no repair made. The slice 2 push
+(commit `6613c1cd37`) reproduced the identical `Backend Unit tests` failure —
+same root cause (`Too many connections`), same cascading test class — a second,
+consistent occurrence of the same pre-existing infrastructure issue; same
+disposition, no repair made.
 
 Behavior: Leave the action unused for 10 seconds and it disappears; interacting
 with it by hover or keyboard focus pauses expiry. One shared lifecycle owns
@@ -216,10 +220,36 @@ for Markdown pastes that do not open the existing removal modal.
 
 ### 3. Retain rich paste context at the existing editor boundary
 Type: Structure
-Status: planned
+Status: done
 Estimate: about 5 minutes; medium confidence.
 Proof: real rich DOM clipboard paste preserves current output, selection, and
 frontmatter using existing editor tests and the outer mounted boundary.
+
+Accepted proof:
+```
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/QuillEditor.spec.ts tests/components/form/QuillEditor.paste.spec.ts tests/components/form/RichMarkdownEditor.spec.ts tests/notes/NoteEditableContent.paste.spec.ts tests/notes/NoteEditableContent.pasteChoice.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
+Both pass (37/37 tests; no type diagnostics). `QuillEditor.vue` exports
+`QuillPasteContext` (`{ originalText, range: {index, length}, insertedLength }`),
+captured in its existing capture-phase paste listener via `getSelection(true)`
+(wrapped in try/catch — Quill's selection-read APIs can throw when no real
+native caret exists) before Quill mutates the document, with `insertedLength`
+computed from the applied Delta's length in `text-change`. Threaded unchanged
+through `RichMarkdownEditor.vue` and `NoteEditableContent.vue` into
+`useNoteContentPaste.ts`'s `handlePasteComplete` as `_quillContext` (received,
+not yet consumed — slice 4 wires it into `pasteChoice`). No visible behavior
+change; rich-mode paste UI is still absent, matching this Structure slice's
+safe stop. `QuillEditor.spec.ts` split into itself (render/link tests),
+`QuillEditor.paste.spec.ts` (paste tests), and `quillEditorTestHarness.ts`
+(shared mount/cleanup), matching the existing `RichMarkdownEditor.*`/harness
+convention in this directory.
+
+Replace `replace()` in slice 4 with a direct Delta swap of the inserted span:
+`quill.updateContents(new Delta().retain(range.index).delete(insertedLength).insert(originalText), Quill.sources.USER)`,
+then `quill.setSelection(range.index + originalText.length, Quill.sources.SILENT)`.
+`getBounds(range.index)` is available for slice 6's viewport placement, not
+needed for `replace()` itself.
 
 Structure: Carry original clipboard text and Quill-native insertion context
 through the existing rich paste path; keep context with the editor that owns
@@ -326,3 +356,16 @@ observed via GitHub Actions `ci.yml` ("donut CI") on that branch.
   `.paste.spec.ts` (link/image-removal), matching this directory's
   one-concern-per-file convention; extend the former for rich-mode/expiry
   cases in later slices.
+- Slice 3: in this repo's Vitest browser-mode tests (real headless Chromium),
+  Quill 2.0.9's `getSelection`/`setSelection` throw for a genuinely-established
+  native caret/selection when no prior test ever exercised those calls; this is
+  an environment limitation (production rich paste already relies on the same
+  Quill API and works), not a product defect. `QuillEditor.vue` wraps the
+  capture-time `getSelection(true)` call in try/catch. Slice 4 tests needing a
+  real, non-null `QuillPasteContext` should stub `quill.getSelection` via
+  `vi.spyOn` (see `QuillEditor.paste.spec.ts`) rather than trying to establish a
+  real browser caret; Quill's `updateContents`/Delta application itself works
+  fine against the real model in this environment — only selection-read APIs
+  are unreliable here. Slice 4 should feed a rich `PasteChoice` into the same
+  `pasteChoice` owner (`useNoteContentPaste.ts`) rather than a parallel
+  lifecycle, and drop the `_quillContext` underscore once it's consumed.

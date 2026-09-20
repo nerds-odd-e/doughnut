@@ -36,7 +36,10 @@
           :is-readme-context="isReadmeContext"
           @update:model-value="update(noteId, $event)"
           @blur="blur"
-          @paste-complete="(content) => handlePasteComplete(content, update)"
+          @paste-complete="
+            (content, quillContext) =>
+              handlePasteComplete(content, update, quillContext)
+          "
           @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
         />
       </template>

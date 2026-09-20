@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, type PropType } from "vue"
-import QuillEditor from "./QuillEditor.vue"
+import QuillEditor, { type QuillPasteContext } from "./QuillEditor.vue"
 import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
 import markdownizer from "./markdownizer"
 import type { WikiLink } from "@generated/donut-backend-api"
@@ -79,7 +79,11 @@ const props = defineProps({
 const emits = defineEmits<{
   (e: "update:modelValue", value: string): void
   (e: "blur"): void
-  (e: "pasteComplete", value: string): void
+  (
+    e: "pasteComplete",
+    value: string,
+    quillContext: QuillPasteContext | null
+  ): void
   (e: "deadWikiLinkClick", payload: DeadWikiLinkPayload): void
 }>()
 
@@ -180,9 +184,16 @@ const onPropertiesChanged = (rows: PropertyRow[]) => {
   })
 }
 
-const onPasteComplete = (html: string) => {
+const onPasteComplete = (
+  html: string,
+  quillContext: QuillPasteContext | null
+) => {
   if (effectiveReadonly.value) return
-  emits("pasteComplete", composeBodyMarkdown(markdownizer.htmlToMarkdown(html)))
+  emits(
+    "pasteComplete",
+    composeBodyMarkdown(markdownizer.htmlToMarkdown(html)),
+    quillContext
+  )
 }
 
 function insertMarkdownAtEnd(text: string) {

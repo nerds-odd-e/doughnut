@@ -1,7 +1,10 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
+import type { QuillPasteContext } from "@/components/form/QuillEditor.vue"
 import routes from "@/routes/routes"
 import helper from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import type Quill from "quill"
+import type { Range } from "quill"
 import {
   createRouter,
   createWebHistory,
@@ -33,8 +36,21 @@ export function createRichMarkdownEditorTestHarness() {
     return emitted![emitted!.length - 1]![0] as string
   }
 
+  function lastEmittedPasteContext(): QuillPasteContext | null {
+    const emitted = wrapper.emitted("pasteComplete")
+    expect(emitted?.length).toBeGreaterThan(0)
+    return (
+      (emitted![emitted!.length - 1]![1] as QuillPasteContext | null) ?? null
+    )
+  }
+
   function quillComponent() {
     return wrapper.findComponent({ name: "QuillEditor" })
+  }
+
+  function quillInstance(): Quill {
+    // biome-ignore lint/suspicious/noExplicitAny: Quill instance is not part of the public API
+    return (quillComponent().vm as any).quill as Quill
   }
 
   function quillEditorEl(): HTMLElement {
@@ -57,11 +73,32 @@ export function createRichMarkdownEditorTestHarness() {
     quillComponent().vm.$emit("pasteComplete", html)
   }
 
-  async function dispatchPasteHtmlToQuill(html: string) {
+  async function dispatchPasteHtmlToQuill(
+    html: string,
+    options?: {
+      plainText?: string
+      selection?: { index: number; length?: number }
+    }
+  ) {
     const qlEditor = quillEditorEl()
     qlEditor.focus()
+    if (options?.selection) {
+      // Quill's own selection-resolution (getRange/normalizedToRange) is
+      // unreliable for a real caret in this headless browser-mode test run;
+      // stub only that one read so the real paste-capture code under test
+      // still runs end-to-end against a real ClipboardEvent, with Quill
+      // applying the paste through its real Delta model.
+      const { index, length = 0 } = options.selection
+      vi.spyOn(quillInstance(), "getSelection").mockReturnValue({
+        index,
+        length,
+      } as Range)
+    }
     const clipboardData = new DataTransfer()
     clipboardData.setData("text/html", html)
+    if (options?.plainText !== undefined) {
+      clipboardData.setData("text/plain", options.plainText)
+    }
     qlEditor.dispatchEvent(
       new ClipboardEvent("paste", {
         bubbles: true,
@@ -159,6 +196,7 @@ export function createRichMarkdownEditorTestHarness() {
     setPropertyValueField,
     lastEmittedMarkdown,
     lastEmittedPasteComplete,
+    lastEmittedPasteContext,
     quillEditorEl,
     quillModelHtml,
     quillReadonly,

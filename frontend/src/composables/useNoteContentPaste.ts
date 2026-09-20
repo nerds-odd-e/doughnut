@@ -1,4 +1,5 @@
 import { nextTick, onMounted, onUnmounted, ref, watch, type Ref } from "vue"
+import type { QuillPasteContext } from "@/components/form/QuillEditor.vue"
 import type TextArea from "@/components/form/TextArea.vue"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
 import { countMarkdownLinksAndImagesInNoteContent } from "@/utils/stripPastedMarkdownLinks"
@@ -126,9 +127,11 @@ export function useNoteContentPaste(options: {
     await offerToRemoveLinksAndImages(newValue, update)
   }
 
+  /** `_quillContext` is captured for slice 4's rich-mode correction; not yet consumed. */
   const handlePasteComplete = async (
     currentValue: string | undefined,
-    update: NoteContentUpdate
+    update: NoteContentUpdate,
+    _quillContext: QuillPasteContext | null
   ) => {
     if (!currentValue) return
     await offerToRemoveLinksAndImages(currentValue, update)
