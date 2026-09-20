@@ -583,11 +583,60 @@ measured 51.
 
 ### 8. Preserve root files through existing history reset
 
-Type: Behavior. Status: planned. Estimate: about 5 active minutes.
+Type: Behavior. Status: **done**. Estimate: about 5 active minutes; actual <5.
 Existing authorized reset retains current root-file content in its new history.
 Proof: `NotebookGitHistoryResetControllerTest` publishes files, resets, downloads,
 and checks bytes in the new root. Keep current reset authorization/history rules;
 ordinary publication still never rewrites history. Full backend suite.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, pass
+(2557 tests, 0 failures), rerun by the coordinator after the refactor — also pass.
+Boundary: `publishNotebookGitProposal` → `resetNotebookGitHistory` → the stored
+binding's bundle bytes. Observation:
+`NotebookGitHistoryResetControllerTest.resetRestartsHistoryCarryingTheRootFilesTheNotebookCurrentlyHolds`
+— `getParentCount() == 0` plus exact ordered list equality over the new root
+(`Diagram.png` with invalid-UTF-8 bytes, `Overview.md`, `reference.json`), in Git
+byte-wise path order.
+
+**No production change was needed** — the fourth slice in a row. `resetHistory`
+rebuilds through `NotebookLivePortableTree`, the assembly point slice 3 established.
+
+Mutation-checked **sharply**, inside the reset path itself: filtering
+`NotebookGitCutoverService.buildBundle` to `.md` only failed exactly 1 of 3 tests,
+landing on the new assertion, while the two pre-existing reset tests stayed green.
+That second fact matters — it rules out the vacuity trap this slice carried, since
+the shared fixture's `snapshotCurrentPortableTree` *is* `resetHistory` and already
+runs suite-wide, but only ever before attachments exist. Restored from a backup copy.
+
+Confirmed unchanged: reset authorization (`deniedResetLeavesAcceptedHistoryUnchanged`
+untouched and green), the parentless root commit, and "ordinary publication never
+rewrites history".
+
+Refactor pass outcome, and a correction to slices 6–7's reasoning: the three
+byte-identical `acceptedEntriesOf` copies were collapsed — not into a new helper,
+but into `testability/GitBundleTestReader.fetchTipTreeEntries`. That class was the
+concept's real home all along (it already owned `fetchSingleParentCommit` and
+`fetchAdvertisedHead` and is imported by all 51 callers), so no fourth idiom was
+created and the over-size base class stayed untouched. Both earlier passes had
+assumed the only candidate home was that base class, which is why they declined.
+Adoption is complete at 3-of-3 for this concept: every other `readTreeEntries`
+caller needs the tip *commit* — parent count, first-parent ancestry, author ident —
+not just its entries, so they are a different concept and correctly keep their own
+repository. Slice 8's own test keeps an inline block for the assertion half,
+because it asserts `getParentCount()` alongside the entries. Net −11 lines.
+
+Server-side coverage is now complete: the invalid-UTF-8 bytes survive publication,
+acceptance, the live projection, a web note save, note and folder operations, ZIP
+export, and history reset. Only the on-disk second-checkout hop remains (slice 9).
+
+Learnings for slice 9:
+
+- Reset produces a parentless root commit, so a receiver that already has the old
+  history needs a fresh clone rather than a pull. If the E2E exercises reset, the
+  **pull case must come before it**, not after.
+- A CLI checkout lists files in filesystem/locale order, which is neither Git's
+  byte-wise order nor the ZIP canonical order — both of which have already bitten
+  twice. Sort explicitly rather than assuming either.
 
 ### 9. Recover files in a real second checkout
 

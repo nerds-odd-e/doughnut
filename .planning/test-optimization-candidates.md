@@ -50,13 +50,16 @@ Consequences for future profiling passes:
   slice 6; three attachment classes were collapsed where they shared a live
   projection read, but the bundle-tip read was deliberately left alone: a helper
   shared by 3 of 51 would add a fourth idiom rather than give the concept one
-  home, and the only genuine shared home,
-  `controllers/NotebookGitBundleControllerTestBase`, is already 258 lines
-  (over the 250 guidance) and is inherited by ~120 test classes, so touching it
-  obliges an infrastructure split — decision needed: whether one
-  `GitBundleTestWriter`/tip-reading seam is worth the sweep across all 51
-  classes, or whether the local idiom is preferred. Two of those files
-  (`NotebookGitRootAttachmentIndependenceControllerTest`,
-  `NotebookExportRootAttachmentControllerTest`) additionally hold a byte-identical
-  private `acceptedEntriesOf` helper, which is the first concrete pair to migrate
-  whenever the sweep happens.
+  home. Updated 2026-09-20: the remaining duplication is *proposal crafting and
+  tip-commit inspection*, not the plain tip read. The three byte-identical
+  `acceptedEntriesOf` copies were collapsed into
+  `testability/GitBundleTestReader.fetchTipTreeEntries`, which was the concept's
+  real home all along — that class already owned `fetchSingleParentCommit` and
+  `fetchAdvertisedHead`, so no new file or idiom was needed and
+  `controllers/NotebookGitBundleControllerTestBase` (258 lines, ~120 subclasses)
+  stayed untouched. Every other `readTreeEntries` call site needs the tip *commit*
+  (parent count, first-parent ancestry, author ident), not only its entries, so
+  they correctly open their own repository and are a different concept — decision
+  needed: whether a `GitBundleTestWriter` mirror for the proposal-crafting half is
+  worth a sweep across the 51 `fetchHead` callers, or whether the local idiom is
+  preferred.

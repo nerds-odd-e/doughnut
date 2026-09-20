@@ -19,9 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
-import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -71,7 +68,8 @@ class NotebookExportRootAttachmentControllerTest extends NotebookGitBundleContro
     makeMe.aNote("Overview").notebook(notebook).content(OVERVIEW_BODY).please();
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
 
-    List<PortableTreeEntry> tip = new ArrayList<>(acceptedEntriesOf(markdownOnly));
+    List<PortableTreeEntry> tip =
+        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(markdownOnly.getBundleBytes()));
     tip.add(ofText("README.md", NOTEBOOK_README));
     tip.add(new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES));
     tip.add(ofText("reference.json", REFERENCE_JSON));
@@ -81,15 +79,6 @@ class NotebookExportRootAttachmentControllerTest extends NotebookGitBundleContro
         proposalBundleBytes(markdownOnly, NotebookGitProposalFile.asProposal(tip)));
 
     return notebookRepository.findById(notebook.getId()).orElseThrow();
-  }
-
-  private List<PortableTreeEntry> acceptedEntriesOf(NotebookGitBinding binding) throws Exception {
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
-        RevWalk revWalk = new RevWalk(repository)) {
-      return GitBundleTestReader.readTreeEntries(
-          repository,
-          revWalk.parseCommit(GitBundleTestReader.fetchHead(repository, binding.getBundleBytes())));
-    }
   }
 
   /** Raw bytes per entry: nothing here may decode a file on the way out. */

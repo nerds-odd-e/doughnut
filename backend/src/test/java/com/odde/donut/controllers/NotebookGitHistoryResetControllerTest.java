@@ -14,6 +14,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Verifies that resetting a notebook's Git history restarts it from the notebook's current content,
- * and that only someone who can edit the notebook may do so.
+ * Verifies that resetting a notebook's Git history restarts it from the notebook's current content
+ * - including the root files it currently holds - and that only someone who can edit the notebook
+ * may do so.
  */
 class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerTestBase {
 
@@ -36,6 +38,10 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
   private static final String OUTSIDE_HISTORY_CONTENT =
       "---\ntype: Note\n---\ncontent outside accepted history";
   private static final String EDITED_CONTENT = "---\ntype: Note\n---\nedited content";
+  private static final String OVERVIEW_CONTENT = "---\ntype: Note\n---\nsee Diagram.png";
+  private static final String REFERENCE_JSON = "{\"schema\": \"donut\"}\n";
+  // Deliberately not valid UTF-8, so nothing on the reset path may decode these bytes.
+  private static final byte[] DIAGRAM_BYTES = {(byte) 0x89, (byte) 0xFF, (byte) 0xFE, 0x00};
 
   @Test
   void resetRestartsHistoryFromTheCurrentNotebookSoAPlainEditPublishesAgain() throws Exception {
@@ -104,5 +110,37 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
     NotebookGitBinding after = reloadCommittedBinding(notebook.getId());
     assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHead));
     assertThat(after.getBundleBytes(), equalTo(acceptedBundle));
+  }
+
+  @Test
+  void resetRestartsHistoryCarryingTheRootFilesTheNotebookCurrentlyHolds() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    makeMe.aNote("Overview").notebook(notebook).content(OVERVIEW_CONTENT).please();
+    NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
+    List<PortableTreeEntry> tipWithRootFiles =
+        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(markdownOnly.getBundleBytes()));
+    tipWithRootFiles.add(new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES));
+    tipWithRootFiles.add(ofText("reference.json", REFERENCE_JSON));
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        markdownOnly.getAcceptedGitObjectId(),
+        proposalBundleBytes(markdownOnly, NotebookGitProposalFile.asProposal(tipWithRootFiles)));
+
+    controller.resetNotebookGitHistory(notebookRepository.findById(notebook.getId()).orElseThrow());
+
+    NotebookGitBinding afterReset = reloadCommittedBinding(notebook.getId());
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk revWalk = new RevWalk(repository)) {
+      RevCommit resetCommit =
+          revWalk.parseCommit(
+              GitBundleTestReader.fetchHead(repository, afterReset.getBundleBytes()));
+      assertThat(resetCommit.getParentCount(), equalTo(0));
+      assertThat(
+          GitBundleTestReader.readTreeEntries(repository, resetCommit),
+          contains(
+              new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES),
+              ofText("Overview.md", OVERVIEW_CONTENT),
+              ofText("reference.json", REFERENCE_JSON)));
+    }
   }
 }

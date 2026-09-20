@@ -98,6 +98,19 @@ public final class GitBundleTestReader {
   }
 
   /**
+   * The Portable tree entries at the tip of a persisted binding's bundle, read through a scratch
+   * in-memory repository. For tests that only need the accepted tip's content; a test that also
+   * needs the tip commit itself opens its own repository and uses {@link #readTreeEntries}.
+   */
+  public static List<PortableTreeEntry> fetchTipTreeEntries(byte[] bundleBytes)
+      throws IOException, URISyntaxException {
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk revWalk = new RevWalk(repository)) {
+      return readTreeEntries(repository, revWalk.parseCommit(fetchHead(repository, bundleBytes)));
+    }
+  }
+
+  /**
    * The bundle's advertised {@code HEAD} object id, or {@code null} if the bundle never included
    * one. A system {@code git clone} of a bundle without this uses the cloning machine's own {@code
    * init.defaultBranch} to name the checked-out branch instead of {@code main}, so every bundle

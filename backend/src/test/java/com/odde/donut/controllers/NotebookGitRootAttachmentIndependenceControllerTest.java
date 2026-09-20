@@ -61,7 +61,10 @@ class NotebookGitRootAttachmentIndependenceControllerTest
     Fixture fixture = publishRootFilesOverNotesAndFolders();
     NotebookGitBinding accepted = reloadCommittedBinding(fixture.notebook().getId());
     List<PortableTreeEntry> relocated =
-        movePath(acceptedEntriesOf(accepted), "Biology/Cells.md", "Study/Cells.md");
+        movePath(
+            GitBundleTestReader.fetchTipTreeEntries(accepted.getBundleBytes()),
+            "Biology/Cells.md",
+            "Study/Cells.md");
 
     controller.publishNotebookGitProposal(
         fixture.notebook().getId(),
@@ -141,7 +144,8 @@ class NotebookGitRootAttachmentIndependenceControllerTest
     MemoryTracker tracker = learnedTracker(cells, 0.5f, 1);
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
 
-    List<PortableTreeEntry> withRootFiles = new ArrayList<>(acceptedEntriesOf(markdownOnly));
+    List<PortableTreeEntry> withRootFiles =
+        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(markdownOnly.getBundleBytes()));
     withRootFiles.addAll(ROOT_FILES);
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -183,15 +187,6 @@ class NotebookGitRootAttachmentIndependenceControllerTest
         .map(
             entry -> entry.path().equals(from) ? new PortableTreeEntry(to, entry.content()) : entry)
         .toList();
-  }
-
-  private List<PortableTreeEntry> acceptedEntriesOf(NotebookGitBinding binding) throws Exception {
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
-        RevWalk revWalk = new RevWalk(repository)) {
-      return GitBundleTestReader.readTreeEntries(
-          repository,
-          revWalk.parseCommit(GitBundleTestReader.fetchHead(repository, binding.getBundleBytes())));
-    }
   }
 
   private ObjectId acceptedHead(Notebook notebook) {
