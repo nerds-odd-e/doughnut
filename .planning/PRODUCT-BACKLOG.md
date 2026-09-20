@@ -23,3 +23,4 @@ and deletable in Web Donut.
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2
+- [Assess whether attachment content needs its own save-path treatment](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3

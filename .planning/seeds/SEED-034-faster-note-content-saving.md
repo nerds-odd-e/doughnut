@@ -108,10 +108,53 @@ or add competing representations. See [current save behavior](../../docs/note-co
   the historical summary alone is insufficient. See the plan for gates and
   preservation obligations, including existing reset and binding cleanup.
 
+<a id="story-3"></a>
+
+### 3. Assess whether attachment content needs its own save-path treatment
+
+- **Identity:** SEED-034#story-3
+- **Status:** queued. Deliberately deferred by the owner until **both**
+  SEED-034#story-2 and SEED-035#story-6 are delivered, because either one can
+  change the answer. No plan; not refined.
+- **Goal / beneficiaries:** Note authors in notebooks that also hold sizeable
+  attachments keep the save responsiveness story 2 delivers, instead of paying
+  for attachment bytes on every note save.
+- **Why now / why deferred:** SEED-035#story-6 made a notebook's root
+  attachments part of its live Portable tree. Every ordinary web note save now
+  loads all of that notebook's attachment bytes, byte-compares them to detect a
+  no-op, and hashes them again when the tree is rebuilt
+  (`AcceptedWebChangeService.commitIfChanged` → `NotebookLivePortableTree.entriesOf`
+  → `NotebookAttachmentRepository.findExportRowsByNotebookId`, whose JPQL
+  projection materialises each `longblob`). Before that story the tree held only
+  note text, so this cost did not exist. It is correct behaviour and is what
+  makes no-op detection and projection-drift checks work — it is not a defect.
+  It is deferred because story 2 is concurrently replacing the accepted-repository
+  storage layer and may remove, relocate or change the shape of this cost, and
+  because the real magnitude depends on attachment sizes owners actually keep.
+- **Evaluation:** With both stories delivered, measure an ordinary note-content
+  save in a notebook holding realistic attachments against the same save with
+  none. If attachment bytes do not meaningfully affect that save, record the
+  measurement and close this story with no change — that is a legitimate
+  outcome. If they do, the fix should make the design simpler and more
+  cohesive, not add a caching layer: candidate directions are comparing a
+  stored content digest rather than the bytes, or loading bytes only when the
+  tree actually has to be rebuilt.
+- **Scope:** Assessment first. Any change stays inside the existing live
+  Portable tree and accepted-change owners; it must not introduce a second
+  content authority, weaken no-op detection or projection-drift detection, or
+  change what a notebook's Portable tree contains.
+- **Depends on:** SEED-034#story-2 and SEED-035#story-6, both delivered.
+- **Effort hypothesis:** S for the measurement; unknown for any change, which
+  is exactly what the measurement decides.
+- **Safe stopping point:** An evidenced answer. A measured "no action needed"
+  closes it.
+
 ## Ordering and Scope Reduction
 
 Queue ahead of the remaining note-presentation cleanup, which was explicitly
-deferred to last. Story 2 remains the first queued item. Preserve the near-future
+deferred to last. Story 2 remains the first queued item. Story 3 is queued last
+by owner request: it cannot be answered until story 2 and SEED-035#story-6 are
+both delivered. Preserve the near-future
 direction and leave implementation to its own bounded plan.
 
 ## When to Surface
