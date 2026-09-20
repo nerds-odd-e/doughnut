@@ -55,8 +55,41 @@ under ADR 0004 regardless of whether it contains IDE guidance or other content.
 
 [ADR 0001](./adrs/0001-ubiquitous-language.md#notebook--note-structure) defines
 the domain vocabulary; [ADR 0004](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation)
-owns representation and validation. These are architectural contracts, not a
-claim that attachment support is already implemented.
+owns representation and validation. Attachments at the notebook root are
+implemented, as **Root attachments today** below records; the rest of this
+section is an architectural contract rather than a claim that those parts are
+already implemented.
+
+### Root attachments today
+
+A non-Markdown file directly at the notebook root is an Attachment: it carries a
+complete filename, extension included, and exact bytes, and it has no note
+identity, title or learning history. Nested non-Markdown paths are refused at
+admission until folders can keep contained files safe through their own
+lifecycles; that refusal fires before any mutation, so a proposal mixing one
+with valid changes leaves the accepted head and the stored files untouched.
+
+`notebook_attachment` holds each file's notebook, filename and bytes. It is a
+projection of accepted Git content, not a second authority, and it is deleted
+with its notebook. Filenames are unique per notebook under a binary collation,
+so paths differing only in case remain distinct files exactly as Git treats
+them.
+
+Acceptance applies a proposal tip's whole root-attachment set in one rule
+covering addition, edit, rename and removal: no commit is replayed, and the set
+is projected before the post-mutation tree comparison, inside the transaction
+that persists the accepted head. An initial publication may therefore be
+file-only, with no note at all.
+
+Every consumer of a notebook's live Portable content — ZIP export, Git cutover
+and history reset, accepted web changes, and projection-drift detection — reads
+one assembled tree, so root files survive ordinary note and folder work and
+appear in export and reset without per-consumer handling. Within a directory the
+canonical order is README, then notes, then attachments by filename, then
+subdirectories; the Git side re-sorts by path.
+
+A root `.keep` is an ordinary attachment. The empty-folder marker is a `.keep`
+inside a folder, which keeps its structural role.
 
 ### Placement and ownership
 
