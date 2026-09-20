@@ -5,7 +5,6 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookExport.NotebookLivePortableTree;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookGit.NotebookGitBundleWriter.BundleWriteResult;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
@@ -38,20 +37,23 @@ public class NotebookGitCutoverService {
 
   private final NotebookLivePortableTree livePortableTree;
   private final NotebookGitBindingRepository notebookGitBindingRepository;
+  private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
   public NotebookGitCutoverService(
       NotebookLivePortableTree livePortableTree,
-      NotebookGitBindingRepository notebookGitBindingRepository) {
+      NotebookGitBindingRepository notebookGitBindingRepository,
+      NotebookGitAcceptedRepositoryStore repositoryStore) {
     this.livePortableTree = livePortableTree;
     this.notebookGitBindingRepository = notebookGitBindingRepository;
+    this.repositoryStore = repositoryStore;
   }
 
   public NotebookGitBinding createBindingForNotebook(Notebook notebook, Instant cutoverTime) {
-    BundleWriteResult written = buildBundle(notebook, cutoverTime, CUTOVER_COMMIT_MESSAGE);
-
     NotebookGitBinding binding = new NotebookGitBinding();
     binding.setNotebook(notebook);
-    applyBundle(binding, written, cutoverTime);
+    try (Repository repository = buildRepository(notebook, cutoverTime, CUTOVER_COMMIT_MESSAGE)) {
+      applyBundle(binding, repository, cutoverTime);
+    }
     return notebookGitBindingRepository.save(binding);
   }
 
@@ -71,26 +73,23 @@ public class NotebookGitCutoverService {
                   created.setNotebook(notebook);
                   return created;
                 });
-    applyBundle(binding, buildBundle(notebook, resetTime, RESET_COMMIT_MESSAGE), resetTime);
+    try (Repository repository = buildRepository(notebook, resetTime, RESET_COMMIT_MESSAGE)) {
+      applyBundle(binding, repository, resetTime);
+    }
     return notebookGitBindingRepository.save(binding);
   }
 
-  private BundleWriteResult buildBundle(Notebook notebook, Instant commitTime, String message) {
+  private Repository buildRepository(Notebook notebook, Instant commitTime, String message) {
     List<PortableTreeEntry> entries = livePortableTree.entriesOf(notebook);
-    try (Repository gitRepository =
-        NotebookGitBundleBuilder.build(
-            entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, message, commitTime)) {
-      return NotebookGitBundleWriter.write(gitRepository);
-    }
+    return NotebookGitBundleBuilder.build(
+        entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, message, commitTime);
   }
 
-  private void applyBundle(NotebookGitBinding binding, BundleWriteResult written, Instant time) {
-    binding.setAcceptedGitObjectId(written.headObjectId());
-    binding.setBundleBytes(written.bundleBytes());
+  private void applyBundle(NotebookGitBinding binding, Repository repository, Instant time) {
     Timestamp timestamp = Timestamp.from(time);
     if (binding.getCreatedAt() == null) {
       binding.setCreatedAt(timestamp);
     }
-    binding.setUpdatedAt(timestamp);
+    repositoryStore.apply(binding, repository, timestamp);
   }
 }

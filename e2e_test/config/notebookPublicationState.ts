@@ -28,7 +28,7 @@ export function publicationPersistedState(repoRoot: string) {
   return {
     notes: query('SELECT * FROM note ORDER BY id'),
     noteIdentity: query(
-      'SELECT id, notebook_id, folder_id, title, created_at, deleted_at FROM note ORDER BY id'
+      'SELECT id, notebook_id, folder_id, title, created_at FROM note ORDER BY id'
     ),
     learning: query('SELECT * FROM memory_tracker ORDER BY id'),
     bindings: query(

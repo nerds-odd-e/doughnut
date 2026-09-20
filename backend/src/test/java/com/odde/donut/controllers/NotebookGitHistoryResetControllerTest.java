@@ -18,6 +18,7 @@ import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -64,9 +65,18 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
     NotebookGitBinding afterReset = reloadCommittedBinding(notebook.getId());
     assertThat(
         afterReset.getAcceptedGitObjectId(), not(equalTo(driftedBinding.getAcceptedGitObjectId())));
+
+    // Read back through the production download path (native object store), not the JPA
+    // bundle_bytes column directly, so this proves the reset's content is genuinely durable in
+    // native storage rather than only reflected in a field the download never has to consult.
+    byte[] downloadedAfterReset =
+        controller
+            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
+            .getBody();
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
-      ObjectId head = GitBundleTestReader.fetchHead(repository, afterReset.getBundleBytes());
+      ObjectId head = GitBundleTestReader.fetchHead(repository, downloadedAfterReset);
+      assertThat(head, equalTo(ObjectId.fromString(afterReset.getAcceptedGitObjectId())));
       RevCommit resetCommit = revWalk.parseCommit(head);
       assertThat(resetCommit.getParentCount(), equalTo(0));
       revWalk.markStart(resetCommit);
@@ -77,6 +87,11 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
           GitBundleTestReader.readTreeEntries(repository, resetCommit),
           contains(
               ofText("note.md", ACCEPTED_CONTENT), ofText("outside.md", OUTSIDE_HISTORY_CONTENT)));
+
+      // The reset's new root commit is disjoint (no parents): confirm the pre-reset head is
+      // genuinely unreachable/not advertised, not merely absent from the visited history list.
+      ObjectId driftedHead = ObjectId.fromString(driftedBinding.getAcceptedGitObjectId());
+      assertThrows(MissingObjectException.class, () -> revWalk.parseCommit(driftedHead));
     }
 
     controller.publishNotebookGitProposal(

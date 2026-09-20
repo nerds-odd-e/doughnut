@@ -127,6 +127,8 @@ class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitBundle
       binding.setAcceptedGitObjectId(commitId.getName());
       binding.setBundleBytes(bundleBytesForHead(repository, commitId));
     }
-    return notebookGitBindingRepository.save(binding);
+    NotebookGitBinding saved = notebookGitBindingRepository.save(binding);
+    clearNativeObjectStoreRows(saved.getId());
+    return saved;
   }
 }

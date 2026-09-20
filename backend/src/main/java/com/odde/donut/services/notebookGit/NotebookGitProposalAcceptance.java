@@ -23,19 +23,19 @@ import org.springframework.stereotype.Service;
 class NotebookGitProposalAcceptance {
 
   private final NotebookGitProjection projection;
-  private final NotebookGitProposalBindingPersistence bindingPersistence;
+  private final NotebookGitAcceptedRepositoryStore repositoryStore;
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
   private final NotebookAttachmentRepository attachmentRepository;
 
   NotebookGitProposalAcceptance(
       NotebookGitProjection projection,
-      NotebookGitProposalBindingPersistence bindingPersistence,
+      NotebookGitAcceptedRepositoryStore repositoryStore,
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
       NotebookAttachmentRepository attachmentRepository) {
     this.projection = projection;
-    this.bindingPersistence = bindingPersistence;
+    this.repositoryStore = repositoryStore;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
     this.attachmentRepository = attachmentRepository;
@@ -55,7 +55,7 @@ class NotebookGitProposalAcceptance {
     projectRootAttachments(published.notebook(), proposal);
     NotebookGitStateLoader.LockedNotebookState reconciled =
         requireMatchingProposedTree(published, proposal);
-    return bindingPersistence.accept(reconciled.binding(), proposal, publishedAt);
+    return repositoryStore.store(reconciled.binding(), proposal.repository(), publishedAt);
   }
 
   /**

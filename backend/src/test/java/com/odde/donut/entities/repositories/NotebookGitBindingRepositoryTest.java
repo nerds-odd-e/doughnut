@@ -44,13 +44,8 @@ class NotebookGitBindingRepositoryTest {
     }
   }
 
-  @Test
-  void persistsAndReloadsAcceptedBundleByNotebookId() throws IOException {
-    Notebook notebook = makeMe.aNotebook().please();
-    makeMe.entityPersister.flush();
-
+  private NotebookGitBinding persistBinding(Notebook notebook) throws IOException {
     BundleWriteResult built = buildBundle();
-
     NotebookGitBinding binding = new NotebookGitBinding();
     binding.setNotebook(notebook);
     binding.setAcceptedGitObjectId(built.headObjectId());
@@ -58,12 +53,55 @@ class NotebookGitBindingRepositoryTest {
     Timestamp now = makeMe.aTimestamp().please();
     binding.setCreatedAt(now);
     binding.setUpdatedAt(now);
-    repository.save(binding);
+    NotebookGitBinding saved = repository.save(binding);
     makeMe.entityPersister.flushAndClear();
+    return saved;
+  }
+
+  @Test
+  void persistsAndReloadsAcceptedBundleByNotebookId() throws IOException {
+    Notebook notebook = makeMe.aNotebook().please();
+    makeMe.entityPersister.flush();
+
+    NotebookGitBinding saved = persistBinding(notebook);
 
     NotebookGitBinding reloaded = repository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    assertThat(reloaded.getAcceptedGitObjectId(), equalTo(built.headObjectId()));
-    assertThat(reloaded.getBundleBytes(), equalTo(built.bundleBytes()));
+    assertThat(reloaded.getAcceptedGitObjectId(), equalTo(saved.getAcceptedGitObjectId()));
+    assertThat(reloaded.getBundleBytes(), equalTo(saved.getBundleBytes()));
+  }
+
+  @Test
+  void cascadeDeletesNativeObjectStoreRowsWhenBindingIsDeleted() throws IOException {
+    Notebook notebook = makeMe.aNotebook().please();
+    makeMe.entityPersister.flush();
+
+    NotebookGitBinding saved = persistBinding(notebook);
+
+    jdbcTemplate.update(
+        """
+        INSERT INTO notebook_git_accepted_object
+          (notebook_git_binding_id, git_object_id, object_type, object_bytes)
+        VALUES (?, ?, ?, ?)
+        """,
+        saved.getId(),
+        "c".repeat(40),
+        1,
+        new byte[] {1, 2, 3});
+    assertThat(countNativeObjectStoreRows(saved.getId()), equalTo(1L));
+
+    repository.deleteById(saved.getId());
+    makeMe.entityPersister.flush();
+
+    assertThat(countNativeObjectStoreRows(saved.getId()), equalTo(0L));
+  }
+
+  private long countNativeObjectStoreRows(Integer bindingId) {
+    Long count =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM notebook_git_accepted_object WHERE notebook_git_binding_id = ?",
+            Long.class,
+            bindingId);
+    return count;
   }
 
   @Test

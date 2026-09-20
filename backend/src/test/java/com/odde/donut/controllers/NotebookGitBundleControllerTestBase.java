@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,27 +17,13 @@ import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.jgit.dircache.DirCache;
-import org.eclipse.jgit.dircache.DirCacheBuilder;
-import org.eclipse.jgit.dircache.DirCacheEntry;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
-import org.eclipse.jgit.lib.CommitBuilder;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectInserter;
-import org.eclipse.jgit.lib.PersonIdent;
-import org.eclipse.jgit.lib.RefUpdate;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.transport.BundleWriter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +33,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Shared notebook/bundle-crafting fixtures for notebook Git controller tests. */
+/** Shared notebook/binding JPA fixtures for notebook Git controller tests. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-abstract class NotebookGitBundleControllerTestBase extends NoteDependentRowsControllerTestBase {
+abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixtureTestSupport {
 
   private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
 
@@ -137,64 +122,15 @@ abstract class NotebookGitBundleControllerTestBase extends NoteDependentRowsCont
     return exception;
   }
 
-  static ObjectId commitOnTopOf(
-      Repository repository, List<ObjectId> parents, String path, String content, String message)
-      throws IOException {
-    return commitOnTopOf(
-        repository, parents, List.of(new NotebookGitProposalFile(path, content)), message);
-  }
-
-  static ObjectId commitOnTopOf(
-      Repository repository,
-      List<ObjectId> parents,
-      List<NotebookGitProposalFile> files,
-      String message)
-      throws IOException {
-    try (ObjectInserter inserter = repository.newObjectInserter()) {
-      DirCache dirCache = DirCache.newInCore();
-      DirCacheBuilder builder = dirCache.builder();
-      List<NotebookGitProposalFile> sortedByPath =
-          files.stream().sorted(Comparator.comparing(NotebookGitProposalFile::path)).toList();
-      for (NotebookGitProposalFile file : sortedByPath) {
-        ObjectId blobId = inserter.insert(Constants.OBJ_BLOB, file.contentBytes());
-        DirCacheEntry entry = new DirCacheEntry(file.path());
-        entry.setFileMode(file.mode());
-        entry.setObjectId(blobId);
-        builder.add(entry);
-      }
-      builder.finish();
-      ObjectId treeId = dirCache.writeTree(inserter);
-
-      PersonIdent author =
-          new PersonIdent("Proposer", "proposer@example.com", Instant.now(), ZoneOffset.UTC);
-      CommitBuilder commitBuilder = new CommitBuilder();
-      commitBuilder.setTreeId(treeId);
-      commitBuilder.setParentIds(parents.toArray(new ObjectId[0]));
-      commitBuilder.setAuthor(author);
-      commitBuilder.setCommitter(author);
-      commitBuilder.setMessage(message);
-      ObjectId commitId = inserter.insert(commitBuilder);
-      inserter.flush();
-      return commitId;
-    }
-  }
-
-  static byte[] bundleBytesForHead(Repository repository, ObjectId headId) throws IOException {
-    RefUpdate refUpdate = repository.updateRef(Constants.R_HEADS + "main");
-    refUpdate.setNewObjectId(headId);
-    refUpdate.forceUpdate();
-
-    BundleWriter bundleWriter = new BundleWriter(repository);
-    bundleWriter.include(Constants.R_HEADS + "main", headId);
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    bundleWriter.writeBundle(NullProgressMonitor.INSTANCE, out);
-    return out.toByteArray();
-  }
-
   /**
    * Testability-only: overwrites {@code notebook}'s accepted Git binding with a fresh root commit
    * built directly from {@code entries}, so proposal-gating tests can control the accepted tree's
-   * exact shape without depending on the notebook's own note/folder content.
+   * exact shape without depending on the notebook's own note/folder content. This sets the
+   * binding's entity fields directly rather than going through {@code
+   * NotebookGitAcceptedRepositoryStore}, so it also clears any native object-store rows the binding
+   * already had: otherwise a binding already converted to native storage would keep a nonzero
+   * object count and never re-trigger the lazy bundle-to-native conversion for this newly-seeded,
+   * disjoint history.
    */
   NotebookGitBinding seedAcceptedBinding(Notebook notebook, List<PortableTreeEntry> entries) {
     NotebookGitBinding binding =
@@ -206,7 +142,43 @@ abstract class NotebookGitBundleControllerTestBase extends NoteDependentRowsCont
       binding.setAcceptedGitObjectId(written.headObjectId());
       binding.setBundleBytes(written.bundleBytes());
     }
-    return notebookGitBindingRepository.save(binding);
+    NotebookGitBinding saved = notebookGitBindingRepository.save(binding);
+    clearNativeObjectStoreRows(saved.getId());
+    return saved;
+  }
+
+  /**
+   * Testability-only: deletes every native object-store row for {@code bindingId}. Any test that
+   * sets {@code NotebookGitBinding#acceptedGitObjectId}/{@code bundleBytes} directly (bypassing
+   * {@code NotebookGitAcceptedRepositoryStore}) to seed a specific, disjoint accepted tree must
+   * call this afterward: otherwise a binding already converted to native storage keeps a nonzero
+   * native object count and never re-triggers the lazy bundle-to-native conversion for the
+   * newly-seeded head, so reads against the new head find its objects missing from the native
+   * store.
+   */
+  void clearNativeObjectStoreRows(Integer bindingId) {
+    committed(
+        () ->
+            entityManager
+                .createNativeQuery(
+                    "DELETE FROM notebook_git_accepted_object WHERE notebook_git_binding_id ="
+                        + " :bindingId")
+                .setParameter("bindingId", bindingId)
+                .executeUpdate());
+  }
+
+  /** Testability-only: counts {@code bindingId}'s native object-store rows. */
+  long countNativeObjectStoreRows(Integer bindingId) {
+    return committed(
+        () ->
+            ((Number)
+                    entityManager
+                        .createNativeQuery(
+                            "SELECT COUNT(*) FROM notebook_git_accepted_object "
+                                + "WHERE notebook_git_binding_id = :bindingId")
+                        .setParameter("bindingId", bindingId)
+                        .getSingleResult())
+                .longValue());
   }
 
   NotebookGitBinding snapshotCurrentPortableTree(Notebook notebook) {
@@ -227,25 +199,23 @@ abstract class NotebookGitBundleControllerTestBase extends NoteDependentRowsCont
         .longValue();
   }
 
-  /** A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. */
+  /**
+   * A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. Reads
+   * the current accepted head/history through the notebook's own download endpoint rather than
+   * {@code binding.getBundleBytes()} directly: once a binding's ordinary saves move onto native
+   * object storage, that column is no longer kept in sync with the accepted head, so only the
+   * download's live, re-serialized bundle reliably reflects the current accepted history.
+   */
   byte[] proposalBundleBytes(
       NotebookGitBinding binding, List<NotebookGitProposalFile> proposedFiles) throws Exception {
+    Notebook notebook = notebookRepository.findById(binding.getNotebook().getId()).orElseThrow();
+    byte[] currentBundle = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, currentBundle);
       ObjectId childCommit =
           commitOnTopOf(repository, List.of(acceptedHead), proposedFiles, "Proposal");
       return bundleBytesForHead(repository, childCommit);
     }
-  }
-
-  /**
-   * A frontmatter-valid baseline tree: one typed note, one typed README - clears tree-shape and
-   * reaches the typed-Markdown gate, for tests whose proposal must get past both.
-   */
-  static List<PortableTreeEntry> validBaselineEntries() {
-    return List.of(
-        ofText("note.md", "---\ntype: Note\n---\noriginal content"),
-        ofText("README.md", "---\ntype: Readme\n---\nreadme original"));
   }
 
   private <T> T committed(java.util.function.Supplier<T> action) {

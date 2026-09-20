@@ -1,7 +1,5 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
-
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -65,12 +63,14 @@ abstract class NotebookGitWebContentHistoryControllerTestSupport
     return historyFromBundle(downloaded, path);
   }
 
+  /**
+   * Reads history through the notebook's own download endpoint rather than {@code
+   * binding.getBundleBytes()} directly: once a binding's ordinary saves move onto native object
+   * storage, that column is no longer kept in sync with the accepted head, so only the download's
+   * live, re-serialized bundle reliably reflects the current accepted history.
+   */
   History historyFromBinding(Integer notebookId, String path) throws Exception {
-    NotebookGitBinding binding =
-        inCommittedTransaction(
-            transactionManager,
-            () -> notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow());
-    return historyFromBundle(binding.getBundleBytes(), path);
+    return downloadHistory(notebookRepository.findById(notebookId).orElseThrow(), path);
   }
 
   static History historyFromBundle(byte[] bundleBytes, String path) throws Exception {

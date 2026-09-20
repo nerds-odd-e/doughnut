@@ -30,84 +30,6 @@ or add competing representations. See [current save behavior](../../docs/note-co
 
 ## Story Decomposition
 
-<a id="story-2"></a>
-
-### 2. Save note content more than four times faster with durable native Git storage
-
-- **Identity:** SEED-034#story-2
-- **Status:** queued first by owner request;
-  [slice plan](../quick/001-durable-native-git-storage/PLAN.md) written and
-  assessed on 2026-09-20. Storage selection and integration sizing remain gated
-  by bounded evidence; implementation has not started.
-- **Goal / beneficiaries:** Note authors in large synchronized notebooks can
-  finish ordinary content saves with substantially less interruption, reaching
-  the remaining greater-than-4× target from story 1's original baseline.
-- **Scope:** Remove repeated full-bundle import, history serialization and
-  multi-MB replacement from ordinary changed saves through durable native Git
-  objects/packs in the existing MySQL infrastructure. Use one shared repository
-  owner for web acceptance, proposal publication, cutover and bundle download.
-  Generate transport bundles on demand. Include migration of existing bindings
-  and preservation of their exact accepted head, object IDs and history.
-- **Evaluation:** Retain story 1's request-initiation → refreshed, no-longer-dirty
-  browser boundary: 20 changed saves after three warm-ups for existing-link and
-  added/changed-link workloads, exact initial fixture/history and comparable
-  normal-JIT environment. Each median must be below one quarter of its original
-  baseline: below 198.75 ms existing and 196.25 ms added links. This is an
-  aggregate 4× goal, not another 4× on the improved story-1 result. Report all
-  samples/p95, plain control and last-edit timing separately; preserve debounce.
-  Verify successful reload/content/link state and investigate tail regressions.
-  Re-establish paired measurements if environment comparability cannot be shown.
-- **Design acceptance:** Owner permits necessary, conservative production-code
-  growth; no numeric line cap is invented. Prefer existing JGit primitives and
-  the smallest cohesive storage owner; explain added responsibilities and
-  remove superseded storage paths. No competing bundle/object authorities,
-  custom delta protocol, cache-invalidation layer, asynchronous save acceptance,
-  new external persistence tier or general storage framework. Review aggregate
-  code/operational cost before extending the design; do not expand speculatively.
-  Owner reaffirmed on 2026-09-20 that no negative architectural impact is
-  acceptable, even if a candidate improves timing. Reject an approach that
-  weakens consistency or adds unjustified lifecycle/operational complexity.
-- **Key examples:**
-  - A changed wiki-linked note saves durably, refreshes correct destinations and
-    appends one complete accepted commit; note/learning identity is retained.
-  - An existing binding migrates without history rewriting; downloaded bundles
-    still clone/fetch correctly with all reachable objects and exact old IDs.
-  - No-op/drift policy, complete multi-note/cross-notebook operations and tracker
-    guards retain their current outcomes. Concurrent or failed saves cannot
-    expose a head whose objects or complete SQL projection are not durable.
-  - Proposal publication, cutover, trash, README and empty-folder bytes retain
-    existing semantics; rapid typing and property-mode switching lose no edits.
-- **Architecture:** Follow Accepted ADR 0002 and `docs/notebook-git-synchronization.md`:
-  durable objects precede advertised heads; the locked SQL head/projection is
-  publication authority. Preserve ADRs 0001/4/5/6/7. The storage redesign is
-  permitted, not an exception to atomicity or append-only history.
-- **Deferred promises:** Title/README latency, initial page loading and bulk
-  publication throughput are not new performance goals. No autosave redesign,
-  generic benchmark platform or unrelated cleanup.
-- **Effort hypothesis:** L, low confidence until native storage lifecycle,
-  migration and measured cost are decomposed; do not treat this as one slice.
-- **Depends on:** Delivered story 1 (`fe413d0f3c1425b2dde545098d844401f2f196ca`).
-- **Evidence / open decisions:** Recover predecessor evidence from commit
-  `7b03bacdbcbea4b4b9618611b8cfca682660c687`, path
-  `.planning/quick/260921-faster-note-content-saving/PLAN.md` ([Git copy](https://github.com/nerds-odd-e/doughnut/blob/7b03bacdbcbea4b4b9618611b8cfca682660c687/.planning/quick/260921-faster-note-content-saving/PLAN.md)).
-  Original product baseline: `b5cad203d1d8915b03cbb2353866134979519349`.
-  Normal-JIT medians existing/added/plain: 795/785/766.5 ms; current repeat
-  563.5/524.5/492.5 ms. Both final runs and their variability remain evidence.
-  Preserve `/tmp/donut-note-save-baseline/` as active acceptance input. Its
-  README and `normal-jit/` retain fixture, harness, samples and JFR; restore in
-  a newly owned isolated checkout, not the retired predecessor worktree.
-  Use the identical `optimizedLaunch=false` BootRun override on both sides
-  and confirm JIT tier 4. Never commit/share its unsanitized `history.git`.
-  Choose indexed packs versus per-object storage from bounded evidence; account
-  for history growth, lookup cost, migration and transaction failure behavior.
-  Native storage's 4× efficacy remains unproven. Incremental-bundle replay chains
-  and whole-pack reuse were rejected for history-dependent cost/retention risks.
-  Planning inspection on 2026-09-20 found `/tmp/donut-note-save-baseline/`
-  absent on this host. Recover the evidence or reconstruct explicitly labelled,
-  comparable paired original/current measurements before claiming acceptance;
-  the historical summary alone is insufficient. See the plan for gates and
-  preservation obligations, including existing reset and binding cleanup.
-
 <a id="story-3"></a>
 
 ### 3. Assess whether attachment content needs its own save-path treatment
@@ -143,20 +65,91 @@ or add competing representations. See [current save behavior](../../docs/note-co
   Portable tree and accepted-change owners; it must not introduce a second
   content authority, weaken no-op detection or projection-drift detection, or
   change what a notebook's Portable tree contains.
-- **Depends on:** SEED-034#story-2 delivered. The root-attachment work it pairs
-  with is already delivered; see "Root attachments today" in
-  `docs/notebook-git-synchronization.md`.
+- **Depends on:** Delivered story 2 (`045a5c6010815a9f106e2cc2241fe7466e24ac55`).
+  The root-attachment work it pairs with is already delivered; see "Root
+  attachments today" in `docs/notebook-git-synchronization.md`. Story 2 closed
+  with revised scope (native storage architecture delivered; the >4× target
+  itself carried forward into story 4) — story 2's actual delivered storage
+  shape is now available for this assessment to measure against.
 - **Effort hypothesis:** S for the measurement; unknown for any change, which
   is exactly what the measurement decides.
 - **Safe stopping point:** An evidenced answer. A measured "no action needed"
   closes it.
 
+<a id="story-4"></a>
+
+### 4. Prove and close the four-times-faster save target, and retire legacy bundle storage
+
+- **Identity:** SEED-034#story-4
+- **Status:** queued; blocked on recovering or reconstructing gate 1's exact
+  historical-shape browser-JIT baseline. That harness and fixture (11,184 notes,
+  4,046 folders, 17,739 references, depth 1–12, 19 changed-history commits; a
+  Cypress typing/debounce timing harness with JFR profiling) are confirmed
+  genuinely unrecoverable — never committed, lived only in a disposable `/tmp`
+  directory on a prior host. Reconstruction must be explicitly labeled as such;
+  the historical numeric thresholds are not automatically valid against a
+  differently-generated fixture unless shape/content comparability is shown.
+- **Goal / beneficiaries:** Note authors in large synchronized notebooks reach
+  story 1's original remaining-greater-than-4× target for ordinary changed
+  saves — the promise story 2 built the storage mechanism for but could not
+  itself verify quantitatively.
+- **Scope:** (a) recover or explicitly-labeled-reconstruct gate 1's baseline
+  fixture and harness; (b) run story 2's slice 10 proof against the now-fully-
+  native storage story 2 delivered — three warm-ups then 20 changed saves per
+  workload (existing links, added/changed links), normal JIT, tier 4 verified,
+  real debounce and serialized saves, reporting every sample and median/p95;
+  (c) separately, complete story 2's deferred retirement half: run the
+  delivered backfill migration (`V300000336__BackfillNotebookGitAcceptedObjects`,
+  already proven correct and committed on `main`) against real dev/production
+  data, verify every binding converted, then remove the legacy `bundle_bytes`
+  column/path in a follow-up migration. Deployment ordering must prevent an old
+  application writer from restoring bundle authority; do not assume
+  mixed-version compatibility. Coordinate timing with story 3: retirement
+  changes the storage shape story 3 measures against.
+- **Evaluation:** Each workload median must be below one quarter of story 1's
+  original baseline: below 198.75 ms (existing links) and 196.25 ms (added
+  links). This is the same aggregate 4× goal story 2 targeted, not a new
+  target. If reconstructed-fixture evidence cannot be shown comparable to the
+  historical shape, disclose the limitation explicitly rather than claiming
+  the threshold was met against incomparable data.
+- **Design acceptance:** No new optimization avenue beyond what story 2 already
+  delivered is pre-authorized; if the measured result still misses the target,
+  stop and report rather than searching for further architectural changes
+  without owner review. Retirement must preserve `docs/database-erd.md`
+  accuracy and pass this project's FK-cascade/migration verification.
+- **Key examples:** Same as story 2's key examples (durable changed saves,
+  binding migration without history rewriting, no-op/drift and concurrent/failed
+  save guarantees, proposal/cutover/trash/README semantics) — story 4 verifies
+  the quantitative target and completes storage retirement on top of story 2's
+  already-delivered and already-tested mechanism; it does not re-open story 2's
+  design.
+- **Architecture:** Follow Accepted ADR 0002 and `docs/notebook-git-synchronization.md`;
+  preserve ADRs 0001/4/5/6/7. Retirement is cleanup of an already-delivered
+  design, not a new architectural exception.
+- **Deferred promises:** Title/README latency, initial page loading and bulk
+  publication throughput remain out of scope, as in story 2.
+- **Effort hypothesis:** M, low confidence until gate 1's fixture/harness
+  reconstruction is scoped; do not treat this as one slice.
+- **Depends on:** Delivered story 2 (`045a5c6010815a9f106e2cc2241fe7466e24ac55`).
+- **Evidence / open decisions:** Story 2's real-save performance measurement
+  (median 3,328.674 ms vs. the pre-native-storage baseline's 3,095.452 ms,
+  within that baseline's own noise band — no regression) supports that native
+  storage itself is not the blocker to the >4× target; gate 1's missing
+  browser-JIT baseline is the actual blocker. The backfill migration is
+  delivered and proven correct in isolation but has never been run against
+  real data — that run, and its verification, is retirement's prerequisite.
+  Recover story 2's full evidence and design history from commit
+  `045a5c6010815a9f106e2cc2241fe7466e24ac55`, path
+  `.planning/quick/001-durable-native-git-storage/PLAN.md` ([Git copy](https://github.com/nerds-odd-e/doughnut/blob/045a5c6010815a9f106e2cc2241fe7466e24ac55/.planning/quick/001-durable-native-git-storage/PLAN.md)).
+
 ## Ordering and Scope Reduction
 
 Queue ahead of the remaining note-presentation cleanup, which was explicitly
-deferred to last. Story 2 remains the first queued item. Story 3 is queued last
-by owner request: it cannot be answered until story 2 is delivered. Preserve the near-future
-direction and leave implementation to its own bounded plan.
+deferred to last. Story 4 is queued first: it finishes story 2's own unmet
+target. Story 3 remains queued last by owner request, since it cannot be
+answered until story 2's (and now story 4's) delivered storage shape is
+settled. Preserve the near-future direction and leave implementation to its
+own bounded plan.
 
 ## When to Surface
 
@@ -170,3 +163,11 @@ When selecting performance work on editing notes in large notebooks.
 - Owner direction, 2026-09-20: queue the remaining 4× target and native Git
   storage redesign first; allow conservative production-code growth while
   retaining correctness and architecture requirements.
+- Owner decision, 2026-09-20: story 2 closed with revised scope after
+  delivering the native storage architecture (schema, JDBC-backed object
+  store, every caller cut over, atomicity, publication ancestry, lifecycle,
+  and a proven-but-not-yet-run backfill migration) with no measured real-save
+  regression, since gate 1's browser-JIT baseline proved genuinely
+  unrecoverable this session. The unmet >4× target and deferred storage
+  retirement carry forward into story 4, queued alongside the already-queued
+  story 3 (attachment save-path assessment), which depends on both.

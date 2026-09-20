@@ -40,6 +40,7 @@ erDiagram
     notebook ||--o{ notebook_attachment : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ notebook_git_binding : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ subscription : "notebook_id ON DELETE NO ACTION"
+    notebook_git_binding ||--o{ notebook_git_accepted_object : "notebook_git_binding_id ON DELETE CASCADE"
     notebook_group ||--o{ notebook : "notebook_group_id ON DELETE SET NULL"
     notebook_group ||--o{ subscription : "notebook_group_id ON DELETE SET NULL"
     ownership ||--o{ conversation : "subject_ownership_id ON DELETE NO ACTION"
@@ -189,6 +190,10 @@ erDiagram
     notebook_attachment {
         int id PK
         int notebook_id FK
+    }
+    notebook_git_accepted_object {
+        int notebook_git_binding_id PK FK
+        string git_object_id PK
     }
     notebook_git_binding {
         int id PK

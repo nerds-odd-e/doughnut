@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,12 +13,15 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -104,11 +108,12 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     NotebookGitBinding initialBinding = snapshotCurrentPortableTree(notebook);
     String initialHead = initialBinding.getAcceptedGitObjectId();
     ObjectId acceptedHead = ObjectId.fromString(initialHead);
+    ObjectId afterDeleteAndEdit;
     ObjectId tip;
     byte[] proposalBytes;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, initialBinding.getBundleBytes());
-      ObjectId afterDeleteAndEdit =
+      afterDeleteAndEdit =
           commitOnTopOf(
               repository,
               List.of(acceptedHead),
@@ -133,6 +138,31 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     assertThat(stateAfterPublication.deletedPresent(), equalTo(false));
     assertThat(stateAfterPublication.dependentCounts(), equalTo(DependentCounts.allAbsent()));
 
+    byte[] downloadedAfterPublication =
+        controller
+            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
+            .getBody();
+    try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk revWalk = new RevWalk(accepted)) {
+      ObjectId downloadedHead = GitBundleTestReader.fetchHead(accepted, downloadedAfterPublication);
+      assertThat(downloadedHead, equalTo(tip));
+      RevCommit tipCommit = revWalk.parseCommit(downloadedHead);
+      assertThat(tipCommit.getParentCount(), equalTo(1));
+      assertThat(tipCommit.getParent(0).getId(), equalTo(afterDeleteAndEdit));
+      RevCommit middleCommit = revWalk.parseCommit(tipCommit.getParent(0));
+      assertThat(middleCommit.getParentCount(), equalTo(1));
+      assertThat(middleCommit.getParent(0).getId(), equalTo(acceptedHead));
+      assertThat(
+          GitBundleTestReader.pathsIn(accepted, downloadedHead),
+          containsInAnyOrder("Retained.md", "Added.md"));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(accepted, downloadedHead, "Retained.md"),
+          equalTo(RETAINED_EDITED_CONTENT));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(accepted, downloadedHead, "Added.md"),
+          equalTo(ADDED_CONTENT));
+    }
+
     testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-06-01 00:00:00"));
     String retriedHead =
         controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
@@ -142,7 +172,6 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
     assertThat(
         stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
-    assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
     assertThat(stateAfterRetry.notes(), equalTo(stateAfterPublication.notes()));
     assertThat(stateAfterRetry.deletedPresent(), equalTo(stateAfterPublication.deletedPresent()));
     assertThat(stateAfterRetry.dependentCounts(), equalTo(stateAfterPublication.dependentCounts()));
@@ -158,7 +187,6 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
           return new PublicationState(
               binding.getAcceptedGitObjectId(),
               binding.getUpdatedAt(),
-              binding.getBundleBytes().clone(),
               notes.stream()
                   .map(
                       note ->
@@ -177,7 +205,6 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
   private record PublicationState(
       String acceptedHead,
       Timestamp bindingUpdatedAt,
-      byte[] bundleBytes,
       List<PublishedNoteState> notes,
       boolean deletedPresent,
       DependentCounts dependentCounts) {}

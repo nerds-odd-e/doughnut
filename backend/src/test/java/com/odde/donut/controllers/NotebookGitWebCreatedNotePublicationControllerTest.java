@@ -79,9 +79,10 @@ class NotebookGitWebCreatedNotePublicationControllerTest
     NotebookGitBinding afterWebSave = binding(notebook);
     ObjectId webSaveHead = ObjectId.fromString(afterWebSave.getAcceptedGitObjectId());
     assertThat(webSaveHead, not(equalTo(creationHead)));
+    byte[] downloadedAfterWebSave = controller.downloadNotebookGitBundle(notebook).getBody();
     ObjectId acceptedMarkerBlob;
     try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(accepted, afterWebSave.getBundleBytes());
+      GitBundleTestReader.fetchHead(accepted, downloadedAfterWebSave);
       acceptedMarkerBlob = GitBundleTestReader.blobIdAt(accepted, webSaveHead, EMPTY_FOLDER_MARKER);
     }
 

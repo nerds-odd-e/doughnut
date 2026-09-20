@@ -6,13 +6,13 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookExport.NotebookLivePortableTree;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
-import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,16 +23,19 @@ public class AcceptedWebChangeService {
   private final NotebookGitBindingRepository bindingRepository;
   private final NotebookLivePortableTree livePortableTree;
   private final EntityPersister entityPersister;
+  private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
   public AcceptedWebChangeService(
       NotebookGitProjection projection,
       NotebookGitBindingRepository bindingRepository,
       NotebookLivePortableTree livePortableTree,
-      EntityPersister entityPersister) {
+      EntityPersister entityPersister,
+      NotebookGitAcceptedRepositoryStore repositoryStore) {
     this.projection = projection;
     this.bindingRepository = bindingRepository;
     this.livePortableTree = livePortableTree;
     this.entityPersister = entityPersister;
+    this.repositoryStore = repositoryStore;
   }
 
   @FunctionalInterface
@@ -80,20 +83,14 @@ public class AcceptedWebChangeService {
 
   private record OpenedNotebook(
       NotebookGitBinding binding,
-      NotebookGitBundleImporter.ImportedBundle accepted,
+      OpenedAcceptedRepository accepted,
       List<PortableTreeEntry> acceptedEntries,
       boolean matchedBefore) {}
 
   private OpenedNotebook open(NotebookGitBinding binding) {
-    ObjectId persistedAcceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    NotebookGitBundleImporter.ImportedBundle accepted =
-        NotebookGitBundleImporter.importMainHead(binding.getBundleBytes(), "accepted-bundle");
-    if (!accepted.mainHead().equals(persistedAcceptedHead)) {
-      accepted.close();
-      throw new IllegalStateException("Accepted bundle main does not match its persisted head");
-    }
+    OpenedAcceptedRepository accepted = repositoryStore.open(binding);
     List<PortableTreeEntry> acceptedEntries =
-        NotebookGitAcceptedTree.readEntries(accepted.repository(), accepted.mainHead());
+        NotebookGitAcceptedTree.readEntries(accepted.repository(), accepted.head());
     return new OpenedNotebook(
         binding,
         accepted,
@@ -106,23 +103,17 @@ public class AcceptedWebChangeService {
     if (projection.matchesAcceptedTree(entries, notebook.acceptedEntries())) {
       return;
     }
-    NotebookGitBundleImporter.ImportedBundle accepted = notebook.accepted();
+    OpenedAcceptedRepository accepted = notebook.accepted();
     NotebookGitBundleBuilder.append(
         accepted.repository(),
-        accepted.mainHead(),
+        accepted.head(),
         notebook.acceptedEntries(),
         entries,
         NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
         NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,
         message,
         updatedAt.toInstant());
-    NotebookGitBundleWriter.BundleWriteResult written =
-        NotebookGitBundleWriter.write(accepted.repository());
-    NotebookGitBinding binding = notebook.binding();
-    binding.setAcceptedGitObjectId(written.headObjectId());
-    binding.setBundleBytes(written.bundleBytes());
-    binding.setUpdatedAt(updatedAt);
-    entityPersister.save(binding);
+    repositoryStore.store(notebook.binding(), accepted.repository(), updatedAt);
   }
 
   private List<PortableTreeEntry> snapshot(NotebookGitBinding binding) {

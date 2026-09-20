@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -75,7 +74,8 @@ class NotebookGitWebNoteMoveControllerTest extends NotebookGitWebNoteMoveTestBas
     }
 
     NotebookGitBinding afterMove = binding(f.notebook());
-    byte[] proposalC = proposalModifyingPath(afterMove, "Study/Cells.md", EDITED_BODY);
+    byte[] downloadedAfterMove = controller.downloadNotebookGitBundle(f.notebook()).getBody();
+    byte[] proposalC = proposalModifyingPath(downloadedAfterMove, "Study/Cells.md", EDITED_BODY);
     controller.publishNotebookGitProposal(
         f.notebook().getId(), afterMove.getAcceptedGitObjectId(), proposalC);
 
@@ -109,8 +109,7 @@ class NotebookGitWebNoteMoveControllerTest extends NotebookGitWebNoteMoveTestBas
 
     assertThat(race.first().get(0).getNote().getFolder().getId(), equalTo(f.study().getId()));
     assertThat(race.second().getNote().getContent(), equalTo(EDITED_BODY));
-    byte[] bundleBytes =
-        inCommittedTransaction(transactionManager, () -> binding(f.notebook()).getBundleBytes());
+    byte[] bundleBytes = controller.downloadNotebookGitBundle(f.notebook()).getBody();
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId head = GitBundleTestReader.fetchHead(repo, bundleBytes);
       try (RevWalk revWalk = new RevWalk(repo)) {
@@ -154,14 +153,17 @@ class NotebookGitWebNoteMoveControllerTest extends NotebookGitWebNoteMoveTestBas
   }
 
   /**
-   * Builds a single-parent proposal on top of {@code binding}'s accepted head that preserves every
-   * file already in the accepted tree and overrides exactly one path's content — mirroring a local
-   * checkout edit followed by a commit on the moved note's new path.
+   * Builds a single-parent proposal on top of the accepted head in {@code acceptedBundleBytes}
+   * (read through the notebook's own download endpoint by the caller, not {@code
+   * binding.getBundleBytes()} directly - that column stops tracking the accepted head once a
+   * binding's saves move onto native object storage) that preserves every file already in the
+   * accepted tree and overrides exactly one path's content — mirroring a local checkout edit
+   * followed by a commit on the moved note's new path.
    */
-  private byte[] proposalModifyingPath(NotebookGitBinding binding, String path, String content)
+  private byte[] proposalModifyingPath(byte[] acceptedBundleBytes, String path, String content)
       throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, acceptedBundleBytes);
       ObjectId parentTree;
       try (RevWalk revWalk = new RevWalk(repository)) {
         parentTree = revWalk.parseCommit(acceptedHead).getTree();

@@ -80,8 +80,9 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
     assertThat(editedNote.getContent(), is(LOCAL_CONTENT));
     assertThat(afterEdit.getAcceptedGitObjectId(), is(localEditHead.getName()));
 
+    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(accepted, afterEdit.getBundleBytes());
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(accepted, downloaded);
       try (RevWalk revWalk = new RevWalk(accepted)) {
         RevCommit acceptedCommit = revWalk.parseCommit(acceptedHead);
         assertThat(acceptedCommit.getParent(0).getId().getName(), is(createdHead));

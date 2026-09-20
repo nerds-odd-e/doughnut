@@ -60,9 +60,12 @@ class NotebookGitRootAttachmentIndependenceControllerTest
   void aLocalNoteRelocationLeavesTheRootFilesUntouched() throws Exception {
     Fixture fixture = publishRootFilesOverNotesAndFolders();
     NotebookGitBinding accepted = reloadCommittedBinding(fixture.notebook().getId());
+    // Read the current accepted tree through the live download endpoint, not the JPA
+    // bundle_bytes column directly: once a binding's saves move onto native object storage,
+    // that column is no longer kept in sync with the accepted head.
     List<PortableTreeEntry> relocated =
         movePath(
-            GitBundleTestReader.fetchTipTreeEntries(accepted.getBundleBytes()),
+            GitBundleTestReader.fetchTipTreeEntries(downloadedBundleBytes(fixture.notebook())),
             "Biology/Cells.md",
             "Study/Cells.md");
 

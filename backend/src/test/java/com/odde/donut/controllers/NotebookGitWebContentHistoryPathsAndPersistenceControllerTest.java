@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.ApiException;
@@ -49,7 +50,8 @@ class NotebookGitWebContentHistoryPathsAndPersistenceControllerTest
 
     saveAt(fixture.noteId(), content("changed"), T1008);
 
-    History history = historyFromBinding(fixture.notebookId(), "Fresh.md");
+    Notebook notebook = notebookRepository.findById(fixture.notebookId()).orElseThrow();
+    History history = downloadHistory(notebook, "Fresh.md");
     assertThat(
         history.headsNewestFirst().get(1), equalTo(ObjectId.fromString(acceptedHeadBeforeSave)));
   }

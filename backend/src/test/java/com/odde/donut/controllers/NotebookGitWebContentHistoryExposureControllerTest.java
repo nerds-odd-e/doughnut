@@ -66,9 +66,9 @@ class NotebookGitWebContentHistoryExposureControllerTest
 
     ObjectId beforeCreatedEdit = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     saveAt(created.getId(), content("created-body"), T1027);
-    NotebookGitBinding afterCreatedEdit = binding(notebook);
+    byte[] downloadedAfterCreatedEdit = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId tip = GitBundleTestReader.fetchHead(repository, afterCreatedEdit.getBundleBytes());
+      ObjectId tip = GitBundleTestReader.fetchHead(repository, downloadedAfterCreatedEdit);
       assertThat(
           NotebookGitProposalBlobText.readUtf8(repository, tip, "Created.md"),
           is(content("created-body")));

@@ -31,10 +31,9 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     Folder created = folderController.createFolder(notebook, request);
 
     assertThat(created.getName(), is("Biology"));
-    NotebookGitBinding after =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, after.getBundleBytes());
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(GitBundleTestReader.pathsIn(repository, acceptedHead), contains("Biology/.keep"));
       assertThat(
           repository

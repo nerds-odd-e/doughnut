@@ -19,8 +19,13 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
+import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
 import java.util.List;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,6 +192,19 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
         .longValue();
   }
 
+  /** Triggers {@link TextContentController#updateNoteContent} and asserts the injected failure. */
+  private void triggerFailingContentUpdate(Note note, String proposedContent) {
+    NoteUpdateContentDTO update = new NoteUpdateContentDTO();
+    update.setContent(proposedContent);
+
+    NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
+
+    RuntimeException failure =
+        assertThrows(
+            RuntimeException.class, () -> textContentController.updateNoteContent(note, update));
+    assertThat(failure.getMessage(), is("forced failure after note projection"));
+  }
+
   @Test
   void lateBindingSaveFailureRollsBackWebContentTimestampReferencesAndAcceptedBinding()
       throws Exception {
@@ -212,15 +230,8 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
                     .anImage()
                     .forNote(noteRepository.findById(note.getId()).orElseThrow())
                     .please());
-    NoteUpdateContentDTO update = new NoteUpdateContentDTO();
-    update.setContent(PROPOSED_CONTENT);
 
-    NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
-
-    RuntimeException failure =
-        assertThrows(
-            RuntimeException.class, () -> textContentController.updateNoteContent(note, update));
-    assertThat(failure.getMessage(), is("forced failure after note projection"));
+    triggerFailingContentUpdate(note, PROPOSED_CONTENT);
 
     inCommittedTransaction(
         transactionManager,
@@ -238,5 +249,39 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+  }
+
+  /**
+   * The append that runs before the injected failure already flushes the new blob/tree/commit rows
+   * into {@code notebook_git_accepted_object} on the same, still-open business transaction; only
+   * the later {@code entityPersister.save(binding)} call fails. Ordinary test-managed rollback
+   * cannot distinguish "never written" from "written then rolled back", so this proves the native
+   * rows specifically from a separately committed reader and a freshly reopened repository (no
+   * process-local cache): failure after native object insertion leaves the previously accepted
+   * state completely unchanged, not a durable head advanced past missing objects and not leftover
+   * garbage rows either.
+   */
+  @Test
+  void lateBindingSaveFailureLeavesNoDurableNativeObjectStoreRows() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
+    NotebookGitBinding acceptedBinding = snapshotCurrentPortableTree(notebook);
+    Integer bindingId = acceptedBinding.getId();
+    String acceptedHead = acceptedBinding.getAcceptedGitObjectId();
+    long nativeRowsBeforeFailedSave = countNativeObjectStoreRows(bindingId);
+
+    triggerFailingContentUpdate(note, PROPOSED_CONTENT);
+
+    assertThat(countNativeObjectStoreRows(bindingId), is(nativeRowsBeforeFailedSave));
+    NotebookGitBinding reloadedBinding = reloadCommittedBinding(notebook.getId());
+    assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
+
+    byte[] reopenedBundle = controller.downloadNotebookGitBundle(notebook).getBody();
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId head = GitBundleTestReader.fetchHead(repository, reopenedBundle);
+      assertThat(head.getName(), is(acceptedHead));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repository, head, "note.md"), is(ACCEPTED_CONTENT));
+    }
   }
 }

@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -61,8 +60,7 @@ class NotebookGitWebTrashQueuedWriterControllerTest
     assertThat(race.first().getNote().isTrashed(), is(true));
     assertThat(race.first().getNote().getFolder().getParentFolder().getName(), equalTo("_trash"));
     assertThat(race.second().getNote().getContent(), equalTo(EDITED_ATOMS_BODY));
-    byte[] bundleBytes =
-        inCommittedTransaction(transactionManager, () -> binding(f.notebook()).getBundleBytes());
+    byte[] bundleBytes = controller.downloadNotebookGitBundle(f.notebook()).getBody();
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId head = GitBundleTestReader.fetchHead(repo, bundleBytes);
       try (RevWalk revWalk = new RevWalk(repo)) {
