@@ -12,7 +12,8 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Prove and close the four-times-faster save target, and retire legacy bundle storage](seeds/SEED-034-faster-note-content-saving.md#story-4) — SEED-034#story-4
+- [Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage](seeds/SEED-034-faster-note-content-saving.md#story-4) — SEED-034#story-4
+- [Assess asynchronous Git processing only if save performance remains inadequate](seeds/SEED-034-faster-note-content-saving.md#story-5) — SEED-034#story-5
 - [Skip common AI guidance folders during assimilation](seeds/SEED-035-ai-workspace-supporting-files.md#story-8) — SEED-035#story-8
 - [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
