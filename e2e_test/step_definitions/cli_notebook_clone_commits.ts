@@ -63,6 +63,19 @@ When(
 )
 
 When(
+  'I commit the root file {string} and the root file {string} holding the bytes {string} together in the cloned checkout:',
+  (
+    textRelativePath: string,
+    binaryRelativePath: string,
+    bytes: string,
+    content: string
+  ) =>
+    cli
+      .notebookCloneCheckout()
+      .commitRootFiles(textRelativePath, content, binaryRelativePath, bytes)
+)
+
+When(
   'I commit a removal of {string} in the cloned checkout',
   (relativePath: string) =>
     cli.notebookCloneCheckout().commitRemoval(relativePath)

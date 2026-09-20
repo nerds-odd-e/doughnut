@@ -1,12 +1,19 @@
 /**
  * Test-owned Git plumbing for CLI notebook clone checkouts: identity, staging,
- * commit, rebase continue, and tree reads. Cypress task names stay in
+ * commit, rebase continue, and tree and on-disk reads. Cypress task names stay in
  * `cliE2eNotebookCloneTasks.ts`.
  */
 
 import { execFileSync, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs'
 import { dirname, join, relative } from 'node:path'
+import { hexFromSpacedHex } from './spacedHexBytes'
 
 const E2E_GIT_IDENTITY_ARGS = [
   '-c',
@@ -59,6 +66,26 @@ export function stageNoteChanges(
     '--',
     ...files.map(({ relativePath }) => relativePath)
   )
+}
+
+/** Stages exactly the bytes a spaced-hex fixture names. */
+export function stageExactBytes(
+  checkoutDir: string,
+  relativePath: string,
+  spacedHex: string
+): void {
+  const filePath = join(checkoutDir, relativePath)
+  mkdirSync(dirname(filePath), { recursive: true })
+  writeFileSync(filePath, Buffer.from(hexFromSpacedHex(spacedHex), 'hex'))
+  git(checkoutDir, 'add', '--', relativePath)
+}
+
+/** The checked-out file's bytes as lowercase hex, never decoded as text. */
+export function readCheckoutFileHex(
+  checkoutDir: string,
+  relativePath: string
+): string {
+  return readFileSync(join(checkoutDir, relativePath)).toString('hex')
 }
 
 export function stageNoteRemoval(

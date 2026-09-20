@@ -5,7 +5,7 @@ import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookClo
 import {
   expectCanonicalTreeAt,
   readCheckoutStateAt,
-} from './notebookCloneCheckoutReceiver'
+} from './notebookCloneCheckoutDestination'
 import { nonInteractiveOutput } from './outputAssertions'
 
 function readCheckoutState(): Cypress.Chainable<CliNotebookCheckoutState> {

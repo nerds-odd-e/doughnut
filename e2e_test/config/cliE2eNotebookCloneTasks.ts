@@ -1,24 +1,22 @@
 /**
  * Cypress task handlers for the CLI `notebook clone` E2E checkout (no PTY): a test-owned
  * temporary destination, and reading back the resulting checkout's file tree.
+ * Tasks that stage and commit a change live in `cliE2eNotebookCloneCommitTasks.ts`.
  */
 
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { createCliE2eNotebookCloneCommitTasks } from './cliE2eNotebookCloneCommitTasks'
 import {
   blobsAt,
-  commitCheckout,
   continueRebaseNoninteractively,
   firstParent,
   git,
   listCheckoutFilesRecursively,
+  readCheckoutFileHex,
   rebaseMergeExists,
-  stageEmptyKeep,
-  stageNoteChanges,
-  stageNoteRemoval,
-  stageNoteRename,
 } from './cliE2eNotebookCloneGit'
 
 export interface CliNotebookCheckoutState {
@@ -41,6 +39,7 @@ export interface CliNotebookCheckoutConflictState {
 
 export function createCliE2eNotebookCloneTasks() {
   return {
+    ...createCliE2eNotebookCloneCommitTasks(),
     /** A destination path that does not yet exist, inside a fresh test-owned temp dir. */
     createCliNotebookCloneDestination(): string {
       const parent = mkdtempSync(join(tmpdir(), 'cypress-cli-clone-'))
@@ -133,93 +132,15 @@ export function createCliE2eNotebookCloneTasks() {
       continueRebaseNoninteractively(checkoutDir)
       return null
     },
-    commitCliNotebookCheckoutNoteChange({
-      checkoutDir,
-      files,
-    }: {
-      checkoutDir: string
-      files: { relativePath: string; content: string }[]
-    }): string {
-      stageNoteChanges(checkoutDir, files)
-      return commitCheckout(checkoutDir, 'Change cloned notebook note')
-    },
-    commitCliNotebookCheckoutNoteRemoval({
+    /** On-disk bytes of a checked-out file as lowercase hex. */
+    readCliNotebookCheckoutFileHex({
       checkoutDir,
       relativePath,
     }: {
       checkoutDir: string
       relativePath: string
     }): string {
-      stageNoteRemoval(checkoutDir, relativePath)
-      return commitCheckout(checkoutDir, 'Remove cloned notebook note')
-    },
-    commitCliNotebookCheckoutNoteRename({
-      checkoutDir,
-      fromRelativePath,
-      toRelativePath,
-    }: {
-      checkoutDir: string
-      fromRelativePath: string
-      toRelativePath: string
-    }): string {
-      stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
-      return commitCheckout(checkoutDir, 'Rename cloned notebook note')
-    },
-    commitCliNotebookCheckoutNoteRenameAndRemoval({
-      checkoutDir,
-      fromRelativePath,
-      toRelativePath,
-      removeRelativePath,
-    }: {
-      checkoutDir: string
-      fromRelativePath: string
-      toRelativePath: string
-      removeRelativePath: string
-    }): string {
-      stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
-      stageNoteRemoval(checkoutDir, removeRelativePath)
-      return commitCheckout(
-        checkoutDir,
-        'Rename cloned notebook note and remove a path'
-      )
-    },
-    commitCliNotebookCheckoutNoteRenameAndEmptyKeep({
-      checkoutDir,
-      fromRelativePath,
-      toRelativePath,
-      keepRelativePath,
-    }: {
-      checkoutDir: string
-      fromRelativePath: string
-      toRelativePath: string
-      keepRelativePath: string
-    }): string {
-      stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
-      stageEmptyKeep(checkoutDir, keepRelativePath)
-      return commitCheckout(
-        checkoutDir,
-        'Rename cloned notebook note and add an empty keep'
-      )
-    },
-    commitCliNotebookCheckoutNoteRenameAndEdit({
-      checkoutDir,
-      fromRelativePath,
-      toRelativePath,
-      relativePath,
-      content,
-    }: {
-      checkoutDir: string
-      fromRelativePath: string
-      toRelativePath: string
-      relativePath: string
-      content: string
-    }): string {
-      stageNoteRename(checkoutDir, fromRelativePath, toRelativePath)
-      stageNoteChanges(checkoutDir, [{ relativePath, content }])
-      return commitCheckout(
-        checkoutDir,
-        'Rename and change cloned notebook notes'
-      )
+      return readCheckoutFileHex(checkoutDir, relativePath)
     },
   }
 }

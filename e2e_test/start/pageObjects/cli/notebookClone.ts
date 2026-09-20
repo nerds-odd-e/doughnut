@@ -9,7 +9,10 @@ function notebookClone() {
   function cloneWithTask(
     notebookName: string,
     task: 'runInstalledCli' | 'runInstalledCliExpectingRejection',
-    destinationAlias: 'cliCloneDestination' | 'cliCloneReceiverDestination'
+    destinationAlias:
+      | 'cliCloneDestination'
+      | 'cliCloneReceiverDestination'
+      | 'cliCloneFreshDestination'
   ): Cypress.Chainable<null> {
     return testability()
       .getNotebookIdByName(notebookName)
@@ -83,6 +86,17 @@ function notebookClone() {
         notebookName,
         'runInstalledCli',
         'cliCloneReceiverDestination'
+      )
+    },
+    /**
+     * A checkout cloned after accepted history has advanced, aliased
+     * `@cliCloneFreshDestination`. It holds no local history of its own.
+     */
+    cloneNotebookIntoFresh(notebookName: string): Cypress.Chainable<null> {
+      return cloneWithTask(
+        notebookName,
+        'runInstalledCli',
+        'cliCloneFreshDestination'
       )
     },
     cloneNotebookExpectingRejection(

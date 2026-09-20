@@ -1,6 +1,6 @@
 # Keep notebook-root attachments through local and web changes
 
-Status: in execution. First story and slice plan refined.
+Status: **all nine slices executed and delivered.** Awaiting retrospective and story wrap-up.
 Work item: **SEED-035#story-6**.
 Source: [refined story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-6).
 This reuses the original plan after its authorized resplit; nothing was delivered
@@ -640,7 +640,7 @@ Learnings for slice 9:
 
 ### 9. Recover files in a real second checkout
 
-Type: Behavior. Status: planned. Estimate: 5–8 active minutes.
+Type: Behavior. Status: **done**. Estimate: 5–8 active minutes; actual ~8.
 Extend `cli_notebook_publish_to_clean_clone.feature`: installed CLI publication
 of root text/binary files → web note edit → clean receiver pull and fresh clone.
 Observe exact on-disk bytes, filenames, accepted ancestry and clean worktree.
@@ -648,6 +648,65 @@ Include a file-only follow-on edit. Reuse native Git transport and existing task
 use a byte fixture/read where text helpers cannot express the observation.
 Proof: the existing E2E spec with real backend acceptance, not a mocked receipt.
 Run CLI tests if CLI code/tests change. No rebase-recognizer changes.
+
+Accepted proof:
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature`,
+pass — 4 passing, 0 failing — rerun green after the refactor. Real end-to-end with
+real backend acceptance; the wrapper owned its own services. New scenario:
+`Published root files reach another checkout byte for byte`.
+
+The arc: two installed-CLI clones → publish `reference.json` (UTF-8) and
+`diagram.png` (`89 FF FE 00`, invalid UTF-8) in one commit → **web note edit** →
+receiver `pull`, asserting exact tree, original head still an ancestor, clean
+worktree at the notebook's current accepted head, and both files' on-disk bytes,
+plus the web edit's `Overview.md` in the same received tree → **file-only
+follow-on edit** (`pages:3`→`pages:4`, no Markdown) published → **fresh third
+clone** asserting the same observations on a checkout carrying no local history.
+
+**No production change was needed** — the fifth slice in a row. Neither backend
+nor CLI code changed; `pnpm cli:test` was correctly not required.
+
+Bytes are never observed through a text codec. The fixture is spaced hex in
+Gherkin, staged with `Buffer.from(hex,'hex')`; the read is
+`readFileSync(path).toString('hex')`. `reference.json` deliberately uses the same
+byte read — load-bearing, not stylistic, because `cy.readFile` auto-parses `.json`
+into an object and a text comparison would have compared an object to a string.
+
+Mutation check — the decisive one for the whole story: publishing `89 FF FE 01`
+while both assertions expected `89 FF FE 00` failed **exactly 1 of 4 scenarios**,
+on the on-disk byte assertion. The changed byte physically travelled installed CLI
+→ backend acceptance → SQL projection → Git bundle → the receiver's working tree.
+Restored from a backup copy.
+
+Two real defects found and diagnosed rather than retried:
+
+1. After the web note edit the receiver's head is the *web* commit, not the publish
+   commit — correct product behavior, since the web save advances accepted history
+   past the publication. The shared `expectCleanAcceptedHeadAt` only held for
+   scenarios with no web change after publishing. Split into
+   `expectCleanCheckoutAtHead` plus two callers; the three pre-existing scenarios
+   keep the sharper publish-head claim.
+2. The `cy.readFile` `.json` auto-parse above.
+
+Deliberate scope notes: history reset is **not** exercised here (it produces a
+parentless root commit, which would force the pull case before it). A third
+checkout alias and `notebookCloneCheckoutFresh` were kept rather than reusing the
+receiver alias, because "the second cloned checkout" would otherwise be ambiguous
+after a re-clone in a spec whose whole point is pull-versus-fresh-clone.
+
+Refactor pass outcome: the slice had pushed three files over the 250-line
+guidance (receiver 347, tasks 260, checkout aggregator 258) and had made
+`notebookCloneCheckoutReceiver` a misnomer — it held the alias-parameterized
+checkout plumbing, so the new *fresh-clone* module had to import four helpers from
+a module named "receiver". Destination-addressed helpers moved to
+`notebookCloneCheckoutDestination`; commit tasks and commit page-object methods
+split onto cohesive seams; the spaced-hex format, previously known on both sides
+of the Cypress node/browser seam, now has one definition in `config/spacedHexBytes.ts`
+(the established pattern of `config/notebookPublicationFixture.ts`). Files over
+250 lines: **3 → 0**, largest now 197. Raw lines **+74** — module headers and
+imports, no added logic — accepted as the right trade against shipping three files
+in breach of a project convention. The two file-size splits are the separable part
+if the raw count is ever preferred.
 
 ## Proof coverage and refinement assessment
 

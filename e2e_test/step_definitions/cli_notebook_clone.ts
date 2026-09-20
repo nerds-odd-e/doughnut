@@ -35,6 +35,12 @@ When(
 )
 
 When(
+  'I clone the notebook {string} into a fresh temporary destination using the installed CLI',
+  (notebookName: string) =>
+    cli.notebookClone().cloneNotebookIntoFresh(notebookName)
+)
+
+When(
   'I clone the notebook {string} expecting rejection from the installed CLI',
   (notebookName: string) =>
     cli.notebookClone().cloneNotebookExpectingRejection(notebookName)
@@ -121,6 +127,54 @@ Then(
     cli
       .notebookCloneCheckout()
       .expectReceiverCheckoutFile(relativePath, content)
+)
+
+Then(
+  'the second cloned checkout is a clean checkout of the notebook {string} accepted head',
+  (notebookName: string) =>
+    cli
+      .notebookCloneCheckout()
+      .expectReceiverAtNotebookAcceptedHead(notebookName)
+)
+
+Then(
+  'the second cloned checkout file {string} holds exactly:',
+  (relativePath: string, text: string) =>
+    cli
+      .notebookCloneCheckout()
+      .expectReceiverCheckoutFileExactText(relativePath, text)
+)
+
+Then(
+  'the second cloned checkout file {string} holds the bytes {string}',
+  (relativePath: string, bytes: string) =>
+    cli
+      .notebookCloneCheckout()
+      .expectReceiverCheckoutFileBytes(relativePath, bytes)
+)
+
+Then('the fresh clone contains exactly:', (data: DataTable) =>
+  cli
+    .notebookCloneCheckout()
+    .expectFreshCloneCanonicalTreeFor(data.raw().map((row) => row[0] as string))
+)
+
+Then('the fresh clone is a clean checkout of the accepted head', () =>
+  cli.notebookCloneCheckout().expectFreshCloneAtAcceptedHead()
+)
+
+Then(
+  'the fresh clone file {string} holds exactly:',
+  (relativePath: string, text: string) =>
+    cli
+      .notebookCloneCheckout()
+      .expectFreshCloneFileExactText(relativePath, text)
+)
+
+Then(
+  'the fresh clone file {string} holds the bytes {string}',
+  (relativePath: string, bytes: string) =>
+    cli.notebookCloneCheckout().expectFreshCloneFileBytes(relativePath, bytes)
 )
 
 When(

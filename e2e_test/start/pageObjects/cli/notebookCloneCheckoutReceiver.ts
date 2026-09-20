@@ -1,104 +1,20 @@
 /**
- * Second-clone checkout: pull accepted history, then commit and publish from the receiver.
+ * Second-clone checkout: pull accepted history, then commit and publish from
+ * the receiver. Shared, destination-addressed checkout plumbing lives in
+ * `notebookCloneCheckoutDestination.ts`.
  */
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
-
-type CliNotebookCloneDestinationAlias =
-  | 'cliCloneDestination'
-  | 'cliCloneReceiverDestination'
-
-function runInstalledOn(
-  destinationAlias: CliNotebookCloneDestinationAlias,
-  subcommand: 'publish' | 'pull',
-  task: 'runInstalledCli' | 'runInstalledCliExpectingRejection'
-): Cypress.Chainable<null> {
-  return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
-    cy.get<string>('@donutPath').then((donutPath) =>
-      cy.get<string>('@cliConfigDir').then((configDir) =>
-        cy.task<null>(task, {
-          donutPath,
-          args: ['notebook', subcommand, checkoutDir],
-          env: { DONUT_CONFIG_DIR: configDir },
-        })
-      )
-    )
-  )
-}
-
-function expectCanonicalTreeAt(
-  destinationAlias: CliNotebookCloneDestinationAlias,
-  seededEntries: string[]
-): Cypress.Chainable<null> {
-  return cy.get<string>(`@${destinationAlias}`).then((destination) => {
-    cy.task<string[]>('listNotebookCheckoutEntries', destination).should(
-      'deep.equal',
-      [...seededEntries].sort()
-    )
-    return cy.wrap(null)
-  })
-}
-
-function expectCheckoutFileAt(
-  destinationAlias: CliNotebookCloneDestinationAlias,
-  relativePath: string,
-  content: string
-): Cypress.Chainable<null> {
-  return cy.get<string>(`@${destinationAlias}`).then((destination) => {
-    cy.readFile(`${destination}/${relativePath}`).should('equal', content)
-    return cy.wrap(null)
-  })
-}
-
-function readCheckoutStateAt(
-  destinationAlias: CliNotebookCloneDestinationAlias
-): Cypress.Chainable<CliNotebookCheckoutState> {
-  return cy
-    .get<string>(`@${destinationAlias}`)
-    .then((checkoutDir) =>
-      cy.task<CliNotebookCheckoutState>(
-        'readCliNotebookCheckoutState',
-        checkoutDir
-      )
-    )
-}
-
-function expectCleanAcceptedHeadAt(
-  destinationAlias: CliNotebookCloneDestinationAlias
-): Cypress.Chainable<null> {
-  return cy.get<string>('@cliNotebookPublishHead').then((acceptedHead) =>
-    readCheckoutStateAt(destinationAlias).then((state) => {
-      expect(
-        state.head,
-        `HEAD should equal accepted commit ${acceptedHead}`
-      ).to.equal(acceptedHead)
-      expect(state.status, 'checkout should be clean').to.equal('')
-      return cy.wrap(null)
-    })
-  )
-}
-
-function commitNoteChangesAt(
-  destinationAlias: CliNotebookCloneDestinationAlias,
-  files: { relativePath: string; content: string }[]
-): Cypress.Chainable<null> {
-  return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
-    cy
-      .task<string>('commitCliNotebookCheckoutNoteChange', {
-        checkoutDir,
-        files,
-      })
-      .then((head) => {
-        cy.wrap(head).as('cliNotebookPublishHead')
-        cy.wrap(
-          files.map(({ relativePath, content }) => ({
-            relativePath,
-            content: `${content}\n`,
-          }))
-        ).as('cliNotebookProposalFiles')
-        return cy.wrap(null)
-      })
-  )
-}
+import {
+  commitNoteChangesAt,
+  expectCanonicalTreeAt,
+  expectCheckoutFileAt,
+  expectCheckoutFileBytesAt,
+  expectCheckoutFileExactTextAt,
+  expectCleanAcceptedHeadAt,
+  expectCleanNotebookAcceptedHeadAt,
+  readCheckoutStateAt,
+  runInstalledOn,
+} from './notebookCloneCheckoutDestination'
 
 function notebookCloneCheckoutReceiver() {
   return {
@@ -184,6 +100,14 @@ function notebookCloneCheckoutReceiver() {
     expectReceiverAtAcceptedHead(): Cypress.Chainable<null> {
       return expectCleanAcceptedHeadAt('cliCloneReceiverDestination')
     },
+    expectReceiverAtNotebookAcceptedHead(
+      notebookName: string
+    ): Cypress.Chainable<null> {
+      return expectCleanNotebookAcceptedHeadAt(
+        'cliCloneReceiverDestination',
+        notebookName
+      )
+    },
     /**
      * After a multi-commit publish, the receiver pull must keep the publisher's
      * original tip SHA and its first-parent chain (A → B → C), not a rewritten tip.
@@ -236,15 +160,27 @@ function notebookCloneCheckoutReceiver() {
         content
       )
     },
+    expectReceiverCheckoutFileBytes(
+      relativePath: string,
+      spacedHex: string
+    ): Cypress.Chainable<null> {
+      return expectCheckoutFileBytesAt(
+        'cliCloneReceiverDestination',
+        relativePath,
+        spacedHex
+      )
+    },
+    expectReceiverCheckoutFileExactText(
+      relativePath: string,
+      text: string
+    ): Cypress.Chainable<null> {
+      return expectCheckoutFileExactTextAt(
+        'cliCloneReceiverDestination',
+        relativePath,
+        text
+      )
+    },
   }
 }
 
-export {
-  commitNoteChangesAt,
-  expectCanonicalTreeAt,
-  expectCheckoutFileAt,
-  expectCleanAcceptedHeadAt,
-  notebookCloneCheckoutReceiver,
-  readCheckoutStateAt,
-  runInstalledOn,
-}
+export { notebookCloneCheckoutReceiver }

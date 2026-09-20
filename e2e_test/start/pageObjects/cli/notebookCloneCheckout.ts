@@ -1,48 +1,26 @@
 /**
- * CLI cloned-checkout page objects: commit, installed publish/pull, and
- * reading back Git parent/blob state for the rebase journey.
+ * The primary cloned checkout (`@cliCloneDestination`): installed publish and
+ * pull, and the accepted-head claims a scenario makes about them. Assembles
+ * the commit, fresh-clone, observation, rebase and receiver page objects into
+ * the single `cli.notebookCloneCheckout()` surface used by the steps.
  */
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
-import { notebookCloneCheckoutObservations } from './notebookCloneCheckoutObservations'
-import { notebookCloneCheckoutRebaseObservations } from './notebookCloneCheckoutRebase'
+import { notebookCloneCheckoutCommits } from './notebookCloneCheckoutCommits'
 import {
-  commitNoteChangesAt,
   expectCheckoutFileAt,
   expectCleanAcceptedHeadAt,
-  notebookCloneCheckoutReceiver,
   readCheckoutStateAt,
   runInstalledOn,
-} from './notebookCloneCheckoutReceiver'
+} from './notebookCloneCheckoutDestination'
+import { notebookCloneCheckoutFresh } from './notebookCloneCheckoutFresh'
+import { notebookCloneCheckoutObservations } from './notebookCloneCheckoutObservations'
+import { notebookCloneCheckoutRebaseObservations } from './notebookCloneCheckoutRebase'
+import { notebookCloneCheckoutReceiver } from './notebookCloneCheckoutReceiver'
 import { nonInteractiveOutput } from './outputAssertions'
 
-type PrimaryCheckoutCommitTask =
-  | 'commitCliNotebookCheckoutNoteRemoval'
-  | 'commitCliNotebookCheckoutNoteRename'
-  | 'commitCliNotebookCheckoutNoteRenameAndEdit'
-  | 'commitCliNotebookCheckoutNoteRenameAndEmptyKeep'
-  | 'commitCliNotebookCheckoutNoteRenameAndRemoval'
-
 function notebookCloneCheckout() {
-  function commitNoteChanges(
-    files: { relativePath: string; content: string }[]
-  ): Cypress.Chainable<null> {
-    return commitNoteChangesAt('cliCloneDestination', files)
-  }
-
   function readCheckoutState(): Cypress.Chainable<CliNotebookCheckoutState> {
     return readCheckoutStateAt('cliCloneDestination')
-  }
-
-  function commitPrimaryCheckoutWith(
-    task: PrimaryCheckoutCommitTask,
-    change: Record<string, string>
-  ): Cypress.Chainable<null> {
-    return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
-      cy.task<string>(task, { checkoutDir, ...change }).then((head) => {
-        cy.wrap(head).as('cliNotebookPublishHead')
-        return cy.wrap(null)
-      })
-    )
   }
 
   function runInstalledOnCheckout(
@@ -59,78 +37,6 @@ function notebookCloneCheckout() {
   }
 
   return {
-    commitEdit(relativePath: string, content: string): Cypress.Chainable<null> {
-      return commitNoteChanges([{ relativePath, content }])
-    },
-    commitAddition(
-      relativePath: string,
-      content: string
-    ): Cypress.Chainable<null> {
-      return commitNoteChanges([{ relativePath, content }])
-    },
-    commitRelatedNoteChanges(
-      files: { relativePath: string; content: string }[]
-    ): Cypress.Chainable<null> {
-      return commitNoteChanges(
-        files.map(({ relativePath, content }) => ({
-          relativePath,
-          content: content.replace(/\\n/g, '\n'),
-        }))
-      )
-    },
-    commitRemoval(relativePath: string): Cypress.Chainable<null> {
-      return commitPrimaryCheckoutWith('commitCliNotebookCheckoutNoteRemoval', {
-        relativePath,
-      })
-    },
-    commitRename(
-      fromRelativePath: string,
-      toRelativePath: string
-    ): Cypress.Chainable<null> {
-      return commitPrimaryCheckoutWith('commitCliNotebookCheckoutNoteRename', {
-        fromRelativePath,
-        toRelativePath,
-      })
-    },
-    commitRenameAndRemoval(
-      fromRelativePath: string,
-      toRelativePath: string,
-      removeRelativePath: string
-    ): Cypress.Chainable<null> {
-      return commitPrimaryCheckoutWith(
-        'commitCliNotebookCheckoutNoteRenameAndRemoval',
-        {
-          fromRelativePath,
-          toRelativePath,
-          removeRelativePath,
-        }
-      )
-    },
-    commitRenameAndEmptyKeep(
-      fromRelativePath: string,
-      toRelativePath: string,
-      keepRelativePath: string
-    ): Cypress.Chainable<null> {
-      return commitPrimaryCheckoutWith(
-        'commitCliNotebookCheckoutNoteRenameAndEmptyKeep',
-        {
-          fromRelativePath,
-          toRelativePath,
-          keepRelativePath,
-        }
-      )
-    },
-    commitRenameAndEdit(
-      fromRelativePath: string,
-      toRelativePath: string,
-      relativePath: string,
-      content: string
-    ): Cypress.Chainable<null> {
-      return commitPrimaryCheckoutWith(
-        'commitCliNotebookCheckoutNoteRenameAndEdit',
-        { fromRelativePath, toRelativePath, relativePath, content }
-      )
-    },
     publish(): Cypress.Chainable<null> {
       return runInstalledOnCheckout('publish', 'runInstalledCli')
     },
@@ -232,6 +138,8 @@ function notebookCloneCheckout() {
     ): Cypress.Chainable<null> {
       return expectCheckoutFileAt('cliCloneDestination', relativePath, content)
     },
+    ...notebookCloneCheckoutCommits(),
+    ...notebookCloneCheckoutFresh(),
     ...notebookCloneCheckoutObservations(),
     ...notebookCloneCheckoutReceiver(),
     ...notebookCloneCheckoutRebaseObservations(),
