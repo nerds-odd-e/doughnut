@@ -516,7 +516,7 @@ coordinator via direct grep, not taken on trust.
 
 ### 8. Preserve repository lifecycle outside ordinary edits
 
-Type: Behavior. Status: planned; depends on 5.
+Type: Behavior. Status: done.
 
 Given creation, the existing reset operation or binding removal, lifecycle action
 → one consistent repository lifecycle with no abandoned authoritative storage.
@@ -528,6 +528,27 @@ FK-cascade coverage; after reset/reopen/download no old head is advertised, and
 binding removal handles its native dependent rows. Size: 5–10 active minutes;
 refine into operation-specific leaves if the selected adapter requires distinct
 lifecycle mechanisms. These are one storage-lifetime rule, not new domain policies.
+
+Delivered: no production code changed — confirmed by inspection that
+`NotebookGitAcceptedRepositoryStore.apply`/`NotebookGitCutoverService` already give
+one consistent lifecycle (single ref authority, no dual write) since slice 5, and
+slice 3's `ON DELETE CASCADE` FK already handles dependent-row removal at the DB
+level. Closed two proof gaps: `NotebookGitHistoryResetControllerTest` now reads
+post-reset ancestry through the production download path (native object store)
+rather than the JPA `bundle_bytes` column, and explicitly asserts the pre-reset
+head is genuinely unreachable (`MissingObjectException`) given the reset's
+disjoint/parentless new root — not merely absent from a visited-history list.
+`NotebookGitBindingRepositoryTest` gained
+`cascadeDeletesNativeObjectStoreRowsWhenBindingIsDeleted`, proving at the DB level
+(not app code) that deleting a binding removes its native object rows. No GC,
+backup, or quota logic was added — explicitly out of scope; harmless orphaned
+native rows from before a reset are acceptable and untouched, matching the
+plan's own exclusion. Post-change refactor deduplicated binding-setup code
+between the new and an existing repository test via a shared `persistBinding`
+helper. Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree` — full
+suite green, 2543 tests, 0 failures, independently reverified by the coordinator
+after implementation, refactor, and formatting; both new/changed test diffs read
+directly to confirm the reported assertions are real, not just claimed.
 
 ### 9. Migrate untouched bindings and retire legacy storage
 
