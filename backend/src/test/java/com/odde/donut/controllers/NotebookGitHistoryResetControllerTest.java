@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -13,7 +14,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,8 +70,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
       assertThat(
           GitBundleTestReader.readTreeEntries(repository, resetCommit),
           contains(
-              new PortableTreeEntry("note.md", ACCEPTED_CONTENT),
-              new PortableTreeEntry("outside.md", OUTSIDE_HISTORY_CONTENT)));
+              ofText("note.md", ACCEPTED_CONTENT), ofText("outside.md", OUTSIDE_HISTORY_CONTENT)));
     }
 
     controller.publishNotebookGitProposal(

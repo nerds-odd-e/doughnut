@@ -1,5 +1,7 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
+
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
@@ -37,8 +39,7 @@ class NotebookGitProposalImportControllerTest extends NotebookGitBundleControlle
 
   /** A well-formed bundle that advertises {@code refs/heads/other}, not {@code refs/heads/main}. */
   private byte[] bundleBytesWithoutUsableMain() throws IOException {
-    List<PortableTreeEntry> entries =
-        List.of(new PortableTreeEntry("README.md", "off-main content"));
+    List<PortableTreeEntry> entries = List.of(ofText("README.md", "off-main content"));
     try (Repository repository =
         NotebookGitBundleBuilder.build(
             entries, "Proposer", "proposer@example.com", "Off-main commit", Instant.now())) {

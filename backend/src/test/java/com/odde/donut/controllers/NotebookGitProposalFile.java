@@ -1,6 +1,8 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.eclipse.jgit.lib.FileMode;
 
 /** One file's path, content bytes, and mode within a crafted notebook Git proposal tree. */
@@ -16,5 +18,12 @@ record NotebookGitProposalFile(String path, byte[] contentBytes, FileMode mode) 
   /** For deliberately-invalid byte sequences (e.g. malformed UTF-8) that no String can hold. */
   NotebookGitProposalFile(String path, byte[] contentBytes) {
     this(path, contentBytes, FileMode.REGULAR_FILE);
+  }
+
+  /** The proposal that publishes a Portable tree snapshot's entries byte for byte. */
+  static List<NotebookGitProposalFile> asProposal(List<PortableTreeEntry> entries) {
+    return entries.stream()
+        .map(entry -> new NotebookGitProposalFile(entry.path(), entry.content()))
+        .toList();
   }
 }

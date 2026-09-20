@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -121,9 +122,9 @@ class NotebookGitProposalFolderRelocationDestinationControllerTest
             notebook,
             binding,
             List.of(
-                new PortableTreeEntry("README.md", README_BODY),
-                new PortableTreeEntry("Empty/Topics/README.md", README_BODY),
-                new PortableTreeEntry("Empty/Topics/A.md", UNREPRESENTED_NOTE)));
+                ofText("README.md", README_BODY),
+                ofText("Empty/Topics/README.md", README_BODY),
+                ofText("Empty/Topics/A.md", UNREPRESENTED_NOTE)));
 
     assertThat(exception.getReason(), containsString("Empty/Topics/README.md"));
     inCommittedTransaction(
@@ -142,15 +143,15 @@ class NotebookGitProposalFolderRelocationDestinationControllerTest
     return assertProposalRejectedWithoutMutatingBinding(
         notebook,
         binding.getAcceptedGitObjectId(),
-        proposalBundleBytes(binding, asProposal(proposed)),
+        proposalBundleBytes(binding, NotebookGitProposalFile.asProposal(proposed)),
         HttpStatus.BAD_REQUEST);
   }
 
   private static List<PortableTreeEntry> topicsAtRoot() {
     return List.of(
-        new PortableTreeEntry("README.md", README_BODY),
-        new PortableTreeEntry("Topics/README.md", README_BODY),
-        new PortableTreeEntry("Topics/A.md", UNREPRESENTED_NOTE));
+        ofText("README.md", README_BODY),
+        ofText("Topics/README.md", README_BODY),
+        ofText("Topics/A.md", UNREPRESENTED_NOTE));
   }
 
   private Folder synchronizedBiology(Notebook notebook) {
@@ -166,12 +167,6 @@ class NotebookGitProposalFolderRelocationDestinationControllerTest
 
   private static List<String> biologySubtreePaths(String destPrefix) {
     return biologySubtreeAt(destPrefix).stream().map(NotebookGitProposalFile::path).toList();
-  }
-
-  private static List<NotebookGitProposalFile> asProposal(List<PortableTreeEntry> entries) {
-    return entries.stream()
-        .map(entry -> new NotebookGitProposalFile(entry.path(), entry.content()))
-        .toList();
   }
 
   private static GitBundleTestReader.SingleParentGitCommit proposedCommit(byte[] proposalBytes)

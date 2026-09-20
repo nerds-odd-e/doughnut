@@ -4,7 +4,6 @@ import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -81,9 +80,8 @@ public final class GitBundleTestReader {
   }
 
   /**
-   * Reads every blob reachable from a commit's tree as a Portable tree entry (path plus decoded
-   * UTF-8 content), for tests comparing a read-back Git tree against expected Portable-tree
-   * content.
+   * Reads every blob reachable from a commit's tree as a Portable tree entry (path plus exact
+   * bytes), for tests comparing a read-back Git tree against expected Portable-tree content.
    */
   public static List<PortableTreeEntry> readTreeEntries(Repository repository, RevCommit commit)
       throws IOException {
@@ -92,10 +90,8 @@ public final class GitBundleTestReader {
       treeWalk.addTree(commit.getTree());
       treeWalk.setRecursive(true);
       while (treeWalk.next()) {
-        ObjectId blobId = treeWalk.getObjectId(0);
-        ObjectLoader loader = repository.open(blobId);
-        String content = new String(loader.getBytes(), StandardCharsets.UTF_8);
-        entries.add(new PortableTreeEntry(treeWalk.getPathString(), content));
+        ObjectLoader loader = repository.open(treeWalk.getObjectId(0));
+        entries.add(new PortableTreeEntry(treeWalk.getPathString(), loader.getBytes()));
       }
     }
     return entries;

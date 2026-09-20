@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -32,15 +33,15 @@ class NotebookGitProposalFolderRelocationShapeControllerTest
     ResponseStatusException exception =
         publishRejected(
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README)),
+                ofText("README.md", README),
+                ofText("Topics/README.md", README),
+                ofText("Topics/A.md", NOTE),
+                ofText("Archive/README.md", README)),
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Topics/README.md", README)));
+                ofText("README.md", README),
+                ofText("Topics/A.md", NOTE),
+                ofText("Archive/README.md", README),
+                ofText("Archive/Topics/README.md", README)));
 
     assertThat(exception.getReason(), containsString("Unsupported tree shape"));
     assertThat(exception.getReason(), containsString("path \"Topics/A.md\""));
@@ -68,42 +69,42 @@ class NotebookGitProposalFolderRelocationShapeControllerTest
             "multiple",
             withOtherFolder(topicsAndArchive),
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("note.md", NOTE),
-                new PortableTreeEntry("Copy.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Topics/README.md", README),
-                new PortableTreeEntry("Archive/Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/Topics/Sub/README.md", README),
-                new PortableTreeEntry("Archive/Topics/Sub/B.md", NOTE),
-                new PortableTreeEntry("Archive/Other/README.md", README),
-                new PortableTreeEntry("Archive/Other/C.md", OTHER)),
+                ofText("README.md", README),
+                ofText("note.md", NOTE),
+                ofText("Copy.md", NOTE),
+                ofText("Archive/README.md", README),
+                ofText("Archive/Topics/README.md", README),
+                ofText("Archive/Topics/A.md", NOTE),
+                ofText("Archive/Topics/Sub/README.md", README),
+                ofText("Archive/Topics/Sub/B.md", NOTE),
+                ofText("Archive/Other/README.md", README),
+                ofText("Archive/Other/C.md", OTHER)),
             "Topics/README.md"),
         Arguments.of(
             "renamed",
             topicsAndArchive,
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("note.md", NOTE),
-                new PortableTreeEntry("Copy.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Renamed/README.md", README),
-                new PortableTreeEntry("Archive/Renamed/A.md", NOTE),
-                new PortableTreeEntry("Archive/Renamed/Sub/README.md", README),
-                new PortableTreeEntry("Archive/Renamed/Sub/B.md", NOTE)),
+                ofText("README.md", README),
+                ofText("note.md", NOTE),
+                ofText("Copy.md", NOTE),
+                ofText("Archive/README.md", README),
+                ofText("Archive/Renamed/README.md", README),
+                ofText("Archive/Renamed/A.md", NOTE),
+                ofText("Archive/Renamed/Sub/README.md", README),
+                ofText("Archive/Renamed/Sub/B.md", NOTE)),
             "Archive/Renamed/README.md"),
         Arguments.of(
             "edited",
             topicsAndArchive,
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("note.md", NOTE),
-                new PortableTreeEntry("Copy.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Topics/README.md", README),
-                new PortableTreeEntry("Archive/Topics/A.md", "edited"),
-                new PortableTreeEntry("Archive/Topics/Sub/README.md", README),
-                new PortableTreeEntry("Archive/Topics/Sub/B.md", NOTE)),
+                ofText("README.md", README),
+                ofText("note.md", NOTE),
+                ofText("Copy.md", NOTE),
+                ofText("Archive/README.md", README),
+                ofText("Archive/Topics/README.md", README),
+                ofText("Archive/Topics/A.md", "edited"),
+                ofText("Archive/Topics/Sub/README.md", README),
+                ofText("Archive/Topics/Sub/B.md", NOTE)),
             "Archive/Topics/A.md"));
   }
 
@@ -119,34 +120,26 @@ class NotebookGitProposalFolderRelocationShapeControllerTest
     return assertProposalRejectedWithoutMutatingBinding(
         notebook,
         binding.getAcceptedGitObjectId(),
-        proposalBundleBytes(binding, asProposal(proposed)),
+        proposalBundleBytes(binding, NotebookGitProposalFile.asProposal(proposed)),
         HttpStatus.BAD_REQUEST);
   }
 
   private static List<PortableTreeEntry> topicsAndArchive() {
     return List.of(
-        new PortableTreeEntry("README.md", README),
-        new PortableTreeEntry("note.md", NOTE),
-        new PortableTreeEntry("Copy.md", NOTE),
-        new PortableTreeEntry("Topics/README.md", README),
-        new PortableTreeEntry("Topics/A.md", NOTE),
-        new PortableTreeEntry("Topics/Sub/README.md", README),
-        new PortableTreeEntry("Topics/Sub/B.md", NOTE),
-        new PortableTreeEntry("Archive/README.md", README));
+        ofText("README.md", README),
+        ofText("note.md", NOTE),
+        ofText("Copy.md", NOTE),
+        ofText("Topics/README.md", README),
+        ofText("Topics/A.md", NOTE),
+        ofText("Topics/Sub/README.md", README),
+        ofText("Topics/Sub/B.md", NOTE),
+        ofText("Archive/README.md", README));
   }
 
   private static List<PortableTreeEntry> withOtherFolder(List<PortableTreeEntry> accepted) {
     return Stream.concat(
             accepted.stream(),
-            Stream.of(
-                new PortableTreeEntry("Other/README.md", README),
-                new PortableTreeEntry("Other/C.md", OTHER)))
-        .toList();
-  }
-
-  private static List<NotebookGitProposalFile> asProposal(List<PortableTreeEntry> entries) {
-    return entries.stream()
-        .map(entry -> new NotebookGitProposalFile(entry.path(), entry.content()))
+            Stream.of(ofText("Other/README.md", README), ofText("Other/C.md", OTHER)))
         .toList();
   }
 }

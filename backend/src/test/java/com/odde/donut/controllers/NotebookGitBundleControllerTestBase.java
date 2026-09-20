@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -243,8 +244,8 @@ abstract class NotebookGitBundleControllerTestBase extends NoteDependentRowsCont
    */
   static List<PortableTreeEntry> validBaselineEntries() {
     return List.of(
-        new PortableTreeEntry("note.md", "---\ntype: Note\n---\noriginal content"),
-        new PortableTreeEntry("README.md", "---\ntype: Readme\n---\nreadme original"));
+        ofText("note.md", "---\ntype: Note\n---\noriginal content"),
+        ofText("README.md", "---\ntype: Readme\n---\nreadme original"));
   }
 
   private <T> T committed(java.util.function.Supplier<T> action) {

@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -44,11 +45,11 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
         seedAcceptedBinding(
             notebook,
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README),
-                new PortableTreeEntry("Archive/Topics/Existing.md", EXISTING)));
+                ofText("README.md", README),
+                ofText("Topics/README.md", README),
+                ofText("Topics/A.md", NOTE),
+                ofText("Archive/README.md", README),
+                ofText("Archive/Topics/Existing.md", EXISTING)));
 
     ApiException exception =
         publishRejectedAs(notebook, binding, moveTopicsUnderArchive(), ApiException.class);
@@ -76,10 +77,10 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
         seedAcceptedBinding(
             notebook,
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README)));
+                ofText("README.md", README),
+                ofText("Topics/README.md", README),
+                ofText("Topics/A.md", NOTE),
+                ofText("Archive/README.md", README)));
 
     ApiException exception =
         publishRejectedAs(notebook, binding, moveTopicsUnderArchive(), ApiException.class);
@@ -103,9 +104,9 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
             notebook,
             binding,
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/Topics/README.md", README),
-                new PortableTreeEntry("Topics/Topics/A.md", NOTE)),
+                ofText("README.md", README),
+                ofText("Topics/Topics/README.md", README),
+                ofText("Topics/Topics/A.md", NOTE)),
             ResponseStatusException.class);
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
@@ -125,20 +126,20 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
         seedAcceptedBinding(
             notebook,
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE),
-                new PortableTreeEntry("Topics/Sub/README.md", README)));
+                ofText("README.md", README),
+                ofText("Topics/README.md", README),
+                ofText("Topics/A.md", NOTE),
+                ofText("Topics/Sub/README.md", README)));
 
     ResponseStatusException exception =
         publishRejectedAs(
             notebook,
             binding,
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/Sub/Topics/README.md", README),
-                new PortableTreeEntry("Topics/Sub/Topics/A.md", NOTE),
-                new PortableTreeEntry("Topics/Sub/Topics/Sub/README.md", README)),
+                ofText("README.md", README),
+                ofText("Topics/Sub/Topics/README.md", README),
+                ofText("Topics/Sub/Topics/A.md", NOTE),
+                ofText("Topics/Sub/Topics/Sub/README.md", README)),
             ResponseStatusException.class);
 
     assertThat(exception.getReason(), containsString("Cannot move folder into its descendant."));
@@ -155,28 +156,22 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
     return assertProposalRejectedWithoutMutatingBinding(
         notebook,
         binding.getAcceptedGitObjectId(),
-        proposalBundleBytes(binding, asProposal(proposed)),
+        proposalBundleBytes(binding, NotebookGitProposalFile.asProposal(proposed)),
         exceptionType);
   }
 
   private static List<PortableTreeEntry> moveTopicsUnderArchive() {
     return List.of(
-        new PortableTreeEntry("README.md", README),
-        new PortableTreeEntry("Archive/README.md", README),
-        new PortableTreeEntry("Archive/Topics/README.md", README),
-        new PortableTreeEntry("Archive/Topics/A.md", NOTE));
+        ofText("README.md", README),
+        ofText("Archive/README.md", README),
+        ofText("Archive/Topics/README.md", README),
+        ofText("Archive/Topics/A.md", NOTE));
   }
 
   private static List<PortableTreeEntry> topicsAtRoot() {
     return List.of(
-        new PortableTreeEntry("README.md", README),
-        new PortableTreeEntry("Topics/README.md", README),
-        new PortableTreeEntry("Topics/A.md", NOTE));
-  }
-
-  private static List<NotebookGitProposalFile> asProposal(List<PortableTreeEntry> entries) {
-    return entries.stream()
-        .map(entry -> new NotebookGitProposalFile(entry.path(), entry.content()))
-        .toList();
+        ofText("README.md", README),
+        ofText("Topics/README.md", README),
+        ofText("Topics/A.md", NOTE));
   }
 }

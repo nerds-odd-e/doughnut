@@ -4,7 +4,6 @@ import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -31,10 +30,9 @@ final class NotebookGitAcceptedTree {
         treeWalk.setRecursive(true);
         List<PortableTreeEntry> entries = new ArrayList<>();
         while (treeWalk.next()) {
-          String content =
-              new String(
-                  repository.open(treeWalk.getObjectId(0)).getBytes(), StandardCharsets.UTF_8);
-          entries.add(new PortableTreeEntry(treeWalk.getPathString(), content));
+          entries.add(
+              new PortableTreeEntry(
+                  treeWalk.getPathString(), repository.open(treeWalk.getObjectId(0)).getBytes()));
         }
         return sorted(entries);
       }

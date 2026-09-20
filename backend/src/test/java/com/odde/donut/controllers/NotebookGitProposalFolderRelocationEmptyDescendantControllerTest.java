@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -39,10 +40,10 @@ class NotebookGitProposalFolderRelocationEmptyDescendantControllerTest
         seedAcceptedBinding(
             notebook,
             List.of(
-                new PortableTreeEntry("README.md", README),
-                new PortableTreeEntry("Topics/README.md", README),
-                new PortableTreeEntry("Topics/A.md", NOTE),
-                new PortableTreeEntry("Archive/README.md", README)));
+                ofText("README.md", README),
+                ofText("Topics/README.md", README),
+                ofText("Topics/A.md", NOTE),
+                ofText("Archive/README.md", README)));
 
     ResponseStatusException exception =
         publishRejected(notebook, binding, moveTopicsUnderArchive());
@@ -63,21 +64,15 @@ class NotebookGitProposalFolderRelocationEmptyDescendantControllerTest
     return assertProposalRejectedWithoutMutatingBinding(
         notebook,
         binding.getAcceptedGitObjectId(),
-        proposalBundleBytes(binding, asProposal(proposed)),
+        proposalBundleBytes(binding, NotebookGitProposalFile.asProposal(proposed)),
         HttpStatus.BAD_REQUEST);
   }
 
   private static List<PortableTreeEntry> moveTopicsUnderArchive() {
     return List.of(
-        new PortableTreeEntry("README.md", README),
-        new PortableTreeEntry("Archive/README.md", README),
-        new PortableTreeEntry("Archive/Topics/README.md", README),
-        new PortableTreeEntry("Archive/Topics/A.md", NOTE));
-  }
-
-  private static List<NotebookGitProposalFile> asProposal(List<PortableTreeEntry> entries) {
-    return entries.stream()
-        .map(entry -> new NotebookGitProposalFile(entry.path(), entry.content()))
-        .toList();
+        ofText("README.md", README),
+        ofText("Archive/README.md", README),
+        ofText("Archive/Topics/README.md", README),
+        ofText("Archive/Topics/A.md", NOTE));
   }
 }

@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -250,7 +251,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
 
   /** A well-formed, parentless root commit bundle unrelated to any notebook's accepted history. */
   private byte[] validProposalBundleBytes() {
-    List<PortableTreeEntry> entries = List.of(new PortableTreeEntry("README.md", "proposal"));
+    List<PortableTreeEntry> entries = List.of(ofText("README.md", "proposal"));
     try (Repository repository =
         NotebookGitBundleBuilder.build(
             entries, "Proposer", "proposer@example.com", "Proposal", Instant.now())) {

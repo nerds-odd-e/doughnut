@@ -3,12 +3,10 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheBuilder;
 import org.eclipse.jgit.dircache.DirCacheEntry;
@@ -43,7 +41,7 @@ public final class NotebookGitBundleBuilder {
       Instant commitTime) {
     InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
     try (ObjectInserter inserter = repository.newObjectInserter()) {
-      ObjectId treeId = writeTree(entries, Map.of(), DirCache.newInCore(), inserter);
+      ObjectId treeId = writeTree(entries, Set.of(), DirCache.newInCore(), inserter);
       ObjectId commitId =
           inserter.insert(commitBuilder(treeId, authorName, authorEmail, message, commitTime));
       inserter.flush();
@@ -65,11 +63,8 @@ public final class NotebookGitBundleBuilder {
       Instant commitTime) {
     try (ObjectInserter inserter = repository.newObjectInserter();
         RevWalk walk = new RevWalk(repository)) {
-      Map<String, String> acceptedContent =
-          acceptedEntries.stream()
-              .collect(Collectors.toMap(PortableTreeEntry::path, PortableTreeEntry::content));
       DirCache dirCache = DirCache.read(walk.getObjectReader(), walk.parseCommit(parent).getTree());
-      ObjectId treeId = writeTree(entries, acceptedContent, dirCache, inserter);
+      ObjectId treeId = writeTree(entries, Set.copyOf(acceptedEntries), dirCache, inserter);
       CommitBuilder commitBuilder =
           commitBuilder(treeId, authorName, authorEmail, message, commitTime);
       commitBuilder.setParentId(parent);
@@ -84,7 +79,7 @@ public final class NotebookGitBundleBuilder {
 
   private static ObjectId writeTree(
       List<PortableTreeEntry> entries,
-      Map<String, String> acceptedContent,
+      Set<PortableTreeEntry> acceptedEntries,
       DirCache dirCache,
       ObjectInserter inserter)
       throws IOException {
@@ -93,13 +88,12 @@ public final class NotebookGitBundleBuilder {
     for (PortableTreeEntry entry : entries) {
       int acceptedIndex = dirCache.findEntry(entry.path());
       if (acceptedIndex >= 0
-          && entry.content().equals(acceptedContent.get(entry.path()))
+          && acceptedEntries.contains(entry)
           && FileMode.REGULAR_FILE.equals(dirCache.getEntry(acceptedIndex).getFileMode())) {
         builder.keep(acceptedIndex, 1);
         continue;
       }
-      ObjectId blobId =
-          inserter.insert(Constants.OBJ_BLOB, entry.content().getBytes(StandardCharsets.UTF_8));
+      ObjectId blobId = inserter.insert(Constants.OBJ_BLOB, entry.content());
       DirCacheEntry dirCacheEntry = new DirCacheEntry(entry.path());
       dirCacheEntry.setFileMode(FileMode.REGULAR_FILE);
       dirCacheEntry.setObjectId(blobId);

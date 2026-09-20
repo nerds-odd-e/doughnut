@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -7,7 +8,6 @@ import static org.hamcrest.Matchers.equalTo;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
@@ -92,8 +92,7 @@ class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitBundle
   void rejectsARenameShapedPairWhoseNewSideHasANonRegularMode() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding =
-        seedAcceptedBinding(
-            notebook, List.of(new PortableTreeEntry("note.md", "original content")));
+        seedAcceptedBinding(notebook, List.of(ofText("note.md", "original content")));
     byte[] proposal =
         proposalBundleBytes(
             binding,

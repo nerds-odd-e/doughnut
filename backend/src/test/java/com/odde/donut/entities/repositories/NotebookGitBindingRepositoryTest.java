@@ -1,5 +1,6 @@
 package com.odde.donut.entities.repositories;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,7 +35,7 @@ class NotebookGitBindingRepositoryTest {
   @Autowired JdbcTemplate jdbcTemplate;
 
   private static BundleWriteResult buildBundle() throws IOException {
-    List<PortableTreeEntry> entries = List.of(new PortableTreeEntry("README.md", "Hello"));
+    List<PortableTreeEntry> entries = List.of(ofText("README.md", "Hello"));
     Instant commitTime = Instant.parse("2026-09-04T10:15:30Z");
     try (Repository gitRepository =
         NotebookGitBundleBuilder.build(

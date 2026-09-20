@@ -3,7 +3,6 @@ package com.odde.donut.services.notebookExport;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -30,10 +29,10 @@ public final class NotebookZipBuilder {
     }
   }
 
-  private static void writeEntry(ZipOutputStream zos, String path, String content)
+  private static void writeEntry(ZipOutputStream zos, String path, byte[] content)
       throws IOException {
     zos.putNextEntry(new ZipEntry(path));
-    zos.write(content.getBytes(StandardCharsets.UTF_8));
+    zos.write(content);
     zos.closeEntry();
   }
 }

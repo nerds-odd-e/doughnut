@@ -49,13 +49,13 @@ public final class PortableTreeSnapshot {
     int firstEntryIndex = entries.size();
     if (readmeContentOrNull != null && !readmeContentOrNull.isBlank()) {
       entries.add(
-          new PortableTreeEntry(
+          PortableTreeEntry.ofText(
               pathPrefix + "README.md", ExportReadmeMarkdown.assemble(readmeContentOrNull)));
     }
 
     for (ExportNoteRow note : notesHere) {
       String content = note.content() == null ? "" : note.content();
-      entries.add(new PortableTreeEntry(pathPrefix + note.title() + ".md", content));
+      entries.add(PortableTreeEntry.ofText(pathPrefix + note.title() + ".md", content));
     }
 
     for (ExportFolderRow folder : childFolders) {
@@ -71,7 +71,7 @@ public final class PortableTreeSnapshot {
     }
 
     if (!pathPrefix.isEmpty() && entries.size() == firstEntryIndex) {
-      entries.add(new PortableTreeEntry(pathPrefix + ".keep", ""));
+      entries.add(PortableTreeEntry.ofText(pathPrefix + ".keep", ""));
     }
   }
 }

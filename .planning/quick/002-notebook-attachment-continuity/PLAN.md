@@ -1,10 +1,27 @@
 # Keep notebook-root attachments through local and web changes
 
-Status: planned; first story and slice plan refined. No execution performed.
+Status: in execution. First story and slice plan refined.
 Work item: **SEED-035#story-6**.
 Source: [refined story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-6).
 This reuses the original plan after its authorized resplit; nothing was delivered
 or discarded. The complete redistribution is recorded below.
+
+## Execution identity
+
+- Mode: Story Branch Mode.
+- Originating checkout: `/Users/terryyin/git/doughnut`, integration branch `main`.
+  Queue claim commit: `d05a76bfbb`.
+- Execution checkout:
+  `/Users/terryyin/git/doughnut/.claude/worktrees/claude+260920-notebook-attachment-continuity`.
+- Execution branch: `worktree-claude+260920-notebook-attachment-continuity`.
+- Integration checkout/branch for later wrap-up: `/Users/terryyin/git/doughnut`, `main`.
+- Authorized remote target: `origin`, execution branch (Story Branch Mode).
+- CI: GitHub Actions, workflow `ci.yml`, display name `donut CI`, branch
+  `worktree-claude+260920-notebook-attachment-continuity`.
+  Observer directory: `/tmp/dough-ci-501/watch-aHFfBb`.
+- Replanning permission: allowed (existing planning authority preserved; no
+  `--no-replan` supplied).
+- Checkout-bound skill runtime: `.agents/skills/dough-execute-plan`.
 
 ## Outcome and safe stopping point
 
@@ -89,13 +106,47 @@ the only elapsed-time exception, not coding or debugging. All slices are planned
 
 ### 1. Preserve file bytes in the shared tree representation
 
-Type: Structure. Status: planned. Estimate: 5–8 active minutes.
+Type: Structure. Status: **done**. Estimate: 5–8 active minutes; actual ~6.
 Change the existing entry and its Git/ZIP readers, writers and equality to exact
 bytes; keep Markdown construction/decoding explicit. No admission change. This
 immediately enables slice 2's codec result.
 Proof: full backend suite; existing Markdown bytes, Git object reuse, ZIP output,
 `.keep`, projection comparisons and no-op saves remain unchanged. Adapt fixture
 text accessors without decoding binary observation data.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, pass.
+Boundary: notebook Git publication/acceptance controllers, notebook export, Git
+binding persistence. Inspected locations: `PortableTreeEntry.equals`/`hashCode`
+(content-based value equality), `PortableTreeEntry.ofText` (the single UTF-8
+encode point), `NotebookGitAcceptedTree.readEntries`, `NotebookGitBundleBuilder`
+unchanged-blob reuse, `NotebookZipBuilder.writeEntry`,
+`NotebookGitProjection.matchesAcceptedTree`,
+`AcceptedWebChangeService.commitIfChanged`, `GitBundleTestReader.readTreeEntries`.
+
+Delivered design: `PortableTreeEntry` is `record(String path, byte[] content)`
+with overridden content-based equality; `ofText(path, text)` on the record is the
+only place text becomes file bytes. Value equality is what preserves
+projection-drift detection and no-op-save detection, which compare entry lists.
+`NotebookGitBundleBuilder` reuses an unchanged blob via
+`acceptedEntries.contains(entry)` on a `Set<PortableTreeEntry>`, still guarded by
+the dircache path/file-mode check. `NotebookGitProposalFile.asProposal(entries)`
+now owns the test-side proposal conversion that four relocation tests duplicated.
+
+Learnings for later slices:
+
+- Root attachments are built as `new PortableTreeEntry(path, bytes)` directly —
+  no text path, no encode. Emit them in `PortableTreeSnapshot`'s root pass so
+  they count toward the otherwise-empty-leaf `.keep` rule.
+- `PortableTreeSnapshot` emits README, then notes, then subfolders. Only ZIP
+  output is order-sensitive; `NotebookGitAcceptedTree.sorted` re-sorts the Git
+  side by path.
+- The test-side `NotebookGitProposalFile` already has a `byte[]` constructor for
+  deliberately invalid UTF-8, so slice 2/4 fixtures can carry binary bytes end to
+  end with no new test plumbing.
+- Pre-existing size debt, untouched by this slice and not this story's work:
+  `NotebookGitBundleControllerTestBase` (258 lines) and
+  `NotebookGitProposalAncestryControllerTest` (355 lines) exceed the 250-line
+  guidance, both already over at the branch point.
 
 ### 2. Serialize root attachments with the notebook tree
 

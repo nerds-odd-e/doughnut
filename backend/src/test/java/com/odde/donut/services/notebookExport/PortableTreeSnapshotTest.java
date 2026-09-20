@@ -1,5 +1,6 @@
 package com.odde.donut.services.notebookExport;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
@@ -22,8 +23,8 @@ class PortableTreeSnapshotTest {
     assertThat(
         entries,
         contains(
-            new PortableTreeEntry("Parent Folder/README.md", README_FENCE + "Parent readme"),
-            new PortableTreeEntry("Parent Folder/Child Folder/Nested note.md", "Nested body")));
+            ofText("Parent Folder/README.md", README_FENCE + "Parent readme"),
+            ofText("Parent Folder/Child Folder/Nested note.md", "Nested body")));
   }
 
   @Test
@@ -36,8 +37,7 @@ class PortableTreeSnapshotTest {
     assertThat(
         entries,
         contains(
-            new PortableTreeEntry("README.md", README_FENCE + "# Notebook readme"),
-            new PortableTreeEntry("My Note.md", "body")));
+            ofText("README.md", README_FENCE + "# Notebook readme"), ofText("My Note.md", "body")));
   }
 
   @Test
@@ -58,10 +58,10 @@ class PortableTreeSnapshotTest {
     assertThat(
         entries,
         contains(
-            new PortableTreeEntry("Empty/.keep", ""),
-            new PortableTreeEntry("Blank/.keep", ""),
-            new PortableTreeEntry("Documented/README.md", README_FENCE + "About"),
-            new PortableTreeEntry("Notes/Existing.md", "body"),
-            new PortableTreeEntry("Parent/Leaf/.keep", "")));
+            ofText("Empty/.keep", ""),
+            ofText("Blank/.keep", ""),
+            ofText("Documented/README.md", README_FENCE + "About"),
+            ofText("Notes/Existing.md", "body"),
+            ofText("Parent/Leaf/.keep", "")));
   }
 }
