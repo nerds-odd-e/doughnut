@@ -6,6 +6,8 @@
 
 **Accepted:** 2026-09-19
 
+**Amended:** 2026-09-20 — local rebase responsibility and Portable/learning-data boundary, decided by Terry Yin
+
 **Decision makers:** Terry Yin
 
 ## Decision
@@ -13,9 +15,15 @@
 - **Content authority:** The accepted Git commit is authoritative for the
   Portable notebook tree. MySQL holds its current application projection and
   remains authoritative for private Note/Folder identities and their learning
-  data. The tree format follows [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md).
+  data. Supporting files, including IDE rules, skills, and attachments, belong
+  to Portable content; recall history and other private learning data do not.
+  The tree format follows [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md);
+  the distinction between learning notes and supporting files must be defined
+  consistently with that profile.
 - **One synchronization model:** Use Git objects, refs, and history for two-way
-  synchronization. Preserve original commit IDs; do not add a custom revision
+  synchronization. Preserve submitted commit IDs on acceptance and never rewrite
+  accepted history; local unpublished commits may be rebased before submission.
+  Do not add a custom revision
   protocol, sync envelope, or merge model. Require no Donut-specific local files or
   database; ordinary Git configuration and credential storage are allowed.
 - **One publication boundary:** Every accepted Portable content change,
@@ -33,8 +41,12 @@
   cannot recover deleted identities or learning data.
 - **Repository binding:** Bind a notebook to a repository, accepted ref, and
   root directory. V1 uses one dedicated repository per notebook and an
-  append-only, linear `main`; reject divergent histories without rewriting
-  either side. Keep the binding model compatible with a future directory
+  append-only, linear `main`. Serialize acceptance per notebook. If web and local
+  content changes diverge from a common base, the local side acquires the latest
+  accepted history, rebases its unpublished changes onto it, resolves conflicts
+  locally, and pushes a fast-forward result. Donut Web never merges or rebases
+  either history; it rejects divergent or stale submissions without rewriting
+  them. Keep the binding model compatible with a future directory
   inside a project repository.
 
 ## Detailed architecture

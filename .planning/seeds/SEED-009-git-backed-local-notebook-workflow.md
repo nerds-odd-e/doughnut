@@ -14,8 +14,10 @@ scope: large
 Notebook owners should move between local refinement and Donut without manual
 copying, losing work, or separating notes from their learning history.
 The [near-future direction](../PRODUCT-BACKLOG.md#near-future-direction) governs
-selection: one append-only history, no branching or rebasing, with either
-repository potentially several commits behind.
+selection: one accepted append-only history, with either repository potentially
+several commits behind. If local and web changes diverge, the local side rebases
+unpublished work onto the latest accepted head before publishing; the remote
+never merges, rebases, or rewrites accepted history (ADR 0002, amended 2026-09-20).
 
 These candidates are planning hypotheses grounded in the retained workflow
 boundaries and the owner's clarified direction, not a fresh implementation
@@ -62,9 +64,10 @@ performance remains the next selected Git-scale item.
 
 Keep these outside the current queue rather than cancelling them:
 
-- Broader reconciliation of independently advanced local and remote histories,
-  including multiple local commits, structural changes, and conflict recovery.
-  Earlier proposals used ordinary Git rebase; the current direction excludes it.
+- Additional Donut-assisted conflict-recovery experiences. Ordinary local Git
+  rebase is the owner's selected reconciliation workflow; the local side resolves
+  divergent work before publishing a fast-forward result. This is not a promise
+  of automatic reconciliation by the CLI or remote.
 - Recovery for notebooks whose live projection already differs from accepted
   history. Establish the owner's blocked journey and a deliberate preservation
   policy before selecting recovery work.
@@ -72,12 +75,14 @@ Keep these outside the current queue rather than cancelling them:
   and multi-commit note identity preservation are supported. Cross-notebook
   folder-move Git histories and further subtree composition remain deferred.
 - Native standard Git transport, notebook binding within a project subdirectory,
-  attachments, and history browsing or revision restoration.
+  and history browsing or revision restoration. Supporting files and attachments
+  are now selected in [SEED-035](SEED-035-ai-workspace-supporting-files.md).
 
 Broader web-authoring coverage is retained in
 [SEED-017](SEED-017-cohesive-design-corrections.md#open-product-decision).
-The old proposal's rebase model and web-tip amendments are not constraints on
-the newly selected append-only stories.
+Local rebasing of unpublished work is compatible with accepted append-only
+history. Web-tip amendments and rewriting already accepted history remain
+outside the selected workflow.
 
 ## Open Decisions
 

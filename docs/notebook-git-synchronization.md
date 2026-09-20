@@ -44,6 +44,13 @@ acquisition. New notebooks are Git-backed from creation.
 After cutover, accepted Git content is authoritative; MySQL is its current
 projection and the authority for private identity-bound data.
 
+Supporting files such as IDE rules, skills, and attachments are Portable
+content. Recall history, memory-tracker state, and other private learning data
+remain server-side and are not synchronized through Git. Preserving learning
+history during content publication means preserving its server-side associations,
+not copying it into the Portable tree. Supporting-file classification remains a
+format concern under ADR 0004.
+
 ## Accepted history
 
 V1 accepts only fast-forward updates to `refs/heads/main`. Every commit has
@@ -51,10 +58,24 @@ exactly one parent except the initial root commit. Reject merge commits,
 non-fast-forward or force pushes, deletion or rewind of `main`, and creation or
 update of other remote branches or tags.
 
-The supported workflow must not require branching, merging, rebasing,
-squashing, or amendment to publish. Local Git branches are possible, but
-publishing a divergent branch is unsupported. If both sides independently
-advance, report the conflict and preserve both histories.
+Donut serializes accepted content changes per notebook into this single history.
+This is a publication contract, not a requirement for a single-threaded server.
+The remote never merges or rebases. A divergent or stale submission is refused
+without rewriting accepted history or the submitted work.
+
+When web and local content changes independently advance from a common base,
+the local side acquires the latest accepted history, rebases its unpublished
+commits onto that head, resolves any conflicts locally, and pushes the resulting
+fast-forward update. Local rebase may change unpublished commit IDs; Donut
+preserves the submitted IDs when accepting the result. Already accepted commits
+are never rebased, amended, or replaced. Local branches are possible, but only
+the resulting linear fast-forward history can be published to accepted `main`.
+
+For example, web history `A → W` and local history `A → L` become a local
+proposal `A → W → L′` after local rebase. Donut accepts `L′` only if `W` is
+still its accepted head and the proposal satisfies publication validation. If
+the web advances again, the local side repeats the reconciliation against the
+new head; the remote does not resolve that race by rewriting either side.
 
 A full clone must receive the entire original history reachable from accepted
 `main`, preserving commit IDs, parents, trees, blobs, and commit metadata.
