@@ -2,6 +2,7 @@ import { computed, nextTick, toRef, type Ref } from "vue"
 import { useFollowFocusedPropertyLocation } from "@/composables/useFollowFocusedPropertyLocation"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
+import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
@@ -49,11 +50,14 @@ export function useRichFrontmatterPropertyEditing(options: {
     if (!options.isReadmeContext()) return rows
     return rows.filter(
       (r) =>
-        !(
-          isReservedReadmeOnlyPropertyKey(r.key) &&
-          !scalarStringFromPropertyRow(r)?.trim()
-        )
+        !isReservedReadmeOnlyPropertyKey(r.key) ||
+        scalarStringFromPropertyRow(r)?.trim()
     )
+  }
+
+  function emitProperties(rows: PropertyRow[]) {
+    options.clearValidation()
+    options.onPropertiesChanged(filterForEmit([...rows]))
   }
 
   function rowsAfterAdding(row: PropertyRow): PropertyRow[] {
@@ -99,8 +103,7 @@ export function useRichFrontmatterPropertyEditing(options: {
       return
     }
 
-    options.clearValidation()
-    options.onPropertiesChanged(filterForEmit(nextRows))
+    emitProperties(nextRows)
   }
 
   function onRowFocus(idx: number) {
@@ -110,20 +113,18 @@ export function useRichFrontmatterPropertyEditing(options: {
     }
   }
 
-  async function removeRow(idx: number) {
-    const key = options.propertyRows.value[idx]?.key.trim() ?? ""
-    const proceed = await confirmAndApplyRemoval(key)
-    if (!proceed) {
-      return
-    }
+  function removeRow(idx: number) {
+    return runWithBlockingApiLoading(async () => {
+      const key = options.propertyRows.value[idx]?.key.trim() ?? ""
+      if (!(await confirmAndApplyRemoval(key))) return
 
-    options.propertyRows.value = removePropertyRowAt(
-      options.propertyRows.value,
-      idx
-    )
-    await followFocusedPropertyDelete(key)
-    options.clearValidation()
-    options.onPropertiesChanged(filterForEmit([...options.propertyRows.value]))
+      options.propertyRows.value = removePropertyRowAt(
+        options.propertyRows.value,
+        idx
+      )
+      await followFocusedPropertyDelete(key)
+      emitProperties(options.propertyRows.value)
+    }, "Updating property…")
   }
 
   async function commitRow(idx: number) {
@@ -146,21 +147,22 @@ export function useRichFrontmatterPropertyEditing(options: {
 
     const newKey = rows[idx]?.key ?? ""
     const oldKey = snapshot?.key.trim() ?? ""
-    if (oldKey !== "" && oldKey !== newKey) {
-      const proceed = await confirmAndApplyRename(oldKey, newKey)
-      if (!proceed) {
-        if (snapshot) {
+    const isRename = oldKey !== "" && oldKey !== newKey
+    const commit = async () => {
+      if (isRename) {
+        if (!(await confirmAndApplyRename(oldKey, newKey))) {
           options.propertyRows.value = options.propertyRows.value.map((r, i) =>
-            i === idx ? { ...snapshot } : r
+            i === idx ? { ...snapshot! } : r
           )
+          return
         }
-        return
+        await followFocusedPropertyRename(newKey)
       }
-      await followFocusedPropertyRename(newKey)
+      emitProperties(options.propertyRows.value)
     }
-
-    options.clearValidation()
-    options.onPropertiesChanged(filterForEmit([...options.propertyRows.value]))
+    return isRename
+      ? runWithBlockingApiLoading(commit, "Updating property…")
+      : commit()
   }
 
   function onRelationTypeSelected(idx: number, newType: string | undefined) {
@@ -184,8 +186,7 @@ export function useRichFrontmatterPropertyEditing(options: {
       options.setValidationMessage(result.message)
       return
     }
-    options.clearValidation()
-    options.onPropertiesChanged(filterForEmit([...options.propertyRows.value]))
+    emitProperties(options.propertyRows.value)
   }
 
   async function addWikiLinkAsProperty(wikiLinkText: string) {
@@ -199,9 +200,8 @@ export function useRichFrontmatterPropertyEditing(options: {
       options.setValidationMessage(result.message)
       return
     }
-    options.clearValidation()
     options.propertyRows.value = newRows
-    options.onPropertiesChanged(filterForEmit([...newRows]))
+    emitProperties(newRows)
     await nextTick()
     const idx = options.propertyRows.value.findIndex(
       (r) =>

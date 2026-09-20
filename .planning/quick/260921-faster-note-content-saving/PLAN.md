@@ -13,7 +13,7 @@ Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
 - Execution branch: `codex/faster-note-content-saving`.
 - Authorized destination: `origin/main`, `nerds-odd-e/doughnut`.
 - Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (claim), `11b76124f07c23f24adac79200cd6a1ebf8794b1` (slice 1).
-- Slice 2 published: `c3ee401d12f703cf94bda093d2c41a002973e466`.
+- Slice 2 published: `c3ee401d12f703cf94bda093d2c41a002973e466`; slice 3: `9f5f9b2b09cc0008d1f5781df563f949203e9643`.
 - Product baseline revision: `b5cad203d1d8915b03cbb2353866134979519349`.
 - Replanning: retain existing plan refinement authority within selected story scope.
 - CI source: GitHub Actions, `ci.yml`, display name `donut CI`.
@@ -182,16 +182,16 @@ This repairs a separate proven draft race; it does not fix the original E2E loss
 ### 4. Finish a guarded property edit before editor-mode teardown
 
 Type: Behavior
-Status: next; existing guarded-operation loading selected
-Size hypothesis: five active minutes; required tests separate.
+Status: done; 7 active minutes, tests separate; independent refactor completed
 The original delayed-note-info E2E still fails after slice 3. Its sole PATCH
 request/response content is identical; no rename PATCH occurs. Switching to
 Markdown unmounts the rich editor before the pending rename emits. Preserve
 tracker confirmation/cancellation. Use existing blocking loading for the complete
 rename/removal only; ordinary value edits stay unblocked. Shared hasOpenModal
 recognizes native modal dialogs so M cannot bypass loading. No new operation queue.
-Proof: delayed guard + attempted M, completion/source check; frontend/typecheck/E2E.
-Evidence `/tmp/donut-property-rename-fixed.log` and `-fixed-http.json`.
+Proof: deferred-guard M regression RED→GREEN; full frontend 1,905 tests, typecheck,
+note-edit 12/12. Refactor emission helper: focused16/typecheck passed. Evidence
+`/tmp/donut-property-mode-{red,frontend,types,e2e}.log`; refactor logs alongside.
 
 ### 5. Accept one final Portable snapshot with less repeated work
 

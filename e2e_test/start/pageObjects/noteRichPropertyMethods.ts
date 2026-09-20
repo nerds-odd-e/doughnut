@@ -141,6 +141,7 @@ export const noteRichPropertyMethods = () => ({
           .blur()
       })
     })
+    waitUntilAppIsNotBusy()
     findNoteContentRegion().within(() => {
       cy.get('.ql-editor[contenteditable="true"]').first().click()
     })

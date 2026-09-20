@@ -25,7 +25,9 @@ function detachListener() {
 }
 
 export function hasOpenModal(): boolean {
-  return modalStack.length > 0
+  return (
+    modalStack.length > 0 || document.querySelector("dialog:modal") !== null
+  )
 }
 
 export function registerModal(close: () => void): () => void {
