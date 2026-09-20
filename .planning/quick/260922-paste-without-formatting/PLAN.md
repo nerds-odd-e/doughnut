@@ -230,9 +230,9 @@ Accepted proof:
 CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/QuillEditor.spec.ts tests/components/form/QuillEditor.paste.spec.ts tests/components/form/RichMarkdownEditor.spec.ts tests/notes/NoteEditableContent.paste.spec.ts tests/notes/NoteEditableContent.pasteChoice.spec.ts
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
 ```
-Both pass (37/37 tests; no type diagnostics). `QuillEditor.vue` exports
-`QuillPasteContext` (`{ originalText, range: {index, length}, insertedLength }`),
-captured in its existing capture-phase paste listener via `getSelection(true)`
+Both pass (37/37 tests; no type diagnostics). `QuillPasteContext`
+(`{ originalText, range: {index, length}, insertedLength }`) is captured in
+`QuillEditor.vue`'s existing capture-phase paste listener via `getSelection(true)`
 (wrapped in try/catch — Quill's selection-read APIs can throw when no real
 native caret exists) before Quill mutates the document, with `insertedLength`
 computed from the applied Delta's length in `text-change`. Threaded unchanged
@@ -244,6 +244,35 @@ safe stop. `QuillEditor.spec.ts` split into itself (render/link tests),
 `QuillEditor.paste.spec.ts` (paste tests), and `quillEditorTestHarness.ts`
 (shared mount/cleanup), matching the existing `RichMarkdownEditor.*`/harness
 convention in this directory.
+
+CI repair (commit `019571d7b4`, run 35483349178): the production build job
+("Package backend & frontend artifacts for deployment", `pnpm frontend:build`
+= `vue-tsc --noEmit && vite build`) failed with `TS2614: Module '"*.vue"' has
+no exported member 'QuillPasteContext'`, even though this slice's own accepted
+`pnpm -C frontend exec vue-tsc --noEmit` proof passed cleanly, repeatedly,
+against the identical committed tree — the two invocations of the same
+underlying `vue-tsc --noEmit` check disagreed, and only the full build's
+whole-program compile caught it. Root cause: `frontend/tests/shims-vue.d.ts`
+declares `declare module "*.vue" { ... export default component }` (default
+export only); a named type exported from a `.vue` SFC's `<script setup>`
+conflicts with that ambient wildcard shim once the whole program (src + tests)
+is compiled together, matching this codebase's existing convention of never
+exporting anything but the default component from a `.vue` file (see
+`DeadWikiLinkPayload`, already defined in the plain `wikiLinkMarkup.ts`, not a
+`.vue` file). Fix: moved `QuillPasteContext` out of `QuillEditor.vue` into a
+new plain module `frontend/src/components/form/quillPasteContext.ts`, updated
+the 4 importers (`QuillEditor.vue`, `RichMarkdownEditor.vue`,
+`useNoteContentPaste.ts`, `richMarkdownEditorTestHarness.ts`) to import from
+there. Verified via the literal failing command, `pnpm -C frontend run build`
+(now passes, 3886 modules built), plus the slice's full proof suite (37/37)
+and `vue-tsc --noEmit` (unchanged, still clean). This is a general lesson for
+any later slice/story introducing a new type shared from a `.vue` SFC: define
+it in a sibling `.ts` module from the start, not inside the SFC. The E2E job
+failure in the same CI run was a downstream dependency-chain failure (its
+setup errored with "State not set" because the packaging job it depends on
+failed) and needed no separate repair; the Backend Unit tests failure in the
+same run was the same recurring `Too many connections` infrastructure flake
+already recorded for slices 1-2 (3rd consistent occurrence), also no repair.
 
 Replace `replace()` in slice 4 with a direct Delta swap of the inserted span:
 `quill.updateContents(new Delta().retain(range.index).delete(insertedLength).insert(originalText), Quill.sources.USER)`,

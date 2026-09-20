@@ -1,5 +1,5 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
-import type { QuillPasteContext } from "@/components/form/QuillEditor.vue"
+import type { QuillPasteContext } from "@/components/form/quillPasteContext"
 import routes from "@/routes/routes"
 import helper from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"

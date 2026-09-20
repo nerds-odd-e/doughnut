@@ -47,7 +47,8 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, type PropType } from "vue"
-import QuillEditor, { type QuillPasteContext } from "./QuillEditor.vue"
+import QuillEditor from "./QuillEditor.vue"
+import type { QuillPasteContext } from "./quillPasteContext"
 import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
 import markdownizer from "./markdownizer"
 import type { WikiLink } from "@generated/donut-backend-api"
