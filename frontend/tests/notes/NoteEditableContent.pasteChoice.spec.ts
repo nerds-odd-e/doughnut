@@ -2,7 +2,11 @@ import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import {
   createClipboardEvent,
+  dispatchRichPaste,
+  clearNativeSelectionForQuillMutation,
   mountNoteEditableContent,
+  richQuillEditorEl,
+  richQuillInstance,
   setupPopupsMock,
   setupUpdateNoteContentMock,
   textareaEl,
@@ -247,6 +251,79 @@ describe("NoteEditableContent paste choice", () => {
 
       expect(() => wrapper.unmount()).not.toThrow()
       await vi.advanceTimersByTimeAsync(EXPIRY_MS)
+    })
+  })
+
+  describe("rich mode", () => {
+    const richOriginalText = "RAWORIGINALTEXT"
+    const richNoteContent = "---\ntopic: training\n---\n\nHello world today"
+
+    async function mountRichWithPasteChoice() {
+      const wrapper = mountNoteEditableContent(
+        { noteId: 1, noteContent: richNoteContent, asMarkdown: false },
+        { attachTo: document.body }
+      )
+      await flushPromises()
+      // "Hello world today": replace the word "world" (index 6, length 5)
+      // with content that loses the original clipboard text, so a choice
+      // is offered.
+      await dispatchRichPaste(wrapper, "<p>Lost</p>", {
+        plainText: richOriginalText,
+        selection: { index: 6, length: 5 },
+      })
+      expect(wrapper.find('[data-testid="paste-choice-action"]').exists()).toBe(
+        true
+      )
+      return wrapper
+    }
+
+    it("replaces the just-pasted content with the original text, preserving surrounding content and frontmatter", async () => {
+      const wrapper = await mountRichWithPasteChoice()
+      clearNativeSelectionForQuillMutation()
+
+      await wrapper.find('[data-testid="paste-choice-action"]').trigger("click")
+      await flushPromises()
+
+      expect(richQuillEditorEl(wrapper).textContent).toBe(
+        `Hello ${richOriginalText} today`
+      )
+      const composed = wrapper
+        .findComponent({ name: "RichMarkdownEditor" })
+        .props("modelValue") as string
+      expect(composed).toContain(richOriginalText)
+      expect(composed).toContain("Hello")
+      expect(composed).toContain("today")
+      expect(composed).toContain("topic: training")
+      wrapper.unmount()
+    })
+
+    it("exposes the corrected content as Markdown after switching to Markdown mode", async () => {
+      const wrapper = await mountRichWithPasteChoice()
+      clearNativeSelectionForQuillMutation()
+
+      await wrapper.find('[data-testid="paste-choice-action"]').trigger("click")
+      await flushPromises()
+
+      await wrapper.setProps({ asMarkdown: true })
+      await flushPromises()
+
+      const markdown = textareaEl(wrapper).value
+      expect(markdown).toContain(richOriginalText)
+      expect(markdown).toContain("Hello")
+      expect(markdown).toContain("today")
+      expect(markdown).toContain("topic: training")
+      wrapper.unmount()
+    })
+
+    it("invalidates the choice when the user types in the rich editor after pasting", async () => {
+      const wrapper = await mountRichWithPasteChoice()
+      clearNativeSelectionForQuillMutation()
+
+      richQuillInstance(wrapper).insertText(0, "x", "user")
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="paste-choice"]').exists()).toBe(false)
+      wrapper.unmount()
     })
   })
 })

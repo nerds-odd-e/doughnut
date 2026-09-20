@@ -20,6 +20,7 @@ export function useNoteContentPaste(options: {
   noteContent: () => string | undefined
   rootRef: Ref<HTMLElement | null>
   textareaRef: Ref<InstanceType<typeof TextArea> | null>
+  replacePastedRange: (context: QuillPasteContext, text: string) => void
 }) {
   const { htmlToMarkdown, processContentAfterPaste } =
     usePasteWithLinkImageOptions()
@@ -42,6 +43,12 @@ export function useNoteContentPaste(options: {
   const startExpiryTimer = () => {
     stopExpiryTimer()
     expiryTimer = setTimeout(clearPasteChoice, EXPIRY_MS)
+  }
+
+  /** Both paste-completion sites (Markdown textarea and rich Quill) offer their choice the same way. */
+  const setPasteChoice = (choice: PasteChoice) => {
+    pasteChoice.value = choice
+    startExpiryTimer()
   }
 
   /** Hover or keyboard focus on the action pauses expiry until it is left/blurred. */
@@ -106,7 +113,7 @@ export function useNoteContentPaste(options: {
     })
 
     if (originalText && originalText !== markdown) {
-      pasteChoice.value = {
+      setPasteChoice({
         originalText,
         replace: () => {
           const replacedValue = before + originalText + after
@@ -118,8 +125,7 @@ export function useNoteContentPaste(options: {
               before.length + originalText.length
           })
         },
-      }
-      startExpiryTimer()
+      })
     } else {
       clearPasteChoice()
     }
@@ -127,13 +133,41 @@ export function useNoteContentPaste(options: {
     await offerToRemoveLinksAndImages(newValue, update)
   }
 
-  /** `_quillContext` is captured for slice 4's rich-mode correction; not yet consumed. */
+  /** A genuine original clipboard text is one the rich conversion actually lost:
+   * non-blank, and no longer present verbatim in the composed note content
+   * (Quill's Delta insertion index doesn't map onto a Markdown character
+   * offset the way the textarea's own selection does, so this checks the
+   * composed result rather than slicing a range out of it). */
+  const quillPasteLostOriginalText = (
+    currentValue: string,
+    quillContext: QuillPasteContext
+  ): boolean =>
+    quillContext.originalText.trim() !== "" &&
+    !currentValue.includes(quillContext.originalText)
+
   const handlePasteComplete = async (
     currentValue: string | undefined,
     update: NoteContentUpdate,
-    _quillContext: QuillPasteContext | null
+    quillContext: QuillPasteContext | null
   ) => {
     if (!currentValue) return
+
+    if (
+      quillContext &&
+      quillPasteLostOriginalText(currentValue, quillContext)
+    ) {
+      lastAppliedValue = currentValue
+      setPasteChoice({
+        originalText: quillContext.originalText,
+        replace: () => {
+          options.replacePastedRange(quillContext, quillContext.originalText)
+          clearPasteChoice()
+        },
+      })
+    } else {
+      clearPasteChoice()
+    }
+
     await offerToRemoveLinksAndImages(currentValue, update)
   }
 
@@ -144,11 +178,10 @@ export function useNoteContentPaste(options: {
     }
   }
 
-  /** Real user typing/undo (or a programmatic insertion elsewhere) invalidates a pending choice. */
-  const handleTextareaModelUpdate = (
-    update: NoteContentUpdate,
-    newValue: string
-  ) => {
+  /** Real user typing/undo (or a programmatic insertion elsewhere), in either editor mode,
+   * invalidates a pending choice. Also fires for our own `replace()`-driven content update
+   * in the rich path, which is harmless since `replace()` clears the choice itself too. */
+  const handleModelUpdate = (update: NoteContentUpdate, newValue: string) => {
     clearPasteChoice()
     update(options.noteId(), newValue)
   }
@@ -190,7 +223,7 @@ export function useNoteContentPaste(options: {
     clearPasteChoice,
     pausePasteChoiceExpiry,
     resumePasteChoiceExpiry,
-    handleTextareaModelUpdate,
+    handleModelUpdate,
     handleTextareaPaste,
     handlePasteComplete,
   }

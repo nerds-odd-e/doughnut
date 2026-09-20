@@ -208,9 +208,18 @@ function insertTextAtCursor(text: string) {
   }
 }
 
+function replacePastedRange(context: QuillPasteContext, text: string) {
+  quillRef.value?.replacePastedRange(context, text)
+}
+
 function addWikiLinkAsProperty(text: string) {
   frontmatterPropertiesRef.value?.addWikiLinkAsProperty(text)
 }
 
-defineExpose({ insertMarkdownAtEnd, insertTextAtCursor, addWikiLinkAsProperty })
+defineExpose({
+  insertMarkdownAtEnd,
+  insertTextAtCursor,
+  addWikiLinkAsProperty,
+  replacePastedRange,
+})
 </script>

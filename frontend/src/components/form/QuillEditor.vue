@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { getCurrentInstance, nextTick, ref, onMounted, watch } from "vue"
 import type { Router } from "vue-router"
-import Quill, { type QuillOptions, type Range } from "quill"
+import Quill, { Delta, type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
 import {
@@ -246,6 +246,17 @@ onMounted(async () => {
 
 watch(() => props.modelValue, syncQuillFromModel)
 
+/** Places the caret at `index` without emitting a selection-change event.
+ * Swallows a "DOM not ready" failure: both callers have already applied
+ * their content change, so a caret placement issue must not undo that. */
+function setSelectionSilently(index: number) {
+  try {
+    quill.value?.setSelection(index, 0, Quill.sources.SILENT)
+  } catch {
+    // ignore if editor DOM is not ready
+  }
+}
+
 function insertTextAtCursor(text: string) {
   if (!quill.value) return
   if (lastRange.value === null) {
@@ -256,13 +267,25 @@ function insertTextAtCursor(text: string) {
   const index = lastRange.value.index
   // Tell the caller that we handled it
   quill.value.insertText(index, text, Quill.sources.USER)
-  try {
-    quill.value.setSelection(index + text.length, 0, Quill.sources.SILENT)
-  } catch {
-    // ignore if editor DOM is not ready
-  }
+  setSelectionSilently(index + text.length)
   return true
 }
 
-defineExpose({ insertTextAtCursor })
+/** Swaps the span a rich paste inserted (`context.range.index` for
+ * `context.insertedLength` characters) back to `text`, via a single Delta
+ * retain/delete/insert so undo history and the `text-change` listener above
+ * (which emits `update:modelValue`) both see one ordinary user edit. */
+function replacePastedRange(context: QuillPasteContext, text: string) {
+  if (!quill.value) return
+  quill.value.updateContents(
+    new Delta()
+      .retain(context.range.index)
+      .delete(context.insertedLength)
+      .insert(text),
+    Quill.sources.USER
+  )
+  setSelectionSilently(context.range.index + text.length)
+}
+
+defineExpose({ insertTextAtCursor, replacePastedRange })
 </script>

@@ -14,7 +14,7 @@
           :model-value="value"
           :readonly="readonly"
           :auto-extend-until="1000"
-          @update:model-value="handleTextareaModelUpdate(update, $event)"
+          @update:model-value="handleModelUpdate(update, $event)"
           @blur="blur"
           @paste="(event) => handleTextareaPaste(event, value, update)"
           @click="captureTextareaSelection"
@@ -34,7 +34,7 @@
           :note-title-for-wikidata-search="noteTitleForWikidataSearch"
           :note-id="noteId"
           :is-readme-context="isReadmeContext"
-          @update:model-value="update(noteId, $event)"
+          @update:model-value="handleModelUpdate(update, $event)"
           @blur="blur"
           @paste-complete="
             (content, quillContext) =>
@@ -133,7 +133,7 @@ const {
   clearPasteChoice,
   pausePasteChoiceExpiry,
   resumePasteChoiceExpiry,
-  handleTextareaModelUpdate,
+  handleModelUpdate,
   handleTextareaPaste,
   handlePasteComplete,
 } = useNoteContentPaste({
@@ -142,6 +142,8 @@ const {
   noteContent: () => props.noteContent,
   rootRef,
   textareaRef,
+  replacePastedRange: (context, text) =>
+    richEditorRef.value?.replacePastedRange(context, text),
 })
 
 const {

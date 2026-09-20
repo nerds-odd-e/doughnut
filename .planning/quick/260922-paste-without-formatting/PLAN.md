@@ -288,10 +288,60 @@ Safe stop: original rich paste behavior is unchanged and tests remain green.
 
 ### 4. Correct the last rich paste through the same choice
 Type: Behavior
-Status: planned
+Status: done
 Estimate: about 5 minutes after slice 3; native range replacement is the risk.
 Proof: real rich paste → action → bold content → Markdown-mode observation,
 with selected-span/surrounding-content and existing-frontmatter preservation.
+
+Accepted proof:
+```
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableContent.pasteChoice.spec.ts tests/components/form/QuillEditor.paste.spec.ts tests/components/form/RichMarkdownEditor.spec.ts tests/notes/NoteEditableContent.paste.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend run build
+```
+33/33 tests pass; no type diagnostics; production build succeeds (3886
+modules). `QuillEditor.vue` exposes `replacePastedRange(context, text)` (a
+Delta swap: `updateContents(retain+delete+insert)` then `setSelection`,
+sharing a new `setSelectionSilently` helper with `insertTextAtCursor`).
+`RichMarkdownEditor.vue` forwards it. `useNoteContentPaste.ts`'s
+`handlePasteComplete` builds a `PasteChoice` from `QuillPasteContext` when
+`quillPasteLostOriginalText` is true (original clipboard text non-blank and no
+longer present verbatim in the composed note content — Quill's Delta index
+doesn't map onto a Markdown offset the way the textarea path's does, so this
+checks the composed result rather than slicing a range). Both paste-completion
+sites now share `setPasteChoice` (set + start timer) and `handleModelUpdate`
+(shared content-update handler that invalidates the choice in either mode).
+The composable takes a `replacePastedRange` **callback** (not a component
+ref) from `NoteEditableContent.vue` — see the CI-repair note below for why.
+One rich invalidation case (typing after a rich paste) proves the shared
+lifecycle, not a parallel one.
+
+CI repair (commit `1af34728d9`, run 35483349178, continued from slice 3):
+after restoring this slice's stashed work, the coordinator found a second
+occurrence of the same class of issue the slice-3 repair fixed, this time via
+the production build itself (not yet pushed) rather than a CI round-trip:
+`options.richEditorRef.value?.replacePastedRange(...)` in the plain `.ts`
+composable produced `TS2722: Cannot invoke an object which is possibly
+'undefined'` under `pnpm -C frontend run build`, but not under standalone
+`pnpm -C frontend exec vue-tsc --noEmit` — the existing working precedents for
+this exact call shape (`richEditorRef.value?.insertTextAtCursor(text)`,
+`richEditorRef.value?.addWikiLinkAsProperty(text)`) live inside `.vue` SFCs,
+not a plain `.ts` file importing `InstanceType<typeof SomeComponent.vue>`
+type-only. Fix: the composable no longer takes a `richEditorRef`; it takes a
+plain `replacePastedRange: (context, text) => void` callback, supplied by
+`NoteEditableContent.vue` as `(context, text) => richEditorRef.value?.replacePastedRange(context, text)`
+— keeping the `.vue`-instance-typed call inside a `.vue` file. **General
+lesson, confirmed twice now: `pnpm -C frontend exec vue-tsc --noEmit` alone is
+not reliable for this repo's whole-program type errors across the `.vue`/`.ts`
+boundary. From slice 5 onward, verify each slice with the actual production
+build (`pnpm -C frontend run build` or `pnpm frontend:build`) in addition to
+the plan's stated `vue-tsc --noEmit`, and never type-import a `.vue`
+component's `InstanceType<>` into a plain `.ts` file to call its exposed
+methods — pass a narrow callback instead.** The same CI run's Backend Unit
+tests failure was the same recurring `Too many connections` flake (4th
+consistent occurrence across slices 1-4, this time also surfacing as a
+`HikariPool` timeout on an unrelated test, same underlying MySQL
+connection-exhaustion cause); no repair, same disposition as before.
 
 Behavior: The same choice corrects the rich insertion, keeps the editor's
 selection after the inserted content, and becomes unavailable on subsequent
@@ -398,3 +448,15 @@ observed via GitHub Actions `ci.yml` ("donut CI") on that branch.
   are unreliable here. Slice 4 should feed a rich `PasteChoice` into the same
   `pasteChoice` owner (`useNoteContentPaste.ts`) rather than a parallel
   lifecycle, and drop the `_quillContext` underscore once it's consumed.
+- Slice 4: confirmed twice now (once via CI, once caught locally before push)
+  that `pnpm -C frontend exec vue-tsc --noEmit` alone does not reliably catch
+  this repo's whole-program type errors across the `.vue`/`.ts` boundary —
+  both a named type export from a `.vue` SFC (slice 3's repair) and a plain
+  `.ts` file calling a `.vue` component's `InstanceType<>`-derived exposed
+  method (this slice's fix) only surfaced under the actual production build
+  (`pnpm -C frontend run build` / `pnpm frontend:build`). From slice 5 onward,
+  run that build command as part of each slice's own verification (in
+  addition to, not instead of, the plan's stated `vue-tsc --noEmit`), and
+  never type-import a `.vue` component into a plain `.ts` file to call its
+  exposed methods — pass a narrow callback from the owning `.vue` SFC instead,
+  as `useNoteContentPaste.ts` now does for `replacePastedRange`.
