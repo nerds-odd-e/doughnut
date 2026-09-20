@@ -1,48 +1,76 @@
 <template>
-  <TextContentWrapper
-    :value="noteContent"
-    field="edit content"
-    :before-save-content="beforeSaveContent"
-  >
-    <template #default="{ value, update, blur }">
-      <TextArea
-        v-if="asMarkdown"
-        ref="textareaRef"
-        :multiple-line="true"
-        scope-name="note"
-        :model-value="value"
-        :readonly="readonly"
-        :auto-extend-until="1000"
-        @update:model-value="update(noteId, $event)"
-        @blur="blur"
-        @paste="(event) => handleTextareaPaste(event, value, update)"
-        @click="captureTextareaSelection"
-        @keyup="captureTextareaSelection"
-        @mouseup="captureTextareaSelection"
-        @focus="captureTextareaSelection"
-      />
-      <RichMarkdownEditor
-        v-else
-        ref="richEditorRef"
-        :multiple-line="true"
-        scope-name="note"
-        :model-value="value"
-        :readonly="readonly"
-        :wiki-links="wikiLinks"
-        :last-saved-markdown="noteContent ?? ''"
-        :note-title-for-wikidata-search="noteTitleForWikidataSearch"
-        :note-id="noteId"
-        :is-readme-context="isReadmeContext"
-        @update:model-value="update(noteId, $event)"
-        @blur="blur"
-        @paste-complete="(content) => handlePasteComplete(content, update)"
-        @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
-      />
-    </template>
-  </TextContentWrapper>
+  <div ref="rootRef" class="note-editable-content">
+    <TextContentWrapper
+      :value="noteContent"
+      field="edit content"
+      :before-save-content="beforeSaveContent"
+    >
+      <template #default="{ value, update, blur }">
+        <TextArea
+          v-if="asMarkdown"
+          ref="textareaRef"
+          :multiple-line="true"
+          scope-name="note"
+          :model-value="value"
+          :readonly="readonly"
+          :auto-extend-until="1000"
+          @update:model-value="handleTextareaModelUpdate(update, $event)"
+          @blur="blur"
+          @paste="(event) => handleTextareaPaste(event, value, update)"
+          @click="captureTextareaSelection"
+          @keyup="captureTextareaSelection"
+          @mouseup="captureTextareaSelection"
+          @focus="captureTextareaSelection"
+        />
+        <RichMarkdownEditor
+          v-else
+          ref="richEditorRef"
+          :multiple-line="true"
+          scope-name="note"
+          :model-value="value"
+          :readonly="readonly"
+          :wiki-links="wikiLinks"
+          :last-saved-markdown="noteContent ?? ''"
+          :note-title-for-wikidata-search="noteTitleForWikidataSearch"
+          :note-id="noteId"
+          :is-readme-context="isReadmeContext"
+          @update:model-value="update(noteId, $event)"
+          @blur="blur"
+          @paste-complete="(content) => handlePasteComplete(content, update)"
+          @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
+        />
+      </template>
+    </TextContentWrapper>
+    <div
+      v-if="pasteChoice"
+      class="paste-choice mt-1 flex items-center gap-1 text-sm"
+      data-testid="paste-choice"
+    >
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-xs"
+        data-testid="paste-choice-action"
+        @mousedown.prevent
+        @click="pasteChoice.replace()"
+      >
+        Use original text
+      </button>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-xs daisy-btn-square"
+        data-testid="paste-choice-dismiss"
+        aria-label="Dismiss"
+        @mousedown.prevent
+        @click="clearPasteChoice"
+      >
+        <X :size="14" />
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { X } from "@lucide/vue"
 import { nextTick, onMounted, onUnmounted, ref, type PropType } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
@@ -90,11 +118,20 @@ async function beforeSaveContent(
   return propertyMemoryTrackerGuard.confirmAndApplyPropertyKeyChanges(changes)
 }
 
+const rootRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)
-const { handleTextareaPaste, handlePasteComplete } = useNoteContentPaste({
+const {
+  pasteChoice,
+  clearPasteChoice,
+  handleTextareaModelUpdate,
+  handleTextareaPaste,
+  handlePasteComplete,
+} = useNoteContentPaste({
   noteId: () => props.noteId,
   asMarkdown: () => props.asMarkdown,
+  noteContent: () => props.noteContent,
+  rootRef,
   textareaRef,
 })
 

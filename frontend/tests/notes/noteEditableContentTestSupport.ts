@@ -76,13 +76,19 @@ export async function blurTextarea(
   await flushPromises()
 }
 
-export function createClipboardEvent(html: string): ClipboardEvent {
+export function createClipboardEvent(
+  html: string,
+  plainText?: string
+): ClipboardEvent {
   const event = new ClipboardEvent("paste", {
     bubbles: true,
     cancelable: true,
     clipboardData: new DataTransfer(),
   })
   event.clipboardData?.setData("text/html", html)
+  if (plainText !== undefined) {
+    event.clipboardData?.setData("text/plain", plainText)
+  }
   return event
 }
 

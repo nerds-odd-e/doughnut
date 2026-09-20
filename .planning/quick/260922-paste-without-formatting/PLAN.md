@@ -1,6 +1,6 @@
 # Paste without formatting
 
-Status: planned; implementation not authorized or started.
+Status: in progress; slice 1 delivered.
 Source: [SEED-035 story 1](../../seeds/SEED-035-paste-without-formatting.md#story-1).
 Identity: SEED-035#story-1.
 Research revision: `f2dddcb9fa31a70286385a4847beb252a7202110`, 2026-09-20.
@@ -148,9 +148,25 @@ Delivery gates follow each accepted slice. Estimates are hypotheses.
 
 ### 1. Correct the last Markdown paste
 Type: Behavior
-Status: planned
+Status: done
 Estimate: about 5 minutes; medium confidence.
 Proof: focused mounted-editor cases in the table, then acceptance checks above.
+
+Accepted proof:
+```
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableContent.pasteChoice.spec.ts tests/notes/NoteEditableContent.paste.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
+Both pass (14/14 tests; no type diagnostics), inspected at the mounted
+`NoteEditableContent` boundary with real `DataTransfer` clipboard events,
+real textarea selection, and real button interactions. `useNoteContentPaste.ts`
+owns the transient `pasteChoice` (original text plus `replace()`) and all its
+invalidation (typing/undo, note/mode switch, external content change, Escape,
+outside click, explicit dismissal, teardown); `NoteEditableContent.vue` renders
+the compact action bar. Rich-mode paste is untouched. Paste-choice tests live
+in their own `NoteEditableContent.pasteChoice.spec.ts` (this directory's
+one-concern-per-file convention), leaving the original `.paste.spec.ts`'s
+link/image-removal tests unchanged.
 
 Behavior: Paste HTML plus original Markdown into a selected span; a compact
 action appears and replaces that paste with original text when chosen, without
@@ -262,10 +278,11 @@ commit with the independent check-only lint hook → push and asynchronous CI
 observation. Implementers/refactorers do not run format:changed or lint:changed.
 Retain this plan for retrospective and story wrap-up after execution.
 
-Current authorization is planning plus commit/push on main only. Commit this
-plan and its seed link; leave backlog order and Taken state unchanged. Preserve
-concurrent tasks' files and do not stage unrelated work. No execution identity
-or accepted product proof exists yet.
+Execution identity: Story Branch Mode. Originating checkout `/Users/terryyin/git/doughnut`
+(integration branch `main`), execution checkout
+`/Users/terryyin/git/doughnut/.claude/worktrees/260922-paste-without-formatting`
+on branch `claude/260922-paste-without-formatting`, pushed to `origin`. CI
+observed via GitHub Actions `ci.yml` ("donut CI") on that branch.
 
 ## Current decisions and learnings
 
@@ -277,3 +294,14 @@ or accepted product proof exists yet.
 - Planning checks and publication evidence belong in the delivery response;
   future execution records accepted commands/results and changed assumptions
   here as it progresses.
+- Slice 1: `useNoteContentPaste.ts` owns the paste-choice's full lifecycle,
+  including document-level Escape/outside-click listeners and note/mode/content
+  watches, via its own `onMounted`/`onUnmounted` (precedent:
+  `useAutoCollapseDetails.ts`), rather than wiring dismissal in
+  `NoteEditableContent.vue`. Slices 2 (expiry) and 5 (modal-cancel restore)
+  should extend this same composable-owned lifecycle rather than adding
+  component-level state. Paste-choice tests live in their own
+  `NoteEditableContent.pasteChoice.spec.ts`, separate from the pre-existing
+  `.paste.spec.ts` (link/image-removal), matching this directory's
+  one-concern-per-file convention; extend the former for rich-mode/expiry
+  cases in later slices.
