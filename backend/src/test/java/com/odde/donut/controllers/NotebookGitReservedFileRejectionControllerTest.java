@@ -56,7 +56,7 @@ class NotebookGitReservedFileRejectionControllerTest extends NotebookGitBundleCo
     return Stream.of(
         Arguments.of("README.md", FileMode.REGULAR_FILE, "folder README, which is reserved"),
         Arguments.of("Folder/README.md", FileMode.REGULAR_FILE, "folder README, which is reserved"),
-        Arguments.of("note.txt", FileMode.REGULAR_FILE, "not a Markdown note"),
+        Arguments.of("Topic/note.txt", FileMode.REGULAR_FILE, "not a Markdown note"),
         Arguments.of("note.md", FileMode.EXECUTABLE_FILE, "not a regular file mode"),
         Arguments.of("note.md", FileMode.SYMLINK, "not a regular file mode"));
   }

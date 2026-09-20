@@ -15,4 +15,6 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
       FROM NotebookAttachment a WHERE a.notebook.id = :notebookId ORDER BY a.id ASC
       """)
   List<ExportAttachmentRow> findExportRowsByNotebookId(@Param("notebookId") Integer notebookId);
+
+  List<NotebookAttachment> findByNotebook_Id(Integer notebookId);
 }

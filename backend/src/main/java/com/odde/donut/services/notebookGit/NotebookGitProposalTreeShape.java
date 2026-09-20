@@ -21,7 +21,9 @@ import org.springframework.web.server.ResponseStatusException;
  * including identical tip bytes) are settled by {@link NotebookGitProposalNoteCorrespondence}.
  * Within one adjacent transition, residual removals mixed with additions are refused when identity
  * correspondence is uncertain. Net tip deletions may compose with later additions once each
- * adjacent step is admissible. Unsafe paths, non-regular modes, or a changed folder-reserved {@code
+ * adjacent step is admissible. A non-Markdown file at the notebook root is an Attachment rather
+ * than a note, and acceptance projects the tip's whole root-Attachment set; nested non-Markdown
+ * paths stay refused. Unsafe paths, non-regular modes, or a changed folder-reserved {@code
  * README.md} are refused. Structural {@code .keep} changes are not note changes. Callers only
  * invoke this once proposal ancestry is confirmed to be a contiguous single-parent range from the
  * accepted commit.
@@ -141,10 +143,29 @@ public final class NotebookGitProposalTreeShape {
     return path.endsWith("/.keep");
   }
 
+  /**
+   * A non-Markdown file directly at the notebook root is an Attachment: a named supporting file the
+   * notebook owns, with no note identity, title or learning history. Nested non-Markdown paths stay
+   * refused until Folders can contain Attachments safely.
+   */
+  static boolean isRootAttachment(String path) {
+    return !path.endsWith(".md") && path.indexOf('/') < 0;
+  }
+
+  /**
+   * True when a path carries Portable content a notebook can be founded on: a Markdown note or
+   * README at any depth, or a root Attachment. Structural {@code .keep} markers do not.
+   */
+  static boolean carriesPortableContent(String path) {
+    return path.endsWith(".md") || isRootAttachment(path);
+  }
+
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {
-      if (isEmptyFolderMarker(document.path())) {
+      // Neither an empty-Folder marker nor a root Attachment carries note identity, so neither
+      // takes part in note correspondence; acceptance projects the tip's whole Attachment set.
+      if (isEmptyFolderMarker(document.path()) || isRootAttachment(document.path())) {
         continue;
       }
       if (document.role() == DocumentRole.CONTAINER) {

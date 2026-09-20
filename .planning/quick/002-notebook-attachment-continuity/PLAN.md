@@ -285,7 +285,7 @@ the same attachment model.
 
 ### 4. Accept root files through the existing publication boundary
 
-Type: Behavior. Status: planned. Estimate: 5–8 active minutes.
+Type: Behavior. Status: **done**. Estimate: 5–8 active minutes; actual ~9.
 A valid root-file proposal becomes the exact accepted tip and remains intact in
 the next web note save. Add one attachment classification and final-set projection
 inside current acceptance. Remove the initial nonempty-Markdown prerequisite for
@@ -296,6 +296,85 @@ boundary, mixed invalid Markdown, stale heads and nested-file proposals must lea
 head/projection unchanged. Extend the existing committed-transaction failure seam
 for rollback after file projection, rather than relying on test rollback. Full suite.
 Existing authorization/mode/path/concurrency tests remain the owning evidence.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, pass
+(2545 tests, 0 failures). Boundary: notebook Git publication controller, bundle
+download controller, web content save. Inspected locations in
+`controllers/NotebookGitRootAttachmentPublicationControllerTest`:
+`publishedRootFilesAreTheExactAcceptedTipAndSurviveTheNextWebNoteSave`,
+`anInitialPublicationMayBeFileOnlyWithNoNoteAtAll`,
+`invalidMarkdownBesideAValidFileChangeLeavesTheHeadAndTheFilesUnchanged`,
+`aStaleHeadLeavesTheAcceptedFilesUnchanged`,
+`aNestedFileIsStillRefusedAndLeavesTheAcceptedFilesUnchanged`; plus
+`controllers/NotebookGitPublicationAtomicControllerTest.lateBindingSaveFailureRollsBackTheProjectedRootFilesAndAcceptedBinding`
+(real committed-transaction rollback after the attachment projection, not
+test-transaction rollback).
+
+The collation guard slice 3 deferred is now executable: the publication test uses
+`Diagram.png` and `diagram.png` holding different invalid-UTF-8 bytes, and the
+post-web-save tip is rebuilt from the live projection, so a collapsed collation
+would fail either the unique key or the tip comparison.
+
+Delivered design: `NotebookGitProposalTreeShape.isRootAttachment(path)` is
+`!path.endsWith(".md") && path.indexOf('/') < 0` — one predicate, not two
+implementations. `noteChangesFrom` skips empty-folder markers and root attachments,
+so attachments carry no note identity, title or memory tracker, while remaining in
+the inspected files and `conceptDocuments` so folder matching keeps complete
+raw-tree evidence. `NotebookGitProposalAcceptance.projectRootAttachments` makes the
+stored set exactly the proposal tip's root set (delete absent, update changed bytes
+in place, insert new) as the first statement of `acceptMatchingProposedTree`, before
+`requireMatchingProposedTree`, so the post-mutation comparison sees the complete
+result. Deletes and inserts are disjoint by construction — a filename the tip keeps
+is updated in place — so the per-notebook filename key cannot trip on a rename.
+Admission for an initial publication now uses
+`NotebookGitProposalTreeShape.carriesPortableContent`, keeping the Markdown-suffix
+rule out of the publisher.
+
+Accepted product decisions recorded here:
+
+- **A root file named `.keep` is now an ordinary Attachment.** `isEmptyFolderMarker`
+  matches only `"/.keep"`, so a root `.keep` never had structural meaning; it was
+  simply refused before. `PortableTreeSnapshot` emits `.keep` only under a non-empty
+  path prefix, so it round-trips as an ordinary root file. Chosen over a special
+  case. Nested `.keep` is unchanged and still structural.
+- **Initial-publication refusal message** changed from "Initial publication requires
+  a nonempty Markdown tree." to "… requires nonempty Portable content." No test,
+  frontend string or E2E step referenced the old text. An initial tree of only
+  `Folder/.keep` is still refused.
+- **The reserved-file rejection suite's root `note.txt` case moved to
+  `Topic/note.txt`.** Root `note.txt` is legitimately an Attachment now; the nested
+  path preserves the same "not a Markdown note" refusal evidence.
+- The publisher's old clause refusing any non-Markdown initial path is gone, but
+  nested non-Markdown is still refused on initial publication: the publisher's
+  content check runs before `noteChangesFrom`, so both paths refuse. Verified by
+  tracing both.
+
+Learnings for slices 5–9:
+
+- **Slice 5:** an attachment-only proposal reaches the publisher's early-return
+  branch (`noteChanges` and `documents` both empty), which does the pre-mutation
+  drift check and then `acceptMatchingProposedTree`, so the projection already runs
+  there. Note that branch **skips `assertValidTypedMarkdown`**, so an attachment-only
+  change to a tree whose Markdown is already invalid is accepted — pre-existing
+  behavior for no-op shapes; slice 5 should decide whether to state it.
+  Identical-byte writes are already skipped by an `Arrays.equals` guard.
+- **Slice 6:** attachments stay in `conceptDocuments` and the inspected-file list, so
+  folder shape and relocation still see them as raw evidence, and the relocation
+  branches converge on the same `acceptMatchingProposedTree`. Web-side note/folder
+  operations need no production change.
+- **Slice 7:** `NotebookExportService` already reads through `NotebookLivePortableTree`,
+  so a ZIP test can publish through the real boundary instead of seeding the
+  projection. In-ZIP canonical order is README → notes → attachments by filename →
+  subfolders, which differs from Git's byte-wise path order.
+- **Slice 8:** `NotebookGitCutoverService.resetHistory` rebuilds from the same live
+  tree, so it needs no production change — only its proof.
+- **Slice 9:** `NotebookGitProposalFile` carries raw `byte[]` and
+  `GitBundleTestReader.readTreeEntries` gives exact bytes; the E2E will need a real
+  binary fixture because the text step helpers cannot express invalid UTF-8.
+- **Story 9 readiness:** only `isRootAttachment`'s `indexOf('/') < 0` and the entity's
+  missing folder column separate root from nested Attachments. The final set is
+  already keyed by full Portable path, so nested placement is a column plus a wider
+  predicate, not a restructure.
 
 ### 5. Publish attachment-only edits, renames and removals
 

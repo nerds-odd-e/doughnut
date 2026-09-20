@@ -17,10 +17,13 @@ import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
+import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -31,8 +34,8 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
   private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   private static final String PROPOSED_CONTENT = "---\ntype: Note\n---\n[[new reference]]";
 
-  @org.springframework.beans.factory.annotation.Autowired
-  TextContentController textContentController;
+  @Autowired TextContentController textContentController;
+  @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
 
   @AfterEach
   void resetFailureInjection() {
@@ -119,6 +122,54 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
+        });
+  }
+
+  @Test
+  void lateBindingSaveFailureRollsBackTheProjectedRootFilesAndAcceptedBinding() throws Exception {
+    String referenceJson = "{\"schema\": \"donut\"}\n";
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        empty.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            empty,
+            List.of(
+                new NotebookGitProposalFile("Root Note.md", ACCEPTED_CONTENT),
+                new NotebookGitProposalFile("reference.json", referenceJson))));
+    NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
+    String acceptedHead = accepted.getAcceptedGitObjectId();
+    byte[] acceptedBundle = accepted.getBundleBytes().clone();
+    byte[] renameAndEdit =
+        proposalBundleBytes(
+            accepted,
+            List.of(
+                new NotebookGitProposalFile("Root Note.md", PROPOSED_CONTENT),
+                new NotebookGitProposalFile("guide.json", referenceJson)));
+
+    NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
+
+    RuntimeException failure =
+        assertThrows(
+            RuntimeException.class,
+            () ->
+                controller.publishNotebookGitProposal(
+                    notebook.getId(), acceptedHead, renameAndEdit));
+    assertThat(failure.getMessage(), is("forced failure after note projection"));
+
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          assertThat(
+              notebookAttachmentRepository.findExportRowsByNotebookId(notebook.getId()).stream()
+                  .map(row -> new PortableTreeEntry(row.filename(), row.content()))
+                  .toList(),
+              equalTo(List.of(PortableTreeEntry.ofText("reference.json", referenceJson))));
+          NotebookGitBinding reloaded =
+              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+          assertThat(reloaded.getAcceptedGitObjectId(), is(acceptedHead));
+          assertThat(reloaded.getBundleBytes(), equalTo(acceptedBundle));
         });
   }
 

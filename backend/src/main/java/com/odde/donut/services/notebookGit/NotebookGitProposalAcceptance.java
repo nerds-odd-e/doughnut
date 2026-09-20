@@ -1,12 +1,17 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,16 +26,19 @@ class NotebookGitProposalAcceptance {
   private final NotebookGitProposalBindingPersistence bindingPersistence;
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
+  private final NotebookAttachmentRepository attachmentRepository;
 
   NotebookGitProposalAcceptance(
       NotebookGitProjection projection,
       NotebookGitProposalBindingPersistence bindingPersistence,
       TestabilitySettings testabilitySettings,
-      EntityPersister entityPersister) {
+      EntityPersister entityPersister,
+      NotebookAttachmentRepository attachmentRepository) {
     this.projection = projection;
     this.bindingPersistence = bindingPersistence;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
+    this.attachmentRepository = attachmentRepository;
   }
 
   String acceptMatchingProposedTree(
@@ -44,9 +52,47 @@ class NotebookGitProposalAcceptance {
       NotebookGitStateLoader.LockedNotebookState published,
       NotebookGitProposalImporter.ImportedProposal proposal,
       Timestamp publishedAt) {
+    projectRootAttachments(published.notebook(), proposal);
     NotebookGitStateLoader.LockedNotebookState reconciled =
         requireMatchingProposedTree(published, proposal);
     return bindingPersistence.accept(reconciled.binding(), proposal, publishedAt);
+  }
+
+  /**
+   * Makes the notebook's stored root Attachments exactly the proposed tip's set. One final-set rule
+   * covers addition, edit, rename and removal: no commit is replayed. A filename the tip keeps is
+   * updated in place, so removals and insertions never share a filename and the per-notebook
+   * filename key cannot trip. This runs before the tip comparison, so the compared tree is the
+   * complete post-mutation result.
+   */
+  private void projectRootAttachments(
+      Notebook notebook, NotebookGitProposalImporter.ImportedProposal proposal) {
+    Map<String, byte[]> proposed = new HashMap<>();
+    for (PortableTreeEntry entry :
+        NotebookGitAcceptedTree.readEntries(proposal.repository(), proposal.mainHead())) {
+      if (NotebookGitProposalTreeShape.isRootAttachment(entry.path())) {
+        proposed.put(entry.path(), entry.content());
+      }
+    }
+    for (NotebookAttachment stored : attachmentRepository.findByNotebook_Id(notebook.getId())) {
+      byte[] content = proposed.remove(stored.getFilename());
+      if (content == null) {
+        entityPersister.remove(stored);
+      } else if (!Arrays.equals(stored.getContent(), content)) {
+        stored.setContent(content);
+        entityPersister.save(stored);
+      }
+    }
+    proposed.forEach((filename, content) -> persistAttachment(notebook, filename, content));
+    entityPersister.flush();
+  }
+
+  private void persistAttachment(Notebook notebook, String filename, byte[] content) {
+    NotebookAttachment attachment = new NotebookAttachment();
+    attachment.setNotebook(notebook);
+    attachment.setFilename(filename);
+    attachment.setContent(content);
+    entityPersister.save(attachment);
   }
 
   NotebookGitStateLoader.LockedNotebookState requireMatchingProposedTree(
