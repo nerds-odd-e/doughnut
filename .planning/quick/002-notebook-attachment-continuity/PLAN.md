@@ -522,11 +522,64 @@ into this story.
 
 ### 7. Export accepted root files in the notebook ZIP
 
-Type: Behavior. Status: planned. Estimate: about 5 active minutes.
+Type: Behavior. Status: **done**. Estimate: about 5 active minutes; actual ~5.
 Existing notebook export includes accepted root-file paths and bytes through the
 shared snapshot. Proof: `NotebookExportControllerTest` publishes the fixture via
 the real boundary and reads ZIP entry bytes. No post-publication projection seeding.
 Full backend suite; this owns public export behavior beyond slice 2's codec proof.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, pass
+(2556 tests, 0 failures). Boundary: `publishNotebookGitProposal` → `exportNotebook`
+→ `NotebookExportService` → `NotebookLivePortableTree` → `NotebookZipBuilder`.
+Observation:
+`controllers/NotebookExportRootAttachmentControllerTest.theExportedZipCarriesThePublishedRootFilesCompleteAndByteExact`
+— complete entry names and canonical order, plus exact bytes for an invalid-UTF-8
+file, a text root file and a Markdown note, all read as raw bytes.
+
+**No production change was needed** — the third slice in a row. Slice 3's single
+`NotebookLivePortableTree` assembly point already carried the files into export.
+
+Observed in-ZIP order, confirming the canonical order and its difference from Git's:
+
+```
+README.md, Overview.md, Diagram.png, reference.json, Biology/README.md, Biology/Cells.md
+```
+
+Git's byte-wise order for the same tip is
+`Biology/Cells.md, Biology/README.md, Diagram.png, Overview.md, README.md, reference.json`.
+
+Mutation-checked twice, with the distinction that matters: making
+`NotebookLivePortableTree` attachment-blind failed at the *publication* step
+(409, never reaching the export assertion — coarse, proves nothing about export),
+while filtering non-`.md` entries inside `NotebookExportService.exportNotebookAsZip`
+failed exactly at the ZIP assertion. Only the second shows the proof observes the
+export route rather than the shared plumbing beneath it. Both files restored from
+backup copies.
+
+Deviation from this slice's text, accepted: the proof lives in a **new** class
+rather than extending `NotebookExportControllerTest`. That class extends
+`NotebookControllerTestBase`, which runs in the default rolled-back test
+transaction and has no Git publication fixtures; publishing through the real
+boundary needs `NotebookGitBundleControllerTestBase`
+(`@Transactional(NOT_SUPPORTED)`, committed fixture user,
+`snapshotCurrentPortableTree`, `proposalBundleBytes`). Changing the existing
+class's base and transaction semantics for its two existing tests would have been
+the larger change. The promise — publish via the real boundary, read ZIP entry
+bytes, no projection seeding — is met.
+
+Unplanned extra evidence: the fixture publishes a root `README.md` in the same
+proposal, so this is the first proof that a notebook README round-trips
+byte-exactly *alongside* new root attachments. A one-byte difference would have
+thrown 409.
+
+Duplication finding corrected on measurement: the "publish-then-observe" fixture
+shape is **two** copies, not four. Slices 4 and 5 use a materially shorter idiom
+(snapshot an empty notebook, publish a literal tree) with no read-back at all.
+Only slices 6 and 7 share the byte-identical 8-line `acceptedEntriesOf` helper,
+and that helper *is* the bundle-tip read already recorded as a standalone
+candidate — extracting it for 2 of 51 callers would start exactly the sweep this
+story declined. The candidate entry's file count was corrected from "~60" to the
+measured 51.
 
 ### 8. Preserve root files through existing history reset
 
