@@ -183,10 +183,31 @@ timed expiry follows in slice 2. Rich paste retains its existing behavior.
 
 ### 2. Dismiss an ignored paste choice automatically
 Type: Behavior
-Status: planned
+Status: done
 Estimate: about 5 minutes; medium confidence.
 Proof: mounted editor with controlled time; observe action visibility and
 unchanged pasted content, including hover/focus pause and teardown.
+
+Accepted proof:
+```
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableContent.pasteChoice.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
+Both pass (14/14 tests; no type diagnostics). `useNoteContentPaste.ts` starts a
+10s expiry timer wherever `pasteChoice` is set, clears it inside the existing
+single `clearPasteChoice()` path (so every prior invalidation route also stops
+the timer with no new call sites), and exposes `pausePasteChoiceExpiry`/
+`resumePasteChoiceExpiry`, wired to `@mouseenter`/`@mouseleave`/`@focusin`/
+`@focusout` on the action bar in `NoteEditableContent.vue`. Tests use
+`vi.useFakeTimers()` scoped to the file's `expiry` describe block.
+
+CI note: the push for slice 1 (commit `0c5e5725a0`) reported a `Backend Unit
+tests` failure in GitHub Actions — 3 `StructuredResponseCreateParamsSerializerTest`
+methods failing with `ApplicationContext failure threshold exceeded`, traced to
+a single root cause: `Too many connections` from MySQL during Flyway init for
+one Spring context in that CI run. This slice touches no backend files, and
+every other job (frontend tests, lint, E2E, other unit tests) passed. Recorded
+as CI infrastructure flakiness, not a defect; no repair made.
 
 Behavior: Leave the action unused for 10 seconds and it disappears; interacting
 with it by hover or keyboard focus pauses expiry. One shared lifecycle owns

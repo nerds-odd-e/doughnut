@@ -11,6 +11,8 @@ export type PasteChoice = {
   replace: () => void
 }
 
+const EXPIRY_MS = 10_000
+
 export function useNoteContentPaste(options: {
   noteId: () => number
   asMarkdown: () => boolean
@@ -24,9 +26,30 @@ export function useNoteContentPaste(options: {
   const pasteChoice = ref<PasteChoice | null>(null)
   /** The value this composable itself last produced, to tell a save-round-trip echo from an actual external change. */
   let lastAppliedValue: string | undefined
+  let expiryTimer: ReturnType<typeof setTimeout> | undefined
+
+  const stopExpiryTimer = () => {
+    clearTimeout(expiryTimer)
+    expiryTimer = undefined
+  }
 
   const clearPasteChoice = () => {
+    stopExpiryTimer()
     pasteChoice.value = null
+  }
+
+  const startExpiryTimer = () => {
+    stopExpiryTimer()
+    expiryTimer = setTimeout(clearPasteChoice, EXPIRY_MS)
+  }
+
+  /** Hover or keyboard focus on the action pauses expiry until it is left/blurred. */
+  const pausePasteChoiceExpiry = () => {
+    if (pasteChoice.value) stopExpiryTimer()
+  }
+
+  const resumePasteChoiceExpiry = () => {
+    if (pasteChoice.value) startExpiryTimer()
   }
 
   const contentOpensLinkImagePrompt = (content: string): boolean => {
@@ -95,6 +118,7 @@ export function useNoteContentPaste(options: {
           })
         },
       }
+      startExpiryTimer()
     } else {
       clearPasteChoice()
     }
@@ -161,6 +185,8 @@ export function useNoteContentPaste(options: {
   return {
     pasteChoice,
     clearPasteChoice,
+    pausePasteChoiceExpiry,
+    resumePasteChoiceExpiry,
     handleTextareaModelUpdate,
     handleTextareaPaste,
     handlePasteComplete,

@@ -45,6 +45,10 @@
       v-if="pasteChoice"
       class="paste-choice mt-1 flex items-center gap-1 text-sm"
       data-testid="paste-choice"
+      @mouseenter="pausePasteChoiceExpiry"
+      @mouseleave="resumePasteChoiceExpiry"
+      @focusin="pausePasteChoiceExpiry"
+      @focusout="resumePasteChoiceExpiry"
     >
       <button
         type="button"
@@ -124,6 +128,8 @@ const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)
 const {
   pasteChoice,
   clearPasteChoice,
+  pausePasteChoiceExpiry,
+  resumePasteChoiceExpiry,
   handleTextareaModelUpdate,
   handleTextareaPaste,
   handlePasteComplete,

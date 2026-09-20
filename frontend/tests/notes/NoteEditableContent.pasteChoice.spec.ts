@@ -41,6 +41,8 @@ describe("NoteEditableContent paste choice", () => {
     return { wrapper, textarea }
   }
 
+  type Wrapper = Awaited<ReturnType<typeof mountWithPasteChoice>>["wrapper"]
+
   it("replaces a selected paste with the original markdown, keeping surrounding text", async () => {
     const wrapper = mountNoteEditableContent(
       { noteId: 1, noteContent: "before [SELECTED] after" },
@@ -155,10 +157,7 @@ describe("NoteEditableContent paste choice", () => {
 
   type Dismissal = "escape" | "outsideClick" | "explicitDismissal"
 
-  async function dismiss(
-    dismissal: Dismissal,
-    wrapper: Awaited<ReturnType<typeof mountWithPasteChoice>>["wrapper"]
-  ) {
+  async function dismiss(dismissal: Dismissal, wrapper: Wrapper) {
     if (dismissal === "escape") {
       document.dispatchEvent(
         new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
@@ -188,4 +187,66 @@ describe("NoteEditableContent paste choice", () => {
       wrapper.unmount()
     }
   )
+
+  describe("expiry", () => {
+    const EXPIRY_MS = 10_000
+
+    beforeEach(() => vi.useFakeTimers())
+    afterEach(() => vi.useRealTimers())
+
+    it("clears an ignored choice after the timeout, leaving the pasted content unchanged", async () => {
+      const { wrapper, textarea } = await mountWithPasteChoice()
+      const contentBeforeExpiry = textarea.value
+
+      await vi.advanceTimersByTimeAsync(EXPIRY_MS)
+
+      expect(wrapper.find('[data-testid="paste-choice"]').exists()).toBe(false)
+      expect(textarea.value).toBe(contentBeforeExpiry)
+      wrapper.unmount()
+    })
+
+    type Interaction = "hover" | "focus"
+
+    async function setInteraction(
+      interaction: Interaction,
+      active: boolean,
+      wrapper: Wrapper
+    ) {
+      if (interaction === "hover") {
+        const event = active ? "mouseenter" : "mouseleave"
+        await wrapper.find('[data-testid="paste-choice"]').trigger(event)
+        return
+      }
+      const action = wrapper.find('[data-testid="paste-choice-action"]')
+        .element as HTMLElement
+      if (active) action.focus()
+      else action.blur()
+      await flushPromises()
+    }
+
+    it.each<Interaction>(["hover", "focus"])(
+      "pauses expiry during %s and resumes once it ends",
+      async (interaction) => {
+        const { wrapper } = await mountWithPasteChoice()
+
+        await setInteraction(interaction, true, wrapper)
+        await vi.advanceTimersByTimeAsync(EXPIRY_MS)
+        expect(wrapper.find('[data-testid="paste-choice"]').exists()).toBe(true)
+
+        await setInteraction(interaction, false, wrapper)
+        await vi.advanceTimersByTimeAsync(EXPIRY_MS)
+        expect(wrapper.find('[data-testid="paste-choice"]').exists()).toBe(
+          false
+        )
+        wrapper.unmount()
+      }
+    )
+
+    it("does not throw when unmounted with a pending expiry timer", async () => {
+      const { wrapper } = await mountWithPasteChoice()
+
+      expect(() => wrapper.unmount()).not.toThrow()
+      await vi.advanceTimersByTimeAsync(EXPIRY_MS)
+    })
+  })
 })
