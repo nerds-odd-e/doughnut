@@ -5,6 +5,7 @@ import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.NoteConstructionService;
 import com.odde.donut.services.wikidataApis.WikidataIdWithApi;
@@ -15,14 +16,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class WebNoteCreationService {
   private final AcceptedWebChangeService acceptedWebChangeService;
+  private final NotebookRepository notebookRepository;
   private final NoteConstructionService noteConstructionService;
   private final TestabilitySettings testabilitySettings;
 
   public WebNoteCreationService(
       AcceptedWebChangeService acceptedWebChangeService,
+      NotebookRepository notebookRepository,
       NoteConstructionService noteConstructionService,
       TestabilitySettings testabilitySettings) {
     this.acceptedWebChangeService = acceptedWebChangeService;
+    this.notebookRepository = notebookRepository;
     this.noteConstructionService = noteConstructionService;
     this.testabilitySettings = testabilitySettings;
   }
@@ -39,12 +43,8 @@ public class WebNoteCreationService {
     }
     return acceptedWebChangeService.apply(
         notebook.getId(),
-        locked -> {
-          Notebook liveNotebook =
-              locked
-                  .state(notebook.getId())
-                  .map(NotebookGitStateLoader.LockedNotebookState::notebook)
-                  .orElse(notebook);
+        () -> {
+          Notebook liveNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
           return noteConstructionService.createRootNote(liveNotebook, noteCreation, user);
         },
         realm -> "Add note: " + realm.getNote().getTitle(),

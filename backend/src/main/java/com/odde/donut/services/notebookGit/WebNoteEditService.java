@@ -109,8 +109,8 @@ public class WebNoteEditService {
       throws UnexpectedNoAccessRightException {
     return acceptedWebChangeService.apply(
         notebookId,
-        locked -> {
-          Note note = resolveNoteWithinLockedNotebooksOrRepository(locked, noteId);
+        () -> {
+          Note note = requireNote(noteId);
           if (!notebookId.equals(note.getNotebook().getId())) {
             throw noteNotFound();
           }
@@ -122,16 +122,7 @@ public class WebNoteEditService {
         updatedAt);
   }
 
-  /**
-   * Resolves the stored note by id, preferring the locked notebooks' snapshots so callers running
-   * inside {@link AcceptedWebChangeService#apply} mutate the same instance the projection compares
-   * against.
-   */
-  Note resolveNoteWithinLockedNotebooksOrRepository(LockedNotebooks locked, Integer noteId) {
-    return locked.storedNote(noteId).orElseGet(() -> requireNote(noteId));
-  }
-
-  private Note requireNote(Integer noteId) {
+  Note requireNote(Integer noteId) {
     return noteRepository.findById(noteId).orElseThrow(this::noteNotFound);
   }
 

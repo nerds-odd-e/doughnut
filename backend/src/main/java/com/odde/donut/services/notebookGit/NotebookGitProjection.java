@@ -186,6 +186,11 @@ public class NotebookGitProjection {
     List<PortableTreeEntry> currentEntries =
         PortableTreeSnapshot.build(
             notebook.getReadmeContent(), folders, NotebookExportRows.notes(storedNotes));
+    return matchesAcceptedTree(currentEntries, repository, acceptedHead);
+  }
+
+  public boolean matchesAcceptedTree(
+      List<PortableTreeEntry> currentEntries, Repository repository, ObjectId acceptedHead) {
     return NotebookGitAcceptedTree.sorted(currentEntries)
         .equals(
             NotebookGitAcceptedTree.sorted(

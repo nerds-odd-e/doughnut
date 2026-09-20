@@ -1,6 +1,6 @@
 # Faster note-content saving
 
-Status: slice 1 verified; ready for slice 2 after publication.
+Status: slice 1 published; slice 2 verified for delivery; slice 3 next.
 Source: [SEED-034 story 1](../../seeds/SEED-034-faster-note-content-saving.md#story-1).
 Identity: SEED-034#story-1.
 Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
@@ -12,12 +12,12 @@ Research revision: `4d06fc052f4b90406677a769e6a998473ea4c2ef`, 2026-09-20.
 - Execution checkout: `/Users/terryyin/.codex/worktrees/faster-note-content-saving/doughnut`.
 - Execution branch: `codex/faster-note-content-saving`.
 - Authorized destination: `origin/main`, `nerds-odd-e/doughnut`.
-- Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (Taken claim).
+- Published revisions: `f2dddcb9fa31a70286385a4847beb252a7202110` (claim), `11b76124f07c23f24adac79200cd6a1ebf8794b1` (slice 1).
 - Product baseline revision: `b5cad203d1d8915b03cbb2353866134979519349`.
 - Replanning: retain existing plan refinement authority within selected story scope.
 - CI source: GitHub Actions, `ci.yml`, display name `donut CI`.
-- CI observer: coordinator `260921-resume1`, yielded cell `57`, session `41042`,
-  process `35912`, directory `/tmp/dough-ci-501/watch-wYpyKS`; runtime is this
+- CI observer: coordinator `260921-resume2`, yielded cell `94`, session `90384`,
+  process `61971`, directory `/tmp/dough-ci-501/watch-WZsYXb`; runtime is this
   execution checkout's `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`.
 - Claim backend CI failed: run `35478855867`, job `105992832735` has five
   failures caused by MySQL `Too many connections`/consequent context-load
@@ -112,20 +112,12 @@ including roughly 956–959 ms debounce. `cy.type` returns about 35–45 ms afte
 final input, so immediate added-link flush has a negative apparent debounce;
 this timestamp limitation does not affect request-to-visible duration.
 
-Initial setup exceeded its estimate: a bounded 30-active-minute exception
-covered inseparable fixture/timing construction, not a profiling-only slice.
-An eager snapshot setup bug was corrected before accepted capture. An edit-22
-stall was caused by MySQL ENOSPC (`mysql/mysql.log:10`, 00:38:15 UTC), also
-blocking Nix. Two-minute recovery instrumentation retained incremental samples
-and JFR. User freed disk (21 GiB), then explicitly resumed; accepted capture
-above followed. Failed evidence stays in `disk-full-attempt/`.
-
-The old CI process 18938 is absent. Disk exhaustion prevented a terminal receipt
-for `/tmp/dough-ci-501/watch-L5kmu0`; its two retained failures were accounted
-for, but pending CI in that gap is unobserved. Only redundant owned
-`initial.bundle` was deleted for shutdown space; shared database/binlogs were
-untouched. New observer identity is above. Remote/main advanced only with
-unrelated paste planning (`c5e36c95e9`), not baseline product changes.
+Baseline setup used a bounded 30-active-minute fixture/timing exception.
+An initial MySQL ENOSPC stall is retained in `disk-full-attempt/`; user freed
+disk and resumed before accepted capture. No shared database/binlogs deleted.
+Old CI process 18938 is absent; ENOSPC prevented its terminal receipt
+(`/tmp/dough-ci-501/watch-L5kmu0`). Its two failures were accounted for;
+pending CI in that gap is unobserved. Current observer identity is above.
 
 ## Evidence-led plan reassessment
 
@@ -179,7 +171,16 @@ a projection semantic gap. Export bytes must remain unchanged.
 ### 2. Save a changed note without hydrating the entire notebook as entities
 
 Type: Behavior
-Status: planned
+Status: done
+Proof: full backend suite passed 2,536 tests (1m03s); controller load regression
+loads fewer than 30 Notes for a notebook with 30 unrelated notes. No-op,
+readback, learning identity, downloaded ancestry, queued saves and cross-notebook
+reduction assertions inspected. Log `/tmp/donut-save-without-hydration-final-backend.log`.
+Active edits ~7 minutes; independent refactor found no changes.
+Identical 72-save browser run passed (2m49s), evidence `after-slice2/` under the
+baseline directory: visible median/p95 existing 1184.5/1272 ms, added 1281/1423,
+plain 1222/1642; speedups 1.228×/1.152×/1.157×. Whole-notebook loader frames
+disappeared; 2284/4056 request CPU samples remain JDBC/TLS crypto leaves.
 Size hypothesis: five to ten minutes; cross-caller adaptation is the sizing risk.
 
 Behavior: given a large synchronized notebook, changing one note's content
@@ -213,8 +214,8 @@ Size hypothesis: about five minutes of edits; final benchmark runtime separate.
 Behavior: saving changed wiki-linked content completes sooner while comparison
 and the appended accepted commit describe the same complete final tree.
 
-Within the existing owner, reuse the accepted entries across before/after
-comparisons and reuse the final snapshot for comparison and persistence. Delete
+Slice 2 already reuses the final snapshot for comparison and persistence.
+Within the existing owner, reuse accepted entries across comparisons. Delete
 redundant construction/decoding, keeping canonical ordering at one boundary.
 Keep no-op, drift, folder/readme/empty-folder representation, and exact authored
 content behavior. Do not introduce changed-note-only Git patching, which could
@@ -246,5 +247,4 @@ regeneration if triggered → `./scripts/run.sh pnpm format:changed` once → pl
 update → commit with check-only hook → Trunk publication/CI registration.
 Retain plan/evidence for automatic retrospective and later story wrap-up.
 
-Slice 2 callback adaptation remains the sizing risk; refine if oversized.
 Final 4× efficacy is unproved until the final comparison passes.

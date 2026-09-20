@@ -61,10 +61,8 @@ public class RelationReduceService {
     Note source =
         acceptedWebChangeService.apply(
             notebookIds,
-            locked -> {
-              Note note =
-                  webNoteEditService.resolveNoteWithinLockedNotebooksOrRepository(
-                      locked, relationNoteId);
+            () -> {
+              Note note = webNoteEditService.requireNote(relationNoteId);
               authorizationService.assertAuthorization(note);
               Note sourceNote = noteService.reduceRelationNoteToSourceProperty(note, viewer, now);
               if (!notebookIds.contains(note.getNotebook().getId())

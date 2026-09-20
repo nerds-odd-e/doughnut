@@ -11,10 +11,10 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
-import com.odde.donut.services.notebookGit.NotebookGitStateLoader;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
@@ -36,6 +36,7 @@ public class FolderRelocationService {
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final AcceptedWebChangeService acceptedWebChangeService;
+  private final NotebookRepository notebookRepository;
   private final FolderConstructionService folderConstructionService;
   private final AuthorizationService authorizationService;
   private final FolderSubtree subtree;
@@ -51,6 +52,7 @@ public class FolderRelocationService {
       WikiLinkRewriteService wikiLinkRewriteService,
       WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
       AcceptedWebChangeService acceptedWebChangeService,
+      NotebookRepository notebookRepository,
       FolderConstructionService folderConstructionService,
       AuthorizationService authorizationService,
       FolderMoveRelocation folderMoveRelocation,
@@ -62,6 +64,7 @@ public class FolderRelocationService {
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.acceptedWebChangeService = acceptedWebChangeService;
+    this.notebookRepository = notebookRepository;
     this.folderConstructionService = folderConstructionService;
     this.authorizationService = authorizationService;
     this.subtree =
@@ -146,12 +149,8 @@ public class FolderRelocationService {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return acceptedWebChangeService.apply(
         notebook.getId(),
-        locked -> {
-          Notebook liveNotebook =
-              locked
-                  .state(notebook.getId())
-                  .map(NotebookGitStateLoader.LockedNotebookState::notebook)
-                  .orElse(notebook);
+        () -> {
+          Notebook liveNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
           Folder liveFolder =
               folderRepository
                   .findById(folderId)
