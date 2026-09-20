@@ -1,9 +1,6 @@
 # 0001 — Ubiquitous language for Donut domain concepts
 
 **Status:** Accepted  
-**Date:** 2026-09-01
-**Amended:** 2026-09-17 — Trash and permanent deletion terms, decided by Terry Yin
-**Amended:** 2026-09-20 — Notebook attachments and folder content, decided by Terry Yin
 **Decision makers:** Terry
 **Consulted:** (people / teams asked for advice)
 
