@@ -92,8 +92,8 @@ or add competing representations. See [current save behavior](../../docs/note-co
   delivered and proven correct in isolation but has never been run against
   real data — that run, and its verification, is retirement's prerequisite.
   Recover story 2's full evidence and design history from commit
-  `ed8a237ab8d3da9550dd6c624480dd6e1d0c6b26`, path
-  `.planning/quick/001-durable-native-git-storage/PLAN.md` ([Git copy](https://github.com/nerds-odd-e/doughnut/blob/ed8a237ab8d3da9550dd6c624480dd6e1d0c6b26/.planning/quick/001-durable-native-git-storage/PLAN.md)).
+  `045a5c6010815a9f106e2cc2241fe7466e24ac55`, path
+  `.planning/quick/001-durable-native-git-storage/PLAN.md` ([Git copy](https://github.com/nerds-odd-e/doughnut/blob/045a5c6010815a9f106e2cc2241fe7466e24ac55/.planning/quick/001-durable-native-git-storage/PLAN.md)).
 
 ## Ordering and Scope Reduction
 
