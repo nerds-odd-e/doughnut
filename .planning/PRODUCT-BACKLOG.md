@@ -9,7 +9,6 @@ either the remote or local repository may be multiple commits behind.
 
 ## Taken
 
-- [Simplify note-content saving and preserve property edits](quick/260921-faster-note-content-saving/PLAN.md) — SEED-034#story-1
 - [Paste without formatting in rich and Markdown modes](seeds/SEED-035-paste-without-formatting.md#story-1) — SEED-035#story-1 ([plan](quick/260922-paste-without-formatting/PLAN.md))
 
 ## Backlog list

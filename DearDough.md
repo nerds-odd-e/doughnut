@@ -845,33 +845,6 @@ the run exists, is discoverable moments later, and goes on to succeed.
     `CI_COVERAGE_UNAVAILABLE` as final, would likely have prevented every one
     of these four false negatives.
 
-## DD-078 — Codex streamed CI events do not advance mailbox delivery accounting
-
-The Codex adapter streams recorded events through `notify`, but neither its
-consumer nor `streamMailboxWorker` records delivery progress. Shutdown computes
-unread evidence from `delivery.json`, so that receipt cannot distinguish a
-streamed notification from an event the coordinator has never seen.
-
-### Occurrences
-
-- Execution: SEED-034#story-1 / quick/260921-faster-note-content-saving / 11b76124f07c23f24adac79200cd6a1ebf8794b1
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: on 2026-09-20, `/tmp/dough-ci-501/watch-L7rB7G/result.json`
-    reported recordedThrough 4, deliveredThrough 0, unread 4. The coordinator
-    inspected all four at shutdown; the slice-2 failure was already triaged,
-    while three later failed attempts received their explicit log triage then.
-    `ci-notify-codex.md` consumes/forwards events without recording delivery;
-    `ci-mailbox.mjs` stream callback writes records; `ci-mailbox-store.mjs`
-    computes unread from `readDeliveryProgress` (default deliveredThrough 0).
-  - Observed effect: final reconciliation could not use the unread count as
-    proof of notification delivery and needed event-by-event reconciliation.
-  - Inference: align streamed delivery acknowledgement and receipt semantics,
-    then verify live host notification and shutdown accounting together. This
-    evidence alone does not prove notifications were lost or identify a host
-    bridge failure; no observer/tooling repair was attempted in retrospective.
-
 ## Retention
 
 - Highest allocated local number: 78
