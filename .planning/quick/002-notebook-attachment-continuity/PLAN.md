@@ -378,7 +378,7 @@ Learnings for slices 5–9:
 
 ### 5. Publish attachment-only edits, renames and removals
 
-Type: Behavior. Status: planned. Estimate: about 5 active minutes.
+Type: Behavior. Status: **done**. Estimate: about 5 active minutes; actual ~8.
 Given accepted root files, a local file-only range produces exactly its final
 root-file set; no Markdown edit or attachment rename correspondence is required.
 Use the same final-set rule for edit, rename and removal, including identical-byte
@@ -386,6 +386,77 @@ files and a multi-commit rename/edit. Do not replay commits into live mutations.
 Proof: parameterized publication-controller cases compare final paths/bytes and
 original ancestry. Assert the removed path is absent, not just the new path present.
 No notes or memory trackers are created for attachments. Full backend suite.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, pass
+(2550 tests, 0 failures). Boundary: notebook Git publication controller, bundle
+download controller, live attachment projection. All observations in the new
+`controllers/NotebookGitRootAttachmentLocalChangeControllerTest`:
+`aFileOnlyProposalBecomesExactlyItsFinalRootFileSet` (4 parameterized cases —
+edit, rename keeping bytes, removal, and renaming one of two identical-byte files)
+and `aMultiCommitRenameAndEditRangeLandsAsItsFinalSetOnItsOriginalAncestry`.
+
+**No production change was needed.** Slice 4's `projectRootAttachments` final-set
+rule already covered edit, rename, removal, identical bytes and multi-commit
+ranges; every case passed on the first run. Recorded as the result rather than
+manufacturing a change.
+
+Proof quality notes:
+
+- The implementer mutation-tested the proof: removing `entityPersister.remove`
+  from `projectRootAttachments` failed 4 of the 5 cases (the pure-edit case
+  correctly stayed green, since it removes nothing), then restored the file. The
+  proof is not vacuous.
+- `assertFinalRootFileSet` derives the vanished names from the baseline rather
+  than hard-coding them per case, and asserts they appear in **neither** the
+  accepted tip **nor** the live projection. It also asserts four root files yield
+  exactly one note (`Root Note`, the only `.md`) and zero memory trackers.
+- The multi-commit test asserts the first-parent chain still runs through both
+  intermediate commits back to the previous accepted head, and that the range's
+  intermediate filename `interim.json` was never a live Attachment row — the
+  sharpest available evidence that commits are not replayed into live mutations.
+- This slice is the first evidence that an *accepted* attachment-only proposal
+  works end to end: slice 4's attachment proposals were either mixed with Markdown
+  or were refusals, so this is the first proof that
+  `NotebookGitProposalFolderShape.requireExactOrCarried` does not mistake a
+  root-file-only change for a folder relocation and that the publisher's
+  early-return branch reaches acceptance for this shape.
+
+Decision recorded — **the `assertValidTypedMarkdown` early-return skip stays
+unchanged and untested.** An attachment-only proposal takes the publisher's
+early-return branch, which skips whole-tip Markdown validation. This is safe by
+induction, not a hole: that branch is reached only when no Markdown differs
+between the accepted tree and the tip, so the tip's Markdown is byte-identical to
+accepted Markdown, which was itself either Donut-generated or validated at its own
+admission. The case is unreachable through the product's own boundaries, and
+testing it would require seeding an unreachable accepted state and would cement
+behavior that is only incidentally correct. The story's atomicity promise concerns
+invalid Markdown *in the proposal*, which is a Markdown change and never takes this
+branch — slice 4 owns that evidence. Residual, recorded: if Markdown validation is
+ever tightened, previously accepted trees stay accepted through attachment-only
+changes until something touches their Markdown. That is a general grandfathering
+property of the design, not an Attachment defect.
+
+Learnings for slices 6–9:
+
+- `NotebookGitProposalFile.asProposal(entries)` builds a proposal from a
+  `List<PortableTreeEntry>`, so declaring a case as its *final tree* and deriving
+  the proposal from it removes a class of hand-ordering mistakes and cut the test
+  class from 301 to 236 lines. It works for multi-commit ranges via
+  `commitOnTopOf(repo, parents, asProposal(entries), message)`.
+- Expected tip lists must be in Git's byte-wise path order (capitals before
+  lowercase). This is **not** the ZIP order slice 7 observes (README → notes →
+  attachments by filename → subfolders).
+- The live projection's row order is insertion order, which drifts from filename
+  order after a rename; compare it sorted by filename.
+- Slice 8's `NotebookGitHistoryResetControllerTest` reads the binding's stored
+  `getBundleBytes()` directly rather than going through `downloadNotebookGitBundle`,
+  so this class's private `acceptedTip` helper would not serve it — do not promote it.
+
+Deliberately not changed, reported instead: `assertFinalRootFileSet`'s explicit
+absence block is logically implied by the exact list equality above it (because
+`PortableTreeEntry` compares content with `Arrays.equals`). It is retained because
+this slice's plan text explicitly requires asserting the removed path is absent;
+removing it would be a plan dispute rather than a refactor.
 
 ### 6. Keep root files independent of note and folder operations
 
