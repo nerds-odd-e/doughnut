@@ -44,8 +44,10 @@ donut_needs_pnpm_install() {
   return 1
 }
 
-# Setup PNPM and Biome
-setup_pnpm_and_biome() {
+# Fingerprint-gated dependency install, callable on its own (no Biome patch,
+# no daemon restart). This is the one dependency-readiness owner; compose it
+# where only dependency preparation is needed.
+setup_pnpm_deps() {
   log "Setting up PNPM..."
   # pnpm is provided by the nix dev shell (flake.nix pins 11.15.1 under nodejs_26).
   # Node 26 dropped bundled corepack, so we no longer activate pnpm via corepack.
@@ -54,6 +56,11 @@ setup_pnpm_and_biome() {
   else
     log "Skipping pnpm install (workspace fingerprint unchanged). Set DONUT_SHELL_HOOK_FORCE_PNPM=1 to force."
   fi
+}
+
+# Setup PNPM and Biome
+setup_pnpm_and_biome() {
+  setup_pnpm_deps
 
   if [ -e /etc/NIXOS ] || [ -e /etc/nixos ]; then
     log "Patching Biome binaries on NixOS..."

@@ -29,6 +29,30 @@ CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 
 Never hand-edit `packages/generated/donut-backend-api/**` or `open_api_docs.yaml`; regenerate them. For whitespace hygiene, use `scripts/check_diff_whitespace.sh` instead of raw `git diff --check` so generated artifacts are not manually "fixed".
 
+## Worktree setup
+
+A freshly created `git worktree` has tracked source but is missing the
+generated Claude skill-discovery links and its own installed dependencies.
+`./scripts/run.sh bash scripts/worktree_setup.sh` is the public preparation
+entry point: it links skill discovery and installs dependencies (fingerprint-
+gated, so repeats are cheap) without starting MySQL/Redis or a Biome daemon.
+Cursor's `.cursor/worktrees.json` `setup-worktree` hook already invokes this
+script (`CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh`) when
+Cursor creates a worktree, so Cursor-created worktrees prepare automatically.
+Codex has no tracked environment-setup configuration in this repo (`.codex/`
+contains only the product-backlog guard hook, nothing under a local-environment
+schema), so Codex-created worktrees are not prepared automatically — run the
+command manually there, same as any other freshly created worktree.
+
+Claude Code is deliberately not wired for automatic invocation either. Its
+`WorktreeCreate` hook replaces git's own worktree-creation logic entirely
+rather than running after it, and `${CLAUDE_PROJECT_DIR}` in a hook
+command stays pinned to the session's original checkout even after
+`EnterWorktree` moves the session into a different worktree — so a hook
+cannot reliably resolve a later-entered worktree either. Both an initially
+launched worktree and one entered mid-session use the same manual fallback:
+run the command by hand in the new checkout, same as Codex.
+
 ## Commands
 
 Run repo tooling through Nix unless working in a documented Cloud VM path:

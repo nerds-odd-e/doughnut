@@ -54,50 +54,62 @@ Do not replace Claude Code's worktree lifecycle merely to install dependencies.
 
 ## Story Decomposition
 
-<a id="story-1"></a>
+<a id="story-2"></a>
 
-### Start isolated AI worktrees quickly and reliably
+### Apply the shared dependency-readiness rule to redundant install-prefixed root scripts
 
-- **Identity:** SEED-039#story-1
-- **Plan:** [AI worktree readiness](../quick/005-ai-worktree-readiness/PLAN.md).
-- **Goal:** Developers using Codex, Cursor, or Claude Code can prepare a fresh
-  Donut worktree on an already-provisioned machine, access repository tooling,
-  and run frontend and backend checks without manual dependency copying or repair.
-- **Scope:** One coherent preparation behavior; supported entry points for all
-  three hosts; tracked tooling and necessary generated skill links; correct
-  dependencies after relevant input changes; cheap unchanged preparation;
-  failed/incomplete preparation never reports readiness. Preserve existing
-  database, port, process, and build-output isolation. Service allocation remains
-  with existing runtime/test commands, not eager startup of every service.
-- **Key examples:** Fresh worktree with warm machine caches → supported setup →
-  repository tools and frontend/backend checks work using committed dependencies.
-  Unchanged worktree → repeat setup and a normal package command → no redundant
-  installation/lifecycle pass. Changed workspace manifest/lockfile or missing
-  install state → prepare → install the valid graph or report the mismatch without
-  silently rewriting committed inputs. Failed preparation → fix its cause and
-  retry → actual readiness. Two concurrent worktrees → prepare and check both →
-  each keeps its dependency view, runtime ownership and disposable data.
-- **Evaluation:** Record before/after fresh and repeated preparation using the
-  same revision inputs, machine/cache conditions and stated timing boundaries;
-  separate setup from compilation/test execution. Record actual host versions
-  and invocation paths. A shell command alone does not prove a host invokes it.
-  Existing caching may already be adequate; no absolute latency or speedup ratio
-  is promised. At most one bounded optimization experiment follows a measured
-  substantial remaining preparation cost.
-- **Deferred promises:** New-machine or cloud provisioning; a worktree manager;
-  branch-policy or cleanup redesign; arbitrary local-file/credential copying;
-  remote caches; general compilation, test or browser-download optimization;
-  fixing every shared retrospective finding; notebook product changes.
-- **Value / learning:** Remove demonstrated repair work and unnecessary setup
-  from repeated development cycles; determine the actual remaining cost before
-  investing in acceleration.
-- **Effort hypothesis:** M, low confidence until host entry points and native
-  pnpm readiness behavior are observed; reassess if these demand lifecycle work.
-- **Depends on:** none.
-- **Safe stopping point:** All three hosts have proven supported preparation,
-  repeated installation is avoided, failures are visible and isolation is
-  preserved. Stop without additional cache machinery when remaining timings
-  do not justify it. Partial host coverage is useful progress, not story completion.
+- **Identity:** SEED-039#story-2
+- **Plan:** none yet; ready for slice planning.
+- **Goal:** Existing repository callers that currently reinstall dependencies
+  unconditionally on every invocation (rather than reusing the one
+  fingerprint-gated readiness owner `scripts/dev_setup.sh:setup_pnpm_deps`,
+  delivered by SEED-039#story-1) reuse that same one rule, so a package
+  command never pays for a redundant reinstall it doesn't need.
+- **Scope:** Caller map recorded during SEED-039#story-1's execution
+  (2026-09-21, at commit `725c0d61f4` on the now-deleted
+  `worktree-claude+260921-ai-worktree-readiness` branch, before its plan
+  history was removed — recover the full map from that commit if needed):
+  root `package.json` has ~19 scripts prefixed with `pnpm --frozen-lockfile
+  --silent recursive install &&` (`mcp-server:bundle/test/format/lint`,
+  `test-fixtures:format/lint`, `cli`, `cli:bundle/format/lint/test`,
+  `frontend:build/format/lint/test:ui/test/test:watch/sut/dev/storybook`,
+  `test`, `dev`) — same install flavor as `setup_pnpm_deps`; 3 scripts
+  (`generateTypeScript`, `cy:format`, `cy:lint`) prefixed with the
+  non-recursive `pnpm --frozen-lockfile --silent install &&` — a different
+  install flavor, not a straight substitution; `lint:all`/`format:all` also
+  call several of the scripts above, so their prefix compounds within one
+  invocation. Preserve each caller's actual task and lifecycle contract; do
+  not add installation to unrelated Git/read-only operations; remove
+  superseded prefix code only once all its callers use the selected owner.
+- **Key examples:** SEED-039#story-1's readiness-gate postconditions
+  (unchanged/mismatched/valid-change/interrupted-install) are already proven
+  and reusable as-is — this story is about *where* that gate gets invoked,
+  not re-proving its own correctness. A root script run after an unrelated
+  dependency change installs once, not twice (its own prefix plus a prior
+  Nix-hook install). `lint:all`/`format:all` no longer carry a separately
+  compounding reinstall from each sub-script they call.
+- **Evaluation:** One representative normal command per distinct changed
+  caller contract still works exactly as before, plus the existing
+  readiness-gate proof (reused, not re-derived). No new fingerprint,
+  package-store, or runtime owner.
+- **Deferred promises:** A second fingerprint/cache mechanism; forcing an
+  unrelated caller with a genuinely different lifecycle contract into this
+  rule merely for uniformity.
+- **Value / learning:** Removes up to ~25 redundant reinstall passes across
+  common package-script invocations, under one consistent readiness rule
+  instead of a parallel ad hoc one per caller.
+- **Effort hypothesis:** S–M; suggested decomposition from the investigation:
+  (a) prove `setup_pnpm_deps` (or a thin wrapper) is safely invokable as a
+  plain `pnpm`-script prefix outside the interactive Nix shell hook, for both
+  install flavors; (b) apply it to the ~19 recursive-flavor leaf scripts;
+  (c) resolve `lint:all`/`format:all`'s compounded prefix once leaf scripts
+  no longer need their own; (d) decide the 3 non-recursive scripts'
+  different contract separately. Not binding — replan at slice planning.
+- **Depends on:** SEED-039#story-1 (delivered) — reuses its
+  `setup_pnpm_deps` fingerprint gate as the one readiness owner.
+- **Safe stopping point:** Any subset of callers fixed consistently with the
+  rule is useful progress; do not force a caller with a genuinely different
+  contract into a partial/inconsistent rule merely to finish this story.
 
 ## Ordering and Scope Reduction
 
@@ -138,8 +150,13 @@ worktree lifecycle issue recorded in `DearDough.md`.
 
 ## When to Surface
 
-Now, as the first queued product-backlog item. The linked plan is planning-only;
-the story has not been taken and implementation is not authorized by refinement.
+SEED-039#story-1 was taken and delivered 2026-09-21 (fresh-worktree tooling
+and dependency readiness across Codex, Cursor, and Claude Code, with a proven
+redundancy-avoidance and parallel-isolation guarantee); its lasting behavior
+now lives in `scripts/worktree_setup.sh`, `scripts/dev_setup.sh`, and
+`.agents/agent-map.md`'s "Worktree setup" section, not in this seed.
+SEED-039#story-2 is queued next in the product backlog, ready for slice
+planning whenever taken.
 
 ## Breadcrumbs
 
@@ -152,3 +169,8 @@ the story has not been taken and implementation is not authorized by refinement.
   inputs, package scripts still run frozen recursive installation checks, pnpm
   uses a shared content-addressable store, Gradle enables shared caching, and
   linked worktrees receive isolated test databases.
+- SEED-039#story-1 execution, 2026-09-21: delivered slices 1-8 of its plan.
+  Slice 4 was found oversized mid-execution and narrowed to its
+  readiness-gate proof half; the deferred half became SEED-039#story-2 above,
+  with its caller map preserved there. Owner chose to close story-1 at that
+  point rather than continue into story-2 in the same execution.

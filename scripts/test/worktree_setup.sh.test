@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+#
+# Tests for scripts/worktree_setup.sh using the Bach testing framework.
+#
+# This is a real command-boundary proof, not a simulation: it creates a real
+# disposable linked git worktree (via `git worktree add`), runs the real
+# scripts/worktree_setup.sh against it in a clean subprocess (no Bach
+# mocking), then asserts the generated .claude/skills/* symlinks actually
+# exist in that worktree and resolve to real tracked skill directories
+# inside it. setup_claude_skills itself is not mocked or faked.
+#
+# Since slice 3, the same real script also calls setup_pnpm_deps, so this
+# fixture's `git worktree add ... HEAD` checks out a real, committed
+# pnpm-lock.yaml/package.json and the run below performs one real
+# `pnpm --frozen-lockfile recursive install` against them (no stubbed pnpm:
+# real manifests from a committed revision are never mismatched, so this
+# is not testing the fingerprint/mismatch gate itself, only that the
+# composed entry point leaves a fresh worktree's dependency graph actually
+# usable). This makes the test slower but real; see the plan's before-change
+# gate for comparable timings (single-digit seconds against a warm local
+# pnpm store).
+
+# Captured before Bach rewrites PATH, so the real-execution probe below can
+# spawn a clean bash unaffected by Bach's function mocking (same pattern as
+# scripts/test/dev_setup.sh.test).
+DONUT_TEST_REAL_PATH="$PATH"
+DONUT_TEST_REAL_BASH="$(command -v bash)"
+DONUT_TEST_REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+DONUT_TEST_WORKTREE_SETUP_SH="${DONUT_TEST_REPO_ROOT}/scripts/worktree_setup.sh"
+
+source "$(dirname "$0")/vendor/bach.sh"
+
+# Fresh worktree lacking generated .claude/skills/* -> real worktree_setup.sh
+# -> tracked Claude discovery links exist in that worktree and resolve inside
+# it (not into the source worktree's own .agents/skills). Running it twice
+# proves it is safe to repeat.
+test-worktree-setup-prepares-fresh-worktree() {
+    local work probe
+    work="$(@mktemp -d)"
+    probe="${work}/probe.sh"
+
+    @cat >"${probe}" <<'PROBE'
+set -euo pipefail
+export PATH="$1"
+repo_root="$2"
+setup_sh="$3"
+work="$4"
+branch="donut-test-worktree-setup-$$"
+wt_path="${work}/fresh-worktree"
+
+# Runs on every exit path (precondition failure, assertion failure, success)
+# so the disposable linked worktree/branch never leaks.
+cleanup() {
+    git worktree remove --force "${wt_path}" >/dev/null 2>&1 || true
+    git branch -D "${branch}" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
+cd "${repo_root}"
+git worktree add -q -b "${branch}" "${wt_path}" HEAD >/dev/null 2>&1
+
+# Absent before preparation: confirms the starting condition this slice fixes.
+if [ -e "${wt_path}/.claude/skills" ]; then
+    echo "PRECONDITION_FAILED: .claude/skills already present before setup"
+    exit 1
+fi
+if [ -e "${wt_path}/node_modules" ]; then
+    echo "PRECONDITION_FAILED: node_modules already present before setup"
+    exit 1
+fi
+
+# scripts/worktree_setup.sh is this slice's uncommitted new artifact, so
+# `git worktree add HEAD` (which checks out a committed ref, not the working
+# tree) does not include it yet. Seed just that one new file so the fixture
+# exercises today's uncommitted entry point; scripts/shell_setup.sh (the
+# existing setup_claude_skills owner this entry point composes with) is
+# already tracked and needs no seeding.
+cp "${setup_sh}" "${wt_path}/scripts/worktree_setup.sh"
+chmod +x "${wt_path}/scripts/worktree_setup.sh"
+
+# Run the real entry point against the fresh worktree, from within it, twice
+# (repeat safety), exactly as documented usage would.
+(cd "${wt_path}" && bash "${wt_path}/scripts/worktree_setup.sh") >/dev/null
+(cd "${wt_path}" && bash "${wt_path}/scripts/worktree_setup.sh") >/dev/null
+
+wt_real="$(cd "${wt_path}" && pwd -P)"
+
+count=0
+for link in "${wt_path}"/.claude/skills/*/; do
+    [ -L "${link%/}" ] || continue
+    target="$(cd "${link}" && pwd -P)"
+    case "${target}" in
+        "${wt_real}"/.agents/skills/*) : ;;
+        *)
+            echo "BAD_TARGET:${link}->${target}"
+            exit 1
+            ;;
+    esac
+    [ -f "${link}SKILL.md" ] || {
+        echo "MISSING_SKILL_MD:${link}"
+        exit 1
+    }
+    count=$((count + 1))
+done
+
+if [ "${count}" -gt 0 ]; then
+    symlinks_result="SYMLINKS_OK:${count}"
+else
+    symlinks_result="SYMLINKS_MISSING"
+fi
+
+# Dependency readiness (new in this slice): the committed dependency graph
+# must actually be installed and usable after the composed entry point runs,
+# not merely a directory that happens to exist. node_modules/.bin/biome is a
+# real workspace devDependency binary; .donut-pnpm-lock.sha256 is the
+# fingerprint setup_pnpm_deps writes on a completed install, which also
+# proves the second run's skip path (no fingerprint change) found real
+# installed state rather than re-running install output we can't see here.
+deps_result="DEPS_MISSING"
+if [ -d "${wt_path}/node_modules" ] \
+    && [ -x "${wt_path}/node_modules/.bin/biome" ] \
+    && [ -f "${wt_path}/.donut-pnpm-lock.sha256" ]; then
+    deps_result="DEPS_OK"
+fi
+
+echo "${symlinks_result} ${deps_result}"
+PROBE
+
+    # Real stdin here is Bach's own re-opened /dev/ptmx master (see
+    # .bach.restore-stdin), not a normal terminal or pipe. The real pnpm
+    # install below spawns several concurrent native-module child processes
+    # (canvas, parcel-watcher, tesseract, esbuild, cypress); inheriting that
+    # raw ptmx fd into all of them is unlike any real invocation of this
+    # script and was observed to abort a child Node process during startup
+    # (node::PlatformInit assertion). Give the real subprocess a normal,
+    # harmless stdin instead, as any non-interactive real invocation would
+    # have.
+    local result symlinks_status deps_status
+    result="$(@real env -i "PATH=${DONUT_TEST_REAL_PATH}" \
+        "${DONUT_TEST_REAL_BASH}" "${probe}" \
+        "${DONUT_TEST_REAL_PATH}" "${DONUT_TEST_REPO_ROOT}" \
+        "${DONUT_TEST_WORKTREE_SETUP_SH}" "${work}" </dev/null)"
+    symlinks_status="${result%% *}"
+    deps_status="${result#* }"
+
+    # Two independent postconditions from the one real run above: the
+    # skill symlinks (already proven since slice 1) and the newly composed
+    # dependency install. Asserted separately so a failure names which one
+    # broke instead of requiring the reader to parse a combined string.
+    @assert-equals true "$([[ "${symlinks_status}" == SYMLINKS_OK:* ]] && echo true || echo "false (${symlinks_status})")"
+    @assert-equals "DEPS_OK" "${deps_status}"
+}

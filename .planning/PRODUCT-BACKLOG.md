@@ -11,7 +11,6 @@ and deletable in Web Donut.
 ## Taken
 
 - [Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage](seeds/SEED-034-faster-note-content-saving.md#story-4) — SEED-034#story-4 ([plan](quick/004-note-save-performance-and-storage-retirement/PLAN.md))
-- [Start isolated AI worktrees quickly and reliably](seeds/SEED-039-fast-isolated-worktree-setup.md#story-1) — SEED-039#story-1 ([plan](quick/005-ai-worktree-readiness/PLAN.md))
 
 ## Backlog list
 
@@ -25,3 +24,4 @@ and deletable in Web Donut.
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2
 - [Assess whether attachment content needs its own save-path treatment](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3
+- [Apply the shared dependency-readiness rule to redundant install-prefixed root scripts](seeds/SEED-039-fast-isolated-worktree-setup.md#story-2) — SEED-039#story-2
