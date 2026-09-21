@@ -186,6 +186,39 @@ satisfy them. A deliberate stop of all incompatible instances can replace the
 rolling stages only when that maintenance procedure is explicitly selected.
 Deployment waits do not prevent independent final attachment assessment.
 
+## Release handoff 2 - WAITING FOR THE OWNER (2026-09-21)
+
+**Published to `origin/main` at `af8fe4e033`**, a merge commit with parents `f82aa48505` (the
+then `origin/main`, a pnpm bump) and story head `18bf3defeb`; its tree equals the tested story tree.
+Verified on the merged code before publishing: B **2,569 tests, 0 failures**, E **40/40**. No
+migration landed on `main` meanwhile, so versions 338/339 and the freeze are intact. New to
+production: `V300000338` (drop `bundle_bytes` after the completeness check) and `V300000339` (tip
+placeholder).
+
+**The integration checkout's local `main` was deliberately not touched:** it holds the owner's own
+unpushed commit `aa8154b272` "Queue fast isolated worktree setup" (backlog + new SEED-039) and was one
+commit behind `origin/main`. Pushing through local `main` would have published that commit without the
+owner deciding to, so the merge was built with `git commit-tree` and pushed straight to
+`refs/heads/main`. The owner needs to pull before pushing `aa8154b272`.
+
+Steps handed to the owner:
+1. **Keep both servers** - do not resize to one. If `V300000338`'s completeness check fails, that
+   server stops and restarts in a loop (slice 10's traced behavior) while the other, already
+   column-independent server keeps serving; the deploy fails loudly and nothing is lost. With one
+   server the same failure would be an outage.
+2. Create the release from `origin/main` (`af8fe4e033` or later) as usual.
+3. Gate C check on production:
+   `SELECT installed_rank, version, description, type, success, installed_on FROM flyway_schema_history WHERE version IN ('300000338','300000339') ORDER BY installed_rank;`
+   and `SELECT MAX(CAST(version AS UNSIGNED)) FROM flyway_schema_history;` - expect 300000338 then
+   300000339, both `success = 1`, and a maximum of 300000339.
+4. If the deploy fails instead: the failing server's log names each incomplete binding and object;
+   reset those notebooks' history through the still-serving server, and the new server then comes up
+   by itself.
+
+**Resume point after the owner reports the release:** slice 12 (squash the spent upgrade chain into
+the baseline per the `db-migration` procedure, which ends the migration freeze) and slice 14 (final
+cleanup), then story wrap-up.
+
 ## Release handoff 1 - DONE (2026-09-21)
 
 **Owner released `main` and reported both read-only production checks passing** on
