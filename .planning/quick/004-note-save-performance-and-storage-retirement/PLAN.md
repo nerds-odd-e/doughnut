@@ -219,7 +219,7 @@ not merged; sharing would make a standalone `scripts/*.mjs` import Cypress-bundl
 TypeScript. Revisit only if slice 13 needs the same content on both sides.
 
 ### 2. Observe complete ordinary saves
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 
 Prepare a temporary browser measurement feature using existing note-edit page
 objects for slice 3, including the seeding path that imports slice 1's
@@ -241,6 +241,75 @@ timeout, not intrinsic seeding cost. Do not assume either bound; measure it.
 Raise `taskTimeout`/`defaultCommandTimeout` as that doc describes if needed.
 Size: ~5 minutes for the harness plus measured pilot runtime; split the seeding
 path from the measurement instrumentation if it exceeds ten.
+
+**Delivered.** Temporary machinery, all of it listed in the feature header for
+slice 14 to delete: `note_save_measurement.feature` (feature-level `@wip`),
+`e2e_test/step_definitions/note_save_measurement.ts`,
+`e2e_test/start/pageObjects/noteSaveMeasurement.ts`,
+`e2e_test/config/noteSaveMeasurement.ts`, a 3-line task registration in
+`e2e_test/config/common.ts` and a 3-line allowlist entry in
+`scripts/isolated-cypress-active-specs.mjs`. No product code changed. The
+payload directory is selected with `NOTE_SAVE_FIXTURE_DIR`.
+
+CI safety (coordinator-verified): `scripts/check_wip_tags.sh` passes at 1 `@wip`
+scenario against a limit of 5, and the cucumber preprocessor is configured
+`filterSpecs: true` + `omitFiltered: true`, so the spec is dropped from CI runs
+entirely rather than producing an empty spec. Preserve the feature-level `@wip`
+tag and do not add scenarios to this file.
+
+**Seeding is not a bottleneck — the plan's 62-minute worry is refuted.** Measured
+wall-clock on this machine, current code, isolated worktree stack:
+
+| notes / folders | injectNotes | accepted-baseline snapshot | total seeding | whole spec |
+| --- | ---: | ---: | ---: | ---: |
+| 200 / 5 | 831 ms | 57 ms | 888 ms | 9 s |
+| 2,000 / 20 | 4,098 ms | 318 ms | 4,416 ms | 13 s |
+| 11,000 / 40 | 19,147 ms | 1,474 ms | 20,621 ms | 35 s |
+
+`injectNotes` sends every note in one REST call and scales sublinearly here
+(10x notes for 4.9x time); the accepted-baseline snapshot of 11,041 files costs
+1.5 s. **One full-scale pass of M is 35 s.** Slice 3's two sides with warm-up
+and a repeated sample are therefore a few minutes of runtime each, plus each
+side's install/build.
+
+Single-run save timings, milliseconds (not medians; sampling belongs to slice 3):
+
+| scale | edit | keystroke->request | request | keystroke->settled |
+| --- | --- | ---: | ---: | ---: |
+| 200 | existing links | 1,020 / 1,008 | 122 / 92 | 1,170 / 1,112 |
+| 200 | added link | 9 | 90 | 112 |
+| 2,000 | existing links | 1,019 / 1,016 | 385 / 358 | 1,425 / 1,392 |
+| 2,000 | added link | 4 | 345 | 364 |
+| 11,000 | existing links | 1,028 / 1,007 | 1,814 / 1,767 | 2,867 / 2,797 |
+| 11,000 | added link | 14 | 1,734 | 1,770 |
+
+The one-second debounce appears in `keystroke->request` and never inside
+`request`, as the plan requires. An added wiki link bypasses the debounce
+through the product's existing `TextContentWrapper.shouldFlushImmediately` ->
+`hasNewWikiLinkTexts` path, which is why its `keystroke->request` is a few
+milliseconds; that is existing product behavior, not measurement machinery.
+
+**Signal for slice 3's learning gate, not a conclusion:** current request time at
+11k is about 1.77 s for both edit kinds, against the plan's recorded historical
+medians of 795/785 ms. Those historical numbers came from a different,
+unrecoverable fixture, so they are not a like-for-like comparison. Nothing about
+a regression or an improvement may be claimed until slice 3 measures **both**
+sides on this same fixture.
+
+**Known gap carried into slice 3:** the harness seeds the fixture's final state
+and re-snapshots, so accepted history is one commit deep; it does not replay the
+fixture's five `revisions`. Both sides seed identically, so the comparison stays
+fair, but real history depth is not exercised. If depth matters, the cheap route
+is replaying the revision edits through the same web save path (about 40 saves at
+default parameters); that is not built.
+
+Sizing learning: this slice ran roughly 25 active minutes against a ~5 minute
+budget — the second consecutive overrun. Slice 1's cause was a plan defect;
+this one was reading the e2e isolation/allowlist machinery plus two real harness
+defects (measuring the last keystroke after `.type()` returns is wrong for the
+immediate-flush edit, and after `cy.reload()` the busy-waiter alone can win the
+race before the note page renders). Both are fixed. Treat the 5-minute target
+for slices 4-7 as optimistic and prefer finer leaves there.
 
 ### 3. Report the no-attachment save comparison
 Type: Behavior. Status: planned.

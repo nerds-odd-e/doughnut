@@ -26,6 +26,8 @@ import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
 import { E2E_APP_BASE_URL } from './constants'
 import { readZipEntries } from './readZipEntries'
 import { notebookPublicationProfileTasks } from './notebookPublicationProfile'
+// TEMPORARY (SEED-034#story-4, slices 2-3): removed with the measurement feature in slice 14.
+import { noteSaveMeasurementTasks } from './noteSaveMeasurement'
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -116,6 +118,7 @@ const commonConfig = {
       on('task', {
         ...worktreeResetIsolationCypressTasks(),
         ...notebookPublicationProfileTasks(repoRoot, on),
+        ...noteSaveMeasurementTasks(),
         ...mcpIsolationCypressTasks(),
         mcpClientConnectionInfo() {
           return mcpClient.connectionInfo()
