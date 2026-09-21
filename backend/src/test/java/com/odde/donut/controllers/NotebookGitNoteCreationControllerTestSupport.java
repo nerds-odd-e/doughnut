@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.is;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
+import java.sql.Timestamp;
 
 abstract class NotebookGitNoteCreationControllerTestSupport
     extends NotebookGitBundleControllerTestBase {
@@ -21,10 +23,20 @@ abstract class NotebookGitNoteCreationControllerTestSupport
     return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
   }
 
-  void assertBindingUnchanged(Notebook notebook, NotebookGitBinding before) {
-    NotebookGitBinding after = binding(notebook);
-    assertThat(after.getAcceptedGitObjectId(), is(before.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(before.getBundleBytes()));
-    assertThat(after.getUpdatedAt(), is(before.getUpdatedAt()));
+  /** The notebook's accepted state as its own boundaries currently report it. */
+  AcceptedBinding acceptedBinding(Notebook notebook) throws Exception {
+    NotebookGitBinding binding = binding(notebook);
+    return new AcceptedBinding(
+        binding.getAcceptedGitObjectId(), binding.getUpdatedAt(), acceptedHistory(notebook));
   }
+
+  void assertBindingUnchanged(Notebook notebook, AcceptedBinding before) throws Exception {
+    NotebookGitBinding after = binding(notebook);
+    assertThat(after.getAcceptedGitObjectId(), is(before.acceptedHead()));
+    assertThat(after.getUpdatedAt(), is(before.updatedAt()));
+    assertThat(acceptedHistory(notebook), equalTo(before.acceptedHistory()));
+  }
+
+  record AcceptedBinding(
+      String acceptedHead, Timestamp updatedAt, AcceptedHistory acceptedHistory) {}
 }

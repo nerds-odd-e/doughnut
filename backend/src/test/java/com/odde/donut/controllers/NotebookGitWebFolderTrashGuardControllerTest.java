@@ -12,6 +12,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,28 +25,30 @@ class NotebookGitWebFolderTrashGuardControllerTest extends NotebookGitWebContent
   @Test
   void unauthorizedTrashLeavesFolderAndAcceptedBindingUnchanged() throws Exception {
     GuardFixture f = seedBiologyUnderResearch();
-    CommittedFolderAndBinding setup =
-        committedFolderAndBinding(f.biology().getId(), f.notebook().getId());
-    User otherUser = createFixtureUser();
-    currentUser.setUser(otherUser);
+    CommittedFolderAndBinding setup = committedFolderAndBinding(f.biology().getId(), f.notebook());
+    User owner = currentUser.getUser();
+    currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> folderController.trashFolder(f.notebook(), f.biology()));
 
+    // The download boundary serving the accepted history is authorization-checked, so the owner
+    // has to be back before the unchanged-history post-condition can be observed.
+    currentUser.setUser(owner);
     CommittedFolderAndBinding committed =
-        committedFolderAndBinding(f.biology().getId(), f.notebook().getId());
+        committedFolderAndBinding(f.biology().getId(), f.notebook());
     assertThat(committed.parentFolderId(), equalTo(f.research().getId()));
     assertThat(committed.trashed(), is(false));
     assertThat(committed.acceptedHead(), equalTo(setup.acceptedHead()));
-    assertThat(committed.acceptedBundle(), equalTo(setup.acceptedBundle()));
+    assertThat(committed.acceptedHistory(), equalTo(setup.acceptedHistory()));
   }
 
   @Test
   void preExistingPortableDriftKeepsTheFolderTrashAndAcceptedHistoryUnchanged() throws Exception {
     GuardFixture f = seedBiologyUnderResearch();
     ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
-    byte[] acceptedBundle = binding(f.notebook()).getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(f.notebook());
     makeMe.aNote().notebook(f.notebook()).title("Unsynchronized").content(CELLS_BODY).please();
 
     folderController.trashFolder(f.notebook(), f.biology());
@@ -54,7 +57,7 @@ class NotebookGitWebFolderTrashGuardControllerTest extends NotebookGitWebContent
         parentFolderName(parentFolderId(parentFolderId(f.biology().getId()))), equalTo("_trash"));
     assertThat(
         ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId()), equalTo(acceptedA));
-    assertThat(binding(f.notebook()).getBundleBytes(), equalTo(acceptedBundle));
+    assertThat(acceptedHistory(f.notebook()), equalTo(acceptedHistoryBefore));
   }
 
   GuardFixture seedBiologyUnderResearch() throws UnexpectedNoAccessRightException {
@@ -80,23 +83,28 @@ class NotebookGitWebFolderTrashGuardControllerTest extends NotebookGitWebContent
         transactionManager, () -> folderRepository.findById(folderId).orElseThrow().getName());
   }
 
-  CommittedFolderAndBinding committedFolderAndBinding(Integer folderId, Integer notebookId) {
+  CommittedFolderAndBinding committedFolderAndBinding(Integer folderId, Notebook notebook)
+      throws Exception {
+    AcceptedHistory acceptedHistory = acceptedHistory(notebook);
     return inCommittedTransaction(
         transactionManager,
         () -> {
           Folder folder = folderRepository.findById(folderId).orElseThrow();
           NotebookGitBinding binding =
-              notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow();
+              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           return new CommittedFolderAndBinding(
               folder.getParentFolder() == null ? null : folder.getParentFolder().getId(),
               folder.isTrashed(),
               binding.getAcceptedGitObjectId(),
-              binding.getBundleBytes().clone());
+              acceptedHistory);
         });
   }
 
   record GuardFixture(Notebook notebook, Folder research, Folder biology) {}
 
   record CommittedFolderAndBinding(
-      Integer parentFolderId, boolean trashed, String acceptedHead, byte[] acceptedBundle) {}
+      Integer parentFolderId,
+      boolean trashed,
+      String acceptedHead,
+      AcceptedHistory acceptedHistory) {}
 }

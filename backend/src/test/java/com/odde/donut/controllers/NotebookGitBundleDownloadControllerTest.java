@@ -11,6 +11,7 @@ import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.concurrent.Callable;
@@ -83,19 +84,21 @@ class NotebookGitBundleDownloadControllerTest extends NotebookGitWebContentContr
     makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
+    User owner = currentUser.getUser();
     currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.downloadNotebookGitBundle(notebook));
 
+    currentUser.setUser(owner);
     NotebookGitBinding after =
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
     assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHead));
-    assertThat(after.getBundleBytes(), equalTo(acceptedBundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   @Test

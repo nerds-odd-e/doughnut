@@ -64,11 +64,11 @@ class NotebookGitJdbcObjectStoreTest {
       commit1 = fixture.exactRef("refs/heads/main").getObjectId();
       commit2 =
           NotebookGitBundleBuilder.append(
-              fixture, commit1, v1, v2, "Donut", "system@donut.local", "Edit", time.plusSeconds(1));
+              fixture, commit1, v2, "Donut", "system@donut.local", "Edit", time.plusSeconds(1));
       commit3 =
           NotebookGitBundleBuilder.append(
-              fixture, commit2, v2, v3, "Donut", "system@donut.local", "Add", time.plusSeconds(2));
-      fixtureBundleBytes = NotebookGitBundleWriter.write(fixture).bundleBytes();
+              fixture, commit2, v3, "Donut", "system@donut.local", "Add", time.plusSeconds(2));
+      fixtureBundleBytes = NotebookGitBundleWriter.write(fixture);
     }
 
     int bindingId = jdbcFixture.insertBinding(commit3.name());
@@ -83,7 +83,7 @@ class NotebookGitJdbcObjectStoreTest {
             new JdbcNotebookGitRepository(bindingId, importConnection)) {
       assertThat(imported.mainHead(), equalTo(commit3));
       try (ObjectInserter inserter = store.newObjectInserter()) {
-        GitBundleTestReader.copyAllReachableObjects(
+        NotebookGitReachableObjectCopier.copyAllReachableObjects(
             imported.repository(), imported.mainHead(), inserter);
         inserter.flush();
       }
@@ -113,7 +113,6 @@ class NotebookGitJdbcObjectStoreTest {
           NotebookGitBundleBuilder.append(
               reopened,
               commit3,
-              v3,
               v4,
               "Donut",
               "system@donut.local",
@@ -129,7 +128,7 @@ class NotebookGitJdbcObjectStoreTest {
               new JdbcNotebookGitRepository(bindingId, exportConnection)) {
         assertThat(reopenedAgain.exactRef("refs/heads/main").getObjectId(), equalTo(commit4));
 
-        byte[] exportedBundleBytes = NotebookGitBundleWriter.write(reopenedAgain).bundleBytes();
+        byte[] exportedBundleBytes = NotebookGitBundleWriter.write(reopenedAgain);
         try (InMemoryRepository scratch = new InMemoryRepository(new DfsRepositoryDescription())) {
           ObjectId fetchedHead = GitBundleTestReader.fetchHead(scratch, exportedBundleBytes);
           assertThat(fetchedHead, equalTo(commit4));
@@ -170,7 +169,6 @@ class NotebookGitJdbcObjectStoreTest {
             NotebookGitBundleBuilder.append(
                 txRepo,
                 commit1,
-                v1,
                 v2,
                 "Donut",
                 "system@donut.local",
@@ -235,7 +233,6 @@ class NotebookGitJdbcObjectStoreTest {
             NotebookGitBundleBuilder.append(
                 repo,
                 baseHead,
-                baseEntries,
                 changedEntries,
                 "Donut",
                 "system@donut.local",

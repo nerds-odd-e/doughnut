@@ -51,12 +51,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
     ObjectId acceptedB = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId downloadedHead =
-          GitBundleTestReader.fetchHead(
-              repo,
-              controller
-                  .downloadNotebookGitBundle(
-                      notebookRepository.findById(f.notebook().getId()).orElseThrow())
-                  .getBody());
+          GitBundleTestReader.fetchHead(repo, acceptedBundleBytes(f.notebook()));
       assertThat(downloadedHead, equalTo(acceptedB));
       try (RevWalk revWalk = new RevWalk(repo)) {
         RevCommit commitB = revWalk.parseCommit(downloadedHead);
@@ -74,12 +69,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
 
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId downloadedHead =
-          GitBundleTestReader.fetchHead(
-              repo,
-              controller
-                  .downloadNotebookGitBundle(
-                      notebookRepository.findById(f.notebook().getId()).orElseThrow())
-                  .getBody());
+          GitBundleTestReader.fetchHead(repo, acceptedBundleBytes(f.notebook()));
       assertThat(
           GitBundleTestReader.pathsIn(repo, downloadedHead),
           containsInAnyOrder(
@@ -104,7 +94,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
   void noOpRenameLeavesFolderAndAcceptedHistoryUnchanged(String requestedName) throws Exception {
     CompleteRenameFixture f = seedCompleteBiologySubtreeWithReferrer();
     ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
-    byte[] acceptedBundleA = binding(f.notebook()).getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(f.notebook());
 
     Folder result =
         folderController.renameFolder(f.notebook(), f.biology(), renameTo(requestedName));
@@ -112,7 +102,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
     assertThat(result.getName(), equalTo("Biology"));
     assertThat(
         ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId()), equalTo(acceptedA));
-    assertThat(binding(f.notebook()).getBundleBytes(), equalTo(acceptedBundleA));
+    assertThat(acceptedHistory(f.notebook()), equalTo(acceptedHistoryBefore));
   }
 
   @Test
@@ -144,13 +134,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
 
     ObjectId editHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId downloadedHead =
-          GitBundleTestReader.fetchHead(
-              repo,
-              controller
-                  .downloadNotebookGitBundle(
-                      notebookRepository.findById(notebook.getId()).orElseThrow())
-                  .getBody());
+      ObjectId downloadedHead = GitBundleTestReader.fetchHead(repo, acceptedBundleBytes(notebook));
       assertThat(downloadedHead, equalTo(editHead));
       try (RevWalk revWalk = new RevWalk(repo)) {
         RevCommit editCommit = revWalk.parseCommit(downloadedHead);

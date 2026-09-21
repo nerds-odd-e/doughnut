@@ -42,7 +42,7 @@ class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleCon
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     var bindingUpdatedAt = binding.getUpdatedAt();
     long originalFolderCount =
@@ -66,8 +66,8 @@ class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleCon
           assertThat(reloadedBiology.isTrashed(), is(false));
           assertThat(reloadedCells.getFolder().getId(), equalTo(biology.getId()));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 }

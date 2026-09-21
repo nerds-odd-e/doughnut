@@ -46,6 +46,7 @@ class NotebookGitProposalFolderRelocationRetryControllerTest
     String publishedHead =
         controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
     PublicationState stateAfterPublication = publicationState(notebook, topics.getId());
+    var acceptedAfterPublication = acceptedHistory(notebook);
     assertThat(stateAfterPublication.sourceParentId(), equalTo(archive.getId()));
 
     String retriedHead =
@@ -56,7 +57,7 @@ class NotebookGitProposalFolderRelocationRetryControllerTest
     assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
     assertThat(
         stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
-    assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedAfterPublication));
     assertThat(stateAfterRetry.sourceParentId(), equalTo(stateAfterPublication.sourceParentId()));
     assertThat(stateAfterRetry.folderIds(), equalTo(stateAfterPublication.folderIds()));
     assertThat(stateAfterRetry.noteIds(), equalTo(stateAfterPublication.noteIds()));
@@ -72,7 +73,6 @@ class NotebookGitProposalFolderRelocationRetryControllerTest
           return new PublicationState(
               binding.getAcceptedGitObjectId(),
               binding.getUpdatedAt(),
-              binding.getBundleBytes().clone(),
               source.getParentFolderId(),
               folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
                   .map(Folder::getId)
@@ -86,7 +86,6 @@ class NotebookGitProposalFolderRelocationRetryControllerTest
   private record PublicationState(
       String acceptedHead,
       Timestamp bindingUpdatedAt,
-      byte[] bundleBytes,
       Integer sourceParentId,
       List<Integer> folderIds,
       List<Integer> noteIds) {}

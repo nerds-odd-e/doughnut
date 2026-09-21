@@ -47,7 +47,7 @@ class NotebookGitNoteCreationFolderControllerTest
     Note created = noteRepository.findById(result.getId()).orElseThrow();
     assertThat(created.getFolder().getId(), is(folder.getId()));
 
-    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId noteHead = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(GitBundleTestReader.pathsIn(repository, noteHead), contains("Biology/Cells.md"));
@@ -83,10 +83,7 @@ class NotebookGitNoteCreationFolderControllerTest
     assertThat(preservedAlpine.getReadmeContent(), nullValue());
     assertThat(preservedFieldNotes.getReadmeContent(), nullValue());
 
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId newHead = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(
@@ -118,10 +115,7 @@ class NotebookGitNoteCreationFolderControllerTest
     Folder preserved = folderRepository.findById(box.getId()).orElseThrow();
     assertThat(preserved.getReadmeContent(), is("Box notes"));
 
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId newHead = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(
@@ -136,7 +130,7 @@ class NotebookGitNoteCreationFolderControllerTest
   @Test
   void driftedDestinationFolderKeepsWebCreationAndAcceptedHeadUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding accepted = binding(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
     Folder unsynchronized = makeMe.aFolder().notebook(notebook).name("Unsynchronized").please();
     NoteCreationDTO creation = titleOnly("Inside Drifted Folder");
     creation.setFolderId(unsynchronized.getId());
@@ -151,7 +145,7 @@ class NotebookGitNoteCreationFolderControllerTest
   @Test
   void absentDestinationFolderIsRefusedBeforeAnyAcceptedChange() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding accepted = binding(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
     NoteCreationDTO creation = titleOnly("Nowhere");
     creation.setFolderId(-1);
 
@@ -166,7 +160,7 @@ class NotebookGitNoteCreationFolderControllerTest
     Notebook notebook = createGitBackedNotebook();
     Notebook otherNotebook = createGitBackedNotebook("Other Git Backed Notebook");
     Folder foreignFolder = makeMe.aFolder().notebook(otherNotebook).name("Foreign").please();
-    NotebookGitBinding accepted = binding(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
     NoteCreationDTO creation = titleOnly("Wrong Notebook");
     creation.setFolderId(foreignFolder.getId());
 

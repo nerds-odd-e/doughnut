@@ -4,10 +4,8 @@ import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommi
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -23,7 +21,6 @@ import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Arrays;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -69,7 +66,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
         makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
     String acceptedHead = accepted.getAcceptedGitObjectId();
-    byte[] acceptedBundle = accepted.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     testabilitySettings.timeTravelTo(editedAt);
 
     textContentController.updateNoteContent(
@@ -80,7 +77,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     assertThat(reloaded.getContent(), is(ACCEPTED_CONTENT));
     assertThat(reloaded.getUpdatedAt(), is(editedAt));
     assertThat(after.getAcceptedGitObjectId(), is(acceptedHead));
-    assertThat(after.getBundleBytes(), equalTo(acceptedBundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   @Test
@@ -106,40 +103,6 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     // the accepted head - the durable identity of "the revision created by the changed save" - must
     // stay exactly what it was; no second commit is appended.
     assertThat(after.getAcceptedGitObjectId(), is(changedHead));
-  }
-
-  @Test
-  void firstSaveConvertsALegacyBindingAndASecondSaveNeitherLoadsNorRewritesTheLegacyBundle()
-      throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Note note =
-        makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
-    NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
-    // Simulate a legacy binding created before native storage existed: bundle bytes are present,
-    // but the native object store has never been touched for this binding.
-    clearNativeObjectStoreRows(accepted.getId());
-    assertThat(countNativeObjectStoreRows(accepted.getId()), is(0L));
-
-    textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
-
-    NotebookGitBinding afterFirstSave = binding(notebook);
-    // The first ordinary changed save converted the legacy binding: every object its new accepted
-    // head reaches (the imported legacy history plus the new commit) is now a durable native row.
-    assertThat(countNativeObjectStoreRows(afterFirstSave.getId()), greaterThan(0L));
-    byte[] bundleBytesAfterFirstSave = afterFirstSave.getBundleBytes();
-
-    textContentController.updateNoteContent(
-        note, contentDto("---\ntype: Note\n---\nsecond web edit"));
-
-    NotebookGitBinding afterSecondSave = binding(notebook);
-    assertThat(
-        afterSecondSave.getAcceptedGitObjectId(), not(afterFirstSave.getAcceptedGitObjectId()));
-    // A binding already converted to native storage never touches bundle_bytes again: the second
-    // save's legacy payload is byte-for-byte the exact same stale snapshot the first save left it
-    // as
-    // - neither loaded (it would have failed loudly per corruptStoredAcceptedBundleFailsLoudly...)
-    // nor rewritten.
-    assertThat(afterSecondSave.getBundleBytes(), equalTo(bundleBytesAfterFirstSave));
   }
 
   @Test
@@ -175,10 +138,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
         noteController.getNoteInfo(reloaded).getMemoryTrackers().getFirst().getDifficulty(),
         is(7f));
 
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId editedHead = GitBundleTestReader.fetchHead(repository, downloaded);
       try (RevWalk revWalk = new RevWalk(repository)) {
@@ -211,6 +171,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     Note note =
         makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     makeMe.aNote().notebook(notebook).title("Unsynchronized").content(ACCEPTED_CONTENT).please();
 
     textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
@@ -219,7 +180,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getContent(), is(EDITED_CONTENT));
     assertThat(after.getAcceptedGitObjectId(), is(accepted.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(accepted.getBundleBytes()));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   @Test
@@ -243,6 +204,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     Note note =
         makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     User owner = currentUser.getUser();
 
     currentUser.setUser(createFixtureUser());
@@ -258,24 +220,19 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
 
     NotebookGitBinding after = binding(notebook);
     assertThat(after.getAcceptedGitObjectId(), is(accepted.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(accepted.getBundleBytes()));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getContent(), is(ACCEPTED_CONTENT));
   }
 
   @Test
-  void corruptStoredAcceptedBundleFailsLoudlyWithoutSavingTheNote() throws Exception {
+  void unreadableAcceptedHistoryFailsLoudlyWithoutSavingTheNote() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note note =
         makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
-    byte[] corruptBundle = Arrays.copyOf(accepted.getBundleBytes(), 12);
-    accepted.setBundleBytes(corruptBundle);
-    notebookGitBindingRepository.save(accepted);
-    // Reset already populated the native object store directly, so it would otherwise never look
-    // at this corrupted legacy payload; clear its rows to simulate a not-yet-touched legacy
-    // binding, whose first open() genuinely must import from (here, corrupt) bundle bytes.
-    clearNativeObjectStoreRows(accepted.getId());
+    String acceptedHead = accepted.getAcceptedGitObjectId();
+    deleteNativeObjectStoreRow(accepted.getId(), acceptedHead);
 
     RuntimeException failure =
         assertThrows(
@@ -285,6 +242,6 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     assertThat(failure instanceof ResponseStatusException, is(false));
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getContent(), is(ACCEPTED_CONTENT));
-    assertThat(binding(notebook).getBundleBytes(), equalTo(corruptBundle));
+    assertThat(binding(notebook).getAcceptedGitObjectId(), is(acceptedHead));
   }
 }

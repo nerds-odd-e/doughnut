@@ -10,28 +10,27 @@ import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.Op
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
+import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AcceptedWebChangeService {
-  private final NotebookGitProjection projection;
   private final NotebookGitBindingRepository bindingRepository;
   private final NotebookLivePortableTree livePortableTree;
   private final EntityPersister entityPersister;
   private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
   public AcceptedWebChangeService(
-      NotebookGitProjection projection,
       NotebookGitBindingRepository bindingRepository,
       NotebookLivePortableTree livePortableTree,
       EntityPersister entityPersister,
       NotebookGitAcceptedRepositoryStore repositoryStore) {
-    this.projection = projection;
     this.bindingRepository = bindingRepository;
     this.livePortableTree = livePortableTree;
     this.entityPersister = entityPersister;
@@ -84,30 +83,29 @@ public class AcceptedWebChangeService {
   private record OpenedNotebook(
       NotebookGitBinding binding,
       OpenedAcceptedRepository accepted,
-      List<PortableTreeEntry> acceptedEntries,
+      Map<String, ObjectId> acceptedBlobIds,
       boolean matchedBefore) {}
 
   private OpenedNotebook open(NotebookGitBinding binding) {
     OpenedAcceptedRepository accepted = repositoryStore.open(binding);
-    List<PortableTreeEntry> acceptedEntries =
-        NotebookGitAcceptedTree.readEntries(accepted.repository(), accepted.head());
+    Map<String, ObjectId> acceptedBlobIds =
+        NotebookGitAcceptedTree.blobIds(accepted.repository(), accepted.head());
     return new OpenedNotebook(
         binding,
         accepted,
-        acceptedEntries,
-        projection.matchesAcceptedTree(snapshot(binding), acceptedEntries));
+        acceptedBlobIds,
+        NotebookGitAcceptedTree.blobIds(snapshot(binding)).equals(acceptedBlobIds));
   }
 
   private void commitIfChanged(OpenedNotebook notebook, String message, Timestamp updatedAt) {
     List<PortableTreeEntry> entries = snapshot(notebook.binding());
-    if (projection.matchesAcceptedTree(entries, notebook.acceptedEntries())) {
+    if (NotebookGitAcceptedTree.blobIds(entries).equals(notebook.acceptedBlobIds())) {
       return;
     }
     OpenedAcceptedRepository accepted = notebook.accepted();
     NotebookGitBundleBuilder.append(
         accepted.repository(),
         accepted.head(),
-        notebook.acceptedEntries(),
         entries,
         NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
         NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,

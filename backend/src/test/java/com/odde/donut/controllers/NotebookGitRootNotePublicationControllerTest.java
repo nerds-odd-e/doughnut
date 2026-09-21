@@ -12,6 +12,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -134,11 +135,12 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
     assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
     assertThat(
         stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
-    assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
+    assertThat(stateAfterRetry.acceptedHistory(), equalTo(stateAfterPublication.acceptedHistory()));
     assertThat(stateAfterRetry.notes(), equalTo(stateAfterPublication.notes()));
   }
 
-  private PublicationState publicationState(Notebook notebook) {
+  private PublicationState publicationState(Notebook notebook) throws Exception {
+    AcceptedHistory acceptedHistory = acceptedHistory(notebook);
     return inCommittedTransaction(
         transactionManager,
         () -> {
@@ -148,7 +150,7 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
           return new PublicationState(
               binding.getAcceptedGitObjectId(),
               binding.getUpdatedAt(),
-              binding.getBundleBytes().clone(),
+              acceptedHistory,
               notes.stream()
                   .map(
                       note ->
@@ -165,7 +167,7 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
   private record PublicationState(
       String acceptedHead,
       Timestamp bindingUpdatedAt,
-      byte[] bundleBytes,
+      AcceptedHistory acceptedHistory,
       List<PublishedNoteState> notes) {}
 
   private record PublishedNoteState(

@@ -63,7 +63,7 @@ class NotebookGitProposalFolderRelocationRollbackControllerTest
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     byte[] proposal =
@@ -101,9 +101,9 @@ class NotebookGitProposalFolderRelocationRollbackControllerTest
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedBefore));
   }
 
   @Test
@@ -130,7 +130,7 @@ class NotebookGitProposalFolderRelocationRollbackControllerTest
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     Boolean trackerRemovedFromTracking = tracker.getRemovedFromTracking();
@@ -174,8 +174,8 @@ class NotebookGitProposalFolderRelocationRollbackControllerTest
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedBefore));
   }
 }

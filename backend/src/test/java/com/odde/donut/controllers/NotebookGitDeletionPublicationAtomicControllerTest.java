@@ -91,7 +91,7 @@ class NotebookGitDeletionPublicationAtomicControllerTest
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     Timestamp retainedUpdatedAt =
@@ -151,8 +151,8 @@ class NotebookGitDeletionPublicationAtomicControllerTest
           assertThat(dependentCounts(deletedA), equalTo(deletedADependentsBefore));
           assertThat(dependentCounts(deletedB), equalTo(deletedBDependentsBefore));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 }

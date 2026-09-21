@@ -66,7 +66,8 @@ class NotebookGitWebContentHistoryPathsAndPersistenceControllerTest
             () ->
                 notebookGitBindingRepository.findByNotebook_Id(fixture.notebookId()).orElseThrow());
     String head = before.getAcceptedGitObjectId();
-    byte[] bundle = before.getBundleBytes();
+    Notebook notebook = notebookRepository.findById(fixture.notebookId()).orElseThrow();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     User owner = currentUser.getUser();
 
     currentUser.setUser(createFixtureUser());
@@ -90,7 +91,7 @@ class NotebookGitWebContentHistoryPathsAndPersistenceControllerTest
             () ->
                 notebookGitBindingRepository.findByNotebook_Id(fixture.notebookId()).orElseThrow());
     assertThat(after.getAcceptedGitObjectId(), equalTo(head));
-    assertThat(after.getBundleBytes(), equalTo(bundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
     assertThat(
         noteRepository.findById(fixture.noteId()).orElseThrow().getContent(),
         is(content("eligible")));

@@ -98,7 +98,7 @@ class NotebookGitComposedDeletionAdditionControllerTest
     ObjectId tip;
     byte[] proposalBytes;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterDeleteAndEdit =
           commitOnTopOf(
               repository,

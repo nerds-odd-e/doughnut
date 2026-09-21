@@ -115,8 +115,6 @@ class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitBundle
    */
   private NotebookGitBinding seedAcceptedBindingWithFileMode(
       Notebook notebook, String path, String content, FileMode mode) throws Exception {
-    NotebookGitBinding binding =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId commitId =
           commitOnTopOf(
@@ -124,11 +122,7 @@ class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitBundle
               List.of(),
               List.of(new NotebookGitProposalFile(path, content, mode)),
               "Seed content");
-      binding.setAcceptedGitObjectId(commitId.getName());
-      binding.setBundleBytes(bundleBytesForHead(repository, commitId));
+      return seedAcceptedHistory(notebook, repository, commitId);
     }
-    NotebookGitBinding saved = notebookGitBindingRepository.save(binding);
-    clearNativeObjectStoreRows(saved.getId());
-    return saved;
   }
 }

@@ -9,17 +9,13 @@ import java.util.List;
 import java.util.Set;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
-import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectInserter;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.ObjectWalk;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevObject;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.FetchConnection;
 import org.eclipse.jgit.transport.TransportBundleStream;
@@ -115,6 +111,30 @@ public final class GitBundleTestReader {
   }
 
   /**
+   * The accepted history a bundle carries: every commit reachable from {@code refs/heads/main},
+   * oldest last, plus the exact Portable content at the tip. Two snapshots are equal exactly when
+   * the accepted history is unchanged. Serialized bundle bytes cannot answer that question: two
+   * downloads of one unchanged history are re-serialized independently and need not be identical
+   * byte for byte.
+   */
+  public static AcceptedHistory fetchAcceptedHistory(byte[] bundleBytes)
+      throws IOException, URISyntaxException {
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk revWalk = new RevWalk(repository)) {
+      RevCommit tip = revWalk.parseCommit(fetchHead(repository, bundleBytes));
+      List<PortableTreeEntry> tipContent = readTreeEntries(repository, tip);
+      revWalk.markStart(tip);
+      List<String> commits = new ArrayList<>();
+      for (RevCommit commit : revWalk) {
+        commits.add(commit.name());
+      }
+      return new AcceptedHistory(commits, tipContent);
+    }
+  }
+
+  public record AcceptedHistory(List<String> commits, List<PortableTreeEntry> tipContent) {}
+
+  /**
    * The bundle's advertised {@code HEAD} object id, or {@code null} if the bundle never included
    * one. A system {@code git clone} of a bundle without this uses the cloning machine's own {@code
    * init.defaultBranch} to name the checked-out branch instead of {@code main}, so every bundle
@@ -132,32 +152,5 @@ public final class GitBundleTestReader {
       Ref headRef = fetchConnection.getRef(Constants.HEAD);
       return headRef == null ? null : headRef.getObjectId();
     }
-  }
-
-  /**
-   * Walks every object reachable from {@code head} in {@code source} (commits, trees, blobs, and
-   * any tags in between) and inserts each one into {@code target}, so a test can seed a fresh store
-   * from a fixture repository without going through a parsed pack stream.
-   */
-  public static void copyAllReachableObjects(
-      Repository source, AnyObjectId head, ObjectInserter target) throws IOException {
-    try (ObjectWalk walk = new ObjectWalk(source)) {
-      RevCommit start = walk.parseCommit(head);
-      walk.markStart(start);
-      RevCommit commit;
-      while ((commit = walk.next()) != null) {
-        copyOne(source, target, commit);
-      }
-      RevObject object;
-      while ((object = walk.nextObject()) != null) {
-        copyOne(source, target, object);
-      }
-    }
-  }
-
-  private static void copyOne(Repository source, ObjectInserter target, AnyObjectId id)
-      throws IOException {
-    ObjectLoader loader = source.open(id);
-    target.insert(loader.getType(), loader.getBytes());
   }
 }

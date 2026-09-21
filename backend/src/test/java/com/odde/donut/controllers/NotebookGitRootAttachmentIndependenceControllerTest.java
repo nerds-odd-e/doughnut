@@ -15,7 +15,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.ArrayList;
@@ -65,7 +64,7 @@ class NotebookGitRootAttachmentIndependenceControllerTest
     // that column is no longer kept in sync with the accepted head.
     List<PortableTreeEntry> relocated =
         movePath(
-            GitBundleTestReader.fetchTipTreeEntries(downloadedBundleBytes(fixture.notebook())),
+            GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(fixture.notebook())),
             "Biology/Cells.md",
             "Study/Cells.md");
 
@@ -148,7 +147,7 @@ class NotebookGitRootAttachmentIndependenceControllerTest
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
 
     List<PortableTreeEntry> withRootFiles =
-        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(markdownOnly.getBundleBytes()));
+        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(notebook)));
     withRootFiles.addAll(ROOT_FILES);
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -169,7 +168,7 @@ class NotebookGitRootAttachmentIndependenceControllerTest
         RevWalk revWalk = new RevWalk(repository)) {
       RevCommit head =
           revWalk.parseCommit(
-              GitBundleTestReader.fetchHead(repository, downloadedBundleBytes(notebook)));
+              GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook)));
       assertThat(head.getParent(0).getId(), equalTo(parentHead));
       assertThat(
           filesAmong(GitBundleTestReader.readTreeEntries(repository, head)), equalTo(ROOT_FILES));
@@ -194,12 +193,6 @@ class NotebookGitRootAttachmentIndependenceControllerTest
 
   private ObjectId acceptedHead(Notebook notebook) {
     return ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
-  }
-
-  private byte[] downloadedBundleBytes(Notebook notebook) throws UnexpectedNoAccessRightException {
-    return controller
-        .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-        .getBody();
   }
 
   private List<PortableTreeEntry> committedRootAttachments(Notebook notebook) {

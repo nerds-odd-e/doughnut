@@ -12,15 +12,13 @@ import org.eclipse.jgit.transport.BundleWriter;
 
 /**
  * Serializes a {@code refs/heads/main} repository built by {@link NotebookGitBundleBuilder} into
- * portable bundle bytes, alongside the head commit's Git object ID, for persistence.
+ * portable bundle bytes for transport (download and cloning).
  */
 public final class NotebookGitBundleWriter {
 
   private NotebookGitBundleWriter() {}
 
-  public record BundleWriteResult(String headObjectId, byte[] bundleBytes) {}
-
-  public static BundleWriteResult write(Repository repository) {
+  public static byte[] write(Repository repository) {
     try {
       Ref mainRef = repository.exactRef(Constants.R_HEADS + "main");
       ObjectId headObjectId = mainRef.getObjectId();
@@ -34,7 +32,7 @@ public final class NotebookGitBundleWriter {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       bundleWriter.writeBundle(NullProgressMonitor.INSTANCE, out);
 
-      return new BundleWriteResult(headObjectId.getName(), out.toByteArray());
+      return out.toByteArray();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

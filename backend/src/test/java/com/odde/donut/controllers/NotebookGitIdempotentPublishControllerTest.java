@@ -11,6 +11,7 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
@@ -40,7 +41,8 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     String expectedHead = binding.getAcceptedGitObjectId();
-    byte[] currentBundle = binding.getBundleBytes();
+    byte[] currentBundle = acceptedBundleBytes(notebook);
+    var acceptedBefore = acceptedHistory(notebook);
 
     String publishedHead =
         controller.publishNotebookGitProposal(notebook.getId(), expectedHead, currentBundle);
@@ -51,7 +53,7 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
     assertThat(after.getAcceptedGitObjectId(), equalTo(expectedHead));
-    assertThat(after.getBundleBytes(), equalTo(currentBundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedBefore));
   }
 
   @Test
@@ -60,19 +62,22 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
-    byte[] currentBundle = binding.getBundleBytes();
+    byte[] currentBundle = acceptedBundleBytes(notebook);
+    var acceptedBefore = acceptedHistory(notebook);
+    User owner = currentUser.getUser();
     currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.publishNotebookGitProposal(notebook.getId(), acceptedHead, currentBundle));
 
+    currentUser.setUser(owner);
     NotebookGitBinding after =
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
     assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHead));
-    assertThat(after.getBundleBytes(), equalTo(currentBundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedBefore));
   }
 
   @Test
@@ -112,7 +117,7 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     ObjectId tip;
     byte[] proposalBytes;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(repository, initialBinding.getBundleBytes());
+      GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       afterDeleteAndEdit =
           commitOnTopOf(
               repository,

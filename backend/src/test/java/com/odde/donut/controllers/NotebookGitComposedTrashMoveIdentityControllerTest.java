@@ -43,7 +43,7 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
         inCommittedTransaction(transactionManager, () -> dependentCounts(seed.cells()));
     ComposedTrashRange range =
         composeTrashThenFinal(
-            seed.binding().getBundleBytes(),
+            acceptedBundleBytes(seed.notebook()),
             seed.acceptedHead(),
             List.of(
                 new NotebookGitProposalFile("_trash/Biology/Cells.md", CELLS_BODY),
@@ -81,7 +81,7 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
     SeededCells seed = seedBiologyCellsWithLearning();
     ComposedTrashRange range =
         composeTrashThenFinal(
-            seed.binding().getBundleBytes(),
+            acceptedBundleBytes(seed.notebook()),
             seed.acceptedHead(),
             List.of(
                 new NotebookGitProposalFile("_trash/Biology/Cells.md", CELLS_BODY),

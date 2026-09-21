@@ -81,13 +81,14 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] acceptedBundle = acceptedBundleBytes(notebook);
     currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () ->
             controller.publishNotebookGitProposal(
-                notebook.getId(), binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
+                notebook.getId(), binding.getAcceptedGitObjectId(), acceptedBundle));
   }
 
   @Test
@@ -95,6 +96,7 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] acceptedBundle = acceptedBundleBytes(notebook);
     User subscriber = createFixtureUser();
     makeMe.aSubscription().forNotebook(notebook).forUser(subscriber).please();
     currentUser.setUser(subscriber);
@@ -103,6 +105,6 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
         UnexpectedNoAccessRightException.class,
         () ->
             controller.publishNotebookGitProposal(
-                notebook.getId(), binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
+                notebook.getId(), binding.getAcceptedGitObjectId(), acceptedBundle));
   }
 }
