@@ -4,53 +4,41 @@ status: dormant
 planted: 2026-09-21
 planted_during: owner request to prioritize cross-agent worktree setup acceleration
 trigger_when: now; first product-backlog priority
-scope: medium
+scope: small
 ---
 
 # SEED-039: Fast, isolated worktree setup across AI coding environments
 
 ## Why This Matters
 
-Developers using Codex, Cursor, and Claude Code encounter worktree startup and
-recovery friction. Retrospective findings demonstrate wrong-base recovery,
-worktree recreation, and missing generated skill paths; they do not establish
-dependency installation as the dominant cost or quantify a potential speedup.
-Current setup also differs between normal Nix entry, agent-mode entry, and
-package commands, which can repeat installation.
+The owner’s remaining concern is developer waiting time and AI token cost.
+The completed worktree setup remains available. The current root
+`frontend:test` script still invokes a frozen recursive install before Vitest,
+even after successful preparation; the agent map names this as the normal
+frontend testing entry point.
 
-The desired effect is predictable preparation on an already-provisioned machine:
-fresh worktrees become usable without manual copying or repair, repeated setup
-avoids unnecessary installation, and concurrent work remains independent. This
-improves development of Donut; its contribution to the near-future notebook
-workflow is indirect. The owner retains first priority as a bounded investment
-in the tools used to deliver that direction.
+This establishes repeated work, not its wall-clock cost or token savings.
+Keep only a small, observable reduction in this feedback loop. Do not justify
+a wider tooling project from the number of install-prefixed scripts.
 
 ## Alternatives and Decision
 
-Reuse host-native setup configuration and the existing repository/package-manager
-behavior before adding another setup authority. One documented command run in a
-fresh checkout is an acceptable supported entry point where automatic integration
-would require taking over worktree creation. Manual copying and repair are not.
-Keep all three tools in scope without requiring identical hook mechanisms.
-
-Use pnpm's existing shared package store and Gradle/Nix caches. Assess native pnpm
-dependency verification before extending the handwritten fingerprint. Do not
-copy or link another worktree's mutable dependency tree. pnpm's managed global
-virtual store is a different candidate, to consider only in one bounded experiment
-if measured fresh-layout cost warrants it; it is not a promised adoption.
-Do not replace Claude Code's worktree lifecycle merely to install dependencies.
+Reuse the existing dependency-readiness owner for this one command if it
+preserves dependency validation and removes meaningful repeated work.
+Leaving the command unchanged is preferable to a readiness redesign whose
+cost exceeds the demonstrated benefit. No performance percentage or token
+saving is promised without evidence.
 
 ## Architectural Constraints
 
-- [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
-  requires stable worktree identities and isolation of mutable application,
-  database, process, and port state. Shared infrastructure is acceptable only
-  when mutable state remains isolated.
-- Dependency and tool versions remain controlled by committed manifests and
-  lockfiles. A faster setup must not silently accept stale or mismatched
-  dependencies.
-- The common behavior belongs to the repository; Codex-, Cursor-, and Claude
-  Code-specific hooks may invoke it but must not become competing authorities.
+- Reuse `scripts/dev_setup.sh:setup_pnpm_deps`; introduce no second readiness
+  or cache authority.
+- Preserve frozen-lockfile failure behavior and task exit status. A package
+  manifest change must not silently bypass validation merely because the
+  root fingerprint is unchanged.
+- Preserve worktree isolation under
+  [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md).
+  Do not share mutable dependency trees or alter runtime provisioning.
 
 ## Story Decomposition
 
@@ -59,64 +47,56 @@ Do not replace Claude Code's worktree lifecycle merely to install dependencies.
 ### Apply the shared dependency-readiness rule to redundant install-prefixed root scripts
 
 - **Identity:** SEED-039#story-2
-- **Plan:** none yet; ready for slice planning.
-- **Goal:** Existing repository callers that currently reinstall dependencies
-  unconditionally on every invocation (rather than reusing the one
-  fingerprint-gated readiness owner `scripts/dev_setup.sh:setup_pnpm_deps`,
-  delivered by SEED-039#story-1) reuse that same one rule, so a package
-  command never pays for a redundant reinstall it doesn't need.
-- **Scope:** Caller map recorded during SEED-039#story-1's execution
-  (2026-09-21, at commit `725c0d61f4` on the now-deleted
-  `worktree-claude+260921-ai-worktree-readiness` branch, before its plan
-  history was removed — recover the full map from that commit if needed):
-  root `package.json` has ~19 scripts prefixed with `pnpm --frozen-lockfile
-  --silent recursive install &&` (`mcp-server:bundle/test/format/lint`,
-  `test-fixtures:format/lint`, `cli`, `cli:bundle/format/lint/test`,
-  `frontend:build/format/lint/test:ui/test/test:watch/sut/dev/storybook`,
-  `test`, `dev`) — same install flavor as `setup_pnpm_deps`; 3 scripts
-  (`generateTypeScript`, `cy:format`, `cy:lint`) prefixed with the
-  non-recursive `pnpm --frozen-lockfile --silent install &&` — a different
-  install flavor, not a straight substitution; `lint:all`/`format:all` also
-  call several of the scripts above, so their prefix compounds within one
-  invocation. Preserve each caller's actual task and lifecycle contract; do
-  not add installation to unrelated Git/read-only operations; remove
-  superseded prefix code only once all its callers use the selected owner.
-- **Key examples:** SEED-039#story-1's readiness-gate postconditions
-  (unchanged/mismatched/valid-change/interrupted-install) are already proven
-  and reusable as-is — this story is about *where* that gate gets invoked,
-  not re-proving its own correctness. A root script run after an unrelated
-  dependency change installs once, not twice (its own prefix plus a prior
-  Nix-hook install). `lint:all`/`format:all` no longer carry a separately
-  compounding reinstall from each sub-script they call.
-- **Evaluation:** One representative normal command per distinct changed
-  caller contract still works exactly as before, plus the existing
-  readiness-gate proof (reused, not re-derived). No new fingerprint,
-  package-store, or runtime owner.
-- **Deferred promises:** A second fingerprint/cache mechanism; forcing an
-  unrelated caller with a genuinely different lifecycle contract into this
-  rule merely for uniformity.
-- **Value / learning:** Removes up to ~25 redundant reinstall passes across
-  common package-script invocations, under one consistent readiness rule
-  instead of a parallel ad hoc one per caller.
-- **Effort hypothesis:** S–M; suggested decomposition from the investigation:
-  (a) prove `setup_pnpm_deps` (or a thin wrapper) is safely invokable as a
-  plain `pnpm`-script prefix outside the interactive Nix shell hook, for both
-  install flavors; (b) apply it to the ~19 recursive-flavor leaf scripts;
-  (c) resolve `lint:all`/`format:all`'s compounded prefix once leaf scripts
-  no longer need their own; (d) decide the 3 non-recursive scripts'
-  different contract separately. Not binding — replan at slice planning.
-- **Depends on:** SEED-039#story-1 (delivered) — reuses its
-  `setup_pnpm_deps` fingerprint gate as the one readiness owner.
-- **Safe stopping point:** Any subset of callers fixed consistently with the
-  rule is useful progress; do not force a caller with a genuinely different
-  contract into a partial/inconsistent rule merely to finish this story.
+- **Plan:** [Frontend test dependency readiness](../quick/006-frontend-test-readiness/PLAN.md)
+  — two planned slices; implementation has not started.
+- **Goal:** Developers and coding agents reach frontend test feedback without
+  paying for an unnecessary installation on an already-prepared checkout.
+  Reduce waiting and avoidable setup interaction; exact token savings remain
+  unmeasured.
+- **Scope:** Only the root `frontend:test` entry point and the minimum shared
+  readiness integration necessary to preserve its existing dependency and
+  task contract. Keep test selection, arguments, and exit status intact.
+  This is the sole caller promised despite the retained broader story title.
+- **Key examples:**
+  - Prepared checkout with unchanged dependencies → run the normal focused
+    frontend test command → the selected test runs without a pnpm install.
+  - Dependencies require preparation → run the same command → prepare once,
+    then run the test; a failed frozen install prevents the test from starting.
+  - An incompatible workspace package-manifest change → the command still
+    detects the dependency mismatch rather than accepting a stale ready state.
+- **Evaluation:** Reuse existing readiness failure/recovery tests where they
+  cover the promise. Record one comparable before/after focused frontend test
+  invocation on a warm checkout, with elapsed time and whether installation
+  ran. Inspect only the missing caller-boundary proof. Count removed setup
+  interactions/output if observed; do not equate output bytes or install
+  counts with measured AI tokens. No profiling campaign or full platform matrix.
+- **Value / why now:** One bounded reduction in a documented feedback loop
+  used to deliver the near-future direction. First position remains an explicit
+  tool-cost investment, not a prerequisite for attachment-folder continuity.
+  If the initial comparison shows negligible cost, or preserving correctness
+  needs a larger redesign, stop and reassess rather than expanding this story.
+- **Dropped scope:** Other root callers, aggregate lint/format command cleanup,
+  non-recursive install normalization, cache/store experiments, cross-IDE
+  setup changes, and general worktree lifecycle work. These are removed,
+  not automatically queued as future stories.
+- **Codex advice considered:** UI-generated repository-owned local environment
+  setup would automate the existing manual command but is a separate outcome.
+  Drop it from this narrowed delivery, including its UI launch/evidence work;
+  retain the existing manual setup and `.codex/hooks.json`. Do not create a
+  replacement story without a new prioritization decision.
+- **Effort hypothesis:** Small only if existing readiness can be reused safely;
+  the package-manifest validation boundary is the main uncertainty.
+- **Depends on:** Delivered SEED-039#story-1 readiness behavior.
+- **Safe stopping point:** This command delivers useful savings on its own;
+  no other caller migration is needed to complete the narrowed promise.
 
 ## Ordering and Scope Reduction
 
-Keep the existing first position as the owner's explicit tool-sharpening choice,
-not a prerequisite for notebook attachments or assimilation. Deliver reliable
-preparation and remove redundant work first. Drop speculative acceleration before
-weakening isolation or broadening into lifecycle/platform management.
+Owner direction during refinement, 2026-09-21: prioritize time and AI token
+cost, dramatically reduce scope, and drop minor or unsupported improvements.
+Keep the current queue position for this bounded attempt. Do not spend more on
+measurement or generalized cleanup than the small improvement warrants.
+No new backlog items are created for the dropped work.
 
 ## Related Retrospective Findings
 
@@ -155,8 +135,8 @@ and dependency readiness across Codex, Cursor, and Claude Code, with a proven
 redundancy-avoidance and parallel-isolation guarantee); its lasting behavior
 now lives in `scripts/worktree_setup.sh`, `scripts/dev_setup.sh`, and
 `.agents/agent-map.md`'s "Worktree setup" section, not in this seed.
-SEED-039#story-2 is queued next in the product backlog, ready for slice
-planning whenever taken.
+SEED-039#story-2 remains first in the product backlog with the narrowed
+frontend-test outcome above; no execution is authorized by this refinement.
 
 ## Breadcrumbs
 
