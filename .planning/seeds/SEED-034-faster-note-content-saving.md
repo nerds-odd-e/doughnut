@@ -41,46 +41,39 @@ not acceptance gates for a changed workload.
 ### 3. Assess whether attachment content needs its own save-path treatment
 
 - **Identity:** SEED-034#story-3
-- **Status:** queued follow-up. Story 4 owns attachment/save-path cohesion and
-  cost assessment as its final concern, after the initial performance comparison
-  without attachments, per clarified owner direction on 2026-09-21. Reuse that
-  evidence here rather than duplicating the investigation. No plan.
+- **Status:** queued. Assessment evidence gathered on 2026-09-21 (below); only the
+  unresolved outcome remains. No plan.
 - **Goal / beneficiaries:** Note authors in notebooks that also hold sizeable
-  attachments keep the save responsiveness story 2 delivers, instead of paying
-  for attachment bytes on every note save.
-- **Original reason for deferral:** delivered work made a notebook's root attachments
-  part of its live Portable tree. Every ordinary web note save now
-  loads all of that notebook's attachment bytes, byte-compares them to detect a
-  no-op, and hashes them again when the tree is rebuilt
-  (`AcceptedWebChangeService.commitIfChanged` → `NotebookLivePortableTree.entriesOf`
-  → `NotebookAttachmentRepository.findExportRowsByNotebookId`, whose JPQL
-  projection materialises each `longblob`). Before that story the tree held only
-  note text, so this cost did not exist. It is correct behaviour and is what
-  makes no-op detection and projection-drift checks work — it is not a defect.
-  It is deferred because story 2 is concurrently replacing the accepted-repository
-  storage layer and may remove, relocate or change the shape of this cost, and
-  because the real magnitude depends on attachment sizes owners actually keep.
-  Both implementations are now available; that deferral no longer applies.
-- **Evaluation:** Consume story 4's final attachment assessment and design findings.
-  If that work resolves the attachment concern or shows no meaningful cost,
-  close this follow-up using its evidence. Otherwise refine only the remaining
-  attachment-specific outcome. Prefer a simpler shared design over an
-  attachment-only cache or bypass; do not prescribe a new digest representation
-  before assessing existing Git object identity and projection guarantees.
-- **Scope:** Assessment first. Any change stays inside the existing live
-  Portable tree and accepted-change owners; it must not introduce a second
-  content authority, weaken no-op detection or projection-drift detection, or
-  change what a notebook's Portable tree contains.
-- **Depends on:** Delivered story 2 (`045a5c6010815a9f106e2cc2241fe7466e24ac55`).
-  The root-attachment work it pairs with is already delivered; see "Root
-  attachments today" in `docs/notebook-git-synchronization.md`. Story 2 closed
-  with revised scope (native storage architecture delivered; the >4× target
-  itself carried forward into story 4) — story 2's actual delivered storage
-  shape is now available for this assessment to measure against.
-- **Effort hypothesis:** S for the measurement; unknown for any change, which
-  is exactly what the measurement decides.
-- **Safe stopping point:** An evidenced answer. A measured "no action needed"
-  closes it.
+  attachments get note saves whose cost does not grow with attachment bytes they
+  did not change.
+- **Evidence (measured 2026-09-21, 11,000-note notebook, same revision and edits):**
+  28 realistic root attachments totalling 12,554,240 bytes (icons, screenshots,
+  photos and two PDFs, all incompressible) add about **+515 ms to every note-save
+  request** - roughly 41 ms per MB - over a base request of about 720 ms. Before
+  saves compared trees by Git blob identity (`562c93a893`) the same files added
+  about +620 ms.
+- **Already resolved:** a save no longer reads accepted blob bytes; drift and no-op
+  decisions compare path-to-blob-id maps taken from tree objects, and unchanged
+  blobs are reused without being re-inserted. No attachment-specific save path
+  exists - the cost runs through the shared live Portable tree and accepted-change
+  owners.
+- **Unresolved outcome:** each changed save still assembles the live Portable tree
+  twice - the before-snapshot for projection-drift detection and the
+  after-snapshot - and each assembly loads every attachment's bytes through
+  `NotebookAttachmentRepository.findExportRowsByNotebookId`, then hashes them to
+  compute blob ids. The cost therefore grows with total attachment size
+  (extrapolated, unmeasured: about 5 s per save at 100 MB).
+- **Scope and constraints:** any change stays inside the live Portable tree and
+  accepted-change owners. No second content authority, no attachment-only cache or
+  bypass, no weakening of no-op or projection-drift detection, and no change to
+  what a notebook's Portable tree contains. Reusing before-snapshot attachment rows
+  in the after-snapshot on the assumption that web edits never touch attachments
+  was assessed and rejected: it is a second content authority in disguise.
+- **Effort hypothesis:** S to decide whether the remaining cost is acceptable for
+  the attachment sizes owners keep; unknown for any change.
+- **Safe stopping point:** an evidenced decision that the remaining cost is
+  acceptable, or one bounded simplification proven with a same-fixture
+  before/after measurement.
 
 <a id="story-4"></a>
 

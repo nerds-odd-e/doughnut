@@ -40,8 +40,14 @@ New migrations need to use a **greater** version number than **`300000339`**.
 ### Migration Process
 
 * Migrations run automatically when the application starts (non-test environments)
-* Non-test startup runs **`flyway.repair()` then `flyway.migrate()`** (`FlyWayFreeVersionRealMigration`). `repair()` is what makes squashing safe on existing databases (checksum realign + remove history for deleted files).
+* Non-test startup runs **`flyway.repair()` then `flyway.migrate()`** (`FlyWayFreeVersionRealMigration`). `repair()` is what makes squashing safe on existing databases (checksum realign + remove history for deleted files). Deleting the **newest** applied migration file is different: until a newer version ships, databases that recorded it treat it as a future migration and keep its row unchanged; the next newer migration's startup then marks it deleted.
 * For unit tests, DB migration is included in the test command (see `backend-development` rule for test execution)
+
+### Release safety
+
+* `FlyWayFreeVersionRealMigration` runs on `ApplicationReadyEvent`, **after** the instance is ready, so new code can serve requests before its own migrations finish. Ship a schema change that code must not see early in two releases: first the compatible schema change (for example relaxing a column to nullable while code still writes it), then the code that relies on it.
+* A migration that throws there closes the application context and the JVM exits; production instance-group autohealing then restarts it in a loop, retrying after `repair()`, until the data is fixed. Production runs two instances and the deploy replaces them one at a time (`--max-surge 0 --max-unavailable 1`), so the other instance keeps serving; on a single instance the same failure is an outage.
+* A destructive migration that must only run when data is ready should check that precondition first and throw before any DDL, as `V300000338__DropNotebookGitBindingBundleBytes` does.
 
 ## Migration file structure
 
