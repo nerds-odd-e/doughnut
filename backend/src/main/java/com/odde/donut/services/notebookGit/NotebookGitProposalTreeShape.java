@@ -13,8 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit.
  * Changed documents are classified once by operation and container/concept role; unchanged accepted
- * files remain context. Publication admission partitions container Readmes (added or modified) from
- * ordinary-note changes so folder Readmes can accompany note edits. Ordinary-note admission permits
+ * files remain context. Folder Readmes can accompany note edits. Ordinary-note admission permits
  * added and/or modified ordinary Markdown notes at regular file modes, any number of ordinary-note
  * deletions alone or with same-path edits, and unambiguous equal-content moves with compatible
  * companions. Exact move correspondence and confirmed deletion-gap recreation (DELETED+ADDED,
@@ -149,7 +148,12 @@ public final class NotebookGitProposalTreeShape {
    * refused until Folders can contain Attachments safely.
    */
   static boolean isRootAttachment(String path) {
-    return !path.endsWith(".md") && path.indexOf('/') < 0;
+    return isAttachment(path) && path.indexOf('/') < 0;
+  }
+
+  /** A non-Markdown, non-structural Portable-tree entry is an Attachment. */
+  static boolean isAttachment(String path) {
+    return !path.endsWith(".md") && !isEmptyFolderMarker(path);
   }
 
   /**

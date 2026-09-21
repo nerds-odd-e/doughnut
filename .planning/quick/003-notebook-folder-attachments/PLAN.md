@@ -20,8 +20,8 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–6 are done with accepted proof; 6 slices remain planned (7
-  is Structure). Remaining concerns are listed at the end.
+- State: slices 1–7 are done with accepted proof; 5 Behavior slices remain
+  planned. Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
   checkout `/Users/terryyin/git/doughnut-worktrees/notebook-folder-attachments`
@@ -265,7 +265,7 @@ cross-notebook move coverage stayed green.
 
 ### 7. Acceptance projects files by their full path
 Type: Structure
-Status: planned
+Status: done
 Internal change: the final-set rule in `NotebookGitProposalAcceptance` compares
 the tip's attachment paths with each stored file's path derived from its folder
 ancestry (`NotebookGitAcceptedTree.folderPath`), and stores a new file in the
@@ -276,6 +276,12 @@ local-change tests stay green.
 Proof: `NotebookGitRootAttachmentPublicationControllerTest`,
 `NotebookGitRootAttachmentLocalChangeControllerTest`,
 `NotebookGitRootAttachmentIndependenceControllerTest`.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,574 backend tests. The three existing root
+attachment controller classes each passed five tests, covering publication,
+final-set local changes, and web-operation independence. The existing
+`aNestedFileIsStillRefusedAndLeavesTheAcceptedFilesUnchanged` case stayed
+green, proving the full-path projection did not open nested admission early.
 
 ### 8. Publish a file beside a note in a folder
 Type: Behavior
