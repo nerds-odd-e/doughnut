@@ -1575,12 +1575,35 @@ runtime. Splitting it would leave a half-converted comparison path, so do not sp
 oversized-slice report if it does not converge.
 
 ### 15b. Clear the native object store on the E2E reset
-Type: Structure. Status: planned. Now, before slice 17, so slice 17's before/after runs start from a clean reset.
+Type: Structure. Status: done.
 
 Make the testability reset leave `notebook_git_accepted_object` empty, so no E2E run can see
 another run's objects. Smallest fix within the existing owner, `DBCleanerWorker`; do not add a
 second reset path or a JPA entity only to make the table visible to the cleaner. Proof: after a
 reset, the table holds no rows, and E stays green. Size: ~5 minutes.
+
+**Delivered.** `DBCleanerWorker` gained `JDBC_ONLY_TABLES = List.of("notebook_git_accepted_object")`,
+truncated inside `truncateAllTables` while foreign-key checks are still off; Javadoc now says
+"all application data tables". No second reset path, no JPA entity added. Comparing
+`information_schema.tables` with every `@Table` found only four non-JPA schema objects: the
+object table (now truncated), `flyway_schema_history` and `shedlock` (correctly never
+truncated - both must survive a reset) and `trashed_folder` (a view). So the one-entry list is
+the right, non-speculative shape.
+
+New permanent test `backend/src/test/java/com/odde/donut/testability/TestabilityDbResetTest.resetLeavesNoNativeGitObjects`:
+setup is the product's own `NotebookGitCutoverService.createBindingForNotebook`, which writes
+real native objects; it calls the real `TestabilityRestController.resetDBAndTestabilitySettings()`
+and asserts the object table is empty. Proven red (2 rows left behind) then green. **It is the
+first backend test to call the real reset**, and MySQL's `TRUNCATE` always commits, so it really
+empties the shared unit-test database mid-suite. That is safe only while backend tests run
+sequentially in one JVM (no `maxParallelForks`, no JUnit parallel config) - its class Javadoc
+says so, so whoever enables parallel runs finds it. No less invasive real-behavior test exists:
+a partial reset needs a production change, a throwaway schema needs new infrastructure, and
+the defect only shows across runs, which no single E2E scenario can observe.
+
+Proof: B 2,566 tests, 0 failures (2,565 + this test). E 40/40; afterwards the isolated E2E
+database held 6 object rows under 1 binding id against 1 live binding, down from 13,887 rows
+across 3 binding ids.
 
 minutes plus profiling runtime.
 

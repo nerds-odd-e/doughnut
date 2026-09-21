@@ -10,13 +10,17 @@ import org.hibernate.metamodel.model.domain.JpaMetamodel;
 
 public class DBCleanerWorker {
 
+  /** Application data tables written only through JDBC, so the JPA metamodel cannot list them. */
+  private static final List<String> JDBC_ONLY_TABLES = List.of("notebook_git_accepted_object");
+
   /**
-   * Truncate all JPA-mapped tables; use the caller’s {@link EntityManager} (same DB session as
-   * seeds).
+   * Truncate all application data tables; use the caller’s {@link EntityManager} (same DB session
+   * as seeds).
    */
   public void truncateAllTables(EntityManager entityManager) {
     entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=0").executeUpdate();
     getAnnotatedTableNames(entityManager).forEach(t -> truncateTable(t, entityManager));
+    JDBC_ONLY_TABLES.forEach(t -> truncateTable(t, entityManager));
     entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=1").executeUpdate();
   }
 
