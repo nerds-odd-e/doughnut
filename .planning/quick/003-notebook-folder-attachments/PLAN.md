@@ -20,7 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–2 are done with accepted proof; 10 slices remain planned (7
+- State: slices 1–3 are done with accepted proof; 9 slices remain planned (7
   is Structure). Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
@@ -183,7 +183,7 @@ tests stayed green, covering the export query's root-preserving left join.
 
 ### 3. Files follow their folder into trash and back
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given the same notebook, trashing `physics` then recovering it leaves
 the accepted tip with `physics/diagrams/force.png`, same bytes, and the trashed
 tip shows the file under the trash path.
@@ -192,6 +192,14 @@ scenario covers trash and recover; a within-notebook move is the same re-parent
 rule and gets no separate case. If production code proves necessary, stop and
 reassess the boundary assumption before continuing.
 Proof: one case in `NotebookGitWebFolderTrashControllerTest`.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,571 backend tests. Setup uses
+`storeFolderAttachmentAndSnapshot` only to establish
+`physics/diagrams/force.png`; observation at
+`NotebookGitWebFolderTrashControllerTest.webFolderTrashAndRecoveryCarryNestedAttachmentBytes`
+invokes the real trash and recovery controllers, then reads the intermediate
+accepted commit and recovered head to assert byte-exact attachment entries at
+the trash and restored paths. No production change was needed.
 
 ### 4. Permanently deleting a trashed folder removes its files
 Type: Behavior
