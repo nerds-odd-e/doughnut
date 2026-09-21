@@ -64,10 +64,10 @@ class NotebookGitJdbcObjectStoreTest {
       commit1 = fixture.exactRef("refs/heads/main").getObjectId();
       commit2 =
           NotebookGitBundleBuilder.append(
-              fixture, commit1, v1, v2, "Donut", "system@donut.local", "Edit", time.plusSeconds(1));
+              fixture, commit1, v2, "Donut", "system@donut.local", "Edit", time.plusSeconds(1));
       commit3 =
           NotebookGitBundleBuilder.append(
-              fixture, commit2, v2, v3, "Donut", "system@donut.local", "Add", time.plusSeconds(2));
+              fixture, commit2, v3, "Donut", "system@donut.local", "Add", time.plusSeconds(2));
       fixtureBundleBytes = NotebookGitBundleWriter.write(fixture);
     }
 
@@ -113,7 +113,6 @@ class NotebookGitJdbcObjectStoreTest {
           NotebookGitBundleBuilder.append(
               reopened,
               commit3,
-              v3,
               v4,
               "Donut",
               "system@donut.local",
@@ -170,7 +169,6 @@ class NotebookGitJdbcObjectStoreTest {
             NotebookGitBundleBuilder.append(
                 txRepo,
                 commit1,
-                v1,
                 v2,
                 "Donut",
                 "system@donut.local",
@@ -235,7 +233,6 @@ class NotebookGitJdbcObjectStoreTest {
             NotebookGitBundleBuilder.append(
                 repo,
                 baseHead,
-                baseEntries,
                 changedEntries,
                 "Donut",
                 "system@donut.local",

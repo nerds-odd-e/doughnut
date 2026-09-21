@@ -1524,7 +1524,7 @@ unexplained. **Production matters here**: its object table will hold every noteb
 objects, so per-query latency there is unlikely to be better than in this disposable schema.
 
 ### 17. Compare accepted and live trees by Git object identity
-Type: Behavior. Status: planned. **Before the first release.** After 15b.
+Type: Behavior. Status: done - **promise met: saves are now faster than `b5cad203d1`.**
 
 **Promise:** given `fixture-a`, an ordinary note save on the current revision is **not slower
 than `b5cad203d1`**, with bytes, history, atomicity, drift and no-op semantics unchanged - and
@@ -1573,6 +1573,80 @@ attachment byte and hashing adds work proportional to them - the fixture-b run s
 Size: one coherent concept across the comparison path; ~10 active minutes plus measurement
 runtime. Splitting it would leave a half-converted comparison path, so do not split; return an
 oversized-slice report if it does not converge.
+
+**Delivered - the regression is gone and saves are now faster than the baseline.** Changes,
+all in `backend/src/main/java/com/odde/donut/services/notebookGit/` (559 -> 554 lines before
+the refactor pass): `NotebookGitAcceptedTree` gained `blobIds(Repository, ObjectId)` (path ->
+blob id from tree objects, no blob opened, mode-insensitive) and `blobIds(List<PortableTreeEntry>)`
+(in-memory ids via JGit's `ObjectInserter.Formatter().idFor`); `AcceptedWebChangeService`'s
+`OpenedNotebook` carries `acceptedBlobIds` instead of byte-carrying `acceptedEntries`, and both
+the drift and no-op decisions are one map comparison; `NotebookGitBundleBuilder.append` lost its
+`acceptedEntries` parameter and the `Set.copyOf` + byte-equality keep check; `NotebookGitProjection`
+lost both `matchesAcceptedTree` overloads, and publication's `requireMatchingAcceptedTree` now uses
+the same blob-id comparison - **one comparison concept instead of two.** `readEntries` survives only
+on the publication path, where attachment projection genuinely needs bytes.
+
+**Measured, same session, coordinator recomputed from raw logs:**
+
+| Fixture | Edit | Before | After | Ratio | Overlap |
+|---|---|---:|---:|---:|---|
+| `fixture-a`: `b5cad203d1` vs fixed | existing links, request | 1,174.5 (1,155-1,209) | 720 (679-759) | **0.613x** | no |
+| `fixture-a`: `b5cad203d1` vs fixed | added link, request | 1,238.5 (1,181-1,278) | 720 (676-777) | **0.581x** | no |
+| `fixture-b`: pre-fix vs fixed | existing links, request | 2,230.5 (2,200-2,309) | 1,237.5 (1,213-1,243) | **0.555x** | no |
+| `fixture-b`: pre-fix vs fixed | added link, request | 2,258.5 (2,219-2,711) | 1,234.5 (1,230-1,242) | **0.547x** | no |
+
+Keystroke->settled on `fixture-a`: 2,205.5 -> 1,750 ms (existing links), 1,272 -> 747.5 ms (added
+link). Four `fixture-a` runs alternated c1, b1, c2, b2 under load 4.5-7.9; all exports keep the
+slice-3 digest. **Per-object SELECTs per save fell from 11,088 to 88** (the cumulative digest rose
+by 1,053 = 12 x 88 - 3 during one run).
+
+**Identical decisions and history, proven directly:** a temporary probe (deleted afterwards) run on
+the pre-fix and the fixed code - notes, a folder README, an empty folder `.keep`, root attachments
+including two identical-byte files, and a JSON file, all published through the product - gave the
+same no-op and changed-save decisions and **the same resulting tree**
+`ca2440071d401f753531570ccb05de983c3cb1c2`, same entries, modes and blob ids.
+`NotebookGitBundleBuilderTest` still asserts an appended tree equals a fresh build.
+
+**Trap guarded:** `NotebookGitWebContentSaveControllerTest.anExecutableAcceptedFileStillMatchesItsUnchangedNote`
+seeds an accepted `Root Note.md` with mode `100755` (publication rejects non-regular modes, so it
+is seeded directly) and asserts a no-op save keeps the head and an edit commits. Proven red-capable:
+a mode-sensitive map made it fail.
+
+**Behavior change, decided by the coordinator under the owner's rule:** a *missing blob* at a path
+the save does not change no longer fails the save; it still fails loudly wherever bytes are read
+(bundle download, clone, publication). A missing *commit or tree* still fails the save loudly -
+`unreadableAcceptedHistoryFailsLoudlyWithoutSavingTheNote` passes. Restoring save-time blob
+detection would add a per-save existence query guarding a state no writer produces (creation,
+cutover and reset write every reachable object; the backfill commits per binding), which is
+defensive programming (CLAUDE.md principle 2) and complexity that does not contribute (owner
+decision 1). Slice 8's completeness check still catches missing blobs before the column drop, and
+broken notebooks are reset by users (owner decision 2). Reported to the owner, who may override.
+
+**Story 3 (attachment cost) shrank but is only partly resolved:** attachments now add about +515 ms
+per request (fixture-b fixed vs fixture-a fixed, same session), down from +617/+628 in slice 13. The
+remainder is the two live assemblies loading every attachment byte plus hashing them.
+
+Proof: B 2,567 tests, 0 failures (2,566 + the trap test); E 40/40 including "Published root files
+reach another checkout byte for byte". Logs: `/Users/terryyin/.claude/jobs/6fda4d71/tmp/slice17/`.
+
+Refactor outcome (slice 17): `NotebookGitBundleBuilder.writeTree` became one rule - every entry is
+written as a regular file, and a blob is inserted only when the parent tree does not already hold
+that id at that path. The mode check, the `continue` and the `builder.add(accepted)` branch are gone;
+the written tree is identical (a temporary probe with unchanged and edited executable files,
+unchanged/edited/deleted/new regular files, a folder README, an empty folder's `.keep`, two
+identical-byte PNGs and a JSON file gave tree `7a299b5a973bced34e7cb5887c83b59a4fb81caa` before and
+after). The skip-if-already-present step stays deliberately: the JDBC inserter checks existence in
+batches of 500 at flush, so inserting all ~11k unchanged blobs would add ~23 queries per save.
+Production across the four files: **559 -> 555 lines**. The trap test moved whole into its own class,
+`backend/src/test/java/com/odde/donut/controllers/NotebookGitWebContentSaveFileModeControllerTest.java`
+(53 lines), because it had pushed `NotebookGitWebContentSaveControllerTest` from 247 to 284; that file
+is now byte-identical to before this slice, and assertion/test counts split exactly (40 = 37 + 3
+`assertThat`, 9 = 8 + 1 `@Test`). Kept deliberately: `PortableTreeEntry`'s byte-aware equality (the
+honest contract of a record holding a `byte[]`), and duplicate live paths confirmed unreachable from the
+uniqueness keys, so no defensive handling. **Later publication-speed candidate, out of this story's
+scope:** all six `representedInTree` callers need only paths and could use `blobIds(...).keySet()`
+instead of reading bytes. `NotebookGitJdbcObjectStoreTest` (263 -> 260 lines) was already over 250
+before this slice and is left alone. Re-verified: B 2,567 tests, 0 failures, including the new class.
 
 ### 15b. Clear the native object store on the E2E reset
 Type: Structure. Status: done.

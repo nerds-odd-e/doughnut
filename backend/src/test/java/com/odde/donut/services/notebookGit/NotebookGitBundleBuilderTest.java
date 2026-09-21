@@ -80,7 +80,6 @@ class NotebookGitBundleBuilderTest {
           NotebookGitBundleBuilder.append(
               repository,
               parent,
-              accepted,
               entries,
               "Donut",
               "system@donut.local",

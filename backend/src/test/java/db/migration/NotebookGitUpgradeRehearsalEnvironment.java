@@ -131,7 +131,6 @@ final class NotebookGitUpgradeRehearsalEnvironment {
       NotebookGitBundleBuilder.append(
           source,
           mainHead(source),
-          entries(label, i - 1),
           entries(label, i),
           "Donut",
           "system@donut.local",

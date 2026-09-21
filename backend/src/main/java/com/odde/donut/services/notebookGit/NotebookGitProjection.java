@@ -177,26 +177,11 @@ public class NotebookGitProjection {
       List<Note> storedNotes,
       Repository repository,
       ObjectId acceptedHead) {
-    if (!matchesAcceptedTree(notebook, folders, storedNotes, repository, acceptedHead)) {
+    List<PortableTreeEntry> live = livePortableTree.entriesOf(notebook, folders, storedNotes);
+    if (!NotebookGitAcceptedTree.blobIds(live)
+        .equals(NotebookGitAcceptedTree.blobIds(repository, acceptedHead))) {
       throw projectionDrift();
     }
-  }
-
-  public boolean matchesAcceptedTree(
-      Notebook notebook,
-      List<ExportFolderRow> folders,
-      List<Note> storedNotes,
-      Repository repository,
-      ObjectId acceptedHead) {
-    List<PortableTreeEntry> currentEntries =
-        livePortableTree.entriesOf(notebook, folders, storedNotes);
-    return matchesAcceptedTree(
-        currentEntries, NotebookGitAcceptedTree.readEntries(repository, acceptedHead));
-  }
-
-  public boolean matchesAcceptedTree(
-      List<PortableTreeEntry> currentEntries, List<PortableTreeEntry> acceptedEntries) {
-    return NotebookGitAcceptedTree.sorted(currentEntries).equals(acceptedEntries);
   }
 
   private static ResponseStatusException projectionDrift() {
