@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /** Shared learned/untouched private-association fixture for Git publication identity proofs. */
 abstract class NotebookGitMovedNotePrivateAssociationControllerTestBase
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   @Autowired ConversationRepository conversationRepository;
   @Autowired McqRepository mcqRepository;

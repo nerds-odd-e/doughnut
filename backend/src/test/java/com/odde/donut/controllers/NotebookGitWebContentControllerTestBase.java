@@ -22,7 +22,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.springframework.beans.factory.annotation.Autowired;
 
-abstract class NotebookGitWebContentControllerTestBase extends NotebookGitBundleControllerTestBase {
+abstract class NotebookGitWebContentControllerTestBase extends NotebookGitControllerTestBase {
   static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   static final String EDITED_CONTENT = "---\ntype: Note\n---\nedited content";
 

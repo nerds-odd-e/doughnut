@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
  * An author-chosen {@code type} value outside Donut's recognized canonical types is still valid
  * here.
  */
-class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControllerTestBase {
 
   @Test
   void rejectsDuplicateKeysInAnEditWithoutChangingTheNoteOrAcceptedBinding() throws Exception {

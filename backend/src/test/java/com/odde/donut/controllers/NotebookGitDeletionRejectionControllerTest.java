@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitDeletionRejectionControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL = "---\ntype: Note\n---\noriginal content";
   private static final String OTHER = "---\ntype: Note\n---\nother content";

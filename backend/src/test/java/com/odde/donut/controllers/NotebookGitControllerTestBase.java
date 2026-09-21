@@ -37,7 +37,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 /** Shared notebook/binding JPA fixtures for notebook Git controller tests. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixtureTestSupport {
+abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTestSupport {
 
   private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
 
@@ -81,7 +81,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
   }
 
   Notebook createGitBackedNotebook() throws UnexpectedNoAccessRightException {
-    return createGitBackedNotebook("Git Backed Notebook For Bundle");
+    return createGitBackedNotebook("Git Backed Notebook");
   }
 
   Notebook createGitBackedNotebook(String title) throws UnexpectedNoAccessRightException {

@@ -24,8 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /** Verifies publication of initial root notebook Readme proposal shapes. */
-class NotebookGitProposalInitialNotebookReadmeControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalInitialNotebookReadmeControllerTest extends NotebookGitControllerTestBase {
 
   private static final String NOTEBOOK_README =
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved notebook readme.\n";

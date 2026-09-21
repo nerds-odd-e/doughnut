@@ -26,8 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
  * NotebookGitProposalRelocationContainerControllerTest}. Addition parent eligibility is covered in
  * {@link NotebookGitFolderNotePublicationControllerTest}.
  */
-class NotebookGitProposalRelocationDestinationControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRelocationDestinationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
 

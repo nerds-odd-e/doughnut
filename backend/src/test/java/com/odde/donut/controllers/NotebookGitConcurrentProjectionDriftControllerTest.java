@@ -40,8 +40,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
-class NotebookGitConcurrentProjectionDriftControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitConcurrentProjectionDriftControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_NOTE_CONTENT = "---\ntype: Note\n---\naccepted content";
   private static final String PROPOSAL_NOTE_CONTENT = "---\ntype: Note\n---\nproposed content";

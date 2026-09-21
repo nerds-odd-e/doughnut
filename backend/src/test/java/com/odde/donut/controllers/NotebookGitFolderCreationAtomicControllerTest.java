@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
-class NotebookGitFolderCreationAtomicControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitFolderCreationAtomicControllerTest extends NotebookGitControllerTestBase {
 
   @AfterEach
   void resetFailureInjection() {

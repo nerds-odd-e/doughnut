@@ -26,7 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Verifies note creation inside folders represented by accepted Portable content. */
-class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitFolderNotePublicationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String EXISTING_CONTENT = "---\ntype: Note\n---\nExisting content.\n";
   private static final String CREATED_CONTENT = "---\ntype: Note\n---\nAuthored inertia content.\n";

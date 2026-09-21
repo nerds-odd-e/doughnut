@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /** Verifies the accepted publication round trip across Note projection and Git history. */
-class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitPublicationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String TARGET_CONTENT = "---\ntype: Note\n---\nReference target.\n";

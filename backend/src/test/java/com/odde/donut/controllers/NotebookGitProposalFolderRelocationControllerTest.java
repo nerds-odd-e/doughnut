@@ -34,8 +34,7 @@ import org.springframework.http.ResponseEntity;
  * NotebookGitProposalRelocationControllerTest} and {@link
  * NotebookGitProposalRelocationContainerControllerTest}.
  */
-class NotebookGitProposalFolderRelocationControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalFolderRelocationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String README_BODY = "readme";
   private static final String README = ExportReadmeMarkdown.assemble(README_BODY);

@@ -31,7 +31,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
-class NotebookGitAdvisoryNamePublicationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitAdvisoryNamePublicationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String CONTENT = "---\ntype: Note\n---\nAdvisory-name content.\n";
   private static final String PIPE_ALIAS_CONTENT =

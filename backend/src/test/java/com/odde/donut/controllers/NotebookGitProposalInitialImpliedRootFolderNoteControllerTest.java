@@ -31,7 +31,7 @@ import org.springframework.http.ResponseEntity;
 
 /** Verifies publication of one or two Notes in an implied root Folder with no Folder Readme. */
 class NotebookGitProposalInitialImpliedRootFolderNoteControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String FIRST_NOTE =
       "---\ntype: Note\n---\nPrecisely preserved first note.\n";

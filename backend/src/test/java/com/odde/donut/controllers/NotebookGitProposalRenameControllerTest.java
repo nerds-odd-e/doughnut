@@ -33,7 +33,7 @@ import org.springframework.http.ResponseEntity;
  * NotebookGitProposalRelocationControllerTest}. Content-changed mixed pairs remain covered as
  * rejections in {@link NotebookGitProposalTreeShapeControllerTest}.
  */
-class NotebookGitProposalRenameControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRenameControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
   private static final String OTHER_NOTE_CONTENT = "---\ntype: Note\n---\nother content";

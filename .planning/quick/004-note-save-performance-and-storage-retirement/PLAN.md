@@ -1,6 +1,6 @@
 # Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage
 
-Status: in execution - slice 19 added by the owner after the retrospective (2026-09-21); then wrap-up.
+Status: **execution complete** (2026-09-21), including owner-added slice 19; wrap-up in progress.
 Evidence sections below record the accepted proof.
 
 ## Execution identity
@@ -1583,7 +1583,7 @@ Proof: B 2,569 tests, 0 failures (Ancestry 3 + CommitRange 4 = the same 7); fres
 outside `.planning`; every file in the diff is at most 250 lines.
 
 ### 19. Name the notebook Git controller test base for what it is
-Type: Structure. Status: planned. **Owner request after the retrospective (2026-09-21).**
+Type: Structure. Status: done. **Owner request after the retrospective (2026-09-21).**
 
 `NotebookGitBundleControllerTestBase` is extended by 69 test classes, most unrelated to bundles (web
 content, folders, trash, creation, access denial, export, migrations), so its name misleads exactly as

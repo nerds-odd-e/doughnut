@@ -25,7 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
  * NotebookGitProposalRenameControllerTest}. Compatible deletion-plus-edit batches are covered in
  * {@link NotebookGitDeletionPublicationControllerTest}.
  */
-class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
 

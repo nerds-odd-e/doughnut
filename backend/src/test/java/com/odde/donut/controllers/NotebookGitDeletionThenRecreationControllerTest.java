@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * permanent removal of the old learning closure — including when tip path and bytes equal the
  * accepted tree. Exact unchanged-content moves still retain identity (no false deletion gap).
  */
-class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String RECREATED_CONTENT =

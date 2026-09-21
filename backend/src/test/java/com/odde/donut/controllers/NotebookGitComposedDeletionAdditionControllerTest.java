@@ -32,8 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
  * note applies permanent removal once for the deleted identity while retaining surviving learning
  * data and authored referrers. Same-transition unmatched remove/add pairs remain refused.
  */
-class NotebookGitComposedDeletionAdditionControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitComposedDeletionAdditionControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String EDITED_CONTENT = "---\ntype: Note\n---\nEdited authored bytes.\n";

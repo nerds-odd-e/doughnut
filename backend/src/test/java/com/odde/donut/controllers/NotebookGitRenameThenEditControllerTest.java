@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * relocation's accepted head updates the same learned concept: the path change is not undone or
  * batched into the edit, and the edit does not disturb the identity or tracker already preserved.
  */
-class NotebookGitRenameThenEditControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitRenameThenEditControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nORIGINAL_CONTENT";
   private static final String EDITED_CONTENT = "---\ntype: Note\n---\nEDITED_CONTENT";

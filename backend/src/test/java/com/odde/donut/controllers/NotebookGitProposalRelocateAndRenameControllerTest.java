@@ -19,8 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * NotebookGitProposalRelocationControllerTest}; same-parent filename changes in {@link
  * NotebookGitProposalRenameControllerTest}.
  */
-class NotebookGitProposalRelocateAndRenameControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRelocateAndRenameControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
   private static final String RESERVED_DELETED_CONTENT =

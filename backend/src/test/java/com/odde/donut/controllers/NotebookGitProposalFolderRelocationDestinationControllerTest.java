@@ -37,7 +37,7 @@ import org.springframework.web.server.ResponseStatusException;
  * {@link NotebookGitProposalFolderRelocationEmptyDescendantControllerTest}.
  */
 class NotebookGitProposalFolderRelocationDestinationControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String README_BODY = "readme";
   private static final String README = ExportReadmeMarkdown.assemble(README_BODY);

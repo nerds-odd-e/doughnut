@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
-abstract class NotebookGitProposalFolderControllerTestBase
-    extends NotebookGitBundleControllerTestBase {
+abstract class NotebookGitProposalFolderControllerTestBase extends NotebookGitControllerTestBase {
 
   static final String FOLDER_README =
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved folder readme.\n";

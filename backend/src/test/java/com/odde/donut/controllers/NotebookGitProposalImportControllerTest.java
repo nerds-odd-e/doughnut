@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 /** Verifies that notebook Git proposals must be readable bundles with a usable main branch. */
-class NotebookGitProposalImportControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalImportControllerTest extends NotebookGitControllerTestBase {
 
   @Test
   void rejectsUnreadableBundleBytesWithoutMutatingTheAcceptedBinding() throws Exception {

@@ -24,7 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
  * cycle, without merging, overwriting, or reparenting.
  */
 class NotebookGitProposalFolderRelocationPlacementControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String README = "readme";
   private static final String NOTE = "note";

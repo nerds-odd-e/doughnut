@@ -29,7 +29,7 @@ import org.springframework.http.ResponseEntity;
  * NotebookGitProposalRelocationDestinationControllerTest}; pre-existing drift is still refused
  * there.
  */
-class NotebookGitProposalRelocationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRelocationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
 

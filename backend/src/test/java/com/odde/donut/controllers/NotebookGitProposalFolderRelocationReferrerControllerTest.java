@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * NotebookGitProposalFolderRelocationControllerTest}. Web folder-move rewrite is out of scope.
  */
 class NotebookGitProposalFolderRelocationReferrerControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String README_BODY = "readme";
   private static final String README = ExportReadmeMarkdown.assemble(README_BODY);

@@ -35,7 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
  * the accepted note identity and learning data at the final path and content. Same-transition
  * changed-content move inference remains refused.
  */
-class NotebookGitComposedMoveEditControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nORIGINAL_CONTENT";
   private static final String EDITED_CONTENT = "---\ntype: Note\n---\nEDITED_CONTENT";

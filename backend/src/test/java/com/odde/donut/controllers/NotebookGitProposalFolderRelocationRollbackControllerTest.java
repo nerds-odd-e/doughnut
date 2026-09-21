@@ -31,7 +31,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
 class NotebookGitProposalFolderRelocationRollbackControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String README_BODY = "readme";
   private static final String README = ExportReadmeMarkdown.assemble(README_BODY);

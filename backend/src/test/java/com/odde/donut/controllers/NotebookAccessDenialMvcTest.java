@@ -19,7 +19,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
 @AutoConfigureMockMvc
-class NotebookAccessDenialMvcTest extends NotebookGitBundleControllerTestBase {
+class NotebookAccessDenialMvcTest extends NotebookGitControllerTestBase {
   @Autowired private MockMvc mockMvc;
 
   @ParameterizedTest

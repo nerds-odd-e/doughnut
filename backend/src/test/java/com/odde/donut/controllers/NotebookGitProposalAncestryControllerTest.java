@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 /** Verifies that notebook Git proposals match the accepted head and its required ancestry. */
-class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalAncestryControllerTest extends NotebookGitControllerTestBase {
 
   @Test
   void rejectsStaleExpectedHeadWithoutMutatingTheAcceptedBinding() throws Exception {

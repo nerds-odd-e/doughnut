@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * NotebookGitProposalRelocationReferrerControllerTest}. Rename acceptance and identity preservation
  * are covered in {@link NotebookGitProposalRenameControllerTest}.
  */
-class NotebookGitProposalRenameReferrerControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRenameReferrerControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TARGET_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String REFERRER_CONTENT =

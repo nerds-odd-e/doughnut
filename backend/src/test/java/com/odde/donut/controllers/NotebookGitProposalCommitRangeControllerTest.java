@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /** Verifies that a multi-commit proposal publishes its tip with the proposal's own history. */
-class NotebookGitProposalCommitRangeControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalCommitRangeControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal.\n";
   private static final String FIRST_EDIT = "---\ntype: Note\n---\nFirst edit.\n";

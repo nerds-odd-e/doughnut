@@ -33,7 +33,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
-class NotebookGitWebContentSaveAtomicControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitWebContentSaveAtomicControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   private static final String PROPOSED_CONTENT = "---\ntype: Note\n---\n[[new reference]]";
