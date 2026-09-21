@@ -302,7 +302,7 @@ clean; B `BUILD SUCCESSFUL`, allocated worktree-scoped test DB identity
 confirmed to belong to this checkout via its own `.worktree.local.json`.
 
 ### 4. Avoid redundant preparation without accepting stale state
-Type: Behavior. Status: planned. Target: ~5 minutes; input diversity is a sizing concern.
+Type: Behavior. Status: done (narrowed at execution — see below).
 
 Prepared worktree → repeat setup and ordinary package command → no redundant
 install/lifecycle pass. Relevant changed or incomplete state → same entry point →
@@ -324,6 +324,31 @@ of failures; test readiness bookkeeping/retry outcomes, not every external error
 Run N/L, one representative normal command for each distinct changed caller
 contract, and F/T when frontend invocation changes. Reuse sufficient B/I evidence
 unless backend routing changes. Record the inspected caller map here at execution.
+
+**Narrowed at execution, per this slice's own "input diversity is a sizing
+concern" warning.** Delivered: the readiness-gate proof half only. Added two
+real command-boundary tests to `scripts/test/dev_setup.sh.test` proving
+`donut_needs_pnpm_install`/`setup_pnpm_deps` correctly forces a real reinstall
+(observed via the fake pnpm's call log, not just exit status) rather than a
+silent false success on (a) an interrupted/partial install — `node_modules`
+present, no fingerprint file, since the fingerprint is only written after a
+*completed* install (`pnpm ... && donut_workspace_deps_fingerprint >file`) —
+and (b) a stale/mismatched fingerprint, also confirming it gets corrected
+afterward. No production logic changed: the existing `&&`-gated write and
+`donut_needs_pnpm_install`'s existing guard clauses were already correct for
+both cases; this closed a real proof gap, not a defect. The unchanged/valid
+manifest-change fixtures from the before-change gate hit the same
+fingerprint-mismatch code path as (b) and were judged not to need a third
+near-duplicate test. S 7/7, P/N/L pass, full suite 20/20.
+
+**Deferred to slice 9** (added below): applying the same one readiness rule
+to the ~25 redundant-install-prefixed root `package.json` scripts and to
+`.cursor/worktrees.json`. Investigation at execution found this set too large
+and heterogeneous (two distinct install flavors — plain `install` vs.
+`recursive install` — plus aggregate scripts like `lint:all`/`format:all`
+that call sub-scripts which each also carry the prefix) to fix safely inside
+this slice's original ~5-minute leaf without inventing per-script exceptions.
+The full caller map is recorded under slice 9.
 
 ### 5. Prepare Cursor-created worktrees through the common behavior
 Type: Behavior. Status: planned. Target: ~5 minutes plus host observation.
@@ -391,6 +416,46 @@ the final behavior, excluding test runtime. Report measured setup time/spread,
 observed eliminated work, remaining cost and comparison limits. Keep temporary
 measurement material only while needed; no permanent benchmark subsystem.
 
+### 9. Apply the readiness rule to redundant install-prefixed root scripts
+Type: Structure. Status: planned. Target: split into smaller leaves at
+execution; do not attempt as one ~5-minute slice (see caller map below).
+
+Deferred from slice 4 at execution 2026-09-21. Same one readiness rule
+(slice 4's now-proven `donut_needs_pnpm_install`/`setup_pnpm_deps` fingerprint
+gate), applied to existing callers that currently reinstall unconditionally
+on every invocation instead of reusing it — not a second mechanism. Preserve
+each caller's actual task and lifecycle contract; do not add installation to
+unrelated Git/read-only operations; remove superseded prefix code only once
+all its callers use the selected owner.
+
+**Recorded caller map** (root `package.json` `scripts`, plus
+`.cursor/worktrees.json`; nested `cli/`, `mcp-server/`, `frontend/`
+`package.json` had no redundant-install callers of their own):
+
+| Callers | Install prefix | Notes |
+| --- | --- | --- |
+| `mcp-server:bundle/test/format/lint`, `test-fixtures:format/lint`, `cli`, `cli:bundle/format/lint/test`, `frontend:build/format/lint/test:ui/test/test:watch/sut/dev/storybook`, `test`, `dev` | `pnpm --frozen-lockfile --silent recursive install &&` | ~19 entries; recursive-install flavor, same as `setup_pnpm_deps`. |
+| `generateTypeScript`, `cy:format`, `cy:lint` | `pnpm --frozen-lockfile --silent install &&` (non-recursive) | Different install flavor from `setup_pnpm_deps` (which is recursive) — a naive substitution would change these three scripts' actual contract, not just skip redundant work. |
+| `lint:all`, `format:all` | same prefix, and each also calls several of the scripts above, which redundantly reapply the prefix again within one invocation | Compounded redundancy; fixing this coherently likely means changing the prefix pattern in one place shared by all callers, not per-script edits. |
+| `.cursor/worktrees.json` (`setup-worktree`) | `nix develop -c pnpm install` (plain, non-`CURSOR_DEV`, no fingerprint) | Real redundant-install caller, but this is slice 5's territory (Cursor host wiring), not this slice — resolve there instead of here. |
+
+Suggested split (not binding — replan at execution): (a) prove
+`setup_pnpm_deps` (or a thin wrapper) is safely invokable as a plain
+`pnpm`-script prefix outside the interactive Nix shell hook, for both the
+recursive and non-recursive install needs identified above; (b) apply it to
+the ~19 recursive-flavor leaf scripts; (c) resolve `lint:all`/`format:all`'s
+compounded prefix once the leaf scripts no longer need their own; (d) decide
+`generateTypeScript`/`cy:format`/`cy:lint`'s non-recursive case separately,
+since it is a different contract, not merely a smaller version of the same
+one.
+
+Proof: P at the command boundary as slice 4 already established (unchanged,
+mismatched, valid paired change, interrupted/partial install all already
+covered by slice 4's `scripts/test/dev_setup.sh.test` proof — reuse it, do
+not re-derive). N/L regression. One representative normal command for each
+distinct changed caller contract touched. F/T when frontend invocation
+changes. Reuse slice 3's B/I evidence unless backend routing changes.
+
 ## Conditional optimization and stopping
 
 After the required behavior and evidence above, stop if setup is reliable and
@@ -408,7 +473,8 @@ package-manager migration, or lifecycle redesign returns to scope discussion.
 | --- | --- |
 | Fresh tracked tooling and skill discovery | 1; actual Claude path in 7 |
 | Correct committed graph and representative checks | 3, final reuse in 8 |
-| Cheap repeats, relevant changes and retry after failure | 4 |
+| Cheap repeats, relevant changes and retry after failure (readiness-gate proof) | 4 |
+| Redundant-install cleanup across existing root-script callers | 9 (deferred from 4) |
 | Cursor / Codex / Claude supported invocation | 5 / 6 / 7 respectively |
 | Independent mutable state and no peer disruption | 2's boundary; 8's final observation; existing I/E allocation proof |
 | Comparable setup observations; bounded acceleration | Before-change gate, 8 and conditional decision |
@@ -417,13 +483,18 @@ Safe stops: after 1 usable tracked tooling; after 2 preserved existing behavior;
 3–4 a usable manual preparation path; after each host its complete supported
 journey. Remaining host/parallel proof stays unfinished. Every delivery retains
 working existing entry points. No story completion based solely on speed or a
-setup command returning zero.
+setup command returning zero. Slice 9 (root-script redundant-install cleanup)
+is itself a further safe stop within the "usable manual preparation path"
+already delivered by 3–4: its own promise is cleanliness/consistency, not new
+capability, so the story is not blocked on it.
 
 All leaves target about five minutes including focused proof. Scrutinize longer
 leaves; above ten minutes split the affected leaf before continuing unless the
 recorded reason is external host access or required install/full-suite runtime.
 Do not hide active implementation time behind that exception. Input/caller
-diversity in 4 may require smaller behavior leaves once the gate selects the owner.
+diversity in 4 required a smaller behavior leaf once the gate selected the
+owner — resolved at execution by narrowing 4 to its proof half and deferring
+the caller-map work to 9, per this note's own anticipation.
 
 ## Delivery and remaining concerns
 
@@ -437,12 +508,16 @@ none of that delivery flow. Do not add a broad test suite per tiny doc/config ed
 
 Remaining slice-specific concerns:
 
-- 3–4: native verification versus frozen-lockfile/lifecycle contracts is unproved
-  on the pinned version. The isolated gate selects the owner before adoption;
-  a failed assumption changes these leaves, not the story outcome.
-- 4: many root script callers have distinct purposes. The caller map and scope
-  of redundant-prefix removal can exceed one leaf; preserve their contracts
-  and split rather than introduce per-package exceptions.
+- 3–4: native verification versus frozen-lockfile/lifecycle contracts was
+  resolved at the before-change gate (bare `pnpm exec` verify-before-run
+  rewrites the lockfile on mismatch instead of failing; the existing
+  frozen-lockfile fingerprint gate remains the one readiness owner). Resolved,
+  no longer an open concern.
+- 9: many root script callers have distinct purposes (two install flavors,
+  compounded aggregate-script prefixes). The recorded caller map and scope of
+  redundant-prefix removal can exceed one leaf; preserve their contracts and
+  split rather than introduce per-package exceptions — see slice 9's own
+  suggested split.
 - 5–7: actual installed host access and hook timing are unproved. Missing access
   leaves host acceptance open; command/config inspection is not equivalent proof.
   Claude's mid-session entry is especially sensitive to original-root paths.
