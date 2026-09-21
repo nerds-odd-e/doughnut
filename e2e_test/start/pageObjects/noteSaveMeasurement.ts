@@ -1,9 +1,10 @@
 /**
  * TEMPORARY MEASUREMENT MACHINERY — SEED-034#story-4, slices 2-3.
- * Deleted together with `note_save_measurement.feature` in slice 14.
+ * Deleted together with `note_save_measurement.feature` in slice 14, which
+ * documents how to run it and what it is for.
  *
- * Drives ordinary note-content saves in a large synchronized notebook and
- * records two separate boundaries per save:
+ * Each ordinary content save in a large synchronized notebook reports three
+ * separate boundaries:
  *
  *   keystrokeToSettledMs — last keystroke until the editor shows the saved
  *                          content again (contains the real one-second
@@ -21,9 +22,11 @@ import { navigationActions } from '../actions/navigationActions'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
 import { noteContentEditingMethods } from './noteContentEditingMethods'
+import { capturePortableExport } from './noteSaveMeasurementExport'
 import { findNoteContentRegion } from './notePageContentRegion'
 
-/** Large seeding and large saves both need far more than the 6s default. */
+/** Seeding, saving and exporting a whole notebook all need far more than the
+ * 6s default. */
 const MEASUREMENT_TIMEOUT_MS = 600_000
 
 const CONTENT_SAVE_ROUTE = '**/api/text_content/*/content'
@@ -32,12 +35,17 @@ type RequestTiming = { startedAt: number; endedAt: number }
 
 type Sample = {
   edit: string
+  sample: number
   note: string
   typed: string
+  linkTarget?: string
   keystrokeToSettledMs: number
   keystrokeToRequestMs: number
   requestMs: number
 }
+
+/** What one measured edit types, and the wiki link it adds, if any. */
+type MeasuredEdit = Pick<Sample, 'edit' | 'typed' | 'linkTarget'>
 
 const fixtureAlias = 'noteSaveFixture'
 const timingsAlias = 'noteSaveRequestTimings'
@@ -47,10 +55,12 @@ const samplesAlias = 'noteSaveSamples'
  * carries resolving wiki links from the generated fixture. */
 const measuredNote = (fixture: NoteSaveFixture) => fixture.notes[0]!.Title
 
-/** A note the measured note does not already reference, so the added-link
- * edit really adds a new resolving wiki link. */
-const addedLinkTarget = (fixture: NoteSaveFixture) =>
-  fixture.notes[Math.floor(fixture.notes.length / 2)]!.Title
+/** A note the measured note does not already reference, distinct per sample,
+ * so every added-link edit really adds a new resolving wiki link. The measured
+ * note's own generated references are notes 1, 2, 3 and `folders`, far below
+ * the middle of the notebook. */
+const addedLinkTarget = (fixture: NoteSaveFixture, sampleNumber: number) =>
+  fixture.notes[Math.floor(fixture.notes.length / 2) + sampleNumber * 7]!.Title
 
 function markdownEditor() {
   noteContentEditingMethods().openMarkdownContentEditor()
@@ -102,24 +112,44 @@ export const noteSaveMeasurement = () => ({
     return this
   },
 
-  measureSaveKeepingExistingWikiLinks(sampleNumber: number) {
-    return this.measureSave(
-      'existing wiki links',
-      () => ` Measured observation ${sampleNumber}.`
-    )
+  /** One save of each kind whose timing is reported but discarded, so the
+   * sampled saves are not measuring a cold application. */
+  warmUpTheMeasuredSavePath() {
+    this.measureSaveKeepingExistingWikiLinks(0)
+    this.measureSaveAddingAWikiLink(0)
+    return this
   },
 
-  measureSaveAddingAWikiLink() {
-    return this.measureSave(
-      'added wiki link',
-      (fixture) => ` See [[${addedLinkTarget(fixture)}]]`
+  /** Evidence that the two compared sides hold the same notebook content. */
+  capturePortableExportForComparison() {
+    cy.get<NoteSaveFixture>(`@${fixtureAlias}`).then((fixture) =>
+      capturePortableExport(fixture.notebook, MEASUREMENT_TIMEOUT_MS)
     )
+    return this
+  },
+
+  measureSaveKeepingExistingWikiLinks(sampleNumber: number) {
+    return this.measureSave(sampleNumber, () => ({
+      edit: 'existing wiki links',
+      typed: ` Measured observation ${sampleNumber}.`,
+    }))
+  },
+
+  measureSaveAddingAWikiLink(sampleNumber: number) {
+    return this.measureSave(sampleNumber, (fixture) => {
+      const linkTarget = addedLinkTarget(fixture, sampleNumber)
+      const typed = ` See [[${linkTarget}]]`
+      return { edit: 'added wiki link', typed, linkTarget }
+    })
   },
 
   /** One changed save, start to settled, before any next sample begins. */
-  measureSave(edit: string, appended: (fixture: NoteSaveFixture) => string) {
+  measureSave(
+    sampleNumber: number,
+    describeEdit: (fixture: NoteSaveFixture) => MeasuredEdit
+  ) {
     cy.get<NoteSaveFixture>(`@${fixtureAlias}`).then((fixture) => {
-      const typed = appended(fixture)
+      const { edit, typed, linkTarget } = describeEdit(fixture)
       navigationActions.jumpToNotePage(measuredNote(fixture))
       waitUntilAppIsNotBusy()
       const lastKeystroke = { at: 0 }
@@ -146,9 +176,11 @@ export const noteSaveMeasurement = () => ({
           `${edit}: exactly one content-save request per measured save`
         ).to.equal(1)
         const sample: Sample = {
-          edit,
+          edit: sampleNumber === 0 ? `warm-up ${edit}` : edit,
+          sample: sampleNumber,
           note: measuredNote(fixture),
           typed,
+          linkTarget,
           keystrokeToSettledMs: settledAt - lastKeystroke.at,
           keystrokeToRequestMs: timings[0]!.startedAt - lastKeystroke.at,
           requestMs: timings[0]!.endedAt - timings[0]!.startedAt,
@@ -183,11 +215,14 @@ export const noteSaveMeasurement = () => ({
       navigationActions.jumpToNotePage(measuredNote(fixture))
       cy.reload()
       waitUntilAppIsNotBusy()
-      findNoteContentRegion()
-        .find('a.donut-wiki-link')
-        .contains(addedLinkTarget(fixture))
-        .should('exist')
       cy.get<Sample[]>(`@${samplesAlias}`).then((samples) => {
+        for (const sample of samples) {
+          if (sample.linkTarget)
+            findNoteContentRegion()
+              .find('a.donut-wiki-link')
+              .contains(sample.linkTarget)
+              .should('exist')
+        }
         const editing = noteContentEditingMethods().openMarkdownContentEditor()
         for (const sample of samples) {
           editing.expectMarkdownContentSourceContains(sample.typed.trim())

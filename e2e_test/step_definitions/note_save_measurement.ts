@@ -9,14 +9,24 @@ Given('I have the generated large synchronized measurement notebook', () =>
   noteSaveMeasurement().seedLargeSynchronizedNotebook()
 )
 
+When("I capture the measurement notebook's Portable export", () =>
+  noteSaveMeasurement().capturePortableExportForComparison()
+)
+
+When('I warm up the measured save path', () =>
+  noteSaveMeasurement().warmUpTheMeasuredSavePath()
+)
+
 When(
   'I measure save {int} of note content that keeps its existing wiki links',
   (sampleNumber: number) =>
     noteSaveMeasurement().measureSaveKeepingExistingWikiLinks(sampleNumber)
 )
 
-When('I measure a save of note content that adds a wiki link', () =>
-  noteSaveMeasurement().measureSaveAddingAWikiLink()
+When(
+  'I measure save {int} of note content that adds a wiki link',
+  (sampleNumber: number) =>
+    noteSaveMeasurement().measureSaveAddingAWikiLink(sampleNumber)
 )
 
 Then('each measured save reports its debounce and its request separately', () =>

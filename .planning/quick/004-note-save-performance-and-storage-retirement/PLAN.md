@@ -312,7 +312,7 @@ race before the note page renders). Both are fixed. Treat the 5-minute target
 for slices 4-7 as optimistic and prefer finer leaves there.
 
 ### 3. Report the no-attachment save comparison
-Type: Behavior. Status: planned.
+Type: Behavior. Status: done. **Learning gate reached: owner decision needed.**
 
 Given matched large notebooks without attachments, editing content with existing
 links and then added/changed links yields repeatable typical save times and a
@@ -328,6 +328,99 @@ durability/link results. Do not mix attachment or bulk-publication results into
 this conclusion. Label the comparison reconstructed. Size: ~5 active minutes,
 seeding and benchmark runtime excepted. Apply the learning gate before inventing
 implementation work.
+
+## Slice 3 result: current code is SLOWER than the earlier revision
+
+**Label: reconstructed comparison.** Both sides ran today's toolchain, today's
+machine and the same synthetic fixture; only the application revision differs.
+Both runs passed command M unchanged (current exit 0, 1 passing, 01:01;
+`b5cad203d1` exit 0, 1 passing, 00:56).
+
+**Comparability established first, and it matched.** Both sides were seeded from
+the same `fixture-a` payload and exported through the product's own
+`GET /api/notebooks/{id}/export` before any measured edit. Each export holds
+11,000 note files with identical relative paths, and `diff -r` of the extracted
+archives reports no differences (coordinator re-verified independently; both
+archives are 3,390,911 bytes, differing only in container metadata). Sorted
+path+content digest on both sides:
+`1b8cdeed86cc5cd6706a37f77a79e6c16f2617682a41083b4eccb95d58240cec`.
+Caveat: the export carries the 11,000 note files, not the 41 container READMEs,
+so comparability is established over all measured note content and paths only.
+
+Shape on both sides: 11,000 notes, 40 folders, 55,000 resolving wiki references,
+0 attachments, 11,210,679 content bytes, accepted history 1 commit deep. Real
+one-second debounce, real serialized persist chain, no mock clock, Electron,
+isolated per-worktree stacks and databases. One warm-up per edit kind, discarded,
+then 5 samples per edit kind per side. Medians and ranges below were recomputed
+by the coordinator directly from the runner's raw log lines.
+
+Medians in milliseconds, with ranges:
+
+| edit | boundary | `b5cad203d1` | current | current / baseline |
+| --- | --- | ---: | ---: | ---: |
+| existing links | keystroke->request | 1,039 (1,032-1,040) | 1,030 (1,029-1,036) | 0.99x |
+| existing links | **request** | **1,199** (1,189-1,308) | **1,651** (1,649-1,669) | **1.38x slower** |
+| existing links | keystroke->settled | 2,299 (2,292-2,412) | 2,745 (2,734-2,764) | 1.19x slower |
+| added link | keystroke->request | 21 (20-21) | 21 (20-21) | 1.00x |
+| added link | **request** | **1,236** (1,179-1,264) | **1,665** (1,648-1,684) | **1.35x slower** |
+| added link | keystroke->settled | 1,326 (1,262-1,337) | 1,753 (1,735-1,771) | 1.32x slower |
+
+**Findings:**
+
+1. Current note saving in a large synchronized notebook is still slow: about
+   1.65 s of server request on top of the one-second debounce. An author waits
+   about 2.75 s from last keystroke to a settled editor for an ordinary edit.
+2. Current code is **slower than the revision the >4x ambition was stated
+   against**, by a median 1.38x (existing links) and 1.35x (added link) on the
+   storage request. The existing-links sample ranges do not overlap
+   (baseline 1,189-1,308 vs current 1,649-1,669), so the direction is not
+   sampling noise.
+3. **The >4x ambition is not achieved and the gap has widened.** Nothing in this
+   evidence supports claiming any improvement.
+4. The entire revision-to-revision difference sits inside `requestMs`. The
+   debounce and the immediate new-wiki-link flush are identical behavior on both
+   revisions and contribute identically; neither is attributable to storage.
+5. Existing-links and added-link saves cost essentially the same server time on
+   each revision. The author-felt difference between the two edit kinds is
+   entirely the one-second debounce, not storage.
+
+**Limitations:** reconstructed, not the original historical run; the historical
+795/785 ms medians came from a different, unrecoverable fixture and are not
+compared against here, and 198.75/196.25 ms are not acceptance gates. Accepted
+history is 1 commit deep on both sides (comparable, but not deep). Synthetic
+uniform content, 0 attachments. Single run per side, 5 samples per edit kind
+within it; no cross-run variance measured. The measured note grows about 25
+characters per sample, identically on both sides and far too small to explain a
+450 ms difference. The cause of the regression was deliberately **not**
+investigated - the learning gate reserves that.
+
+### Learning gate outcome
+
+The plan's gate says: report the observed result; a bounded correction may be
+refined into this plan **only when its cause and outside-in proof are known**;
+no placeholder "optimize until fast" slice is dispatchable; if the result needs a
+new architecture or a different product promise, get the owner's decision; and
+safe independent retirement work may continue.
+
+Applying it:
+
+- The cause is **not** known, so **no correction is planned here** and none may
+  be invented.
+- The story's premise - that the delivered native-storage work moved saves toward
+  the >4x ambition - is contradicted by this evidence. Whether to open a bounded
+  investigation, change the product promise, or accept current speed is an
+  **owner decision**, recorded here and not made by execution.
+- **Retirement work in slices 4-7 is safe and independent of this result** and
+  continues. It is cleanup of an already-delivered design and does not depend on
+  save speed.
+- Not established here: whether the regression is attributable to the
+  native-Git storage work of stories 1-2 or to something else between
+  `b5cad203d1` and current. Do not assume; it needs its own evidence.
+
+Harness note for later slices: the disposable `b5cad203d1` worktree still holds
+the pre-refactor harness copies. The accepted evidence above is already captured,
+and slice 13 measures the current side only, so no refresh is needed. If the
+baseline side is ever re-run, refresh its four copied harness files first.
 
 ### 4. Seed current accepted histories directly
 Type: Structure. Status: planned.

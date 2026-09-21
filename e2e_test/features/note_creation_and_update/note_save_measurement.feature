@@ -5,6 +5,7 @@
 # story's save-speed comparison rests on evidence. Slice 14 deletes this file
 # together with e2e_test/step_definitions/note_save_measurement.ts,
 # e2e_test/start/pageObjects/noteSaveMeasurement.ts,
+# e2e_test/start/pageObjects/noteSaveMeasurementExport.ts,
 # e2e_test/config/noteSaveMeasurement.ts, its registration in
 # e2e_test/config/common.ts and its entry in
 # scripts/isolated-cypress-active-specs.mjs.
@@ -20,7 +21,11 @@
 #     --spec e2e_test/features/note_creation_and_update/note_save_measurement.feature
 #
 # Measured numbers are printed by the runner as `note-save-measurement {...}`
-# lines: seeding wall-clock, then one line per save with both boundaries.
+# lines: seeding wall-clock, the captured Portable export, then one line per
+# save with both boundaries. Sample 0 is the discarded warm-up.
+#
+# `NOTE_SAVE_EXPORT_OUT` names the file the notebook's Portable export ZIP is
+# written to; the two sides of a comparison must not share one path.
 #
 # Seeding imports the fixture's final state and re-snapshots the notebook's
 # accepted baseline; it does not replay the fixture's `revisions`, so accepted
@@ -37,8 +42,17 @@ Feature: Note save measurement
     And I have the generated large synchronized measurement notebook
 
   Scenario: Ordinary content saves in a large synchronized notebook
-    When I measure save 1 of note content that keeps its existing wiki links
+    When I capture the measurement notebook's Portable export
+    And I warm up the measured save path
+    And I measure save 1 of note content that keeps its existing wiki links
     And I measure save 2 of note content that keeps its existing wiki links
-    And I measure a save of note content that adds a wiki link
+    And I measure save 3 of note content that keeps its existing wiki links
+    And I measure save 4 of note content that keeps its existing wiki links
+    And I measure save 5 of note content that keeps its existing wiki links
+    And I measure save 1 of note content that adds a wiki link
+    And I measure save 2 of note content that adds a wiki link
+    And I measure save 3 of note content that adds a wiki link
+    And I measure save 4 of note content that adds a wiki link
+    And I measure save 5 of note content that adds a wiki link
     Then each measured save reports its debounce and its request separately
     And the measured note reloads with every measured edit and a live link
