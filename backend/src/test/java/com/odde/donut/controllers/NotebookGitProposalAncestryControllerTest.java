@@ -222,6 +222,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
 
     ObjectId acceptedWithMergeBelow;
+    byte[] acceptedWithMergeBelowBundle;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId priorAccepted = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
       ObjectId otherParent =
@@ -232,13 +233,12 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
               List.of(priorAccepted, otherParent),
               List.of(new NotebookGitProposalFile("Topic.md", ORIGINAL_CONTENT)),
               "Merge below accepted tip");
-      binding.setAcceptedGitObjectId(acceptedWithMergeBelow.getName());
-      binding.setBundleBytes(bundleBytesForHead(repository, acceptedWithMergeBelow));
-      notebookGitBindingRepository.save(binding);
-      clearNativeObjectStoreRows(binding.getId());
+      acceptedWithMergeBelowBundle = bundleBytesForHead(repository, acceptedWithMergeBelow);
+      seedAcceptedHistory(notebook, repository, acceptedWithMergeBelow);
     }
 
-    ContentEditRange range = contentEditRangeOn(binding.getBundleBytes(), acceptedWithMergeBelow);
+    ContentEditRange range =
+        contentEditRangeOn(acceptedWithMergeBelowBundle, acceptedWithMergeBelow);
 
     String publishedHead =
         controller.publishNotebookGitProposal(

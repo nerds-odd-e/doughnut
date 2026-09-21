@@ -14,12 +14,13 @@ import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
-import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.NotebookGitAcceptedHistoryFixture;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import javax.sql.DataSource;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -41,6 +42,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
 
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired PlatformTransactionManager transactionManager;
+  @Autowired DataSource dataSource;
 
   private String testFixturePrefix;
 
@@ -123,38 +125,43 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
   }
 
   /**
-   * Testability-only: overwrites {@code notebook}'s accepted Git binding with a fresh root commit
-   * built directly from {@code entries}, so proposal-gating tests can control the accepted tree's
-   * exact shape without depending on the notebook's own note/folder content. This sets the
-   * binding's entity fields directly rather than going through {@code
-   * NotebookGitAcceptedRepositoryStore}, so it also clears any native object-store rows the binding
-   * already had: otherwise a binding already converted to native storage would keep a nonzero
-   * object count and never re-trigger the lazy bundle-to-native conversion for this newly-seeded,
-   * disjoint history.
+   * Testability-only: replaces {@code notebook}'s accepted history with a fresh root commit built
+   * directly from {@code entries}, so proposal-gating tests can control the accepted tree's exact
+   * shape without depending on the notebook's own note/folder content.
    */
   NotebookGitBinding seedAcceptedBinding(Notebook notebook, List<PortableTreeEntry> entries) {
-    NotebookGitBinding binding =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    try (Repository repository =
+    try (Repository seeded =
         NotebookGitBundleBuilder.build(
             entries, "System", "system@example.com", "Seed content", Instant.now())) {
-      NotebookGitBundleWriter.BundleWriteResult written = NotebookGitBundleWriter.write(repository);
-      binding.setAcceptedGitObjectId(written.headObjectId());
-      binding.setBundleBytes(written.bundleBytes());
+      return seedAcceptedHistory(
+          notebook, seeded, NotebookGitAcceptedHistoryFixture.mainHeadOf(seeded));
     }
+  }
+
+  /**
+   * Testability-only: makes {@code head} - and every object it reaches in {@code source} - {@code
+   * notebook}'s accepted history, written into the same native object store the product's own
+   * accepted repository reads. Deliberately disjoint from the notebook's own content, for drift,
+   * invalid-tip and admission-rejection fixtures that must start from an accepted state the
+   * product's creation/publication/reset owners would never produce.
+   */
+  NotebookGitBinding seedAcceptedHistory(Notebook notebook, Repository source, ObjectId head) {
+    NotebookGitBinding binding =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    binding.setAcceptedGitObjectId(head.name());
     NotebookGitBinding saved = notebookGitBindingRepository.save(binding);
-    clearNativeObjectStoreRows(saved.getId());
+    committed(
+        () ->
+            NotebookGitAcceptedHistoryFixture.seedNativeObjectStore(
+                dataSource, saved.getId(), source, head));
     return saved;
   }
 
   /**
-   * Testability-only: deletes every native object-store row for {@code bindingId}. Any test that
-   * sets {@code NotebookGitBinding#acceptedGitObjectId}/{@code bundleBytes} directly (bypassing
-   * {@code NotebookGitAcceptedRepositoryStore}) to seed a specific, disjoint accepted tree must
-   * call this afterward: otherwise a binding already converted to native storage keeps a nonzero
-   * native object count and never re-triggers the lazy bundle-to-native conversion for the
-   * newly-seeded head, so reads against the new head find its objects missing from the native
-   * store.
+   * Testability-only: deletes every native object-store row for {@code bindingId}, so a binding
+   * that current code already converted looks like one created before native storage existed. Only
+   * for tests that prove the legacy-bundle import path itself; ordinary accepted state is seeded
+   * through {@link #seedAcceptedHistory}.
    */
   void clearNativeObjectStoreRows(Integer bindingId) {
     committed(

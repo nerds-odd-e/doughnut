@@ -83,7 +83,7 @@ class NotebookGitJdbcObjectStoreTest {
             new JdbcNotebookGitRepository(bindingId, importConnection)) {
       assertThat(imported.mainHead(), equalTo(commit3));
       try (ObjectInserter inserter = store.newObjectInserter()) {
-        GitBundleTestReader.copyAllReachableObjects(
+        NotebookGitReachableObjectCopier.copyAllReachableObjects(
             imported.repository(), imported.mainHead(), inserter);
         inserter.flush();
       }

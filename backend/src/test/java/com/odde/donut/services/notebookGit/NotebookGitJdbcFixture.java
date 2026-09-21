@@ -1,7 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.services.notebookGit.objectstore.JdbcNotebookGitRepository;
-import com.odde.donut.testability.GitBundleTestReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -75,7 +74,7 @@ final class NotebookGitJdbcFixture implements AutoCloseable {
     try (Connection connection = openConnection();
         JdbcNotebookGitRepository store = new JdbcNotebookGitRepository(bindingId, connection)) {
       try (ObjectInserter inserter = store.newObjectInserter()) {
-        GitBundleTestReader.copyAllReachableObjects(source, head, inserter);
+        NotebookGitReachableObjectCopier.copyAllReachableObjects(source, head, inserter);
         inserter.flush();
       }
     }

@@ -35,12 +35,10 @@ class NotebookGitReservedFileRejectionControllerTest extends NotebookGitBundleCo
     byte[] acceptedBundle =
         proposalBundleBytes(binding, List.of(new NotebookGitProposalFile(path, ORIGINAL, mode)));
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      binding.setAcceptedGitObjectId(
-          GitBundleTestReader.fetchHead(repository, acceptedBundle).name());
+      binding =
+          seedAcceptedHistory(
+              notebook, repository, GitBundleTestReader.fetchHead(repository, acceptedBundle));
     }
-    binding.setBundleBytes(acceptedBundle);
-    notebookGitBindingRepository.save(binding);
-    clearNativeObjectStoreRows(binding.getId());
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(

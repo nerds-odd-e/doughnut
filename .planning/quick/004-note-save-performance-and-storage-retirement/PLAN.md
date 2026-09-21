@@ -20,10 +20,10 @@ slices; no product proof is claimed beyond what the evidence sections record.
   settings were not rewritten. CI selection, had it been available, resolves to
   GitHub Actions with workflow `ci.yml`, display name `donut CI` (not the default
   `CI`), which is push-triggered on all branches.
-Work item: **SEED-034#story-4**.
-Source: [refined story](../../seeds/SEED-034-faster-note-content-saving.md#story-4).
-Planning inspection: `2e8cf08e01c55caa60fa8b161716ccfd5acf4d76`, plus the
-owner's current story refinements. Keep the item queued until execution starts.
+- Work item: **SEED-034#story-4**.
+  Source: [refined story](../../seeds/SEED-034-faster-note-content-saving.md#story-4).
+  Planning inspection: `2e8cf08e01c55caa60fa8b161716ccfd5acf4d76`, plus the
+  owner's current story refinements.
 
 ## Outcome and boundaries
 
@@ -423,7 +423,7 @@ and slice 13 measures the current side only, so no refresh is needed. If the
 baseline side is ever re-run, refresh its four copied harness files first.
 
 ### 4. Seed current accepted histories directly
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 
 Remove conversion-dependent setup in `NotebookGitBundleControllerTestBase` and
 other shared builders: valid setup goes through existing creation/publication/
@@ -434,6 +434,88 @@ trick wherever its only purpose was lazy conversion. Preserve independent SQL
 observations of transaction rollback/cascade. Enables slices 5–7 and 9.
 Proof: B, with existing invalid-tip/drift/publication assertions preserved.
 Size: 5–10 active minutes; split if distinct fixture owners need different work.
+
+**Delivered.** Four backend test files, no production code. `seedAcceptedBinding`
+no longer writes the legacy column or clears native rows; it delegates to a new
+`seedAcceptedHistory(Notebook, Repository, ObjectId)` that sets the accepted head
+and copies every reachable object into the binding's native object store through
+the **existing** seam - `new JdbcNotebookGitRepository(bindingId, connection)` plus
+`GitBundleTestReader.copyAllReachableObjects`, on a `DataSourceUtils`-bound
+connection inside a committed transaction, the same mechanic production's
+`NotebookGitAcceptedRepositoryStore` uses. No new test-only storage facade.
+Three per-domain files held their own copy of the same trick and now delegate to
+that one seam: proposal rename rejection, reserved-file rejection, proposal
+ancestry. `seedAcceptedHistory` is the single seam for any later slice needing a
+deliberately malformed or disjoint accepted state, and needs no change when the
+column goes.
+
+Preserved, verified present: `assertProposalRejectedWithoutMutatingBinding`
+(head, bytes and `updatedAt` unchanged), reserved-file rejection reasons,
+non-regular-mode rename rejections, merge-below-tip publication acceptance,
+`NotebookGitPublicationAtomicControllerTest`'s unchanged native row count across
+a failed save, and `NotebookGitBindingRepositoryTest`'s FK-cascade observation.
+No assertion was weakened or deleted. The new seeding cannot pass vacuously: if
+the object copy did not land, `open()` reads a seeded head absent from the store,
+or `importAndVerifyMainHead` fails loudly against a stale creation bundle.
+
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, exit 0,
+BUILD SUCCESSFUL. Coordinator confirmed from the JUnit XML: **2,564 tests,
+0 failures, 0 errors, 0 skipped.**
+
+**Learnings that resize slices 5, 6 and 9 (fold in before dispatching them):**
+
+- **Slice 5 is smaller than the 51-file count suggests.** No proposal-gating test
+  now depends on the legacy column for its seeded state. The remaining
+  old-column reads in the proposal family sit in
+  `NotebookGitProposalAncestryControllerTest` (about six sites) against bindings
+  produced by `snapshotCurrentPortableTree` (reset), which still works only
+  because production `NotebookGitAcceptedRepositoryStore.apply()` writes the
+  column. The ready replacement is the download boundary already used by the
+  base's `proposalBundleBytes`
+  (`controller.downloadNotebookGitBundle(notebook).getBody()`); the same
+  substitution took one line in slice 4.
+- **Slice 6 carries a coupling to slice 9.** `NotebookGitWebContentSaveControllerTest`
+  deliberately exercises the legacy conversion path in two tests
+  (`firstSaveConvertsALegacyBindingAndASecondSaveNeitherLoadsNorRewritesTheLegacyBundle`
+  and `corruptStoredAcceptedBundleFailsLoudlyWithoutSavingTheNote`, the latter an
+  ADR 0006 loud-failure observation). These cannot be "moved off the old column" -
+  the column *is* their subject. They must be deleted or re-aimed **together with
+  slice 9**, when the runtime legacy-import fallback goes. Their two retained
+  `clearNativeObjectStoreRows` calls and the base's `countNativeObjectStoreRows`
+  uses are justified for the same reason. Plan this coupling into slice 6 rather
+  than discovering it mid-slice.
+- **Slice 9 has three non-obvious column writers besides the entity field**, and
+  the `NOT NULL` constraint is the real gate - until the nullable transition
+  lands, any new binding insert must still supply something:
+  1. production `NotebookGitAcceptedRepositoryStore.apply()`, which writes
+     `bundleBytes` purely to satisfy `NOT NULL`;
+  2. `backend/src/test/java/com/odde/donut/services/notebookGit/NotebookGitJdbcFixture.insertBinding`,
+     which inserts `new byte[0]` for the same reason;
+  3. the base's `assertProposalRejectedWithoutMutatingBinding` bundle-bytes
+     assertion.
+- Live transport is untouched and must stay so: `NotebookGitBundleWriter`,
+  `NotebookGitBundleImporter`, `proposalBundleBytes` and `bundleBytesForHead`
+  remain in use for clone/download/proposal transport.
+
+Refactor outcome (slice 4): `GitBundleTestReader` held a **verbatim duplicate** of
+production's `NotebookGitReachableObjectCopier.copyAllReachableObjects`, whose own
+Javadoc says it is public so callers reuse that exact copy mechanic instead of a
+second implementation. The duplicate and its three test callers were collapsed onto
+the production copier, so one algorithm now has one implementation used by tests,
+`NotebookGitAcceptedRepositoryStore` and the migration backfill alike. The raw
+JDBC/JGit seeding mechanics moved out of the controller test base into
+`backend/src/test/java/com/odde/donut/testability/NotebookGitAcceptedHistoryFixture.java`,
+returning that base to Spring/JPA fixtures only (258 -> 235 lines). Net test-code
+lines fell despite adding a file. Suite re-run after the refactor: 2,564 tests,
+0 failures, 0 errors, 0 skipped.
+
+Known remaining duplication, for slice 9 or 14 to retire: the test seeding path
+still re-implements `NotebookGitAcceptedRepositoryStore`'s own copy-into-native-store
+step because that service and its `copyIntoNativeStore`/`mainHeadOf` are
+package-private. If a later slice makes that seam reachable, or moves these
+fixtures into `com.odde.donut.services.notebookGit`, the test helper can go away
+entirely. Left deliberately: collapsing it now would need a production visibility
+change that slice 4 is not authorized to make.
 
 ### 5. Observe publication history through the public boundary
 Type: Structure. Status: planned.
