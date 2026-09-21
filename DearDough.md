@@ -263,7 +263,9 @@ actually remove the dead dependencies, then re-ran the affected suites.
     consolidation is exactly the kind of refactor claim that is cheap to
     verify against `git diff` and easy to misreport.
 
-## DD-061 — Story Branch Mode edits made in the originating checkout got swept into an unrelated concurrent commit
+## ODF-081 — Story Branch Mode edits made in the originating checkout got swept into an unrelated concurrent commit
+
+Former local code: DD-061.
 
 `dough-execute-plan` created a Story Branch Mode execution worktree for plan
 131, but the coordinator's later edits to that plan's own PLAN.md (recording
@@ -310,7 +312,9 @@ ended up stale and empty, later deleted with nothing to deliver.
     this; a repeated `git status` check before delivery in the wrong
     checkout would also have surfaced it earlier.
 
-## DD-062 — Delegation guidance has no protocol for a subagent that dies mid-edit from an infrastructure error, leaving a silent partial change
+## ODF-059 — Delegation guidance has no protocol for a subagent that dies mid-edit from an infrastructure error, leaving a silent partial change
+
+Former local code: DD-062.
 
 [Delegation](../dough-execute-plan/references/delegation.md) and
 [refactor return](../dough-post-change-refactor/SKILL.md#return-control) both
@@ -353,7 +357,9 @@ whether to retry, revert, or finish the work itself.
     the partial edit, or complete it directly) and must improvise from raw
     diff inspection every time this occurs.
 
-## DD-063 — Coordinator kept editing the shared execution checkout while a delegated refactor subagent was inspecting the same files, forcing a wasted stop
+## ODF-082 — Coordinator kept editing the shared execution checkout while a delegated refactor subagent was inspecting the same files, forcing a wasted stop
+
+Former local code: DD-063.
 
 [Delivery](../dough-execute-plan/references/wrap-up.md#deliver-the-change) step
 1 spawns a fresh post-change-refactor subagent against "the execution
@@ -401,7 +407,9 @@ full subagent turn (~6 minutes, ~86k tokens) with no usable output.
     concurrently-running subagent reading the same files and burn a full
     subagent turn on a stop neither side could have avoided once started.
 
-## DD-064 — A prior execution left the shared main checkout on its own feature branch with uncommitted work, blocking the next plan's execution setup
+## ODF-083 — A prior execution left the shared main checkout on its own feature branch with uncommitted work, blocking the next plan's execution setup
+
+Former local code: DD-064.
 
 [Execution location](../dough-execute-plan/references/execution-location.md)
 requires Story Branch Mode to create one execution branch and worktree per
@@ -450,162 +458,9 @@ session tasked with the same repair.
     checkout — rather than creating its own worktree — strands that checkout
     for every later execution until manually repaired.
 
-## DD-065 — ci-mailbox.mjs's CLI dispatch silently no-ops when invoked through the `.claude/skills` symlink instead of its `.agents/skills` realpath
+## ODF-084 — A concurrent session deleted an active Story Branch execution worktree and branch while a delegated subagent was mid-slice
 
-`ci-mailbox.mjs`'s main-module guard
-(`process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href`)
-compares the invoked path against the module's symlink-resolved URL. This
-project's own Nix shell setup (`scripts/shell_setup.sh`) deliberately
-symlinks `.claude/skills/<name>` to `.agents/skills/<name>` in every
-checkout/worktree so Claude Code can discover skills, and
-`references/runtime-setup.md` documents `.claude/skills/dough-execute-plan`
-as the normal Claude Code script path. Invoking
-`node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe` (or
-`start`/`register-push`/`stop`) makes Node resolve `import.meta.url` to the
-real, post-symlink `.agents/skills/...` path while `process.argv[1]` keeps
-the invoked `.claude/skills/...` path, so the strict equality check fails,
-the CLI dispatch branch never runs, and the process exits 0 with zero
-stdout — no error, no `CI_OBSERVER` receipt, no diagnostic. The identical
-command run via the `.agents/skills/...` realpath works correctly and prints
-the expected receipt. The failure mode (silent success-looking no-op, not a
-stop or error) is worse than `runtime-setup.md`'s existing checkout-identity
-guidance anticipates: a coordinator following the documented path literally
-gets nothing, which is easy to mistake for a successful no-op rather than an
-untriggered CLI guard.
-
-### Ownership and current status (2026-09-21)
-
-Restored to the shared findings log after checking the published payload.
-Donut has no `.planning/open-dough.json` CI adapter or tracked observer-setting
-overrides; the installed runtime, setup guidance, and hook templates match
-Open Dough v0.3.26 byte-for-byte. The local skill symlink exposes a defect in
-the shared CLI entry guard; it is not a custom Donut observer implementation.
-
-The original failure still reproduces with Donut’s installed v0.3.26. Published
-[v0.3.27](https://github.com/terryyin/open-dough/blob/v0.3.27/src/skills/dough-execute-plan/scripts/ci-direct-entry.mjs)
-fixes realpath-equivalent CLI entry detection (upstream commit `eff69eb`). An
-isolated probe using that released runtime through the same skill symlink
-returned exit 0 with `CI_OBSERVER`, confirming the fix at the reported boundary.
-The release has not been installed into Donut by this review. This is an upstream
-fix awaiting adoption, not a Donut product story or a confirmed local resolution.
-
-### Occurrences
-
-- Execution: SEED-024 story 1 / quick/135-irreversible-relationship-reduction
-  - Timestamp: 2026-09-17, evening +08:00 (during CI-observer arming before
-    slice 1 delegation)
-  - Tool: Claude Code
-  - Model: claude-sonnet-5
-  - Open Dough release: unknown
-  - Evidence: `node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
-    run from the execution worktree root produced no stdout and exit code 0;
-    an inline `node -e` script importing the same file's `probeMailbox` export
-    directly worked and returned a directory; `node .agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
-    then printed `CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-oZWLUN"}`
-    and the PostToolUse hook added `CI_MONITOR_READY` context, confirming the
-    realpath invocation was the fix.
-  - Observed effect: no lost coverage — the silent no-op was caught by testing
-    an inline import before trusting the CLI, and the observer was armed
-    successfully via the realpath before any slice was delegated — but it
-    cost extra diagnostic steps, and a less cautious run could have proceeded
-    believing CI observation was set up when it was not.
-  - Inference: the CLI entry guard should compare canonicalized/realpath forms
-    of `process.argv[1]` and the module path (or otherwise detect direct
-    invocation more robustly than exact string equality against a path that
-    may traverse a project-standard symlink), since this project's own setup
-    deliberately creates that exact symlink in every checkout.
-
-- Execution: SEED-028 story 1 / quick/140-admin-job-status-local-time / 1694c122d9
-  - Timestamp: 2026-09-18 (session date)
-  - Tool: Claude Code
-  - Model: claude-sonnet-5
-  - Open Dough release: unknown
-  - Evidence: `node '.claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
-    run from the execution worktree root produced no stdout and exit code 0,
-    with no `CI_MONITOR_READY` PostToolUse context added. `node '.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
-    then printed `CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-mL5Kzr"}`
-    and the hook added `CI_MONITOR_READY`.
-  - Observed effect: worse than the prior occurrence — this coordinator
-    concluded CI observation was genuinely unavailable from the silent no-op
-    alone, reported that limitation to the user, and had already pushed
-    slice 1's commit unobserved before checking this log's existing DD-065
-    entry, recognizing the exact match, retrying via the realpath, and
-    starting the observer late (after the push it should have covered).
-    No coverage was permanently lost (the observer's startup snapshot still
-    discovered the already-pushed commit's run), but the sequence shows the
-    silent-no-op failure mode reliably reproduces a false "unavailable"
-    conclusion for a coordinator that does not already know to check this
-    log before trusting the probe's silence.
-  - Inference: same root cause and same fix as the original finding; the
-    false-unavailable conclusion this occurrence reached is itself further
-    evidence for fixing the CLI guard rather than relying on operators to
-    recall this log entry.
-
-- Execution: SEED-033 story 1 / quick/144-compact-spelling-results / 55fc4ba255
-  - Timestamp: 2026-09-18 (session date)
-  - Tool: Claude Code
-  - Model: claude-sonnet-5
-  - Open Dough release: unknown
-  - Evidence: `node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
-    run from the execution worktree root (with both a bare relative path and
-    an absolute path) produced no stdout and exit code 0, with no
-    `CI_MONITOR_READY` PostToolUse context added; a standalone inline script
-    confirmed `pathToFileURL` resolution matched in isolation, so the silence
-    was not an obvious invocation mistake. `node '.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs' probe`
-    then printed `CI_OBSERVER {"directory":"/tmp/dough-ci-501/watch-mAT38C"}`
-    and the hook added `CI_MONITOR_READY`.
-  - Observed effect: same false-unavailable pattern as the second occurrence —
-    this coordinator concluded the bridge was unavailable for this
-    non-interactive/background-job session, reported that limitation, and had
-    already pushed slice 1's commit unobserved before reaching the
-    retrospective's process review, which is what surfaced this log's
-    existing DD-065 entry and prompted retrying via the realpath. The
-    observer's startup snapshot still discovered the already-pushed commit's
-    run once armed and the SHA was registered after the fact, so no coverage
-    was permanently lost, but two independent coordinators have now reached
-    the same wrong "unavailable" conclusion from the same silent no-op before
-    reading this log.
-  - Inference: same root cause and fix as the prior occurrences. The repeat
-    across three separate executions (two different coordinators reaching the
-    false-unavailable conclusion) strengthens the case that this needs the
-    CLI guard fixed rather than continuing to rely on retrospective review to
-    catch it after the fact.
-
-- Execution: quick/260920-frontend-proof-type-checking / 7b1d80b4e8
-  - Timestamp: 2026-09-19 (session date)
-  - Tool: Claude Code
-  - Model: claude-sonnet-5
-  - Open Dough release: unknown
-  - Evidence: `node ./.claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs
-    start --execution nerds-odd-e/doughnut worktree-260920-frontend-proof-type-checking`
-    run from the execution worktree root (after this session had already
-    entered a Nix shell there, which creates the `.claude/skills/<name>`
-    symlinks) produced no stdout and exit code 0, with no
-    `CI_OBSERVER`/`CI_MONITOR_READY` context added. Individually reading that
-    same path with `sed`/`grep`/`cp` returned real file content matching
-    `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`, while a bare
-    `ls -la .claude/skills` from the worktree root (no subpath) showed zero
-    entries beside `.` and `..` — the per-file reads and the directory
-    listing disagreed about whether the path existed.
-    `node ./.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs start ...`
-    then printed the expected `CI_OBSERVER {"directory":...}` receipt and the
-    PostToolUse hook added its context.
-  - Observed effect: no lost coverage — diagnosed via an inline import script
-    that printed the module's actual exports before trusting the CLI's
-    silence, then armed and registered the already-pushed commit via the
-    realpath before shutting the observer down — but cost several extra
-    diagnostic tool calls after the branch had already been pushed, during a
-    background/non-interactive session with no live user to consult.
-  - Inference: same root cause and fix as the prior three occurrences. The
-    disagreement between successful individual-file reads and an empty bare
-    directory listing for the same `.claude/skills` path is a new wrinkle
-    worth naming: it means confirming the target file is readable is not
-    sufficient confirmation that the CLI invocation through that path will
-    behave correctly, which makes runtime-setup.md's own "do not reuse the
-    installed directory that supplied the initially loaded skill" caution
-    easy to satisfy on a shallow check while still hitting this failure mode.
-
-## DD-072 — A concurrent session deleted an active Story Branch execution worktree and branch while a delegated subagent was mid-slice
+Former local code: DD-072.
 
 `dough-execute-plan` created the Story Branch Mode worktree
 `.worktrees/145-reset-notebook-git-history` (branch of the same name) from
@@ -662,7 +517,9 @@ another execution's in-flight tree rather than a teardown of plan 145.
     integration checkout for edits but not that its working-tree state is
     untrustworthy as evidence.
 
-## DD-074 — The documented `.claude/skills` runtime path did not exist at all in a freshly created execution worktree
+## ODF-085 — The documented `.claude/skills` runtime path did not exist at all in a freshly created execution worktree
+
+Former local code: DD-074.
 
 [runtime-setup.md](.agents/skills/dough-execute-plan/references/runtime-setup.md) documents
 `.claude/skills/dough-execute-plan` as the normal Claude Code location of the
@@ -817,7 +674,9 @@ withdrawn after this ownership check; no product replacement is queued.
     `.agents/skills` never consulted even though this entry already names it
     as the fix.
 
-## DD-075 — The product backlog moved on the shared integration branch between the coordinator's read and its queue claim
+## ODF-086 — The product backlog moved on the shared integration branch between the coordinator's read and its queue claim
+
+Former local code: DD-075.
 
 `dough-execute-plan`'s [Take queued work](../dough-execute-plan/SKILL.md#take-queued-work)
 requires preflighting the originating checkout for branch, backlog path,
@@ -862,7 +721,9 @@ text; an edit applied from the earlier in-memory reading would have written a
     must be confirmed to be exactly the intended one-entry move, would make
     this independent of how the edit happens to be applied.
 
-## DD-076 — The CI observer's fixed discovery-poll bound reports lost coverage for revisions whose CI run exists and later succeeds
+## ODF-069 — The CI observer's fixed discovery-poll bound reports lost coverage for revisions whose CI run exists and later succeeds
+
+Former local code: DD-076.
 
 [runtime-setup.md](../dough-execute-plan/references/runtime-setup.md) polls
 30 seconds apart and ends discovery after three consecutive misses (about 90
