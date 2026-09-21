@@ -8,7 +8,7 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,7 @@ class NotebookGitProposalFolderRelocationPrivateAssociationControllerTest
     extends NotebookGitMovedNotePrivateAssociationControllerTestBase {
 
   private static final String README_BODY = "readme";
-  private static final String README = ExportReadmeMarkdown.assemble(README_BODY);
+  private static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
   private static final String MATCHING_CONTENT = "---\ntype: Note\n---\nmatching learned content";
   private static final String EDITED_CONTENT = "---\ntype: Note\n---\nedited after folder move";
 

@@ -1,6 +1,6 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
+import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -13,7 +13,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedTip;
 import java.util.List;

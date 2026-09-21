@@ -1,12 +1,12 @@
 package com.odde.donut.services.notebookGit;
 
-import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
+import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.io.IOException;
 import java.time.Instant;

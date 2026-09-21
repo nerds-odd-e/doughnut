@@ -1,6 +1,6 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
+import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -13,9 +13,9 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,7 @@ class NotebookGitProposalFolderRelocationDestinationControllerTest
     extends NotebookGitControllerTestBase {
 
   private static final String README_BODY = "readme";
-  private static final String README = ExportReadmeMarkdown.assemble(README_BODY);
+  private static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
   private static final String NOTE = "---\ntype: Note\n---\nnote";
   private static final String UNREPRESENTED_NOTE = "note";
 

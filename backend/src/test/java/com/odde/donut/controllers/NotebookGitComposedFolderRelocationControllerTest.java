@@ -10,7 +10,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +30,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 class NotebookGitComposedFolderRelocationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String README_BODY = "readme";
-  private static final String README = ExportReadmeMarkdown.assemble(README_BODY);
+  private static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
   private static final String NOTE = "---\ntype: Note\n---\nnote";
   private static final String EDITED = "---\ntype: Note\n---\nedited";
   private static final String ADDED = "---\ntype: Note\n---\nadded";
-  private static final String ARCHIVE_README = ExportReadmeMarkdown.assemble("Archive landing");
+  private static final String ARCHIVE_README =
+      PortableTreeReadmeMarkdown.assemble("Archive landing");
 
   @Autowired FolderRepository folderRepository;
 

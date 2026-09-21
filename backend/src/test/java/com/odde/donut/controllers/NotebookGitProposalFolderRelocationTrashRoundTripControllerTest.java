@@ -13,8 +13,8 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -33,7 +33,7 @@ class NotebookGitProposalFolderRelocationTrashRoundTripControllerTest
     extends NotebookGitWebContentControllerTestBase {
 
   static final String README_BODY = "Biology readme";
-  static final String README = ExportReadmeMarkdown.assemble(README_BODY);
+  static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
   static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";
   static final String NUCLEUS_BODY = "---\ntype: Note\n---\nnucleus body";
 

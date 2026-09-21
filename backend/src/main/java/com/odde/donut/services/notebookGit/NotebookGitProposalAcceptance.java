@@ -5,8 +5,8 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.factoryServices.EntityPersister;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -141,11 +141,12 @@ class NotebookGitProposalAcceptance {
   private NotebookGitStateLoader.LockedNotebookState reconcileUnrepresentedFolders(
       NotebookGitStateLoader.LockedNotebookState published,
       NotebookGitProposalImporter.ImportedProposal proposal) {
-    List<ExportFolderRow> folders = published.folders();
-    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
+    List<PortableTreeFolderRow> folders = published.folders();
+    Map<Integer, PortableTreeFolderRow> folderById =
+        NotebookGitAcceptedTree.indexFoldersById(folders);
     List<PortableTreeEntry> proposedEntries =
         NotebookGitAcceptedTree.readEntries(proposal.repository(), proposal.mainHead());
-    List<ExportFolderRow> unrepresented =
+    List<PortableTreeFolderRow> unrepresented =
         folders.stream()
             .filter(
                 folder ->
@@ -153,15 +154,15 @@ class NotebookGitProposalAcceptance {
                         NotebookGitAcceptedTree.folderPath(folder, folderById), proposedEntries))
             .sorted(
                 Comparator.comparingInt(
-                        (ExportFolderRow folder) ->
+                        (PortableTreeFolderRow folder) ->
                             NotebookGitAcceptedTree.folderPath(folder, folderById).length())
                     .reversed())
             .toList();
-    for (ExportFolderRow folder : unrepresented) {
+    for (PortableTreeFolderRow folder : unrepresented) {
       entityPersister.remove(entityPersister.find(Folder.class, folder.id()));
     }
     Set<Integer> removedIds =
-        unrepresented.stream().map(ExportFolderRow::id).collect(Collectors.toSet());
+        unrepresented.stream().map(PortableTreeFolderRow::id).collect(Collectors.toSet());
     return new NotebookGitStateLoader.LockedNotebookState(
         published.binding(),
         published.notebook(),

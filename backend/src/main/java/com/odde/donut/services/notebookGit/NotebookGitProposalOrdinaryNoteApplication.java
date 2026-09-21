@@ -11,7 +11,7 @@ import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteMotionService;
 import com.odde.donut.services.NoteService;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +70,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
     }
   }
 
-  List<ExportFolderRow> applyModificationsAndRenames(
+  List<PortableTreeFolderRow> applyModificationsAndRenames(
       NotebookGitProposalTreeShape.AdmittedShape admitted,
       Notebook notebook,
       NotebookGitProposalImporter.ImportedProposal proposal,

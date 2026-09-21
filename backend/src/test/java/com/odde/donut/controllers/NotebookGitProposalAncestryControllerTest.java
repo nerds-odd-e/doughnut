@@ -1,12 +1,12 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
+import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
 import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.time.Instant;
 import java.util.List;

@@ -9,7 +9,7 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.NoteFactory;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
 import java.util.List;
@@ -62,7 +62,7 @@ class NotebookGitProposalNoteAddition {
    */
   Note applyAtRepresentedPath(
       Notebook notebook,
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       String path,
@@ -106,7 +106,7 @@ class NotebookGitProposalNoteAddition {
   }
 
   Folder representedDestinationFolder(
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       NotebookGitProposalImporter.ImportedProposal proposal,
       ObjectId acceptedHead,
       String path) {

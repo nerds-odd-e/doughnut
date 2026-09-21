@@ -2,7 +2,7 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -13,11 +13,12 @@ public interface FolderRepository extends CrudRepository<Folder, Integer> {
 
   @Query(
       """
-      SELECT NEW com.odde.donut.services.notebookExport.ExportFolderRow(
+      SELECT NEW com.odde.donut.services.notebookTree.PortableTreeFolderRow(
           f.id, f.parentFolder.id, f.name, f.readmeContent)
       FROM Folder f WHERE f.notebook.id = :notebookId ORDER BY f.id ASC
       """)
-  List<ExportFolderRow> findExportRowsByNotebookId(@Param("notebookId") Integer notebookId);
+  List<PortableTreeFolderRow> findPortableTreeRowsByNotebookId(
+      @Param("notebookId") Integer notebookId);
 
   String FOLDER_SEARCHABLE = " AND f.notebook.deletedAt IS NULL AND f.trashedInDatabase = false ";
   String FOLDER_NAME_LIKE = " WHERE LOWER(f.name) LIKE LOWER(:pattern)" + FOLDER_SEARCHABLE;

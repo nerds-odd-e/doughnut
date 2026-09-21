@@ -5,7 +5,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public class NotebookGitProposalPublisher {
                         HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
     NotebookGitBinding binding = state.binding();
     Notebook notebook = state.notebook();
-    List<ExportFolderRow> folders = state.folders();
+    List<PortableTreeFolderRow> folders = state.folders();
     List<Note> storedNotes = state.storedNotes();
     authorizationService.assertAuthorization(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
@@ -168,7 +168,7 @@ public class NotebookGitProposalPublisher {
               publishedAt);
       proposedNotes = new ArrayList<>(published.storedNotes());
     }
-    List<ExportFolderRow> proposedFolders =
+    List<PortableTreeFolderRow> proposedFolders =
         ordinaryNoteApplication.applyModificationsAndRenames(
             admitted, published.notebook(), proposal, proposedNotes, publishedAt);
     return proposalAcceptance.acceptMatchingProposedTree(
@@ -233,7 +233,7 @@ public class NotebookGitProposalPublisher {
   }
 
   private static boolean isEmptyAcceptedNotebook(
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       List<Note> storedNotes,
       List<NotebookGitProposalTreeShape.InspectedRegularFile> files) {
     return folders.isEmpty()

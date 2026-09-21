@@ -5,7 +5,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.FolderMoveRelocation;
 import com.odde.donut.services.FolderSiblingNameValidation;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jgit.lib.ObjectId;
@@ -63,7 +63,7 @@ class NotebookGitProposalFolderRelocation {
       ObjectId acceptedHead,
       NotebookGitProposalFolderShape.FolderRelocation relocation,
       boolean requireMatchingAcceptedTree) {
-    List<ExportFolderRow> folders = state.folders();
+    List<PortableTreeFolderRow> folders = state.folders();
     int sourceFolderId =
         projection.requireRepresentedRelocationSource(
             folders, proposal.repository(), acceptedHead, relocation);

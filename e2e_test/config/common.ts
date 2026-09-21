@@ -22,7 +22,6 @@ import { composeCypressPluginEvents } from './composeCypressPluginEvents.mjs'
 import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { E2E_APP_BASE_URL } from './constants'
-import { readZipEntries } from './readZipEntries'
 import { notebookPublicationProfileTasks } from './notebookPublicationProfile'
 import { mcpClientTasks } from './mcpClientTasks'
 
@@ -153,25 +152,6 @@ const commonConfig = {
           })
         },
 
-        readZipEntries,
-        fileShouldExistSoon(filePath, retryCount = 50): Promise<string> {
-          const checker = (count: number): Promise<string> => {
-            return new Promise((resolve) => {
-              if (existsSync(filePath)) {
-                resolve(filePath)
-                return
-              }
-              if (count === 0) {
-                resolve(`file not found: ${filePath}`)
-                return
-              }
-              setTimeout(() => {
-                checker(count - 1).then((result) => resolve(result))
-              }, 100)
-            })
-          }
-          return checker(retryCount)
-        },
         async ocrCanvasImage(base64Png: string) {
           const { createWorker } = await import('tesseract.js')
           const tessDir = join(repoRoot, 'e2e_test', 'tesseract')

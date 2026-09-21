@@ -1,4 +1,4 @@
-package com.odde.donut.services.notebookExport;
+package com.odde.donut.services.notebookTree;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,23 +7,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Builds the canonical, ordered Portable-tree snapshot for a notebook export: one entry per
- * README.md, note file and attachment, in the same traversal order the ZIP export produces. Within
- * a directory the order is README, then notes, then attachments by filename, then subdirectories.
+ * Builds the canonical, ordered Portable-tree snapshot for a notebook: one entry per README.md,
+ * note file and attachment, in the same traversal order every consumer uses. Within a directory the
+ * order is README, then notes, then attachments by filename, then subdirectories.
  */
 public final class PortableTreeSnapshot {
   // Notebook/Folder rows are database ids and are never 0, so 0 safely means "no parent / root".
   private static final int ROOT_KEY = 0;
 
-  private final Map<Integer, List<ExportFolderRow>> childFoldersByParent;
-  private final Map<Integer, List<ExportNoteRow>> notesByFolder;
-  private final Map<Integer, List<ExportAttachmentRow>> attachmentsByFolder;
+  private final Map<Integer, List<PortableTreeFolderRow>> childFoldersByParent;
+  private final Map<Integer, List<PortableTreeNoteRow>> notesByFolder;
+  private final Map<Integer, List<PortableTreeAttachmentRow>> attachmentsByFolder;
   private final List<PortableTreeEntry> entries = new ArrayList<>();
 
   private PortableTreeSnapshot(
-      List<ExportFolderRow> folders,
-      List<ExportNoteRow> notes,
-      List<ExportAttachmentRow> attachments) {
+      List<PortableTreeFolderRow> folders,
+      List<PortableTreeNoteRow> notes,
+      List<PortableTreeAttachmentRow> attachments) {
     childFoldersByParent =
         folders.stream().collect(Collectors.groupingBy(f -> folderKey(f.parentFolderId())));
     notesByFolder = notes.stream().collect(Collectors.groupingBy(n -> folderKey(n.folderId())));
@@ -33,9 +33,9 @@ public final class PortableTreeSnapshot {
 
   public static List<PortableTreeEntry> build(
       String notebookReadmeContent,
-      List<ExportFolderRow> folders,
-      List<ExportNoteRow> notes,
-      List<ExportAttachmentRow> attachments) {
+      List<PortableTreeFolderRow> folders,
+      List<PortableTreeNoteRow> notes,
+      List<PortableTreeAttachmentRow> attachments) {
     PortableTreeSnapshot snapshot = new PortableTreeSnapshot(folders, notes, attachments);
     snapshot.collectDirectory("", ROOT_KEY, notebookReadmeContent);
     return snapshot.entries;
@@ -50,23 +50,23 @@ public final class PortableTreeSnapshot {
     if (readmeContentOrNull != null && !readmeContentOrNull.isBlank()) {
       entries.add(
           PortableTreeEntry.ofText(
-              pathPrefix + "README.md", ExportReadmeMarkdown.assemble(readmeContentOrNull)));
+              pathPrefix + "README.md", PortableTreeReadmeMarkdown.assemble(readmeContentOrNull)));
     }
 
-    for (ExportNoteRow note : notesByFolder.getOrDefault(folderKey, List.of())) {
+    for (PortableTreeNoteRow note : notesByFolder.getOrDefault(folderKey, List.of())) {
       String content = note.content() == null ? "" : note.content();
       entries.add(PortableTreeEntry.ofText(pathPrefix + note.title() + ".md", content));
     }
 
-    List<ExportAttachmentRow> orderedAttachments =
+    List<PortableTreeAttachmentRow> orderedAttachments =
         attachmentsByFolder.getOrDefault(folderKey, List.of()).stream()
-            .sorted(Comparator.comparing(ExportAttachmentRow::filename))
+            .sorted(Comparator.comparing(PortableTreeAttachmentRow::filename))
             .toList();
-    for (ExportAttachmentRow attachment : orderedAttachments) {
+    for (PortableTreeAttachmentRow attachment : orderedAttachments) {
       entries.add(new PortableTreeEntry(pathPrefix + attachment.filename(), attachment.content()));
     }
 
-    for (ExportFolderRow folder : childFoldersByParent.getOrDefault(folderKey, List.of())) {
+    for (PortableTreeFolderRow folder : childFoldersByParent.getOrDefault(folderKey, List.of())) {
       collectDirectory(pathPrefix + folder.name() + "/", folder.id(), folder.readmeContent());
     }
 

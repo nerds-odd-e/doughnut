@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitJdbcFixture;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.NotebookGitAcceptedHistoryFixture;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

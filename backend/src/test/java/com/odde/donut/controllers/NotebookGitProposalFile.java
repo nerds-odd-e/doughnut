@@ -1,6 +1,6 @@
 package com.odde.donut.controllers;
 
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.eclipse.jgit.lib.FileMode;

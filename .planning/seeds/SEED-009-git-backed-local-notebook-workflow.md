@@ -38,52 +38,6 @@ web workflow changes take precedence while publishing after each local commit
 remains a smaller workaround. Accumulated publication is retained after them;
 its frequency and urgency remain unmeasured.
 
-## Story Decomposition
-
-S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. These are comparative,
-low-confidence hypotheses; refinement may split work further. Example counts
-are evidence of behavior, never limits on accepted histories or note counts.
-All stories preserve authorization, authored content, note identity and learning
-data; invalid or ambiguous changes must not silently discard work.
-
-<a id="story-46"></a>
-
-### Remove the ZIP export feature
-
-- **Identity:** SEED-009#story-46
-- **Goal:** Notebook owners use the Git workflow for local acquisition while
-  owners and maintainers stop carrying the weaker ZIP export through every
-  Portable-tree change. Less product and maintenance surface is the value.
-- **Scope / value:** Remove the ZIP feature completely: both web affordances,
-  the raw browser download path and its dependency, the HTTP operation and
-  generated client contract, ZIP assembly, feature-specific unit and E2E
-  coverage, E2E-only ZIP helpers, and current product documentation. Remove
-  export-shaped package, query, type, comment, and test vocabulary from the
-  shared live Portable-tree implementation; that implementation remains because
-  Git cutover, history reset, accepted web changes, and drift detection use it.
-  Do not add a replacement button, navigation, browser bundle download,
-  redirect, compatibility endpoint, deprecation record, or historical product
-  note. Generic ZIP support used by unrelated EPUB or CLI tests is not part of
-  this feature.
-- **Key examples:**
-  - Given any notebook visible in the catalog or its settings, when its actions
-    are shown, no ZIP export action or replacement acquisition navigation is
-    present.
-  - Given a client built from Donut's OpenAPI contract, when notebook operations
-    are inspected, there is no `exportNotebook` operation or notebook ZIP route;
-    the old route has no compatibility behavior.
-  - Given an owned notebook whose accepted tree contains Readmes, notes and
-    byte-exact attachments, when the owner uses the existing CLI Git acquisition,
-    the checkout still contains that accepted tree. Its existing owner-only
-    authorization and missing-binding behavior are unchanged; removal does not
-    widen access or create a browser alternative.
-- **Effort hypothesis:** M, medium confidence; deletion is small, but the shared
-  tree vocabulary has a broad mechanical Java import and query-method ripple.
-- **Depends on:** None. Queued immediately after delivered nested attachment
-  continuity by owner instruction; that delivery intentionally proved nothing
-  about ZIP output.
-- **Safe stopping point:** Complete on its own; nothing later needs it.
-
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order.

@@ -1,4 +1,4 @@
-package com.odde.donut.services.notebookExport;
+package com.odde.donut.services.notebookTree;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 /**
  * Builds a notebook's current Portable tree from its stored folders, notes (trash included) and
- * attachments. Every consumer of live Portable content — ZIP export, Git cutover, accepted web
- * changes, projection-drift detection — reads the tree from here, so what a notebook's Portable
- * tree contains is decided in one place.
+ * attachments. Every consumer of live Portable content — Git cutover, accepted web changes,
+ * projection-drift detection — reads the tree from here, so what a notebook's Portable tree
+ * contains is decided in one place.
  */
 @Service
 public class NotebookLivePortableTree {
@@ -32,30 +32,30 @@ public class NotebookLivePortableTree {
   public List<PortableTreeEntry> entriesOf(Notebook notebook) {
     return entries(
         notebook,
-        folderRepository.findExportRowsByNotebookId(notebook.getId()),
-        noteRepository.findExportRowsByNotebookId(notebook.getId()));
+        folderRepository.findPortableTreeRowsByNotebookId(notebook.getId()),
+        noteRepository.findPortableTreeRowsByNotebookId(notebook.getId()));
   }
 
   /** The same tree from folders and notes a caller already holds, as a locked publication does. */
   public List<PortableTreeEntry> entriesOf(
-      Notebook notebook, List<ExportFolderRow> folders, List<Note> storedNotes) {
+      Notebook notebook, List<PortableTreeFolderRow> folders, List<Note> storedNotes) {
     return entries(notebook, folders, noteRows(storedNotes));
   }
 
   private List<PortableTreeEntry> entries(
-      Notebook notebook, List<ExportFolderRow> folders, List<ExportNoteRow> notes) {
+      Notebook notebook, List<PortableTreeFolderRow> folders, List<PortableTreeNoteRow> notes) {
     return PortableTreeSnapshot.build(
         notebook.getReadmeContent(),
         folders,
         notes,
-        notebookAttachmentRepository.findExportRowsByNotebookId(notebook.getId()));
+        notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebook.getId()));
   }
 
-  private static List<ExportNoteRow> noteRows(List<Note> notes) {
+  private static List<PortableTreeNoteRow> noteRows(List<Note> notes) {
     return notes.stream()
         .map(
             note ->
-                new ExportNoteRow(
+                new PortableTreeNoteRow(
                     note.getFolder() == null ? null : note.getFolder().getId(),
                     note.getTitle(),
                     note.getContent()))

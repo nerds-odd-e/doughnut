@@ -1,10 +1,10 @@
-package com.odde.donut.services.notebookExport;
+package com.odde.donut.services.notebookTree;
 
 import com.odde.donut.entities.DisplayName;
 
-public record ExportFolderRow(
+public record PortableTreeFolderRow(
     Integer id, Integer parentFolderId, String name, String readmeContent) {
-  public ExportFolderRow(
+  public PortableTreeFolderRow(
       Integer id, Integer parentFolderId, DisplayName name, String readmeContent) {
     this(id, parentFolderId, name.value(), readmeContent);
   }

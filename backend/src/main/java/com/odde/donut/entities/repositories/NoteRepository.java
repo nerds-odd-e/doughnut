@@ -6,7 +6,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteLevelIndex;
 import com.odde.donut.entities.NotebookSettings;
 import com.odde.donut.services.AssimilationUnit;
-import com.odde.donut.services.notebookExport.ExportNoteRow;
+import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
 import com.odde.donut.utils.SearchTitleNormalizer;
 import java.util.List;
 import java.util.Set;
@@ -113,11 +113,12 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
 
   @Query(
       """
-      SELECT NEW com.odde.donut.services.notebookExport.ExportNoteRow(
+      SELECT NEW com.odde.donut.services.notebookTree.PortableTreeNoteRow(
           n.folder.id, n.title, n.content)
       FROM Note n WHERE n.notebook.id = :notebookId ORDER BY n.id ASC
       """)
-  List<ExportNoteRow> findExportRowsByNotebookId(@Param("notebookId") Integer notebookId);
+  List<PortableTreeNoteRow> findPortableTreeRowsByNotebookId(
+      @Param("notebookId") Integer notebookId);
 
   List<Note> findAllByNotebookIdOrderByIdAsc(Integer notebookId);
 

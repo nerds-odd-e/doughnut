@@ -13,7 +13,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -156,7 +156,9 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitControllerTe
         transactionManager,
         () -> {
           assertThat(
-              notebookAttachmentRepository.findExportRowsByNotebookId(notebook.getId()).stream()
+              notebookAttachmentRepository
+                  .findPortableTreeRowsByNotebookId(notebook.getId())
+                  .stream()
                   .map(row -> new PortableTreeEntry(row.filename(), row.content()))
                   .toList(),
               equalTo(List.of(PortableTreeEntry.ofText("reference.json", referenceJson))));

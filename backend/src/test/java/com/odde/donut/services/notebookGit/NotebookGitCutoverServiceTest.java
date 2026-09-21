@@ -10,10 +10,10 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.ExportNoteRow;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookExport.PortableTreeSnapshot;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
+import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
+import com.odde.donut.services.notebookTree.PortableTreeSnapshot;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.MakeMe;
 import java.time.Instant;
@@ -66,9 +66,9 @@ class NotebookGitCutoverServiceTest {
         PortableTreeSnapshot.build(
             "# Notebook readme",
             List.of(
-                new ExportFolderRow(folder.getId(), null, "Recipes", "# Recipes readme"),
-                new ExportFolderRow(emptyFolderId, null, "Ideas", null)),
-            List.of(new ExportNoteRow(folder.getId(), "Pasta", "Boil water")),
+                new PortableTreeFolderRow(folder.getId(), null, "Recipes", "# Recipes readme"),
+                new PortableTreeFolderRow(emptyFolderId, null, "Ideas", null)),
+            List.of(new PortableTreeNoteRow(folder.getId(), "Pasta", "Boil water")),
             List.of());
 
     assertThat(
@@ -138,8 +138,8 @@ class NotebookGitCutoverServiceTest {
     List<PortableTreeEntry> expectedEntries =
         PortableTreeSnapshot.build(
             "# Notebook readme",
-            List.of(new ExportFolderRow(folder.getId(), null, "Recipes", "# Recipes readme")),
-            List.of(new ExportNoteRow(folder.getId(), "Pasta", "Boil water")),
+            List.of(new PortableTreeFolderRow(folder.getId(), null, "Recipes", "# Recipes readme")),
+            List.of(new PortableTreeNoteRow(folder.getId(), "Pasta", "Boil water")),
             List.of());
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {

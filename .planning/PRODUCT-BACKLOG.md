@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Remove the ZIP export feature](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-46) — SEED-009#story-46 ([plan](quick/008-remove-zip-export/PLAN.md))
-
 ## Backlog list
 
 - [Repair the North Star attachment-classification link](quick/009-repair-attachment-contract-link/PLAN.md) — .planning/quick/008-repair-attachment-contract-link/PLAN.md

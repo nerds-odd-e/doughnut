@@ -1,6 +1,6 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
+import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -15,7 +15,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.ArrayList;
 import java.util.List;

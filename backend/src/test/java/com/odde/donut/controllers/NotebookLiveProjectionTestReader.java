@@ -7,7 +7,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import jakarta.persistence.EntityManager;
 import java.util.Comparator;
 import java.util.List;
@@ -33,7 +33,7 @@ final class NotebookLiveProjectionTestReader {
     return inCommittedTransaction(
         transactionManager,
         () ->
-            notebookAttachmentRepository.findExportRowsByNotebookId(notebookId).stream()
+            notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebookId).stream()
                 .map(row -> new PortableTreeEntry(row.filename(), row.content()))
                 .sorted(Comparator.comparing(PortableTreeEntry::path))
                 .toList());
@@ -48,7 +48,7 @@ final class NotebookLiveProjectionTestReader {
         transactionManager,
         () -> {
           Map<Integer, Folder> folders = foldersById(folderRepository, notebookId);
-          return notebookAttachmentRepository.findExportRowsByNotebookId(notebookId).stream()
+          return notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebookId).stream()
               .map(
                   row ->
                       new PortableTreeEntry(
