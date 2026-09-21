@@ -17,7 +17,7 @@ projection. Every Markdown file uses the existing note/Readme rules, including
 AI guidance; invalid Markdown is rejected, never treated as an attachment.
 Preserve non-Markdown attachment bytes. Follow
 [ADR 0004](../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation)
-and the [integration details](../docs/notebook-git-synchronization.md#classification-and-references).
+and the [integration details](../docs/notebook-git-attachments.md#classification-and-references).
 
 ## One accepted-change boundary
 

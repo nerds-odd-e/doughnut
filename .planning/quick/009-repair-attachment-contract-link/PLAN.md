@@ -2,7 +2,24 @@
 
 **Identity:** .planning/quick/008-repair-attachment-contract-link/PLAN.md
 
-Status: planned retrospective correction.
+Status: executed retrospective correction; execution retrospective pending.
+
+## Execution identity
+
+- Mode: Story Branch Mode.
+- Originating and integration checkout: `/Users/terryyin/git/doughnut` on
+  `main`.
+- Execution checkout: `/Users/terryyin/.codex/worktrees/repair-attachment-contract-link/doughnut`
+  on `codex/009-repair-attachment-contract-link`.
+- Authorized remote target: `origin/codex/009-repair-attachment-contract-link`;
+  integration target: `origin/main`.
+- Published claim revision: `cae26e44b7377ae748a002d8d237c9aeecc49b3d`.
+- CI observer: Codex yielded cell `22`, coordinator `/root`, checkout above,
+  repository `nerds-odd-e/doughnut`, target
+  `codex/009-repair-attachment-contract-link`, GitHub workflow `ci.yml`
+  (`donut CI`), mailbox `/tmp/dough-ci-501/watch-p3ngLY`, PID `35421`.
+  The Story Branch claim on `main` is `pendingCi: unobserved` by this
+  branch-bound observer.
 
 ## Source and bounded outcome
 
@@ -46,7 +63,7 @@ CURSOR_DEV=true nix develop -c sh -c \
 
 ### 1. North Star navigation reaches the attachment classification contract
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: given the North Star's **One format boundary** direction, when a
 maintainer follows its integration-details link, the destination is the
@@ -56,6 +73,11 @@ Change: repoint the existing link in `.planning/NORTH-STAR.md`; do not duplicate
 or move the destination text.
 
 Proof: the literal focused command above, plus `git diff --check`.
+
+Accepted proof: the focused command passed against the existing
+`integration details` link in `.planning/NORTH-STAR.md` and the existing
+`## Classification and references` heading in
+`docs/notebook-git-attachments.md`; `git diff --check` also passed.
 
 ## Current decisions
 
