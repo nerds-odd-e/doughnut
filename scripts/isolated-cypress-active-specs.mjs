@@ -51,7 +51,6 @@ export const APPLICATION_ONLY_ACTIVE_SPECS = [
   'e2e_test/features/note_view/search_note.feature',
   'e2e_test/features/notebooks/notebook_catalog_navigation.feature',
   'e2e_test/features/notebooks/notebook_creation.feature',
-  'e2e_test/features/notebooks/notebook_export.feature',
   'e2e_test/features/notebooks/notebook_group.feature',
   'e2e_test/features/notebooks/notebook_health.feature',
   'e2e_test/features/recall/accidental_match_scheduling.feature',

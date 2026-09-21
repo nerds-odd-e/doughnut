@@ -34,17 +34,6 @@
             Move to group…
           </button>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <button
-            type="button"
-            :class="dropdownMenuButtonClass"
-            :title="NOTEBOOK_EXPORT_BUTTON_LABEL"
-            data-testid="notebook-catalog-export"
-            @click="exportNotebook(closeDropdown)"
-          >
-            {{ NOTEBOOK_EXPORT_BUTTON_LABEL }}
-          </button>
-        </DropdownMenuItem>
       </DropdownMenu>
     </AutoCollapseDropdown>
     <Modal v-if="showMoveToGroup" @close_request="closeMoveToGroup">
@@ -79,10 +68,6 @@ import {
   type CatalogMoveToGroupInjected,
 } from "@/components/notebook/catalogMoveToGroupContext"
 import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"
-import {
-  downloadNotebookExport,
-  NOTEBOOK_EXPORT_BUTTON_LABEL,
-} from "@/utils/notebookExport"
 
 const router = useRouter()
 
@@ -123,11 +108,6 @@ const onReadBook = () => {
 const openMoveToGroup = (closeDropdown: () => void) => {
   closeDropdown()
   showMoveToGroup.value = true
-}
-
-const exportNotebook = async (closeDropdown: () => void) => {
-  closeDropdown()
-  await downloadNotebookExport(props.notebook.id, props.notebook.name)
 }
 
 const closeMoveToGroup = () => {

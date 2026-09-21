@@ -18,8 +18,7 @@
   responses, deprecation/history prose, or an absence-specific regression test;
   wider Git authorization, binding migration or recovery; changes to the CLI or
   Git bundle contract; generic ZIP handling used by EPUB or unrelated CLI tests.
-- State: 3 planned slices (slice 2 is Structure). No implementation or proof has
-  run.
+- State: slice 1 delivered; slices 2–3 planned (slice 2 is Structure).
 
 ## Existing solution and constraints
 
@@ -75,7 +74,7 @@ Commands are run through Nix except Git:
 
 ### 1. The web offers no notebook ZIP export
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given an owned or readable notebook in the catalog or notebook
 settings, when its available actions are shown, no ZIP export action is offered
 and no replacement acquisition navigation is added.
