@@ -18,9 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Rejects proposals that remove a reserved folder README or a non-regular / non-Markdown file from
- * the accepted tree. These refusals are about the accepted tree's reserved/shape contract, not
- * uncertain identity, so they live apart from the identity-uncertain deletion rejection cases.
+ * Rejects proposals that remove a reserved folder README or a non-regular file from the accepted
+ * tree. These refusals are about the accepted tree's reserved/shape contract, not uncertain
+ * identity, so they live apart from the identity-uncertain deletion rejection cases.
  */
 class NotebookGitReservedFileRejectionControllerTest extends NotebookGitControllerTestBase {
 
@@ -55,7 +55,6 @@ class NotebookGitReservedFileRejectionControllerTest extends NotebookGitControll
     return Stream.of(
         Arguments.of("README.md", FileMode.REGULAR_FILE, "folder README, which is reserved"),
         Arguments.of("Folder/README.md", FileMode.REGULAR_FILE, "folder README, which is reserved"),
-        Arguments.of("Topic/note.txt", FileMode.REGULAR_FILE, "not a Markdown note"),
         Arguments.of("note.md", FileMode.EXECUTABLE_FILE, "not a regular file mode"),
         Arguments.of("note.md", FileMode.SYMLINK, "not a regular file mode"));
   }

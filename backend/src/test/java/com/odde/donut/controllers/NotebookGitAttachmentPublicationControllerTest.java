@@ -3,7 +3,6 @@ package com.odde.donut.controllers;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -23,14 +22,12 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Root Attachments become accepted Portable content through the ordinary publication boundary and
- * survive the next web note save unchanged. Nested non-Markdown paths stay refused until Folders
- * can contain Attachments safely.
+ * Attachments become accepted Portable content through the ordinary publication boundary and
+ * survive the next web note save unchanged.
  */
-class NotebookGitRootAttachmentPublicationControllerTest
+class NotebookGitAttachmentPublicationControllerTest
     extends NotebookGitWebContentControllerTestBase {
 
   private static final String NOTE_MARKDOWN = "---\ntype: Note\n---\naccepted content";
@@ -140,28 +137,42 @@ class NotebookGitRootAttachmentPublicationControllerTest
   }
 
   @Test
-  void aNestedFileIsStillRefusedAndLeavesTheAcceptedFilesUnchanged() throws Exception {
+  void publishedFileBesideANoteIsExactAndSurvivesTheNextWebNoteSave() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding accepted = publishNoteAndRootFile(notebook);
-    List<PortableTreeEntry> filesBefore = committedRootAttachments(notebook);
+    makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
+    NotebookGitBinding notesOnly = snapshotCurrentPortableTree(notebook);
 
-    ResponseStatusException refusal =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook,
-            accepted.getAcceptedGitObjectId(),
-            proposalBundleBytes(
-                accepted,
-                List.of(
-                    new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
-                    new NotebookGitProposalFile("reference.json", CHANGED_REFERENCE_JSON),
-                    new NotebookGitProposalFile("Topic/README.md", "---\ntype: Readme\n---\nt\n"),
-                    new NotebookGitProposalFile("Topic/diagram.png", LOWERCASE_DIAGRAM))),
-            HttpStatus.BAD_REQUEST);
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        notesOnly.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            notesOnly,
+            List.of(
+                new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
+                new NotebookGitProposalFile("physics/diagrams/Force.md", NOTE_MARKDOWN),
+                new NotebookGitProposalFile("physics/diagrams/force.png", LOWERCASE_DIAGRAM))));
 
-    assertThat(refusal.getReason(), containsString("Topic/diagram.png"));
-    assertThat(refusal.getReason(), containsString("not a Markdown note"));
-    assertThat(committedRootAttachments(notebook), equalTo(filesBefore));
-    assertThat(countFoldersForNotebook(notebook.getId()), is(0L));
+    AcceptedTip published = acceptedTip(notebook);
+    assertThat(
+        published.entries(),
+        contains(
+            PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
+            PortableTreeEntry.ofText("physics/diagrams/Force.md", NOTE_MARKDOWN),
+            new PortableTreeEntry("physics/diagrams/force.png", LOWERCASE_DIAGRAM)));
+
+    Note force =
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .filter(note -> note.getTitle().equals("Force"))
+            .findFirst()
+            .orElseThrow();
+    textContentController.updateNoteContent(force, contentDto(EDITED_CONTENT));
+
+    assertThat(
+        acceptedTip(notebook).entries(),
+        contains(
+            PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
+            PortableTreeEntry.ofText("physics/diagrams/Force.md", EDITED_CONTENT),
+            new PortableTreeEntry("physics/diagrams/force.png", LOWERCASE_DIAGRAM)));
   }
 
   /** An accepted tip holding one Markdown note and one root file, for refusal cases to preserve. */

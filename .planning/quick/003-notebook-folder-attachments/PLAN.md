@@ -20,7 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–7 are done with accepted proof; 5 Behavior slices remain
+- State: slices 1–8 are done with accepted proof; 4 Behavior slices remain
   planned. Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
@@ -71,7 +71,7 @@ PFE finding — every responsibility already has an owner; extend those owners:
 | Where content sits | `Note.folder`: a note refers to its Folder and stores no path, so rename, move, trash (a move under the trash parent) and recover never touch notes | **Reuse the rule**: `NotebookAttachment` refers to its Folder the same way; null means the notebook root |
 | Sibling-name uniqueness with a nullable parent | `uk_folder_notebook_parent_name (notebook_id, (ifnull(parent_folder_id,0)), name)` | **Reuse the convention** for `(notebook_id, (ifnull(folder_id,0)), filename)`, binary collation kept |
 | Live Portable tree | `NotebookLivePortableTree` → `PortableTreeSnapshot` | **Change**: place attachments by folder exactly as notes are; the root-only `attachmentsHere` parameter goes away |
-| Accepting a tip's files | `NotebookGitProposalAcceptance.projectRootAttachments` (one final-set rule) | **Change**: key the same rule by full path |
+| Accepting a tip's files | `NotebookGitProposalAcceptance.projectAttachments` (one final-set rule) | **Change**: key the same rule by full path |
 | Creating folders for proposed paths | `NotebookGitProposalFolderMaterialization.ensureAncestry` (path-general) | **Reuse** for attachment paths |
 | Dissolving a folder whose last path is gone | `reconcileUnrepresentedFolders` + `representedInTree` (any entry path) | **Reuse unchanged**; a file is one more represented path |
 | Operations that rehome a folder's direct contents | `FolderSubtree.dissolveInto`, `mergeInto`, `reassignToNotebook` — reached by dissolve, move-with-merge and cross-notebook move | **Change**: one refusal rule in `FolderSubtree` while the subtree contains files |
@@ -139,14 +139,14 @@ Internal change: migration adds nullable `notebook_attachment.folder_id`
 `(notebook_id, (ifnull(folder_id,0)), filename)`; `NotebookAttachment` gains its
 `folder`. Follow the `db-migration` skill; regenerate the ERD.
 Enables: slice 2. Unchanged behavior: every existing root attachment test.
-Proof: `backend:verify`; `NotebookGitRootAttachment*ControllerTest` and
+Proof: `backend:verify`; `NotebookGitAttachment*ControllerTest` and
 `NotebookExportRootAttachmentControllerTest` stay green.
 Accepted proof (2026-09-21):
 `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed the migration and
 all 2,569 backend tests. The migrated isolated test schema was the setup;
-`NotebookGitRootAttachmentPublicationControllerTest` (5),
-`NotebookGitRootAttachmentLocalChangeControllerTest` (5),
-`NotebookGitRootAttachmentIndependenceControllerTest` (5), and
+`NotebookGitAttachmentPublicationControllerTest` (5),
+`NotebookGitAttachmentLocalChangeControllerTest` (5),
+`NotebookGitAttachmentIndependenceControllerTest` (5), and
 `NotebookExportRootAttachmentControllerTest` (1) observed unchanged root-file
 behavior with no failures. `CURSOR_DEV=true
 DONUT_ERD_SCHEMA=doughnut_wt_0f09c575e6774885b61cc53b7c547f97_test nix
@@ -273,9 +273,9 @@ folder its path names. Admission still allows root files only, so nothing
 nested can arrive yet.
 Enables: slice 8. Unchanged behavior: all root attachment publication and
 local-change tests stay green.
-Proof: `NotebookGitRootAttachmentPublicationControllerTest`,
-`NotebookGitRootAttachmentLocalChangeControllerTest`,
-`NotebookGitRootAttachmentIndependenceControllerTest`.
+Proof: `NotebookGitAttachmentPublicationControllerTest`,
+`NotebookGitAttachmentLocalChangeControllerTest`,
+`NotebookGitAttachmentIndependenceControllerTest`.
 Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
 backend:test_only` passed all 2,574 backend tests. The three existing root
 attachment controller classes each passed five tests, covering publication,
@@ -285,7 +285,7 @@ green, proving the full-path projection did not open nested admission early.
 
 ### 8. Publish a file beside a note in a folder
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given an accepted tip with notes only, publishing
 `physics/diagrams/Force.md` together with `physics/diagrams/force.png` is
 accepted; the tip holds both with exact bytes; the next web note save keeps the
@@ -300,6 +300,15 @@ files anywhere.
 Interim: a folder holding only files is refused loudly by the tip comparison
 until slice 9; nothing is lost.
 Proof: the renamed publication test class.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,573 backend tests. The renamed
+`NotebookGitAttachmentPublicationControllerTest.publishedFileBesideANoteIsExactAndSurvivesTheNextWebNoteSave`
+starts from an accepted notes-only tree, publishes a nested note beside a
+byte-exact attachment, observes the exact accepted tree, then performs a real
+web note save and observes the same file and bytes. Invalid-Markdown atomic
+refusal stayed green. The obsolete nested `.txt` rejection example was removed
+because that path is now a valid attachment; a file-only nested folder remains
+deferred to slice 9.
 
 ### 9. Publish a folder that holds only files
 Type: Behavior
