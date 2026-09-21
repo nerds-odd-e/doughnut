@@ -186,6 +186,50 @@ satisfy them. A deliberate stop of all incompatible instances can replace the
 rolling stages only when that maintenance procedure is explicitly selected.
 Deployment waits do not prevent independent final attachment assessment.
 
+## Release handoff 1 - WAITING FOR THE OWNER (2026-09-21)
+
+**Merged to `main` at `c661bf9c0c`** (story branch head `c8105cde7e`, which first merged
+`origin/main` at `1687055556` cleanly). Verified on the merged code before pushing `main`: B
+**2,569 tests, 0 failures** (2,567 + 2 from `main`'s spelling fix) and E **40/40**. Contents
+new to production: story 2's native storage and backfill `V300000336`, `V300000337` (column
+nullable), 9b (column no longer read or written), 15b, 17 (saves ~0.6x the old time), and the
+temporary measurement harness (excluded from CI).
+
+**This release is production's native-storage cutover and must not overlap old and new
+servers.** Facts from this repo: the app runs as managed instance group `doughnut-app-group`
+in `us-east1-b`, created with `--size 2` (`infra/gcp/scripts/create-app-mig.sh`); the deploy's
+rolling replace uses `--max-surge 0 --max-unavailable 1`
+(`infra/gcp/scripts/perform-rolling-replace-app-mig.sh`), which on two servers keeps one old
+server serving while the other is replaced. An old server records saves only in `bundle_bytes`;
+a notebook saved there during the overlap gets an accepted head the native store lacks and then
+fails loudly on its next save until reset. With the group at size 1 the same rolling replace stops
+the only old server before starting the new one - no overlap.
+
+Steps handed to the owner:
+1. `gcloud compute instance-groups managed resize doughnut-app-group --size 1 --zone us-east1-b`,
+   and wait until the group is stable.
+2. Create the release from `main` (`c661bf9c0c` or later) as usual. Brief downtime is expected
+   while the new server boots; afterwards the startup migrations run, including the backfill, and
+   notebooks not yet converted fail to save until it finishes.
+3. After the deploy is healthy, run the two read-only checks below against production.
+4. Only if both pass: `gcloud compute instance-groups managed resize doughnut-app-group --size 2 --zone us-east1-b`.
+
+Read-only production checks:
+- Migrations applied:
+  `SELECT version, description, success FROM flyway_schema_history WHERE CAST(version AS UNSIGNED) >= 300000334 ORDER BY installed_rank;`
+  - every row must have `success = 1`, and `300000337` must be present. **If `300000336`
+  failed, stop and report before doing anything else**: a single corrupt legacy binding aborts the
+  backfill, `V300000337` then never applies, and notebook creation fails on the `NOT NULL` column.
+- Every binding's accepted head is in native storage:
+  `SELECT b.id, b.notebook_id FROM notebook_git_binding b WHERE NOT EXISTS (SELECT 1 FROM notebook_git_accepted_object o WHERE o.notebook_git_binding_id = b.id AND o.git_object_id = b.accepted_git_object_id);`
+  - should return no rows; any notebook listed needs its history reset (owner decision 2).
+  The full reachable-graph check runs inside slice 10's migration before the column drop.
+
+**Resume point after the owner reports the release:** slice 10 (drop `bundle_bytes`, running
+`NotebookGitAcceptedHistoryCompleteness.requireEveryAcceptedHistoryComplete` before the DDL) and
+slice 11 (migration checkpoint) - together the **second release**. Then slices 12 and 14. Keep
+using this branch and worktree; the backlog entry stays **Taken**.
+
 ## Ordered slices
 
 Target about five minutes per execution leaf including focused proof; scrutinize
