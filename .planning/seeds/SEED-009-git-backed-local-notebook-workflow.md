@@ -79,8 +79,9 @@ data; invalid or ambiguous changes must not silently discard work.
     widen access or create a browser alternative.
 - **Effort hypothesis:** M, medium confidence; deletion is small, but the shared
   tree vocabulary has a broad mechanical Java import and query-method ripple.
-- **Depends on:** None. Queued right after SEED-035#story-9 by owner instruction,
-  which is why that story proves nothing about ZIP output.
+- **Depends on:** None. Queued immediately after delivered nested attachment
+  continuity by owner instruction; that delivery intentionally proved nothing
+  about ZIP output.
 - **Safe stopping point:** Complete on its own; nothing later needs it.
 
 ## Ordering and Scope Reduction

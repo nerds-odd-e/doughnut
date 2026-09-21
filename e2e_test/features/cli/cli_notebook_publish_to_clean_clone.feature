@@ -1,5 +1,4 @@
-@bundleCliE2eInstall
-@withCliConfig
+@bundleCliE2eInstall @withCliConfig
 Feature: CLI notebook publish received by a clean clone
   As a notebook owner, I want a clean clone to receive my published local changes so both copies retain my work.
 
@@ -216,5 +215,36 @@ Feature: CLI notebook publish received by a clean clone
     And the fresh clone file "reference.json" holds exactly:
       """
       {"kind":"reference","pages":4}
+
+      """
+
+  Scenario: Nested attachments follow a web folder rename into a clean clone
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
+    And I commit the root file "References/reference.json" and the root file "References/diagram.png" holding the bytes "89 FF FE 00" together in the cloned checkout:
+      """
+      {"kind":"reference","pages":3}
+      """
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I open the folder page for "References" in notebook "CLI Clone Notebook"
+    And I rename the folder heading to "Research"
+    And I pull the cloned checkout using the installed CLI
+    And I pull the second cloned checkout using the installed CLI
+    Then the second cloned checkout preserves the publisher's A to C history
+    And the second cloned checkout retains its original head as an ancestor
+    And the second cloned checkout is a clean checkout of the notebook "CLI Clone Notebook" accepted head
+    And the second cloned checkout contains exactly:
+      | README.md                 |
+      | Overview.md               |
+      | Research/diagram.png      |
+      | Research/reference.json   |
+      | Kitchen/README.md         |
+      | Recipes/README.md         |
+      | Recipes/Pasta.md          |
+    And the second cloned checkout file "Research/diagram.png" holds the bytes "89 FF FE 00"
+    And the second cloned checkout file "Research/reference.json" holds exactly:
+      """
+      {"kind":"reference","pages":3}
 
       """

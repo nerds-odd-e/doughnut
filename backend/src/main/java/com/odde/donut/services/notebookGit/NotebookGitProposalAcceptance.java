@@ -27,18 +27,24 @@ class NotebookGitProposalAcceptance {
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
   private final NotebookAttachmentRepository attachmentRepository;
+  private final NotebookGitProposalFolderMaterialization folderMaterialization;
+  private final NotebookGitStateLoader stateLoader;
 
   NotebookGitProposalAcceptance(
       NotebookGitProjection projection,
       NotebookGitAcceptedRepositoryStore repositoryStore,
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
-      NotebookAttachmentRepository attachmentRepository) {
+      NotebookAttachmentRepository attachmentRepository,
+      NotebookGitProposalFolderMaterialization folderMaterialization,
+      NotebookGitStateLoader stateLoader) {
     this.projection = projection;
     this.repositoryStore = repositoryStore;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
     this.attachmentRepository = attachmentRepository;
+    this.folderMaterialization = folderMaterialization;
+    this.stateLoader = stateLoader;
   }
 
   String acceptMatchingProposedTree(
@@ -52,30 +58,38 @@ class NotebookGitProposalAcceptance {
       NotebookGitStateLoader.LockedNotebookState published,
       NotebookGitProposalImporter.ImportedProposal proposal,
       Timestamp publishedAt) {
-    projectRootAttachments(published.notebook(), proposal);
+    NotebookGitStateLoader.LockedNotebookState withAttachmentFolders =
+        projectAttachments(published, proposal);
     NotebookGitStateLoader.LockedNotebookState reconciled =
-        requireMatchingProposedTree(published, proposal);
+        requireMatchingProposedTree(withAttachmentFolders, proposal);
     return repositoryStore.store(reconciled.binding(), proposal.repository(), publishedAt);
   }
 
   /**
-   * Makes the notebook's stored root Attachments exactly the proposed tip's set. One final-set rule
-   * covers addition, edit, rename and removal: no commit is replayed. A filename the tip keeps is
-   * updated in place, so removals and insertions never share a filename and the per-notebook
-   * filename key cannot trip. This runs before the tip comparison, so the compared tree is the
-   * complete post-mutation result.
+   * Makes the notebook's stored Attachments exactly the proposed tip's set. One final-set rule
+   * covers addition, edit, rename and removal: no commit is replayed. A path the tip keeps is
+   * updated in place, so removals and insertions never share a sibling filename and its uniqueness
+   * key cannot trip. This runs before the tip comparison, so the compared tree is the complete
+   * post-mutation result.
    */
-  private void projectRootAttachments(
-      Notebook notebook, NotebookGitProposalImporter.ImportedProposal proposal) {
+  private NotebookGitStateLoader.LockedNotebookState projectAttachments(
+      NotebookGitStateLoader.LockedNotebookState published,
+      NotebookGitProposalImporter.ImportedProposal proposal) {
+    Notebook notebook = published.notebook();
     Map<String, byte[]> proposed = new HashMap<>();
     for (PortableTreeEntry entry :
         NotebookGitAcceptedTree.readEntries(proposal.repository(), proposal.mainHead())) {
-      if (NotebookGitProposalTreeShape.isRootAttachment(entry.path())) {
+      if (NotebookGitProposalTreeShape.isAttachment(entry.path())) {
         proposed.put(entry.path(), entry.content());
       }
     }
+    Map<String, Folder> foldersByPath =
+        folderMaterialization.ensureAncestry(notebook, proposed.keySet().stream().toList());
+    entityPersister.flush();
+    List<ExportFolderRow> folders = stateLoader.foldersOf(notebook);
+    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
     for (NotebookAttachment stored : attachmentRepository.findByNotebook_Id(notebook.getId())) {
-      byte[] content = proposed.remove(stored.getFilename());
+      byte[] content = proposed.remove(attachmentPath(stored, folderById));
       if (content == null) {
         entityPersister.remove(stored);
       } else if (!Arrays.equals(stored.getContent(), content)) {
@@ -83,14 +97,29 @@ class NotebookGitProposalAcceptance {
         entityPersister.save(stored);
       }
     }
-    proposed.forEach((filename, content) -> persistAttachment(notebook, filename, content));
+    proposed.forEach((path, content) -> persistAttachment(notebook, foldersByPath, path, content));
     entityPersister.flush();
+    return new NotebookGitStateLoader.LockedNotebookState(
+        published.binding(), notebook, folders, published.storedNotes());
   }
 
-  private void persistAttachment(Notebook notebook, String filename, byte[] content) {
+  private static String attachmentPath(
+      NotebookAttachment attachment, Map<Integer, ExportFolderRow> folderById) {
+    Folder folder = attachment.getFolder();
+    String folderPath =
+        folder == null
+            ? ""
+            : NotebookGitAcceptedTree.folderPath(folderById.get(folder.getId()), folderById);
+    return folderPath + attachment.getFilename();
+  }
+
+  private void persistAttachment(
+      Notebook notebook, Map<String, Folder> foldersByPath, String path, byte[] content) {
+    int separator = path.lastIndexOf('/');
     NotebookAttachment attachment = new NotebookAttachment();
     attachment.setNotebook(notebook);
-    attachment.setFilename(filename);
+    attachment.setFolder(separator < 0 ? null : foldersByPath.get(path.substring(0, separator)));
+    attachment.setFilename(path.substring(separator + 1));
     attachment.setContent(content);
     entityPersister.save(attachment);
   }

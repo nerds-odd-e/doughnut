@@ -13,20 +13,18 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit.
  * Changed documents are classified once by operation and container/concept role; unchanged accepted
- * files remain context. Publication admission partitions container Readmes (added or modified) from
- * ordinary-note changes so folder Readmes can accompany note edits. Ordinary-note admission permits
+ * files remain context. Folder Readmes can accompany note edits. Ordinary-note admission permits
  * added and/or modified ordinary Markdown notes at regular file modes, any number of ordinary-note
  * deletions alone or with same-path edits, and unambiguous equal-content moves with compatible
  * companions. Exact move correspondence and confirmed deletion-gap recreation (DELETED+ADDED,
  * including identical tip bytes) are settled by {@link NotebookGitProposalNoteCorrespondence}.
  * Within one adjacent transition, residual removals mixed with additions are refused when identity
  * correspondence is uncertain. Net tip deletions may compose with later additions once each
- * adjacent step is admissible. A non-Markdown file at the notebook root is an Attachment rather
- * than a note, and acceptance projects the tip's whole root-Attachment set; nested non-Markdown
- * paths stay refused. Unsafe paths, non-regular modes, or a changed folder-reserved {@code
- * README.md} are refused. Structural {@code .keep} changes are not note changes. Callers only
- * invoke this once proposal ancestry is confirmed to be a contiguous single-parent range from the
- * accepted commit.
+ * adjacent step is admissible. A non-Markdown file at any depth is an Attachment rather than a
+ * note, and acceptance projects the tip's whole Attachment set. Unsafe paths, non-regular modes, or
+ * a changed folder-reserved {@code README.md} are refused. Structural {@code .keep} changes are not
+ * note changes. Callers only invoke this once proposal ancestry is confirmed to be a contiguous
+ * single-parent range from the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -143,36 +141,29 @@ public final class NotebookGitProposalTreeShape {
     return path.endsWith("/.keep");
   }
 
-  /**
-   * A non-Markdown file directly at the notebook root is an Attachment: a named supporting file the
-   * notebook owns, with no note identity, title or learning history. Nested non-Markdown paths stay
-   * refused until Folders can contain Attachments safely.
-   */
-  static boolean isRootAttachment(String path) {
-    return !path.endsWith(".md") && path.indexOf('/') < 0;
+  /** A non-Markdown, non-structural Portable-tree entry is an Attachment. */
+  static boolean isAttachment(String path) {
+    return !path.endsWith(".md") && !isEmptyFolderMarker(path);
   }
 
   /**
-   * True when a path carries Portable content a notebook can be founded on: a Markdown note or
-   * README at any depth, or a root Attachment. Structural {@code .keep} markers do not.
+   * True when a path carries non-structural Portable content: a Markdown note, README or Attachment
+   * at any depth. Structural {@code .keep} markers do not.
    */
   static boolean carriesPortableContent(String path) {
-    return path.endsWith(".md") || isRootAttachment(path);
+    return path.endsWith(".md") || isAttachment(path);
   }
 
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {
-      // Neither an empty-Folder marker nor a root Attachment carries note identity, so neither
+      // Neither an empty-Folder marker nor an Attachment carries note identity, so neither
       // takes part in note correspondence; acceptance projects the tip's whole Attachment set.
-      if (isEmptyFolderMarker(document.path()) || isRootAttachment(document.path())) {
+      if (isEmptyFolderMarker(document.path()) || isAttachment(document.path())) {
         continue;
       }
       if (document.role() == DocumentRole.CONTAINER) {
         throw reservedFolderReadme(document.path());
-      }
-      if (!document.path().endsWith(".md")) {
-        throw unsupportedTreeShape("path \"" + document.path() + "\" is not a Markdown note");
       }
       changes.add(new NoteChange(document.path(), document.kind(), document.blobId(), null));
     }

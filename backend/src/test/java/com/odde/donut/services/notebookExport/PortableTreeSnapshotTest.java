@@ -24,9 +24,9 @@ class PortableTreeSnapshotTest {
             List.of(folder),
             List.of(note, new ExportNoteRow(10, "Pasta", "Boil water")),
             List.of(
-                new ExportAttachmentRow("diagram.png", invalidUtf8),
-                new ExportAttachmentRow("empty.bin", new byte[0]),
-                new ExportAttachmentRow("agents.json", "{\"a\": 1}".getBytes(UTF_8))));
+                new ExportAttachmentRow(null, "diagram.png", invalidUtf8),
+                new ExportAttachmentRow(null, "empty.bin", new byte[0]),
+                new ExportAttachmentRow(null, "agents.json", "{\"a\": 1}".getBytes(UTF_8))));
 
     assertThat(
         entries,

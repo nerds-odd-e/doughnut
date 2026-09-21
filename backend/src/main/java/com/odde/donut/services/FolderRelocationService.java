@@ -10,7 +10,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -45,7 +44,6 @@ public class FolderRelocationService {
 
   public FolderRelocationService(
       FolderRepository folderRepository,
-      NoteRepository noteRepository,
       FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
@@ -55,6 +53,7 @@ public class FolderRelocationService {
       NotebookRepository notebookRepository,
       FolderConstructionService folderConstructionService,
       AuthorizationService authorizationService,
+      FolderSubtree subtree,
       FolderMoveRelocation folderMoveRelocation,
       NoteService noteService) {
     this.folderRepository = folderRepository;
@@ -67,9 +66,7 @@ public class FolderRelocationService {
     this.notebookRepository = notebookRepository;
     this.folderConstructionService = folderConstructionService;
     this.authorizationService = authorizationService;
-    this.subtree =
-        new FolderSubtree(
-            folderRepository, noteRepository, folderSiblingNameValidation, entityPersister);
+    this.subtree = subtree;
     this.folderMoveRelocation = folderMoveRelocation;
     this.noteService = noteService;
   }

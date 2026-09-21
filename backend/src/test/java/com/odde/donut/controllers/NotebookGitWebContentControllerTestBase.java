@@ -8,11 +8,14 @@ import static org.hamcrest.Matchers.hasSize;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteRecallInfo;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +32,22 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   @Autowired TextContentController textContentController;
   @Autowired NoteController noteController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
+  @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
 
   NotebookGitBinding binding(Notebook notebook) {
     return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+  }
+
+  NotebookAttachment storeFolderAttachmentAndSnapshot(
+      Notebook notebook, Folder folder, String filename, byte[] content) {
+    NotebookAttachment attachment = new NotebookAttachment();
+    attachment.setNotebook(notebook);
+    attachment.setFolder(folder);
+    attachment.setFilename(filename);
+    attachment.setContent(content);
+    notebookAttachmentRepository.save(attachment);
+    snapshotCurrentPortableTree(notebook);
+    return attachment;
   }
 
   static NoteUpdateContentDTO contentDto(String content) {

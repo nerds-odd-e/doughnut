@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Builds a notebook's current Portable tree from its stored folders, notes (trash included) and
- * root attachments. Every consumer of live Portable content — ZIP export, Git cutover, accepted web
+ * attachments. Every consumer of live Portable content — ZIP export, Git cutover, accepted web
  * changes, projection-drift detection — reads the tree from here, so what a notebook's Portable
  * tree contains is decided in one place.
  */

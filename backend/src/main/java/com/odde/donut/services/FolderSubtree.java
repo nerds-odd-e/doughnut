@@ -6,6 +6,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.ArrayDeque;
@@ -15,21 +16,28 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 /** Walks a folder tree and applies subtree reassignment, merge, dissolve and removal. */
+@Service
 final class FolderSubtree {
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
+  private final NotebookAttachmentRepository notebookAttachmentRepository;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final EntityPersister entityPersister;
 
   FolderSubtree(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
+      NotebookAttachmentRepository notebookAttachmentRepository,
       FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
+    this.notebookAttachmentRepository = notebookAttachmentRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
   }
@@ -71,6 +79,7 @@ final class FolderSubtree {
 
   void reassignToNotebook(
       List<Folder> subtreeFolders, Notebook destinationNotebook, Timestamp now) {
+    requireSubtreeHasNoAttachments(subtreeFolders.getFirst());
     for (Folder subtreeFolder : subtreeFolders) {
       subtreeFolder.setNotebook(destinationNotebook);
       subtreeFolder.setUpdatedAt(now);
@@ -88,6 +97,7 @@ final class FolderSubtree {
    * when {@code merge} is set, and refused otherwise.
    */
   void dissolveInto(Folder folder, boolean merge, Timestamp now) {
+    requireSubtreeHasNoAttachments(folder);
     Folder destination = folder.getParentFolder();
     Integer destinationId = destination == null ? null : destination.getId();
 
@@ -132,6 +142,7 @@ final class FolderSubtree {
   }
 
   void mergeInto(Folder source, Folder target, Timestamp now) {
+    requireSubtreeHasNoAttachments(source);
     Notebook destinationNotebook = target.getNotebook();
     boolean crossNotebook = !source.getNotebook().getId().equals(destinationNotebook.getId());
 
@@ -169,5 +180,14 @@ final class FolderSubtree {
     entityPersister.merge(target);
     entityPersister.flush();
     entityPersister.remove(source);
+  }
+
+  private void requireSubtreeHasNoAttachments(Folder source) {
+    List<Integer> folderIds = collectFolders(source).stream().map(Folder::getId).toList();
+    if (notebookAttachmentRepository.existsByFolder_IdIn(folderIds)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Folders containing files cannot be dissolved, merged, or moved to another notebook yet.");
+    }
   }
 }

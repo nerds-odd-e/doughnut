@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * root: none of them collects a file into a folder, and none takes a file away. Where the note
  * survives the operation, its identity and learning data survive with it.
  */
-class NotebookGitRootAttachmentIndependenceControllerTest
+class NotebookGitAttachmentIndependenceControllerTest
     extends NotebookGitWebContentControllerTestBase {
 
   private static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";

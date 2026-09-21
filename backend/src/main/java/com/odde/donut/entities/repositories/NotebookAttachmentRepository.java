@@ -2,6 +2,7 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.services.notebookExport.ExportAttachmentRow;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -11,10 +12,13 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
 
   @Query(
       """
-      SELECT NEW com.odde.donut.services.notebookExport.ExportAttachmentRow(a.filename, a.content)
-      FROM NotebookAttachment a WHERE a.notebook.id = :notebookId ORDER BY a.id ASC
+      SELECT NEW com.odde.donut.services.notebookExport.ExportAttachmentRow(f.id, a.filename, a.content)
+      FROM NotebookAttachment a LEFT JOIN a.folder f
+      WHERE a.notebook.id = :notebookId ORDER BY a.id ASC
       """)
   List<ExportAttachmentRow> findExportRowsByNotebookId(@Param("notebookId") Integer notebookId);
 
   List<NotebookAttachment> findByNotebook_Id(Integer notebookId);
+
+  boolean existsByFolder_IdIn(Collection<Integer> folderIds);
 }

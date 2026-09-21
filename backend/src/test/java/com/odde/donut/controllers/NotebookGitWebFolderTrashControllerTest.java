@@ -4,6 +4,7 @@ import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommi
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -13,6 +14,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
+import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
@@ -30,6 +32,7 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
   static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";
   static final String NUCLEUS_BODY = "---\ntype: Note\n---\nnucleus body";
   static final String BIOLOGY_README = "Biology readme";
+  static final byte[] FORCE_DIAGRAM = {(byte) 0x89, (byte) 0xFF, (byte) 0xFE, 0x00};
 
   @Autowired FolderRepository folderRepository;
 
@@ -111,6 +114,29 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
               "_trash/Research/.keep"));
     }
     assertThat(parentFolderId(f.biology().getId()), nullValue());
+  }
+
+  @Test
+  void webFolderTrashAndRecoveryCarryNestedAttachmentBytes() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
+    storeFolderAttachmentAndSnapshot(notebook, diagrams, "force.png", FORCE_DIAGRAM);
+
+    folderController.trashFolder(notebook, physics);
+    ObjectId trashedHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+    folderController.moveFolder(notebook, physics, new FolderMoveRequest());
+
+    try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk revWalk = new RevWalk(repo)) {
+      ObjectId recoveredHead = GitBundleTestReader.fetchHead(repo, downloadedBundle(notebook));
+      assertThat(
+          GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(trashedHead)),
+          hasItem(new PortableTreeEntry("_trash/physics/diagrams/force.png", FORCE_DIAGRAM)));
+      assertThat(
+          GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(recoveredHead)),
+          hasItem(new PortableTreeEntry("physics/diagrams/force.png", FORCE_DIAGRAM)));
+    }
   }
 
   @Test

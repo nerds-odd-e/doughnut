@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -14,8 +15,10 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
+import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
+import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -36,6 +39,31 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
       "---\ntype: Note\nrelated: \"[[Zoology/Cells|shown]]\"\n---\nSee [[Zoology/Cells|shown]] for "
           + "details.";
   static final String EDITED_CELLS_BODY = "---\ntype: Note\n---\nedited cells body";
+  static final byte[] FORCE_DIAGRAM = {(byte) 0x89, (byte) 0xFF, (byte) 0xFE, 0x00};
+
+  @Test
+  void webFolderRenameCarriesNestedAttachmentsAndNoteIdentity() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
+    Note force = makeMe.aNote("Force").folder(diagrams).content(CELLS_BODY).please();
+    storeFolderAttachmentAndSnapshot(notebook, diagrams, "force.png", FORCE_DIAGRAM);
+
+    folderController.renameFolder(notebook, physics, renameTo("mechanics"));
+
+    Note retained = noteRepository.findById(force.getId()).orElseThrow();
+    assertThat(retained.getId(), equalTo(force.getId()));
+    try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk revWalk = new RevWalk(repo)) {
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repo, acceptedBundleBytes(notebook));
+      assertThat(
+          GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(acceptedHead)),
+          equalTo(
+              List.of(
+                  ofText("mechanics/diagrams/Force.md", CELLS_BODY),
+                  new PortableTreeEntry("mechanics/diagrams/force.png", FORCE_DIAGRAM))));
+    }
+  }
 
   @Test
   void webFolderRenameAppendsAcceptedChildAndRetainsNoteAndLearningIdentity() throws Exception {

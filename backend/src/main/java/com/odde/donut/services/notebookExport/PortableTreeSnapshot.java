@@ -8,9 +8,8 @@ import java.util.stream.Collectors;
 
 /**
  * Builds the canonical, ordered Portable-tree snapshot for a notebook export: one entry per
- * README.md, note file and root attachment, in the same traversal order the ZIP export produces.
- * Within a directory the order is README, then notes, then attachments by filename, then
- * subdirectories.
+ * README.md, note file and attachment, in the same traversal order the ZIP export produces. Within
+ * a directory the order is README, then notes, then attachments by filename, then subdirectories.
  */
 public final class PortableTreeSnapshot {
   // Notebook/Folder rows are database ids and are never 0, so 0 safely means "no parent / root".
@@ -18,21 +17,27 @@ public final class PortableTreeSnapshot {
 
   private final Map<Integer, List<ExportFolderRow>> childFoldersByParent;
   private final Map<Integer, List<ExportNoteRow>> notesByFolder;
+  private final Map<Integer, List<ExportAttachmentRow>> attachmentsByFolder;
   private final List<PortableTreeEntry> entries = new ArrayList<>();
 
-  private PortableTreeSnapshot(List<ExportFolderRow> folders, List<ExportNoteRow> notes) {
+  private PortableTreeSnapshot(
+      List<ExportFolderRow> folders,
+      List<ExportNoteRow> notes,
+      List<ExportAttachmentRow> attachments) {
     childFoldersByParent =
         folders.stream().collect(Collectors.groupingBy(f -> folderKey(f.parentFolderId())));
     notesByFolder = notes.stream().collect(Collectors.groupingBy(n -> folderKey(n.folderId())));
+    attachmentsByFolder =
+        attachments.stream().collect(Collectors.groupingBy(a -> folderKey(a.folderId())));
   }
 
   public static List<PortableTreeEntry> build(
       String notebookReadmeContent,
       List<ExportFolderRow> folders,
       List<ExportNoteRow> notes,
-      List<ExportAttachmentRow> rootAttachments) {
-    PortableTreeSnapshot snapshot = new PortableTreeSnapshot(folders, notes);
-    snapshot.collectDirectory("", ROOT_KEY, notebookReadmeContent, rootAttachments);
+      List<ExportAttachmentRow> attachments) {
+    PortableTreeSnapshot snapshot = new PortableTreeSnapshot(folders, notes, attachments);
+    snapshot.collectDirectory("", ROOT_KEY, notebookReadmeContent);
     return snapshot.entries;
   }
 
@@ -40,11 +45,7 @@ public final class PortableTreeSnapshot {
     return folderId == null ? ROOT_KEY : folderId;
   }
 
-  private void collectDirectory(
-      String pathPrefix,
-      int folderKey,
-      String readmeContentOrNull,
-      List<ExportAttachmentRow> attachmentsHere) {
+  private void collectDirectory(String pathPrefix, int folderKey, String readmeContentOrNull) {
     int firstEntryIndex = entries.size();
     if (readmeContentOrNull != null && !readmeContentOrNull.isBlank()) {
       entries.add(
@@ -58,7 +59,7 @@ public final class PortableTreeSnapshot {
     }
 
     List<ExportAttachmentRow> orderedAttachments =
-        attachmentsHere.stream()
+        attachmentsByFolder.getOrDefault(folderKey, List.of()).stream()
             .sorted(Comparator.comparing(ExportAttachmentRow::filename))
             .toList();
     for (ExportAttachmentRow attachment : orderedAttachments) {
@@ -66,8 +67,7 @@ public final class PortableTreeSnapshot {
     }
 
     for (ExportFolderRow folder : childFoldersByParent.getOrDefault(folderKey, List.of())) {
-      collectDirectory(
-          pathPrefix + folder.name() + "/", folder.id(), folder.readmeContent(), List.of());
+      collectDirectory(pathPrefix + folder.name() + "/", folder.id(), folder.readmeContent());
     }
 
     if (!pathPrefix.isEmpty() && entries.size() == firstEntryIndex) {

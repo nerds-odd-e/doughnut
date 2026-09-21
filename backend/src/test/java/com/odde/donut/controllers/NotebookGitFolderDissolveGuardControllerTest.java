@@ -3,11 +3,14 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
+import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.ApiException;
@@ -22,6 +25,71 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
   static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";
 
   @Autowired FolderRepository folderRepository;
+
+  @Test
+  void folderContainingAFileCannotBeDissolved() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder old = makeMe.aFolder().parentFolder(physics).name("old").please();
+    NotebookAttachment sketch =
+        storeFolderAttachmentAndSnapshot(notebook, old, "sketch.png", new byte[] {1, 2, 3});
+    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> folderController.dissolveFolder(notebook, old, false));
+
+    assertThat(
+        exception.getReason(),
+        equalTo(
+            "Folders containing files cannot be dissolved, merged, or moved to another notebook"
+                + " yet."));
+    assertThat(
+        folderRepository.findById(old.getId()).orElseThrow().getParentFolder().getId(),
+        equalTo(physics.getId()));
+    assertThat(
+        notebookAttachmentRepository.findById(sketch.getId()).orElseThrow().getFolder().getId(),
+        equalTo(old.getId()));
+    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
+
+  @Test
+  void folderContainingAFileCannotBeMerged() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder target = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder holder = makeMe.aFolder().notebook(notebook).name("holder").please();
+    Folder source = makeMe.aFolder().parentFolder(holder).name("physics").please();
+    Folder old = makeMe.aFolder().parentFolder(source).name("old").please();
+    NotebookAttachment sketch =
+        storeFolderAttachmentAndSnapshot(notebook, old, "sketch.png", new byte[] {1, 2, 3});
+    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+    FolderMoveRequest mergeAtRoot = new FolderMoveRequest();
+    mergeAtRoot.setMerge(true);
+
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> folderController.moveFolder(notebook, source, mergeAtRoot));
+
+    assertThat(
+        exception.getReason(),
+        equalTo(
+            "Folders containing files cannot be dissolved, merged, or moved to another notebook"
+                + " yet."));
+    assertThat(
+        folderRepository.findById(target.getId()).orElseThrow().getParentFolder(), nullValue());
+    assertThat(
+        folderRepository.findById(source.getId()).orElseThrow().getParentFolder().getId(),
+        equalTo(holder.getId()));
+    assertThat(
+        folderRepository.findById(old.getId()).orElseThrow().getParentFolder().getId(),
+        equalTo(source.getId()));
+    assertThat(
+        notebookAttachmentRepository.findById(sketch.getId()).orElseThrow().getFolder().getId(),
+        equalTo(old.getId()));
+    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
 
   @Test
   void conflictingSiblingNameWithoutMergeLeavesFolderAndAcceptedHistoryUnchanged()
