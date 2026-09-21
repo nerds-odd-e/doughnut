@@ -407,7 +407,7 @@ included — the entry point does not discriminate by which tool created the
 worktree. Full suite 20/20. No live Codex app was used or simulated.
 
 ### 7. Prepare Claude Code worktrees without replacing their lifecycle
-Type: Behavior. Status: planned. Target: ~5 minutes plus host observation.
+Type: Behavior. Status: done.
 
 Enter a fresh worktree with Claude Code → supported preparation → repository
 tooling and dependencies are available before use. Cover both an initially
@@ -424,6 +424,29 @@ Proof: real Claude session observations for the two entry situations; resolve
 tooling to the intended checkout and use prepared dependencies. Record host
 version, selected path, command and outcome. P covers common preparation, not
 whether the host invokes it. Document any explicit command requirement honestly.
+
+Delivered: real host observation, this being the one host this execution
+runs as. Fetched official Claude Code docs confirming `WorktreeCreate`
+replaces git's own worktree-creation logic entirely (all-or-nothing, not a
+post-creation step) and that `${CLAUDE_PROJECT_DIR}` in a hook stays pinned
+to the session's original checkout after `EnterWorktree` — the exact
+"origin-root environment variable" risk this slice names. Created a
+disposable worktree from this execution branch's HEAD, attempted
+`EnterWorktree` on it (blocked from this delegated subagent context: a path
+outside `.claude/worktrees/` is refused, and creating one from a
+pinned-cwd subagent is refused outright — a subagent-specific restriction,
+not necessarily how a real top-level session behaves), ran the documented
+fallback command there successfully (`.claude/skills` 0→45 entries,
+dependencies usable), then fully removed the disposable worktree/branch
+(confirmed via `git worktree list` and `.claude/worktrees/` remaining
+empty). No `WorktreeCreate`/`WorktreeRemove` hook added to
+`.claude/settings.json`, confirmed untouched. `scripts/worktree_setup.sh`
+resolves its own root via `BASH_SOURCE`/`pwd`, not an environment variable,
+so it is unaffected by the `$CLAUDE_PROJECT_DIR` pinning regardless of which
+checkout runs it — no Donut-owned path-assumption bug found. Both entry
+situations (initial launch, mid-session entry) documented in
+`.agents/agent-map.md` as using the same manual fallback as Codex. P and
+full suite pass.
 
 ### 8. Preserve parallel work while establishing the final result
 Type: Behavior. Status: planned. Target: ~5 minutes active work plus concurrent checks.

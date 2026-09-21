@@ -44,6 +44,15 @@ contains only the product-backlog guard hook, nothing under a local-environment
 schema), so Codex-created worktrees are not prepared automatically — run the
 command manually there, same as any other freshly created worktree.
 
+Claude Code is deliberately not wired for automatic invocation either. Its
+`WorktreeCreate` hook replaces git's own worktree-creation logic entirely
+rather than running after it, and `${CLAUDE_PROJECT_DIR}` in a hook
+command stays pinned to the session's original checkout even after
+`EnterWorktree` moves the session into a different worktree — so a hook
+cannot reliably resolve a later-entered worktree either. Both an initially
+launched worktree and one entered mid-session use the same manual fallback:
+run the command by hand in the new checkout, same as Codex.
+
 ## Commands
 
 Run repo tooling through Nix unless working in a documented Cloud VM path:
