@@ -798,7 +798,7 @@ backend:test_only`, exit 0, **2,563 tests, 0 failures, 0 errors, 0 skipped**,
 coordinator-confirmed from JUnit XML, including result files for both new classes.
 
 ### 8. Verify native history survives the upgrade
-Type: Behavior. Status: planned.
+Type: Behavior. Status: done (local rehearsal). **Owner decision needed: partial-binding repair policy.**
 
 Given an isolated database with untouched legacy bindings, already-native
 bindings with stale retained bundles, and several history commits, the actual
@@ -863,6 +863,124 @@ into a verification slice.
 The completeness check is needed again by slice 10 ("perform the completeness
 check before destructive DDL and fail before dropping when it is not satisfied"),
 so decide where it should live with that reuse in mind.
+
+**Delivered - local rehearsal passes.** Proof V:
+`CURSOR_DEV=true nix develop -c pnpm backend:verify`, exit 0, test-database
+migration succeeded, **2,565 tests, 0 failures, 0 errors, 0 skipped** (the 2,563
+baseline plus the 2 new rehearsal tests). **MySQL engine: 8.4.11** (Source
+distribution), read with `SELECT version()` on 127.0.0.1:3309. Focused run:
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'db.migration.*'`,
+3/3. No existing production file modified.
+
+Two new files, both upgrade machinery that **slice 12 deletes** together with the
+backfill, `V300000336` and `NotebookGitAcceptedObjectBackfillTest`:
+
+- `backend/src/main/java/db/migration/NotebookGitAcceptedHistoryCompleteness.java`
+  - the completeness check. **Lives in main-source `db.migration`, Spring-free,
+  beside the backfill**, because slice 10 must call it from a Flyway Java migration
+  that runs before any Spring bean exists; test source would only have to be moved
+  there later. Its cost is main-source code with only a test caller until slice 10.
+- `backend/src/test/java/db/migration/NotebookGitUpgradeRehearsalTest.java` - the
+  temporary rehearsal fixture and its two tests.
+
+Rehearsal result, per binding category, after the **real**
+`NotebookGitAcceptedObjectBackfill.backfillLegacyBindings` (the method `V300000336`
+runs, not a re-implementation):
+
+| Category | What the backfill did | Preserved |
+| --- | --- | --- |
+| Legacy - 3 bindings x 3 commits | Converted each | Head, full reachable graph, bytes; binding row unchanged |
+| Already native, **stale** retained bundle | **Skipped it**; native rows (id, type, byte hash) and binding row identical before and after | Head still c3 with full graph and correct download; stale bundle never used |
+| **Partial** (head's blob missing) | **Skipped it - see below** | Still incomplete; the check flags it |
+
+Preservation was checked by reopening each complete binding on a fresh connection:
+head matches; every object reachable in the source history is present with the same
+type and bytes; a download bundle rebuilt with the same writer `downloadableBundle`
+uses re-imports with the same head and reachable set; and all binding-row fields
+(`notebook_id`, head, a hash of the bundle bytes, `created_at`, `updated_at`) are
+identical before and after. **Gate A's "existing converted bindings must not be
+overwritten with stale retained bundle bytes" is now proven, not just structural.**
+
+**How the completeness check works, and the subtlety it gets right.** It walks each
+binding's accepted head with JGit's `ObjectWalk` and compares every commit, tree and
+blob against the binding's stored object ids - not a row count. `ObjectWalk` loads
+commits and trees, so a missing one surfaces as `MissingObjectException`, caught and
+reported. **Blobs are referenced only by id from their parent trees and are never
+loaded, so a walk alone would miss a missing blob;** the explicit membership test
+against the stored-id set catches it. Proven falsifiable: with the blob check
+disabled, the test fails. An unconverted legacy binding is caught too (its head
+commit is missing), so "the backfill never ran" also blocks the drop.
+`requireEveryAcceptedHistoryComplete` throws `IllegalStateException` naming each
+incomplete binding and object (fail loudly, ADR 0006) - that throw is what blocks
+column retirement.
+
+**Interruption/resume.** The backfill's connection is wrapped in a proxy that, on the
+second `commit()`, closes the real connection and throws - after that binding's
+inserts have run but before they commit, the harshest crash point. The run fails
+loudly; each legacy binding is then either empty or complete per the check, with at
+least one still empty; a rerun on a fresh connection converts the rest, and all three
+then reopen and download with exact history.
+
+### Owner decision needed - partial-binding repair policy
+
+**The backfill does nothing with a partial binding.** It already has native rows, so
+the selection query never picks it; it stays partial across any number of runs, with
+no error. The same is true at runtime by reading the code:
+`NotebookGitAcceptedRepositoryStore.open()` converts only when the object count is 0,
+so a partial binding is never repaired there either, and would fail when a missing
+object is read.
+
+This is **not** a defect introduced by this work, and it does not endanger anything
+today: slice 10's completeness gate will refuse to drop the column while any partial
+binding exists, so no retained bundle can be lost. But it means **a single partial
+binding anywhere would block slice 10 indefinitely** until a policy exists. Options,
+for the owner to choose:
+
+1. **Repair from the retained bundle** for genuine legacy bindings (safe: object
+   inserts are idempotent). For an already-native binding with a stale bundle,
+   `importAndVerifyMainHead` stops with a head-mismatch error - loud, not corrupting -
+   so such a binding would still need separate handling.
+2. **Report and stop** - leave the check as the only guard and investigate any
+   partial binding Gate A finds by hand. Simplest; right if none are expected.
+3. **Decide after Gate A** - measure whether any partial binding actually exists in
+   real data before designing a repair nobody needs.
+
+Option 3 fits the plan's "do not invent work before evidence" rule best; the migration
+was left unchanged pending this decision.
+
+Gaps stated plainly: private identities were checked only as the binding's own
+identity (row id, `notebook_id`) - the fixture seeds no real notes, though by reading
+the code the backfill only inserts into `notebook_git_accepted_object`. The download
+was checked with the same writer rather than through the Spring controller endpoint
+(existing controller tests cover that endpoint on native storage). The check's cost at
+real data volume is unmeasured - one set query per binding plus a query per commit/tree
+read - and **Gate A owns that, along with all live-data proof.** This is a local
+rehearsal and claims nothing about Development or Production.
+
+For slice 9: the rehearsal's `INSERT` sets `bundle_bytes`; it keeps working once the
+column is nullable. For slice 10: call
+`NotebookGitAcceptedHistoryCompleteness.requireEveryAcceptedHistoryComplete(connection)`
+in the drop-column Java migration **before** the DDL, and fail there if it throws.
+
+Refactor outcome (slice 8): the rehearsal test was 367 lines and held the third
+copy of the connection/insert/cleanup/seeding setup. The pass reused the existing
+seam, `com.odde.donut.services.notebookGit.NotebookGitJdbcFixture` (made public,
+plus an `insertBinding(head, bundleBytes)` overload the old signature delegates to),
+split the seeded pre-upgrade environment into
+`backend/src/test/java/db/migration/NotebookGitUpgradeRehearsalEnvironment.java`
+(164 lines), leaving the rehearsal test at 181, and moved
+`NotebookGitAcceptedObjectBackfillTest` onto the same fixture (204 -> 154 lines,
+assertion count unchanged at 13). The completeness check is byte-for-byte untouched,
+including its blob membership test. The test's own `reachable()` walk was kept
+separate on purpose: it is the independent oracle and must not reuse the code under
+test. Re-verified: `backend:verify` exit 0, 2,565 tests, 0 failures.
+
+**Slice 12 deletes:** `NotebookGitUpgradeRehearsalTest`,
+`NotebookGitUpgradeRehearsalEnvironment`, `NotebookGitAcceptedHistoryCompleteness`,
+the backfill, `V300000336` and `NotebookGitAcceptedObjectBackfillTest`.
+`NotebookGitJdbcFixture` stays (`NotebookGitJdbcObjectStoreTest` uses it), but once
+the backfill test is gone its `insertBinding(head, bundleBytes)` overload loses its
+callers and goes too.
 
 ### 9. Operate without reading or writing the retained column
 Type: Structure. Status: planned.

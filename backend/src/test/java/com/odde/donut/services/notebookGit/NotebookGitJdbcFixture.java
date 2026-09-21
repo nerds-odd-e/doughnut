@@ -21,12 +21,12 @@ import org.eclipse.jgit.lib.Repository;
  * real MySQL with no Spring context. Tracks every connection and binding row it hands out so {@link
  * #close()} can release them all.
  */
-final class NotebookGitJdbcFixture implements AutoCloseable {
+public final class NotebookGitJdbcFixture implements AutoCloseable {
 
   private final List<Connection> openConnections = new ArrayList<>();
   private final List<Integer> insertedBindingIds = new ArrayList<>();
 
-  Connection openConnection() throws SQLException {
+  public Connection openConnection() throws SQLException {
     String url = System.getenv("SPRING_DATASOURCE_URL");
     if (url == null || url.isBlank()) {
       url =
@@ -38,7 +38,12 @@ final class NotebookGitJdbcFixture implements AutoCloseable {
     return connection;
   }
 
-  int insertBinding(String initialHeadObjectId) throws SQLException {
+  public int insertBinding(String initialHeadObjectId) throws SQLException {
+    return insertBinding(initialHeadObjectId, new byte[0]);
+  }
+
+  /** A binding that still retains {@code bundleBytes} in its legacy column. */
+  public int insertBinding(String initialHeadObjectId, byte[] bundleBytes) throws SQLException {
     int notebookId = ThreadLocalRandom.current().nextInt(1_500_000_000, 2_000_000_000);
     try (Connection connection = openConnection()) {
       try (Statement pragma = connection.createStatement()) {
@@ -52,7 +57,7 @@ final class NotebookGitJdbcFixture implements AutoCloseable {
           connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
         statement.setInt(1, notebookId);
         statement.setString(2, initialHeadObjectId);
-        statement.setBytes(3, new byte[0]);
+        statement.setBytes(3, bundleBytes);
         statement.executeUpdate();
         try (ResultSet keys = statement.getGeneratedKeys()) {
           keys.next();
@@ -69,7 +74,7 @@ final class NotebookGitJdbcFixture implements AutoCloseable {
   }
 
   /** Seeds a fresh store for {@code bindingId} with every object reachable from {@code head}. */
-  void seedStore(int bindingId, Repository source, AnyObjectId head)
+  public void seedStore(int bindingId, Repository source, AnyObjectId head)
       throws IOException, SQLException {
     try (Connection connection = openConnection();
         JdbcNotebookGitRepository store = new JdbcNotebookGitRepository(bindingId, connection)) {
