@@ -983,10 +983,57 @@ the backfill test is gone its `insertBinding(head, bundleBytes)` overload loses 
 callers and goes too.
 
 ### 9. Operate without reading or writing the retained column
+
+**Refined 2026-09-21 into 9a (expand) and 9b (contract), before dispatch.**
+
+Evidence: `backend/src/main/java/com/odde/donut/configs/FlyWayFreeVersionRealMigration.java`
+runs `flyway.repair(); flyway.migrate();` from an `@EventListener(ApplicationReadyEvent.class)`
+under `@Profile("!test")` - so in every long-lived environment **migrations run after the
+instance is already ready**. Deployment is triggered only by pushing a `v*.*.*` tag
+(`.github/workflows/deploy.yml`, "Application Release", behind a release-admission job);
+merging to `main` does not deploy. With migrations running after readiness, the original
+one-step slice 9 carried two release-ordering hazards:
+
+1. **Nullable before omit.** A release that both relaxes `bundle_bytes` to `NULL` and
+   removes the entity field lets a freshly started instance insert a binding without the
+   column before its own migration has relaxed `NOT NULL`, so notebook creation fails in
+   that startup window.
+2. **Backfill before fallback removal.** Any production binding not yet converted is
+   served only by the runtime legacy-import fallback that slice 9 deletes. If
+   `V300000336` has not already run in production, it would run at that same startup
+   step, and saves on unconverted bindings would fail until the whole backfill finishes -
+   a much longer window than an `ALTER`.
+
+Neither is a code defect and neither is live now (release is tag-gated and this branch
+reaches `main` only at story wrap-up). The standard expand/contract split removes both,
+and it is exactly the plan's own "staged compatibility" release path. The outcome of
+slice 9 is unchanged; only its release boundary is made explicit.
+
+### 9a. Relax the retained column to nullable (expand)
 Type: Structure. Status: planned.
 
-Add a compatible nullable-column migration, remove the entity field and runtime
+Add one Flyway migration relaxing `notebook_git_binding.bundle_bytes` from `NOT NULL` to
+`NULL`. **Change no Java behavior**: creation/reset still write the column and the runtime
+fallback still reads it, so every running version - old or new - stays compatible with the
+relaxed schema. Allocate the migration version above every existing one following the
+`db-migration` skill. Proof: V (migration applies on a populated database and the full
+suite stays green; an empty-schema pass alone is insufficient - reuse slice 8's rehearsal
+environment) and D (`docs/database-erd.md` regenerated against the verified migrated
+disposable schema via `DONUT_ERD_SCHEMA`). **Release: safe at any time** - a pure expand
+that old code tolerates. Size: ~5 minutes plus suite runtime.
+
+### 9b. Stop reading and writing the retained column (contract)
+Type: Structure. Status: planned. **Depends on 9a. Release only after 9a is deployed
+everywhere AND Gate A confirms `V300000336` completed, with
+`NotebookGitAcceptedHistoryCompleteness.requireEveryAcceptedHistoryComplete` passing, in
+every long-lived database.**
+
+With the column already nullable from 9a, remove the entity field and runtime
 legacy import fallback, and stop bundle serialization in creation/reset storage.
+Also delete the two legacy-subject carve-out tests in
+`NotebookGitWebContentSaveControllerTest`, the now-callerless
+`clearNativeObjectStoreRows`, and the five `NOT NULL` satisfiers (see the starting
+map below). Keep `countNativeObjectStoreRows`.
 Keep native storage, current bundle transport and still-required migration
 helpers. Fix Javadoc to describe current ownership only. Enables slice 10.
 Proof: V and E; native reopen/save, creation/reset, download/publication and
