@@ -12,6 +12,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Apply the shared dependency-readiness rule to redundant install-prefixed root scripts](seeds/SEED-039-fast-isolated-worktree-setup.md#story-2) — SEED-039#story-2
 - [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
@@ -21,4 +22,3 @@ and deletable in Web Donut.
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2
 - [Assess whether attachment content needs its own save-path treatment](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3
-- [Apply the shared dependency-readiness rule to redundant install-prefixed root scripts](seeds/SEED-039-fast-isolated-worktree-setup.md#story-2) — SEED-039#story-2
