@@ -11,35 +11,34 @@ scope: medium
 
 ## Why This Matters
 
-Developers using Codex, Cursor, and Cloud Code need fresh Git worktrees to
-become ready for useful Donut development quickly. Today the repository safely
-reuses machine-level package caches, but a new worktree still needs its own
-dependency layout, and setup and package commands can repeat installation
-checks. Slow or inconsistent preparation reduces the value of parallel AI work,
-while sharing mutable dependency or runtime directories would let concurrent
-worktrees interfere.
+Developers using Codex, Cursor, and Claude Code encounter worktree startup and
+recovery friction. Retrospective findings demonstrate wrong-base recovery,
+worktree recreation, and missing generated skill paths; they do not establish
+dependency installation as the dominant cost or quantify a potential speedup.
+Current setup also differs between normal Nix entry, agent-mode entry, and
+package commands, which can repeat installation.
 
-The desired effect is one repository-owned setup outcome that each supported
-environment can invoke: a fresh worktree reuses safe immutable caches, creates
-only the isolated state it needs, and becomes ready for representative Donut
-checks without manual dependency copying. Repeated setup in an unchanged
-worktree should be a cheap no-op, and concurrent worktrees must remain stable.
+The desired effect is predictable preparation on an already-provisioned machine:
+fresh worktrees become usable without manual copying or repair, repeated setup
+avoids unnecessary installation, and concurrent work remains independent. This
+improves development of Donut; its contribution to the near-future notebook
+workflow is indirect. The owner retains first priority as a bounded investment
+in the tools used to deliver that direction.
 
 ## Alternatives and Decision
 
-Doing nothing retains the current safe behavior, including pnpm's shared store,
-Gradle's user cache, Nix's store, and Donut's isolated worktree databases, but it
-leaves repeated setup work and environment-specific entrypoints unassessed.
-Manually preparing each worktree is the strongest smaller alternative; it is
-insufficient because every supported AI environment would pay the same operator
-cost and could drift onto a different setup sequence.
+Reuse host-native setup configuration and the existing repository/package-manager
+behavior before adding another setup authority. One documented command run in a
+fresh checkout is an acceptable supported entry point where automatic integration
+would require taking over worktree creation. Manual copying and repair are not.
+Keep all three tools in scope without requiring identical hook mechanisms.
 
-Do not share or copy a mutable `node_modules` directory between worktrees.
-Instead, first measure fresh and repeated setup through Codex, Cursor, and Cloud
-Code, then optimize the common repository-owned dependency-readiness path while
-preserving each worktree's own dependency view. The highest-learning question is
-which cold-worktree costs remain after the existing pnpm, Gradle, and Nix caches
-are warm; do not add cache machinery that measurements do not justify.
+Use pnpm's existing shared package store and Gradle/Nix caches. Assess native pnpm
+dependency verification before extending the handwritten fingerprint. Do not
+copy or link another worktree's mutable dependency tree. pnpm's managed global
+virtual store is a different candidate, to consider only in one bounded experiment
+if measured fresh-layout cost warrants it; it is not a promised adoption.
+Do not replace Claude Code's worktree lifecycle merely to install dependencies.
 
 ## Architectural Constraints
 
@@ -50,7 +49,7 @@ are warm; do not add cache machinery that measurements do not justify.
 - Dependency and tool versions remain controlled by committed manifests and
   lockfiles. A faster setup must not silently accept stale or mismatched
   dependencies.
-- The common behavior belongs to the repository; Codex-, Cursor-, and Cloud
+- The common behavior belongs to the repository; Codex-, Cursor-, and Claude
   Code-specific hooks may invoke it but must not become competing authorities.
 
 ## Story Decomposition
@@ -60,36 +59,52 @@ are warm; do not add cache machinery that measurements do not justify.
 ### Start isolated AI worktrees quickly and reliably
 
 - **Identity:** SEED-039#story-1
-- **For / why:** Developers using Codex, Cursor, and Cloud Code can begin useful
-  work in a fresh Donut worktree without manually copying dependencies or
-  waiting for redundant setup, while concurrent worktrees remain independent.
-- **Evaluation:** With machine-level dependency caches warm, create fresh linked
-  worktrees through each supported environment and invoke its normal setup path.
-  Each worktree reaches representative frontend and backend checks using the
-  committed dependency graph. Repeating setup without dependency changes takes
-  the verified no-op path. Concurrent worktrees neither mutate one another's
-  dependency view nor share test databases, ports, or build outputs. Record the
-  comparable before/after setup boundaries and timings rather than claiming an
-  unmeasured speedup.
-- **Value / learning:** Makes the near-future parallel-AI-work direction cheaper
-  and more predictable, while identifying whether remaining cost comes from Nix
-  entry, pnpm link creation, lifecycle/native builds, or another owned step.
-- **Effort hypothesis:** M, low confidence until the three environment
-  entrypoints and cold-worktree baseline are observed.
+- **Plan:** [AI worktree readiness](../quick/005-ai-worktree-readiness/PLAN.md).
+- **Goal:** Developers using Codex, Cursor, or Claude Code can prepare a fresh
+  Donut worktree on an already-provisioned machine, access repository tooling,
+  and run frontend and backend checks without manual dependency copying or repair.
+- **Scope:** One coherent preparation behavior; supported entry points for all
+  three hosts; tracked tooling and necessary generated skill links; correct
+  dependencies after relevant input changes; cheap unchanged preparation;
+  failed/incomplete preparation never reports readiness. Preserve existing
+  database, port, process, and build-output isolation. Service allocation remains
+  with existing runtime/test commands, not eager startup of every service.
+- **Key examples:** Fresh worktree with warm machine caches → supported setup →
+  repository tools and frontend/backend checks work using committed dependencies.
+  Unchanged worktree → repeat setup and a normal package command → no redundant
+  installation/lifecycle pass. Changed workspace manifest/lockfile or missing
+  install state → prepare → install the valid graph or report the mismatch without
+  silently rewriting committed inputs. Failed preparation → fix its cause and
+  retry → actual readiness. Two concurrent worktrees → prepare and check both →
+  each keeps its dependency view, runtime ownership and disposable data.
+- **Evaluation:** Record before/after fresh and repeated preparation using the
+  same revision inputs, machine/cache conditions and stated timing boundaries;
+  separate setup from compilation/test execution. Record actual host versions
+  and invocation paths. A shell command alone does not prove a host invokes it.
+  Existing caching may already be adequate; no absolute latency or speedup ratio
+  is promised. At most one bounded optimization experiment follows a measured
+  substantial remaining preparation cost.
+- **Deferred promises:** New-machine or cloud provisioning; a worktree manager;
+  branch-policy or cleanup redesign; arbitrary local-file/credential copying;
+  remote caches; general compilation, test or browser-download optimization;
+  fixing every shared retrospective finding; notebook product changes.
+- **Value / learning:** Remove demonstrated repair work and unnecessary setup
+  from repeated development cycles; determine the actual remaining cost before
+  investing in acceleration.
+- **Effort hypothesis:** M, low confidence until host entry points and native
+  pnpm readiness behavior are observed; reassess if these demand lifecycle work.
 - **Depends on:** none.
-- **Safe stopping point:** All three environments use one proven repository
-  setup outcome, unchanged worktrees skip unnecessary preparation, and failures
-  remain visible without weakening worktree isolation. Further optimization can
-  be deferred if the measured result is already adequate.
+- **Safe stopping point:** All three hosts have proven supported preparation,
+  repeated installation is avoided, failures are visible and isolation is
+  preserved. Stop without additional cache machinery when remaining timings
+  do not justify it. Partial host coverage is useful progress, not story completion.
 
 ## Ordering and Scope Reduction
 
-The owner placed this story first in the product backlog because fast, reliable
-worktree creation directly enables the current parallel-AI-work direction. Keep
-the first delivery to the shared setup outcome and its three supported callers.
-Drop speculative cache formats, copied dependency trees, remote caches, and
-unmeasured build acceleration before weakening isolation or broadening the
-story.
+Keep the existing first position as the owner's explicit tool-sharpening choice,
+not a prerequisite for notebook attachments or assimilation. Deliver reliable
+preparation and remove redundant work first. Drop speculative acceleration before
+weakening isolation or broadening into lifecycle/platform management.
 
 ## Related Retrospective Findings
 
@@ -123,13 +138,16 @@ worktree lifecycle issue recorded in `DearDough.md`.
 
 ## When to Surface
 
-Now, as the first queued product-backlog item. This seed does not authorize
-implementation or allocate an executable plan.
+Now, as the first queued product-backlog item. The linked plan is planning-only;
+the story has not been taken and implementation is not authorized by refinement.
 
 ## Breadcrumbs
 
 - Owner direction, 2026-09-21: prioritize worktree dependency setup
-  acceleration and scope it across Codex, Cursor, and Cloud Code.
+  acceleration and scope it across Codex, Cursor, and Claude Code (corrected by
+  the owner; cloud infrastructure is not an additional required platform).
+- Owner accepted the research-based scope and requested slice planning. Keep
+  reliable setup and all three hosts; condition further optimization on evidence.
 - Current repository evidence: the Nix shell hook already fingerprints pnpm
   inputs, package scripts still run frozen recursive installation checks, pnpm
   uses a shared content-addressable store, Gradle enables shared caching, and
