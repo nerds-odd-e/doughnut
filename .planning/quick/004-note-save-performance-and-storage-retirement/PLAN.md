@@ -1406,7 +1406,7 @@ projection-drift suites); E 40/40, including "Published root files reach another
 byte for byte".
 
 ### 15. Re-establish the save-speed comparison with the corrected harness
-Type: Behavior. Status: planned. **Before the first release.**
+Type: Behavior. Status: done - **regression confirmed.** Before the first release.
 
 Given `fixture-a` (11,000 notes, 0 attachments), run command M with the **corrected**
 harness (Node-side export) on `b5cad203d1` and on the current revision, same edits and
@@ -1437,6 +1437,54 @@ Per the plan's learning gate, the correction is then refined into this plan as i
 bounded slice with a same-fixture before/after M measurement and byte/history/atomicity
 proof. The owner's rule governs its shape: **it must remove complexity, not add machinery**
 - no caches, no second content authority, no attachment-only path. Size: ~5-10 active
+**Slice 15 result - the regression is real, about 1.35x.** Reconstructed comparison:
+same machine and toolchain, corrected harness (Node-side export), `fixture-a` (11,000
+notes, 0 attachments), same edits and order; only the revision differs. The baseline
+worktree's five harness files were refreshed and `cmp` confirms them byte-identical to
+current; the endpoints the Node-side tasks call exist on `b5cad203d1`. Current was measured
+fresh rather than reusing slice 13's control, **alternating sides** (b1, c1, b2, c2, b3, c3)
+so both ran under the same load (1-minute load 6-7 throughout; no run discarded). Six runs,
+all exit 0 with reload durability verified; n=15 per edit kind per side, warm-ups discarded.
+Coordinator recomputed every median from the raw logs and they match:
+
+| Edit | Boundary | `b5cad203d1` | current | Ratio | Ranges overlap? |
+|---|---|---:|---:|---:|---|
+| Existing links | request | 1,170 (1,127-1,229) | 1,594 (1,512-1,879) | **1.36x** | no |
+| Existing links | keystroke->settled | 2,203 (2,161-2,264) | 2,622 (2,539-2,906) | 1.19x | no |
+| Added link | request | 1,203 (1,167-1,228) | 1,624 (1,545-1,882) | **1.35x** | no |
+| Added link | keystroke->settled | 1,231 (1,206-1,269) | 1,654 (1,573-1,918) | 1.34x | no |
+
+The whole gap, about **+420 ms, sits inside `requestMs`**; the debounce is identical on both
+sides. Adjacent run pairs give 1.33x, 1.36x and 1.41x; even current's fastest run against the
+baseline's slowest is about 1.29x. Correcting the harness lowered both sides' absolute numbers
+but left the ratio almost unchanged from slice 3's 1.38x / 1.35x. All six Node-side exports are
+3,390,911 bytes with 11,000 files and the same digest as slice 3
+(`1b8cdeed86cc5cd6706a37f77a79e6c16f2617682a41083b4eccb95d58240cec`).
+
+**Clue for slice 16:** current grew slower from run to run (existing-links request median
+1,538 -> 1,594 -> 1,685, about +150 ms) while the baseline barely moved (1,156 -> 1,170 ->
+1,193, about +40 ms), under the same load.
+
+**Test-isolation defect found while checking that clue - does NOT explain the drift.**
+`backend/src/main/java/com/odde/donut/testability/DBCleanerWorker.truncateAllTables` sets
+`FOREIGN_KEY_CHECKS=0` and truncates only JPA-mapped tables. `notebook_git_accepted_object`
+is written by raw JDBC and has no JPA entity, so **the E2E reset never clears it**:
+truncating `notebook_git_binding` with FK checks off does not cascade, and binding ids restart,
+so a new run's binding can inherit a previous run's objects under the same id. Measured in the
+current worktree's disposable E2E database: 13,887 object rows (25.6 MB) across 3 binding ids
+against 1 live binding - about one notebook's worth, because objects are content-addressed and
+re-seeding identical content reuses them. **So the leak did not inflate slice 15's
+measurement**, and the drift above still needs its own explanation. The defect is real test
+isolation debt from story 2's native storage and is planned as slice 15b.
+
+### 15b. Clear the native object store on the E2E reset
+Type: Structure. Status: planned. After slice 16 (so it cannot perturb slice 16's runs).
+
+Make the testability reset leave `notebook_git_accepted_object` empty, so no E2E run can see
+another run's objects. Smallest fix within the existing owner, `DBCleanerWorker`; do not add a
+second reset path or a JPA entity only to make the table visible to the cleaner. Proof: after a
+reset, the table holds no rows, and E stays green. Size: ~5 minutes.
+
 minutes plus profiling runtime.
 
 ### 14. Leave only the current implementation
