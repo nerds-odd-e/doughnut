@@ -43,7 +43,7 @@ Otherwise run `nix develop`.
 
 ### Persistent Development (manual feedback)
 
-From the **unconfigured primary** checkout only:
+From the **primary checkout** (configured or unconfigured):
 
 ```bash
 pnpm dev
@@ -55,8 +55,10 @@ This starts the reload-capable Development stack (Spring profile `dev`, database
 `manual` / `password`. Logs: `dev.log`; PID: `dev.pid`. Restart only that stack
 (without deleting Development data) with `pnpm dev:restart`.
 
-Linked or configured worktrees refuse `pnpm dev` / `pnpm dev:restart`. E2E
-testability and reset endpoints are unavailable under `dev`.
+Git linked worktrees refuse `pnpm dev` / `pnpm dev:restart`. A configured
+primary keeps its isolated Unit Test and E2E resources while using the
+persistent Development stack. E2E testability and reset endpoints are
+unavailable under `dev`.
 
 ### E2E system under test (`pnpm cy:run`)
 
