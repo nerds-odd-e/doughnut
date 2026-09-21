@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Apply the shared dependency-readiness rule to redundant install-prefixed root scripts](seeds/SEED-039-fast-isolated-worktree-setup.md#story-2) ([plan](quick/006-frontend-test-readiness/PLAN.md)) — SEED-039#story-2
-
 ## Backlog list
 
 - [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9
