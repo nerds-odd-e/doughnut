@@ -1,3 +1,5 @@
 {
-  "setup-worktree": ["nix develop -c pnpm install"]
+  "setup-worktree": [
+    "CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh"
+  ]
 }

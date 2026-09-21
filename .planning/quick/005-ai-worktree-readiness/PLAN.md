@@ -351,7 +351,8 @@ this slice's original ~5-minute leaf without inventing per-script exceptions.
 The full caller map is recorded under slice 9.
 
 ### 5. Prepare Cursor-created worktrees through the common behavior
-Type: Behavior. Status: planned. Target: ~5 minutes plus host observation.
+Type: Behavior. Status: config delivered; host-integration proof unavailable
+(no live Cursor app in this execution environment — see below).
 
 Create a fresh worktree through Cursor → its configured setup invokes public
 preparation → repository tooling/dependencies are ready without duplicate Nix
@@ -361,6 +362,23 @@ Proof: actual Cursor setup log and resulting checkout; record host version,
 command, cwd, exit outcome and dependency use. P/N cover repository behavior;
 invoking the JSON's command manually alone does not prove this host integration.
 Document this supported path in existing development guidance in the same slice.
+
+Delivered: `.cursor/worktrees.json`'s `setup-worktree` now runs
+`CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh` (quiet mode —
+without it, `nix develop`'s own shellHook restarts the Biome daemon and starts
+MySQL/Redis before the wrapped command even runs, which the refactor pass
+caught by empirical comparison and which would have directly contradicted
+this slice's own "without... global daemon restart" promise). Documented in
+`.agents/agent-map.md`'s new "Worktree setup" section. Manual command run
+(`CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh`, the exact
+JSON literal) exits 0, quiet, no daemon/service side effects; P/N/full suite
+pass (regression, unaffected by a config/doc-only change). **Genuine
+unclosed gap, honestly reported per the plan's own boundary ("An unavailable
+host blocks only that host's acceptance, not independent repository work"):**
+this execution environment (Claude Code, no installed Cursor app) cannot
+produce actual Cursor setup-log proof — host version, real invocation cwd,
+Cursor's own recorded exit outcome. That proof needs a session with real
+Cursor access.
 
 ### 6. Prepare Codex-created worktrees through the common behavior
 Type: Behavior. Status: planned. Target: ~5 minutes plus host observation.

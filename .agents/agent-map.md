@@ -29,6 +29,18 @@ CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 
 Never hand-edit `packages/generated/donut-backend-api/**` or `open_api_docs.yaml`; regenerate them. For whitespace hygiene, use `scripts/check_diff_whitespace.sh` instead of raw `git diff --check` so generated artifacts are not manually "fixed".
 
+## Worktree setup
+
+A freshly created `git worktree` has tracked source but is missing the
+generated Claude skill-discovery links and its own installed dependencies.
+`./scripts/run.sh bash scripts/worktree_setup.sh` is the public preparation
+entry point: it links skill discovery and installs dependencies (fingerprint-
+gated, so repeats are cheap) without starting MySQL/Redis or a Biome daemon.
+Cursor's `.cursor/worktrees.json` `setup-worktree` hook already invokes this
+script (`CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh`) when
+Cursor creates a worktree, so Cursor-created worktrees prepare automatically;
+run the command manually in any other freshly created worktree.
+
 ## Commands
 
 Run repo tooling through Nix unless working in a documented Cloud VM path:
