@@ -38,7 +38,7 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
     return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
   }
 
-  NotebookGitBinding storeFolderAttachmentAndSnapshot(
+  NotebookAttachment storeFolderAttachmentAndSnapshot(
       Notebook notebook, Folder folder, String filename, byte[] content) {
     NotebookAttachment attachment = new NotebookAttachment();
     attachment.setNotebook(notebook);
@@ -46,7 +46,8 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
     attachment.setFilename(filename);
     attachment.setContent(content);
     notebookAttachmentRepository.save(attachment);
-    return snapshotCurrentPortableTree(notebook);
+    snapshotCurrentPortableTree(notebook);
+    return attachment;
   }
 
   static NoteUpdateContentDTO contentDto(String content) {

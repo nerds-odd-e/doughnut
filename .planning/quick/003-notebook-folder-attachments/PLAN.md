@@ -20,7 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–3 are done with accepted proof; 9 slices remain planned (7
+- State: slices 1–4 are done with accepted proof; 8 slices remain planned (7
   is Structure). Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
@@ -203,7 +203,7 @@ the trash and restored paths. No production change was needed.
 
 ### 4. Permanently deleting a trashed folder removes its files
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given a trashed folder holding `a.pdf`, permanent deletion yields an
 accepted tip without `a.pdf`; the stored row is gone; the earlier commit still
 contains the file.
@@ -211,6 +211,15 @@ Expected: no production change (FK cascade from slice 1). If the cascade does
 not hold under the persistence context, remove the files explicitly beside the
 note removal already there.
 Proof: one case in `NotebookGitWebFolderPermanentDeleteControllerTest`.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,571 backend tests after the cohesion pass.
+The existing complete delete fixture now includes a folder attachment and
+retains its direct/nested notes and surviving sibling. Observation at
+`NotebookGitWebFolderPermanentDeleteControllerTest.permanentDeleteOfATrashedFolderAppendsOneAcceptedChildWithoutTheSubtree`
+invokes the real permanent-delete controller and proves the new exact tree
+omits the deleted subtree, the attachment row is gone by its captured id, and
+the parent accepted commit retains byte-exact `_trash/Topic/a.pdf`. The FK
+cascade required no production fallback.
 
 ### 5. Dissolving or merging a folder that contains files is refused
 Type: Behavior
