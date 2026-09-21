@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
 import java.time.Instant;

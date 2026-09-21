@@ -86,8 +86,9 @@ class NotebookGitProposalAcceptance {
     Map<String, Folder> foldersByPath =
         folderMaterialization.ensureAncestry(notebook, proposed.keySet().stream().toList());
     entityPersister.flush();
-    List<ExportFolderRow> folders = stateLoader.foldersOf(notebook);
-    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
+    List<PortableTreeFolderRow> folders = stateLoader.foldersOf(notebook);
+    Map<Integer, PortableTreeFolderRow> folderById =
+        NotebookGitAcceptedTree.indexFoldersById(folders);
     for (NotebookAttachment stored : attachmentRepository.findByNotebook_Id(notebook.getId())) {
       byte[] content = proposed.remove(attachmentPath(stored, folderById));
       if (content == null) {
@@ -104,7 +105,7 @@ class NotebookGitProposalAcceptance {
   }
 
   private static String attachmentPath(
-      NotebookAttachment attachment, Map<Integer, ExportFolderRow> folderById) {
+      NotebookAttachment attachment, Map<Integer, PortableTreeFolderRow> folderById) {
     Folder folder = attachment.getFolder();
     String folderPath =
         folder == null
