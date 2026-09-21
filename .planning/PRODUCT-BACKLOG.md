@@ -14,6 +14,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Start isolated AI worktrees quickly and reliably](seeds/SEED-039-fast-isolated-worktree-setup.md#story-1) — SEED-039#story-1
 - [Assess asynchronous Git processing only if save performance remains inadequate](seeds/SEED-034-faster-note-content-saving.md#story-5) — SEED-034#story-5
 - [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
