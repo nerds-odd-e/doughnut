@@ -20,9 +20,22 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: 12 planned slices (1 and 7 are Structure); no implementation or proof
-  has run. Refinement result: ready for direct execution once separately
-  authorized; remaining concerns are listed at the end.
+- State: slice 1 is done with accepted proof; 11 slices remain planned (7 is
+  Structure). Remaining concerns are listed at the end.
+- Execution identity (started 2026-09-21): Story Branch Mode; originating and
+  integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
+  checkout `/Users/terryyin/git/doughnut-worktrees/notebook-folder-attachments`
+  on `codex/notebook-folder-attachments`; integration publication target
+  `origin/main`; Story Branch delivery target
+  `origin/codex/notebook-folder-attachments`; published Taken claim
+  `418f9d914813f29964fbed297c6dfa5eafc7ae67`. Replanning was not explicitly
+  selected; preserve the plan's existing planning authority.
+- CI observer: GitHub Actions workflow `ci.yml` / `donut CI`, repository
+  `nerds-odd-e/doughnut`, target branch `codex/notebook-folder-attachments`,
+  coordinator `/root`, checkout-bound runtime in this execution worktree;
+  observer directory `/tmp/dough-ci-501/watch-dlxcD4`, PID 6546, stream session
+  6399, yielded cell 35. The Taken claim on `main` is `pendingCi: unobserved`
+  because this Story Branch observer covers only implementation deliveries.
 
 ## Resplit mapping
 
@@ -120,7 +133,7 @@ over one per arrangement.
 
 ### 1. Attachments take folder placement
 Type: Structure
-Status: planned
+Status: done
 Internal change: migration adds nullable `notebook_attachment.folder_id`
 (`ON DELETE CASCADE` to `folder`) and replaces the filename key with
 `(notebook_id, (ifnull(folder_id,0)), filename)`; `NotebookAttachment` gains its
@@ -128,6 +141,18 @@ Internal change: migration adds nullable `notebook_attachment.folder_id`
 Enables: slice 2. Unchanged behavior: every existing root attachment test.
 Proof: `backend:verify`; `NotebookGitRootAttachment*ControllerTest` and
 `NotebookExportRootAttachmentControllerTest` stay green.
+Accepted proof (2026-09-21):
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed the migration and
+all 2,569 backend tests. The migrated isolated test schema was the setup;
+`NotebookGitRootAttachmentPublicationControllerTest` (5),
+`NotebookGitRootAttachmentLocalChangeControllerTest` (5),
+`NotebookGitRootAttachmentIndependenceControllerTest` (5), and
+`NotebookExportRootAttachmentControllerTest` (1) observed unchanged root-file
+behavior with no failures. `CURSOR_DEV=true
+DONUT_ERD_SCHEMA=doughnut_wt_0f09c575e6774885b61cc53b7c547f97_test nix
+develop -c pnpm export:database-erd` passed against that migrated schema;
+`docs/database-erd.md` records `folder_id` and the folder-to-attachment
+`ON DELETE CASCADE` edge.
 Sizing: migration plus verify likely exceeds the 5-minute target; the external
 wait (migration/verify runtime) is the stated exception, not extra scope.
 
@@ -302,6 +327,9 @@ folder operation either carries files or refuses loudly.
 
 ## Current decisions
 
+- Owner decision 2026-09-21: the nullable `folder_id` migration and its entity
+  mapping may ship in the same commit/release; accept the brief production
+  window created by post-ready Flyway migration for this change.
 - Dissolve, merge and cross-notebook move of a folder containing files are
   refused for now under one rule (owner, 2026-09-21: cross-notebook refusal and
   the two-story split). If slice 5 or 6 shows that carrying the files is no more
@@ -313,4 +341,6 @@ folder operation either carries files or refuses loudly.
 
 ## Learnings
 
-None yet.
+- Slice 1's cohesion pass updated `NotebookAttachment` Javadoc to describe
+  folder placement, so slice 9 no longer needs that documentation edit; its
+  synchronization-contract documentation remains planned.

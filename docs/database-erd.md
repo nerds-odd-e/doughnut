@@ -18,6 +18,7 @@ erDiagram
     conversation ||--o{ conversation_message : "conversation_id ON DELETE CASCADE"
     folder ||--o{ folder : "parent_folder_id ON DELETE CASCADE"
     folder ||--o{ "note" : "folder_id ON DELETE RESTRICT"
+    folder ||--o{ notebook_attachment : "folder_id ON DELETE CASCADE"
     image ||--o{ "note" : "image_id ON DELETE CASCADE"
     mcq ||--o{ recall_prompt : "mcq_id ON DELETE CASCADE"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id ON DELETE CASCADE"
@@ -190,6 +191,7 @@ erDiagram
     notebook_attachment {
         int id PK
         int notebook_id FK
+        int folder_id FK
     }
     notebook_git_accepted_object {
         int notebook_git_binding_id PK FK
