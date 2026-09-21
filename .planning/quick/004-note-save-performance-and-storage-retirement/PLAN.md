@@ -1422,7 +1422,7 @@ If current is still slower, slice 16 attributes it. Size: ~5 active minutes plus
 measurement runs.
 
 ### 16. Attribute the save-speed regression
-Type: Behavior. Status: planned. Runs only if slice 15 confirms current is slower.
+Type: Behavior. Status: done - **cause proven.**
 
 Given the confirmed gap, identify **where** the extra server time goes, with in-process
 evidence on both revisions - not code reading alone. The plan's earlier "no JFR unless
@@ -1477,8 +1477,105 @@ re-seeding identical content reuses them. **So the leak did not inflate slice 15
 measurement**, and the drift above still needs its own explanation. The defect is real test
 isolation debt from story 2's native storage and is planned as slice 15b.
 
+**Slice 16 result - the cause is proven: one SELECT per accepted object on every save.**
+
+Method: JFR attached at runtime with `jcmd` to each side's E2E backend (`settings=profile`),
+the JDK 25 `method-trace` filter timing named Donut methods without code change, and MySQL
+`performance_schema.events_statements_summary_by_digest` read per side's disposable schema.
+Same `fixture-a`, unchanged command M, sides alternated, all runs exit 0. Nothing was built
+into the source tree; the tree is clean and no profiler or backend process remains
+(coordinator-checked). Recordings and scripts:
+`/Users/terryyin/.claude/jobs/6fda4d71/tmp/slice16/`.
+
+**SQL per save.** Current issues exactly **11,088** `SELECT object_type, object_bytes FROM
+notebook_git_accepted_object WHERE notebook_git_binding_id=? AND git_object_id=?` per save.
+Coordinator verified from the cumulative digest table: successive current runs each add
+exactly **133,053** of them (12 saves x 11,088, minus 3), identical run to run; the baseline
+issues **none**. MySQL spends 18.6-24.4 us on each (about 206-270 ms per save); the rest of
+their cost is the JDBC/TLS round trip. The baseline issues about 20-30 statements per save.
+
+Time per save, method-trace medians (baseline 8 saves, current 10; ms):
+
+| Step | `b5cad203d1` | current | Difference |
+|---|---:|---:|---:|
+| Content-save request, measured in the server | 1,203 | 1,601 | **+398** |
+| Accepted-tree read | 360 (bundle import 99 + two tree reads 261) | 1,040 (one read) | **+680 +/-45** |
+| Live-tree assembly, two passes on both sides | 491 | 386 | -105 |
+| Writing the new commit | 82 | 54 | -28 |
+| `EntityPersister.flush` | 25.6 | 1.3 | -24 |
+| Lock and the edit itself | ~46 | ~12 | -34 |
+| After the save transaction | ~196 | ~104 | -92 |
+
+The per-object read **alone costs +680 ms, about 170% of the net gap**; current is cheaper
+than the baseline elsewhere by about 280 ms, which is why the net gap is +398 (slice 15
+measured +420). JFR agrees: `JdbcNotebookObjectDatabase.find` is the nearest Donut frame for
+about 443 ms per save under current, with no baseline equivalent. Other hypotheses: the two
+live-tree assemblies are **not** part of the gap (the baseline also assembled twice, and
+current's pair is 105 ms cheaper); byte-equality hashing is small (about 21 ms per save,
+estimated). Nothing else found.
+
+**Slice 15's run-to-run drift, explained in mechanism though not in root cause:** the work
+per save does not grow (identical SELECT counts every run), but 11,088 round trips magnify any
+change in per-query latency - MySQL time per object SELECT was 24.4, 18.6 and 19.5 us in the
+three current runs, and request medians followed. +13.5 us across 11,088 queries is +150 ms;
+the baseline's ~30 round trips barely notice. What varies the per-query latency (machine load,
+a nearly full 128 MB InnoDB buffer pool shared by every database on this server) remains
+unexplained. **Production matters here**: its object table will hold every notebook's
+objects, so per-query latency there is unlikely to be better than in this disposable schema.
+
+### 17. Compare accepted and live trees by Git object identity
+Type: Behavior. Status: planned. **Before the first release.** After 15b.
+
+**Promise:** given `fixture-a`, an ordinary note save on the current revision is **not slower
+than `b5cad203d1`**, with bytes, history, atomicity, drift and no-op semantics unchanged - and
+the save path gets **simpler**. This is the bounded correction the learning gate required:
+cause proven in slice 16, outside-in proof known.
+
+**Change:** stop reading every accepted blob's bytes on the save path. On the accepted side,
+walk the accepted tree taking each path's **blob id** from the tree objects without opening a
+blob (for this fixture about 88 tree reads instead of 11,088 queries). On the live side,
+compute each assembled entry's Git blob id in memory with standard JGit
+(`ObjectInserter.Formatter.idFor`). Decide "matches before" and "changed after" by comparing
+**path -> blob id** maps. `append` keeps entries whose ids match and inserts only changed blobs.
+
+**Must delete** (the owner's rule: no complexity that does not contribute): the bytes-reading
+`NotebookGitAcceptedTree.readEntries` on the save path, `OpenedNotebook.acceptedEntries` and
+the bytes it carries, the `acceptedEntries` parameter of `NotebookGitBundleBuilder.append`,
+the `Set.copyOf(...)` and byte-equality keep check in `writeTree`, and byte-level
+`PortableTreeEntry` equality on this path. **Must not add:** no cache, no second content
+authority, no attachment-only path. Blob identity is Git's own concept; the synchronization
+contract already relies on it ("object IDs supply tree integrity checks",
+`docs/notebook-git-synchronization.md:23`). ADR 0004 requires stored bytes to stay lossless,
+which this does not touch. No architectural exception is needed.
+
+**Trap to avoid:** do **not** simplify further to comparing the whole live tree id against the
+accepted commit's tree id. Tree ids include file modes, so a published file with mode `100755`
+would read as drift, turning "matches before" false and **silently stopping Git commits for
+web saves**. Compare per-path blob ids, which keeps today's mode-insensitive behavior.
+
+**Proof:**
+- M, same session, sides alternated, on `fixture-a` with `b5cad203d1` measured alongside;
+  **pass = current's request median is not slower than the baseline's**, ranges reported.
+  Repeat on slice 13's attachment fixture
+  `/Users/terryyin/.claude/jobs/6fda4d71/tmp/slice13/fixture-b/` against slice 13's recorded
+  with-attachments numbers, same revision pair.
+- B: the full suite, especially the drift and no-op save tests including attachment variants,
+  the root-attachment publication / independence / local-change / projection-drift suites, and
+  the web-content-save suites. **Add one controller-level case guarding the trap**: a published
+  file with mode `100755`, after which a web save still commits and a no-op save does not.
+- E: including "Published root files reach another checkout byte for byte".
+
+Expected effect, an estimate to be replaced by measurement: about 1,000 ms off the ~1,040 ms
+read, 20-40 ms added back for hashing and tree reads, landing current's request around 600-700
+ms against the baseline's ~1,200. **Story 3 is expected to be partly, not fully, resolved:** the
+accepted-side read of attachment bytes goes away, but the two live assemblies still load every
+attachment byte and hashing adds work proportional to them - the fixture-b run settles it.
+Size: one coherent concept across the comparison path; ~10 active minutes plus measurement
+runtime. Splitting it would leave a half-converted comparison path, so do not split; return an
+oversized-slice report if it does not converge.
+
 ### 15b. Clear the native object store on the E2E reset
-Type: Structure. Status: planned. After slice 16 (so it cannot perturb slice 16's runs).
+Type: Structure. Status: planned. Now, before slice 17, so slice 17's before/after runs start from a clean reset.
 
 Make the testability reset leave `notebook_git_accepted_object` empty, so no E2E run can see
 another run's objects. Smallest fix within the existing owner, `DBCleanerWorker`; do not add a
