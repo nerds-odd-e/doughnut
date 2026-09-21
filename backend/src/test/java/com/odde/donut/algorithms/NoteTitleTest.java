@@ -10,29 +10,29 @@ class NoteTitleTest {
   @Test
   void fullwidth_slash_is_literal_title_text() {
     NoteTitle noteTitle = new NoteTitle("colour／hue／／tone");
-    assertThat(noteTitle.getRecallTitleFragments().getFirst().stem(), equalTo("colour／hue／／tone"));
+    assertThat(noteTitle.getClozeTitleFragments().getFirst().stem(), equalTo("colour／hue／／tone"));
   }
 
   @Test
-  void recallTitleFragments_treatsTrailingBracketAsLiteralTitleText() {
+  void clozeTitleFragments_treatsTrailingBracketAsLiteralTitleText() {
     NoteTitle noteTitle = new NoteTitle("cat(animal)");
     assertThat(
-        noteTitle.getRecallTitleFragments().stream().map(TitleFragment::stem).toList(),
+        noteTitle.getClozeTitleFragments().stream().map(TitleFragment::stem).toList(),
         contains("cat(animal)"));
   }
 
   @Test
-  void recallTitleFragments_treatsLaterTildeAsLiteralTitleText() {
+  void clozeTitleFragments_treatsLaterTildeAsLiteralTitleText() {
     NoteTitle noteTitle = new NoteTitle("word／~logical");
     assertThat(
-        noteTitle.getRecallTitleFragments().stream().map(TitleFragment::stem).toList(),
+        noteTitle.getClozeTitleFragments().stream().map(TitleFragment::stem).toList(),
         contains("word／~logical"));
   }
 
   @Test
-  void recallTitleFragments_fullwidthTildeMarkerStaysInPrimary() {
+  void clozeTitleFragments_fullwidthTildeMarkerStaysInPrimary() {
     NoteTitle noteTitle = new NoteTitle("～によると／によれば");
-    assertThat(noteTitle.getRecallTitleFragments().getFirst().stem(), equalTo("によると／によれば"));
+    assertThat(noteTitle.getClozeTitleFragments().getFirst().stem(), equalTo("によると／によれば"));
   }
 
   @Test
@@ -62,10 +62,10 @@ class NoteTitleTest {
   }
 
   @Test
-  void matchesForRecall_treatsTrailingBracketAsLiteralTitleText() {
+  void matchesForRecall_acceptsTitleWithoutTrailingParenthesizedContent() {
     NoteTitle noteTitle = new NoteTitle("cat(animal)");
     assertThat(noteTitle.matchesForRecall("cat(animal)"), is(true));
-    assertThat(noteTitle.matchesForRecall("cat"), is(false));
+    assertThat(noteTitle.matchesForRecall("cat"), is(true));
     assertThat(noteTitle.matchesForRecall("animal"), is(false));
   }
 }

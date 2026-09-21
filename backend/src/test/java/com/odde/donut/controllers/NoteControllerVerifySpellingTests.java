@@ -41,7 +41,9 @@ class NoteControllerVerifySpellingTests extends ControllerTestBase {
     "word／~logical, word, false",
     "word／~logical, logical, false",
     "cat(animal), cat(animal), true",
-    "cat(animal), cat, false",
+    "cat(animal), cat, true",
+    "cat (animal), cat, true",
+    "煩う(接尾辞), 煩う, true",
     "cat(animal), animal, false",
     "~logical, logical, true",
   })

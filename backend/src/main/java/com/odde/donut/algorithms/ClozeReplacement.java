@@ -20,7 +20,7 @@ record ClozeReplacement(
     final String internalFullMatchReplacement = "__f_u_l_l__";
 
     var aliases =
-        TitleFragment.mergeSortedLongestFirst(noteTitle.getRecallTitleFragments(), extraAliases);
+        TitleFragment.mergeSortedLongestFirst(noteTitle.getClozeTitleFragments(), extraAliases);
     String step1 =
         replaceFragmentsWithInternalPlaceholder(
             aliases,
