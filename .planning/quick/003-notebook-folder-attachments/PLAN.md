@@ -20,8 +20,8 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slice 1 is done with accepted proof; 11 slices remain planned (7 is
-  Structure). Remaining concerns are listed at the end.
+- State: slices 1–2 are done with accepted proof; 10 slices remain planned (7
+  is Structure). Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
   checkout `/Users/terryyin/git/doughnut-worktrees/notebook-folder-attachments`
@@ -158,7 +158,7 @@ wait (migration/verify runtime) is the stated exception, not extra scope.
 
 ### 2. A folder's files appear at its path and follow a web folder rename
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given an accepted notebook holding `physics/diagrams/force.png`, when
 the owner renames `physics` to `mechanics` on the web, the new accepted tip has
 `mechanics/diagrams/force.png` with the same bytes, no `.keep` in `diagrams`,
@@ -170,6 +170,16 @@ Test setup: one small helper on the Git controller test base that stores a file
 in a folder and then snapshots the Portable tree; slices 3–6 reuse it.
 Proof: one case in `NotebookGitFolderRenameControllerTest`; update
 `PortableTreeSnapshotTest` for the changed signature only.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,570 backend tests. Setup at
+`NotebookGitWebContentControllerTestBase.storeFolderAttachmentAndSnapshot`
+stores the folder attachment and snapshots only the starting tree. Observation
+at
+`NotebookGitFolderRenameControllerTest.webFolderRenameCarriesNestedAttachmentsAndNoteIdentity`
+invokes the real web folder rename and asserts the exact accepted tree contains
+the renamed note plus the byte-exact attachment, contains no `.keep`, and keeps
+the note queryable by its original id. The existing root-attachment publication
+tests stayed green, covering the export query's root-preserving left join.
 
 ### 3. Files follow their folder into trash and back
 Type: Behavior

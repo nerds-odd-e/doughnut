@@ -53,8 +53,8 @@ class NotebookZipBuilderTest {
                 List.of(),
                 List.of(new ExportNoteRow(null, "My Note", "body")),
                 List.of(
-                    new ExportAttachmentRow("diagram.png", invalidUtf8),
-                    new ExportAttachmentRow("empty.bin", new byte[0]))));
+                    new ExportAttachmentRow(null, "diagram.png", invalidUtf8),
+                    new ExportAttachmentRow(null, "empty.bin", new byte[0]))));
 
     Map<String, byte[]> entries = readZipEntryBytes(zipBytes);
 

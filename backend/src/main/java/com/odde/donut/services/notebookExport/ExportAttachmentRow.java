@@ -1,7 +1,4 @@
 package com.odde.donut.services.notebookExport;
 
-/**
- * One named non-Markdown file kept at the notebook root: its complete filename, extension included,
- * and its exact file bytes. Nothing decodes or classifies the bytes.
- */
-public record ExportAttachmentRow(String filename, byte[] content) {}
+/** One named non-Markdown file with its folder placement and exact file bytes. */
+public record ExportAttachmentRow(Integer folderId, String filename, byte[] content) {}
