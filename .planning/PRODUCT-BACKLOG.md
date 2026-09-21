@@ -14,7 +14,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Remove the ZIP export feature](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-46) — SEED-009#story-46
+- [Remove the ZIP export feature](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-46) — SEED-009#story-46 ([plan](quick/008-remove-zip-export/PLAN.md))
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Skip common AI guidance folders during assimilation](seeds/SEED-035-ai-workspace-supporting-files.md#story-8) — SEED-035#story-8

@@ -51,31 +51,37 @@ data; invalid or ambiguous changes must not silently discard work.
 ### Remove the ZIP export feature
 
 - **Identity:** SEED-009#story-46
-- **Goal:** Donut offers one way to take a notebook's Portable content out — Git
-  acquisition — so owners and maintainers no longer carry a second, weaker export
-  that every tree change (attachments now, images next) must also keep correct.
-- **Evaluation:** The web notebook menu and notebook settings no longer offer a
-  ZIP export, the `exportNotebook` API operation is gone, and an owner still
-  obtains the complete notebook, including attachments, through Git acquisition.
-- **Scope / value:** Owner decision 2026-09-21: ZIP export is no longer needed
-  now that Git acquisition exists; remove it completely — web buttons, API
-  operation and generated client, ZIP building, and its E2E feature. The shared
-  live Portable tree stays: Git cutover, history reset, accepted web changes and
-  drift detection still read it. Less code is the main value.
-- **Effort hypothesis:** S–M, medium confidence; mostly deletion.
+- **Goal:** Notebook owners use the Git workflow for local acquisition while
+  owners and maintainers stop carrying the weaker ZIP export through every
+  Portable-tree change. Less product and maintenance surface is the value.
+- **Scope / value:** Remove the ZIP feature completely: both web affordances,
+  the raw browser download path and its dependency, the HTTP operation and
+  generated client contract, ZIP assembly, feature-specific unit and E2E
+  coverage, E2E-only ZIP helpers, and current product documentation. Remove
+  export-shaped package, query, type, comment, and test vocabulary from the
+  shared live Portable-tree implementation; that implementation remains because
+  Git cutover, history reset, accepted web changes, and drift detection use it.
+  Do not add a replacement button, navigation, browser bundle download,
+  redirect, compatibility endpoint, deprecation record, or historical product
+  note. Generic ZIP support used by unrelated EPUB or CLI tests is not part of
+  this feature.
+- **Key examples:**
+  - Given any notebook visible in the catalog or its settings, when its actions
+    are shown, no ZIP export action or replacement acquisition navigation is
+    present.
+  - Given a client built from Donut's OpenAPI contract, when notebook operations
+    are inspected, there is no `exportNotebook` operation or notebook ZIP route;
+    the old route has no compatibility behavior.
+  - Given an owned notebook whose accepted tree contains Readmes, notes and
+    byte-exact attachments, when the owner uses the existing CLI Git acquisition,
+    the checkout still contains that accepted tree. Its existing owner-only
+    authorization and missing-binding behavior are unchanged; removal does not
+    widen access or create a browser alternative.
+- **Effort hypothesis:** M, medium confidence; deletion is small, but the shared
+  tree vocabulary has a broad mechanical Java import and query-method ripple.
 - **Depends on:** None. Queued right after SEED-035#story-9 by owner instruction,
   which is why that story proves nothing about ZIP output.
 - **Safe stopping point:** Complete on its own; nothing later needs it.
-- **Open decisions for refinement:**
-  - ZIP export needs only read access, while Git bundle download needs full
-    notebook authorization. Removing ZIP takes the only export away from
-    read-only users (for example subscribers). Accept that, or open Git
-    acquisition to readers?
-  - Git acquisition is CLI-only today; the web offers no Git download. After
-    removal a browser-only owner has no export. Accept that, or add a web
-    download of the Git bundle (a file ordinary users cannot open without Git)?
-  - Confirm no notebook remains without a Git binding, so none loses its only
-    export.
 
 ## Ordering and Scope Reduction
 
