@@ -1393,7 +1393,7 @@ Housekeeping outside this slice: the `db-migration` skill still says new version
 300000333; the real floor is now above 300000338. Slice 14 corrects it.
 
 ### 11. Establish the migration checkpoint
-Type: Behavior. Status: planned; rollout requires authorization.
+Type: Behavior. Status: done (code); ships in release 2 with slice 10. Gate C evidence pending the owner.
 
 Given the verified column-drop rollout, add a no-op checkpoint above every
 ever-applied migration version and confirm its application in every affected
@@ -1406,6 +1406,30 @@ runbook. Size: ~5 active minutes; release waits excepted. Stop safely with the
 upgrade machinery still present if a database has not crossed the checkpoint;
 the story remains incomplete. The checkpoint is a required migration floor,
 not an archive of the removed implementation.
+
+**Delivered.** Highest version ever used confirmed independently as **300000338**, across current SQL
+files (highest `V300000337`), current Java migrations (highest `V300000338`), every `V<number>__`
+filename ever committed on any ref (highest `V300000338`; the retired 300000330 is below it), and the
+worktree schema's history (`MAX(version) = 300000338`). New tip placeholder
+`backend/src/main/resources/db/migration/V300000339__db_migration_placeholder.sql` - comments only,
+no statements (coordinator-checked: zero non-comment lines) - stating that future migrations must be
+greater than 300000339 and that **new schema migrations are frozen until the squash that removes the
+spent upgrade chain is deployed**. `.agents/skills/db-migration/SKILL.md` no longer claims the newest
+file is `V300000333`: it names the `V300000339` placeholder, requires versions above 300000339, and
+states the freeze and its end condition; the squash steps themselves are left for slice 12.
+`AGENTS.md`/`CLAUDE.md` carry none of these version numbers. The freeze is documentation only - no
+tooling enforces it.
+
+Proof in isolation: `backend:verify` on the upgraded worktree schema, exit 0, 2,569 tests, 0 failures,
+new row `300000339 | db migration placeholder | SQL | success 1` directly after `300000338`; and a
+**fresh install** (schema dropped and recreated empty, then `backend:verify`) ending at 300000339 with
+30 history rows, 0 failed, and no `bundle_bytes` column. No schema change, so no ERD diff.
+
+**Gate C evidence still required from the owner after release 2** - on production and every other
+long-lived database:
+`SELECT installed_rank, version, description, type, success, installed_on FROM flyway_schema_history WHERE version IN ('300000338','300000339') ORDER BY installed_rank;`
+and `SELECT MAX(CAST(version AS UNSIGNED)) FROM flyway_schema_history;` - expect 300000338 then
+300000339, both `success = 1`, and a maximum of 300000339. Only then may slice 12 delete files.
 
 ### 12. Remove the spent upgrade machinery
 Type: Structure. Status: planned; source removal depends on Gate C.
