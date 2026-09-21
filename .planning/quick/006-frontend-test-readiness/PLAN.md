@@ -9,7 +9,44 @@
   dependency validation, selected tests, arguments, and exit status.
 - Scope: this caller and the minimum correction to its existing readiness owner.
   Other scripts, Codex environment setup, caches, and IDE lifecycle work are dropped.
-- State: two planned Behavior slices; no implementation or proof has run.
+- State: stopped at the bounded cost check; both Behavior slices remain
+  unexecuted and no product change was made.
+
+## Execution identity
+
+- Mode: Story Branch Mode.
+- Originating/integration checkout: `/Users/terryyin/git/doughnut`, branch
+  `main`.
+- Execution checkout: `/Users/terryyin/.codex/worktrees/frontend-test-readiness/doughnut`,
+  branch `codex/frontend-test-readiness`.
+- Authorized target: `origin/main`.
+- Published backlog claim: `83c2489755ee8ca0af247bc4d5c50e85d070c153`.
+- CI observer: GitHub Actions workflow `ci.yml` / `donut CI` for
+  `nerds-odd-e/doughnut` branch `codex/frontend-test-readiness`, coordinator
+  `root`, mailbox `/tmp/dough-ci-501/watch-BGg4bn`, PID `86389`, yielded cell
+  `28`. The earlier claim publication to `main` remains unobserved by this
+  story-branch observer.
+
+## Bounded cost result
+
+At unchanged revision `83c2489755ee8ca0af247bc4d5c50e85d070c153`, after
+successful canonical worktree preparation, the warm focused invocation passed:
+
+`/usr/bin/time -p env CURSOR_DEV=true nix develop -c pnpm frontend:test tests/store/storeUndoCommand.spec.ts`
+
+Result: 11 selected tests passed; elapsed time was 6.77 seconds. The command
+still visibly selected the install-prefixed script, but the silent install
+produced no interaction or output.
+
+The isolated warm install-stage measurement also passed:
+
+`/usr/bin/time -p env CURSOR_DEV=true nix develop -c pnpm --frozen-lockfile --silent recursive install`
+
+Result: elapsed time was 0.91 seconds with no install output. This sub-second
+cost is negligible for the plan's bounded investment decision, so execution
+stopped before either slice as required. No before/after performance claim is
+established, and implementation requires an explicit reassessment rather than
+resuming the planned slices automatically.
 
 ## Existing solution and constraints
 
