@@ -109,9 +109,7 @@ class CircleControllerTest extends ControllerTestBase {
       NotebookRealm response = controller.createNotebookInCircle(circle, noteCreation);
 
       NotebookGitBindingAssertions.assertEmptyTreeRootCommitBinding(
-          notebookGitBindingRepository,
-          notebookController,
-          notebookRepository.findById(response.notebook().getId()).orElseThrow());
+          notebookGitBindingRepository, notebookController, response.notebook());
     }
   }
 

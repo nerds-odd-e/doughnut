@@ -633,7 +633,7 @@ only inside those two tests. Consequence for slice 9:
 callers, so it can be deleted outright when they go. **Corrected by slice 7:**
 this note originally said the same of `countNativeObjectStoreRows`, which is
 wrong - that helper still has a legitimate non-legacy caller,
-`NotebookGitPublicationAtomicControllerTest.lateBindingSaveFailureLeavesNoDurableNativeObjectStoreRows`,
+`NotebookGitWebContentSaveAtomicControllerTest.lateBindingSaveFailureLeavesNoDurableNativeObjectStoreRows`,
 a native-storage durability observation. It must stay.
 
 **Three hazards now confirmed as recurring, for slice 7 to expect:**
@@ -768,20 +768,34 @@ moved **down**: one test and one fixture helper deleted, a leftover duplicate
 `NotebookGitBindingAssertions` became the single owner of the download-and-inspect
 recipe for both creation hierarchies.
 
-> **OUTSTANDING ON RESUME - slice 7's post-change refactor pass did not run.**
-> The developer needed to restart the machine, so the refactor agent was stopped
-> before it made any edit (it was still reading the skill) and slice 7's verified
-> implementation was committed as-is to avoid losing it. The delivered code is
-> green and complete against the slice's promises - proof is the full backend
-> suite at 2,563 tests, 0 failures - but the required
-> `dough-post-change-refactor` pass is **still owed** and must run before slice 8
-> is dispatched. Re-run it over slice 7's commit with the same constraints
-> recorded above: the `NotebookGitWebContentSaveControllerTest` carve-out stays
-> untouched including its 289-line deferral, `countNativeObjectStoreRows` stays
-> (it has a legitimate native-durability caller), `clearNativeObjectStoreRows`
-> waits for slice 9, no assertion may be weakened or relocated, the three
-> authorization restores and the outside-the-committed-block history reads are
-> load-bearing, and `GitBundleTestReader` must stay a pure bundle-parsing utility.
+**Refactor pass (run after the machine restart, over `git diff ab74d85aa5 b21445a6b8`).**
+Test-only, no production change:
+
+- Removed a redundant reload the slice had added: `CircleControllerTest` and
+  `NotebookCrudControllerTest` now pass `response.notebook()` straight to
+  `assertEmptyTreeRootCommitBinding` - both classes are `@Transactional`, so the
+  notebook is already the managed entity.
+- Two files the slice touched were over the refactor skill's 250-line check, so
+  **whole tests moved, unchanged, into new files**:
+  `NotebookGitDeletionPublicationRetryControllerTest` (the retry test, its
+  `publicationState` helper and `PublicationState` record; original 324 -> 234)
+  and `NotebookGitWebContentSaveAtomicControllerTest` (the two web-content-save
+  rollback tests and their shared helper; original 287 -> 183). Coordinator
+  verified `assertThat`/`assertThrows`/`@Test` counts split exactly
+  (42 = 32 + 10, 36 = 20 + 16).
+- Judgement accepted by the coordinator: "no assertion may be relocated" protects
+  an assertion from being moved *out of its test* or weakened. Moving a whole test
+  to another file keeps every assertion inside its own test, so it honours the rule.
+- Left deliberately: merging the two `PublicationState` records onto `AcceptedBinding`
+  (would collapse three assertions into one record equality and push the shared base
+  past 250 lines), and the two cosmetic inlined-download sites.
+
+`countNativeObjectStoreRows`'s non-legacy caller moved with the split: it is now
+`NotebookGitWebContentSaveAtomicControllerTest.lateBindingSaveFailureLeavesNoDurableNativeObjectStoreRows`.
+
+**Post-restart green baseline for slice 8:** `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only`, exit 0, **2,563 tests, 0 failures, 0 errors, 0 skipped**,
+coordinator-confirmed from JUnit XML, including result files for both new classes.
 
 ### 8. Verify native history survives the upgrade
 Type: Behavior. Status: planned.
@@ -798,6 +812,57 @@ fixture/check temporary, and delete it in slice 12. Existing one-note backfill
 proof is useful but does not establish a whole-environment migration.
 Size: 5–10 active minutes plus full-suite/engine runtime; refine if rehearsal
 setup becomes a separate implementation responsibility. Gate A owns live proof.
+
+**Coordinator scouting before dispatch (2026-09-21, after the machine restart).**
+
+Existing evidence is exactly one test,
+`NotebookGitAcceptedObjectBackfillTest.backfillsALegacyBindingIdempotentlyWithoutTouchingBundleColumns`
+- the "one-note proof" this slice says is insufficient. It covers idempotent rerun
+on one legacy binding. It does **not** cover multiple bindings, several history
+commits, already-native bindings with stale retained bundles, a mid-run
+interruption, or an independent completeness check.
+
+What `NotebookGitAcceptedObjectBackfill` guarantees **by design**, to be proven
+here rather than assumed:
+
+- It selects only bindings with **zero** native rows
+  (`WHERE NOT EXISTS (... notebook_git_accepted_object ...)`), so an already-native
+  binding with a stale retained bundle is never re-selected and therefore can
+  never be overwritten with stale bytes. That is Gate A's "existing converted
+  bindings must not be overwritten with stale retained bundle bytes" - satisfied
+  structurally, but unproven.
+- Each binding imports, verifies its head, copies and commits as its own unit of
+  work, rolling back on failure, so an interrupted run leaves every binding wholly
+  old or wholly native, and a rerun is a complete retry.
+
+**The blind spot this slice's completeness check must cover.** The same
+zero-rows selection rule means a binding holding *some but not all* of its
+reachable objects is **never re-selected**, so it would stay incomplete forever.
+The backfill cannot create that state itself, but it is not the only writer: the
+runtime lazy conversion in `NotebookGitAcceptedRepositoryStore.open()` converts
+through a Spring-managed `DataSourceUtils` connection, which is atomic only when
+its caller is transactional. Proving every caller transactional would be a wider
+audit than this slice owns - and it is unnecessary. **A completeness check that
+verifies the end state catches a partial binding regardless of which writer
+produced it.** This is exactly why the plan says nonempty native storage is not
+verification.
+
+Therefore the rehearsal fixture should include, alongside untouched legacy
+bindings and already-native bindings with stale bundles, **a deliberately partial
+binding** (some reachable objects present natively, others missing). The proof
+must show the completeness check - walking each binding's accepted head through
+its reachable object graph, not counting rows - reports it as incomplete, and that
+this blocks column retirement. **Report what the backfill does with a partial
+binding; do not change the migration's behavior without an owner decision.**
+Repairing partial bindings from the retained bundle would be safe for a genuine
+legacy binding (object inserts are idempotent), but for an already-native binding
+whose retained bundle is stale, `importAndVerifyMainHead` would fail loudly on the
+head mismatch - so any repair policy is a design decision, not something to slip
+into a verification slice.
+
+The completeness check is needed again by slice 10 ("perform the completeness
+check before destructive DDL and fail before dropping when it is not satisfied"),
+so decide where it should live with that reuse in mind.
 
 ### 9. Operate without reading or writing the retained column
 Type: Structure. Status: planned.
