@@ -449,7 +449,7 @@ situations (initial launch, mid-session entry) documented in
 full suite pass.
 
 ### 8. Preserve parallel work while establishing the final result
-Type: Behavior. Status: planned. Target: ~5 minutes active work plus concurrent checks.
+Type: Behavior. Status: done.
 
 Two owned worktrees, with distinguishable dependency inputs/runtime identities →
 prepare and run normal checks concurrently → each retains its dependencies,
@@ -469,6 +469,34 @@ Repeat the comparable fresh/repeated setup measurements from the gate against
 the final behavior, excluding test runtime. Report measured setup time/spread,
 observed eliminated work, remaining cost and comparison limits. Keep temporary
 measurement material only while needed; no permanent benchmark subsystem.
+
+Delivered: two disposable worktrees (`slice8-parallel-a-d1ef5a`,
+`slice8-parallel-b-fecc8e`, both from this execution branch's HEAD),
+genuinely concurrent preparation (both launched in one shell with `&`/`wait`;
+~63µs apart, full overlap; each ~2x solo duration from real CPU contention,
+both succeeded) and concurrent real backend tests (`UserControllerTest`,
+8/8 pass each side, full duration overlap). Confirmed distinct, non-shared
+state throughout: different `node_modules`/`.donut-pnpm-lock.sha256` inodes,
+different `backend/build` inodes, and three DIFFERENT allocated test-database
+identities (this execution checkout's own `wt_2a609b3c9a6b4f35a9cdaa7a04110085`
+plus each disposable worktree's own freshly allocated one) — no new
+allocator/registry added, existing `scripts/worktree-identity.mjs` ownership
+reused as-is. I 85/85 pass (regression). E skipped, not implicated (no
+E2E/Cypress path touched). No isolation bug found; no production code
+changed. All three disposable worktrees/branches (including one used
+standalone for the timing pass) fully removed; `git worktree list`
+confirmed to show only main/004/005 afterward; `004` never touched.
+
+Timing comparison against the gate's baseline (final delivered
+`scripts/worktree_setup.sh`, single worktree, non-concurrent): fresh 7.1s
+(pnpm "Done in 6.1s"), repeated 1.0s ("fingerprint unchanged, skipping") —
+consistent with the gate's own 7.6s/1.1s within normal machine variance; no
+speedup claimed. What changed is reliability/discoverability, not raw
+speed: before this story a fresh worktree had zero `.claude/skills` links
+(ODF-085) and no documented dependency-install path outside the interactive
+Nix hook; now one command reliably produces both, idempotently, across
+hosts. Comparison limited to this single machine with warm local pnpm/Nix
+caches, same limitation the gate itself already carried.
 
 ### 9. Apply the readiness rule to redundant install-prefixed root scripts
 Type: Structure. Status: planned. Target: split into smaller leaves at
