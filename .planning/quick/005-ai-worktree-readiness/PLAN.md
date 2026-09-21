@@ -37,6 +37,29 @@ or absolute setup time has been agreed. Further caching is conditional below.
 - This is preparation ownership, not an execution identity or Taken claim.
   Draft remains local for review. Execution must establish its own identity.
 
+## Execution identity
+
+- Mode: Story Branch Mode (default; no `--trunk`).
+- Taken claim: committed and published on `main` at `b5d4225d49`
+  ("Take SEED-039#story-1 for execution").
+- Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/005-ai-worktree-readiness`.
+- Execution branch: `worktree-claude+260921-ai-worktree-readiness`, created
+  from published `main` (`b5d4225d49`) and pushed to
+  `origin/worktree-claude+260921-ai-worktree-readiness` after slice 1.
+- Integration checkout/branch: `/Users/terryyin/git/doughnut`, `main`.
+- Authorized publication target: `origin/main`,
+  `git@github.com:nerds-odd-e/doughnut.git` (fast-forward via the integration
+  checkout at story wrap-up; this execution branch itself is pushed to
+  `origin`, not merged into `main`, until wrap-up).
+- CI observer: repo `nerds-odd-e/doughnut`, branch
+  `worktree-claude+260921-ai-worktree-readiness`, workflow `ci.yml`
+  ("donut CI"), directory `/tmp/dough-ci-501/watch-YlPJi2`. Registered SHA:
+  `86b2fadc4ebb4eecfc63769088cd117f7ed22b67` (slice 1 delivery).
+- Replanning permission: not explicitly granted or denied by the invoking
+  instruction (`/dough-execute-plan 005`); existing planning authority
+  preserved (ordinary refinement/replanning stays available if a slice
+  overruns).
+
 ## Existing solutions and proof gaps
 
 Inspected at the starting revision; recheck changed callers before execution.
