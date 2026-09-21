@@ -277,7 +277,7 @@ proves `setup_pnpm_deps` alone installs once, writes the fingerprint, skips
 on repeat, and never touches Biome. S 5/5, N 2/2, L 2/2, full suite 20/20.
 
 ### 3. Prepare the committed dependency graph for useful checks
-Type: Behavior. Status: planned. Target: ~5 minutes active work plus tool/test runtime.
+Type: Behavior. Status: done.
 
 Fresh worktree with warmed machine cache → public preparation → dependencies
 required by F/B work, with unchanged manifests and lockfile. Compose the readiness
@@ -287,6 +287,19 @@ build requirements. Runtime commands retain lazy service/database provisioning.
 Proof: P/L plus one real install and F/T/B through normal commands. Verify the
 allocated test identity belongs to this checkout. Use the existing native
 dependency consumers rather than testing a new cache implementation in isolation.
+
+Delivered: `scripts/worktree_setup.sh` now also sources `scripts/dev_setup.sh`
+and calls `setup_pnpm_deps` alongside `setup_claude_skills` (plus
+`setup_logging`, required once `setup_pnpm_deps`'s `log()` calls are
+composed in — without it `log` silently resolved to macOS's unrelated
+`/usr/bin/log` and aborted under `set -e`). No service/Biome-daemon startup
+added. `scripts/test/worktree_setup.sh.test` extended to assert real
+dependency usability (`node_modules/.bin/biome` executable, fingerprint
+written) after a real `pnpm --frozen-lockfile recursive install` against the
+disposable worktree's committed, consistent manifests, with symlink and
+dependency postconditions asserted separately. P/L pass; F 1938/1938; T
+clean; B `BUILD SUCCESSFUL`, allocated worktree-scoped test DB identity
+confirmed to belong to this checkout via its own `.worktree.local.json`.
 
 ### 4. Avoid redundant preparation without accepting stale state
 Type: Behavior. Status: planned. Target: ~5 minutes; input diversity is a sizing concern.
