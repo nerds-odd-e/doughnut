@@ -14,7 +14,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Repair the North Star attachment-classification link](quick/008-repair-attachment-contract-link/PLAN.md) — .planning/quick/008-repair-attachment-contract-link/PLAN.md
+- [Repair the North Star attachment-classification link](quick/009-repair-attachment-contract-link/PLAN.md) — .planning/quick/008-repair-attachment-contract-link/PLAN.md
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Skip common AI guidance folders during assimilation](seeds/SEED-035-ai-workspace-supporting-files.md#story-8) — SEED-035#story-8

@@ -1,7 +1,8 @@
 # Repair the North Star attachment-classification link
 
+**Identity:** .planning/quick/008-repair-attachment-contract-link/PLAN.md
+
 Status: planned retrospective correction.
-Work item: `.planning/quick/008-repair-attachment-contract-link/PLAN.md`.
 
 ## Source and bounded outcome
 
