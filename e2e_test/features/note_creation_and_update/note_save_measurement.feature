@@ -1,11 +1,11 @@
-# TEMPORARY MEASUREMENT MACHINERY — SEED-034#story-4, slices 2-3.
+# TEMPORARY MEASUREMENT MACHINERY — SEED-034#story-4, slices 2-3 and 13.
 #
 # This is not a product test and carries no acceptance promise. It exists to
 # observe ordinary note-content saves in a large synchronized notebook so the
 # story's save-speed comparison rests on evidence. Slice 14 deletes this file
 # together with e2e_test/step_definitions/note_save_measurement.ts,
 # e2e_test/start/pageObjects/noteSaveMeasurement.ts,
-# e2e_test/start/pageObjects/noteSaveMeasurementExport.ts,
+# e2e_test/start/pageObjects/noteSaveMeasurementNotebookTask.ts,
 # e2e_test/config/noteSaveMeasurement.ts, its registration in
 # e2e_test/config/common.ts and its entry in
 # scripts/isolated-cypress-active-specs.mjs.
@@ -27,6 +27,10 @@
 # `NOTE_SAVE_EXPORT_OUT` names the file the notebook's Portable export ZIP is
 # written to; the two sides of a comparison must not share one path.
 #
+# A payload generated with NOTE_SAVE_FIXTURE_ATTACHMENTS=realistic also has
+# root attachment files, which are published through Git before any measured
+# save; a payload without them publishes nothing.
+#
 # Seeding imports the fixture's final state and re-snapshots the notebook's
 # accepted baseline; it does not replay the fixture's `revisions`, so accepted
 # history is one commit deep on every side that seeds this way.
@@ -40,6 +44,7 @@ Feature: Note save measurement
   Background:
     Given I am logged in as an existing user
     And I have the generated large synchronized measurement notebook
+    And the measurement notebook's root holds the fixture's attachments, published through Git
 
   Scenario: Ordinary content saves in a large synchronized notebook
     When I capture the measurement notebook's Portable export

@@ -1,5 +1,5 @@
 /**
- * TEMPORARY MEASUREMENT MACHINERY — SEED-034#story-4, slices 2-3.
+ * TEMPORARY MEASUREMENT MACHINERY — SEED-034#story-4, slices 2-3 and 13.
  * Deleted together with `note_save_measurement.feature` in slice 14, which
  * documents how to run it and what it is for.
  *
@@ -22,7 +22,7 @@ import { navigationActions } from '../actions/navigationActions'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
 import { noteContentEditingMethods } from './noteContentEditingMethods'
-import { capturePortableExport } from './noteSaveMeasurementExport'
+import { runNodeSideNotebookTask } from './noteSaveMeasurementNotebookTask'
 import { findNoteContentRegion } from './notePageContentRegion'
 
 /** Seeding, saving and exporting a whole notebook all need far more than the
@@ -112,6 +112,19 @@ export const noteSaveMeasurement = () => ({
     return this
   },
 
+  /** TEMPORARY (slice 13): the fixture's root attachments, if it has any,
+   * published through Git before any measured save. */
+  publishFixtureRootAttachments() {
+    return this.runNotebookTask('publishNoteSaveMeasurementAttachments')
+  },
+
+  runNotebookTask(task: string) {
+    cy.get<NoteSaveFixture>(`@${fixtureAlias}`).then((fixture) =>
+      runNodeSideNotebookTask(fixture.notebook, task, MEASUREMENT_TIMEOUT_MS)
+    )
+    return this
+  },
+
   /** One save of each kind whose timing is reported but discarded, so the
    * sampled saves are not measuring a cold application. */
   warmUpTheMeasuredSavePath() {
@@ -122,10 +135,7 @@ export const noteSaveMeasurement = () => ({
 
   /** Evidence that the two compared sides hold the same notebook content. */
   capturePortableExportForComparison() {
-    cy.get<NoteSaveFixture>(`@${fixtureAlias}`).then((fixture) =>
-      capturePortableExport(fixture.notebook, MEASUREMENT_TIMEOUT_MS)
-    )
-    return this
+    return this.runNotebookTask('saveNoteSaveMeasurementExport')
   },
 
   measureSaveKeepingExistingWikiLinks(sampleNumber: number) {

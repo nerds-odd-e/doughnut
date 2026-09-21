@@ -1310,7 +1310,7 @@ Size: 5–10 active minutes once Gate C evidence exists; required verification
 runtime excepted. Never mark this complete at checkpoint publication.
 
 ### 13. Assess attachment cost and cohesion last
-Type: Behavior. Status: planned.
+Type: Behavior. Status: done. Story 3 not resolved by assessment alone - folded into slices 15-16.
 
 Given the measured current notebook, add realistic root attachments through
 publication and repeat M with identical note edits. Report the separate overhead
@@ -1330,6 +1330,114 @@ measurement. No attachment-only cache or speculative universal-file model.
 If changes are required, assessment alone does not satisfy them. Feed the result
 to SEED-034#story-3; close it through wrap-up if resolved, otherwise retain only
 the unresolved outcome. Do not repeat the assessment as a later story.
+
+**Delivered.** Root attachments add a real, repeatable cost that grows with their bytes,
+and **all of it runs through the shared owners - no attachment-only path and no
+attachment-specific defect.**
+
+Attachment set, published through the product's own Git publication (download the
+accepted bundle, clone, commit root files, POST the proposal with `expectedHead`; no
+rows written directly): **28 root files, 12,554,240 bytes**, deterministic and
+incompressible like real media - 8 icons (4-11 KiB), 12 screenshots (80-300 KiB),
+6 photos (400-1,200 KiB), 2 PDFs (2 MiB and 3 MiB). Export grew from 3,390,911 to
+15,952,376 bytes, confirming the files are in the live tree. Generated with the
+temporary `NOTE_SAVE_FIXTURE_ATTACHMENTS=realistic` option; with it unset the generator
+still reproduces `fixture-a` byte for byte.
+
+Measured on the **same revision** (post-9b), same note edits; medians recomputed by the
+coordinator from the raw run logs:
+
+| Edit | Boundary | No attachments (n=10) | With attachments (n=15) | Overhead |
+|---|---|---:|---:|---:|
+| Existing links | request | 1,568.5 (1,506-1,787) | 2,196 (2,089-2,357) | **+628 (1.40x)** |
+| Existing links | keystroke->settled | 2,596 (2,533-2,827) | 3,231 (3,116-3,389) | +635 |
+| Added link | request | 1,574.5 (1,537-1,599) | 2,191 (2,124-2,394) | **+617 (1.39x)** |
+| Added link | keystroke->settled | 1,604 (1,564-1,627) | 2,218 (2,169-2,433) | +614 |
+
+The ranges do not overlap, and the overhead sits entirely inside the request; the
+debounce is unaffected. About 49 ms per MB of root attachments per save.
+
+Cohesion inspection, per changed web save (`AcceptedWebChangeService.apply` -> open ->
+operation -> `commitIfChanged`):
+- **Assembled tree** is built **twice per save** (before-snapshot for drift, after-snapshot),
+  each loading every note and attachment byte via
+  `NotebookAttachmentRepository.findExportRowsByNotebookId`. One owner for export,
+  reset, web change and drift. Both passes are needed; reusing the before-pass attachment
+  rows would be an attachment-only shortcut assuming web operations never touch
+  attachments - a second content authority, forbidden by story 4. **Not recommended.**
+- **Accepted-tree comparison** (`NotebookGitAcceptedTree.readEntries`) reads **every
+  accepted blob's bytes from native storage, one SELECT per object** (13,284 blobs, about
+  26 MB stored), then compares by `PortableTreeEntry` byte equality. Repetition, but not
+  attachment-specific - note blobs pay the same way.
+- **Blob reuse works**: `NotebookGitBundleBuilder.append` keeps unchanged entries by index,
+  so attachments are never re-inserted or re-hashed with SHA-1. `Set.copyOf` plus
+  `contains` still run `Arrays.hashCode`/`equals` over all bytes - minor and general.
+- **Final-set projection** (`projectRootAttachments`) is one necessary rule; publication
+  rereads the proposal tree several times, but bulk publication is out of scope.
+
+**Harness defect found and fixed (affects slice 3's evidence).** The slice-3 export
+capture pulled the whole export ZIP through the browser as base64 into a `cy.task`
+argument. With attachments (about 16 MB) that slowed every later measured save (4-7 s
+debounce, 10-25 s to settle) and failed the reload. The export now downloads on the Node
+side. **Slice 3's runs carried the same browser-borne 3.4 MB export on both sides**, so
+their absolute numbers were inflated - the corrected current control is 1,568.5 /
+1,574.5 ms against slice 3's 1,651 / 1,665 ms. Because an added delay lands on both
+sides, it would pull their ratio towards 1, so **the true regression may be larger or
+smaller than the recorded 1.37x - it must be re-measured with the corrected harness
+before anything is concluded** (slice 15).
+
+**Owner direction applied** (2026-09-21 decision 1a, "not slower, and no complexity that
+does not contribute"): the only simplification found - comparing the accepted tree by Git
+object identity instead of reading every accepted blob's bytes - is **not
+attachment-specific**; it changes every save's base cost. It therefore belongs to the
+regression work below, not to a separate attachment correction. **SEED-034#story-3 stays
+open** with this evidence: +617/+628 ms request (1.39-1.40x) for 12.5 MB of root
+attachments through shared owners, blob reuse working, the remaining cost generic
+snapshot/compare repetition. It resolves only if slice 16's cause and the correction that
+follows remove that repetition.
+
+Unrelated product cost observed, **not investigated and out of this story's scope**: after
+an 11,000-note run, the frontend's assimilation-count query kept running for about 4
+minutes in the isolated database, blocking the next run's reset. Reported to the owner.
+
+Proof: M control-3/4 and attach-4/5/6 all passed with reload durability; B 2,565 tests,
+0 failures (including the root-attachment publication, independence, local-change and
+projection-drift suites); E 40/40, including "Published root files reach another checkout
+byte for byte".
+
+### 15. Re-establish the save-speed comparison with the corrected harness
+Type: Behavior. Status: planned. **Before the first release.**
+
+Given `fixture-a` (11,000 notes, 0 attachments), run command M with the **corrected**
+harness (Node-side export) on `b5cad203d1` and on the current revision, same edits and
+order, warm-up discarded, a modest repeated sample. Report both boundaries and the ratio,
+labelled reconstructed. The baseline worktree at
+`/Users/terryyin/.claude/jobs/6fda4d71/tmp/baseline-b5cad203d1` holds **pre-correction**
+harness copies: refresh its copied harness files from the current ones first (its
+`testability.ts` and `cy:run` are identical to current, verified in slice 1). The current
+side may reuse slice 13's control-3/4 only if the harness logic is unchanged since; state
+which. **Decisive outcome:** if current is not slower, the regression was a measurement
+artifact and slices 16 onward are unnecessary - record that and stop the regression work.
+If current is still slower, slice 16 attributes it. Size: ~5 active minutes plus two
+measurement runs.
+
+### 16. Attribute the save-speed regression
+Type: Behavior. Status: planned. Runs only if slice 15 confirms current is slower.
+
+Given the confirmed gap, identify **where** the extra server time goes, with in-process
+evidence on both revisions - not code reading alone. The plan's earlier "no JFR unless
+needed to explain a consequential ambiguity" now applies in its favour: this ambiguity is
+consequential. Leading hypothesis to test, not assume: `b5cad203d1` imported one retained
+bundle into an in-memory repository per save, while current reads every accepted blob from
+native storage one SELECT per object (13,284 for this fixture) in
+`NotebookGitAcceptedTree.readEntries`. Also weigh the two live-tree assemblies and the
+byte-equality hashing slice 13 found. **Deliverable: the cause, its measured share of the
+gap, and the outside-in proof a correction would need** - no optimization implemented.
+Per the plan's learning gate, the correction is then refined into this plan as its own
+bounded slice with a same-fixture before/after M measurement and byte/history/atomicity
+proof. The owner's rule governs its shape: **it must remove complexity, not add machinery**
+- no caches, no second content authority, no attachment-only path. Size: ~5-10 active
+minutes plus profiling runtime.
 
 ### 14. Leave only the current implementation
 Type: Structure. Status: planned; closure depends on completed required work.

@@ -9,6 +9,11 @@ Given('I have the generated large synchronized measurement notebook', () =>
   noteSaveMeasurement().seedLargeSynchronizedNotebook()
 )
 
+Given(
+  "the measurement notebook's root holds the fixture's attachments, published through Git",
+  () => noteSaveMeasurement().publishFixtureRootAttachments()
+)
+
 When("I capture the measurement notebook's Portable export", () =>
   noteSaveMeasurement().capturePortableExportForComparison()
 )
