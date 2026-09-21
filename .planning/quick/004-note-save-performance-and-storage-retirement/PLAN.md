@@ -1,7 +1,25 @@
 # Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage
 
-Status: planned; execution has not started. Measurement and deployment gates
-below constrain later slices; no product proof is claimed.
+Status: in execution. Measurement and deployment gates below constrain later
+slices; no product proof is claimed beyond what the evidence sections record.
+
+## Execution identity
+
+- Originating checkout / integration branch: `/Users/terryyin/git/doughnut`, `main`.
+  Backlog claim commit: `9e75c98921`.
+- Execution checkout / branch:
+  `/Users/terryyin/git/doughnut/.worktrees/004-note-save-performance`,
+  `worktree-claude+260921-note-save-performance-and-storage-retirement`.
+- Mode: Story Branch Mode. Authorized push destination: `origin`, execution branch.
+- Replanning permission: allowed (no `--replan`/`--no-replan` supplied).
+- **CI observation: unavailable.** The host notification bridge readiness probe
+  (`node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`) exits 0
+  but emits no `CI_OBSERVER` receipt, and no `CI_MONITOR_READY` context is added
+  by a host hook. No observer is armed; pushes from this execution are
+  `pendingCi: unobserved`. Reported once, per the host adapter contract; host
+  settings were not rewritten. CI selection, had it been available, resolves to
+  GitHub Actions with workflow `ci.yml`, display name `donut CI` (not the default
+  `CI`), which is push-triggered on all branches.
 Work item: **SEED-034#story-4**.
 Source: [refined story](../../seeds/SEED-034-faster-note-content-saving.md#story-4).
 Planning inspection: `2e8cf08e01c55caa60fa8b161716ccfd5acf4d76`, plus the
@@ -72,8 +90,15 @@ boundary support this reuse. No new architectural direction is needed.
 folders, wiki references and several history commits, zero attachments. Roughly
 the prior scale (11,184 notes) is useful; exact counts/content are unnecessary.
 Record actual shape, revisions, runtime settings, timing boundaries and sample
-spread. The historical baseline revision recorded by the previous plan is
-`1204b33d3f48da94ad495e1a0c9beb6054b68aa2`; verify it is usable before running it.
+spread. **Verified earlier revision (resolved 2026-09-21):** the previous plan's
+`1204b33d3f48da94ad495e1a0c9beb6054b68aa2` is **not usable** — `git cat-file -t`
+reports `bad object`; it is absent from this repository and from `origin`, so it
+was never published. The usable earlier revision is the recorded original product
+baseline `b5cad203d1d8915b03cbb2353866134979519349` (2026-09-20 08:26, ancestor of
+story 1's final commit `fe413d0f3c1425b2dde545098d844401f2f196ca`, itself an
+ancestor of `main`). That revision is the one the >4x ambition was stated against
+(historical medians 795/785 ms for existing/added links). Use `b5cad203d1` as the
+earlier side of the comparison and label the comparison reconstructed.
 Use isolated disposable environments for both versions, populated from the same
 Portable inputs through compatible setup; never point old code at current
 Development/Production or downgrade a shared schema. Label the comparison
@@ -137,40 +162,103 @@ do not excuse an oversized implementation. Every slice starts planned. Keep
 evidence only here while work is active, with literal commands and observations.
 
 ### 1. Comparable notebook content
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 
-Prepare the disposable deterministic no-attachment fixture for slice 3, using
-existing notebook creation/publication setup. Inspect both versions' available
-entry points and record actual note/folder/link/history counts. Keep generated
-payloads outside tracked source; no persistent development data is modified.
-Proof: import the same Portable content into each isolated setup and compare
-exported paths/content. Native commit IDs need not match independently created
-histories; history depth and timed edits must be comparable. Size: ~5 minutes
-once environments exist; integration uncertainty is bounded by the ten-minute
-rule, not waived because this is setup.
+Prepare the disposable deterministic no-attachment fixture for slices 2-3 and
+verify the earlier revision is runnable. Record actual note/folder/link/history
+counts. Keep generated payloads outside tracked source; no persistent development
+data is modified. Proof: the generator is deterministic (same inputs produce a
+byte-identical payload and identical paths), the manifest records the actual
+counts, the payload stays untracked, and the earlier revision installs and
+compiles under today's toolchain.
+
+**Refined 2026-09-21 (sizing assumption failed, ~30 active min against a ~5 min
+budget).** The original proof — "import the same Portable content into each
+isolated setup and compare exported paths/content" — had a hidden dependency on
+slice 2: importing a large notebook requires a booted isolated stack plus a
+seeding spec, which slice 2 creates. That proof is therefore relocated to
+slice 3, where both stacks are booted anyway; verifying comparability there
+costs one extra export and diff per side rather than a second harness. The
+overrun was a plan defect, not an oversized implementation: the fixture work
+itself completed.
+
+Delivered evidence: `scripts/profiling/generate-note-save-fixture.mjs` emits a
+Portable tree, a `testability().injectNotes`-shaped `fixture.json` and a counts/
+digest `manifest.json`. Actual shape at default parameters: 11,000 notes,
+40 folders, 41 container READMEs, 11,041 Portable files, 55,000 wiki references
+(5 per note, resolving within the notebook), 5 history commits (root plus 4
+increments of 10 timed edits each), 0 attachments, 11,210,679 content bytes.
+All four counts are env-overridable (`NOTE_SAVE_FIXTURE_NOTES`, `_FOLDERS`,
+`_REVISIONS`, `_REVISION_EDITS`) so a small-scale pilot needs no second fixture.
+Payload lives outside the repository under the job scratch directory.
+
+Earlier-revision runnability: a detached disposable worktree at
+`b5cad203d1` installs (`pnpm --frozen-lockfile recursive install`, exit 0) and
+compiles (`backend/gradlew -p backend compileJava`, BUILD SUCCESSFUL). Its
+`e2e_test/start/testability.ts` is byte-identical to current and its `cy:run`
+script is the same `node scripts/e2e-runner.mjs`, so **the plan's earlier-revision
+command-adaptation caveat is retired**: the literal commands below run unchanged
+on both sides.
+
+Accepted proof (coordinator-inspected):
+`CURSOR_DEV=true nix develop -c node scripts/profiling/generate-note-save-fixture.mjs <dir>`
+runs in ~6 s and emits the manifest above; regenerating into a second directory
+and `diff -r` reports no differences across all 11,043 emitted files. The
+generator contains no `Math.random`, `Date.now`, `new Date`, `randomUUID` or
+`process.hrtime`, so determinism holds by construction. `git status` shows no
+generated payload. Post-refactor the script reproduces the same payload
+byte-for-byte (re-verified), at 186 lines.
+
+Refactor learnings: the existing CLI publication fixture
+(`e2e_test/config/notebookPublicationFixture.ts`,
+`e2e_test/start/pageObjects/cli/notebookPublicationProfile.ts`) shares template
+formatting with this generator but not a domain rule — it is a permanent
+publication workload with an encode/decode pair for drift protection, while this
+is a disposable no-decode fixture with a history-depth dimension. Deliberately
+not merged; sharing would make a standalone `scripts/*.mjs` import Cypress-bundle
+TypeScript. Revisit only if slice 13 needs the same content on both sides.
 
 ### 2. Observe complete ordinary saves
 Type: Structure. Status: planned.
 
 Prepare a temporary browser measurement feature using existing note-edit page
-objects for slice 3. Observe real typing, the request interval and refreshed
-editor completion; retain debounce, serialized saves and normal runtime settings.
-One pilot save must reload with the new content and expected live link result.
-Use the planned temporary feature command M below; this file does not exist yet.
-No production timing hooks, mock clocks or permanent benchmark framework.
-Size: ~5 minutes; split instrumentation from fixture adaptation if it exceeds ten.
+objects for slice 3, including the seeding path that imports slice 1's
+`fixture.json` into a booted isolated stack. Observe real typing, the request
+interval and refreshed editor completion; retain debounce, serialized saves and
+normal runtime settings. One pilot save must reload with the new content and
+expected live link result. Use the planned temporary feature command M below;
+this file does not exist yet. No production timing hooks, mock clocks or
+permanent benchmark framework.
+
+**Pilot at small scale first** (for example `NOTE_SAVE_FIXTURE_NOTES=200
+NOTE_SAVE_FIXTURE_FOLDERS=5`) to validate the seeding and measurement route
+cheaply, and **record the actual seeding wall-clock at that scale** so slice 3's
+full-scale cost is sized from evidence. Seeding cost is currently unmeasured:
+the 62-minute figure in `docs/notebook-publication-profiling.md` is bulk HTTP
+publication of 10,000 documents, a different workload from `injectNotes`
+database seeding, and the 66,000 ms note there describes a too-small task
+timeout, not intrinsic seeding cost. Do not assume either bound; measure it.
+Raise `taskTimeout`/`defaultCommandTimeout` as that doc describes if needed.
+Size: ~5 minutes for the harness plus measured pilot runtime; split the seeding
+path from the measurement instrumentation if it exceeds ten.
 
 ### 3. Report the no-attachment save comparison
 Type: Behavior. Status: planned.
 
 Given matched large notebooks without attachments, editing content with existing
 links and then added/changed links yields repeatable typical save times and a
-qualified comparison. Run M on the verified earlier revision and current code,
-warm up, then take a modest repeated sample with the same edits/order. Report all
-sample outcomes, median and range, alongside both timing boundaries. Reload at
-the end to verify durability/link results. Do not mix attachment or bulk-publication
-results into this conclusion. Size: ~5 active minutes, benchmark runtime excepted.
-Apply the learning gate before inventing implementation work.
+qualified comparison. Seed both sides from the same `fixture.json` at the scale
+slice 2's measured cost supports. **First establish comparability** (relocated
+from slice 1): export each side's Portable content and compare paths and content
+between the two imports. Native commit IDs need not match independently created
+histories; history depth and timed edits must be comparable. Then run M on the
+verified earlier revision `b5cad203d1` and current code, warm up, and take a
+modest repeated sample with the same edits/order. Report all sample outcomes,
+median and range, alongside both timing boundaries. Reload at the end to verify
+durability/link results. Do not mix attachment or bulk-publication results into
+this conclusion. Label the comparison reconstructed. Size: ~5 active minutes,
+seeding and benchmark runtime excepted. Apply the learning gate before inventing
+implementation work.
 
 ### 4. Seed current accepted histories directly
 Type: Structure. Status: planned.
@@ -341,8 +429,9 @@ default connection settings when running a migration rehearsal.
 | E | `CURSOR_DEV=true nix develop -c pnpm cy:run --spec 'e2e_test/features/note_creation_and_update/note_edit.feature,e2e_test/features/note_topology/wiki_link.feature,e2e_test/features/note_topology/property_wiki_link.feature,e2e_test/features/cli/cli_notebook_existing_note_edits.feature,e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature,e2e_test/features/cli/cli_notebook_git_history_reset.feature'` | Storage cutover/removal and final attachments: editor/link behavior, real installed CLI ancestry/bytes, existing reset |
 | D | `CURSOR_DEV=true nix develop -c pnpm export:database-erd` | Schema-changing slices; set `DONUT_ERD_SCHEMA` to the verified migrated disposable schema before running, not implicit Development fallback |
 
-For earlier revisions lacking today's wrapper, use that revision's documented
-isolated runner and retain the literal adapted command here. These commands
+The earlier revision `b5cad203d1` needs no command adaptation: its `cy:run`
+script and `e2e_test/start/testability.ts` are identical to current, verified in
+slice 1. Run the literal commands above unchanged on both sides. These commands
 are planned, not claimed executed. Read frontend rules/typecheck requirements
 if implementation later touches frontend production code; no such change is
 currently selected. Read script rules if a shell script becomes necessary.
