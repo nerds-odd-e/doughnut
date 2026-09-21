@@ -58,7 +58,7 @@ class NotebookGitAcceptedObjectBackfillTest {
       commit2 =
           NotebookGitBundleBuilder.append(
               fixture, commit1, v1, v2, "Donut", "system@donut.local", "Edit", time.plusSeconds(1));
-      bundleBytes = NotebookGitBundleWriter.write(fixture).bundleBytes();
+      bundleBytes = NotebookGitBundleWriter.write(fixture);
     }
 
     int seededBindingId = jdbc.insertBinding(commit2.name(), bundleBytes);

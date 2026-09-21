@@ -1067,7 +1067,7 @@ Housekeeping outside this slice: the `db-migration` skill still names 333 as the
 version; `V300000337` is now the highest.
 
 ### 9b. Stop reading and writing the retained column (contract)
-Type: Structure. Status: planned. **Depends on 9a. Release only after 9a is deployed
+Type: Structure. Status: done (code); **release still gated as below.** **Depends on 9a. Release only after 9a is deployed
 everywhere AND Gate A confirms `V300000336` completed, with
 `NotebookGitAcceptedHistoryCompleteness.requireEveryAcceptedHistoryComplete` passing, in
 every long-lived database.**
@@ -1084,6 +1084,89 @@ Proof: V and E; native reopen/save, creation/reset, download/publication and
 rollback remain valid with the column unpopulated. Reuse existing behavior
 tests; no permanent test of a retired field's existence. Regenerate ERD with D.
 Size: 5–10 active minutes plus required suites. Gate A/B controls deployment.
+
+**Delivered (9b).** Production code no longer reads or writes `bundle_bytes`: the
+`NotebookGitBinding.bundleBytes` field and its `@Column` are gone (no replacement mapping -
+the column stays in the schema, nullable and unused, until slice 10); the runtime
+legacy-import fallback in `NotebookGitAcceptedRepositoryStore.open()` and its
+`importBundleIntoNativeStoreOnce` helper are deleted; and `apply()` **serializes nothing** -
+it only ever wrote a bundle for the column, and the one other thing it took from the write
+result, the head id, now comes from the existing `mainHeadOf(repository)`. Transport is
+untouched: the download and publication endpoints, `downloadableBundle`, the bundle
+importer/writer and proposal importer. `importAndVerifyMainHead` stays because the backfill
+still uses it. Javadoc on the touched production classes now describes current ownership only.
+
+`open()` on a binding with no native rows now fails on the first read of the accepted head
+with `UncheckedIOException: Could not inspect accepted Portable tree` caused by
+`MissingObjectException: Missing unknown <head sha>`. **No catch and no empty-store branch
+was added**: that chain already names what failed and the missing object (ADR 0006), and a
+defensive branch would violate CLAUDE.md principle 2. After Gate A no long-lived binding
+should reach it.
+
+Carve-out tests resolved as planned:
+- `firstSaveConvertsALegacyBindingAndASecondSaveNeitherLoadsNorRewritesTheLegacyBundle` -
+  **deleted**; its entire subject no longer exists.
+- `corruptStoredAcceptedBundleFailsLoudlyWithoutSavingTheNote` - **re-aimed**, not deleted,
+  as `unreadableAcceptedHistoryFailsLoudlyWithoutSavingTheNote`. The retired *subject* went,
+  but the *behavior* it guarded is current and was covered nowhere else at the web-save
+  level (the only `MissingObjectException` tests were store-level and reset). New setup: a
+  real reset via `snapshotCurrentPortableTree`, then delete the accepted head commit from
+  native storage. Assertions: the save throws a runtime failure that is **not** a
+  `ResponseStatusException` (loud, not a clean rejection), the note content is unchanged,
+  and the accepted head is unchanged. Coordinator read the test and accepted it.
+
+`clearNativeObjectStoreRows` replaced by the narrower
+`deleteNativeObjectStoreRow(bindingId, gitObjectId)`, whose only caller is the re-aimed test;
+`countNativeObjectStoreRows` kept. `NotebookGitWebContentSaveControllerTest` is now **247
+lines**, closing slice 6's 250-line deferral exactly as predicted. Four of the five `NOT NULL`
+satisfiers are gone; the fifth - `NotebookGitJdbcFixture`'s raw SQL behind the kept
+`insertBinding(head, bundleBytes)` overload - **correctly stays**, because the migration tests
+still seed pre-upgrade bindings with real bundle bytes; slice 12 removes it. 9a's rehearsal
+test no longer re-imposes `NOT NULL` on the shared table, so it can never leave the schema
+stricter than the migrated state (the NOT NULL -> NULL transition itself was proven once in 9a
+and is applied by real Flyway).
+
+Proof V: `CURSOR_DEV=true nix develop -c pnpm backend:verify`, exit 0, **2,565 tests,
+0 failures, 0 errors, 0 skipped** - 2,566 minus the one deleted test, the re-aimed test
+replacing its predecessor one-for-one. Proof E: the six-spec Cypress run, exit 0, **40/40**
+(`note_edit` 12, `wiki_link` 11, `property_wiki_link` 8, `cli_notebook_existing_note_edits` 4,
+`cli_notebook_publish_to_clean_clone` 4, `cli_notebook_git_history_reset` 1) - the real editor,
+wiki links, installed CLI ancestry/bytes and reset all work with the column unpopulated. No
+ERD regeneration: the schema did not change.
+
+**Found outside the plan's starting map:** `e2e_test/config/notebookPublicationState.ts:35`
+selects `SHA2(bundle_bytes, 256)` into the maintained publication profiler's state snapshot.
+Harmless today, since hashing NULL just gives NULL, but it has silently stopped
+discriminating (nothing writes the column), and slice 10's drop would break the query. Assigned
+to 9b's refactor pass as a "stop reading" item, with a positional-read audit.
+
+Refactor outcome (9b):
+- `e2e_test/config/notebookPublicationState.ts:35` no longer selects
+  `SHA2(bundle_bytes, 256)`. **Positional-read audit, coordinator re-checked:** the only
+  consumer of `bindings` compares the whole string
+  (`assert.equal(after.bindings, before.bindings)`, line 66), so dropping a column cannot
+  shift anything; the other snapshot consumers use unrelated fields. Its only runners are
+  the opt-in `@publicationProfile*` scenarios excluded from ordinary runs, so the edit was
+  proven by that audit plus a clean `biome check` of the file. **No E2E reference to
+  `bundle_bytes` remains**, so slice 10's drop cannot break the E2E snapshot.
+- `NotebookGitBundleWriter.write(Repository)` now returns `byte[]`; the callerless
+  `BundleWriteResult` record (its `headObjectId` had no reader after `apply()` stopped
+  serializing) is deleted, and the Javadoc now says the output is for transport (download
+  and cloning) rather than "for persistence". **Transport bytes are unchanged** -
+  coordinator confirmed the serialization body is identical, including both
+  `bundleWriter.include(...)` calls for `main` and `HEAD`.
+- `copyAllReachableObjectsInto` (one caller) folded into `copyIntoNativeStore`: same
+  inserter, flush, `UncheckedIOException` wrap and connection release in `finally`.
+- Left deliberately, as a possible later candidate rather than a refactor: `apply()` and
+  `store()` now look alike, but they differ on a real domain point - `apply()` saves before
+  copying so a brand-new binding has the id its native rows' foreign key needs, and never
+  skips the copy. Merging them would reorder save and copy on the hot `store()` path, which
+  is a persistence-behavior change, not a pure refactor.
+
+Re-verified after the refactor: `backend:verify` exit 0, **2,565 tests, 0 failures**. The
+40/40 E run stays valid: the store change restructures the same insert/flush/release
+sequence, the writer's bytes are unchanged, and none of the six specs uses
+`notebookPublicationState.ts`.
 
 ### Slice 9's exact starting map (measured after slice 7)
 

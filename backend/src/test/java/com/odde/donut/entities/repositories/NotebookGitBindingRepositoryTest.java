@@ -25,16 +25,11 @@ class NotebookGitBindingRepositoryTest {
   @Autowired NotebookGitBindingRepository repository;
   @Autowired JdbcTemplate jdbcTemplate;
 
-  /**
-   * A persisted binding with the minimum every column requires. {@code bundleBytes} is empty rather
-   * than a real bundle: nothing here observes it, and the column only still needs a value because
-   * it remains {@code NOT NULL}.
-   */
+  /** A persisted binding with the minimum every column requires. */
   private NotebookGitBinding persistBinding(Notebook notebook) {
     NotebookGitBinding binding = new NotebookGitBinding();
     binding.setNotebook(notebook);
     binding.setAcceptedGitObjectId("a".repeat(40));
-    binding.setBundleBytes(new byte[0]);
     Timestamp now = makeMe.aTimestamp().please();
     binding.setCreatedAt(now);
     binding.setUpdatedAt(now);
@@ -85,12 +80,11 @@ class NotebookGitBindingRepositoryTest {
     jdbcTemplate.update(
         """
         INSERT INTO notebook_git_binding
-          (notebook_id, accepted_git_object_id, bundle_bytes, created_at, updated_at)
-        VALUES (?, ?, ?, NOW(3), NOW(3))
+          (notebook_id, accepted_git_object_id, created_at, updated_at)
+        VALUES (?, ?, NOW(3), NOW(3))
         """,
         notebook.getId(),
-        "a".repeat(40),
-        new byte[] {1, 2, 3});
+        "a".repeat(40));
 
     assertThrows(
         DataIntegrityViolationException.class,
@@ -98,11 +92,10 @@ class NotebookGitBindingRepositoryTest {
             jdbcTemplate.update(
                 """
                 INSERT INTO notebook_git_binding
-                  (notebook_id, accepted_git_object_id, bundle_bytes, created_at, updated_at)
-                VALUES (?, ?, ?, NOW(3), NOW(3))
+                  (notebook_id, accepted_git_object_id, created_at, updated_at)
+                VALUES (?, ?, NOW(3), NOW(3))
                 """,
                 notebook.getId(),
-                "b".repeat(40),
-                new byte[] {4, 5, 6}));
+                "b".repeat(40)));
   }
 }

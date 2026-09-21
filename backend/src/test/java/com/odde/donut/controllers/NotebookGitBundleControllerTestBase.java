@@ -159,19 +159,18 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
   }
 
   /**
-   * Testability-only: deletes every native object-store row for {@code bindingId}, so a binding
-   * that current code already converted looks like one created before native storage existed. Only
-   * for tests that prove the legacy-bundle import path itself; ordinary accepted state is seeded
-   * through {@link #seedAcceptedHistory}.
+   * Testability-only: deletes one object from {@code bindingId}'s native object store, leaving an
+   * accepted history that reaches an object the store no longer holds.
    */
-  void clearNativeObjectStoreRows(Integer bindingId) {
+  void deleteNativeObjectStoreRow(Integer bindingId, String gitObjectId) {
     committed(
         () ->
             entityManager
                 .createNativeQuery(
                     "DELETE FROM notebook_git_accepted_object WHERE notebook_git_binding_id ="
-                        + " :bindingId")
+                        + " :bindingId AND git_object_id = :gitObjectId")
                 .setParameter("bindingId", bindingId)
+                .setParameter("gitObjectId", gitObjectId)
                 .executeUpdate());
   }
 

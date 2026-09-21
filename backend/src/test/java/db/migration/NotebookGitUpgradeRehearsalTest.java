@@ -99,7 +99,6 @@ class NotebookGitUpgradeRehearsalTest {
   void relaxingTheRetainedBundleColumnKeepsEveryRowAndAdmitsBindingsWithoutOne() throws Exception {
     try (Connection connection = jdbc.openConnection();
         Statement statement = connection.createStatement()) {
-      statement.execute("ALTER TABLE notebook_git_binding MODIFY bundle_bytes longblob NOT NULL");
       Map<Integer, List<Object>> rowsBefore = environment.bindingRows();
 
       statement.execute(
@@ -107,7 +106,7 @@ class NotebookGitUpgradeRehearsalTest {
 
       assertThat("binding rows are untouched", environment.bindingRows(), equalTo(rowsBefore));
     }
-    int withoutBundle = jdbc.insertBinding(environment.legacy.getFirst().head().name(), null);
+    int withoutBundle = jdbc.insertBinding(environment.legacy.getFirst().head().name());
     try (Connection connection = jdbc.openConnection();
         PreparedStatement select =
             connection.prepareStatement(
@@ -160,7 +159,7 @@ class NotebookGitUpgradeRehearsalTest {
         assertThat(actual.getType(), equalTo(expected.getType()));
         assertThat(actual.getBytes(), equalTo(expected.getBytes()));
       }
-      byte[] download = NotebookGitBundleWriter.write(reopened).bundleBytes();
+      byte[] download = NotebookGitBundleWriter.write(reopened);
       try (ImportedBundle clone =
           NotebookGitBundleImporter.importAndVerifyMainHead(download, "download", binding.head())) {
         assertThat(

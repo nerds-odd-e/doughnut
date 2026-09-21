@@ -32,7 +32,7 @@ export function publicationPersistedState(repoRoot: string) {
     ),
     learning: query('SELECT * FROM memory_tracker ORDER BY id'),
     bindings: query(
-      'SELECT id, notebook_id, accepted_git_object_id, SHA2(bundle_bytes, 256), created_at, updated_at FROM notebook_git_binding ORDER BY id'
+      'SELECT id, notebook_id, accepted_git_object_id, created_at, updated_at FROM notebook_git_binding ORDER BY id'
     ),
     aliasIndex: query(
       'SELECT n.title, i.alias_display, i.alias_lookup_key FROM note_alias_index i JOIN note n ON n.id = i.note_id ORDER BY n.title, i.alias_display'

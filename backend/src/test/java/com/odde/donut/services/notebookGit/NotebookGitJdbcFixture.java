@@ -39,10 +39,10 @@ public final class NotebookGitJdbcFixture implements AutoCloseable {
   }
 
   public int insertBinding(String initialHeadObjectId) throws SQLException {
-    return insertBinding(initialHeadObjectId, new byte[0]);
+    return insertBinding(initialHeadObjectId, null);
   }
 
-  /** A binding that still retains {@code bundleBytes} in its legacy column. */
+  /** A pre-upgrade binding that still retains {@code bundleBytes} in its legacy column. */
   public int insertBinding(String initialHeadObjectId, byte[] bundleBytes) throws SQLException {
     int notebookId = ThreadLocalRandom.current().nextInt(1_500_000_000, 2_000_000_000);
     try (Connection connection = openConnection()) {

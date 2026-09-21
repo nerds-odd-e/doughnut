@@ -155,7 +155,7 @@ final class NotebookGitUpgradeRehearsalEnvironment {
   }
 
   private static byte[] bundle(Repository source) {
-    return NotebookGitBundleWriter.write(source).bundleBytes();
+    return NotebookGitBundleWriter.write(source);
   }
 
   private static String sha256(byte[] bytes) throws Exception {

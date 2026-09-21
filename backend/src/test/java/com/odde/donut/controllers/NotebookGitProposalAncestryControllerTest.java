@@ -253,7 +253,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
     try (Repository repository =
         NotebookGitBundleBuilder.build(
             entries, "Proposer", "proposer@example.com", "Proposal", Instant.now())) {
-      return NotebookGitBundleWriter.write(repository).bundleBytes();
+      return NotebookGitBundleWriter.write(repository);
     }
   }
 
