@@ -18,7 +18,7 @@
   responses, deprecation/history prose, or an absence-specific regression test;
   wider Git authorization, binding migration or recovery; changes to the CLI or
   Git bundle contract; generic ZIP handling used by EPUB or unrelated CLI tests.
-- State: slices 1–2 delivered; slice 3 planned.
+- State: all 3 slices delivered.
 
 ## Existing solution and constraints
 
@@ -119,7 +119,7 @@ threshold; E2E startup/runtime is the stated external-wait exception.
 
 ### 3. The notebook ZIP API and builder no longer exist
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given Donut's generated HTTP client or a direct request to the former
 notebook ZIP route, when notebook operations are inspected or requested, there
 is no ZIP operation and no redirect, compatibility response, or alternative web

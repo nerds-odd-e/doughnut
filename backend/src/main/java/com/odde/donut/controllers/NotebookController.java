@@ -17,7 +17,6 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.BazaarService;
 import com.odde.donut.services.NotebookCatalogService;
-import com.odde.donut.services.NotebookExportService;
 import com.odde.donut.services.NotebookGroupService;
 import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
@@ -60,7 +59,6 @@ class NotebookController {
   private final NotebookCatalogService notebookCatalogService;
   private final WebNoteCreationService webNoteCreationService;
   private final WikidataService wikidataService;
-  private final NotebookExportService notebookExportService;
   private final NotebookGitBundleDownloadService notebookGitBundleDownloadService;
   private final NotebookGitProposalPublisher notebookGitProposalPublisher;
   private final NotebookGitCutoverService notebookGitCutoverService;
@@ -78,7 +76,6 @@ class NotebookController {
       NotebookCatalogService notebookCatalogService,
       WebNoteCreationService webNoteCreationService,
       WikidataService wikidataService,
-      NotebookExportService notebookExportService,
       NotebookGitBundleDownloadService notebookGitBundleDownloadService,
       NotebookGitProposalPublisher notebookGitProposalPublisher,
       NotebookGitCutoverService notebookGitCutoverService) {
@@ -94,7 +91,6 @@ class NotebookController {
     this.notebookCatalogService = notebookCatalogService;
     this.webNoteCreationService = webNoteCreationService;
     this.wikidataService = wikidataService;
-    this.notebookExportService = notebookExportService;
     this.notebookGitBundleDownloadService = notebookGitBundleDownloadService;
     this.notebookGitProposalPublisher = notebookGitProposalPublisher;
     this.notebookGitCutoverService = notebookGitCutoverService;
@@ -266,21 +262,6 @@ class NotebookController {
     authorizationService.assertAuthorization(notebook);
     notebookGitCutoverService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
-  }
-
-  @Operation(operationId = "exportNotebook", summary = "Export notebook as a Markdown zip")
-  @GetMapping(value = "/{notebook}/export", produces = "application/zip")
-  @Transactional(readOnly = true)
-  public ResponseEntity<byte[]> exportNotebook(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(notebook);
-    byte[] zipBytes = notebookExportService.exportNotebookAsZip(notebook);
-    String filename = notebookExportService.exportFileName(notebook);
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-        .contentType(MediaType.valueOf("application/zip"))
-        .body(zipBytes);
   }
 
   @Operation(

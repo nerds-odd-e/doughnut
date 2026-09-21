@@ -3674,24 +3674,6 @@ export type ListNotebookFolderListingResponses = {
 
 export type ListNotebookFolderListingResponse = ListNotebookFolderListingResponses[keyof ListNotebookFolderListingResponses];
 
-export type ExportNotebookData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/export';
-};
-
-export type ExportNotebookResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type ExportNotebookResponse = ExportNotebookResponses[keyof ExportNotebookResponses];
-
 export type DeleteBookData = {
     body?: never;
     path: {
