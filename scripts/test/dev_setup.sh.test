@@ -6,9 +6,79 @@
 # clean bash that sources the real dev_setup.sh (see start_detached test).
 DONUT_TEST_REAL_PATH="$PATH"
 DONUT_TEST_REAL_BASH="$(command -v bash)"
-DONUT_TEST_DEV_SETUP_SH="$(cd "$(dirname "$0")/.." && pwd)/dev_setup.sh"
+DONUT_TEST_REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+DONUT_TEST_DEV_SETUP_SH="${DONUT_TEST_REPO_ROOT}/scripts/dev_setup.sh"
 
 source "$(dirname "$0")/vendor/bach.sh"
+
+# setup_pnpm_deps must be callable on its own (slice 2: separate dependency
+# preparation from Biome restart/service startup). Real command-boundary
+# proof, not a simulation: a clean bash subprocess sources the real
+# dev_setup.sh against a real disposable temp "workspace" (real pnpm-lock.yaml
+# / package.json / fingerprint file), with only the external `pnpm` binary
+# substituted for a logging stub (per the plan's "subprocess substitutes only
+# for external tools" rule) so the test stays fast and offline. Asserts:
+# setup_pnpm_deps alone runs the frozen-lockfile install once, writes the
+# fingerprint, and — unlike setup_pnpm_and_biome — never touches Biome.
+test-setup-pnpm-deps-real-invocation-installs-once-then-skips-and-skips-biome() {
+    local work bin probe
+
+    work="$(@mktemp -d)"
+    bin="${work}/bin"
+    probe="${work}/probe.sh"
+    @mkdir -p "${bin}"
+
+    # Stand-in for the external pnpm binary: records every invocation and
+    # marks node_modules present after a frozen-lockfile install, like real
+    # pnpm would, without touching the network or the real package graph.
+    @cat >"${bin}/pnpm" <<'FAKE_PNPM'
+#!/usr/bin/env bash
+echo "$*" >>"${DONUT_TEST_PNPM_LOG}"
+if [ "$1" = "--frozen-lockfile" ]; then
+    mkdir -p node_modules
+fi
+FAKE_PNPM
+    @chmod +x "${bin}/pnpm"
+
+    @cat >"${probe}" <<'PROBE'
+set -euo pipefail
+export PATH="$1:$2"
+repo_root="$3"
+work="$4"
+export DONUT_TEST_PNPM_LOG="$5"
+
+cd "${work}"
+: >pnpm-lock.yaml
+: >package.json
+: >pnpm-workspace.yaml
+: >"${DONUT_TEST_PNPM_LOG}"
+
+source "${repo_root}/scripts/shell_setup.sh"
+source "${repo_root}/scripts/dev_setup.sh"
+setup_logging >/dev/null
+
+setup_pnpm_deps >/dev/null
+first_calls="$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ')"
+fingerprint_written="$([ -f .donut-pnpm-lock.sha256 ] && echo yes || echo no)"
+
+# Repeat: fingerprint unchanged and node_modules present -> no second install.
+setup_pnpm_deps >/dev/null
+second_calls="$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ')"
+
+# setup_pnpm_deps alone must never touch the Biome daemon.
+biome_touched="no"
+grep -q biome "${DONUT_TEST_PNPM_LOG}" && biome_touched="yes"
+
+echo "first_calls=${first_calls} fingerprint=${fingerprint_written} second_calls=${second_calls} biome_touched=${biome_touched}"
+PROBE
+
+    local result
+    result="$(@real env -i "PATH=${DONUT_TEST_REAL_PATH}" \
+        "${DONUT_TEST_REAL_BASH}" "${probe}" \
+        "${bin}" "${DONUT_TEST_REAL_PATH}" "${DONUT_TEST_REPO_ROOT}" "${work}" "${work}/pnpm-calls.log")"
+
+    @assert-equals "first_calls=1 fingerprint=yes second_calls=1 biome_touched=no" "${result}"
+}
 
 # start_detached must shield direnv from daemon FD inheritance (direnv/direnv#755):
 # it closes FD 3 and redirects the command's stdio to the log. Run the real

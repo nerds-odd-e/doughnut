@@ -255,7 +255,7 @@ every exit path removes the disposable worktree/branch). Proof P passing;
 full `scripts/test/run_all_script_tests.sh` 20/20.
 
 ### 2. Separate dependency preparation from interactive services
-Type: Structure. Status: planned. Target: ~5 minutes.
+Type: Structure. Status: done.
 
 Expose the existing dependency preparation independently from Biome restart and
 service startup. Keep normal interactive setup calling the appropriate existing
@@ -266,6 +266,15 @@ runtime owner.
 Proof: S/N/L as touched, including real invocation with external commands
 observed. Existing interactive behavior and quiet command output remain intact.
 The extracted preparation does not start/stop services or a foreign daemon.
+
+Delivered: `scripts/dev_setup.sh:setup_pnpm_deps` extracted from
+`setup_pnpm_and_biome` (byte-identical fingerprint-gated `pnpm
+--frozen-lockfile recursive install` body); `setup_pnpm_and_biome` now calls
+`setup_pnpm_deps` plus the unchanged NixOS Biome-patch step and
+`restart_biome_daemon`. `scripts/nix_shell_hook.sh`'s one call site
+unchanged. New real-invocation test in `scripts/test/dev_setup.sh.test`
+proves `setup_pnpm_deps` alone installs once, writes the fingerprint, skips
+on repeat, and never touches Biome. S 5/5, N 2/2, L 2/2, full suite 20/20.
 
 ### 3. Prepare the committed dependency graph for useful checks
 Type: Behavior. Status: planned. Target: ~5 minutes active work plus tool/test runtime.
