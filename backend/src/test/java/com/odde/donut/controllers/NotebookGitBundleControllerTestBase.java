@@ -206,12 +206,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
         .longValue();
   }
 
-  /**
-   * The notebook's current accepted history, served by its own download endpoint. Tests read the
-   * accepted history here rather than from {@code binding.getBundleBytes()}: once a binding's
-   * ordinary saves move onto native object storage, that column is no longer kept in sync with the
-   * accepted head, so only the download's live, re-serialized bundle reliably reflects it.
-   */
+  /** The notebook's current accepted history, served by its own download endpoint. */
   byte[] acceptedBundleBytes(Notebook notebook) throws Exception {
     return controller
         .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())

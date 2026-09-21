@@ -51,10 +51,6 @@ abstract class NotebookGitWebContentHistoryControllerTestSupport
     return notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow();
   }
 
-  List<String> contentChain(Integer notebookId, String path) throws Exception {
-    return historyFromBinding(notebookId, path).contentsNewestFirst();
-  }
-
   History downloadHistory(Notebook notebook, String path) throws Exception {
     byte[] downloaded =
         controller
@@ -63,13 +59,7 @@ abstract class NotebookGitWebContentHistoryControllerTestSupport
     return historyFromBundle(downloaded, path);
   }
 
-  /**
-   * Reads history through the notebook's own download endpoint rather than {@code
-   * binding.getBundleBytes()} directly: once a binding's ordinary saves move onto native object
-   * storage, that column is no longer kept in sync with the accepted head, so only the download's
-   * live, re-serialized bundle reliably reflects the current accepted history.
-   */
-  History historyFromBinding(Integer notebookId, String path) throws Exception {
+  History downloadHistory(Integer notebookId, String path) throws Exception {
     return downloadHistory(notebookRepository.findById(notebookId).orElseThrow(), path);
   }
 

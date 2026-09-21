@@ -36,7 +36,7 @@ class NotebookGitWebContentHistoryExposureControllerTest
     }
 
     saveAt(fixture.noteId(), content("second"), T1008);
-    History afterSaves = historyFromBinding(fixture.notebookId(), "Pulled.md");
+    History afterSaves = downloadHistory(fixture.notebookId(), "Pulled.md");
     assertThat(
         afterSaves.contentsNewestFirst(),
         equalTo(List.of(content("second"), content("first"), ACCEPTED_CONTENT)));
@@ -59,7 +59,7 @@ class NotebookGitWebContentHistoryExposureControllerTest
     saveAt(noteB.getId(), content("B1"), T1008);
     saveAt(noteA.getId(), content("A2"), T1016);
 
-    History noteAHistory = historyFromBinding(notebook.getId(), "NoteA.md");
+    History noteAHistory = downloadHistory(notebook.getId(), "NoteA.md");
     assertThat(noteAHistory.contentsNewestFirst().size(), is(5));
     assertThat(noteAHistory.contentsNewestFirst().get(0), is(content("A2")));
     assertThat(noteAHistory.headsNewestFirst().contains(creationHead), is(true));
@@ -97,7 +97,7 @@ class NotebookGitWebContentHistoryExposureControllerTest
         fixture.notebookId(), afterWeb.getAcceptedGitObjectId(), proposal);
 
     saveAt(fixture.noteId(), content("web-2"), T1008);
-    History history = historyFromBinding(fixture.notebookId(), "Local.md");
+    History history = downloadHistory(fixture.notebookId(), "Local.md");
     assertThat(
         history.contentsNewestFirst(),
         equalTo(List.of(content("web-2"), content("local"), content("web-1"), ACCEPTED_CONTENT)));
@@ -120,7 +120,7 @@ class NotebookGitWebContentHistoryExposureControllerTest
       downloadedHead = GitBundleTestReader.fetchHead(repository, race.first().getBody());
     }
     saveAt(fixture.noteId(), content("further"), T1008);
-    History history = historyFromBinding(fixture.notebookId(), "RaceDown.md");
+    History history = downloadHistory(fixture.notebookId(), "RaceDown.md");
     assertThat(history.headsNewestFirst().contains(downloadedHead), is(true));
   }
 
@@ -142,7 +142,7 @@ class NotebookGitWebContentHistoryExposureControllerTest
         downloadedHead.getName(),
         equalTo(bindingById(fixture.notebookId()).getAcceptedGitObjectId()));
     saveAt(fixture.noteId(), content("further"), T1008);
-    History history = historyFromBinding(fixture.notebookId(), "RaceSave.md");
+    History history = downloadHistory(fixture.notebookId(), "RaceSave.md");
     assertThat(history.headsNewestFirst().contains(downloadedHead), is(true));
     assertThat(history.contentsNewestFirst().get(0), is(content("further")));
     assertThat(history.headsNewestFirst().get(1), equalTo(downloadedHead));

@@ -1870,7 +1870,7 @@ across 3 binding ids.
 minutes plus profiling runtime.
 
 ### 14. Leave only the current implementation
-Type: Structure. Status: planned; closure depends on completed required work.
+Type: Structure. Status: done except the migration-bound items, which move to slice 12.
 
 Delete any remaining dead helpers, compatibility aliases, conversion branches,
 temporary measurements, fixtures and raw experiment outputs owned by this work.
@@ -1885,6 +1885,41 @@ actual deletions require; no redundant rerun when already sufficient evidence
 matches the final boundary. Target ~5 minutes; unresolved references keep this
 slice open. Required story wrap-up then removes spent plan/source detail and
 incoming plan links, without a replacement record and without deleting siblings.
+
+**Delivered.** The temporary note-save measurement harness is gone - the feature,
+`e2e_test/step_definitions/note_save_measurement.ts`, `e2e_test/start/pageObjects/noteSaveMeasurement.ts`,
+`noteSaveMeasurementNotebookTask.ts`, `e2e_test/config/noteSaveMeasurement.ts`,
+`scripts/profiling/generate-note-save-fixture.mjs`, its registration in `e2e_test/config/common.ts` and
+its allowlist entry. No reference remains outside `.planning`; `@wip` count is 0; command M in this
+plan's proof table is retired with it. Shared helpers the harness used all keep other callers. The
+maintained publication profiler is untouched.
+
+Stale prose removed from test support (`NotebookGitBundleControllerTestBase`,
+`NotebookGitWebContentHistoryControllerTestSupport` - where `historyFromBinding` became
+`downloadHistory` and the already-uncalled `contentChain` was deleted - and the two web-note-move tests,
+including a slice-number reference). `NotebookGitCutoverService`'s private `applyBundle` became
+`storeHistory`, since it no longer applies a bundle. `docs/note-content-saving.md` now describes current
+behavior only - native object store, drift/no-op/publication comparison by per-path Git blob id with
+modes ignored, a save writing only new objects, bundles as transport only - and the refactor pass
+spot-checked each claim against the code. `docs/notebook-git-synchronization.md` and the ADRs had
+nothing stale; no Accepted ADR is inaccurate. The refactor pass also split the shared Cypress plugin
+config (251 lines) by moving its five MCP-client tasks unchanged into `e2e_test/config/mcpClientTasks.ts`
+(`common.ts` now 202 lines), proven by `mcp_services.feature` 5/5.
+
+Disposable resources removed: the detached `b5cad203d1` worktree (`git worktree remove --force` +
+`prune`, and only the database its `.worktree.local.json` named), and about 1.5 GB of fixtures, exports,
+logs and recordings under the job scratch directory. Kept: `recreate_db.sh` for slice 12's fresh-install
+proof. Reported, not changed: `NotebookGitBundleBuilder` builds an in-memory repository rather than a
+bundle, a misnomer predating this story; renaming touches 11 files, left for the owner.
+
+**Moved to slice 12 (they must go with the backfill):** `NotebookGitBundleImporter.importAndVerifyMainHead`
+has the backfill as its only caller, and the class Javadoc justifies `public` visibility only for that
+migration - delete the method and the justification, and consider package-private, when slice 12 deletes
+the backfill. Also the stale wording in `V300000336`, `V300000337`, `NotebookGitAcceptedObjectBackfill` and
+`NotebookGitAcceptedHistoryCompleteness`.
+
+Proof on the final tree: B 2,569 tests, 0 failures; E 40/40 (coordinator re-ran it after the config
+split); `check_wip_tags.sh` 0; script tests 76/76.
 
 ## Proof commands and ownership
 
