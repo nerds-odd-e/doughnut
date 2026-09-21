@@ -1,7 +1,7 @@
 # Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage
 
-Status: in execution. Measurement and deployment gates below constrain later
-slices; no product proof is claimed beyond what the evidence sections record.
+Status: **execution complete** (2026-09-21). Every slice is delivered; the story awaits retrospective
+and wrap-up. Evidence sections below record the accepted proof.
 
 ## Execution identity
 
@@ -471,7 +471,7 @@ race before the note page renders). Both are fixed. Treat the 5-minute target
 for slices 4-7 as optimistic and prefer finer leaves there.
 
 ### 3. Report the no-attachment save comparison
-Type: Behavior. Status: done. **Learning gate reached: owner decision needed.**
+Type: Behavior. Status: done. Learning gate resolved by owner decision 1 (investigate and correct; slices 15-17).
 
 Given matched large notebooks without attachments, editing content with existing
 links and then added/changed links yields repeatable typical save times and a
@@ -1237,7 +1237,7 @@ Housekeeping outside this slice: the `db-migration` skill still names 333 as the
 version; `V300000337` is now the highest.
 
 ### 9b. Stop reading and writing the retained column (contract)
-Type: Structure. Status: done (code); **release still gated as below.** **Depends on 9a. Release only after 9a is deployed
+Type: Structure. Status: done; released in release 1 after its gates were met. **Depended on 9a. Release only after 9a is deployed
 everywhere AND Gate A confirms `V300000336` completed, with
 `NotebookGitAcceptedHistoryCompleteness.requireEveryAcceptedHistoryComplete` passing, in
 every long-lived database.**
@@ -1393,7 +1393,7 @@ demonstrates that a test in `com.odde.donut.services.notebookGit` can autowire t
 store directly. Moving those fixtures into that package would retire the helper.
 
 ### 10. Remove redundant persisted bundles
-Type: Behavior. Status: done (code); ships in release 2. Gate B satisfied by release 1.
+Type: Behavior. Status: done; released in release 2 (production 300000338 success).
 
 Given verified native histories and only column-independent running versions,
 the next migration removes `bundle_bytes`; users can still edit, publish and
@@ -1458,7 +1458,7 @@ Housekeeping outside this slice: the `db-migration` skill still says new version
 300000333; the real floor is now above 300000338. Slice 14 corrects it.
 
 ### 11. Establish the migration checkpoint
-Type: Behavior. Status: done (code); ships in release 2 with slice 10. Gate C evidence pending the owner.
+Type: Behavior. Status: done; released in release 2; Gate C met in production and Development. Its placeholder was later retired by slice 12.
 
 Given the verified column-drop rollout, add a no-op checkpoint above every
 ever-applied migration version and confirm its application in every affected
