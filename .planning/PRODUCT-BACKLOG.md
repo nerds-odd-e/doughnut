@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9 ([plan](quick/003-notebook-folder-attachments/PLAN.md))
-
 ## Backlog list
 
 - [Repair the North Star attachment-classification link](quick/008-repair-attachment-contract-link/PLAN.md) — .planning/quick/008-repair-attachment-contract-link/PLAN.md

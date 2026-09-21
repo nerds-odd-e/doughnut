@@ -772,31 +772,6 @@ the run exists, is discoverable moments later, and goes on to succeed.
     `CI_COVERAGE_UNAVAILABLE` as final, would likely have prevented every one
     of these four false negatives.
 
-## DD-096 — Documentation refactor link inspection skipped hidden planning references
-
-A post-change refactor extracted attachment headings into a focused document,
-but its incoming-link inspection did not include the hidden `.planning/`
-directory and left the North Star pointing to an anchor that no longer exists.
-
-### Occurrences
-
-- Execution: SEED-035#story-9 / quick/003-notebook-folder-attachments / 41432e75e9
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: the slice 9 refactor created `docs/notebook-git-attachments.md`
-    and reported that link/anchor inspection passed; commit `cbd8d0bdb1` left
-    `.planning/NORTH-STAR.md` linking to
-    `docs/notebook-git-synchronization.md#classification-and-references`, whose
-    heading had moved. During retrospective, ordinary `rg` found no incoming
-    reference while `rg --hidden` exposed the stale North Star link.
-  - Observed effect: the implementation and E2E proofs stayed green, but a
-    durable architectural-direction link was broken and requires a follow-up
-    correction plan.
-  - Inference: link inspection after moving documentation headings should
-    include hidden planning directories, or use a repository-wide anchor
-    checker that does, before reporting the refactor complete.
-
 ## Retention
 
 - Highest allocated local number: 96

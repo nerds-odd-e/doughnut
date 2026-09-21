@@ -3,15 +3,16 @@
 Status: **awaiting story refinement — not ready for slice-plan refinement or execution**.
 Work item: **SEED-035#story-11**.
 Source: [mapped story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-11).
-Depends on [SEED-035#story-9](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-9)
-([plan 003](../003-notebook-folder-attachments/PLAN.md)), which is not yet
-executed. No implementation or completed evidence is carried over.
+Depends on delivered nested attachment continuity. Its deleted story and plan
+history are recoverable from commit
+`653f5ce5a7365a4296c3206dcdf554bdccd28fb0`; no implementation or completed
+evidence is carried into this plan.
 
 ## Mapped outcome and boundaries
 
 An owner can dissolve or merge a folder that contains files on the web: the
 files move with the notes, and a filename clash refuses the whole operation.
-This replaces the temporary dissolve/merge refusal that story 9 delivers.
+This replaces the current temporary dissolve/merge refusal.
 
 It adds no cross-notebook behavior (SEED-035#story-10), web file controls,
 renaming on clash, or reference rewriting.
@@ -27,13 +28,13 @@ readiness does not carry across the split.
 
 ## Architecture carried forward
 
-Follow plan 003's existing-solution table: a file refers to its folder the way a
-note does, and `FolderSubtree.dissolveInto` / `mergeInto` own rehoming. Add one
-rehome rule used by both, which refuses an occupied destination path before any
-mutation. No second attachment representation and no per-operation file copier.
+Follow the delivered model: a file refers to its folder the way a note does,
+and `FolderSubtree.dissolveInto` / `mergeInto` own rehoming. Add one rehome rule
+used by both, which refuses an occupied destination path before any mutation.
+No second attachment representation and no per-operation file copier.
 
-Owner decision carried from story 9 (2026-09-21): on a filename clash, refuse
-the whole dissolve or merge, name the clashing path, and change nothing.
+Owner decision (2026-09-21): on a filename clash, refuse the whole dissolve or
+merge, name the clashing path, and change nothing.
 
 ## Provisional mapped inputs
 
@@ -55,7 +56,7 @@ folders, files and the accepted head are unchanged. Likewise through a merge.
 One rule, not one per arrangement. Proof location proposed:
 `NotebookGitFolderDissolveGuardControllerTest`.
 
-### 4. Remove story 9's temporary dissolve/merge refusal
+### 4. Remove the temporary dissolve/merge refusal
 New from the split. The refusal and its two guard cases go away in the same
 change that makes input 1 work, never before; the cross-notebook refusal stays
 until SEED-035#story-10. Decide during refinement whether this is its own leaf
@@ -63,7 +64,8 @@ or part of input 1.
 
 ## Evidence, priority and safety
 
-Plan 003's "Resplit mapping" table accounts for every slice of the earlier
-14-slice draft. No product tests were run and no slices are done. Queued after
-the attachment journeys and before the cross-notebook move: the refusal it
-replaces loses nothing and a local workaround exists.
+The completed predecessor's "Resplit mapping" table at commit
+`653f5ce5a7365a4296c3206dcdf554bdccd28fb0` accounts for every slice of the
+earlier 14-slice draft. No product tests were run and no slices are done. Queued
+after the attachment journeys and before the cross-notebook move: the refusal
+it replaces loses nothing and a local workaround exists.

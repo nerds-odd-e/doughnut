@@ -80,11 +80,10 @@ folder-based assimilation outcome; its detailed behavior is not decided here.
 
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. Estimates
 are hypotheses; refine/split work that exceeds L before execution planning.
-Story 6 (root-file continuity) is delivered; story 9 receives the nested-file
-outcome after resplitting the original 15-slice plan; stories 11 and 10 receive
-the dissolve/merge and cross-notebook operations that story 9 refuses for now. The
-[product backlog](../PRODUCT-BACKLOG.md) owns global order. No executable plan
-or implementation is authorized by this seed.
+Root-file and nested-file continuity are delivered. Stories 11 and 10 own the
+dissolve/merge and cross-notebook operations that the delivered behavior
+refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
+No executable plan or implementation is authorized by this seed.
 
 <a id="story-8"></a>
 
@@ -115,97 +114,6 @@ or implementation is authorized by this seed.
   behave? Is the exclusion limited to assimilation, or does the owner intend a
   broader folder-ignore rule? Decide those boundaries before planning; do not
   turn examples into a fixed IDE list or choose an ignore mechanism now.
-
-<a id="story-9"></a>
-
-### Keep attachments inside notebook folders through local and web changes
-
-- **Identity:** SEED-035#story-9
-- **Slice plan:** [Folder attachment continuity](../quick/003-notebook-folder-attachments/PLAN.md)
-  — story refined 2026-09-21; see the plan for its current planning status.
-- **Resplit trace:** Receives nested-file and folder-lifecycle scope from the
-  former broad story 6. Resplit again on 2026-09-21 by owner request: this story
-  keeps publication and the folder operations that need no file rehoming;
-  [story 11](#story-11) receives dissolve and merge. The slice mapping is in the
-  plan above.
-- **Goal:** A notebook owner can publish a real local working checkout — one
-  with supporting non-Markdown files inside its folders — and keep using Web
-  Donut folder operations without losing those files. Today one nested
-  non-Markdown file makes the whole publication fail ("is not a Markdown note"),
-  so root-only support does not help an ordinary AI IDE checkout. Keeping the
-  owner's directory organization follows from this; it is not the main value.
-- **Value / why now:** A value hypothesis: the owner has no real attachments yet
-  but expects them. Queued browsing and image stories need files beside notes in
-  folders, so this completes the near-future direction rather than answering a
-  reported pain. The [product backlog](../PRODUCT-BACKLOG.md) owns its position.
-- **Scope — required behavior:**
-  - Local publication accepts non-Markdown files at any folder depth, with exact
-    bytes and paths, under the same rules root files already follow (addition,
-    edit, rename, removal; whole-proposal refusal for an invalid tip). A folder
-    holding only files is created, stays visible, and needs no `.keep`.
-  - A file counts as folder content. When a local publication removes a folder's
-    last represented path (note or file), the projected Folder is dissolved, so
-    Donut matches the Git tree. This is the existing rule in the
-    [synchronization contract](../../docs/notebook-git-synchronization.md#publication-guarantees);
-    a file is one more represented path, not a new rule.
-  - Web folder rename, move within the notebook, trash and recover carry the
-    contained files to the matching paths. Web note edits and removals leave
-    sibling files untouched.
-  - Dissolving a folder that contains files (at any depth), or merging it into
-    another folder, is refused with a clear message, changing nothing. These are
-    the operations that would have to move files to another folder;
-    [story 11](#story-11) replaces this refusal.
-  - Permanent deletion of a trashed folder removes its files from the new
-    accepted tree. Earlier Git history stays readable.
-  - Moving a folder that contains files (at any depth) to another notebook is
-    refused the same way, leaving both notebooks unchanged. Owner decision
-    2026-09-21; [story 10](#story-10) replaces the refusal. Both refusals are
-    one rule: an operation that would rehome files is not available yet.
-  - Dot-folders such as `.claude/` get no special handling: they become ordinary
-    folders and their non-Markdown files ordinary attachments. Owner decision
-    2026-09-21; story 8 may revisit this for assimilation only.
-- **Key examples:**
-  1. *Publish a real checkout.* The accepted tree has notes only. The owner
-     publishes `tools/cache/reference.json` and `physics/diagrams/force.png` →
-     accepted; `tools/cache` exists on the web although it holds no note; a fresh
-     local checkout has both files byte-for-byte.
-  2. *Web folder work keeps files.* Given example 1, the owner renames `physics`
-     to `mechanics` on the web and pulls → `mechanics/diagrams/force.png` has the
-     same bytes; notes under it keep their learning identities.
-  3. *Last file removed locally.* `tools/cache/` holds only `reference.json`. The
-     owner deletes it locally and publishes → `tools/cache` no longer exists on
-     the web. `tools` also disappears if nothing else represents it.
-  4. *Dissolve refused for now.* `physics/old/` holds `sketch.png`. The owner
-     dissolves `old` on the web → refused with a message saying folders that
-     contain files cannot be dissolved or merged yet; nothing changes. A folder
-     without files still dissolves.
-  5. *Permanent deletion.* A trashed folder holding `a.pdf` is permanently deleted
-     → the next accepted tree has no `a.pdf`; earlier history still has it.
-  6. *Cross-notebook move refused.* Folder `refs/` holds `paper.pdf`. The owner
-     moves `refs` to another notebook → refused; both notebooks unchanged.
-- **Constraints:** No silent overwrite or file loss. One attachment model and one
-  accepted-change boundary; no separate root and folder attachment types. Lift
-  the interim nested-file refusal only after permanent deletion and the
-  dissolve/merge/cross-notebook refusals are in place — otherwise a web dissolve
-  would drop files silently. Existing Markdown format stays unchanged.
-- **Boundary assumption (sizing):** Files take folder placement the way notes do
-  (a note refers to its folder; it stores no path). Then rename, move, trash and
-  recover need proof but no file-specific code, and the real work is admission
-  and projection plus the one refusal rule. If planning finds files must store
-  full paths, resize before execution.
-- **Deferred promises:** New web file controls; image rendering/conversion;
-  attachment-reference rewriting; dissolving and merging folders that contain
-  files ([story 11](#story-11)); files following a folder to another notebook
-  ([story 10](#story-10)); any proof or change specific to ZIP export, which is
-  to be removed ([SEED-009#story-46](SEED-009-git-backed-local-notebook-workflow.md#story-46));
-  size limits and note-save cost growth
-  ([SEED-034#story-3](SEED-034-faster-note-content-saving.md#story-3)).
-- **Effort hypothesis:** M–L, medium confidence under the boundary assumption.
-- **Depends on:** Story 6's delivered byte-preserving root workflow.
-- **Safe stopping point:** Organized files remain usable and safe without later
-  stories: every folder operation either carries the files or refuses loudly.
-  The local workaround for a refused dissolve is to reorganize in the checkout
-  and publish.
 
 <a id="story-1"></a>
 
@@ -308,7 +216,8 @@ or implementation is authorized by this seed.
 - **Slice plan:** [Mapped dissolve and merge with files](../quick/007-dissolve-merge-folders-with-files/PLAN.md)
   — awaiting story refinement; not ready for slice-plan refinement or execution.
 - **Resplit trace:** Receives the dissolve, merge and filename-clash scope from
-  story 9 (owner-requested resplit, 2026-09-21). Nothing was implemented.
+  the delivered nested-attachment work (owner-requested resplit, 2026-09-21).
+  Nothing was implemented for this story.
 - **Goal:** An owner tidying folders on the web can dissolve or merge a folder
   that contains supporting files, instead of being refused and having to
   reorganize in a local checkout.
@@ -317,20 +226,20 @@ or implementation is authorized by this seed.
   `physics/sketch.png`, same bytes. With different pictures at
   `physics/force.png` and `physics/old/force.png`, the dissolve is refused,
   naming `physics/force.png`, and nothing changes.
-- **Scope / value:** Replaces story 9's dissolve/merge refusal: files move with
-  the notes, including files of merged same-name subfolders. A convenience — the
-  refusal loses nothing and a local workaround exists.
-- **Clash rule (owner decision 2026-09-21, carried from story 9):** When a web dissolve or merge would
-  put a file on a path that is already taken, refuse the whole operation, name
-  the clashing path, and change nothing. This is a Web Donut folder operation,
-  not a Git merge: Git content merges stay the local user's problem because
-  Donut accepts only forward linear history. Overwriting would lose a file;
-  renaming would break local references while reference rewriting is deferred.
-  Known related gap, not this story's to fix: dissolve and merge do not check
-  note-title clashes today, although a single-note move does.
+- **Scope / value:** Replaces the current dissolve/merge refusal: files move
+  with the notes, including files of merged same-name subfolders. A convenience
+  — the refusal loses nothing and a local workaround exists.
+- **Clash rule (owner decision 2026-09-21):** When a web dissolve or merge
+  would put a file on a path that is already taken, refuse the whole operation,
+  name the clashing path, and change nothing. This is a Web Donut folder
+  operation, not a Git merge: Git content merges stay the local user's problem
+  because Donut accepts only forward linear history. Overwriting would lose a
+  file; renaming would break local references while reference rewriting is
+  deferred. Known related gap, not this story's to fix: dissolve and merge do
+  not check note-title clashes today, although a single-note move does.
 - **Effort hypothesis:** S–M, medium confidence; the clash rule is decided.
-- **Depends on:** Story 9.
-- **Safe stopping point:** If never delivered, story 9's refusal stays safe.
+- **Depends on:** Delivered nested attachment continuity.
+- **Safe stopping point:** If never delivered, the current refusal stays safe.
 - **Refinement needed:** Confirm key examples for merge arrangements (dissolve
   with merge, move with merge) and whether the refusal message lists every
   clashing path or the first.
@@ -347,14 +256,14 @@ or implementation is authorized by this seed.
   `refs` to another notebook on the web, then pulls both notebooks: the source no
   longer has `refs/`, the destination has `refs/paper.pdf` with the same bytes,
   and the note keeps its learning identity.
-- **Scope / value:** Replaces story 9's refusal with the move notes already get.
+- **Scope / value:** Replaces the current refusal with the move notes already get.
   Both notebooks' accepted trees change through the existing accepted-change
   boundary. The refusal loses nothing and a local workaround exists (copy the
   files between two checkouts), so this is a convenience, ranked after the
   retrieval, image and deletion journeys.
 - **Effort hypothesis:** S–M, low confidence until the existing cross-notebook
   note move's publication path is inspected.
-- **Depends on:** Story 9.
+- **Depends on:** Delivered nested attachment continuity.
 - **Safe stopping point:** If never delivered, the refusal stays safe and clear.
 - **Open decisions for refinement:** Destination filename clashes follow the
   clash rule recorded in story 11. Confirm whether a cross-notebook merge needs anything
@@ -362,32 +271,31 @@ or implementation is authorized by this seed.
 
 ## Ordering and Scope Reduction
 
-The [product backlog](../PRODUCT-BACKLOG.md) owns global order; on 2026-09-21
-the owner confirmed its current order, which serves completing the near-future
-direction. Nested attachment continuity comes before the browsing journey that
-requires nested files, then browser retrieval, existing images, guidance-folder
-assimilation, local visual authoring, new web-image portability, web cleanup,
-and last the two conveniences whose absence loses nothing: dissolve/merge with
-files (story 11), then the rarer cross-notebook folder move (story 10). Root attachment continuity (story 6) is delivered.
+The [product backlog](../PRODUCT-BACKLOG.md) owns global order. Delivered nested
+attachment continuity enables the browsing journey that requires nested files.
+The remaining attachment order then covers browser retrieval, existing images,
+guidance-folder assimilation, local visual authoring, new web-image portability,
+web cleanup, and last the two conveniences whose absence loses nothing:
+dissolve/merge with files (story 11), then the rarer cross-notebook folder move
+(story 10). Root attachment continuity is also delivered.
 
 The split is by usable placement, not backend/frontend layers or equal slice
 counts. Reject a publish-now/preserve-on-web-later split: it would expose accepted
-files to loss. Root continuity must include its complete web/checkout loop and
-existing snapshot consumers. Nested support cannot be activated while folder
-operations can discard contents. Both stories use the same attachment concept.
+files to loss. Root continuity includes its complete web/checkout loop and
+existing snapshot consumers. Nested support stays safe because operations that
+would rehome files currently refuse instead of discarding contents. Both use
+the same attachment concept.
 
-If scope shrinks, nested support can be deferred while root continuity remains
-useful; nested browsing then waits too. Image stories retain their existing goals;
-refinement must identify whether their chosen file placement requires story 9,
-rather than silently narrowing them to root files. All original promises have an
-owner in the slice redistribution recorded in the delivered root-attachment plan
+Image stories retain their existing goals and can use delivered root or nested
+file placement. All original promises have an owner in the slice redistribution
+recorded in the delivered root-attachment plan
 (`.planning/quick/002-notebook-attachment-continuity/PLAN.md` at `6b906462dd`,
 section "Redistribution of the original 15 slices").
 
 ## Open Refinement Details
 
-- Story 9 is refined; its plan owns slice readiness. Story 11 needs story
-  refinement and plan realignment before slice refinement/execution.
+- Story 11 needs story refinement and plan realignment before slice
+  refinement/execution.
 - Story 8 owns common guidance folder identification and assimilation/ignore
   behavior; the owner deferred those decisions until its refinement.
 - Image stories must establish existing ownership, sharing, reference spelling,
@@ -403,19 +311,6 @@ Git integration need their own selected outcomes.
 
 ## Breadcrumbs
 
-- Owner-requested resplit: former story 6 becomes root continuity (same identity)
-  plus nested continuity (story 9). First plan refined in place; later plan held
-  for story refinement. No implementation, completed slices or scope discarded.
-- Owner refinement, 2026-09-21 (story 9): goal reframed as publishing a real
-  checkout; dot-folders get default handling; a folder whose last file is removed
-  locally is dissolved; ZIP export is out of scope and queued for removal
-  (SEED-009#story-46); a cross-notebook move of a folder with files is refused
-  for now and queued as story 10. After seeing a clash example the owner chose
-  atomic refusal for a dissolve/merge filename clash.
-- Owner-requested resplit, 2026-09-21: story 9 looked big. It keeps publication
-  and the operations that need no file rehoming; dissolve/merge with files
-  becomes story 11, refused until then. A split into "web safety first,
-  publication second" was rejected: its first story would show no value.
 - Owner direction, 2026-09-20: AI IDEs alongside Web Donut; portable attachments
   and image files; web browsing, download, and deletion.
 - Owner clarification: all Markdown retains the existing cohesive behavior,

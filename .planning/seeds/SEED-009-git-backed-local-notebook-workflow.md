@@ -63,8 +63,9 @@ data; invalid or ambiguous changes must not silently discard work.
   live Portable tree stays: Git cutover, history reset, accepted web changes and
   drift detection still read it. Less code is the main value.
 - **Effort hypothesis:** S–M, medium confidence; mostly deletion.
-- **Depends on:** None. Queued right after SEED-035#story-9 by owner instruction,
-  which is why that story proves nothing about ZIP output.
+- **Depends on:** None. Queued immediately after delivered nested attachment
+  continuity by owner instruction; that delivery intentionally proved nothing
+  about ZIP output.
 - **Safe stopping point:** Complete on its own; nothing later needs it.
 - **Open decisions for refinement:**
   - ZIP export needs only read access, while Git bundle download needs full

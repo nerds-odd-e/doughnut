@@ -5,9 +5,12 @@ Work item: `.planning/quick/008-repair-attachment-contract-link/PLAN.md`.
 
 ## Source and bounded outcome
 
-- Source: execution retrospective of
-  [SEED-035#story-9](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-9)
-  and plan 003. Reviewed published implementation commits:
+- Source: execution retrospective of completed `SEED-035#story-9` and plan
+  003. Their deleted live history is recoverable from before-cleanup commit
+  `653f5ce5a7365a4296c3206dcdf554bdccd28fb0` at
+  `.planning/seeds/SEED-035-ai-workspace-supporting-files.md#story-9` and
+  `.planning/quick/003-notebook-folder-attachments/PLAN.md`. Reviewed published
+  implementation commits:
   `41432e75e9`, `eb45391b29`, `c3ef810931`, `2971b7eb08`, `af23aba73b`,
   `c8ce42da17`, `53bf499f7a`, `474b8e1a69`, `cbd8d0bdb1`, `34fd2fe9bc`,
   `70b9116e13`, and `6125fe0c3d`.
