@@ -27,15 +27,17 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 * SQL migrations: `backend/src/main/resources/db/migration/`
 * Java migrations: `backend/src/main/java/db/migration/`
 * Files follow the naming convention: `V{version}__{description}.sql` (or `.java`)
-    * Example: `V300000334__rename_a_column.sql` (version must exceed **`300000333`**)
+    * Example: `V300000340__rename_a_column.sql` (version must exceed **`300000339`**)
 
 ## Version Numbering
 
 * Versions use a numerical format
 
-The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; **`V300000333__notebook_follows_folder_containment.sql`** is the newest file. Version **`300000330`** is retired — its migration was deleted after production applied it — and stays reserved in `flyway_schema_history`.
+The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; **`V300000339__db_migration_placeholder.sql`** is the newest file: a no-op tip placeholder above every version ever applied. Version **`300000330`** is retired — its migration was deleted after production applied it — and stays reserved in `flyway_schema_history`.
 
-New migrations need to use a **greater** version number than **`300000333`**.
+New migrations need to use a **greater** version number than **`300000339`**.
+
+**Freeze:** new schema migrations are frozen until the squash that removes the spent upgrade chain below the `300000339` tip placeholder is deployed (see Squashing historical migrations).
 
 ### Migration Process
 
@@ -46,7 +48,7 @@ New migrations need to use a **greater** version number than **`300000333`**.
 ## Migration file structure
 
 * **`V100000000__baseline.sql`** holds the collapsed full DDL (fresh installs).
-* **`V300000333__notebook_follows_folder_containment.sql`** is the newest file; **`300000330`** is retired and reserved (its migration file was removed after production applied it) — add new migrations with a version higher than **`300000333`**.
+* **`V300000339__db_migration_placeholder.sql`** is the no-op tip placeholder; the next-version rule, the retired version, and the current freeze are under Version Numbering.
 * Each **new** file after that should contain one atomic change (create/alter/rename/drop as needed).
 
 ## Best Practices:

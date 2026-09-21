@@ -186,6 +186,67 @@ satisfy them. A deliberate stop of all incompatible instances can replace the
 rolling stages only when that maintenance procedure is explicitly selected.
 Deployment waits do not prevent independent final attachment assessment.
 
+## Release handoff 1 - DONE (2026-09-21)
+
+**Owner released `main` and reported both read-only production checks passing** on
+`doughnut-db-instance` (database `doughnut`):
+- Check A, Flyway history >= 300000334: `300000334` create notebook git accepted object,
+  `300000335` create notebook attachment, `300000336` BackfillNotebookGitAcceptedObjects,
+  `300000337` allow notebook git binding without bundle bytes - **all `success = 1`**. The
+  backfill did not fail, so no conversion stop occurred.
+- Check B, bindings whose accepted head is missing from native storage: **0 rows**. No notebook
+  needs a history reset from this check.
+
+**Gate A satisfied** for production: the backfill completed and every current accepted head is
+present natively. **Gate B satisfied** for production: the column-independent application (9b)
+is deployed and no old bundle-authority server remains, since the release replaced it. The full
+reachable-graph completeness check still runs inside slice 10's own migration, immediately before
+the destructive DDL. Development is the owner's local environment and runs `main` directly.
+
+### Original handoff instructions (kept for the record)
+
+**Merged to `main` at `c661bf9c0c`** (story branch head `c8105cde7e`, which first merged
+`origin/main` at `1687055556` cleanly). Verified on the merged code before pushing `main`: B
+**2,569 tests, 0 failures** (2,567 + 2 from `main`'s spelling fix) and E **40/40**. Contents
+new to production: story 2's native storage and backfill `V300000336`, `V300000337` (column
+nullable), 9b (column no longer read or written), 15b, 17 (saves ~0.6x the old time), and the
+temporary measurement harness (excluded from CI).
+
+**This release is production's native-storage cutover and must not overlap old and new
+servers.** Facts from this repo: the app runs as managed instance group `doughnut-app-group`
+in `us-east1-b`, created with `--size 2` (`infra/gcp/scripts/create-app-mig.sh`); the deploy's
+rolling replace uses `--max-surge 0 --max-unavailable 1`
+(`infra/gcp/scripts/perform-rolling-replace-app-mig.sh`), which on two servers keeps one old
+server serving while the other is replaced. An old server records saves only in `bundle_bytes`;
+a notebook saved there during the overlap gets an accepted head the native store lacks and then
+fails loudly on its next save until reset. With the group at size 1 the same rolling replace stops
+the only old server before starting the new one - no overlap.
+
+Steps handed to the owner:
+1. `gcloud compute instance-groups managed resize doughnut-app-group --size 1 --zone us-east1-b`,
+   and wait until the group is stable.
+2. Create the release from `main` (`c661bf9c0c` or later) as usual. Brief downtime is expected
+   while the new server boots; afterwards the startup migrations run, including the backfill, and
+   notebooks not yet converted fail to save until it finishes.
+3. After the deploy is healthy, run the two read-only checks below against production.
+4. Only if both pass: `gcloud compute instance-groups managed resize doughnut-app-group --size 2 --zone us-east1-b`.
+
+Read-only production checks:
+- Migrations applied:
+  `SELECT version, description, success FROM flyway_schema_history WHERE CAST(version AS UNSIGNED) >= 300000334 ORDER BY installed_rank;`
+  - every row must have `success = 1`, and `300000337` must be present. **If `300000336`
+  failed, stop and report before doing anything else**: a single corrupt legacy binding aborts the
+  backfill, `V300000337` then never applies, and notebook creation fails on the `NOT NULL` column.
+- Every binding's accepted head is in native storage:
+  `SELECT b.id, b.notebook_id FROM notebook_git_binding b WHERE NOT EXISTS (SELECT 1 FROM notebook_git_accepted_object o WHERE o.notebook_git_binding_id = b.id AND o.git_object_id = b.accepted_git_object_id);`
+  - should return no rows; any notebook listed needs its history reset (owner decision 2).
+  The full reachable-graph check runs inside slice 10's migration before the column drop.
+
+**Resume point after the owner reports the release:** slice 10 (drop `bundle_bytes`, running
+`NotebookGitAcceptedHistoryCompleteness.requireEveryAcceptedHistoryComplete` before the DDL) and
+slice 11 (migration checkpoint) - together the **second release**. Then slices 12 and 14. Keep
+using this branch and worktree; the backlog entry stays **Taken**.
+
 ## Ordered slices
 
 Target about five minutes per execution leaf including focused proof; scrutinize
@@ -1267,7 +1328,7 @@ demonstrates that a test in `com.odde.donut.services.notebookGit` can autowire t
 store directly. Moving those fixtures into that package would retire the helper.
 
 ### 10. Remove redundant persisted bundles
-Type: Behavior. Status: planned; deployment depends on Gate B.
+Type: Behavior. Status: done (code); ships in release 2. Gate B satisfied by release 1.
 
 Given verified native histories and only column-independent running versions,
 the next migration removes `bundle_bytes`; users can still edit, publish and
@@ -1279,8 +1340,60 @@ check made while incompatible writers could still run. Proof: V, E and D;
 live rollout uses the release runbook and Gate B. Size: ~5 active minutes plus
 engine and release waits. Migration version is allocated at implementation time.
 
+**Delivered.** New Java migration
+`backend/src/main/java/db/migration/V300000338__DropNotebookGitBindingBundleBytes.java`: `migrate()`
+calls `NotebookGitAcceptedHistoryCompleteness.requireEveryAcceptedHistoryComplete(connection)` first
+and only then runs `ALTER TABLE notebook_git_binding DROP COLUMN bundle_bytes`; a throw leaves before
+any DDL. Version 300000338 verified above every file on disk, every version named across all refs in
+Git history, and the worktree schema's history (at 300000337 before). Fresh install migrates cleanly
+through 338 (319 creates the column, 336 backfills nothing on an empty database, 337 relaxes it, 338
+drops it).
+
+**Test-schema consequence, handled.** `migrateTestDB` drops the column from the shared test schema
+too, so tests that wrote it could no longer run. **Deleted, not renamed:**
+`NotebookGitAcceptedObjectBackfillTest`, `NotebookGitUpgradeRehearsalTest` and
+`NotebookGitUpgradeRehearsalEnvironment` - their subject was the column and its backfill, which ran
+and was verified in production (Gate A). **Kept and re-expressed** as
+`backend/src/test/java/db/migration/NotebookGitAcceptedHistoryCompletenessTest.java` (4 tests),
+because the drop still depends on the check: a complete binding passes; a binding missing its head
+commit, a tree, or a blob blocks, with the message naming only the incomplete binding. The blob case
+stays falsifiable (disabling the blob-membership test made only it fail).
+`NotebookGitJdbcFixture`'s insert no longer names the column and its bundle-bytes overload is gone.
+Migration source (`V300000319`, `V300000336` + backfill class, `V300000337`, `V300000338`) stays until
+slice 12. Suite count unchanged at 2,569 (4 deleted, 4 added).
+
+**Rehearsal on isolated populated MySQL (one-time, scripts in the job scratch directory, not
+tracked):** migrated a disposable schema to 300000337 with
+`SPRING_FLYWAY_TARGET=300000337 CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB`
+(existing task, no new infrastructure), loaded three real Git histories with legacy bundle bytes, one
+missing reachable blob `e99a7ec0...`. Running migrate: **exit 1, `binding 3 is missing
+e99a7ec082e1fb002a8419e667863a7b1c5da732`, history `300000338 success=0`, column still present.**
+After inserting the blob: exit 0, `repair()` removed the failed row, `300000338 success=1`, **column
+gone**, every binding intact.
+
+**Production behavior if the check fails - the earlier expectation was wrong.** It was assumed the app
+would keep running and simply retry. Traced in code: the failure escapes
+`FlyWayFreeVersionRealMigration.actualMigration()` on `ApplicationReadyEvent`; Spring Boot's
+`SpringApplication.run` catches it, closes the application context and rethrows, so the JVM exits.
+`infra/gcp/scripts/add-mig-autohealing.sh` then recreates the instance, which retries after
+`flyway.repair()` removes the failed row - a **restart loop until the data is fixed**. No DDL runs, so
+nothing is lost. **Consequence for release 2: keep two servers.** The rolling replace
+(`--max-surge 0 --max-unavailable 1`) leaves the other, already column-independent server serving, so a
+failure degrades capacity and fails the deploy loudly instead of causing an outage. The looping
+server's log names the incomplete notebook; resetting it through the still-serving server lets the new
+one come up by itself. Resizing to one server for this release would turn a failure into a full outage.
+Likelihood is low: release 1's check B found every accepted head present, and every save since writes
+complete histories.
+
+Proof: V `CURSOR_DEV=true nix develop -c pnpm backend:verify` exit 0, 2,569 tests, 0 failures
+(coordinator re-ran the full suite on the final tree: 2,569, 0 failures); E 40/40 against the dropped
+schema; D no ERD diff (`DONUT_ERD_SCHEMA=doughnut_wt_14f749cc53694accb4e47498f7a2e996_test`).
+
+Housekeeping outside this slice: the `db-migration` skill still says new versions must exceed
+300000333; the real floor is now above 300000338. Slice 14 corrects it.
+
 ### 11. Establish the migration checkpoint
-Type: Behavior. Status: planned; rollout requires authorization.
+Type: Behavior. Status: done (code); ships in release 2 with slice 10. Gate C evidence pending the owner.
 
 Given the verified column-drop rollout, add a no-op checkpoint above every
 ever-applied migration version and confirm its application in every affected
@@ -1293,6 +1406,30 @@ runbook. Size: ~5 active minutes; release waits excepted. Stop safely with the
 upgrade machinery still present if a database has not crossed the checkpoint;
 the story remains incomplete. The checkpoint is a required migration floor,
 not an archive of the removed implementation.
+
+**Delivered.** Highest version ever used confirmed independently as **300000338**, across current SQL
+files (highest `V300000337`), current Java migrations (highest `V300000338`), every `V<number>__`
+filename ever committed on any ref (highest `V300000338`; the retired 300000330 is below it), and the
+worktree schema's history (`MAX(version) = 300000338`). New tip placeholder
+`backend/src/main/resources/db/migration/V300000339__db_migration_placeholder.sql` - comments only,
+no statements (coordinator-checked: zero non-comment lines) - stating that future migrations must be
+greater than 300000339 and that **new schema migrations are frozen until the squash that removes the
+spent upgrade chain is deployed**. `.agents/skills/db-migration/SKILL.md` no longer claims the newest
+file is `V300000333`: it names the `V300000339` placeholder, requires versions above 300000339, and
+states the freeze and its end condition; the squash steps themselves are left for slice 12.
+`AGENTS.md`/`CLAUDE.md` carry none of these version numbers. The freeze is documentation only - no
+tooling enforces it.
+
+Proof in isolation: `backend:verify` on the upgraded worktree schema, exit 0, 2,569 tests, 0 failures,
+new row `300000339 | db migration placeholder | SQL | success 1` directly after `300000338`; and a
+**fresh install** (schema dropped and recreated empty, then `backend:verify`) ending at 300000339 with
+30 history rows, 0 failed, and no `bundle_bytes` column. No schema change, so no ERD diff.
+
+**Gate C evidence still required from the owner after release 2** - on production and every other
+long-lived database:
+`SELECT installed_rank, version, description, type, success, installed_on FROM flyway_schema_history WHERE version IN ('300000338','300000339') ORDER BY installed_rank;`
+and `SELECT MAX(CAST(version AS UNSIGNED)) FROM flyway_schema_history;` - expect 300000338 then
+300000339, both `success = 1`, and a maximum of 300000339. Only then may slice 12 delete files.
 
 ### 12. Remove the spent upgrade machinery
 Type: Structure. Status: planned; source removal depends on Gate C.

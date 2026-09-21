@@ -39,11 +39,6 @@ public final class NotebookGitJdbcFixture implements AutoCloseable {
   }
 
   public int insertBinding(String initialHeadObjectId) throws SQLException {
-    return insertBinding(initialHeadObjectId, null);
-  }
-
-  /** A pre-upgrade binding that still retains {@code bundleBytes} in its legacy column. */
-  public int insertBinding(String initialHeadObjectId, byte[] bundleBytes) throws SQLException {
     int notebookId = ThreadLocalRandom.current().nextInt(1_500_000_000, 2_000_000_000);
     try (Connection connection = openConnection()) {
       try (Statement pragma = connection.createStatement()) {
@@ -51,13 +46,12 @@ public final class NotebookGitJdbcFixture implements AutoCloseable {
       }
       String sql =
           "INSERT INTO notebook_git_binding "
-              + "(notebook_id, accepted_git_object_id, bundle_bytes, created_at, updated_at) "
-              + "VALUES (?, ?, ?, NOW(), NOW())";
+              + "(notebook_id, accepted_git_object_id, created_at, updated_at) "
+              + "VALUES (?, ?, NOW(), NOW())";
       try (PreparedStatement statement =
           connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
         statement.setInt(1, notebookId);
         statement.setString(2, initialHeadObjectId);
-        statement.setBytes(3, bundleBytes);
         statement.executeUpdate();
         try (ResultSet keys = statement.getGeneratedKeys()) {
           keys.next();

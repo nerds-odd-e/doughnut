@@ -165,7 +165,7 @@ class NotebookGitConcurrentProjectionDriftControllerTest
   }
 
   /**
-   * Verifies the retained bundle after a content drift is one exact linear advance: the new head
+   * Verifies the accepted bundle after a content drift is one exact linear advance: the new head
    * matches the binding, its note.md agrees with the freshly loaded database projection, and its
    * sole parent is the prior accepted head.
    */

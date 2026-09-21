@@ -52,8 +52,8 @@ final class NotebookGitAcceptedHistoryCompleteness {
   }
 
   /** The first object reachable from the binding's accepted head that native storage lacks. */
-  static Optional<ObjectId> firstMissingReachableObject(Connection connection, int bindingId)
-      throws SQLException, IOException {
+  private static Optional<ObjectId> firstMissingReachableObject(
+      Connection connection, int bindingId) throws SQLException, IOException {
     Set<String> stored = storedObjectIds(connection, bindingId);
     try (JdbcNotebookGitRepository repository =
             new JdbcNotebookGitRepository(bindingId, connection);

@@ -67,9 +67,6 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
     assertThat(
         afterReset.getAcceptedGitObjectId(), not(equalTo(driftedBinding.getAcceptedGitObjectId())));
 
-    // Read back through the production download path (native object store), not the JPA
-    // bundle_bytes column directly, so this proves the reset's content is genuinely durable in
-    // native storage rather than only reflected in a field the download never has to consult.
     byte[] downloadedAfterReset =
         controller
             .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())

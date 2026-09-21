@@ -95,10 +95,6 @@ class NotebookGitRootAttachmentLocalChangeControllerTest
     ObjectId tip;
     byte[] proposalBytes;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      // Fetch the accepted history through the live download endpoint, not the JPA bundle_bytes
-      // column directly: once a binding's saves move onto native object storage, that column is
-      // no longer kept in sync with the accepted head, so it would seed this scratch repository
-      // with a stale (or missing) object graph.
       byte[] currentBundle =
           controller
               .downloadNotebookGitBundle(
