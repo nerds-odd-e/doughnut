@@ -772,8 +772,38 @@ the run exists, is discoverable moments later, and goes on to succeed.
     `CI_COVERAGE_UNAVAILABLE` as final, would likely have prevented every one
     of these four false negatives.
 
+## DD-097 — Coordinator implemented a planned slice locally during multi-slice execution
+
+`dough-execute-plan` assigns each planned slice to a fresh implementation agent and allows local implementation only for a single interactive slice. Slice 1 of a three-slice plan was edited in the coordinator session.
+
+### Occurrences
+
+- Execution: quick/008-remove-zip-export / 38b5e1ef69
+  - Timestamp: 2026-09-21T22:08:41+08:00
+  - Tool: Cursor
+  - Model: Cursor Grok 4.7
+  - Open Dough release: 0.3.27
+  - Evidence: conversation implementing catalog/settings and E2E harness edits directly; commit `38b5e1ef69` on `codex/remove-zip-export`. Slices 2 and 3 were delegated.
+  - Observed effect: slice 1 was committed with its planned frontend proof. No separate implementation-agent return exists for that slice.
+  - Inference: the single-slice local exception was applied to the first slice of a multi-slice plan. The record does not show a product defect from that choice.
+
+## DD-098 — Coordinator accepted its own refactor pass without a fresh refactor agent
+
+Slice delivery requires a fresh `dough-post-change-refactor` agent and a verbatim `## REFACTOR COMPLETE` marker before commit. For each delivered slice the coordinator judged the diff itself and committed without that marker.
+
+### Occurrences
+
+- Execution: quick/008-remove-zip-export / 38b5e1ef69
+  - Timestamp: 2026-09-21T22:08:41+08:00
+  - Tool: Cursor
+  - Model: Cursor Grok 4.7
+  - Open Dough release: 0.3.27
+  - Evidence: same execution as DD-097; commits `38b5e1ef69`, `4711b98d93`, and `670f8e7313` have no refactor-agent report. The coordinator's slice 1 note was a local grep of notebook components.
+  - Observed effect: delivery continued and the three commits landed. No independent refactor findings were recorded.
+  - Inference: deletion-heavy slices made a missed cohesion issue less likely, but the required second reader did not run.
+
 ## Retention
 
-- Highest allocated local number: 95
+- Highest allocated local number: 98
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial
