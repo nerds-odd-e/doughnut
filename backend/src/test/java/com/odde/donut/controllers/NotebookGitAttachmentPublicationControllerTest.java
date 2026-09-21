@@ -5,11 +5,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
@@ -23,10 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-/**
- * Attachments become accepted Portable content through the ordinary publication boundary and
- * survive the next web note save unchanged.
- */
 class NotebookGitAttachmentPublicationControllerTest
     extends NotebookGitWebContentControllerTestBase {
 
@@ -38,6 +38,7 @@ class NotebookGitAttachmentPublicationControllerTest
   private static final byte[] CAPITALIZED_DIAGRAM = {(byte) 0x80, 0x00, (byte) 0xC3};
 
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
+  @Autowired FolderRepository folderRepository;
 
   @Test
   void publishedRootFilesAreTheExactAcceptedTipAndSurviveTheNextWebNoteSave() throws Exception {
@@ -96,6 +97,33 @@ class NotebookGitAttachmentPublicationControllerTest
         contains(PortableTreeEntry.ofText("reference.json", REFERENCE_JSON)));
     assertThat(committedNoteIds(notebook), empty());
     assertThat(countFoldersForNotebook(notebook.getId()), is(0L));
+  }
+
+  @Test
+  void anInitialPublicationMayContainOnlyAFileInNestedFolders() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
+    String attachmentPath = "tools/cache/reference.json";
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        empty.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            empty, List.of(new NotebookGitProposalFile(attachmentPath, REFERENCE_JSON))));
+
+    assertThat(
+        acceptedTip(notebook).entries(),
+        contains(PortableTreeEntry.ofText(attachmentPath, REFERENCE_JSON)));
+    List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(folders, hasSize(2));
+    Folder tools = folders.get(0);
+    assertThat(tools.getName(), equalTo("tools"));
+    assertThat(tools.getParentFolderId(), nullValue());
+    assertThat(tools.getReadmeContent(), nullValue());
+    Folder cache = folders.get(1);
+    assertThat(cache.getName(), equalTo("cache"));
+    assertThat(cache.getParentFolderId(), equalTo(tools.getId()));
+    assertThat(cache.getReadmeContent(), nullValue());
   }
 
   @Test

@@ -28,6 +28,7 @@ class NotebookGitProposalAcceptance {
   private final EntityPersister entityPersister;
   private final NotebookAttachmentRepository attachmentRepository;
   private final NotebookGitProposalFolderMaterialization folderMaterialization;
+  private final NotebookGitStateLoader stateLoader;
 
   NotebookGitProposalAcceptance(
       NotebookGitProjection projection,
@@ -35,13 +36,15 @@ class NotebookGitProposalAcceptance {
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
       NotebookAttachmentRepository attachmentRepository,
-      NotebookGitProposalFolderMaterialization folderMaterialization) {
+      NotebookGitProposalFolderMaterialization folderMaterialization,
+      NotebookGitStateLoader stateLoader) {
     this.projection = projection;
     this.repositoryStore = repositoryStore;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
     this.attachmentRepository = attachmentRepository;
     this.folderMaterialization = folderMaterialization;
+    this.stateLoader = stateLoader;
   }
 
   String acceptMatchingProposedTree(
@@ -55,9 +58,10 @@ class NotebookGitProposalAcceptance {
       NotebookGitStateLoader.LockedNotebookState published,
       NotebookGitProposalImporter.ImportedProposal proposal,
       Timestamp publishedAt) {
-    projectAttachments(published.notebook(), published.folders(), proposal);
+    NotebookGitStateLoader.LockedNotebookState withAttachmentFolders =
+        projectAttachments(published, proposal);
     NotebookGitStateLoader.LockedNotebookState reconciled =
-        requireMatchingProposedTree(published, proposal);
+        requireMatchingProposedTree(withAttachmentFolders, proposal);
     return repositoryStore.store(reconciled.binding(), proposal.repository(), publishedAt);
   }
 
@@ -68,10 +72,10 @@ class NotebookGitProposalAcceptance {
    * key cannot trip. This runs before the tip comparison, so the compared tree is the complete
    * post-mutation result.
    */
-  private void projectAttachments(
-      Notebook notebook,
-      List<ExportFolderRow> folders,
+  private NotebookGitStateLoader.LockedNotebookState projectAttachments(
+      NotebookGitStateLoader.LockedNotebookState published,
       NotebookGitProposalImporter.ImportedProposal proposal) {
+    Notebook notebook = published.notebook();
     Map<String, byte[]> proposed = new HashMap<>();
     for (PortableTreeEntry entry :
         NotebookGitAcceptedTree.readEntries(proposal.repository(), proposal.mainHead())) {
@@ -79,9 +83,11 @@ class NotebookGitProposalAcceptance {
         proposed.put(entry.path(), entry.content());
       }
     }
-    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
     Map<String, Folder> foldersByPath =
         folderMaterialization.ensureAncestry(notebook, proposed.keySet().stream().toList());
+    entityPersister.flush();
+    List<ExportFolderRow> folders = stateLoader.foldersOf(notebook);
+    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
     for (NotebookAttachment stored : attachmentRepository.findByNotebook_Id(notebook.getId())) {
       byte[] content = proposed.remove(attachmentPath(stored, folderById));
       if (content == null) {
@@ -93,6 +99,8 @@ class NotebookGitProposalAcceptance {
     }
     proposed.forEach((path, content) -> persistAttachment(notebook, foldersByPath, path, content));
     entityPersister.flush();
+    return new NotebookGitStateLoader.LockedNotebookState(
+        published.binding(), notebook, folders, published.storedNotes());
   }
 
   private static String attachmentPath(

@@ -20,7 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–8 are done with accepted proof; 4 Behavior slices remain
+- State: slices 1–9 are done with accepted proof; 3 Behavior slices remain
   planned. Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
@@ -312,7 +312,7 @@ deferred to slice 9.
 
 ### 9. Publish a folder that holds only files
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given an empty accepted notebook (the real first-publish situation),
 publishing only `tools/cache/reference.json` is accepted; `tools` and
 `tools/cache` exist as folders on the web with no invented README and no
@@ -323,6 +323,17 @@ Also: update `docs/notebook-git-synchronization.md` "Root attachments today" to
 describe folder placement and the interim refusals, and the
 `NotebookAttachment`/tree-shape Javadoc.
 Proof: one case in the publication test class.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,574 backend tests. The new
+`NotebookGitAttachmentPublicationControllerTest.anInitialPublicationMayContainOnlyAFileInNestedFolders`
+starts from an empty accepted notebook, publishes only
+`tools/cache/reference.json`, and observes the exact path and bytes, the two
+web folders with their proper ancestry and null Readmes, and no invented
+README or `.keep`. Attachment ancestry is now materialized and the folder
+snapshot refreshed before final-tree comparison. The synchronization contract
+now documents folder placement and the temporary folder-operation refusals in
+`docs/notebook-git-attachments.md`, linked from the established synchronization
+document.
 
 ### 10. Local file edits, renames and removals in folders; the last file removed dissolves the folder
 Type: Behavior
@@ -404,3 +415,13 @@ folder operation either carries files or refuses loudly.
 - Slice 5 made `FolderSubtree` the single Spring-managed owner of subtree
   traversal and the temporary attachment guard; slice 6 reuses that owner
   rather than adding another repository check.
+- Slice 9 located the previously uncertain call point inside attachment
+  acceptance: folder ancestry was persisted, but final comparison still held
+  the pre-materialization folder snapshot. Refreshing that snapshot at the
+  same acceptance boundary lets attachment-only folders participate in the
+  existing one-tree comparison.
+- CI run 35612309734 for slice 8 failed one E2E shard before project setup:
+  Docker Hub returned `504 Gateway Timeout` to `docker/login-action@v4`.
+  No product command or E2E scenario ran, so this was classified as external
+  registry infrastructure rather than an owned-code failure; no repair or
+  rerun was started.
