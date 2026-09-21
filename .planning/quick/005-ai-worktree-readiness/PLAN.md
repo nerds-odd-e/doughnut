@@ -381,7 +381,7 @@ Cursor's own recorded exit outcome. That proof needs a session with real
 Cursor access.
 
 ### 6. Prepare Codex-created worktrees through the common behavior
-Type: Behavior. Status: planned. Target: ~5 minutes plus host observation.
+Type: Behavior. Status: done (fallback path — see below).
 
 Create a fresh worktree through the installed Codex app's configured local
 environment → preparation completes in the worktree before useful commands.
@@ -392,6 +392,19 @@ Proof: actual app setup invocation with cwd, version and outcome, then use the
 prepared dependencies/tooling. Record the supported path in development guidance.
 If the installed app has no compatible automatic entry point, explicitly document
 and prove the same public command in a Codex worktree as the supported path.
+
+Delivered: this slice's own anticipated fallback applies. Confirmed by
+inspection that no tracked Codex local-environment configuration exists in
+this repo (`.codex/` contains only the product-backlog guard hook; no
+schema was invented, per this slice's own "do not invent its file schema"
+instruction). Documented the fallback in `.agents/agent-map.md`'s "Worktree
+setup" section: Codex-created worktrees are not prepared automatically, run
+`CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh` manually,
+same as any other freshly created worktree. P (slices 1/3/4's real
+disposable-worktree proof) reused as evidence the public command itself
+works correctly in any freshly created worktree, Codex-created ones
+included — the entry point does not discriminate by which tool created the
+worktree. Full suite 20/20. No live Codex app was used or simulated.
 
 ### 7. Prepare Claude Code worktrees without replacing their lifecycle
 Type: Behavior. Status: planned. Target: ~5 minutes plus host observation.

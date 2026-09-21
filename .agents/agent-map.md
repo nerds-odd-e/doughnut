@@ -38,8 +38,11 @@ entry point: it links skill discovery and installs dependencies (fingerprint-
 gated, so repeats are cheap) without starting MySQL/Redis or a Biome daemon.
 Cursor's `.cursor/worktrees.json` `setup-worktree` hook already invokes this
 script (`CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh`) when
-Cursor creates a worktree, so Cursor-created worktrees prepare automatically;
-run the command manually in any other freshly created worktree.
+Cursor creates a worktree, so Cursor-created worktrees prepare automatically.
+Codex has no tracked environment-setup configuration in this repo (`.codex/`
+contains only the product-backlog guard hook, nothing under a local-environment
+schema), so Codex-created worktrees are not prepared automatically — run the
+command manually there, same as any other freshly created worktree.
 
 ## Commands
 
