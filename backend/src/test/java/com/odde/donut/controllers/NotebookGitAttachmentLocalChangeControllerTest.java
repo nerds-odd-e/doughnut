@@ -11,28 +11,21 @@ import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
-import java.util.ArrayList;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedTip;
 import java.util.List;
 import java.util.stream.Stream;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * A local file-only range publishes exactly its final root-file set, with no Markdown edit and no
- * Attachment rename correspondence. Edit, rename and removal share that one rule, so a name the
- * range left behind is absent from both the accepted tip and the live projection, and a
- * multi-commit range lands as its final set instead of being replayed as live mutations.
- */
 class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControllerTestBase {
 
   private static final String NOTE_MARKDOWN = "---\ntype: Note\n---\naccepted content";
@@ -53,6 +46,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
   private static final List<PortableTreeEntry> BASELINE = List.of(DIAGRAM, NOTE, TWIN, REFERENCE);
 
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
+  @Autowired FolderRepository folderRepository;
 
   private static Stream<FileOnlyChange> fileOnlyChanges() {
     return Stream.of(
@@ -136,7 +130,45 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
     assertThat(committedRootAttachmentNames(notebook), not(hasItem("interim.json")));
   }
 
-  /** The accepted starting point: one note beside three root files, two of them byte-identical. */
+  @Test
+  void nestedFileChangesBecomeExactlyTheirFinalSetAndDissolveEmptyFolders() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
+    PortableTreeEntry nestedDiagram =
+        new PortableTreeEntry("physics/diagrams/force.png", DIAGRAM_BYTES);
+    PortableTreeEntry nestedReference = ofText("tools/cache/reference.json", REFERENCE_JSON);
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        empty.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            empty, NotebookGitProposalFile.asProposal(List.of(nestedDiagram, nestedReference))));
+
+    PortableTreeEntry renamedDiagram =
+        new PortableTreeEntry("physics/diagrams/free-body.png", DIAGRAM_BYTES);
+    PortableTreeEntry editedReference =
+        ofText("tools/cache/reference.json", CHANGED_REFERENCE_JSON);
+    List<PortableTreeEntry> editedAndRenamed = List.of(renamedDiagram, editedReference);
+    NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        accepted.getAcceptedGitObjectId(),
+        proposalBundleBytes(accepted, NotebookGitProposalFile.asProposal(editedAndRenamed)));
+
+    assertThat(acceptedTip(notebook).entries(), equalTo(editedAndRenamed));
+    assertThat(committedAttachmentTree(notebook), equalTo(editedAndRenamed));
+
+    List<PortableTreeEntry> referenceRemoved = List.of(renamedDiagram);
+    accepted = reloadCommittedBinding(notebook.getId());
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        accepted.getAcceptedGitObjectId(),
+        proposalBundleBytes(accepted, NotebookGitProposalFile.asProposal(referenceRemoved)));
+
+    assertThat(acceptedTip(notebook).entries(), equalTo(referenceRemoved));
+    assertThat(committedAttachmentTree(notebook), equalTo(referenceRemoved));
+    assertThat(committedFolderPaths(notebook), equalTo(List.of("physics", "physics/diagrams")));
+  }
+
   private NotebookGitBinding publishBaseline(Notebook notebook) throws Exception {
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     controller.publishNotebookGitProposal(
@@ -147,11 +179,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
     return reloadCommittedBinding(notebook.getId());
   }
 
-  /**
-   * The accepted tip and the live projection both hold exactly {@code finalTree}; every baseline
-   * name the range left behind is gone from both; and the Attachments created no note identity or
-   * learning data of their own.
-   */
+  /** The accepted tip and live projection hold exactly the final Attachment set. */
   private void assertFinalRootFileSet(
       Notebook notebook, AcceptedTip published, List<PortableTreeEntry> finalTree) {
     assertThat(published.entries(), equalTo(finalTree));
@@ -176,7 +204,9 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
         is(empty()));
 
     assertThat(committedNoteTitles(notebook), contains("Root Note"));
-    assertThat(countMemoryTrackersForNotebook(notebook.getId()), is(0L));
+    assertThat(
+        NotebookLiveProjectionTestReader.memoryTrackerCount(entityManager, notebook.getId()),
+        is(0L));
   }
 
   private List<PortableTreeEntry> committedRootAttachments(Notebook notebook) {
@@ -193,37 +223,19 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
         transactionManager, noteRepository, notebook.getId());
   }
 
-  private long countMemoryTrackersForNotebook(Integer notebookId) {
-    return ((Number)
-            entityManager
-                .createNativeQuery(
-                    "SELECT COUNT(*) FROM memory_tracker mt "
-                        + "JOIN note n ON mt.note_id = n.id WHERE n.notebook_id = :notebookId")
-                .setParameter("notebookId", notebookId)
-                .getSingleResult())
-        .longValue();
+  private List<PortableTreeEntry> committedAttachmentTree(Notebook notebook) {
+    return NotebookLiveProjectionTestReader.attachmentTree(
+        transactionManager, notebookAttachmentRepository, folderRepository, notebook.getId());
+  }
+
+  private List<String> committedFolderPaths(Notebook notebook) {
+    return NotebookLiveProjectionTestReader.folderPaths(
+        transactionManager, folderRepository, notebook.getId());
   }
 
   private AcceptedTip acceptedTip(Notebook notebook) throws Exception {
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
-        RevWalk revWalk = new RevWalk(repository)) {
-      RevCommit head = revWalk.parseCommit(GitBundleTestReader.fetchHead(repository, downloaded));
-      List<ObjectId> ancestry = new ArrayList<>();
-      for (RevCommit walked = head; walked.getParentCount() > 0; ) {
-        walked = revWalk.parseCommit(walked.getParent(0));
-        ancestry.add(walked.getId());
-      }
-      return new AcceptedTip(
-          head.getId(), ancestry, GitBundleTestReader.readTreeEntries(repository, head));
-    }
+    return GitBundleTestReader.fetchAcceptedTip(acceptedBundleBytes(notebook));
   }
-
-  private record AcceptedTip(
-      ObjectId head, List<ObjectId> ancestry, List<PortableTreeEntry> entries) {}
 
   /** One local file-only range, named by the lifecycle operation it performs on the baseline. */
   private record FileOnlyChange(String name, List<PortableTreeEntry> finalTree) {

@@ -20,7 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–9 are done with accepted proof; 3 Behavior slices remain
+- State: slices 1–10 are done with accepted proof; 2 Behavior slices remain
   planned. Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
@@ -337,7 +337,7 @@ document.
 
 ### 10. Local file edits, renames and removals in folders; the last file removed dissolves the folder
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given accepted `tools/cache/reference.json` and
 `physics/diagrams/force.png`, one publication that edits the JSON bytes and
 renames the picture yields exactly that tip; a second publication deleting
@@ -346,6 +346,14 @@ Both observations are one rule — the stored files become exactly the tip's set
 so they share one scenario. Expected: no production change (final-set rule plus
 `reconcileUnrepresentedFolders`, which already counts any entry path).
 Proof: one case in the renamed local-change test class.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,575 backend tests; the focused local-change
+class passed six. Its new controller scenario publishes nested JSON and image
+attachments, then publishes the edited JSON and renamed image and observes the
+exact accepted tip and committed attachment projection. A final publication
+removes the JSON and observes only the renamed image plus exactly the remaining
+`physics` and `physics/diagrams` folders. The existing final-set projection and
+unrepresented-folder reconciliation needed no production change.
 
 ### 11. A local folder rename keeps note identities and carries files
 Type: Behavior

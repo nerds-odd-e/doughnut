@@ -99,8 +99,8 @@ public final class GitBundleTestReader {
 
   /**
    * The Portable tree entries at the tip of a persisted binding's bundle, read through a scratch
-   * in-memory repository. For tests that only need the accepted tip's content; a test that also
-   * needs the tip commit itself opens its own repository and uses {@link #readTreeEntries}.
+   * in-memory repository. Tests that also need the tip identity or first-parent ancestry use {@link
+   * #fetchAcceptedTip(byte[])}.
    */
   public static List<PortableTreeEntry> fetchTipTreeEntries(byte[] bundleBytes)
       throws IOException, URISyntaxException {
@@ -109,6 +109,24 @@ public final class GitBundleTestReader {
       return readTreeEntries(repository, revWalk.parseCommit(fetchHead(repository, bundleBytes)));
     }
   }
+
+  /** The accepted tip, its first-parent ancestry, and its exact Portable tree content. */
+  public static AcceptedTip fetchAcceptedTip(byte[] bundleBytes)
+      throws IOException, URISyntaxException {
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk revWalk = new RevWalk(repository)) {
+      RevCommit head = revWalk.parseCommit(fetchHead(repository, bundleBytes));
+      List<ObjectId> ancestry = new ArrayList<>();
+      for (RevCommit walked = head; walked.getParentCount() > 0; ) {
+        walked = revWalk.parseCommit(walked.getParent(0));
+        ancestry.add(walked.getId());
+      }
+      return new AcceptedTip(head.getId(), ancestry, readTreeEntries(repository, head));
+    }
+  }
+
+  public record AcceptedTip(
+      ObjectId head, List<ObjectId> ancestry, List<PortableTreeEntry> entries) {}
 
   /**
    * The accepted history a bundle carries: every commit reachable from {@code refs/heads/main},
