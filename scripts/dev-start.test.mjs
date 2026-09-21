@@ -42,26 +42,27 @@ test('linked worktree refuses Development start without spawning', async (t) => 
       spawnFn: spawn.spawnFn,
       isPortOccupiedFn: async () => false,
     }),
-    /unconfigured primary|worktree isolation/
+    /primary checkout.*linked worktree isolation/
   )
   assert.equal(spawn.calls.length, 0)
 })
 
-test('configured primary refuses Development start without spawning', async (t) => {
+test('configured primary starts Development', async (t) => {
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(identityOnlyConfig),
   })
+  const runtimeTarget = targetFor(checkout.root)
   const spawn = makeStartSpy()
-  await assert.rejects(
-    runDevStart({
-      checkoutRoot: checkout.root,
-      runtimeTarget: targetFor(checkout.root),
-      spawnFn: spawn.spawnFn,
-      isPortOccupiedFn: async () => false,
-    }),
-    /unconfigured primary|worktree isolation/
-  )
-  assert.equal(spawn.calls.length, 0)
+  const code = await runDevStart({
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    spawnFn: spawn.spawnFn,
+    isPortOccupiedFn: async () => false,
+    healthcheckFn: healthyOnce,
+  })
+
+  assert.equal(code, 0)
+  assert.equal(spawn.calls.length, 1)
 })
 
 test('live Development pid refuses duplicate start without signalling', async (t) => {

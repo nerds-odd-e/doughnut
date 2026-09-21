@@ -104,11 +104,13 @@ The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/d
 
 **Local Development vs E2E / Cypress (ports and LB — source of truth):**
 
-**Development** (`pnpm dev` / `pnpm dev:restart`) runs only from an unconfigured
-primary checkout: Spring profile **`dev`**, database **`doughnut_development`**,
-backend **8081**, browser/LB **5175**, Vite **5176**, log **`dev.log`**. Local
-sign-in (e.g. `manual` / `password`). No Mountebank; no E2E testability/reset.
-Isolated E2E allocation never selects those Development ports.
+**Development** (`pnpm dev` / `pnpm dev:restart`) runs only from the primary
+checkout, configured or unconfigured: Spring profile **`dev`**, database
+**`doughnut_development`**, backend **8081**, browser/LB **5175**, Vite
+**5176**, log **`dev.log`**. Local sign-in (e.g. `manual` / `password`). Git
+linked worktrees refuse this persistent stack. No Mountebank; no E2E
+testability/reset. Isolated E2E allocation never selects those Development
+ports.
 
 **E2E** (`pnpm cy:run` / `pnpm test`) is disposable. Primary unconfigured
 checkouts and CI use the shared ports below. Cypress **`baseUrl`** in those

@@ -1,6 +1,8 @@
+import assert from 'node:assert/strict'
 import { writeFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
+import { runDevRestart } from './dev-restart.mjs'
 import {
   assertRefuseWithoutSignalOrStart,
   listenersForPorts,
@@ -14,6 +16,7 @@ import {
 import {
   allocateFreePort,
   closeServer,
+  identityOnlyConfig,
   listenTcp,
 } from './sut-isolated-fixtures.mjs'
 
@@ -144,7 +147,30 @@ test('linked worktree refuses Development restart without signalling', async (t)
         throw new Error('must not probe listeners for linked worktree')
       },
     }),
-    /unconfigured primary|worktree isolation/,
+    /primary checkout.*linked worktree isolation/,
     { kill, start }
   )
+})
+
+test('configured primary restarts Development', async (t) => {
+  const checkout = makePrimaryCheckout(t, {
+    config: JSON.stringify(identityOnlyConfig),
+  })
+  const runtimeTarget = targetFor(checkout.root)
+  const start = makeStartSpy()
+
+  const code = await runDevRestart({
+    checkoutRoot: checkout.root,
+    runtimeTarget,
+    getListenerPidsFn: async () => [],
+    runDevStartFn: async (options) => {
+      start.calls.push(options)
+      return 0
+    },
+  })
+
+  assert.equal(code, 0)
+  assert.deepEqual(start.calls, [
+    { checkoutRoot: checkout.root, runtimeTarget },
+  ])
 })

@@ -86,14 +86,16 @@ commands and parsing notes live in the `frontend-testing`,
 `backend-testing`, `cli`, `mcp-server`, or `e2e-authoring` skills.
 Raw profiles are local evidence and must not be committed.
 
-**Development vs E2E:** For manual product feedback from the unconfigured primary,
+**Development vs E2E:** For manual product feedback from the primary checkout,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
 `doughnut_development`, `dev.log` / `dev.pid`; restart with `pnpm dev:restart`;
-local sign-in e.g. `manual` / `password`). `pnpm cy:run` is the disposable E2E
-stack (http://localhost:5173/, profile `e2e`): each invocation starts and stops
-its own services. `pnpm cy:open` owns services for the interactive session.
-Do not ask developers to manage E2E services separately or restart Development
-after normal code changes; backend and frontend auto-reload.
+local sign-in e.g. `manual` / `password`). This includes a configured primary;
+Git linked worktrees refuse the persistent Development stack. `pnpm cy:run` is
+the disposable E2E stack (http://localhost:5173/, profile `e2e`): each
+invocation starts and stops its own services. `pnpm cy:open` owns services for
+the interactive session. Do not ask developers to manage E2E services
+separately or restart Development after normal code changes; backend and
+frontend auto-reload.
 
 ## Architectural decisions (ADRs)
 

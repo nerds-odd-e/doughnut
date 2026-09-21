@@ -6,7 +6,7 @@
 import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { worktreeIsolationApplies } from './browser-worktree-isolation.mjs'
+import { isLinkedGitWorktree } from './browser-worktree-isolation.mjs'
 import { runDevelopmentHealthcheck } from './dev-healthcheck.mjs'
 import { isProcessAlive, readLiveDevelopmentPid } from './development-pid.mjs'
 import { DEVELOPMENT_RUNTIME_TARGET } from './development-runtime.mjs'
@@ -66,10 +66,10 @@ export async function runDevStart({
   log = (s) => process.stdout.write(`${s}\n`),
   errLog = (s) => process.stderr.write(`${s}\n`),
 } = {}) {
-  if (worktreeIsolationApplies(checkoutRoot)) {
+  if (isLinkedGitWorktree(checkoutRoot)) {
     throw new Error(
-      'Development (`pnpm dev`) is only supported in the unconfigured primary checkout. ' +
-        'This checkout uses worktree isolation; refusing to start. Resources were left unchanged.'
+      'Development (`pnpm dev`) is only supported in the primary checkout. ' +
+        'This checkout uses linked worktree isolation; refusing to start. Resources were left unchanged.'
     )
   }
 

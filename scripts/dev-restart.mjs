@@ -6,7 +6,7 @@
  */
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { worktreeIsolationApplies } from './browser-worktree-isolation.mjs'
+import { isLinkedGitWorktree } from './browser-worktree-isolation.mjs'
 import { runDevStart } from './dev-start.mjs'
 import {
   isProcessAlive,
@@ -174,10 +174,10 @@ export async function runDevRestart({
   stopTimeoutMs = 5_000,
   portsFreeTimeoutMs = 15_000,
 } = {}) {
-  if (worktreeIsolationApplies(checkoutRoot)) {
+  if (isLinkedGitWorktree(checkoutRoot)) {
     throw new Error(
-      'Development (`pnpm dev:restart`) is only supported in the unconfigured primary checkout. ' +
-        'This checkout uses worktree isolation; refusing restart. Resources were left unchanged.'
+      'Development (`pnpm dev:restart`) is only supported in the primary checkout. ' +
+        'This checkout uses linked worktree isolation; refusing restart. Resources were left unchanged.'
     )
   }
 
