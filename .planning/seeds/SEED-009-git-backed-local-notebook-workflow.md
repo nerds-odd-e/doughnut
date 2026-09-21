@@ -46,6 +46,37 @@ are evidence of behavior, never limits on accepted histories or note counts.
 All stories preserve authorization, authored content, note identity and learning
 data; invalid or ambiguous changes must not silently discard work.
 
+<a id="story-46"></a>
+
+### Remove the ZIP export feature
+
+- **Identity:** SEED-009#story-46
+- **Goal:** Donut offers one way to take a notebook's Portable content out — Git
+  acquisition — so owners and maintainers no longer carry a second, weaker export
+  that every tree change (attachments now, images next) must also keep correct.
+- **Evaluation:** The web notebook menu and notebook settings no longer offer a
+  ZIP export, the `exportNotebook` API operation is gone, and an owner still
+  obtains the complete notebook, including attachments, through Git acquisition.
+- **Scope / value:** Owner decision 2026-09-21: ZIP export is no longer needed
+  now that Git acquisition exists; remove it completely — web buttons, API
+  operation and generated client, ZIP building, and its E2E feature. The shared
+  live Portable tree stays: Git cutover, history reset, accepted web changes and
+  drift detection still read it. Less code is the main value.
+- **Effort hypothesis:** S–M, medium confidence; mostly deletion.
+- **Depends on:** None. Queued right after SEED-035#story-9 by owner instruction,
+  which is why that story proves nothing about ZIP output.
+- **Safe stopping point:** Complete on its own; nothing later needs it.
+- **Open decisions for refinement:**
+  - ZIP export needs only read access, while Git bundle download needs full
+    notebook authorization. Removing ZIP takes the only export away from
+    read-only users (for example subscribers). Accept that, or open Git
+    acquisition to readers?
+  - Git acquisition is CLI-only today; the web offers no Git download. After
+    removal a browser-only owner has no export. Accept that, or add a web
+    download of the Git bundle (a file ordinary users cannot open without Git)?
+  - Confirm no notebook remains without a Git binding, so none loses its only
+    export.
+
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
