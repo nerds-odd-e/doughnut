@@ -2,7 +2,6 @@ import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { existsSync, watch, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 import {
   checkoutRoot,
   createMailbox,
@@ -10,6 +9,7 @@ import {
   readMailbox,
   receiptPrefix,
 } from "./ci-mailbox-location.mjs";
+import { isDirectCliEntry } from "./ci-direct-entry.mjs";
 import {
   publishMailboxEvent,
   readWorkerIdentity,
@@ -165,10 +165,7 @@ export function probeMailbox(options = {}) {
   return directory;
 }
 
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
+if (isDirectCliEntry(import.meta.url, process.argv[1])) {
   const [command, ...args] = process.argv.slice(2);
   if (command === "worker") {
     await runMailboxWorker(args[0]);

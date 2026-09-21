@@ -7,7 +7,7 @@
 // that.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 
@@ -58,15 +58,30 @@ export function repositoryRoot(cwd) {
   }
 }
 
+// Where Git itself keeps one named piece of its own state for this checkout.
+// `<repoRoot>/.git` is a directory only in a primary checkout; in a linked
+// worktree (`git worktree add`) it is a file, shared state such as
+// `info/attributes` lives in the common Git directory, and in-progress
+// operation state (`MERGE_HEAD`, `rebase-merge`, `sequencer`, ...) is that
+// worktree's own. Git already knows which is which, so it is asked rather
+// than assumed; a relative answer is relative to the checkout it was asked
+// from.
+export function gitPath(repoRoot, name) {
+  return resolve(
+    repoRoot,
+    gitLine(["rev-parse", "--git-path", name], repoRoot),
+  );
+}
+
 // Registers this one path to be reconciled by the shared resolver for every
 // future content merge Git attempts on it in this checkout. Both the
-// attribute and the driver command are written to this checkout's own
-// `.git/` directory — never to a file a project tracks or ships — because
+// attribute and the driver command are written to this checkout's own Git
+// directory — never to a file a project tracks or ships — because
 // registering the driver for every checkout a project might have, on every
 // install, is a separate, later concern; this adapter only needs the
 // mechanism to be in effect for the merge it is about to run.
 export function ensureDriverRegistered(repoRoot, file) {
-  const attributesPath = join(repoRoot, ".git", "info", "attributes");
+  const attributesPath = gitPath(repoRoot, "info/attributes");
   const line = `/${file} merge=${driverName}`;
   const existing = existsSync(attributesPath)
     ? readFileSync(attributesPath, "utf8")
@@ -109,13 +124,13 @@ export function blockedStopMessage(operationNoun, file, stderr) {
 }
 
 // Reads one small state file Git itself maintains for an in-progress
-// operation (a rebase's own directory, or `.git` directly for cherry-pick's
-// top-level markers), trimmed, or `undefined` when absent or empty — the
-// same "nothing here means no operation in progress" shape every caller
-// below shares.
-function readOperationStateFile(directory, name) {
+// operation (inside a rebase's or the sequencer's own directory, or
+// cherry-pick's top-level marker), trimmed, or `undefined` when absent or
+// empty — the same "nothing here means no operation in progress" shape every
+// caller below shares.
+function readOperationStateFile(path) {
   try {
-    const contents = readFileSync(join(directory, name), "utf8").trim();
+    const contents = readFileSync(path, "utf8").trim();
     return contents === "" ? undefined : contents;
   } catch {
     return undefined;
@@ -131,11 +146,11 @@ function readOperationStateFile(directory, name) {
 // apply, just under different filenames, so one caller-facing shape covers
 // either.
 function rebaseStateDirectory(repoRoot) {
-  const merge = join(repoRoot, ".git", "rebase-merge");
+  const merge = gitPath(repoRoot, "rebase-merge");
   if (existsSync(merge)) {
     return { directory: merge, replayedFile: "stopped-sha" };
   }
-  const apply = join(repoRoot, ".git", "rebase-apply");
+  const apply = gitPath(repoRoot, "rebase-apply");
   if (existsSync(apply)) {
     return { directory: apply, replayedFile: "original-commit" };
   }
@@ -161,8 +176,7 @@ export function rebaseState(repoRoot) {
     return undefined;
   }
   const replayedCommit = readOperationStateFile(
-    state.directory,
-    state.replayedFile,
+    join(state.directory, state.replayedFile),
   );
   if (!replayedCommit) {
     return undefined;
@@ -171,9 +185,9 @@ export function rebaseState(repoRoot) {
     replayedCommit,
     replayedParent: gitLine(["rev-parse", `${replayedCommit}^`], repoRoot),
     destination: gitLine(["rev-parse", "HEAD"], repoRoot),
-    onto: readOperationStateFile(state.directory, "onto"),
-    origHead: readOperationStateFile(state.directory, "orig-head"),
-    headName: readOperationStateFile(state.directory, "head-name"),
+    onto: readOperationStateFile(join(state.directory, "onto")),
+    origHead: readOperationStateFile(join(state.directory, "orig-head")),
+    headName: readOperationStateFile(join(state.directory, "head-name")),
   };
 }
 
@@ -187,7 +201,7 @@ export function rebaseState(repoRoot) {
 // still in progress (confirmed by `git cherry-pick --continue` still working
 // correctly there) would otherwise be misreported as finished.
 function pendingPickedCommit(sequencerDirectory) {
-  const todo = readOperationStateFile(sequencerDirectory, "todo");
+  const todo = readOperationStateFile(join(sequencerDirectory, "todo"));
   const line = todo?.split("\n").find((entry) => entry.startsWith("pick "));
   return line?.split(" ")[1];
 }
@@ -208,9 +222,9 @@ function pendingPickedCommit(sequencerDirectory) {
 // ordinary, non-merge picked commit). Returns `undefined` when no cherry-pick
 // is in progress.
 export function cherryPickState(repoRoot, mainline = 1) {
-  const sequencerDirectory = join(repoRoot, ".git", "sequencer");
+  const sequencerDirectory = gitPath(repoRoot, "sequencer");
   const pickedCommit =
-    readOperationStateFile(join(repoRoot, ".git"), "CHERRY_PICK_HEAD") ??
+    readOperationStateFile(gitPath(repoRoot, "CHERRY_PICK_HEAD")) ??
     (existsSync(sequencerDirectory)
       ? pendingPickedCommit(sequencerDirectory)
       : undefined);
