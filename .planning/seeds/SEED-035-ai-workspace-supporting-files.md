@@ -196,8 +196,7 @@ or implementation is authorized by this seed.
 - **Deferred promises:** New web file controls; image rendering/conversion;
   attachment-reference rewriting; dissolving and merging folders that contain
   files ([story 11](#story-11)); files following a folder to another notebook
-  ([story 10](#story-10)); any proof or change specific to ZIP export, which is
-  to be removed ([SEED-009#story-46](SEED-009-git-backed-local-notebook-workflow.md#story-46));
+  ([story 10](#story-10));   any proof or change specific to ZIP export, which was removed (SEED-009#story-46);
   size limits and note-save cost growth
   ([SEED-034#story-3](SEED-034-faster-note-content-saving.md#story-3)).
 - **Effort hypothesis:** M–L, medium confidence under the boundary assumption.
@@ -408,8 +407,8 @@ Git integration need their own selected outcomes.
   for story refinement. No implementation, completed slices or scope discarded.
 - Owner refinement, 2026-09-21 (story 9): goal reframed as publishing a real
   checkout; dot-folders get default handling; a folder whose last file is removed
-  locally is dissolved; ZIP export is out of scope and queued for removal
-  (SEED-009#story-46); a cross-notebook move of a folder with files is refused
+  locally is dissolved; ZIP export was removed (SEED-009#story-46); a cross-notebook
+  move of a folder with files is refused
   for now and queued as story 10. After seeing a clash example the owner chose
   atomic refusal for a dissolve/merge filename clash.
 - Owner-requested resplit, 2026-09-21: story 9 looked big. It keeps publication

@@ -16,7 +16,7 @@
   ([SEED-035#story-11](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-11),
   [plan 007](../007-dissolve-merge-folders-with-files/PLAN.md)); files following
   a folder to another notebook (SEED-035#story-10); ZIP export proof
-  (SEED-009#story-46 removes it); web file controls; image rendering; reference
+  (removed as SEED-009#story-46); web file controls; image rendering; reference
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
