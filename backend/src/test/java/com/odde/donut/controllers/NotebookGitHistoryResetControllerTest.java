@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
@@ -116,15 +117,17 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
     makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
-    byte[] acceptedBundle = binding.getBundleBytes().clone();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
+    User owner = currentUser.getUser();
     currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.resetNotebookGitHistory(notebook));
 
+    currentUser.setUser(owner);
     NotebookGitBinding after = reloadCommittedBinding(notebook.getId());
     assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHead));
-    assertThat(after.getBundleBytes(), equalTo(acceptedBundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   @Test
@@ -133,7 +136,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
     makeMe.aNote("Overview").notebook(notebook).content(OVERVIEW_CONTENT).please();
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
     List<PortableTreeEntry> tipWithRootFiles =
-        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(markdownOnly.getBundleBytes()));
+        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(notebook)));
     tipWithRootFiles.add(new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES));
     tipWithRootFiles.add(ofText("reference.json", REFERENCE_JSON));
     controller.publishNotebookGitProposal(
@@ -143,12 +146,11 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerT
 
     controller.resetNotebookGitHistory(notebookRepository.findById(notebook.getId()).orElseThrow());
 
-    NotebookGitBinding afterReset = reloadCommittedBinding(notebook.getId());
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
       RevCommit resetCommit =
           revWalk.parseCommit(
-              GitBundleTestReader.fetchHead(repository, afterReset.getBundleBytes()));
+              GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook)));
       assertThat(resetCommit.getParentCount(), equalTo(0));
       assertThat(
           GitBundleTestReader.readTreeEntries(repository, resetCommit),

@@ -17,6 +17,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -217,7 +218,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
     assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
     assertThat(
         stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
-    assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
+    assertThat(stateAfterRetry.acceptedHistory(), equalTo(stateAfterPublication.acceptedHistory()));
     assertThat(stateAfterRetry.notePresent(), equalTo(stateAfterPublication.notePresent()));
     // The deleted note's complete dependent closure stays absent across the retry: the accepted
     // proposal identity matches, so no second deletion runs and nothing resurrects.
@@ -297,7 +298,8 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
         .toList();
   }
 
-  private PublicationState publicationState(Notebook notebook, Note note) {
+  private PublicationState publicationState(Notebook notebook, Note note) throws Exception {
+    AcceptedHistory acceptedHistory = acceptedHistory(notebook);
     return inCommittedTransaction(
         transactionManager,
         () -> {
@@ -307,7 +309,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
           return new PublicationState(
               binding.getAcceptedGitObjectId(),
               binding.getUpdatedAt(),
-              binding.getBundleBytes().clone(),
+              acceptedHistory,
               notePresent,
               dependentCounts(note));
         });
@@ -316,7 +318,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
   private record PublicationState(
       String acceptedHead,
       Timestamp bindingUpdatedAt,
-      byte[] bundleBytes,
+      AcceptedHistory acceptedHistory,
       boolean notePresent,
       DependentCounts dependentCounts) {}
 }

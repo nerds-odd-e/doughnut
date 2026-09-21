@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -43,8 +44,10 @@ class NotebookAccessDenialMvcTest extends NotebookGitBundleControllerTestBase {
     NotebookGitBinding before =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     String acceptedHead = before.getAcceptedGitObjectId();
-    byte[] acceptedBundle = before.getBundleBytes().clone();
+    byte[] acceptedBundle = acceptedBundleBytes(notebook);
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     var updatedAt = before.getUpdatedAt().toInstant();
+    User owner = currentUser.getUser();
     currentUser.setUser(createFixtureUser());
 
     mockMvc
@@ -56,10 +59,11 @@ class NotebookAccessDenialMvcTest extends NotebookGitBundleControllerTestBase {
         .andExpect(status().isForbidden())
         .andExpect(content().string(""));
 
+    currentUser.setUser(owner);
     NotebookGitBinding after =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHead));
-    assertThat(after.getBundleBytes(), equalTo(acceptedBundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
     assertThat(after.getUpdatedAt().toInstant(), equalTo(updatedAt));
     Note unchanged = noteRepository.findById(note.getId()).orElseThrow();
     assertThat(unchanged.getTitle(), equalTo("Private note"));

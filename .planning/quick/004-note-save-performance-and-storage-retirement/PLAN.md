@@ -629,9 +629,12 @@ incidental and were converted. The two legacy-conversion tests were left exactly
 as they are, verified by the coordinator as zero diff lines. After this slice that
 file is the **only** file in the web-change family still reading the column, and
 only inside those two tests. Consequence for slice 9:
-`clearNativeObjectStoreRows` and `countNativeObjectStoreRows` on the shared base
-now have **no other caller in the web family**, so when slice 9 retires those two
-tests both base helpers can be deleted outright rather than kept for someone else.
+`clearNativeObjectStoreRows` on the shared base has **only** those two carve-out
+callers, so it can be deleted outright when they go. **Corrected by slice 7:**
+this note originally said the same of `countNativeObjectStoreRows`, which is
+wrong - that helper still has a legitimate non-legacy caller,
+`NotebookGitPublicationAtomicControllerTest.lateBindingSaveFailureLeavesNoDurableNativeObjectStoreRows`,
+a native-storage durability observation. It must stay.
 
 **Three hazards now confirmed as recurring, for slice 7 to expect:**
 
@@ -695,7 +698,7 @@ legacy-subject tests, about 55 lines plus imports, bringing the file to roughly
 be churn slice 9 undoes.
 
 ### 7. Observe creation and repository lifecycle through current storage
-Type: Structure. Status: planned. **Also owns
+Type: Structure. Status: done. **Owned
 `assertProposalRejectedWithoutMutatingBinding` (see slice 5's note): replace its
 stored-bytes line with `acceptedHistory(notebook)`. 30 callers depend on it and
 slice 9 is blocked until it lands.**
@@ -706,6 +709,79 @@ Preserve the root-commit, reset-history and binding FK-cascade behavior. Delete
 old-field-only expectations instead of renaming them as historical tests.
 Enables slice 9. Proof: B; retain complete FK-closure fixtures for deletion.
 Size: ~5 minutes, with a separate leaf if a remaining setup needs new mechanics.
+
+**Delivered.** 18 backend test files, no production change, net +1 line
+(90 insertions / 89 deletions). Suite **2,563 tests**, 0 failures, 0 errors,
+0 skipped - the count change from 2,564 is exactly the one deliberate deletion
+below. Per-file assertion counts are at zero delta versus HEAD everywhere except
+that test's own -2. The carve-out file has zero diff.
+
+`assertProposalRejectedWithoutMutatingBinding` no longer reads the column: the
+stored-bytes line became `acceptedHistory(notebook)` equality, with head and
+`updatedAt` kept verbatim. Both overloads widened to `throws Exception`, and
+**none of the 30 caller files needed a change** - every enclosing test method
+already declared it. **Slice 9 is unblocked.**
+
+**One test deleted, not renamed:**
+`NotebookGitBindingRepositoryTest.persistsAndReloadsAcceptedBundleByNotebookId`.
+Strip its column line and the only remaining claim is "JPA round-trips a String
+column" - a framework assertion with no domain observable, already exercised by
+every Git controller test through `findByNotebook_Id`. Its `buildBundle()` helper
+and 9 imports went with it; the file fell 135 -> 108 lines with both surviving
+tests intact. This is the plan's "delete old-field-only expectations instead of
+renaming them as historical tests" rule applied literally.
+
+Preserved, with locations: root-commit in
+`NotebookGitBindingAssertions.assertEmptyTreeRootCommitBinding` (parentCount 0,
+empty tree, exactly 1 reachable commit) and `NotebookGitCutoverServiceTest`;
+reset-history in
+`NotebookGitHistoryResetControllerTest.resetRestartsHistoryCarryingTheRootFilesTheNotebookCurrentlyHolds`
+and `NotebookGitCutoverServiceTest.resetHistoryReplacesTheExistingBindingWithTheNotebooksCurrentContent`;
+FK cascade in `NotebookGitBindingRepositoryTest.cascadeDeletesNativeObjectStoreRowsWhenBindingIsDeleted`,
+whose private `countNativeObjectStoreRows` 1->0 observation and complete
+FK-closure fixture are untouched.
+
+**How the three predicted hazards actually landed.** Authorization: 3 restores
+needed. Committed transactions: 6 sites, in two shapes - capture-before/assert-after,
+and moving a `PublicationState` record's byte field to an `AcceptedHistory` read
+above the lambda. Non-inheritors: **the prediction was wrong in a useful way** -
+`NotebookAccessDenialMvcTest` does extend the base, leaving only two, and neither
+needed the local escape hatch. `NotebookGitCutoverServiceTest` lives in
+`com.odde.donut.services.notebookGit` so it autowires the package-private
+`NotebookGitAcceptedRepositoryStore` and calls `downloadableBundle(binding)`, the
+production read path itself; `NotebookGitBindingRepositoryTest` stopped reading
+accepted history at all. So the "three or more callers" trigger never fired and
+**no cross-hierarchy seam was invented**; `GitBundleTestReader` stays a pure
+bundle-parsing utility. A third hierarchy did surface, and was solved by giving the
+*existing* shared `NotebookGitBindingAssertions` the controller and notebook so it
+owns the download recipe once (its two callers, `NotebookCrudControllerTest` and
+`CircleControllerTest`, moved with the signature).
+
+False positives correctly left alone - 5 sites in 3 files, all Javadoc saying
+"read through the download endpoint, **not** `binding.getBundleBytes()` directly",
+plus a parameter and a record field named `bundleBytes` already holding
+download-boundary bytes.
+
+Sizing: about 18 active minutes, inside the revised 15-20 expectation. Complexity
+moved **down**: one test and one fixture helper deleted, a leftover duplicate
+`downloadedBundleBytes` collapsed onto `acceptedBundleBytes`, and
+`NotebookGitBindingAssertions` became the single owner of the download-and-inspect
+recipe for both creation hierarchies.
+
+> **OUTSTANDING ON RESUME - slice 7's post-change refactor pass did not run.**
+> The developer needed to restart the machine, so the refactor agent was stopped
+> before it made any edit (it was still reading the skill) and slice 7's verified
+> implementation was committed as-is to avoid losing it. The delivered code is
+> green and complete against the slice's promises - proof is the full backend
+> suite at 2,563 tests, 0 failures - but the required
+> `dough-post-change-refactor` pass is **still owed** and must run before slice 8
+> is dispatched. Re-run it over slice 7's commit with the same constraints
+> recorded above: the `NotebookGitWebContentSaveControllerTest` carve-out stays
+> untouched including its 289-line deferral, `countNativeObjectStoreRows` stays
+> (it has a legitimate native-durability caller), `clearNativeObjectStoreRows`
+> waits for slice 9, no assertion may be weakened or relocated, the three
+> authorization restores and the outside-the-committed-block history reads are
+> load-bearing, and `GitBundleTestReader` must stay a pure bundle-parsing utility.
 
 ### 8. Verify native history survives the upgrade
 Type: Behavior. Status: planned.
@@ -734,6 +810,60 @@ Proof: V and E; native reopen/save, creation/reset, download/publication and
 rollback remain valid with the column unpopulated. Reuse existing behavior
 tests; no permanent test of a retired field's existence. Regenerate ERD with D.
 Size: 5–10 active minutes plus required suites. Gate A/B controls deployment.
+
+### Slice 9's exact starting map (measured after slice 7)
+
+**Production Java - 2 behavioral sites plus the field:**
+- `backend/src/main/java/com/odde/donut/entities/NotebookGitBinding.java:35` -
+  `@Column(name = "bundle_bytes", nullable = false)`, the entity field.
+- `.../services/notebookGit/NotebookGitAcceptedRepositoryStore.java:81` -
+  `binding.getBundleBytes()` inside `importBundleIntoNativeStoreOnce`: the
+  **runtime legacy-conversion fallback**.
+- `.../services/notebookGit/NotebookGitAcceptedRepositoryStore.java:152` -
+  `binding.setBundleBytes(written.bundleBytes())` inside `apply()`, written purely
+  to satisfy `NOT NULL` (its own Javadoc at :146 says so).
+
+**Schema - the real gate:**
+`backend/src/main/resources/db/migration/V300000319__create_notebook_git_binding.sql:5`,
+`bundle_bytes longblob NOT NULL`. Nothing else removes cleanly until the nullable
+transition lands. **Sequence the nullable migration first**; the five `NOT NULL`
+satisfiers then delete mechanically with no test redesign:
+`NotebookGitAcceptedRepositoryStore.apply():152`, `NotebookGitJdbcFixture:49`,
+`NotebookGitBindingRepositoryTest:37`, and the raw-SQL inserts at
+`NotebookGitBindingRepositoryTest:88,101`.
+
+**Test Java - entity accessors, 6 sites in 2 files:**
+- `NotebookGitWebContentSaveControllerTest:129,142,271,272,287` - the carve-out's
+  two legacy-subject tests, to **delete with the runtime fallback**. Removing them
+  also drops that file to roughly 234 lines, clearing the 250-line deferral, and
+  leaves `clearNativeObjectStoreRows` on the shared base with no caller, so delete
+  it too. Keep `countNativeObjectStoreRows` - see slice 6's corrected note.
+- `NotebookGitBindingRepositoryTest:37` - a pure `NOT NULL` satisfier.
+
+**Migration source - Gate C, not slice 9:**
+`backend/src/main/java/db/migration/NotebookGitAcceptedObjectBackfill.java:98,105`,
+`V300000336__BackfillNotebookGitAcceptedObjects.java:14`, and
+`backend/src/test/java/db/migration/NotebookGitAcceptedObjectBackfillTest.java:86,90,95,157`.
+
+**Prose only - 8 Javadoc/comment sites**, each explaining why the code deliberately
+avoids the column: `NotebookGitBundleControllerTestBase:212`,
+`NotebookGitWebNoteMoveControllerTest:158`,
+`NotebookGitWebNoteMoveEmptyFolderControllerTest:136`,
+`NotebookGitWebContentHistoryControllerTestSupport:68`,
+`NotebookGitHistoryResetControllerTest:71`,
+`NotebookGitRootAttachmentIndependenceControllerTest:63`,
+`NotebookGitRootAttachmentLocalChangeControllerTest:98`,
+`NotebookGitWebContentSaveControllerTest:137`. Accurate today, stale once the
+column is gone - **slice 14 deletes them with it.**
+
+**Removing the entity field breaks no assertion.** After slice 7 the only reads
+outside the carve-out are the `NOT NULL` writes and prose.
+
+Also retired by slice 7's finding: slice 4's deferred duplication (the test seeding
+path re-implementing `copyIntoNativeStore` because the service is package-private)
+needs **no production visibility change** - `NotebookGitCutoverServiceTest`
+demonstrates that a test in `com.odde.donut.services.notebookGit` can autowire the
+store directly. Moving those fixtures into that package would retire the helper.
 
 ### 10. Remove redundant persisted bundles
 Type: Behavior. Status: planned; deployment depends on Gate B.

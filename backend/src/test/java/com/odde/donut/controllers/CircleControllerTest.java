@@ -36,6 +36,7 @@ class CircleControllerTest extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookRepository notebookRepository;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
+  @Autowired NotebookController notebookController;
 
   @BeforeEach
   void setup() {
@@ -108,7 +109,9 @@ class CircleControllerTest extends ControllerTestBase {
       NotebookRealm response = controller.createNotebookInCircle(circle, noteCreation);
 
       NotebookGitBindingAssertions.assertEmptyTreeRootCommitBinding(
-          notebookGitBindingRepository, response.notebook().getId());
+          notebookGitBindingRepository,
+          notebookController,
+          notebookRepository.findById(response.notebook().getId()).orElseThrow());
     }
   }
 

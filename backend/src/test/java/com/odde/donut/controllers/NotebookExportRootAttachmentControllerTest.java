@@ -69,7 +69,7 @@ class NotebookExportRootAttachmentControllerTest extends NotebookGitBundleContro
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
 
     List<PortableTreeEntry> tip =
-        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(markdownOnly.getBundleBytes()));
+        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(notebook)));
     tip.add(ofText("README.md", NOTEBOOK_README));
     tip.add(new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES));
     tip.add(ofText("reference.json", REFERENCE_JSON));

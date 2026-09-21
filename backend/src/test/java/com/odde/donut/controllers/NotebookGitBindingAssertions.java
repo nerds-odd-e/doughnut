@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.testability.GitBundleTestReader;
@@ -18,20 +19,25 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 /**
  * Asserts that a freshly created notebook already has its accepted Git binding: one root commit on
- * {@code refs/heads/main} with no parents and an empty tree.
+ * {@code refs/heads/main} with no parents and an empty tree. The accepted history is read through
+ * the notebook's own Git-bundle download endpoint, the public boundary over current accepted
+ * storage.
  */
 final class NotebookGitBindingAssertions {
 
   private NotebookGitBindingAssertions() {}
 
   static void assertEmptyTreeRootCommitBinding(
-      NotebookGitBindingRepository notebookGitBindingRepository, Integer notebookId)
+      NotebookGitBindingRepository notebookGitBindingRepository,
+      NotebookController notebookController,
+      Notebook notebook)
       throws Exception {
     NotebookGitBinding binding =
-        notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow();
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] acceptedBundle = notebookController.downloadNotebookGitBundle(notebook).getBody();
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, binding.getBundleBytes());
+      ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, acceptedBundle);
       assertThat(headObjectId.getName(), equalTo(binding.getAcceptedGitObjectId()));
 
       try (RevWalk revWalk = new RevWalk(readBack)) {

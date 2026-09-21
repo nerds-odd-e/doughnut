@@ -207,7 +207,8 @@ class NotebookGitPublicationConcurrencyControllerTest
   private Proposal multiCommitProposal(
       NotebookGitBinding binding, String middleContent, String tipContent) throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      ObjectId acceptedHead =
+          GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(binding.getNotebook()));
       ObjectId middle =
           commitOnTopOf(
               repository,

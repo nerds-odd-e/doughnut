@@ -63,7 +63,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     Timestamp noteUpdatedAt =
@@ -125,9 +125,9 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
               countRowsForNotebook("authored_note_reference", "source_note_id", notebook.getId()),
               is(originalReferenceCount));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   @Test
@@ -145,7 +145,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
                 new NotebookGitProposalFile("reference.json", referenceJson))));
     NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
     String acceptedHead = accepted.getAcceptedGitObjectId();
-    byte[] acceptedBundle = accepted.getBundleBytes().clone();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     byte[] renameAndEdit =
         proposalBundleBytes(
             accepted,
@@ -174,8 +174,8 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
           NotebookGitBinding reloaded =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           assertThat(reloaded.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloaded.getBundleBytes(), equalTo(acceptedBundle));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   private long countRowsForNotebook(String table, String noteColumn, Integer notebookId) {
@@ -215,7 +215,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     Timestamp noteUpdatedAt =
@@ -246,9 +246,9 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
           assertThat(
               entityManager.find(AttachmentBlob.class, orphan.getBlob().getId()), notNullValue());
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   /**

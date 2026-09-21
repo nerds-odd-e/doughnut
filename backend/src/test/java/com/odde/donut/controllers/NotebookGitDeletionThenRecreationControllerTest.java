@@ -58,7 +58,7 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitBundleC
     ObjectId tip;
     byte[] proposalBytes;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterRename =
           commitOnTopOf(
               repository,
@@ -104,7 +104,7 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitBundleC
     ObjectId tip;
     byte[] proposalBytes;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterDelete =
           commitOnTopOf(
               repository,

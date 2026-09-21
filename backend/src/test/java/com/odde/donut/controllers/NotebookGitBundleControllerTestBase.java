@@ -93,7 +93,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
 
   ResponseStatusException assertProposalRejectedWithoutMutatingBinding(
       Notebook notebook, String expectedHead, byte[] bundleBytes, HttpStatus expectedStatus)
-      throws UnexpectedNoAccessRightException {
+      throws Exception {
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
             notebook, expectedHead, bundleBytes, ResponseStatusException.class);
@@ -104,11 +104,11 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
 
   <T extends RuntimeException> T assertProposalRejectedWithoutMutatingBinding(
       Notebook notebook, String expectedHead, byte[] bundleBytes, Class<T> exceptionType)
-      throws UnexpectedNoAccessRightException {
+      throws Exception {
     NotebookGitBinding before =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     String acceptedHeadBefore = before.getAcceptedGitObjectId();
-    byte[] acceptedBundleBefore = before.getBundleBytes().clone();
+    AcceptedHistory acceptedHistoryBefore = acceptedHistory(notebook);
     Instant updatedAtBefore = before.getUpdatedAt().toInstant();
 
     T exception =
@@ -120,7 +120,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
     NotebookGitBinding after =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHeadBefore));
-    assertThat(after.getBundleBytes(), equalTo(acceptedBundleBefore));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
     assertThat(after.getUpdatedAt().toInstant(), equalTo(updatedAtBefore));
     return exception;
   }

@@ -38,6 +38,7 @@ class NotebookGitCutoverServiceTest {
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
   @Autowired FolderRepository folderRepository;
+  @Autowired NotebookGitAcceptedRepositoryStore acceptedRepositoryStore;
 
   @Test
   void createsOneRootCommitBindingCapturingTheNotebooksCanonicalTree() throws Exception {
@@ -74,7 +75,9 @@ class NotebookGitCutoverServiceTest {
         folderRepository.findById(emptyFolderId).orElseThrow().getId(), equalTo(emptyFolderId));
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, binding.getBundleBytes());
+      ObjectId headObjectId =
+          GitBundleTestReader.fetchHead(
+              readBack, acceptedRepositoryStore.downloadableBundle(binding));
       assertThat(headObjectId.getName(), equalTo(binding.getAcceptedGitObjectId()));
 
       try (RevWalk revWalk = new RevWalk(readBack)) {
@@ -140,7 +143,9 @@ class NotebookGitCutoverServiceTest {
             List.of());
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, binding.getBundleBytes());
+      ObjectId headObjectId =
+          GitBundleTestReader.fetchHead(
+              readBack, acceptedRepositoryStore.downloadableBundle(binding));
       assertThat(headObjectId.getName(), equalTo(binding.getAcceptedGitObjectId()));
 
       try (RevWalk revWalk = new RevWalk(readBack)) {

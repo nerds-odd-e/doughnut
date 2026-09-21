@@ -1,22 +1,13 @@
 package com.odde.donut.entities.repositories;
 
-import static com.odde.donut.services.notebookExport.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
-import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
-import com.odde.donut.services.notebookGit.NotebookGitBundleWriter.BundleWriteResult;
 import com.odde.donut.testability.MakeMe;
-import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.List;
-import org.eclipse.jgit.lib.Repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,22 +25,16 @@ class NotebookGitBindingRepositoryTest {
   @Autowired NotebookGitBindingRepository repository;
   @Autowired JdbcTemplate jdbcTemplate;
 
-  private static BundleWriteResult buildBundle() throws IOException {
-    List<PortableTreeEntry> entries = List.of(ofText("README.md", "Hello"));
-    Instant commitTime = Instant.parse("2026-09-04T10:15:30Z");
-    try (Repository gitRepository =
-        NotebookGitBundleBuilder.build(
-            entries, "Donut System", "system@donut.local", "Snapshot import", commitTime)) {
-      return NotebookGitBundleWriter.write(gitRepository);
-    }
-  }
-
-  private NotebookGitBinding persistBinding(Notebook notebook) throws IOException {
-    BundleWriteResult built = buildBundle();
+  /**
+   * A persisted binding with the minimum every column requires. {@code bundleBytes} is empty rather
+   * than a real bundle: nothing here observes it, and the column only still needs a value because
+   * it remains {@code NOT NULL}.
+   */
+  private NotebookGitBinding persistBinding(Notebook notebook) {
     NotebookGitBinding binding = new NotebookGitBinding();
     binding.setNotebook(notebook);
-    binding.setAcceptedGitObjectId(built.headObjectId());
-    binding.setBundleBytes(built.bundleBytes());
+    binding.setAcceptedGitObjectId("a".repeat(40));
+    binding.setBundleBytes(new byte[0]);
     Timestamp now = makeMe.aTimestamp().please();
     binding.setCreatedAt(now);
     binding.setUpdatedAt(now);
@@ -59,19 +44,7 @@ class NotebookGitBindingRepositoryTest {
   }
 
   @Test
-  void persistsAndReloadsAcceptedBundleByNotebookId() throws IOException {
-    Notebook notebook = makeMe.aNotebook().please();
-    makeMe.entityPersister.flush();
-
-    NotebookGitBinding saved = persistBinding(notebook);
-
-    NotebookGitBinding reloaded = repository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    assertThat(reloaded.getAcceptedGitObjectId(), equalTo(saved.getAcceptedGitObjectId()));
-    assertThat(reloaded.getBundleBytes(), equalTo(saved.getBundleBytes()));
-  }
-
-  @Test
-  void cascadeDeletesNativeObjectStoreRowsWhenBindingIsDeleted() throws IOException {
+  void cascadeDeletesNativeObjectStoreRowsWhenBindingIsDeleted() {
     Notebook notebook = makeMe.aNotebook().please();
     makeMe.entityPersister.flush();
 
