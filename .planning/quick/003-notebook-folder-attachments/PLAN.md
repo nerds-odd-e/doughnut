@@ -20,7 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–4 are done with accepted proof; 8 slices remain planned (7
+- State: slices 1–5 are done with accepted proof; 7 slices remain planned (7
   is Structure). Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
@@ -223,7 +223,7 @@ cascade required no production fallback.
 
 ### 5. Dissolving or merging a folder that contains files is refused
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given `physics/old/sketch.png`, dissolving `old` is refused with a
 message saying folders that contain files cannot be dissolved or merged yet;
 folders, stored files and the accepted head are unchanged. Moving a folder that
@@ -235,6 +235,13 @@ Interim behavior: SEED-035#story-11 (plan 007) replaces it with rehoming.
 Proof: two cases (dissolve; move with merge) in
 `NotebookGitFolderDissolveGuardControllerTest`, using the unchanged-state
 pattern already there.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,573 backend tests after the cohesion pass.
+`NotebookGitFolderDissolveGuardControllerTest.folderContainingAFileCannotBeDissolved`
+and `.folderContainingAFileCannotBeMerged` seed direct and descendant files,
+invoke the real controller operations, and observe the shared clear refusal,
+unchanged folder/file placement, and unchanged accepted head. Existing
+file-free dissolve and merge coverage stayed green.
 
 ### 6. Moving a folder that contains files to another notebook is refused
 Type: Behavior
@@ -371,3 +378,6 @@ folder operation either carries files or refuses loudly.
 - Slice 1's cohesion pass updated `NotebookAttachment` Javadoc to describe
   folder placement, so slice 9 no longer needs that documentation edit; its
   synchronization-contract documentation remains planned.
+- Slice 5 made `FolderSubtree` the single Spring-managed owner of subtree
+  traversal and the temporary attachment guard; slice 6 reuses that owner
+  rather than adding another repository check.

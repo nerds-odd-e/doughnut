@@ -2,6 +2,7 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.services.notebookExport.ExportAttachmentRow;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,4 +19,6 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
   List<ExportAttachmentRow> findExportRowsByNotebookId(@Param("notebookId") Integer notebookId);
 
   List<NotebookAttachment> findByNotebook_Id(Integer notebookId);
+
+  boolean existsByFolder_IdIn(Collection<Integer> folderIds);
 }

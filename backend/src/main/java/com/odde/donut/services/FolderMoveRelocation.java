@@ -7,7 +7,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -33,21 +32,19 @@ public class FolderMoveRelocation {
 
   public FolderMoveRelocation(
       FolderRepository folderRepository,
-      NoteRepository noteRepository,
       FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       WikiLinkRewriteService wikiLinkRewriteService,
-      WikiLinkRelocationRewrite wikiLinkRelocationRewrite) {
+      WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
+      FolderSubtree subtree) {
     this.folderRepository = folderRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
-    this.subtree =
-        new FolderSubtree(
-            folderRepository, noteRepository, folderSiblingNameValidation, entityPersister);
+    this.subtree = subtree;
   }
 
   Folder moveFolder(
