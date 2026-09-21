@@ -87,8 +87,12 @@ not acceptance gates for a changed workload.
 ### 4. Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage
 
 - **Identity:** SEED-034#story-4
-- **Status:** queued; refined by owner direction on 2026-09-21. The missing
-  historical fixture is no longer a blocker. Execution has not started.
+- **Status:** in execution (plan 004). **Owner direction 2026-09-21, after slice 3
+  measured current saves ~1.37x slower than `b5cad203d1`:** the >4x ambition is
+  dropped from this story; saves must **not be slower** than `b5cad203d1`, and no
+  complexity may remain that does not contribute to the result. Partially converted
+  bindings get no repair code - users reset their notebooks' initial commit. Releases
+  are created by the owner after execution merges to `main`.
 - **Plan:** [Note-save performance and storage retirement](../quick/004-note-save-performance-and-storage-retirement/PLAN.md).
 - **Goal / beneficiaries:** Note authors in large synchronized notebooks get
   responsive, durable saves with attachments included in Git. Evaluate the

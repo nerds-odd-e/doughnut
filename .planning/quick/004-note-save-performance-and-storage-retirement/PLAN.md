@@ -27,6 +27,22 @@ slices; no product proof is claimed beyond what the evidence sections record.
 
 ## Outcome and boundaries
 
+> **Owner decisions, 2026-09-21 (after slice 3's measurement):**
+> 1. **The >4x speed ambition is dropped from this story.** The promise is now: note
+>    saves must **not be slower** than the earlier revision `b5cad203d1`, measured
+>    the slice-3 way, and **no complexity may be kept that does not contribute to the
+>    result**. Slice 3's measured regression (current ~1.37x slower) must therefore be
+>    investigated and corrected, simplifying rather than adding machinery.
+> 2. **No repair for partially converted bindings.** Users will manually reset the
+>    initial commit of their notebooks. A reset rebuilds the binding's native history
+>    from scratch, so the completeness check's refusal simply names the notebooks to
+>    reset; no repair code is to be written.
+> 3. **Release handoff.** When the work reaches a point that needs a release, merge
+>    everything back to `main` and tell the owner; the owner creates the release, then
+>    tells execution to continue with the remaining slices. Execution never creates a
+>    release or tag itself.
+
+
 Note authors get responsive, durable saves in large synchronized notebooks.
 First assess the original save optimization without attachments. Retire obsolete
 storage completely. Address unchanged attachment processing and cohesion last,
@@ -115,6 +131,23 @@ outside-in proof are known. No placeholder "optimize until fast" slice is
 dispatchable. If the remaining result needs a new architecture or a different
 product promise, get the owner's decision; safe independent retirement work
 may continue. Do not claim the speed ambition achieved without evidence.
+
+**Release facts established 2026-09-21 (read before the first release):** the last
+release tag is `v1.3.14` (2026-09-20 11:55); story 2's native Git storage and the
+backfill `V300000336` merged afterwards (`2e8cf08e01`, 2026-09-20 22:37), and **no
+release tag contains them** (`git tag --contains 2e8cf08e01` finds none). So production
+has never run native storage, and **the next release is production's native-storage
+cutover**. The deployment scripts replace instances one at a time, so an ordinary
+release would briefly run old bundle-authority instances beside new native-only ones:
+an old instance records a save only in `bundle_bytes`, which a new instance never reads,
+losing that save from accepted history. **That first release must fence old writers -
+stop every old instance before starting the new version - and keep users out until the
+startup migrations (the backfill, then `V300000337`) finish.** This is Gate A made
+concrete. Because production holds no native rows yet, every binding there is a clean
+legacy binding, so a partial binding can only arise from a crash mid-backfill, which the
+per-binding transaction prevents. The exact stop-then-start steps for this project's
+deployment scripts are to be looked up in `docs/gcp/conditional-backend-deploy.md` and
+handed to the owner at the release point.
 
 **Release procedure:** Default planning path is staged compatibility, using the
 [release runbook](../../../docs/gcp/conditional-backend-deploy.md). Production
@@ -416,6 +449,12 @@ Applying it:
 - Not established here: whether the regression is attributable to the
   native-Git storage work of stories 1-2 or to something else between
   `b5cad203d1` and current. Do not assume; it needs its own evidence.
+
+**Owner decision (2026-09-21): investigate and correct.** The regression is in scope
+for this story. Plan the diagnosis after slice 13 returns, because slice 13 recaptures
+the no-attachment control on the post-9b revision - that tells us whether the storage
+retirement itself already moved save cost. The correction must make saves no slower
+than `b5cad203d1` while removing, not adding, complexity.
 
 Harness note for later slices: the disposable `b5cad203d1` worktree still holds
 the pre-refactor harness copies. The accepted evidence above is already captured,
@@ -798,7 +837,7 @@ backend:test_only`, exit 0, **2,563 tests, 0 failures, 0 errors, 0 skipped**,
 coordinator-confirmed from JUnit XML, including result files for both new classes.
 
 ### 8. Verify native history survives the upgrade
-Type: Behavior. Status: done (local rehearsal). **Owner decision needed: partial-binding repair policy.**
+Type: Behavior. Status: done (local rehearsal). Partial-binding policy decided: no repair.
 
 Given an isolated database with untouched legacy bindings, already-native
 bindings with stale retained bundles, and several history commits, the actual
@@ -921,7 +960,12 @@ loudly; each legacy binding is then either empty or complete per the check, with
 least one still empty; a rerun on a fresh connection converts the rest, and all three
 then reopen and download with exact history.
 
-### Owner decision needed - partial-binding repair policy
+### Partial-binding repair policy - DECIDED 2026-09-21: no repair
+
+Owner: users will manually reset the initial commit of their notebooks. No repair code.
+The options below are kept only as the reasoning that was offered.
+
+#### Options that were considered
 
 **The backfill does nothing with a partial binding.** It already has native rows, so
 the selection query never picks it; it stays partial across any number of runs, with
