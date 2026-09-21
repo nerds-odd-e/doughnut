@@ -103,7 +103,7 @@ public class AcceptedWebChangeService {
       return;
     }
     OpenedAcceptedRepository accepted = notebook.accepted();
-    NotebookGitBundleBuilder.append(
+    NotebookGitCommitBuilder.append(
         accepted.repository(),
         accepted.head(),
         entries,

@@ -22,15 +22,16 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 
 /**
- * Turns a canonical Portable-tree snapshot (see {@code notebookExport.PortableTreeSnapshot} into an
- * in-memory Git repository with a single, parentless root commit on {@code refs/heads/main}.
+ * Commits a canonical Portable-tree snapshot (see {@code notebookExport.PortableTreeSnapshot}) on
+ * {@code refs/heads/main}: {@link #build} makes a fresh in-memory repository with a single,
+ * parentless root commit; {@link #append} adds a commit on a given parent.
  *
  * <p>No filesystem writes and no Donut identity: the caller supplies author/message/time, and the
  * notebook ID (if any) stays the caller's concern rather than being embedded in paths or blobs.
  */
-public final class NotebookGitBundleBuilder {
+public final class NotebookGitCommitBuilder {
 
-  private NotebookGitBundleBuilder() {}
+  private NotebookGitCommitBuilder() {}
 
   public static Repository build(
       List<PortableTreeEntry> entries,

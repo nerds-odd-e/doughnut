@@ -23,8 +23,8 @@ import org.eclipse.jgit.revwalk.RevObject;
  * dropped: every {@code notebook_git_binding}'s persisted accepted head, and every object it
  * reaches, is present in {@code notebook_git_accepted_object}. A nonempty native store is not
  * evidence - a binding holding only some of its reachable objects is never re-selected by {@link
- * NotebookGitAcceptedObjectBackfill}, whichever writer left it partial - so this walks each head's
- * reachable graph instead of counting rows.
+ * V300000336__BackfillNotebookGitAcceptedObjects}, whichever writer left it partial - so this walks
+ * each head's reachable graph instead of counting rows.
  *
  * <p>A plain class with no Spring dependency, because {@link
  * V300000338__DropNotebookGitBindingBundleBytes} runs it as a Flyway Java migration before its

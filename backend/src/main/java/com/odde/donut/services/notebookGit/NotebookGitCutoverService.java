@@ -81,7 +81,7 @@ public class NotebookGitCutoverService {
 
   private Repository buildRepository(Notebook notebook, Instant commitTime, String message) {
     List<PortableTreeEntry> entries = livePortableTree.entriesOf(notebook);
-    return NotebookGitBundleBuilder.build(
+    return NotebookGitCommitBuilder.build(
         entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, message, commitTime);
   }
 

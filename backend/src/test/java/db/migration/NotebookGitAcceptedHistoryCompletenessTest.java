@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
+import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitJdbcFixture;
 import com.odde.donut.testability.NotebookGitAcceptedHistoryFixture;
 import java.sql.Connection;
@@ -74,10 +74,10 @@ class NotebookGitAcceptedHistoryCompletenessTest {
 
   private Binding seedCompleteBinding(String label) throws Exception {
     Repository source =
-        NotebookGitBundleBuilder.build(
+        NotebookGitCommitBuilder.build(
             entries(label, 1), "Donut", "system@donut.local", "c1", time(1));
     ObjectId head =
-        NotebookGitBundleBuilder.append(
+        NotebookGitCommitBuilder.append(
             source,
             NotebookGitAcceptedHistoryFixture.mainHeadOf(source),
             entries(label, 2),

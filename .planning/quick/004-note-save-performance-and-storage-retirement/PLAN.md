@@ -1542,7 +1542,7 @@ install ends at 300000338 with 0 failed rows and no `bundle_bytes`; an already-u
 339 row migrates with exit 0.
 
 ### 18. Name the in-memory commit builder for what it does
-Type: Structure. Status: planned. After 12. **Owner request (2026-09-21).**
+Type: Structure. Status: done. **Owner request (2026-09-21).**
 
 `NotebookGitBundleBuilder` builds commits in an in-memory JGit repository from Portable entries
 (`build()` for a fresh root commit, `append()` on a parent); it writes no bundle. Rename it and its test
@@ -1555,6 +1555,32 @@ longer justifies being a separate class - its focused test was deleted in slice 
 drop the unused return value. Java migrations carry no Flyway checksum here, so editing one is safe; its
 behavior (per-binding commit, head verification, reachable-object copy, zero-rows selection) must stay
 identical. `NotebookGitAcceptedHistoryCompleteness` keeps its own class - it still has a focused test.
+
+**Delivered.** `NotebookGitBundleBuilder` is now **`NotebookGitCommitBuilder`** (with
+`NotebookGitCommitBuilderTest`), via `git mv`: its output is commits on `refs/heads/main` in an in-memory
+repository, so the name is about commits, following the `NotebookGit<Concept><Role>` pattern; the classes
+that genuinely handle bundles (`NotebookGitBundleWriter`, `NotebookGitBundleImporter`,
+`GitBundleTestReader`, the bundle-transport test base, download/publication) keep their names, so
+"bundle" now always means transport. `NotebookGitAcceptedObjectBackfill` is folded into
+`V300000336__BackfillNotebookGitAcceptedObjects` as private helpers, with the unused count dropped; no
+migration overrides `getChecksum()`, so editing it cannot trip validation. Behavior is identical
+(per-binding commit and rollback-rethrow, head verification, reachable-object copy, zero-rows selection).
+
+Refactor outcome: the migration's leftover nested `try` was flattened (same close-then-catch order) and a
+wrong Javadoc claim corrected. Two test files in the diff were already over 250 lines and were fixed:
+`NotebookGitProposalAncestryControllerTest` (355) split into itself (103 lines, 3 rejection tests) and
+`NotebookGitProposalCommitRangeControllerTest` (248 lines, 4 multi-commit acceptance tests), with a shared
+`assertDownloadedHistoryIsRangeOn` helper; `NotebookGitJdbcObjectStoreTest` 260 -> 240 with a `commitOn`
+helper and its planning-referencing Javadoc replaced. Two assertions were removed from
+`acceptsContentEditRangeThatRestoresAcceptedTreeWithNewHistory` (the downloaded tip's tree equals the
+accepted tree; the tip differs from the accepted head); **coordinator verified they are strictly implied**:
+the helper still asserts the downloaded tip's id equals `range.secondEdit()`, a commit id hashes its tree
+id, and the test still asserts the second edit's tree equals the accepted tree and its id differs from the
+accepted head - so "same tree, new history" is still proven through the product's accepted result.
+
+Proof: B 2,569 tests, 0 failures (Ancestry 3 + CommitRange 4 = the same 7); fresh install ends at
+300000338 with 0 failed rows (re-run after the migration edit); E 40/40; no reference to either old name
+outside `.planning`; every file in the diff is at most 250 lines.
 
 ### 13. Assess attachment cost and cohesion last
 Type: Behavior. Status: done. Story 3 not resolved by assessment alone - folded into slices 15-16.

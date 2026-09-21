@@ -24,10 +24,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Permanent product tests for the JDBC-backed native Git object store adapter, proven directly
- * against real JGit and this worktree's real isolated MySQL - no Spring context, matching the
- * disposable spike's round-trip/reopen/transaction-abort proof shape (see the plan's "Recorded
- * evidence: gates 2-3"). This adapter is not wired into any product caller yet.
+ * Tests the JDBC-backed native Git object store adapter directly against real JGit and the test
+ * MySQL database, with no Spring context.
  */
 class NotebookGitJdbcObjectStoreTest {
 
@@ -60,14 +58,10 @@ class NotebookGitJdbcObjectStoreTest {
     ObjectId commit3;
     byte[] fixtureBundleBytes;
     try (Repository fixture =
-        NotebookGitBundleBuilder.build(v1, "Donut", "system@donut.local", "Initial", time)) {
+        NotebookGitCommitBuilder.build(v1, "Donut", "system@donut.local", "Initial", time)) {
       commit1 = fixture.exactRef("refs/heads/main").getObjectId();
-      commit2 =
-          NotebookGitBundleBuilder.append(
-              fixture, commit1, v2, "Donut", "system@donut.local", "Edit", time.plusSeconds(1));
-      commit3 =
-          NotebookGitBundleBuilder.append(
-              fixture, commit2, v3, "Donut", "system@donut.local", "Add", time.plusSeconds(2));
+      commit2 = commitOn(fixture, commit1, v2, "Edit", time.plusSeconds(1));
+      commit3 = commitOn(fixture, commit2, v3, "Add", time.plusSeconds(2));
       fixtureBundleBytes = NotebookGitBundleWriter.write(fixture);
     }
 
@@ -109,15 +103,7 @@ class NotebookGitJdbcObjectStoreTest {
               PortableTreeEntry.ofText("Parent/README.md", "Parent readme"),
               PortableTreeEntry.ofText("Parent/Child/Note.md", "Third body"),
               PortableTreeEntry.ofText("Parent/Added.md", "New note"));
-      ObjectId commit4 =
-          NotebookGitBundleBuilder.append(
-              reopened,
-              commit3,
-              v4,
-              "Donut",
-              "system@donut.local",
-              "Third edit",
-              time.plusSeconds(3));
+      ObjectId commit4 = commitOn(reopened, commit3, v4, "Third edit", time.plusSeconds(3));
 
       assertThat(reopened.exactRef("refs/heads/main").getObjectId(), equalTo(commit4));
 
@@ -153,7 +139,7 @@ class NotebookGitJdbcObjectStoreTest {
 
     ObjectId commit1;
     try (Repository fixture =
-        NotebookGitBundleBuilder.build(v1, "Donut", "system@donut.local", "Initial", time)) {
+        NotebookGitCommitBuilder.build(v1, "Donut", "system@donut.local", "Initial", time)) {
       commit1 = fixture.exactRef("refs/heads/main").getObjectId();
 
       int bindingId = jdbcFixture.insertBinding(commit1.name());
@@ -165,15 +151,7 @@ class NotebookGitJdbcObjectStoreTest {
       ObjectId commit2;
       try (JdbcNotebookGitRepository txRepo =
           new JdbcNotebookGitRepository(bindingId, txConnection)) {
-        commit2 =
-            NotebookGitBundleBuilder.append(
-                txRepo,
-                commit1,
-                v2,
-                "Donut",
-                "system@donut.local",
-                "Aborted edit",
-                time.plusSeconds(1));
+        commit2 = commitOn(txRepo, commit1, v2, "Aborted edit", time.plusSeconds(1));
 
         // Visible on this connection's own uncommitted transaction.
         assertThat(txRepo.exactRef("refs/heads/main").getObjectId(), equalTo(commit2));
@@ -217,7 +195,7 @@ class NotebookGitJdbcObjectStoreTest {
 
     ObjectId baseHead;
     try (Repository fixture =
-        NotebookGitBundleBuilder.build(
+        NotebookGitCommitBuilder.build(
             baseEntries, "Donut", "system@donut.local", "Initial", time)) {
       baseHead = fixture.exactRef("refs/heads/main").getObjectId();
 
@@ -229,15 +207,7 @@ class NotebookGitJdbcObjectStoreTest {
       ObjectId newHead;
       try (JdbcNotebookGitRepository repo =
           new JdbcNotebookGitRepository(bindingId, appendConnection)) {
-        newHead =
-            NotebookGitBundleBuilder.append(
-                repo,
-                baseHead,
-                changedEntries,
-                "Donut",
-                "system@donut.local",
-                "Deep edit",
-                time.plusSeconds(1));
+        newHead = commitOn(repo, baseHead, changedEntries, "Deep edit", time.plusSeconds(1));
       }
 
       assertThat(newHead, notNullValue());
@@ -246,6 +216,16 @@ class NotebookGitJdbcObjectStoreTest {
           callLog.countMatching("notebook_git_accepted_object", " IN ("),
           equalTo(1L));
     }
+  }
+
+  private static ObjectId commitOn(
+      Repository repo,
+      ObjectId parent,
+      List<PortableTreeEntry> entries,
+      String message,
+      Instant commitTime) {
+    return NotebookGitCommitBuilder.append(
+        repo, parent, entries, "Donut", "system@donut.local", message, commitTime);
   }
 
   private void assertTreeEntries(

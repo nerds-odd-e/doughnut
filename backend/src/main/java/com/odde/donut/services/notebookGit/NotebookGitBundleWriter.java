@@ -11,7 +11,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.BundleWriter;
 
 /**
- * Serializes a {@code refs/heads/main} repository built by {@link NotebookGitBundleBuilder} into
+ * Serializes a {@code refs/heads/main} repository built by {@link NotebookGitCommitBuilder} into
  * portable bundle bytes for transport (download and cloning).
  */
 public final class NotebookGitBundleWriter {
