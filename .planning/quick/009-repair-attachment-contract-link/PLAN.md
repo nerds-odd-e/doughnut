@@ -2,7 +2,7 @@
 
 **Identity:** .planning/quick/008-repair-attachment-contract-link/PLAN.md
 
-Status: executed retrospective correction; execution retrospective pending.
+Status: executed retrospective correction; execution retrospective complete.
 
 ## Execution identity
 
@@ -14,12 +14,18 @@ Status: executed retrospective correction; execution retrospective pending.
 - Authorized remote target: `origin/codex/009-repair-attachment-contract-link`;
   integration target: `origin/main`.
 - Published claim revision: `cae26e44b7377ae748a002d8d237c9aeecc49b3d`.
-- CI observer: Codex yielded cell `22`, coordinator `/root`, checkout above,
+- Delivery CI observer: Codex yielded cell `22`, coordinator `/root`, checkout above,
   repository `nerds-odd-e/doughnut`, target
   `codex/009-repair-attachment-contract-link`, GitHub workflow `ci.yml`
-  (`donut CI`), mailbox `/tmp/dough-ci-501/watch-p3ngLY`, PID `35421`.
+  (`donut CI`), mailbox `/tmp/dough-ci-501/watch-p3ngLY`, PID `35421`;
+  stopped with `pendingCi: unobserved` after the registered delivery exposed
+  only the inherited `ExportFolderRow` compile failure from base revision
+  `efdc4753102a08c79e95c89270ce4dfe1fea61fb`.
   The Story Branch claim on `main` is `pendingCi: unobserved` by this
   branch-bound observer.
+- Retrospective-close CI observer: Codex yielded cell `46`, coordinator
+  `/root`, checkout and target above, mailbox
+  `/tmp/dough-ci-501/watch-cAkyW0`, PID `55072`.
 
 ## Source and bounded outcome
 
