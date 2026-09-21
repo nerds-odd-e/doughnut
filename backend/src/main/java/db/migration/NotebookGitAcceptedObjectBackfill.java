@@ -18,17 +18,15 @@ import org.eclipse.jgit.lib.Repository;
 
 /**
  * Converts every {@code notebook_git_binding} row whose native object store ({@code
- * notebook_git_accepted_object}) is still empty into native storage, reusing the exact conversion
- * mechanics {@code NotebookGitAcceptedRepositoryStore.open} already uses for a not-yet-touched
- * legacy binding on ordinary first-open (slice 5): import the binding's bundle bytes, verify the
- * imported {@code main} head matches the binding's persisted accepted head, then copy every
- * reachable object into the native store. {@code bundle_bytes} and {@code accepted_git_object_id}
- * are never read for anything but this verification and are never modified - this only adds native
- * rows.
+ * notebook_git_accepted_object}) is still empty into native storage: import the binding's bundle
+ * bytes, verify the imported {@code main} head matches the binding's persisted accepted head, then
+ * copy every reachable object into the native store. {@code bundle_bytes} and {@code
+ * accepted_git_object_id} are never read for anything but this verification and are never modified;
+ * this only adds native rows.
  *
- * <p>Extracted as a plain class outside Spring context (this runs from a Flyway Java migration,
- * before any Spring bean exists) so it can be exercised directly by a focused test, separate from
- * the once-ever, automatic {@link V300000336__BackfillNotebookGitAcceptedObjects} migration itself.
+ * <p>A plain class with no Spring dependency, because {@link
+ * V300000336__BackfillNotebookGitAcceptedObjects} runs it as a Flyway Java migration, before any
+ * Spring bean exists.
  *
  * <p>Each binding is imported, verified, copied and committed as its own unit of work - not one
  * transaction for every binding - so an interrupted run (crash, restart) leaves every binding

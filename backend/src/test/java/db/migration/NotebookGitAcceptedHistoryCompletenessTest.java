@@ -62,7 +62,7 @@ class NotebookGitAcceptedHistoryCompletenessTest {
       assertThat(
           refusal.getMessage(),
           equalTo(
-              "Native accepted history is incomplete; retained bundles must not be dropped:"
+              "Native accepted history is incomplete; bundle_bytes must not be dropped:"
                   + " binding "
                   + incomplete.id()
                   + " is missing "

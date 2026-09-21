@@ -7,15 +7,11 @@ import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
 /**
- * One-time backfill: converts every {@code notebook_git_binding} row that predates native Git
- * object storage (slices 3-5) into the native {@code notebook_git_accepted_object} store, so an
- * existing binding never opened since upgrade retains its exact head/history without depending on
- * {@link com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore}'s lazy
- * convert-on-first-open path. {@code bundle_bytes} and {@code accepted_git_object_id} are left
- * completely untouched; this migration only adds native rows. See {@link
- * NotebookGitAcceptedObjectBackfill} for the actual algorithm, kept as a plain, independently
- * testable class since this migration itself runs automatically, once per environment, outside
- * Spring context.
+ * One-time upgrade step: converts every {@code notebook_git_binding} row that stored its accepted
+ * history only as {@code bundle_bytes} into the native {@code notebook_git_accepted_object} store,
+ * keeping its exact head and history. {@code bundle_bytes} and {@code accepted_git_object_id} are
+ * left untouched; this migration only adds native rows. A fresh install runs it over empty tables,
+ * where it does nothing. See {@link NotebookGitAcceptedObjectBackfill} for the algorithm.
  *
  * <p>Each binding is converted and committed as its own unit of work ({@link
  * #canExecuteInTransaction()} is {@code false}), so a restart after an interrupted run resumes

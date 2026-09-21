@@ -33,11 +33,9 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 
 * Versions use a numerical format
 
-The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; **`V300000339__db_migration_placeholder.sql`** is the newest file: a no-op tip placeholder above every version ever applied. Version **`300000330`** is retired — its migration was deleted after production applied it — and stays reserved in `flyway_schema_history`.
+The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; the upgrade migrations after it run in order on every install, and **`V300000338__DropNotebookGitBindingBundleBytes.java`** is the newest file. Versions **`300000330`** and **`300000339`** are retired — their migrations were deleted after production applied them — and stay reserved in `flyway_schema_history`.
 
 New migrations need to use a **greater** version number than **`300000339`**.
-
-**Freeze:** new schema migrations are frozen until the squash that removes the spent upgrade chain below the `300000339` tip placeholder is deployed (see Squashing historical migrations).
 
 ### Migration Process
 
@@ -48,8 +46,8 @@ New migrations need to use a **greater** version number than **`300000339`**.
 ## Migration file structure
 
 * **`V100000000__baseline.sql`** holds the collapsed full DDL (fresh installs).
-* **`V300000339__db_migration_placeholder.sql`** is the no-op tip placeholder; the next-version rule, the retired version, and the current freeze are under Version Numbering.
-* Each **new** file after that should contain one atomic change (create/alter/rename/drop as needed).
+* The upgrade migrations after the baseline run in order; the newest file, the retired versions, and the next-version rule are under Version Numbering.
+* Each **new** file should contain one atomic change (create/alter/rename/drop as needed).
 
 ## Best Practices:
 

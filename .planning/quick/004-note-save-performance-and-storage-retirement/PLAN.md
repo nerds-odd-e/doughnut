@@ -1497,7 +1497,7 @@ and `SELECT MAX(CAST(version AS UNSIGNED)) FROM flyway_schema_history;` - expect
 300000339, both `success = 1`, and a maximum of 300000339. Only then may slice 12 delete files.
 
 ### 12. Retire the squash preparation (owner: no squash)
-Type: Structure. Status: planned. **Replaces the original baseline-squash slice**, which the owner
+Type: Structure. Status: done. **Replaces the original baseline-squash slice**, which the owner
 dropped on 2026-09-21: the spent upgrade migrations stay, because fresh installs run them in order.
 
 - **Delete `V300000339__db_migration_placeholder.sql`.** It existed only to anchor the squash, and its
@@ -1517,6 +1517,30 @@ dropped on 2026-09-21: the spent upgrade migrations stay, because fresh installs
   `migrateTestDB`) ends at 300000338 with no failed rows; and an **already-upgraded** schema holding
   a 300000339 row still migrates cleanly (repair marks it deleted). Size: ~5 minutes plus suite.
 
+**Delivered.** `V300000339__db_migration_placeholder.sql` deleted - the only SQL change; every other SQL
+migration is byte-identical. Confirmed from code that all three paths run `flyway.repair()` before
+`flyway.migrate()`: `FlyWayFreeVersionRealMigration` (non-test profiles, where Spring's own migration is
+disabled by `FlyWayFreeVersionIgnoreMigrationStrategyConfig`), `DonutTaskRunner` (`migrateTestDB`) and
+`FlyWayTestMigrationStrategyConfig` (tests); Flyway 12.4.0, no custom validation settings.
+
+**Correction to the reasoning above:** repair does **not** immediately mark 300000339 deleted. Because
+it was the newest version, a schema that recorded it now sees it as a *future* migration: repair leaves
+the row as an ordinary success row and default validation accepts it, so startup succeeds. It becomes a
+`DELETE` row on the first startup after a version above 339 ships - proven with a temporary
+`V300000340` probe on a disposable schema (repair appended `300000339 | DELETE`, then applied 340), then
+removed. The 300000330 precedent differed only because 330 was not the newest version when deleted.
+Production and Development keep their 339 row until then; nothing needs doing.
+
+`.agents/skills/db-migration/SKILL.md`: the current-state freeze is removed; `V300000338` is the newest
+file; 300000330 and 300000339 are retired and reserved; new migrations must exceed 300000339. Its
+general, optional squash procedure is left intact. Java prose in `V300000336`, `NotebookGitAcceptedObjectBackfill`,
+`V300000338`, `NotebookGitAcceptedHistoryCompleteness` and `NotebookGitBundleImporter` now states current
+truth - one-time upgrade steps that a fresh install runs over an empty binding table (true: no migration
+inserts bindings) - with the false "independently testable" claims removed (that test went in slice 10);
+the refusal message now says "bundle_bytes must not be dropped". Proof: B 2,569 tests, 0 failures; fresh
+install ends at 300000338 with 0 failed rows and no `bundle_bytes`; an already-upgraded schema holding a
+339 row migrates with exit 0.
+
 ### 18. Name the in-memory commit builder for what it does
 Type: Structure. Status: planned. After 12. **Owner request (2026-09-21).**
 
@@ -1524,6 +1548,13 @@ Type: Structure. Status: planned. After 12. **Owner request (2026-09-21).**
 (`build()` for a fresh root commit, `append()` on a parent); it writes no bundle. Rename it and its test
 to a domain name that says so, updating its ~11 files. Behavior unchanged. Proof: B and E. Size: ~5
 minutes plus suites.
+
+Also, raised by slice 12's refactor pass under the owner's rule: `NotebookGitAcceptedObjectBackfill` no
+longer justifies being a separate class - its focused test was deleted in slice 10 and its only caller is
+`V300000336`, which ignores the converted count it returns. Fold it into `V300000336`'s `migrate()` and
+drop the unused return value. Java migrations carry no Flyway checksum here, so editing one is safe; its
+behavior (per-binding commit, head verification, reachable-object copy, zero-rows selection) must stay
+identical. `NotebookGitAcceptedHistoryCompleteness` keeps its own class - it still has a focused test.
 
 ### 13. Assess attachment cost and cohesion last
 Type: Behavior. Status: done. Story 3 not resolved by assessment alone - folded into slices 15-16.

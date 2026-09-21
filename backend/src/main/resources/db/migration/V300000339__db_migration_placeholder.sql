@@ -1,3 +1,0 @@
--- No-op tip placeholder above every migration version ever applied (highest was 300000338).
--- Future migrations must use a version greater than 300000339.
--- New schema migrations are frozen until the squash that removes the spent upgrade chain is deployed.
