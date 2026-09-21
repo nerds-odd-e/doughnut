@@ -10,7 +10,7 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage](seeds/SEED-034-faster-note-content-saving.md#story-4) — SEED-034#story-4 — plan: [004-note-save-performance-and-storage-retirement](quick/004-note-save-performance-and-storage-retirement/PLAN.md)
+- [Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage](seeds/SEED-034-faster-note-content-saving.md#story-4) — SEED-034#story-4 ([plan](quick/004-note-save-performance-and-storage-retirement/PLAN.md))
 
 ## Backlog list
 
