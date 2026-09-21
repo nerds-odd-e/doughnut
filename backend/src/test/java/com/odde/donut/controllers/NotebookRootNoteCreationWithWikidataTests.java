@@ -9,6 +9,8 @@ import com.odde.donut.controllers.dto.*;
 import com.odde.donut.entities.*;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
+import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import com.odde.donut.testability.MakeMeWithoutDB;
 import java.io.IOException;
 import java.net.URI;
@@ -74,8 +76,7 @@ class NotebookRootNoteCreationWithWikidataTests extends NotebookControllerTestBa
     }
 
     @Test
-    void wikidataAssistedRootCreateDoesNotAdvanceAcceptedHead()
-        throws UnexpectedNoAccessRightException, InterruptedException, IOException {
+    void wikidataAssistedRootCreateDoesNotAdvanceAcceptedHead() throws Exception {
       NotebookCreationRequest request = new NotebookCreationRequest();
       request.setNewTitle("Wikidata Git Notebook");
       Notebook gitNotebook =
@@ -84,6 +85,7 @@ class NotebookRootNoteCreationWithWikidataTests extends NotebookControllerTestBa
               .orElseThrow();
       NotebookGitBinding accepted =
           notebookGitBindingRepository.findByNotebook_Id(gitNotebook.getId()).orElseThrow();
+      AcceptedHistory acceptedHistoryBefore = acceptedHistory(gitNotebook);
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       NoteCreationDTO creation = new NoteCreationDTO();
@@ -96,7 +98,13 @@ class NotebookRootNoteCreationWithWikidataTests extends NotebookControllerTestBa
       NotebookGitBinding after =
           notebookGitBindingRepository.findByNotebook_Id(gitNotebook.getId()).orElseThrow();
       assertThat(after.getAcceptedGitObjectId(), is(accepted.getAcceptedGitObjectId()));
-      assertThat(after.getBundleBytes(), equalTo(accepted.getBundleBytes()));
+      assertThat(acceptedHistory(gitNotebook), equalTo(acceptedHistoryBefore));
+    }
+
+    /** The accepted history the notebook's own download boundary currently serves. */
+    private AcceptedHistory acceptedHistory(Notebook notebook) throws Exception {
+      return GitBundleTestReader.fetchAcceptedHistory(
+          controller.downloadNotebookGitBundle(notebook).getBody());
     }
 
     @Nested

@@ -64,12 +64,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     ObjectId acceptedB = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId downloadedHead =
-          GitBundleTestReader.fetchHead(
-              repo,
-              controller
-                  .downloadNotebookGitBundle(
-                      notebookRepository.findById(f.notebook().getId()).orElseThrow())
-                  .getBody());
+          GitBundleTestReader.fetchHead(repo, acceptedBundleBytes(f.notebook()));
       assertThat(downloadedHead, equalTo(acceptedB));
       try (RevWalk revWalk = new RevWalk(repo)) {
         RevCommit commitB = revWalk.parseCommit(downloadedHead);
@@ -95,12 +90,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
 
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId downloadedHead =
-          GitBundleTestReader.fetchHead(
-              repo,
-              controller
-                  .downloadNotebookGitBundle(
-                      notebookRepository.findById(f.notebook().getId()).orElseThrow())
-                  .getBody());
+          GitBundleTestReader.fetchHead(repo, acceptedBundleBytes(f.notebook()));
       assertThat(
           GitBundleTestReader.pathsIn(repo, downloadedHead),
           containsInAnyOrder(
@@ -165,7 +155,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
   void preExistingPortableDriftKeepsTheFolderMoveAndAcceptedHistoryUnchanged() throws Exception {
     FolderMoveFixture f = seedLearnedCellsInBiologyWithEmptyStudy();
     ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
-    byte[] acceptedBundle = binding(f.notebook()).getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(f.notebook());
     makeMe.aNote().notebook(f.notebook()).title("Unsynchronized").content(CELLS_BODY).please();
 
     folderController.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
@@ -173,7 +163,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     assertThat(parentFolderId(f.biology().getId()), equalTo(f.study().getId()));
     assertThat(
         ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId()), equalTo(acceptedA));
-    assertThat(binding(f.notebook()).getBundleBytes(), equalTo(acceptedBundle));
+    assertThat(acceptedHistory(f.notebook()), equalTo(acceptedHistoryBefore));
   }
 
   CompleteSubtreeFixture seedCompleteBiologySubtreeWithReferrer()

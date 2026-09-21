@@ -16,6 +16,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.RecallLog;
+import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.exceptions.ApiException;
@@ -23,6 +24,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -50,12 +52,12 @@ class NotebookGitWebContentHistoryControllerTest
     Note note = makeMe.aNote().notebook(notebook).title("Original").please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
     String acceptedHead = accepted.getAcceptedGitObjectId();
-    byte[] acceptedBundle = accepted.getBundleBytes().clone();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     testabilitySettings.timeTravelTo(Timestamp.from(T1008));
 
     textContentController.updateNoteTitle(note, titleDto("Original"));
 
-    assertAcceptedHistoryUnchanged(notebook.getId(), acceptedHead, acceptedBundle);
+    assertAcceptedHistoryUnchanged(notebook, acceptedHead, acceptedHistoryBefore);
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getUpdatedAt(),
         is(Timestamp.from(T1008)));
@@ -69,7 +71,7 @@ class NotebookGitWebContentHistoryControllerTest
     textContentController.updateNoteContent(referrer, contentDto(REFERENCE_CONTENT));
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
     String acceptedHead = accepted.getAcceptedGitObjectId();
-    byte[] acceptedBundle = accepted.getBundleBytes().clone();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
 
     ApiException thrown =
         assertThrows(
@@ -77,7 +79,7 @@ class NotebookGitWebContentHistoryControllerTest
             () -> textContentController.updateNoteTitle(target, titleDto("Renamed")));
 
     assertThat(thrown.getErrorBody().getErrorType(), is(ApiError.ErrorType.BINDING_ERROR));
-    assertAcceptedHistoryUnchanged(notebook.getId(), acceptedHead, acceptedBundle);
+    assertAcceptedHistoryUnchanged(notebook, acceptedHead, acceptedHistoryBefore);
     assertThat(noteRepository.findById(target.getId()).orElseThrow().getTitle(), is("Target"));
     assertThat(
         noteRepository.findById(referrer.getId()).orElseThrow().getContent(),
@@ -92,14 +94,16 @@ class NotebookGitWebContentHistoryControllerTest
     textContentController.updateNoteContent(referrer, contentDto(REFERENCE_CONTENT));
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
     String acceptedHead = accepted.getAcceptedGitObjectId();
-    byte[] acceptedBundle = accepted.getBundleBytes().clone();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
+    User owner = currentUser.getUser();
     currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> textContentController.updateNoteTitle(target, titleDto("Renamed")));
 
-    assertAcceptedHistoryUnchanged(notebook.getId(), acceptedHead, acceptedBundle);
+    currentUser.setUser(owner);
+    assertAcceptedHistoryUnchanged(notebook, acceptedHead, acceptedHistoryBefore);
     assertThat(noteRepository.findById(target.getId()).orElseThrow().getTitle(), is("Target"));
     assertThat(
         noteRepository.findById(referrer.getId()).orElseThrow().getContent(),
@@ -152,10 +156,7 @@ class NotebookGitWebContentHistoryControllerTest
     assertThat(reloadedLog.getMemoryTracker().getId(), is(learningIds[0]));
     assertThat(reloadedLog.getProductOutcome(), is(recallOutcomeBeforeRename));
 
-    byte[] downloadedBundle =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloadedBundle = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId tip = GitBundleTestReader.fetchHead(repository, downloadedBundle);
       try (RevWalk revWalk = new RevWalk(repository)) {
@@ -233,9 +234,9 @@ class NotebookGitWebContentHistoryControllerTest
   }
 
   private void assertAcceptedHistoryUnchanged(
-      Integer notebookId, String acceptedHead, byte[] acceptedBundle) {
-    NotebookGitBinding reloaded = bindingById(notebookId);
-    assertThat(reloaded.getAcceptedGitObjectId(), is(acceptedHead));
-    assertThat(reloaded.getBundleBytes(), is(acceptedBundle));
+      Notebook notebook, String acceptedHead, AcceptedHistory acceptedHistoryBefore)
+      throws Exception {
+    assertThat(bindingById(notebook.getId()).getAcceptedGitObjectId(), is(acceptedHead));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 }

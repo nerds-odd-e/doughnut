@@ -30,7 +30,7 @@ class NotebookGitFolderCreationAtomicControllerTest extends NotebookGitBundleCon
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     var bindingUpdatedAt = binding.getUpdatedAt();
     long originalFolderCount =
@@ -52,8 +52,8 @@ class NotebookGitFolderCreationAtomicControllerTest extends NotebookGitBundleCon
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           assertThat(countFoldersForNotebook(notebook.getId()), is(originalFolderCount));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 }

@@ -53,8 +53,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
   @Test
   void initialOrdinaryMarkdownIsAcceptedAsCanonicalRootFile() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding accepted = binding(notebook);
-    ObjectId acceptedHead = ObjectId.fromString(accepted.getAcceptedGitObjectId());
+    ObjectId acceptedHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     NoteCreationDTO creation = titleOnly("With Body");
     creation.setContent("---\naliases:\n  - hello\n---\nSee [[Link]]\n");
 
@@ -63,10 +62,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
     Note created = noteRepository.findById(result.getId()).orElseThrow();
     assertThat(created.getContent(), is(CANONICAL_INITIAL_CONTENT));
 
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId newHead = GitBundleTestReader.fetchHead(repository, downloaded);
       try (RevWalk revWalk = new RevWalk(repository)) {
@@ -84,7 +80,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
   @Test
   void relationshipNoteKeepsExistingWebCreationAndAcceptedHead() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding accepted = binding(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
     NoteCreationDTO creation = titleOnly("Relates");
     creation.setContent("---\ntype: Relationship\nsource: \"[[A]]\"\ntarget: \"[[B]]\"\n---\n");
 
@@ -107,10 +103,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
     Note created = noteRepository.findById(result.getId()).orElseThrow();
     assertThat(created.getTitle(), is("Another"));
 
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId newHead = GitBundleTestReader.fetchHead(repository, downloaded);
       try (RevWalk revWalk = new RevWalk(repository)) {
@@ -132,7 +125,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
   void earlierProjectionDriftKeepsExistingWebCreationAndAcceptedHead() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote().notebook(notebook).title("Unsynchronized").please();
-    NotebookGitBinding accepted = binding(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
 
     NoteRealm result = controller.createNoteAtNotebookRoot(notebook, titleOnly("Another"));
 
@@ -140,23 +133,20 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
     assertThat(created.getTitle(), is("Another"));
     assertBindingUnchanged(notebook, accepted);
 
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId head = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(GitBundleTestReader.pathsIn(repository, head), not(hasItem("Another.md")));
       assertThat(
           GitBundleTestReader.fetchAdvertisedHead(downloaded).getName(),
-          is(accepted.getAcceptedGitObjectId()));
+          is(accepted.acceptedHead()));
     }
   }
 
   @Test
   void unauthorizedCreationLeavesAcceptedHeadUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding accepted = binding(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
     User owner = currentUser.getUser();
 
     currentUser.setUser(createFixtureUser());
@@ -171,7 +161,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
   @Test
   void reservedTitleLeavesAcceptedHeadUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding accepted = binding(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
 
     ApiException ex =
         assertThrows(
@@ -185,7 +175,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
   void occupiedTitleLeavesAcceptedHeadUnchanged() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote().notebook(notebook).title("Taken").please();
-    NotebookGitBinding accepted = binding(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
 
     assertThrows(
         ConstraintViolationException.class,

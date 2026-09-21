@@ -85,14 +85,14 @@ class NotebookGitFolderRenameGuardControllerTest extends NotebookGitWebContentCo
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
     snapshotCurrentPortableTree(notebook);
     ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
-    byte[] acceptedBundle = binding(notebook).getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     makeMe.aNote().notebook(notebook).title("Unsynchronized").content(CELLS_BODY).please();
 
     Folder renamed = folderController.renameFolder(notebook, biology, renameTo("Zoology"));
 
     assertThat(renamed.getName(), equalTo("Zoology"));
     assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
-    assertThat(binding(notebook).getBundleBytes(), equalTo(acceptedBundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   static FolderRenameRequest renameTo(String name) {

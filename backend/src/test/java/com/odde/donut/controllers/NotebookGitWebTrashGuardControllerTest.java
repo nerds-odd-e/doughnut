@@ -14,6 +14,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,30 +27,30 @@ class NotebookGitWebTrashGuardControllerTest extends NotebookGitWebContentContro
   @Test
   void unauthorizedTrashLeavesLocationContentAndAcceptedBindingUnchanged() throws Exception {
     LiveCellsFixture f = seedLiveCellsInBiology();
-    CommittedNoteAndBinding setup =
-        committedNoteAndBinding(f.cells().getId(), f.notebook().getId());
-    User otherUser = createFixtureUser();
-    currentUser.setUser(otherUser);
+    CommittedNoteAndBinding setup = committedNoteAndBinding(f.cells().getId(), f.notebook());
+    User owner = currentUser.getUser();
+    currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> noteController.trashNote(f.cells(), leaveDeadLinks()));
 
-    CommittedNoteAndBinding committed =
-        committedNoteAndBinding(f.cells().getId(), f.notebook().getId());
+    // The download boundary serving the accepted history is authorization-checked, so the owner
+    // has to be back before the unchanged-history post-condition can be observed.
+    currentUser.setUser(owner);
+    CommittedNoteAndBinding committed = committedNoteAndBinding(f.cells().getId(), f.notebook());
     assertThat(committed.folderId(), equalTo(f.biology().getId()));
     assertThat(committed.content(), equalTo(CELLS_BODY));
     assertThat(committed.trashed(), is(false));
     assertThat(committed.acceptedHead(), equalTo(setup.acceptedHead()));
-    assertThat(committed.acceptedBundle(), equalTo(setup.acceptedBundle()));
+    assertThat(committed.acceptedHistory(), equalTo(setup.acceptedHistory()));
   }
 
   @Test
   void occupiedMoveRecoveryOfGitTrashedNoteLeavesNoteInTrashAndAcceptedBindingUnchanged()
       throws Exception {
     OccupiedRecoveryFixture f = seedGitTrashedCellsWithOccupiedBiology();
-    CommittedNoteAndBinding setup =
-        committedNoteAndBinding(f.cells().getId(), f.notebook().getId());
+    CommittedNoteAndBinding setup = committedNoteAndBinding(f.cells().getId(), f.notebook());
 
     ApiException conflict =
         assertThrows(
@@ -63,8 +64,7 @@ class NotebookGitWebTrashGuardControllerTest extends NotebookGitWebContentContro
   @Test
   void occupiedUndoOfGitTrashedNoteLeavesNoteInTrashAndAcceptedBindingUnchanged() throws Exception {
     OccupiedRecoveryFixture f = seedGitTrashedCellsWithOccupiedBiology();
-    CommittedNoteAndBinding setup =
-        committedNoteAndBinding(f.cells().getId(), f.notebook().getId());
+    CommittedNoteAndBinding setup = committedNoteAndBinding(f.cells().getId(), f.notebook());
 
     ApiException conflict =
         assertThrows(
@@ -76,7 +76,9 @@ class NotebookGitWebTrashGuardControllerTest extends NotebookGitWebContentContro
     assertOccupiedRecoveryUnchanged(f, setup);
   }
 
-  void assertOccupiedRecoveryUnchanged(OccupiedRecoveryFixture f, CommittedNoteAndBinding setup) {
+  void assertOccupiedRecoveryUnchanged(OccupiedRecoveryFixture f, CommittedNoteAndBinding setup)
+      throws Exception {
+    assertThat(acceptedHistory(f.notebook()), equalTo(setup.acceptedHistory()));
     inCommittedTransaction(
         transactionManager,
         () -> {
@@ -90,7 +92,6 @@ class NotebookGitWebTrashGuardControllerTest extends NotebookGitWebContentContro
           assertThat(occupier.getFolder().getId(), equalTo(f.biology().getId()));
           assertThat(occupier.getContent(), equalTo(OCCUPIER_BODY));
           assertThat(binding.getAcceptedGitObjectId(), equalTo(setup.acceptedHead()));
-          assertThat(binding.getBundleBytes(), equalTo(setup.acceptedBundle()));
         });
   }
 
@@ -114,19 +115,21 @@ class NotebookGitWebTrashGuardControllerTest extends NotebookGitWebContentContro
     return new OccupiedRecoveryFixture(notebook, biology, trashBiology, cells, occupier);
   }
 
-  CommittedNoteAndBinding committedNoteAndBinding(Integer noteId, Integer notebookId) {
+  CommittedNoteAndBinding committedNoteAndBinding(Integer noteId, Notebook notebook)
+      throws Exception {
+    AcceptedHistory acceptedHistory = acceptedHistory(notebook);
     return inCommittedTransaction(
         transactionManager,
         () -> {
           Note note = noteRepository.findById(noteId).orElseThrow();
           NotebookGitBinding binding =
-              notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow();
+              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           return new CommittedNoteAndBinding(
               note.getFolder().getId(),
               note.getContent(),
               note.isTrashed(),
               binding.getAcceptedGitObjectId(),
-              binding.getBundleBytes().clone());
+              acceptedHistory);
         });
   }
 
@@ -140,5 +143,5 @@ class NotebookGitWebTrashGuardControllerTest extends NotebookGitWebContentContro
       String content,
       boolean trashed,
       String acceptedHead,
-      byte[] acceptedBundle) {}
+      AcceptedHistory acceptedHistory) {}
 }

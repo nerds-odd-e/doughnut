@@ -69,7 +69,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
         makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
     String acceptedHead = accepted.getAcceptedGitObjectId();
-    byte[] acceptedBundle = accepted.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     testabilitySettings.timeTravelTo(editedAt);
 
     textContentController.updateNoteContent(
@@ -80,7 +80,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     assertThat(reloaded.getContent(), is(ACCEPTED_CONTENT));
     assertThat(reloaded.getUpdatedAt(), is(editedAt));
     assertThat(after.getAcceptedGitObjectId(), is(acceptedHead));
-    assertThat(after.getBundleBytes(), equalTo(acceptedBundle));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   @Test
@@ -175,10 +175,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
         noteController.getNoteInfo(reloaded).getMemoryTrackers().getFirst().getDifficulty(),
         is(7f));
 
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId editedHead = GitBundleTestReader.fetchHead(repository, downloaded);
       try (RevWalk revWalk = new RevWalk(repository)) {
@@ -211,6 +208,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     Note note =
         makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     makeMe.aNote().notebook(notebook).title("Unsynchronized").content(ACCEPTED_CONTENT).please();
 
     textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
@@ -219,7 +217,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getContent(), is(EDITED_CONTENT));
     assertThat(after.getAcceptedGitObjectId(), is(accepted.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(accepted.getBundleBytes()));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   @Test
@@ -243,6 +241,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
     Note note =
         makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     User owner = currentUser.getUser();
 
     currentUser.setUser(createFixtureUser());
@@ -258,7 +257,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
 
     NotebookGitBinding after = binding(notebook);
     assertThat(after.getAcceptedGitObjectId(), is(accepted.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(accepted.getBundleBytes()));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getContent(), is(ACCEPTED_CONTENT));
   }

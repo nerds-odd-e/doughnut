@@ -31,7 +31,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     Folder created = folderController.createFolder(notebook, request);
 
     assertThat(created.getName(), is("Biology"));
-    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(GitBundleTestReader.pathsIn(repository, acceptedHead), contains("Biology/.keep"));
@@ -69,7 +69,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     NotebookGitBinding before =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     String acceptedHeadBefore = before.getAcceptedGitObjectId();
-    byte[] acceptedBundleBefore = before.getBundleBytes().clone();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     makeMe
         .aNote()
         .notebook(notebook)
@@ -87,7 +87,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     NotebookGitBinding after =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(after.getAcceptedGitObjectId(), is(acceptedHeadBefore));
-    assertThat(after.getBundleBytes(), equalTo(acceptedBundleBefore));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   @Test
@@ -115,7 +115,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControlle
     Folder biology = folderController.createFolder(notebook, childRequest);
 
     assertThat(biology.getParentFolder().getId(), equalTo(science.getId()));
-    byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, downloaded);
       assertThat(

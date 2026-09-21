@@ -601,7 +601,7 @@ group. Pre-existing and out of scope so far: `NotebookGitProposalAncestryControl
 (355 lines) and `NotebookGitComposedMoveEditControllerTest` (251).
 
 ### 6. Observe web-change durability through current storage
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 
 Move web-content, folder/move/trash and failed/concurrent-save tests off old-column
 observations. Keep their actual discriminating assertions: complete final tree,
@@ -609,6 +609,90 @@ no-op head, stale/drift refusal, refreshed content, private identities and atomi
 rollback. Do not replace these with object-row counts alone. Enables slice 9.
 Proof: B. Size: ~5 minutes for shared observation changes; subdivide by domain
 operation if the same change does not apply coherently.
+
+**Delivered.** 19 backend test files, no production code. Repo-wide old-column
+reads fell from 36 files to **20**. Suite unchanged at 2,564 tests, 0 failures,
+0 errors, 0 skipped; no test added, removed, renamed or weakened.
+
+Patterns A and B from slice 5 covered every site. Three shared observation owners
+were rewritten rather than edited line by line:
+`NotebookGitWebContentHistoryControllerTest.assertAcceptedHistoryUnchanged`
+(3 call sites), the `CommittedFolderAndBinding` / `CommittedNoteAndBinding` guard
+records, and `NotebookGitNoteCreationControllerTestSupport.assertBindingUnchanged`
+via a new `record AcceptedBinding(acceptedHead, updatedAt, acceptedHistory)`
+(8 call sites). Each keeps its accepted-head and `updatedAt` assertions; only the
+byte-column line became a full accepted-history comparison.
+
+**Carve-out honored, and now confirmed minimal.** In
+`NotebookGitWebContentSaveControllerTest`, three of nine references were genuinely
+incidental and were converted. The two legacy-conversion tests were left exactly
+as they are, verified by the coordinator as zero diff lines. After this slice that
+file is the **only** file in the web-change family still reading the column, and
+only inside those two tests. Consequence for slice 9:
+`clearNativeObjectStoreRows` and `countNativeObjectStoreRows` on the shared base
+now have **no other caller in the web family**, so when slice 9 retires those two
+tests both base helpers can be deleted outright rather than kept for someone else.
+
+**Three hazards now confirmed as recurring, for slice 7 to expect:**
+
+1. **Authorization restore** - three more sites needed `currentUser.setUser(owner)`
+   before observing, because the download boundary is authorization-checked
+   (`deniedOwnerKeepsAcceptedHistoryAndStoredNotesUnchanged`, and the two
+   unauthorized-trash guards). Slice 7's denial tests will all hit this.
+2. **Committed-transaction placement (new in slice 6).** Where the old-column
+   assertion sat *inside* an `inCommittedTransaction` block, `acceptedHistory`
+   cannot be substituted in place - it goes through the controller and must be
+   read outside the block. The shape that worked five times: capture before,
+   assert immediately after the block closes. Slice 7's cutover/reset/deletion
+   fixtures use the same committed-transaction style.
+3. **Not every file inherits the slice-5 seams (new in slice 6).**
+   `NotebookRootNoteCreationWithWikidataTests` extends `NotebookControllerTestBase`,
+   not the Git bundle base, and needed a local four-line
+   `GitBundleTestReader.fetchAcceptedHistory(download)` escape hatch.
+   `NotebookAccessDenialMvcTest` and others in slice 7 will need the same. If three
+   or more such callers accumulate, hoist that helper into `GitBundleTestReader`.
+
+**Sizing: third consecutive overrun** - about 20 active minutes against ~5. Cause
+was again volume (30 call sites across 19 files), not differing edits, so the
+subdivide-by-domain trigger did not fire and pushing through was correct;
+subdividing would have left the tree non-compiling between leaves. **Revised
+expectation for slice 7: 15-20 minutes, not 5** - roughly 20 files of the same two
+patterns plus the one-line `assertProposalRejectedWithoutMutatingBinding` fix.
+
+Refactor outcome (slice 6): the pass found the same files still hand-rolling
+`controller.downloadNotebookGitBundle(notebookRepository.findById(...).orElseThrow()).getBody()`
+a few lines from where they now call the seam - 16 occurrences across 8 files -
+and collapsed them onto `acceptedBundleBytes`. That turned the slice's net +37
+lines into **net -13**. `acceptedBundleBytes`/`acceptedHistory` is now the uniform
+read seam; slice 7 should call it rather than re-inlining the download recipe.
+Two adjacent files still inline it and were left as cosmetic-only:
+`NotebookGitWebNoteMoveControllerTest:112` and
+`NotebookGitWebContentHistoryControllerTestSupport:61`.
+
+Coordinator verification of the preservation claims, done independently rather
+than accepted on report: per-file `assertThat(`/`assertThrows(` counts compared
+against `HEAD` across all 19 files show **zero delta in every file**, and both
+carve-out test bodies extracted and hashed against `HEAD` are **byte-identical**.
+
+The local `acceptedHistory` escape hatch in `NotebookRootNoteCreationWithWikidataTests`
+was deliberately **not** hoisted: the two hierarchies share no notebook-git
+ancestor (one transactional, one `@Transactional(NOT_SUPPORTED)` with committed
+fixtures), and the only other candidate home, `GitBundleTestReader`, is a pure
+bundle-parsing utility that should not gain a controller call. With one caller a
+cross-hierarchy seam would be an extensibility framework for a hypothetical.
+Slice 7 decides if it adds callers.
+
+**Deferred to slice 9 (250-line check):** `NotebookGitWebContentSaveControllerTest`
+is 289 lines, over the refactor skill's 250-line check. It was **not** split, and
+the reasoning is accepted: the only cohesive seam matching this repo's pattern is
+a guard-test file holding the refusal behaviors, but one of those is
+`corruptStoredAcceptedBundleFailsLoudlyWithoutSavingTheNote` - a carve-out test -
+so the split would either relocate a protected test or leave a guard file missing
+its ADR 0006 loud-failure guard. The overage is pre-existing (290 at HEAD, 289 now,
+i.e. the file is smaller than before this slice). **Slice 9 deletes both
+legacy-subject tests, about 55 lines plus imports, bringing the file to roughly
+234 lines on its own** - that is the natural moment, and forcing a split now would
+be churn slice 9 undoes.
 
 ### 7. Observe creation and repository lifecycle through current storage
 Type: Structure. Status: planned. **Also owns

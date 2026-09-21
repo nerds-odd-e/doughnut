@@ -59,10 +59,7 @@ class NotebookGitNoteCreationAtomicControllerTest
     assertThat(created.getContent(), is(TITLE_ONLY_CONTENT));
     assertThat(created.getFolder(), nullValue());
 
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
+    byte[] downloaded = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId newHead = GitBundleTestReader.fetchHead(repository, downloaded);
       try (RevWalk revWalk = new RevWalk(repository)) {
@@ -102,7 +99,7 @@ class NotebookGitNoteCreationAtomicControllerTest
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     long originalNoteCount =
@@ -139,9 +136,9 @@ class NotebookGitNoteCreationAtomicControllerTest
               countRowsForNotebook("authored_note_reference", "source_note_id", notebook.getId()),
               is(originalReferenceCount));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
   }
 
   private long countNotesForNotebook(Integer notebookId) {
