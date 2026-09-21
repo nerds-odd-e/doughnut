@@ -79,6 +79,7 @@ final class FolderSubtree {
 
   void reassignToNotebook(
       List<Folder> subtreeFolders, Notebook destinationNotebook, Timestamp now) {
+    requireSubtreeHasNoAttachments(subtreeFolders.getFirst());
     for (Folder subtreeFolder : subtreeFolders) {
       subtreeFolder.setNotebook(destinationNotebook);
       subtreeFolder.setUpdatedAt(now);
@@ -185,7 +186,8 @@ final class FolderSubtree {
     List<Integer> folderIds = collectFolders(source).stream().map(Folder::getId).toList();
     if (notebookAttachmentRepository.existsByFolder_IdIn(folderIds)) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Folders containing files cannot be dissolved or merged yet.");
+          HttpStatus.BAD_REQUEST,
+          "Folders containing files cannot be dissolved, merged, or moved to another notebook yet.");
     }
   }
 }

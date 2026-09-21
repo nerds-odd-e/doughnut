@@ -20,7 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–5 are done with accepted proof; 7 slices remain planned (7
+- State: slices 1–6 are done with accepted proof; 6 slices remain planned (7
   is Structure). Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
@@ -245,7 +245,7 @@ file-free dissolve and merge coverage stayed green.
 
 ### 6. Moving a folder that contains files to another notebook is refused
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given `refs/paper.pdf` (or a file in any descendant folder), moving
 `refs` to another notebook is refused with a clear message; both notebooks'
 folders, files and accepted heads are unchanged. A folder without files still
@@ -254,6 +254,14 @@ Change: `FolderSubtree.reassignToNotebook` requires the slice 5 rule; the
 cross-notebook merge branch is already covered through `mergeInto`.
 Interim behavior: SEED-035#story-10 replaces it.
 Proof: one case in `NotebookGitWebFolderMoveControllerTest`.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,574 backend tests after the cohesion pass.
+Setup at `NotebookGitWebFolderCrossNotebookMoveControllerTest` creates accepted
+source and destination trees with a descendant source file and an existing
+destination file. Its controller scenario invokes the real cross-notebook move
+and observes the shared clear refusal, unchanged source/destination folder and
+file placement, and both accepted heads unchanged. Existing file-free
+cross-notebook move coverage stayed green.
 
 ### 7. Acceptance projects files by their full path
 Type: Structure

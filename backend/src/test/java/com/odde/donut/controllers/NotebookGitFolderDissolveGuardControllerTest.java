@@ -42,7 +42,9 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
 
     assertThat(
         exception.getReason(),
-        equalTo("Folders containing files cannot be dissolved or merged yet."));
+        equalTo(
+            "Folders containing files cannot be dissolved, merged, or moved to another notebook"
+                + " yet."));
     assertThat(
         folderRepository.findById(old.getId()).orElseThrow().getParentFolder().getId(),
         equalTo(physics.getId()));
@@ -72,7 +74,9 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
 
     assertThat(
         exception.getReason(),
-        equalTo("Folders containing files cannot be dissolved or merged yet."));
+        equalTo(
+            "Folders containing files cannot be dissolved, merged, or moved to another notebook"
+                + " yet."));
     assertThat(
         folderRepository.findById(target.getId()).orElseThrow().getParentFolder(), nullValue());
     assertThat(
