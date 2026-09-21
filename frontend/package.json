@@ -63,7 +63,7 @@
     "storybook": "10.6.0",
     "tailwindcss": "4.3.3",
     "terser": "^5.51.2",
-    "tsx": "4.23.13",
+    "tsx": "4.23.15",
     "typescript": "6.0.3",
     "unimport": "^7.0.2",
     "unplugin-auto-import": "^21.1.0",
