@@ -20,8 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–11 are done with accepted proof; 1 Behavior slice remains
-  planned. Remaining concerns are listed at the end.
+- State: all 12 slices are done with accepted proof.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
   checkout `/Users/terryyin/git/doughnut-worktrees/notebook-folder-attachments`
@@ -382,13 +381,21 @@ a production change.
 
 ### 12. Round trip an organized checkout through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Behavior: with the installed CLI and native Git, publish a nested text file and
 a nested binary file, rename the containing folder on the web, then pull into a
 second clean clone: exact paths and bytes, clean worktree, linear ancestry.
 Proof: extend `cli_notebook_publish_to_clean_clone.feature` with one scenario,
 reusing the root story's byte fixtures and steps. E2E runtime is the stated
 focused-test exception to the slice time limit.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm cy:run
+--spec e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature`
+passed all five scenarios in 31 seconds. The new installed-CLI scenario
+publishes nested JSON and binary attachments, renames their folder on the web,
+pulls into the publisher and a second clean clone, and observes the exact tree,
+text and binary bytes, accepted head, clean worktree, and linear ancestry. The
+existing path-general fixture and ancestry assertions needed no step-definition
+or product change.
 
 ## Refinement assessment
 
