@@ -13,6 +13,45 @@ maintains both physical skill installations. These are local integration
 findings; the historical descriptions and occurrence evidence below are
 preserved unchanged.
 
+## Reliable CI-observer startup in Donut execution worktrees
+
+Reviewed 2026-09-21 against `8766adefee`. Both findings remain unresolved;
+none were removed. They share Donut’s skill-path integration as their parent
+problem, but have distinct observable failures before and after shell setup.
+
+| Priority | Failure group | Finding | Retained occurrences | Observed impact | Queued story |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Runtime unavailable in a fresh worktree | [DD-074](#dd-074) | 4 | Ten of eleven pushes unobserved in one execution; repeated copying and discovery work | [Start CI observation from a fresh Donut worktree](.planning/seeds/SEED-038-reliable-ci-observer-startup.md#story-1) |
+| 2 | Silent dispatch failure after shell setup | [DD-065](#dd-065) | 4 | Two executions initially reported observation unavailable and pushed before arming it; repeated diagnosis | [Start CI observation reliably after Donut shell setup](.planning/seeds/SEED-038-reliable-ci-observer-startup.md#story-2) |
+
+Frequency is tied; the recorded extent of missed observation puts DD-074 first.
+These are retained occurrence counts, not all-time totals. The check below is
+validation of the existing findings, not another execution occurrence.
+
+### Current verification and story matching
+
+A temporary export of the committed runtime and `scripts/shell_setup.sh`
+reproduced both failures using Node from `CURSOR_DEV=true nix develop`:
+
+- Before shell setup, `node .claude/skills/dough-execute-plan/scripts/ci-mailbox.mjs probe`
+  exited 1 with `MODULE_NOT_FOUND`.
+- After `source scripts/shell_setup.sh; setup_claude_skills`, the same command
+  exited 0 with empty stdout through the generated symlink.
+- The control invocation through `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`
+  exited 0 and printed `CI_OBSERVER`.
+
+The check used temporary mailbox storage and launched no CI observer or GitHub
+run. The tracked files, `.gitignore`, and Nix/cloud setup still retain the
+reported mechanisms. No current queued/taken story covers either outcome.
+Searches of planning history found no confirmed fix for these mechanisms;
+earlier completed observer-shutdown work (SEED-012 story 6, `72701489a7`)
+concerned recovering a running observer after compaction, not startup paths.
+Thus these are persistent findings, with repeated workarounds rather than an
+evidenced fix followed by regression. Both stories belong to
+[SEED-038](.planning/seeds/SEED-038-reliable-ci-observer-startup.md).
+
+<a id="dd-065"></a>
+
 ## DD-065 — ci-mailbox.mjs's CLI dispatch silently no-ops when invoked through the `.claude/skills` symlink instead of its `.agents/skills` realpath
 
 `ci-mailbox.mjs`'s main-module guard
@@ -152,9 +191,11 @@ untriggered CLI guard.
     installed directory that supplied the initially loaded skill" caution
     easy to satisfy on a shallow check while still hitting this failure mode.
 
+<a id="dd-074"></a>
+
 ## DD-074 — The documented `.claude/skills` runtime path did not exist at all in a freshly created execution worktree
 
-[runtime-setup.md](../dough-execute-plan/references/runtime-setup.md) documents
+[runtime-setup.md](.agents/skills/dough-execute-plan/references/runtime-setup.md) documents
 `.claude/skills/dough-execute-plan` as the normal Claude Code location of the
 CI observer runtime. In a worktree created by `git worktree add` and used
 immediately, that directory does not exist: `.claude/skills/<name>` is a
