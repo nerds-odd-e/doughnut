@@ -2,9 +2,9 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.NotebookLivePortableTree;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jgit.lib.ObjectId;
@@ -29,7 +29,7 @@ public class NotebookGitProjection {
    * representation for an empty parent while an earlier-range folder Readme still can.
    */
   public Integer requireRepresentedFolderId(
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       Repository repository,
       ObjectId acceptedHead,
       ObjectId tipHead,
@@ -39,7 +39,7 @@ public class NotebookGitProjection {
       return null;
     }
     String requiredFolderPath = notePath.substring(0, folderPathEnd + 1);
-    ExportFolderRow folder = requireFolderRowAtPath(folders, requiredFolderPath, notePath);
+    PortableTreeFolderRow folder = requireFolderRowAtPath(folders, requiredFolderPath, notePath);
     if (NotebookGitAcceptedTree.representedInTree(
             requiredFolderPath, NotebookGitAcceptedTree.readEntries(repository, acceptedHead))
         || NotebookGitAcceptedTree.representedInTree(
@@ -58,7 +58,7 @@ public class NotebookGitProjection {
    * accepted tree.
    */
   int requireRepresentedRelocationSource(
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       Repository repository,
       ObjectId acceptedHead,
       NotebookGitProposalFolderShape.FolderRelocation relocation) {
@@ -70,7 +70,7 @@ public class NotebookGitProjection {
         relocation.sourcePrefix() + "/README.md");
   }
 
-  boolean hasFolderAtPath(List<ExportFolderRow> folders, String requiredFolderPath) {
+  boolean hasFolderAtPath(List<PortableTreeFolderRow> folders, String requiredFolderPath) {
     return folderRowAtPath(folders, requiredFolderPath) != null;
   }
 
@@ -81,7 +81,7 @@ public class NotebookGitProjection {
    * dest parent that is absent from live folders.
    */
   Integer requireRepresentedDestinationParent(
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       Repository repository,
       ObjectId acceptedHead,
       ObjectId tipHead,
@@ -92,7 +92,7 @@ public class NotebookGitProjection {
     }
     String parentPath = destParentPrefix + "/";
     String pathForError = destPrefix + "/README.md";
-    ExportFolderRow folder = requireFolderRowAtPath(folders, parentPath, pathForError);
+    PortableTreeFolderRow folder = requireFolderRowAtPath(folders, parentPath, pathForError);
     if (NotebookGitAcceptedTree.representedInTree(
             parentPath, NotebookGitAcceptedTree.readEntries(repository, acceptedHead))
         || NotebookGitAcceptedTree.representedInTreeExcludingUnder(
@@ -105,12 +105,13 @@ public class NotebookGitProjection {
   }
 
   private Integer requireRepresentedFolderPath(
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       Repository repository,
       ObjectId treeHead,
       String requiredFolderPath,
       String pathForError) {
-    ExportFolderRow folder = requireFolderRowAtPath(folders, requiredFolderPath, pathForError);
+    PortableTreeFolderRow folder =
+        requireFolderRowAtPath(folders, requiredFolderPath, pathForError);
     if (!NotebookGitAcceptedTree.representedInTree(
         requiredFolderPath, NotebookGitAcceptedTree.readEntries(repository, treeHead))) {
       throw unrepresentedParentFolder(pathForError);
@@ -118,18 +119,19 @@ public class NotebookGitProjection {
     return folder.id();
   }
 
-  private static ExportFolderRow requireFolderRowAtPath(
-      List<ExportFolderRow> folders, String requiredFolderPath, String pathForError) {
-    ExportFolderRow folder = folderRowAtPath(folders, requiredFolderPath);
+  private static PortableTreeFolderRow requireFolderRowAtPath(
+      List<PortableTreeFolderRow> folders, String requiredFolderPath, String pathForError) {
+    PortableTreeFolderRow folder = folderRowAtPath(folders, requiredFolderPath);
     if (folder == null) {
       throw unrepresentedParentFolder(pathForError);
     }
     return folder;
   }
 
-  private static ExportFolderRow folderRowAtPath(
-      List<ExportFolderRow> folders, String requiredFolderPath) {
-    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
+  private static PortableTreeFolderRow folderRowAtPath(
+      List<PortableTreeFolderRow> folders, String requiredFolderPath) {
+    Map<Integer, PortableTreeFolderRow> folderById =
+        NotebookGitAcceptedTree.indexFoldersById(folders);
     return folders.stream()
         .filter(
             candidate ->
@@ -140,16 +142,17 @@ public class NotebookGitProjection {
   }
 
   void requireNoUnrepresentedEmptySourceDescendants(
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       Repository repository,
       ObjectId acceptedHead,
       int sourceFolderId) {
-    Map<Integer, ExportFolderRow> folderById = NotebookGitAcceptedTree.indexFoldersById(folders);
+    Map<Integer, PortableTreeFolderRow> folderById =
+        NotebookGitAcceptedTree.indexFoldersById(folders);
     String sourcePath =
         NotebookGitAcceptedTree.folderPath(folderById.get(sourceFolderId), folderById);
     List<PortableTreeEntry> accepted =
         NotebookGitAcceptedTree.readEntries(repository, acceptedHead);
-    for (ExportFolderRow folder : folders) {
+    for (PortableTreeFolderRow folder : folders) {
       String descendantPath = NotebookGitAcceptedTree.folderPath(folder, folderById);
       if (descendantPath.equals(sourcePath) || !descendantPath.startsWith(sourcePath)) {
         continue;
@@ -173,7 +176,7 @@ public class NotebookGitProjection {
 
   public void requireMatchingAcceptedTree(
       Notebook notebook,
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       List<Note> storedNotes,
       Repository repository,
       ObjectId acceptedHead) {

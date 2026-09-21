@@ -1,7 +1,7 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -90,11 +90,13 @@ final class NotebookGitAcceptedTree {
         .anyMatch(entry -> entry.path().startsWith(folderPath) && !excludedPath.test(entry.path()));
   }
 
-  static Map<Integer, ExportFolderRow> indexFoldersById(List<ExportFolderRow> folders) {
-    return folders.stream().collect(Collectors.toMap(ExportFolderRow::id, Function.identity()));
+  static Map<Integer, PortableTreeFolderRow> indexFoldersById(List<PortableTreeFolderRow> folders) {
+    return folders.stream()
+        .collect(Collectors.toMap(PortableTreeFolderRow::id, Function.identity()));
   }
 
-  static String folderPath(ExportFolderRow folder, Map<Integer, ExportFolderRow> folderById) {
+  static String folderPath(
+      PortableTreeFolderRow folder, Map<Integer, PortableTreeFolderRow> folderById) {
     String parentPath =
         folder.parentFolderId() == null
             ? ""

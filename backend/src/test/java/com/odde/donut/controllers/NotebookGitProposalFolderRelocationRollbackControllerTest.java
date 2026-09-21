@@ -14,7 +14,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
-import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -34,7 +34,7 @@ class NotebookGitProposalFolderRelocationRollbackControllerTest
     extends NotebookGitControllerTestBase {
 
   private static final String README_BODY = "readme";
-  private static final String README = ExportReadmeMarkdown.assemble(README_BODY);
+  private static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
   private static final String NOTE = "---\ntype: Note\n---\nnote";
 
   @Autowired FolderRepository folderRepository;

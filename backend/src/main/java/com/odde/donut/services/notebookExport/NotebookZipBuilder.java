@@ -1,5 +1,6 @@
 package com.odde.donut.services.notebookExport;
 
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;

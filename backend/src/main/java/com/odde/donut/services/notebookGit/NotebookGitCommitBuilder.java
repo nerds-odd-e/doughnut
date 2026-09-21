@@ -1,6 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Instant;
@@ -22,7 +22,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 
 /**
- * Commits a canonical Portable-tree snapshot (see {@code notebookExport.PortableTreeSnapshot}) on
+ * Commits a canonical Portable-tree snapshot (see {@code notebookTree.PortableTreeSnapshot}) on
  * {@code refs/heads/main}: {@link #build} makes a fresh in-memory repository with a single,
  * parentless root commit; {@link #append} adds a commit on a given parent.
  *

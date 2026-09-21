@@ -12,8 +12,8 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -62,7 +62,7 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
       assertThat(
           NotebookGitProposalBlobText.readUtf8(
               repo, downloaded.head(), "_trash/Research/Biology/README.md"),
-          equalTo(ExportReadmeMarkdown.assemble(BIOLOGY_README)));
+          equalTo(PortableTreeReadmeMarkdown.assemble(BIOLOGY_README)));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(
               repo, downloaded.head(), "_trash/Research/Biology/Cells.md"),

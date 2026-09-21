@@ -7,7 +7,7 @@ import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -44,13 +44,13 @@ public class NotebookGitStateLoader {
             .findById(notebookId)
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found."));
-    List<ExportFolderRow> folders = foldersOf(notebook);
+    List<PortableTreeFolderRow> folders = foldersOf(notebook);
     List<Note> storedNotes = storedNotesOf(notebook);
     return new LockedNotebookState(binding, notebook, folders, storedNotes);
   }
 
-  List<ExportFolderRow> foldersOf(Notebook notebook) {
-    return folderRepository.findExportRowsByNotebookId(notebook.getId());
+  List<PortableTreeFolderRow> foldersOf(Notebook notebook) {
+    return folderRepository.findPortableTreeRowsByNotebookId(notebook.getId());
   }
 
   List<Note> storedNotesOf(Notebook notebook) {
@@ -60,6 +60,6 @@ public class NotebookGitStateLoader {
   public record LockedNotebookState(
       NotebookGitBinding binding,
       Notebook notebook,
-      List<ExportFolderRow> folders,
+      List<PortableTreeFolderRow> folders,
       List<Note> storedNotes) {}
 }

@@ -4,6 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.donut.services.notebookTree.PortableTreeAttachmentRow;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
+import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
+import com.odde.donut.services.notebookTree.PortableTreeSnapshot;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +41,9 @@ class NotebookZipBuilderTest {
   }
 
   private byte[] buildZip(
-      String notebookReadmeContent, List<ExportFolderRow> folders, List<ExportNoteRow> notes) {
+      String notebookReadmeContent,
+      List<PortableTreeFolderRow> folders,
+      List<PortableTreeNoteRow> notes) {
     return NotebookZipBuilder.build(
         PortableTreeSnapshot.build(notebookReadmeContent, folders, notes, List.of()));
   }
@@ -51,10 +57,10 @@ class NotebookZipBuilderTest {
             PortableTreeSnapshot.build(
                 null,
                 List.of(),
-                List.of(new ExportNoteRow(null, "My Note", "body")),
+                List.of(new PortableTreeNoteRow(null, "My Note", "body")),
                 List.of(
-                    new ExportAttachmentRow("diagram.png", invalidUtf8),
-                    new ExportAttachmentRow("empty.bin", new byte[0]))));
+                    new PortableTreeAttachmentRow("diagram.png", invalidUtf8),
+                    new PortableTreeAttachmentRow("empty.bin", new byte[0]))));
 
     Map<String, byte[]> entries = readZipEntryBytes(zipBytes);
 
@@ -75,9 +81,10 @@ class NotebookZipBuilderTest {
 
   @Test
   void writesNestedFolderReadmeAsReadmeMarkdownAndOmitsBlank() throws IOException {
-    ExportFolderRow parent = new ExportFolderRow(10, null, "Parent Folder", "Parent readme");
-    ExportFolderRow child = new ExportFolderRow(11, 10, "Child Folder", null);
-    ExportNoteRow noteInChild = new ExportNoteRow(11, "Nested note", "Nested body");
+    PortableTreeFolderRow parent =
+        new PortableTreeFolderRow(10, null, "Parent Folder", "Parent readme");
+    PortableTreeFolderRow child = new PortableTreeFolderRow(11, 10, "Child Folder", null);
+    PortableTreeNoteRow noteInChild = new PortableTreeNoteRow(11, "Nested note", "Nested body");
 
     byte[] zipBytes = buildZip(null, List.of(parent, child), List.of(noteInChild));
 
@@ -121,7 +128,7 @@ class NotebookZipBuilderTest {
   @Test
   void preservesAuthorFrontmatterWithoutStrippingProperties() throws IOException {
     String contentWithFrontmatter = "---\nwikidata_id: Q123\n---\n\nActual body text";
-    ExportNoteRow note = new ExportNoteRow(null, "My Note", contentWithFrontmatter);
+    PortableTreeNoteRow note = new PortableTreeNoteRow(null, "My Note", contentWithFrontmatter);
 
     byte[] zipBytes = buildZip(null, List.of(), List.of(note));
 
@@ -132,7 +139,7 @@ class NotebookZipBuilderTest {
 
   @Test
   void writesNoteFileAsExactDisplayName() throws IOException {
-    ExportNoteRow note = new ExportNoteRow(null, "Q&A What Why", "body");
+    PortableTreeNoteRow note = new PortableTreeNoteRow(null, "Q&A What Why", "body");
 
     Map<String, String> entries = readZipEntryTexts(buildZip(null, List.of(), List.of(note)));
 

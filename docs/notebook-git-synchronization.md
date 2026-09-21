@@ -81,10 +81,10 @@ is projected before the post-mutation tree comparison, inside the transaction
 that persists the accepted head. An initial publication may therefore be
 file-only, with no note at all.
 
-Every consumer of a notebook's live Portable content — ZIP export, Git cutover
-and history reset, accepted web changes, and projection-drift detection — reads
-one assembled tree, so root files survive ordinary note and folder work and
-appear in export and reset without per-consumer handling. Within a directory the
+Every consumer of a notebook's live Portable content — Git cutover and history
+reset, accepted web changes, and projection-drift detection — reads one
+assembled tree, so root files survive ordinary note and folder work and appear
+in publication and reset without per-consumer handling. Within a directory the
 canonical order is README, then notes, then attachments by filename, then
 subdirectories; the Git side re-sorts by path.
 
@@ -116,8 +116,7 @@ note/property Portable paths or stable identities across moves.
 
 ### Classification and references
 
-Use one classification and codec contract across import, export, publication,
-and lint. Web browsing consumes the resulting domain projection rather than
+Use one classification and codec contract across import, publication, and lint. Web browsing consumes the resulting domain projection rather than
 reclassifying files or maintaining another inventory. All Markdown, including
 `AGENTS.md`, `SKILL.md`, and tool documentation, retains ordinary note/Readme
 behavior. Purpose, IDE name, folder location, and whether the file is new do not

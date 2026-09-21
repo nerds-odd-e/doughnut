@@ -5,7 +5,7 @@ import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommi
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
-import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -27,7 +27,7 @@ final class NotebookLiveProjectionTestReader {
     return inCommittedTransaction(
         transactionManager,
         () ->
-            notebookAttachmentRepository.findExportRowsByNotebookId(notebookId).stream()
+            notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebookId).stream()
                 .map(row -> new PortableTreeEntry(row.filename(), row.content()))
                 .sorted(Comparator.comparing(PortableTreeEntry::path))
                 .toList());

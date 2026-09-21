@@ -13,8 +13,8 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookExport.ExportReadmeMarkdown;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
@@ -76,7 +76,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
               "Zoology/README.md", "Zoology/Cells.md", "Zoology/Empty/.keep", "Reading.md"));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Zoology/README.md"),
-          equalTo(ExportReadmeMarkdown.assemble(BIOLOGY_README)));
+          equalTo(PortableTreeReadmeMarkdown.assemble(BIOLOGY_README)));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Zoology/Cells.md"),
           equalTo(CELLS_BODY));

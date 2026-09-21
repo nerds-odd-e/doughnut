@@ -18,7 +18,7 @@
   responses, deprecation/history prose, or an absence-specific regression test;
   wider Git authorization, binding migration or recovery; changes to the CLI or
   Git bundle contract; generic ZIP handling used by EPUB or unrelated CLI tests.
-- State: slice 1 delivered; slices 2–3 planned (slice 2 is Structure).
+- State: slices 1–2 delivered; slice 3 planned.
 
 ## Existing solution and constraints
 
@@ -93,7 +93,7 @@ and full-suite runtime are external-wait cost, not another implementation beat.
 
 ### 2. The live Portable tree has capability names
 Type: Structure
-Status: planned
+Status: done
 Internal change: while behavior is still unchanged, move the surviving shared
 tree classes from `services.notebookExport` to a capability package such as
 `services.notebookTree`; rename `Export*Row`, `ExportReadmeMarkdown`, and

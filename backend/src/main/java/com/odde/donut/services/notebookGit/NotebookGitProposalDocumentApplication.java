@@ -3,9 +3,9 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.factoryServices.EntityPersister;
-import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangedDocument;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.DocumentRole;
+import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +68,7 @@ class NotebookGitProposalDocumentApplication {
                     emptyFolderMarkerPaths.stream())
                 .toList(),
             proposal);
-    List<ExportFolderRow> folders = stateLoader.foldersOf(state.notebook());
+    List<PortableTreeFolderRow> folders = stateLoader.foldersOf(state.notebook());
     List<Note> proposedNotes = new ArrayList<>(state.storedNotes());
     for (String path : conceptPaths) {
       proposedNotes.add(

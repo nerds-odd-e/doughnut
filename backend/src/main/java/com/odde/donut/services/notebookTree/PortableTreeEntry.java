@@ -1,13 +1,13 @@
-package com.odde.donut.services.notebookExport;
+package com.odde.donut.services.notebookTree;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * One file in the canonical Portable-tree snapshot of a notebook export: its final path (relative
- * to the notebook root, folders joined with "/") and its exact final file bytes. Entries compare by
- * path and byte content, so snapshots built from different sources are equal exactly when they
- * describe the same files.
+ * One file in the canonical Portable-tree snapshot of a notebook: its final path (relative to the
+ * notebook root, folders joined with "/") and its exact final file bytes. Entries compare by path
+ * and byte content, so snapshots built from different sources are equal exactly when they describe
+ * the same files.
  */
 public record PortableTreeEntry(String path, byte[] content) {
 

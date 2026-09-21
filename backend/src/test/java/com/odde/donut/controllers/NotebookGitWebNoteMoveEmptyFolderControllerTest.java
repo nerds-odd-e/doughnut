@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * {@code Study/.keep} (Study is no longer empty). Both existing folders retain their identities; a
  * subsequent same-path local edit C published through the real controller keeps both original
  * folder identities and the note. The existing {@link
- * com.odde.donut.services.notebookExport.PortableTreeSnapshot} rule already emits {@code .keep} for
+ * com.odde.donut.services.notebookTree.PortableTreeSnapshot} rule already emits {@code .keep} for
  * empty folders and omits it for non-empty ones; this slice only adds the missing behavioral
  * evidence.
  */
