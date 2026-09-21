@@ -103,29 +103,80 @@ workspace resolution. Do not choose `--ignore-scripts` as a performance shortcut
 Obtain this during authorized execution, before edits invalidate the baseline.
 Use owned disposable linked worktrees, never the shared development checkout.
 Record revision, OS/architecture, Nix/Node/pnpm and host versions, commands,
-cache conditions, elapsed times and failures in this plan. No observations below
-have run. Do not confuse absence of a setup hook with slow dependency install.
+cache conditions, elapsed times and failures in this plan. Do not confuse
+absence of a setup hook with slow dependency install.
 
-1. With machine caches warm, observe fresh-worktree setup and one immediate
-   repeat. For Cursor use the actual configured setup; for Codex and Claude
-   inspect the installed supported path and record missing setup as a gap.
-   Record checkout/base identity without changing host branching policy.
-2. Isolate the present dependency baseline with
-   `CURSOR_DEV=true nix develop -c pnpm --frozen-lockfile recursive install`;
-   repeat in the same owned checkout. Measure Nix entry separately with
-   `CURSOR_DEV=true nix develop -c true`. Record lifecycle work as well as
-   wall time. Reuse a sufficient baseline; no profiling framework or fixed
-   sample count is required. Repeat samples only if the result is ambiguous.
-3. In a disposable representative workspace under pinned pnpm 11.27.0, assess
-   native readiness through `CURSOR_DEV=true nix develop -c pnpm exec biome --version`.
-   Test unchanged state, a missing install, a workspace manifest inconsistent
-   with the committed lockfile, and a valid paired input change. Critical
-   postconditions: unchanged does not reinstall; valid change becomes usable;
-   mismatch stays visible without rewriting inputs; required lifecycle work
-   still runs when needed. Record exact fixture changes and any configuration
-   used, literal command and result. A version print alone proves none of this.
-   If native verification fails this contract, change the existing readiness
-   owner instead; do not propagate an unproved native setting into host adapters.
+Recorded 2026-09-21 in owned worktree
+`.worktrees/005-ai-worktree-readiness` (branch
+`worktree-claude+260921-ai-worktree-readiness`) at revision `b5d4225d49`,
+machine cache warm. Host: Darwin 25.6.0 arm64 (macOS, Apple Silicon); Nix
+2.30.2; Node v24.5.0 (host shell; the Nix shell provides its own pinned
+Node); pnpm pinned `11.27.1` (`packageManager` in `package.json`; the plan's
+`11.27.0` reference is stale — 11.27.1 is what is actually pinned and used
+below).
+
+1. Fresh-worktree setup: `git worktree add` alone leaves `node_modules` and
+   `.claude/skills` absent (0 entries), confirming ODF-085 — Claude has no
+   session-start or `WorktreeCreate` hook that prepares a new worktree, and
+   `.claude/settings.json` in this checkout declares no `Worktree*` hook at
+   all. `.agents/skills/*` (the tracked source) is present and unaffected —
+   only the generated `.claude/skills/*` symlinks are missing. Codex has no
+   tracked environment file (`.codex/hooks.json` only wires the product
+   backlog guard, not setup). Cursor's `.cursor/worktrees.json` already runs
+   `nix develop -c pnpm install` — plain (non-`CURSOR_DEV`, non-frozen)
+   install with no `setup_claude_skills` call and no readiness fingerprint —
+   on worktree creation; not re-observed live here since that requires the
+   installed Cursor app itself. Missing setup recorded as the gap for Codex
+   and Claude; a documented repository command is the fallback per the plan's
+   boundaries.
+2. Dependency baseline, `CURSOR_DEV=true nix develop -c pnpm --frozen-lockfile
+   recursive install` in the fresh owned worktree: first run 7.6s wall (1201
+   packages resolved, 0 downloaded — reused from the local content-addressable
+   store — plus `postinstall: syncpack fix`); immediate repeat 1.1s wall
+   (pnpm's own already-up-to-date check, "Done in 273ms" pnpm-reported).
+   Nix shell entry alone (`CURSOR_DEV=true nix develop -c true`), separately:
+   4.7s cold-of-turn, 2.2s repeated. Dependency install is not the dominant
+   cost once caches are warm; Nix entry and install are both low-single-digit
+   seconds here. No profiling framework used; two samples were unambiguous.
+3. Native-readiness assessment, same owned worktree, pinned pnpm 11.27.1
+   (`pnpm exec biome --version`, no explicit `verify-deps-before-run` config
+   present — `pnpm config get verify-deps-before-run` reports `undefined`,
+   i.e. pnpm's built-in default applies):
+   - Unchanged state: 2.3s wall, `Version: 2.5.14`, no reinstall output. Pass.
+   - Missing install (`node_modules` moved aside): `pnpm exec` transparently
+     ran a full install before printing the version (implicit
+     verify-before-run). Required lifecycle work (`postinstall: syncpack fix`)
+     ran. Pass for "still usable"; not itself evidence for the mismatch
+     postcondition below.
+   - Workspace manifest inconsistent with the committed lockfile (added
+     `left-pad` to root `package.json`'s `dependencies` only, lockfile
+     untouched): `pnpm exec biome --version` silently ran an install that
+     resolved and added `left-pad`, **rewriting `pnpm-lock.yaml`** to match,
+     then printed the version with no visible warning of the prior mismatch.
+     **Fails** the "mismatch stays visible without rewriting inputs"
+     postcondition — bare `pnpm exec`'s implicit verification silently heals
+     divergent inputs instead of surfacing them.
+   - The same mismatch fixture against the existing readiness owner's actual
+     command, `pnpm --frozen-lockfile recursive install` (no `pnpm exec`):
+     fails loudly with `ERR_PNPM_OUTDATED_LOCKFILE` / "specifiers in the
+     lockfile don't match specifiers in package.json: 1 dependencies were
+     added: left-pad", exit 1, and leaves `pnpm-lock.yaml` unchanged. Pass.
+   - Valid paired input change (`package.json` plus a matching
+     `pnpm install --no-frozen-lockfile --lockfile-only` update):
+     `pnpm --frozen-lockfile recursive install` then succeeds normally
+     (1s, `postinstall` ran). Pass.
+   - All fixtures reverted (`git checkout -- package.json pnpm-lock.yaml`)
+     and `node_modules` restored to the committed lockfile afterward; worktree
+     left clean at `b5d4225d49`.
+
+   **Decision:** bare `pnpm exec`'s native verify-before-run does not satisfy
+   the required mismatch-visibility contract (it rewrites the lockfile
+   instead of failing), so slices 3–4 do not adopt it as the dependency
+   readiness owner. The existing owner — `pnpm --frozen-lockfile recursive
+   install`, as `scripts/dev_setup.sh:setup_pnpm_and_biome` already runs —
+   already satisfies all four postconditions and is what slice 3 composes
+   with slice 1's entry point; slice 4's redundancy rule reuses the existing
+   fingerprint gate around that same command rather than a native setting.
 
 Preparation baseline and actual check completion are separate observations.
 The full backend suite runtime may exceed a slice budget; do not call it setup
@@ -159,7 +210,7 @@ update this plan's command and host callers together.
 ## Ordered slices
 
 ### 1. Make repository tooling available in a fresh worktree
-Type: Behavior. Status: planned. Target: ~5 minutes.
+Type: Behavior. Status: done.
 
 Fresh checkout lacking generated skill links → public preparation → tracked
 repository tooling and Claude discovery links are usable from this checkout.
@@ -170,6 +221,15 @@ fork Open Dough's observer implementation or copy a local skill installation.
 Proof: P with real temporary checkout and actual script path resolution. The
 resolved source stays in this worktree; representative tracked scripts load.
 Do not start a live CI observer merely to demonstrate tool discovery.
+
+Delivered: new `scripts/worktree_setup.sh` (resolves its own repo root via
+`BASH_SOURCE`, sources `scripts/shell_setup.sh`, calls `setup_claude_skills`;
+no dependency install or service/daemon startup, `scripts/nix_shell_hook.sh`
+unchanged) and `scripts/test/worktree_setup.sh.test` (real disposable
+`git worktree add`, unmocked script execution run twice, symlink/SKILL.md
+resolution asserted inside that same temp worktree, `trap cleanup EXIT` so
+every exit path removes the disposable worktree/branch). Proof P passing;
+full `scripts/test/run_all_script_tests.sh` 20/20.
 
 ### 2. Separate dependency preparation from interactive services
 Type: Structure. Status: planned. Target: ~5 minutes.
