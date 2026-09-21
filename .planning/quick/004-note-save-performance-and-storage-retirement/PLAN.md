@@ -186,7 +186,24 @@ satisfy them. A deliberate stop of all incompatible instances can replace the
 rolling stages only when that maintenance procedure is explicitly selected.
 Deployment waits do not prevent independent final attachment assessment.
 
-## Release handoff 1 - WAITING FOR THE OWNER (2026-09-21)
+## Release handoff 1 - DONE (2026-09-21)
+
+**Owner released `main` and reported both read-only production checks passing** on
+`doughnut-db-instance` (database `doughnut`):
+- Check A, Flyway history >= 300000334: `300000334` create notebook git accepted object,
+  `300000335` create notebook attachment, `300000336` BackfillNotebookGitAcceptedObjects,
+  `300000337` allow notebook git binding without bundle bytes - **all `success = 1`**. The
+  backfill did not fail, so no conversion stop occurred.
+- Check B, bindings whose accepted head is missing from native storage: **0 rows**. No notebook
+  needs a history reset from this check.
+
+**Gate A satisfied** for production: the backfill completed and every current accepted head is
+present natively. **Gate B satisfied** for production: the column-independent application (9b)
+is deployed and no old bundle-authority server remains, since the release replaced it. The full
+reachable-graph completeness check still runs inside slice 10's own migration, immediately before
+the destructive DDL. Development is the owner's local environment and runs `main` directly.
+
+### Original handoff instructions (kept for the record)
 
 **Merged to `main` at `c661bf9c0c`** (story branch head `c8105cde7e`, which first merged
 `origin/main` at `1687055556` cleanly). Verified on the merged code before pushing `main`: B
