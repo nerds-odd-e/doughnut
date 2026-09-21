@@ -10,11 +10,8 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage](seeds/SEED-034-faster-note-content-saving.md#story-4) — SEED-034#story-4 ([plan](quick/004-note-save-performance-and-storage-retirement/PLAN.md))
-
 ## Backlog list
 
-- [Assess asynchronous Git processing only if save performance remains inadequate](seeds/SEED-034-faster-note-content-saving.md#story-5) — SEED-034#story-5
 - [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
