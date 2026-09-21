@@ -1,7 +1,7 @@
 # Make note saves fast and cohesive with Git attachments, and retire legacy bundle storage
 
-Status: **execution complete** (2026-09-21). Every slice is delivered; the story awaits retrospective
-and wrap-up. Evidence sections below record the accepted proof.
+Status: in execution - slice 19 added by the owner after the retrospective (2026-09-21); then wrap-up.
+Evidence sections below record the accepted proof.
 
 ## Execution identity
 
@@ -1581,6 +1581,19 @@ accepted head - so "same tree, new history" is still proven through the product'
 Proof: B 2,569 tests, 0 failures (Ancestry 3 + CommitRange 4 = the same 7); fresh install ends at
 300000338 with 0 failed rows (re-run after the migration edit); E 40/40; no reference to either old name
 outside `.planning`; every file in the diff is at most 250 lines.
+
+### 19. Name the notebook Git controller test base for what it is
+Type: Structure. Status: planned. **Owner request after the retrospective (2026-09-21).**
+
+`NotebookGitBundleControllerTestBase` is extended by 69 test classes, most unrelated to bundles (web
+content, folders, trash, creation, access denial, export, migrations), so its name misleads exactly as
+`NotebookGitBundleBuilder` did before slice 18. Rename it to a name that says it is the shared base for
+notebook Git controller tests, updating every subclass and reference. Keep names that genuinely handle
+bundles (transport). Behavior unchanged. Proof: B. Size: mechanical across ~70 files; one coherent
+rename, not to be split.
+
+The retrospective's correction plan 006 (folding `NotebookGitAcceptedHistoryCompleteness` into
+`V300000338`) was **declined by the owner** and not written; that class and its test stay.
 
 ### 13. Assess attachment cost and cohesion last
 Type: Behavior. Status: done. Story 3 not resolved by assessment alone - folded into slices 15-16.
