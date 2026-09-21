@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.services.notebookGit.NotebookGitBundleImporter;
@@ -12,10 +13,15 @@ import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
 import com.odde.donut.services.notebookGit.NotebookGitJdbcFixture;
 import com.odde.donut.services.notebookGit.objectstore.JdbcNotebookGitRepository;
 import db.migration.NotebookGitUpgradeRehearsalEnvironment.Binding;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +40,9 @@ import org.junit.jupiter.api.Test;
  * Temporary upgrade rehearsal for retiring {@code bundle_bytes}: the real {@link
  * NotebookGitAcceptedObjectBackfill} over a whole populated {@link
  * NotebookGitUpgradeRehearsalEnvironment} on this worktree's isolated MySQL, followed by an
- * independent reopen/download of every binding and {@link NotebookGitAcceptedHistoryCompleteness}.
- * Removed with the rest of the upgrade machinery.
+ * independent reopen/download of every binding and {@link NotebookGitAcceptedHistoryCompleteness},
+ * and the expand migration that lets a binding exist without the retained bundle. Removed with the
+ * rest of the upgrade machinery.
  */
 class NotebookGitUpgradeRehearsalTest {
 
@@ -89,6 +96,31 @@ class NotebookGitUpgradeRehearsalTest {
   }
 
   @Test
+  void relaxingTheRetainedBundleColumnKeepsEveryRowAndAdmitsBindingsWithoutOne() throws Exception {
+    try (Connection connection = jdbc.openConnection();
+        Statement statement = connection.createStatement()) {
+      statement.execute("ALTER TABLE notebook_git_binding MODIFY bundle_bytes longblob NOT NULL");
+      Map<Integer, List<Object>> rowsBefore = environment.bindingRows();
+
+      statement.execute(
+          migrationSql("V300000337__allow_notebook_git_binding_without_bundle_bytes"));
+
+      assertThat("binding rows are untouched", environment.bindingRows(), equalTo(rowsBefore));
+    }
+    int withoutBundle = jdbc.insertBinding(environment.legacy.getFirst().head().name(), null);
+    try (Connection connection = jdbc.openConnection();
+        PreparedStatement select =
+            connection.prepareStatement(
+                "SELECT bundle_bytes IS NULL FROM notebook_git_binding WHERE id = ?")) {
+      select.setInt(1, withoutBundle);
+      try (ResultSet result = select.executeQuery()) {
+        result.next();
+        assertThat(result.getBoolean(1), is(true));
+      }
+    }
+  }
+
+  @Test
   void anInterruptedBackfillLeavesEachBindingWhollyOldOrWhollyNativeAndARerunCompletesIt()
       throws Exception {
     try (Connection connection = jdbc.openConnection()) {
@@ -135,6 +167,14 @@ class NotebookGitUpgradeRehearsalTest {
             reachable(clone.repository(), binding.head()),
             equalTo(reachable(binding.source(), binding.head())));
       }
+    }
+  }
+
+  private static String migrationSql(String name) throws Exception {
+    try (InputStream sql =
+        NotebookGitUpgradeRehearsalTest.class.getResourceAsStream(
+            "/db/migration/" + name + ".sql")) {
+      return new String(sql.readAllBytes(), StandardCharsets.UTF_8);
     }
   }
 

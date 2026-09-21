@@ -1010,7 +1010,7 @@ and it is exactly the plan's own "staged compatibility" release path. The outcom
 slice 9 is unchanged; only its release boundary is made explicit.
 
 ### 9a. Relax the retained column to nullable (expand)
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 
 Add one Flyway migration relaxing `notebook_git_binding.bundle_bytes` from `NOT NULL` to
 `NULL`. **Change no Java behavior**: creation/reset still write the column and the runtime
@@ -1021,6 +1021,50 @@ suite stays green; an empty-schema pass alone is insufficient - reuse slice 8's 
 environment) and D (`docs/database-erd.md` regenerated against the verified migrated
 disposable schema via `DONUT_ERD_SCHEMA`). **Release: safe at any time** - a pure expand
 that old code tolerates. Size: ~5 minutes plus suite runtime.
+
+**Delivered.** New migration
+`backend/src/main/resources/db/migration/V300000337__allow_notebook_git_binding_without_bundle_bytes.sql`:
+`ALTER TABLE notebook_git_binding MODIFY bundle_bytes longblob NULL;`. **No production
+Java changed.** Version 300000337 verified above every existing version three ways:
+files on disk (highest SQL `V300000335`, highest Java `V300000336`), every version ever
+named across all refs in Git history (maximum `V300000336`; only 300000330 retired), and
+the worktree test database's `flyway_schema_history` (at 300000336 before the run).
+`V300000319` was not edited.
+
+Proof V: `CURSOR_DEV=true nix develop -c pnpm backend:verify`, exit 0, **2,566 tests,
+0 failures, 0 errors, 0 skipped** - the 2,565 baseline plus exactly one new test. Real
+Flyway applied `300000337 | success=1` on the isolated worktree schema, leaving the column
+`IS_NULLABLE=YES`, still `longblob`.
+
+**Populated-database evidence**, because that worktree schema happened to hold zero
+binding rows (an empty-schema pass alone is insufficient per the plan): the new test
+`NotebookGitUpgradeRehearsalTest.relaxingTheRetainedBundleColumnKeepsEveryRowAndAdmitsBindingsWithoutOne`
+reuses slice 8's rehearsal environment (legacy bindings with several commits, an
+already-native binding with a stale bundle, a partial binding), re-imposes `NOT NULL`,
+runs the real `V300000337` SQL loaded from the classpath, and asserts every row - including
+the SHA-256 of each `bundle_bytes` - is **unchanged**; it then inserts a binding with
+`bundle_bytes` NULL and reads it back as NULL. Temporary; slice 12 deletes it. Gap stated
+plainly: the populated proof runs the migration's exact SQL rather than going through
+Flyway itself; for a one-statement `MODIFY` that is judged sufficient.
+
+Proof D: `DONUT_ERD_SCHEMA=doughnut_wt_14f749cc53694accb4e47498f7a2e996_test CURSOR_DEV=true
+nix develop -c pnpm export:database-erd`, exit 0, **no diff** - the ERD shows only
+PK/UK/FK columns, so `bundle_bytes` never appears. Expect no ERD diff from slice 10 either.
+
+Entity annotation left as `@Column(name = "bundle_bytes", nullable = false)`: no
+`spring.jpa.hibernate.ddl-auto`/`hbm2ddl` is set anywhere, so Hibernate never validates or
+generates DDL and the attribute is inert. The full suite boots the Spring context green with
+the relaxed schema. 9b removes the field.
+
+**Note for 9b:** the new test temporarily re-imposes `NOT NULL` on the shared test table.
+Backend tests run sequentially (no `maxParallelForks`, no JUnit parallel config), and the
+test ends relaxed, so this is safe today. After 9b stops writing the column, a failure
+*between* re-imposing and relaxing would leave `NOT NULL` in place and cascade into later
+binding inserts - a run that is already failing loudly, but 9b should simplify the test to
+only its `insertBinding(head, null)` assertion, or drop the re-impose step.
+
+Housekeeping outside this slice: the `db-migration` skill still names 333 as the newest
+version; `V300000337` is now the highest.
 
 ### 9b. Stop reading and writing the retained column (contract)
 Type: Structure. Status: planned. **Depends on 9a. Release only after 9a is deployed
