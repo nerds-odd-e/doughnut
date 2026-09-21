@@ -14,6 +14,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Repair the North Star attachment-classification link](quick/008-repair-attachment-contract-link/PLAN.md) — .planning/quick/008-repair-attachment-contract-link/PLAN.md
 - [Remove the ZIP export feature](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-46) — SEED-009#story-46
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
