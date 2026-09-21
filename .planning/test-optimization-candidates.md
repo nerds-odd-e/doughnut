@@ -56,7 +56,7 @@ Consequences for future profiling passes:
   `testability/GitBundleTestReader.fetchTipTreeEntries`, which was the concept's
   real home all along — that class already owned `fetchSingleParentCommit` and
   `fetchAdvertisedHead`, so no new file or idiom was needed and
-  `controllers/NotebookGitBundleControllerTestBase` (258 lines, ~120 subclasses)
+  `controllers/NotebookGitControllerTestBase` (258 lines, ~120 subclasses)
   stayed untouched. Every other `readTreeEntries` call site needs the tip *commit*
   (parent count, first-parent ancestry, author ident), not only its entries, so
   they correctly open their own repository and are a different concept — decision
