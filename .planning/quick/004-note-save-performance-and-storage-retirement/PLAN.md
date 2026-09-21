@@ -518,7 +518,7 @@ entirely. Left deliberately: collapsing it now would need a production visibilit
 change that slice 4 is not authorized to make.
 
 ### 5. Observe publication history through the public boundary
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 
 Replace old-column reads/assertions in proposal, admission and composed-range
 controller tests with the existing download boundary and Git object/tree/history
@@ -527,6 +527,78 @@ same-tree identity-change, deletion/recreation and rollback assertions; compare
 content/ancestry rather than serialized transport byte identity. Enables slice 9.
 Proof: B. Size: ~5 minutes for a mechanical owner-based change; the number of
 callers is a sizing concern and requires further subdivision if edits differ.
+
+**Delivered.** 14 backend test files, no production code. All 12 owned
+proposal/admission/composed-range files now hold **zero** legacy-column
+references. Repo-wide the remaining old-column reads fell from 49 files to
+**36 files**. Suite unchanged at 2,564 tests, 0 failures, 0 errors, 0 skipped;
+no test added or removed.
+
+Two additive seams in `NotebookGitBundleControllerTestBase`, both inherited by
+the web-durability base that slice 6 will use:
+
+- `acceptedBundleBytes(Notebook)` - the public download boundary,
+  `controller.downloadNotebookGitBundle(...).getBody()`. `proposalBundleBytes`
+  now delegates to it instead of inlining the download.
+- `acceptedHistory(Notebook)` returning
+  `record AcceptedHistory(List<String> commits, List<PortableTreeEntry> tipContent)`.
+
+**How "unchanged accepted history" is now expressed.** Pattern A (capture bytes
+before a refused operation, assert equal bytes after) became: capture
+`acceptedHistory(notebook)` before, assert equality after. The record holds every
+commit reachable from the tip by object id plus the tip's exact Portable content,
+and `PortableTreeEntry` has byte-aware equality. Commit ids are content-and-ancestry
+hashes, so equality means identical ancestry **and** identical tip bytes, with no
+dependence on how a bundle was packed or ordered on the wire. This is **stronger**
+than what it replaced: the old line could only say "the stored column holds the
+same array", while the new one says "the accepted head, every ancestor and all tip
+content are unchanged". Pattern B (`fetchHead(repository, binding.getBundleBytes())`)
+became the predicted one-line substitution to `acceptedBundleBytes(notebook)`.
+
+**One non-mechanical hazard, now a known pattern for slices 6 and 7:** the download
+boundary is authorization-checked. A test that switches `currentUser` away from the
+owner before its post-condition must restore the owner before observing, as
+`NotebookGitIdempotentPublishControllerTest.rejectedPublishLeavesAcceptedHistoryUnchanged`
+now does. Expect this in any non-owner or rejection test.
+
+Sizing: about 12-15 active minutes against the ~5 minute budget. The plan's
+subdivision trigger did **not** fire - patterns A and B covered every caller and
+the three variants were small and same-shaped, so the overrun was volume (22 call
+sites across 13 files), not differing edits. Pushing through was correct here.
+
+### Newly assigned to slice 7: the shared rejection helper
+
+`NotebookGitBundleControllerTestBase.assertProposalRejectedWithoutMutatingBinding`
+still reads the legacy column, and **no slice owned that change** - slice 5 did not
+need it, and slice 9 would otherwise discover it. **Slice 7 now owns it**, because
+slice 7 already owns the other shared assertion owner, `NotebookGitBindingAssertions`,
+and runs after most callers have moved. **30 test files call this helper, so it is a
+blocking dependency for slice 9: the entity field cannot be removed until it stops
+reading the column.** The change itself is one line and touches no caller signature.
+
+Stated precisely, because it matters for how urgent this is: the helper asserts
+three things - accepted head unchanged, stored bytes unchanged, `updatedAt`
+unchanged. The **accepted-head assertion is load-bearing and still discriminating**,
+so the helper is *not* vacuous today. It is the stored-bytes line alone that is
+weak: once a binding's saves move onto native object storage the column goes stale,
+so comparing it before and after a refusal can prove only that a stale value stayed
+stale. Replacing that one line with `acceptedHistory(notebook)` both removes the
+column dependency and strengthens the helper. This is cleanup plus a genuine
+coverage improvement, not a defect being papered over.
+
+Refactor outcome (slice 5): the accepted-history read moved out of the controller
+test base into `GitBundleTestReader.fetchAcceptedHistory(byte[])`, which already
+owns "fetch a bundle into a scratch in-memory repository and inspect it"; the base
+kept a one-line delegation. That satisfied the refactor skill's 250-line file check
+along a cohesive seam rather than an arbitrary cut, and left the base at exactly
+250 lines. Additive only - no existing member changed, and no slice-6/7 old-column
+read was converted. Suite re-run after the refactor: 2,564 tests, 0 failures.
+
+Next natural split, when something else must be added to that base: move the
+seeding helpers (`seedAcceptedBinding`, `seedAcceptedHistory`,
+`clearNativeObjectStoreRows`, `countNativeObjectStoreRows`) out as a cohesive
+group. Pre-existing and out of scope so far: `NotebookGitProposalAncestryControllerTest`
+(355 lines) and `NotebookGitComposedMoveEditControllerTest` (251).
 
 ### 6. Observe web-change durability through current storage
 Type: Structure. Status: planned.
@@ -539,7 +611,10 @@ Proof: B. Size: ~5 minutes for shared observation changes; subdivide by domain
 operation if the same change does not apply coherently.
 
 ### 7. Observe creation and repository lifecycle through current storage
-Type: Structure. Status: planned.
+Type: Structure. Status: planned. **Also owns
+`assertProposalRejectedWithoutMutatingBinding` (see slice 5's note): replace its
+stored-bytes line with `acceptedHistory(notebook)`. 30 callers depend on it and
+slice 9 is blocked until it lands.**
 
 Update remaining creation/cutover/reset/download/repository fixtures, including
 `NotebookGitBindingAssertions`, to stop requiring retained bundle storage.

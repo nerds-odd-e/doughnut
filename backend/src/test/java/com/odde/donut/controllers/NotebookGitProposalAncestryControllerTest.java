@@ -47,13 +47,11 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
   @Test
   void rejectsStaleExpectedHeadWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
 
     assertProposalRejectedWithoutMutatingBinding(
         notebook,
         "0000000000000000000000000000000000000000",
-        singleParentChildBundleBytes(binding),
+        singleParentChildBundleBytes(notebook),
         HttpStatus.CONFLICT);
   }
 
@@ -80,7 +78,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
     assertProposalRejectedWithoutMutatingBinding(
         notebook,
         binding.getAcceptedGitObjectId(),
-        mergeCommitBundleBytes(binding),
+        mergeCommitBundleBytes(notebook),
         HttpStatus.CONFLICT);
   }
 
@@ -90,7 +88,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
     Note note = makeMe.aNote().notebook(notebook).title("Topic").content(ORIGINAL_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    ContentEditRange range = contentEditRangeOn(binding.getBundleBytes(), acceptedHead);
+    ContentEditRange range = contentEditRangeOn(acceptedBundleBytes(notebook), acceptedHead);
 
     String publishedHead =
         controller.publishNotebookGitProposal(
@@ -122,7 +120,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
     ContentEditRange range =
-        editThenRestoreRangeOn(binding.getBundleBytes(), acceptedHead, ORIGINAL_CONTENT);
+        editThenRestoreRangeOn(acceptedBundleBytes(notebook), acceptedHead, ORIGINAL_CONTENT);
 
     ObjectId acceptedTree;
     ObjectId restoredTree;
@@ -168,7 +166,8 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
         makeMe.aNote().notebook(notebook).title("Surviving").content(ORIGINAL_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    TemporaryNoteRange range = temporaryNoteRemovedRangeOn(binding.getBundleBytes(), acceptedHead);
+    TemporaryNoteRange range =
+        temporaryNoteRemovedRangeOn(acceptedBundleBytes(notebook), acceptedHead);
 
     String publishedHead =
         controller.publishNotebookGitProposal(
@@ -219,12 +218,13 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
   void acceptsSingleParentRangeWhenAMergeExistsBelowTheAcceptedHead() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote().notebook(notebook).title("Topic").content(ORIGINAL_CONTENT).please();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    snapshotCurrentPortableTree(notebook);
 
     ObjectId acceptedWithMergeBelow;
     byte[] acceptedWithMergeBelowBundle;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId priorAccepted = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      ObjectId priorAccepted =
+          GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId otherParent =
           commitOnTopOf(repository, List.of(), "other.md", "other content", "Other root commit");
       acceptedWithMergeBelow =
@@ -258,9 +258,10 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
   }
 
   /** A bundle whose {@code main} is a genuine single-parent child of the accepted head. */
-  private byte[] singleParentChildBundleBytes(NotebookGitBinding binding) throws Exception {
+  private byte[] singleParentChildBundleBytes(Notebook notebook) throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      ObjectId acceptedHead =
+          GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId childCommit =
           commitOnTopOf(
               repository, List.of(acceptedHead), "proposal.md", "proposal content", "Proposal");
@@ -272,9 +273,10 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
    * A bundle whose {@code main} is a merge commit with two parents, one of which is the accepted
    * head - still rejected, because ancestry here requires a single-parent tip.
    */
-  private byte[] mergeCommitBundleBytes(NotebookGitBinding binding) throws Exception {
+  private byte[] mergeCommitBundleBytes(Notebook notebook) throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      ObjectId acceptedHead =
+          GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId otherParent =
           commitOnTopOf(repository, List.of(), "other.md", "other content", "Other root commit");
       ObjectId mergeCommit =

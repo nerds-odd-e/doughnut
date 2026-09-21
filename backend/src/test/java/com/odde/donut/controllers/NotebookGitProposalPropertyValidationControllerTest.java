@@ -78,6 +78,7 @@ class NotebookGitProposalPropertyValidationControllerTest
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     NotebookGitBinding before =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    var acceptedBefore = acceptedHistory(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
@@ -100,7 +101,7 @@ class NotebookGitProposalPropertyValidationControllerTest
     NotebookGitBinding after =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(after.getAcceptedGitObjectId(), equalTo(before.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(before.getBundleBytes()));
     assertThat(after.getUpdatedAt(), equalTo(before.getUpdatedAt()));
+    assertThat(acceptedHistory(notebook), equalTo(acceptedBefore));
   }
 }

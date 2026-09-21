@@ -95,7 +95,7 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
         inCommittedTransaction(
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
-    byte[] acceptedBundle = binding.getBundleBytes();
+    var acceptedBefore = acceptedHistory(notebook);
     String acceptedHead = binding.getAcceptedGitObjectId();
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     Timestamp movedUpdatedAt =
@@ -113,7 +113,7 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
     ObjectId acceptedHeadId = ObjectId.fromString(acceptedHead);
     byte[] proposal;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterMoveDeleteAndCompanionEdit =
           commitOnTopOf(
               repository,
@@ -178,8 +178,8 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
           assertThat(reloadedMovedTracker.getNextRecallAt(), is(movedTrackerNextRecallAt));
 
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
-          assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+    assertThat(acceptedHistory(notebook), equalTo(acceptedBefore));
   }
 }

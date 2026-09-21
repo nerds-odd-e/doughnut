@@ -111,6 +111,30 @@ public final class GitBundleTestReader {
   }
 
   /**
+   * The accepted history a bundle carries: every commit reachable from {@code refs/heads/main},
+   * oldest last, plus the exact Portable content at the tip. Two snapshots are equal exactly when
+   * the accepted history is unchanged. Serialized bundle bytes cannot answer that question: two
+   * downloads of one unchanged history are re-serialized independently and need not be identical
+   * byte for byte.
+   */
+  public static AcceptedHistory fetchAcceptedHistory(byte[] bundleBytes)
+      throws IOException, URISyntaxException {
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
+        RevWalk revWalk = new RevWalk(repository)) {
+      RevCommit tip = revWalk.parseCommit(fetchHead(repository, bundleBytes));
+      List<PortableTreeEntry> tipContent = readTreeEntries(repository, tip);
+      revWalk.markStart(tip);
+      List<String> commits = new ArrayList<>();
+      for (RevCommit commit : revWalk) {
+        commits.add(commit.name());
+      }
+      return new AcceptedHistory(commits, tipContent);
+    }
+  }
+
+  public record AcceptedHistory(List<String> commits, List<PortableTreeEntry> tipContent) {}
+
+  /**
    * The bundle's advertised {@code HEAD} object id, or {@code null} if the bundle never included
    * one. A system {@code git clone} of a bundle without this uses the cloning machine's own {@code
    * init.defaultBranch} to name the checked-out branch instead of {@code main}, so every bundle

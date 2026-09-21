@@ -72,7 +72,7 @@ class NotebookGitProposalFolderCreationControllerTest
     ObjectId tip;
     byte[] proposalBytes;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       List<NotebookGitProposalFile> afterB = new ArrayList<>();
       afterB.add(new NotebookGitProposalFile("Existing.md", EDITED_EXISTING_WITH_LINK));
       if (nestedDestination) {

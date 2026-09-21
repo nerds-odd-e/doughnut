@@ -16,6 +16,7 @@ import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import com.odde.donut.testability.NotebookGitAcceptedHistoryFixture;
 import java.time.Instant;
 import java.util.List;
@@ -207,16 +208,30 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
   }
 
   /**
-   * A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. Reads
-   * the current accepted head/history through the notebook's own download endpoint rather than
-   * {@code binding.getBundleBytes()} directly: once a binding's ordinary saves move onto native
-   * object storage, that column is no longer kept in sync with the accepted head, so only the
-   * download's live, re-serialized bundle reliably reflects the current accepted history.
+   * The notebook's current accepted history, served by its own download endpoint. Tests read the
+   * accepted history here rather than from {@code binding.getBundleBytes()}: once a binding's
+   * ordinary saves move onto native object storage, that column is no longer kept in sync with the
+   * accepted head, so only the download's live, re-serialized bundle reliably reflects it.
+   */
+  byte[] acceptedBundleBytes(Notebook notebook) throws Exception {
+    return controller
+        .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
+        .getBody();
+  }
+
+  /** The accepted history the notebook's own download boundary currently serves. */
+  AcceptedHistory acceptedHistory(Notebook notebook) throws Exception {
+    return GitBundleTestReader.fetchAcceptedHistory(acceptedBundleBytes(notebook));
+  }
+
+  /**
+   * A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head, built
+   * on the accepted history the download boundary currently serves.
    */
   byte[] proposalBundleBytes(
       NotebookGitBinding binding, List<NotebookGitProposalFile> proposedFiles) throws Exception {
     Notebook notebook = notebookRepository.findById(binding.getNotebook().getId()).orElseThrow();
-    byte[] currentBundle = controller.downloadNotebookGitBundle(notebook).getBody();
+    byte[] currentBundle = acceptedBundleBytes(notebook);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, currentBundle);
       ObjectId childCommit =
