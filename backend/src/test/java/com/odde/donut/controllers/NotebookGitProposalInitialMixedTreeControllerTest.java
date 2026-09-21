@@ -25,8 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /** Verifies mixed initial trees with explicit and implied Folder ancestry. */
-class NotebookGitProposalInitialMixedTreeControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalInitialMixedTreeControllerTest extends NotebookGitControllerTestBase {
 
   private static final String NOTEBOOK_README =
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved notebook readme.\n";

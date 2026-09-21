@@ -10,8 +10,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.sql.Timestamp;
 
-abstract class NotebookGitNoteCreationControllerTestSupport
-    extends NotebookGitBundleControllerTestBase {
+abstract class NotebookGitNoteCreationControllerTestSupport extends NotebookGitControllerTestBase {
 
   static NoteCreationDTO titleOnly(String title) {
     NoteCreationDTO dto = new NoteCreationDTO();

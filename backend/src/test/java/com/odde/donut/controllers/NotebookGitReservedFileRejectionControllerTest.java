@@ -22,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
  * the accepted tree. These refusals are about the accepted tree's reserved/shape contract, not
  * uncertain identity, so they live apart from the identity-uncertain deletion rejection cases.
  */
-class NotebookGitReservedFileRejectionControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitReservedFileRejectionControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL = "---\ntype: Note\n---\noriginal content";
 

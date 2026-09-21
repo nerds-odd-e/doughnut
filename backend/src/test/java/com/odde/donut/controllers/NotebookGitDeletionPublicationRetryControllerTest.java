@@ -21,8 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * binding timestamp and accepted history stay as the first publication left them, and the deleted
  * note's complete dependent closure stays absent.
  */
-class NotebookGitDeletionPublicationRetryControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitDeletionPublicationRetryControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
 

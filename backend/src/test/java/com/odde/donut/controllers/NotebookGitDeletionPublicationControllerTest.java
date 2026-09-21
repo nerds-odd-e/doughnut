@@ -30,7 +30,7 @@ import org.springframework.http.ResponseEntity;
  * projection and Git history. An accepted file deletion permanently removes the note and its
  * complete dependent data; the container and other notes remain.
  */
-class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitDeletionPublicationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String EDITED_CONTENT = "---\ntype: Note\n---\nEdited authored bytes.\n";

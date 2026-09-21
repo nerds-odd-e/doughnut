@@ -29,7 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
-class NotebookGitProposalRenameRollbackControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRenameRollbackControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
 

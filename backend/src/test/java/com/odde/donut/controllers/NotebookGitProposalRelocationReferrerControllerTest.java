@@ -25,8 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * covered in {@link NotebookGitProposalRenameControllerTest}. Placement is covered in {@link
  * NotebookGitProposalRelocationControllerTest}. Web folder-move rewrite is out of scope.
  */
-class NotebookGitProposalRelocationReferrerControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRelocationReferrerControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
   private static final String TARGET_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";

@@ -26,8 +26,7 @@ import org.springframework.http.ResponseEntity;
  * NotebookGitProposalRelocationDestinationControllerTest}. Last-note deletion containers are
  * covered in {@link NotebookGitDeletionContainerPublicationControllerTest}.
  */
-class NotebookGitProposalRelocationContainerControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalRelocationContainerControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
 

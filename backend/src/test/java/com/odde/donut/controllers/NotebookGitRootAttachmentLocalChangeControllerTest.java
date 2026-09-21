@@ -33,8 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * range left behind is absent from both the accepted tip and the live projection, and a
  * multi-commit range lands as its final set instead of being replayed as live mutations.
  */
-class NotebookGitRootAttachmentLocalChangeControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitRootAttachmentLocalChangeControllerTest extends NotebookGitControllerTestBase {
 
   private static final String NOTE_MARKDOWN = "---\ntype: Note\n---\naccepted content";
   private static final String REFERENCE_JSON = "{\"schema\": \"donut\"}\n";

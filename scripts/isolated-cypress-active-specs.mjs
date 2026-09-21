@@ -38,9 +38,6 @@ export const APPLICATION_ONLY_ACTIVE_SPECS = [
   'e2e_test/features/note_creation_and_update/note_creation.feature',
   'e2e_test/features/note_creation_and_update/note_deletion.feature',
   'e2e_test/features/note_creation_and_update/note_edit.feature',
-  // TEMPORARY (SEED-034#story-4, slices 2-3): removed with the measurement
-  // feature in slice 14.
-  'e2e_test/features/note_creation_and_update/note_save_measurement.feature',
   'e2e_test/features/note_topology/markdown_link.feature',
   'e2e_test/features/note_topology/note_move.feature',
   'e2e_test/features/note_topology/note_property.feature',

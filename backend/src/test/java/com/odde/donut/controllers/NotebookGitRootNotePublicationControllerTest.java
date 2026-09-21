@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /** Verifies root-note creation across Note projection and accepted Git history. */
-class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitRootNotePublicationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String CREATED_CONTENT =

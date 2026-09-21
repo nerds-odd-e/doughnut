@@ -33,23 +33,27 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 
 * Versions use a numerical format
 
-The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; **`V300000339__db_migration_placeholder.sql`** is the newest file: a no-op tip placeholder above every version ever applied. Version **`300000330`** is retired — its migration was deleted after production applied it — and stays reserved in `flyway_schema_history`.
+The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; the upgrade migrations after it run in order on every install, and **`V300000338__DropNotebookGitBindingBundleBytes.java`** is the newest file. Versions **`300000330`** and **`300000339`** are retired — their migrations were deleted after production applied them — and stay reserved in `flyway_schema_history`.
 
 New migrations need to use a **greater** version number than **`300000339`**.
-
-**Freeze:** new schema migrations are frozen until the squash that removes the spent upgrade chain below the `300000339` tip placeholder is deployed (see Squashing historical migrations).
 
 ### Migration Process
 
 * Migrations run automatically when the application starts (non-test environments)
-* Non-test startup runs **`flyway.repair()` then `flyway.migrate()`** (`FlyWayFreeVersionRealMigration`). `repair()` is what makes squashing safe on existing databases (checksum realign + remove history for deleted files).
+* Non-test startup runs **`flyway.repair()` then `flyway.migrate()`** (`FlyWayFreeVersionRealMigration`). `repair()` is what makes squashing safe on existing databases (checksum realign + remove history for deleted files). Deleting the **newest** applied migration file is different: until a newer version ships, databases that recorded it treat it as a future migration and keep its row unchanged; the next newer migration's startup then marks it deleted.
 * For unit tests, DB migration is included in the test command (see `backend-development` rule for test execution)
+
+### Release safety
+
+* `FlyWayFreeVersionRealMigration` runs on `ApplicationReadyEvent`, **after** the instance is ready, so new code can serve requests before its own migrations finish. Ship a schema change that code must not see early in two releases: first the compatible schema change (for example relaxing a column to nullable while code still writes it), then the code that relies on it.
+* A migration that throws there closes the application context and the JVM exits; production instance-group autohealing then restarts it in a loop, retrying after `repair()`, until the data is fixed. Production runs two instances and the deploy replaces them one at a time (`--max-surge 0 --max-unavailable 1`), so the other instance keeps serving; on a single instance the same failure is an outage.
+* A destructive migration that must only run when data is ready should check that precondition first and throw before any DDL, as `V300000338__DropNotebookGitBindingBundleBytes` does.
 
 ## Migration file structure
 
 * **`V100000000__baseline.sql`** holds the collapsed full DDL (fresh installs).
-* **`V300000339__db_migration_placeholder.sql`** is the no-op tip placeholder; the next-version rule, the retired version, and the current freeze are under Version Numbering.
-* Each **new** file after that should contain one atomic change (create/alter/rename/drop as needed).
+* The upgrade migrations after the baseline run in order; the newest file, the retired versions, and the next-version rule are under Version Numbering.
+* Each **new** file should contain one atomic change (create/alter/rename/drop as needed).
 
 ## Best Practices:
 

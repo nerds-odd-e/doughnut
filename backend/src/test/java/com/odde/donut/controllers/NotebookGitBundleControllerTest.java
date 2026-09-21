@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitBundleControllerTest extends NotebookGitControllerTestBase {
 
   @Test
   void ownerDownloadsAcceptedBundleWithoutMutatingIt() throws Exception {

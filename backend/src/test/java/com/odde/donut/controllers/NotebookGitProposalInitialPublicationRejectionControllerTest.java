@@ -27,7 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookGitProposalInitialPublicationRejectionControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String NOTEBOOK_README =
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved notebook readme.\n";

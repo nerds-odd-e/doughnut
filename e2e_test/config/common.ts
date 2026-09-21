@@ -13,7 +13,6 @@ import {
   WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
   worktreeResetIsolationCypressTasks,
 } from '../../scripts/worktree-reset-isolation-barrier.mjs'
-import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
 } = require('@badeball/cypress-cucumber-preprocessor')
@@ -22,12 +21,10 @@ import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import { composeCypressPluginEvents } from './composeCypressPluginEvents.mjs'
 import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
-import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
 import { E2E_APP_BASE_URL } from './constants'
 import { readZipEntries } from './readZipEntries'
 import { notebookPublicationProfileTasks } from './notebookPublicationProfile'
-// TEMPORARY (SEED-034#story-4, slices 2-3): removed with the measurement feature in slice 14.
-import { noteSaveMeasurementTasks } from './noteSaveMeasurement'
+import { mcpClientTasks } from './mcpClientTasks'
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -118,11 +115,8 @@ const commonConfig = {
       on('task', {
         ...worktreeResetIsolationCypressTasks(),
         ...notebookPublicationProfileTasks(repoRoot, on),
-        ...noteSaveMeasurementTasks(),
         ...mcpIsolationCypressTasks(),
-        mcpClientConnectionInfo() {
-          return mcpClient.connectionInfo()
-        },
+        ...mcpClientTasks(repoRoot),
         ...createCliE2ePluginTasks(repoRoot, {
           saveBufferToCurrentSpecFolder:
             specScreenshotSink.saveBufferToCurrentSpecFolder.bind(
@@ -178,32 +172,6 @@ const commonConfig = {
           }
           return checker(retryCount)
         },
-        async spawnAndConnectMcpServer({
-          baseUrl,
-          accessToken,
-        }: {
-          baseUrl: string
-          accessToken: string
-        }) {
-          const apiBaseUrl =
-            baseUrl && baseUrl !== 'undefined' ? baseUrl : E2E_APP_BASE_URL
-          return await mcpClient.spawnAndConnectMcpServer({
-            baseUrl: apiBaseUrl,
-            accessToken,
-          })
-        },
-        async callMcpToolWithParams({
-          apiName,
-          params,
-        }: {
-          apiName: string
-          params: Record<string, any>
-        }) {
-          return await mcpClient.callMcpToolWithParams({ apiName, params })
-        },
-        async disconnectMcpServer() {
-          return await mcpClient.disconnectMcpServer()
-        },
         async ocrCanvasImage(base64Png: string) {
           const { createWorker } = await import('tesseract.js')
           const tessDir = join(repoRoot, 'e2e_test', 'tesseract')
@@ -216,26 +184,6 @@ const commonConfig = {
           } = await worker.recognize(Buffer.from(base64Png, 'base64'))
           await worker.terminate()
           return text
-        },
-        async bundleMcpServer() {
-          const mcpServerDir = join(repoRoot, 'mcp-server')
-          const bundlePath = join(mcpServerDir, 'dist', 'mcp-server.bundle.mjs')
-          if (existsSync(bundlePath)) {
-            return true
-          }
-          try {
-            runShellCommandSync('pnpm bundle', {
-              cwd: mcpServerDir,
-              env: {
-                ...process.env,
-                ...CLI_E2E_PNPM_SPAWN_ENV,
-              },
-            })
-            return true
-          } catch (error) {
-            console.error('Failed to bundle MCP server:', error)
-            throw error
-          }
         },
       })
 

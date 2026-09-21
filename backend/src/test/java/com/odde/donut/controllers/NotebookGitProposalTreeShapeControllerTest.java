@@ -33,7 +33,7 @@ import org.springframework.web.server.ResponseStatusException;
  * relocation in {@link NotebookGitProposalRelocationControllerTest}; combined parent-and-filename
  * acceptance in {@link NotebookGitProposalRelocateAndRenameControllerTest}.
  */
-class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalTreeShapeControllerTest extends NotebookGitControllerTestBase {
 
   private static final String TYPED_NOTE_CONTENT = "---\ntype: Note\n---\noriginal content";
   private static final String EDITED_ROOT_README =

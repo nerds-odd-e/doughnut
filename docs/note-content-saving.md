@@ -16,16 +16,24 @@ A canonical no-op does not append a commit.
 
 Snapshots use the shared flat export rows without hydrating every note and
 folder as editable entities. Publication retains entity loading where it needs
-identity evidence. Accepted entries are decoded once per operation; one final
-snapshot supplies both comparison and commit construction. Every final path is
-considered, including changes to other notes, README, trash and empty folders.
-Native JGit `DirCache` reuses unchanged regular-file blobs, inserts changed
-content and omits deleted paths. The accepted head and complete bundle are
-stored with the application projection in the same transaction.
+identity evidence. Both the drift and no-op decisions, like publication's drift
+check, compare path to Git blob id maps: accepted ids come from the accepted
+tree objects without reading blob content, live ids are hashed in memory, and
+file modes are ignored. One final snapshot supplies both comparison and commit
+construction. Every final path is considered, including changes to other
+notes, README, trash and empty folders. Native JGit `DirCache` keeps blobs the
+accepted tree already holds at a path, inserts changed content and omits
+deleted paths.
+
+Accepted history lives in the native object store
+(`notebook_git_accepted_object`) on the connection of the surrounding
+transaction, so a save's new objects and accepted head commit or roll back with
+the application projection. A save writes only its new blobs, trees and
+commit. Git bundles are produced only for download and clone, and read only
+from publication proposals.
 
 The [Git synchronization contract](notebook-git-synchronization.md) governs
-history, identity and publication guarantees. Complete bundles remain the live
-storage representation; each changed save imports and serializes a bundle.
+history, identity and publication guarantees.
 
 ## Rich property editing
 

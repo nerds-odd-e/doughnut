@@ -25,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 
 /** Verifies publication of an initial root Folder Readme with one or two contained Notes. */
 class NotebookGitProposalInitialFolderAndContainedNoteControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String FOLDER_README =
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved folder readme.\n";

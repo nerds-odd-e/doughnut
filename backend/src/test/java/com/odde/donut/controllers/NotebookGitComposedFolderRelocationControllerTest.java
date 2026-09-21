@@ -27,8 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * addition retains Folder/Note identities at the final hierarchy, including when the destination
  * parent was represented earlier in the range.
  */
-class NotebookGitComposedFolderRelocationControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitComposedFolderRelocationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String README_BODY = "readme";
   private static final String README = ExportReadmeMarkdown.assemble(README_BODY);

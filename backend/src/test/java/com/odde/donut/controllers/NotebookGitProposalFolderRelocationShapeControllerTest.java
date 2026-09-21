@@ -21,8 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
  * not one exact same-name subtree relocation. Exact candidates are accepted in {@link
  * NotebookGitProposalFolderRelocationControllerTest}.
  */
-class NotebookGitProposalFolderRelocationShapeControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalFolderRelocationShapeControllerTest extends NotebookGitControllerTestBase {
 
   private static final String README = "readme";
   private static final String NOTE = "note";

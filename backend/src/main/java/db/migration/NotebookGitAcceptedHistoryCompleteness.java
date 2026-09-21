@@ -19,16 +19,16 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
 
 /**
- * Verifies the end state native storage must reach before the retained {@code bundle_bytes} column
- * may be dropped: every {@code notebook_git_binding}'s persisted accepted head, and every object it
+ * Verifies the end state native storage must reach before the {@code bundle_bytes} column may be
+ * dropped: every {@code notebook_git_binding}'s persisted accepted head, and every object it
  * reaches, is present in {@code notebook_git_accepted_object}. A nonempty native store is not
  * evidence - a binding holding only some of its reachable objects is never re-selected by {@link
- * NotebookGitAcceptedObjectBackfill}, whichever writer left it partial - so this walks each head's
- * reachable graph instead of counting rows.
+ * V300000336__BackfillNotebookGitAcceptedObjects}, whichever writer left it partial - so this walks
+ * each head's reachable graph instead of counting rows.
  *
- * <p>A plain class outside Spring context beside the backfill, because the column-dropping Flyway
- * migration must run it before its destructive DDL; it is removed with the rest of the upgrade
- * machinery.
+ * <p>A plain class with no Spring dependency, because {@link
+ * V300000338__DropNotebookGitBindingBundleBytes} runs it as a Flyway Java migration before its
+ * destructive DDL.
  */
 final class NotebookGitAcceptedHistoryCompleteness {
 
@@ -46,7 +46,7 @@ final class NotebookGitAcceptedHistoryCompleteness {
     }
     if (!incomplete.isEmpty()) {
       throw new IllegalStateException(
-          "Native accepted history is incomplete; retained bundles must not be dropped: "
+          "Native accepted history is incomplete; bundle_bytes must not be dropped: "
               + String.join(", ", incomplete));
     }
   }

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * by filename, then subfolders. The files get there through the ordinary publication boundary, not
  * through seeded projection rows.
  */
-class NotebookExportRootAttachmentControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookExportRootAttachmentControllerTest extends NotebookGitControllerTestBase {
 
   private static final String NOTEBOOK_README = "---\ntype: Readme\n---\nnotebook readme";
   private static final String OVERVIEW_BODY = "---\ntype: Note\n---\nsee Diagram.png";

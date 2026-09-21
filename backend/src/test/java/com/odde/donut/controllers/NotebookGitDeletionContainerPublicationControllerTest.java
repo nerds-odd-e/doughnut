@@ -24,8 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /** Verifies last-note deletion keeps the Donut notebook without invisible folder structure. */
-class NotebookGitDeletionContainerPublicationControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitDeletionContainerPublicationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String CONTENT = "---\ntype: Note\n---\nOnly authored bytes.\n";
 

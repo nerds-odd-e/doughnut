@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * <p>{@code NotebookService} calls {@link #createBindingForNotebook} at creation time so every
  * notebook starts Git-backed from an empty tree; {@link #resetHistory} writes the same kind of root
- * commit over a binding a notebook already has. The caller supplies the commit time, and a tree or
- * bundle failure propagates before a binding is persisted.
+ * commit over a binding a notebook already has. The caller supplies the commit time, and a tree
+ * failure propagates before a binding is persisted.
  */
 @Service
 public class NotebookGitCutoverService {
@@ -52,7 +52,7 @@ public class NotebookGitCutoverService {
     NotebookGitBinding binding = new NotebookGitBinding();
     binding.setNotebook(notebook);
     try (Repository repository = buildRepository(notebook, cutoverTime, CUTOVER_COMMIT_MESSAGE)) {
-      applyBundle(binding, repository, cutoverTime);
+      storeHistory(binding, repository, cutoverTime);
     }
     return notebookGitBindingRepository.save(binding);
   }
@@ -74,18 +74,18 @@ public class NotebookGitCutoverService {
                   return created;
                 });
     try (Repository repository = buildRepository(notebook, resetTime, RESET_COMMIT_MESSAGE)) {
-      applyBundle(binding, repository, resetTime);
+      storeHistory(binding, repository, resetTime);
     }
     return notebookGitBindingRepository.save(binding);
   }
 
   private Repository buildRepository(Notebook notebook, Instant commitTime, String message) {
     List<PortableTreeEntry> entries = livePortableTree.entriesOf(notebook);
-    return NotebookGitBundleBuilder.build(
+    return NotebookGitCommitBuilder.build(
         entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, message, commitTime);
   }
 
-  private void applyBundle(NotebookGitBinding binding, Repository repository, Instant time) {
+  private void storeHistory(NotebookGitBinding binding, Repository repository, Instant time) {
     Timestamp timestamp = Timestamp.from(time);
     if (binding.getCreatedAt() == null) {
       binding.setCreatedAt(timestamp);

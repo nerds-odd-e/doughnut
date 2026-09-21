@@ -31,8 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
  * but the single-shot endpoint of the range falls below it, so identity must be carried through the
  * range rather than detected at the tip.
  */
-class NotebookGitComposedAccumulatedRenameControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitComposedAccumulatedRenameControllerTest extends NotebookGitControllerTestBase {
 
   /**
    * Accumulated-rename fixture bodies (10 substantial prose lines each). {@link

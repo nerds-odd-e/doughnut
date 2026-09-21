@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /** Verifies that copied Portable content receives a fresh Donut identity. */
-class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitCopyIdentityControllerTest extends NotebookGitControllerTestBase {
 
   private static final String COPIED_CONTENT =
       "---\ntype: Note\ntopic: inertia\n---\nA body copied without changes.\n";

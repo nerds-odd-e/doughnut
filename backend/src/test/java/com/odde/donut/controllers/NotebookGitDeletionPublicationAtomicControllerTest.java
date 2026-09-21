@@ -23,8 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
-class NotebookGitDeletionPublicationAtomicControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitDeletionPublicationAtomicControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String EDITED_CONTENT = "---\ntype: Note\n---\nEdited authored bytes.\n";

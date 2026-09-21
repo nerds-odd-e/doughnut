@@ -34,7 +34,7 @@ import org.springframework.web.server.ResponseStatusException;
  * - including the root files it currently holds - and that only someone who can edit the notebook
  * may do so.
  */
-class NotebookGitHistoryResetControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   private static final String OUTSIDE_HISTORY_CONTENT =

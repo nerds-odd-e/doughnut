@@ -19,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
-class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitWebFolderTrashAtomicControllerTest extends NotebookGitControllerTestBase {
 
   static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";
 

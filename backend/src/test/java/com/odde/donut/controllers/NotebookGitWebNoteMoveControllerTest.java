@@ -153,12 +153,9 @@ class NotebookGitWebNoteMoveControllerTest extends NotebookGitWebNoteMoveTestBas
   }
 
   /**
-   * Builds a single-parent proposal on top of the accepted head in {@code acceptedBundleBytes}
-   * (read through the notebook's own download endpoint by the caller, not {@code
-   * binding.getBundleBytes()} directly - that column stops tracking the accepted head once a
-   * binding's saves move onto native object storage) that preserves every file already in the
-   * accepted tree and overrides exactly one path's content — mirroring a local checkout edit
-   * followed by a commit on the moved note's new path.
+   * Builds a single-parent proposal on top of the accepted head in {@code acceptedBundleBytes} that
+   * preserves every file already in the accepted tree and overrides exactly one path's content —
+   * mirroring a local checkout edit followed by a commit on the moved note's new path.
    */
   private byte[] proposalModifyingPath(byte[] acceptedBundleBytes, String path, String content)
       throws Exception {

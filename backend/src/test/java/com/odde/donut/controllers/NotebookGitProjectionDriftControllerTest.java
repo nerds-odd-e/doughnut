@@ -23,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Verifies that a Git proposal cannot overwrite accepted content or unsupported structural drift.
  */
-class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTestBase {
 
   private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   private static final String PROPOSED_CONTENT = "---\ntype: Note\n---\nproposed content";

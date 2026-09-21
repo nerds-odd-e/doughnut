@@ -774,6 +774,6 @@ the run exists, is discoverable moments later, and goes on to succeed.
 
 ## Retention
 
-- Highest allocated local number: 78
+- Highest allocated local number: 95
 - Recovery: `f38363d3789bec23e5aa5c323ab56f4baf3db554`
 - Occurrence history is partial

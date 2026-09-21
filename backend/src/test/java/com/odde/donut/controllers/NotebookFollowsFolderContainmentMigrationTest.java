@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /** Migration-only: remove once production has applied the containment repair. */
-class NotebookFollowsFolderContainmentMigrationTest extends NotebookGitBundleControllerTestBase {
+class NotebookFollowsFolderContainmentMigrationTest extends NotebookGitControllerTestBase {
 
   private static final String MIGRATION =
       "db/migration/V300000333__notebook_follows_folder_containment.sql";

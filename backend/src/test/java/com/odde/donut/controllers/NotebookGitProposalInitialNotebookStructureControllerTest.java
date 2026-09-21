@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 
 /** Verifies publication of initial empty-notebook structures that introduce Folders. */
 class NotebookGitProposalInitialNotebookStructureControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String FOLDER_README =
       "---\ntype: Readme\nsource: local\n---\nPrecisely preserved folder readme.\n";

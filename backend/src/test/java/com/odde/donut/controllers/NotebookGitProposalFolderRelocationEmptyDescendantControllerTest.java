@@ -21,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
  * accepted in {@link NotebookGitProposalFolderRelocationControllerTest}.
  */
 class NotebookGitProposalFolderRelocationEmptyDescendantControllerTest
-    extends NotebookGitBundleControllerTestBase {
+    extends NotebookGitControllerTestBase {
 
   private static final String README = "readme";
   private static final String NOTE = "note";

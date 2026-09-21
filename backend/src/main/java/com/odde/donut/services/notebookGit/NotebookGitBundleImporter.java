@@ -18,9 +18,10 @@ import org.eclipse.jgit.transport.TransportBundleStream;
 import org.eclipse.jgit.transport.URIish;
 
 /**
- * Public so {@code db.migration}'s Flyway backfill migration - which runs outside Spring context
- * and cannot depend on any Spring-managed bean - can import a legacy binding's bundle bytes
- * directly, reusing this exact conversion mechanic rather than a second importer.
+ * Imports a Git bundle's {@code main} history into an in-memory repository. Public so {@code
+ * db.migration}'s one-time backfill migration - which runs outside Spring context and cannot depend
+ * on any Spring-managed bean - can import a pre-upgrade binding's bundle bytes with the same
+ * importer that reads proposal bundles.
  */
 public final class NotebookGitBundleImporter {
   private NotebookGitBundleImporter() {}
@@ -47,10 +48,10 @@ public final class NotebookGitBundleImporter {
   }
 
   /**
-   * {@link #importMainHead} plus the check every caller that imports a stored bundle to recover an
-   * already-persisted head needs: the bundle's {@code main} must equal {@code expectedHead}, since
-   * the bundle bytes are only ever a re-derivable encoding of that already-accepted history, never
-   * an independent source of truth for it.
+   * {@link #importMainHead} plus the check the one-time backfill migration needs when it imports a
+   * pre-upgrade binding's stored bundle: the bundle's {@code main} must equal {@code expectedHead},
+   * since the bundle bytes are only an encoding of that already-accepted history, never an
+   * independent source of truth for it.
    */
   public static ImportedBundle importAndVerifyMainHead(
       byte[] bundleBytes, String sourceName, ObjectId expectedHead) {

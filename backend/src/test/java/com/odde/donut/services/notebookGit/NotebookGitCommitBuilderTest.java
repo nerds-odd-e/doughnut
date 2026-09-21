@@ -18,7 +18,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 
-class NotebookGitBundleBuilderTest {
+class NotebookGitCommitBuilderTest {
 
   @Test
   void buildsSingleRootCommitOnMainWithMatchingPathsAndContent() throws IOException {
@@ -30,7 +30,7 @@ class NotebookGitBundleBuilderTest {
     Instant commitTime = Instant.parse("2026-09-04T10:15:30Z");
 
     try (Repository repository =
-        NotebookGitBundleBuilder.build(
+        NotebookGitCommitBuilder.build(
             entries, "Donut System", "system@donut.local", "Snapshot import", commitTime)) {
       Ref mainRef = repository.exactRef("refs/heads/main");
       assertThat(mainRef, notNullValue());
@@ -69,15 +69,15 @@ class NotebookGitBundleBuilderTest {
             ofText("Emptied/.keep", ""));
     Instant time = Instant.parse("2026-09-04T10:15:30Z");
     try (Repository repository =
-            NotebookGitBundleBuilder.build(
+            NotebookGitCommitBuilder.build(
                 accepted, "Donut", "system@donut.local", "Initial", time);
         Repository fresh =
-            NotebookGitBundleBuilder.build(entries, "Donut", "system@donut.local", "Fresh", time);
+            NotebookGitCommitBuilder.build(entries, "Donut", "system@donut.local", "Fresh", time);
         RevWalk walk = new RevWalk(repository);
         RevWalk freshWalk = new RevWalk(fresh)) {
       ObjectId parent = repository.resolve("refs/heads/main");
       ObjectId appended =
-          NotebookGitBundleBuilder.append(
+          NotebookGitCommitBuilder.append(
               repository,
               parent,
               entries,

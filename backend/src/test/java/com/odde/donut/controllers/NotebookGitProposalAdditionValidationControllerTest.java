@@ -20,8 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Publish-boundary examples for diagnosing unsupported local note additions. */
-class NotebookGitProposalAdditionValidationControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalAdditionValidationControllerTest extends NotebookGitControllerTestBase {
 
   private static final String VALID_CONTENT = "---\ntype: Note\n---\nAuthored content.\n";
 

@@ -17,7 +17,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 
-class NotebookGitFolderCreationControllerTest extends NotebookGitBundleControllerTestBase {
+class NotebookGitFolderCreationControllerTest extends NotebookGitControllerTestBase {
 
   @Test
   void webCreatedEmptyFolderAdvancesAcceptedHistoryWithMarker() throws Exception {

@@ -22,8 +22,7 @@ import org.junit.jupiter.api.Test;
  * contract ({@link com.odde.donut.validators.AuthoredNoteContent#assertValidForSave}) for each
  * changed note, once the proposal clears the tree-shape and typed-Markdown gates.
  */
-class NotebookGitProposalPropertyValidationControllerTest
-    extends NotebookGitBundleControllerTestBase {
+class NotebookGitProposalPropertyValidationControllerTest extends NotebookGitControllerTestBase {
 
   @Test
   void identifiesALaterInvalidPropertyAndRejectsTheWholeMixedProposal() throws Exception {

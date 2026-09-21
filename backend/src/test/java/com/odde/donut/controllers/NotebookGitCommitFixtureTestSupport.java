@@ -22,10 +22,10 @@ import org.eclipse.jgit.transport.BundleWriter;
 
 /**
  * Raw JGit commit-crafting helpers shared by notebook Git controller tests: building a commit
- * directly against a {@link Repository} (bypassing {@code NotebookGitBundleBuilder}) and
+ * directly against a {@link Repository} (bypassing {@code NotebookGitCommitBuilder}) and
  * serializing a chosen head into bundle bytes, for tests that need to construct a specific
  * tree/history shape rather than one produced by the product's own save path. These do not depend
- * on the notebook/JPA fixtures {@link NotebookGitBundleControllerTestBase} adds on top.
+ * on the notebook/JPA fixtures {@link NotebookGitControllerTestBase} adds on top.
  */
 abstract class NotebookGitCommitFixtureTestSupport extends NoteDependentRowsControllerTestBase {
 

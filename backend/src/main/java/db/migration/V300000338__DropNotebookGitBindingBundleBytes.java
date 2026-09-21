@@ -8,11 +8,12 @@ import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
 /**
- * Contract step for retiring the legacy bundle column: accepted history lives only in {@code
- * notebook_git_accepted_object}, so {@code notebook_git_binding.bundle_bytes} is dropped - but only
- * after {@link NotebookGitAcceptedHistoryCompleteness} confirms every binding's accepted history is
+ * One-time upgrade step that drops {@code notebook_git_binding.bundle_bytes}: accepted history
+ * lives only in {@code notebook_git_accepted_object}, so the column is dropped - but only after
+ * {@link NotebookGitAcceptedHistoryCompleteness} confirms every binding's accepted history is
  * complete in native storage. An incomplete history fails this migration before any DDL, leaving
- * the column in place.
+ * the column in place. A fresh install runs it over an empty binding table, so the check passes
+ * trivially.
  */
 public class V300000338__DropNotebookGitBindingBundleBytes extends BaseJavaMigration {
 

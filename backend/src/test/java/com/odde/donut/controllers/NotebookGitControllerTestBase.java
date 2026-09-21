@@ -13,7 +13,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
+import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
@@ -37,7 +37,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 /** Shared notebook/binding JPA fixtures for notebook Git controller tests. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixtureTestSupport {
+abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTestSupport {
 
   private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
 
@@ -81,7 +81,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
   }
 
   Notebook createGitBackedNotebook() throws UnexpectedNoAccessRightException {
-    return createGitBackedNotebook("Git Backed Notebook For Bundle");
+    return createGitBackedNotebook("Git Backed Notebook");
   }
 
   Notebook createGitBackedNotebook(String title) throws UnexpectedNoAccessRightException {
@@ -132,7 +132,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
    */
   NotebookGitBinding seedAcceptedBinding(Notebook notebook, List<PortableTreeEntry> entries) {
     try (Repository seeded =
-        NotebookGitBundleBuilder.build(
+        NotebookGitCommitBuilder.build(
             entries, "System", "system@example.com", "Seed content", Instant.now())) {
       return seedAcceptedHistory(
           notebook, seeded, NotebookGitAcceptedHistoryFixture.mainHeadOf(seeded));
@@ -206,12 +206,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookGitCommitFixt
         .longValue();
   }
 
-  /**
-   * The notebook's current accepted history, served by its own download endpoint. Tests read the
-   * accepted history here rather than from {@code binding.getBundleBytes()}: once a binding's
-   * ordinary saves move onto native object storage, that column is no longer kept in sync with the
-   * accepted head, so only the download's live, re-serialized bundle reliably reflects it.
-   */
+  /** The notebook's current accepted history, served by its own download endpoint. */
   byte[] acceptedBundleBytes(Notebook notebook) throws Exception {
     return controller
         .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
