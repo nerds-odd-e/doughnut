@@ -20,7 +20,7 @@
   rewriting; size limits and save cost (SEED-034#story-3); special dot-folder
   handling. History reset and Git cutover read the one live tree, so they
   include folder files without a delivery or proof commitment.
-- State: slices 1–10 are done with accepted proof; 2 Behavior slices remain
+- State: slices 1–11 are done with accepted proof; 1 Behavior slice remains
   planned. Remaining concerns are listed at the end.
 - Execution identity (started 2026-09-21): Story Branch Mode; originating and
   integration checkout `/Users/terryyin/git/doughnut` on `main`; execution
@@ -357,7 +357,7 @@ unrepresented-folder reconciliation needed no production change.
 
 ### 11. A local folder rename keeps note identities and carries files
 Type: Behavior
-Status: planned
+Status: done
 Behavior: given accepted `physics/` holding a note and `diagrams/force.png`, a
 publication that renames `physics` to `mechanics` (`git mv`) is accepted; the
 note keeps its id and learning data; the file is at
@@ -368,7 +368,17 @@ relocation reparents the Folder row, and the final-set projection then finds
 nothing to change. Identical file bytes must not count as ambiguous note
 correspondence. If detection needs a change, record the learning and reassess
 before extending this slice.
-Proof: one case in `NotebookGitProposalFolderRelocationControllerTest`.
+Proof: one case in
+`NotebookGitProposalFolderRelocationAttachmentControllerTest`.
+Accepted proof (2026-09-21): `CURSOR_DEV=true nix develop -c pnpm
+backend:test_only` passed all 2,576 backend tests. The extracted
+`NotebookGitProposalFolderRelocationAttachmentControllerTest` publishes a note
+and byte-identical attachment under `physics`, adds learning data, and then
+publishes the whole-tree rename to `mechanics`. It observes the original note
+and memory-tracker identities, difficulty and recall count, the exact accepted
+tree, and the exact committed attachment path and bytes. Existing folder-shape
+detection, row relocation and full-path attachment projection composed without
+a production change.
 
 ### 12. Round trip an organized checkout through the installed CLI
 Type: Behavior
