@@ -50,8 +50,10 @@ boundary. Before choosing further subdivision, apply the shared
 
 ## Refine the plan
 
-Read the plan and only the code and tests needed to judge execution boundaries.
-Read and apply:
+Before writing to the plan, establish or reuse the required workspace under
+[preparation workspace](../dough-story-refinement/references/preparation-workspace.md);
+reading the plan and the code and tests needed to judge execution boundaries
+needs no workspace on its own. Read and apply:
 
 - [slice decomposition](../dough-story-decomposition/references/problem-decomposition.md#decompose-slices),
   including its cumulative design assessment, sizing, and escalation rules; and
@@ -96,6 +98,10 @@ not an automatic invocation or a new execution-readiness gate. Do not resplit
 the story or change its backlog placement during slice-plan refinement.
 
 Report the plan path, replaced slices, resulting slice count, sizing exceptions,
-any resplit recommendation, and whether execution can resume. End with:
+any resplit recommendation, and whether execution can resume. Apply
+[preparation workspace](../dough-story-refinement/references/preparation-workspace.md)'s
+keep or discard decision, then close or retain the workspace, when this
+session ends.
+End with:
 
 `## SLICE PLAN REFINED`

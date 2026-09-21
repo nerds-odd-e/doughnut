@@ -84,8 +84,11 @@ or merely inferred location.
 
 ## Write the plan
 
-Record the source, goal, included scope, material exclusions, assumptions, and
-key examples without enlarging that source. Read and apply:
+Before writing to the plan, establish or reuse the required workspace under
+[preparation workspace](../dough-story-refinement/references/preparation-workspace.md);
+inspecting the story, code, or tests to prepare the plan needs no workspace on
+its own. Record the source, goal, included scope, material exclusions,
+assumptions, and key examples without enlarging that source. Read and apply:
 
 - [architectural thinking](references/architectural-thinking.md) to carry
   PFE findings, relevant accepted decisions, and only warranted short-term
@@ -148,6 +151,10 @@ triggering human or parent-agent instruction:
   subject to this project's gates and any unresolved concerns that still block
   progress. Prefer the project's established execution path (for example
   [dough-execute-plan](../dough-execute-plan/SKILL.md)) when that path applies.
+
+Apply [preparation workspace](../dough-story-refinement/references/preparation-workspace.md)'s
+keep or discard decision, then close or retain the workspace, when this
+session ends.
 
 After the matching case above, end with:
 

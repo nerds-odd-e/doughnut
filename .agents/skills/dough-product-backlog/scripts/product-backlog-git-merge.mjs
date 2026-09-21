@@ -15,7 +15,6 @@
 // unrelated conflicted path — is left exactly as Git already had it, for a
 // human to resolve and then explicitly continue.
 import { existsSync } from "node:fs";
-import { join } from "node:path";
 import {
   acceptStaged,
   validateCandidate,
@@ -26,6 +25,7 @@ import {
   git,
   gitLine,
   gitOutcome,
+  gitPath,
   repositoryRoot,
 } from "./product-backlog-git-repository.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
@@ -125,7 +125,7 @@ export function mergeOperation({ repoRoot, file, ref }) {
 // candidate that fails this tool's invariants, or one that does not match
 // the working tree all stay stopped exactly where they were.
 export function continueOperation({ repoRoot, file }) {
-  if (!existsSync(join(repoRoot, ".git", "MERGE_HEAD"))) {
+  if (!existsSync(gitPath(repoRoot, "MERGE_HEAD"))) {
     throw new BacklogError(`No merge is in progress in ${repoRoot}.`);
   }
   const unresolved = gitLine(["ls-files", "-u", "--", file], repoRoot);

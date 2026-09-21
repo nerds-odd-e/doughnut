@@ -45,11 +45,18 @@ before writing.
 
 Read and follow [problem decomposition](references/problem-decomposition.md)
 to establish human-owned framing decisions, challenge alternatives, and select,
-size, and order stories. Then use [seed format](references/seed-format.md) to
-update the supplied seed or create a new seed. Leave the seed uncommitted for
-review unless the user explicitly requests a commit.
+size, and order stories. Before writing to the seed, establish or reuse the
+required workspace under
+[preparation workspace](../dough-story-refinement/references/preparation-workspace.md);
+this discussion and decomposition work needs no workspace on its own. Then use
+[seed format](references/seed-format.md) to update the supplied seed or create
+a new seed in that workspace. Leave the seed there for review by default; this
+skill commits, integrates, or publishes it only when that reference's keep
+decision authorizes it.
 
 Report the seed path, recommended first story, rejected simpler alternative,
-effort distribution, and open decisions. After writing the seed, end with:
+effort distribution, and open decisions. Apply that reference's keep or
+discard decision, then close or retain the workspace, when this session ends.
+After writing the seed, end with:
 
 `## STORY DECOMPOSITION WRITTEN`

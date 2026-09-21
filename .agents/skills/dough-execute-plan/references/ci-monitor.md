@@ -12,9 +12,16 @@ observes shared trunk; Story Branch Mode observes the branch it pushes. Reuse it
 across claim, normal, and repair pushes. Register each
 delivered revision through [slice delivery](wrap-up.md#deliver-the-change);
 register a Trunk Mode claim once the execution workspace exists and the observer
-is armed there. The observer continues discovery after later publications, and a
-changed SHA does not require new setup. Publication success closes routine
-delivery without waiting for CI or deployment.
+is armed there. A Story Branch claim publishes to trunk before that
+story-branch observer exists or is armed, and trunk is not the target that
+observer will cover: report the claim `pendingCi: unobserved` unless a
+matching existing observer/coverage for that exact trunk target is already
+established with verified ownership and receipts. Do not start a second
+observer or register that claim with the story-branch observer to manufacture
+coverage; the story-branch observer still starts and covers ordinary
+implementation delivery once armed. The observer continues discovery after
+later publications, and a changed SHA does not require new setup. Publication
+success closes routine delivery without waiting for CI or deployment.
 
 Bind the observer's runtime, pause, stash, repair, delivery, and restoration to
 the selected execution checkout. Observe the target branch from that checkout.

@@ -7,7 +7,6 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 import {
   checkoutRoot,
   mailboxRoot,
@@ -17,6 +16,7 @@ import {
   recordDeliveryProgress,
   receiptPrefix,
 } from "./ci-mailbox.mjs";
+import { isDirectCliEntry } from "./ci-direct-entry.mjs";
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 
@@ -141,10 +141,7 @@ export function deliverCiEvents(input, host, options) {
   return selection.output;
 }
 
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
+if (isDirectCliEntry(import.meta.url, process.argv[1])) {
   let raw = "";
   for await (const chunk of process.stdin) raw += chunk;
   try {

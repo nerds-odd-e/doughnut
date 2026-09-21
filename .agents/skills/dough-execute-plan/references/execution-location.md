@@ -5,10 +5,13 @@ Git worktree for the selected work. Explicit `--trunk` uses Trunk Mode: still
 one retained local execution branch and worktree, with claim and increment
 publication as in [trunk publication](trunk-publication.md). Explicit caller selection uses the
 current branch instead. Establish any queue claim first under
-[Take queued work](../SKILL.md#take-queued-work). After that commit succeeds,
-Story Branch and Trunk modes create their branch/worktree from that revision
-before delegation; caller-selected current-branch work continues from that same
-committed revision. When no claim applies, including authorized contextual
+[Take queued work](../SKILL.md#take-queued-work), which commits it locally on
+the integration branch, then, for Story Branch and Trunk Mode, publishes it per
+[trunk publication](trunk-publication.md#publish-a-queue-claim). Only after
+that publication is confirmed do Story Branch and Trunk modes create their
+branch/worktree from the published revision before delegation; caller-selected
+current-branch work continues from that same committed revision, which is
+never published. When no claim applies, including authorized contextual
 planless work, use verified current HEAD and create no story, plan, or queue
 entry; still create the local execution workspace from that HEAD unless the caller selected the current
 branch. Resolve names and safe location from project conventions and ordinary

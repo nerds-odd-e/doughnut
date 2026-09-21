@@ -66,8 +66,9 @@ Resolve project context at the first boundary that needs it:
 - backlog path and selected entry for work selected from **Backlog list**;
 - selective formatter and commit hook contract before taking queued work and its claim commit;
 - navigation, focused tests, runtime wrapper, and workflow precedence for the selected slice;
-- authorized push destination before delivery, and for Trunk Mode before
-  publishing a queue claim or verified increment;
+- authorized push destination before delivery; for Story Branch or Trunk Mode, also
+  [trunk publication's Preconditions](references/trunk-publication.md#preconditions) before
+  taking queued work, and for Trunk Mode before publishing a queue claim or verified increment;
 - generation triggers and commands when affected; and
 - [refactor context](../dough-post-change-refactor/SKILL.md) before refactor delegation.
 
@@ -95,8 +96,9 @@ This section's own backlog change is a same-branch commit on the resolved
 integration checkout, moving an entry to **Taken** with nothing to merge, rebase,
 or cherry-pick from another ref — so it needs none of the installed product
 backlog Git adapters or [reconcile product backlog Git operations](../dough-product-backlog/references/merge-conflicts.md) by itself.
-Only Trunk Mode's later publication of that claim is a real rebase, covered by
-[trunk publication](references/trunk-publication.md#resolve-a-publication-rebase-conflict); Story Branch Mode and current-branch mode never rebase or merge this commit.
+Publishing that claim through trunk publication may be a real rebase, for
+Story Branch or Trunk Mode alike, covered by
+[trunk publication](references/trunk-publication.md#resolve-a-publication-rebase-conflict); current-branch mode never publishes a claim, so it never rebases or merges this commit.
 
 After resolving execution source and authority, inspect the backlog before plan-status
 changes, observer recovery/startup, delegation, or implementation. Moving a selected
@@ -110,8 +112,17 @@ Before moving it, resolve selective formatting and the Taken-only commit's hook 
 An absent or understood check-only hook permits the transition. An unknown, mutating,
 failing, or disputed hook stops it with the queue unchanged until safely resolved through
 execution decisions. Resolution runs neither delivery formatting nor hook-owned lint;
-obtain push/CI context only when another current boundary needs it. Then follow
-[take queued work](../dough-product-backlog/SKILL.md#take-queued-work-for-execution).
+obtain push/CI context only when another current boundary needs it.
+
+For Story Branch or Trunk Mode, also resolve
+[trunk publication's Preconditions](references/trunk-publication.md#preconditions) — the claim's
+publication authority, authorized push destination, and exclusive integration turn — before
+moving the entry; reuse permission already established for this execution rather than requesting
+it again. An unresolved precondition stops the move with the backlog, index, and refs unchanged,
+and starts no implementation. Caller-selected current-branch work keeps its existing contract and
+gains no new publication authority here.
+
+Then follow [take queued work](../dough-product-backlog/SKILL.md#take-queued-work-for-execution).
 An ambiguous move stops implementation.
 
 Already **Taken** means resume: preserve its position without duplication. Work absent
@@ -131,11 +142,16 @@ complete it before dispatch. Staging/commit failure stops isolated execution:
 preserve and report backlog/index state. No-change cases produce no empty claim
 commit.
 
-Story Branch Mode creates the execution branch/worktree from that local commit
-only after success; do not push the claim separately. Trunk Mode publishes the
-claim per [trunk publication](references/trunk-publication.md#publish-a-queue-claim)
-before implementation. Later workspace-setup failure leaves the published or
-locally committed **Taken** entry for retry; do not treat that as a new claim.
+Story Branch Mode and Trunk Mode both publish that local commit per
+[trunk publication](references/trunk-publication.md#publish-a-queue-claim)
+before creating the execution branch/worktree; do not invent a second
+publication procedure for either mode. Only a confirmed published revision
+starts workspace creation, and only workspace creation precedes implementation.
+A persistent publication failure leaves the claim locally recoverable and
+unpublished per [trunk publication's preserved state](references/trunk-publication.md#preserve-remaining-state):
+it creates no execution branch/worktree and starts no implementation, pending
+manual recovery or handoff. Later workspace-setup failure leaves the published
+or locally committed **Taken** entry for retry; do not treat that as a new claim.
 
 ## Choose the execution location
 
@@ -162,7 +178,8 @@ Resume at the first delivery obligation not established by evidence. An incomple
 or oversized return still needs [oversized-slice handling](references/execution-decisions.md#refine-an-oversized-slice)
 before proof acceptance. Otherwise implementation returns still need proof
 acceptance/refactoring; completed refactors need remaining delivery;
-uncommitted plan edits need staging/commit. Classify a Trunk Mode increment with
+uncommitted plan edits need staging/commit. Classify an interrupted claim or
+Trunk Mode increment with
 [interrupted publication](references/trunk-publication.md#resume-an-interrupted-publication)
 before any further commit or push. Story Branch Mode still pushes local commits
 absent from its authorized destination. Plan status or a compact report proves none
@@ -209,42 +226,5 @@ before a dependent slice starts.
 
 ## Finish or stop
 
-On completion, human-judgment stop, or cancellation, close the observer through the current
-host adapter: handle delivered failures, then stop observers without waiting for CI. Report pending CI
-as unobserved.
-
-After all planned slices satisfy proof/delivery and required observer shutdown succeeds,
-report completion, retained evidence, and CI limitations. `--skip-retro` skips only this
-execution's automatic retrospective; it changes no preferences or proof/delivery/shutdown
-obligations. Explicit omit/defer instructions also take precedence. When skipped, report it
-and end with `## PLAN EXECUTION COMPLETE`, retaining plan/evidence for later review and wrap-up.
-
-Otherwise report `## PLAN EXECUTION COMPLETE`, then invoke
-[dough-execution-retrospective](../dough-execution-retrospective/SKILL.md) without another
-confirmation. Preserve explicit review instructions and project preferences through its
-review selection; its authority excludes implementing findings or changing the backlog.
-
-Continue in the recorded execution project/checkout. Supply available references/context:
-source contract, original plan and approved changes, attributable commits, decisions, proof,
-delivery state, CI limitations, and checkout/branch identity. Trunk Mode attributable
-commits are that identity's retained published revisions, not another ledger or a
-rewrite's unpublished SHA. Include an initial quick attempt and its planned
-continuation as one execution. Reuse context without another handoff artifact
-or transcript copy; retrospective validates attribution and recovers real gaps.
-
-Execution completion and review completion are distinct. A retrospective context stop leaves
-execution complete: report missing input without rerunning implementation or claiming review
-completion. On recovery, use retained review state to continue or recognize completed review;
-ambiguous state requires recovery rather than duplicate review or guessed completion.
-
-Retain the completed plan, evidence, execution checkout, branch, and worktree for story
-wrap-up; do not invoke it here. Wholly planless completion retains source, conversation,
-identity, delivered changes, and proof, reports delivered work and shutdown, and ends with
-`## QUICK EXECUTION COMPLETE` after required delivery/shutdown, without automatic
-retrospective. The coordinator invokes wrap-up after successful branch delivery. Do not
-report integrated completion here; wrap-up owns Story Branch merge and required
-target push, Trunk Mode closure publication, and resource cleanup.
-
-For incomplete work, failed delivery/shutdown, cancellation, or a human-judgment stop, report
-source, active plan/next slice or quick-slice state, preserved work, observer state,
-and required decision/recovery action. Emit no completion marker or automatic retrospective.
+Follow [finish or stop](references/finish-or-stop.md) for observer shutdown, completion
+reporting and its markers, automatic retrospective invocation, and incomplete-work reporting.
