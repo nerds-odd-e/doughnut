@@ -41,6 +41,11 @@ slices; no product proof is claimed beyond what the evidence sections record.
 >    everything back to `main` and tell the owner; the owner creates the release, then
 >    tells execution to continue with the remaining slices. Execution never creates a
 >    release or tag itself.
+> 4. **No migration squash (2026-09-21, after release 2).** The spent upgrade migrations
+>    stay in the chain - fresh installs run them in order over empty tables - so the
+>    baseline squash is dropped, and with it the migration freeze. Execution was asked to
+>    migrate the owner's Development database, and to rename the misnamed
+>    `NotebookGitBundleBuilder`.
 
 
 Note authors get responsive, durable saves in large synchronized notebooks.
@@ -193,7 +198,16 @@ DropNotebookGitBindingBundleBytes | JDBC | success 1 | 2026-09-21 07:41:11` then
 db migration placeholder | SQL | success 1 | 2026-09-21 07:41:11`; `MAX(version) = 300000339`. The
 completeness check passed in production and the column is gone. **Gate C is satisfied for production.**
 
-**Gate C is NOT yet satisfied for Development**, checked read-only by the coordinator on the local
+**Development migrated at the owner's request (2026-09-21):** the owner's `pnpm dev` refused to start
+because the primary checkout carries its own E2E isolation file (`.worktree.local.json`, created
+2026-09-18, left untouched), so the coordinator ran only the dev backend
+(`CURSOR_DEV=true nix develop -c backend/gradlew -p backend bootRunDev --no-daemon` from the primary
+checkout, profile `dev`, `doughnut_development`), which applied `300000334`-`300000339` in 1.6 s, all
+`success = 1`; the drop's completeness check passed over its 3 bindings and `bundle_bytes` is gone. The
+backend was stopped afterwards, as the dev server had not been running. **Every long-lived database is
+now past `300000339`.**
+
+Earlier state, kept for the record: **Gate C was NOT yet satisfied for Development**, checked read-only by the coordinator on the local
 MySQL: `doughnut_development` is at `MAX(version) = 300000333` with 0 failed rows, and still has
 `bundle_bytes`. It has applied none of 334-339. **Slice 12 must not run until it has**: the squash
 replaces the baseline's contents and deletes 334-338, so a database at 333 would afterwards apply only
@@ -1482,20 +1496,34 @@ long-lived database:
 and `SELECT MAX(CAST(version AS UNSIGNED)) FROM flyway_schema_history;` - expect 300000338 then
 300000339, both `success = 1`, and a maximum of 300000339. Only then may slice 12 delete files.
 
-### 12. Remove the spent upgrade machinery
-Type: Structure. Status: planned; source removal depends on Gate C.
+### 12. Retire the squash preparation (owner: no squash)
+Type: Structure. Status: planned. **Replaces the original baseline-squash slice**, which the owner
+dropped on 2026-09-21: the spent upgrade migrations stay, because fresh installs run them in order.
 
-Use the established deployed-checkpoint/baseline process to remove the old
-column's create/transition/drop history and Java backfill/helper code after all
-affected databases have crossed it. Do not selectively delete a migration and
-leave a fresh install unable to build the current schema. Remove conversion-only
-tests, temporary migration verification helpers and dead callers at the same
-time. Keep transport import/copy machinery only where current callers need it.
-This directly owns the owner's final-cleanup requirement; it is not preparation
-for a hypothetical feature. Proof: V on a fresh disposable database and the
-checkpoint-upgraded disposable database, D, and E as warranted by removed code.
-Size: 5–10 active minutes once Gate C evidence exists; required verification
-runtime excepted. Never mark this complete at checkpoint publication.
+- **Delete `V300000339__db_migration_placeholder.sql`.** It existed only to anchor the squash, and its
+  comment ("frozen until the squash ... is deployed") would now be false. Deleting an applied migration
+  is safe here: every migration path runs `flyway.repair()` first - `FlyWayFreeVersionRealMigration`
+  (production and dev), `DonutTaskRunner` (`migrateTestDB`) and `FlyWayTestMigrationStrategyConfig`
+  (tests) - which marks the missing version deleted. Precedent: `300000330` was retired the same way.
+  Production and Development both recorded 300000339; their next startup repairs it.
+- **`.agents/skills/db-migration/SKILL.md`:** lift the freeze; name `V300000338` as the newest file;
+  record 300000339 as retired and reserved alongside 300000330; new migrations must exceed 300000339.
+- **Keep** `V300000336` + `NotebookGitAcceptedObjectBackfill`, `V300000337`, `V300000338` +
+  `NotebookGitAcceptedHistoryCompleteness` and its test, and `NotebookGitBundleImporter.importAndVerifyMainHead`
+  - fresh installs still run them. Correct only their **Java** prose so it states current truth (one-time
+  upgrade steps that a fresh install runs over empty tables) with no "convert-on-first-open" or
+  "retained bundle" narrative. Leave SQL migration files byte-identical.
+- Proof: B; a **fresh install** (`/Users/terryyin/.claude/jobs/6fda4d71/tmp/recreate_db.sh`, then
+  `migrateTestDB`) ends at 300000338 with no failed rows; and an **already-upgraded** schema holding
+  a 300000339 row still migrates cleanly (repair marks it deleted). Size: ~5 minutes plus suite.
+
+### 18. Name the in-memory commit builder for what it does
+Type: Structure. Status: planned. After 12. **Owner request (2026-09-21).**
+
+`NotebookGitBundleBuilder` builds commits in an in-memory JGit repository from Portable entries
+(`build()` for a fresh root commit, `append()` on a parent); it writes no bundle. Rename it and its test
+to a domain name that says so, updating its ~11 files. Behavior unchanged. Proof: B and E. Size: ~5
+minutes plus suites.
 
 ### 13. Assess attachment cost and cohesion last
 Type: Behavior. Status: done. Story 3 not resolved by assessment alone - folded into slices 15-16.
