@@ -186,7 +186,25 @@ satisfy them. A deliberate stop of all incompatible instances can replace the
 rolling stages only when that maintenance procedure is explicitly selected.
 Deployment waits do not prevent independent final attachment assessment.
 
-## Release handoff 2 - WAITING FOR THE OWNER (2026-09-21)
+## Release handoff 2 - DONE for production; Development pending (2026-09-21)
+
+**Owner released and reported the Gate C check on production:** `installed_rank 943 | 300000338 |
+DropNotebookGitBindingBundleBytes | JDBC | success 1 | 2026-09-21 07:41:11` then `944 | 300000339 |
+db migration placeholder | SQL | success 1 | 2026-09-21 07:41:11`; `MAX(version) = 300000339`. The
+completeness check passed in production and the column is gone. **Gate C is satisfied for production.**
+
+**Gate C is NOT yet satisfied for Development**, checked read-only by the coordinator on the local
+MySQL: `doughnut_development` is at `MAX(version) = 300000333` with 0 failed rows, and still has
+`bundle_bytes`. It has applied none of 334-339. **Slice 12 must not run until it has**: the squash
+replaces the baseline's contents and deletes 334-338, so a database at 333 would afterwards apply only
+the 339 placeholder - never creating `notebook_git_accepted_object` (334) or `notebook_attachment`
+(335) - and the dev app would break. Coordinators must not migrate the owner's Development database
+themselves; the owner brings it to 339 by pulling `origin/main` and starting the dev server once
+(its startup runs `FlyWayFreeVersionRealMigration`), or declares its data disposable. Re-check with
+`SELECT MAX(CAST(version AS UNSIGNED)) FROM doughnut_development.flyway_schema_history;` - expect
+300000339. Slice 14 does not depend on this and proceeds meanwhile.
+
+### Release 2 handoff instructions (kept for the record)
 
 **Published to `origin/main` at `af8fe4e033`**, a merge commit with parents `f82aa48505` (the
 then `origin/main`, a pnpm bump) and story head `18bf3defeb`; its tree equals the tested story tree.
