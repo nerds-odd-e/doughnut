@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9 ([plan](quick/003-notebook-folder-attachments/PLAN.md))
+
 ## Backlog list
 
-- [Keep attachments inside notebook folders through local and web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-9) — SEED-035#story-9
 - [Remove the ZIP export feature](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-46) — SEED-009#story-46
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
