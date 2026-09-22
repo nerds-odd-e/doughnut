@@ -1,6 +1,6 @@
 # Save a note by editing its Git ancestor trees
 
-Status: planned; no implementation started.
+Status: in progress; slice 1 delivered, slices 2–4 planned.
 Work item: **SEED-037#story-1**.
 Source: [refined story](../../seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-1)
 and the owner's 2026-09-22 acceptance of ancestor-only reads, request for
@@ -112,11 +112,16 @@ must be calibrated against known real SELECT/INSERT/UPDATE calls before its
 counts are accepted. Report transaction completion separately; JDBC executions
 are not automatically measured wire round trips.
 
-Before the first production change, capture a reproducible baseline on the
-starting revision using this observation support. The prior 34 + 2F measurement
-is motivation, not a substitute for matched baseline conditions. Record revision,
-fixture, request timing, statement/object counts, command and result here.
-No runtime baseline or test result was obtained during this planning session.
+Baseline captured on `853a01f996` before the slice 1 production edit, fixture
+`depth-6-plus-4-sibling-folders` in
+`NotebookGitWebContentSaveCostControllerTest.contentSaveJdbcObjectFetchesAreScopedToTheControllerCall`.
+JDBC execute calls, not wire round trips: elapsedMs 37, objectFetches 26,
+treeFetches 22, commitFetches 4, objectInsertExecutions 1,
+bindingUpdateExecutions 1, jdbcExecutions 58. After removing the builder's
+parent-tree read, the same fixture reported treeFetches 11 (one whole-tree
+walk remains). The prior 34 + 2F measurement stays motivation, not this
+baseline. Slice 3 still needs its own cold depth-12 / thousands-of-folders
+observation; this depth-6 fixture does not satisfy that proof.
 
 ## Ordered slices
 
@@ -129,7 +134,7 @@ overrun is not covered by that exception. Keep each delivered slice green.
 
 ### 1. Append a complete tree without reading the parent tree again
 
-Type: Behavior. Status: planned. Estimate: 5–8 minutes plus suite wait.
+Type: Behavior. Status: done. Estimate: 5–8 minutes plus suite wait.
 
 Behavior: a web content save with a fully derived tree appends the same native
 tree and parent commit while avoiding the builder's second recursive read.
@@ -138,11 +143,20 @@ IDs and required changed blob bytes: remove `DirCache.read` and the held-blob
 scan, build from those supplied IDs, and let existing batched storage deduplicate
 attempted blobs. Preserve the complete-snapshot append callers in fixtures.
 
-Proof: the real content-save observation shows one whole-tree traversal removed;
+Proof accepted: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+on this checkout. `append` no longer calls `DirCache.read`; `writeTree` builds
+from the supplied path IDs with `DirCache.newInCore()`.
 `NotebookGitCommitBuilderTest.appendsCompleteSnapshotWithTheSameTreeAsAFreshBuild`
-asserts exact tree ID and parent. Existing JDBC batching and rollback tests stay
-green. This slice is useful alone, but still walks/builds the whole tree once
-and may batch many attempted objects; it does not fulfill final acceptance.
+asserts exact tree ID and parent.
+`NotebookGitWebContentSaveCostControllerTest.contentSaveJdbcObjectFetchesAreScopedToTheControllerCall`
+activates `SqlStatementCallLog` only around `updateNoteContent` and asserts
+`treeFetches <= 12` (matched baseline was 22). JDBC batching and recorder
+calibration live in `NotebookGitJdbcObjectStoreSqlObservationTest`
+(`oneAppendAcrossManyTreesIssuesOneBatchedExistenceCheckQuery`,
+`recorderCapturesSelectInsertAndUpdateExecutionsAgainstKnownStoreCalls`);
+focused rerun after the test split passed. This slice is useful alone, but
+still walks/builds the whole tree once and may batch many attempted objects;
+it does not fulfill final acceptance.
 
 ### 2. Derive Portable changes through directory-owned tree edits
 
@@ -259,5 +273,16 @@ whole-tree input is explicitly removed in slice 3. Final design has one editor,
 one encoding owner and the existing transaction owner, with no persistent new
 representation. Slice 2's relocation conversion remains a sizing risk; the
 explicit re-split rule applies if implementation contradicts its estimate.
-Production latency is unproved until measured. No product tests were run for
-this documentation-only preparation.
+Production latency is unproved until measured.
+
+## Execution
+
+Story Branch Mode. Execution checkout
+`/Users/terryyin/git/doughnut-worktrees/012-path-scoped-note-save`, branch
+`story/012-path-scoped-note-save`, created from `origin/main` at `cf2f317c27`.
+Queue claim `853a01f996` is published on `origin/main`. Increments publish to
+`origin/story/012-path-scoped-note-save`. GitHub Actions observer
+`/tmp/dough-ci-501/watch-Pkeu0n` covers that story branch (`ci.yml`, display
+name `donut CI`). The trunk claim is unobserved. Slice 1's learning for later
+proof: activate `SqlStatementCallLog` only around the controller call; one
+accepted-tree walk on the depth-6 fixture is about 11 tree fetches.

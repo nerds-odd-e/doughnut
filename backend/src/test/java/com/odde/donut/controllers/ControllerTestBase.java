@@ -10,11 +10,13 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.GithubService;
+import com.odde.donut.services.notebookGit.SqlStatementCallLog;
 import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.TestabilitySettings;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.convention.TestBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@Import(SqlStatementCallLog.DataSourceConfig.class)
 public abstract class ControllerTestBase {
   @Autowired protected MakeMe makeMe;
   @Autowired protected AuthorizationService authorizationService;

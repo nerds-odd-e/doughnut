@@ -179,51 +179,6 @@ class NotebookGitJdbcObjectStoreTest {
     }
   }
 
-  @Test
-  void oneAppendAcrossManyTreesIssuesOneBatchedExistenceCheckQuery() throws Exception {
-    Instant time = Instant.parse("2026-09-20T12:00:00Z");
-    List<PortableTreeEntry> baseEntries =
-        List.of(
-            PortableTreeEntry.ofText("A/B/C/Leaf.md", "before"),
-            PortableTreeEntry.ofText("A/B/Sibling.md", "unchanged"),
-            PortableTreeEntry.ofText("A/Other/Note.md", "unchanged"),
-            PortableTreeEntry.ofText("Top.md", "unchanged"));
-    List<PortableTreeEntry> changedEntries =
-        List.of(
-            PortableTreeEntry.ofText("A/B/C/Leaf.md", "after"),
-            PortableTreeEntry.ofText("A/B/Sibling.md", "unchanged"),
-            PortableTreeEntry.ofText("A/Other/Note.md", "unchanged"),
-            PortableTreeEntry.ofText("Top.md", "unchanged"));
-
-    ObjectId baseHead;
-    try (Repository fixture =
-        NotebookGitCommitBuilder.build(
-            NotebookGitTreeContent.of(baseEntries),
-            "Donut",
-            "system@donut.local",
-            "Initial",
-            time)) {
-      baseHead = fixture.exactRef("refs/heads/main").getObjectId();
-
-      int bindingId = jdbcFixture.insertBinding(baseHead.name());
-      jdbcFixture.seedStore(bindingId, fixture, baseHead);
-
-      SqlStatementCallLog callLog = new SqlStatementCallLog();
-      Connection appendConnection = callLog.wrap(jdbcFixture.openConnection());
-      ObjectId newHead;
-      try (JdbcNotebookGitRepository repo =
-          new JdbcNotebookGitRepository(bindingId, appendConnection)) {
-        newHead = commitOn(repo, baseHead, changedEntries, "Deep edit", time.plusSeconds(1));
-      }
-
-      assertThat(newHead, notNullValue());
-      assertThat(
-          "one batched existence-check query for the whole flush, not one per attempted tree",
-          callLog.countMatching("notebook_git_accepted_object", " IN ("),
-          equalTo(1L));
-    }
-  }
-
   private static ObjectId commitOn(
       Repository repo,
       ObjectId parent,
