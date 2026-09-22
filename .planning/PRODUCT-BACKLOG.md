@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Save note edits at a cost proportional to the change, not the notebook](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3 — plan: [quick/010-change-proportional-note-save](quick/010-change-proportional-note-save/PLAN.md)
-
 ## Backlog list
 
 - [Web README edits enter the accepted-change boundary, and story 3's proof is tightened](quick/011-readme-edits-through-accepted-change-owner/PLAN.md) — correction of SEED-034#story-3

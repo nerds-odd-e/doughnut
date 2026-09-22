@@ -3,7 +3,7 @@
 Status: **planned** (bounded retrospective correction, 2026-09-22). No
 execution authorization.
 Kind: correction from the execution retrospective of
-[quick/010-change-proportional-note-save](../010-change-proportional-note-save/PLAN.md)
+`quick/010-change-proportional-note-save/PLAN.md` (spent; recoverable at before-cleanup commit `b0b385a184`)
 (SEED-034#story-3). No seed is required; this plan carries its own input.
 
 ## Source and provenance
@@ -41,7 +41,7 @@ Kind: correction from the execution retrospective of
 - Complexity delta of the original story, stated for the owner: backend
   production +703/-280 (net +423 lines: capture, changed-folder relocation
   and derivation machinery replaced three 160-line assemblers); tests +497;
-  docs +9. The 010 plan's slice 8 note "about 80 lines fewer" described that
+  docs +9. That plan's slice 8 note "about 80 lines fewer" described that
   slice's refactor only.
 
 ## Beneficiary and bounded outcome
