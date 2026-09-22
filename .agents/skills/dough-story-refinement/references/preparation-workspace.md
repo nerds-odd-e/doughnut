@@ -9,8 +9,10 @@ already-decided correction. Reading, discussing, answering questions, or
 reviewing an existing seed or plan needs no workspace at all.
 
 Once a write is done, [decide what happens to the written
-result](preparation-disposition.md) covers keeping, leaving unpublished, or
-discarding it, before the workspace below is closed or retained.
+result](preparation-disposition.md) is the only disposition for that record.
+Decomposition, refinement, planning, and plan refinement all use it for keep,
+leaving the result unpublished, or discarding it. None of them publishes by
+another path. Then close or retain the workspace below.
 
 ## Determine whether a write needs a workspace
 
@@ -22,39 +24,37 @@ or confirm the workspace immediately before making it.
 ## Select or reuse the workspace
 
 Apply [own a temporary exploration workspace](../../dough-manual-testing/references/exploration-workspace.md)
-"Select the checkout" and "Use and resume it" as this preparation's Git
-lifecycle; do not duplicate its recipe here. First check whether the current
-story, active plan, session, or a host-supplied workspace already owns a
-suitable checkout for this preparation. Use it, and do not create a nested or
-per-invocation workspace merely because a different one of the four skills
-above is now writing. When no suitable owned workspace exists, start one using
-that reference's create step, from a suitable existing host workspace when one
-is available, otherwise from the verified current revision of the checkout
-this preparation was invoked from.
+"Select the checkout", "Record local checkout role and target selection",
+and "Use and resume it" as this preparation's Git lifecycle; do not duplicate
+its recipe here. First check whether the current story, active plan, session,
+or a host-supplied workspace already owns a suitable checkout for this
+preparation. Use it, and do not create a nested or per-invocation workspace
+merely because a different one of the four skills above is now writing. When
+no suitable owned workspace exists, start one using that reference's create
+step, from a suitable existing host workspace when one is available, otherwise
+from the verified current revision of the checkout this preparation was
+invoked from.
 
-Shared checkout identity is decided by role, not by Git merely reporting a
-worktree: a directory `git worktree list` shows is not automatically this
-preparation's workspace. Verify that a candidate workspace is actually owned
-by the current story, plan, session, or host — the same verification that
-reference's resume step performs — before writing into it. Treat an
-unverifiable or ambiguous match the same as a missing workspace.
+Verify a candidate against that reference before writing into it. The suitable
+owner is the current story, plan, session, or host. An unverifiable or
+ambiguous match is a missing workspace.
 
 Resolve this project's own conventions for the write — seed directory and
 ID/filename rules, plan root and layout, required metadata, and installed
 skill guidance — from the intended, owned checkout, not from wherever the
 invocation started.
 
-Alongside that owned workspace identity, record this preparation's
-integration checkout: the checkout it was invoked from, or a reused host
-workspace's own already-recorded integration checkout when one applies — the
-project's established checkout for ordinary work, never the owned preparation
-workspace itself. Record its authorized remote target the same way
-[execution location](../../dough-execute-plan/references/execution-location.md)
-resolves the integration checkout and branch and the authorized remote target
-for ordinary work in this project, defaulting the branch to `main` only when
-neither caller nor project supplies one. A later keep decision publishes onto
-this recorded target; see
+Record local checkout role and target selection through that reference, using
+the actual established paths. The owned workspace path is the preparation
+workspace. The integration checkout path is the checkout this preparation was
+invoked from, or a reused host workspace's already-recorded integration
+checkout — the project's established checkout for ordinary work, never the
+owned preparation workspace itself. Target selection is the authorized remote
+target, recorded separately from that path. A later keep decision publishes
+onto this recorded target; see
 [Decide what happens to the written result](preparation-disposition.md#decide-what-happens-to-the-written-result).
+Preparation's continuation after this selection is the record write and that
+disposition. It does not apply execution mode or project-command readiness.
 
 ## Continue related preparation
 
@@ -96,11 +96,12 @@ found. Do not silently replace the workspace, create a second one alongside
 it, or guess which candidate is the right one — the same rule that already
 governs an unresolved first-time workspace selection.
 
-This resume verification relies only on the workspace identity already
-recorded when the workspace was selected or created — story, plan, session,
-or host ownership. Do not add a session registry, log, or other persistent
-index to track preparation sessions across time; resume continues to depend
-purely on verifying that recorded identity against actual Git state.
+This resume verification relies only on the local checkout role already
+recorded when the workspace was selected or created — the actual paths and
+story, plan, session, or host ownership. Do not add a session registry, log,
+or other persistent index to track preparation sessions across time; resume
+continues to depend purely on verifying that recorded role against actual
+Git state.
 
 ## Tiny corrections are included; the Taken transition is not
 
@@ -135,11 +136,11 @@ what happens to the written result](preparation-disposition.md#decide-what-happe
 is actually **confirmed**, never merely attempted or merely because the
 session is ending:
 
-- a **keep-and-publish** that reached
-  [Keep and publish the retained result](preparation-disposition.md#keep-and-publish-the-retained-result)
-  step 6's own agreement check — local `main`, the freshly fetched remote,
-  and the retained candidate SHA on the integration checkout all agreeing,
-  with `main...origin/main` reporting `0	0`;
+- a **keep-and-publish** whose candidate the fetched authorized remote
+  contains, per
+  [Keep and publish the retained result](preparation-disposition.md#keep-and-publish-the-retained-result).
+  The default checkout need not match that SHA. A deferred maintenance result
+  does not withhold this confirmation;
 - an explicit **discard** that actually removed the identified draft under
   [Discard an identified draft](preparation-disposition.md#discard-an-identified-draft),
   not one that stopped because the content could not be unambiguously
@@ -154,20 +155,24 @@ session is ending:
   disposition for cleanup purposes.
 
 Failed or unconfirmed publication never triggers cleanup. A keep-and-publish
-interrupted before step 6's agreement is reached — see [Resume an
-interrupted keep-and-publish](preparation-disposition.md#resume-an-interrupted-keep-and-publish) —
-is not a confirmed disposition merely because the session is ending or the
-conversation is being closed out. Treat it as still unresolved and preserve
-every resource exactly as found, so the resume/retry path above remains
-reachable. Pausing, going quiet, or any other interruption before a decision
-is confirmed is never itself a trigger, exactly as it is never itself a keep
-or discard decision.
+interrupted before the authorized remote contains the candidate — see [Resume
+an interrupted keep-and-publish](preparation-disposition.md#resume-an-interrupted-keep-and-publish) —
+is not a confirmed disposition merely because the session is ending. Treat it
+as still unresolved and preserve every resource exactly as found under
+[preserve pending local work](../../dough-execute-plan/references/maintain-default-checkout.md#preserve-pending-local-work),
+including a pending human edit on the default checkout. Pausing, going quiet,
+or ending the conversation before a decision is confirmed is never itself a
+trigger, exactly as it is never itself a keep or discard decision.
 
 Once a confirmed disposition applies, apply [own a temporary exploration
 workspace](../../dough-manual-testing/references/exploration-workspace.md)
 "Close or retain it": remove only a clean, unambiguous, session-created
 workspace; retain and report a reused, host-owned, or otherwise unsafe one
-instead of forcing its removal. A clean working directory is a necessary
+instead of forcing its removal. Delete a removed session-created branch only
+when its tip is contained in the fetched authorized remote target. That
+containment is what makes deletion safe; the default checkout being behind
+that target does not make the branch unmerged, and it does not authorize a
+force delete. A clean working directory is a necessary
 check there, not by itself proof of ownership: a workspace can be clean
 because a keep-and-publish just succeeded in it while still being the same
 reused or host-owned workspace [Select or reuse the

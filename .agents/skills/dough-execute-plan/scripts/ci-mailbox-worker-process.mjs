@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
 import { setTimeout as pause } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
@@ -22,6 +22,10 @@ async function waitForWorkerExit(pid, timeoutMs = 1_000) {
   return !workerIsRunning(pid);
 }
 
+function expectedWorkerCommand(directory) {
+  return `${process.execPath} ${mailboxWorkerPath} worker ${directory}`;
+}
+
 async function readProcessCommand(pid) {
   return new Promise((resolveCommand, rejectCommand) => {
     execFile(
@@ -42,13 +46,36 @@ async function readProcessCommand(pid) {
   });
 }
 
+function readProcessCommandSync(pid) {
+  try {
+    return execFileSync("ps", ["-ww", "-p", String(pid), "-o", "command="], {
+      encoding: "utf8",
+    }).trim();
+  } catch (error) {
+    if (error.status === 1) return undefined;
+    throw error;
+  }
+}
+
 async function verifyMailboxWorker(pid, directory) {
   const command = await readProcessCommand(pid);
   if (command === undefined) return false;
-  const expected = `${process.execPath} ${mailboxWorkerPath} worker ${directory}`;
-  if (command !== expected)
+  if (command !== expectedWorkerCommand(directory))
     throw new Error(`CI observer worker ${pid} does not match this mailbox`);
   return true;
+}
+
+// Read-only liveness check reusing the same identity rule as termination,
+// without ever signaling a process. A PID that exists but runs a different
+// command is reused/mismatched identity: this reports "unknown" rather than
+// "alive" or "dead" so callers neither reassure a coordinator nor act on an
+// unrelated process.
+export function checkMailboxWorkerLiveness({ pid } = {}, directory) {
+  if (!(Number.isSafeInteger(pid) && pid > 0)) return "unknown";
+  if (!workerIsRunning(pid)) return "dead";
+  const command = readProcessCommandSync(pid);
+  if (command === undefined) return "dead";
+  return command === expectedWorkerCommand(directory) ? "alive" : "unknown";
 }
 
 export async function terminateMailboxWorker({ pid }, directory) {

@@ -35,11 +35,17 @@ Otherwise, run the operation actually being performed, supplying the
 backlog's real path with `--file` when it is not this project's default:
 
 - Merge: `product-backlog-git-merge.mjs merge --ref <ref> [--file <path>]`
-- Rebase: `product-backlog-git-rebase.mjs rebase --ref <ref> [--file <path>]`
-  (a caller whose real pre-operation tip or destination differs from the
-  currently checked-out branch and the supplied `--ref` — for example,
-  replaying only an unpublished suffix — supplies its own actual revisions
-  with `--pre-rebase-tip <ref>`/`--destination-at-start <ref>`)
+- Rebase: `product-backlog-git-rebase.mjs rebase --ref <upstream> [--onto <newbase>] [--branch <branch>] [--file <path>]`
+  Without `--onto`, this rebases the current branch onto `--ref`, or the
+  named `--branch` when that branch is not the one checked out. With
+  `--onto`, `--ref` is the cutoff and Git replays only commits after it onto
+  `<newbase>`, including on the named `--branch` when one is given. A caller
+  replaying an owned unpublished suffix passes that suffix's cutoff as
+  `--ref`; which revision that cutoff is belongs to the caller.
+  `--pre-rebase-tip` and `--destination-at-start` override only the
+  whole-rebase aggregate endpoints. They do not change which commits are
+  replayed. They default to that branch's tip and the onto (or `--ref`)
+  destination.
 - Cherry-pick: `product-backlog-git-cherry-pick.mjs pick --ref <rev[ rev...]>
   [--mainline <n>] [--file <path>]`
 

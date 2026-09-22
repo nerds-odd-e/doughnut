@@ -49,7 +49,12 @@ try {
     consume(result.output)
     deliver()
   }
-  store(key, { status: terminal?.status === 'stopped' ? 'stopped' : 'finished', sessionId: undefined, directory, pid, tail, terminal })
+  if (!terminal) {
+    store(key, { status: 'lost', sessionId: undefined, directory, pid, tail })
+    notify({ type: 'CI_MONITOR_UNAVAILABLE', key, reason: 'observer stream ended without a terminal result' })
+  } else {
+    store(key, { status: terminal.status === 'stopped' ? 'stopped' : 'finished', sessionId: undefined, directory, pid, tail, terminal })
+  }
 } catch (error) {
   store(key, { status: 'lost' })
   notify({ type: 'CI_MONITOR_UNAVAILABLE', key, reason: String(error).slice(-1000) })
@@ -62,6 +67,13 @@ Cell `store` may stay invisible until the cell finishes; do not coordinate
 shutdown through cross-cell `load`/`store`. Continue delegation after yielding.
 `notify` arrives at the next coordinator boundary. Do not `wait`, assign a
 watching agent, or broaden ordinary permissions.
+
+When the stream ends without ever parsing a `CI_OBSERVER_RESULT` line, no
+terminal evidence exists: store `lost`, not `finished`, and send
+`CI_MONITOR_UNAVAILABLE` so the coordinator does not treat the stream's end as
+closure. A parsed terminal result keeps its actual meaning (`stopped` or
+`finished`); do not relabel a valid stop as loss, and never claim `finished`
+from a missing or partial terminal record.
 
 Without those host tools, report monitoring unavailable once and continue; never
 poll or claim notifications from a background shell or file. Use another native

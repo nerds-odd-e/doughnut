@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, watch, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, watch, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   checkoutRoot,
@@ -13,16 +13,20 @@ import { isDirectCliEntry } from "./ci-direct-entry.mjs";
 import {
   publishMailboxEvent,
   readWorkerIdentity,
-  registerPushedRevision,
-  readRevisionCoverage,
-  observeRevisionCoverage,
   recordLostTerminalResult,
   recordTerminalResult,
   recordWorkerIdentity,
   terminalResultDeadlineCode,
   waitForTerminalResult,
+  workerLossReason,
 } from "./ci-mailbox-store.mjs";
 import {
+  observeRevisionCoverage,
+  readRevisionCoverage,
+  registerPushedRevision,
+} from "./ci-mailbox-revision-coverage.mjs";
+import {
+  checkMailboxWorkerLiveness,
   mailboxWorkerPath,
   terminateMailboxWorker,
 } from "./ci-mailbox-worker-process.mjs";
@@ -42,9 +46,35 @@ export {
   readWorkerIdentity,
   recordDeliveryProgress,
   recordWorkerIdentity,
+  workerLossReason,
+} from "./ci-mailbox-store.mjs";
+export {
   readRevisionCoverage,
   registerPushedRevision,
-} from "./ci-mailbox-store.mjs";
+} from "./ci-mailbox-revision-coverage.mjs";
+
+// Read-only: reports an already-recorded loss, or newly detects one from the
+// worker's own recorded identity, without ever signaling a process. Returns
+// undefined for anything short of a confirmed death (alive, uncertain
+// identity, or already-terminal for another reason such as a normal stop),
+// so an intentional completed stop is never mislabeled as unexpected death.
+export function mailboxWorkerLoss(directory) {
+  const resultPath = join(directory, "result.json");
+  if (existsSync(resultPath)) {
+    const result = JSON.parse(readFileSync(resultPath, "utf8"));
+    return result.coverage?.state === "lost" ? result : undefined;
+  }
+  let identity;
+  try {
+    identity = readWorkerIdentity(directory);
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    return undefined;
+  }
+  if (checkMailboxWorkerLiveness(identity, directory) !== "dead")
+    return undefined;
+  return recordLostTerminalResult(directory, workerLossReason);
+}
 
 const resultPrefix = "CI_OBSERVER_RESULT ";
 export async function runMailboxWorker(

@@ -51,8 +51,7 @@ required workspace under
 this discussion and decomposition work needs no workspace on its own. Then use
 [seed format](references/seed-format.md) to update the supplied seed or create
 a new seed in that workspace. Leave the seed there for review by default; this
-skill commits, integrates, or publishes it only when that reference's keep
-decision authorizes it.
+skill commits or publishes it only through that reference's disposition.
 
 Report the seed path, recommended first story, rejected simpler alternative,
 effort distribution, and open decisions. Apply that reference's keep or

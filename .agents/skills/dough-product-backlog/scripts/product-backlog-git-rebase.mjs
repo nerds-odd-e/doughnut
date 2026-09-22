@@ -110,32 +110,47 @@ function interpretStop(repoRoot, file, outcome) {
 // path is then gated once more by the whole-operation aggregate comparison
 // (`acceptCleanRebase`) before being reported as accepted.
 //
-// `preRebaseTip`/`destinationAtStart` default to what they genuinely are for
-// the ordinary shape of this call — the currently checked-out branch's own
-// HEAD right now, and `ref` resolved right now, captured before Git moves
-// anything — but a caller whose real boundaries differ (a rejected-push
-// retry rebasing only an unpublished suffix, an execution-branch replay onto
-// trunk) supplies its own actual revisions instead; this never assumes the
-// destination is always `main` or the pre-rebase tip is always `ORIG_HEAD`.
+// `preRebaseTip`/`destinationAtStart` default to the branch actually being
+// replayed and the commit it is replayed onto, captured before Git moves
+// anything. They only name the whole-rebase aggregate endpoints. They do not
+// choose which commits Git replays.
+//
+// Without `--onto`, this is `git rebase <ref>` of the current branch, or
+// `git rebase <ref> <branch>` when a branch that is not checked out is named.
+// With `--onto`, `--ref` is the upstream cutoff and Git replays only the
+// commits after that cutoff:
+// `git rebase --onto <onto> <ref> [<branch>]`.
 export function rebaseOperation({
   repoRoot,
   file,
   ref,
+  onto,
+  branch,
   "pre-rebase-tip": explicitPreRebaseTip,
   "destination-at-start": explicitDestinationAtStart,
 }) {
   ensureDriverRegistered(repoRoot, file);
   const preRebaseTip =
-    explicitPreRebaseTip ?? gitLine(["rev-parse", "HEAD"], repoRoot);
+    explicitPreRebaseTip ?? gitLine(["rev-parse", branch ?? "HEAD"], repoRoot);
   const destinationAtStart =
-    explicitDestinationAtStart ?? gitLine(["rev-parse", ref], repoRoot);
+    explicitDestinationAtStart ?? gitLine(["rev-parse", onto ?? ref], repoRoot);
 
-  const outcome = gitOutcome(["rebase", ref], repoRoot, noEditor);
+  const args = ["rebase"];
+  if (onto) {
+    args.push("--onto", onto, ref);
+    if (branch) args.push(branch);
+  } else if (branch) {
+    args.push(ref, branch);
+  } else {
+    args.push(ref);
+  }
+
+  const outcome = gitOutcome(args, repoRoot, noEditor);
   if (outcome.code === 0) {
     return acceptCleanRebase(
       repoRoot,
       file,
-      ref,
+      onto ?? ref,
       preRebaseTip,
       destinationAtStart,
     );
@@ -182,8 +197,9 @@ export function continueOperation({ repoRoot, file }) {
 
 const usage =
   `Usage:\n` +
-  `  product-backlog-git-rebase.mjs rebase --ref <ref> ` +
-  `[--file <path>] [--cwd <dir>]\n` +
+  `  product-backlog-git-rebase.mjs rebase --ref <upstream> ` +
+  `[--onto <newbase>] [--branch <branch>]\n` +
+  `    [--file <path>] [--cwd <dir>]\n` +
   `    [--pre-rebase-tip <ref>] [--destination-at-start <ref>]\n` +
   `  product-backlog-git-rebase.mjs continue [--file <path>] [--cwd <dir>]\n` +
   `  product-backlog-git-rebase.mjs validate [--file <path>] [--cwd <dir>]\n`;
@@ -197,6 +213,8 @@ await runGitOperationCli({
   validateOperation,
   failingStatuses: ["conflict", "refused", "blocked", "disputed"],
   extraOptions: {
+    onto: { type: "string" },
+    branch: { type: "string" },
     "pre-rebase-tip": { type: "string" },
     "destination-at-start": { type: "string" },
   },

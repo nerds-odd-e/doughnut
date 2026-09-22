@@ -54,6 +54,18 @@ publication itself, so a
 push changes neither its owner binding nor its process handle. Continue
 delegation and execution immediately.
 
+If the detached worker behind this directory has died without recording a
+normal terminal result, the hook adds `CI observer lost its worker for this
+coordinator` instead — at the next ordinary interaction, not only when a new
+receipt arrives, and a repeated receipt for the same directory does not
+restore the attached message. Treat this exactly like other unavailable
+coverage: report it once and continue execution without promising monitoring.
+Do not restart the observer, guess another mailbox directory, or re-run the
+launcher to "recover" this directory; start a new observer only through
+ordinary setup for a later push. A worker that stopped normally (via the
+`stop` command below, or its own budget) is reported as ended coverage, not as
+this lost state.
+
 The next coordinator hook invocation after a result is ready adds the event to the owning
 coordinator's context exactly once. Pending polls and successful CI add no
 context. The native hook selects durable records without advancing delivery

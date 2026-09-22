@@ -85,7 +85,10 @@ checkout already belongs to an active execute-plan repair, return the evidence
 to that owning execution instead of invoking a nested one. Pass `--no-replan`
 and a ten-minute hard limit. Carry the gathered expectation, actual behavior,
 evidence, and gaps. Do not plan, invent a story, or start a local
-implement-and-refactor loop.
+implement-and-refactor loop. That execution publishes the validated repair
+through
+[increment and repair publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair).
+Do not push the repair through a separate procedure.
 
 Debug with available knowledge as needed. Do not require a separate debugging
 skill.
@@ -142,7 +145,7 @@ a checkout.
 Do not repeat execute-plan preservation, rollback, or retry. Link the
 execution-preserved evidence already written under this project's
 executable-plan root (see [refine an oversized
-slice](../dough-execute-plan/references/execution-decisions.md#refine-an-oversized-slice)
+slice](../dough-execute-plan/references/oversized-slice.md)
 and [resolve execution
 context](../dough-slice-planning/SKILL.md#resolve-execution-context)). Carry the
 gathered expectation, actual behavior, remaining uncertainty, and acceptance
@@ -166,26 +169,36 @@ deduplication, and Taken placement. Do not list the same work twice. Do not
 move or interrupt **Taken** work; leave it running and in place, and report any
 contradiction with it to the coordinator.
 
-When a session-created exploration workspace contains an authorized canonical
-story, executable plan, backlog change, or other durable planning evidence,
-remove temporary reproduction and product changes first. Verify that only those
-owned planning artifacts remain, commit only them on the exploration branch,
-and record the commit. Resolve the local integration checkout for `main`; verify
-its branch, cleanliness, and ownership before integrating the artifact commit
-using the project's safe local Git convention. Integrate only the owned planning
-artifacts, not unrelated exploration ancestry, and do not push. Then rebase the
-exploration branch onto the resulting local `main` without carrying unrelated
-ancestry, verify the durable artifacts are integrated and the worktree is clean,
-and close the temporary worktree and branch through the shared
+When the owned workspace contains an authorized canonical story, executable
+plan, backlog change, or other durable planning evidence, those records
+follow
+[preparation disposition](../dough-story-refinement/references/preparation-disposition.md).
+Carry out that disposition with
+[retained-artifacts.mjs](scripts/retained-artifacts.mjs). Name the disposable
+reproduction paths and the durable record. It removes only those disposable
+paths and leaves unrelated exploration content. An explicit keep commits
+only the retained record in this owned workspace and publishes that SHA
+through that disposition's
+[keep and publish](../dough-story-refinement/references/preparation-disposition.md#keep-and-publish-the-retained-result),
+which uses
+[publish the candidate](../dough-execute-plan/references/publish-the-candidate.md).
+This owned workspace is the publication checkout. A different checkout that
+holds a pending human edit stays untouched. Without an explicit keep, that
+module does not commit or push. The local draft remains in the owned
+workspace, is not published, and the module's result states that pending
+disposition.
+
+Workspace removal stays with the shared
 [exploration workspace lifecycle](../dough-manual-testing/references/exploration-workspace.md).
-If any commit, integration, rebase, verification, or cleanup step is unsafe,
-ambiguous, or incomplete, use the shared lifecycle's retained-workspace handoff
-and add the artifact commit when one exists and the integration evidence state.
-Do not force cleanup or start repair.
+Remove only a clean, unambiguous workspace this session created, after a
+confirmed disposition. A reused workspace stays with its owner. An unrelated
+exploration workspace is not this session's workspace; leave it in place.
+If that cleanup is unsafe, ambiguous, or incomplete, use the lifecycle's
+retained-workspace handoff. Do not force cleanup or start repair.
 
 An established checkout remains under its owning workflow's delivery and
-cleanup rules; do not impose this temporary-workspace integration sequence or
-create a nested workspace there.
+cleanup rules; do not impose this retention sequence or create a nested
+workspace there.
 
 Do not start execution of the queued work. Later refinement or planning reads
 the same linked expectations, evidence, gaps, and examples; do not invent

@@ -76,8 +76,10 @@ prerequisite for later execution; do not run it now.
 ## Experiment, learn, and reassess
 
 Execute through [dough-execute-plan](../dough-execute-plan/SKILL.md), keeping its
-implementation/refactor ownership, delivery, and normal retrospective. Make the
-following loop explicit in the plan and each experiment slice:
+implementation/refactor ownership, delivery, and normal retrospective. That
+delivery publishes through
+[increment and repair publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair).
+Make the following loop explicit in the plan and each experiment slice:
 
 1. **Hypothesize:** read [optimization tactics](references/optimization-tactics.md)
    and choose a promising way to remove cost across the family. Challenge the

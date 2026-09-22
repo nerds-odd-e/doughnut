@@ -69,7 +69,8 @@ Ordinary Open Dough release updates remain available from the recorded source.
       <commit>`, and check out that commit detached. Confirm
       `git rev-parse HEAD` equals the peeled commit.
    c. Inspect that snapshot's `src/install/open-dough-release.sh`,
-      `src/install/open-dough-release-apply.sh`, `install.sh`, the helpers they
+      `src/install/open-dough-release-apply.sh`, `install.sh`,
+      `src/install/open-dough-install-payload.sh`, the helpers they
       source (including `src/install/open-dough-register-hooks.sh`,
       `src/install/open-dough-register-hooks.mjs`,
       `src/install/open-dough-register-hooks-merge.mjs`, and

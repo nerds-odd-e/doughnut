@@ -42,6 +42,14 @@ Give the agent:
   When replanning is disabled, an oversized stop returns the incomplete attempt in
   place; do not plan, retry, invent backlog work, or clean up. The coordinator
   applies the overrun branch.
+- When the slice includes an authorized live action, the plan's named
+  regression prerequisite and whether an accepted current observation of it
+  already exists. Require the agent apply [require current regression proof
+  before a live action](execution-decisions.md#require-current-regression-proof-before-a-live-action)
+  at the point it performs that action, not only at coordinator acceptance:
+  obtain the missing proof first, or leave the action unperformed and return
+  the exact obligation and gap. A passing operational or health check does not
+  relieve this requirement.
 - Ownership of the slice's changes. State that other agents may share the
   execution checkout and their work must be preserved.
 - A stop before coordinator delivery: no commit, push, marking a planned slice

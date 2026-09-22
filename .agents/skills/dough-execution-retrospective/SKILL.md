@@ -135,7 +135,7 @@ require replacement unit coverage before narrowing/removing E2E tests. Plan clea
   Changing promises/constraints or findings that cannot form one bounded correction need user decision.
 
 Only the designated writer changes the plan when two authorized reviews cover one execution;
-the other returns evidence. Continue enabled reviews; correction refinement/execution needs a separate request.
+the other returns evidence. Continue enabled reviews; a separate request executes the correction, and [dough-execute-plan](../dough-execute-plan/SKILL.md) publishes it through [increment and repair publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair). This review does not publish.
 
 ## Review process only from a real record
 

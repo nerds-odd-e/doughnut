@@ -8,7 +8,8 @@ repository, branch, runtime, and host-bridge readiness before launching.
 Start one observer per repository/branch/coordinator before the first
 publication it must cover, where branch is the authorized **target** from the
 push destination, not the execution checkout's current branch. Trunk Mode
-observes shared trunk; Story Branch Mode observes the branch it pushes. Reuse it
+observes shared trunk; Story Branch Mode observes the recorded remote
+execution branch it publishes. Reuse it
 across claim, normal, and repair pushes. Register each
 delivered revision through [slice delivery](wrap-up.md#deliver-the-change);
 register a Trunk Mode claim once the execution workspace exists and the observer
@@ -118,6 +119,13 @@ until that missing history is accounted for.
    Flakiness is a defect even if a rerun passes. Never rerun until green as a fix.
    `CI_MONITOR_UNAVAILABLE` means observation failed, not that CI passed or the
    server caused a test failure; report lost coverage once and continue.
+   `CI_COVERAGE_UNAVAILABLE` is different: it means a registered revision had no
+   discoverable run yet, not that observation ended. While the same observer
+   remains active it keeps checking that revision and still delivers a real
+   verdict — including a later failure — if one becomes discoverable; do not
+   treat it as a final, unrepairable gap or stop the observer over it. Confirm
+   a revision's actual final state from coverage/records at that observer's own
+   stop, not from an early `CI_COVERAGE_UNAVAILABLE` notification alone.
    `CI_INCOMPLETE` needs a bounded inspection of cancellation/skipping; ignore
    proven supersession, not an unexplained missing result. If a failed run's
    cause is uncertain, enter the analysis/repair path below.
@@ -154,8 +162,10 @@ until that missing history is accounted for.
    failures were CI infrastructure, record the evidence and ignore the attempt
    without a repair commit. If HEAD already contains a demonstrated repair,
    accept the focused proof without manufacturing another commit. For a new
-   repair, the coordinator runs [wrap-up](wrap-up.md). Preserve the same
-   observer through the repair push.
+   repair, the coordinator runs [wrap-up](wrap-up.md), which publishes through
+   [increment and repair publication](trunk-publication.md#publish-an-execution-increment-or-repair).
+   Do not use a second repair push. Preserve the same
+   observer through that publication.
 5. **Restore unfinished owned work and resume the same execution.**
    Publish a new repair first; otherwise proceed as soon as focused proof shows
    HEAD is already fixed or analysis proves all failures were infrastructure.

@@ -1,123 +1,13 @@
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  renameSync,
-  rmSync,
-  watch,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, readFileSync, readdirSync, rmSync, watch } from "node:fs";
 import { join } from "node:path";
-import { isFullGitRevision } from "./ci-revisions.mjs";
+import { publishJson } from "./ci-mailbox-json-file.mjs";
+import { readRevisionCoverage } from "./ci-mailbox-revision-coverage.mjs";
 
 const eventFilePattern = /^(\d{12})\.json$/;
 const terminalResultDeadlineMs = 5_000;
-const missingRevisionPollLimit = 3;
 export const terminalResultDeadlineCode = "CI_OBSERVER_TERMINAL_DEADLINE";
 export const terminalResultDeadlineReason =
   "CI observer terminal result was not published before its lifecycle deadline";
-
-function publishJson(directory, name, value) {
-  const temporary = join(directory, `${name}.tmp`);
-  writeFileSync(temporary, JSON.stringify(value), { mode: 0o600 });
-  renameSync(temporary, join(directory, name));
-}
-const revisionDirectory = (directory) => join(directory, "coverage");
-
-function revisionPath(directory, sha) {
-  if (!isFullGitRevision(sha))
-    throw new Error("Expected a full Git revision SHA");
-  return join(revisionDirectory(directory), `${sha.toLowerCase()}.json`);
-}
-
-export function registerPushedRevision(directory, sha) {
-  const path = revisionPath(directory, sha);
-  const normalized = sha.toLowerCase();
-  mkdirSync(revisionDirectory(directory), { recursive: true, mode: 0o700 });
-  if (!existsSync(path))
-    publishJson(revisionDirectory(directory), `${normalized}.json`, {
-      sha: normalized,
-      state: "unchecked",
-      missingPolls: 0,
-    });
-  return readRevisionCoverage(directory).find(
-    (revision) => revision.sha === normalized,
-  );
-}
-
-export function readRevisionCoverage(directory) {
-  const coverage = revisionDirectory(directory);
-  if (!existsSync(coverage)) return [];
-  return readdirSync(coverage)
-    .filter(
-      (name) =>
-        name.toLowerCase().endsWith(".json") &&
-        isFullGitRevision(name.slice(0, -5)),
-    )
-    .sort()
-    .map((name) => JSON.parse(readFileSync(join(coverage, name), "utf8")));
-}
-
-function preferredAttempt(attempts) {
-  return (
-    attempts.find(
-      ({ status, conclusion }) =>
-        status === "completed" && conclusion === "success",
-    ) ??
-    attempts.find(({ status }) => status !== "completed") ??
-    attempts[0]
-  );
-}
-
-function observedRevision(revision, attempt) {
-  let state = "failure";
-  if (attempt.status !== "completed") state = "pending";
-  else if (attempt.conclusion === "success") state = "success";
-  else if (attempt.conclusion === "cancelled") state = "incomplete";
-  return {
-    ...revision,
-    state,
-    missingPolls: 0,
-    checkedBy: { runId: attempt.databaseId, attemptId: attempt.attempt },
-  };
-}
-
-export function observeRevisionCoverage(directory, runs, request) {
-  const events = [];
-  for (const revision of readRevisionCoverage(directory)) {
-    const matches = runs.filter(
-      ({ headSha }) => headSha?.toLowerCase() === revision.sha,
-    );
-    let next;
-    const attempt = preferredAttempt(matches);
-    if (attempt) {
-      next = observedRevision(revision, attempt);
-    } else if (["success", "failure", "incomplete"].includes(revision.state)) {
-      next = revision;
-    } else {
-      const missingPolls = (revision.missingPolls ?? 0) + 1;
-      next = {
-        ...revision,
-        state:
-          missingPolls >= missingRevisionPollLimit
-            ? "uncovered"
-            : revision.state,
-        missingPolls,
-      };
-      if (next.state === "uncovered" && revision.state !== "uncovered")
-        events.push({
-          type: "CI_COVERAGE_UNAVAILABLE",
-          repo: request.repo,
-          branch: request.branch,
-          sha: revision.sha,
-          reason: `No CI attempt for pushed revision after ${missingRevisionPollLimit} discovery polls.`,
-        });
-    }
-    publishJson(revisionDirectory(directory), `${revision.sha}.json`, next);
-  }
-  return events;
-}
 
 export function readMailboxEvents(directory, after = 0) {
   return readdirSync(join(directory, "events"))
@@ -166,14 +56,23 @@ function mailboxEvidence(directory) {
   return { recordedThrough, deliveredThrough, unread };
 }
 
+const unresolvedRevisionStates = [
+  "unchecked",
+  "pending",
+  "uncovered",
+  "incomplete",
+];
+
+function unresolvedRevisions(directory) {
+  return readRevisionCoverage(directory)
+    .filter(({ state }) => unresolvedRevisionStates.includes(state))
+    .map(({ sha, state }) => ({ sha, state }));
+}
+
 function terminalResult(directory, request, status) {
   if (!(request.mode === "execution" && status === "stopped"))
     return { status };
-  const unproved = readRevisionCoverage(directory)
-    .filter(({ state }) =>
-      ["unchecked", "pending", "uncovered", "incomplete"].includes(state),
-    )
-    .map(({ sha, state }) => ({ sha, state }));
+  const unproved = unresolvedRevisions(directory);
   return {
     status,
     coverage: {
@@ -185,13 +84,24 @@ function terminalResult(directory, request, status) {
   };
 }
 
-export function recordLostTerminalResult(directory) {
+// Distinct from terminalResultDeadlineReason: this records an unexpected
+// worker death discovered by a liveness check at an ordinary coordinator
+// interaction, not the stop command's own publication deadline.
+export const workerLossReason =
+  "CI observer worker exited without recording a normal terminal result";
+
+export function recordLostTerminalResult(
+  directory,
+  reason = terminalResultDeadlineReason,
+) {
+  const unproved = unresolvedRevisions(directory);
   const result = {
     status: "stopped",
     coverage: {
       state: "lost",
       pendingCi: "unobserved",
-      reason: terminalResultDeadlineReason,
+      reason,
+      ...(unproved.length ? { unproved } : {}),
     },
     evidence: mailboxEvidence(directory),
   };

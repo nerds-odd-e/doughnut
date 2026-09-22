@@ -132,6 +132,57 @@ for human judgment. A recorded explanation never waives required proof or the
 CI repair protocol; an infrastructure finding cannot excuse a separate assertion
 failure.
 
+## Require current regression proof before a live action
+
+Given an active plan naming a regression prerequisite, when the agent reaches
+an authorized live action within the slice — one that changes a live
+installation, for example a restart, deployed configuration change, upgrade,
+migration, or updater enrollment — confirm an accepted current observation of
+that prerequisite applies to the actual candidate and conditions before
+performing the action, or leave the action unperformed and report the exact
+obligation and gap. Read-only observation is not a live action and is not
+gated by this decision.
+
+When no accepted observation exists, run the named regression command and
+treat its result under [Diagnose failed proof](#diagnose-failed-proof); do
+not invent a second proof or failure contract for this decision. A passing
+result authorizes the dependent live action; retain the literal command,
+candidate identity, and result as the observation that authorized it.
+
+A retained pass authorizes reuse only while it still applies to the actual
+candidate and conditions now being acted on. Confirm that correspondence
+using [own executable proof](../../dough-story-refinement/references/planning.md#own-executable-proof)'s
+matching promise, implementation/candidate, setup, relevant conditions, and
+observation — not a recent timestamp or an identical whole-repository SHA
+alone. A relevant change to the actual candidate's code, tests, dependencies,
+configuration, or environment breaks that correspondence and requires
+reassessment; an irrelevant change, such as documentation-only, leaves it
+intact. When correspondence holds, reuse the retained pass and cite it as the
+authorizing observation instead of rerunning the command. A pass observed for
+a different candidate or checkout does not qualify the actual one without
+this demonstrated correspondence, regardless of an unrelated passing CI
+result or an unaffected CI-visible subset.
+
+An independently passing operational or health check — for example a curl
+probe or container health check — never substitutes for the missing
+regression prerequisite, even while it keeps passing throughout. Operational
+checks retain their own observations and timing: do not require a
+post-transition observation before the transition it can only observe, and do
+not treat it as satisfying this prerequisite.
+
+If the named command fails, is absent, or is unavailable — including when a
+retained pass no longer corresponds to the actual candidate — leave the live
+action unperformed; do not proceed on an explanation or on unrelated green
+CI. Report the exact command/obligation and gap in the existing plan or
+conversation, and continue other unrelated authorized work in the same
+slice. Once the command is rerun and passes for the actual candidate, perform
+the live action. Missing correspondence is diagnosed and resolved through
+this same obtain-or-stop path; it does not need a separate decision.
+
+This decision does not itself grant deployment permission and adds no new
+post-action observation requirement: existing deployment authority and
+post-action observations are unchanged.
+
 ## Choose replanning permission
 
 Resolve this at entry and retain it for [delegation](delegation.md) and resume.
@@ -142,72 +193,10 @@ scope, destructive action, or missing execution.
 
 ## Refine an oversized slice
 
-Use this project's target, hard limit, exceptions, and repeated-overrun threshold
-under [slice sizing](../../dough-story-decomposition/references/problem-decomposition.md#size-and-escalate-slices).
-Track elapsed implementation, focused testing, and slice-local cleanup with the
-host clock; exclude explicit CI repair pauses. Lack of one coherent behavior or
-failure to converge also calls for refinement.
-
-Inventory tracked and untracked changes owned by the attempt and preserve
-pre-existing work. Never use broad `git checkout .` or `git clean -fd`. Unclear
-ownership requires [human judgment](#stop-for-human-judgment); do not guess,
-silently revert unrelated work, or continue cleanup. Apply the same ownership
-stop as [delivery staging](wrap-up.md#deliver-the-change) and
-[resume](../SKILL.md#continue-or-recover-at-an-execution-boundary). A verified-result
-[delivery](wrap-up.md#deliver-the-change) failure or
-[integration](../../dough-story-wrap-up/SKILL.md#integrate-committed-story-branch-mode-closure)
-failure is ordinary recovery, not this overrun.
-
-When replanning is disabled, do not plan, refine, or retry. First write useful
-evidence under this project's executable-plan root, resolved from this project
-as in [slice planning](../../dough-slice-planning/SKILL.md#resolve-execution-context).
-Do not invent a location or write a plan. Evidence may be prose, snippets, or a
-patch; it need not run. Then remove only current attempt-owned unfinished changes
-outside that folder. Leave no abandoned incomplete code or test work elsewhere.
-Preserve unrelated work and earlier delivered slices; do not undo delivered
-work. Existing Taken entries stay Taken; invent no story, plan, or backlog
-entry. Report the stop under [Finish or stop](../SKILL.md#finish-or-stop).
-
-When replanning is allowed, continue as follows. For planned execution, safely park or revert
-only attempt-owned changes, then record elapsed time, completed proof, and the
-failed sizing assumption in the same plan. Invoke
-[dough-slice-plan-refinement](../../dough-slice-plan-refinement/SKILL.md) only
-when learning escalation permits slice refinement. The coordinator commits and
-pushes the updated plan. Report `reverted and refined`, elapsed time, and
-whether the hard limit applied, then restart from the plan on disk.
-
-For quick execution, first make a safe stop in the conversation. Identify the
-source, elapsed time, the failed sizing assumption, completed compatible
-work and proof, and every incomplete attempt-owned change. Keep completed
-compatible work and proof in place. Safely park or revert only incomplete
-attempt-owned changes; do not discard completed work merely to give later slices
-a clean starting point. Keep the same execution identity and backlog placement under
-[Take queued work](../SKILL.md#take-queued-work). A quick attempt that becomes
-planned keeps its selected mode and checkout; Trunk Mode stays Trunk Mode in
-the same worktree. Unclear ownership stops disposition and the dependent
-planning path for human judgment.
-
-After that stop, when the triggering instruction authorizes planning and
-continued execution, use this project's
-[ordinary slice planning](../../dough-slice-planning/SKILL.md) for remaining
-work from the established source — the selected story or the sufficient
-instruction. Replanning permission grants neither missing scope nor execution
-authority. Transfer the source, relevant chat evidence, completed work and
-proof, incomplete-change disposition, elapsed time, failed sizing assumption,
-and retained identity into the ordinary plan as source, decisions, or
-learnings needed for resume. Plan only the remaining work. Do not fabricate a
-story, completed planned slices, already satisfied promises, a substitute
-quick-execution record, or a second execution. Restart execute-plan from that
-plan in the preserved checkout and mode; ordinary plan refinement remains
-available before delegation. Reuse preserved proof while its boundary remains
-unchanged.
-
-If planning or continued execution is not authorized, or ordinary planning
-returns a missing field or disputed decision, report the safe stop and that
-exact need without creating the plan or fabricating a story. If evidence
-changes the source scope or exposes a disputed constraint, use the existing human
-decision path before planning the affected work; complexity alone does not
-authorize a scope change.
+See [oversized-slice handling](oversized-slice.md) for target/limit resolution,
+ownership-preserving cleanup, and the replanning-disabled/replanning-allowed
+paths, including the quick-execution safe stop and restart into ordinary
+planning.
 
 ## Handle an implementation commit
 

@@ -10,6 +10,7 @@ import { join } from "node:path";
 import {
   checkoutRoot,
   mailboxRoot,
+  mailboxWorkerLoss,
   readDeliveryProgress,
   readMailbox,
   readMailboxEvents,
@@ -21,6 +22,9 @@ import { isDirectCliEntry } from "./ci-direct-entry.mjs";
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 
 const emptySelection = () => ({ output: {}, acknowledge: () => undefined });
+
+const lostWorkerMessage = (directory, lost) =>
+  `CI observer lost its worker for this coordinator: ${directory} (${lost.coverage.reason})`;
 
 export function selectCiEvents(
   input,
@@ -63,6 +67,7 @@ export function selectCiEvents(
   }
   const context = [];
   const acknowledgements = [];
+  const attachedThisCall = new Set();
 
   if (["Shell", "Bash"].includes(input.tool_name)) {
     const output =
@@ -91,7 +96,11 @@ export function selectCiEvents(
       });
       if (host === "cursor")
         writeFileSync(generation, input.generation_id, { mode: 0o600 });
-      if (!request.probe)
+      attachedThisCall.add(directory);
+      const lostAtAttachment = mailboxWorkerLoss(directory);
+      if (lostAtAttachment)
+        context.push(lostWorkerMessage(directory, lostAtAttachment));
+      else if (!request.probe)
         context.push(`CI observer attached to this coordinator: ${directory}`);
     }
   }
@@ -99,6 +108,10 @@ export function selectCiEvents(
   if (existsSync(bindings))
     for (const binding of readdirSync(bindings)) {
       const directory = readFileSync(join(bindings, binding), "utf8");
+      if (!attachedThisCall.has(directory)) {
+        const lost = mailboxWorkerLoss(directory);
+        if (lost) context.push(lostWorkerMessage(directory, lost));
+      }
       const progress = readDeliveryProgress(directory);
       const records = readMailboxEvents(directory, progress.deliveredThrough);
       if (records.length)

@@ -15,15 +15,11 @@ way: repair the backlog by hand, or decide the current result should stand as is
 own `validate` before this section's own revalidation below and before publishing. If neither the adapter
 nor that reference is available, preserve the conflict and report the missing guidance.
 
-[Recover a rejected push](publish-the-candidate.md#recover-a-rejected-push)'s two `--onto` rebases are not run through this
-adapter: its CLI has no equivalent for rebasing a range other than the currently checked-out branch onto a
-ref. Until that gap is closed, resolve a conflict touching the backlog on either of those two rebases with
-[the fallback domain knowledge](../../dough-product-backlog/references/merge-conflicts.md#fallback-domain-knowledge)
-instead, applied by hand exactly as below.
+[Recover a rejected push](publish-the-candidate.md#recover-a-rejected-push) uses that same adapter for the owned-suffix range named there, not a raw `git rebase` and not a rebase of whatever branch happens to be checked out. The cutoff is the base that section retains for the push. A `conflict`, `refused`, or `disputed` result stops before the retry push and leaves the refs, worktree, and index as Git left them. Resolve a backlog conflict the same way as the ordinary rebase above, then run this adapter's `continue`. If the adapter is unavailable, use [the fallback domain knowledge](../../dough-product-backlog/references/merge-conflicts.md#fallback-domain-knowledge) by hand exactly as below.
 
 For other product or code paths, read the three Git versions (ancestor,
 current side, and incoming side; index stages 1, 2, and 3). Identify the
-fetched trunk versus the unpublished suffix from the actual commits; Git's
+fetched authorized remote target versus the unpublished suffix from the actual commits; Git's
 ours/theirs labels during rebase do not name intent. Compare each side with
 the ancestor and retain a brief account of what each contributor changed.
 
