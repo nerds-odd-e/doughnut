@@ -252,7 +252,26 @@ test and example 3's trash half; existing `NotebookGitWebNoteMove*`,
 `NotebookGitWebTrash*` unchanged.
 
 ### 6. Derive folder changes by prefix
-Type: Behavior. Status: planned.
+Type: Behavior. Status: **done** (2026-09-22), nested-ancestor composition
+included; the split rule was not needed.
+
+Delivered: `NotebookGitDerivedTree.of` accepts Note and Folder rows. Inner
+`ChangedFolders` composes each changed folder's captured previous path through
+its changed ancestors (unchanged ancestors from the live entity), re-lists
+every accepted key under a changed prefix at its current prefix with the same
+blob id (deepest changed ancestor wins, deleted prefix drops its keys and so
+its cascade-deleted attachments), and names the touched directories in
+current coordinates; markers are applied deepest first. Accepted proof:
+`NotebookGit*` plus `services.notebookGit.*`, 393 tests green before the
+refactor; after the refactor the oracle, folder, trash, note-move, creation
+and content-save classes, 111 tests green. Example 2 and the folder cases live
+in `NotebookGitDerivedFolderTreeOracleControllerTest`:
+`renamingAFolderRelistsItsNotesAttachmentsAndSubfolderUnderTheNewPrefixAndMatchesTheFullAssembly`
+(after-map equals before-map re-keyed, no `NotebookAttachment` query),
+`creatingAFolderAddsItsMarkerAndMatchesTheFullAssembly`,
+`trashingAndRecoveringAFolderMoveItsEntriesWithTheirBlobsAndMatchTheFullAssembly`,
+`permanentlyDeletingAFolderDropsItsNotesAndAttachmentsWithItsPrefixAndMatchesTheFullAssembly`.
+The five folder drift tests now assert the drifted note stays absent.
 
 Pre-condition: a folder holding notes and attachments, with a nested
 subfolder. Triggers: folder create, rename, move (including into `_trash/`
@@ -360,6 +379,18 @@ retained in the repository. Proof: the recorded numbers in this plan.
   back until slice 6; recovery never deletes the emptied mirror. Test probes:
   `NotebookGitWebContentControllerTestBase.hibernateStatisticsOf(operation)`
   for the no-attachment-query signal; `ControllerTestBase.titleDto(title)`.
+- Slice 6 observation (product gap, outside this story's boundary): the
+  folder and notebook README endpoints
+  (`NotebookFolderController.updateFolderReadmeContent`,
+  `NotebookController.updateNotebookReadmeContent`) save and flush directly
+  and never enter `AcceptedWebChangeService`, so a web README edit creates no
+  accepted commit today. The plan's "included" list assumed otherwise. Not
+  routed here; recommended as a backlog follow-up at wrap-up. Slice 7 still
+  makes the derivation total: a Folder or Notebook row update refreshes that
+  prefix's `README.md`, proven through the owner's `apply` entry point.
+- Slice 6: no web path inserts or updates a `NotebookAttachment` row;
+  cascade-deleted attachment rows are not captured (database cascade) and
+  vanish with their deleted folder's prefix.
 - Retrospective candidate (not acted on): the committed referrer-authoring
   pattern `inCommittedTransaction(..., () -> authorReferencingContent(...))`
   has about twenty copies across fourteen NotebookGit test files.

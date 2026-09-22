@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -46,7 +47,7 @@ class NotebookGitWebFolderTrashGuardControllerTest extends NotebookGitWebContent
   }
 
   @Test
-  void preExistingPortableDriftDoesNotBlockTheFolderTrash() throws Exception {
+  void preExistingPortableDriftIsNeitherBlockingTheFolderTrashNorAdoptedByIt() throws Exception {
     GuardFixture f = seedBiologyUnderResearch();
     var acceptedHistoryBefore = acceptedHistory(f.notebook());
     makeMe.aNote().notebook(f.notebook()).title("Unsynchronized").content(CELLS_BODY).please();
@@ -56,6 +57,7 @@ class NotebookGitWebFolderTrashGuardControllerTest extends NotebookGitWebContent
     AcceptedHistory after = acceptedHistory(f.notebook());
     assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
     assertThat(after.tipPaths(), hasItem(startsWith("_trash/")));
+    assertThat(after.tipPaths(), not(hasItem("Unsynchronized.md")));
   }
 
   GuardFixture seedBiologyUnderResearch() throws UnexpectedNoAccessRightException {

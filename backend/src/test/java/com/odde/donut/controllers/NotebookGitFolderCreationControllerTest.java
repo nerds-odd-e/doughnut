@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.entities.Folder;
@@ -66,7 +67,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitControllerTestB
   }
 
   @Test
-  void preExistingPortableDriftDoesNotBlockTheFolderCreation() throws Exception {
+  void preExistingPortableDriftIsNeitherBlockingTheFolderCreationNorAdoptedByIt() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     var acceptedHistoryBefore = acceptedHistory(notebook);
     makeMe
@@ -83,6 +84,7 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitControllerTestB
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
     assertThat(after.tipPaths(), hasItem("Biology/.keep"));
+    assertThat(after.tipPaths(), not(hasItem("Unsynchronized.md")));
   }
 
   @Test

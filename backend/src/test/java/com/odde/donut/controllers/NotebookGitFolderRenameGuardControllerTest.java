@@ -4,10 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
-import com.odde.donut.controllers.dto.FolderRenameRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
@@ -82,7 +82,7 @@ class NotebookGitFolderRenameGuardControllerTest extends NotebookGitWebContentCo
   }
 
   @Test
-  void preExistingPortableDriftDoesNotBlockTheFolderRename() throws Exception {
+  void preExistingPortableDriftIsNeitherBlockingTheFolderRenameNorAdoptedByIt() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
     snapshotCurrentPortableTree(notebook);
@@ -94,11 +94,6 @@ class NotebookGitFolderRenameGuardControllerTest extends NotebookGitWebContentCo
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
     assertThat(after.tipPaths(), hasItem("Zoology/.keep"));
-  }
-
-  static FolderRenameRequest renameTo(String name) {
-    FolderRenameRequest req = new FolderRenameRequest();
-    req.setName(name);
-    return req;
+    assertThat(after.tipPaths(), not(hasItem("Unsynchronized.md")));
   }
 }

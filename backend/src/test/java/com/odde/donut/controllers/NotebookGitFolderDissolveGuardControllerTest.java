@@ -153,7 +153,7 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
   }
 
   @Test
-  void preExistingPortableDriftDoesNotBlockTheFolderDissolve() throws Exception {
+  void preExistingPortableDriftIsNeitherBlockingTheFolderDissolveNorAdoptedByIt() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
     Folder biology = makeMe.aFolder().parentFolder(outer).name("Biology").please();
@@ -166,6 +166,7 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
     assertThat(after.tipPaths(), not(hasItem(startsWith("Outer/Biology/"))));
+    assertThat(after.tipPaths(), not(hasItem("Unsynchronized.md")));
   }
 
   @Test

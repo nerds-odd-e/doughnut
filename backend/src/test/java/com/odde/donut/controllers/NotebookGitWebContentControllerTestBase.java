@@ -5,6 +5,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
+import com.odde.donut.controllers.dto.FolderMoveRequest;
+import com.odde.donut.controllers.dto.FolderRenameRequest;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteRecallInfo;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
@@ -17,8 +19,11 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
+import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -36,6 +41,7 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   @Autowired NoteController noteController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
+  @Autowired NotebookLivePortableTree livePortableTree;
 
   NotebookGitBinding binding(Notebook notebook) {
     return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
@@ -57,6 +63,36 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
     NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
     dto.setContent(content);
     return dto;
+  }
+
+  static FolderRenameRequest renameTo(String name) {
+    FolderRenameRequest req = new FolderRenameRequest();
+    req.setName(name);
+    return req;
+  }
+
+  static FolderMoveRequest folderMove(Integer newParentFolderId) {
+    FolderMoveRequest req = new FolderMoveRequest();
+    req.setNewParentFolderId(newParentFolderId);
+    return req;
+  }
+
+  /**
+   * The accepted head's tree, derived from the change, equals a full assembly of the projection.
+   */
+  void assertAcceptedTreeMatchesTheFullAssembly(Notebook notebook) throws Exception {
+    assertThat(
+        acceptedBlobIds(notebook),
+        equalTo(NotebookGitTreeContent.of(livePortableTree.entriesOf(notebook)).blobIds()));
+  }
+
+  Map<String, ObjectId> acceptedBlobIds(Notebook notebook) throws Exception {
+    return NotebookGitTreeContent.of(acceptedHistory(notebook).tipContent()).blobIds();
+  }
+
+  /** The queries {@code operation} alone executed. */
+  List<String> queriesOf(Executable operation) throws Throwable {
+    return List.of(hibernateStatisticsOf(operation).getQueries());
   }
 
   /** Hibernate statistics of {@code operation} alone; its counts and queries stay readable. */

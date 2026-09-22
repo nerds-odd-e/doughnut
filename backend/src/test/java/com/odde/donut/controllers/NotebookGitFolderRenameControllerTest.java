@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-import com.odde.donut.controllers.dto.FolderRenameRequest;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
@@ -192,12 +191,6 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
                 noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY_BEFORE));
     snapshotCurrentPortableTree(notebook);
     return new CompleteRenameFixture(notebook, biology, cells, tracker, recallCountBefore);
-  }
-
-  static FolderRenameRequest renameTo(String name) {
-    FolderRenameRequest req = new FolderRenameRequest();
-    req.setName(name);
-    return req;
   }
 
   record CompleteRenameFixture(

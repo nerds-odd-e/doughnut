@@ -11,7 +11,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
-import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -153,7 +152,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
   }
 
   @Test
-  void preExistingPortableDriftDoesNotBlockTheFolderMove() throws Exception {
+  void preExistingPortableDriftIsNeitherBlockingTheFolderMoveNorAdoptedByIt() throws Exception {
     FolderMoveFixture f = seedLearnedCellsInBiologyWithEmptyStudy();
     var acceptedHistoryBefore = acceptedHistory(f.notebook());
     makeMe.aNote().notebook(f.notebook()).title("Unsynchronized").content(CELLS_BODY).please();
@@ -163,6 +162,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     AcceptedHistory after = acceptedHistory(f.notebook());
     assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
     assertThat(after.tipPaths(), hasItem("Study/Biology/Cells.md"));
+    assertThat(after.tipPaths(), not(hasItem("Unsynchronized.md")));
   }
 
   CompleteSubtreeFixture seedCompleteBiologySubtreeWithReferrer()
@@ -203,12 +203,6 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
           Folder folder = folderRepository.findById(folderId).orElseThrow();
           return folder.getParentFolder() == null ? null : folder.getParentFolder().getId();
         });
-  }
-
-  static FolderMoveRequest folderMove(Integer newParentFolderId) {
-    FolderMoveRequest req = new FolderMoveRequest();
-    req.setNewParentFolderId(newParentFolderId);
-    return req;
   }
 
   record FolderMoveFixture(

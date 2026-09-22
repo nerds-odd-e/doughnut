@@ -15,8 +15,6 @@ import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
-import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +23,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Every web change's accepted tree, derived from the change, must equal the tree a full assembly of
- * the notebook's projection would produce.
+ * Every web note change's accepted tree, derived from the change, must equal the tree a full
+ * assembly of the notebook's projection would produce.
  */
 class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentControllerTestBase {
 
-  @Autowired NotebookLivePortableTree livePortableTree;
   @Autowired RelationController relationController;
 
   @Test
@@ -95,10 +92,7 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
     NoteUpdateTitleDTO rename = titleDto("B");
     rename.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
 
-    List<String> queries =
-        List.of(
-            hibernateStatisticsOf(() -> textContentController.updateNoteTitle(a, rename))
-                .getQueries());
+    List<String> queries = queriesOf(() -> textContentController.updateNoteTitle(a, rename));
 
     Map<String, ObjectId> after = acceptedBlobIds(notebook);
     assertThat(after.keySet(), not(hasItem("A.md")));
@@ -155,16 +149,6 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
         acceptedHistory(notebook).tipPaths(),
         containsInAnyOrder("Ideas/Plan.md", "_trash/Ideas/.keep"));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
-  }
-
-  private void assertAcceptedTreeMatchesTheFullAssembly(Notebook notebook) throws Exception {
-    assertThat(
-        acceptedBlobIds(notebook),
-        equalTo(NotebookGitTreeContent.of(livePortableTree.entriesOf(notebook)).blobIds()));
-  }
-
-  private Map<String, ObjectId> acceptedBlobIds(Notebook notebook) throws Exception {
-    return NotebookGitTreeContent.of(acceptedHistory(notebook).tipContent()).blobIds();
   }
 
   private static Map<String, ObjectId> without(Map<String, ObjectId> blobIds, List<String> paths) {
