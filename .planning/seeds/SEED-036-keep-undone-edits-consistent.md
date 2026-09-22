@@ -32,41 +32,68 @@ delivery.
 ## Story Decomposition
 
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. Estimates
-are hypotheses. No executable plan or implementation is authorized by this
-seed.
+are hypotheses. This seed is non-executable input; the owner authorized
+refinement and slice planning on 2026-09-23, without starting implementation.
 
 <a id="story-1"></a>
 
 ### Keep remote note content aligned when an in-flight edit is undone
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/008-undone-edit-autosave/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"76b4d1bc06839603883ebf64788bf2edbf95821c3351adf343717bbf2f37dfe4","plan":"32993b8d80f2554c1a826350d927e67abb3b0ec348ab90be8462591ec567a45f"}}
+```
 
 - **Identity:** SEED-036#story-1
-- **Goal / beneficiary:** A note author who changes content while a save is in
-  flight finishes with remote content matching the content shown in the editor.
-- **Evaluation:** Start from content `A`, change it to `AB` so a save request is
-  sent, then restore `A` before that request successfully returns. After all
-  save activity settles, both the editor and the remote note contain `A`.
-- **Scope:** Cover the reported edit-then-undo interaction when the later local
-  value equals the content from before the in-flight request. Preserve normal
-  automatic content saving. Investigation must confirm the discrepancy and its
-  affected editing surface before repair. No broader conflict-resolution or
-  offline-editing behavior is promised.
+- **Kind:** Bug — automatic saving can retain an edit the author removed.
+- **Goal:** A note author who restores earlier text while automatic saving is
+  pending finishes with the server and editor agreeing on the latest draft.
+  This preserves authored knowledge for subsequent Web Donut and local Git use.
+- **Scope:** Repair edit-then-restore within one active editor session, including
+  a pending debounce and an already dispatched save. Restoring text is an
+  ordinary edit (typing, deleting, or editor undo), not a new undo command.
+  Preserve normal autosave, normalization, response synchronization, validation
+  guards, and existing flush/cancel behavior for callers of the shared owner.
+  Successful saves converge without another user action; failures retain the
+  existing visible error and unsuccessful completion behavior.
+- **Boundary assumptions:** One author in one active editor, with the content
+  requests in the reported sequence succeeding. Equality uses the existing
+  content normalization. Backend canonical content formatting remains supported.
+- **Deferred promises:** Multi-tab/user conflict resolution, offline recovery,
+  automatic retries, changes to toolbar undo/history, new navigation durability
+  guarantees, backend save optimization, and new save-status UI. These are not
+  rejection rules for naturally supported cases.
+- **Key examples:**
+  1. Saved `A` → type `AB` → restore `A` before debounce fires → obsolete `AB`
+     is not sent; editor and server stay at `A`.
+  2. Saved `A` → send `AB` and hold its response → restore `A` → acknowledge
+     `AB` → automatically persist `A`; the response never replaces the restored
+     draft. After saves settle, the editor and server both hold `A`.
+  3. In example 2, the restored draft is empty, or the author continues to `AC`
+     before completion → the latest draft wins by the same save rule. Empty
+     content is a valid note value, not an absent proposal.
+  4. A normal successful save returns canonical ordinary-note Markdown → the
+     editor accepts it when no newer draft exists and becomes clean, preserving
+     the current behavior.
+- **Open questions:** None affecting the goal or scope. Code inspection supports
+  the reported cause; deterministic red regression proof remains delivery work.
+- **Plan:** [Undone edit autosave](../quick/008-undone-edit-autosave/PLAN.md).
 - **Value / learning:** Prevent silent loss of the author's latest intent and
   establish which save lifecycle state must own consistency.
-- **Effort hypothesis:** M, low confidence until the request ordering and
-  editor state transitions are reproduced.
+- **Effort hypothesis:** S (30–60 minutes including delivery), medium confidence
+  after locating the shared save owner and existing race/normalization tests.
 - **Depends on:** none.
 - **Safe stopping point:** The reported interaction cannot leave local and
   remote note content different after saves settle.
 
 ## Ordering and Scope Reduction
 
-This correctness bug is the owner's explicit top backlog priority. Its single
-story is the minimum observable outcome; investigation and repair stay within
-that story rather than becoming separate queued work.
+This correctness bug is the selected second backlog item on 2026-09-23. Preserve
+the current queue order. Its single story is the minimum observable outcome;
+investigation and repair stay within that story rather than becoming separate
+queued work.
 
 ## When to Surface
 
-Now, as the first product-backlog story.
+Now, when the selected second product-backlog story is authorized for execution.
 
 ## Breadcrumbs
 
@@ -76,3 +103,7 @@ Now, as the first product-backlog story.
   content, leaving local and remote content inconsistent.
 - Owner direction: capture the bug only and place it first in the product
   backlog.
+- Owner direction, 2026-09-23: refine the second backlog item, make a slice plan
+  if goal and scope have no open questions, and refine that plan if needed.
+  Prioritize a reliable, simple, cohesive frontend design that maps directly to
+  the domain and avoids duplication.
