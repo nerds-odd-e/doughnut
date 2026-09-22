@@ -145,7 +145,21 @@ behavior change. Proof: focused run of
 and `NotebookGitFolderRenameControllerTest` passes unchanged.
 
 ### 2. Capture the projection change at flush
-Type: Structure. Status: planned. Enables slice 3.
+Type: Structure. Status: **done** (2026-09-22). Enables slice 3.
+
+Delivered: `ProjectionChangeCapture` (a `@Component` that is both the Hibernate
+`Interceptor`, registered through `HibernatePropertiesCustomizer` with
+`AvailableSettings.INTERCEPTOR`, and the per-thread capture window).
+`open()` returns an `AutoCloseable` `ProjectionChange`; `change.of(notebookId)`
+yields `NotebookProjectionChange{inserted, updated, deleted}` keyed by
+`ProjectionRow(kind, id)`, with `updated` holding the first-seen
+`PreviousPath(containerId, name)`; Notebook rows count only on readme change.
+`AcceptedWebChangeService.apply` opens the window around the whole operation
+and still assembles the full tree. Accepted proof: literal `*Capture*` command
+(1 test, previous title present after two in-window flushes, nothing outside
+the window) plus content-save, folder-rename and concurrent-drift controller
+classes, 18 tests green. Assumption verified: no `@Modifying` query on the four
+tables.
 
 A small component (working name: projection change capture) binds a
 per-transaction collector to a Hibernate `Interceptor` registered through a
@@ -280,6 +294,10 @@ retained in the repository. Proof: the recorded numbers in this plan.
   Decision 4 is applied per operation kind as it becomes derived: each slice
   rewrites the drift tests of the operations it derives, and the before-snapshot
   comparison stays only for the fallback path until slice 7 retires it.
+
+- Slice 2: interceptor callbacks receive real entity instances and lookups
+  are keyed by exact entity class; `open()` overwrites any existing window,
+  so `apply` must never re-enter itself (its five callers do not).
 
 ## Remaining concerns
 

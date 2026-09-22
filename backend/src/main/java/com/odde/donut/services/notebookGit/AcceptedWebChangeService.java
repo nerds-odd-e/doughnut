@@ -5,6 +5,7 @@ import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
+import com.odde.donut.services.notebookGit.ProjectionChangeCapture.ProjectionChange;
 import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -24,16 +25,19 @@ public class AcceptedWebChangeService {
   private final NotebookLivePortableTree livePortableTree;
   private final EntityPersister entityPersister;
   private final NotebookGitAcceptedRepositoryStore repositoryStore;
+  private final ProjectionChangeCapture projectionChangeCapture;
 
   public AcceptedWebChangeService(
       NotebookGitBindingRepository bindingRepository,
       NotebookLivePortableTree livePortableTree,
       EntityPersister entityPersister,
-      NotebookGitAcceptedRepositoryStore repositoryStore) {
+      NotebookGitAcceptedRepositoryStore repositoryStore,
+      ProjectionChangeCapture projectionChangeCapture) {
     this.bindingRepository = bindingRepository;
     this.livePortableTree = livePortableTree;
     this.entityPersister = entityPersister;
     this.repositoryStore = repositoryStore;
+    this.projectionChangeCapture = projectionChangeCapture;
   }
 
   @FunctionalInterface
@@ -59,7 +63,7 @@ public class AcceptedWebChangeService {
       Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
     List<OpenedNotebook> opened = new ArrayList<>();
-    try {
+    try (ProjectionChange change = projectionChangeCapture.open()) {
       for (Integer notebookId : new TreeSet<>(notebookIds)) {
         bindingRepository
             .findByNotebookIdForUpdate(notebookId)
