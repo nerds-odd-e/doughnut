@@ -11,6 +11,7 @@ import {
 import {
   ciWorkflowFile,
   createGitHubRunAcquisition,
+  discoverApplicabilityCandidateRuns,
   readGitHubActions,
 } from "./ci-runs.mjs";
 
@@ -65,6 +66,27 @@ export async function watchCiExecution({
         timeoutMs: adapterTimeoutMs,
       })
     : createGitHubFailureAcquisition({ repo, gh });
+  // GitHub-only: CI-path applicability reuses a proved ancestor attempt, and
+  // that ancestor is not always among the runs the ordinary poll already
+  // surfaced (older completed runs intentionally drop out of `matching` once
+  // seen, per createGitHubRunAcquisition's own startup/observed-run pruning).
+  // A custom adapter does not own GitHub workflow-path applicability, so it
+  // gets no candidate discovery here; ci-mailbox-revision-coverage.mjs then
+  // has nothing to broaden with and an ignored-only revision simply stays
+  // undiscovered, unchanged from before this wiring existed.
+  // Deliberately left run-shaped (not flattened to bare SHAs): coverage
+  // selection reuses these same candidates to resolve a `not_required`
+  // revision's basis ancestor to its actual attempt below, so that ancestor's
+  // eventual failure stays actionable for every revision that reuses it.
+  const discoverAncestorCandidates = adapter
+    ? undefined
+    : async () =>
+        discoverApplicabilityCandidateRuns({
+          repo,
+          branch,
+          gh,
+          signal: observationSignal,
+        });
   let consecutiveErrors = 0;
 
   const unavailable = (reason) => ({
@@ -97,8 +119,38 @@ export async function watchCiExecution({
           : matching.filter((run) =>
               registeredShas.includes(run.headSha?.toLowerCase()),
             );
+      // Coverage selection runs before failure acquisition so a `not_required`
+      // revision's resolved basis ancestor (an attempt this poll's ordinary
+      // `matching`/`actionable` lists may not include at all — the ancestor is
+      // usually not itself registered here) can be folded into the same
+      // failure-acquisition call as ordinary actionable runs, reusing its
+      // existing per-run/job dedup: a failure shared by several ignored-only
+      // descendants is still delivered exactly once. Coverage's own events are
+      // still emitted after the failure event, preserving prior ordering.
+      const coverageResult = await observeCoverage(
+        matching,
+        now(),
+        discoverAncestorCandidates,
+      );
+      const coverageEvents = Array.isArray(coverageResult)
+        ? coverageResult
+        : (coverageResult?.events ?? []);
+      const ancestorRuns = Array.isArray(coverageResult)
+        ? []
+        : (coverageResult?.ancestorRuns ?? []);
+      const actionableKeys = new Set(
+        actionable.map((run) => `${run.databaseId}:${run.attempt}`),
+      );
+      const actionableWithAncestors = ancestorRuns.length
+        ? [
+            ...actionable,
+            ...ancestorRuns.filter(
+              (run) => !actionableKeys.has(`${run.databaseId}:${run.attempt}`),
+            ),
+          ]
+        : actionable;
       const { event, observationError, deferredFailureEvent } =
-        await acquireFailure(actionable, observationSignal);
+        await acquireFailure(actionableWithAncestors, observationSignal);
       if (event) {
         await emit(event);
       }
@@ -111,8 +163,7 @@ export async function watchCiExecution({
       } else {
         consecutiveErrors = 0;
       }
-      for (const coverageEvent of await observeCoverage(matching))
-        await emit(coverageEvent);
+      for (const coverageEvent of coverageEvents) await emit(coverageEvent);
       const incomplete = actionable.find(
         (run) =>
           run.status === "completed" &&

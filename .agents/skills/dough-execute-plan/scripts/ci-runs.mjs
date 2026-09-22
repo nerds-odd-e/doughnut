@@ -86,6 +86,28 @@ export function viewRunArguments({ repo, runId }) {
   ];
 }
 
+// Bounded-history lookup used only to find an applicable ancestor attempt
+// for CI-path-applicability classification (ci-path-applicability.mjs via
+// ci-mailbox-revision-coverage.mjs). Distinct from the polling acquisition
+// above: it is not part of the ordinary per-poll run/failure loop and is
+// called on demand, only when a registered revision's exact-SHA classification
+// cannot find a proved ancestor among the runs already visible to that poll.
+// `limit` bounds how far back the search looks; it does not track state
+// across calls the way `createGitHubRunAcquisition` does.
+export async function discoverApplicabilityCandidateRuns({
+  repo,
+  branch,
+  gh = readGitHubActions,
+  signal,
+  limit = 100,
+}) {
+  const runs = await gh(
+    listRunsArguments({ repo, branch, limit, includeCreatedAt: true }),
+    signal,
+  );
+  return matchingCiRuns(runs, { branch });
+}
+
 export function createGitHubRunAcquisition({
   repo,
   branch,

@@ -16,7 +16,12 @@ Before editing, identify from human instructions or repository guidance:
   planned stories when they are affected.
 - [Work item identity](references/identity.md), which is the single contract
   for what identifies an entry and what only navigates to it.
-- Decomposition, refinement, and slice-planning workflows, when needed.
+- [Record preparation facts](references/record-preparation.md), when
+  decomposition, refinement, slice planning, plan refinement, execution,
+  resume, or wrap-up writes or consumes structured preparation or readiness
+  assessment in a canonical home through `record-state` / `read-state`.
+- Decomposition, refinement, slice-planning, plan-refinement, execute-plan, and
+  wrap-up workflows, when needed.
 - Commit conventions, if a commit is authorized.
 
 If the backlog or the canonical home required by an affected entry cannot be
@@ -94,7 +99,10 @@ required workflow is unavailable, stop that activity and ask for its guidance.
 Move an entry from **Backlog list** to **Taken** only when execution of its
 authorized plan or explicitly selected planless quick story is starting.
 Refinement, planning, and an intention to execute leave it in the queue. If execution context or authorization fails before execution starts,
-leave the entry unchanged.
+leave the entry unchanged. Taking or resuming alone neither renews readiness nor
+derives it from membership; follow
+[execution and resume](references/record-preparation.md#execution-and-resume)
+and do not write or infer a ready assessment here.
 
 Preserve the title, canonical link, and recorded identity. Add any missing
 slice-plan link for a planned story, including on resume; stop if its plan is

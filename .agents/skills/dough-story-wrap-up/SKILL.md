@@ -150,7 +150,8 @@ content.
 ## Delete spent history, including shared records
 
 After completion and Git recovery are established — including any required Trunk
-Mode before-cleanup publication — delete the selected work's spent history:
+Mode before-cleanup publication — delete the selected work's spent history under
+[wrap-up cleanup](../dough-product-backlog/references/record-preparation.md#wrap-up-cleanup):
 
 - its executable plan and owned proof, evidence, and assessment records, even
   when the plan was retained at execution completion;

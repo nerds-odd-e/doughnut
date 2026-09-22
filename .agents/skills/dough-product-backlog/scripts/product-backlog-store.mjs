@@ -1,9 +1,10 @@
 // Reads and replaces the files this tool edits, and applies one validated
-// change to a backlog file. Cooperating script runs are serialized through a
-// lock directory beside the backlog and always re-read it inside the lock, so
-// a concurrent run cannot lose the other's update. This coordinates script
-// writers only; it cannot protect the file from an arbitrary external writer
-// that ignores the lock.
+// change under a cooperating lock. Cooperating script runs are serialized
+// through a lock directory beside the target file and always re-read it
+// inside the lock, so a concurrent run cannot lose the other's update. This
+// coordinates script writers only; it cannot protect the file from an
+// arbitrary external writer that ignores the lock, and it does not serialize
+// across worktrees.
 
 import {
   existsSync,
@@ -38,7 +39,7 @@ async function acquire(lockPath) {
       }
       if (Date.now() >= deadline) {
         throw new BacklogError(
-          `The backlog is locked by another run: ${lockPath}. Nothing was written. Wait for that run, or remove the lock by hand once you have established that no run holds it.`,
+          `The file is locked by another run: ${lockPath}. Nothing was written. Wait for that run, or remove the lock by hand once you have established that no run holds it.`,
         );
       }
       await delay(pollMilliseconds);
@@ -77,11 +78,12 @@ export function readFile(path, missing) {
   }
 }
 
-// Reads the file, applies `change` to its current bytes, and replaces the file
-// atomically. A refused change leaves the file untouched.
-export async function applyToBacklog(path, change) {
-  const missing = `Backlog file not found: ${path}`;
-  // The lock is made beside the backlog, so a path that is not there at all
+// Reads any file this tool mutates, applies `change` to its current bytes, and
+// replaces it atomically under a cooperating lock beside that path. A refused
+// change leaves the file untouched. Callers supply the missing-file refusal so
+// backlog and canonical-home wording stay accurate.
+export async function applyToFile(path, change, missing) {
+  // The lock is made beside the file, so a path that is not there at all
   // cannot be locked either. Establishing the file first keeps a mistyped path
   // an ordinary refusal instead of a failure to create its lock, and neither
   // the lock nor the directory a typo names is ever created. The read inside
@@ -99,4 +101,10 @@ export async function applyToBacklog(path, change) {
   } finally {
     rmdirSync(lockPath);
   }
+}
+
+// Reads the backlog, applies `change` to its current bytes, and replaces the
+// file atomically. A refused change leaves the file untouched.
+export async function applyToBacklog(path, change) {
+  await applyToFile(path, change, `Backlog file not found: ${path}`);
 }

@@ -9,9 +9,10 @@ description: >-
   work from a sufficient instruction needs an ordinary plan. Stays within the
   triggering instruction's execution authority: finish after writing and
   reporting the plan unless that instruction explicitly also requests execution.
-  Reports remaining slice-specific concerns or a limited no-concerns finding;
-  does not prescribe the next workflow action or certify execution readiness.
-  Concern evidence does not authorize execution.
+  Reports remaining slice-specific concerns or a limited no-concerns finding,
+  then records readiness assessment through the shared preparation procedure
+  without granting Take or execution. Concern evidence does not authorize
+  execution.
 ---
 
 # Slice planning
@@ -115,24 +116,30 @@ slice. [dough-slice-plan-refinement](../dough-slice-plan-refinement/SKILL.md)
 owns resolving remaining concerns when the coordinator or invoking workflow
 separately requests it; do not invoke it as part of writing this plan.
 
-## Report concern evidence
+After the plan file exists for a work item with a recorded identity, apply
+[record preparation facts](../dough-product-backlog/references/record-preparation.md)
+for the planned approach (omit assessment on that write).
 
-After constructing the plan, report remaining concerns rather than a workflow
-verdict:
+## Report concern evidence and assess readiness
+
+After constructing the plan, report remaining concerns, then record readiness
+through the shared procedure:
 
 - Name each remaining slice-specific concern with the affected slice, the
   reason (for example an integration assumption or repeated special-case
   design), and its consequence (for example uncertain sizing or duplicated
-  domain rules). Include concerns spanning successive slices. Do not prescribe refinement or certify execution
-  readiness.
-- When no concerns were identified in this assessment, say so narrowly. Do not
-  claim that no further refinement is required or treat that finding as
-  permission to execute.
+  domain rules). Include concerns spanning successive slices.
+- When no concerns were identified in this review, say so narrowly.
+- Then apply
+  [assess readiness at preparation completion](../dough-product-backlog/references/record-preparation.md#assess-readiness-at-preparation-completion):
+  remaining concerns become `not-ready` reasons; when none remain and the plan
+  has bounded slices with mapped proof, record `ready`. Do not prescribe the
+  next workflow action, Take the item, or start execution from this finding.
 
 The recipient chooses the next action under the triggering instruction's
-authority and project policy. Concern evidence is an assessment of the plan, not
-authorization to execute. It does not grant, expand, or replace the triggering
-instruction's execution authority.
+authority and project policy. The recorded assessment is agent judgment bound to
+content digests, not authorization to execute. It does not grant, expand, or
+replace the triggering instruction's execution authority.
 
 ## Stay within the triggering instruction
 
@@ -140,12 +147,13 @@ After writing and reporting the plan, the next action remains within the
 triggering human or parent-agent instruction:
 
 - Planning-only request: report the plan path, ordered slices,
-  considered-but-excluded additions, and remaining concerns or the limited
-  no-concerns finding, then stop. Do not implement and do not invoke execution.
-- Parent-agent delegation that asks only for slice planning: return the plan
-  and remaining concerns or the limited no-concerns finding to the parent. The
-  parent's broader implementation task is not an explicit execution request to
-  this planner.
+  considered-but-excluded additions, remaining concerns or the limited
+  no-concerns finding, and the recorded readiness assessment, then stop. Do
+  not implement and do not invoke execution.
+- Parent-agent delegation that asks only for slice planning: return the plan,
+  remaining concerns or the limited no-concerns finding, and the recorded
+  readiness assessment to the parent. The parent's broader implementation task
+  is not an explicit execution request to this planner.
 - Explicit plan-and-execute request: after reporting, the authorized workflow
   may continue into execution without asking again for the same authorization,
   subject to this project's gates and any unresolved concerns that still block

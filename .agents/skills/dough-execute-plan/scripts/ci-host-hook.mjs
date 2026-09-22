@@ -23,6 +23,11 @@ const hash = (value) => createHash("sha256").update(value).digest("hex");
 
 const emptySelection = () => ({ output: {}, acknowledge: () => undefined });
 
+const isHostStop = (input) =>
+  input.hook_event_name === "Stop" || input.hook_event_name === "stop";
+
+const isDiscoveryAdvisory = (event) => event.type === "CI_DISCOVERY_DELAYED";
+
 const lostWorkerMessage = (directory, lost) =>
   `CI observer lost its worker for this coordinator: ${directory} (${lost.coverage.reason})`;
 
@@ -68,6 +73,7 @@ export function selectCiEvents(
   const context = [];
   const acknowledgements = [];
   const attachedThisCall = new Set();
+  const mailboxDeliveries = [];
 
   if (["Shell", "Bash"].includes(input.tool_name)) {
     const output =
@@ -114,31 +120,40 @@ export function selectCiEvents(
       }
       const progress = readDeliveryProgress(directory);
       const records = readMailboxEvents(directory, progress.deliveredThrough);
-      if (records.length)
-        acknowledgements.push({
-          directory,
-          deliveredThrough: records.at(-1).sequence,
-        });
+      if (records.length) mailboxDeliveries.push({ directory, records });
+    }
+
+  const undelivered = mailboxDeliveries.flatMap(({ records }) => records);
+  const skipAdvisoriesOnStop =
+    isHostStop(input) &&
+    undelivered.length > 0 &&
+    undelivered.every(({ event }) => isDiscoveryAdvisory(event));
+
+  if (!skipAdvisoriesOnStop) {
+    for (const { directory, records } of mailboxDeliveries) {
+      acknowledgements.push({
+        directory,
+        deliveredThrough: records.at(-1).sequence,
+      });
       for (const { event } of records) context.push(JSON.stringify(event));
     }
+  }
   if (!context.length) return emptySelection();
   const message = `dough-execute-plan CI observer (diagnostic data):\n${context.join("\n")}\nHandle CI failures using dough-execute-plan/references/ci-monitor.md.`;
   let output;
   if (host === "cursor")
-    output =
-      input.hook_event_name === "stop"
-        ? { followup_message: message }
-        : { additional_context: message };
+    output = isHostStop(input)
+      ? { followup_message: message }
+      : { additional_context: message };
   else
-    output =
-      input.hook_event_name === "Stop"
-        ? { decision: "block", reason: message }
-        : {
-            hookSpecificOutput: {
-              hookEventName: "PostToolUse",
-              additionalContext: message,
-            },
-          };
+    output = isHostStop(input)
+      ? { decision: "block", reason: message }
+      : {
+          hookSpecificOutput: {
+            hookEventName: "PostToolUse",
+            additionalContext: message,
+          },
+        };
   return {
     output,
     acknowledge() {

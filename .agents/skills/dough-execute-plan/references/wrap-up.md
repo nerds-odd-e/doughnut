@@ -98,6 +98,8 @@ and continue that unfinished obligation only.
    summary with learnings, slice status, accepted proof needed for reuse, and
    revised remaining slices under
    [plan refinement](../../dough-story-refinement/references/planning.md#refine-the-active-plan).
+   Publish that plan evidence without renewing readiness: follow
+   [plan evidence during delivery](../../dough-product-backlog/references/record-preparation.md#plan-evidence-during-delivery).
    For stale feature-story understanding, record `awaiting story review` and
    identify the selected story in its seed and the affected field. For stale
    correction understanding, record `awaiting correction review` and identify

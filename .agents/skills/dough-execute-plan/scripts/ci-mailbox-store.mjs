@@ -56,17 +56,29 @@ function mailboxEvidence(directory) {
   return { recordedThrough, deliveredThrough, unread };
 }
 
-const unresolvedRevisionStates = [
-  "unchecked",
-  "pending",
-  "uncovered",
-  "incomplete",
-];
+const unresolvedRevisionStates = ["undiscovered", "pending", "incomplete"];
+// A `not_required` revision's own state is never itself "pending" or
+// "incomplete" (see ci-mailbox-revision-coverage.mjs); whether it is proved
+// terminal is decided by its applicable ancestor's resolved `basis.state`.
+// A proved success or failure ancestor makes it a proved terminal case, same
+// as an ordinary registered revision, so it is fully omitted here. A still
+// pending/incomplete (or not yet resolved) ancestor must not be reported as
+// success, and must not silently vanish either: it stays visible with its
+// applicable source (`basis`) so a reader can see why no run exists for this
+// revision and what its effective attempt's real state is.
+const provedApplicableAncestorStates = ["success", "failure"];
 
 function unresolvedRevisions(directory) {
   return readRevisionCoverage(directory)
-    .filter(({ state }) => unresolvedRevisionStates.includes(state))
-    .map(({ sha, state }) => ({ sha, state }));
+    .filter(
+      ({ state, basis }) =>
+        unresolvedRevisionStates.includes(state) ||
+        (state === "not_required" &&
+          !provedApplicableAncestorStates.includes(basis?.state)),
+    )
+    .map(({ sha, state, basis }) =>
+      state === "not_required" ? { sha, state, basis } : { sha, state },
+    );
 }
 
 function terminalResult(directory, request, status) {

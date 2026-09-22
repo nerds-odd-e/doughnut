@@ -46,7 +46,10 @@ conversation, scope decisions, optional UI and architecture detail, seed updates
 and cleanup after implementation. Before writing to a story's seed, establish
 or reuse the required workspace under
 [preparation workspace](references/preparation-workspace.md); refinement
-discussion and clarifying questions need no workspace on their own.
+discussion and clarifying questions need no workspace on their own. After the
+seed or correction-home write records goal, scope, and key examples for a work
+item with a known identity, apply
+[record preparation facts](../dough-product-backlog/references/record-preparation.md).
 
 Report the story links, material constraints and deferred promises, and
 unresolved decisions. Apply that reference's keep or discard decision, then

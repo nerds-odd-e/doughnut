@@ -119,13 +119,26 @@ until that missing history is accounted for.
    Flakiness is a defect even if a rerun passes. Never rerun until green as a fix.
    `CI_MONITOR_UNAVAILABLE` means observation failed, not that CI passed or the
    server caused a test failure; report lost coverage once and continue.
-   `CI_COVERAGE_UNAVAILABLE` is different: it means a registered revision had no
-   discoverable run yet, not that observation ended. While the same observer
-   remains active it keeps checking that revision and still delivers a real
-   verdict — including a later failure — if one becomes discoverable; do not
-   treat it as a final, unrepairable gap or stop the observer over it. Confirm
-   a revision's actual final state from coverage/records at that observer's own
-   stop, not from an early `CI_COVERAGE_UNAVAILABLE` notification alone.
+   A revision without a discovered run is quiet until its verdict arrives or
+   observation ends; after a long discovery gap the observer may emit one
+   informational `CI_DISCOVERY_DELAYED` advisory and keep observing.
+   A revision recorded `not_required` (GitHub default only) is a different,
+   already-proved case: its own changed paths are all ignored by the
+   workflow's trigger filter, so GitHub created no run for it, and the
+   observer already proved a nearby applicable attempt (`basis.sha`) covers
+   it instead. `not_required` is an applicability fact, not a verdict — never
+   treat it as a skipped-and-therefore-fine success, and never report a
+   missing-run warning for it. The effective attempt is that applicable
+   ancestor: inspect its own real state exactly as for any other registered
+   revision, and act only on a genuinely delivered failure for it (the
+   observer still delivers that failure once, following the ancestor across
+   every `not_required` revision that reuses it). A terminal report or
+   shutdown that still shows `basis.state: "pending"` or `"incomplete"` for a
+   `not_required` revision means the applicable ancestor has not reached a
+   verdict yet, not that the revision itself is unproved or missing; `success`
+   or `failure` there means the ancestor already proved the case and no
+   further action is needed beyond ordinary failure handling. No new agent
+   action exists for `not_required` beyond that ordinary handling.
    `CI_INCOMPLETE` needs a bounded inspection of cancellation/skipping; ignore
    proven supersession, not an unexplained missing result. If a failed run's
    cause is uncertain, enter the analysis/repair path below.

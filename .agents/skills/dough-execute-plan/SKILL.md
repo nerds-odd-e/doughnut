@@ -136,7 +136,7 @@ current-branch work keeps its existing contract and gains no new publication
 authority here.
 
 Then follow [take queued work](../dough-product-backlog/SKILL.md#take-queued-work-for-execution)
-in the checkout that holds the claim. An ambiguous move stops implementation.
+in the checkout that holds the claim ([execution and resume](../dough-product-backlog/references/record-preparation.md#execution-and-resume)). An ambiguous move stops implementation.
 
 Resume a remote **Taken** entry when retained execution context and publication
 provenance agree this execution owns it. Preserve its position without

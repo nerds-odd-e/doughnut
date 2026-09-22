@@ -79,4 +79,6 @@ and is then recorded rather than re-read from wherever its section currently
 sits. Renaming the seed file, moving it, or changing the story's anchor updates
 the link and the incoming references; it does not re-identify the story, and the
 recorded identity stays as it was. Preserve existing recorded identities and
-anchors when you edit a seed.
+anchors when you edit a seed. When a write leaves a candidate with that
+recorded identity in its canonical section, apply
+[record preparation facts](../../dough-product-backlog/references/record-preparation.md).

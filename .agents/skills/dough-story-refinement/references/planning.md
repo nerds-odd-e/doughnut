@@ -91,6 +91,9 @@ Do not create a separate refinement file.
 
 Preserve the story's anchor and recorded identity when you rename or move its
 seed, updating incoming links instead: relocating a story does not re-identify it.
+After the selected story section records goal, scope, and key examples for a
+known identity, apply
+[record preparation facts](../../dough-product-backlog/references/record-preparation.md).
 
 Discuss goal or scope changes with the human and keep the story in its seed and
 any active plan aligned; discovery alone does not authorize expansion. Do not
@@ -154,67 +157,14 @@ next Behavior it enables, or the directly owned retrospective correction under
 [slice decomposition](../../dough-story-decomposition/references/problem-decomposition.md#decompose-slices). Planning numbers stay in planning artifacts; product
 code, tests, and enduring documentation remain capability-named.
 
+After the plan file exists for a work item with a recorded identity, apply
+[record preparation facts](../../dough-product-backlog/references/record-preparation.md)
+for the planned approach (omit assessment on that write).
+
 ## Own executable proof
 
-Map every checkable final-state promise in the plan's source and current
-decisions to an owning slice and observable proof. Inline links or a compact table
-are sufficient. Include applicable promises, not broader aspirations. Passing
-commands without the promised observation does not establish completion.
-
-Preserve mappings through refinement, replacement, and resume. Repoint promises
-before declaring replacement slices ready; orphaned promises leave the plan
-incomplete. Preserve completed evidence unless a changed boundary invalidates
-what it covers. For interim replacements, align affected callers, fixtures,
-assertions, and documentation with the final success and rejection behavior.
-
-Choose the smallest sufficient proof at the stable boundary of the promise.
-Inspect assertions and setup: distinguish starting preconditions from behavior
-the product promises to establish. A fixture or seam supplying that behavior
-leaves it unproved; keep the evidence for what it actually observes. An inner
-operation finishing does not prove completion for its caller.
-
-Before changing a shared operation or choosing its proof, inspect affected production
-call sites, reusing available product-wide search. Derive obligations from each caller's
-actual use, not method name or dominant use; exclude unrelated consumers. Incompatible
-purposes each need an observation; equivalent purposes may share sufficient proof.
-For unresolved domain purpose, ask precisely about that caller's requirement and stop
-its dependent obligation until answered rather than guessing policy.
-
-For artifact-preservation promises, identify installation, physical store, and
-predecessor using project-supplied identities/scope. Same-store continuity proves no
-transfer from another store. Surface target/scope conflicts before dependent work
-(e.g. preserving a Docker volume while the owner's native data lives elsewhere).
-Migration needs authority and proof; deferred migration is not completed. Ordinary
-single-store continuity reuses matching evidence without inventing a predecessor or
-migration task. Apply conditionally, not as a mandatory story section.
-
-When acceptance needs a pre-change observation, obtain it before dispatching the
-change that would invalidate it. Reuse adequate baselines with known matching revision
-and relevant environment/selection conditions. Missing/failed prerequisites stop only
-the dependent path; name the gap and continue unrelated work. If the original baseline
-is unrecoverable, label a reconstructed comparison and prove revision/conditions
-comparable; otherwise its claim (e.g. speedup) remains unproved. Apply conditionally,
-without benchmarking every story or delaying independent work/setup.
-
-Reuse sufficient evidence. Obtain only missing observations within authorized
-work; if unavailable, report what is covered and the specific unproved promise.
-That promise remains incomplete; reporting the gap does not fulfill or remove
-it. Limit success claims to the observed cases.
-
-| Situation | Proof |
-| --- | --- |
-| Main user behavior | Targeted end-to-end check or another real high-level boundary |
-| Edge, error, or pure contract | Focused unit proof |
-| Existing untested behavior | Regression proof before changing it |
-| Structure slice | Existing external behavior remains green |
-| Interim behavior | Name the later slice that removes or replaces it |
-
-Run focused relevant checks at slice boundaries. Require broader suites only when
-this project's workflow or user requires them. When asynchronous ownership
-changes, prove that the named lifecycle owner observes background failure in
-time and performs applicable cleanup after failure or shutdown; an awaited
-exception alone proves neither. Derive timing from the selected lifecycle
-contract rather than an arbitrary timeout.
+Proof ownership for executable plans lives in
+[own executable proof](executable-proof.md).
 
 ## Refine the active plan
 
@@ -222,8 +172,15 @@ Edit the same plan in place. Preserve completed slices and resume-useful history
 replace obsolete planned detail rather than appending a competing breakdown,
 and record only learnings that affect remaining work. Apply
 [slice decomposition](../../dough-story-decomposition/references/problem-decomposition.md#decompose-slices)
-and its cumulative design assessment, sizing, and escalation rules before
-declaring execution ready.
+and its cumulative design assessment, sizing, and escalation rules when changing
+remaining-slice design. After a preparation plan rewrite (slice planning or
+slice-plan refinement) for a work item with a recorded identity, reassess through
+[assess readiness at preparation completion](../../dough-product-backlog/references/record-preparation.md#assess-readiness-at-preparation-completion);
+do not grant Take or execution from that record. After an ordinary execution
+delivery update that records slice status or accepted proof without that
+preparation rewrite, follow
+[plan evidence during delivery](../../dough-product-backlog/references/record-preparation.md#plan-evidence-during-delivery)
+and do not renew readiness.
 
 When evidence changes an execution assumption, apply [execution reassessment](../../dough-execute-plan/references/execution-decisions.md#reassess-before-extending-work).
 Retain only consequential information needed later; leave raw diagnostics at their
