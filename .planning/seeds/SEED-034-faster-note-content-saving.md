@@ -110,9 +110,11 @@ tree and the rows the change touched, so unchanged notes are not rendered and
 attachment bytes are never read. Measured on an 11,000-note notebook with 28
 attachments (12.5 MB): the content-save request median fell from about
 1.3 s to about 180 ms, and the request part of a save that adds a wiki link
-from about 1.3 s to about 180 ms as well. Story 5 stays a conditional
-fallback: judge its activation gate against that result before exploring
-deferred Git work. Web README edits enter the accepted-change boundary in the
+from about 1.3 s to about 180 ms as well. That fixture had 40 flat folders,
+so it did not show the folder-proportional tree reads that keep production
+saves at 7 to 10 seconds (SEED-037). Story 5 stays a conditional fallback:
+judge its activation gate after SEED-037#story-1 before exploring deferred
+Git work. Web README edits enter the accepted-change boundary in the
 same request as other web changes.
 
 ## When to Surface
