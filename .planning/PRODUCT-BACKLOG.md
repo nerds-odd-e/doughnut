@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Save note edits at a cost proportional to the change, not the notebook](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3 — plan: [quick/010-change-proportional-note-save](quick/010-change-proportional-note-save/PLAN.md)
+
 ## Backlog list
 
-- [Save note edits at a cost proportional to the change, not the notebook](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3
 - [Assess asynchronous Git processing only if save performance remains inadequate](seeds/SEED-034-faster-note-content-saving.md#story-5) — SEED-034#story-5
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
