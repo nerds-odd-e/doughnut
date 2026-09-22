@@ -23,6 +23,9 @@ import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class NotebookGitWebContentControllerTestBase extends NotebookGitControllerTestBase {
@@ -54,6 +57,21 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
     NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
     dto.setContent(content);
     return dto;
+  }
+
+  /** Hibernate statistics of {@code operation} alone; its counts and queries stay readable. */
+  Statistics hibernateStatisticsOf(Executable operation) throws Throwable {
+    Statistics statistics =
+        entityManager.getEntityManagerFactory().unwrap(SessionFactory.class).getStatistics();
+    boolean previouslyEnabled = statistics.isStatisticsEnabled();
+    statistics.setStatisticsEnabled(true);
+    statistics.clear();
+    try {
+      operation.execute();
+      return statistics;
+    } finally {
+      statistics.setStatisticsEnabled(previouslyEnabled);
+    }
   }
 
   static List<String> portablePaths(InMemoryRepository repository, ObjectId head) throws Exception {

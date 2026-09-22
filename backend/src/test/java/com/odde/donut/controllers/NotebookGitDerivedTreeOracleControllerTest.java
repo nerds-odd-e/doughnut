@@ -1,15 +1,26 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.controllers.dto.NoteCreationDTO;
+import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
+import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
 import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentControllerTestBase {
 
   @Autowired NotebookLivePortableTree livePortableTree;
+  @Autowired RelationController relationController;
 
   @Test
   void contentEditMatchesTheFullAssembly() throws Exception {
@@ -63,9 +75,101 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 
+  @Test
+  void renamingALinkedNoteReplacesItsPathAndItsReferrersOnlyAndMatchesTheFullAssembly()
+      throws Throwable {
+    Notebook notebook = createGitBackedNotebook();
+    Note a = makeMe.aNote("A").notebook(notebook).content(ACCEPTED_CONTENT).please();
+    for (String referrer : List.of("First", "Second", "Third")) {
+      Note note = makeMe.aNote(referrer).notebook(notebook).please();
+      inCommittedTransaction(
+          transactionManager,
+          () ->
+              authorReferencingContent(
+                  noteRepository.findById(note.getId()).orElseThrow(),
+                  "---\ntype: Note\n---\nSee [[A]]."));
+    }
+    makeMe.aNote("Unrelated").notebook(notebook).please();
+    storeFolderAttachmentAndSnapshot(notebook, null, "picture.bin", new byte[64]);
+    Map<String, ObjectId> before = acceptedBlobIds(notebook);
+    NoteUpdateTitleDTO rename = titleDto("B");
+    rename.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
+
+    List<String> queries =
+        List.of(
+            hibernateStatisticsOf(() -> textContentController.updateNoteTitle(a, rename))
+                .getQueries());
+
+    Map<String, ObjectId> after = acceptedBlobIds(notebook);
+    assertThat(after.keySet(), not(hasItem("A.md")));
+    assertThat(after.keySet(), hasItem("B.md"));
+    List<String> replaced = List.of("A.md", "B.md", "First.md", "Second.md", "Third.md");
+    for (String referrer : List.of("First.md", "Second.md", "Third.md")) {
+      assertThat(after.get(referrer), not(equalTo(before.get(referrer))));
+    }
+    assertThat(without(after, replaced), equalTo(without(before, replaced)));
+    assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  @Test
+  void movingANoteToAnotherFolderMovesItsPathAndMarkersAndMatchesTheFullAssembly()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
+    Folder study = makeMe.aFolder().notebook(notebook).name("Study").please();
+    Note cells = makeMe.aNote("Cells").folder(biology).content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+    assertThat(
+        acceptedHistory(notebook).tipPaths(),
+        containsInAnyOrder("Biology/Cells.md", "Study/.keep"));
+
+    relationController.moveNoteToFolder(cells, study);
+
+    assertThat(
+        acceptedHistory(notebook).tipPaths(),
+        containsInAnyOrder("Biology/.keep", "Study/Cells.md"));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  @Test
+  void trashingAndRecoveringTheOnlyNoteOfAFolderMoveItsPathAndMatchTheFullAssembly()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder ideas = makeMe.aFolder().notebook(notebook).name("Ideas").please();
+    makeMe.aFolder().inTrashOf(notebook).name("Ideas").please();
+    Note plan = makeMe.aNote("Plan").folder(ideas).content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+
+    noteController.trashNote(plan, leaveDeadLinks());
+
+    assertThat(
+        acceptedHistory(notebook).tipPaths(),
+        containsInAnyOrder("Ideas/.keep", "_trash/Ideas/Plan.md"));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+
+    noteController.undoTrashNote(
+        noteRepository.findById(plan.getId()).orElseThrow(), undoTo("Plan", ideas));
+
+    assertThat(
+        acceptedHistory(notebook).tipPaths(),
+        containsInAnyOrder("Ideas/Plan.md", "_trash/Ideas/.keep"));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
   private void assertAcceptedTreeMatchesTheFullAssembly(Notebook notebook) throws Exception {
     assertThat(
-        NotebookGitTreeContent.of(acceptedHistory(notebook).tipContent()).blobIds(),
+        acceptedBlobIds(notebook),
         equalTo(NotebookGitTreeContent.of(livePortableTree.entriesOf(notebook)).blobIds()));
+  }
+
+  private Map<String, ObjectId> acceptedBlobIds(Notebook notebook) throws Exception {
+    return NotebookGitTreeContent.of(acceptedHistory(notebook).tipContent()).blobIds();
+  }
+
+  private static Map<String, ObjectId> without(Map<String, ObjectId> blobIds, List<String> paths) {
+    Map<String, ObjectId> rest = new HashMap<>(blobIds);
+    paths.forEach(rest::remove);
+    return rest;
   }
 }

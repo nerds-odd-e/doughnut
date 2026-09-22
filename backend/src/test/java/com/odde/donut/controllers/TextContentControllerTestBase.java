@@ -2,7 +2,6 @@ package com.odde.donut.controllers;
 
 import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
-import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -18,12 +17,6 @@ abstract class TextContentControllerTestBase extends ControllerTestBase {
   void setupNote() {
     currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote("new").notebookOwnedBy(currentUser.getUser()).please();
-  }
-
-  protected NoteUpdateTitleDTO titleDto(String newTitle) {
-    NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
-    dto.setNewTitle(newTitle);
-    return dto;
   }
 
   protected NoteUpdateContentDTO contentDto(String content) {

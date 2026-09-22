@@ -5,6 +5,7 @@ import com.odde.donut.controllers.currentUser.ThreadLocalCurrentUser;
 import com.odde.donut.controllers.dto.NoteTrashDTO;
 import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.controllers.dto.NoteTrashUndoDTO;
+import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.AuthorizationService;
@@ -62,5 +63,11 @@ public abstract class ControllerTestBase {
     request.setPriorTitle(title);
     request.setPriorFolderId(folder == null ? null : folder.getId());
     return request;
+  }
+
+  protected NoteUpdateTitleDTO titleDto(String newTitle) {
+    NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
+    dto.setNewTitle(newTitle);
+    return dto;
   }
 }

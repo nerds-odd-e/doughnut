@@ -34,9 +34,10 @@ class NotebookGitDerivedTree {
   }
 
   /**
-   * The accepted tree with each inserted or updated note's blob put at its path, each deleted
-   * note's path removed and the {@code .keep} marker of every touched directory re-evaluated; empty
-   * when the change holds any other kind of row change, which the caller still assembles in full.
+   * The accepted tree with each inserted or updated note's blob put at its current path, each
+   * deleted or moved note's previous path removed and the {@code .keep} marker of every touched
+   * directory re-evaluated; empty when the change holds any other kind of row change, which the
+   * caller still assembles in full.
    */
   Optional<NotebookGitTreeContent> of(
       NotebookProjectionChange change, Map<String, ObjectId> acceptedBlobIds) {
@@ -47,15 +48,16 @@ class NotebookGitDerivedTree {
       return Optional.empty();
     }
     List<PortableTreeEntry> added = new ArrayList<>();
+    List<String> removed = new ArrayList<>();
+    change.deleted.values().forEach(path -> removed.add(portablePathOf(path)));
     for (Map.Entry<ProjectionRow, RowPath> update : change.updated.entrySet()) {
       Note note = noteRepository.findById(update.getKey().id()).orElseThrow();
-      if (!update.getValue().equals(pathOf(note))) {
-        return Optional.empty();
+      if (!update.getValue().equals(rowPathOf(note))) {
+        removed.add(portablePathOf(update.getValue()));
       }
       added.add(entryOf(note));
     }
     change.inserted.forEach(inserted -> added.add(entryOf((Note) inserted)));
-    List<String> removed = change.deleted.values().stream().map(this::notePathOf).toList();
 
     Map<String, ObjectId> blobIds = new HashMap<>(acceptedBlobIds);
     removed.forEach(blobIds::remove);
@@ -95,7 +97,7 @@ class NotebookGitDerivedTree {
     return PortableTreeEntry.ofNote(NotebookGitLivePortablePath.ofNote(note), note.getContent());
   }
 
-  private String notePathOf(RowPath path) {
+  private String portablePathOf(RowPath path) {
     Folder folder =
         path.containerId() == null
             ? null
@@ -103,7 +105,7 @@ class NotebookGitDerivedTree {
     return NotebookGitLivePortablePath.ofNote(folder, path.name());
   }
 
-  private static RowPath pathOf(Note note) {
+  private static RowPath rowPathOf(Note note) {
     Integer folderId = note.getFolder() == null ? null : note.getFolder().getId();
     return new RowPath(folderId, note.getTitle());
   }

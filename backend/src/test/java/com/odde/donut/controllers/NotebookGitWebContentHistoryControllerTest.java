@@ -134,8 +134,7 @@ class NotebookGitWebContentHistoryControllerTest
         recallLogRepository.findById(learningIds[1]).orElseThrow().getProductOutcome();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
     ObjectId preRenameParent = ObjectId.fromString(accepted.getAcceptedGitObjectId());
-    NoteUpdateTitleDTO title = new NoteUpdateTitleDTO();
-    title.setNewTitle("Cell structure");
+    NoteUpdateTitleDTO title = titleDto("Cell structure");
 
     NoteRealm response =
         inCommittedTransaction(
@@ -225,12 +224,6 @@ class NotebookGitWebContentHistoryControllerTest
         assertThat(commit.getFullMessage(), is("Edit note content: Root Note"));
       }
     }
-  }
-
-  private static NoteUpdateTitleDTO titleDto(String title) {
-    NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
-    dto.setNewTitle(title);
-    return dto;
   }
 
   private void assertAcceptedHistoryUnchanged(

@@ -229,7 +229,18 @@ equality for each. Proof: example 3's creation half as a test; existing
 `NotebookGitNoteCreation*` and `NotebookGitWebPermanentDelete*` unchanged.
 
 ### 5. Derive note moves and renames
-Type: Behavior. Status: planned.
+Type: Behavior. Status: **done** (2026-09-22).
+
+Delivered: a Note update whose captured previous `RowPath` differs from its
+current path removes the previous path and adds the current entry; referrer
+rewrites are ordinary in-place updates. The fallback now covers only Folder,
+NotebookAttachment and Notebook readme rows. Accepted proof: `NotebookGit*`
+plus `services.notebookGit.*`, 388 tests green; oracle tests
+`renamingALinkedNoteReplacesItsPathAndItsReferrersOnlyAndMatchesTheFullAssembly`
+(example 4, with the no-`NotebookAttachment`-query signal),
+`movingANoteToAnotherFolderMovesItsPathAndMarkersAndMatchesTheFullAssembly`,
+`trashingAndRecoveringTheOnlyNoteOfAFolderMoveItsPathAndMatchTheFullAssembly`
+(example 3 trash half).
 
 Pre-condition: a note linked from three referrers, and a note in a folder.
 Triggers: rename the title with references rewritten; move the note to
@@ -343,6 +354,15 @@ retained in the repository. Proof: the recorded numbers in this plan.
   remove them by the deleted folder's previous prefix, not by folder lookup.
   `NotebookGitLivePortablePath.ofNote(Folder, title)` is the one note-path
   rule; the `.keep` rule is duplicated in `PortableTreeSnapshot` until slice 8.
+- Slice 5: trashing a note whose `_trash/<folder>` mirror does not exist yet
+  inserts the `_trash` root and mirror folders (find-or-create) before the
+  note move, so the first trash from a folder is a Folder insert and falls
+  back until slice 6; recovery never deletes the emptied mirror. Test probes:
+  `NotebookGitWebContentControllerTestBase.hibernateStatisticsOf(operation)`
+  for the no-attachment-query signal; `ControllerTestBase.titleDto(title)`.
+- Retrospective candidate (not acted on): the committed referrer-authoring
+  pattern `inCommittedTransaction(..., () -> authorReferencingContent(...))`
+  has about twenty copies across fourteen NotebookGit test files.
 
 - Slice 2: interceptor callbacks receive real entity instances and lookups
   are keyed by exact entity class; `open()` overwrites any existing window,

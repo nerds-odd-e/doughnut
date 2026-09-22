@@ -11,10 +11,8 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.util.List;
-import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 /** A web save's server work depends on what changed, not on the notebook's size. */
 class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentControllerTestBase {
@@ -35,35 +33,18 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentC
     }
     var acceptedBefore = acceptedHistory(large);
 
-    Statistics statistics =
-        entityManager.getEntityManagerFactory().unwrap(SessionFactory.class).getStatistics();
     long smallStatements =
-        preparedStatementsOf(
-            statistics,
-            () -> textContentController.updateNoteContent(smallNote, contentDto(EDITED_CONTENT)));
-    long largeStatements =
-        preparedStatementsOf(
-            statistics,
+        hibernateStatisticsOf(
+                () ->
+                    textContentController.updateNoteContent(smallNote, contentDto(EDITED_CONTENT)))
+            .getPrepareStatementCount();
+    Statistics largeSave =
+        hibernateStatisticsOf(
             () -> textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT)));
 
-    assertThat(largeStatements, is(smallStatements));
-    assertThat(
-        List.of(statistics.getQueries()), not(hasItem(containsString("NotebookAttachment"))));
+    assertThat(largeSave.getPrepareStatementCount(), is(smallStatements));
+    assertThat(List.of(largeSave.getQueries()), not(hasItem(containsString("NotebookAttachment"))));
     AcceptedHistory after = acceptedHistory(large);
     assertThat(after.parents(), equalTo(acceptedBefore.commits()));
-  }
-
-  /** Statements the save prepared; the queries it ran stay readable from {@code statistics}. */
-  private static long preparedStatementsOf(Statistics statistics, Executable save)
-      throws Throwable {
-    boolean previouslyEnabled = statistics.isStatisticsEnabled();
-    statistics.setStatisticsEnabled(true);
-    statistics.clear();
-    try {
-      save.execute();
-      return statistics.getPrepareStatementCount();
-    } finally {
-      statistics.setStatisticsEnabled(previouslyEnabled);
-    }
   }
 }
