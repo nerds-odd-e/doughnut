@@ -78,20 +78,18 @@ those files with the notebook, not because later stories need infrastructure.
 The [North Star](../NORTH-STAR.md) owns the concise direction and the
 [synchronization contract](../../docs/notebook-git-synchronization.md#attachments-in-the-portable-tree)
 owns details. Ordinary local rebase reconciles unpublished work against the
-latest accepted history; the remote never merges or rebases. These stories
-introduce no new conflict-recovery or transport policy. Story 8 owns the selected
-folder-based assimilation outcome; its detailed behavior is not decided here.
+latest accepted history; the remote never merges or rebases. Story 8 owns the
+selected folder-based assimilation outcome; its detailed behavior is not decided here.
 
-The owner now intends attachment bytes to leave both the MySQL projection and
-ordinary Git history so accepted bundles do not grow with binary payloads. Git
-will carry a content-addressed, Git-LFS-style pointer rather than a raw GCS URL;
-the bytes will live in bucket-backed object storage. This direction conflicts
-with ADR 0002's current promise that Git itself is authoritative for complete
-Portable attachment content and that a full clone contains every blob. A
-human-owned architecture decision must revise that promise before executable
-planning or implementation. It will choose the simplest end-to-end acquisition
-model that achieves smaller bundles; whether Git LFS or Donut tooling becomes
-mandatory remains deliberately undecided until that choice is needed.
+The accepted [Git LFS storage contract](../../docs/notebook-git-lfs.md), linked
+from ADRs 0002 and 0004, specifies standard Git LFS, its client and protocol, and
+immutable GCS payloads; accepted Git pointers select exact file versions. The
+[North Star](../NORTH-STAR.md#attachment-storage-transition) owns initial
+transport, size-policy, and rollout choices. Architecture acceptance does not
+mean implementation is complete. Stories 13 and 14 separate new
+notebook adoption from migration; browsing and image behavior keep their own
+outcomes. Accepted history is preserved, so old binaries remain in historical
+bundles even after their physical storage moves out of MySQL.
 
 ## Story Decomposition
 
@@ -113,11 +111,12 @@ No executable plan or implementation is authorized by this seed.
 - **Goal:** Notebook owners receive a clear refusal before an oversized image,
   PDF, or other attachment can consume accepted storage or leave their notebook
   in a partially changed state.
-- **Evaluation:** An attachment within the agreed 10 MB boundary is accepted
+- **Evaluation:** An attachment within the 10 MiB boundary is accepted
   through a supported attachment-publication path. An attachment just over the
   boundary is refused with a clear size message; the accepted Git head,
-  application projection, object storage, notes, files, and learning histories
-  remain unchanged.
+  application projection, notes, files, and learning histories remain unchanged.
+  Oversized uploads are refused before becoming durable verified objects;
+  abandoned staging data is not accepted content.
 - **Scope / value:** Establish one attachment-size rule at the common acceptance
   boundary and apply it to every attachment ingress available when delivered,
   including local publication rather than only multipart web requests. This is
@@ -130,10 +129,12 @@ No executable plan or implementation is authorized by this seed.
   delivered attachment continuity for files within the limit.
 - **Safe stopping point:** Oversized attachments cannot enter accepted state;
   current binary storage and Git history remain otherwise unchanged.
-- **Open decisions for refinement:** Define the exact byte interpretation of
-  10 MB and whether the rule examines only the proposed final tree or every new
-  binary object in submitted history. A per-file limit does not decide a total
-  proposal, notebook, or account quota.
+- **Policy:** Accept up to 10 MiB (10,485,760 bytes), inclusive. Inspect
+  new attachment payloads across all submitted commits, including a file added
+  then deleted before the tip. Grandfather already accepted oversized content;
+  reject new oversized versions. Books keep their independent policy.
+- **Refinement remaining:** Map the existing ingress paths and boundary examples.
+  A per-file limit does not decide a proposal, notebook, or account quota.
 
 <a id="story-13"></a>
 
@@ -144,28 +145,31 @@ No executable plan or implementation is authorized by this seed.
 
 - **Identity:** SEED-035#story-13
 - **Goal:** Notebook owners can publish and reacquire current images, PDFs, and
-  other attachments without making MySQL storage and Git bundle transfer grow
-  with the attachments' binary history.
-- **Evaluation:** Publish a valid attachment, change it in later accepted
-  history, and acquire the notebook in a fresh checkout. The current file is
+  other attachments in a new notebook without making MySQL storage and Git
+  bundle transfer grow with the attachments' binary history.
+- **Evaluation:** In a new notebook, publish a valid attachment, change it in
+  later accepted history, and acquire the notebook in a fresh checkout. The current file is
   available with its exact verified bytes, while the Git history and bundle
   carry content-addressed pointer data rather than either binary version and
-  MySQL holds no attachment payload copy.
-- **Scope / value:** Use one Git-LFS-style pointer representation for all
+  MySQL holds no attachment payload copy. Compare bundles containing several
+  incompressible binary versions: they carry pointers rather than payload-sized
+  growth. Measure separate LFS downloads honestly; current file bytes still move.
+- **Scope / value:** Use the standard Git LFS pointer representation for all
   non-Markdown attachments and bucket-backed immutable object content. Never
   store a raw GCS URL in a commit. Preserve notebook paths, references, access
   control, atomic acceptance, and the common attachment model used by later
-  browsing, image, deletion, and folder-operation stories. Select the simplest
-  acquisition mechanism that achieves the bundle-size outcome; this story does
-  not yet mandate the Git LFS client, Donut CLI hydration, or another tool.
-- **Architecture:** Before executable planning, a human-owned architecture
-  decision must reconcile this pointer/object authority with ADR 0002's current
-  complete-Git-tree, ordinary-clone, immutable-history, and durability promises.
-  It must also define integrity, authorization, object retention, failure
-  atomicity, and the meaning of clone/pull when object hydration is unavailable.
-- **Effort hypothesis:** L, low confidence. Refine after the architecture
-  decision and resplit if migration or acquisition creates more than one
-  independently valuable outcome or exceeds the project's L band.
+  browsing, image, deletion, and folder-operation stories. Local workflows
+  require standard Git LFS; Donut's bundle workflow explicitly
+  coordinates its object transfers. Include web preservation, metadata/empty-file
+  classification, and missing-object failure in the same usable loop. Existing
+  notebooks retain current behavior until story 14; no generic web-upload UI is
+  added here.
+- **Architecture:** Follow the accepted Git LFS storage contract and North Star.
+  Client choice is decided; endpoint spelling and implementation details belong
+  in slice planning.
+- **Effort hypothesis:** L, low confidence; the full client/server loop may
+  exceed the band. Refine and resplit around usable outcomes before execution
+  planning if needed; do not split into independently unusable storage layers.
 - **Depends on:** Story 12 supplies the accepted per-file boundary. Existing
   root and nested attachment continuity supplies the paths and user model this
   story changes internally.
@@ -173,11 +177,43 @@ No executable plan or implementation is authorized by this seed.
   remain usable locally and on the web, and no longer add their payloads to
   MySQL-backed Git history. Later browsing and presentation stories can proceed
   without introducing another attachment model.
-- **Open decisions for refinement:** Decide the minimum client/tooling contract,
-  whether the target includes shrinking already accepted binary history or only
-  stopping future growth, how existing attachments migrate without losing the
-  only accessible copy, and whether any aggregate quota is needed beyond the
-  10 MB per-file rule.
+- **Refinement remaining:** Establish representative size proof, setup/retry
+  examples, and bounded delivery slices. Aggregate quotas and old-history
+  shrinking are outside this outcome; story 14 owns existing notebook conversion.
+
+<a id="story-14"></a>
+
+### Move existing notebook attachments out of MySQL while preserving access and history
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Identity:** SEED-035#story-14
+- **Goal:** Existing notebook owners retain their files, local workflow, and
+  history while operators remove attachment payloads from MySQL and stop new
+  binary versions enlarging their Git bundles.
+- **Evaluation:** Convert a notebook with several historical versions of a PDF
+  and image. Current files hydrate with identical bytes, existing web access
+  still works, and all earlier commit IDs and historical file bytes remain
+  retrievable. A subsequent file update adds a pointer to Git and bytes to GCS;
+  no current or historical attachment payload copy remains in MySQL.
+- **Scope / value:** Migrate generic attachments by forward conversion of the
+  current tree, keep old raw Git blobs readable from GCS under their original
+  Git object IDs, and verify copies before removing database payloads. Handle
+  interruption and existing local checkouts without losing unpublished work.
+  Do not rewrite accepted commits or promise that their full bundles shrink.
+  Legacy uploaded-image conversion remains story 5's separate outcome.
+- **Depends on:** Story 13.
+- **Effort hypothesis:** L, low confidence until fleet size, migration recovery,
+  and historical storage access are understood; resplit if larger than L.
+- **Safe stopping point:** Converted notebooks use one LFS write model;
+  unconverted notebooks and historical commits remain readable throughout the
+  transition. Retain the only accessible copy until verified replacement exists.
+- **Refinement remaining:** Confirm migration batching, rollback/retry proof,
+  verification of grandfathered files against accepted bytes (never a client
+  exemption), and stale-checkout upgrade examples. This is
+  an unqueued migration candidate; the backlog still contains the two selected
+  size-limit and new-notebook stories.
 
 <a id="story-8"></a>
 
@@ -368,8 +404,10 @@ No executable plan or implementation is authorized by this seed.
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The size boundary
 comes first because it protects accepted storage independently of the later
 architecture. External binary storage follows because it changes the shared
-foundation and is a prerequisite for attachment journeys that should not deepen
-the current database and bundle cost. Delivered nested attachment continuity
+foundation. Story 13 serves new notebooks; candidate story 14 applies it to
+existing notebooks, and should precede their image conversion when queued.
+This is delivery order, not a reason to withhold browsing from already supported
+legacy content. Delivered nested attachment continuity
 then enables the browsing journey that requires nested files. The remaining
 attachment order covers browser retrieval, existing images, guidance-folder
 assimilation, local visual authoring, new web-image portability, web cleanup,
@@ -392,10 +430,9 @@ section "Redistribution of the original 15 slices").
 
 ## Open Refinement Details
 
-- Stories 12 and 13 retain the owner's 10 MB boundary, Git-LFS-style pointer
-  direction, no-raw-GCS-URL constraint, and bundle-reduction goal. Story 13
-  cannot enter executable planning until the required architecture decision is
-  made; client/tooling mandates and existing-history treatment remain open.
+- Stories 12–14 carry the size, bundle, and migration outcomes under the accepted
+  Git LFS storage contract. Client/protocol and history policy are decided;
+  detailed sizing and examples remain story refinement work.
 - Story 11 needs story refinement and plan realignment before slice
   refinement/execution.
 - Story 8 owns common guidance folder identification and assimilation/ignore
@@ -422,9 +459,10 @@ Git integration need their own selected outcomes.
 - Owner direction, 2026-09-23: cap attachments at approximately 10 MB, keep
   attachment payloads out of MySQL and ordinary Git history, reduce bundle size,
   and store payloads in bucket-backed object storage. Git commits use a
-  Git-LFS-style content-addressed pointer, never a raw GCS URL. Choose whether
-  client tooling is mandatory only when the smallest workable architecture is
-  evaluated; do not decide it in decomposition.
+  Git-LFS-style content-addressed pointer, never a raw GCS URL. The owner accepted
+  standard Git LFS and the preserved-history transition, directing concise rules
+  into existing ADRs and the Git LFS details into a regular document. Rollout
+  belongs in the North Star and stories; implementation remains separate work.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity and guidance-folder

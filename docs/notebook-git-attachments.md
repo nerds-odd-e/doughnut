@@ -9,6 +9,10 @@ implemented, as **Attachments today** below records; the rest of this document i
 an architectural contract rather than a claim that those parts are already
 implemented.
 
+[Git LFS attachment storage](./notebook-git-lfs.md) defines the accepted target
+for external immutable payloads and their Git pointers. The database-byte
+projection below describes the current implementation awaiting that transition.
+
 ## Attachments today
 
 A non-Markdown file at the notebook root or in a folder is an Attachment: it
@@ -85,10 +89,15 @@ accepted content or learning identities. The CLI reports the error; the owner
 corrects the local file and republishes. Publication does not repair it or
 preserve it as an attachment. Existing web save normalization also stays intact.
 
-Non-Markdown files use the attachment model with their original bytes preserved.
+Non-Markdown supporting files use the attachment model with their original
+bytes preserved. Standard Git metadata such as `.gitattributes` remains metadata;
+it is not an attachment or learning concept. The hydrated Portable tree contains
+the actual attachment files; their Git representation follows the
+[LFS storage contract](./notebook-git-lfs.md).
 Accept files and authored references through the existing publication boundary,
 with no separate attachment history or mutable content authority. ADR 0002
-excludes mandatory local classification manifests. Check the resulting mixed-tree
+excludes Donut-specific local classification manifests; standard Git metadata
+and LFS configuration are allowed. Check the resulting hydrated mixed-tree
 profile against OKF before claiming compatibility for the entire tree.
 
 AI guidance uses ordinary note refinement, with no refinement changes required

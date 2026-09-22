@@ -22,7 +22,10 @@ extended attributes, or filesystem watcher. Binding and authentication data may
 live in ordinary Git configuration or the normal credential store. Git tree
 object IDs supply tree integrity checks; the commit graph supplies common
 ancestors. Do not introduce a custom tree digest, sync envelope, delta format,
-or three-way merge protocol.
+or three-way merge protocol. Standard Git LFS metadata and its local object
+cache are allowed; local attachment workflows require Git LFS. The
+[attachment storage contract](./notebook-git-lfs.md) owns object transfer,
+verification, authorization, and retention.
 
 A future binding may select a directory inside a project repository. Git
 operations, permissions, commits, and integration policy then apply to the
@@ -41,8 +44,11 @@ canonical Portable tree at cutover. Do not fabricate commits for earlier MySQL
 history, require owner opt-in, or defer repository creation until local
 acquisition. New notebooks are Git-backed from creation.
 
-After cutover, accepted Git content is authoritative; MySQL is its current
-projection and the authority for private identity-bound data.
+After cutover, accepted Git content is authoritative, including pointers that
+select immutable attachment versions in object storage. MySQL holds the current
+projection without attachment payloads and is authoritative for private
+identity-bound data. Existing database payloads transition under the
+[attachment storage contract](./notebook-git-lfs.md).
 
 Markdown notes and AI guidance, and non-Markdown attachments, are Portable
 content. Recall history, memory-tracker state, and other private learning data
@@ -88,14 +94,22 @@ A full clone must receive the entire original history reachable from accepted
 Unsubmitted local refs, reflogs, and unreachable objects are outside this
 promise. Do not compact accepted history into equivalent snapshots that change
 commit IDs. Quota, backup, erasure, and garbage-collection policies remain
-separate operational decisions.
+separate operational decisions within the attachment retention contract.
+LFS payloads are external to Git blobs: a full Git bundle preserves the original
+Git history and pointers, while a usable checkout separately hydrates its files.
+Historical LFS objects remain available for explicit retrieval; a complete
+backup includes them. Legacy binary Git blobs remain in historical bundles,
+even after their server-side bytes move to object storage.
 
 Only the publication tip must satisfy
 [ADR 0004 validation](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation)
 and current business invariants. Intermediate trees may contain malformed
 Markdown, temporary files, or structures Donut cannot represent. Git object
 integrity, connectivity, permitted ancestry, authorization, and safe inspection
-still apply to the entire received range. Retention does not authorize rendering
+still apply to the entire received range. Attachment admission and referenced
+object availability also apply across newly admitted history, including files
+absent from the tip. The legacy transition does not rewrite existing commits.
+Retention does not authorize rendering
 historical drafts as current application content.
 
 V1 requires no historical-checkout UI, remote-history browser, or Donut revert
@@ -115,7 +129,9 @@ supply evidence, not temporary application entities, learning updates, or index
 mutations. Apply the resolved final state once. A new commit with the same tree
 as A can still be accepted and can still require identity changes.
 
-Git objects must be durable before advertising a head that references them.
+Git objects and referenced attachment payloads must be durable before
+advertising a head that references them. Attachment upload verification follows
+the [storage contract](./notebook-git-lfs.md#decision).
 When objects and MySQL cannot share a transaction, stage immutable objects first
 and use the MySQL-accepted head as publication authority. Unaccepted objects
 may remain unreachable for garbage collection. Every advertised head must have

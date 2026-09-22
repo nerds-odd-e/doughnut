@@ -6,15 +6,16 @@
 
 **Accepted:** 2026-09-19
 
-**Amended:** 2026-09-20 — local rebase responsibility and Portable/learning-data boundary, decided by Terry Yin
-
 **Decision makers:** Terry Yin
 
 ## Decision
 
 - **Content authority:** The accepted Git commit is authoritative for the
-  Portable notebook tree. MySQL holds its current application projection and
-  remains authoritative for private Note/Folder identities and their learning
+  Portable notebook tree, including the exact immutable attachment versions
+  selected by its pointers. Attachment bytes live in private object storage;
+  MySQL holds metadata and references, not attachment payloads. It holds the
+  current application projection and remains authoritative for private
+  Note/Folder identities and their learning
   data. Markdown notes and guidance, and non-Markdown attachments, belong to
   Portable content; recall history and other private learning data do not.
   The tree format follows [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md);
@@ -24,15 +25,22 @@
   accepted history; local unpublished commits may be rebased before submission.
   Do not add a custom revision
   protocol, sync envelope, or merge model. Require no Donut-specific local files or
-  database; ordinary Git configuration and credential storage are allowed.
+  database; standard Git metadata, configuration, and credential storage are
+  allowed. Local attachment workflows use standard Git LFS; its storage,
+  transfer, and retention contract lives in
+  [Git LFS attachment storage](../notebook-git-lfs.md).
 - **One publication boundary:** Every accepted Portable content change,
   including web edits, goes through Git publication. Commit the accepted head,
   final MySQL projection, identity outcomes, and required derived state
   atomically. Reject stale or invalid updates without overwriting accepted work.
-  Portable content changes must appear in the published commit.
-- **Final-state projection:** Retain original Git history, but validate and
-  materialize only the publication tip. Use intermediate commits as identity
-  evidence; do not replay them through live application mutations. The
+  Portable content changes must appear in the published commit. Referenced
+  objects must be verified and durable before acceptance; object access follows
+  notebook authorization and retained history determines their lifetime.
+- **Final-state projection:** Retain original Git history, but validate domain
+  structure and materialize only the publication tip. Object integrity,
+  attachment admission, and availability apply across newly accepted history.
+  Use intermediate commits as identity evidence; do not replay them through
+  live application mutations. The
   relationship to ADR 0004's validation rule remains unresolved below.
 - **Identity protection:** Preserve existing identities and dependent data for
   soundly identified moves. Refuse ambiguous identity changes. Confirmed

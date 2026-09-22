@@ -2,11 +2,6 @@
 
 **Status:** Accepted  
 **Date:** 2026-09-01
-**Amended:** 2026-09-13 — portable trash rules, decided by Terry Yin
-**Amended:** 2026-09-14 — folder trash rules, decided by Terry Yin
-**Amended:** 2026-09-15 — canonical empty-folder representation, decided by Terry Yin
-**Amended:** 2026-09-17 — trash collision wording aligned with delivered behavior, decided by Terry Yin
-**Amended:** 2026-09-20 — Attachments alongside OKF concepts, decided by Terry Yin
 **Decision makers:** Terry Yin  
 **Consulted:** None 
 
@@ -29,8 +24,10 @@ the profile this ADR records.
 ## Decision
 
 Notes and container Readmes follow OKF v0.2 plus this profile. The **Portable
-notebook tree** also carries attachments as ordinary files. Codec round-trips
-must be lossless for both concepts and attachment bytes.
+notebook tree** carries hydrated attachments as ordinary files; Git represents
+their content through immutable pointers. Codec round-trips must preserve both
+concepts and exact attachment bytes. Pointer and hydration rules live in
+[Git LFS attachment storage](../notebook-git-lfs.md).
 
 ### Bundle and concepts
 
@@ -39,6 +36,9 @@ must be lossless for both concepts and attachment bytes.
   including AI guidance. Noncompliant Markdown is rejected on publication, never
   reclassified as an attachment. Non-Markdown attachments, including images,
   retain their complete filenames and original bytes.
+- Standard Git metadata such as `.gitattributes` is preserved as metadata, not
+  classified as an attachment or a learning concept. Structural markers retain
+  their existing role; empty attachments follow the standard LFS representation.
 - OKF calls a concept's bundle path without `.md` its **Concept ID**. For a
   Donut note, this is the normalized note portion of its **Portable path**.
 - Stored note markdown carries `type` and valid YAML frontmatter.
