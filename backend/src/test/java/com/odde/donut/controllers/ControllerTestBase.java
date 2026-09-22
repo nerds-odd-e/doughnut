@@ -10,7 +10,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.GithubService;
-import com.odde.donut.services.notebookGit.SqlStatementCallLog;
+import com.odde.donut.services.notebookGit.SqlStatementCallLogDataSourceConfig;
 import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.TestabilitySettings;
 import org.junit.jupiter.api.AfterEach;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-@Import(SqlStatementCallLog.DataSourceConfig.class)
+@Import(SqlStatementCallLogDataSourceConfig.class)
 public abstract class ControllerTestBase {
   @Autowired protected MakeMe makeMe;
   @Autowired protected AuthorizationService authorizationService;

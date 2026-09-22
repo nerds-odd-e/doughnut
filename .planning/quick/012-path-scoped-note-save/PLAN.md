@@ -1,6 +1,6 @@
 # Save a note by editing its Git ancestor trees
 
-Status: in progress; slices 1–3 delivered, slice 4 planned.
+Status: slices 1–4 delivered. Local representative measurement recorded. The about-one-second production observation is unproved; the story is not complete.
 Work item: **SEED-037#story-1**.
 Source: [refined story](../../seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-1)
 and the owner's 2026-09-22 acceptance of ancestor-only reads, request for
@@ -216,7 +216,7 @@ cohesion split. Production latency remains slice 4.
 
 ### 4. Demonstrate responsive saves on the representative notebook shape
 
-Type: Behavior. Status: planned. Estimate: 5 minutes analysis plus bounded measurement wait.
+Type: Behavior. Status: done. Estimate: 5 minutes analysis plus bounded measurement wait.
 
 Behavior: cold single-note saves on the reported shape (about 4,000 folders,
 11,000 notes, depth 12, with unrelated attachment content) satisfy the selected
@@ -231,14 +231,35 @@ round-trip sensitivity but must be labelled a simulation. Do not put elapsed
 time assertions in ordinary CI or add production instrumentation merely for
 this experiment. Record the literal experiment command before running it.
 
-Proof: the controller cost counts and matching native trees remain correct;
-representative request measurements establish the local/controlled outcome.
-The roughly one-second production promise requires an actual post-deployment
-observation on the reported notebook. This plan does not authorize a release
-or production edits. If that observation is unavailable, retain the plan with
-that promise explicitly unproved; do not substitute simulated/local timing or
-declare the whole story complete. An unexplained performance miss triggers
-analysis of this story's remaining work, not automatic expansion into story 2.
+Proof accepted for the local outcome. Ordinary CI does not assert elapsed time.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed with
+`representativeNotebookShapeColdSaveCostExperiment` skipped. Count-only cases
+in `NotebookGitWebContentSaveCostControllerTest`: depth 1 vs 12 tree fetches
+at most 2 vs at most 13; ancestor width 0 vs 20 keeps equal tree fetches at
+most 13 while fetched bytes grow. Focused rerun of that class and the JDBC
+observation tests passed after the harness split.
+
+Literal experiment, run on `fe33b3f1` before this slice's commit:
+
+```sh
+DONUT_MEASURE_REPRESENTATIVE_SAVE_COST=true DONUT_MEASURE_REVISION=$(git rev-parse HEAD) CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests com.odde.donut.controllers.NotebookGitWebContentSaveCostControllerTest.representativeNotebookShapeColdSaveCostExperiment
+```
+
+The class later moved to
+`NotebookGitWebContentSaveCostRepresentativeExperimentTest`; the gate is still
+`assumeTrue` on `DONUT_MEASURE_REPRESENTATIVE_SAVE_COST`. Fixture: depth 12,
+4,000 folders, 11,000 notes, one unrelated attachment. Five successive edits
+on that notebook after `entityManager.clear()`, not five independent cold
+databases. Local elapsedMs min/median/max 54/55/101. Final sample: treeFetches
+13, objectFetches 18, commitFetches 5, jdbcExecutions 62, one existence check,
+one INSERT of 15 rows, attemptedObjectIds 15, fetchedObjectBytes 128125, one
+binding update. Full-assembly comparison stayed outside the measured window.
+
+These local numbers do not prove the about-one-second production promise.
+That still needs a post-deployment observation on the reported notebook. This
+plan does not authorize a release or production edits. The story stays
+incomplete until that observation exists. Do not expand into story 2 from
+this local result.
 
 ## Verification and delivery
 
@@ -274,17 +295,17 @@ No unresolved product/ADR decision blocks these slices. Scope and reuse were
 critically reviewed against current callers at `0f8e0bf6ba`. The only intermediate
 whole-tree input is explicitly removed in slice 3. Final design has one editor,
 one encoding owner and the existing transaction owner, with no persistent new
-representation. Slice 2's relocation conversion and slice 3's path-scoped read are delivered.
-Slice 4 owns the latency measurement. Production latency is unproved until measured.
+representation. Slice 2's relocation conversion, slice 3's path-scoped read, and slice 4's
+local measurement are delivered. Production latency is unproved until measured
+on the reported notebook.
 
 ## Execution
 
 Story Branch Mode. Execution checkout
 `/Users/terryyin/git/doughnut-worktrees/012-path-scoped-note-save`, branch
 `story/012-path-scoped-note-save`, created from `origin/main` at `cf2f317c27`.
-Queue claim `853a01f996` is published on `origin/main`. Slice 1 increment `9cf34be8b4` and slice 2 increment `70e86008ca` are published
-on `origin/story/012-path-scoped-note-save`. Later increments publish to that
-same branch. GitHub Actions observer
+Queue claim `853a01f996` is published on `origin/main`. Slice 1 increment `9cf34be8b4`, slice 2 increment `70e86008ca`, and slice 3
+increment `fe33b3f1bf` are published on `origin/story/012-path-scoped-note-save`. GitHub Actions observer
 `/tmp/dough-ci-501/watch-Pkeu0n` covers that story branch (`ci.yml`, display
 name `donut CI`). The trunk claim is unobserved. Slice 1's learning for later
 proof: activate `SqlStatementCallLog` only around the controller call; one
