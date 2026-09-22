@@ -16,6 +16,15 @@ Review implementation, process, and product learning by default. Return evidence
 correction plans; do not implement, commit, push, or change the backlog. Leave closure to
 [dough-story-wrap-up](../dough-story-wrap-up/SKILL.md).
 
+An execution retrospective may start once implementation is delivered while its
+applicable CI result remains pending. Treat the retained observer, publication
+target, accepted revision, and pending state as input, not as a missing
+completion prerequisite. Review the delivered implementation while observation
+continues and state which conclusions remain conditional on unresolved CI. Do
+not invoke the CI wait, stop or replace its observer, acknowledge its events, or
+claim final execution/review handoff; the invoking execution owns those actions
+through its [completion wait](../dough-execute-plan/references/ci-monitor.md#await-the-applicable-revision-at-completion).
+
 ## Select reviews
 
 Select reviews before focus-specific actions or context, including log-location resolution.
@@ -71,6 +80,8 @@ conversation/repository proof of delivered outcome. Quick-to-planned needs a com
 plan plus quick/planned proof covering the original outcome without gaps or assumed repeated work.
 Missing kind, continuity, contract, completion, or proof limits dependent conclusions only.
 Two equally plausible executions need user selection; continue independently supported review.
+Pending CI alone does not make delivered implementation incomplete. Preserve its
+explicit pending state and do not convert it into passing validation.
 
 Manifest each related SHA with a reason from story/plan, retained published revisions, message, diff, or transcript. When those published revisions exist, they are the related set; do not attribute a whole-trunk range, interleaved sibling work, or a rewritten unpublished SHA (use its published replacement).
 Inspect nearby/intervening commits and exclude unrelated work with reasons.
@@ -149,77 +160,11 @@ review. Process proposals stay outside correction plans.
 
 ### Record supported process findings
 
-Use the explicit user/project `DearDough.md` location or `<project-root>/DearDough.md` for enabled
-process findings. No findings means unchanged/no new log. Missing/conflicting root/location stops
-recording only: return findings and continue independent reviews without inventing/searching elsewhere.
-
-Reuse logged execution identity, else canonical plan/story plus first related implementation commit,
-or a stable execution-record reference if no commit exists. Later commits/reviews/dates create no
-identity. Missing/conflicting identity permits findings but no countable row or invented tracking.
-
-For a new log, assign `DD-001` upward in supported-finding order using:
-
-```markdown
-# DearDough Process Findings
-
-## DD-001 — <descriptive issue title>
-<concise concrete description>
-
-### Occurrences
-- Execution: <stable execution identity>
-  - Timestamp: <ISO 8601 occurrence time with timezone | unknown>
-  - Tool: <Codex, Cursor, Claude Code, or another identified tool>
-  - Model: <model identifier, when available>
-  - Open Dough release: <version | unknown | unreleased | modified>
-  - Evidence: <decisive compact references or locators>
-  - Observed effect: <what the record shows>
-  - Inference: <qualified cause, cost, or uncertainty, only when needed>
-```
-
-Use compact references and separate observation/inference. Rows count retained occurrences,
-not all-time recurrence. Record supported one-offs, practices, potential general issues, and
-retrospective observations with qualified generality. For each new occurrence:
-
-- **Timestamp:** actual event time, ISO 8601 with timezone, from execution evidence or live clock;
-  otherwise `unknown`, with available dates/ranges in Evidence. Never substitute review/import/
-  nearby-commit times or invent date precision. Preserve timestamps; fill unknown only with event
-  evidence. Older timestamp-free rows remain valid without replay rewrites.
-- **Tool/model:** identify the executing tool, not reviewer; omit Model when execution evidence
-  supplies none, without guessing or separate lookup. Unidentified tool means no countable row.
-  Backfill older rows only with supporting evidence.
-- **Release:** execution-time guidance provenance, otherwise `unknown`; not product version or
-  today's checkout/installation `VERSION` unless tied to this work. Mark unreleased/modified
-  guidance with available revision/base release, e.g. `modified; revision <rev>; base <version>`.
-  Never mislabel it a clean release, guess, or backfill older releases; identical rereview stays unchanged.
-
-Existing headings/descriptions/rows must safely identify issues, executions, and next ID.
-Use only this log's IDs; preserve DD/adopted ODF codes, mint only `DD-NNN`. Keep notes, evidence,
-release rows, and unrelated content; make the smallest supported edit. Migration, normalization,
-reordering, deletion, or merging requires bounded retention below.
-
-Match the same concrete problem/practice by decisive evidence, not wording/symptoms; reuse its code.
-Recover history only for consequential identity/match questions, reusing established removed IDs.
-Missing history that prevents safe identity resolution stops allocation. Otherwise an unmatched/
-uncertain finding gets the next unused `DD-NNN`, with matching uncertainty stated when relevant.
-Never renumber to fill gaps or restore a pruned occurrence on identical rereview.
-
-Next DD number is one above the greater of all current DD/adopted-ODF heading numbers and
-retention metadata's highest allocated local number. Never reuse removed IDs or collide across
-prefixes (`ODF-001` reserves 1). Update existing high-water metadata on every allocation, even
-without pruning. Uncertain historical gaps cannot be filled; report inability to allocate safely.
-
-One execution means one row: identical/pruned rereview makes no edit; decisive new evidence or
-corrected qualified conclusions enrich it, preserving prior notes. New executions add rows, symptoms do not.
-
-For supported writes only, build the complete ordinary candidate, then follow
-[bounded process-log recording](references/bounded-process-log.md) for measurement, retention,
-warnings, writing/refusal, and recovery. No-findings/identical rereviews load no reference;
-skipped/unresolved process accesses neither log nor reference. Ambiguity, malformed content,
-unsafe retention, or write failure leaves the log byte-identical; report limitations/findings and continue.
-
-Report path, created IDs/rows or `unchanged`/`not recorded` with reason, and required size/retention
-warnings or refusal. Claim no unsuccessful write as success. The final banner requires an evidenced
-overlooked request, decision, warning, failed verification, or Jidoka stop still needing user action.
+When enabled process review produces supported findings, read and follow
+[process-finding recording](references/process-finding-recording.md). No findings
+or an identified identical rereview means no log change or reference load;
+skipped or unresolved process review does not access the log or its recording
+references.
 
 ## Review product learning
 
@@ -239,9 +184,19 @@ Report work identity/completion, provenance, manifest/boundary, impact-ordered f
 and evidence limits. Classify planning as amended, new, read-only, unchanged, or unavailable pending
 execution-boundary evidence. Report enabled process proposals and product advice/reasoned no-change;
 unresolved process selection reports its error only. Distinguish evidence from hypotheses and
-recommendations from proposals/unresolved choices. End with `## EXECUTION RETROSPECTIVE COMPLETE`.
+recommendations from proposals/unresolved choices. When CI is pending, report its retained target
+and revision as pending and make no success claim. End with
+`## EXECUTION RETROSPECTIVE COMPLETE`; this marker completes review, not the
+execution's final CI handoff. When this review was invoked automatically by an
+active `dough-execute-plan` execution, do not end the turn at this marker:
+return immediately to that execution's completion-wait and shutdown procedure,
+without asking for confirmation. If an authorized CI repair later changes
+reviewed code, resume only the affected conclusions using the retained review
+state.
 
-Only with the evidenced attention need above, append this at the absolute end:
+Only with the evidenced attention need above, append this at the absolute end
+of a standalone retrospective report. For an automatic execute-plan review,
+return the attention need to the invoking execution for its final handoff:
 
 ```text
 !!!!!!!!!! DEVELOPER ATTENTION REQUIRED !!!!!!!!!!

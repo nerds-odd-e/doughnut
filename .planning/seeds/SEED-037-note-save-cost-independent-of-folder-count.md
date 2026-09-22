@@ -67,46 +67,94 @@ are hypotheses. Story 2 is not authorized for implementation by this seed.
 <a id="story-3"></a>
 
 ### Publish a web save from a whole-notebook assembly that never moves content bytes
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
 
 - **Identity:** SEED-037#story-3
-- **Goal / beneficiary:** Maintainers get one way to encode a notebook's
-  Portable tree, the full assembly, for cutover, reset and every web save,
-  with note saves as fast as today and about 500 fewer lines of production
-  code to understand.
-- **Evaluation:** On the depth-12, 4,000-folder, 11,000-note fixture, a
-  content save transfers under 1 MB from MySQL, executes no more JDBC
-  statements than today's save, reads at most one accepted tree per differing
-  directory, and inserts only the differing trees and blobs. The accepted head
-  equals the Java full assembly after content edits, note moves and renames,
-  folder moves, renames and deletions, README edits and cross-notebook moves,
-  including multibyte and empty note content. The full backend suite and the
-  E2E Git features stay green.
-- **Scope:** Note and attachment row queries return MySQL-computed blob
-  hashes instead of content; the full assembly builds the tree from those
-  hashes and hashes only readmes and `.keep` itself; the accepted-change owner
-  assembles each locked notebook, diffs the assembled root against the
-  accepted root top-down, fetches changed note contents by id, and appends the
-  commit through story 1's write path. Delete `ProjectionChangeCapture`,
+- **Goal / beneficiary:** Maintainers get one whole-notebook Portable-tree
+  encoder for cutover, history reset, publication comparison and web saves.
+  Note authors retain synchronous, atomic saves with no measured latency
+  regression. Removing change capture and partial-tree derivation is the
+  simplification outcome; roughly 500 fewer production lines is a hypothesis,
+  not a deletion quota.
+- **Scope:** Assemble paths and Git blob IDs from the current projection after
+  the complete operation is flushed under the existing notebook locks. MySQL
+  computes note and legacy attachment Git blob IDs without returning their
+  payloads. Match the codec's exact UTF-8 bytes, null-note-as-empty rule and
+  arbitrary binary bytes; byte length is not character count. Continue using
+  the existing README codec and `.keep` rules. Fetch file content only for Git
+  blobs the target repository actually needs, not merely because a path moved.
+  Cutover/reset necessarily materialize initial blobs; "never moves content
+  bytes" describes hash-only assembly, not the entire publication operation.
+  Compare trees top-down and reuse existing object IDs, then append through
+  the existing native transactional writer. Keep the lock ordering, one commit
+  per changed notebook, stale-publication checks, identity outcomes and rollback.
+- **Accepted attachment architecture:** Follow ADRs
+  [0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
+  and [0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md),
+  [the LFS contract](../../docs/notebook-git-lfs.md) and the
+  [staged transition](../NORTH-STAR.md#attachment-storage-transition).
+  This story delivers the current legacy representation, not LFS rollout.
+  The assembly contract is the Git blob ID of the file representation: today
+  a raw legacy attachment blob; after conversion, the standard pointer blob's
+  Git ID, distinct from the payload's LFS SHA-256. Do not embed GCS URLs, add
+  a payload-hashing dependency to the assembler, or prepare a second storage
+  framework. The later LFS stories supply pointer metadata without reading or
+  rehashing unchanged bucket objects. Attachment hash/pointer metadata is part
+  of that accepted transition, no longer an undecided future optimization.
+- **Publication semantics:** As already selected in this story's 2026-09-22
+  decision, the next accepted web save adopts existing projection drift at
+  untouched paths into its new commit. Local publication still detects drift;
+  no accepted history is rewritten. Replace the old web-drift assertions with
+  an explicit example of the new rule. Update the domain-operation section of
+  `docs/notebook-git-synchronization.md` and `docs/note-content-saving.md` when
+  delivered; there is no numbered "drift decision 4" in the current ADRs.
+  Preserve canonical no-op behavior, including the existing rule that Git file
+  mode alone is not a Portable-content change.
+- **Evaluation:** Reproduce the depth-12, 4,000-folder, 11,000-note fixture
+  with 1 KB notes and 20 × 500 KB attachments on local MySQL 8.4. Compare cold
+  controller saves before/after under the same conditions, including transaction
+  completion. Require under 1 MB of returned SQL value bytes, no more real JDBC
+  executions than the measured baseline and no median latency regression.
+  Report result-value bytes, not an unmeasured network-wire total. A content
+  edit reads at most one accepted tree per differing directory and inserts
+  only missing blobs, changed trees and one commit. Independently decoded
+  downloaded history must match expected paths and exact content after the
+  supported note/folder/README and multi-notebook operations. The full backend
+  suite and Git-focused E2E features remain green; timing is a local experiment,
+  not a flaky CI wall-clock assertion or a production latency claim.
+- **Simplification:** Remove `ProjectionChangeCapture`,
   `NotebookGitChangedFolders`, `NotebookGitChangedFiles`,
-  `NotebookGitAcceptedDirectoryReader`, the relocation and unresolved-subtree
-  parts of `NotebookGitDirectoryTree`, the derive path of
-  `NotebookGitTreeEncoder`, the capture test, the derived-tree oracle tests and
-  the pre-existing-drift tests. Update
-  `docs/notebook-git-synchronization.md`: a web save makes the accepted tree
-  equal the projection, so pre-existing drift at untouched paths is adopted by
-  the next web save; record this as the replacement of drift policy decision 4
-  in the relevant ADR. Cost tests count real JDBC statements and bytes.
-- **Not promised:** Storing attachment hashes at upload time (needed once
-  notebooks hold hundreds of megabytes of attachments; capture it when
-  SEED-035 makes that real), per-note stored hashes, and any asynchronous
-  processing.
-- **Key examples:** Editing one note at depth 12 reads 13 accepted trees and
-  writes 13 trees and 1 blob. Moving a folder with 1,000 notes reads and
-  writes only the directories on the old and new paths. A save whose
-  assembled root equals the accepted root appends nothing.
+  `NotebookGitAcceptedDirectoryReader`, relocation/unresolved-tree machinery
+  and the encoder's derive path once their callers use full assembly. Remove
+  obsolete capture/derivation-specific tests, preserving their product promises
+  through controller observations rather than self-comparison with the new
+  encoder. Keep one format implementation, not a parallel SQL-specific codec.
+- **Deferred promises:** GCS transfer, LFS admission/hydration/metadata rollout,
+  existing-attachment migration, the 10 MiB limit, per-note stored hashes,
+  asynchronous acceptance and story 2's additional round-trip optimization.
+  Existing attachment and cross-notebook guards remain; no new supported move
+  or upload workflow is introduced here.
+- **Key examples:**
+  1. Edit one note at depth 12 among unrelated notes and binary files → exact
+     saved bytes in one child commit, at most 13 accepted-tree reads and 13
+     changed-tree inserts plus the new note blob; no unchanged payload fetched.
+  2. Move a folder with 1,000 unchanged notes → correct new paths and markers,
+     reusing existing subtree/blob IDs without fetching those note bodies.
+  3. Save equivalent canonical content → no new objects or commit, including
+     when the accepted file is executable. Empty/null and multibyte note
+     content hash exactly as the existing Java codec does.
+  4. An unrelated projected note differs from accepted history, then a web edit
+     succeeds → both projected contents appear in that one new commit. A local
+     publication attempted before that save still refuses projection drift.
+  5. A supported operation changes two notebooks, or fails late during binding
+     persistence → one commit per changed notebook on success; on failure,
+     neither projection, accepted head nor native object rows are left changed.
 - **Depends on:** story 1 (delivered).
-- **Effort hypothesis:** L, medium confidence; the prototype is about 50
-  lines, most of the effort is deleting code and tests safely.
+- **Effort hypothesis:** L (2–4 hours), medium confidence. Prototype evidence
+  supports the design; byte accounting, mode-only no-ops and removal of
+  derivation-specific assertions are the main proof work.
 - **Safe stopping point:** The full assembly is the only encoder and every
   web save publishes through it with the measured cost.
 

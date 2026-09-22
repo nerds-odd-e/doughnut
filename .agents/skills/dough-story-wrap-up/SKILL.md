@@ -196,11 +196,12 @@ integration and resource cleanup below.
 
 ## Integrate committed Story Branch Mode closure
 
-Save the committed final-closure tip. It is already published on the remote
-execution branch. Publish it from the owned execution workspace through
-[Preserve published history](../dough-execute-plan/references/publish-the-candidate.md#preserve-published-history).
-The integration checkout's unrelated commits and pending human edit stay out of
-the published trunk commit.
+Save the final-closure tip already published on the remote execution branch.
+Follow [Story Branch integration observation](../dough-execute-plan/references/trunk-publication.md#observe-story-branch-integration)
+for the target transition, publication, accepted integrated-SHA wait, and
+shutdown. Its publication uses [Preserve published history](../dough-execute-plan/references/publish-the-candidate.md#preserve-published-history)
+from the owned execution workspace, excluding the integration checkout's
+unrelated commits and pending human edit.
 
 When the merge touches the product backlog, use the owned workspace's installed
 merge adapter as that procedure requires. A stopped result stays as Git left
@@ -218,8 +219,9 @@ and blocks completion. Do not force-push.
 ## Remove execution resources safely
 
 After Story Branch Mode's verified integration and required target push, or after
-Trunk Mode's wrap-up closure publications and wrap-up observer shutdown, remove
-this execution's clean local worktree and local execution branch. Use retained
+Trunk Mode's final accepted closure has its bounded CI result handled and its
+wrap-up observer shut down, remove this execution's clean local worktree and
+local execution branch. Use retained
 identity and non-force operations. Preserve unrelated resources, unique or
 unpublished work, a dirty checkout, and a worktree that still hosts an active
 checkout-bound observer under [preserve pending local work](../dough-execute-plan/references/maintain-default-checkout.md#preserve-pending-local-work). Trunk Mode never deletes a remote execution branch.
@@ -232,7 +234,8 @@ and skip cleanup in direct-current-branch mode.
 
 Report the selected work and identity, completion judgment, mode and retained
 checkout/branch/target, before-cleanup and final-closure commits when deletion
-happened, Trunk Mode published closure SHAs and remaining CI coverage, assimilated
+happened, Trunk Mode published closure SHAs, bounded wait receipt, remaining CI
+coverage, assimilated
 knowledge, deleted paths, Story Branch saved tip and integration/push results when
 the target is `main`, worktree and branch cleanup results (remote deletion only when
 verified absent), preserved material and resources, and any gap. Distinguish a new

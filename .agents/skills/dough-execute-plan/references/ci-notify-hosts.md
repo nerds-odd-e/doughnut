@@ -90,10 +90,13 @@ Use the same shared mailbox directory for launcher and hooks as specified in
 runtime setup. Mailboxes survive stashing. Use the host's agent message and
 resume handles to follow the shared [pause contract](ci-monitor.md#pause-and-resume-writers).
 
-## Stop without waiting for CI
+## Stop after completion observation
 
-When the shared lifecycle calls for shutdown, stop using the exact saved
-directory:
+When the shared lifecycle calls for shutdown, consume delivered failures first.
+At normal execution completion, the shared
+[bounded wait](ci-monitor.md#await-the-applicable-revision-at-completion) must
+already have returned and been handled; this stop command never substitutes for
+that wait. Stop using the exact saved directory:
 
 ```sh
 node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' stop '/EXACT/RECORDED/MAILBOX'
@@ -108,7 +111,8 @@ and targets only that process; it revalidates before escalating the signal.
 The command then returns an explicit lost-coverage terminal result instead of
 hanging or implying success. This is local process shutdown, not waiting for
 CI. The hook drains an already-finished event even if stop was requested. Unread
-records remain in the mailbox, and shutdown reports pending CI as unobserved.
+records remain in the mailbox, and shutdown reports any still-pending CI as
+unobserved.
 Handle delivered failures before claiming completion. Retain these small
 recovery records for interrupted sessions; never kill by a broad process-name
 pattern. The runtime budget also bounds an observer whose coordinator disappears.

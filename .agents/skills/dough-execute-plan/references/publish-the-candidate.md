@@ -9,8 +9,9 @@ acceptance does not require that checkout to move, and a later maintenance
 result does not erase an accepted publication.
 
 A calling procedure supplies the owned workspace, the owned unpublished
-suffix, the authorized remote target, and how it registers or validates the
-pushed result. Nothing below requires execution's mode selection, Taken-claim
+suffix, the authorized remote target as the fully qualified branch ref
+`refs/heads/<target-branch>`, and how it registers or validates the pushed
+result. Nothing below requires execution's mode selection, Taken-claim
 semantics, or CI-observer policy. [Trunk publication](trunk-publication.md) is
 `dough-execute-plan`'s caller for claims, increments, and owned repairs: it
 names the suffix, workspace, and authorized remote target, then uses the
@@ -103,7 +104,7 @@ Apply [Preconditions](#preconditions) before this sequence.
    suffix, that base is the fetched target it was replayed onto, not the
    older revision and not the candidate tip. Push that exact candidate
    from the owned workspace:
-   `git -C <owned-workspace> push <remote> <candidate>:<target-branch>`.
+   `git -C <owned-workspace> push <remote> <candidate>:refs/heads/<target-branch>`.
    Do not fast-forward the default checkout, force-push, or move that
    checkout's branch with `merge`, `update-ref`, or `branch -f`.
 6. After the push, fetch again and confirm the authorized remote contains

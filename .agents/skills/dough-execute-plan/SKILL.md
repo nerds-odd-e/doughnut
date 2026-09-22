@@ -96,25 +96,13 @@ for omitted/truncated passages or bounded investigations; another step alone nee
 
 ## Take queued work
 
-The Taken edit is a same-branch commit in the checkout that holds it: the owned
-execution workspace for Story Branch and Trunk Mode, or the resolved integration
-checkout for caller-selected current-branch work. That commit moves an entry to
-**Taken** with nothing to merge, rebase, or cherry-pick from another ref, so the
-edit itself needs none of the installed product backlog Git adapters or
-[reconcile product backlog Git operations](../dough-product-backlog/references/merge-conflicts.md).
-Publishing that claim from the owned workspace may be a real rebase, for Story
-Branch or Trunk Mode alike, covered by
-[trunk publication](references/trunk-publication.md#resolve-a-publication-rebase-conflict).
-Current-branch mode never publishes a claim, so it never rebases or merges this
-commit.
-
 After resolving execution source and authority, inspect the backlog before
 plan-status changes, observer recovery/startup, delegation, or implementation.
 For Story Branch and Trunk Mode, select or reuse the owned workspace under
 [execution location](references/execution-location.md) before the Taken commit,
 using fetched remote trunk as the base. Current-branch work uses the checkout
-it already recorded and creates no worktree. The Taken commit in that checkout
-is the backlog change.
+it already recorded and creates no worktree. The claim is a same-branch backlog
+commit in that checkout; it needs no backlog Git integration adapter.
 
 Before the Taken commit, resolve selective formatting and that commit's hook
 contract. An absent or understood check-only hook permits the transition. An
@@ -135,8 +123,18 @@ applies when this claim or a later refresh mutates that checkout. Caller-selecte
 current-branch work keeps its existing contract and gains no new publication
 authority here.
 
-Then follow [take queued work](../dough-product-backlog/SKILL.md#take-queued-work-for-execution)
-in the checkout that holds the claim ([execution and resume](../dough-product-backlog/references/record-preparation.md#execution-and-resume)). An ambiguous move stops implementation.
+For a queued planned feature story, invoke the installed writer from the
+product-backlog skill directory in the checkout that holds the claim:
+
+```text
+node <installed>/scripts/product-backlog.mjs take --identity <story-id> --plan <plan-path>
+```
+
+The writer owns the move and canonical plan link. Follow its
+[take contract](../dough-product-backlog/SKILL.md#take-queued-work-for-execution)
+and [execution and resume](../dough-product-backlog/references/record-preparation.md#execution-and-resume);
+do not construct the entry or record preparation state during Take. A refusal
+or ambiguous move stops implementation.
 
 Resume a remote **Taken** entry when retained execution context and publication
 provenance agree this execution owns it. Preserve its position without
@@ -163,8 +161,9 @@ Story Branch Mode and Trunk Mode both publish that commit's SHA from the owned
 workspace per
 [trunk publication](references/trunk-publication.md#publish-a-queue-claim)
 before implementation; do not invent a second publication procedure for either
-mode. Only a confirmed published revision starts implementation. Prepare
-required project commands after that confirmation under
+mode. Publication may require its defined rebase conflict procedure. Only a
+confirmed published revision starts implementation. Prepare required project
+commands after that confirmation under
 [execution location](references/execution-location.md). Publication and later
 preparation failure follow those references: no implementation and no new claim.
 
