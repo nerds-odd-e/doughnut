@@ -89,22 +89,54 @@ is not the Story Branch increment destination above. Do not merge the
 execution branch.
 
 Resolve observation ownership before the first wrap-up publication: recover
-the execution's observer when it still exists; if execution already stopped
-it, arm one observer from the same execution checkout against the authorized
-target using [CI observation](ci-monitor.md). Register each confirmed
-published SHA with that observer. After the last wrap-up publication this
-invocation will perform, stop only that observer through the host adapter,
-report the exact published closure SHAs and remaining coverage, and do not
-wait. An unavailable bridge or registration failure is lost coverage: report
-it and continue.
+the matching execution observer when it still exists; if observation already
+ended, use the existing setup to arm one observer from the same execution
+checkout against the authorized target using [CI observation](ci-monitor.md).
+Register each confirmed published SHA with that observer. After the last
+wrap-up publication this invocation will perform, apply
+[the shared completion wait](ci-monitor.md#await-the-applicable-revision-at-completion)
+once to that final accepted SHA. Handle its verdict or bounded exception before
+stopping only that observer through the host adapter, then report the exact
+published closure SHAs, wait receipt, and remaining coverage. An unavailable
+bridge or registration failure is lost coverage: report it truthfully and
+continue without inventing successful observation.
 
 A publication stop leaves the commit recoverable on the execution branch.
-Do not delete spent history, remove resources, or claim closure. After the
-final-closure publication and wrap-up observer shutdown succeed, wrap-up
-removes only this execution's clean local worktree and local execution branch,
-applying
+Do not delete spent history, remove resources, or claim closure. Wait only
+after the final applicable wrap-up publication, never between intermediate
+recovery-record publications. After its bounded result is handled and wrap-up
+observer shutdown succeeds, wrap-up removes only this execution's clean local
+worktree and local execution branch, applying
 [preserve pending local work](maintain-default-checkout.md#preserve-pending-local-work)
 when cleanup would mutate or discard a dirty or ambiguous checkout.
+
+## Observe Story Branch integration
+
+Story Branch wrap-up changes publication targets. Before integrating its saved,
+published final-closure tip, close the observer bound to the remote execution
+branch through its existing completion lifecycle: await that tip when it is the
+last accepted registered revision, handle the result, then stop that exact
+observer. A green execution-branch receipt covers only that branch and never
+releases later trunk observation.
+
+From the retained execution workspace, recover one matching observer already
+bound to the authorized trunk target or use the existing setup to start one
+there. Establish it before integration publication. Do not retarget the old
+mailbox, register a revision against a differently targeted observer, or create
+a duplicate observer for the same repository, target, and coordinator. When the
+old observer cannot be awaited or stopped, or the trunk bridge cannot be
+established, retain explicit unavailable coverage; do not invent success or
+silently discard an observer that may still own the checkout.
+
+Publish the history-preserving integration through the common candidate
+sequence. After remote confirmation, register only the accepted integrated SHA
+with the trunk observer. A saved branch tip or superseded merge candidate is
+not that receipt. Apply
+[the shared completion wait](ci-monitor.md#await-the-applicable-revision-at-completion)
+once to the accepted integrated SHA, handle its verdict or bounded exception,
+then explicitly stop the trunk observer. Resource cleanup follows successful
+shutdown and the existing ownership checks; publication recovery retains the
+same observer and repeats neither target setup nor an already accepted push.
 
 ## Recover a rejected push
 

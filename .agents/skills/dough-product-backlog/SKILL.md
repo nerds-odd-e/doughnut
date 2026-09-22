@@ -96,26 +96,22 @@ required workflow is unavailable, stop that activity and ask for its guidance.
 
 ## Take queued work for execution
 
-Move an entry from **Backlog list** to **Taken** only when execution of its
-authorized plan or explicitly selected planless quick story is starting.
-Refinement, planning, and an intention to execute leave it in the queue. If execution context or authorization fails before execution starts,
-leave the entry unchanged. Taking or resuming alone neither renews readiness nor
-derives it from membership; follow
+Invoke the installed `scripts/product-backlog.mjs take` operation only as
+execution of the selected authorized plan or explicitly planless quick story
+starts. Refinement, planning, intent, or missing execution context or authority
+leaves the entry queued. Follow
 [execution and resume](references/record-preparation.md#execution-and-resume)
-and do not write or infer a ready assessment here.
+for readiness; Take and resume neither record nor infer it.
 
-Preserve the title, canonical link, and recorded identity. Add any missing
-slice-plan link for a planned story, including on resume; stop if its plan is
-unresolved.
-Quick stories need no plan, and corrections need no duplicate plan link.
+Preserve the title, canonical link, and identity. A planned story requires its
+resolvable slice-plan link, including on resume. Quick stories need no plan;
+corrections need no duplicate plan link.
 
-Move the entry to the end of **Taken** in one backlog update. On resume, do not
-duplicate or reorder it. Do not fabricate absent entries; stop if an expected
-queued entry cannot be moved unambiguously.
+Move the entry to the end of **Taken** once. On resume, do not duplicate or
+reorder it. Refuse an absent or ambiguous entry instead of fabricating one.
 
-Once execution starts, leave the entry in **Taken** across pauses, failures,
-resumption, successful plan completion, and retrospective. Returning cancelled
-work to the queue requires an explicit backlog-maintenance decision.
+Leave started work in **Taken** across pauses, failures, resume, completion, and
+retrospective; returning cancelled work requires an explicit backlog decision.
 
 ## Remove completed items
 
@@ -133,10 +129,9 @@ An installed Claude Code project may deny a direct `Edit`/`Write`/
 an installed Codex project may deny an `apply_patch` attempt there, and an
 installed Cursor project may deny a `Write`/`StrReplace`/`Delete` attempt
 there. Each reports the denial before any bytes change. This is expected:
-use the scripts above (`product-backlog.mjs` and its Git merge/rebase/
-cherry-pick adapters) instead of a direct hand-edit. Reads, edits to other
-files, and shell-run commands (including shell redirection into the backlog
-file) are unaffected.
+invoke the installed `scripts/product-backlog.mjs` operation instead of a
+direct hand-edit. Reads, edits to other files, and shell-run commands (including
+shell redirection into the backlog file) are unaffected.
 
 ## Merge, rebase, or cherry-pick the backlog across branches
 

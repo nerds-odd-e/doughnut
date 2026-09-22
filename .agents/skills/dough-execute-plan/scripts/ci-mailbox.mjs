@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, readFileSync, watch, writeFileSync } from "node:fs";
+import { existsSync, watch, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   checkoutRoot,
@@ -18,7 +18,6 @@ import {
   recordWorkerIdentity,
   terminalResultDeadlineCode,
   waitForTerminalResult,
-  workerLossReason,
 } from "./ci-mailbox-store.mjs";
 import {
   observeRevisionCoverage,
@@ -26,11 +25,11 @@ import {
   registerPushedRevision,
 } from "./ci-mailbox-revision-coverage.mjs";
 import {
-  checkMailboxWorkerLiveness,
   mailboxWorkerPath,
   terminateMailboxWorker,
 } from "./ci-mailbox-worker-process.mjs";
 import { executionBudgetMs, watchCiExecution } from "./watch-ci-execution.mjs";
+import { awaitRevision } from "./ci-mailbox-await.mjs";
 
 export {
   checkoutRoot,
@@ -52,29 +51,7 @@ export {
   readRevisionCoverage,
   registerPushedRevision,
 } from "./ci-mailbox-revision-coverage.mjs";
-
-// Read-only: reports an already-recorded loss, or newly detects one from the
-// worker's own recorded identity, without ever signaling a process. Returns
-// undefined for anything short of a confirmed death (alive, uncertain
-// identity, or already-terminal for another reason such as a normal stop),
-// so an intentional completed stop is never mislabeled as unexpected death.
-export function mailboxWorkerLoss(directory) {
-  const resultPath = join(directory, "result.json");
-  if (existsSync(resultPath)) {
-    const result = JSON.parse(readFileSync(resultPath, "utf8"));
-    return result.coverage?.state === "lost" ? result : undefined;
-  }
-  let identity;
-  try {
-    identity = readWorkerIdentity(directory);
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-    return undefined;
-  }
-  if (checkMailboxWorkerLiveness(identity, directory) !== "dead")
-    return undefined;
-  return recordLostTerminalResult(directory, workerLossReason);
-}
+export { mailboxWorkerLoss } from "./ci-mailbox-worker-process.mjs";
 
 const resultPrefix = "CI_OBSERVER_RESULT ";
 export async function runMailboxWorker(
@@ -235,6 +212,21 @@ if (isDirectCliEntry(import.meta.url, process.argv[1])) {
     process.stdout.write(
       `${receiptPrefix}${JSON.stringify({ directory, revision })}\n`,
     );
+  } else if (command === "await-revision") {
+    const [directory, sha] = args;
+    const cancellation = new AbortController();
+    const cancel = () => cancellation.abort();
+    process.once("SIGINT", cancel);
+    process.once("SIGTERM", cancel);
+    try {
+      const awaited = await awaitRevision(directory, sha, {
+        cancellation: cancellation.signal,
+      });
+      process.stdout.write(`${receiptPrefix}${JSON.stringify(awaited)}\n`);
+    } finally {
+      process.removeListener("SIGINT", cancel);
+      process.removeListener("SIGTERM", cancel);
+    }
   } else if (command === "stop") {
     const directory = args[0];
     const terminal = await stopMailbox(directory);
@@ -243,7 +235,7 @@ if (isDirectCliEntry(import.meta.url, process.argv[1])) {
     );
   } else {
     throw new Error(
-      "Usage: ci-mailbox.mjs probe | start --execution OWNER/REPO BRANCH [BUDGET_MS] | stream --execution OWNER/REPO BRANCH [BUDGET_MS] | register-push DIRECTORY SHA | stop DIRECTORY",
+      "Usage: ci-mailbox.mjs probe | start --execution OWNER/REPO BRANCH [BUDGET_MS] | stream --execution OWNER/REPO BRANCH [BUDGET_MS] | register-push DIRECTORY SHA | await-revision DIRECTORY SHA | stop DIRECTORY",
     );
   }
 }
