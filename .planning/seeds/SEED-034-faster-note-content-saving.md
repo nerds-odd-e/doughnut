@@ -18,16 +18,16 @@ the development environment as a reproduction example. Owner report on
 takes about 1.2 s; production saves take about 6 to 7 s, and the owner
 believes production notebooks hold sizeable attachments. Plain note-content
 saves became faster in story 4 (released in v1.3.15), but every save still
-does work proportional to the whole notebook: it renders and hashes every
-note twice and loads and hashes every attachment's bytes twice. Story 3 owns
-removing that whole-notebook cost from the frequent save path. Title-edit
+did work proportional to the whole notebook: it rendered and hashed every
+note twice and loaded and hashed every attachment's bytes twice. Story 3
+removed that whole-notebook cost from the frequent save path. Title-edit
 latency beyond what that naturally gives remains outside this outcome.
 
 ## Alternatives and Decision
 
 The save path uses durable native Git storage. Until story 3, it rebuilt the
 notebook's complete Portable tree from MySQL on every web change and let Git
-find the difference. The decision for story 3 is to derive the new commit's
+find the difference. The decision for story 3 was to derive the new commit's
 tree from the accepted head's tree plus the rows the change actually touched,
 keeping one complete accepted-change owner, one content authority and the
 existing publication contracts. Rejected alternatives: stored blob-id or hash
@@ -264,11 +264,17 @@ acknowledgement or background Git work (story 5's separate question).
 
 ## Ordering and Scope Reduction
 
-Story 3 removes the whole-notebook cost from every web save and makes
-attachment bytes irrelevant to unrelated edits by construction. Story 5 stays
-second as a conditional fallback: consume story 3's result against story 5's
-activation gate before exploring deferred Git work. Preserve the near-future
-direction and leave implementation to story 3's plan.
+Story 3 (closed 2026-09-22) removed the whole-notebook cost from every web
+save: each accepted web change derives its commit from the accepted head's
+tree and the rows the change touched, so unchanged notes are not rendered and
+attachment bytes are never read. Measured on an 11,000-note notebook with 28
+attachments (12.5 MB): the content-save request median fell from about
+1.3 s to about 180 ms, and the request part of a save that adds a wiki link
+from about 1.3 s to about 180 ms as well. Story 5 stays a conditional
+fallback: judge its activation gate against that result before exploring
+deferred Git work. Web README edits do not yet enter the accepted-change
+boundary; correction plan `quick/011-readme-edits-through-accepted-change-owner`
+routes them.
 
 ## When to Surface
 

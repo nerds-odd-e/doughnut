@@ -24,7 +24,8 @@ import org.springframework.stereotype.Component;
  * folders, attachments, notebook readmes) the flushed changes inserted, updated or deleted, grouped
  * by notebook. Updates keep the first-seen previous path fields so a later flush cannot lose the
  * original path; deletes keep the path the row had, since the entity is gone. Attachment bytes are
- * never read.
+ * never read. The window is not reentrant: opening one replaces any window already open on the
+ * thread, so the accepted-change owner must not re-enter itself.
  */
 @Component
 public class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomizer {

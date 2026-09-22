@@ -68,6 +68,12 @@ those files with the notebook, not because later stories need infrastructure.
   become semantic note/property Wiki links.
 - [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md) permits loud
   failures; do not conceal invalid output or lost files as successful acceptance.
+- Accepted web changes derive their commit from the accepted head's tree and
+  the projection rows the change touched (`NotebookGitTreeEncoder.derive`);
+  today only the full assembly adds attachment entries. A web operation that
+  inserts, renames or moves an attachment row must add that entry in the
+  derivation (bytes for an insert, the accepted blob id at the previous path
+  for a rename or move); the derived-tree oracle tests catch a missing entry.
 
 The [North Star](../NORTH-STAR.md) owns the concise direction and the
 [synchronization contract](../../docs/notebook-git-synchronization.md#attachments-in-the-portable-tree)
