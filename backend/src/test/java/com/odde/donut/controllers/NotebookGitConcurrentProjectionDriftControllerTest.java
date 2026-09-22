@@ -196,7 +196,11 @@ class NotebookGitConcurrentProjectionDriftControllerTest extends NotebookGitCont
         } else {
           assertThat(
               GitBundleTestReader.pathsIn(repository, head),
-              containsInAnyOrder("note.md", "new folder/.keep"));
+              containsInAnyOrder("note.md", "new folder/README.md"));
+          assertThat(commit.getParentCount(), is(1));
+          RevCommit folderCreation = revWalk.parseCommit(commit.getParent(0));
+          assertThat(folderCreation.getParentCount(), is(1));
+          assertThat(folderCreation.getParent(0), equalTo(priorAccepted));
         }
       }
     }

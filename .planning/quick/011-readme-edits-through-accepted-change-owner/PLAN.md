@@ -1,7 +1,16 @@
 # Web README edits enter the accepted-change boundary, and story 3's proof is tightened
 
-Status: **planned** (bounded retrospective correction, 2026-09-22). No
-execution authorization.
+Status: **executing** (bounded retrospective correction, 2026-09-22).
+Execution authorized by the owner on 2026-09-22, with retrospective skipped.
+
+## Execution
+
+- Mode: Story Branch. Replanning preserved (allowed if a slice overruns).
+- Originating checkout: `/Users/terryyin/git/doughnut` (integration, `main`).
+- Execution checkout: `/Users/terryyin/git/doughnut-worktrees/011-readme-edits-through-accepted-change-owner`, branch `cursor/011-readme-edits-through-accepted-change-owner`, created this session from `a2660d71f61797895fed18155da10ea0745a5f42`.
+- Published claim: `c5a3c91333427de908df87d585322cdd1d0d9871` on `origin/main`. Claim publisher `cursor-011-readme-edits`. Identity `quick/011-readme-edits-through-accepted-change-owner/PLAN.md`.
+- Story-branch increments publish to `origin/cursor/011-readme-edits-through-accepted-change-owner`. Observer: `/tmp/dough-ci-501/watch-NJo55N` (GitHub Actions `ci.yml` / `donut CI`). The trunk claim is unobserved.
+- Default checkout refresh: advanced to `c5a3c91333427de908df87d585322cdd1d0d9871`.
 Kind: correction from the execution retrospective of
 `quick/010-change-proportional-note-save/PLAN.md` (spent; recoverable at before-cleanup commit `b0b385a184`)
 (SEED-034#story-3). No seed is required; this plan carries its own input.
@@ -108,8 +117,9 @@ containment migration is finalized).
 Target about 5 minutes each including tests; over 10 minutes, stop and split.
 
 ### 1. README edits through the accepted-change owner
-Type: Behavior. Status: planned.
+Type: Behavior. Status: done.
 Wrap both README endpoint bodies in `acceptedWebChangeService.apply(notebook.getId(), operation, r -> "<message>", now)`, dropping the manual flush. Switch the two README oracle tests to the controllers; delete `saveFolderReadme` / `saveNotebookReadme` / `saveReadme`; adjust the concurrent-drift README-bearing scenario to expect two commits. Proof: the focused command above plus `NotebookGitConcurrentProjectionDrift*`.
+Learning: both README endpoints call `AcceptedWebChangeService.apply` (`Edit folder README: …` / `Edit notebook README`) with SERIALIZABLE isolation, matching the other web-change methods. Oracle tests call the controllers and assert `parents()` equals the prior commit list. The concurrent README scenario expects `new folder/README.md` and two commits from the prior head. Refactor moved folder queries to `NotebookFolderQuerySupport` and Git HTTP to `NotebookGitHttpSupport` so the controllers stay within 250 lines; README behavior was unchanged and that proof was not rerun. Compile of the split passed offline.
 
 ### 2. Cost proof that discriminates derivation from assembly
 Type: Behavior (proof). Status: planned.

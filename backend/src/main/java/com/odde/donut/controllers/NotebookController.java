@@ -21,9 +21,9 @@ import com.odde.donut.services.NotebookGroupService;
 import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
+import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
 import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
-import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
 import com.odde.donut.services.notebookGit.WebNoteCreationService;
 import com.odde.donut.testability.TestabilitySettings;
@@ -33,9 +33,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -44,24 +41,18 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/notebooks")
-class NotebookController {
+class NotebookController extends NotebookGitHttpSupport {
   private final EntityPersister entityPersister;
   private final NotebookService notebookService;
-
-  private final TestabilitySettings testabilitySettings;
-
   private final NotebookIndexingService notebookIndexingService;
   private final BazaarService bazaarService;
-  private final AuthorizationService authorizationService;
   private final NotebookGroupRepository notebookGroupRepository;
   private final NotebookGroupService notebookGroupService;
   private final NotebookRepository notebookRepository;
   private final NotebookCatalogService notebookCatalogService;
   private final WebNoteCreationService webNoteCreationService;
   private final WikidataService wikidataService;
-  private final NotebookGitBundleDownloadService notebookGitBundleDownloadService;
-  private final NotebookGitProposalPublisher notebookGitProposalPublisher;
-  private final NotebookGitCutoverService notebookGitCutoverService;
+  private final AcceptedWebChangeService acceptedWebChangeService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -78,12 +69,17 @@ class NotebookController {
       WikidataService wikidataService,
       NotebookGitBundleDownloadService notebookGitBundleDownloadService,
       NotebookGitProposalPublisher notebookGitProposalPublisher,
-      NotebookGitCutoverService notebookGitCutoverService) {
+      NotebookGitCutoverService notebookGitCutoverService,
+      AcceptedWebChangeService acceptedWebChangeService) {
+    super(
+        authorizationService,
+        testabilitySettings,
+        notebookGitBundleDownloadService,
+        notebookGitProposalPublisher,
+        notebookGitCutoverService);
     this.entityPersister = entityPersister;
-    this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
     this.bazaarService = bazaarService;
-    this.authorizationService = authorizationService;
     this.notebookService = notebookService;
     this.notebookGroupRepository = notebookGroupRepository;
     this.notebookGroupService = notebookGroupService;
@@ -91,16 +87,13 @@ class NotebookController {
     this.notebookCatalogService = notebookCatalogService;
     this.webNoteCreationService = webNoteCreationService;
     this.wikidataService = wikidataService;
-    this.notebookGitBundleDownloadService = notebookGitBundleDownloadService;
-    this.notebookGitProposalPublisher = notebookGitProposalPublisher;
-    this.notebookGitCutoverService = notebookGitCutoverService;
+    this.acceptedWebChangeService = acceptedWebChangeService;
   }
 
   @GetMapping("")
   public NotebooksViewedByUser myNotebooks() {
-    authorizationService.assertLoggedIn();
-
-    User user = authorizationService.getCurrentUser();
+    authorizationService().assertLoggedIn();
+    User user = authorizationService().getCurrentUser();
     var ownership = user.getOwnership();
     List<NotebookGroup> groups = notebookGroupRepository.findByOwnership_Id(ownership.getId());
     List<Notebook> notebooks =
@@ -113,13 +106,13 @@ class NotebookController {
   @Transactional
   public NotebookRealm createNotebook(@Valid @RequestBody NotebookCreationRequest noteCreation)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn();
-    User userEntity = authorizationService.getCurrentUser();
+    authorizationService().assertLoggedIn();
+    User userEntity = authorizationService().getCurrentUser();
     Notebook notebook =
         notebookService.createNotebookForOwnership(
             userEntity.getOwnership(),
             userEntity,
-            testabilitySettings.getCurrentUTCTimestamp(),
+            testabilitySettings().getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
             noteCreation.getDescription());
     notebookGroupService.assignNotebookToGroupById(
@@ -133,8 +126,8 @@ class NotebookController {
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException {
-    authorizationService.assertAuthorization(notebook);
-    User user = authorizationService.getCurrentUser();
+    authorizationService().assertAuthorization(notebook);
+    User user = authorizationService().getCurrentUser();
     return webNoteCreationService.createRootNote(
         notebook,
         noteCreation,
@@ -150,7 +143,7 @@ class NotebookController {
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody NotebookUpdateRequest request)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
+    authorizationService().assertAuthorization(notebook);
     notebook.getNotebookSettings().update(request.getNotebookSettings());
     if (request.getDescription() != null) {
       notebook.setDescription(request.getDescription().isBlank() ? null : request.getDescription());
@@ -165,8 +158,8 @@ class NotebookController {
   @GetMapping(value = "/{notebook}")
   public NotebookRealm get(@PathVariable @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(notebook);
-    User user = authorizationService.getCurrentUser();
+    authorizationService().assertReadAuthorization(notebook);
+    User user = authorizationService().getCurrentUser();
     return notebookCatalogService.notebookRealmFor(notebook, user);
   }
 
@@ -175,7 +168,7 @@ class NotebookController {
   public Notebook shareNotebook(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
+    authorizationService().assertAuthorization(notebook);
     bazaarService.shareNotebook(notebook);
     return notebook;
   }
@@ -186,8 +179,8 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @RequestBody UpdateNotebookGroupRequest request)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
-    User user = authorizationService.getCurrentUser();
+    authorizationService().assertAuthorization(notebook);
+    User user = authorizationService().getCurrentUser();
     if (request.getNotebookGroupId() == null) {
       notebookGroupService.clearNotebookGroup(user, notebook);
     } else {
@@ -202,7 +195,7 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
-    if (notebook.getCreator().getId() != authorizationService.getCurrentUser().getId()) {
+    if (notebook.getCreator().getId() != authorizationService().getCurrentUser().getId()) {
       throw new UnexpectedNoAccessRightException();
     }
     notebook.setOwnership(circle.getOwnership());
@@ -216,21 +209,28 @@ class NotebookController {
           "Saves the given markdown (with optional YAML frontmatter) as the notebook container's"
               + " readmeContent field. Blank content clears the field.")
   @PatchMapping("/{notebook}/readme-content")
-  @Transactional
+  @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
   public NotebookRealm updateNotebookReadmeContent(
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @RequestBody NoteUpdateContentDTO dto)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
+    authorizationService().assertAuthorization(notebook);
     String content = dto.getContent();
     if (content != null && !content.isBlank()) {
       content = AuthoredNoteContent.prepareContentForSave(content);
     }
-    notebook.setReadmeContent(content == null || content.isBlank() ? null : content);
-    entityPersister.save(notebook);
-    entityPersister.flush();
-    User user = authorizationService.getCurrentUser();
-    return notebookCatalogService.notebookRealmFor(notebook, user);
+    String readme = content == null || content.isBlank() ? null : content;
+    return acceptedWebChangeService.apply(
+        notebook.getId(),
+        () -> {
+          Notebook liveNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
+          liveNotebook.setReadmeContent(readme);
+          entityPersister.save(liveNotebook);
+          User user = authorizationService().getCurrentUser();
+          return notebookCatalogService.notebookRealmFor(liveNotebook, user);
+        },
+        realm -> "Edit notebook README",
+        testabilitySettings().getCurrentUTCTimestamp());
   }
 
   @PostMapping("/{notebook}/update-index")
@@ -238,7 +238,7 @@ class NotebookController {
   public void updateNotebookIndex(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
+    authorizationService().assertAuthorization(notebook);
     notebookIndexingService.updateNotebookIndex(notebook);
   }
 
@@ -247,54 +247,7 @@ class NotebookController {
   public void resetNotebookIndex(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
+    authorizationService().assertAuthorization(notebook);
     notebookIndexingService.resetNotebookIndex(notebook);
-  }
-
-  @Operation(
-      operationId = "resetNotebookGitHistory",
-      summary = "Restart the notebook's Git history from its current content")
-  @PostMapping("/{notebook}/reset-git-history")
-  @Transactional
-  public void resetNotebookGitHistory(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
-    notebookGitCutoverService.resetHistory(
-        notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
-  }
-
-  @Operation(
-      operationId = "downloadNotebookGitBundle",
-      summary = "Download the notebook's accepted Git bundle")
-  @GetMapping(value = "/{notebook}/git-bundle", produces = "application/x-git-bundle")
-  public ResponseEntity<byte[]> downloadNotebookGitBundle(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
-    byte[] bundleBytes = notebookGitBundleDownloadService.select(notebook.getId());
-    String filename = "notebook-" + notebook.getId() + ".bundle";
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-        .contentType(MediaType.valueOf("application/x-git-bundle"))
-        .body(bundleBytes);
-  }
-
-  @Operation(
-      operationId = "publishNotebookGitProposal",
-      summary = "Submit a proposal Git bundle to publish onto the notebook's accepted main")
-  @PostMapping(value = "/{notebook}/git-bundle", consumes = "application/x-git-bundle")
-  public String publishNotebookGitProposal(
-      @PathVariable("notebook") @Schema(type = "integer") Integer notebookId,
-      @RequestParam("expectedHead") String expectedHead,
-      @RequestBody byte[] bundleBytes)
-      throws UnexpectedNoAccessRightException {
-    NotebookGitProposalImporter.ImportedProposal proposal =
-        NotebookGitProposalImporter.importMainHead(bundleBytes);
-    try {
-      return notebookGitProposalPublisher.publish(notebookId, expectedHead, proposal);
-    } finally {
-      proposal.repository().close();
-    }
   }
 }

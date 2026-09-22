@@ -10,18 +10,17 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
+import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Every web folder change's accepted tree, derived by re-listing the accepted entries under the
@@ -30,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 class NotebookGitDerivedFolderTreeOracleControllerTest
     extends NotebookGitWebContentControllerTestBase {
-  @Autowired AcceptedWebChangeService acceptedWebChangeService;
-  @Autowired FolderRepository folderRepository;
 
   @Test
   void
@@ -137,19 +134,26 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
     Notebook notebook = createGitBackedNotebook();
     Folder docs = makeMe.aFolder().notebook(notebook).name("Docs").please();
     snapshotCurrentPortableTree(notebook);
+    AcceptedHistory beforeEdit = acceptedHistory(notebook);
+    NoteUpdateContentDTO dto = contentDto("Read these first");
 
-    saveFolderReadme(notebook, docs, "Read these first");
+    folderController.updateFolderReadmeContent(notebook, docs, dto);
 
+    AcceptedHistory afterEdit = acceptedHistory(notebook);
+    assertThat(afterEdit.parents(), equalTo(beforeEdit.commits()));
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        afterEdit.tipContent(),
         contains(
             PortableTreeEntry.ofText(
                 "Docs/README.md", PortableTreeReadmeMarkdown.assemble("Read these first"))));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
 
-    saveFolderReadme(notebook, docs, " ");
+    AcceptedHistory beforeClear = acceptedHistory(notebook);
+    folderController.updateFolderReadmeContent(notebook, docs, contentDto(" "));
 
-    assertThat(acceptedHistory(notebook).tipPaths(), contains("Docs/.keep"));
+    AcceptedHistory afterClear = acceptedHistory(notebook);
+    assertThat(afterClear.parents(), equalTo(beforeClear.commits()));
+    assertThat(afterClear.tipPaths(), contains("Docs/.keep"));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 
@@ -158,43 +162,26 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
     snapshotCurrentPortableTree(notebook);
+    AcceptedHistory beforeEdit = acceptedHistory(notebook);
 
-    saveNotebookReadme(notebook, "Welcome");
+    controller.updateNotebookReadmeContent(notebook, contentDto("Welcome"));
 
+    AcceptedHistory afterEdit = acceptedHistory(notebook);
+    assertThat(afterEdit.parents(), equalTo(beforeEdit.commits()));
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        afterEdit.tipContent(),
         contains(
             PortableTreeEntry.ofText("README.md", PortableTreeReadmeMarkdown.assemble("Welcome"))));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
 
-    saveNotebookReadme(notebook, null);
+    AcceptedHistory beforeClear = acceptedHistory(notebook);
+    NoteUpdateContentDTO clear = new NoteUpdateContentDTO();
+    clear.setContent(null);
+    controller.updateNotebookReadmeContent(notebook, clear);
 
-    assertThat(acceptedHistory(notebook).tipPaths(), empty());
+    AcceptedHistory afterClear = acceptedHistory(notebook);
+    assertThat(afterClear.parents(), equalTo(beforeClear.commits()));
+    assertThat(afterClear.tipPaths(), empty());
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
-  }
-
-  private void saveFolderReadme(Notebook notebook, Folder folder, String content) throws Exception {
-    saveReadme(
-        notebook,
-        () -> folderRepository.findById(folder.getId()).orElseThrow().setReadmeContent(content));
-  }
-
-  private void saveNotebookReadme(Notebook notebook, String content) throws Exception {
-    saveReadme(
-        notebook,
-        () ->
-            notebookRepository.findById(notebook.getId()).orElseThrow().setReadmeContent(content));
-  }
-
-  /** A readme edit accepted through the owner, as a readme endpoint routed through it would be. */
-  private void saveReadme(Notebook notebook, Runnable edit) throws Exception {
-    acceptedWebChangeService.apply(
-        notebook.getId(),
-        () -> {
-          edit.run();
-          return null;
-        },
-        ignored -> "Edit readme",
-        testabilitySettings.getCurrentUTCTimestamp());
   }
 }
