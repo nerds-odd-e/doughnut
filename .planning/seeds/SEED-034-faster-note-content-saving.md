@@ -112,9 +112,8 @@ attachments (12.5 MB): the content-save request median fell from about
 1.3 s to about 180 ms, and the request part of a save that adds a wiki link
 from about 1.3 s to about 180 ms as well. Story 5 stays a conditional
 fallback: judge its activation gate against that result before exploring
-deferred Git work. Web README edits do not yet enter the accepted-change
-boundary; correction plan `quick/011-readme-edits-through-accepted-change-owner`
-routes them.
+deferred Git work. Web README edits enter the accepted-change boundary in the
+same request as other web changes.
 
 ## When to Surface
 
