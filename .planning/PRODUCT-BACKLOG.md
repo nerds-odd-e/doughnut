@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Web README edits enter the accepted-change boundary, and story 3's proof is tightened](quick/011-readme-edits-through-accepted-change-owner/PLAN.md)
-
 ## Backlog list
 
 - [Assess asynchronous Git processing only if save performance remains inadequate](seeds/SEED-034-faster-note-content-saving.md#story-5) — SEED-034#story-5
