@@ -9,6 +9,7 @@ Execution authorized by the owner on 2026-09-22, with retrospective skipped.
 - Originating checkout: `/Users/terryyin/git/doughnut` (integration, `main`).
 - Execution checkout: `/Users/terryyin/git/doughnut-worktrees/011-readme-edits-through-accepted-change-owner`, branch `cursor/011-readme-edits-through-accepted-change-owner`, created this session from `a2660d71f61797895fed18155da10ea0745a5f42`.
 - Published claim: `c5a3c91333427de908df87d585322cdd1d0d9871` on `origin/main`. Claim publisher `cursor-011-readme-edits`. Identity `quick/011-readme-edits-through-accepted-change-owner/PLAN.md`.
+- Slice 1 increment: `7f217de349c5201c909e0b36d84cc7008543cf9d` on `origin/cursor/011-readme-edits-through-accepted-change-owner`, registered with the observer. An earlier observer poll failed on a TLS timeout (`CI_MONITOR_UNAVAILABLE`); the observer is still attached.
 - Story-branch increments publish to `origin/cursor/011-readme-edits-through-accepted-change-owner`. Observer: `/tmp/dough-ci-501/watch-NJo55N` (GitHub Actions `ci.yml` / `donut CI`). The trunk claim is unobserved.
 - Default checkout refresh: advanced to `c5a3c91333427de908df87d585322cdd1d0d9871`.
 Kind: correction from the execution retrospective of
@@ -122,8 +123,9 @@ Wrap both README endpoint bodies in `acceptedWebChangeService.apply(notebook.get
 Learning: both README endpoints call `AcceptedWebChangeService.apply` (`Edit folder README: …` / `Edit notebook README`) with SERIALIZABLE isolation, matching the other web-change methods. Oracle tests call the controllers and assert `parents()` equals the prior commit list. The concurrent README scenario expects `new folder/README.md` and two commits from the prior head. Refactor moved folder queries to `NotebookFolderQuerySupport` and Git HTTP to `NotebookGitHttpSupport` so the controllers stay within 250 lines; README behavior was unchanged and that proof was not rerun. Compile of the split passed offline.
 
 ### 2. Cost proof that discriminates derivation from assembly
-Type: Behavior (proof). Status: planned.
+Type: Behavior (proof). Status: done.
 In `NotebookGitWebContentSaveCostControllerTest`, replace statement-count equality with assertions that no executed query names `NotebookAttachment` or `PortableTreeNoteRow`; keep "one commit appended". Proof: that class green; temporarily forcing the full assembly should make it fail (do not keep that change).
+Learning: `savingContentInALargeNotebookWithAttachmentsDoesNotQueryAttachmentsOrPortableTreeRows` asserts those two query names are absent and one commit is appended. Forcing `AcceptedWebChangeService.commitIfChanged` onto `fullTree` failed on the `NotebookAttachment` assertion and was reverted. Focused class passed after the revert. Rename-only refactor did not rerun that proof.
 
 ### 3. Encoder stays inside its package
 Type: Structure. Status: planned.
