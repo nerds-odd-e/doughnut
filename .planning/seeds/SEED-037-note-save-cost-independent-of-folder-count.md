@@ -68,7 +68,7 @@ are hypotheses. Story 2 is not authorized for implementation by this seed.
 
 ### Publish a web save from a whole-notebook assembly that never moves content bytes
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/013-hash-only-notebook-assembly/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ae38738b7810ffc30e34d1f3a60712b285b5b68cf67a799166bc8be6b94deedb","plan":"3abcc7b36e2eb666944bbb56fb22263b3c70b0a3cb641733063ecba61f8bd095"}}
 ```
 
 - **Identity:** SEED-037#story-3
