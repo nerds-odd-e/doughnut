@@ -1,11 +1,12 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheBuilder;
 import org.eclipse.jgit.dircache.DirCacheEntry;
@@ -22,9 +23,9 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 
 /**
- * Commits a canonical Portable-tree snapshot (see {@code notebookTree.PortableTreeSnapshot}) on
- * {@code refs/heads/main}: {@link #build} makes a fresh in-memory repository with a single,
- * parentless root commit; {@link #append} adds a commit on a given parent.
+ * Commits a {@link NotebookGitTreeContent} on {@code refs/heads/main}: {@link #build} makes a fresh
+ * in-memory repository with a single, parentless root commit; {@link #append} adds a commit on a
+ * given parent.
  *
  * <p>No filesystem writes and no Donut identity: the caller supplies author/message/time, and the
  * notebook ID (if any) stays the caller's concern rather than being embedded in paths or blobs.
@@ -34,14 +35,14 @@ public final class NotebookGitCommitBuilder {
   private NotebookGitCommitBuilder() {}
 
   public static Repository build(
-      List<PortableTreeEntry> entries,
+      NotebookGitTreeContent tree,
       String authorName,
       String authorEmail,
       String message,
       Instant commitTime) {
     InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
     try (ObjectInserter inserter = repository.newObjectInserter()) {
-      ObjectId treeId = writeTree(entries, DirCache.newInCore(), inserter);
+      ObjectId treeId = writeTree(tree, DirCache.newInCore(), inserter);
       ObjectId commitId =
           inserter.insert(commitBuilder(treeId, authorName, authorEmail, message, commitTime));
       inserter.flush();
@@ -55,15 +56,16 @@ public final class NotebookGitCommitBuilder {
   public static ObjectId append(
       Repository repository,
       ObjectId parent,
-      List<PortableTreeEntry> entries,
+      NotebookGitTreeContent tree,
       String authorName,
       String authorEmail,
       String message,
       Instant commitTime) {
     try (ObjectInserter inserter = repository.newObjectInserter();
         RevWalk walk = new RevWalk(repository)) {
-      DirCache dirCache = DirCache.read(walk.getObjectReader(), walk.parseCommit(parent).getTree());
-      ObjectId treeId = writeTree(entries, dirCache, inserter);
+      DirCache parentTree =
+          DirCache.read(walk.getObjectReader(), walk.parseCommit(parent).getTree());
+      ObjectId treeId = writeTree(tree, parentTree, inserter);
       CommitBuilder commitBuilder =
           commitBuilder(treeId, authorName, authorEmail, message, commitTime);
       commitBuilder.setParentId(parent);
@@ -76,26 +78,30 @@ public final class NotebookGitCommitBuilder {
     }
   }
 
-  /** Writes each entry as a regular file; inserts only blobs the parent lacks at that path. */
+  /** Writes each path as a regular file; inserts only blobs the parent tree does not hold. */
   private static ObjectId writeTree(
-      List<PortableTreeEntry> entries, DirCache dirCache, ObjectInserter inserter)
+      NotebookGitTreeContent tree, DirCache parentTree, ObjectInserter inserter)
       throws IOException {
-    DirCacheBuilder builder = dirCache.builder();
-
-    for (PortableTreeEntry entry : entries) {
-      ObjectId blobId = inserter.idFor(Constants.OBJ_BLOB, entry.content());
-      DirCacheEntry accepted = dirCache.getEntry(entry.path());
-      if (accepted == null || !blobId.equals(accepted.getObjectId())) {
-        inserter.insert(Constants.OBJ_BLOB, entry.content());
+    Set<ObjectId> held = new HashSet<>();
+    for (int i = 0; i < parentTree.getEntryCount(); i++) {
+      held.add(parentTree.getEntry(i).getObjectId());
+    }
+    for (Map.Entry<ObjectId, byte[]> blob : tree.blobs().entrySet()) {
+      if (!held.contains(blob.getKey())) {
+        inserter.insert(Constants.OBJ_BLOB, blob.getValue());
       }
-      DirCacheEntry dirCacheEntry = new DirCacheEntry(entry.path());
+    }
+
+    DirCacheBuilder builder = parentTree.builder();
+    for (Map.Entry<String, ObjectId> entry : tree.blobIds().entrySet()) {
+      DirCacheEntry dirCacheEntry = new DirCacheEntry(entry.getKey());
       dirCacheEntry.setFileMode(FileMode.REGULAR_FILE);
-      dirCacheEntry.setObjectId(blobId);
+      dirCacheEntry.setObjectId(entry.getValue());
       builder.add(dirCacheEntry);
     }
     builder.finish();
 
-    return dirCache.writeTree(inserter);
+    return parentTree.writeTree(inserter);
   }
 
   private static CommitBuilder commitBuilder(

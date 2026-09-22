@@ -6,7 +6,6 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
-import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,22 +90,19 @@ public class AcceptedWebChangeService {
     Map<String, ObjectId> acceptedBlobIds =
         NotebookGitAcceptedTree.blobIds(accepted.repository(), accepted.head());
     return new OpenedNotebook(
-        binding,
-        accepted,
-        acceptedBlobIds,
-        NotebookGitAcceptedTree.blobIds(snapshot(binding)).equals(acceptedBlobIds));
+        binding, accepted, acceptedBlobIds, snapshot(binding).blobIds().equals(acceptedBlobIds));
   }
 
   private void commitIfChanged(OpenedNotebook notebook, String message, Timestamp updatedAt) {
-    List<PortableTreeEntry> entries = snapshot(notebook.binding());
-    if (NotebookGitAcceptedTree.blobIds(entries).equals(notebook.acceptedBlobIds())) {
+    NotebookGitTreeContent tree = snapshot(notebook.binding());
+    if (tree.blobIds().equals(notebook.acceptedBlobIds())) {
       return;
     }
     OpenedAcceptedRepository accepted = notebook.accepted();
     NotebookGitCommitBuilder.append(
         accepted.repository(),
         accepted.head(),
-        entries,
+        tree,
         NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
         NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,
         message,
@@ -114,7 +110,7 @@ public class AcceptedWebChangeService {
     repositoryStore.store(notebook.binding(), accepted.repository(), updatedAt);
   }
 
-  private List<PortableTreeEntry> snapshot(NotebookGitBinding binding) {
-    return livePortableTree.entriesOf(binding.getNotebook());
+  private NotebookGitTreeContent snapshot(NotebookGitBinding binding) {
+    return NotebookGitTreeContent.of(livePortableTree.entriesOf(binding.getNotebook()));
   }
 }

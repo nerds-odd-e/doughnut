@@ -1,8 +1,19 @@
 # Save note edits at a cost proportional to the change, not the notebook
 
-Status: **planned** (2026-09-22); all decisions settled. No execution
-authorization.
+Status: **in progress** (execution started 2026-09-22).
 Work item: **SEED-034#story-3**.
+
+Execution identity (Story Branch Mode): worktree
+`/Users/terryyin/git/doughnut-worktrees/010-change-proportional-note-save`,
+branch `claude/010-change-proportional-note-save`, created by this execution
+from fetched `origin/main` at `0e64e66041`; originating and integration
+checkout `/Users/terryyin/git/doughnut` (`main`). Authorized remote target for
+increments: `origin claude/010-change-proportional-note-save`. Queue claim
+published to `origin/main` as `12702ca604` (`pendingCi: unobserved` on trunk).
+CI observer: GitHub Actions `ci.yml` ("donut CI"), mailbox
+`/tmp/dough-ci-501/watch-h71PBC`, target branch
+`claude/010-change-proportional-note-save`. Published revisions on that target:
+none yet. Replanning: in-place refinement allowed (no flag given).
 Source: [refined story](../../seeds/SEED-034-faster-note-content-saving.md#story-3).
 Planning inspection: `a27f572a14` (main, 2026-09-22).
 
@@ -111,7 +122,20 @@ Target about 5 minutes per slice including tests; over 10 minutes, stop and
 decompose further unless a stated reason applies.
 
 ### 1. Commit from a path-to-blob map
-Type: Structure. Status: planned. Enables slice 3.
+Type: Structure. Status: **done** (2026-09-22). Enables slice 3.
+
+Delivered: `NotebookGitTreeContent(blobIds, blobs)` record (path-to-blob map
+plus bytes of blobs that may need inserting; `of(entries)` is the one hasher).
+`NotebookGitCommitBuilder.build/append` take it; `writeTree` inserts only blobs
+the parent tree does not hold, then lists every path. Callers
+(`AcceptedWebChangeService`, `NotebookGitCutoverService`, `NotebookGitProjection`)
+wrap the full assembly; the duplicate entries hasher left
+`NotebookGitAcceptedTree`. Accepted proof: focused run of the three planned
+classes plus `NotebookGitCommitBuilderTest`, `NotebookGitJdbcObjectStoreTest`,
+`NotebookGitAcceptedHistoryCompletenessTest`, proposal import/ancestry tests:
+32 tests pass, no assertion changed
+(`NotebookGitCommitBuilderTest.appendsCompleteSnapshotWithTheSameTreeAsAFreshBuild`
+proves tree-id equality of the map shape).
 
 `NotebookGitCommitBuilder.build/append` take the final tree as a map from
 path to blob id plus the contents of blobs that must be inserted; the
@@ -243,6 +267,19 @@ retained in the repository. Proof: the recorded numbers in this plan.
   `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 - Each slice owns the tests named in its proof; the oracle test is created in
   slice 3 and extended in slices 4 to 7.
+
+## Learnings
+
+- Slice 1: derivation recipe for slice 3 is copy `acceptedBlobIds` (already
+  read in `AcceptedWebChangeService.open`), put `path -> Formatter.idFor(BLOB,
+  bytes)` for each changed note, remove deleted paths, and pass
+  `new NotebookGitTreeContent(map, replacedBlobs)`; no-op stays
+  `blobIds().equals(acceptedBlobIds)`.
+- Five `preExistingPortableDrift*` tests exist (content save, folder dissolve,
+  folder rename, folder move, folder trash), not only the content-save one.
+  Decision 4 is applied per operation kind as it becomes derived: each slice
+  rewrites the drift tests of the operations it derives, and the before-snapshot
+  comparison stays only for the fallback path until slice 7 retires it.
 
 ## Remaining concerns
 

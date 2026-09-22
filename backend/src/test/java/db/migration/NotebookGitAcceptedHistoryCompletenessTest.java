@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitJdbcFixture;
+import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.NotebookGitAcceptedHistoryFixture;
 import java.sql.Connection;
@@ -75,12 +76,16 @@ class NotebookGitAcceptedHistoryCompletenessTest {
   private Binding seedCompleteBinding(String label) throws Exception {
     Repository source =
         NotebookGitCommitBuilder.build(
-            entries(label, 1), "Donut", "system@donut.local", "c1", time(1));
+            NotebookGitTreeContent.of(entries(label, 1)),
+            "Donut",
+            "system@donut.local",
+            "c1",
+            time(1));
     ObjectId head =
         NotebookGitCommitBuilder.append(
             source,
             NotebookGitAcceptedHistoryFixture.mainHeadOf(source),
-            entries(label, 2),
+            NotebookGitTreeContent.of(entries(label, 2)),
             "Donut",
             "system@donut.local",
             "c2",

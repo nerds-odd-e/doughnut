@@ -31,7 +31,11 @@ class NotebookGitCommitBuilderTest {
 
     try (Repository repository =
         NotebookGitCommitBuilder.build(
-            entries, "Donut System", "system@donut.local", "Snapshot import", commitTime)) {
+            NotebookGitTreeContent.of(entries),
+            "Donut System",
+            "system@donut.local",
+            "Snapshot import",
+            commitTime)) {
       Ref mainRef = repository.exactRef("refs/heads/main");
       assertThat(mainRef, notNullValue());
 
@@ -70,9 +74,14 @@ class NotebookGitCommitBuilderTest {
     Instant time = Instant.parse("2026-09-04T10:15:30Z");
     try (Repository repository =
             NotebookGitCommitBuilder.build(
-                accepted, "Donut", "system@donut.local", "Initial", time);
+                NotebookGitTreeContent.of(accepted),
+                "Donut",
+                "system@donut.local",
+                "Initial",
+                time);
         Repository fresh =
-            NotebookGitCommitBuilder.build(entries, "Donut", "system@donut.local", "Fresh", time);
+            NotebookGitCommitBuilder.build(
+                NotebookGitTreeContent.of(entries), "Donut", "system@donut.local", "Fresh", time);
         RevWalk walk = new RevWalk(repository);
         RevWalk freshWalk = new RevWalk(fresh)) {
       ObjectId parent = repository.resolve("refs/heads/main");
@@ -80,7 +89,7 @@ class NotebookGitCommitBuilderTest {
           NotebookGitCommitBuilder.append(
               repository,
               parent,
-              entries,
+              NotebookGitTreeContent.of(entries),
               "Donut",
               "system@donut.local",
               "Edit",

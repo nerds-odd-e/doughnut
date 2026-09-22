@@ -11,9 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectInserter;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
@@ -53,16 +51,6 @@ final class NotebookGitAcceptedTree {
     } catch (IOException e) {
       throw new UncheckedIOException("Could not inspect accepted Portable tree", e);
     }
-  }
-
-  /** Each entry's path with the Git blob id of its bytes, comparable with the accepted tree's. */
-  static Map<String, ObjectId> blobIds(List<PortableTreeEntry> entries) {
-    ObjectInserter.Formatter formatter = new ObjectInserter.Formatter();
-    return entries.stream()
-        .collect(
-            Collectors.toMap(
-                PortableTreeEntry::path,
-                entry -> formatter.idFor(Constants.OBJ_BLOB, entry.content())));
   }
 
   static boolean representedInTree(String folderPath, List<PortableTreeEntry> entries) {

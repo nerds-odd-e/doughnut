@@ -58,7 +58,8 @@ class NotebookGitJdbcObjectStoreTest {
     ObjectId commit3;
     byte[] fixtureBundleBytes;
     try (Repository fixture =
-        NotebookGitCommitBuilder.build(v1, "Donut", "system@donut.local", "Initial", time)) {
+        NotebookGitCommitBuilder.build(
+            NotebookGitTreeContent.of(v1), "Donut", "system@donut.local", "Initial", time)) {
       commit1 = fixture.exactRef("refs/heads/main").getObjectId();
       commit2 = commitOn(fixture, commit1, v2, "Edit", time.plusSeconds(1));
       commit3 = commitOn(fixture, commit2, v3, "Add", time.plusSeconds(2));
@@ -139,7 +140,8 @@ class NotebookGitJdbcObjectStoreTest {
 
     ObjectId commit1;
     try (Repository fixture =
-        NotebookGitCommitBuilder.build(v1, "Donut", "system@donut.local", "Initial", time)) {
+        NotebookGitCommitBuilder.build(
+            NotebookGitTreeContent.of(v1), "Donut", "system@donut.local", "Initial", time)) {
       commit1 = fixture.exactRef("refs/heads/main").getObjectId();
 
       int bindingId = jdbcFixture.insertBinding(commit1.name());
@@ -196,7 +198,11 @@ class NotebookGitJdbcObjectStoreTest {
     ObjectId baseHead;
     try (Repository fixture =
         NotebookGitCommitBuilder.build(
-            baseEntries, "Donut", "system@donut.local", "Initial", time)) {
+            NotebookGitTreeContent.of(baseEntries),
+            "Donut",
+            "system@donut.local",
+            "Initial",
+            time)) {
       baseHead = fixture.exactRef("refs/heads/main").getObjectId();
 
       int bindingId = jdbcFixture.insertBinding(baseHead.name());
@@ -225,7 +231,13 @@ class NotebookGitJdbcObjectStoreTest {
       String message,
       Instant commitTime) {
     return NotebookGitCommitBuilder.append(
-        repo, parent, entries, "Donut", "system@donut.local", message, commitTime);
+        repo,
+        parent,
+        NotebookGitTreeContent.of(entries),
+        "Donut",
+        "system@donut.local",
+        message,
+        commitTime);
   }
 
   private void assertTreeEntries(

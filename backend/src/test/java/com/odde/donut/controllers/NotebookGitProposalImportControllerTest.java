@@ -4,6 +4,7 @@ import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
+import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,7 +43,11 @@ class NotebookGitProposalImportControllerTest extends NotebookGitControllerTestB
     List<PortableTreeEntry> entries = List.of(ofText("README.md", "off-main content"));
     try (Repository repository =
         NotebookGitCommitBuilder.build(
-            entries, "Proposer", "proposer@example.com", "Off-main commit", Instant.now())) {
+            NotebookGitTreeContent.of(entries),
+            "Proposer",
+            "proposer@example.com",
+            "Off-main commit",
+            Instant.now())) {
       ObjectId commitId = repository.exactRef(Constants.R_HEADS + "main").getObjectId();
 
       BundleWriter bundleWriter = new BundleWriter(repository);

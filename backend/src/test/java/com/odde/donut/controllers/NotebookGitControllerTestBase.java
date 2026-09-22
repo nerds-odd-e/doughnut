@@ -14,6 +14,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
@@ -133,7 +134,11 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
   NotebookGitBinding seedAcceptedBinding(Notebook notebook, List<PortableTreeEntry> entries) {
     try (Repository seeded =
         NotebookGitCommitBuilder.build(
-            entries, "System", "system@example.com", "Seed content", Instant.now())) {
+            NotebookGitTreeContent.of(entries),
+            "System",
+            "system@example.com",
+            "Seed content",
+            Instant.now())) {
       return seedAcceptedHistory(
           notebook, seeded, NotebookGitAcceptedHistoryFixture.mainHeadOf(seeded));
     }

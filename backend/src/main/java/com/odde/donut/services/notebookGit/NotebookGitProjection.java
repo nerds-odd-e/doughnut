@@ -181,7 +181,8 @@ public class NotebookGitProjection {
       Repository repository,
       ObjectId acceptedHead) {
     List<PortableTreeEntry> live = livePortableTree.entriesOf(notebook, folders, storedNotes);
-    if (!NotebookGitAcceptedTree.blobIds(live)
+    if (!NotebookGitTreeContent.of(live)
+        .blobIds()
         .equals(NotebookGitAcceptedTree.blobIds(repository, acceptedHead))) {
       throw projectionDrift();
     }

@@ -4,10 +4,8 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
-import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,9 +78,12 @@ public class NotebookGitCutoverService {
   }
 
   private Repository buildRepository(Notebook notebook, Instant commitTime, String message) {
-    List<PortableTreeEntry> entries = livePortableTree.entriesOf(notebook);
     return NotebookGitCommitBuilder.build(
-        entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, message, commitTime);
+        NotebookGitTreeContent.of(livePortableTree.entriesOf(notebook)),
+        SYSTEM_AUTHOR_NAME,
+        SYSTEM_AUTHOR_EMAIL,
+        message,
+        commitTime);
   }
 
   private void storeHistory(NotebookGitBinding binding, Repository repository, Instant time) {

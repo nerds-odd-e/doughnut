@@ -6,6 +6,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
 import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
+import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.time.Instant;
@@ -63,7 +64,11 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitControllerTes
     List<PortableTreeEntry> entries = List.of(ofText("README.md", "proposal"));
     try (Repository repository =
         NotebookGitCommitBuilder.build(
-            entries, "Proposer", "proposer@example.com", "Proposal", Instant.now())) {
+            NotebookGitTreeContent.of(entries),
+            "Proposer",
+            "proposer@example.com",
+            "Proposal",
+            Instant.now())) {
       return NotebookGitBundleWriter.write(repository);
     }
   }
