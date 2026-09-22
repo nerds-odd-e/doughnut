@@ -140,10 +140,9 @@ are hypotheses. Story 2 is not authorized for implementation by this seed.
 - **Key examples:** The same one-note edit at shallow and deep paths should
   not incur one database round trip per ancestor; a cold first edit must gain
   the improvement too; a late failure must preserve prior content and history.
-- **Deferred promises:** Background acknowledgement/worker delivery (the
-  separate SEED-034#story-5), universal optimization of Git downloads/imports,
-  and an exact chosen storage architecture. No index or migration is approved
-  by this backlog entry.
+- **Deferred promises:** Background acknowledgement/worker delivery, universal
+  optimization of Git downloads/imports, and an exact chosen storage
+  architecture. No index or migration is approved by this backlog entry.
 - **Depends on:** the measured ancestor-only save in commit `458496764f931f05b0d46d955e1bbbebf04beefc` (`.planning/quick/012-path-scoped-note-save/PLAN.md`).
 - **Effort hypothesis:** Unknown until the remaining cost and architectural
   tradeoff are established. Refine before slice planning; resplit if needed.
