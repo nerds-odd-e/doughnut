@@ -12,7 +12,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Assess whether attachment content needs its own save-path treatment](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3
+- [Save note edits at a cost proportional to the change, not the notebook](seeds/SEED-034-faster-note-content-saving.md#story-3) — SEED-034#story-3
 - [Assess asynchronous Git processing only if save performance remains inadequate](seeds/SEED-034-faster-note-content-saving.md#story-5) — SEED-034#story-5
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5

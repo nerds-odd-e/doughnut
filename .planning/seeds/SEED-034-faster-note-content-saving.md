@@ -13,61 +13,189 @@ scope: medium
 
 Note authors experience slow saves when editing content in large notebooks,
 especially content containing wiki links. The owner identifies notebook 1 in
-the development environment as a reproduction example and estimates that
-production saves take a few seconds. Production timing remains a reported
-estimate. Local investigation on 2026-09-20 reproduced substantial backend
-latency on an isolated copy. Plain note-content saves are now faster than
-before this seed's work; the remaining concern is attachment bytes, which story
-3 owns. Title-edit latency remains outside this outcome.
+the development environment as a reproduction example. Owner report on
+2026-09-22: that notebook holds no attachments and a content save's API call
+takes about 1.2 s; production saves take about 6 to 7 s, and the owner
+believes production notebooks hold sizeable attachments. Plain note-content
+saves became faster in story 4 (released in v1.3.15), but every save still
+does work proportional to the whole notebook: it renders and hashes every
+note twice and loads and hashes every attachment's bytes twice. Story 3 owns
+removing that whole-notebook cost from the frequent save path. Title-edit
+latency beyond what that naturally gives remains outside this outcome.
 
 ## Alternatives and Decision
 
-The save path uses durable native Git storage and shared Portable-tree assembly
-that includes root attachments, and decides drift and no-op saves by comparing
-Git blob identities. Keep one complete accepted-change owner and the existing
-correctness and architecture contracts; do not hide latency through early
-acknowledgement or add competing representations.
+The save path uses durable native Git storage. Until story 3, it rebuilt the
+notebook's complete Portable tree from MySQL on every web change and let Git
+find the difference. The decision for story 3 is to derive the new commit's
+tree from the accepted head's tree plus the rows the change actually touched,
+keeping one complete accepted-change owner, one content authority and the
+existing publication contracts. Rejected alternatives: stored blob-id or hash
+columns (derived caches that keep per-save work proportional to the notebook),
+per-operation declarations of changed paths (scattered and incomplete), early
+acknowledgement or background Git work (story 5's separate question).
 
 ## Story Decomposition
 
 <a id="story-3"></a>
 
-### 3. Assess whether attachment content needs its own save-path treatment
+### 3. Save note edits at a cost proportional to the change, not the notebook
 
-- **Identity:** SEED-034#story-3
-- **Status:** queued. Assessment evidence gathered on 2026-09-21 (below); only the
-  unresolved outcome remains. No plan.
-- **Goal / beneficiaries:** Note authors in notebooks that also hold sizeable
-  attachments get note saves whose cost does not grow with attachment bytes they
-  did not change.
-- **Evidence (measured 2026-09-21, 11,000-note notebook, same revision and edits):**
-  28 realistic root attachments totalling 12,554,240 bytes (icons, screenshots,
-  photos and two PDFs, all incompressible) add about **+515 ms to every note-save
-  request** - roughly 41 ms per MB - over a base request of about 720 ms. Before
-  saves compared trees by Git blob identity (`562c93a893`) the same files added
-  about +620 ms.
-- **Already resolved:** a save no longer reads accepted blob bytes; drift and no-op
-  decisions compare path-to-blob-id maps taken from tree objects, and unchanged
-  blobs are reused without being re-inserted. No attachment-specific save path
-  exists - the cost runs through the shared live Portable tree and accepted-change
-  owners.
-- **Unresolved outcome:** each changed save still assembles the live Portable tree
-  twice - the before-snapshot for projection-drift detection and the
-  after-snapshot - and each assembly loads every attachment's bytes through
-  `NotebookAttachmentRepository.findExportRowsByNotebookId`, then hashes them to
-  compute blob ids. The cost therefore grows with total attachment size
-  (extrapolated, unmeasured: about 5 s per save at 100 MB).
-- **Scope and constraints:** any change stays inside the live Portable tree and
-  accepted-change owners. No second content authority, no attachment-only cache or
-  bypass, no weakening of no-op or projection-drift detection, and no change to
-  what a notebook's Portable tree contains. Reusing before-snapshot attachment rows
-  in the after-snapshot on the assumption that web edits never touch attachments
-  was assessed and rejected: it is a second content authority in disguise.
-- **Effort hypothesis:** S to decide whether the remaining cost is acceptable for
-  the attachment sizes owners keep; unknown for any change.
-- **Safe stopping point:** an evidenced decision that the remaining cost is
-  acceptable, or one bounded simplification proven with a same-fixture
-  before/after measurement.
+- **Identity:** SEED-034#story-3 (unchanged; retitled on 2026-09-22 from
+  "Assess whether attachment content needs its own save-path treatment"; the
+  assessment is complete and its evidence is kept below).
+- **Status:** refined 2026-09-22; executable plan
+  [`quick/010-change-proportional-note-save`](../quick/010-change-proportional-note-save/PLAN.md).
+  The drift policy (architecture decision 4) was decided by the owner on
+  2026-09-22. No execution authorization.
+- **Goal / beneficiaries:** Note authors in large notebooks get web saves
+  whose server work depends on what they changed, not on how many notes or
+  how many attachment bytes the notebook holds. This keeps editing responsive
+  as notebooks grow through local AI IDE work and through the coming move of
+  note images into notebook attachments (SEED-035 story 5), instead of
+  degrading linearly with notebook size.
+- **Evidence:**
+  - Measured 2026-09-21 on an 11,000-note fixture: base save request about
+    720 ms with no attachments; 28 realistic attachments totalling
+    12,554,240 bytes add about +515 ms to every save, about 41 ms per MB,
+    linear. Extrapolated: 100 MB of attachments adds about 4 s per save.
+  - Owner report 2026-09-22: development notebook 1 (no attachments) saves in
+    about 1.2 s; production saves take 6 to 7 s and production notebooks are
+    believed to hold sizeable attachments. Story 4's speed-up is in the
+    released code (v1.3.15 and later), so these figures describe the current
+    design.
+  - Cause: `AcceptedWebChangeService` assembles the complete live Portable
+    tree twice per change (a before-snapshot for whole-tree drift detection
+    and an after-snapshot for the commit). Each assembly renders every note
+    and loads every attachment's bytes through
+    `findPortableTreeRowsByNotebookId`, then hashes all of it to compute blob
+    ids. The Git write side already skips unchanged blobs; the cost is the
+    rebuild, not the commit.
+- **Scope, promised behavior:**
+  1. Every web accepted change that goes through the accepted-change owner
+     today (note content and title edits including referrer rewrites, note
+     creation, note move, trash, recovery and permanent removal, folder
+     creation, rename, move, trash and permanent deletion, folder README
+     edits, relationship reduction across its notebook set) appends its commit
+     by deriving the new tree from the accepted head's tree and the rows that
+     change inserted, updated or deleted. Unchanged notes are neither rendered
+     nor hashed. Unchanged attachments' bytes are neither read from the
+     database, nor hashed, nor written to Git, regardless of where in the
+     notebook they sit.
+  2. A change that only moves paths (folder rename or move, trash, recovery,
+     note move) re-lists the affected entries under their new paths using the
+     blob ids already in the accepted tree. Attachments follow their folder
+     without their bytes being read.
+  3. The `.keep` marker for folders without other content, and folder and
+     notebook `README.md` files, keep their current Portable rules; the rule
+     is applied to the directories the change touched.
+  4. A canonical no-op save (same resulting tree) still leaves accepted
+     history unchanged.
+  5. The complete assembly of a notebook's tree remains for repository cutover
+     and history reset, and for the local publication drift check, and is the
+     same derivation applied to an empty base, so one place decides how
+     projection rows become Portable entries.
+  6. The synchronization contract
+     ([domain operation ownership](../../docs/notebook-git-synchronization.md#domain-operation-ownership))
+     is updated to describe derivation from the projection change.
+- **Rejection constraints (each with its independent reason):**
+  - No second content authority, attachment-only cache or bypass
+    ([ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
+    content authority).
+  - No stored blob-id or content-hash columns, per-note caches, or background
+    precomputation (owner direction 2026-09-22: manipulate less data through a
+    simpler design; caches keep per-save work proportional to the notebook).
+  - No change to what a notebook's Portable tree contains or how files are
+    encoded ([ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)).
+  - Exactly one commit per accepted web change on linear `main`, appended in
+    the same transaction as the projection (ADR 0002 publication boundary).
+  - No asynchronous or deferred Git work (story 5 owns that question).
+- **Deferred (not built or verified here):** making local publication
+  acceptance or its drift check incremental (infrequent; still assembles the
+  full tree with attachment bytes); title-edit latency beyond the natural
+  effect; web attachment upload or deletion (SEED-035); removing the attachment
+  bytes column from MySQL (decide together with web download, SEED-035
+  story 1); a retained performance harness.
+- **Key examples:**
+  1. *Content edit in a large notebook.* Notebook with 11,000 notes and 28
+     attachments (12.5 MB). Trigger: save new content for one root note.
+     Result: one commit whose tree differs from the parent's only at that
+     note's path; the request issues the same database statements as the same
+     edit in a notebook holding one note and no attachments; the commit's tree
+     equals the full assembly of the projection.
+  2. *Folder rename carrying attachments.* Folder `Photos/` holds three notes
+     and 10 MB of images. Trigger: rename to `Pictures/`. Result: the new tree
+     lists every entry under `Pictures/` with the blob ids the parent tree had
+     under `Photos/`; no attachment content is read; oracle equality holds.
+  3. *Folder emptiness marker.* Folder `Ideas/` is empty (tree holds
+     `Ideas/.keep`). Trigger: create note "Plan" in it. Result: `Ideas/.keep`
+     is gone and `Ideas/Plan.md` is present. Trigger: trash that note. Result:
+     `_trash/Ideas/Plan.md` appears and `Ideas/.keep` returns.
+  4. *Title rename with referrer rewrites.* Note "A" is linked from three
+     notes. Trigger: rename "A" to "B" with references rewritten. Result: the
+     tree drops `A.md`, adds `B.md`, and replaces the three referrers' blobs;
+     nothing else changes; oracle equality holds.
+  5. *Canonical no-op save.* Trigger: save content that encodes to the same
+     bytes. Result: accepted head unchanged, note timestamp updated (existing
+     behavior).
+  6. *Pre-existing drift.* A note was created outside the owner and exists in
+     MySQL but not in Git. Trigger: edit a different note. Result: the edit is
+     committed on the accepted head and
+     the unsynchronized note stays absent from Git until a history reset or a
+     local publication surfaces the drift.
+- **Architecture (decisions made up front, 2026-09-22):**
+  1. **Derive, do not rebuild.** The accepted head's tree is the base; a web
+     change becomes removals, renames and additions of tree entries. Git
+     commits stay full snapshots, shared by object id. No ADR changes: ADR
+     0002's publication boundary, content authority and linear history are
+     untouched; only how the owner computes the tree changes.
+  2. **The owner captures the projection change at flush.** The accepted
+     change owner binds a per-transaction collector to Hibernate's flush
+     events (an `Interceptor` registered through Spring Boot's Hibernate
+     customizer) for Note, Folder, NotebookAttachment and Notebook rows:
+     inserts, updates with the pre-update path fields (folder or parent,
+     title or name or filename) and deletes. Domain operations declare
+     nothing, so referrer rewrites and other indirect changes are captured
+     without each operation knowing about Git. Rows changed in a notebook the
+     operation did not lock are ignored, as today. Attachments cascade-deleted
+     with their folder at the database level are covered by the folder's
+     prefix removal. No repository on these tables uses bulk update queries
+     (checked 2026-09-22), so flush events see every change.
+  3. **One encoder over path-to-blob maps.** A Portable tree revision is a
+     map from path to blob id. Deriving a revision applies the captured
+     change: remove old paths, rename entries under changed folder prefixes
+     (deepest changed ancestor wins), add new entries whose content is in
+     hand, then apply the `.keep` rule to the directories touched. New blobs
+     are inserted only for added or replaced content. The full assembly for
+     cutover, history reset and publication drift checks is this derivation
+     over an empty base with every row as an insertion, so
+     `PortableTreeSnapshot`, `NotebookLivePortableTree` and
+     `NotebookGitLivePortablePath` merge into that one encoder.
+  4. **Drift policy on the web path (owner decision, 2026-09-22): drop the
+     before-snapshot.** Today a whole-tree before-snapshot detects any
+     pre-existing drift and silently skips the commit, after which that
+     notebook never commits again until a history reset. A derived commit
+     never adopts drift at untouched paths by construction, records the
+     author's edit as ADR 0002 requires, and drift stays detectable where the
+     whole-tree comparison already lives, the local publication check (409
+     "refresh the checkout"). Rejected: a path-scoped check that skips the
+     commit when the changed rows' pre-change content does not match the
+     accepted tree at their old paths; it needs pre-change content and keeps
+     silently dropping edits. The existing test
+     `preExistingPortableDriftKeepsTheWebSaveAndAcceptedHistoryUnchanged` is
+     rewritten to the new policy.
+  5. **No-op detection is tree identity.** A derived tree id equal to the
+     parent's tree id means no commit.
+  6. **Publication acceptance stays as is.** Git-to-web publication, its
+     projection and its drift check are outside this story.
+- **Effort hypothesis:** M to L (one day of slices), medium confidence. The
+  mechanism is known; risk sits in change-capture completeness and the local
+  `.keep` rule, both guarded by an oracle test comparing every derived tree
+  with the full assembly.
+- **Safe stopping point:** each slice keeps every operation correct because
+  change kinds the derivation does not yet cover fall back to the full
+  assembly; the fallback is removed in the last slice. Stopping early retains
+  the cheap path for the covered change kinds.
 
 <a id="story-5"></a>
 
@@ -136,11 +264,11 @@ acknowledgement or add competing representations.
 
 ## Ordering and Scope Reduction
 
-Story 3 is a follow-up on the attachment cost that still reaches every note
-save. Story 5 is restored second in the product backlog as a conditional
-fallback pending the owner's reading of story 4's closed result against its
-activation gate. Preserve the near-future direction and leave implementation
-to its own bounded plan.
+Story 3 removes the whole-notebook cost from every web save and makes
+attachment bytes irrelevant to unrelated edits by construction. Story 5 stays
+second as a conditional fallback: consume story 3's result against story 5's
+activation gate before exploring deferred Git work. Preserve the near-future
+direction and leave implementation to story 3's plan.
 
 ## When to Surface
 
@@ -154,3 +282,8 @@ When selecting performance work on editing notes in large notebooks.
 - Owner direction, 2026-09-22: restore story 5 (asynchronous Git processing),
   which was removed on 2026-09-21 when story 4 closed; queue it second in the
   product backlog.
+- Owner direction, 2026-09-22: production saves take 6 to 7 s and development
+  notebook 1 (no attachments) about 1.2 s; the full-snapshot design is
+  challenged because saving is frequent and should manipulate far less data.
+  Story 3 is reframed from an assessment into the change-proportional save
+  promise, kept as one story, with architecture decided up front.
