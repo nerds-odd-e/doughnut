@@ -12,6 +12,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Publish a web save from a whole-notebook assembly that never moves content bytes](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-3) — SEED-037#story-3
 - [Keep remote note content aligned when an in-flight edit is undone](seeds/SEED-036-keep-undone-edits-consistent.md#story-1) — SEED-036#story-1
 - [Save a note with only a few database round trips for Git history](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2) — SEED-037#story-2
 - [Assess asynchronous Git processing only if save performance remains inadequate](seeds/SEED-034-faster-note-content-saving.md#story-5) — SEED-034#story-5
