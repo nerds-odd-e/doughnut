@@ -10,9 +10,11 @@ Execution authorized by the owner on 2026-09-22, with retrospective skipped.
 - Execution checkout: `/Users/terryyin/git/doughnut-worktrees/011-readme-edits-through-accepted-change-owner`, branch `cursor/011-readme-edits-through-accepted-change-owner`, created this session from `a2660d71f61797895fed18155da10ea0745a5f42`.
 - Published claim: `c5a3c91333427de908df87d585322cdd1d0d9871` on `origin/main`. Claim publisher `cursor-011-readme-edits`. Identity `quick/011-readme-edits-through-accepted-change-owner/PLAN.md`.
 - Slice 1 increment: `7f217de349c5201c909e0b36d84cc7008543cf9d` on `origin/cursor/011-readme-edits-through-accepted-change-owner`.
-- Slice 2 increment: `01a501700725b29568fc8d6c694c55c1f5690951` on that same branch, registered with the observer.
+- Slice 2 increment: `01a501700725b29568fc8d6c694c55c1f5690951` on that same branch.
+- Slice 3 increment: `0f84e9725969cbea2f4004812d0068f33fdb49c3` on that same branch, registered with the observer.
 - Story-branch increments publish to `origin/cursor/011-readme-edits-through-accepted-change-owner`. Observer: `/tmp/dough-ci-501/watch-NJo55N` (GitHub Actions `ci.yml` / `donut CI`). The trunk claim is unobserved.
 - Default checkout refresh: advanced to `c5a3c91333427de908df87d585322cdd1d0d9871`.
+
 Kind: correction from the execution retrospective of
 `quick/010-change-proportional-note-save/PLAN.md` (spent; recoverable at before-cleanup commit `b0b385a184`)
 (SEED-034#story-3). No seed is required; this plan carries its own input.
@@ -134,8 +136,9 @@ Type: Structure. Status: done.
 Learning: the oracle reloads the notebook and compares blob ids before and after `snapshotCurrentPortableTree`. Proposal bundle bytes live on `NotebookGitCommitFixtureTestSupport`, which already owned the commit helpers, so `GitBundleTestReader` stayed read-only. Property-wiki publication cases moved to `NotebookGitPublicationPropertyWikiControllerTest` to keep the touched files within 250 lines. That move did not rerun the accepted proof.
 
 ### 4. Retire five redundant drift tests
-Type: Structure (test cleanup). Status: planned.
+Type: Structure (test cleanup). Status: done.
 Remove `preExistingPortableDriftIsNeitherBlockingTheFolderCreationNorAdoptedByIt` (NotebookGitFolderCreationControllerTest), `...FolderDissolve...` (NotebookGitFolderDissolveGuardControllerTest), `...FolderRename...` (NotebookGitFolderRenameGuardControllerTest), `...FolderTrash...` (NotebookGitWebFolderTrashGuardControllerTest), `...NoteCreation...` (NotebookGitNoteCreationControllerTest). Surviving coverage of decision 4: `NotebookGitWebContentSaveControllerTest.preExistingPortableDriftIsNeitherBlockingTheWebSaveNorAdoptedByIt`, `NotebookGitWebFolderMoveControllerTest.preExistingPortableDriftIsNeitherBlockingTheFolderMoveNorAdoptedByIt`, `NotebookGitNoteCreationFolderControllerTest.preExistingPortableDriftDoesNotBlockTheNoteCreationInsideTheDriftedFolder`, `NotebookGitWebRelationReduceControllerTest.reduceIntoDriftedSourceNotebookCommitsEachNotebookOnItsOwnAcceptedHead`. Proof: the five classes green; full backend suite before delivery.
+Learning: the five methods and their sole-use helpers are gone. The four named survivors remain. The five classes passed, and `pnpm backend:test_only` passed on `doughnut_wt_09f6ed5904fc4a01a2506ac3c0739caf_test`. Refactor found nothing further to change.
 
 ## Remaining concerns
 

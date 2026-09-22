@@ -3,16 +3,13 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.testability.GitBundleTestReader;
-import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -64,27 +61,6 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitControllerTestB
     assertThat(countFoldersForNotebook(notebook.getId()), is(1L));
     assertThat(
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).isPresent(), is(false));
-  }
-
-  @Test
-  void preExistingPortableDriftIsNeitherBlockingTheFolderCreationNorAdoptedByIt() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    var acceptedHistoryBefore = acceptedHistory(notebook);
-    makeMe
-        .aNote()
-        .notebook(notebook)
-        .title("Unsynchronized")
-        .content("---\ntype: Note\n---\nbody")
-        .please();
-    FolderCreationRequest request = new FolderCreationRequest();
-    request.setName("Biology");
-
-    folderController.createFolder(notebook, request);
-
-    AcceptedHistory after = acceptedHistory(notebook);
-    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
-    assertThat(after.tipPaths(), hasItem("Biology/.keep"));
-    assertThat(after.tipPaths(), not(hasItem("Unsynchronized.md")));
   }
 
   @Test

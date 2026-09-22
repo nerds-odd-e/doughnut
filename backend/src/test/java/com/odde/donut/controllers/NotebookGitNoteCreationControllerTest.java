@@ -20,7 +20,6 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
-import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -118,19 +117,6 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
           GitBundleTestReader.blobIdAt(repository, newHead, "Existing.md"),
           is(GitBundleTestReader.blobIdAt(repository, acceptedHead, "Existing.md")));
     }
-  }
-
-  @Test
-  void preExistingPortableDriftIsNeitherBlockingTheNoteCreationNorAdoptedByIt() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    makeMe.aNote().notebook(notebook).title("Unsynchronized").please();
-    var acceptedHistoryBefore = acceptedHistory(notebook);
-
-    controller.createNoteAtNotebookRoot(notebook, titleOnly("Another"));
-
-    AcceptedHistory after = acceptedHistory(notebook);
-    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
-    assertThat(after.tipPaths(), contains("Another.md"));
   }
 
   @Test

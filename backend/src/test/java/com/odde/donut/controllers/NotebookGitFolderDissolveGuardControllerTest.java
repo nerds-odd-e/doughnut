@@ -2,11 +2,8 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
@@ -18,15 +15,12 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContentControllerTestBase {
-
-  static final String CELLS_BODY = "---\ntype: Note\n---\ncells body";
 
   @Autowired FolderRepository folderRepository;
 
@@ -150,23 +144,6 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
     assertThat(folderRepository.findById(biology.getId()).isPresent(), is(true));
     assertThat(
         ObjectId.fromString(binding(owningNotebook).getAcceptedGitObjectId()), equalTo(acceptedA));
-  }
-
-  @Test
-  void preExistingPortableDriftIsNeitherBlockingTheFolderDissolveNorAdoptedByIt() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
-    Folder biology = makeMe.aFolder().parentFolder(outer).name("Biology").please();
-    snapshotCurrentPortableTree(notebook);
-    var acceptedHistoryBefore = acceptedHistory(notebook);
-    makeMe.aNote().notebook(notebook).title("Unsynchronized").content(CELLS_BODY).please();
-
-    folderController.dissolveFolder(notebook, biology, false);
-
-    AcceptedHistory after = acceptedHistory(notebook);
-    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
-    assertThat(after.tipPaths(), not(hasItem(startsWith("Outer/Biology/"))));
-    assertThat(after.tipPaths(), not(hasItem("Unsynchronized.md")));
   }
 
   @Test
