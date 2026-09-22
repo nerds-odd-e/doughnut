@@ -41,15 +41,14 @@ final class NotebookGitChangedFolders {
     updated.forEach(
         (id, path) -> {
           Folder folder = folderRepository.findById(id).orElseThrow();
-          String currentPrefix = NotebookGitLivePortablePath.folderPath(folder);
+          String currentPrefix = NotebookGitPortablePath.folderPath(folder);
           relocations.put(previousPrefixOf(path), currentPrefix);
           currentFolders.put(currentPrefix, folder);
         });
     change.inserted.stream()
         .filter(Folder.class::isInstance)
         .map(Folder.class::cast)
-        .forEach(
-            folder -> currentFolders.put(NotebookGitLivePortablePath.folderPath(folder), folder));
+        .forEach(folder -> currentFolders.put(NotebookGitPortablePath.folderPath(folder), folder));
   }
 
   private static Map<Integer, RowPath> folderRows(Map<ProjectionRow, RowPath> rows) {
@@ -72,14 +71,13 @@ final class NotebookGitChangedFolders {
         .keySet()
         .forEach(
             previous ->
-                currentPathOf(NotebookGitLivePortablePath.parentOf(previous))
-                    .ifPresent(touched::add));
+                currentPathOf(NotebookGitPortablePath.parentOf(previous)).ifPresent(touched::add));
     currentFolders
         .keySet()
         .forEach(
             current -> {
               touched.add(current);
-              touched.add(NotebookGitLivePortablePath.parentOf(current));
+              touched.add(NotebookGitPortablePath.parentOf(current));
             });
     return touched;
   }
@@ -87,7 +85,7 @@ final class NotebookGitChangedFolders {
   String previousPathOf(Class<?> kind, RowPath path) {
     String prefix = previousPrefixOf(path.containerId());
     return kind == Note.class
-        ? NotebookGitLivePortablePath.ofNote(prefix, path.name())
+        ? NotebookGitPortablePath.ofNote(prefix, path.name())
         : prefix + path.name();
   }
 
@@ -116,7 +114,8 @@ final class NotebookGitChangedFolders {
   }
 
   private String previousPrefixOf(RowPath folderPath) {
-    return previousPrefixOf(folderPath.containerId()) + folderPath.name() + "/";
+    return NotebookGitPortablePath.ofFolder(
+        previousPrefixOf(folderPath.containerId()), folderPath.name());
   }
 
   private String previousPrefixOf(Integer folderId) {

@@ -25,19 +25,19 @@ public class AcceptedWebChangeService {
   private final EntityPersister entityPersister;
   private final NotebookGitAcceptedRepositoryStore repositoryStore;
   private final ProjectionChangeCapture projectionChangeCapture;
-  private final NotebookGitDerivedTree derivedTree;
+  private final NotebookGitTreeEncoder treeEncoder;
 
   public AcceptedWebChangeService(
       NotebookGitBindingRepository bindingRepository,
       EntityPersister entityPersister,
       NotebookGitAcceptedRepositoryStore repositoryStore,
       ProjectionChangeCapture projectionChangeCapture,
-      NotebookGitDerivedTree derivedTree) {
+      NotebookGitTreeEncoder treeEncoder) {
     this.bindingRepository = bindingRepository;
     this.entityPersister = entityPersister;
     this.repositoryStore = repositoryStore;
     this.projectionChangeCapture = projectionChangeCapture;
-    this.derivedTree = derivedTree;
+    this.treeEncoder = treeEncoder;
   }
 
   @FunctionalInterface
@@ -95,7 +95,7 @@ public class AcceptedWebChangeService {
   private void commitIfChanged(
       OpenedNotebook notebook, ProjectionChange change, String message, Timestamp updatedAt) {
     NotebookProjectionChange notebookChange = change.of(notebook.binding().getNotebook().getId());
-    NotebookGitTreeContent tree = derivedTree.of(notebookChange, notebook.acceptedBlobIds());
+    NotebookGitTreeContent tree = treeEncoder.derive(notebookChange, notebook.acceptedBlobIds());
     if (tree.blobIds().equals(notebook.acceptedBlobIds())) {
       return;
     }

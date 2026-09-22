@@ -87,10 +87,9 @@ class NotebookGitProposalAcceptance {
         folderMaterialization.ensureAncestry(notebook, proposed.keySet().stream().toList());
     entityPersister.flush();
     List<PortableTreeFolderRow> folders = stateLoader.foldersOf(notebook);
-    Map<Integer, PortableTreeFolderRow> folderById =
-        NotebookGitAcceptedTree.indexFoldersById(folders);
+    Map<Integer, String> prefixes = NotebookGitPortablePath.folderPrefixes(folders);
     for (NotebookAttachment stored : attachmentRepository.findByNotebook_Id(notebook.getId())) {
-      byte[] content = proposed.remove(attachmentPath(stored, folderById));
+      byte[] content = proposed.remove(attachmentPath(stored, prefixes));
       if (content == null) {
         entityPersister.remove(stored);
       } else if (!Arrays.equals(stored.getContent(), content)) {
@@ -105,13 +104,9 @@ class NotebookGitProposalAcceptance {
   }
 
   private static String attachmentPath(
-      NotebookAttachment attachment, Map<Integer, PortableTreeFolderRow> folderById) {
+      NotebookAttachment attachment, Map<Integer, String> prefixes) {
     Folder folder = attachment.getFolder();
-    String folderPath =
-        folder == null
-            ? ""
-            : NotebookGitAcceptedTree.folderPath(folderById.get(folder.getId()), folderById);
-    return folderPath + attachment.getFilename();
+    return prefixes.get(folder == null ? null : folder.getId()) + attachment.getFilename();
   }
 
   private void persistAttachment(
@@ -143,8 +138,7 @@ class NotebookGitProposalAcceptance {
       NotebookGitStateLoader.LockedNotebookState published,
       NotebookGitProposalImporter.ImportedProposal proposal) {
     List<PortableTreeFolderRow> folders = published.folders();
-    Map<Integer, PortableTreeFolderRow> folderById =
-        NotebookGitAcceptedTree.indexFoldersById(folders);
+    Map<Integer, String> prefixes = NotebookGitPortablePath.folderPrefixes(folders);
     List<PortableTreeEntry> proposedEntries =
         NotebookGitAcceptedTree.readEntries(proposal.repository(), proposal.mainHead());
     List<PortableTreeFolderRow> unrepresented =
@@ -152,11 +146,10 @@ class NotebookGitProposalAcceptance {
             .filter(
                 folder ->
                     !NotebookGitAcceptedTree.representedInTree(
-                        NotebookGitAcceptedTree.folderPath(folder, folderById), proposedEntries))
+                        prefixes.get(folder.id()), proposedEntries))
             .sorted(
                 Comparator.comparingInt(
-                        (PortableTreeFolderRow folder) ->
-                            NotebookGitAcceptedTree.folderPath(folder, folderById).length())
+                        (PortableTreeFolderRow folder) -> prefixes.get(folder.id()).length())
                     .reversed())
             .toList();
     for (PortableTreeFolderRow folder : unrepresented) {

@@ -1,5 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
+import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -11,9 +12,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
-import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
-import com.odde.donut.services.notebookTree.PortableTreeSnapshot;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.MakeMe;
 import java.time.Instant;
@@ -33,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class NotebookGitCutoverServiceTest {
-
   @Autowired MakeMe makeMe;
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
@@ -63,13 +61,11 @@ class NotebookGitCutoverServiceTest {
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
 
     List<PortableTreeEntry> expectedEntries =
-        PortableTreeSnapshot.build(
-            "# Notebook readme",
-            List.of(
-                new PortableTreeFolderRow(folder.getId(), null, "Recipes", "# Recipes readme"),
-                new PortableTreeFolderRow(emptyFolderId, null, "Ideas", null)),
-            List.of(new PortableTreeNoteRow(folder.getId(), "Pasta", "Boil water")),
-            List.of());
+        List.of(
+            ofText("Ideas/.keep", ""),
+            ofText("README.md", PortableTreeReadmeMarkdown.assemble("# Notebook readme")),
+            ofText("Recipes/Pasta.md", "Boil water"),
+            ofText("Recipes/README.md", PortableTreeReadmeMarkdown.assemble("# Recipes readme")));
 
     assertThat(
         folderRepository.findById(emptyFolderId).orElseThrow().getId(), equalTo(emptyFolderId));
@@ -89,9 +85,7 @@ class NotebookGitCutoverServiceTest {
         List<PortableTreeEntry> foundEntries =
             GitBundleTestReader.readTreeEntries(readBack, commit);
 
-        List<PortableTreeEntry> sortedExpected =
-            expectedEntries.stream().sorted((a, b) -> a.path().compareTo(b.path())).toList();
-        assertThat(foundEntries, contains(sortedExpected.toArray(new PortableTreeEntry[0])));
+        assertThat(foundEntries, contains(expectedEntries.toArray(new PortableTreeEntry[0])));
 
         // Only one commit reachable from main: no earlier history was fabricated.
         revWalk.reset();
@@ -136,11 +130,10 @@ class NotebookGitCutoverServiceTest {
     assertThat(binding.getAcceptedGitObjectId(), not(equalTo(initialGitObjectId)));
 
     List<PortableTreeEntry> expectedEntries =
-        PortableTreeSnapshot.build(
-            "# Notebook readme",
-            List.of(new PortableTreeFolderRow(folder.getId(), null, "Recipes", "# Recipes readme")),
-            List.of(new PortableTreeNoteRow(folder.getId(), "Pasta", "Boil water")),
-            List.of());
+        List.of(
+            ofText("README.md", PortableTreeReadmeMarkdown.assemble("# Notebook readme")),
+            ofText("Recipes/Pasta.md", "Boil water"),
+            ofText("Recipes/README.md", PortableTreeReadmeMarkdown.assemble("# Recipes readme")));
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId headObjectId =
@@ -154,9 +147,7 @@ class NotebookGitCutoverServiceTest {
         List<PortableTreeEntry> foundEntries =
             GitBundleTestReader.readTreeEntries(readBack, commit);
 
-        List<PortableTreeEntry> sortedExpected =
-            expectedEntries.stream().sorted((a, b) -> a.path().compareTo(b.path())).toList();
-        assertThat(foundEntries, contains(sortedExpected.toArray(new PortableTreeEntry[0])));
+        assertThat(foundEntries, contains(expectedEntries.toArray(new PortableTreeEntry[0])));
       }
     }
   }

@@ -20,7 +20,7 @@ import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
-import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
+import com.odde.donut.services.notebookGit.NotebookGitTreeEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   @Autowired NoteController noteController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
-  @Autowired NotebookLivePortableTree livePortableTree;
+  @Autowired NotebookGitTreeEncoder treeEncoder;
 
   NotebookGitBinding binding(Notebook notebook) {
     return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
@@ -83,9 +83,7 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
    */
   void assertAcceptedTreeMatchesTheFullAssembly(Notebook notebook) throws Exception {
     Notebook stored = notebookRepository.findById(notebook.getId()).orElseThrow();
-    assertThat(
-        acceptedBlobIds(notebook),
-        equalTo(NotebookGitTreeContent.of(livePortableTree.entriesOf(stored)).blobIds()));
+    assertThat(acceptedBlobIds(notebook), equalTo(treeEncoder.fullTree(stored).blobIds()));
   }
 
   Map<String, ObjectId> acceptedBlobIds(Notebook notebook) throws Exception {

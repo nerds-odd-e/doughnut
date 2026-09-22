@@ -2,7 +2,6 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.util.List;
@@ -16,10 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 /** Compares the live MySQL projection with a notebook's accepted Portable tree. */
 @Service
 public class NotebookGitProjection {
-  private final NotebookLivePortableTree livePortableTree;
+  private final NotebookGitTreeEncoder treeEncoder;
 
-  public NotebookGitProjection(NotebookLivePortableTree livePortableTree) {
-    this.livePortableTree = livePortableTree;
+  public NotebookGitProjection(NotebookGitTreeEncoder treeEncoder) {
+    this.treeEncoder = treeEncoder;
   }
 
   /**
@@ -130,13 +129,9 @@ public class NotebookGitProjection {
 
   private static PortableTreeFolderRow folderRowAtPath(
       List<PortableTreeFolderRow> folders, String requiredFolderPath) {
-    Map<Integer, PortableTreeFolderRow> folderById =
-        NotebookGitAcceptedTree.indexFoldersById(folders);
+    Map<Integer, String> prefixes = NotebookGitPortablePath.folderPrefixes(folders);
     return folders.stream()
-        .filter(
-            candidate ->
-                NotebookGitAcceptedTree.folderPath(candidate, folderById)
-                    .equals(requiredFolderPath))
+        .filter(candidate -> requiredFolderPath.equals(prefixes.get(candidate.id())))
         .findFirst()
         .orElse(null);
   }
@@ -146,14 +141,12 @@ public class NotebookGitProjection {
       Repository repository,
       ObjectId acceptedHead,
       int sourceFolderId) {
-    Map<Integer, PortableTreeFolderRow> folderById =
-        NotebookGitAcceptedTree.indexFoldersById(folders);
-    String sourcePath =
-        NotebookGitAcceptedTree.folderPath(folderById.get(sourceFolderId), folderById);
+    Map<Integer, String> prefixes = NotebookGitPortablePath.folderPrefixes(folders);
+    String sourcePath = prefixes.get(sourceFolderId);
     List<PortableTreeEntry> accepted =
         NotebookGitAcceptedTree.readEntries(repository, acceptedHead);
     for (PortableTreeFolderRow folder : folders) {
-      String descendantPath = NotebookGitAcceptedTree.folderPath(folder, folderById);
+      String descendantPath = prefixes.get(folder.id());
       if (descendantPath.equals(sourcePath) || !descendantPath.startsWith(sourcePath)) {
         continue;
       }
@@ -166,7 +159,7 @@ public class NotebookGitProjection {
   public Note requireOneNoteAtPath(List<Note> notes, String changedPath) {
     List<Note> matches =
         notes.stream()
-            .filter(note -> NotebookGitLivePortablePath.ofNote(note).equals(changedPath))
+            .filter(note -> NotebookGitPortablePath.ofNote(note).equals(changedPath))
             .toList();
     if (matches.size() != 1) {
       throw new IllegalStateException("Expected exactly one Note at Portable path " + changedPath);
@@ -180,8 +173,8 @@ public class NotebookGitProjection {
       List<Note> storedNotes,
       Repository repository,
       ObjectId acceptedHead) {
-    List<PortableTreeEntry> live = livePortableTree.entriesOf(notebook, folders, storedNotes);
-    if (!NotebookGitTreeContent.of(live)
+    if (!treeEncoder
+        .fullTree(notebook, folders, storedNotes)
         .blobIds()
         .equals(NotebookGitAcceptedTree.blobIds(repository, acceptedHead))) {
       throw projectionDrift();

@@ -34,15 +34,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Slice 5 empty-folder proof: Biology contains only Cells (no Readme) and Study is an existing
- * empty folder represented by {@code Study/.keep}. The web Move appends B whose tree carries {@code
+ * Empty-folder proof: Biology contains only Cells (no Readme) and Study is an existing empty folder
+ * represented by {@code Study/.keep}. The web Move appends B whose tree carries {@code
  * Biology/.keep} (Biology is now empty), {@code Study/Cells.md} (Study now has the note), and no
  * {@code Study/.keep} (Study is no longer empty). Both existing folders retain their identities; a
  * subsequent same-path local edit C published through the real controller keeps both original
- * folder identities and the note. The existing {@link
- * com.odde.donut.services.notebookTree.PortableTreeSnapshot} rule already emits {@code .keep} for
- * empty folders and omits it for non-empty ones; this slice only adds the missing behavioral
- * evidence.
+ * folder identities and the note. {@link
+ * com.odde.donut.services.notebookGit.NotebookGitTreeEncoder} emits {@code .keep} for empty folders
+ * and omits it for non-empty ones.
  */
 class NotebookGitWebNoteMoveEmptyFolderControllerTest extends NotebookGitWebNoteMoveTestBase {
 

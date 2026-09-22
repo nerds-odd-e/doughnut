@@ -1,22 +1,19 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
-/** Reads accepted Portable tree blob ids and entries from a Git commit, and folder-row paths. */
+/** Reads accepted Portable tree blob ids and entries from a Git commit. */
 final class NotebookGitAcceptedTree {
 
   private NotebookGitAcceptedTree() {}
@@ -76,19 +73,5 @@ final class NotebookGitAcceptedTree {
       String folderPath, List<PortableTreeEntry> entries, Predicate<String> excludedPath) {
     return entries.stream()
         .anyMatch(entry -> entry.path().startsWith(folderPath) && !excludedPath.test(entry.path()));
-  }
-
-  static Map<Integer, PortableTreeFolderRow> indexFoldersById(List<PortableTreeFolderRow> folders) {
-    return folders.stream()
-        .collect(Collectors.toMap(PortableTreeFolderRow::id, Function.identity()));
-  }
-
-  static String folderPath(
-      PortableTreeFolderRow folder, Map<Integer, PortableTreeFolderRow> folderById) {
-    String parentPath =
-        folder.parentFolderId() == null
-            ? ""
-            : folderPath(folderById.get(folder.parentFolderId()), folderById);
-    return parentPath + folder.name() + "/";
   }
 }

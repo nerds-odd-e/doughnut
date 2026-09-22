@@ -99,7 +99,7 @@ class NotebookGitProposalFolderMaterialization {
   private Map<String, Folder> foldersByPath(Notebook notebook) {
     Map<String, Folder> folders = new LinkedHashMap<>();
     for (Folder folder : folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId())) {
-      String folderPath = NotebookGitLivePortablePath.folderPath(folder);
+      String folderPath = NotebookGitPortablePath.folderPath(folder);
       folders.put(folderPath.substring(0, folderPath.length() - 1), folder);
     }
     return folders;

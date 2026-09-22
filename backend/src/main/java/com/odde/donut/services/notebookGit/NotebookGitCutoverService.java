@@ -3,7 +3,6 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
-import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
 import java.sql.Timestamp;
 import java.time.Instant;
 import org.eclipse.jgit.lib.Repository;
@@ -33,15 +32,15 @@ public class NotebookGitCutoverService {
 
   static final String RESET_COMMIT_MESSAGE = "Reset: restart Git history from the current notebook";
 
-  private final NotebookLivePortableTree livePortableTree;
+  private final NotebookGitTreeEncoder treeEncoder;
   private final NotebookGitBindingRepository notebookGitBindingRepository;
   private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
   public NotebookGitCutoverService(
-      NotebookLivePortableTree livePortableTree,
+      NotebookGitTreeEncoder treeEncoder,
       NotebookGitBindingRepository notebookGitBindingRepository,
       NotebookGitAcceptedRepositoryStore repositoryStore) {
-    this.livePortableTree = livePortableTree;
+    this.treeEncoder = treeEncoder;
     this.notebookGitBindingRepository = notebookGitBindingRepository;
     this.repositoryStore = repositoryStore;
   }
@@ -79,7 +78,7 @@ public class NotebookGitCutoverService {
 
   private Repository buildRepository(Notebook notebook, Instant commitTime, String message) {
     return NotebookGitCommitBuilder.build(
-        NotebookGitTreeContent.of(livePortableTree.entriesOf(notebook)),
+        treeEncoder.fullTree(notebook),
         SYSTEM_AUTHOR_NAME,
         SYSTEM_AUTHOR_EMAIL,
         message,

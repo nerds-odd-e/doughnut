@@ -144,22 +144,26 @@ draft buffering is outside this decision.
 ## Domain operation ownership
 
 One accepted-change owner coordinates complete web domain operations. Lock and
-load current state, apply the complete operation, read its final projection,
-then append one accepted commit in the publication transaction. Destination
-construction, collision resolution, placement, and authored reference handling
-finish before that projection; include newly created folders and all affected
-in-notebook content. Do not publish individual low-level placement steps.
+load current state, apply the complete operation, capture the projection rows
+it inserted, updated or deleted, derive the new tree from the accepted head's
+tree and those rows, then append one accepted commit in the publication
+transaction when the tree differs. Destination construction, collision
+resolution, placement, and authored reference handling finish before that
+capture closes; newly created folders and all affected in-notebook content are
+captured with it. Do not publish individual low-level placement steps.
 
 Placement, folder construction, reference choices, content persistence, deletion,
 and Portable encoding remain with their domain owners. Controllers do not
-duplicate Git coordination. Preserve existing non-Git behavior and the policy
-for pre-existing projection drift; publication does not silently adopt drift.
+duplicate Git coordination. Preserve existing non-Git behavior. A derived commit
+neither adopts nor detects pre-existing projection drift at paths the change
+did not touch; drift remains detectable at local publication, which does not
+silently adopt it.
 
 An operation touching several notebooks uses the same owner over their set.
 Determine that set before locking, lock bindings in ascending notebook-id order,
 and re-verify the set under lock. Refuse a mismatch. Apply the domain operation
 once and append one accepted commit per changed locked notebook in the same
-transaction, retaining each notebook's drift policy.
+transaction, each derived from that notebook's own captured rows.
 
 Existing coverage includes ordinary note content/title edits, creation and
 movement, same-notebook folder creation, rename, move and dissolve, and

@@ -8,22 +8,27 @@ durable acceptance and application of the refreshed note and live link state.
 ## Accepted Git changes
 
 `AcceptedWebChangeService` owns the transaction for a complete web operation.
-It locks affected notebook bindings in ascending notebook-ID order, compares
-the current persisted Portable tree with the accepted tree, applies the domain
-operation, flushes and reads the complete final projection. Pre-existing drift
-keeps its existing policy: that notebook's web change is not appended to Git.
-A canonical no-op does not append a commit.
+It locks affected notebook bindings in ascending notebook-ID order, applies the
+domain operation while Hibernate flush events capture the note, folder,
+attachment and notebook-readme rows it inserted, updated or deleted, and derives
+the new tree from the accepted head's tree and those rows. Unchanged notes are
+neither rendered nor hashed, and unchanged attachment bytes are never read; a
+path-only change (folder rename or move, trash, recovery, note move) re-lists
+the affected entries under their new paths with the blob ids the accepted tree
+already holds. The `.keep` and README rules are applied to the directories the
+change touched. A derived commit never adopts drift at untouched paths; drift
+stays detectable at local publication. A canonical no-op does not append a
+commit.
 
-Snapshots use the shared flat export rows without hydrating every note and
-folder as editable entities. Publication retains entity loading where it needs
-identity evidence. Both the drift and no-op decisions, like publication's drift
-check, compare path to Git blob id maps: accepted ids come from the accepted
-tree objects without reading blob content, live ids are hashed in memory, and
-file modes are ignored. One final snapshot supplies both comparison and commit
-construction. Every final path is considered, including changes to other
-notes, README, trash and empty folders. Native JGit `DirCache` keeps blobs the
-accepted tree already holds at a path, inserts changed content and omits
-deleted paths.
+The same encoder, applied to an empty base with every row as an insertion,
+assembles a notebook's complete tree for repository cutover, history reset and
+the publication drift check, so one place decides how projection rows become
+Portable entries. Publication retains entity loading where it needs identity
+evidence. The no-op decision, like publication's drift check, compares path to
+Git blob id maps: accepted ids come from the accepted tree objects without
+reading blob content, live ids are hashed in memory, and file modes are
+ignored. Native JGit `DirCache` keeps blobs the accepted tree already holds at
+a path, inserts changed content and omits deleted paths.
 
 Accepted history lives in the native object store
 (`notebook_git_accepted_object`) on the connection of the surrounding

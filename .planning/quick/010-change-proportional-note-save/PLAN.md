@@ -310,8 +310,26 @@ web change is derived. Proof: existing `NotebookGitWebContentFolderSave*`
 and `NotebookGitWebRelationReduce*` unchanged; oracle test covers both.
 
 ### 8. One encoder for derived and full trees
-Type: Structure. Status: planned. Enables nothing further; closes the story's
-structural promise.
+Type: Structure. Status: **done** (2026-09-22). Closes the story's structural
+promise.
+
+Delivered: `NotebookGitTreeEncoder` (renamed from `NotebookGitDerivedTree`)
+has `derive(change, acceptedBlobIds)` and `fullTree(notebook)` /
+`fullTree(notebook, folders, storedNotes)`, both ending in one private
+`encode`; the full assembly is that encode over an empty map with every row as
+an insertion, and attachments with bytes and the root readme enter only there.
+`PortableTreeSnapshot`, `NotebookLivePortableTree` and
+`NotebookGitLivePortablePath` are deleted; path arithmetic is
+`NotebookGitPortablePath`, whose `folderPrefixes(rows)` is the one folder-row
+walk (stray rows whose ancestry leaves the notebook get no prefix, as the old
+assembler skipped them; `NotebookFollowsFolderContainmentMigrationTest` relies
+on that). Contract text updated in `docs/notebook-git-synchronization.md`
+(domain operation ownership) and `docs/note-content-saving.md`. Net about 80
+lines fewer in the whole change. Accepted proof: full backend suite
+`pnpm backend:test_only`, 535 classes, 2575 tests, 0 failures, rerun after the
+refactor; `NotebookGitTreeEncoderTest` (2), `NotebookGitCutoverServiceTest`,
+`NotebookGitHistoryResetControllerTest`, both oracle classes (12), projection
+drift classes (6).
 
 The full assembly used by cutover, history reset and the publication drift
 check becomes the derivation applied to an empty base with every row as an
@@ -416,6 +434,10 @@ retained in the repository. Proof: the recorded numbers in this plan.
   `NotebookAttachmentRepository.findPortableTreeRowsByNotebookId`) and the
   root readme fed directly, since `of` today adds attachments never and the
   root readme only from a captured Notebook row.
+- Slice 8: the old assembler silently dropped rows whose folder ancestry
+  left the notebook (pre-`V300000333` data); only the full suite exercises that
+  shape. `services/notebookTree` keeps its package: its records are JPQL
+  projections and ADR 0004 format concepts, not Git mechanics.
 - Retrospective candidate (not acted on): the committed referrer-authoring
   pattern `inCommittedTransaction(..., () -> authorReferencingContent(...))`
   has about twenty copies across fourteen NotebookGit test files.
