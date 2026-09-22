@@ -69,11 +69,78 @@ acknowledgement or add competing representations.
   acceptable, or one bounded simplification proven with a same-fixture
   before/after measurement.
 
+<a id="story-5"></a>
+
+### 5. Assess asynchronous Git processing only if save performance remains inadequate
+
+- **Identity:** SEED-034#story-5
+- **Status:** restored on 2026-09-22 at the owner's direction; removed on
+  2026-09-21 when story 4 closed, on the premise that note saves were then
+  faster than before. Story 4's closed outcome (saves at about 0.6× the old
+  time; the owner explicitly dropped the >4× ambition for that story rather
+  than reach it) is now the evidence available for this story's activation
+  gate below. Whether that outcome satisfies or falls short of the gate is
+  an open owner decision, not resolved by this restoration. No executable
+  plan or implementation authorization.
+- **Goal / beneficiaries:** Note authors whose frequent web saves remain too
+  slow get an evidenced decision on whether deferring Git processing can make
+  editing responsive at an acceptable complexity cost, allowing infrequent Git
+  operations to bear some waiting instead.
+- **Activation gate:** First consume story 4's practical performance results.
+  If that work achieves the original four-times improvement, or gets close
+  enough in the owner's judgment, do not explore this solution; close this
+  conditional story without investigation or implementation. Explore only if
+  the result falls materially short. No exact numerical definition of "close"
+  is prescribed. Missing or inconclusive comparison evidence does not by itself
+  activate the story: resolve adequacy with the owner using available timings.
+- **Scope:** If activated, assess the smaller alternative of updating normal
+  application state and recording durable pending Git work in the same database
+  transaction, then constructing Git history in a background worker. Compare
+  the remaining synchronous save cost, achievable benefit, and ongoing
+  complexity against keeping the improved synchronous design. Reuse story 4's
+  measurements and final attachment/cohesion findings; keep its initial
+  no-attachment comparison distinct from attachment overhead. Full event
+  sourcing is abandoned and outside this story: no authoritative domain event
+  log, whole-application replay model, or event-sourcing migration.
+- **Evaluation:** Give the owner a bounded adopt/defer/reject recommendation
+  supported by the remaining measured bottleneck and a concrete account of
+  save latency, total work, Git waiting, recovery, and design complexity.
+  Background execution alone does not establish reduced total work or zero
+  impact on editing. Assessment does not commit to delivering a worker.
+- **Key examples and design questions:** A web save acknowledged before Git
+  catches up must survive a crash with its pending work. A local publication
+  arriving during that delay must not overwrite a saved web edit; assess
+  ordered catch-up and stale-head revalidation. Clone/pull must have a defined
+  freshness boundary. Retrying a worker must not duplicate commits or lose
+  ordering. Preserve immutable content needed by pending changes, including
+  attachment bytes, without copying all unchanged attachments on every save.
+  Distinguish processing batches from collapsing several saves into one commit;
+  history consolidation is not implicitly authorized. Review whether the same
+  shared owners can handle notes, attachments and publication coherently.
+- **Architecture:** This is exploration of a possible change to Accepted
+  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
+  and its [synchronization contract](../../docs/notebook-git-synchronization.md):
+  acknowledging saved application content before accepted Git advances changes
+  current content authority and atomic-publication guarantees. Describe that
+  tradeoff explicitly; any implementation requires a human-owned architecture
+  decision and separate execution authorization.
+- **Depends on:** SEED-034#story-4's performance and combined-design assessment
+  (closed; recover its full evidence and design history from commit
+  `a62ecad9fb74ba316af133a35793a1e71f795028`'s parent,
+  `2f0f1a969b`).
+- **Effort hypothesis:** Unknown until activation; bound the assessment before
+  planning any experiment. Do not pre-plan a speculative implementation.
+- **Safe stopping point:** Either close without exploration because performance
+  is sufficient, or deliver an evidenced recommendation. Rejecting or deferring
+  the asynchronous design is a valid outcome.
+
 ## Ordering and Scope Reduction
 
-Story 3 is the only remaining story: a follow-up on the attachment cost that
-still reaches every note save. Preserve the near-future direction and leave
-implementation to its own bounded plan.
+Story 3 is a follow-up on the attachment cost that still reaches every note
+save. Story 5 is restored second in the product backlog as a conditional
+fallback pending the owner's reading of story 4's closed result against its
+activation gate. Preserve the near-future direction and leave implementation
+to its own bounded plan.
 
 ## When to Surface
 
@@ -84,3 +151,6 @@ When selecting performance work on editing notes in large notebooks.
 - Owner report, 2026-09-20: content saves in large notebooks, especially with
   wiki links, are slow; development notebook 1 is an example, production is
   estimated at a few seconds, and the requested improvement is more than 4×.
+- Owner direction, 2026-09-22: restore story 5 (asynchronous Git processing),
+  which was removed on 2026-09-21 when story 4 closed; queue it second in the
+  product backlog.
