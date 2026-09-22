@@ -147,7 +147,13 @@ One accepted-change owner coordinates complete web domain operations. Lock and
 load current state, apply the complete operation, capture the projection rows
 it inserted, updated or deleted, derive the new tree from the accepted head's
 tree and those rows, then append one accepted commit in the publication
-transaction when the tree differs. Destination construction, collision
+transaction when the root tree differs. Derivation opens the accepted root and
+the ancestor directories of the paths that captured change affects, rewrites
+those directories from the changed leaf toward the root, and reuses untouched
+child-tree object IDs. It does not load unrelated subtrees, note bodies, or
+attachment bytes in order to publish history. Cutover, history reset, drift
+checks, and bundle download may still read a complete tree. An unchanged root
+tree ID does not append a commit or insert new Git objects. Destination construction, collision
 resolution, placement, and authored reference handling finish before that
 capture closes; newly created folders and all affected in-notebook content are
 captured with it. Do not publish individual low-level placement steps.
