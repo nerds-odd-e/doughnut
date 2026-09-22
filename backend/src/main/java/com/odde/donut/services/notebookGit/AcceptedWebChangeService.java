@@ -7,7 +7,6 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.NotebookProjectionChange;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.ProjectionChange;
-import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AcceptedWebChangeService {
   private final NotebookGitBindingRepository bindingRepository;
-  private final NotebookLivePortableTree livePortableTree;
   private final EntityPersister entityPersister;
   private final NotebookGitAcceptedRepositoryStore repositoryStore;
   private final ProjectionChangeCapture projectionChangeCapture;
@@ -31,13 +29,11 @@ public class AcceptedWebChangeService {
 
   public AcceptedWebChangeService(
       NotebookGitBindingRepository bindingRepository,
-      NotebookLivePortableTree livePortableTree,
       EntityPersister entityPersister,
       NotebookGitAcceptedRepositoryStore repositoryStore,
       ProjectionChangeCapture projectionChangeCapture,
       NotebookGitDerivedTree derivedTree) {
     this.bindingRepository = bindingRepository;
-    this.livePortableTree = livePortableTree;
     this.entityPersister = entityPersister;
     this.repositoryStore = repositoryStore;
     this.projectionChangeCapture = projectionChangeCapture;
@@ -99,10 +95,7 @@ public class AcceptedWebChangeService {
   private void commitIfChanged(
       OpenedNotebook notebook, ProjectionChange change, String message, Timestamp updatedAt) {
     NotebookProjectionChange notebookChange = change.of(notebook.binding().getNotebook().getId());
-    NotebookGitTreeContent tree =
-        derivedTree
-            .of(notebookChange, notebook.acceptedBlobIds())
-            .orElseGet(() -> snapshot(notebook.binding()));
+    NotebookGitTreeContent tree = derivedTree.of(notebookChange, notebook.acceptedBlobIds());
     if (tree.blobIds().equals(notebook.acceptedBlobIds())) {
       return;
     }
@@ -116,9 +109,5 @@ public class AcceptedWebChangeService {
         message,
         updatedAt.toInstant());
     repositoryStore.store(notebook.binding(), accepted.repository(), updatedAt);
-  }
-
-  private NotebookGitTreeContent snapshot(NotebookGitBinding binding) {
-    return NotebookGitTreeContent.of(livePortableTree.entriesOf(binding.getNotebook()));
   }
 }

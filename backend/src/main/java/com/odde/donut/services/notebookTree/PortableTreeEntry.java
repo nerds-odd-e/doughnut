@@ -2,6 +2,7 @@ package com.odde.donut.services.notebookTree;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * One file in the canonical Portable-tree snapshot of a notebook: its final path (relative to the
@@ -22,6 +23,20 @@ public record PortableTreeEntry(String path, byte[] content) {
   /** A note's Markdown file; a note with no stored content is an empty file. */
   public static PortableTreeEntry ofNote(String path, String contentOrNull) {
     return ofText(path, contentOrNull == null ? "" : contentOrNull);
+  }
+
+  /**
+   * A container's readme file, assembled with {@code type: Readme}; a container with blank or no
+   * readme content holds none.
+   */
+  public static Optional<PortableTreeEntry> ofReadme(String directory, String contentOrNull) {
+    if (contentOrNull == null || contentOrNull.isBlank()) return Optional.empty();
+    return Optional.of(
+        ofText(readmePath(directory), PortableTreeReadmeMarkdown.assemble(contentOrNull)));
+  }
+
+  public static String readmePath(String directory) {
+    return directory + "README.md";
   }
 
   @Override

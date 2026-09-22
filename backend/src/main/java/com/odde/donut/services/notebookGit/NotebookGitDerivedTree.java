@@ -2,21 +2,18 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.NotebookProjectionChange;
-import com.odde.donut.services.notebookGit.ProjectionChangeCapture.ProjectionRow;
-import com.odde.donut.services.notebookGit.ProjectionChangeCapture.RowPath;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Component;
@@ -29,52 +26,83 @@ import org.springframework.stereotype.Component;
 class NotebookGitDerivedTree {
   private final NoteRepository noteRepository;
   private final FolderRepository folderRepository;
+  private final NotebookRepository notebookRepository;
 
-  NotebookGitDerivedTree(NoteRepository noteRepository, FolderRepository folderRepository) {
+  NotebookGitDerivedTree(
+      NoteRepository noteRepository,
+      FolderRepository folderRepository,
+      NotebookRepository notebookRepository) {
     this.noteRepository = noteRepository;
     this.folderRepository = folderRepository;
+    this.notebookRepository = notebookRepository;
   }
 
   /**
    * The accepted tree with every changed note's and attachment's previous path removed, every entry
    * under a changed folder re-listed at its current path with its accepted blob, each inserted or
-   * updated note's blob put at its current path and the {@code .keep} marker of every touched
-   * directory re-evaluated at its current path; empty when the change holds a notebook readme or an
-   * attachment insert or update, which the caller still assembles in full.
+   * updated note's blob put at its current path, each changed container's {@code README.md}
+   * refreshed at its current prefix and the {@code .keep} marker of every touched directory
+   * re-evaluated at its current path.
    */
-  Optional<NotebookGitTreeContent> of(
+  NotebookGitTreeContent of(
       NotebookProjectionChange change, Map<String, ObjectId> acceptedBlobIds) {
-    Stream<Class<?>> presentKinds =
-        Stream.concat(
-            change.updated.keySet().stream().map(ProjectionRow::kind),
-            change.inserted.stream().map(Object::getClass));
-    if (!presentKinds.allMatch(kind -> kind == Note.class || kind == Folder.class)) {
-      return Optional.empty();
-    }
-    ChangedFolders folders = new ChangedFolders(change);
+    NotebookGitChangedFolders folders = new NotebookGitChangedFolders(folderRepository, change);
     Set<String> touchedDirectories = new LinkedHashSet<>(folders.touchedDirectories());
 
     Map<String, ObjectId> previousTree = new HashMap<>(acceptedBlobIds);
     Stream.concat(change.deleted.entrySet().stream(), change.updated.entrySet().stream())
-        .filter(entry -> entry.getKey().kind() != Folder.class)
+        .filter(entry -> isFile(entry.getKey().kind()))
         .map(entry -> folders.previousPathOf(entry.getKey().kind(), entry.getValue()))
         .forEach(
             previousPath -> {
               previousTree.remove(previousPath);
-              folders.currentPathOf(directoryOf(previousPath)).ifPresent(touchedDirectories::add);
+              folders
+                  .currentPathOf(NotebookGitLivePortablePath.directoryOf(previousPath))
+                  .ifPresent(touchedDirectories::add);
             });
     Map<String, ObjectId> blobIds = folders.relist(previousTree);
+    Map<ObjectId, byte[]> blobs = new HashMap<>();
 
-    List<PortableTreeEntry> added = currentNoteEntries(change);
-    NotebookGitTreeContent addedContent = NotebookGitTreeContent.of(added);
-    blobIds.putAll(addedContent.blobIds());
-    Map<ObjectId, byte[]> blobs = new HashMap<>(addedContent.blobs());
-    added.forEach(entry -> touchedDirectories.add(directoryOf(entry.path())));
-
+    currentNoteEntries(change)
+        .forEach(
+            entry -> {
+              put(entry, blobIds, blobs);
+              touchedDirectories.add(NotebookGitLivePortablePath.directoryOf(entry.path()));
+            });
+    readmeContents(change, folders)
+        .forEach(
+            (prefix, content) -> {
+              applyReadme(prefix, content, blobIds, blobs);
+              touchedDirectories.add(prefix);
+            });
     touchedDirectories.stream()
         .sorted(Comparator.comparing(String::length).reversed())
         .forEach(directory -> applyEmptyDirectoryMarker(directory, blobIds, blobs));
-    return Optional.of(new NotebookGitTreeContent(blobIds, blobs));
+    return new NotebookGitTreeContent(blobIds, blobs);
+  }
+
+  private static boolean isFile(Class<?> kind) {
+    return kind != Folder.class && kind != Notebook.class;
+  }
+
+  /**
+   * The current readme content of every container whose row changed, by its current prefix: each
+   * inserted or updated folder, and the notebook root when its readme changed.
+   */
+  private Map<String, String> readmeContents(
+      NotebookProjectionChange change, NotebookGitChangedFolders folders) {
+    Map<String, String> contents = new HashMap<>();
+    folders
+        .currentFolders()
+        .forEach((prefix, folder) -> contents.put(prefix, folder.getReadmeContent()));
+    change.updated.keySet().stream()
+        .filter(row -> row.kind() == Notebook.class)
+        .findAny()
+        .ifPresent(
+            row ->
+                contents.put(
+                    "", notebookRepository.findById(row.id()).orElseThrow().getReadmeContent()));
+    return contents;
   }
 
   /** The current file of every note the change updated or inserted. */
@@ -93,6 +121,13 @@ class NotebookGitDerivedTree {
         .toList();
   }
 
+  /** A container's {@code README.md} follows its current readme content. */
+  private static void applyReadme(
+      String prefix, String content, Map<String, ObjectId> blobIds, Map<ObjectId, byte[]> blobs) {
+    blobIds.remove(PortableTreeEntry.readmePath(prefix));
+    PortableTreeEntry.ofReadme(prefix, content).ifPresent(entry -> put(entry, blobIds, blobs));
+  }
+
   /**
    * A represented folder with no other entry holds {@code .keep}; the notebook root never does.
    * Same rule as the full assembly's {@code PortableTreeSnapshot}.
@@ -108,126 +143,13 @@ class NotebookGitDerivedTree {
       blobIds.remove(keep);
       return;
     }
-    NotebookGitTreeContent marker =
-        NotebookGitTreeContent.of(List.of(PortableTreeEntry.ofText(keep, "")));
-    blobIds.putAll(marker.blobIds());
-    blobs.putAll(marker.blobs());
+    put(PortableTreeEntry.ofText(keep, ""), blobIds, blobs);
   }
 
-  private static String directoryOf(String path) {
-    return path.substring(0, path.lastIndexOf('/') + 1);
-  }
-
-  private static String parentOf(String prefix) {
-    return directoryOf(prefix.substring(0, prefix.length() - 1));
-  }
-
-  private static Map<Integer, RowPath> folderRows(Map<ProjectionRow, RowPath> rows) {
-    return rows.entrySet().stream()
-        .filter(entry -> entry.getKey().kind() == Folder.class)
-        .collect(Collectors.toMap(entry -> entry.getKey().id(), Map.Entry::getValue));
-  }
-
-  /**
-   * The folders the change inserted, updated or deleted. A row's previous path composes its
-   * container's previous path (as captured for a changed folder, live for an unchanged one); every
-   * entry under an updated or deleted folder's previous prefix re-lists under its current prefix,
-   * or disappears.
-   */
-  private final class ChangedFolders {
-    private final Map<Integer, RowPath> previousPaths = new HashMap<>();
-
-    /**
-     * Each updated or deleted folder's previous prefix to its current prefix, null once deleted.
-     */
-    private final Map<String, String> relocations = new HashMap<>();
-
-    /** Where each updated or inserted folder now is. */
-    private final List<String> currentPrefixes = new ArrayList<>();
-
-    ChangedFolders(NotebookProjectionChange change) {
-      Map<Integer, RowPath> updated = folderRows(change.updated);
-      Map<Integer, RowPath> deleted = folderRows(change.deleted);
-      previousPaths.putAll(updated);
-      previousPaths.putAll(deleted);
-      deleted.forEach((id, path) -> relocations.put(previousPrefixOf(path), null));
-      updated.forEach(
-          (id, path) -> {
-            Folder folder = folderRepository.findById(id).orElseThrow();
-            String currentPrefix = NotebookGitLivePortablePath.folderPath(folder);
-            relocations.put(previousPrefixOf(path), currentPrefix);
-            currentPrefixes.add(currentPrefix);
-          });
-      change.inserted.stream()
-          .filter(Folder.class::isInstance)
-          .map(Folder.class::cast)
-          .map(NotebookGitLivePortablePath::folderPath)
-          .forEach(currentPrefixes::add);
-    }
-
-    /**
-     * Where entries left or arrived through folder changes, at their current path: each changed
-     * folder's previous container, and each current folder with its container.
-     */
-    Set<String> touchedDirectories() {
-      Set<String> touched = new LinkedHashSet<>();
-      relocations
-          .keySet()
-          .forEach(previous -> currentPathOf(parentOf(previous)).ifPresent(touched::add));
-      currentPrefixes.forEach(
-          current -> {
-            touched.add(current);
-            touched.add(parentOf(current));
-          });
-      return touched;
-    }
-
-    String previousPathOf(Class<?> kind, RowPath path) {
-      String prefix = previousPrefixOf(path.containerId());
-      return kind == Note.class
-          ? NotebookGitLivePortablePath.ofNote(prefix, path.name())
-          : prefix + path.name();
-    }
-
-    /** Every entry at its current path; those under a deleted folder are gone. */
-    Map<String, ObjectId> relist(Map<String, ObjectId> previousTree) {
-      Map<String, ObjectId> currentTree = new HashMap<>();
-      previousTree.forEach(
-          (path, blobId) ->
-              currentPathOf(path).ifPresent(current -> currentTree.put(current, blobId)));
-      return currentTree;
-    }
-
-    /**
-     * A previous path under its deepest changed folder's current prefix; unchanged when no changed
-     * folder contains it, empty when that folder is deleted.
-     */
-    Optional<String> currentPathOf(String previousPath) {
-      Optional<String> previousPrefix =
-          relocations.keySet().stream()
-              .filter(previousPath::startsWith)
-              .max(Comparator.comparing(String::length));
-      if (previousPrefix.isEmpty()) return Optional.of(previousPath);
-      return Optional.ofNullable(relocations.get(previousPrefix.get()))
-          .map(
-              currentPrefix ->
-                  currentPrefix + previousPath.substring(previousPrefix.get().length()));
-    }
-
-    private String previousPrefixOf(RowPath folderPath) {
-      return previousPrefixOf(folderPath.containerId()) + folderPath.name() + "/";
-    }
-
-    private String previousPrefixOf(Integer folderId) {
-      if (folderId == null) return "";
-      RowPath path = previousPaths.get(folderId);
-      if (path == null) {
-        Folder folder = folderRepository.findById(folderId).orElseThrow();
-        Integer parentId =
-            folder.getParentFolder() == null ? null : folder.getParentFolder().getId();
-        path = new RowPath(parentId, folder.getName());
-      }
-      return previousPrefixOf(path);
-    }
+  private static void put(
+      PortableTreeEntry entry, Map<String, ObjectId> blobIds, Map<ObjectId, byte[]> blobs) {
+    NotebookGitTreeContent hashed = NotebookGitTreeContent.of(List.of(entry));
+    blobIds.putAll(hashed.blobIds());
+    blobs.putAll(hashed.blobs());
   }
 }

@@ -285,7 +285,22 @@ Proof: example 2 test; existing `NotebookGitFolder*`, `NotebookGitWebFolder*`
 unchanged.
 
 ### 7. Derive README edits and multi-notebook changes, retire the fallback
-Type: Behavior. Status: planned.
+Type: Behavior. Status: **done** (2026-09-22).
+
+Delivered: `NotebookGitDerivedTree.of` is total (no kind gate, no
+`Optional`); a Folder or Notebook row change refreshes that prefix's
+`README.md` through `PortableTreeEntry.ofReadme` (one README rule shared with
+the full assembly) before markers; `AcceptedWebChangeService` no longer
+depends on `NotebookLivePortableTree`; `NotebookGitChangedFolders` was
+extracted; path arithmetic lives in `NotebookGitLivePortablePath`. Multi-notebook
+`apply` already committed each opened notebook from its own captured rows.
+Accepted proof: `NotebookGit*` plus `services.notebookGit.*`, 395 tests
+green before the refactor, 116 across the derivation, full-assembly consumer
+and snapshot classes after it. README examples through the owner's `apply`
+entry point: `NotebookGitDerivedFolderTreeOracleControllerTest.editingAFolderReadmeReplacesItsMarkerWithTheReadmeAndMatchesTheFullAssembly`
+and `editingTheNotebookReadmePutsItAtTheRootWithoutAMarkerAndMatchesTheFullAssembly`;
+two-notebook reduce: `NotebookGitWebRelationReduceControllerTest.reduceAcrossNotebooksDerivesEachNotebookFromItsOwnRowsAndMatchesBothFullAssemblies`,
+and the drifted-source test now asserts the unsynchronized note stays absent.
 
 Triggers: folder README edit; relationship reduction whose relation note and
 source note sit in two notebooks. Postcondition: `README.md` replaced at the
@@ -391,6 +406,16 @@ retained in the repository. Proof: the recorded numbers in this plan.
 - Slice 6: no web path inserts or updates a `NotebookAttachment` row;
   cascade-deleted attachment rows are not captured (database cascade) and
   vanish with their deleted folder's prefix.
+- Slice 7: the oracle helper `assertAcceptedTreeMatchesTheFullAssembly`
+  reloads the notebook row because controller tests run without a transaction
+  and a caller's `Notebook` instance is detached; slice 8 must keep comparing
+  against stored rows. With the gate gone, a `NotebookAttachment` row update
+  (unreachable through `apply` today; web attachment upload is out of scope)
+  would remove its previous path without re-adding it; note for the
+  retrospective. Slice 8 needs attachment entries (bytes from
+  `NotebookAttachmentRepository.findPortableTreeRowsByNotebookId`) and the
+  root readme fed directly, since `of` today adds attachments never and the
+  root readme only from a captured Notebook row.
 - Retrospective candidate (not acted on): the committed referrer-authoring
   pattern `inCommittedTransaction(..., () -> authorReferencingContent(...))`
   has about twenty copies across fourteen NotebookGit test files.

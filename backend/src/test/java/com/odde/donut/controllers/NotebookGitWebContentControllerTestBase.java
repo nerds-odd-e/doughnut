@@ -78,12 +78,14 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   }
 
   /**
-   * The accepted head's tree, derived from the change, equals a full assembly of the projection.
+   * The accepted head's tree, derived from the change, equals a full assembly of the stored
+   * projection.
    */
   void assertAcceptedTreeMatchesTheFullAssembly(Notebook notebook) throws Exception {
+    Notebook stored = notebookRepository.findById(notebook.getId()).orElseThrow();
     assertThat(
         acceptedBlobIds(notebook),
-        equalTo(NotebookGitTreeContent.of(livePortableTree.entriesOf(notebook)).blobIds()));
+        equalTo(NotebookGitTreeContent.of(livePortableTree.entriesOf(stored)).blobIds()));
   }
 
   Map<String, ObjectId> acceptedBlobIds(Notebook notebook) throws Exception {

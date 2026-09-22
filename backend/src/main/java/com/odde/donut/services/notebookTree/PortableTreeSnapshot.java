@@ -47,11 +47,7 @@ public final class PortableTreeSnapshot {
 
   private void collectDirectory(String pathPrefix, int folderKey, String readmeContentOrNull) {
     int firstEntryIndex = entries.size();
-    if (readmeContentOrNull != null && !readmeContentOrNull.isBlank()) {
-      entries.add(
-          PortableTreeEntry.ofText(
-              pathPrefix + "README.md", PortableTreeReadmeMarkdown.assemble(readmeContentOrNull)));
-    }
+    PortableTreeEntry.ofReadme(pathPrefix, readmeContentOrNull).ifPresent(entries::add);
 
     for (PortableTreeNoteRow note : notesByFolder.getOrDefault(folderKey, List.of())) {
       entries.add(PortableTreeEntry.ofNote(pathPrefix + note.title() + ".md", note.content()));

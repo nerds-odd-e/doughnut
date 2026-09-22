@@ -103,10 +103,22 @@ class NotebookGitWebRelationReduceControllerTest extends NotebookGitWebContentCo
   }
 
   @Test
+  void reduceAcrossNotebooksDerivesEachNotebookFromItsOwnRowsAndMatchesBothFullAssemblies()
+      throws Exception {
+    CrossNotebookReduceFixture f = seedAstronomyMoonAPartOfSpaceTopicsEarth();
+
+    relationController.reduceToSourceProperty(f.relation());
+
+    assertAcceptedTreeMatchesTheFullAssembly(f.astronomy());
+    assertAcceptedTreeMatchesTheFullAssembly(f.spaceTopics());
+  }
+
+  @Test
   void reduceIntoDriftedSourceNotebookCommitsEachNotebookOnItsOwnAcceptedHead() throws Exception {
     CrossNotebookReduceFixture f = seedAstronomyMoonAPartOfSpaceTopicsEarth();
     f.moon().setContent("Changed without a snapshot");
     noteRepository.save(f.moon());
+    makeMe.aNote("Sun").notebook(f.astronomy()).please();
 
     relationController.reduceToSourceProperty(f.relation());
 
@@ -118,6 +130,7 @@ class NotebookGitWebRelationReduceControllerTest extends NotebookGitWebContentCo
       assertThat(
           NotebookGitProposalBlobText.readUtf8(repo, astronomyCommit.head(), "Moon.md"),
           equalTo(moonContent));
+      assertThat(GitBundleTestReader.pathsIn(repo, astronomyCommit.head()), not(hasItem("Sun.md")));
     }
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.SingleParentGitCommit spaceTopicsCommit =

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
@@ -11,11 +12,16 @@ import static org.hamcrest.Matchers.not;
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Every web folder change's accepted tree, derived by re-listing the accepted entries under the
@@ -24,6 +30,8 @@ import org.junit.jupiter.api.Test;
  */
 class NotebookGitDerivedFolderTreeOracleControllerTest
     extends NotebookGitWebContentControllerTestBase {
+  @Autowired AcceptedWebChangeService acceptedWebChangeService;
+  @Autowired FolderRepository folderRepository;
 
   @Test
   void
@@ -121,5 +129,72 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
     assertThat(acceptedHistory(notebook).tipPaths(), contains("_trash/.keep"));
     assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  @Test
+  void editingAFolderReadmeReplacesItsMarkerWithTheReadmeAndMatchesTheFullAssembly()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder docs = makeMe.aFolder().notebook(notebook).name("Docs").please();
+    snapshotCurrentPortableTree(notebook);
+
+    saveFolderReadme(notebook, docs, "Read these first");
+
+    assertThat(
+        acceptedHistory(notebook).tipContent(),
+        contains(
+            PortableTreeEntry.ofText(
+                "Docs/README.md", PortableTreeReadmeMarkdown.assemble("Read these first"))));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+
+    saveFolderReadme(notebook, docs, " ");
+
+    assertThat(acceptedHistory(notebook).tipPaths(), contains("Docs/.keep"));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  @Test
+  void editingTheNotebookReadmePutsItAtTheRootWithoutAMarkerAndMatchesTheFullAssembly()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    snapshotCurrentPortableTree(notebook);
+
+    saveNotebookReadme(notebook, "Welcome");
+
+    assertThat(
+        acceptedHistory(notebook).tipContent(),
+        contains(
+            PortableTreeEntry.ofText("README.md", PortableTreeReadmeMarkdown.assemble("Welcome"))));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+
+    saveNotebookReadme(notebook, null);
+
+    assertThat(acceptedHistory(notebook).tipPaths(), empty());
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  private void saveFolderReadme(Notebook notebook, Folder folder, String content) throws Exception {
+    saveReadme(
+        notebook,
+        () -> folderRepository.findById(folder.getId()).orElseThrow().setReadmeContent(content));
+  }
+
+  private void saveNotebookReadme(Notebook notebook, String content) throws Exception {
+    saveReadme(
+        notebook,
+        () ->
+            notebookRepository.findById(notebook.getId()).orElseThrow().setReadmeContent(content));
+  }
+
+  /** A readme edit accepted through the owner, as a readme endpoint routed through it would be. */
+  private void saveReadme(Notebook notebook, Runnable edit) throws Exception {
+    acceptedWebChangeService.apply(
+        notebook.getId(),
+        () -> {
+          edit.run();
+          return null;
+        },
+        ignored -> "Edit readme",
+        testabilitySettings.getCurrentUTCTimestamp());
   }
 }

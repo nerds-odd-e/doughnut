@@ -24,4 +24,14 @@ final class NotebookGitLivePortablePath {
   static String folderPath(Folder folder) {
     return folder == null ? "" : folderPath(folder.getParentFolder()) + folder.getName() + "/";
   }
+
+  /** The prefix of the directory holding a file path; empty at the notebook root. */
+  static String directoryOf(String path) {
+    return path.substring(0, path.lastIndexOf('/') + 1);
+  }
+
+  /** The prefix of the directory holding a folder prefix; empty for a root folder. */
+  static String parentOf(String prefix) {
+    return directoryOf(prefix.substring(0, prefix.length() - 1));
+  }
 }
