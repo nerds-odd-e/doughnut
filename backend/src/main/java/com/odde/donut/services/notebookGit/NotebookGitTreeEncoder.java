@@ -1,6 +1,5 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
@@ -18,7 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectInserter;
+import org.eclipse.jgit.lib.ObjectReader;
+import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,32 +49,24 @@ class NotebookGitTreeEncoder {
   }
 
   /**
-   * The accepted tree with every changed note's and attachment's previous path removed, every entry
-   * under a changed folder relocated at its current path with its accepted blob, each inserted or
-   * updated note's blob put at its current path, each changed container's {@code README.md}
-   * refreshed at its current prefix and the {@code .keep} marker of every touched directory
-   * re-evaluated at its current path.
+   * Accepted tree edited by the projection change: stale file paths cleared, folder subtrees
+   * relocated, note blobs and container readmes refreshed, {@code .keep} re-evaluated.
    */
   NotebookGitTreeContent derive(
-      NotebookProjectionChange change, Map<String, ObjectId> acceptedBlobIds) {
+      NotebookProjectionChange change, Repository repository, ObjectId acceptedRootTreeId) {
     NotebookGitChangedFolders folders = new NotebookGitChangedFolders(folderRepository, change);
+    NotebookGitChangedFiles files =
+        new NotebookGitChangedFiles(noteRepository, notebookAttachmentRepository, change);
     Set<String> touchedDirectories = new LinkedHashSet<>(folders.touchedDirectories());
-    NotebookGitDirectoryTree tree = NotebookGitDirectoryTree.fromBlobIds(acceptedBlobIds);
-
-    Stream.concat(change.deleted.entrySet().stream(), change.updated.entrySet().stream())
-        .filter(entry -> isFile(entry.getKey().kind()))
-        .map(entry -> folders.previousPathOf(entry.getKey().kind(), entry.getValue()))
-        .forEach(
-            previousPath -> {
-              tree.removeFile(previousPath);
-              folders
-                  .currentPathOf(NotebookGitPortablePath.directoryOf(previousPath))
-                  .ifPresent(touchedDirectories::add);
-            });
-    folders.relocate(tree);
-    folders.currentFolders().keySet().forEach(tree::ensureDirectory);
-    return encode(
-        tree, currentNoteEntries(change), readmeContents(change, folders), touchedDirectories);
+    try (ObjectReader objectReader = repository.newObjectReader()) {
+      NotebookGitDirectoryTree tree =
+          NotebookGitDirectoryTree.fromAcceptedRoot(objectReader, acceptedRootTreeId);
+      files.forgetStalePaths(tree, folders, touchedDirectories);
+      folders.relocate(tree);
+      folders.currentFolders().keySet().forEach(tree::ensureDirectory);
+      return encode(
+          tree, files.currentNoteEntries(), readmeContents(change, folders), touchedDirectories);
+    }
   }
 
   /** The notebook's whole tree from its stored folders, notes (trash included) and attachments. */
@@ -140,9 +135,7 @@ class NotebookGitTreeEncoder {
 
   /**
    * Puts each file, refreshes each container's {@code README.md}, and re-evaluates {@code .keep}
-   * deepest first through the directory tree. Serialization flattens to path blob ids for the
-   * commit builder's native tree write; the directory model can still hold unresolved child tree
-   * ids.
+   * deepest first. Serialization emits native trees that reuse unresolved child tree ids.
    */
   private static NotebookGitTreeContent encode(
       NotebookGitDirectoryTree tree,
@@ -164,7 +157,7 @@ class NotebookGitTreeEncoder {
         });
     directories.stream().filter(directory -> !directory.isEmpty()).forEach(tree::ensureDirectory);
     normalizeKeep(tree, directories, blobs);
-    return new NotebookGitTreeContent(tree.toBlobIds(), blobs);
+    return NotebookGitTreeContent.fromDirectory(tree, blobs);
   }
 
   /**
@@ -184,10 +177,6 @@ class NotebookGitTreeEncoder {
                 tree.removeFile(directory + ".keep");
               }
             });
-  }
-
-  private static boolean isFile(Class<?> kind) {
-    return kind != Folder.class && kind != Notebook.class;
   }
 
   /**
@@ -210,26 +199,10 @@ class NotebookGitTreeEncoder {
     return contents;
   }
 
-  /** The current file of every note the change updated or inserted. */
-  private List<PortableTreeEntry> currentNoteEntries(NotebookProjectionChange change) {
-    Stream<Note> updated =
-        change.updated.keySet().stream()
-            .filter(row -> row.kind() == Note.class)
-            .map(row -> noteRepository.findById(row.id()).orElseThrow());
-    Stream<Note> inserted =
-        change.inserted.stream().filter(Note.class::isInstance).map(Note.class::cast);
-    return Stream.concat(updated, inserted)
-        .map(
-            note ->
-                PortableTreeEntry.ofNote(NotebookGitPortablePath.ofNote(note), note.getContent()))
-        .toList();
-  }
-
   private static void put(
       PortableTreeEntry entry, NotebookGitDirectoryTree tree, Map<ObjectId, byte[]> blobs) {
-    NotebookGitTreeContent hashed = NotebookGitTreeContent.of(List.of(entry));
-    ObjectId blobId = hashed.blobIds().get(entry.path());
-    blobs.putAll(hashed.blobs());
+    ObjectId blobId = new ObjectInserter.Formatter().idFor(Constants.OBJ_BLOB, entry.content());
+    blobs.put(blobId, entry.content());
     tree.putFile(entry.path(), blobId);
   }
 }

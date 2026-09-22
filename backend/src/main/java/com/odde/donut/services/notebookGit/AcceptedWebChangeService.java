@@ -10,7 +10,6 @@ import com.odde.donut.services.notebookGit.ProjectionChangeCapture.ProjectionCha
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -81,25 +80,23 @@ public class AcceptedWebChangeService {
     }
   }
 
-  private record OpenedNotebook(
-      NotebookGitBinding binding,
-      OpenedAcceptedRepository accepted,
-      Map<String, ObjectId> acceptedBlobIds) {}
+  private record OpenedNotebook(NotebookGitBinding binding, OpenedAcceptedRepository accepted) {}
 
   private OpenedNotebook open(NotebookGitBinding binding) {
-    OpenedAcceptedRepository accepted = repositoryStore.open(binding);
-    return new OpenedNotebook(
-        binding, accepted, NotebookGitAcceptedTree.blobIds(accepted.repository(), accepted.head()));
+    return new OpenedNotebook(binding, repositoryStore.open(binding));
   }
 
   private void commitIfChanged(
       OpenedNotebook notebook, ProjectionChange change, String message, Timestamp updatedAt) {
+    OpenedAcceptedRepository accepted = notebook.accepted();
+    ObjectId acceptedRootTreeId =
+        NotebookGitAcceptedTree.rootTreeId(accepted.repository(), accepted.head());
     NotebookProjectionChange notebookChange = change.of(notebook.binding().getNotebook().getId());
-    NotebookGitTreeContent tree = treeEncoder.derive(notebookChange, notebook.acceptedBlobIds());
-    if (tree.blobIds().equals(notebook.acceptedBlobIds())) {
+    NotebookGitTreeContent tree =
+        treeEncoder.derive(notebookChange, accepted.repository(), acceptedRootTreeId);
+    if (tree.treeId().equals(acceptedRootTreeId)) {
       return;
     }
-    OpenedAcceptedRepository accepted = notebook.accepted();
     NotebookGitCommitBuilder.append(
         accepted.repository(),
         accepted.head(),

@@ -1,6 +1,6 @@
 # Save a note by editing its Git ancestor trees
 
-Status: in progress; slices 1–2 delivered, slices 3–4 planned.
+Status: in progress; slices 1–3 delivered, slice 4 planned.
 Work item: **SEED-037#story-1**.
 Source: [refined story](../../seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-1)
 and the owner's 2026-09-22 acceptance of ancestor-only reads, request for
@@ -186,7 +186,7 @@ refs, not another encoder.
 
 ### 3. Save through the edited paths and reuse untouched subtrees
 
-Type: Behavior. Status: planned. Estimate: 5–10 minutes plus suite wait.
+Type: Behavior. Status: done. Estimate: 5–10 minutes plus suite wait.
 
 Behavior: an existing note at root or depth 12 is edited beside thousands of
 unrelated folders and attachments; publication reads only the edited ancestor
@@ -200,17 +200,19 @@ builder. Remove the eager bridge and whole-map comparison/copies. Existing
 full-snapshot build/append consumers keep their supported complete-tree input
 without reading a parent just to build it.
 
-Proof: extend `NotebookGitWebContentSaveCostControllerTest` with fixed-path,
-fixed-depth fixtures whose unrelated folder counts differ substantially,
-including thousands of folders; clear the persistence context before each
-measured call and reopen the accepted repository. Verify executed SQL/object
-IDs show no unrelated tree/blob reads, no duplicate ancestor reads by the
-editor, and no folder-proportional existence batches. Check one object batch
-for the depth-12 example and distinguish rows from statements. Assert the
-unchanged-save Git-write delta only in its own case. Check exact full-assembly
-tree, parent continuity and existing late-failure committed-reader rollback
-outside the measurement window. Reuse slice 2's structural proofs, adding a
-composed-operation example only if their actual setup leaves a capture gap.
+Proof accepted: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`AcceptedWebChangeService.commitIfChanged` compares `tree.treeId()` with
+`NotebookGitAcceptedTree.rootTreeId` and skips append when they match.
+`NotebookGitWebContentSaveCostControllerTest.contentSaveTreeFetchesStayBoundedWhenUnrelatedFoldersGrowFromDozensToThousands`
+measures depth 12 with 40 and 3000 unrelated folders after `entityManager.clear()`
+inside `inCommittedTransaction`, with `SqlStatementCallLog` only around
+`updateNoteContent`. Tree fetches are equal and at most 13, with one existence
+`IN`, one INSERT statement, at most 15 insert rows, and unique fetched tree
+IDs. Full-assembly comparison is after that window.
+`unchangedContentSaveDoesNotInsertGitObjectsOrAdvanceTheRef` asserts no object
+INSERT and no binding UPDATE. Slice 2 oracles still compare root IDs with
+full assembly. Focused builder, encoder, and oracle tests passed after the
+cohesion split. Production latency remains slice 4.
 
 ### 4. Demonstrate responsive saves on the representative notebook shape
 
@@ -272,18 +274,17 @@ No unresolved product/ADR decision blocks these slices. Scope and reuse were
 critically reviewed against current callers at `0f8e0bf6ba`. The only intermediate
 whole-tree input is explicitly removed in slice 3. Final design has one editor,
 one encoding owner and the existing transaction owner, with no persistent new
-representation. Slice 2's relocation conversion fit the delivered slice. Slice 3 remains the
-path-scoped read and native tree-ref emission.
-Production latency is unproved until measured.
+representation. Slice 2's relocation conversion and slice 3's path-scoped read are delivered.
+Slice 4 owns the latency measurement. Production latency is unproved until measured.
 
 ## Execution
 
 Story Branch Mode. Execution checkout
 `/Users/terryyin/git/doughnut-worktrees/012-path-scoped-note-save`, branch
 `story/012-path-scoped-note-save`, created from `origin/main` at `cf2f317c27`.
-Queue claim `853a01f996` is published on `origin/main`. Slice 1 increment
-`9cf34be8b4` is published on `origin/story/012-path-scoped-note-save`. Later
-increments publish to that same branch. GitHub Actions observer
+Queue claim `853a01f996` is published on `origin/main`. Slice 1 increment `9cf34be8b4` and slice 2 increment `70e86008ca` are published
+on `origin/story/012-path-scoped-note-save`. Later increments publish to that
+same branch. GitHub Actions observer
 `/tmp/dough-ci-501/watch-Pkeu0n` covers that story branch (`ci.yml`, display
 name `donut CI`). The trunk claim is unobserved. Slice 1's learning for later
 proof: activate `SqlStatementCallLog` only around the controller call; one

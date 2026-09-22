@@ -31,14 +31,22 @@ final class NotebookGitAcceptedTree {
     return entries;
   }
 
+  /** Root tree id of the commit at {@code commitId}. */
+  static ObjectId rootTreeId(Repository repository, ObjectId commitId) {
+    try (RevWalk revWalk = new RevWalk(repository)) {
+      return revWalk.parseCommit(commitId).getTree();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Could not read accepted root tree id", e);
+    }
+  }
+
   /**
    * Each path of the tree at {@code commitId} with its Git blob id, read from tree objects alone:
    * no blob is opened, and file modes are not part of the result.
    */
   static Map<String, ObjectId> blobIds(Repository repository, ObjectId commitId) {
-    try (RevWalk revWalk = new RevWalk(repository);
-        TreeWalk treeWalk = new TreeWalk(repository)) {
-      treeWalk.addTree(revWalk.parseCommit(commitId).getTree());
+    try (TreeWalk treeWalk = new TreeWalk(repository)) {
+      treeWalk.addTree(rootTreeId(repository, commitId));
       treeWalk.setRecursive(true);
       Map<String, ObjectId> blobIds = new HashMap<>();
       while (treeWalk.next()) {

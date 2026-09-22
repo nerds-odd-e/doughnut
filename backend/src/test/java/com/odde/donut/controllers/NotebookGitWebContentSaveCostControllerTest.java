@@ -1,10 +1,12 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 
@@ -13,8 +15,10 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookGit.SqlStatementCallLog;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
+import java.util.HashSet;
 import java.util.List;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 
@@ -99,4 +103,121 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentC
     assertThat(objectInserts, greaterThan(0L));
     assertThat(treeFetches, lessThanOrEqualTo(12L));
   }
+
+  @Test
+  void contentSaveTreeFetchesStayBoundedWhenUnrelatedFoldersGrowFromDozensToThousands()
+      throws Exception {
+    SaveCostObservation shallow = measureContentSaveAtDepth(12, 40, "cost-depth12-unrelated-40");
+    SaveCostObservation deep = measureContentSaveAtDepth(12, 3000, "cost-depth12-unrelated-3000");
+
+    assertThat(shallow.treeFetches(), equalTo(deep.treeFetches()));
+    assertThat(shallow.treeFetches(), lessThanOrEqualTo(13L));
+    assertThat(deep.existenceCheckExecutions(), equalTo(1L));
+    assertThat(deep.objectInsertExecutions(), equalTo(1L));
+    assertThat(deep.objectInsertRows(), lessThanOrEqualTo(15));
+    assertThat(deep.fetchedTreeIds(), hasSize((int) deep.treeFetches()));
+    assertThat(
+        "editor opens each ancestor tree once",
+        deep.fetchedTreeIds().size(),
+        equalTo(new HashSet<>(deep.fetchedTreeIds()).size()));
+    assertAcceptedTreeMatchesTheFullAssembly(deep.notebook());
+  }
+
+  @Test
+  void unchangedContentSaveDoesNotInsertGitObjectsOrAdvanceTheRef() throws Exception {
+    Notebook notebook = createGitBackedNotebook("Unchanged Save");
+    Note note = makeMe.aNote().notebook(notebook).content(EDITED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+    AcceptedHistory before = acceptedHistory(notebook);
+    Integer noteId = note.getId();
+
+    Note reloaded =
+        inCommittedTransaction(
+            transactionManager,
+            () -> {
+              entityManager.clear();
+              return entityManager.find(Note.class, noteId);
+            });
+
+    SqlStatementCallLog callLog = new SqlStatementCallLog();
+    try (AutoCloseable ignored = callLog.activate()) {
+      textContentController.updateNoteContent(reloaded, contentDto(EDITED_CONTENT));
+    }
+
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.commits(), equalTo(before.commits()));
+    assertThat(
+        callLog.countExecutionsMatching("INSERT INTO notebook_git_accepted_object"), equalTo(0L));
+    assertThat(
+        callLog.countExecutionsMatching("UPDATE notebook_git_binding", "accepted_git_object_id"),
+        equalTo(0L));
+  }
+
+  private SaveCostObservation measureContentSaveAtDepth(
+      int depth, int unrelatedFolders, String label) throws Exception {
+    Notebook notebook = createGitBackedNotebook(label);
+    Folder parent = null;
+    for (int i = 0; i < depth; i++) {
+      parent =
+          parent == null
+              ? makeMe.aFolder().notebook(notebook).name("D" + i).please()
+              : makeMe.aFolder().parentFolder(parent).name("D" + i).please();
+    }
+    Note note = makeMe.aNote().folder(parent).content(ACCEPTED_CONTENT).please();
+    for (int i = 0; i < unrelatedFolders; i++) {
+      makeMe.aFolder().notebook(notebook).name("U" + i).please();
+    }
+    storeFolderAttachmentAndSnapshot(
+        notebook, null, "noise.bin", new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+    AcceptedHistory acceptedBefore = acceptedHistory(notebook);
+    Integer noteId = note.getId();
+
+    Note reloaded =
+        inCommittedTransaction(
+            transactionManager,
+            () -> {
+              entityManager.clear();
+              return entityManager.find(Note.class, noteId);
+            });
+
+    SqlStatementCallLog callLog = new SqlStatementCallLog();
+    try (AutoCloseable ignored = callLog.activate()) {
+      textContentController.updateNoteContent(reloaded, contentDto(EDITED_CONTENT));
+    }
+
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(acceptedBefore.commits()));
+    List<ObjectId> fetchedTrees = fetchedObjectIdsReturningType(callLog, Constants.OBJ_TREE);
+    int insertRows =
+        callLog.executions().stream()
+            .filter(e -> e.sql().contains("INSERT INTO notebook_git_accepted_object"))
+            .mapToInt(SqlStatementCallLog.Execution::result)
+            .sum();
+    return new SaveCostObservation(
+        notebook,
+        callLog.countObjectFetchesReturningType(Constants.OBJ_TREE),
+        callLog.countExecutionsMatching("notebook_git_accepted_object", " IN ("),
+        callLog.countExecutionsMatching("INSERT INTO notebook_git_accepted_object"),
+        insertRows,
+        fetchedTrees);
+  }
+
+  private static List<ObjectId> fetchedObjectIdsReturningType(
+      SqlStatementCallLog callLog, int objectType) {
+    return callLog.executions().stream()
+        .filter(e -> "executeQuery".equals(e.method()))
+        .filter(e -> e.sql().contains("notebook_git_accepted_object"))
+        .filter(e -> e.sql().contains("git_object_id = ?"))
+        .filter(e -> e.objectTypes().contains(objectType))
+        .map(e -> ObjectId.fromString(e.parameters().get(1).toString()))
+        .toList();
+  }
+
+  private record SaveCostObservation(
+      Notebook notebook,
+      long treeFetches,
+      long existenceCheckExecutions,
+      long objectInsertExecutions,
+      int objectInsertRows,
+      List<ObjectId> fetchedTreeIds) {}
 }
