@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -122,7 +121,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
   }
 
   @Test
-  void preExistingPortableDriftDoesNotBlockTheNoteCreation() throws Exception {
+  void preExistingPortableDriftIsNeitherBlockingTheNoteCreationNorAdoptedByIt() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote().notebook(notebook).title("Unsynchronized").please();
     var acceptedHistoryBefore = acceptedHistory(notebook);
@@ -131,7 +130,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
 
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
-    assertThat(after.tipPaths(), hasItem("Another.md"));
+    assertThat(after.tipPaths(), contains("Another.md"));
   }
 
   @Test

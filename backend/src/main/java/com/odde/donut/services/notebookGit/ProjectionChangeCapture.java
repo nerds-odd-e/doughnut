@@ -23,7 +23,8 @@ import org.springframework.stereotype.Component;
  * Records, while a capture window is open on the current thread, which projection rows (notes,
  * folders, attachments, notebook readmes) the flushed changes inserted, updated or deleted, grouped
  * by notebook. Updates keep the first-seen previous path fields so a later flush cannot lose the
- * original path. Attachment bytes are never read.
+ * original path; deletes keep the path the row had, since the entity is gone. Attachment bytes are
+ * never read.
  */
 @Component
 public class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomizer {
@@ -34,9 +35,11 @@ public class ProjectionChangeCapture implements Interceptor, HibernateProperties
   public record RowPath(Integer containerId, String name) {}
 
   public static class NotebookProjectionChange {
-    public final Set<ProjectionRow> inserted = new LinkedHashSet<>();
+    /** The inserted entities themselves: a row's id is only assigned by its insert. */
+    public final Set<Object> inserted = new LinkedHashSet<>();
+
     public final Map<ProjectionRow, RowPath> updated = new LinkedHashMap<>();
-    public final Set<ProjectionRow> deleted = new LinkedHashSet<>();
+    public final Map<ProjectionRow, RowPath> deleted = new LinkedHashMap<>();
   }
 
   public class ProjectionChange implements AutoCloseable {
@@ -77,14 +80,14 @@ public class ProjectionChangeCapture implements Interceptor, HibernateProperties
   @Override
   public boolean onSave(Object entity, Object id, Object[] state, String[] names, Type[] types) {
     NotebookProjectionChange change = changeFor(entity, state, names);
-    if (change != null) change.inserted.add(row(entity, id));
+    if (change != null) change.inserted.add(entity);
     return false;
   }
 
   @Override
   public void onDelete(Object entity, Object id, Object[] state, String[] names, Type[] types) {
     NotebookProjectionChange change = changeFor(entity, state, names);
-    if (change != null) change.deleted.add(row(entity, id));
+    if (change != null) change.deleted.put(row(entity, id), rowPath(entity, state, names));
   }
 
   @Override
@@ -115,9 +118,12 @@ public class ProjectionChangeCapture implements Interceptor, HibernateProperties
           Objects.equals(at(previous, names, "readmeContent"), at(current, names, "readmeContent"));
       return readmeUnchanged ? null : new RowPath(null, null);
     }
+    return rowPath(entity, previous, names);
+  }
+
+  private static RowPath rowPath(Object entity, Object[] state, String[] names) {
     PathFields fields = PATH_FIELDS.get(entity.getClass());
-    return new RowPath(
-        idAt(previous, names, fields.container()), nameAt(previous, names, fields.name()));
+    return new RowPath(idAt(state, names, fields.container()), nameAt(state, names, fields.name()));
   }
 
   private static ProjectionRow row(Object entity, Object id) {

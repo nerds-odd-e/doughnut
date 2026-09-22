@@ -207,7 +207,19 @@ example 1 test, examples 5 and 6 tests, focused `NotebookGitWebContentSave*`
 run.
 
 ### 4. Derive note additions and removals with the folder marker rule
-Type: Behavior. Status: planned.
+Type: Behavior. Status: **done** (2026-09-22).
+
+Delivered: `NotebookGitDerivedTree.of` handles any mix of Note inserts,
+deletes and in-place updates: removed paths come from the captured deleted
+row's `RowPath`, added entries are hashed, then `applyEmptyDirectoryMarker`
+applies the `.keep` rule to each touched directory prefix. Capture now holds
+inserted entity instances (ids exist only after insert) and each deleted row's
+`RowPath`. Accepted proof: `NotebookGit*` plus `services.notebookGit.*`, 385
+tests green; oracle tests
+`firstNoteInAnEmptyFolderReplacesItsMarkerAndMatchesTheFullAssembly` and
+`permanentlyRemovingTheOnlyNoteOfAFolderRestoresItsMarkerAndMatchesTheFullAssembly`;
+`NotebookGitNoteCreationControllerTest.preExistingPortableDriftIsNeitherBlockingTheNoteCreationNorAdoptedByIt`
+now asserts the drifted note stays absent.
 
 Pre-condition: an empty folder holding `.keep`, and a folder holding one note.
 Triggers: create a note in the empty folder; permanently remove the only note
@@ -322,6 +334,15 @@ retained in the repository. Proof: the recorded numbers in this plan.
   `GitBundleTestReader` make "one commit appended" assertions two lines.
   `.keep` belongs inside `NotebookGitDerivedTree.of` after keys are added and
   removed, evaluated on touched directory prefixes.
+- Slice 4: `of` is kind gate → added entries and removed paths → apply to a
+  copy of the map → `applyEmptyDirectoryMarker` per touched prefix. A
+  path-changed Note update (slice 5) contributes its previous path to removals
+  and its new entry to additions; the empty return on path mismatch is the only
+  line to replace. Cascade-deleted attachments (slice 6) arrive in `deleted`
+  with `RowPath(folderId, filename)` but their folder may be deleted too, so
+  remove them by the deleted folder's previous prefix, not by folder lookup.
+  `NotebookGitLivePortablePath.ofNote(Folder, title)` is the one note-path
+  rule; the `.keep` rule is duplicated in `PortableTreeSnapshot` until slice 8.
 
 - Slice 2: interceptor callbacks receive real entity instances and lookups
   are keyed by exact entity class; `open()` overwrites any existing window,

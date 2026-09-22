@@ -9,7 +9,11 @@ final class NotebookGitLivePortablePath {
   private NotebookGitLivePortablePath() {}
 
   static String ofNote(Note note) {
-    return folderPath(note.getFolder()) + note.getTitle() + ".md";
+    return ofNote(note.getFolder(), note.getTitle());
+  }
+
+  static String ofNote(Folder folder, String title) {
+    return folderPath(folder) + title + ".md";
   }
 
   /** Notebook root ({@code folder == null}) has an empty prefix. */
