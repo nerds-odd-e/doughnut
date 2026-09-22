@@ -178,7 +178,23 @@ Critical postcondition: previous title present, nothing recorded outside the
 capture window. Record the result here before slice 3.
 
 ### 3. Derive a content edit's commit from the changed note
-Type: Behavior. Status: planned.
+Type: Behavior. Status: **done** (2026-09-22).
+
+Delivered: the before-snapshot is gone from `AcceptedWebChangeService`
+(decision 4); `NotebookGitDerivedTree.of(change, acceptedBlobIds)` returns the
+accepted map with each in-place Note update's blob replaced, or empty for any
+other change kind, which still falls back to the full assembly. Accepted
+proof: full `NotebookGit*` controller run plus the capture test, 376 tests
+green. Example 1 cost signal:
+`NotebookGitWebContentSaveCostControllerTest.savingContentCostsTheSameStatementsInALargeNotebookWithAttachmentsAsInASmallOne`
+(statement-count equality and no query naming `NotebookAttachment`);
+example 1 tree exactness and the oracle:
+`NotebookGitDerivedTreeOracleControllerTest.contentEditMatchesTheFullAssembly`;
+example 6: `preExistingPortableDriftIsNeitherBlockingTheWebSaveNorAdoptedByIt`;
+example 5 tests unchanged. Nine former before-snapshot drift tests (content
+save, folder dissolve, rename, move, trash, creation; note creation and
+creation in folder; relation reduce) now assert decision 4's first half:
+the operation is committed on the accepted head.
 
 Pre-condition: Git-backed notebook with unrelated notes and attachments.
 Trigger: save new content for one note. Postcondition: one commit whose tree
@@ -289,11 +305,23 @@ retained in the repository. Proof: the recorded numbers in this plan.
   bytes)` for each changed note, remove deleted paths, and pass
   `new NotebookGitTreeContent(map, replacedBlobs)`; no-op stays
   `blobIds().equals(acceptedBlobIds)`.
-- Five `preExistingPortableDrift*` tests exist (content save, folder dissolve,
-  folder rename, folder move, folder trash), not only the content-save one.
-  Decision 4 is applied per operation kind as it becomes derived: each slice
-  rewrites the drift tests of the operations it derives, and the before-snapshot
-  comparison stays only for the fallback path until slice 7 retires it.
+- The before-snapshot could not survive for the fallback path (it is taken
+  before the operation runs), so slice 3 removed it entirely and rewrote all
+  nine drift tests to "the operation is committed on the accepted head". The
+  fallback still adopts drift until each operation is derived; slices 4 to 7
+  add the "drifted note stays absent" assertion for the operations they
+  derive (note creation in slice 4; folder creation, rename, move, trash,
+  dissolve in slice 6; relation reduce in slice 7).
+- Slice 3: statement-count equality alone also holds for the full assembly
+  (fixed query count); the distinguishing signal is that no executed query
+  names `NotebookAttachment` (`Statistics.getQueries()` after `clear()`).
+  Slice 6 should use that signal. `ProjectionChangeCapture.RowPath(containerId,
+  name)` is the row path record (renamed from `PreviousPath`; `updated` holds
+  the previous one). `PortableTreeEntry.ofNote(path, contentOrNull)` is the one
+  note-file rule. `AcceptedHistory.parents()` / `tipPaths()` in
+  `GitBundleTestReader` make "one commit appended" assertions two lines.
+  `.keep` belongs inside `NotebookGitDerivedTree.of` after keys are added and
+  removed, evaluated on touched directory prefixes.
 
 - Slice 2: interceptor callbacks receive real entity instances and lookups
   are keyed by exact entity class; `open()` overwrites any existing window,

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,6 +18,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -128,18 +130,19 @@ class NotebookGitNoteCreationFolderControllerTest
   }
 
   @Test
-  void driftedDestinationFolderKeepsWebCreationAndAcceptedHeadUnchanged() throws Exception {
+  void preExistingPortableDriftDoesNotBlockTheNoteCreationInsideTheDriftedFolder()
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    AcceptedBinding accepted = acceptedBinding(notebook);
+    var acceptedHistoryBefore = acceptedHistory(notebook);
     Folder unsynchronized = makeMe.aFolder().notebook(notebook).name("Unsynchronized").please();
     NoteCreationDTO creation = titleOnly("Inside Drifted Folder");
     creation.setFolderId(unsynchronized.getId());
 
-    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
+    controller.createNoteAtNotebookRoot(notebook, creation);
 
-    Note created = noteRepository.findById(result.getId()).orElseThrow();
-    assertThat(created.getFolder().getId(), is(unsynchronized.getId()));
-    assertBindingUnchanged(notebook, accepted);
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
+    assertThat(after.tipPaths(), hasItem("Unsynchronized/Inside Drifted Folder.md"));
   }
 
   @Test

@@ -150,7 +150,16 @@ public final class GitBundleTestReader {
     }
   }
 
-  public record AcceptedHistory(List<String> commits, List<PortableTreeEntry> tipContent) {}
+  public record AcceptedHistory(List<String> commits, List<PortableTreeEntry> tipContent) {
+    /** The parents this history advanced from: every commit but the newest. */
+    public List<String> parents() {
+      return commits.subList(1, commits.size());
+    }
+
+    public List<String> tipPaths() {
+      return tipContent.stream().map(PortableTreeEntry::path).toList();
+    }
+  }
 
   /**
    * The bundle's advertised {@code HEAD} object id, or {@code null} if the bundle never included

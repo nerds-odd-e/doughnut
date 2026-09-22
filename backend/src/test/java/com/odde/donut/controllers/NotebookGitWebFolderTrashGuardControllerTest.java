@@ -3,7 +3,9 @@ package com.odde.donut.controllers;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Folder;
@@ -13,7 +15,6 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
-import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,19 +46,16 @@ class NotebookGitWebFolderTrashGuardControllerTest extends NotebookGitWebContent
   }
 
   @Test
-  void preExistingPortableDriftKeepsTheFolderTrashAndAcceptedHistoryUnchanged() throws Exception {
+  void preExistingPortableDriftDoesNotBlockTheFolderTrash() throws Exception {
     GuardFixture f = seedBiologyUnderResearch();
-    ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     var acceptedHistoryBefore = acceptedHistory(f.notebook());
     makeMe.aNote().notebook(f.notebook()).title("Unsynchronized").content(CELLS_BODY).please();
 
     folderController.trashFolder(f.notebook(), f.biology());
 
-    assertThat(
-        parentFolderName(parentFolderId(parentFolderId(f.biology().getId()))), equalTo("_trash"));
-    assertThat(
-        ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId()), equalTo(acceptedA));
-    assertThat(acceptedHistory(f.notebook()), equalTo(acceptedHistoryBefore));
+    AcceptedHistory after = acceptedHistory(f.notebook());
+    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
+    assertThat(after.tipPaths(), hasItem(startsWith("_trash/")));
   }
 
   GuardFixture seedBiologyUnderResearch() throws UnexpectedNoAccessRightException {

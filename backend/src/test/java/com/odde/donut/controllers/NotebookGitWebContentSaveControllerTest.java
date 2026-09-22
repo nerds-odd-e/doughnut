@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -19,6 +18,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.sql.Timestamp;
 import java.time.Instant;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -26,37 +26,10 @@ import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.hibernate.SessionFactory;
-import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentControllerTestBase {
-
-  @Test
-  void savingContentDoesNotLoadEveryStoredNote() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Note note = makeMe.aNote().notebook(notebook).content(ACCEPTED_CONTENT).please();
-    int unrelatedNotes = 30;
-    for (int i = 0; i < unrelatedNotes; i++) {
-      makeMe.aNote().notebook(notebook).title("Unrelated " + i).please();
-    }
-    snapshotCurrentPortableTree(notebook);
-    Statistics statistics =
-        entityManager.getEntityManagerFactory().unwrap(SessionFactory.class).getStatistics();
-    boolean previouslyEnabled = statistics.isStatisticsEnabled();
-    statistics.setStatisticsEnabled(true);
-    long loadedBefore = statistics.getEntityStatistics(Note.class.getName()).getLoadCount();
-    try {
-      textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
-
-      long loaded =
-          statistics.getEntityStatistics(Note.class.getName()).getLoadCount() - loadedBefore;
-      assertThat(loaded, lessThan((long) unrelatedNotes));
-    } finally {
-      statistics.setStatisticsEnabled(previouslyEnabled);
-    }
-  }
 
   @Test
   void canonicalNoOpSaveKeepsAcceptedHistoryWhileUpdatingTheNoteTimestamp() throws Exception {
@@ -166,21 +139,19 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
   }
 
   @Test
-  void preExistingPortableDriftKeepsTheWebSaveAndAcceptedHistoryUnchanged() throws Exception {
+  void preExistingPortableDriftIsNeitherBlockingTheWebSaveNorAdoptedByIt() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note note =
         makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
-    NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    snapshotCurrentPortableTree(notebook);
     var acceptedHistoryBefore = acceptedHistory(notebook);
     makeMe.aNote().notebook(notebook).title("Unsynchronized").content(ACCEPTED_CONTENT).please();
 
     textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
 
-    NotebookGitBinding after = binding(notebook);
-    assertThat(
-        noteRepository.findById(note.getId()).orElseThrow().getContent(), is(EDITED_CONTENT));
-    assertThat(after.getAcceptedGitObjectId(), is(accepted.getAcceptedGitObjectId()));
-    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
+    assertThat(after.tipPaths(), contains("Root Note.md"));
   }
 
   @Test

@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -22,6 +21,7 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -122,25 +122,16 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
   }
 
   @Test
-  void earlierProjectionDriftKeepsExistingWebCreationAndAcceptedHead() throws Exception {
+  void preExistingPortableDriftDoesNotBlockTheNoteCreation() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote().notebook(notebook).title("Unsynchronized").please();
-    AcceptedBinding accepted = acceptedBinding(notebook);
+    var acceptedHistoryBefore = acceptedHistory(notebook);
 
-    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, titleOnly("Another"));
+    controller.createNoteAtNotebookRoot(notebook, titleOnly("Another"));
 
-    Note created = noteRepository.findById(result.getId()).orElseThrow();
-    assertThat(created.getTitle(), is("Another"));
-    assertBindingUnchanged(notebook, accepted);
-
-    byte[] downloaded = acceptedBundleBytes(notebook);
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId head = GitBundleTestReader.fetchHead(repository, downloaded);
-      assertThat(GitBundleTestReader.pathsIn(repository, head), not(hasItem("Another.md")));
-      assertThat(
-          GitBundleTestReader.fetchAdvertisedHead(downloaded).getName(),
-          is(accepted.acceptedHead()));
-    }
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
+    assertThat(after.tipPaths(), hasItem("Another.md"));
   }
 
   @Test

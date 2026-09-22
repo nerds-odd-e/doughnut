@@ -31,11 +31,11 @@ public class ProjectionChangeCapture implements Interceptor, HibernateProperties
   public record ProjectionRow(Class<?> kind, Integer id) {}
 
   /** Container is the folder (notes, attachments) or parent folder (folders); null at root. */
-  public record PreviousPath(Integer containerId, String name) {}
+  public record RowPath(Integer containerId, String name) {}
 
   public static class NotebookProjectionChange {
     public final Set<ProjectionRow> inserted = new LinkedHashSet<>();
-    public final Map<ProjectionRow, PreviousPath> updated = new LinkedHashMap<>();
+    public final Map<ProjectionRow, RowPath> updated = new LinkedHashMap<>();
     public final Set<ProjectionRow> deleted = new LinkedHashSet<>();
   }
 
@@ -92,7 +92,7 @@ public class ProjectionChangeCapture implements Interceptor, HibernateProperties
       Object entity, Object id, Object[] current, Object[] previous, String[] names, Type[] types) {
     NotebookProjectionChange change = changeFor(entity, previous, names);
     if (change != null) {
-      PreviousPath previousPath = previousPath(entity, current, previous, names);
+      RowPath previousPath = previousPath(entity, current, previous, names);
       if (previousPath != null) change.updated.putIfAbsent(row(entity, id), previousPath);
     }
     return false;
@@ -108,15 +108,15 @@ public class ProjectionChangeCapture implements Interceptor, HibernateProperties
   }
 
   /** A notebook row counts as a path change only when its root README content changed. */
-  private static PreviousPath previousPath(
+  private static RowPath previousPath(
       Object entity, Object[] current, Object[] previous, String[] names) {
     if (entity instanceof Notebook) {
       boolean readmeUnchanged =
           Objects.equals(at(previous, names, "readmeContent"), at(current, names, "readmeContent"));
-      return readmeUnchanged ? null : new PreviousPath(null, null);
+      return readmeUnchanged ? null : new RowPath(null, null);
     }
     PathFields fields = PATH_FIELDS.get(entity.getClass());
-    return new PreviousPath(
+    return new RowPath(
         idAt(previous, names, fields.container()), nameAt(previous, names, fields.name()));
   }
 

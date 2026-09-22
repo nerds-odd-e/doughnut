@@ -5,6 +5,7 @@ import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
+import com.odde.donut.services.notebookGit.ProjectionChangeCapture.NotebookProjectionChange;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.ProjectionChange;
 import com.odde.donut.services.notebookTree.NotebookLivePortableTree;
 import java.sql.Timestamp;
@@ -26,18 +27,21 @@ public class AcceptedWebChangeService {
   private final EntityPersister entityPersister;
   private final NotebookGitAcceptedRepositoryStore repositoryStore;
   private final ProjectionChangeCapture projectionChangeCapture;
+  private final NotebookGitDerivedTree derivedTree;
 
   public AcceptedWebChangeService(
       NotebookGitBindingRepository bindingRepository,
       NotebookLivePortableTree livePortableTree,
       EntityPersister entityPersister,
       NotebookGitAcceptedRepositoryStore repositoryStore,
-      ProjectionChangeCapture projectionChangeCapture) {
+      ProjectionChangeCapture projectionChangeCapture,
+      NotebookGitDerivedTree derivedTree) {
     this.bindingRepository = bindingRepository;
     this.livePortableTree = livePortableTree;
     this.entityPersister = entityPersister;
     this.repositoryStore = repositoryStore;
     this.projectionChangeCapture = projectionChangeCapture;
+    this.derivedTree = derivedTree;
   }
 
   @FunctionalInterface
@@ -70,12 +74,10 @@ public class AcceptedWebChangeService {
             .ifPresent(binding -> opened.add(open(binding)));
       }
       T result = operation.run();
-      List<OpenedNotebook> matchedBefore =
-          opened.stream().filter(OpenedNotebook::matchedBefore).toList();
-      if (!matchedBefore.isEmpty()) {
+      if (!opened.isEmpty()) {
         entityPersister.flush();
         String message = commitMessage.apply(result);
-        matchedBefore.forEach(notebook -> commitIfChanged(notebook, message, updatedAt));
+        opened.forEach(notebook -> commitIfChanged(notebook, change, message, updatedAt));
       }
       return result;
     } finally {
@@ -86,19 +88,21 @@ public class AcceptedWebChangeService {
   private record OpenedNotebook(
       NotebookGitBinding binding,
       OpenedAcceptedRepository accepted,
-      Map<String, ObjectId> acceptedBlobIds,
-      boolean matchedBefore) {}
+      Map<String, ObjectId> acceptedBlobIds) {}
 
   private OpenedNotebook open(NotebookGitBinding binding) {
     OpenedAcceptedRepository accepted = repositoryStore.open(binding);
-    Map<String, ObjectId> acceptedBlobIds =
-        NotebookGitAcceptedTree.blobIds(accepted.repository(), accepted.head());
     return new OpenedNotebook(
-        binding, accepted, acceptedBlobIds, snapshot(binding).blobIds().equals(acceptedBlobIds));
+        binding, accepted, NotebookGitAcceptedTree.blobIds(accepted.repository(), accepted.head()));
   }
 
-  private void commitIfChanged(OpenedNotebook notebook, String message, Timestamp updatedAt) {
-    NotebookGitTreeContent tree = snapshot(notebook.binding());
+  private void commitIfChanged(
+      OpenedNotebook notebook, ProjectionChange change, String message, Timestamp updatedAt) {
+    NotebookProjectionChange notebookChange = change.of(notebook.binding().getNotebook().getId());
+    NotebookGitTreeContent tree =
+        derivedTree
+            .of(notebookChange, notebook.acceptedBlobIds())
+            .orElseGet(() -> snapshot(notebook.binding()));
     if (tree.blobIds().equals(notebook.acceptedBlobIds())) {
       return;
     }

@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -13,6 +14,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,19 +82,18 @@ class NotebookGitFolderRenameGuardControllerTest extends NotebookGitWebContentCo
   }
 
   @Test
-  void preExistingPortableDriftKeepsTheFolderRenameAndAcceptedHistoryUnchanged() throws Exception {
+  void preExistingPortableDriftDoesNotBlockTheFolderRename() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
     snapshotCurrentPortableTree(notebook);
-    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     var acceptedHistoryBefore = acceptedHistory(notebook);
     makeMe.aNote().notebook(notebook).title("Unsynchronized").content(CELLS_BODY).please();
 
-    Folder renamed = folderController.renameFolder(notebook, biology, renameTo("Zoology"));
+    folderController.renameFolder(notebook, biology, renameTo("Zoology"));
 
-    assertThat(renamed.getName(), equalTo("Zoology"));
-    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
-    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
+    assertThat(after.tipPaths(), hasItem("Zoology/.keep"));
   }
 
   static FolderRenameRequest renameTo(String name) {

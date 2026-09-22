@@ -3,6 +3,7 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
@@ -10,6 +11,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -64,11 +66,8 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitControllerTestB
   }
 
   @Test
-  void driftedNotebookFolderCreationKeepsMutationAndAcceptedHistoryUnchanged() throws Exception {
+  void preExistingPortableDriftDoesNotBlockTheFolderCreation() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding before =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    String acceptedHeadBefore = before.getAcceptedGitObjectId();
     var acceptedHistoryBefore = acceptedHistory(notebook);
     makeMe
         .aNote()
@@ -76,18 +75,14 @@ class NotebookGitFolderCreationControllerTest extends NotebookGitControllerTestB
         .title("Unsynchronized")
         .content("---\ntype: Note\n---\nbody")
         .please();
-    long originalFolderCount = countFoldersForNotebook(notebook.getId());
     FolderCreationRequest request = new FolderCreationRequest();
     request.setName("Biology");
 
-    Folder created = folderController.createFolder(notebook, request);
+    folderController.createFolder(notebook, request);
 
-    assertThat(created.getName(), is("Biology"));
-    assertThat(countFoldersForNotebook(notebook.getId()), is(originalFolderCount + 1));
-    NotebookGitBinding after =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    assertThat(after.getAcceptedGitObjectId(), is(acceptedHeadBefore));
-    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
+    assertThat(after.tipPaths(), hasItem("Biology/.keep"));
   }
 
   @Test

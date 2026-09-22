@@ -19,6 +19,11 @@ public record PortableTreeEntry(String path, byte[] content) {
     return new PortableTreeEntry(path, text.getBytes(StandardCharsets.UTF_8));
   }
 
+  /** A note's Markdown file; a note with no stored content is an empty file. */
+  public static PortableTreeEntry ofNote(String path, String contentOrNull) {
+    return ofText(path, contentOrNull == null ? "" : contentOrNull);
+  }
+
   @Override
   public boolean equals(Object other) {
     return other instanceof PortableTreeEntry entry

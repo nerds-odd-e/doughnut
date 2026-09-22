@@ -22,6 +22,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.sql.Timestamp;
 import java.time.Instant;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -152,18 +153,16 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
   }
 
   @Test
-  void preExistingPortableDriftKeepsTheFolderMoveAndAcceptedHistoryUnchanged() throws Exception {
+  void preExistingPortableDriftDoesNotBlockTheFolderMove() throws Exception {
     FolderMoveFixture f = seedLearnedCellsInBiologyWithEmptyStudy();
-    ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
     var acceptedHistoryBefore = acceptedHistory(f.notebook());
     makeMe.aNote().notebook(f.notebook()).title("Unsynchronized").content(CELLS_BODY).please();
 
     folderController.moveFolder(f.notebook(), f.biology(), folderMove(f.study().getId()));
 
-    assertThat(parentFolderId(f.biology().getId()), equalTo(f.study().getId()));
-    assertThat(
-        ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId()), equalTo(acceptedA));
-    assertThat(acceptedHistory(f.notebook()), equalTo(acceptedHistoryBefore));
+    AcceptedHistory after = acceptedHistory(f.notebook());
+    assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
+    assertThat(after.tipPaths(), hasItem("Study/Biology/Cells.md"));
   }
 
   CompleteSubtreeFixture seedCompleteBiologySubtreeWithReferrer()

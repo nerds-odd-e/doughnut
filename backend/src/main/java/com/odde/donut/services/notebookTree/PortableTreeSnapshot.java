@@ -54,8 +54,7 @@ public final class PortableTreeSnapshot {
     }
 
     for (PortableTreeNoteRow note : notesByFolder.getOrDefault(folderKey, List.of())) {
-      String content = note.content() == null ? "" : note.content();
-      entries.add(PortableTreeEntry.ofText(pathPrefix + note.title() + ".md", content));
+      entries.add(PortableTreeEntry.ofNote(pathPrefix + note.title() + ".md", note.content()));
     }
 
     List<PortableTreeAttachmentRow> orderedAttachments =
