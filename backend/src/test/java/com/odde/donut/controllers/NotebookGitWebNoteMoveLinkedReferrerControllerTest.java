@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -101,11 +100,7 @@ class NotebookGitWebNoteMoveLinkedReferrerControllerTest extends NotebookGitWebN
     Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
     MemoryTracker tracker = learnedTracker(cells, 0.5f, 1);
     Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY_BEFORE));
+    authorReferencingContentCommitted(referrer, REFERRER_BODY_BEFORE);
     long recallCountBefore = countRecallPromptsByNoteId(cells.getId());
     snapshotCurrentPortableTree(notebook);
     return new LearnedMoveFixture(

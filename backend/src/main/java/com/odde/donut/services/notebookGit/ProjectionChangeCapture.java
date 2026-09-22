@@ -28,25 +28,25 @@ import org.springframework.stereotype.Component;
  * thread, so the accepted-change owner must not re-enter itself.
  */
 @Component
-public class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomizer {
+class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomizer {
 
-  public record ProjectionRow(Class<?> kind, Integer id) {}
+  record ProjectionRow(Class<?> kind, Integer id) {}
 
   /** Container is the folder (notes, attachments) or parent folder (folders); null at root. */
-  public record RowPath(Integer containerId, String name) {}
+  record RowPath(Integer containerId, String name) {}
 
-  public static class NotebookProjectionChange {
+  static class NotebookProjectionChange {
     /** The inserted entities themselves: a row's id is only assigned by its insert. */
-    public final Set<Object> inserted = new LinkedHashSet<>();
+    final Set<Object> inserted = new LinkedHashSet<>();
 
-    public final Map<ProjectionRow, RowPath> updated = new LinkedHashMap<>();
-    public final Map<ProjectionRow, RowPath> deleted = new LinkedHashMap<>();
+    final Map<ProjectionRow, RowPath> updated = new LinkedHashMap<>();
+    final Map<ProjectionRow, RowPath> deleted = new LinkedHashMap<>();
   }
 
-  public class ProjectionChange implements AutoCloseable {
+  class ProjectionChange implements AutoCloseable {
     private final Map<Integer, NotebookProjectionChange> byNotebook = new HashMap<>();
 
-    public NotebookProjectionChange of(Integer notebookId) {
+    NotebookProjectionChange of(Integer notebookId) {
       return byNotebook.computeIfAbsent(notebookId, id -> new NotebookProjectionChange());
     }
 
@@ -67,7 +67,7 @@ public class ProjectionChangeCapture implements Interceptor, HibernateProperties
 
   private final ThreadLocal<ProjectionChange> window = new ThreadLocal<>();
 
-  public ProjectionChange open() {
+  ProjectionChange open() {
     ProjectionChange change = new ProjectionChange();
     window.set(change);
     return change;

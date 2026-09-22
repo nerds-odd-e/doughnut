@@ -175,11 +175,7 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
     Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
     learnedTracker(cells, 0.5f, 1);
     Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY_BEFORE));
+    authorReferencingContentCommitted(referrer, REFERRER_BODY_BEFORE);
     snapshotCurrentPortableTree(notebook);
     return new CompleteSubtreeFixture(notebook, biology, study);
   }

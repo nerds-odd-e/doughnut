@@ -175,11 +175,7 @@ class NotebookGitWebTrashLocalRecoveryPublicationControllerTest
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
     Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
     Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY));
+    authorReferencingContentCommitted(referrer, REFERRER_BODY);
     MemoryTracker tracker = learnedTracker(cells, 0.5f, 1);
     MemoryTracker removed =
         inCommittedTransaction(
@@ -203,12 +199,7 @@ class NotebookGitWebTrashLocalRecoveryPublicationControllerTest
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
     Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
     Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(),
-                PROPERTY_ONLY_REFERRER_BODY));
+    authorReferencingContentCommitted(referrer, PROPERTY_ONLY_REFERRER_BODY);
     snapshotCurrentPortableTree(notebook);
     return new PropertyRemovedFixture(notebook, cells, referrer);
   }

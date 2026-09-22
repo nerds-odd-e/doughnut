@@ -27,6 +27,10 @@ final class NotebookGitPortablePath {
     return folderPrefix + title + ".md";
   }
 
+  static String ofAttachment(String folderPrefix, String filename) {
+    return folderPrefix + filename;
+  }
+
   /** A folder's prefix under its container's prefix. */
   static String ofFolder(String parentPrefix, String name) {
     return parentPrefix + name + "/";

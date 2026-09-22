@@ -42,11 +42,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitControllerTe
     String existingContent = "---\ntype: Note\n---\n[[original reference]]";
     Note existing =
         makeMe.aNote().notebook(notebook).title("Existing").content(existingContent).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            makeMe.authorReferencingContent(
-                noteRepository.findById(existing.getId()).orElseThrow(), existingContent));
+    authorReferencingContentCommitted(existing, existingContent);
     snapshotCurrentPortableTree(notebook);
     NotebookGitBinding binding =
         inCommittedTransaction(

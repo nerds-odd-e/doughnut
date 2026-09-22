@@ -1,8 +1,10 @@
 package com.odde.donut.controllers;
 
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.testability.GitBundleTestReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Comparator;
@@ -10,6 +12,8 @@ import java.util.List;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheBuilder;
 import org.eclipse.jgit.dircache.DirCacheEntry;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.CommitBuilder;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.NullProgressMonitor;
@@ -28,6 +32,19 @@ import org.eclipse.jgit.transport.BundleWriter;
  * on the notebook/JPA fixtures {@link NotebookGitControllerTestBase} adds on top.
  */
 abstract class NotebookGitCommitFixtureTestSupport extends NoteDependentRowsControllerTestBase {
+
+  /**
+   * A bundle whose {@code main} is a single-parent child of the tip in {@code currentBundle}, with
+   * exactly {@code files} as its tree.
+   */
+  static byte[] proposalBundleBytes(byte[] currentBundle, List<NotebookGitProposalFile> files)
+      throws IOException, URISyntaxException {
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, currentBundle);
+      ObjectId childCommit = commitOnTopOf(repository, List.of(acceptedHead), files, "Proposal");
+      return bundleBytesForHead(repository, childCommit);
+    }
+  }
 
   static ObjectId commitOnTopOf(
       Repository repository, List<ObjectId> parents, String path, String content, String message)

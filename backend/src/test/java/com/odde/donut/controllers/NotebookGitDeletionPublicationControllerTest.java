@@ -172,11 +172,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
         makeMe.aNote().notebook(notebook).title("Target").content(ORIGINAL_CONTENT).please();
     Note referrer =
         makeMe.aNote().notebook(notebook).title("Referrer").content(REFERRER_CONTENT).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            makeMe.authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_CONTENT));
+    authorReferencingContentCommitted(referrer, REFERRER_CONTENT);
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     List<WikiLink.Resolution> resolutionsBeforePublish =
         targetResolutions(

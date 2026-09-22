@@ -82,11 +82,7 @@ class NotebookGitWebTrashLinkedReferrerControllerTest
     Folder biology = makeMe.aFolder().notebook(notebook).name("Biology").please();
     Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
     Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY));
+    authorReferencingContentCommitted(referrer, REFERRER_BODY);
     snapshotCurrentPortableTree(notebook);
     return new ReferrerTrashFixture(notebook, cells);
   }
@@ -98,11 +94,7 @@ class NotebookGitWebTrashLinkedReferrerControllerTest
     Notebook notebook = createGitBackedNotebook();
     Note target = makeMe.aNote("Target").notebook(notebook).please();
     Note referrer = makeMe.aNote("Referrer").notebook(notebook).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(), PROPERTY_REFERRER_BODY));
+    authorReferencingContentCommitted(referrer, PROPERTY_REFERRER_BODY);
     snapshotCurrentPortableTree(notebook);
     return new PropertyReferrerTrashFixture(notebook, target, referrer);
   }

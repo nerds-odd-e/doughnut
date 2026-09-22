@@ -86,7 +86,7 @@ final class NotebookGitChangedFolders {
     String prefix = previousPrefixOf(path.containerId());
     return kind == Note.class
         ? NotebookGitPortablePath.ofNote(prefix, path.name())
-        : prefix + path.name();
+        : NotebookGitPortablePath.ofAttachment(prefix, path.name());
   }
 
   /** Every entry at its current path; those under a deleted folder are gone. */

@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -184,11 +183,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
     MemoryTracker tracker = learnedTracker(cells, 0.5f, 1);
     long recallCountBefore = countRecallPromptsByNoteId(cells.getId());
     Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY_BEFORE));
+    authorReferencingContentCommitted(referrer, REFERRER_BODY_BEFORE);
     snapshotCurrentPortableTree(notebook);
     return new CompleteRenameFixture(notebook, biology, cells, tracker, recallCountBefore);
   }

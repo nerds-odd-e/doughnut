@@ -9,7 +9,8 @@ Execution authorized by the owner on 2026-09-22, with retrospective skipped.
 - Originating checkout: `/Users/terryyin/git/doughnut` (integration, `main`).
 - Execution checkout: `/Users/terryyin/git/doughnut-worktrees/011-readme-edits-through-accepted-change-owner`, branch `cursor/011-readme-edits-through-accepted-change-owner`, created this session from `a2660d71f61797895fed18155da10ea0745a5f42`.
 - Published claim: `c5a3c91333427de908df87d585322cdd1d0d9871` on `origin/main`. Claim publisher `cursor-011-readme-edits`. Identity `quick/011-readme-edits-through-accepted-change-owner/PLAN.md`.
-- Slice 1 increment: `7f217de349c5201c909e0b36d84cc7008543cf9d` on `origin/cursor/011-readme-edits-through-accepted-change-owner`, registered with the observer. An earlier observer poll failed on a TLS timeout (`CI_MONITOR_UNAVAILABLE`); the observer is still attached.
+- Slice 1 increment: `7f217de349c5201c909e0b36d84cc7008543cf9d` on `origin/cursor/011-readme-edits-through-accepted-change-owner`.
+- Slice 2 increment: `01a501700725b29568fc8d6c694c55c1f5690951` on that same branch, registered with the observer.
 - Story-branch increments publish to `origin/cursor/011-readme-edits-through-accepted-change-owner`. Observer: `/tmp/dough-ci-501/watch-NJo55N` (GitHub Actions `ci.yml` / `donut CI`). The trunk claim is unobserved.
 - Default checkout refresh: advanced to `c5a3c91333427de908df87d585322cdd1d0d9871`.
 Kind: correction from the execution retrospective of
@@ -128,8 +129,9 @@ In `NotebookGitWebContentSaveCostControllerTest`, replace statement-count equali
 Learning: `savingContentInALargeNotebookWithAttachmentsDoesNotQueryAttachmentsOrPortableTreeRows` asserts those two query names are absent and one commit is appended. Forcing `AcceptedWebChangeService.commitIfChanged` onto `fullTree` failed on the `NotebookAttachment` assertion and was reverted. Focused class passed after the revert. Rename-only refactor did not rerun that proof.
 
 ### 3. Encoder stays inside its package
-Type: Structure. Status: planned.
+Type: Structure. Status: done.
 `assertAcceptedTreeMatchesTheFullAssembly` compares against a history reset's tree; `NotebookGitTreeEncoder`, `fullTree`, `ProjectionChangeCapture` and its nested types become package-private; add `NotebookGitPortablePath.ofAttachment(prefix, filename)` and use it in the three sites; add `authorReferencingContentCommitted(Note, String)` to `NotebookGitControllerTestBase`, moving its proposal-bundle helpers to `testability/GitBundleTestReader` (or a proposal support) to stay under 250 lines; replace the eleven copies. Proof: both oracle classes, `NotebookGitProposal*`, `NotebookGitPublication*`, `NotebookGitWebTrash*`, `NotebookGitFolder*` classes green.
+Learning: the oracle reloads the notebook and compares blob ids before and after `snapshotCurrentPortableTree`. Proposal bundle bytes live on `NotebookGitCommitFixtureTestSupport`, which already owned the commit helpers, so `GitBundleTestReader` stayed read-only. Property-wiki publication cases moved to `NotebookGitPublicationPropertyWikiControllerTest` to keep the touched files within 250 lines. That move did not rerun the accepted proof.
 
 ### 4. Retire five redundant drift tests
 Type: Structure (test cleanup). Status: planned.

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * insertion.
  */
 @Component
-public class NotebookGitTreeEncoder {
+class NotebookGitTreeEncoder {
   private final NoteRepository noteRepository;
   private final FolderRepository folderRepository;
   private final NotebookRepository notebookRepository;
@@ -78,7 +78,7 @@ public class NotebookGitTreeEncoder {
   }
 
   /** The notebook's whole tree from its stored folders, notes (trash included) and attachments. */
-  public NotebookGitTreeContent fullTree(Notebook notebook) {
+  NotebookGitTreeContent fullTree(Notebook notebook) {
     return fullTree(
         notebook.getReadmeContent(),
         folderRepository.findPortableTreeRowsByNotebookId(notebook.getId()),
@@ -87,7 +87,7 @@ public class NotebookGitTreeEncoder {
   }
 
   /** The same tree from folders and notes a caller already holds, as a locked publication does. */
-  public NotebookGitTreeContent fullTree(
+  NotebookGitTreeContent fullTree(
       Notebook notebook, List<PortableTreeFolderRow> folders, List<Note> storedNotes) {
     return fullTree(
         notebook.getReadmeContent(),
@@ -130,7 +130,8 @@ public class NotebookGitTreeEncoder {
                     .map(
                         attachment ->
                             new PortableTreeEntry(
-                                prefixes.get(attachment.folderId()) + attachment.filename(),
+                                NotebookGitPortablePath.ofAttachment(
+                                    prefixes.get(attachment.folderId()), attachment.filename()),
                                 attachment.content())))
             .toList();
     return encode(new HashMap<>(), files, readmeContents, Set.of());

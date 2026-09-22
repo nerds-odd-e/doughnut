@@ -106,7 +106,8 @@ class NotebookGitProposalAcceptance {
   private static String attachmentPath(
       NotebookAttachment attachment, Map<Integer, String> prefixes) {
     Folder folder = attachment.getFolder();
-    return prefixes.get(folder == null ? null : folder.getId()) + attachment.getFilename();
+    return NotebookGitPortablePath.ofAttachment(
+        prefixes.get(folder == null ? null : folder.getId()), attachment.getFilename());
   }
 
   private void persistAttachment(

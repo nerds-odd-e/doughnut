@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
@@ -23,8 +24,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import javax.sql.DataSource;
-import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
-import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.junit.jupiter.api.AfterEach;
@@ -223,20 +222,17 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
     return GitBundleTestReader.fetchAcceptedHistory(acceptedBundleBytes(notebook));
   }
 
-  /**
-   * A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head, built
-   * on the accepted history the download boundary currently serves.
-   */
+  /** Single-parent proposal bundle on {@code binding}'s accepted head. */
   byte[] proposalBundleBytes(
       NotebookGitBinding binding, List<NotebookGitProposalFile> proposedFiles) throws Exception {
     Notebook notebook = notebookRepository.findById(binding.getNotebook().getId()).orElseThrow();
-    byte[] currentBundle = acceptedBundleBytes(notebook);
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, currentBundle);
-      ObjectId childCommit =
-          commitOnTopOf(repository, List.of(acceptedHead), proposedFiles, "Proposal");
-      return bundleBytesForHead(repository, childCommit);
-    }
+    return proposalBundleBytes(acceptedBundleBytes(notebook), proposedFiles);
+  }
+
+  void authorReferencingContentCommitted(Note note, String content) {
+    committed(
+        () ->
+            authorReferencingContent(noteRepository.findById(note.getId()).orElseThrow(), content));
   }
 
   private <T> T committed(java.util.function.Supplier<T> action) {

@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -79,12 +78,7 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
     Note a = makeMe.aNote("A").notebook(notebook).content(ACCEPTED_CONTENT).please();
     for (String referrer : List.of("First", "Second", "Third")) {
       Note note = makeMe.aNote(referrer).notebook(notebook).please();
-      inCommittedTransaction(
-          transactionManager,
-          () ->
-              authorReferencingContent(
-                  noteRepository.findById(note.getId()).orElseThrow(),
-                  "---\ntype: Note\n---\nSee [[A]]."));
+      authorReferencingContentCommitted(note, "---\ntype: Note\n---\nSee [[A]].");
     }
     makeMe.aNote("Unrelated").notebook(notebook).please();
     storeFolderAttachmentAndSnapshot(notebook, null, "picture.bin", new byte[64]);

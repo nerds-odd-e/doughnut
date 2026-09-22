@@ -39,11 +39,7 @@ class NotebookGitFolderDissolveAtomicControllerTest extends NotebookGitControlle
     Folder biology = makeMe.aFolder().parentFolder(outer).name("Biology").please();
     Note cells = makeMe.aNote("Cells").folder(biology).content(CELLS_BODY).please();
     Note referrer = makeMe.aNote("Reading").notebook(notebook).please();
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            authorReferencingContent(
-                noteRepository.findById(referrer.getId()).orElseThrow(), REFERRER_BODY_BEFORE));
+    authorReferencingContentCommitted(referrer, REFERRER_BODY_BEFORE);
     snapshotCurrentPortableTree(notebook);
     NotebookGitBinding binding =
         inCommittedTransaction(
