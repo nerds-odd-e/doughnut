@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Save a note without visiting every folder of its notebook](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-1) — SEED-037#story-1 ([plan](quick/012-path-scoped-note-save/PLAN.md))
-
 ## Backlog list
 
 - [Keep remote note content aligned when an in-flight edit is undone](seeds/SEED-036-keep-undone-edits-consistent.md#story-1) — SEED-036#story-1

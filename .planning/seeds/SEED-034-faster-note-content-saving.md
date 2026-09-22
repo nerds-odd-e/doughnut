@@ -113,7 +113,8 @@ attachments (12.5 MB): the content-save request median fell from about
 from about 1.3 s to about 180 ms as well. That fixture had 40 flat folders,
 so it did not show the folder-proportional tree reads that keep production
 saves at 7 to 10 seconds (SEED-037). Story 5 stays a conditional fallback:
-judge its activation gate after SEED-037#story-1 before exploring deferred
+judge its activation gate after the ancestor-only save recorded in commit
+`458496764f931f05b0d46d955e1bbbebf04beefc` before exploring deferred
 Git work. Web README edits enter the accepted-change boundary in the
 same request as other web changes.
 
