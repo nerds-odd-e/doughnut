@@ -146,11 +146,12 @@ public final class GitBundleTestReader {
       for (RevCommit commit : revWalk) {
         commits.add(commit.name());
       }
-      return new AcceptedHistory(commits, tipContent);
+      return new AcceptedHistory(commits, tipContent, tip.getTree().getId());
     }
   }
 
-  public record AcceptedHistory(List<String> commits, List<PortableTreeEntry> tipContent) {
+  public record AcceptedHistory(
+      List<String> commits, List<PortableTreeEntry> tipContent, ObjectId tipTreeId) {
     /** The parents this history advanced from: every commit but the newest. */
     public List<String> parents() {
       return commits.subList(1, commits.size());

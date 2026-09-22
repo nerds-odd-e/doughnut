@@ -23,7 +23,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 
 /**
- * Every web folder change's accepted tree, derived by re-listing the accepted entries under the
+ * Every web folder change's accepted tree, derived by relocating accepted subtrees under the
  * folder's current prefix, must equal the tree a full assembly of the notebook's projection would
  * produce, without reading attachment content.
  */
@@ -32,7 +32,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
 
   @Test
   void
-      renamingAFolderRelistsItsNotesAttachmentsAndSubfolderUnderTheNewPrefixAndMatchesTheFullAssembly()
+      renamingAFolderRelocatesItsNotesAttachmentsAndSubfolderUnderTheNewPrefixAndMatchesTheFullAssembly()
           throws Throwable {
     Notebook notebook = createGitBackedNotebook();
     Folder photos = makeMe.aFolder().notebook(notebook).name("Photos").please();
@@ -49,13 +49,13 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
     List<String> queries =
         queriesOf(() -> folderController.renameFolder(notebook, photos, renameTo("Pictures")));
 
-    Map<String, ObjectId> relisted =
+    Map<String, ObjectId> relocated =
         before.entrySet().stream()
             .collect(
                 Collectors.toMap(
                     entry -> entry.getKey().replaceFirst("^Photos/", "Pictures/"),
                     Map.Entry::getValue));
-    assertThat(acceptedBlobIds(notebook), equalTo(relisted));
+    assertThat(acceptedBlobIds(notebook), equalTo(relocated));
     assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }

@@ -77,12 +77,14 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
 
   /**
    * The accepted head's tree, derived from the change, equals a full assembly of the stored
-   * projection (the tree a history reset would produce).
+   * projection (the tree a history reset would produce), including native root tree id.
    */
   void assertAcceptedTreeMatchesTheFullAssembly(Notebook notebook) throws Exception {
     Map<String, ObjectId> derived = acceptedBlobIds(notebook);
+    ObjectId derivedRoot = acceptedHistory(notebook).tipTreeId();
     snapshotCurrentPortableTree(notebookRepository.findById(notebook.getId()).orElseThrow());
     assertThat(derived, equalTo(acceptedBlobIds(notebook)));
+    assertThat(derivedRoot, equalTo(acceptedHistory(notebook).tipTreeId()));
   }
 
   Map<String, ObjectId> acceptedBlobIds(Notebook notebook) throws Exception {

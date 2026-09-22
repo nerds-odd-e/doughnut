@@ -13,13 +13,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.eclipse.jgit.lib.ObjectId;
 
 /**
  * The folders a projection change inserted, updated or deleted. A row's previous path composes its
  * container's previous path (as captured for a changed folder, live for an unchanged one); every
- * entry under an updated or deleted folder's previous prefix re-lists under its current prefix, or
- * disappears.
+ * subtree under an updated or deleted folder's previous prefix relocates under its current prefix,
+ * or disappears.
  */
 final class NotebookGitChangedFolders {
   private final FolderRepository folderRepository;
@@ -89,13 +88,20 @@ final class NotebookGitChangedFolders {
         : NotebookGitPortablePath.ofAttachment(prefix, path.name());
   }
 
-  /** Every entry at its current path; those under a deleted folder are gone. */
-  Map<String, ObjectId> relist(Map<String, ObjectId> previousTree) {
-    Map<String, ObjectId> currentTree = new HashMap<>();
-    previousTree.forEach(
-        (path, blobId) ->
-            currentPathOf(path).ifPresent(current -> currentTree.put(current, blobId)));
-    return currentTree;
+  /**
+   * Deepest previous prefix first: each updated folder's subtree moves to its current prefix; each
+   * deleted folder's subtree is removed. Unchanged child trees move as a unit.
+   */
+  void relocate(NotebookGitDirectoryTree tree) {
+    relocations.entrySet().stream()
+        .sorted(
+            Comparator.comparing((Map.Entry<String, String> e) -> e.getKey().length()).reversed())
+        .forEach(
+            relocation -> {
+              Optional<NotebookGitDirectoryTree> taken = tree.takeDirectory(relocation.getKey());
+              if (relocation.getValue() == null) return;
+              taken.ifPresent(subtree -> tree.putDirectory(relocation.getValue(), subtree));
+            });
   }
 
   /**

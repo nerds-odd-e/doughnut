@@ -1,6 +1,6 @@
 # Save a note by editing its Git ancestor trees
 
-Status: in progress; slice 1 delivered, slices 2–4 planned.
+Status: in progress; slices 1–2 delivered, slices 3–4 planned.
 Work item: **SEED-037#story-1**.
 Source: [refined story](../../seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-1)
 and the owner's 2026-09-22 acceptance of ancestor-only reads, request for
@@ -160,7 +160,7 @@ it does not fulfill final acceptance.
 
 ### 2. Derive Portable changes through directory-owned tree edits
 
-Type: Structure. Status: planned. Estimate: 8–10 minutes plus suite wait.
+Type: Structure. Status: done. Estimate: 8–10 minutes plus suite wait.
 
 Structure: replace the encoder's copied flat-map manipulation with the small
 directory-tree model and native root construction described above. Initially
@@ -169,19 +169,20 @@ unchanged. This directly enables slice 3's lazy accepted-tree source. Keep only
 the minimal eager input bridge needed for this transition; slice 3 removes it.
 Do not add a permanent old/new strategy switch or note-specific branch.
 
-Proof: reuse `NotebookGitDerivedTreeOracleControllerTest` and
-`NotebookGitDerivedFolderTreeOracleControllerTest` over real controllers:
-content, first/last file, note move/trash, referrer rename, folder rename/trash/
-deletion and README transitions. Preserve shared encoding for full assembly.
-Upgrade the oracle to compare root IDs as well as its existing content claim;
-obtain the expected root through full assembly of independently loaded rows,
-not a fixture supplying the proposed incremental result. Existing builder tests
-cover native metadata/order; add only a missing decisive ordering case.
+Proof accepted: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitTreeEncoder.derive` edits a `NotebookGitDirectoryTree` seeded by
+`fromBlobIds`. `assertAcceptedTreeMatchesTheFullAssembly` compares the derived
+blob map and `tipTreeId` with a later `resetHistory` full assembly. The derived
+and folder oracle controller tests call that assertion. Ordering is
+`NotebookGitCommitBuilderTest.ordersFileBesideDirectoryWithSharedNamePrefixLikeGit`
+(`foo.md`, `foo/.keep`, `föo.md`). Focused oracle rerun after moving `.keep`
+hashing back onto the encoder also passed. `TreeRef` exists but stays
+unpopulated; encode still flattens to path/blob IDs. Slice 3 still has to
+emit native trees that reuse unresolved tree refs and remove this eager seed.
 
-The relocation/empty-folder conversion is the largest sizing risk. If it cannot
-fit this bound, preserve current behavior and refine this Structure in place
-around a concrete remaining responsibility before continuing; do not add
-fallback branches or waive the implementation limit.
+Relocation and empty-folder conversion fit this slice. The remaining gap is
+slice 3's lazy accepted-tree source and native emission of unresolved tree
+refs, not another encoder.
 
 ### 3. Save through the edited paths and reuse untouched subtrees
 
@@ -271,8 +272,8 @@ No unresolved product/ADR decision blocks these slices. Scope and reuse were
 critically reviewed against current callers at `0f8e0bf6ba`. The only intermediate
 whole-tree input is explicitly removed in slice 3. Final design has one editor,
 one encoding owner and the existing transaction owner, with no persistent new
-representation. Slice 2's relocation conversion remains a sizing risk; the
-explicit re-split rule applies if implementation contradicts its estimate.
+representation. Slice 2's relocation conversion fit the delivered slice. Slice 3 remains the
+path-scoped read and native tree-ref emission.
 Production latency is unproved until measured.
 
 ## Execution
@@ -280,8 +281,9 @@ Production latency is unproved until measured.
 Story Branch Mode. Execution checkout
 `/Users/terryyin/git/doughnut-worktrees/012-path-scoped-note-save`, branch
 `story/012-path-scoped-note-save`, created from `origin/main` at `cf2f317c27`.
-Queue claim `853a01f996` is published on `origin/main`. Increments publish to
-`origin/story/012-path-scoped-note-save`. GitHub Actions observer
+Queue claim `853a01f996` is published on `origin/main`. Slice 1 increment
+`9cf34be8b4` is published on `origin/story/012-path-scoped-note-save`. Later
+increments publish to that same branch. GitHub Actions observer
 `/tmp/dough-ci-501/watch-Pkeu0n` covers that story branch (`ci.yml`, display
 name `donut CI`). The trunk claim is unobserved. Slice 1's learning for later
 proof: activate `SqlStatementCallLog` only around the controller call; one

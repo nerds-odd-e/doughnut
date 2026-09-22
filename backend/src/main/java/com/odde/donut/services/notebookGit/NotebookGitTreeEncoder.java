@@ -12,7 +12,6 @@ import com.odde.donut.services.notebookTree.PortableTreeAttachmentRow;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,10 +23,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * The one encoder of projection rows into a commit's Portable tree. A web commit's tree is derived
- * from the accepted head's path-to-blob map and the projection change the operation flushed, so
- * only the changed rows are rendered and hashed; a notebook's full tree (cutover, history reset,
- * the publication drift check) is the same encoding over an empty base with every row as an
- * insertion.
+ * by editing the accepted directory tree with the projection change the operation flushed; a
+ * notebook's full tree (cutover, history reset, the publication drift check) is the same encoding
+ * over an empty base with every row as an insertion.
  */
 @Component
 class NotebookGitTreeEncoder {
@@ -49,7 +47,7 @@ class NotebookGitTreeEncoder {
 
   /**
    * The accepted tree with every changed note's and attachment's previous path removed, every entry
-   * under a changed folder re-listed at its current path with its accepted blob, each inserted or
+   * under a changed folder relocated at its current path with its accepted blob, each inserted or
    * updated note's blob put at its current path, each changed container's {@code README.md}
    * refreshed at its current prefix and the {@code .keep} marker of every touched directory
    * re-evaluated at its current path.
@@ -58,23 +56,22 @@ class NotebookGitTreeEncoder {
       NotebookProjectionChange change, Map<String, ObjectId> acceptedBlobIds) {
     NotebookGitChangedFolders folders = new NotebookGitChangedFolders(folderRepository, change);
     Set<String> touchedDirectories = new LinkedHashSet<>(folders.touchedDirectories());
+    NotebookGitDirectoryTree tree = NotebookGitDirectoryTree.fromBlobIds(acceptedBlobIds);
 
-    Map<String, ObjectId> previousTree = new HashMap<>(acceptedBlobIds);
     Stream.concat(change.deleted.entrySet().stream(), change.updated.entrySet().stream())
         .filter(entry -> isFile(entry.getKey().kind()))
         .map(entry -> folders.previousPathOf(entry.getKey().kind(), entry.getValue()))
         .forEach(
             previousPath -> {
-              previousTree.remove(previousPath);
+              tree.removeFile(previousPath);
               folders
                   .currentPathOf(NotebookGitPortablePath.directoryOf(previousPath))
                   .ifPresent(touchedDirectories::add);
             });
+    folders.relocate(tree);
+    folders.currentFolders().keySet().forEach(tree::ensureDirectory);
     return encode(
-        folders.relist(previousTree),
-        currentNoteEntries(change),
-        readmeContents(change, folders),
-        touchedDirectories);
+        tree, currentNoteEntries(change), readmeContents(change, folders), touchedDirectories);
   }
 
   /** The notebook's whole tree from its stored folders, notes (trash included) and attachments. */
@@ -134,17 +131,21 @@ class NotebookGitTreeEncoder {
                                     prefixes.get(attachment.folderId()), attachment.filename()),
                                 attachment.content())))
             .toList();
-    return encode(new HashMap<>(), files, readmeContents, Set.of());
+    Set<String> retainedDirectories = new LinkedHashSet<>();
+    prefixes.values().stream()
+        .filter(prefix -> !prefix.isEmpty())
+        .forEach(retainedDirectories::add);
+    return encode(new NotebookGitDirectoryTree(), files, readmeContents, retainedDirectories);
   }
 
   /**
-   * The tree with each file put at its path, each container's {@code README.md} following its
-   * readme content, and the {@code .keep} marker of every touched directory re-evaluated deepest
-   * first: a represented folder with no other entry holds {@code .keep}; the notebook root never
-   * does.
+   * Puts each file, refreshes each container's {@code README.md}, and re-evaluates {@code .keep}
+   * deepest first through the directory tree. Serialization flattens to path blob ids for the
+   * commit builder's native tree write; the directory model can still hold unresolved child tree
+   * ids.
    */
   private static NotebookGitTreeContent encode(
-      Map<String, ObjectId> blobIds,
+      NotebookGitDirectoryTree tree,
       List<PortableTreeEntry> files,
       Map<String, String> readmeContents,
       Set<String> touchedDirectories) {
@@ -152,29 +153,37 @@ class NotebookGitTreeEncoder {
     Set<String> directories = new LinkedHashSet<>(touchedDirectories);
     files.forEach(
         file -> {
-          put(file, blobIds, blobs);
+          put(file, tree, blobs);
           directories.add(NotebookGitPortablePath.directoryOf(file.path()));
         });
     readmeContents.forEach(
         (prefix, content) -> {
-          blobIds.remove(PortableTreeEntry.readmePath(prefix));
-          PortableTreeEntry.ofReadme(prefix, content)
-              .ifPresent(entry -> put(entry, blobIds, blobs));
+          tree.removeFile(PortableTreeEntry.readmePath(prefix));
+          PortableTreeEntry.ofReadme(prefix, content).ifPresent(entry -> put(entry, tree, blobs));
           directories.add(prefix);
         });
+    directories.stream().filter(directory -> !directory.isEmpty()).forEach(tree::ensureDirectory);
+    normalizeKeep(tree, directories, blobs);
+    return new NotebookGitTreeContent(tree.toBlobIds(), blobs);
+  }
+
+  /**
+   * Deepest-first: a represented directory with no entries other than {@code .keep} holds {@code
+   * .keep}; one with other content drops it. The notebook root never gets {@code .keep}.
+   */
+  private static void normalizeKeep(
+      NotebookGitDirectoryTree tree, Set<String> directories, Map<ObjectId, byte[]> blobs) {
     directories.stream()
         .filter(directory -> !directory.isEmpty())
-        .sorted(Comparator.comparing(String::length).reversed())
+        .sorted((a, b) -> Integer.compare(b.length(), a.length()))
         .forEach(
             directory -> {
-              String keep = directory + ".keep";
-              boolean empty =
-                  blobIds.keySet().stream()
-                      .noneMatch(path -> path.startsWith(directory) && !path.equals(keep));
-              if (empty) put(PortableTreeEntry.ofText(keep, ""), blobIds, blobs);
-              else blobIds.remove(keep);
+              if (tree.isEmptyAsideFromKeep(directory)) {
+                put(PortableTreeEntry.ofText(directory + ".keep", ""), tree, blobs);
+              } else {
+                tree.removeFile(directory + ".keep");
+              }
             });
-    return new NotebookGitTreeContent(blobIds, blobs);
   }
 
   private static boolean isFile(Class<?> kind) {
@@ -217,9 +226,10 @@ class NotebookGitTreeEncoder {
   }
 
   private static void put(
-      PortableTreeEntry entry, Map<String, ObjectId> blobIds, Map<ObjectId, byte[]> blobs) {
+      PortableTreeEntry entry, NotebookGitDirectoryTree tree, Map<ObjectId, byte[]> blobs) {
     NotebookGitTreeContent hashed = NotebookGitTreeContent.of(List.of(entry));
-    blobIds.putAll(hashed.blobIds());
+    ObjectId blobId = hashed.blobIds().get(entry.path());
     blobs.putAll(hashed.blobs());
+    tree.putFile(entry.path(), blobId);
   }
 }

@@ -102,4 +102,27 @@ class NotebookGitCommitBuilderTest {
           List.of(commit.getParents()).stream().map(RevCommit::getId).toList(), contains(parent));
     }
   }
+
+  @Test
+  void ordersFileBesideDirectoryWithSharedNamePrefixLikeGit() throws IOException {
+    List<PortableTreeEntry> entries =
+        List.of(ofText("foo.md", "note"), ofText("foo/.keep", ""), ofText("föo.md", "unicode"));
+
+    try (Repository repository =
+            NotebookGitCommitBuilder.build(
+                NotebookGitTreeContent.of(entries),
+                "Donut System",
+                "system@donut.local",
+                "Ordering",
+                Instant.parse("2026-09-04T10:15:30Z"));
+        RevWalk revWalk = new RevWalk(repository)) {
+      assertThat(
+          GitBundleTestReader.readTreeEntries(
+                  repository, revWalk.parseCommit(repository.resolve("refs/heads/main")))
+              .stream()
+              .map(PortableTreeEntry::path)
+              .toList(),
+          contains("foo.md", "foo/.keep", "föo.md"));
+    }
+  }
 }
