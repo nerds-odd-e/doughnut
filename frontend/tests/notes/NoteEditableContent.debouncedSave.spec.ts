@@ -52,6 +52,26 @@ describe("NoteEditableContent debounced save", () => {
     wrapper.unmount()
   })
 
+  it("does not send obsolete edit when draft is restored before debounce fires", async () => {
+    vi.useFakeTimers()
+    const noteId = 1
+    const wrapper = await mountMarkdownTextarea({
+      noteId,
+      noteContent: "A",
+    })
+
+    await setTextareaValue(wrapper, "AB")
+    expect(updateNoteContentSpy).not.toHaveBeenCalled()
+
+    await setTextareaValue(wrapper, "A")
+    await advanceNoteContentSaveDebounce()
+
+    expect(updateNoteContentSpy).not.toHaveBeenCalled()
+    expect(textareaEl(wrapper).value).toBe("A")
+
+    wrapper.unmount()
+  })
+
   it("should save content immediately when a new wiki link appears (flush debounce)", async () => {
     vi.useFakeTimers()
     const noteId = 1

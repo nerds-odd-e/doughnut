@@ -103,6 +103,8 @@ export function useDebouncedTextAutosave(
     localValue.value = newValue
 
     if (normalizedNewValue === normalizedLastSaved) {
+      cancel()
+      version.value = savedVersion.value
       return
     }
 

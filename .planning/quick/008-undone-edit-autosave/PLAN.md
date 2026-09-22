@@ -2,7 +2,19 @@
 
 Work item: **SEED-036#story-1**.
 Source: [refined bug story](../../seeds/SEED-036-keep-undone-edits-consistent.md#story-1).
-Status: planned; no implementation or runtime proof completed.
+Status: in progress; slice 1 delivered, slice 2 not started.
+
+## Execution
+
+- Mode: Story Branch.
+- Originating checkout: `/Users/terryyin/git/doughnut` (`main`).
+- Integration checkout: `/Users/terryyin/git/doughnut` (`main`).
+- Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/008-undone-edit-autosave`, branch `008-undone-edit-autosave`, created this session from `19244e701cab42ed45060fcbf57559d0d09acc4d`.
+- Claim published: `dc29e4525a0fdb9b68a8afd94a820553850fc088` on `refs/heads/main`. Claim CI: unobserved (story-branch observer does not cover trunk).
+- Increment target: `refs/heads/008-undone-edit-autosave`.
+- Default-checkout refresh after the trunk claim: deferred (unclear ownership of the open integration checkout). Its HEAD remains `19244e701cab42ed45060fcbf57559d0d09acc4d`.
+- Replanning: existing planning authority retained (refine this plan if active slice work exceeds 10 minutes, except the named verification-wait exception).
+- CI: GitHub Actions workflow `ci.yml`, display name `donut CI`. Observer directory `/tmp/dough-ci-501/watch-zDxIaG` for `nerds-odd-e/doughnut` branch `008-undone-edit-autosave`.
 
 ## Goal and scope
 
@@ -123,8 +135,10 @@ Current evidence to extend/preserve:
 ### 1. Restoring a draft discards its unsent edit
 
 Type: Behavior
-Status: planned
+Status: done
 Sizing hypothesis: about 5 minutes including focused proof and cleanup.
+
+Accepted proof: mounted `NoteEditableContent` restore `A → AB → A` before debounce does not call `updateNoteContent` and the textarea stays `A` (`does not send obsolete edit when draft is restored before debounce fires` in `frontend/tests/notes/NoteEditableContent.debouncedSave.spec.ts`; command `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableContent.debouncedSave.spec.ts`, 6 passed). Shared caller files named below also passed (30 tests) on the same implementation. Learning: equality with the acknowledged value must cancel the pending debounce and realign proposal version with `savedVersion`; returning early left the unsent edit armed. In-flight correction remains slice 2.
 
 Saved `A` → draft `AB` → restore `A` before dispatch → obsolete `AB` never
 reaches the API and the editor stays at `A`.
