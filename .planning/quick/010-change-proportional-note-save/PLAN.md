@@ -1,6 +1,6 @@
 # Save note edits at a cost proportional to the change, not the notebook
 
-Status: **in progress** (execution started 2026-09-22).
+Status: **executed** (all nine slices delivered 2026-09-22; awaiting retrospective and wrap-up).
 Work item: **SEED-034#story-3**.
 
 Execution identity (Story Branch Mode): worktree
@@ -341,7 +341,33 @@ Update the synchronization contract's domain-operation paragraph. Proof:
 unchanged; full backend suite green.
 
 ### 9. Report the save-time comparison
-Type: Behavior (demonstration). Status: planned.
+Type: Behavior (demonstration). Status: **done** (2026-09-22).
+
+Measured with the harness recovered from the parent of `a823dbbafe` into the
+job scratch directory (nothing retained in the repository; one harness-only
+fix: its export capture used the ZIP export endpoint removed in `670f8e7313`,
+replaced by the accepted-history bundle download). Fixture: 11,000 notes, 40
+folders, 28 root attachments totalling 12,554,240 bytes, identical on both
+sides (same accepted tree id `0d8b524a` before any measured save). Sequential
+runs on the same machine and MySQL, each backend compiled from a clean classes
+directory, each run with its own isolated E2E database. Medians of samples 1
+to 5 (sample 0 discarded), milliseconds:
+
+| Save kind | Boundary | Before (`0e64e66041`) | After (`a6f5223fbb`) |
+|---|---|---|---|
+| keeps existing wiki links | request | 1297 | 180 |
+| keeps existing wiki links | keystroke to settled editor | 2331 | 1215 |
+| adds a wiki link | request | 1301 | 183 |
+| adds a wiki link | keystroke to settled editor | 1338 | 215 |
+
+The 1 s debounce before the request is unchanged (about 1006 vs 1010 ms on
+the existing-links kind; immediate on the added-link kind). Spread within
+each five-sample series is under 35 ms. Before-run request time matches the
+seed's 2026-09-21 evidence (about 720 ms base plus 515 ms for the
+attachments). Logs: job scratch `baseline-run.log` and `story-run.log`.
+Caveat: a loaded developer laptop (dev stack, dashboard and Gradle daemons
+were running for both runs), so absolute numbers are indicative; the ratio is
+the finding.
 
 Recover the deleted measurement harness temporarily from the parent of
 `a823dbbafe` into the job scratch directory, run the 11,000-note fixture with
