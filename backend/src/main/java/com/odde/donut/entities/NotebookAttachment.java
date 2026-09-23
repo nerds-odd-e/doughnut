@@ -12,10 +12,14 @@ import lombok.Setter;
 
 /**
  * One non-Markdown file kept in a notebook's Portable tree: its complete filename, extension
- * included, exact file bytes, and optional folder placement. A null folder means the notebook root.
- * This row projects accepted Git content; Git remains the content authority. Filenames are unique
- * among sibling attachments under a binary collation, so distinct Git paths stay distinct rows.
- * Deleted along with its notebook or containing folder.
+ * included, accepted Git content, and optional folder placement. A null folder means the notebook
+ * root. This row projects accepted Git content; Git remains the content authority. Filenames are
+ * unique among sibling attachments under a binary collation, so distinct Git paths stay distinct
+ * rows. Deleted along with its notebook or containing folder.
+ *
+ * <p>The {@code content} column holds accepted Git blob bytes only: legacy raw payload bytes, or
+ * standard Git LFS pointer bytes. It never stores hydrated LFS object payloads. Digest and size
+ * live in the pointer when representation is LFS; this row does not duplicate them.
  */
 @Entity
 @Table(name = "notebook_attachment")
@@ -40,7 +44,27 @@ public class NotebookAttachment extends EntityIdentifiedByIdOnly {
 
   @Lob
   @Column(name = "content", nullable = false)
-  @Getter
-  @Setter
   private byte[] content;
+
+  /**
+   * Accepted Git blob bytes for this attachment: legacy raw payload, or a standard Git LFS pointer.
+   * Never hydrated LFS object bytes.
+   */
+  public byte[] getAcceptedGitContent() {
+    return content;
+  }
+
+  public void setAcceptedGitContent(byte[] acceptedGitContent) {
+    this.content = acceptedGitContent;
+  }
+
+  /** JPA property for column {@code content}; prefer {@link #getAcceptedGitContent()}. */
+  public byte[] getContent() {
+    return getAcceptedGitContent();
+  }
+
+  /** JPA property for column {@code content}; prefer {@link #setAcceptedGitContent(byte[])}. */
+  public void setContent(byte[] content) {
+    setAcceptedGitContent(content);
+  }
 }

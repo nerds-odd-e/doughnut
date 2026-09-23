@@ -31,6 +31,11 @@ final class NotebookGitAcceptedTree {
     return entries;
   }
 
+  /** Reserved Git metadata from the accepted tip (for example {@code .gitattributes}). */
+  static List<PortableTreeEntry> metadataEntries(Repository repository, ObjectId commitId) {
+    return NotebookGitAttributes.selectFrom(readEntries(repository, commitId));
+  }
+
   /** Root tree id of the commit at {@code commitId}. */
   static ObjectId rootTreeId(Repository repository, ObjectId commitId) {
     try (RevWalk revWalk = new RevWalk(repository)) {

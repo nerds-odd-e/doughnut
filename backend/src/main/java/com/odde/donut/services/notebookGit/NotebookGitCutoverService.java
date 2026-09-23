@@ -3,10 +3,12 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Service;
@@ -51,7 +53,9 @@ public class NotebookGitCutoverService {
   public NotebookGitBinding createBindingForNotebook(Notebook notebook, Instant cutoverTime) {
     NotebookGitBinding binding = new NotebookGitBinding();
     binding.setNotebook(notebook);
-    try (Repository repository = buildRepository(notebook, cutoverTime, CUTOVER_COMMIT_MESSAGE)) {
+    // Activation stays off: new notebooks remain RAW and do not receive LFS attributes yet.
+    try (Repository repository =
+        buildRepository(notebook, cutoverTime, CUTOVER_COMMIT_MESSAGE, List.of())) {
       storeHistory(binding, repository, cutoverTime);
     }
     return binding;
@@ -60,7 +64,8 @@ public class NotebookGitCutoverService {
   /**
    * Restarts {@code notebook}'s accepted Git history: one parentless commit of the notebook's
    * current content replaces whatever the binding held, so the notebook can be cloned and published
-   * again whatever state its history was in.
+   * again whatever state its history was in. Accepted Git metadata such as {@code .gitattributes}
+   * is preserved exactly rather than regenerated from defaults.
    */
   @Transactional
   public NotebookGitBinding resetHistory(Notebook notebook, Instant resetTime) {
@@ -73,15 +78,31 @@ public class NotebookGitCutoverService {
                   created.setNotebook(notebook);
                   return created;
                 });
-    try (Repository repository = buildRepository(notebook, resetTime, RESET_COMMIT_MESSAGE)) {
+    List<PortableTreeEntry> acceptedMetadata = acceptedMetadata(binding);
+    try (Repository repository =
+        buildRepository(notebook, resetTime, RESET_COMMIT_MESSAGE, acceptedMetadata)) {
       storeHistory(binding, repository, resetTime);
     }
     return binding;
   }
 
-  private Repository buildRepository(Notebook notebook, Instant commitTime, String message) {
+  private List<PortableTreeEntry> acceptedMetadata(NotebookGitBinding binding) {
+    if (binding.getId() == null || binding.getAcceptedGitObjectId() == null) {
+      return List.of();
+    }
+    try (NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository opened =
+        repositoryStore.open(binding)) {
+      return NotebookGitAcceptedTree.metadataEntries(opened.repository(), opened.head());
+    }
+  }
+
+  private Repository buildRepository(
+      Notebook notebook,
+      Instant commitTime,
+      String message,
+      List<PortableTreeEntry> acceptedMetadata) {
     return NotebookGitCommitBuilder.build(
-        treeEncoder.fullTree(notebook),
+        treeEncoder.fullTree(notebook, acceptedMetadata),
         SYSTEM_AUTHOR_NAME,
         SYSTEM_AUTHOR_EMAIL,
         message,

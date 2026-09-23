@@ -27,6 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
+- Published increment: `7db86ca0a5f54aba91d6856c76864025eaa9d7b3` on
+  `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
+  observer.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
@@ -211,20 +214,38 @@ Safe stop: transfers work, user-facing LFS activation still off.
 
 ### 4. Represent attachments and metadata through the existing tree owner
 Type: Structure
-Status: planned
+Status: done
 
-Use the existing attachment content column for accepted Git content with explicit
-accessor semantics. Add standard pointer/empty-file classification and reserve
-Git attributes as metadata. Full and derived trees preserve accepted metadata;
-new initialization creates attributes exempting Markdown and structural markers.
-Keep automatic LFS activation off until the complete loop is available.
-This immediately enables slice 5 admission.
+`NotebookAttachment.content` is accepted Git content (`getAcceptedGitContent`):
+legacy payload bytes or LFS pointer bytes, never a hydrated payload. No digest
+or size columns. `NotebookGitLfsPointer` classifies a canonical v1 pointer and
+treats an empty file as not a pointer. `.gitattributes` is reserved metadata.
+Full assembly and history reset keep accepted attribute bytes. New notebooks
+stay `RAW` with no attributes. `NotebookGitAttributes.initialMetadata()` exists
+for later creation-time LFS and is not applied yet.
 
-Proof: B; `NotebookGitTreeEncoderTest`, derived-tree controller oracles,
-Markdown-format and reserved-file tests. Legacy pointer-looking payloads remain
-legacy bytes. Fixtures establish representation only, not publication.
-8–10 minutes: one representation change across actual consumers.
-Safe stop: legacy behavior unchanged; no newly accepted LFS notebook enabled.
+Accepted proof:
+- Promise: populated raw trees stay readable; pointer-looking legacy bytes stay
+  legacy bytes; authored `.gitattributes` survive web save and history reset;
+  creation does not activate LFS.
+- Boundary: Notebook Git proposal publish, web note save, and
+  `NotebookGitCutoverService.resetHistory`.
+- Setup: `createGitBackedNotebook()` does not set representation. The LFS
+  fixture sets the binding mode and pointer bytes and does not publish.
+- Observations: `NotebookGitAttachmentMetadataControllerTest` (attachment row
+  is only `diagram.png`; authored attributes remain after save and
+  `snapshotCurrentPortableTree`; new notebooks are `RAW` with an empty tip;
+  legacy pointer bytes round-trip). `NotebookGitLfsPointerTest` classifies a
+  canonical pointer and an empty file. `NotebookGitTreeEncoderTest` keeps
+  supplied initial attributes and exact attachment bytes.
+- Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass (2606 tests, 2 skipped). After metadata selection moved to
+  `NotebookGitAttributes.selectFrom`, the four slice tests were rerun with
+  `backend/gradlew -p backend test --tests` for `NotebookGitTreeEncoderTest`,
+  `NotebookGitAttachmentClassificationTest`, `NotebookGitLfsPointerTest`, and
+  `NotebookGitAttachmentMetadataControllerTest`; result pass. Note
+  correspondence still admits only `.md` paths, matching the previous skip of
+  attachments, markers, and metadata.
 
 ### 5. Publish a valid LFS tree and preserve it through web edits
 Type: Behavior

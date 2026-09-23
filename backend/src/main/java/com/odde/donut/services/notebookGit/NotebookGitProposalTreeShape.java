@@ -75,6 +75,8 @@ public final class NotebookGitProposalTreeShape {
           throw reservedFolderReadme(document.path());
         }
         containerDocuments.add(document);
+      } else if (NotebookGitAttributes.isMetadataPath(document.path())) {
+        // Reserved Git metadata stays in the tip; it is never a note or attachment projection.
       } else if (isEmptyFolderMarker(document.path()) && document.kind() == ChangeKind.ADDED) {
         // An added .keep marks a new empty Folder; it carries no note identity, so it bypasses
         // note correspondence entirely rather than being dropped like other .keep changes.
@@ -141,14 +143,16 @@ public final class NotebookGitProposalTreeShape {
     return path.endsWith("/.keep");
   }
 
-  /** A non-Markdown, non-structural Portable-tree entry is an Attachment. */
+  /** A non-Markdown, non-structural, non-metadata Portable-tree entry is an Attachment. */
   static boolean isAttachment(String path) {
-    return !path.endsWith(".md") && !isEmptyFolderMarker(path);
+    return !path.endsWith(".md")
+        && !isEmptyFolderMarker(path)
+        && !NotebookGitAttributes.isMetadataPath(path);
   }
 
   /**
    * True when a path carries non-structural Portable content: a Markdown note, README or Attachment
-   * at any depth. Structural {@code .keep} markers do not.
+   * at any depth. Structural {@code .keep} markers and reserved Git metadata do not.
    */
   static boolean carriesPortableContent(String path) {
     return path.endsWith(".md") || isAttachment(path);
@@ -157,9 +161,8 @@ public final class NotebookGitProposalTreeShape {
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {
-      // Neither an empty-Folder marker nor an Attachment carries note identity, so neither
-      // takes part in note correspondence; acceptance projects the tip's whole Attachment set.
-      if (isEmptyFolderMarker(document.path()) || isAttachment(document.path())) {
+      // Only Markdown paths carry note identity; attachments, markers, and Git metadata do not.
+      if (!document.path().endsWith(".md")) {
         continue;
       }
       if (document.role() == DocumentRole.CONTAINER) {

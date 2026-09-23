@@ -173,8 +173,10 @@ public class NotebookGitProjection {
       List<Note> storedNotes,
       Repository repository,
       ObjectId acceptedHead) {
+    List<PortableTreeEntry> acceptedMetadata =
+        NotebookGitAcceptedTree.metadataEntries(repository, acceptedHead);
     if (!treeEncoder
-        .fullTree(notebook, folders, storedNotes)
+        .fullTree(notebook, folders, storedNotes, acceptedMetadata)
         .blobIds()
         .equals(NotebookGitAcceptedTree.blobIds(repository, acceptedHead))) {
       throw projectionDrift();

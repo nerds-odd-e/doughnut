@@ -93,8 +93,8 @@ class NotebookGitProposalAcceptance {
       byte[] content = proposed.remove(attachmentPath(stored, prefixes));
       if (content == null) {
         entityPersister.remove(stored);
-      } else if (!Arrays.equals(stored.getContent(), content)) {
-        stored.setContent(content);
+      } else if (!Arrays.equals(stored.getAcceptedGitContent(), content)) {
+        stored.setAcceptedGitContent(content);
         entityPersister.save(stored);
       }
     }
@@ -118,7 +118,7 @@ class NotebookGitProposalAcceptance {
     attachment.setNotebook(notebook);
     attachment.setFolder(separator < 0 ? null : foldersByPath.get(path.substring(0, separator)));
     attachment.setFilename(path.substring(separator + 1));
-    attachment.setContent(content);
+    attachment.setAcceptedGitContent(content);
     entityPersister.save(attachment);
   }
 

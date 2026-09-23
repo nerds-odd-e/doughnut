@@ -51,7 +51,7 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
     attachment.setNotebook(notebook);
     attachment.setFolder(folder);
     attachment.setFilename(filename);
-    attachment.setContent(content);
+    attachment.setAcceptedGitContent(content);
     notebookAttachmentRepository.save(attachment);
     snapshotCurrentPortableTree(notebook);
     return attachment;

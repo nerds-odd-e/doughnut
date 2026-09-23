@@ -71,16 +71,33 @@ class NotebookGitTreeEncoder {
 
   /** The notebook's whole tree from its stored folders, notes (trash included) and attachments. */
   NotebookGitTreeContent fullTree(Notebook notebook) {
+    return fullTree(notebook, List.of());
+  }
+
+  /**
+   * Full assembly that preserves accepted Git metadata (for example {@code .gitattributes}) rather
+   * than regenerating it from defaults.
+   */
+  NotebookGitTreeContent fullTree(Notebook notebook, List<PortableTreeEntry> acceptedMetadata) {
     return fullTree(
         notebook.getReadmeContent(),
         folderRepository.findPortableTreeRowsByNotebookId(notebook.getId()),
         noteRepository.findPortableTreeRowsByNotebookId(notebook.getId()),
-        notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebook.getId()));
+        notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebook.getId()),
+        acceptedMetadata);
   }
 
   /** The same tree from folders and notes a caller already holds, as a locked publication does. */
   NotebookGitTreeContent fullTree(
       Notebook notebook, List<PortableTreeFolderRow> folders, List<Note> storedNotes) {
+    return fullTree(notebook, folders, storedNotes, List.of());
+  }
+
+  NotebookGitTreeContent fullTree(
+      Notebook notebook,
+      List<PortableTreeFolderRow> folders,
+      List<Note> storedNotes,
+      List<PortableTreeEntry> acceptedMetadata) {
     return fullTree(
         notebook.getReadmeContent(),
         folders,
@@ -92,7 +109,8 @@ class NotebookGitTreeEncoder {
                         note.getTitle(),
                         note.getContent()))
             .toList(),
-        notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebook.getId()));
+        notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebook.getId()),
+        acceptedMetadata);
   }
 
   /** Every row as an insertion over an empty base. */
@@ -101,6 +119,19 @@ class NotebookGitTreeEncoder {
       List<PortableTreeFolderRow> folders,
       List<PortableTreeNoteRow> notes,
       List<PortableTreeAttachmentRow> attachments) {
+    return fullTree(notebookReadmeContent, folders, notes, attachments, List.of());
+  }
+
+  /**
+   * Every projection row as an insertion over an empty base, plus reserved Git metadata preserved
+   * from the accepted tip (or supplied for LFS initialization).
+   */
+  static NotebookGitTreeContent fullTree(
+      String notebookReadmeContent,
+      List<PortableTreeFolderRow> folders,
+      List<PortableTreeNoteRow> notes,
+      List<PortableTreeAttachmentRow> attachments,
+      List<PortableTreeEntry> acceptedMetadata) {
     Map<Integer, String> prefixes = NotebookGitPortablePath.folderPrefixes(folders);
     Map<String, String> readmeContents = new HashMap<>();
     readmeContents.put("", notebookReadmeContent);
@@ -109,22 +140,24 @@ class NotebookGitTreeEncoder {
         .forEach(folder -> readmeContents.put(prefixes.get(folder.id()), folder.readmeContent()));
     List<PortableTreeEntry> files =
         Stream.concat(
-                notes.stream()
-                    .filter(note -> prefixes.containsKey(note.folderId()))
-                    .map(
-                        note ->
-                            PortableTreeEntry.ofNote(
-                                NotebookGitPortablePath.ofNote(
-                                    prefixes.get(note.folderId()), note.title()),
-                                note.content())),
-                attachments.stream()
-                    .filter(attachment -> prefixes.containsKey(attachment.folderId()))
-                    .map(
-                        attachment ->
-                            new PortableTreeEntry(
-                                NotebookGitPortablePath.ofAttachment(
-                                    prefixes.get(attachment.folderId()), attachment.filename()),
-                                attachment.content())))
+                Stream.concat(
+                    notes.stream()
+                        .filter(note -> prefixes.containsKey(note.folderId()))
+                        .map(
+                            note ->
+                                PortableTreeEntry.ofNote(
+                                    NotebookGitPortablePath.ofNote(
+                                        prefixes.get(note.folderId()), note.title()),
+                                    note.content())),
+                    attachments.stream()
+                        .filter(attachment -> prefixes.containsKey(attachment.folderId()))
+                        .map(
+                            attachment ->
+                                new PortableTreeEntry(
+                                    NotebookGitPortablePath.ofAttachment(
+                                        prefixes.get(attachment.folderId()), attachment.filename()),
+                                    attachment.acceptedGitContent()))),
+                acceptedMetadata.stream())
             .toList();
     Set<String> retainedDirectories = new LinkedHashSet<>();
     prefixes.values().stream()

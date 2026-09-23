@@ -155,7 +155,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitControllerTe
               notebookAttachmentRepository
                   .findPortableTreeRowsByNotebookId(notebook.getId())
                   .stream()
-                  .map(row -> new PortableTreeEntry(row.filename(), row.content()))
+                  .map(row -> new PortableTreeEntry(row.filename(), row.acceptedGitContent()))
                   .toList(),
               equalTo(List.of(PortableTreeEntry.ofText("reference.json", referenceJson))));
           NotebookGitBinding reloaded =

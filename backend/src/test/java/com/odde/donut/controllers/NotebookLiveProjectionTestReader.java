@@ -34,7 +34,7 @@ final class NotebookLiveProjectionTestReader {
         transactionManager,
         () ->
             notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebookId).stream()
-                .map(row -> new PortableTreeEntry(row.filename(), row.content()))
+                .map(row -> new PortableTreeEntry(row.filename(), row.acceptedGitContent()))
                 .sorted(Comparator.comparing(PortableTreeEntry::path))
                 .toList());
   }
@@ -52,7 +52,7 @@ final class NotebookLiveProjectionTestReader {
               .map(
                   row ->
                       new PortableTreeEntry(
-                          path(folders, row.folderId(), row.filename()), row.content()))
+                          path(folders, row.folderId(), row.filename()), row.acceptedGitContent()))
               .sorted(Comparator.comparing(PortableTreeEntry::path))
               .toList();
         });
