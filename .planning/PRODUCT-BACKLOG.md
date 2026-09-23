@@ -14,7 +14,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Save a note with only a few database round trips for Git history](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2) — SEED-037#story-2
+- [Simplify Git publication during note saves by eliminating unnecessary database work](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2) — SEED-037#story-2
 - [Reject oversized supporting files without changing the notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-12) — SEED-035#story-12
 - [Acquire current supporting files without carrying their bytes in Git history](seeds/SEED-035-ai-workspace-supporting-files.md#story-13) — SEED-035#story-13
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1

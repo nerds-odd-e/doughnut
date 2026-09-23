@@ -3,7 +3,7 @@ id: SEED-037
 status: dormant
 planted: 2026-09-22
 planted_during: owner report that production note saves take 7 to 10 seconds after SEED-034#story-3 shipped
-trigger_when: story 3's hash-only assembly attempt failed (2026-09-23); a retry needs a design that avoids a whole-notebook row read per save
+trigger_when: selecting the owner's bounded simplify-or-abandon attempt for story 2
 scope: medium
 ---
 
@@ -18,8 +18,9 @@ The contract is in
 [notebook Git synchronization](../../docs/notebook-git-synchronization.md#domain-operation-ownership).
 
 Those ancestor reads, existence checks, and object inserts still follow
-nesting depth. A note at depth 12 still pays for that chain. Production timing
-on the reported notebook was not observed. The pre-change investigation and
+nesting depth. A note at depth 12 still pays for that chain. Detailed production
+cost attribution was not measured; the owner reported roughly one-second saves
+after the repair and now considers that good enough. The pre-change investigation and
 the local measurement are in commit `458496764f931f05b0d46d955e1bbbebf04beefc`,
 at `.planning/seeds/SEED-037-note-save-cost-independent-of-folder-count.md` and
 `.planning/quick/012-path-scoped-note-save/PLAN.md`.
@@ -52,11 +53,11 @@ differ and writes only those trees and blobs; changed note contents are then
 fetched by id. The prototype's root tree hash equalled the Java assembly and
 the accepted head before and after the edit.
 
-Decision: replace change capture with the MySQL-hashed full assembly and
+Historical decision (superseded by the failed attempt below): replace change capture with the MySQL-hashed full assembly and
 top-down diff (story 3), keeping story 1's write path. Ancestor-only
-publication is current behavior until then. Story 2 still has to choose
+publication was to remain current behavior until then. Story 2 then still had to choose
 whether fewer database round trips come from simpler use of the existing store
-or from a new index. That choice is not selected. The decision record and
+or from a new index. That choice was not selected. The decision record and
 measurements are in commit `458496764f931f05b0d46d955e1bbbebf04beefc`.
 
 **Outcome (2026-09-23):** story 3's implementation failed this decision's own
@@ -90,60 +91,83 @@ ordinary single-note save, not just a cheaper hash.
 
 <a id="story-2"></a>
 
-### Save a note with only a few database round trips for Git history
+### Simplify Git publication during note saves by eliminating unnecessary database work
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/017-simplify-note-save-publication/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7129dccdf92414f6862496ab97e1d6f2a607b48ea382d6b0ef988b229c2c8476","plan":"bae497a4ae32448a3c21ebf28050d0fdd1362707c764bbc3faeaf25dd22e8e68"}}
+```
 
 - **Identity:** SEED-037#story-2
-- **Goal / beneficiary:** A note author gets lower and more predictable save
-  latency even for deeply nested notes, by reducing remaining Git-related
-  database round trips beyond the current ancestor-only traversal.
-- **Scope:** Start from the measured ancestor-only save in that commit: object and ref reads,
-  existence checks, object inserts, binding/projection writes and transaction
-  completion. Seek one/few Git persistence round trips independent of nesting
-  depth without loading unrelated content. Distinguish reducing round trips
-  from reducing object rows, bytes and server work. Compare simpler use of the
-  existing store first, then tree-edge/path indexing or storage redesign if
-  needed. Deliver the selected improvement after refinement; this is not just
-  a report recommending future implementation.
-- **Evaluation:** A cold content-only save at the root and at depth 12 or more
-  uses the refined small round-trip budget and improves measured end-to-end
-  latency against that measured save under comparable database conditions. Unrelated
-  notebook growth adds no traversal; accepted content/history and rollback
-  remain correct. Agree the numeric budget after consuming those measurements
-  rather than inventing a promise now.
-- **Design constraints:** Prefer fewer concepts and domain-cohesive owners,
-  with less code when practical. Any added index, cache, store or maintenance
-  mechanism must justify its total cost, including initialization, publication,
-  recovery and migration. Retain native Git history and atomic synchronous
-  acceptance under ADR 0002. Architectural exceptions remain human-owned.
-- **Key examples:** The same one-note edit at shallow and deep paths should
-  not incur one database round trip per ancestor; a cold first edit must gain
-  the improvement too; a late failure must preserve prior content and history.
-- **Deferred promises:** Background acknowledgement/worker delivery, universal
-  optimization of Git downloads/imports, and an exact chosen storage
-  architecture. No index or migration is approved by this backlog entry.
-- **Depends on:** the measured ancestor-only save in commit `458496764f931f05b0d46d955e1bbbebf04beefc` (`.planning/quick/012-path-scoped-note-save/PLAN.md`).
-- **Effort hypothesis:** Unknown until the remaining cost and architectural
-  tradeoff are established. Refine before slice planning; resplit if needed.
-- **Safe stopping point:** The selected deeper optimization delivers its
-  agreed latency/round-trip improvement with history and publication guarantees
-  intact. The current ancestor-only save remains useful if this work is deferred.
-- **Open decisions:** Numeric budget, selected design, and whether its
-  complexity/migration cost is justified.
+- **Goal / beneficiary:** The owner and maintainers get a cleaner, smaller
+  publication implementation with less unnecessary SQL; note authors retain
+  acceptable save latency and complete history. Owner decision (2026-09-23):
+  roughly one-second production saves are already good enough. Speedup is
+  welcome, not mandatory; design improvement, fewer production lines, fewer
+  unnecessary queries, and no performance regression are all mandatory.
+- **Scope:** One bounded simplification attempt on the existing publication
+  and persistence owners, evaluated through an ordinary content-only save of
+  an existing note at an unchanged path. Include root and depth-12 notes,
+  without relying on a warmed application cache. Necessary shared-caller
+  changes belong to this outcome. Preserve native Git history, synchronous
+  atomic acceptance, learning identities, and existing operation semantics.
+  Fewer queries alone do not establish a better design. This replaces the
+  earlier promise of a fixed small query budget independent of nesting depth.
+- **Acceptance:** A net reduction in affected production implementation lines,
+  clearer responsibility ownership and less duplicate work, a demonstrated
+  reduction in unnecessary save-path SQL executions, and representative save
+  latency at least maintained under comparable conditions. Count all affected
+  production files, including new/moved code, SQL and configuration; do not
+  manufacture a reduction by deleting tests/comments or compressing layout.
+  Review test/support growth separately. Distinguish JDBC executions from
+  measured network round trips. Inconclusive performance evidence is not a pass.
+- **Key examples:**
+  1. Existing root or depth-12 note, fresh application persistence context →
+     change only its body → fewer unnecessary SQL executions, no demonstrated
+     latency regression, one correct new Git commit, and retained learning data.
+  2. More unrelated folders, notes or attachment bytes → the same edit → no
+     reintroduced whole-notebook scan or loading of unchanged attachment bytes.
+  3. Repeat canonical content → save → no new Git objects or accepted revision.
+  4. Failure after native object writes, before acceptance completes → a fresh
+     committed read sees the previous content, references and complete history.
+- **Constraints:** Follow ADR 0002's publication boundary and current North
+  Star ownership. Preserve live transactional ref semantics and existing
+  stale-update protection. No endpoint-specific bypass or second authority.
+- **Excluded promises:** Depth-independent total work or round-trip count;
+  speedups for moves, renames, imports, downloads or reset; asynchronous success;
+  history rewriting; persistent indexes/caches, schema/storage redesign,
+  whole-notebook reconstruction, and LFS implementation. Existing behavior of
+  shared callers remains a preservation obligation, not extra optimization scope.
+- **Decision and stopping rule:** Try the selected simple approach once. Keep
+  it only if every acceptance condition holds after independent review and
+  measurement. Otherwise discard attempt-owned changes and abandon this story,
+  removing it from the active backlog rather than deferring or automatically
+  replacing it with another experiment. Retain a short evidence-based reason;
+  a future need may justify fresh work. No fallback redesign campaign.
+- **Depends on:** No unfinished product story. Historical ancestor-only
+  measurements in `458496764f931f05b0d46d955e1bbbebf04beefc` are context, not a
+  matched baseline for this attempt; capture the current baseline before edits.
+- **Effort hypothesis:** S (30–60 minutes of active work), medium-low confidence;
+  complete backend verification and paired local measurements add waiting time.
+- **Plan:** [Bounded publication simplification](../quick/017-simplify-note-save-publication/PLAN.md).
+- **Open decisions:** None for product scope. Whether the selected approach
+  meets the conditions is the experiment's result, not an unresolved requirement.
 
 ## Ordering and Scope Reduction
 
 Story 3 failed (2026-09-23); the codebase is unchanged from before it was
 attempted — the ancestor-only change-capture save (story 1, delivered) remains
 current behavior. Story 2, if pursued, starts from that unchanged ancestor-only
-save, not from a story-3 measurement that no longer applies. The asynchronous
-assessment stays conditional. Preserve unrelated backlog order. Do not prepare
-an index, alternate store, or asynchronous worker before story 2 selects one.
+save, not from a story-3 measurement that no longer applies. The owner now
+prefers an immediate, bounded simplify-or-abandon decision to deferral. Preserve
+its current queue position and unrelated order: this is a small attempt to
+improve the shared publication design, not an attachment prerequisite or an
+open-ended performance project. If the attempt fails, remove it rather than
+reserving another place ahead of attachment work. No index, alternate store,
+asynchronous worker or automatic story-3 retry belongs to this attempt.
 
 ## When to Surface
 
-Story 2 when selecting the remaining round-trip reduction for deeply nested
-note saves; a story-3 retry only with a design that avoids a whole-notebook
-row read per save.
+Story 2 is selected for preparation under the owner's simplify-or-abandon
+conditions. A failed attempt ends this queued story; it is not a deferred retry.
 
 ## Breadcrumbs
 
