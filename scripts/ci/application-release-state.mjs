@@ -44,7 +44,9 @@ function validateState(record) {
     'ci_run_attempt',
     'outcome',
   ]
+  if (Object.hasOwn(record, 'ci_sha')) keys.push('ci_sha')
   if (
+    (!Object.hasOwn(record, 'ci_sha') || objectId.test(record.ci_sha)) &&
     keys.every((key) => Object.hasOwn(record, key)) &&
     Object.keys(record).length === keys.length &&
     isApplicationTag(record.tag) &&
@@ -66,6 +68,7 @@ function initialState(classification) {
       tag: classification.tag,
       ref_oid: classification.refOid,
       sha: classification.sha,
+      ...(classification.ciSha ? { ci_sha: classification.ciSha } : {}),
       ci_run_id: String(classification.runId),
       ci_run_attempt: String(classification.runAttempt),
       outcome: 'succeeded',

@@ -32,12 +32,13 @@ test('reconciliation keeps the highest numeric pending version across reversed t
       ref: 'refs/tags/v1.3.10',
       refOid: higherRefOid,
       sha: higherSha,
+      ciSha: higherSha,
       runId: 43,
       runAttempt: 1,
     })
     assert.equal(
       result.output,
-      `state=waiting\ntag=v1.3.10\nref=refs/tags/v1.3.10\nrefOid=${higherRefOid}\nsha=${higherSha}\nrunId=43\nrunAttempt=1\n`
+      `state=waiting\ntag=v1.3.10\nref=refs/tags/v1.3.10\nrefOid=${higherRefOid}\nsha=${higherSha}\nrunId=43\nrunAttempt=1\nciSha=${higherSha}\n`
     )
     assert.deepEqual(
       result.requests
@@ -74,6 +75,7 @@ test('premature tag returns waiting and an explicit retry after CI succeeds sele
     ref: 'refs/tags/v1.2.3',
     refOid,
     sha: fixture.sha,
+    ciSha: fixture.sha,
     runId: 42,
     runAttempt: 1,
   })
@@ -151,6 +153,7 @@ test('failed CI blocks the current highest release without failing or selecting 
     ref: 'refs/tags/v1.3.10',
     refOid: fixture.git('rev-parse', 'refs/tags/v1.3.10'),
     sha: higherSha,
+    ciSha: higherSha,
     runId: 43,
     runAttempt: 1,
     diagnostic: `CI 43 attempt 1 for ${higherSha} finished with failure`,

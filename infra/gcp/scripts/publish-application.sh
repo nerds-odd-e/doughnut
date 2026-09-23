@@ -7,6 +7,7 @@ CONTROL_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 : "${RELEASE_SOURCE_ROOT:?RELEASE_SOURCE_ROOT is required}"
 : "${RELEASE_REF:?RELEASE_REF is required}"
 : "${RELEASE_REF_OID:?RELEASE_REF_OID is required}"
+: "${RELEASE_CI_SHA:?RELEASE_CI_SHA is required}"
 : "${RELEASE_CI_RUN_ID:?RELEASE_CI_RUN_ID is required}"
 : "${RELEASE_CI_RUN_ATTEMPT:?RELEASE_CI_RUN_ATTEMPT is required}"
 : "${GITHUB_SHA:?GITHUB_SHA is required}"
@@ -30,10 +31,11 @@ record_application_outcome() {
 		--arg tag "${RELEASE_REF#refs/tags/}" \
 		--arg ref_oid "$RELEASE_REF_OID" \
 		--arg sha "$GITHUB_SHA" \
+		--arg ci_sha "$RELEASE_CI_SHA" \
 		--arg ci_run_id "$RELEASE_CI_RUN_ID" \
 		--arg ci_run_attempt "$RELEASE_CI_RUN_ATTEMPT" \
 		--arg outcome "$1" \
-		'{tag: $tag, ref_oid: $ref_oid, sha: $sha, ci_run_id: $ci_run_id, ci_run_attempt: $ci_run_attempt, outcome: $outcome}' \
+		'{tag: $tag, ref_oid: $ref_oid, sha: $sha, ci_sha: $ci_sha, ci_run_id: $ci_run_id, ci_run_attempt: $ci_run_attempt, outcome: $outcome}' \
 		| gcloud storage cp - "$APPLICATION_RELEASE_RECORD_URI"
 }
 
@@ -43,5 +45,5 @@ bash "$SCRIPT_DIR/upload-cli-binary-to-gcs.sh"
 if git -C "$RELEASE_SOURCE_ROOT" log -1 --format=%B "$GITHUB_SHA" | grep -qE 'force-deployment[[:space:]]*:[[:space:]]*true'; then
 	export FORCE_FULL_DEPLOY=1
 fi
-bash "$SCRIPT_DIR/deploy-backend-jar-to-gcp-mig.sh"
+DEPLOY_BUILD_SHA="$RELEASE_CI_SHA" bash "$SCRIPT_DIR/deploy-backend-jar-to-gcp-mig.sh"
 record_application_outcome succeeded

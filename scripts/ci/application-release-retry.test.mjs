@@ -43,6 +43,7 @@ async function selectReleaseBeforeArtifactFailure(t, annotated = true) {
   assert.deepEqual(JSON.parse(ready.stdout), {
     state: 'ready',
     ...release,
+    ciSha: release.sha,
     runId: 42,
     runAttempt: 3,
   })
@@ -163,6 +164,7 @@ test('a selected release resumes with a newer exact-identity CI attempt after ar
   assert.deepEqual(JSON.parse(recovered.stdout), {
     state: 'ready',
     ...release,
+    ciSha: release.sha,
     runId: 99,
     runAttempt: 4,
   })

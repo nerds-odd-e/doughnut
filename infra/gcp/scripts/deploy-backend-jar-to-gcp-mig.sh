@@ -66,13 +66,13 @@ bash "$SCRIPT_DIR/update-mig-startup-script.sh"
 
 bash "$SCRIPT_DIR/check-mig-rollout.sh"
 
-export GITHUB_SHA
-bash "$SCRIPT_DIR/app-instance-healthcheck.sh"
+DEPLOY_BUILD_SHA="${DEPLOY_BUILD_SHA:-$GITHUB_SHA}"
+GITHUB_SHA="$DEPLOY_BUILD_SHA" bash "$SCRIPT_DIR/app-instance-healthcheck.sh"
 
 jq -n \
   --arg sha "$new_hash" \
   --arg startup_script_sha "$new_startup_script_hash" \
-  --arg git "$GITHUB_SHA" \
+  --arg git "$DEPLOY_BUILD_SHA" \
   --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   '{sha256: $sha, startup_script_sha256: $startup_script_sha, git_sha: $git, recorded_at: $at}' \
   | gcloud storage cp - "$RECORD_URI"

@@ -192,3 +192,17 @@ test('workflow notifies admission and deployment failures using selected outputs
   )
   assert.doesNotMatch(JSON.stringify(notify), /workflow_run|git log/)
 })
+
+test('artifact recovery identifies the reused build commit independently of the tag', (t) => {
+  const ciSha = 'c'.repeat(40)
+  const { fields } = render(t, {
+    RELEASE_SHA: selectedSha,
+    RELEASE_CI_SHA: ciSha,
+    RELEASE_CI_RUN_ID: '42',
+    RELEASE_CI_RUN_ATTEMPT: '3',
+    FAILURE_STAGE: 'artifact admission',
+  })
+  assert.equal(fields.commit, selectedSha)
+  assert.equal(fields['build commit'], ciSha)
+  assert.match(fields.recovery, new RegExp(`build commit ${ciSha}`))
+})
