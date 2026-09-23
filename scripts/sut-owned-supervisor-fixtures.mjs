@@ -36,6 +36,7 @@ export function writeOwnedSupervisorRunPPeers(checkoutRoot) {
       private: true,
       scripts: {
         'backend:sut': 'node ./peer.mjs backend',
+        'backend:sut:ci': 'node ./peer.mjs backend',
         'local:lb:vite': 'node ./peer.mjs lb',
         'frontend:sut': 'node ./peer.mjs frontend',
       },
@@ -97,7 +98,7 @@ await startOwnedSutSupervisor({
   checkoutRoot: process.env.SUT_CHECKOUT_ROOT,
   logFile: process.env.SUT_LOG_FILE,
   env: process.env,
-  serviceArgs: sutServiceArgs({}),
+  serviceArgs: sutServiceArgs({}, process.env.SUT_BACKEND_RELOAD !== 'false'),
   spawnFn: (_cmd, args, opts) => {
     const runP = args.indexOf('run-p')
     return spawn(${JSON.stringify(runPBin)}, args.slice(runP + 1), opts)

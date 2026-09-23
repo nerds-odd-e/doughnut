@@ -13,6 +13,11 @@ Typical workflow:
 2. Develop or debug interactively with `pnpm cy:open`.
 3. Run a feature headlessly with `pnpm cypress run --spec <feature-path>`.
 
+Local `pnpm cy:run` batches compile current backend source once and retain Vite
+for the frontend. After editing backend source, start a new batch. Interactive
+`pnpm cy:open` sessions retain backend reload and frontend HMR. Built CI runs
+use their existing frontend assets without Vite.
+
 WSL2 users must install `xvfb` outside Nix. Set
 `NODE_OPTIONS="--max-old-space-size=4096"` before Cypress commands.
 

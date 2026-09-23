@@ -2,7 +2,7 @@
 
 Work item: **SEED-040#story-1**.
 Source: [refined story](../../seeds/SEED-040-reliable-local-e2e-startup.md#story-1).
-Status: planned; no execution authorized or started.
+Status: implementation and proof complete; delivery underway. Owner authorized execution on 2026-09-23.
 Inspected revision: `6a7e92dc8c0376d13d3352151f11d6d0157c8079`.
 
 ## Goal and scope
@@ -51,7 +51,7 @@ owner on 2026-09-23; no product decisions remain open.
 
 ### 1. Batch E2E tests current source without a competing watcher
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given a linked checkout with previously compiled backend output and
 a source edit, the ordinary selected-feature batch command compiles that edit,
@@ -99,7 +99,7 @@ CURSOR_DEV=true nix develop -c node --test scripts/e2e-runner.test.mjs scripts/s
 Run in the execution's owned linked checkout after its ordinary
 `./scripts/run.sh bash scripts/worktree_setup.sh` preparation. Record the actual
 revision, selected database/origin, literal commands, observations, and outcomes
-here during execution. This plan contains no accepted runtime proof yet.
+here during execution. Accepted runtime proof is recorded below.
 
 1. With no backend build output, run:
 
@@ -167,3 +167,44 @@ interactive reload for continuing sessions, with frontend asset choice separate.
 No generic scheduler, watcher replacement, or extra architecture is justified.
 Every retained promise has proof above. No blocking slice-specific concern was
 identified in this planning review; real results remain execution obligations.
+
+## Execution identity
+
+- Mode: Story Branch Mode; selected story SEED-040#story-1.
+- Owned checkout (created by this session): `/Users/terryyin/.codex/worktrees/reliable-local-e2e-startup/doughnut`.
+- Branch: `codex/reliable-local-e2e-startup`; initial base `8c96f96894c4a8efd5923c5ae7bd4a334853af3c`.
+- Originating/integration checkout: `/Users/terryyin/git/doughnut`; retained unchanged at the initial base, refresh deferred because exclusive ownership is not established.
+- Claim `be7a99eb08840415478a99ca2914b68f438d340e` confirmed published to `origin refs/heads/main`; claim CI unobserved (Story Branch claim).
+- Increment destination: `origin refs/heads/codex/reliable-local-e2e-startup` (`git@github.com:nerds-odd-e/doughnut.git`).
+- Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` passed; `./scripts/run.sh node --version` returned v26.8.2 in this checkout.
+- Replanning: preserve existing planning authority within the story; no scope expansion.
+- CI source: GitHub Actions, `ci.yml`, display name `donut CI`, push trigger covers the execution branch.
+- Observer: `/tmp/dough-ci-501/watch-VaHMtw`, coordinator `plan016`, PID 35736, stream session 77053, yielded cell 19; checkout-bound `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`. No implementation revision registered yet.
+
+## Execution observations
+
+Candidate: uncommitted launch-mode change on claim `be7a99eb08840415478a99ca2914b68f438d340e`.
+All runtime commands run from the owned checkout. Allocation:
+`doughnut_e2e_wt_61125c3a327b4abb9ca4f4e6ee869f77`, backend 59921,
+Vite 59922, browser `http://127.0.0.1:59923`. Development data untouched.
+
+- Deterministic red: `CURSOR_DEV=true nix develop -c node --test --test-name-pattern='runner propagates backend reload intent' scripts/e2e-runner.test.mjs` failed before production changes: local batch emitted `backend:sut` rather than `backend:sut:ci`; interactive and built cases passed.
+- Deterministic green: the exact focused automated command above passed 84/84 tests. Inspected the three entry-point regressions: real batch/interactive caller, lifetime/spawn environment, child running real `runSutServices`; only external services and readiness substituted. Emitted launch args and package-script definitions prove mode selection and Vite preservation. Inspected existing failure/cleanup assertions (readiness, required exit, foreign peer) and Development service selection.
+- Cold run: no `backend/build` existed before invocation. Exact ordinary batch command above exited 0, feature 1/1 passed; populated output through `bootRunE2E`. Log `/tmp/donut-plan016-cold.log`, service log `/tmp/donut-plan016-cold-sut.log`.
+- First edited run: disposable `source-canary-alpha` appended in `HealthCheckController.ping`; disposable support-file `beforeEach` requested `/api/healthcheck` and asserted the response includes the marker. Exact ordinary batch command exited 0, feature 1/1 passed. Log `/tmp/donut-plan016-alpha.log`; service log `/tmp/donut-plan016-alpha-sut.log` contains `:compileJava`, bootRun-only and Vite, no watcher. Owned lock absent and all three app ports released afterward.
+- Second edited run with `source-canary-beta`: exact ordinary batch command exited 0, feature 1/1 passed including marker assertion; no output clearing or prebuilding between runs. Logs `/tmp/donut-plan016-beta.log` and `/tmp/donut-plan016-beta-sut.log`; no continuous compiler in either edited batch.
+- Invalid-source run: changed the same response expression to undefined `missingSourceCanary` while retaining previously valid output. Exact ordinary batch command exited 1, `:compileJava FAILED` with `cannot find symbol`; wrapper printed compiler diagnostics and `SUT readiness failed`, with no Cypress Run Starting/feature run. Owned lock absent and all three app ports released. Logs `/tmp/donut-plan016-invalid.log` and `/tmp/donut-plan016-invalid-sut.log`. Restored valid beta source promptly.
+- Interactive proof: literal `CURSOR_DEV=true nix develop -c pnpm cy:open --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature` reached readiness. Through native Cypress UI, selected Electron and the focused feature: Passed 1 with beta healthcheck assertion. Edited Java and assertion to `source-canary-gamma` without restarting; watcher logged `Change detected`, `:compileJava`, and BUILD SUCCESSFUL; live healthcheck returned gamma. Clicked Rerun all tests in the same UI: gamma assertion and Passed 1 observed. Owner token/socket remained the same before/after the edit (`/tmp/donut-sut-owner-NzHwUJ/owner.sock`). Closed Cypress with Cmd-Q: wrapper exited 0, lock absent, three app ports released. Log `/tmp/donut-plan016-interactive.log`; service log `/tmp/donut-plan016-interactive-sut.log`. No manual discrepancies found.
+- Removed disposable Java/support edits; both files have no diff. Final exact ordinary batch command on restored source exited 0, feature 1/1 passed; log `/tmp/donut-plan016-restored.log`. All runtime proof is complete.
+
+Manual observation plan (required by this slice): use the same owned checkout and isolated allocation, launch the literal `cy:open` command above, observe initial selected-feature result, edit the Java marker and temporary assertion, rerun through Cypress UI in that session, and inspect cleanup after closing. Reserve roughly 10 minutes for interactive startup/selection and reload observations, plus cleanup; stop and reassess if interactive startup requires a new repair.
+
+### Refactor and delivery proof
+
+- Fresh independent refactor completed; required <=250-line check exposed existing large runner/test files. Cohesively extracted Cypress process, invocation selection/signals/ownership, primary mock-port allocation, and SUT lifetime modules. Public runner/start exports remain compatible; no lifecycle redesign or API contract change. Test bodies moved unchanged to imported `*.cases.mjs` files; original test entry filenames preserve discovery without duplicate runs. Test-data guidance moved to a linked reference.
+- Inspected final `e2e-runner.mjs` → `e2e-owned-invocation.mjs` → `sut-owned-lifetime.mjs` → `sut-start-spawn.mjs` → `sut-services.mjs` wiring, and `e2e-runner-backend-reload.cases.mjs` setup/assertions. Reload selection and Gradle/package-script inputs are unchanged by extraction, so the real cold/edited/invalid/interactive observations remain applicable. Agent compared all 12 extracted runner function bodies and lifetime body as unchanged.
+- Exact focused automated command above rerun after refactor: exit 0, 84/84 passed. It re-establishes imports, moved test setup/assertions, public entry exports and affected lifecycle boundaries. Failure/cleanup, built, interactive and Development cases remain covered.
+- Exact ordinary batch command rerun after refactor: exit 0, feature 1/1 passed; `/tmp/donut-plan016-refactored.log`. Owned SUT lock absent afterward. This establishes final module wiring through Gradle, Spring, Vite and Cypress.
+- Refactor handoff: `REFACTOR COMPLETE`; roughly 15 minutes reported, within the plan's explicit delivery-time exception. No unexplained overrun or scope expansion in behavior.
+- Coordinator `./scripts/run.sh pnpm format:changed` passed once after refactor; 32 files mechanically formatted. No API generation needed. Commit check-only hook and branch publication remain the current delivery boundary.
+- No permanent Java/Cypress canary edits or scratch logs are included.
