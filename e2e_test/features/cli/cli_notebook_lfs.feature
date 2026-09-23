@@ -40,3 +40,55 @@ Feature: Notebook Git LFS authenticated transfer
     When I clone the notebook "LFS Transfer Notebook" expecting rejection from the installed CLI into that existing destination
     Then the existing destination file "sentinel.txt" is still "pre-existing"
     And I should see "already exists" in the non-interactive output
+
+  @bundleCliE2eInstall @withCliConfig
+  Scenario: CLI publishes two LFS versions and a fresh clone receives current bytes after a web save
+    Given the backend is serving the CLI and install script
+    And the CLI is installed from localhost
+    And the notebook "LFS Transfer Notebook" has an accepted LFS tip "payload.bin" with payload "seed-lfs-bytes" and obsolete payload "obsolete-lfs-bytes"
+    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
+    And I commit the LFS attachment "payload.bin" filled with 1024 bytes of "0x11" as "lfsVersionA"
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I commit the LFS attachment "payload.bin" filled with 2048 bytes of "0x22" as "lfsVersionB"
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And the LFS commit "lfsVersionA" remains an ancestor of "lfsVersionB"
+    And the notebook "LFS Transfer Notebook" MySQL attachment "payload.bin" holds the LFS pointer for "lfsVersionB"
+    When I create a title-only root note titled "Overview" in the notebook "LFS Transfer Notebook"
+    And I update note "Overview" content to become "Reviewed on the web after LFS publish"
+    And I clone the notebook "LFS Transfer Notebook" into a fresh temporary destination using the installed CLI
+    Then the fresh clone file "payload.bin" is filled with 2048 bytes of "0x22"
+    And the fresh clone LFS object cache holds only the tip digest
+
+  @bundleCliE2eInstall @withCliConfig
+  Scenario: Corrective oversized intermediate LFS commit is omitted while the tip publishes
+    Given the backend is serving the CLI and install script
+    And the CLI is installed from localhost
+    And the notebook "LFS Transfer Notebook" has an accepted LFS tip "payload.bin" with payload "seed-lfs-bytes" and obsolete payload "obsolete-lfs-bytes"
+    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
+    And I commit the LFS attachment "payload.bin" filled with 20971520 bytes of "0x74" as "lfsOversizedIntermediate"
+    And I commit the LFS attachment "payload.bin" filled with 3145728 bytes of "0x75" as "lfsCorrectiveTip"
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And the LFS commit "lfsOversizedIntermediate" remains an ancestor of "lfsCorrectiveTip"
+    And the notebook "LFS Transfer Notebook" content store lacks object for "lfsOversizedIntermediate" under attachment "payload.bin"
+    And the notebook "LFS Transfer Notebook" content store has object for "lfsCorrectiveTip" under attachment "payload.bin"
+    And the notebook "LFS Transfer Notebook" MySQL attachment "payload.bin" holds the LFS pointer for "lfsCorrectiveTip"
+
+  @bundleCliE2eInstall @withCliConfig
+  Scenario: Three incompressible LFS versions keep pointer history and current-only clone download
+    Given the backend is serving the CLI and install script
+    And the CLI is installed from localhost
+    And the notebook "LFS Transfer Notebook" has an accepted LFS tip "payload.bin" with payload "seed-lfs-bytes" and obsolete payload "obsolete-lfs-bytes"
+    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
+    And I commit the incompressible LFS attachment "payload.bin" of 3145728 bytes as "lfsRandV1"
+    And I commit the incompressible LFS attachment "payload.bin" of 3145728 bytes as "lfsRandV2"
+    And I commit the incompressible LFS attachment "payload.bin" of 3145728 bytes as "lfsRandV3"
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And the LFS commit "lfsRandV1" remains an ancestor of "lfsRandV3"
+    And the notebook "LFS Transfer Notebook" MySQL attachment "payload.bin" holds the LFS pointer for "lfsRandV3"
+    When I clone the notebook "LFS Transfer Notebook" into a fresh temporary destination using the installed CLI
+    Then the fresh clone LFS object cache holds only the tip digest
+    And bundle traffic stays pointer-scale versus object traffic for versions "lfsRandV1, lfsRandV2, lfsRandV3"

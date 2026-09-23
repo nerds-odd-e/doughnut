@@ -332,6 +332,24 @@ paths:
       responses:
         "200":
           description: OK
+  /api/testability/inspect_notebook_lfs_attachment_for_testability:
+    post:
+      tags:
+      - notebook-git-testability-controller
+      operationId: inspectNotebookLfsAttachmentForTestability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InspectNotebookLfsAttachmentRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InspectNotebookLfsAttachmentResponse"
   /api/testability/inject_notes:
     post:
       tags:
@@ -3756,6 +3774,32 @@ components:
         seed:
           type: integer
           format: int32
+    InspectNotebookLfsAttachmentRequest:
+      type: object
+      properties:
+        notebookName:
+          type: string
+        filename:
+          type: string
+        oid:
+          type: string
+      required:
+      - filename
+      - notebookName
+      - oid
+    InspectNotebookLfsAttachmentResponse:
+      type: object
+      properties:
+        acceptedGitContentLength:
+          type: integer
+          format: int32
+        acceptedGitContentUtf8:
+          type: string
+        objectStored:
+          type: boolean
+        storedObjectSize:
+          type: integer
+          format: int64
     NoteTestData:
       type: object
       properties:

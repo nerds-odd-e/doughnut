@@ -74,6 +74,7 @@ describe('acquireNotebookGitCheckout — LFS tip hydration', () => {
         ],
         ['-C', checkoutDir, 'remote', 'remove', 'origin'],
         ['lfs', 'version'],
+        ['-C', checkoutDir, 'remote'],
         [
           '-C',
           checkoutDir,

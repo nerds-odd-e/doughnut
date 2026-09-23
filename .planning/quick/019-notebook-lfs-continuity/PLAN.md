@@ -27,9 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `fce754e518c12751539f33e51d5e92a5a266353e` on
+- Published increment: `a1396fb353189fae366f35eb6989735c3c36b4c3` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer. Parent on that branch: `c51f7cbcd0840a286bb6c12fae02e71b47934804`.
+  observer. Parent on that branch: `fce754e518c12751539f33e51d5e92a5a266353e`.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
@@ -372,22 +372,40 @@ Safe stop: a fresh checkout can receive LFS content without later story 15.
 
 ### 8. Publish local files and acquire them in another checkout
 Type: Behavior
-Status: planned
+Status: done
 
-Existing CLI publish selects required objects from its unpublished range,
-explicitly uploads using standard LFS, then submits the original Git bundle.
-No blind upload of omitted oversized intermediate content; selection cannot
-override server admission. Failed upload/submission preserves local refs/files.
-A fresh CLI clone receives exact current content after publication and web save.
+CLI publish on an LFS checkout selects required objects from the unpublished
+first-parent range, uploads them with `git lfs push --object-id`, then submits
+the original Git bundle. A new oversized intermediate-only payload is not
+uploaded. In-limit, tip, and previously accepted digests stay required. A failed
+upload or bundle submission leaves local refs and files unchanged. Raw publish
+does not upload LFS objects. After publication and a web note save, a fresh
+clone receives the current file bytes and only the current object. The CLI size
+limit stays aligned with server admission; it is not a shared module.
 
-Proof: E actual installed CLI commits/filters, two valid versions and the
-corrective-commit case. Observe original commit IDs and upload-before-acceptance.
-The same loop owns size proof: three incompressible 3 MiB versions yield pointer
-blobs, no payload copy in MySQL and current-only download; report bundle and
-object traffic separately. Structural absence of raw binary blobs is required;
-no flaky timing threshold or separate benchmark project. C and E.
-8–10 minutes after established transfer and admission; if object enumeration
-exceeds this, decompose on observed evidence instead of duplicating policy.
+Accepted proof:
+- Promise: upload before acceptance, original commit IDs, omission of a new
+  20 MiB intermediate when the 3 MiB tip is valid, two published versions
+  surviving a web save, three incompressible 3 MiB versions as pointer blobs
+  with payload outside MySQL, bundle traffic and object traffic reported
+  separately, current-only clone download, failed upload/submission preserves
+  the checkout.
+- Boundary: `completeNotebookPublish` →
+  `uploadRequiredLfsObjectsBeforeProposal` → bundle submission, then slice 7
+  clone.
+- Setup: unit tests use a real local Git checkout and intercept `git lfs push`.
+  E2E commits through `git add` on an LFS checkout, publishes with the
+  installed CLI, saves a note on the web, then clones again.
+- Observations: `notebookPublish.lfs.test.ts` (`callOrder` is lfs-push then
+  bundle-post; oversized OID absent; local git observation unchanged).
+  `cli_notebook_lfs.feature` accepted head equals the local commit, ancestor
+  chain, MySQL pointer, content-store presence, git blob under 500 bytes,
+  fresh clone bytes and tip-only cache, `lfsTrafficReport` bundle versus
+  object bytes.
+- Commands: `CURSOR_DEV=true nix develop -c pnpm cli:test` and
+  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`
+- Result: pass. CLI proof was rerun after selection moved to its own module
+  (65 files, 458 tests). E2E stayed valid (7 scenarios) and was not rerun.
 Safe stop: automated publish-to-fresh-clone journey complete in test mode.
 
 ### 9. Recover published versions explicitly after replacement or deletion

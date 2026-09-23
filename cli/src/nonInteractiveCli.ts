@@ -9,6 +9,7 @@ import {
   assertLocalMainIsReadyToReceive,
 } from './commands/notebook/notebookCheckoutReadiness.js'
 import { assertLocalMainFollowsAcceptedHistory } from './commands/notebook/notebookPublishAncestry.js'
+import { uploadRequiredLfsObjectsBeforeProposal } from './commands/notebook/notebookPublishLfs.js'
 import { submitNotebookGitProposal } from './commands/notebook/notebookPublishSubmission.js'
 import { receiveAcceptedNotebookHead } from './commands/notebook/notebookPull.js'
 
@@ -122,6 +123,11 @@ async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
     const expectedHead = await assertLocalMainFollowsAcceptedHistory(
       directory,
       Number(notebookId)
+    )
+    uploadRequiredLfsObjectsBeforeProposal(
+      directory,
+      Number(notebookId),
+      expectedHead
     )
     acceptedHead = await submitNotebookGitProposal(
       directory,

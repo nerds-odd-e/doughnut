@@ -1,10 +1,11 @@
 /**
  * Standard Git LFS client against a notebook's authenticated LFS endpoint,
- * plus CLI clone observations for an already-accepted LFS tip.
+ * plus CLI clone observations for LFS tips.
  */
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
 import testability from '../../testability'
 import { expectCheckoutFileExactTextAt } from './notebookCloneCheckoutDestination'
+import { notebookLfsPublish } from './notebookLfsPublish'
 
 export function notebookLfs() {
   return {
@@ -175,5 +176,6 @@ export function notebookLfs() {
           cy.readFile(`${destination}/${relativePath}`).should('equal', content)
         })
     },
+    ...notebookLfsPublish(),
   }
 }

@@ -13,6 +13,7 @@ import {
 } from './cliE2eInstalledCli'
 import { createCliE2ePluginConfigDirTasks } from './cliE2ePluginConfigDirTasks'
 import { createCliE2eNotebookCloneTasks } from './cliE2eNotebookCloneTasks'
+import { createCliE2eNotebookLfsPublishTasks } from './cliE2eNotebookLfsPublishTasks'
 import { createCliE2eNotebookLfsTasks } from './cliE2eNotebookLfsTasks'
 import { notebookAcceptedGitObjectId } from './notebookPublicationState'
 import {
@@ -110,6 +111,7 @@ export function createCliE2ePluginTasks(
     ...createCliE2ePluginConfigDirTasks(),
     ...createCliE2eNotebookCloneTasks(),
     ...createCliE2eNotebookLfsTasks(),
+    ...createCliE2eNotebookLfsPublishTasks(),
     readNotebookAcceptedGitObjectId(notebookName: string): string {
       return notebookAcceptedGitObjectId(repoRoot, notebookName)
     },

@@ -138,6 +138,39 @@ class NotebookGitTestabilityController {
     return response;
   }
 
+  /**
+   * Testability-only: returns the MySQL-projected accepted Git content for a root attachment and
+   * whether the content store holds a given digest for that notebook.
+   */
+  @PostMapping("/inspect_notebook_lfs_attachment_for_testability")
+  @Transactional(readOnly = true)
+  public InspectNotebookLfsAttachmentResponse inspectNotebookLfsAttachmentForTestability(
+      @RequestBody InspectNotebookLfsAttachmentRequest request) {
+    if (Strings.isEmpty(request.getNotebookName())
+        || Strings.isEmpty(request.getFilename())
+        || Strings.isEmpty(request.getOid())) {
+      throw new IllegalArgumentException("notebookName, filename, and oid are required");
+    }
+    Notebook notebook = requireNotebook(request.getNotebookName());
+    NotebookAttachment attachment =
+        notebookAttachmentRepository.findByNotebook_Id(notebook.getId()).stream()
+            .filter(
+                row -> request.getFilename().equals(row.getFilename()) && row.getFolder() == null)
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        "No root attachment named " + request.getFilename()));
+    byte[] accepted = attachment.getAcceptedGitContent();
+    InspectNotebookLfsAttachmentResponse response = new InspectNotebookLfsAttachmentResponse();
+    response.setAcceptedGitContentLength(accepted.length);
+    response.setAcceptedGitContentUtf8(new String(accepted, StandardCharsets.US_ASCII));
+    var stored = notebookAttachmentContent.get(notebook.getId(), request.getOid());
+    response.setObjectStored(stored.isPresent());
+    stored.ifPresent(bytes -> response.setStoredObjectSize((long) bytes.length));
+    return response;
+  }
+
   private Notebook requireNotebook(String notebookName) {
     return notebookRepository
         .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(new DisplayName(notebookName))
@@ -160,5 +193,29 @@ class NotebookGitTestabilityController {
     private String oid;
     private long size;
     private String obsoleteOid;
+  }
+
+  @Schema(name = "InspectNotebookLfsAttachmentRequest")
+  @Getter
+  @Setter
+  static class InspectNotebookLfsAttachmentRequest {
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String notebookName;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String filename;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String oid;
+  }
+
+  @Schema(name = "InspectNotebookLfsAttachmentResponse")
+  @Getter
+  @Setter
+  static class InspectNotebookLfsAttachmentResponse {
+    private int acceptedGitContentLength;
+    private String acceptedGitContentUtf8;
+    private boolean objectStored;
+    private Long storedObjectSize;
   }
 }

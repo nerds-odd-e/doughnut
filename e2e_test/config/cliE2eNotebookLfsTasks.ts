@@ -23,7 +23,7 @@ export type NotebookLfsClientInput = {
   payload: string
 }
 
-function runOrThrow(
+export function runOrThrow(
   command: string,
   args: string[],
   cwd: string,

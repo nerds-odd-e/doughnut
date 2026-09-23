@@ -105,3 +105,88 @@ Then(
     cli.notebookLfs().expectExistingDestinationFile(relativePath, content)
   }
 )
+
+When(
+  'I commit the LFS attachment {string} filled with {int} bytes of {string} as {string}',
+  (
+    relativePath: string,
+    byteLength: number,
+    fillByteHex: string,
+    alias: string
+  ) => {
+    cli
+      .notebookLfs()
+      .commitLfsFilledAttachment(relativePath, byteLength, fillByteHex, alias)
+  }
+)
+
+When(
+  'I commit the incompressible LFS attachment {string} of {int} bytes as {string}',
+  (relativePath: string, byteLength: number, alias: string) => {
+    cli.notebookLfs().commitLfsRandomAttachment(relativePath, byteLength, alias)
+  }
+)
+
+Then(
+  'the LFS commit {string} remains an ancestor of {string}',
+  (ancestorAlias: string, descendantAlias: string) => {
+    cli.notebookLfs().expectCommitIsAncestor(ancestorAlias, descendantAlias)
+  }
+)
+
+Then(
+  'the fresh clone file {string} is filled with {int} bytes of {string}',
+  (relativePath: string, byteLength: number, fillByteHex: string) => {
+    cli
+      .notebookLfs()
+      .expectFreshCloneFileFilledBytes(relativePath, byteLength, fillByteHex)
+  }
+)
+
+Then(
+  'the notebook {string} MySQL attachment {string} holds the LFS pointer for {string}',
+  (notebookName: string, filename: string, versionAlias: string) => {
+    cli
+      .notebookLfs()
+      .expectMysqlAcceptedGitContentIsTipPointer(
+        notebookName,
+        filename,
+        versionAlias
+      )
+  }
+)
+
+Then(
+  'the notebook {string} content store {word} object for {string} under attachment {string}',
+  (
+    notebookName: string,
+    storedWord: string,
+    versionAlias: string,
+    filename: string
+  ) => {
+    expect(storedWord, 'expected "has" or "lacks"').to.be.oneOf([
+      'has',
+      'lacks',
+    ])
+    cli
+      .notebookLfs()
+      .expectObjectStorage(
+        notebookName,
+        filename,
+        versionAlias,
+        storedWord === 'has'
+      )
+  }
+)
+
+Then('the fresh clone LFS object cache holds only the tip digest', () => {
+  cli.notebookLfs().expectFreshCloneLfsCacheHoldsOnlyTip()
+})
+
+Then(
+  'bundle traffic stays pointer-scale versus object traffic for versions {string}',
+  (aliasesCsv: string) => {
+    const aliases = aliasesCsv.split(',').map((s) => s.trim())
+    cli.notebookLfs().expectSizeProofTraffic(aliases)
+  }
+)

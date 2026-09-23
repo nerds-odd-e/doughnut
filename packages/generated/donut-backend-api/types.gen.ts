@@ -118,6 +118,19 @@ export type Randomization = {
     seed?: number;
 };
 
+export type InspectNotebookLfsAttachmentRequest = {
+    notebookName: string;
+    filename: string;
+    oid: string;
+};
+
+export type InspectNotebookLfsAttachmentResponse = {
+    acceptedGitContentLength?: number;
+    acceptedGitContentUtf8?: string;
+    objectStored?: boolean;
+    storedObjectSize?: number;
+};
+
 export type NoteTestData = {
     Title?: string;
     Content?: string;
@@ -1603,6 +1616,22 @@ export type SetOpenAiTokenResponses = {
      */
     200: unknown;
 };
+
+export type InspectNotebookLfsAttachmentForTestabilityData = {
+    body: InspectNotebookLfsAttachmentRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/inspect_notebook_lfs_attachment_for_testability';
+};
+
+export type InspectNotebookLfsAttachmentForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: InspectNotebookLfsAttachmentResponse;
+};
+
+export type InspectNotebookLfsAttachmentForTestabilityResponse = InspectNotebookLfsAttachmentForTestabilityResponses[keyof InspectNotebookLfsAttachmentForTestabilityResponses];
 
 export type InjectNotesData = {
     body: NotesTestData;
