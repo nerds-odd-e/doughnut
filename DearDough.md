@@ -5,7 +5,7 @@ Donut-specific findings are recorded in
 [DonutRetrospectiveFindings.md](DonutRetrospectiveFindings.md).
 
 Ownership checked on 2026-09-23 against published Open Dough v0.3.31: all
-13 retained ODF entries have upstream finding mappings; DD-097 and DD-098
+retained ODF entries have upstream finding mappings; ODF-090 and ODF-091
 concern the published delegation and refactor requirements. None is a
 Donut-only finding to move. Project resolution checks and the recovered
 E2E-runner finding are in the project log linked above.
@@ -778,7 +778,9 @@ the run exists, is discoverable moments later, and goes on to succeed.
     `CI_COVERAGE_UNAVAILABLE` as final, would likely have prevented every one
     of these four false negatives.
 
-## DD-097 — Coordinator implemented a planned slice locally during multi-slice execution
+## ODF-090 — Coordinator implemented a planned slice locally during multi-slice execution
+
+Former local code: DD-097.
 
 `dough-execute-plan` assigns each planned slice to a fresh implementation agent and allows local implementation only for a single interactive slice. Slice 1 of a three-slice plan was edited in the coordinator session.
 
@@ -793,7 +795,9 @@ the run exists, is discoverable moments later, and goes on to succeed.
   - Observed effect: slice 1 was committed with its planned frontend proof. No separate implementation-agent return exists for that slice.
   - Inference: the single-slice local exception was applied to the first slice of a multi-slice plan. The record does not show a product defect from that choice.
 
-## DD-098 — Coordinator accepted its own refactor pass without a fresh refactor agent
+## ODF-091 — Coordinator accepted its own refactor pass without a fresh refactor agent
+
+Former local code: DD-098.
 
 Slice delivery requires a fresh `dough-post-change-refactor` agent and a verbatim `## REFACTOR COMPLETE` marker before commit. For each delivered slice the coordinator judged the diff itself and committed without that marker.
 
