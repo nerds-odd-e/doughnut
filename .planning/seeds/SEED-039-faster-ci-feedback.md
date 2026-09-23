@@ -56,29 +56,58 @@ authorizes no implementation, profiling run, or executable slice plan.
 
 **Identity:** SEED-039#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/015-smaller-ci-dependency-caches/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9f951423543b3055c657451b9a071484771cdf4e8c0afc61479078777248ff93","plan":"668551d1f2952e2c4147ab1aca441728e5b56e7583fd8a39c2e06b8e6d6e88ff"}}
 ```
 
-- **For / why:** Contributors receive CI results sooner because dependency
-  preparation no longer pays an oversized cache restoration cost on every job.
-- **Scope:** Measure and improve the shared dependency-cache strategy end to
-  end: restoration, installation, and any cache publication overhead. Investigate
-  the contents and cost of the combined pnpm/Cypress cache; choose the simplest
-  effective reduction. A smaller archive alone is insufficient if installation
-  or the full job becomes slower. Test optimization and shard reassignment are
-  deferred to their own stories.
-- **Evaluation:** Comparable successful CI runs show lower dependency-preparation
-  wall time and its contribution to E2E completion, with cache size, hit/miss
-  conditions, installation time, and total workflow time reported separately.
-  A cache miss or dependency update must still install the correct locked
-  dependencies and run all required checks.
-- **Value / learning:** Test whether reducing the cache's transfer/extraction
-  cost shortens feedback without merely moving the cost into installation.
+- **Goal:** Contributors receive trustworthy CI results sooner through materially
+  faster dependency preparation, measured across restore, install, and cache-save
+  costs. The improvement must survive normal dependency updates, rather than
+  depending on a one-off deletion of the current archive.
+- **Scope:** Improve the cache lifecycle owned by the existing shared Node/pnpm
+  setup action and preserve its current consumers: lint/type generation, frontend
+  and other unit tests, deployment packaging, six E2E shards, and CLI release
+  builds. Keep the locked workspace installation and required native/postinstall
+  behavior. Compare cache contents and total setup costs before choosing the
+  smallest effective change. Cold caches remain a supported normal condition;
+  their initial population cost is measured separately from repeat cache hits.
+- **Key examples:**
+  - Given an unchanged lockfile and a populated cache, a fresh runner completes
+    correct dependency setup measurably faster and the same checks still pass.
+  - Given an empty or evicted cache, setup installs the committed dependencies
+    and required Cypress binary, and the subsequent warm run reuses the result.
+  - Given a dependency or Cypress version update, setup installs the newly
+    requested versions without repeatedly carrying historical browser versions
+    or an ever-growing inherited dependency archive into future runs.
+  - Given the same action in a build-only consumer, dependency preparation still
+    supports bundling; no release tag or live deployment is needed to prove it.
+- **Evaluation:** Compare successful Linux CI runs with matching dependency graph,
+  Node/pnpm/Cypress versions, runner class, and job selection. Report cache bytes,
+  restore/install/save times, cold versus warm conditions, total job/workflow
+  elapsed time, and queue delays separately. Require repeatable setup improvement
+  beyond observed run-to-run variation; smaller bytes or a single fast run alone
+  are insufficient. Assess downstream CI benefit without attributing unrelated
+  test or scheduling variation to this change. Do not invent a numeric saving
+  before the representative experiment.
+- **Preserved constraints:** Keep coverage, dependency versions, shard assignments,
+  test parallelism, release behavior, existing force-install compatibility, and
+  persistent developer caches intact. Use isolated runner stores for experiments.
+  Missing cache data is recoverable by normal installation; installation or
+  verification failures remain visible.
+- **Deferred promises:** Test optimization, E2E rebalancing, removing repeated
+  installs from package scripts, selective workspace installs, skipping Cypress
+  in particular jobs, new runner infrastructure, and global cache deletion.
+  These are not prerequisites for this story's bounded cache improvement.
+- **Value / learning:** Establish which cached payload causes the observed cost
+  and prove that a bounded cache lifecycle lowers total preparation time rather
+  than shifting the cost elsewhere.
 - **Effort hypothesis:** M, medium confidence; assumes the existing setup action
   can be improved without introducing a new runner platform.
 - **Depends on:** None.
 - **Safe stopping point:** Measurably faster, correct dependency preparation
   remains valuable even if no tests or shards subsequently change.
+- **Plan:** [Smaller CI dependency caches](../quick/015-smaller-ci-dependency-caches/PLAN.md).
+- **Open questions:** None about the outcome or scope. Cache partition and
+  performance remain implementation hypotheses with a measured decision gate.
 
 <a id="story-2"></a>
 
@@ -172,9 +201,10 @@ selected, so these remain ordered candidates in this seed.
 
 ## Open Decisions
 
-No unresolved decision changes the requested three-story order. Numeric speedup
-targets and concrete experiments require fresh baselines during refinement;
-story 3's grouping must await story 2's result.
+No unresolved decision changes the requested three-story order. Story 1 is
+refined with a comparative performance criterion and a measured implementation
+gate. Stories 2 and 3 remain candidates; story 3's grouping must await story 2's
+result.
 
 ## When to Surface
 
