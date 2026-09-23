@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Reject oversized supporting files without changing the notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-12) — SEED-035#story-12 ([plan](quick/018-attachment-size-admission/PLAN.md))
-
 ## Backlog list
 
 - [Acquire current supporting files without carrying their bytes in Git history](seeds/SEED-035-ai-workspace-supporting-files.md#story-13) — SEED-035#story-13

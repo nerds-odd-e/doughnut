@@ -136,20 +136,6 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
 
 - Execution: quick/008-remove-zip-export / 38b5e1ef69; Timestamp: 2026-09-21T22:08:41+08:00; Tool: Cursor; Model: Cursor Grok 4.7; Open Dough release: 0.3.27.
 
-## DD-105 — CI tip registration used a path-ignored planning-only revision
-
-After code increments, the branch tip was advanced by a `.planning/**`-only commit and registered for observation. This project's `ci.yml` ignores `.planning/**` and `docs/**` on push, so that tip produces no workflow while the earlier code tip already has one.
-
-### Occurrences
-
-- Execution: SEED-035#story-12 / quick/018-attachment-size-admission / b3ddc1fa3e
-  - Timestamp: 2026-09-23T16:55:18+08:00
-  - Tool: Cursor
-  - Open Dough release: unknown
-  - Evidence: registered tip `70192908196039382d377c64b0a3d32a35fd3835` (PLAN.md only); code tip `4e04fa3eb54ed8a39b8935c7c8bcb805b6018804` has Actions run `35839842301` (`donut CI`); `.github/workflows/ci.yml` `paths-ignore` includes `.planning/**`; observer `/tmp/dough-ci-501/watch-mO4rGQ` bound to `story/attachment-size-admission`
-  - Observed effect: latest registered revision was undiscovered at registration; observation risked waiting on a tip that cannot start CI
-  - Inference: prefer the last code increment (or verify path eligibility) when arming or advancing the observed tip after a planning-only push
-
 ## Retention
 
 - Highest allocated local number: 105
