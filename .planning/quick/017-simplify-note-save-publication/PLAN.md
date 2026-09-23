@@ -1,6 +1,6 @@
 # Simplify Git publication during note saves
 
-Status: abandoned; strict implementation-size gate failed; no product change retained.
+Status: abandoned after authorized retry; no latency regression was not established.
 Work item: **SEED-037#story-2**.
 Source: [refined story](../../seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2)
 and the owner's 2026-09-23 simplify-or-abandon decision and planning request.
@@ -8,8 +8,8 @@ and the owner's 2026-09-23 simplify-or-abandon decision and planning request.
 ## Goal and acceptance
 
 Try one coherent simplification of existing publication persistence. Keep it
-only if it makes the design cleaner, reduces affected production code and
-unnecessary save-path SQL, preserves correctness, and leaves representative
+only if it makes the design cleaner, does not increase affected production code,
+reduces unnecessary save-path SQL, preserves correctness, and leaves representative
 latency at least as good. Roughly one-second production saves are acceptable;
 this is not an incident response or a fixed-query-budget promise. Failure or
 unresolved evidence ends the attempt and removes the story from the backlog.
@@ -47,7 +47,7 @@ change capture with their current owners. Adapt all actual callers together;
 do not introduce a separate web fast path, a caller-controlled trust flag, or
 an overload that merely preserves redundant orchestration.
 
-This is a hypothesis, not a claim that it saves enough lines. If preserving
+This is a hypothesis, not a claim that it improves latency. If preserving
 the differing copy/creation lifecycles makes the combined implementation
 larger or harder to understand, abandon it. Repeated commit parsing is recorded
 historical evidence but is not a second optimization candidate in this plan.
@@ -67,7 +67,7 @@ Type: Behavior. Status: abandoned.
 
 Behavior: an author edits an existing root or deeply nested note → publication
 uses the already-known new head without rediscovering it → the same complete,
-durable history is accepted with fewer unnecessary SQL calls, using less and
+durable history is accepted with fewer unnecessary SQL calls, using no more and
 clearer production code and without a measured latency regression.
 
 This is one deliverable with one keep/discard decision. Baseline, regression
@@ -85,9 +85,10 @@ an independent preparatory story or independently shipped test-only slice.
    timestamps and transaction completion. No product-code commit yet.
 3. Run required tests and the fresh `dough-post-change-refactor` agent. Review
    the aggregate affected implementation for clearer ownership, fewer duplicate
-   steps and strictly fewer production lines. Reject transferred complexity,
+   steps and no increase in production implementation lines. Reject transferred complexity,
    cosmetic shortening or removed test coverage. Recheck after final formatting.
-4. Run the matched candidate measurements. Retain only if every gate passes;
+4. Run the matched comparison. Reuse measurements after an unchanged refactor;
+   rerun affected comparisons if final refactoring changes the candidate. Retain only if every gate passes;
    otherwise discard only attempt-owned code/test changes and close the story
    as abandoned, with a brief result and no replacement backlog item.
 
@@ -116,7 +117,7 @@ These are inspected existing proof locations, not tests run during preparation.
 | Creation/reset still copies objects after binding creation | Existing notebook creation through the controller test fixtures plus `NotebookGitHistoryResetControllerTest.resetRestartsHistoryFromTheCurrentNotebookSoAPlainEditPublishesAgain`; add a focused public notebook-creation observation only if existing fixture/controller coverage leaves initial durable head/objects unobserved. |
 | Shared web operations and files preserved | Existing derived-tree/folder oracle, attachment publication and web move controller tests run in the full backend suite; compare native tree with full assembly, exact file bytes and preserved identities. |
 | Live refs and native transaction visibility | `services/notebookGit/NotebookGitJdbcObjectStoreTest` close/reopen/append/export and aborted-transaction cases. Keep JGit ref update/CAS code unchanged; existing stale proposal refusal remains required. |
-| Cleaner design and fewer production lines | Fresh refactor review of aggregate diff versus execution base; list removed duplication and count all affected production files with `git diff --numstat <base> -- backend/src/main`. Include new/untracked files before counting. Report tests/support separately and inspect the diff to exclude cosmetic/comment-only reductions. |
+| Cleaner design and no increase in production lines | Fresh refactor review of aggregate diff versus execution base; list removed duplication and count all affected production files with `git diff --numstat <base> -- backend/src/main`. Include new/untracked files before counting. Report tests/support separately and inspect the diff to exclude cosmetic/comment-only reductions. |
 | No latency regression | Matched baseline/candidate procedure below, evaluated after final code/refactor changes. An unsupported or inconclusive claim fails acceptance. |
 
 ## Matched measurement procedure
@@ -140,9 +141,9 @@ necessary for identical baseline/candidate selection and retain them in both:
   setup outside it equally for both revisions. This measures server save work,
   not browser/network end-to-end latency.
 - Use the same isolated MySQL environment, notebook shape, JVM conditions and
-  sample count. Capture two baseline batches before production edits to expose
-  ordinary run-to-run variation, then two candidate batches with the same
-  setup. Existing five samples per batch are the minimum; retain individual
+  sample count. For the authorized retry, compare baseline/candidate/candidate/baseline
+  batches to expose chronological drift, with identical setup and 20 samples
+  per shape in each batch. Preserve the pre-edit baselines above; retain individual
   timings, median and range, with first saves identified. Do not claim p95
   significance from this small sample.
 
@@ -199,22 +200,16 @@ Preparation provenance is retained in `2604bfcfee`: session-created `/Users/terr
 
 User invoked dough-execute-plan 017. Story Branch Mode; no replanning or
 fallback candidate is authorized by this plan's stopping rule.
-Session-created execution checkout:
-`/Users/terryyin/.codex/worktrees/simplify-note-save-publication/doughnut`,
-branch `codex/simplify-note-save-publication`, starting revision
-`2604bfcfee8b34e346be2acecbba2a006e01fcff`.
+Session-created checkout: `/Users/terryyin/.codex/worktrees/simplify-note-save-publication/doughnut`, branch `codex/simplify-note-save-publication`, starting revision `2604bfcfee8b34e346be2acecbba2a006e01fcff`.
 Originating/integration checkout: `/Users/terryyin/git/doughnut`.
-Claim published and confirmed on `origin/main`:
-`596ad1f7e4cde58b505404bae9ab15bccc40abcc`.
+Original claim published and confirmed on `origin/main`: `596ad1f7e4cde58b505404bae9ab15bccc40abcc`.
 Implementation destination: `origin/codex/simplify-note-save-publication`.
 Default checkout refresh deferred: no exclusive ownership established; clean
 main at `33939aa45a` preserved. Claim CI coverage: unobserved (Story Branch).
 Worktree setup succeeded using `./scripts/run.sh bash scripts/worktree_setup.sh`;
 locked dependencies installed, and the claim's check-only lint hook passed.
 CI source: GitHub Actions `ci.yml`, display name `donut CI` (push all branches).
-Execution observer: coordinator `root-017`, functions cell `20`, PTY `50444`,
-mailbox `/tmp/dough-ci-501/watch-iKcBgO`, PID `21932`; request identity verified
-against this execution checkout and `codex/simplify-note-save-publication`.
+Original observer: coordinator `root-017`, cell `20`, PTY `50444`, mailbox `/tmp/dough-ci-501/watch-iKcBgO`, PID `21932`; identity verified against this checkout/execution branch.
 No implementation revision was published. Branch observer stopped with no unread events; PID exit confirmed. Abandonment closure target: `origin/main`, under the plan's authorized closeout disposition.
 
 ### Attempt evidence and disposition
@@ -233,3 +228,23 @@ No implementation revision was published. Branch observer stopped with no unread
 - Candidate batch 1 already running at rejection completed successfully before restoration: root `[19,17,19,19,17]` ms (median19, range17–19), depth12 `[78,89,71,74,73]` (median74, range71–89); first entry is first-save timing. JDBC totals root `[24,25,26,26,26]`, depth12 `[59,60,61,61,61]`: one fewer execution throughout. No second candidate batch was run after the decisive size failure; these timings do not establish performance acceptance.
 - All seven attempt-owned production/test files were restored to the published claim revision. Only this plan, seed lesson and backlog removal remain; the discarded patch/logs are local evidence. The slice is abandoned, not delivered.
 - Closeout observer: coordinator `root-017-closure`, target `origin/main`, cell `60`, PTY `71442`, mailbox `/tmp/dough-ci-501/watch-g9hLWU`, PID `73104`; verified same execution checkout. No implementation was published to the execution branch.
+
+### Owner-authorized retry (2026-09-23)
+
+The owner explicitly relaxed size to **no increase** and authorized another try of the same candidate, while requiring performance not to worsen; otherwise discard again. Earlier abandonment is historical, superseded only for this bounded retry. No redesign is authorized. Reuse this clean execution checkout at `145156658e`; remote main matches. The work is absent from active backlog lists, so no fabricated queue claim is needed. Setup fingerprint and command remain valid; both prior observers are stopped.
+Use the preserved exact candidate patch and matched harness, with 20 samples per shape and baseline/candidate/candidate/baseline order. Inspect fixture cleanup, timing/transaction boundaries and competing workload; retain raw timings and SQL counts. Consistent slowdown or still-inconclusive evidence fails acceptance; do not hide first saves/outliers or substitute a permissive percentage margin. A single additional matched comparison is allowed only to resolve an identified noise cause, not to rerun until favorable. Prior correctness/red proof applies to the unchanged candidate; full suites still run for measurements. Coordinator retains plan edits, final review, formatting and delivery.
+
+### Retry measurements
+
+Retained raw evidence: `/tmp/donut-017-retry/` (four XML/log pairs, comparison.json, load snapshots and exact patches). All four full backend suites passed with 20 timed controller saves per depth. The candidate production patch remains byte-identical to the reviewed/formatted original (`cc471458ea3c1ae53008709bcc097479e9e77e6bd6bb7807808514f0688fa668`). The interrupted agent's candidate1 run finished successfully; coordinator recovered its terminal log/XML before continuing. One missing restored test-support field caused an earlier compile-only failure and was corrected before candidate1; it changes only untimed observations.
+- baseline1, depth0: individual μs `[17521, 17303, 18194, 18953, 22994, 24775, 17875, 20031, 16852, 18023, 18060, 21745, 21748, 17976, 17894, 16603, 20531, 23520, 21969, 17365]`; median 18.1270 ms, first 17.521 ms, range 16.603–24.775 ms.
+- baseline1, depth12: individual μs `[72782, 72967, 68623, 72969, 74407, 75237, 68818, 70892, 55160, 35504, 34131, 34912, 40069, 34591, 34152, 41233, 33598, 41661, 35924, 36506]`; median 41.4470 ms, first 72.782 ms, range 33.598–75.237 ms.
+- candidate1, depth0: individual μs `[17833, 17260, 19398, 23817, 17141, 19028, 16615, 17054, 17596, 20495, 24178, 17565, 17690, 19250, 20390, 22573, 18653, 17214, 22374, 20027]`; median 18.8405 ms, first 17.833 ms, range 16.615–24.178 ms.
+- candidate1, depth12: individual μs `[40697, 38162, 35492, 33029, 35320, 33050, 35413, 33868, 40112, 35470, 32986, 35920, 32596, 34293, 39387, 33750, 41455, 33719, 34172, 36077]`; median 35.3665 ms, first 40.697 ms, range 32.596–41.455 ms.
+- candidate2, depth0: individual μs `[19610, 16918, 18072, 23369, 21056, 18438, 18085, 18788, 17331, 18883, 19959, 22006, 17569, 18201, 17891, 21785, 27867, 17419, 24728, 21707]`; median 18.8355 ms, first 19.610 ms, range 16.918–27.867 ms.
+- candidate2, depth12: individual μs `[77470, 79996, 71076, 80071, 73473, 69312, 70119, 53218, 41056, 34896, 34886, 35841, 34490, 35644, 41545, 36801, 36900, 40969, 36087, 42656]`; median 41.3005 ms, first 77.470 ms, range 34.490–80.071 ms.
+- baseline2, depth0: individual μs `[14223, 14085, 15472, 15237, 15140, 17821, 14563, 15162, 14400, 12483, 13035, 15908, 20204, 14101, 13179, 12929, 15655, 14804, 28851, 14540]`; median 14.6835 ms, first 14.223 ms, range 12.483–28.851 ms.
+- baseline2, depth12: individual μs `[75050, 73943, 73217, 71494, 75680, 69557, 79053, 81751, 74708, 68132, 80403, 72486, 77975, 76166, 70478, 71631, 74283, 69844, 70288, 74121]`; median 74.0320 ms, first 75.050 ms, range 68.132–81.751 ms.
+Root candidate medians exceed both baseline medians, whereas depth12 varies markedly within/between batches. SQL/bytes remain steady across the roughly70→35ms within-batch shifts. Background VM/application workload was recorded and not modified. This supports caution about causation, not a claim of no regression; fresh independent review agrees no-regression is unestablished. It found no defensible additional comparison from the available noise evidence; repeating until favorable would not justify acceptance.
+
+Retry disposition: **discard**. No causal slowdown is proven, but no-regression was not established for both shapes. The relaxed size gate, design, SQL and correctness passed; performance did not. All seven code/test files restored; no product change retained. No new backlog entry or successor. Owner confirmed the retry entry need not be restored after asking about its absence. Retry closeout publishes only this plan and the seed lesson to `origin/main`.

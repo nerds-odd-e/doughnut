@@ -93,7 +93,7 @@ ordinary single-note save, not just a cheaper hash.
 
 ### Simplify Git publication during note saves by eliminating unnecessary database work
 
-**Identity:** SEED-037#story-2. **Status: experiment failed, abandoned (2026-09-23).**
+**Identity:** SEED-037#story-2. **Status: retry also abandoned; no-regression unestablished (2026-09-23).**
 
 The accepted-head handoff removed the redundant post-append SQL read and passed
 all 2,581 backend tests (two opt-in measurement cases skipped). Independent
@@ -110,12 +110,24 @@ Original contract and plan are recoverable from `2604bfcfee`;
 [execution evidence](../quick/017-simplify-note-save-publication/PLAN.md) retains
 the attempt's identity, baseline measurements and final disposition.
 
+The owner authorized a retry of the same candidate with **no increase in
+implementation size**, retaining the strict no-performance-regression condition.
+Four full-suite batches in baseline/candidate/candidate/baseline order measured
+20 saves at each depth per batch. Root medians were **18.127 / 18.841 / 18.836 /
+14.684 ms**; depth-12 medians were **41.447 / 35.367 / 41.301 / 74.032 ms**.
+Candidate root medians exceeded both baselines; depth-12 varied substantially,
+including roughly 70→35 ms shifts within both a baseline and candidate batch
+without SQL-count changes. These observations do not prove the change caused a
+slowdown, but they do not establish no regression for both shapes. Independent
+review agreed to discard under the owner's condition. All code and harness
+changes were restored; design, size, SQL reduction and correctness had passed.
+The plan retains individual timings and proof. No successor was queued.
+
 ## Ordering and Scope Reduction
 
-Stories 2 and 3 were abandoned under their own acceptance gates; no attempt
-code remains. Ancestor-only change-capture publication remains current behavior.
-Neither story reserves a backlog position or authorizes an automatic retry.
-A future attempt requires a fresh owner decision and new evidence.
+Stories 2 and 3 remain abandoned. Ancestor-only change-capture publication
+remains unchanged. Neither story reserves a backlog position or authorizes an
+automatic retry; further work requires a fresh owner decision and evidence.
 
 ## Breadcrumbs
 
