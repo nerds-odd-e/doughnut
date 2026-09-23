@@ -27,9 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `7693f1df237e8ff364765e6c489dc70e7b5a506d` on
+- Published increment: `df8c86b0db28cd02a395f0c52fd3cbeb75b1bad7` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer. Parent on that branch: `de5d4e036437f3ee3b5e132195077339b5214ea6`.
+  observer. Parent on that branch: `7693f1df237e8ff364765e6c489dc70e7b5a506d`.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then

@@ -73,22 +73,20 @@ Endpoint and credential configuration stay outside authored content.
    payloads throughout submitted history; retain already accepted oversized
    content without allowing it to bypass the rule for new content. Books keep
    their separate limits. Aggregate quotas remain outside this increment.
-2. Story 13 supplies automated CLI publication/fresh acquisition and web
-   preservation for new notebooks using LFS. Story 15 completes receiving into
+2. New notebooks use LFS. Owners publish with the Donut CLI and acquire a
+   fresh checkout after web or remote changes. Story 15 completes receiving into
    an existing checkout and supported local rebase. Until then, an LFS pull
    stops before mutation and directs the owner to a separate fresh CLI clone;
    legacy pull remains unchanged and unpublished work stays in its old checkout.
    This is a usable workflow split, not manual API operation or separate
-   storage-layer delivery. Prove bundle growth against incompressible
-   binary versions and measure object traffic separately. Note-only web saves
-   must neither load unchanged payloads nor contact GCS to rewrite them.
-   Owner-approved retention refinement (2026-09-23): preserve every successfully
-   published snapshot, but allow new oversized payloads found only in unpublished
-   intermediate LFS commits to remain unavailable when the tip is valid. This
-   enables correction by a later commit. Keep within-limit intermediate content
-   and previously accepted payloads. Story 13 records the authorized exception
-   to the blanket historical-object availability rule; story 12 stays strict
-   while attachments remain raw Git blobs.
+   storage-layer delivery. Bundle growth and object traffic stay separate
+   measurements. Note-only web saves must neither load unchanged payloads nor
+   contact GCS to rewrite them. Preserve every successfully published snapshot,
+   but allow new oversized payloads found only in unpublished intermediate LFS
+   commits to remain unavailable when the tip is valid. This enables correction
+   by a later commit. Keep within-limit intermediate content and previously
+   accepted payloads. Story 12 stays strict while attachments remain raw Git
+   blobs.
 3. Story 14 transitions existing notebooks without rewriting their accepted
    history or losing file access. Keep the legacy representation readable during
    rollout; once converted, require pointers for newly introduced attachments.
