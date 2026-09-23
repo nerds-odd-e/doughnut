@@ -2,7 +2,7 @@
 
 Work item: **SEED-040#story-1**.
 Source: [refined story](../../seeds/SEED-040-reliable-local-e2e-startup.md#story-1).
-Status: implementation and proof complete; delivery underway. Owner authorized execution on 2026-09-23.
+Status: complete; implementation delivered and CI passed. Owner authorized execution on 2026-09-23.
 Inspected revision: `6a7e92dc8c0376d13d3352151f11d6d0157c8079`.
 
 ## Goal and scope
@@ -179,11 +179,11 @@ identified in this planning review; real results remain execution obligations.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` passed; `./scripts/run.sh node --version` returned v26.8.2 in this checkout.
 - Replanning: preserve existing planning authority within the story; no scope expansion.
 - CI source: GitHub Actions, `ci.yml`, display name `donut CI`, push trigger covers the execution branch.
-- Observer: `/tmp/dough-ci-501/watch-VaHMtw`, coordinator `plan016`, PID 35736, stream session 77053, yielded cell 19; checkout-bound `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`. No implementation revision registered yet.
+- Observer: `/tmp/dough-ci-501/watch-VaHMtw`, coordinator `plan016`, PID 35736, stream session 77053, yielded cell 19; checkout-bound `.agents/skills/dough-execute-plan/scripts/ci-mailbox.mjs`. Implementation `d86864023c2bbf2dcb39e787cd6c70cb486f4ab4` was registered and passed CI run 35826235576 attempt 1; completion receipt confirmed observer shutdown.
 
 ## Execution observations
 
-Candidate: uncommitted launch-mode change on claim `be7a99eb08840415478a99ca2914b68f438d340e`.
+Runtime proof candidate: launch-mode change later delivered as `d86864023c2bbf2dcb39e787cd6c70cb486f4ab4`, based on claim `be7a99eb08840415478a99ca2914b68f438d340e`.
 All runtime commands run from the owned checkout. Allocation:
 `doughnut_e2e_wt_61125c3a327b4abb9ca4f4e6ee869f77`, backend 59921,
 Vite 59922, browser `http://127.0.0.1:59923`. Development data untouched.
@@ -206,5 +206,7 @@ Manual observation plan (required by this slice): use the same owned checkout an
 - Exact focused automated command above rerun after refactor: exit 0, 84/84 passed. It re-establishes imports, moved test setup/assertions, public entry exports and affected lifecycle boundaries. Failure/cleanup, built, interactive and Development cases remain covered.
 - Exact ordinary batch command rerun after refactor: exit 0, feature 1/1 passed; `/tmp/donut-plan016-refactored.log`. Owned SUT lock absent afterward. This establishes final module wiring through Gradle, Spring, Vite and Cypress.
 - Refactor handoff: `REFACTOR COMPLETE`; roughly 15 minutes reported, within the plan's explicit delivery-time exception. No unexplained overrun or scope expansion in behavior.
-- Coordinator `./scripts/run.sh pnpm format:changed` passed once after refactor; 32 files mechanically formatted. No API generation needed. Commit check-only hook and branch publication remain the current delivery boundary.
+- Coordinator `./scripts/run.sh pnpm format:changed` passed once after refactor; 32 files mechanically formatted. No API generation needed. Check-only hook passed, and `d86864023c2bbf2dcb39e787cd6c70cb486f4ab4` was confirmed published to the execution branch.
 - No permanent Java/Cypress canary edits or scratch logs are included.
+
+Retrospective completed: no implementation correction plan or product-backlog change. Process finding DD-104 records file-size-driven refactor expansion. Story Branch closure remains authorized by the owner’s wrap-up request.

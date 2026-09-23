@@ -808,8 +808,32 @@ Slice delivery requires a fresh `dough-post-change-refactor` agent and a verbati
   - Observed effect: delivery continued and the three commits landed. No independent refactor findings were recorded.
   - Inference: deletion-heavy slices made a missed cohesion issue less likely, but the required second reader did not run.
 
+## DD-104 — File-size gate expanded bounded launch plumbing into broad file relocation
+
+A small launch-mode correction touched existing oversized runner and test files.
+The mandatory 250-line refactor check required splitting those files before
+publication, despite no identified lifecycle redesign being needed.
+
+### Occurrences
+
+- Execution: quick/016-reliable-local-e2e-startup / d86864023c2bbf2dcb39e787cd6c70cb486f4ab4
+  - Timestamp: unknown (2026-09-23)
+  - Tool: Codex
+  - Open Dough release: 0.3.32
+  - Evidence: plan 016 refactor/delivery proof; refactor agent's read-only size check
+    named runner 827 lines, runner tests 2835, SUT start 291, child-exit tests 284,
+    and E2E authoring skill 269; implementation commit changes 43 files, including
+    22 imported case modules and extracted production/fixture modules.
+  - Observed effect: fresh refactor reported roughly 15 active minutes; 84 focused
+    tests and a real batch were rerun after relocation. Runtime behavior was
+    preserved, with the earlier source-edit proof still applicable.
+  - Inference: applying the size ceiling to all touched legacy files can dominate
+    a bounded fix's delivery. Consider a scoped exception or separately planned
+    cohesive cleanup when size alone triggers the expansion; the long-term value
+    of these particular splits was not measured.
+
 ## Retention
 
-- Highest allocated local number: 103
+- Highest allocated local number: 104
 - Recovery: `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad`
 - Occurrence history is partial
