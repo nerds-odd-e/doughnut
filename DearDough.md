@@ -4,6 +4,12 @@ Findings about shared OpenDough skills, supporting guidelines, and skill scripts
 Donut-specific findings are recorded in
 [DonutRetrospectiveFindings.md](DonutRetrospectiveFindings.md).
 
+Ownership checked on 2026-09-23 against published Open Dough v0.3.31: all
+13 retained ODF entries have upstream finding mappings; DD-097 and DD-098
+concern the published delegation and refactor requirements. None is a
+Donut-only finding to move. Project resolution checks and the recovered
+E2E-runner finding are in the project log linked above.
+
 ## ODF-030 — One-off profile capture treated as durable runner plumbing
 
 Former local code: DD-013.
