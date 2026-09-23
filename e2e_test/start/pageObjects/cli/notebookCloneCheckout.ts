@@ -18,6 +18,39 @@ import { notebookCloneCheckoutRebaseObservations } from './notebookCloneCheckout
 import { notebookCloneCheckoutReceiver } from './notebookCloneCheckoutReceiver'
 import { nonInteractiveOutput } from './outputAssertions'
 
+type RetainedProposalTextFile = { relativePath: string; content: string }
+type RetainedProposalFilledBytesFile = {
+  relativePath: string
+  byteLength: number
+  fillByte: number
+}
+type RetainedProposalFile =
+  | RetainedProposalTextFile
+  | RetainedProposalFilledBytesFile
+
+function isRetainedProposalTextFile(
+  file: RetainedProposalFile
+): file is RetainedProposalTextFile {
+  return 'content' in file
+}
+
+function expectRetainedProposalFile(
+  file: RetainedProposalFile
+): Cypress.Chainable<null> | void {
+  if (isRetainedProposalTextFile(file)) {
+    expectCheckoutFileAt('cliCloneDestination', file.relativePath, file.content)
+    return
+  }
+  return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+    cy.task('assertCliNotebookCheckoutFilledBytes', {
+      checkoutDir,
+      relativePath: file.relativePath,
+      byteLength: file.byteLength,
+      fillByte: file.fillByte,
+    })
+  )
+}
+
 function notebookCloneCheckout() {
   function readCheckoutState(): Cypress.Chainable<CliNotebookCheckoutState> {
     return readCheckoutStateAt('cliCloneDestination')
@@ -97,12 +130,29 @@ function notebookCloneCheckout() {
     },
     expectProposalRetained(): Cypress.Chainable<null> {
       expectCleanAcceptedHeadAt('cliCloneDestination')
-      cy.get<{ relativePath: string; content: string }[]>(
-        '@cliNotebookProposalFiles'
-      ).each(({ relativePath, content }) => {
-        expectCheckoutFileAt('cliCloneDestination', relativePath, content)
-      })
-      return cy.wrap(null)
+      return cy
+        .get<RetainedProposalFile[]>('@cliNotebookProposalFiles')
+        .each((file) => expectRetainedProposalFile(file))
+        .then(() => cy.wrap(null))
+    },
+    /**
+     * Notebook accepted head still equals the parent of the unpublished local
+     * tip — rejection did not advance server acceptance.
+     */
+    expectAcceptedHeadUnchangedFromCheckoutParent(
+      notebookName: string
+    ): Cypress.Chainable<null> {
+      return readCheckoutStateAt('cliCloneDestination').then((state) =>
+        cy
+          .task<string>('readNotebookAcceptedGitObjectId', notebookName)
+          .then((acceptedHead) => {
+            expect(
+              acceptedHead,
+              `notebook "${notebookName}" accepted head should remain the unpublished tip's parent`
+            ).to.equal(state.parent)
+            return cy.wrap(null)
+          })
+      )
     },
     expectCommittedHeadAccepted(): Cypress.Chainable<null> {
       return cy

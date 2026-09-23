@@ -49,6 +49,19 @@ the Git side re-sorts by path.
 A root `.keep` is an ordinary attachment. The empty-folder marker is a `.keep`
 inside a folder, which keeps its structural role.
 
+Publication admits each newly introduced raw-Git attachment blob against an
+inclusive 10 MiB (10,485,760 byte) limit across the contiguous first-parent
+proposal range, not only the tip. Classification uses the ordinary attachment
+rule at each historical path, so a later rename to Markdown does not hide an
+earlier oversized attachment. Payloads already accepted as attachments in the
+same notebook's retained history remain reusable by content identity. Removing
+or shrinking the tip is not enough while an oversized unpublished blob remains
+in that range; rewrite only unpublished commits. While attachments remain raw
+Git blobs, that intermediate refusal stays in force. The accepted Git LFS
+contract is intended to replace it by omitting new oversized unpublished
+intermediate LFS payloads when the tip is valid; that exception is not part of
+the current raw-Git admission.
+
 ## Placement and ownership
 
 Notes and attachments use the same notebook folder structure and access boundary.

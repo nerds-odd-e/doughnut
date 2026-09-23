@@ -68,16 +68,59 @@ export function stageNoteChanges(
   )
 }
 
+/** Writes raw bytes at a relative path and stages them. */
+function stageFileBytes(
+  checkoutDir: string,
+  relativePath: string,
+  bytes: Buffer
+): void {
+  const filePath = join(checkoutDir, relativePath)
+  mkdirSync(dirname(filePath), { recursive: true })
+  writeFileSync(filePath, bytes)
+  git(checkoutDir, 'add', '--', relativePath)
+}
+
 /** Stages exactly the bytes a spaced-hex fixture names. */
 export function stageExactBytes(
   checkoutDir: string,
   relativePath: string,
   spacedHex: string
 ): void {
-  const filePath = join(checkoutDir, relativePath)
-  mkdirSync(dirname(filePath), { recursive: true })
-  writeFileSync(filePath, Buffer.from(hexFromSpacedHex(spacedHex), 'hex'))
-  git(checkoutDir, 'add', '--', relativePath)
+  stageFileBytes(
+    checkoutDir,
+    relativePath,
+    Buffer.from(hexFromSpacedHex(spacedHex), 'hex')
+  )
+}
+
+/** Stages a deterministic filled attachment of exact length (one repeated byte). */
+export function stageFilledBytes(
+  checkoutDir: string,
+  relativePath: string,
+  byteLength: number,
+  fillByte: number
+): void {
+  stageFileBytes(checkoutDir, relativePath, Buffer.alloc(byteLength, fillByte))
+}
+
+/** True when the on-disk file is exactly `byteLength` copies of `fillByte`. */
+export function checkoutFilledBytesMatch(
+  checkoutDir: string,
+  relativePath: string,
+  byteLength: number,
+  fillByte: number
+): boolean {
+  const actual = readFileSync(join(checkoutDir, relativePath))
+  if (actual.length !== byteLength) {
+    return false
+  }
+  return actual.equals(Buffer.alloc(byteLength, fillByte))
+}
+
+/** Amends HEAD in place (unpublished tip) after staging; returns the new commit id. */
+export function amendCheckout(checkoutDir: string): string {
+  git(checkoutDir, ...E2E_GIT_IDENTITY_ARGS, 'commit', '--amend', '--no-edit')
+  return git(checkoutDir, 'rev-parse', 'HEAD')
 }
 
 /** The checked-out file's bytes as lowercase hex, never decoded as text. */
@@ -107,10 +150,7 @@ export function stageEmptyKeep(
   checkoutDir: string,
   relativePath: string
 ): void {
-  const filePath = join(checkoutDir, relativePath)
-  mkdirSync(dirname(filePath), { recursive: true })
-  writeFileSync(filePath, '')
-  git(checkoutDir, 'add', '--', relativePath)
+  stageFileBytes(checkoutDir, relativePath, Buffer.alloc(0))
 }
 
 export function continueRebaseNoninteractively(checkoutDir: string): void {

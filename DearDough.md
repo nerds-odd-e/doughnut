@@ -138,6 +138,6 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
 
 ## Retention
 
-- Highest allocated local number: 104
+- Highest allocated local number: 105
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
