@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Prepare CI dependencies faster with a smaller effective cache](seeds/SEED-039-faster-ci-feedback.md#story-1) — SEED-039#story-1 ([plan](quick/015-smaller-ci-dependency-caches/PLAN.md))
-
 ## Backlog list
 
 - [Save a note with only a few database round trips for Git history](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2) — SEED-037#story-2

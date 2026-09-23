@@ -24,10 +24,7 @@ branches. E2E finished last in all five; other checks finished 2m09s–2m59s ear
 | [21343](https://github.com/nerds-odd-e/doughnut/actions/runs/35800888132) | 9m52s | Note-topology E2E shard, started 2m47s late |
 | [21342](https://github.com/nerds-odd-e/doughnut/actions/runs/35800881836) | 7m35s | CLI-containing E2E shard |
 
-The combined pnpm/Cypress cache was 3,597 MB. In the five CLI shards its
-restoration took 56–106 seconds, followed by only 6–12 seconds of dependency
-installation. In run 21345 the critical note-topology shard spent 128 seconds
-restoring it. The CLI-containing E2E invocation consistently took 4m35s–4m52s;
+The CLI-containing E2E invocation consistently took 4m35s–4m52s;
 in the latest run the other invocations took 2m24s–2m39s. Invocation duration
 includes application/browser startup and orchestration, not only test bodies.
 These observations motivate experiments; they are not promised savings or a
@@ -35,79 +32,23 @@ substitute for fresh, comparable baselines.
 
 ## Alternatives and Decision
 
-The owner selected three ordered outcomes: reduce dependency-cache overhead,
-optimize related tests globally, then redistribute E2E shards using the resulting
-measurements. Immediate shard rebalancing is the strongest smaller alternative,
-but would redistribute current waste and rely on timings that optimization
-will change. It is explicitly deferred to story 3. Doing nothing retains the
-observed delay; optimizing packaging or unit tests alone would not have shortened
-completion in this sample. Cache layout and test implementation remain choices
-to establish through measurement, not designs selected by this decomposition.
+The remaining sequence is to optimize related tests globally, then redistribute
+E2E shards using the resulting measurements. Immediate shard rebalancing would
+redistribute current waste and rely on timings that optimization will change.
+It remains deferred to story 3. Optimizing packaging or unit tests alone would
+not have shortened completion in the initial sample.
+
+Dependency preparation follows the [maintained CI policy](../../docs/development-setup.md#ci-dependency-preparation).
+Use fresh baselines for test optimization. [Run 35818732541](https://github.com/nerds-odd-e/doughnut/actions/runs/35818732541)
+on revision `cd57b491fa57e768997b5fc1b2e7d5eaaf5ab939` passed all six E2E shards
+in a 6m56s workflow; the CLI-containing shard finished last. This single run is
+starting evidence, not a controlled test-optimization result.
 
 ## Story Decomposition
 
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. These are
 rough hypotheses; measurement may require refinement or resplitting. This seed
 authorizes no implementation, profiling run, or executable slice plan.
-
-<a id="story-1"></a>
-
-### Prepare CI dependencies faster with a smaller effective cache
-
-**Identity:** SEED-039#story-1
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/015-smaller-ci-dependency-caches/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9f951423543b3055c657451b9a071484771cdf4e8c0afc61479078777248ff93","plan":"668551d1f2952e2c4147ab1aca441728e5b56e7583fd8a39c2e06b8e6d6e88ff"}}
-```
-
-- **Goal:** Contributors receive trustworthy CI results sooner through materially
-  faster dependency preparation, measured across restore, install, and cache-save
-  costs. The improvement must survive normal dependency updates, rather than
-  depending on a one-off deletion of the current archive.
-- **Scope:** Improve the cache lifecycle owned by the existing shared Node/pnpm
-  setup action and preserve its current consumers: lint/type generation, frontend
-  and other unit tests, deployment packaging, six E2E shards, and CLI release
-  builds. Keep the locked workspace installation and required native/postinstall
-  behavior. Compare cache contents and total setup costs before choosing the
-  smallest effective change. Cold caches remain a supported normal condition;
-  their initial population cost is measured separately from repeat cache hits.
-- **Key examples:**
-  - Given an unchanged lockfile and a populated cache, a fresh runner completes
-    correct dependency setup measurably faster and the same checks still pass.
-  - Given an empty or evicted cache, setup installs the committed dependencies
-    and required Cypress binary, and the subsequent warm run reuses the result.
-  - Given a dependency or Cypress version update, setup installs the newly
-    requested versions without repeatedly carrying historical browser versions
-    or an ever-growing inherited dependency archive into future runs.
-  - Given the same action in a build-only consumer, dependency preparation still
-    supports bundling; no release tag or live deployment is needed to prove it.
-- **Evaluation:** Compare successful Linux CI runs with matching dependency graph,
-  Node/pnpm/Cypress versions, runner class, and job selection. Report cache bytes,
-  restore/install/save times, cold versus warm conditions, total job/workflow
-  elapsed time, and queue delays separately. Require repeatable setup improvement
-  beyond observed run-to-run variation; smaller bytes or a single fast run alone
-  are insufficient. Assess downstream CI benefit without attributing unrelated
-  test or scheduling variation to this change. Do not invent a numeric saving
-  before the representative experiment.
-- **Preserved constraints:** Keep coverage, dependency versions, shard assignments,
-  test parallelism, release behavior, existing force-install compatibility, and
-  persistent developer caches intact. Use isolated runner stores for experiments.
-  Missing cache data is recoverable by normal installation; installation or
-  verification failures remain visible.
-- **Deferred promises:** Test optimization, E2E rebalancing, removing repeated
-  installs from package scripts, selective workspace installs, skipping Cypress
-  in particular jobs, new runner infrastructure, and global cache deletion.
-  These are not prerequisites for this story's bounded cache improvement.
-- **Value / learning:** Establish which cached payload causes the observed cost
-  and prove that a bounded cache lifecycle lowers total preparation time rather
-  than shifting the cost elsewhere.
-- **Effort hypothesis:** M, medium confidence; assumes the existing setup action
-  can be improved without introducing a new runner platform.
-- **Depends on:** None.
-- **Safe stopping point:** Measurably faster, correct dependency preparation
-  remains valuable even if no tests or shards subsequently change.
-- **Plan:** [Smaller CI dependency caches](../quick/015-smaller-ci-dependency-caches/PLAN.md).
-- **Open questions:** None about the outcome or scope. Cache partition and
-  performance remain implementation hypotheses with a measured decision gate.
 
 <a id="story-2"></a>
 
@@ -154,8 +95,8 @@ authorizes no implementation, profiling run, or executable slice plan.
 - **Effort hypothesis:** L, low confidence until profiling establishes the
   related families and removable cost. Refine or resplit if the investigation
   reveals multiple independently useful outcomes beyond one bounded round.
-- **Depends on:** Follow story 1 in the owner's sequence and establish a fresh
-  baseline after its changes; no particular cache design is a technical prerequisite.
+- **Depends on:** Establish a fresh baseline using the current dependency setup;
+  no particular cache design is a technical prerequisite.
 - **Safe stopping point:** Verified test improvements stand on their own with
   the existing shards. Preserve coverage and record inconclusive experiments
   or remaining candidates honestly rather than claiming an unmeasured gain.
@@ -185,38 +126,29 @@ authorizes no implementation, profiling run, or executable slice plan.
 - **Effort hypothesis:** S, medium confidence once story 2's measurements exist;
   assumes feature reassignment among the existing shards is sufficient.
 - **Depends on:** Story 2's completed optimization and fresh measurements on
-  the retained implementation, including the effects of story 1.
+  the retained implementation and current dependency setup.
 - **Safe stopping point:** A verified redistribution is independently usable.
   If the resulting timings no longer justify rebalancing, bring that evidence
   back for an owner decision rather than inventing work or silently cancelling it.
 
 ## Ordering and Scope Reduction
 
-Follow the owner's sequence: story 1, then story 2, then story 3. Story 1 tests
-the clearest infrastructure-overhead hypothesis. Story 2 removes shared test
-cost before story 3 redistributes the residual workload. No rebalancing belongs
-in either earlier story. If scope must shrink, defer story 3 first; stories 1
-and 2 retain their own measurable value. Global backlog priority has not been
-selected, so these remain ordered candidates in this seed.
+Follow story 2, then story 3. Test optimization removes shared cost before shard
+rebalancing redistributes the residual workload. If scope must shrink, defer
+story 3 first. Global backlog priority has not been selected, so these remain
+ordered candidates in this seed.
 
 ## Open Decisions
 
-No unresolved decision changes the requested three-story order. Story 1 is
-refined with a comparative performance criterion and a measured implementation
-gate. Stories 2 and 3 remain candidates; story 3's grouping must await story 2's
-result.
+Stories 2 and 3 remain candidates; story 3's grouping must await story 2's result.
 
 ## When to Surface
 
-Select story 1 when taking up CI feedback acceleration. Continue to story 2
-after measuring the cache change, then assess story 3 using the optimized suite.
+Select story 2 for the next CI feedback improvement, then assess story 3 using
+the optimized suite.
 
 ## Breadcrumbs
 
-- Owner request on 2026-09-23: reduce the oversized cache; invoke test
-  optimization with global, simple, cohesive improvement as the goal; only then
-  rebalance E2E shards based on the optimization result.
-- [CLI shard cache and test evidence](https://github.com/nerds-odd-e/doughnut/actions/runs/35808762047/job/107015324770).
-- [Critical note-topology cache evidence](https://github.com/nerds-odd-e/doughnut/actions/runs/35805143511/job/107004176637).
-- SEED-038 was already allocated by unrelated work in the originating checkout;
-  this decomposition uses the next seed identity.
+- Owner instruction: invoke test optimization with global, simple, cohesive
+  improvement as the goal; only then rebalance E2E shards from its measurements.
+- [CLI shard test evidence](https://github.com/nerds-odd-e/doughnut/actions/runs/35808762047/job/107015324770).
