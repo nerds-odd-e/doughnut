@@ -120,6 +120,21 @@ Feature: Notebook Git LFS authenticated transfer
     Then the cached LFS object for "lfsVersionA" is filled with 1024 bytes of "0x11"
 
   @bundleCliE2eInstall @withCliConfig
+  Scenario: Product-created LFS notebook publishes and a fresh clone receives current bytes after a web save
+    Given the backend is serving the CLI and install script
+    And the CLI is installed from localhost
+    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
+    And I commit the LFS attachment "payload.bin" filled with 1024 bytes of "0x11" as "lfsProductVersion"
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And the notebook "LFS Transfer Notebook" MySQL attachment "payload.bin" holds the LFS pointer for "lfsProductVersion"
+    When I create a title-only root note titled "Overview" in the notebook "LFS Transfer Notebook"
+    And I update note "Overview" content to become "Reviewed on the web after product LFS publish"
+    And I clone the notebook "LFS Transfer Notebook" into a fresh temporary destination using the installed CLI
+    Then the fresh clone file "payload.bin" is filled with 1024 bytes of "0x11"
+    And the fresh clone LFS object cache holds only the tip digest
+
+  @bundleCliE2eInstall @withCliConfig
   Scenario: Explicit Git LFS fetch of an omitted oversized intermediate reports unavailable
     Given the backend is serving the CLI and install script
     And the CLI is installed from localhost

@@ -2,14 +2,12 @@ package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -84,52 +82,61 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
     return createGitBackedNotebook("Git Backed Notebook");
   }
 
+  /**
+   * Product creation demoted to legacy RAW (most Git fixtures). Prefer {@link
+   * #createProductLfsNotebook}.
+   */
   Notebook createGitBackedNotebook(String title) throws UnexpectedNoAccessRightException {
+    return demoteToLegacyRawBinding(createProductLfsNotebook(title));
+  }
+
+  /** Real product creation: LFS representation and initial {@code .gitattributes}. */
+  Notebook createProductLfsNotebook() throws UnexpectedNoAccessRightException {
+    return createProductLfsNotebook("Git Backed Notebook");
+  }
+
+  Notebook createProductLfsNotebook(String title) throws UnexpectedNoAccessRightException {
     NotebookCreationRequest request = new NotebookCreationRequest();
     request.setNewTitle(title);
     NotebookRealm response = controller.createNotebook(request);
     return notebookRepository.findById(response.notebook().getId()).orElseThrow();
   }
 
+  Notebook demoteToLegacyRawBinding(Notebook notebook) {
+    NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
+    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.RAW);
+    notebookGitBindingRepository.save(binding);
+    notebookGitCutoverService.resetHistory(notebook, Instant.now(), List.of());
+    return notebook;
+  }
+
   ResponseStatusException assertProposalRejectedWithoutMutatingBinding(
       Notebook notebook, String expectedHead, byte[] bundleBytes, HttpStatus expectedStatus)
       throws Exception {
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, expectedHead, bundleBytes, ResponseStatusException.class);
-
-    assertThat(exception.getStatusCode(), equalTo(expectedStatus));
-    return exception;
+    return NotebookGitProposalRejectionAssertions.assertRejectedWithoutMutatingBinding(
+        controller,
+        notebookGitBindingRepository,
+        this::acceptedHistory,
+        notebook,
+        expectedHead,
+        bundleBytes,
+        expectedStatus);
   }
 
   <T extends RuntimeException> T assertProposalRejectedWithoutMutatingBinding(
       Notebook notebook, String expectedHead, byte[] bundleBytes, Class<T> exceptionType)
       throws Exception {
-    NotebookGitBinding before =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    String acceptedHeadBefore = before.getAcceptedGitObjectId();
-    AcceptedHistory acceptedHistoryBefore = acceptedHistory(notebook);
-    Instant updatedAtBefore = before.getUpdatedAt().toInstant();
-
-    T exception =
-        assertThrows(
-            exceptionType,
-            () ->
-                controller.publishNotebookGitProposal(notebook.getId(), expectedHead, bundleBytes));
-
-    NotebookGitBinding after =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHeadBefore));
-    assertThat(acceptedHistory(notebook), equalTo(acceptedHistoryBefore));
-    assertThat(after.getUpdatedAt().toInstant(), equalTo(updatedAtBefore));
-    return exception;
+    return NotebookGitProposalRejectionAssertions.assertRejectedWithoutMutatingBinding(
+        controller,
+        notebookGitBindingRepository,
+        this::acceptedHistory,
+        notebook,
+        expectedHead,
+        bundleBytes,
+        exceptionType);
   }
 
-  /**
-   * Testability-only: replaces {@code notebook}'s accepted history with a fresh root commit built
-   * directly from {@code entries}, so proposal-gating tests can control the accepted tree's exact
-   * shape without depending on the notebook's own note/folder content.
-   */
+  /** Seeds accepted history from exact tree entries (disjoint from notebook content). */
   NotebookGitBinding seedAcceptedBinding(Notebook notebook, List<PortableTreeEntry> entries) {
     try (Repository seeded =
         NotebookGitCommitBuilder.build(
@@ -143,13 +150,7 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
     }
   }
 
-  /**
-   * Testability-only: makes {@code head} - and every object it reaches in {@code source} - {@code
-   * notebook}'s accepted history, written into the same native object store the product's own
-   * accepted repository reads. Deliberately disjoint from the notebook's own content, for drift,
-   * invalid-tip and admission-rejection fixtures that must start from an accepted state the
-   * product's creation/publication/reset owners would never produce.
-   */
+  /** Seeds accepted history from an arbitrary repository tip into the native object store. */
   NotebookGitBinding seedAcceptedHistory(Notebook notebook, Repository source, ObjectId head) {
     NotebookGitBinding binding =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
@@ -162,10 +163,6 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
     return saved;
   }
 
-  /**
-   * Testability-only: deletes one object from {@code bindingId}'s native object store, leaving an
-   * accepted history that reaches an object the store no longer holds.
-   */
   void deleteNativeObjectStoreRow(Integer bindingId, String gitObjectId) {
     committed(
         () ->
@@ -178,7 +175,6 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
                 .executeUpdate());
   }
 
-  /** Testability-only: counts {@code bindingId}'s native object-store rows. */
   long countNativeObjectStoreRows(Integer bindingId) {
     return committed(
         () ->

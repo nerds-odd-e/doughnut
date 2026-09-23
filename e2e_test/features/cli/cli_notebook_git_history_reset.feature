@@ -16,6 +16,7 @@ Feature: CLI notebook Git history reset
       ---
       """
     And the notebook "CLI Reset Notebook" has readme content "Notebook landing"
+    And the notebook "CLI Reset Notebook" uses legacy raw Git attachment storage
     And I have a valid Donut Access Token with label "E2E CLI Reset Token"
 
   Scenario: Resetting Git history makes the whole notebook clonable in one commit

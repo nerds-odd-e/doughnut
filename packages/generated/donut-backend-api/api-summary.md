@@ -63,6 +63,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `resnapshotNotebookGitBindingForTestability`: POST `/api/testability/resnapshot_notebook_git_binding_for_testability` -> `ResnapshotNotebookGitBindingForTestabilityResponse` (request: `ResnapshotNotebookGitBindingForTestabilityData`; body: ResnapshotNotebookGitBindingRequest; response body: string)
 - `inspectNotebookLfsAttachmentForTestability`: POST `/api/testability/inspect_notebook_lfs_attachment_for_testability` -> `InspectNotebookLfsAttachmentForTestabilityResponse` (request: `InspectNotebookLfsAttachmentForTestabilityData`; body: InspectNotebookLfsAttachmentRequest; response body: InspectNotebookLfsAttachmentResponse)
+- `forceRawNotebookGitBindingForTestability`: POST `/api/testability/force_raw_notebook_git_binding_for_testability` -> `ForceRawNotebookGitBindingForTestabilityResponse` (request: `ForceRawNotebookGitBindingForTestabilityData`; body: ResnapshotNotebookGitBindingRequest; response body: string)
 - `acceptLfsAttachmentTipForTestability`: POST `/api/testability/accept_lfs_attachment_tip_for_testability` -> `AcceptLfsAttachmentTipForTestabilityResponse` (request: `AcceptLfsAttachmentTipForTestabilityData`; body: AcceptLfsAttachmentTipRequest; response body: AcceptLfsAttachmentTipResponse)
 
 ## Subscription Controller

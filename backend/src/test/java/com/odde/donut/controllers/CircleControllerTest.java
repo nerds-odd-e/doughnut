@@ -100,7 +100,7 @@ class CircleControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void startsWithAnEmptyTreeRootCommitBinding() throws Exception {
+    void startsWithLfsRootCommitAndInitialAttributes() throws Exception {
       User user = currentUser.getUser();
       Circle circle = makeMe.aCircle().hasMember(user).please();
       NotebookCreationRequest noteCreation = new NotebookCreationRequest();
@@ -108,7 +108,7 @@ class CircleControllerTest extends ControllerTestBase {
 
       NotebookRealm response = controller.createNotebookInCircle(circle, noteCreation);
 
-      NotebookGitBindingAssertions.assertEmptyTreeRootCommitBinding(
+      NotebookGitBindingAssertions.assertInitialLfsRootCommitBinding(
           notebookGitBindingRepository, notebookController, response.notebook());
     }
   }

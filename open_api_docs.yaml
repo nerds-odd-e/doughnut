@@ -411,6 +411,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Mcq"
+  /api/testability/force_raw_notebook_git_binding_for_testability:
+    post:
+      tags:
+      - notebook-git-testability-controller
+      operationId: forceRawNotebookGitBindingForTestability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResnapshotNotebookGitBindingRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/feature_toggle:
     get:
       tags:

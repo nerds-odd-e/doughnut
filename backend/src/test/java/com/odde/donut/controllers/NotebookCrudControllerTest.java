@@ -41,9 +41,9 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
-    void startsWithAnEmptyTreeRootCommitBinding() throws Exception {
+    void startsWithLfsRootCommitAndInitialAttributes() throws Exception {
       NotebookRealm response = controller.createNotebook(notebookCreate("Git Backed Notebook"));
-      NotebookGitBindingAssertions.assertEmptyTreeRootCommitBinding(
+      NotebookGitBindingAssertions.assertInitialLfsRootCommitBinding(
           notebookGitBindingRepository, controller, response.notebook());
     }
 

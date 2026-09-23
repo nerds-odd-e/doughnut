@@ -24,6 +24,7 @@ Feature: CLI notebook publish received by a clean clone
       Boil water
       """
     And the notebook "CLI Clone Notebook" has a readme-only folder "Kitchen" with readme "Kitchen landing"
+    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
@@ -76,7 +77,6 @@ Feature: CLI notebook publish received by a clean clone
       Second example
 
       """
-
   Scenario: Publishing a note rename with an unrelated edit is received by a clean clone
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
@@ -159,7 +159,6 @@ Feature: CLI notebook publish received by a clean clone
       """
     And I open the original note route
     And the note content on the current page should be "Simmer until al dente and salt the water"
-
   Scenario: Published root files reach another checkout byte for byte
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI

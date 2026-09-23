@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
@@ -81,6 +82,29 @@ class NotebookGitTestabilityController {
     notebookGitCutoverService.resetHistory(
         requireNotebook(request.getNotebookName()),
         testabilitySettings.getCurrentUTCTimestamp().toInstant());
+    return "OK";
+  }
+
+  /**
+   * Testability-only: demotes a notebook to legacy RAW attachment storage and clears LFS attributes
+   * so pull-based fixtures keep proving the raw journey after creation selects LFS.
+   */
+  @PostMapping("/force_raw_notebook_git_binding_for_testability")
+  @Transactional
+  public String forceRawNotebookGitBindingForTestability(
+      @RequestBody ResnapshotNotebookGitBindingRequest request) {
+    if (Strings.isEmpty(request.getNotebookName())) {
+      throw new IllegalArgumentException("notebookName is required and cannot be empty");
+    }
+    Notebook notebook = requireNotebook(request.getNotebookName());
+    NotebookGitBinding binding =
+        notebookGitBindingRepository
+            .findByNotebook_Id(notebook.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Notebook has no Git binding"));
+    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.RAW);
+    notebookGitBindingRepository.save(binding);
+    notebookGitCutoverService.resetHistory(
+        notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant(), List.of());
     return "OK";
   }
 

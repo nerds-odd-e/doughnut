@@ -1686,6 +1686,22 @@ export type InjectMcqResponses = {
 
 export type InjectMcqResponse = InjectMcqResponses[keyof InjectMcqResponses];
 
+export type ForceRawNotebookGitBindingForTestabilityData = {
+    body: ResnapshotNotebookGitBindingRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/force_raw_notebook_git_binding_for_testability';
+};
+
+export type ForceRawNotebookGitBindingForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ForceRawNotebookGitBindingForTestabilityResponse = ForceRawNotebookGitBindingForTestabilityResponses[keyof ForceRawNotebookGitBindingForTestabilityResponses];
+
 export type GetFeatureToggleData = {
     body?: never;
     path?: never;

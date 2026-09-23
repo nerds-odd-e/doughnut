@@ -27,6 +27,7 @@ Feature: CLI notebook clone
       """
     And the notebook "CLI Clone Notebook" has a readme-only folder "Kitchen" with readme "Kitchen landing"
     And the notebook "CLI Clone Notebook" has an empty folder "Ideas"
+    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
@@ -51,6 +52,7 @@ Feature: CLI notebook clone
 
   Scenario: Publishing an initial nested tree round-trips the authored checkout
     Given I have a notebook "CLI Initial Tree Notebook"
+    And the notebook "CLI Initial Tree Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Initial Tree Notebook"'s Git binding reflects its current content
     When I clone the notebook "CLI Initial Tree Notebook" into a temporary destination using the installed CLI
     And I author and commit the following initial tree in the cloned checkout:

@@ -108,7 +108,12 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        `Run "donut notebook pull ${destinationPath}" to receive newer accepted history. ${notebookPullNextSteps(destinationPath)}`
+        `After remote or web changes, acquire a fresh checkout elsewhere with "donut notebook clone 42 <destination>"`
+      )
+    )
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
+        `For legacy raw checkouts, run "donut notebook pull ${destinationPath}" to receive newer accepted history. ${notebookPullNextSteps(destinationPath)}`
       )
     )
   })

@@ -18,6 +18,11 @@ Given(
 )
 
 Given(
+  'the notebook {string} uses legacy raw Git attachment storage',
+  (notebookName: string) => cli.notebookClone().forceRawGitBinding(notebookName)
+)
+
+Given(
   "the notebook {string}'s Git binding reflects its current content",
   (notebookName: string) =>
     cli.notebookClone().resnapshotGitBinding(notebookName)

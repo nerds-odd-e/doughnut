@@ -19,4 +19,19 @@ export const notebookGitTestabilityMethods = {
       { log: false }
     )
   },
+
+  /**
+   * Demotes a product-created LFS notebook to legacy RAW so pull-based fixtures keep proving
+   * the raw journey explicitly.
+   */
+  forceRawNotebookGitBindingForTestability(notebookName: string) {
+    return cy.wrap(
+      NotebookGitTestabilityController.forceRawNotebookGitBindingForTestability(
+        {
+          body: { notebookName },
+        }
+      ),
+      { log: false }
+    )
+  },
 }

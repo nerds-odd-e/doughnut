@@ -3,10 +3,8 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
@@ -20,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Reserved Git metadata and accepted Git attachment content through publication and derived-tree
- * preservation. Fixtures establish representation only; product creation stays RAW.
+ * preservation. Fixtures use legacy RAW demotion unless a case sets LFS explicitly.
  */
 class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentControllerTestBase {
 
@@ -76,18 +74,6 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
     assertThat(
         reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
         is(NotebookGitAttachmentRepresentation.RAW));
-  }
-
-  @Test
-  void newNotebooksStayRawWithoutLfsAttributesOrPointerPublication() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
-
-    assertThat(binding.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.RAW));
-    assertThat(acceptedHistory(notebook).tipContent(), empty());
-    assertThat(
-        acceptedHistory(notebook).tipContent().stream().map(PortableTreeEntry::path).toList(),
-        not(contains(".gitattributes")));
   }
 
   @Test

@@ -36,7 +36,8 @@ export function describeNotebookPullReadiness(): void {
       )
 
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        'donut: usage: donut notebook pull <directory>\nReceives accepted notebook history onto a clean local main. ' +
+        'donut: usage: donut notebook pull <directory>\nReceives accepted notebook history onto a clean local main for legacy raw checkouts. ' +
+          'LFS checkouts refuse pull until in-place receive ships; clone fresh elsewhere instead. ' +
           notebookPullNextSteps('<directory>')
       )
       expect(fetchMock).not.toHaveBeenCalled()

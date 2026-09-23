@@ -1,6 +1,7 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
@@ -20,9 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
  * Donut system identity, and persists the accepted binding.
  *
  * <p>{@code NotebookService} calls {@link #createBindingForNotebook} at creation time so every
- * notebook starts Git-backed from an empty tree; {@link #resetHistory} writes the same kind of root
- * commit over a binding a notebook already has. The caller supplies the commit time, and a tree
- * failure propagates before a binding is persisted.
+ * notebook starts Git-backed from an empty content tree with LFS representation and initial {@code
+ * .gitattributes}; {@link #resetHistory} writes the same kind of root commit over a binding a
+ * notebook already has, preserving that binding's representation and accepted metadata. The caller
+ * supplies the commit time, and a tree failure propagates before a binding is persisted.
  */
 @Service
 public class NotebookGitCutoverService {
@@ -53,9 +55,13 @@ public class NotebookGitCutoverService {
   public NotebookGitBinding createBindingForNotebook(Notebook notebook, Instant cutoverTime) {
     NotebookGitBinding binding = new NotebookGitBinding();
     binding.setNotebook(notebook);
-    // Activation stays off: new notebooks remain RAW and do not receive LFS attributes yet.
+    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
     try (Repository repository =
-        buildRepository(notebook, cutoverTime, CUTOVER_COMMIT_MESSAGE, List.of())) {
+        buildRepository(
+            notebook,
+            cutoverTime,
+            CUTOVER_COMMIT_MESSAGE,
+            NotebookGitAttributes.initialMetadata())) {
       storeHistory(binding, repository, cutoverTime);
     }
     return binding;

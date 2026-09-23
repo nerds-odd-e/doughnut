@@ -1,39 +1,40 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
+import com.odde.donut.services.notebookGit.NotebookGitAttributes;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
-import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.TreeWalk;
 
 /**
  * Asserts that a freshly created notebook already has its accepted Git binding: one root commit on
- * {@code refs/heads/main} with no parents and an empty tree. The accepted history is read through
- * the notebook's own Git-bundle download endpoint, the public boundary over current accepted
- * storage.
+ * {@code refs/heads/main} with no parents, LFS representation, and initial {@code .gitattributes}.
+ * The accepted history is read through the notebook's own Git-bundle download endpoint.
  */
 final class NotebookGitBindingAssertions {
 
   private NotebookGitBindingAssertions() {}
 
-  static void assertEmptyTreeRootCommitBinding(
+  static void assertInitialLfsRootCommitBinding(
       NotebookGitBindingRepository notebookGitBindingRepository,
       NotebookController notebookController,
       Notebook notebook)
       throws Exception {
     NotebookGitBinding binding =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    assertThat(binding.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.LFS));
     byte[] acceptedBundle = notebookController.downloadNotebookGitBundle(notebook).getBody();
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -43,16 +44,11 @@ final class NotebookGitBindingAssertions {
       try (RevWalk revWalk = new RevWalk(readBack)) {
         RevCommit commit = revWalk.parseCommit(headObjectId);
         assertThat(commit.getParentCount(), equalTo(0));
-
-        List<String> blobPaths = new ArrayList<>();
-        try (TreeWalk treeWalk = new TreeWalk(readBack)) {
-          treeWalk.addTree(commit.getTree());
-          treeWalk.setRecursive(true);
-          while (treeWalk.next()) {
-            blobPaths.add(treeWalk.getPathString());
-          }
-        }
-        assertThat(blobPaths, empty());
+        assertThat(
+            GitBundleTestReader.readTreeEntries(readBack, commit),
+            contains(
+                PortableTreeEntry.ofText(
+                    NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT)));
 
         revWalk.reset();
         revWalk.markStart(commit);

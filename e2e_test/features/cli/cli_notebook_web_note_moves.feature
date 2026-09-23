@@ -18,6 +18,7 @@ Feature: CLI notebook web note moves
     And the notebook "CLI Clone Notebook" has readme content "Notebook landing"
     And the notebook "CLI Clone Notebook" has a readme-only folder "Biology" with readme "Biology landing"
     And the notebook "CLI Clone Notebook" has a readme-only folder "Study" with readme "Study landing"
+    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
@@ -35,6 +36,7 @@ Feature: CLI notebook web note moves
       Membranes
       """
     And I assimilate the note "Cells"
+    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I capture the note id of "Cells"
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
@@ -89,6 +91,7 @@ Feature: CLI notebook web note moves
       Inheritance
       """
     And I assimilate the note "Genetics"
+    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I capture the note id of "Genetics"
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
@@ -150,6 +153,7 @@ Feature: CLI notebook web note moves
       ---
       See [[Biology/Cells|shown]] for details.
       """
+    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I route to the note "Cells"
@@ -189,6 +193,7 @@ Feature: CLI notebook web note moves
       Membranes
       """
     And I assimilate the note "Cells"
+    And the notebook "CLI Empty Folder Move Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Empty Folder Move Notebook"'s Git binding reflects its current content
     And I capture the note id of "Cells"
     When I clone the notebook "CLI Empty Folder Move Notebook" into a temporary destination using the installed CLI

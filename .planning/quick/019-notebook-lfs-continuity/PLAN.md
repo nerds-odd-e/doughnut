@@ -27,9 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `de5d4e036437f3ee3b5e132195077339b5214ea6` on
+- Published increment: `7693f1df237e8ff364765e6c489dc70e7b5a506d` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer. Parent on that branch: `a1396fb353189fae366f35eb6989735c3c36b4c3`.
+  observer. Parent on that branch: `de5d4e036437f3ee3b5e132195077339b5214ea6`.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
@@ -439,21 +439,45 @@ Safe stop: preserved history has independently observed access.
 
 ### 10. Enable new notebooks with an honest interim receive boundary
 Type: Behavior
-Status: planned
+Status: done
 
-After schema confirmation and complete-loop proof, creation selects LFS and
-generates attributes. Existing notebooks remain raw, including never-cloned ones.
-CLI success/help describes supported publish + fresh clone. Until story 15,
-LFS pull refuses before changing refs/files and advises a separate fresh clone,
-preserving unpublished work; do not affect legacy pull or broaden publish ancestry.
-Older clients must fail actionably rather than publish raw payloads into LFS mode.
+New notebooks are created as LFS with initial `.gitattributes`. Existing
+bindings stay RAW, including never-cloned ones. History reset keeps the
+binding's representation and accepted attributes and does not delete retained
+content objects. CLI success text describes publish plus a fresh clone. Until
+story 15, pull on an LFS checkout refuses before changing refs or files and
+leaves unpublished work in place. Raw pull is unchanged. An older client that
+submits raw attachment bytes into an LFS notebook is refused and those bytes
+are not stored. Schema release confirmation remains a deploy constraint
+separate from this commit.
 
-Proof: creation/cutover controller tests use actual creation, not injected mode;
-history reset preserves the existing representation and attributes, without
-deleting retained content. C tests the temporary refusal and raw pull regression.
-E creates/publishes/web-edits/fresh-clones; R preserves legacy paths explicitly.
-B/C/E/R; 8–10 minutes. Safe stop: first story is independently useful even if
-existing-checkout receive is never delivered.
+Accepted proof:
+- Promise: product creation selects LFS and attributes; reset keeps
+  representation, attributes, and stored bytes; raw payloads into LFS are
+  refused; LFS pull does not mutate; a product-created notebook publishes,
+  survives a web save, and fresh-clones; legacy raw publish-to-clone stays
+  explicit.
+- Boundary: `createBindingForNotebook` and `resetHistory`;
+  `completeNotebookPull` before receive; proposal admission; installed CLI.
+- Setup: `createProductLfsNotebook` calls `controller.createNotebook`. Legacy
+  fixtures demote through `demoteToLegacyRawBinding` or
+  `force_raw_notebook_git_binding_for_testability`. The product E2E does not
+  plant an LFS tip.
+- Observations: `NotebookGitAttachmentCreationControllerTest` (LFS binding,
+  attributes, retained payload, pointer refusal).
+  `notebookPull.lfsRefusal.suite.ts` (refusal text, unchanged checkout,
+  unpublished file, no fetch). `cli_notebook_lfs.feature` product scenario
+  (MySQL pointer, fresh clone bytes, tip-only cache).
+  `cli_notebook_publish_to_clean_clone.feature` after the raw Given.
+- Commands: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`;
+  `CURSOR_DEV=true nix develop -c pnpm cli:test`;
+  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`;
+  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature`
+- Result: pass. Backend 2633 tests. CLI 459 tests, then 133 focused tests
+  after the refusal suite moved. LFS feature 10 scenarios (product scenario
+  not rerun after refactor). Legacy raw feature 5 scenarios after the
+  force-raw client moved to the generated SDK.
+Safe stop: this story is useful without existing-checkout receive.
 
 ## Proof ownership and mapping from the original plan
 
