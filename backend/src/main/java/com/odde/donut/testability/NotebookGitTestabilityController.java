@@ -2,9 +2,21 @@ package com.odde.donut.testability;
 
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
+import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
+import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
+import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
+import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.HexFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -22,6 +34,9 @@ import org.springframework.web.bind.annotation.RestController;
 class NotebookGitTestabilityController {
 
   @Autowired NotebookRepository notebookRepository;
+  @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
+  @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
+  @Autowired NotebookAttachmentContent notebookAttachmentContent;
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
 
@@ -31,6 +46,23 @@ class NotebookGitTestabilityController {
   static class ResnapshotNotebookGitBindingRequest {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String notebookName;
+  }
+
+  @Schema(name = "AcceptLfsAttachmentTipRequest")
+  @Getter
+  @Setter
+  static class AcceptLfsAttachmentTipRequest {
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String notebookName;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String filename;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String payload;
+
+    /** Optional prior payload retained in the content store only (not the tip). */
+    private String obsoletePayload;
   }
 
   /**
@@ -45,16 +77,88 @@ class NotebookGitTestabilityController {
     if (Strings.isEmpty(request.getNotebookName())) {
       throw new IllegalArgumentException("notebookName is required and cannot be empty");
     }
-    Notebook notebook =
-        notebookRepository
-            .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(
-                new DisplayName(request.getNotebookName()))
-            .orElseThrow(
-                () ->
-                    new IllegalArgumentException(
-                        "No notebook with name: " + request.getNotebookName()));
     notebookGitCutoverService.resetHistory(
-        notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
+        requireNotebook(request.getNotebookName()),
+        testabilitySettings.getCurrentUTCTimestamp().toInstant());
     return "OK";
+  }
+
+  /**
+   * Testability-only: selects LFS representation, stores the tip payload (and optional obsolete
+   * payload), projects a root attachment as a pointer, and resets accepted history with LFS
+   * attributes so CLI clone can hydrate an already-accepted LFS tip.
+   */
+  @PostMapping("/accept_lfs_attachment_tip_for_testability")
+  @Transactional
+  public AcceptLfsAttachmentTipResponse acceptLfsAttachmentTipForTestability(
+      @RequestBody AcceptLfsAttachmentTipRequest request) throws Exception {
+    if (Strings.isEmpty(request.getNotebookName())
+        || Strings.isEmpty(request.getFilename())
+        || request.getPayload() == null) {
+      throw new IllegalArgumentException("notebookName, filename, and payload are required");
+    }
+    Notebook notebook = requireNotebook(request.getNotebookName());
+    NotebookGitBinding binding =
+        notebookGitBindingRepository
+            .findByNotebook_Id(notebook.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Notebook has no Git binding"));
+    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
+    notebookGitBindingRepository.save(binding);
+
+    String obsoleteOid = null;
+    if (request.getObsoletePayload() != null) {
+      byte[] obsolete = request.getObsoletePayload().getBytes(StandardCharsets.UTF_8);
+      obsoleteOid = storePayload(notebook.getId(), obsolete);
+    }
+    byte[] payload = request.getPayload().getBytes(StandardCharsets.UTF_8);
+    String oid = storePayload(notebook.getId(), payload);
+    byte[] pointer = NotebookGitLfsPointer.format(oid, payload.length);
+
+    NotebookAttachment attachment =
+        notebookAttachmentRepository.findByNotebook_Id(notebook.getId()).stream()
+            .filter(
+                row -> request.getFilename().equals(row.getFilename()) && row.getFolder() == null)
+            .findFirst()
+            .orElseGet(NotebookAttachment::new);
+    attachment.setNotebook(notebook);
+    attachment.setFolder(null);
+    attachment.setFilename(request.getFilename());
+    attachment.setAcceptedGitContent(pointer);
+    notebookAttachmentRepository.save(attachment);
+
+    notebookGitCutoverService.resetHistory(
+        notebook,
+        testabilitySettings.getCurrentUTCTimestamp().toInstant(),
+        NotebookGitAttributes.initialMetadata());
+
+    AcceptLfsAttachmentTipResponse response = new AcceptLfsAttachmentTipResponse();
+    response.setOid(oid);
+    response.setSize(payload.length);
+    response.setObsoleteOid(obsoleteOid);
+    return response;
+  }
+
+  private Notebook requireNotebook(String notebookName) {
+    return notebookRepository
+        .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(new DisplayName(notebookName))
+        .orElseThrow(() -> new IllegalArgumentException("No notebook with name: " + notebookName));
+  }
+
+  private String storePayload(Integer notebookId, byte[] payload) throws Exception {
+    String oid = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(payload));
+    if (!notebookAttachmentContent.store(
+        notebookId, oid, payload.length, new ByteArrayInputStream(payload))) {
+      throw new IllegalStateException("Failed to store LFS payload for testability");
+    }
+    return oid;
+  }
+
+  @Schema(name = "AcceptLfsAttachmentTipResponse")
+  @Getter
+  @Setter
+  static class AcceptLfsAttachmentTipResponse {
+    private String oid;
+    private long size;
+    private String obsoleteOid;
   }
 }

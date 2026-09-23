@@ -12,40 +12,47 @@ function notebookClone() {
     destinationAlias:
       | 'cliCloneDestination'
       | 'cliCloneReceiverDestination'
-      | 'cliCloneFreshDestination'
+      | 'cliCloneFreshDestination',
+    options?: { useExistingDestination?: boolean }
   ): Cypress.Chainable<null> {
     return testability()
       .getNotebookIdByName(notebookName)
-      .then((notebookId) =>
-        cy
-          .task<string>('createCliNotebookCloneDestination')
-          .then((destination) => {
-            cy.wrap(destination).as(destinationAlias)
-            return cy.get<string>('@donutPath').then((donutPath) =>
-              cy.get<string>('@cliConfigDir').then((configDir) =>
-                cy.get<string>('@savedAccessToken').then((token) =>
-                  cy
-                    .task<null>('writeCliAccessToken', {
-                      configDir,
-                      token,
+      .then((notebookId) => {
+        const destination =
+          options?.useExistingDestination === true
+            ? cy.get<string>(`@${destinationAlias}`)
+            : cy
+                .task<string>('createCliNotebookCloneDestination')
+                .then((path) => {
+                  cy.wrap(path).as(destinationAlias)
+                  return cy.wrap(path)
+                })
+        return destination.then((checkoutPath) =>
+          cy.get<string>('@donutPath').then((donutPath) =>
+            cy.get<string>('@cliConfigDir').then((configDir) =>
+              cy.get<string>('@savedAccessToken').then((token) =>
+                cy
+                  .task<null>('writeCliAccessToken', {
+                    configDir,
+                    token,
+                  })
+                  .then(() =>
+                    cy.task<null>(task, {
+                      donutPath,
+                      args: [
+                        'notebook',
+                        'clone',
+                        String(notebookId),
+                        checkoutPath,
+                      ],
+                      env: { DONUT_CONFIG_DIR: configDir },
                     })
-                    .then(() =>
-                      cy.task<null>(task, {
-                        donutPath,
-                        args: [
-                          'notebook',
-                          'clone',
-                          String(notebookId),
-                          destination,
-                        ],
-                        env: { DONUT_CONFIG_DIR: configDir },
-                      })
-                    )
-                )
+                  )
               )
             )
-          })
-      )
+          )
+        )
+      })
   }
   return {
     useAccessTokenOf(userIdentifier: string) {
@@ -106,6 +113,20 @@ function notebookClone() {
         notebookName,
         'runInstalledCliExpectingRejection',
         'cliCloneDestination'
+      )
+    },
+    /**
+     * Clones into an already-aliased `@cliCloneDestination` that already exists,
+     * expecting the CLI to refuse without modifying it.
+     */
+    cloneNotebookExpectingRejectionIntoExisting(
+      notebookName: string
+    ): Cypress.Chainable<null> {
+      return cloneWithTask(
+        notebookName,
+        'runInstalledCliExpectingRejection',
+        'cliCloneDestination',
+        { useExistingDestination: true }
       )
     },
     expectDestinationAbsent(): Cypress.Chainable<null> {

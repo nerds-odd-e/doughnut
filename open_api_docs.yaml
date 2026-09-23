@@ -437,6 +437,24 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/testability/accept_lfs_attachment_tip_for_testability:
+    post:
+      tags:
+      - notebook-git-testability-controller
+      operationId: acceptLfsAttachmentTipForTestability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptLfsAttachmentTipRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AcceptLfsAttachmentTipResponse"
   /api/subscriptions/{subscription}:
     post:
       tags:
@@ -3815,6 +3833,31 @@ components:
       - id
       - questionStem
       - responseChoices
+    AcceptLfsAttachmentTipRequest:
+      type: object
+      properties:
+        notebookName:
+          type: string
+        filename:
+          type: string
+        payload:
+          type: string
+        obsoletePayload:
+          type: string
+      required:
+      - filename
+      - notebookName
+      - payload
+    AcceptLfsAttachmentTipResponse:
+      type: object
+      properties:
+        oid:
+          type: string
+        size:
+          type: integer
+          format: int64
+        obsoleteOid:
+          type: string
     SubscriptionDTO:
       type: object
       properties:

@@ -1,11 +1,14 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import * as childProcess from 'node:child_process'
 import * as fs from 'node:fs'
-import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { getApiConfig } from 'donut-api'
 import { acquireNotebookGitCheckout } from '../src/commands/notebook/notebookAcquisition.js'
-import { tempConfigWithToken } from './tempConfigTestHelpers.js'
+import {
+  installAcquireNotebookGitCheckoutTest,
+  stagingDirsUnderTmp,
+  stubBundleFetch,
+} from './notebookAcquisition.testHelpers.js'
 
 vi.mock('node:child_process', () => ({
   spawnSync: vi.fn(),
@@ -16,39 +19,11 @@ vi.mock('node:fs', async () => {
   return { ...actual, renameSync: vi.fn(actual.renameSync) }
 })
 
-const STAGING_PREFIX = 'donut-notebook-clone-'
-
-function stagingDirsUnderTmp(): string[] {
-  return fs
-    .readdirSync(tmpdir())
-    .filter((name) => name.startsWith(STAGING_PREFIX))
-}
-
 describe('acquireNotebookGitCheckout', () => {
-  let savedConfigDir: string | undefined
-  let configDir: string
-  let destinationParent: string
-  let destinationPath: string
-
-  beforeEach(() => {
-    savedConfigDir = process.env.DONUT_CONFIG_DIR
-    configDir = tempConfigWithToken()
-    process.env.DONUT_CONFIG_DIR = configDir
-    destinationParent = fs.mkdtempSync(join(tmpdir(), 'donut-notebook-dest-'))
-    destinationPath = join(destinationParent, 'notebook-checkout')
-  })
-
-  afterEach(() => {
-    if (savedConfigDir === undefined) delete process.env.DONUT_CONFIG_DIR
-    else process.env.DONUT_CONFIG_DIR = savedConfigDir
-    fs.rmSync(configDir, { recursive: true, force: true })
-    fs.rmSync(destinationParent, { recursive: true, force: true })
-    vi.unstubAllGlobals()
-    vi.mocked(childProcess.spawnSync).mockReset()
-    vi.mocked(fs.renameSync).mockClear()
-  })
+  const ctx = installAcquireNotebookGitCheckoutTest()
 
   test('binary download failure (non-OK response) leaves destination untouched and cleans staging', async () => {
+    const destinationPath = ctx.getDestinationPath()
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({ ok: false, status: 404 })
@@ -65,6 +40,7 @@ describe('acquireNotebookGitCheckout', () => {
   })
 
   test('binary download failure (fetch rejects) leaves destination untouched and cleans staging', async () => {
+    const destinationPath = ctx.getDestinationPath()
     vi.stubGlobal(
       'fetch',
       vi.fn().mockRejectedValue(new TypeError('fetch failed'))
@@ -80,7 +56,8 @@ describe('acquireNotebookGitCheckout', () => {
   })
 
   test('missing stored access token leaves destination untouched and cleans staging', async () => {
-    fs.rmSync(join(configDir, 'access-tokens.json'))
+    const destinationPath = ctx.getDestinationPath()
+    fs.rmSync(join(ctx.getConfigDir(), 'access-tokens.json'))
     vi.stubGlobal('fetch', vi.fn())
     const before = stagingDirsUnderTmp()
 
@@ -94,14 +71,8 @@ describe('acquireNotebookGitCheckout', () => {
   })
 
   test('git executable missing leaves destination untouched and cleans staging', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        arrayBuffer: () =>
-          Promise.resolve(new TextEncoder().encode('bundle-bytes').buffer),
-      })
-    )
+    const destinationPath = ctx.getDestinationPath()
+    stubBundleFetch()
     vi.mocked(childProcess.spawnSync).mockReturnValue({
       stdout: '',
       stderr: '',
@@ -119,14 +90,8 @@ describe('acquireNotebookGitCheckout', () => {
   })
 
   test('git clone non-zero exit leaves destination untouched and cleans staging', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        arrayBuffer: () =>
-          Promise.resolve(new TextEncoder().encode('bundle-bytes').buffer),
-      })
-    )
+    const destinationPath = ctx.getDestinationPath()
+    stubBundleFetch()
     vi.mocked(childProcess.spawnSync).mockReturnValue({
       stdout: '',
       stderr: 'fatal: not a valid bundle file',
@@ -143,21 +108,17 @@ describe('acquireNotebookGitCheckout', () => {
     expect(stagingDirsUnderTmp()).toEqual(before)
   })
 
-  test('happy path downloads, clones, and installs the checkout at the destination', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        arrayBuffer: () =>
-          Promise.resolve(new TextEncoder().encode('bundle-bytes').buffer),
-      })
-    )
+  test('happy path downloads, clones without premature LFS smudge, and installs the checkout', async () => {
+    const destinationPath = ctx.getDestinationPath()
+    stubBundleFetch()
     let checkoutDir = ''
     vi.mocked(childProcess.spawnSync).mockImplementation(((
       _cmd: string,
-      args?: readonly string[]
+      args?: readonly string[],
+      options?: { env?: NodeJS.ProcessEnv }
     ) => {
       if (args?.[0] === 'clone') {
+        expect(options?.env?.GIT_LFS_SKIP_SMUDGE).toBe('1')
         checkoutDir = args[3] as string
         fs.mkdirSync(checkoutDir, { recursive: true })
         fs.writeFileSync(join(checkoutDir, 'README.md'), '# notebook')
@@ -190,14 +151,8 @@ describe('acquireNotebookGitCheckout', () => {
   })
 
   test('git config recording failure surfaces an error', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        arrayBuffer: () =>
-          Promise.resolve(new TextEncoder().encode('bundle-bytes').buffer),
-      })
-    )
+    const destinationPath = ctx.getDestinationPath()
+    stubBundleFetch()
     vi.mocked(childProcess.spawnSync).mockImplementation(((
       _cmd: string,
       args?: readonly string[]
@@ -224,14 +179,8 @@ describe('acquireNotebookGitCheckout', () => {
   })
 
   test('falls back to copy+remove when rename fails with EXDEV (cross-device destination)', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        arrayBuffer: () =>
-          Promise.resolve(new TextEncoder().encode('bundle-bytes').buffer),
-      })
-    )
+    const destinationPath = ctx.getDestinationPath()
+    stubBundleFetch()
     vi.mocked(childProcess.spawnSync).mockImplementation(((
       _cmd: string,
       args?: readonly string[]
@@ -264,6 +213,7 @@ describe('acquireNotebookGitCheckout', () => {
   })
 
   test('refuses to overwrite an already-existing destination', async () => {
+    const destinationPath = ctx.getDestinationPath()
     fs.mkdirSync(destinationPath)
     fs.writeFileSync(join(destinationPath, 'sentinel.txt'), 'pre-existing')
     vi.stubGlobal('fetch', vi.fn())

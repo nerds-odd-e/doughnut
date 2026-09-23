@@ -158,6 +158,19 @@ export type Mcq = {
     responseChoices: Array<string>;
 };
 
+export type AcceptLfsAttachmentTipRequest = {
+    notebookName: string;
+    filename: string;
+    payload: string;
+    obsoletePayload?: string;
+};
+
+export type AcceptLfsAttachmentTipResponse = {
+    oid?: string;
+    size?: number;
+    obsoleteOid?: string;
+};
+
 export type SubscriptionDto = {
     dailyTargetOfNewNotes?: number;
 };
@@ -1692,6 +1705,22 @@ export type ResetDbAndTestabilitySettingsResponses = {
 };
 
 export type ResetDbAndTestabilitySettingsResponse = ResetDbAndTestabilitySettingsResponses[keyof ResetDbAndTestabilitySettingsResponses];
+
+export type AcceptLfsAttachmentTipForTestabilityData = {
+    body: AcceptLfsAttachmentTipRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/accept_lfs_attachment_tip_for_testability';
+};
+
+export type AcceptLfsAttachmentTipForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: AcceptLfsAttachmentTipResponse;
+};
+
+export type AcceptLfsAttachmentTipForTestabilityResponse = AcceptLfsAttachmentTipForTestabilityResponses[keyof AcceptLfsAttachmentTipForTestabilityResponses];
 
 export type UpdateSubscriptionData = {
     body: SubscriptionDto;

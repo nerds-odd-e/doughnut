@@ -62,6 +62,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Notebook Git Testability Controller
 
 - `resnapshotNotebookGitBindingForTestability`: POST `/api/testability/resnapshot_notebook_git_binding_for_testability` -> `ResnapshotNotebookGitBindingForTestabilityResponse` (request: `ResnapshotNotebookGitBindingForTestabilityData`; body: ResnapshotNotebookGitBindingRequest; response body: string)
+- `acceptLfsAttachmentTipForTestability`: POST `/api/testability/accept_lfs_attachment_tip_for_testability` -> `AcceptLfsAttachmentTipForTestabilityResponse` (request: `AcceptLfsAttachmentTipForTestabilityData`; body: AcceptLfsAttachmentTipRequest; response body: AcceptLfsAttachmentTipResponse)
 
 ## Subscription Controller
 

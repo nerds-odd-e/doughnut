@@ -27,9 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `c51f7cbcd0840a286bb6c12fae02e71b47934804` on
+- Published increment: `fce754e518c12751539f33e51d5e92a5a266353e` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer. Parent on that branch: `8f1910c4200ec0712a59f8a9cdc96284420d41d7`.
+  observer. Parent on that branch: `c51f7cbcd0840a286bb6c12fae02e71b47934804`.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
@@ -338,17 +338,36 @@ Accepted proof:
 
 ### 7. Clone current usable files with a recoverable failure path
 Type: Behavior
-Status: planned
+Status: done
 
-Existing CLI clone stages without premature smudge, records binding/endpoint,
-configures standard LFS, hydrates only the selected current ref, and installs
-the destination only after success. Missing client/auth/download failures are
-actionable and never report pointers as usable files. Rerunning clone is the
-retry; existing destination content is untouched. No new resume subsystem.
+CLI clone stages with `GIT_LFS_SKIP_SMUDGE=1`, records the local notebook
+binding, configures standard Git LFS against the notebook endpoint, hydrates
+only the current tip (`lfs fetch origin` then `lfs checkout`), and installs the
+destination only after success. Missing Git LFS or a failed download is
+actionable and does not install pointer text. An existing destination is left
+untouched. Rerunning clone is the retry. The bearer token stays in local Git
+config. An unreferenced obsolete payload is not downloaded.
 
-Proof: CLI `run` clone/failure tests plus E actual hydration. Observe clean main,
-exact bytes, no obsolete payload requests, no tracked credentials and intact
-existing destination. C and E; 8–10 minutes.
+Accepted proof:
+- Promise: skip-smudge staging, authenticated current-tip hydration, install
+  only after success, actionable missing-client and failed-download paths,
+  existing destination untouched, no tracked credentials, no obsolete object
+  in the checkout cache.
+- Boundary: `acquireNotebookGitCheckout` and
+  `configureAndHydrateCurrentLfsCheckoutIfNeeded`.
+- Setup: unit tests mock `spawnSync` and write a `.gitattributes` LFS filter
+  plus a pointer. E2E plants an accepted LFS tip and a stored obsolete payload
+  that is not a Git pointer, then clones with the installed CLI.
+- Observations: `notebookAcquisition.lfs.test.ts` (fetch/checkout order,
+  hydrated bytes, missing Git LFS, failed fetch, two origin removals).
+  `cli_notebook_lfs.feature` clean main, exact `payload.bin` bytes, cache
+  equals only the tip oid, token not tracked, `lfs.url`, sentinel file
+  unchanged.
+- Commands: `CURSOR_DEV=true nix develop -c pnpm cli:test` and
+  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`
+- Result: pass. CLI proof was rerun after LFS acquisition moved to its own
+  module (64 files, 453 tests). E2E stayed valid (4 scenarios) and was not
+  rerun.
 Safe stop: a fresh checkout can receive LFS content without later story 15.
 
 ### 8. Publish local files and acquire them in another checkout

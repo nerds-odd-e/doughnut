@@ -69,18 +69,39 @@ public class NotebookGitCutoverService {
    */
   @Transactional
   public NotebookGitBinding resetHistory(Notebook notebook, Instant resetTime) {
-    NotebookGitBinding binding =
-        notebookGitBindingRepository
-            .findByNotebookIdForUpdate(notebook.getId())
-            .orElseGet(
-                () -> {
-                  NotebookGitBinding created = new NotebookGitBinding();
-                  created.setNotebook(notebook);
-                  return created;
-                });
-    List<PortableTreeEntry> acceptedMetadata = acceptedMetadata(binding);
+    NotebookGitBinding binding = findOrCreateBinding(notebook);
+    return resetHistory(notebook, binding, resetTime, acceptedMetadata(binding));
+  }
+
+  /**
+   * Like {@link #resetHistory(Notebook, Instant)}, but installs the supplied metadata entries (for
+   * example initial LFS {@code .gitattributes}) into the new tip instead of preserving the previous
+   * tip's metadata.
+   */
+  @Transactional
+  public NotebookGitBinding resetHistory(
+      Notebook notebook, Instant resetTime, List<PortableTreeEntry> metadata) {
+    return resetHistory(notebook, findOrCreateBinding(notebook), resetTime, metadata);
+  }
+
+  private NotebookGitBinding findOrCreateBinding(Notebook notebook) {
+    return notebookGitBindingRepository
+        .findByNotebookIdForUpdate(notebook.getId())
+        .orElseGet(
+            () -> {
+              NotebookGitBinding created = new NotebookGitBinding();
+              created.setNotebook(notebook);
+              return created;
+            });
+  }
+
+  private NotebookGitBinding resetHistory(
+      Notebook notebook,
+      NotebookGitBinding binding,
+      Instant resetTime,
+      List<PortableTreeEntry> metadata) {
     try (Repository repository =
-        buildRepository(notebook, resetTime, RESET_COMMIT_MESSAGE, acceptedMetadata)) {
+        buildRepository(notebook, resetTime, RESET_COMMIT_MESSAGE, metadata)) {
       storeHistory(binding, repository, resetTime);
     }
     return binding;

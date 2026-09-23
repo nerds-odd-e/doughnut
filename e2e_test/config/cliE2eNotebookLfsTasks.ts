@@ -1,9 +1,18 @@
 /**
- * Cypress tasks: standard Git LFS client against a notebook LFS endpoint.
+ * Cypress tasks: standard Git LFS client against a notebook LFS endpoint,
+ * plus clone-checkout observations for hydrated LFS tips.
  */
 
 import { createHash } from 'node:crypto'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -85,6 +94,26 @@ function configureLfsEndpoint(
   )
 }
 
+function listLfsObjectOids(checkoutDir: string): string[] {
+  const objectsRoot = join(checkoutDir, '.git', 'lfs', 'objects')
+  if (!existsSync(objectsRoot)) {
+    return []
+  }
+  const oids: string[] = []
+  for (const a of readdirSync(objectsRoot)) {
+    const levelA = join(objectsRoot, a)
+    for (const b of readdirSync(levelA)) {
+      const levelB = join(levelA, b)
+      for (const name of readdirSync(levelB)) {
+        if (/^[a-f0-9]{64}$/.test(name)) {
+          oids.push(name)
+        }
+      }
+    }
+  }
+  return oids.sort()
+}
+
 export function createCliE2eNotebookLfsTasks() {
   return {
     notebookLfsStandardClientRoundTrip(input: NotebookLfsClientInput) {
@@ -132,6 +161,53 @@ export function createCliE2eNotebookLfsTasks() {
       } finally {
         rmSync(dir, { recursive: true, force: true })
       }
+    },
+    listCliNotebookCheckoutLfsObjectOids(checkoutDir: string): string[] {
+      return listLfsObjectOids(checkoutDir)
+    },
+    readCliNotebookCheckoutGitConfig({
+      checkoutDir,
+      key,
+    }: {
+      checkoutDir: string
+      key: string
+    }): string {
+      return runOrThrow(
+        'git',
+        ['config', '--local', '--get', key],
+        checkoutDir
+      ).trim()
+    },
+    cliNotebookCheckoutTracksToken({
+      checkoutDir,
+      token,
+    }: {
+      checkoutDir: string
+      token: string
+    }): { tracked: boolean; matchedPath?: string } {
+      const tracked = runOrThrow('git', ['ls-files', '-z'], checkoutDir)
+        .split('\0')
+        .filter((path) => path.length > 0)
+      for (const relativePath of tracked) {
+        const bytes = readFileSync(join(checkoutDir, relativePath))
+        if (bytes.toString('utf8').includes(token)) {
+          return { tracked: true, matchedPath: relativePath }
+        }
+      }
+      return { tracked: false }
+    },
+    createCliNotebookCloneDestinationWithFile({
+      relativePath,
+      content,
+    }: {
+      relativePath: string
+      content: string
+    }): string {
+      const parent = mkdtempSync(join(tmpdir(), 'cypress-cli-clone-'))
+      const destination = join(parent, 'checkout')
+      mkdirSync(destination, { recursive: true })
+      writeFileSync(join(destination, relativePath), content)
+      return destination
     },
   }
 }
