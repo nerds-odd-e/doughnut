@@ -61,4 +61,26 @@ class NoteControllerUploadNoteImageTests extends ControllerTestBase {
       assertThat(factory.getValidator().validate(dto), is(not(empty())));
     }
   }
+
+  @Test
+  void shouldAcceptExactLimitImageUploadDtoThroughBeanValidation() {
+    try (var factory = Validation.buildDefaultValidatorFactory()) {
+      NoteImageUploadDTO dto = new NoteImageUploadDTO();
+      dto.setUploadImage(
+          new MockMultipartFile(
+              "uploadImage", "exact.png", "image/png", new byte[10 * 1024 * 1024]));
+      assertThat(factory.getValidator().validate(dto), is(empty()));
+    }
+  }
+
+  @Test
+  void shouldRejectOneByteOverImageUploadDtoThroughBeanValidation() {
+    try (var factory = Validation.buildDefaultValidatorFactory()) {
+      NoteImageUploadDTO dto = new NoteImageUploadDTO();
+      dto.setUploadImage(
+          new MockMultipartFile(
+              "uploadImage", "over.png", "image/png", new byte[10 * 1024 * 1024 + 1]));
+      assertThat(factory.getValidator().validate(dto), is(not(empty())));
+    }
+  }
 }

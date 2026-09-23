@@ -84,7 +84,16 @@ that the new rule accepts an oversized addition.
 ### 1. Reject oversized proposed files while preserving existing content
 
 Type: Behavior
-Status: planned
+Status: done
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+before refactor. Refactor kept `publish` → ancestry → `admitTip` before
+projection mutations and reran
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookGitAttachmentSizeAdmission*'`
+(pass). Image Bean Validation tests were not edited. Grandfather fixtures use
+`storeFolderAttachmentAndSnapshot`, then prove reuse through publish. Slice 2
+should extend `NotebookGitAttachmentSizeAdmission`, not grow
+`NotebookGitProposalPublisher`.
 
 Behavior: An owner publishes root or nested files → exact-limit payloads are
 accepted; a new over-limit tip payload is refused with path, size, and limit.
@@ -206,4 +215,14 @@ Structured readiness is recorded in the story after reviewing this final content
 
 ## Execution evidence
 
-None. This is planning only; no product tests or implementation have run.
+Story Branch Mode. Created this session.
+
+- Owned workspace: `/Users/terryyin/.cursor/worktrees/attachment-size-admission/doughnut`, branch `story/attachment-size-admission`, starting revision `d8c411dd724e209bfbb813ba477bad33667b272f`.
+- Originating checkout: `/Users/terryyin/git/doughnut`.
+- Integration checkout: `/Users/terryyin/git/doughnut` (local `main`). Default-checkout refresh after the claim was deferred (`unclear-ownership`); it remains at `d8c411dd724e209bfbb813ba477bad33667b272f`.
+- Claim publication: `4ad31c66bca8d73110e8a37de10a5aded3711fa3` accepted on `origin` `refs/heads/main`.
+- Increment target: `origin` `refs/heads/story/attachment-size-admission`.
+- Replanning: preserved (allowed on overrun).
+- CI source: GitHub Actions workflow `ci.yml`, display name `donut CI`. Observer directory `/tmp/dough-ci-501/watch-mO4rGQ`, bound to `story/attachment-size-admission`. Claim on trunk is `pendingCi: unobserved`.
+
+Slice 1 is implemented and awaiting its increment publication. Slices 2 and 3 remain planned.

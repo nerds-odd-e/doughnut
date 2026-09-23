@@ -26,6 +26,7 @@ public class NotebookGitProposalPublisher {
   private final AuthorizationService authorizationService;
   private final NotebookGitProjection projection;
   private final NotebookGitProposalAcceptance proposalAcceptance;
+  private final NotebookGitAcceptedRepositoryStore repositoryStore;
   private final TestabilitySettings testabilitySettings;
   private final NotebookGitProposalFolderRelocation folderRelocation;
   private final NotebookGitProposalDocumentApplication documentApplication;
@@ -37,6 +38,7 @@ public class NotebookGitProposalPublisher {
       AuthorizationService authorizationService,
       NotebookGitProjection projection,
       NotebookGitProposalAcceptance proposalAcceptance,
+      NotebookGitAcceptedRepositoryStore repositoryStore,
       TestabilitySettings testabilitySettings,
       NotebookGitProposalFolderRelocation folderRelocation,
       NotebookGitProposalDocumentApplication documentApplication,
@@ -46,6 +48,7 @@ public class NotebookGitProposalPublisher {
     this.authorizationService = authorizationService;
     this.projection = projection;
     this.proposalAcceptance = proposalAcceptance;
+    this.repositoryStore = repositoryStore;
     this.testabilitySettings = testabilitySettings;
     this.folderRelocation = folderRelocation;
     this.documentApplication = documentApplication;
@@ -86,6 +89,10 @@ public class NotebookGitProposalPublisher {
     }
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
+    try (var accepted = repositoryStore.open(binding)) {
+      NotebookGitAttachmentSizeAdmission.admitTip(
+          proposal.repository(), proposal.mainHead(), accepted.repository(), acceptedHead);
+    }
 
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
         NotebookGitProposalTreeShape.inspectRegularFiles(
