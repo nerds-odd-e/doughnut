@@ -9,3 +9,12 @@ export async function advanceNoteContentSaveDebounce() {
   vi.advanceTimersByTime(NOTE_CONTENT_SAVE_DEBOUNCE_MS)
   await flushPromises()
 }
+
+/** Promise with an external resolve for gating in-flight autosave responses. */
+export function deferred() {
+  let resolve!: () => void
+  const promise = new Promise<void>((done) => {
+    resolve = done
+  })
+  return { promise, resolve }
+}

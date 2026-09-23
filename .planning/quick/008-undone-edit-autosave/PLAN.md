@@ -2,7 +2,7 @@
 
 Work item: **SEED-036#story-1**.
 Source: [refined bug story](../../seeds/SEED-036-keep-undone-edits-consistent.md#story-1).
-Status: in progress; slice 1 delivered, slice 2 not started.
+Status: delivered; both slices done.
 
 ## Execution
 
@@ -11,7 +11,8 @@ Status: in progress; slice 1 delivered, slice 2 not started.
 - Integration checkout: `/Users/terryyin/git/doughnut` (`main`).
 - Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/008-undone-edit-autosave`, branch `008-undone-edit-autosave`, created this session from `19244e701cab42ed45060fcbf57559d0d09acc4d`.
 - Claim published: `dc29e4525a0fdb9b68a8afd94a820553850fc088` on `refs/heads/main`. Claim CI: unobserved (story-branch observer does not cover trunk).
-- Increment target: `refs/heads/008-undone-edit-autosave`.
+- Slice 1 published: `4bd112ff206bb75b37747235cfd58386dc2bedc8` on `refs/heads/008-undone-edit-autosave`, registered with observer `/tmp/dough-ci-501/watch-zDxIaG` (state undiscovered at registration).
+- Increment target: `refs/heads/008-undone-edit-autosave`. Previously published base for the next increment: `4bd112ff206bb75b37747235cfd58386dc2bedc8`.
 - Default-checkout refresh after the trunk claim: deferred (unclear ownership of the open integration checkout). Its HEAD remains `19244e701cab42ed45060fcbf57559d0d09acc4d`.
 - Replanning: existing planning authority retained (refine this plan if active slice work exceeds 10 minutes, except the named verification-wait exception).
 - CI: GitHub Actions workflow `ci.yml`, display name `donut CI`. Observer directory `/tmp/dough-ci-501/watch-zDxIaG` for `nerds-odd-e/doughnut` branch `008-undone-edit-autosave`.
@@ -157,7 +158,7 @@ the in-flight case remains explicitly unfinished for slice 2.
 ### 2. An acknowledged older edit is followed by the latest draft
 
 Type: Behavior
-Status: planned
+Status: done
 Sizing hypothesis: 5–10 minutes for the focused implementation/proof loop;
 scrutinized above the 5-minute target because response ownership and completion
 must change coherently. Slow required full-suite/typecheck time is an explicit
@@ -182,6 +183,8 @@ Proof: new editor/page scenarios and existing shared-consumer tests mapped
 above, followed by the required frontend suite and typecheck. Safe stopping
 point: the reported successful-save interaction converges without another user
 action and all named shared consumers retain their existing behavior.
+
+Accepted proof: `NoteEditableContent.debouncedSave.inFlightRestore.spec.ts` holds `AB`, restores `A` (also empty, `AC`, and a canonical `---\ntype: Note\n---\nAB` response), and observes the correcting request plus DOM and simulated server content. `NoteShowPage.autosaveTrash.spec.ts` orders `save-1`, correcting `save-2`, then trash, and a later failed save does not trash again. After the post-change schedule consolidation, `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed (344 files, 1930 tests). Learning: a restore that equals the acknowledged value must stay the current proposal while a write is in flight, then persist only if that acknowledgement still differs.
 
 ## Commands and delivery gates
 

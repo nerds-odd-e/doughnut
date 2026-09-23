@@ -17,6 +17,11 @@ import {
   installMockResizeObserver,
   restoreNoteToolbarWidthMocks,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
+import {
+  advanceNoteContentSaveDebounce,
+  deferred,
+} from "@tests/helpers/noteContentDebounceTestSupport"
+import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
 import makeMe from "donut-test-fixtures/makeMe"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
@@ -24,14 +29,6 @@ import {
   renderNoteShowPageWithoutSidebar,
 } from "./noteShowPageTestSupport"
 import { qualifyingRelationRealmForTrash } from "../notes/noteMoreOptionsTrashTestSupport"
-
-function deferred<T>() {
-  let resolve!: (value: T) => void
-  const promise = new Promise<T>((done) => {
-    resolve = done
-  })
-  return { promise, resolve }
-}
 
 async function editBody(content: string) {
   const editButton = document.querySelector(
@@ -83,7 +80,8 @@ describe("note show autosave before trashing", () => {
     const router = createNoteShowPageRouter()
     mockSdkService(NoteController, "showNote", relationRealm)
     mockNotebookGetForNoteRealm(relationRealm)
-    const firstSave = deferred<void>()
+    const firstSave = deferred()
+    const secondSave = deferred()
     const mutationOrder: string[] = []
     let saveCalls = 0
     const updateSpy = mockSdkServiceWithImplementation(
@@ -93,6 +91,7 @@ describe("note show autosave before trashing", () => {
         saveCalls += 1
         mutationOrder.push(`save-${saveCalls}-start`)
         if (saveCalls === 1) await firstSave.promise
+        if (saveCalls === 2) await secondSave.promise
         mutationOrder.push(`save-${saveCalls}-finish`)
         return makeMe.aNoteRealm
           .id(relationRealm.id)
@@ -110,9 +109,16 @@ describe("note show autosave before trashing", () => {
       return wrapSdkError("trash failed")
     })
 
-    const editedRelationship = `${relationRealm.note.content}Edited relationship`
+    const originalContent = relationRealm.note.content ?? ""
+    const editedRelationship = `${originalContent}Edited relationship`
     await renderNoteShowPageWithoutSidebar(router, relationRealm.id)
     const textarea = await editBody(editedRelationship)
+    await advanceNoteContentSaveDebounce()
+
+    expect(mutationOrder).toEqual(["save-1-start"])
+
+    setBodyValue(textarea, originalContent)
+    await flushPromises()
     await startTrash("REDUCE")
 
     expect(mutationOrder).toEqual(["save-1-start"])
@@ -121,16 +127,40 @@ describe("note show autosave before trashing", () => {
     firstSave.resolve()
     await flushPromises()
 
-    expect(mutationOrder).toEqual(["save-1-start", "save-1-finish", "trash"])
+    expect(mutationOrder).toEqual([
+      "save-1-start",
+      "save-1-finish",
+      "save-2-start",
+    ])
+    expect(trashSpy).not.toHaveBeenCalled()
+
+    secondSave.resolve()
+    await flushPromises()
+
+    expect(mutationOrder).toEqual([
+      "save-1-start",
+      "save-1-finish",
+      "save-2-start",
+      "save-2-finish",
+      "trash",
+    ])
+    expect(updateSpy).toHaveBeenNthCalledWith(1, {
+      path: { note: relationRealm.id },
+      body: { content: editedRelationship },
+    })
+    expect(updateSpy).toHaveBeenNthCalledWith(2, {
+      path: { note: relationRealm.id },
+      body: { content: normalizeNoteContent(originalContent) },
+    })
     vi.runAllTimers()
     await flushPromises()
-    expect(updateSpy).toHaveBeenCalledTimes(1)
+    expect(updateSpy).toHaveBeenCalledTimes(2)
 
     updateSpy.mockResolvedValueOnce(wrapSdkError("save failed"))
     setBodyValue(textarea, "Second edit")
     await startTrash("REDUCE")
 
-    expect(updateSpy).toHaveBeenCalledTimes(2)
+    expect(updateSpy).toHaveBeenCalledTimes(3)
     expect(trashSpy).toHaveBeenCalledTimes(1)
   })
 })

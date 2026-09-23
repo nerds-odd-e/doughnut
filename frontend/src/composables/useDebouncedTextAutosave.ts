@@ -58,6 +58,10 @@ export function useDebouncedTextAutosave(
     if (!isCurrentProposal(nextVersion)) {
       return true
     }
+    if (normalize(newValue) === normalize(lastSavedValue.value ?? "")) {
+      savedVersion.value = nextVersion
+      return true
+    }
     if (options.beforePersist) {
       const proceed = await options.beforePersist(
         lastSavedValue.value ?? "",
@@ -104,13 +108,20 @@ export function useDebouncedTextAutosave(
 
     if (normalizedNewValue === normalizedLastSaved) {
       cancel()
-      version.value = savedVersion.value
-      return
+      if (pendingSaveValues.size === 0) {
+        version.value = savedVersion.value
+        return
+      }
+      // In-flight write may still change the acknowledged value; keep the draft
+      // and re-evaluate it when that write can finish.
     }
 
     debouncedPersist(normalizedNewValue, version.value + 1)
     version.value += 1
-    if (options.shouldFlushImmediately?.(prevNormalized, normalizedNewValue)) {
+    if (
+      normalizedNewValue !== normalizedLastSaved &&
+      options.shouldFlushImmediately?.(prevNormalized, normalizedNewValue)
+    ) {
       debouncedPersist.flush()
     }
   }
@@ -145,7 +156,14 @@ export function useDebouncedTextAutosave(
   const syncFromExternal = (newValue: string | undefined) => {
     const valueToSet = newValue ?? ""
     if (version.value !== savedVersion.value) {
-      if (valueToSet !== "" && pendingSaveValues.has(valueToSet)) {
+      if (pendingSaveValues.size > 0) {
+        const draftMatchesPending = pendingSaveValues.has(
+          normalize(localValue.value ?? "")
+        )
+        lastSavedValue.value = valueToSet
+        if (draftMatchesPending) {
+          localValue.value = valueToSet
+        }
         return
       }
       const normalizedCurrentValue = localValue.value ?? ""
