@@ -241,8 +241,8 @@ Story Branch Mode. Created this session.
 - Integration checkout: `/Users/terryyin/git/doughnut` (local `main`). Default-checkout refresh after the claim was deferred (`unclear-ownership`); it remains at `d8c411dd724e209bfbb813ba477bad33667b272f`.
 - Claim publication: `4ad31c66bca8d73110e8a37de10a5aded3711fa3` accepted on `origin` `refs/heads/main`.
 - Increment target: `origin` `refs/heads/story/attachment-size-admission`.
-- Published increments on `origin` `refs/heads/story/attachment-size-admission`: `b3ddc1fa3e48bdf95cb0b5b264636a720d0cd7cc` (slice 1), `71c3716963f300145be29dde4da4ad02ccf5f922` (slice 2). Both registered with observer `/tmp/dough-ci-501/watch-mO4rGQ`.
+- Published increments on `origin` `refs/heads/story/attachment-size-admission`: `b3ddc1fa3e48bdf95cb0b5b264636a720d0cd7cc` (slice 1), `71c3716963f300145be29dde4da4ad02ccf5f922` (slice 2), `4e04fa3eb54ed8a39b8935c7c8bcb805b6018804` (slice 3). Registered with observer `/tmp/dough-ci-501/watch-mO4rGQ`.
 - Replanning: preserved (allowed on overrun).
 - CI source: GitHub Actions workflow `ci.yml`, display name `donut CI`. Observer directory `/tmp/dough-ci-501/watch-mO4rGQ`, bound to `story/attachment-size-admission`. Claim on trunk is `pendingCi: unobserved`.
 
-Slice 2 is published as `71c3716963f300145be29dde4da4ad02ccf5f922` on `origin/story/attachment-size-admission`. Slice 3 is implemented and awaiting its increment publication.
+All three slices are published. The latest increment is `4e04fa3eb54ed8a39b8935c7c8bcb805b6018804` on `origin/story/attachment-size-admission`.
