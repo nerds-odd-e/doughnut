@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Align durable LFS contract with authorized oversized-intermediate exception](quick/021-lfs-contract-oversized-exception/PLAN.md)
-
 ## Backlog list
 
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
