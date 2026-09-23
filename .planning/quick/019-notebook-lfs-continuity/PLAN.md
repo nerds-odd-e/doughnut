@@ -27,16 +27,17 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `7db86ca0a5f54aba91d6856c76864025eaa9d7b3` on
+- Published increment: `8adda16de33139831134ffbe3b91c4dc505c8ddf` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer.
+  observer. Earlier increment `7db86ca0a5f54aba91d6856c76864025eaa9d7b3` is its
+  parent on the same branch.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
   `CURSOR_DEV=true nix develop -c node -e "console.log('worktree-command-ready')"`
   printed `worktree-command-ready`.
-- Slices 2–3 stay blocked until an isolated GCS target and a representative
-  standard-client result exist. Slice 1 does not depend on that evidence.
+- Automated tests do not call Google Cloud Storage. Slice 2 continues with the
+  Book storage test seam.
 - CI observer: `/tmp/dough-ci-501/watch-p2I1y8`, GitHub Actions, workflow
   `ci.yml` / `donut CI`, target `story/notebook-lfs-continuity` on
   `nerds-odd-e/doughnut`. Armed after the claim; the claim itself stays
@@ -111,10 +112,19 @@ attachment data migration. The existing two-release schema rule still applies.
   `notebookPublishSubmission` owns bundle submission; publish ancestry checking
   is independent of `receiveAcceptedNotebookHead`. That verified separation
   makes the story cut viable.
-- Reuse GCS client/configuration patterns from `BookStorageConfiguration`,
-  not Book keys, deletion policy, byte-array storage, or non-prod DB fallback.
-  Use notebook-scoped digest keys, immutable content, standard Batch/Basic API,
-  and existing authorization at every transfer route.
+- Book PDF storage and notebook attachment content are different policies.
+  Books put, get, and delete format-specific files, and non-production uses
+  `DbBookStorage`. Notebook content is immutable, digest-addressed, and
+  notebook-scoped; removing a current file does not delete retained bytes, and
+  those bytes never go through `BookStorage` or MySQL.
+- They share the Google `Storage` client. Production keeps the single
+  `StorageOptions.getDefaultInstance().getService()` construction in
+  `BookStorageConfiguration`. Adapter tests inject a mocked `Storage`, the same
+  seam as `GcsBookStorageTest`. No second client factory, mock style, or remote
+  bucket. Test and end-to-end runs use an in-memory notebook content store so
+  Git LFS talks to Donut on localhost.
+- Use notebook-scoped digest keys, standard Batch/Basic API, and existing
+  authorization at every transfer route.
 - Retain all published and in-limit intermediate bytes. Only new oversized
   intermediate-only LFS payloads may be absent after a corrective commit.
   Missing required objects reject; omitted history reports unavailable.
@@ -132,8 +142,10 @@ All proof below is planned, not run:
   (new focused feature, not an existing passing command).
 - R: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature`.
 
-Unit proof drives controllers or CLI `run`; mock only external GCS/network.
-The real protocol journey uses installed CLI + standard Git LFS + actual backend.
+Unit proof drives controllers or CLI `run` and mocks `Storage` the way
+`GcsBookStorageTest` does. The protocol journey uses the installed CLI, standard
+Git LFS, and the local backend over its in-memory content store. No automated
+test contacts Google Cloud Storage.
 Existing acquisition tests that mock Git cannot prove hydration. Reuse
 publication rollback support and tree/save-cost oracles; do not duplicate all
 shared rollback assertions for every rejection.
@@ -178,23 +190,28 @@ the binding stays `RAW`.
 
 ### 2. Stage verified immutable content for standard transfers
 Type: Structure
-Status: planned
+Status: done
 
-Add the narrowly scoped attachment content owner consumed immediately by slice 3:
-stream, count, hash and durably store immutable notebook/digest content. Reuse
-SDK 2.73.0 and private GCS configuration patterns. An interrupted/mismatched
-attempt cannot become verified content or overwrite valid content. No custom
-cache, generic storage framework or durable pending-upload workflow.
+`NotebookAttachmentContent` streams, counts, and SHA-256-checks bytes, then
+stores them under `notebook/{id}/lfs/{sha256}`. Production uses
+`GcsNotebookAttachmentContent` with the existing prod `Storage` bean. Test and
+other non-production profiles use `InMemoryNotebookAttachmentContent`. A
+mismatch or failed upload leaves nothing verified. A second store of the same
+digest does not overwrite verified bytes. Book storage is unchanged. The prod
+bucket name `doughnut-notebook-lfs-carbon-syntax-298809` is configuration only;
+no bucket was created and no test contacts Google.
 
-Proof: B with external GCS seam; an isolated representative GCS contract check
-must observe exact bytes, wrong size/digest, interrupted upload, and same-digest
-retry before broad integration. Planned test `NotebookLfsGcsContractTest` uses
-the ordinary B command with explicit isolated test-storage configuration; record
-the literal configured invocation, SDK version, prefix and result at execution.
-No target/credentials are currently established: missing configuration skips no
-required proof and never falls back to production or Development.
-8–10 minutes excluding representative test runtime. Safe stop: unused verified
-content operation; slice 3 is its immediate consumer.
+Accepted proof:
+- Promise: exact bytes round-trip; wrong size or digest stores nothing; a
+  failed upload stores nothing; same-digest retry keeps the original bytes.
+- Boundary: `NotebookAttachmentContent` GCS adapter and in-memory store.
+- Setup: mocked `Storage` or an empty in-memory store. The product verifies
+  the stream.
+- Observations: `NotebookAttachmentContentTest.GcsStore` and `.InMemoryStore`.
+- Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass (2615 tests). After the test class move, the focused command
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.donut.services.notebookAttachment.NotebookAttachmentContentTest`
+  passed. Production store and get were unchanged.
 
 ### 3. Transfer exact content with the standard authenticated client
 Type: Behavior
@@ -204,10 +221,11 @@ Given a permitted notebook owner/reader, standard LFS Batch/Basic upload/downloa
 uses the same verified content. Wrong notebook/access and missing objects return
 standard failures; a hash alone grants no access. Upload does not accept a commit.
 
-Proof: HTTP-boundary `NotebookLfsTransferControllerTest` plus real standard-client
-round trip in E. Observe upload, download, authorization denial and exact digest;
-slice 2 owns storage failure combinations. Add Git LFS to reproducible runtime
-and record actual version (host `git lfs version` previously failed).
+Proof: HTTP-boundary `NotebookLfsTransferControllerTest` plus a standard-client
+round trip in E against the in-memory content store. Observe upload, download,
+authorization denial and exact digest; slice 2 owns storage failure
+combinations. Add Git LFS to reproducible runtime and record actual version
+(host `git lfs version` previously failed).
 B and E; 8–10 minutes if the standard auth exchange fits existing bearer access.
 If not, stop this slice and reassess the precise integration issue.
 Safe stop: transfers work, user-facing LFS activation still off.
@@ -255,13 +273,13 @@ A valid root/nested/empty attachment proposal is accepted through the existing
 publisher with pointers in Git and projection. Verify referenced actual size,
 digest and durability before acceptance. Preserve attributes, exact file identity
 and private learning state through existing web edits/folder operations.
-A note-only save performs no payload reads or GCS rewriting.
+A note-only save performs no payload reads or object rewriting.
 
 Proof: extend `NotebookGitAttachmentPublicationControllerTest`, committed-state
 rollback support, derived-tree oracles, and `NotebookGitWebContentSaveCostControllerTest`.
 Exact 10 MiB succeeds; one byte over/missing/corrupt required content refuses.
-One mixed refusal owns atomic head/projection/learning assertions. Scope SQL/GCS
-observations to the save, excluding setup. B; 8–10 minutes, reusing existing
+One mixed refusal owns atomic head/projection/learning assertions. Scope SQL and
+content-store observations to the save, excluding setup. B; 8–10 minutes, reusing existing
 projection and admission rather than building another store.
 Safe stop: complete server current-tree behavior in test mode.
 
@@ -379,12 +397,10 @@ story-boundary decision is needed for this proposed automated fresh-checkout
 increment under the authorized resplit. No slice inherits readiness from the
 old plan. No product tests or infrastructure experiments ran during planning.
 
-Remaining readiness concern is localized to 2–3: actual isolated GCS and standard
-client integration has no representative result or established test target yet.
-The plan is refined; mark it not-ready for direct execution until the evidence
-and environment prerequisites are resolved, rather than changing story scope or
-claiming a passing infrastructure check. Low-to-medium effort confidence remains
-a hypothesis; stop on actual overruns under the project rules.
+Owner decision, 2026-09-23: keep automated tests off Google Cloud Storage and
+use the Book storage test seam. The remote contract test is removed. Standard
+Git LFS still runs against the local backend. Low-to-medium effort confidence
+remains a hypothesis; stop on actual overruns under the project rules.
 
 Authorized implementation follows dough-execute-plan: Jidoka, fresh independent
 post-change refactor, API regeneration for changed contracts, coordinator format
