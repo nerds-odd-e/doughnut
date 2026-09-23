@@ -5,7 +5,9 @@
 //
 // Deliberately narrow: only the literal-list `paths-ignore` form under
 // `push`/`pull_request` is supported, and only patterns of the exact shape
-// `<prefix>/**`. Aliases, expressions, generated/templated policy, flow
+// `<prefix>/**`. A push trigger may also restrict runs to all branches with
+// a literal `branches` list containing only quoted `**`. Other branch/tag
+// filters remain unsupported. Aliases, expressions, generated/templated policy, flow
 // collections, comments, or any other structure fail closed to
 // `{ supported: false }` rather than being approximated. No general YAML
 // engine is used or required.
@@ -53,25 +55,44 @@ function parseMapping(blockRaw, indent) {
   return entries;
 }
 
-function parseEventPolicy(children) {
-  if (children.length === 0) return { pathsIgnore: [] };
-  const keys = parseMapping(children, children[0].indent);
-  if (keys === null || keys.length !== 1 || keys[0].key !== "paths-ignore")
-    return null;
-  const items = keys[0].children;
+function parseLiteralList(items) {
   if (items.length === 0) return null;
   const itemIndent = items[0].indent;
-  const pathsIgnore = [];
+  const values = [];
   for (const item of items) {
     if (item.indent !== itemIndent) return null;
     const match = sequenceItemPattern.exec(item.text);
     if (!match) return null;
     const scalar = parseScalar(match[1]);
-    if (scalar === null || !supportedIgnoreGlobPattern.test(scalar))
-      return null;
-    pathsIgnore.push(scalar);
+    if (scalar === null) return null;
+    values.push(scalar);
   }
-  return { pathsIgnore };
+  return values;
+}
+
+function parseEventPolicy(event, children) {
+  if (children.length === 0) return { pathsIgnore: [] };
+  const keys = parseMapping(children, children[0].indent);
+  if (keys === null) return null;
+  let pathsIgnore;
+  let hasBranches = false;
+  for (const { key, children: items } of keys) {
+    const values = parseLiteralList(items);
+    if (values === null) return null;
+    if (key === "paths-ignore" && pathsIgnore === undefined) {
+      if (!values.every((value) => supportedIgnoreGlobPattern.test(value)))
+        return null;
+      pathsIgnore = values;
+    } else if (key === "branches" && event === "push" && !hasBranches) {
+      // The watcher observes branch revisions. This single pattern covers
+      // every branch while preserving the workflow's exclusion of tags.
+      if (values.length !== 1 || values[0] !== "**") return null;
+      hasBranches = true;
+    } else {
+      return null;
+    }
+  }
+  return pathsIgnore === undefined ? null : { pathsIgnore };
 }
 
 // Reads the accepted narrow literal-list `paths-ignore` policy out of a
@@ -104,13 +125,16 @@ export function readCiPathIgnorePolicy(workflowContent) {
   if (topKeys === null) return { supported: false };
 
   const result = { supported: true, workflowDispatch: false, events: {} };
+  const seenEvents = new Set();
   for (const { key, children } of topKeys) {
+    if (seenEvents.has(key)) return { supported: false };
+    seenEvents.add(key);
     if (key === "workflow_dispatch") {
       result.workflowDispatch = true;
       continue;
     }
     if (key !== "push" && key !== "pull_request") return { supported: false };
-    const eventPolicy = parseEventPolicy(children);
+    const eventPolicy = parseEventPolicy(key, children);
     if (eventPolicy === null) return { supported: false };
     result.events[key] = eventPolicy;
   }
