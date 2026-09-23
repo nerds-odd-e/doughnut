@@ -169,7 +169,18 @@ journey still requires its outside-in proof.
 ### 3. Recover from a size rejection through the installed CLI
 
 Type: Behavior
-Status: planned
+Status: done
+
+Accepted proof: installed CLI journey in
+`e2e_test/features/cli/cli_notebook_attachment_size_admission.feature`.
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature`
+passed before the scenario was split out; replacement
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_attachment_size_admission.feature`
+passed (1/1). Refusal wording change covered by
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only`, then focused
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookGitAttachmentSizeAdmission*'`
+after the assertion was tightened. CLI production code was unchanged. New CLI
+features must be listed in `scripts/isolated-cypress-active-specs.mjs`.
 
 Behavior: Publish an oversized attachment → CLI reports the offending path,
 actual bytes, 10 MiB limit, and explains removing it from unpublished history;
@@ -230,8 +241,8 @@ Story Branch Mode. Created this session.
 - Integration checkout: `/Users/terryyin/git/doughnut` (local `main`). Default-checkout refresh after the claim was deferred (`unclear-ownership`); it remains at `d8c411dd724e209bfbb813ba477bad33667b272f`.
 - Claim publication: `4ad31c66bca8d73110e8a37de10a5aded3711fa3` accepted on `origin` `refs/heads/main`.
 - Increment target: `origin` `refs/heads/story/attachment-size-admission`.
-- Published increment: `b3ddc1fa3e48bdf95cb0b5b264636a720d0cd7cc` accepted on `origin` `refs/heads/story/attachment-size-admission` (slice 1). Registered with observer `/tmp/dough-ci-501/watch-mO4rGQ`.
+- Published increments on `origin` `refs/heads/story/attachment-size-admission`: `b3ddc1fa3e48bdf95cb0b5b264636a720d0cd7cc` (slice 1), `71c3716963f300145be29dde4da4ad02ccf5f922` (slice 2). Both registered with observer `/tmp/dough-ci-501/watch-mO4rGQ`.
 - Replanning: preserved (allowed on overrun).
 - CI source: GitHub Actions workflow `ci.yml`, display name `donut CI`. Observer directory `/tmp/dough-ci-501/watch-mO4rGQ`, bound to `story/attachment-size-admission`. Claim on trunk is `pendingCi: unobserved`.
 
-Slice 1 is published as `b3ddc1fa3e48bdf95cb0b5b264636a720d0cd7cc` on `origin/story/attachment-size-admission`. Slice 2 is implemented and awaiting its increment publication. Slice 3 remains planned.
+Slice 2 is published as `71c3716963f300145be29dde4da4ad02ccf5f922` on `origin/story/attachment-size-admission`. Slice 3 is implemented and awaiting its increment publication.

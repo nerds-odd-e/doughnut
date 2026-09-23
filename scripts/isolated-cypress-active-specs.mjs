@@ -11,6 +11,7 @@ export const ACTIVE_CLI_SPECS = [
   'e2e_test/features/cli/cli_notebook_web_folder_moves.feature',
   'e2e_test/features/cli/cli_notebook_web_local_reconciliation.feature',
   'e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature',
+  'e2e_test/features/cli/cli_notebook_attachment_size_admission.feature',
   'e2e_test/features/cli/cli_notebook_web_note_moves.feature',
   'e2e_test/features/cli/cli_notebook_web_note_renames.feature',
   'e2e_test/features/cli/cli_notebook_web_trash.feature',

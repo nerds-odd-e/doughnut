@@ -68,6 +68,14 @@ Then('the cloned checkout retains the original committed proposal', () =>
 )
 
 Then(
+  'the notebook {string} accepted head remains the parent of the cloned checkout',
+  (notebookName: string) =>
+    cli
+      .notebookCloneCheckout()
+      .expectAcceptedHeadUnchangedFromCheckoutParent(notebookName)
+)
+
+Then(
   'the installed CLI reports the committed change as the accepted head',
   () => cli.notebookCloneCheckout().expectCommittedHeadAccepted()
 )

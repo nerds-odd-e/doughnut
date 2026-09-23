@@ -76,6 +76,20 @@ When(
 )
 
 When(
+  'I commit the attachment {string} filled with {int} bytes of {string} in the cloned checkout',
+  (relativePath: string, byteLength: number, fillByteHex: string) =>
+    cli
+      .notebookCloneCheckout()
+      .commitFilledAttachment(relativePath, byteLength, fillByteHex)
+)
+
+When(
+  'I amend the unpublished commit replacing {string} with the bytes {string} in the cloned checkout',
+  (relativePath: string, bytes: string) =>
+    cli.notebookCloneCheckout().amendExactBytes(relativePath, bytes)
+)
+
+When(
   'I commit a removal of {string} in the cloned checkout',
   (relativePath: string) =>
     cli.notebookCloneCheckout().commitRemoval(relativePath)

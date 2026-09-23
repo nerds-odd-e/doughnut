@@ -12,6 +12,8 @@ type PrimaryCheckoutCommitTask =
   | 'commitCliNotebookCheckoutNoteRenameAndEmptyKeep'
   | 'commitCliNotebookCheckoutNoteRenameAndRemoval'
   | 'commitCliNotebookCheckoutRootFiles'
+  | 'commitCliNotebookCheckoutFilledAttachment'
+  | 'amendCliNotebookCheckoutExactBytes'
 
 function commitNoteChanges(
   files: { relativePath: string; content: string }[]
@@ -21,7 +23,7 @@ function commitNoteChanges(
 
 function commitPrimaryCheckoutWith(
   task: PrimaryCheckoutCommitTask,
-  change: Record<string, string>
+  change: Record<string, string | number>
 ): Cypress.Chainable<null> {
   return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
     cy.task<string>(task, { checkoutDir, ...change }).then((head) => {
@@ -63,6 +65,50 @@ function notebookCloneCheckoutCommits() {
         textRelativePath,
         content,
         binaryRelativePath,
+        bytes,
+      })
+    },
+    /**
+     * One unpublished commit adding a filled attachment of exact length; records
+     * the proposal for retention checks after a rejected publish.
+     * `fillByteHex` is a single byte such as `0x41`.
+     */
+    commitFilledAttachment(
+      relativePath: string,
+      byteLength: number,
+      fillByteHex: string
+    ): Cypress.Chainable<null> {
+      const fillByte = Number.parseInt(fillByteHex.replace(/^0x/i, ''), 16)
+      expect(
+        fillByte,
+        `fill byte ${fillByteHex} should be a single hex byte`
+      ).to.be.within(0, 255)
+      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+        cy
+          .task<string>('commitCliNotebookCheckoutFilledAttachment', {
+            checkoutDir,
+            relativePath,
+            byteLength,
+            fillByte,
+          })
+          .then((head) => {
+            cy.wrap(head).as('cliNotebookPublishHead')
+            cy.wrap([{ relativePath, byteLength, fillByte }]).as(
+              'cliNotebookProposalFiles'
+            )
+            return cy.wrap(null)
+          })
+      )
+    },
+    /**
+     * Amends the unpublished tip replacing one attachment with spaced-hex bytes.
+     */
+    amendExactBytes(
+      relativePath: string,
+      bytes: string
+    ): Cypress.Chainable<null> {
+      return commitPrimaryCheckoutWith('amendCliNotebookCheckoutExactBytes', {
+        relativePath,
         bytes,
       })
     },

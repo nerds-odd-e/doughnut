@@ -101,8 +101,8 @@ final class NotebookGitAttachmentSizeAdmission {
             + size
             + " bytes, which exceeds the "
             + LIMIT_BYTES
-            + "-byte limit. Remove this oversized payload from the unpublished proposal before"
-            + " publishing. Do not rewrite already accepted commits; a later tip deletion alone"
-            + " does not clear an oversized payload from unpublished history.");
+            + "-byte limit. Amend or rebase the unpublished proposal so this oversized payload is"
+            + " gone before publishing. Do not rewrite already accepted commits; a later tip"
+            + " deletion alone does not clear an oversized payload from unpublished history.");
   }
 }

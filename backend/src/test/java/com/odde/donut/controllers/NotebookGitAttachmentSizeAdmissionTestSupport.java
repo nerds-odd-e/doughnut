@@ -34,8 +34,9 @@ abstract class NotebookGitAttachmentSizeAdmissionTestSupport
     assertThat(reason, containsString("\"" + path + "\""));
     assertThat(reason, containsString(Long.toString(size)));
     assertThat(reason, containsString(Long.toString(LIMIT)));
-    assertThat(reason, containsString("unpublished"));
+    assertThat(reason, containsString("Amend or rebase the unpublished proposal"));
     assertThat(reason, containsString("Do not rewrite already accepted commits"));
+    assertThat(reason, containsString("tip deletion alone"));
   }
 
   List<PortableTreeEntry> committedRootAttachments(Notebook notebook) {

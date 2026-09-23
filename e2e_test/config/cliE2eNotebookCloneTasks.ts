@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import { createCliE2eNotebookCloneCommitTasks } from './cliE2eNotebookCloneCommitTasks'
 import {
   blobsAt,
+  checkoutFilledBytesMatch,
   continueRebaseNoninteractively,
   firstParent,
   git,
@@ -141,6 +142,37 @@ export function createCliE2eNotebookCloneTasks() {
       relativePath: string
     }): string {
       return readCheckoutFileHex(checkoutDir, relativePath)
+    },
+    /**
+     * Whether a checked-out path is still exactly `byteLength` copies of
+     * `fillByte` (retained oversized proposal after a rejected publish).
+     */
+    assertCliNotebookCheckoutFilledBytes({
+      checkoutDir,
+      relativePath,
+      byteLength,
+      fillByte,
+    }: {
+      checkoutDir: string
+      relativePath: string
+      byteLength: number
+      fillByte: number
+    }): null {
+      if (
+        !checkoutFilledBytesMatch(
+          checkoutDir,
+          relativePath,
+          byteLength,
+          fillByte
+        )
+      ) {
+        throw new Error(
+          `${relativePath} should still be ${byteLength} bytes filled with 0x${fillByte
+            .toString(16)
+            .padStart(2, '0')}`
+        )
+      }
+      return null
     },
   }
 }

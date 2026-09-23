@@ -5,9 +5,11 @@
  */
 
 import {
+  amendCheckout,
   commitCheckout,
   stageEmptyKeep,
   stageExactBytes,
+  stageFilledBytes,
   stageNoteChanges,
   stageNoteRemoval,
   stageNoteRename,
@@ -47,6 +49,36 @@ export function createCliE2eNotebookCloneCommitTasks() {
       ])
       stageExactBytes(checkoutDir, binaryRelativePath, bytes)
       return commitCheckout(checkoutDir, 'Add cloned notebook root files')
+    },
+    /** One unpublished commit adding a filled attachment of exact byte length. */
+    commitCliNotebookCheckoutFilledAttachment({
+      checkoutDir,
+      relativePath,
+      byteLength,
+      fillByte,
+    }: {
+      checkoutDir: string
+      relativePath: string
+      byteLength: number
+      fillByte: number
+    }): string {
+      stageFilledBytes(checkoutDir, relativePath, byteLength, fillByte)
+      return commitCheckout(checkoutDir, 'Add filled attachment')
+    },
+    /**
+     * Amends the unpublished tip replacing one path with exact spaced-hex bytes.
+     */
+    amendCliNotebookCheckoutExactBytes({
+      checkoutDir,
+      relativePath,
+      bytes,
+    }: {
+      checkoutDir: string
+      relativePath: string
+      bytes: string
+    }): string {
+      stageExactBytes(checkoutDir, relativePath, bytes)
+      return amendCheckout(checkoutDir)
     },
     commitCliNotebookCheckoutNoteRemoval({
       checkoutDir,
