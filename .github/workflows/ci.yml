@@ -1,249 +1,75 @@
-name: donut CI
-
+name: Disposable dependency cache inventory
 on:
   push:
-    branches:
-      - "**"
-    paths-ignore:
-      - ".planning/**"
-      - "docs/**"
-
-env:
-  ARTIFACT: "donut"
-  VERSION: "0.0.1-SNAPSHOT"
-  FRONTEND_DIST_ARTIFACT: frontend-dist
-  CLI_DIST_ARTIFACT: cli-dist
-  MYSQL_UT_DB: "doughnut_test"
-  MYSQL_E2E_DB: "doughnut_e2e_test"
-  MYSQL_DB_USER: ${{ secrets.DBUSER }}
-  MYSQL_DB_PASSWORD: ${{ secrets.DBPASSWORD }}
-  REDIS_VERSION: "8.4"
-  MYSQL_VERSION: "8.4"
-  REDIS_PORT: "6380"
-  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GITHUB_FOR_ISSUES_API_TOKEN: ${{ secrets.GH_ISSUES_API_TOKEN }}
-  OPENAI_API_TOKEN: ${{ secrets.OPENAI_API_TOKEN }}
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-
+    branches: [codex/ci-cache-probe]
+permissions:
+  contents: read
 jobs:
-  Lint-N-Backend-Generated-Types-For-Frontend:
-    name: Linting & Types Gen for Frontend
+  baseline:
+    name: Legacy cache baseline ${{ matrix.sample }}
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Check for @focus tags in e2e test feature files
-        run: ./scripts/check_focus_tags.sh
-      - name: Check E2E cy.visit is only in the SPA visit gate
-        run: ./scripts/check_e2e_spa_visit_gate.sh
-      - name: Check @wip scenario count limit
-        run: ./scripts/check_wip_tags.sh
-      - uses: ./.github/setup_jdk_with_cache
-        with:
-          java_version: ${{ vars.JAVA_VERSION }}
-      - uses: ./.github/setup_nodejs_with_cache
-        with:
-          node_version: ${{ vars.NODE_VERSION }}
-      - run: bash -c ./assert_generated_type_script_up_to_date.sh
-      - run: pnpm lint:all
-
-  Backend-unit-tests:
-    name: Backend Unit tests
-    runs-on: ${{ vars.RUNNER }}
-    steps:
-      - uses: actions/checkout@v7
-      - name: Setup MySQL DB Server
-        uses: ./.github/mysql_db
-        with:
-          mysql_version: ${{ env.MYSQL_VERSION }}
-          mysql_db_host_port: ${{ vars.MYSQL_PORT }}
-          mysql_db_container_port: ${{ vars.MYSQL_PORT }}
-          mysql_db_instance: ${{ env.MYSQL_UT_DB }}
-          mysql_db_user: ${{ env.MYSQL_DB_USER }}
-          mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
-      - name: Setup Redis DB Server
-        uses: ./.github/redis_db
-        with:
-          redis_version: ${{ vars.REDIS_VERSION || env.REDIS_VERSION }}
-          redis_port: ${{ vars.REDIS_PORT || env.REDIS_PORT }}
-      - uses: ./.github/setup_jdk_with_cache
-        with:
-          java_version: ${{ vars.JAVA_VERSION }}
-      - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
-      - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
-      # Fat jar does not embed SPA/CLI (deploy workflow uploads them to GCS). Jar repro is Gradle-only.
-      - name: Boot jar reproducibility
-        run: bash backend/scripts/boot-jar-reproducible.sh
-
-  Frontend-unit-tests:
-    # Sharded to keep each browser session short: the Vitest browser-mode
-    # orchestrator leaks frame state and Chromium eventually crashes mid-run
-    # ("Browser connection was closed"). 2 shards keeps each session under
-    # ~100 spec files. Increase the shard count when the frontend spec count
-    # grows past ~250 (i.e. when a single shard nears ~125 files again).
-    name: Frontend Unit Tests (${{ matrix.shard }}/2)
-    runs-on: ${{ vars.RUNNER }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
-    env:
-      FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
+        sample: [1, 2, 3]
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/setup_nodejs_with_cache
-        with:
-          node_version: ${{ vars.NODE_VERSION }}
-      - run: pnpm frontend:test --shard=${{ matrix.shard }}/2
-
-  Other-unit-tests:
-    name: Other Unit Tests
-    runs-on: ${{ vars.RUNNER }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/setup_nodejs_with_cache
-        with:
-          node_version: ${{ vars.NODE_VERSION }}
-      - run: pnpm mcp-server:test
-      - run: pnpm cli:test
-      - name: Run script unit tests
-        run: bash scripts/test/run_all_script_tests.sh
-
-  Package-artifacts:
-    name: Package backend & frontend artifacts for deployment
-    runs-on: ${{ vars.RUNNER }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/setup_jdk_with_cache
-        with:
-          java_version: ${{ vars.JAVA_VERSION }}
-      - uses: ./.github/setup_nodejs_with_cache
-        with:
-          node_version: ${{ vars.NODE_VERSION }}
-      - name: Build SPA, CLI, and backend jar for deployment
-        run: pnpm cli:bundle && pnpm frontend:build
-      - name: Build application jar artifact
-        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-          path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-      - uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.FRONTEND_DIST_ARTIFACT }}
-          path: frontend/dist
-      - uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.CLI_DIST_ARTIFACT }}
-          path: cli/dist
-
-  E2E-tests:
-    # Explicit feature dirs (not letter globs) keep Cypress load ~even across
-    # the 6 shards. When adding a feature directory, put it in the lightest shard.
-    name: End-to-End tests with Database
-    runs-on: ${{ vars.RUNNER }}
-    strategy:
-      matrix:
-        spec:
-          - |
-            e2e_test/features/assimilation/**
-            e2e_test/features/ai_generated_content/**
-            e2e_test/features/ai_generated_recall_questions/**
-            e2e_test/features/note_view/**
-          - |
-            e2e_test/features/bazaar/**
-            e2e_test/features/book_reading/**
-            e2e_test/features/folder_organization/**
-            e2e_test/features/notebooks/**
-          - |
-            e2e_test/features/note_creation_and_update/**
-          - |
-            e2e_test/features/note_topology/**
-            e2e_test/features/relationships/**
-            e2e_test/features/circles/**
-          - |
-            e2e_test/features/recall/**
-            e2e_test/features/wikidata/**
-            e2e_test/features/mcp/**
-          - |
-            e2e_test/features/cli/**
-            e2e_test/features/messages/**
-            e2e_test/features/testability/**
-            e2e_test/features/user_admin/**
-            e2e_test/features/users/**
-    steps:
-      - uses: actions/checkout@v7
-      - uses: docker/login-action@v4
-        with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
-      - uses: ./.github/mysql_db
-        with:
-          mysql_version: ${{ env.MYSQL_VERSION }}
-          mysql_db_host_port: ${{ vars.MYSQL_PORT }}
-          mysql_db_container_port: ${{ vars.MYSQL_PORT }}
-          mysql_db_instance: ${{ env.MYSQL_E2E_DB }}
-          mysql_db_user: ${{ env.MYSQL_DB_USER }}
-          mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
-      - name: Setup Redis DB Server
-        uses: ./.github/redis_db
-        with:
-          redis_version: ${{ vars.REDIS_VERSION || env.REDIS_VERSION }}
-          redis_port: ${{ vars.REDIS_PORT || env.REDIS_PORT }}
-      - name: Setup JDK
-        uses: ./.github/setup_jdk_with_cache
-        with:
-          java_version: ${{ vars.JAVA_VERSION }}
-      - name: Setup E2E Cypress dependencies
+      - uses: actions/checkout@v6
+      - name: Start preparation clock
+        run: echo "PROBE_START_MS=$(date +%s%3N)" >> "$GITHUB_ENV"
+      - name: Existing shared setup unchanged
         uses: ./.github/setup_nodejs_with_cache
         with:
-          node_version: ${{ vars.NODE_VERSION }}
-      - name: Restore E2E bundled dist cache
-        id: e2e-dist-cache
-        uses: actions/cache@v6
-        with:
-          path: |
-            frontend/dist
-            cli/dist
-            mcp-server/dist
-          key: ${{ runner.os }}-e2e-dist-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'frontend/package.json', 'frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/index.html', 'frontend/src/**', 'frontend/public/**', 'cli/package.json', 'cli/src/**', 'cli/tsconfig.json', 'mcp-server/package.json', 'mcp-server/src/**', 'packages/generated/donut-backend-api/**', 'packages/donut-api/**') }}
-      - name: Build E2E bundles if needed
-        run: bash scripts/ci/e2e-bundle-if-needed.sh
-        env:
-          E2E_DIST_CACHE_HIT: ${{ steps.e2e-dist-cache.outputs.cache-hit }}
-      - name: Run E2E matrix via owned invocation wrapper
+          node_version: '26'
+      - name: Inventory and verify
+        shell: bash
         run: |
-          SUT_RUNTIME_TARGET='{"built":true}' node scripts/e2e-runner.mjs --spec "${{ matrix.spec }}" --browser chrome
-        env:
-          E2E_DIST_CACHE_HIT: ${{ steps.e2e-dist-cache.outputs.cache-hit }}
-          GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
-          NO_PROXY: 127.0.0.1,localhost
-      - uses: actions/upload-artifact@v7
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: e2e_test/screenshots
-
-  Notify-on-failure:
-    name: Single Slack notification on CI failure
-    runs-on: ${{ vars.RUNNER }}
-    needs:
-      [
-        Lint-N-Backend-Generated-Types-For-Frontend,
-        Backend-unit-tests,
-        Frontend-unit-tests,
-        Other-unit-tests,
-        Package-artifacts,
-        E2E-tests,
-      ]
-    if: always() && contains(needs.*.result, 'failure')
+          set -euo pipefail
+          echo "PROBE setup_ms=$(( $(date +%s%3N) - PROBE_START_MS )) sample=${{ matrix.sample }} mode=legacy"
+          echo "PROBE revision=$GITHUB_SHA runner_os=$RUNNER_OS runner_arch=$RUNNER_ARCH image=$ImageOS image_version=$ImageVersion"
+          echo "PROBE node=$(node --version) pnpm=$(pnpm --version) lock_sha256=$(sha256sum pnpm-lock.yaml | cut -d' ' -f1)"
+          store_path=$(pnpm store path --silent)
+          cypress_path=$(pnpm exec cypress cache path)
+          echo "PROBE store_path=$store_path cypress_path=$cypress_path"
+          du -sk "$store_path" "$cypress_path"
+          du -k --max-depth=1 "$store_path" "$cypress_path" | sort -n
+          pnpm exec cypress cache list
+          pnpm exec cypress version
+          expected=$(node -p 'require("cypress/package.json").version')
+          actual=$(pnpm exec cypress version --component binary)
+          test "$expected" = "$actual"
+          echo "PROBE package_binary_match=$expected"
+          /usr/bin/time -f 'PROBE cypress_verify_seconds=%e' pnpm exec cypress verify
+  clean:
+    name: Clean uncached installation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
+      - name: Start preparation clock
+        run: echo "PROBE_START_MS=$(date +%s%3N)" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@v7
         with:
-          fetch-depth: 1
-      - uses: ./.github/notify_ci_failure
-        with:
-          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          node-version: '26'
+      - uses: pnpm/action-setup@v6
+      - name: Install dependencies without cache
+        run: /usr/bin/time -f 'PROBE install_seconds=%e' pnpm --frozen-lockfile recursive install
+      - name: Inventory and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "PROBE setup_ms=$(( $(date +%s%3N) - PROBE_START_MS )) mode=clean"
+          echo "PROBE revision=$GITHUB_SHA runner_os=$RUNNER_OS runner_arch=$RUNNER_ARCH image=$ImageOS image_version=$ImageVersion"
+          echo "PROBE node=$(node --version) pnpm=$(pnpm --version) lock_sha256=$(sha256sum pnpm-lock.yaml | cut -d' ' -f1)"
+          store_path=$(pnpm store path --silent)
+          cypress_path=$(pnpm exec cypress cache path)
+          echo "PROBE store_path=$store_path cypress_path=$cypress_path"
+          du -sk "$store_path" "$cypress_path"
+          du -k --max-depth=1 "$store_path" "$cypress_path" | sort -n
+          pnpm exec cypress cache list
+          pnpm exec cypress version
+          expected=$(node -p 'require("cypress/package.json").version')
+          actual=$(pnpm exec cypress version --component binary)
+          test "$expected" = "$actual"
+          echo "PROBE package_binary_match=$expected"
+          /usr/bin/time -f 'PROBE cypress_verify_seconds=%e' pnpm exec cypress verify
