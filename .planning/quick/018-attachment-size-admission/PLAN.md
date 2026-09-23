@@ -130,7 +130,15 @@ explicitly unfinished until slice 2, with no content loss or history changes.
 ### 2. Refuse oversized payloads hidden in unpublished history
 
 Type: Behavior
-Status: planned
+Status: done
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`admit` walks `firstParentRange` from index 1. History scenarios live in
+`NotebookGitAttachmentSizeAdmissionHistoryControllerTest`. Refactor consolidated
+fixtures and reran
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookGitAttachmentSizeAdmission*'`
+(pass). Docs in `docs/notebook-git-attachments.md` state the raw-Git rule and
+that the LFS exception is not delivered.
 
 Behavior: A new oversized payload occurs in an intermediate commit, followed by
 deletion or smaller replacement → the whole publication is refused even if the
@@ -222,7 +230,8 @@ Story Branch Mode. Created this session.
 - Integration checkout: `/Users/terryyin/git/doughnut` (local `main`). Default-checkout refresh after the claim was deferred (`unclear-ownership`); it remains at `d8c411dd724e209bfbb813ba477bad33667b272f`.
 - Claim publication: `4ad31c66bca8d73110e8a37de10a5aded3711fa3` accepted on `origin` `refs/heads/main`.
 - Increment target: `origin` `refs/heads/story/attachment-size-admission`.
+- Published increment: `b3ddc1fa3e48bdf95cb0b5b264636a720d0cd7cc` accepted on `origin` `refs/heads/story/attachment-size-admission` (slice 1). Registered with observer `/tmp/dough-ci-501/watch-mO4rGQ`.
 - Replanning: preserved (allowed on overrun).
 - CI source: GitHub Actions workflow `ci.yml`, display name `donut CI`. Observer directory `/tmp/dough-ci-501/watch-mO4rGQ`, bound to `story/attachment-size-admission`. Claim on trunk is `pendingCi: unobserved`.
 
-Slice 1 is implemented and awaiting its increment publication. Slices 2 and 3 remain planned.
+Slice 1 is published as `b3ddc1fa3e48bdf95cb0b5b264636a720d0cd7cc` on `origin/story/attachment-size-admission`. Slice 2 is implemented and awaiting its increment publication. Slice 3 remains planned.

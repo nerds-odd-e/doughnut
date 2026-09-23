@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
@@ -15,9 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Admits tip attachment payloads against the inclusive raw-Git size limit, grandfathering object
- * identities already accepted as attachments in this notebook's retained history (ADR 0002; ADR
- * 0004 Portable attachments; ADR 0006 loud actionable refusal).
+ * Admits attachment payloads across a proposal's first-parent range against the inclusive raw-Git
+ * size limit, grandfathering object identities already accepted as attachments in this notebook's
+ * retained history (ADR 0002; ADR 0004 Portable attachments; ADR 0006 loud actionable refusal).
  */
 final class NotebookGitAttachmentSizeAdmission {
 
@@ -26,26 +27,32 @@ final class NotebookGitAttachmentSizeAdmission {
   private NotebookGitAttachmentSizeAdmission() {}
 
   /**
-   * Refuses a newly introduced tip attachment whose object length exceeds {@link #LIMIT_BYTES}.
-   * Payloads already present as attachments anywhere in history rooted at {@code acceptedHead} in
-   * {@code acceptedRepository} are reused by content identity.
+   * Refuses a newly introduced attachment whose object length exceeds {@link #LIMIT_BYTES} at any
+   * path in the contiguous first-parent range from {@code acceptedHead} (exclusive) through {@code
+   * proposedHead}. Payloads already present as attachments anywhere in history rooted at {@code
+   * acceptedHead} in {@code acceptedRepository} are reused by content identity.
    */
-  static void admitTip(
+  static void admit(
       Repository proposalRepository,
       ObjectId proposedHead,
       Repository acceptedRepository,
       ObjectId acceptedHead) {
     Set<ObjectId> grandfathered = attachmentObjectIdsInHistory(acceptedRepository, acceptedHead);
     Set<ObjectId> inspected = new HashSet<>();
-    for (Map.Entry<String, ObjectId> tipBlob :
-        attachmentBlobIds(proposalRepository, proposedHead).entrySet()) {
-      ObjectId blobId = tipBlob.getValue();
-      if (grandfathered.contains(blobId) || !inspected.add(blobId)) {
-        continue;
-      }
-      long size = objectLength(proposalRepository, blobId);
-      if (size > LIMIT_BYTES) {
-        throw oversizedRefusal(tipBlob.getKey(), size);
+    List<ObjectId> range =
+        NotebookGitProposalAncestry.firstParentRange(
+            proposalRepository, acceptedHead, proposedHead);
+    for (ObjectId commitId : range.subList(1, range.size())) {
+      for (Map.Entry<String, ObjectId> blob :
+          attachmentBlobIds(proposalRepository, commitId).entrySet()) {
+        ObjectId blobId = blob.getValue();
+        if (grandfathered.contains(blobId) || !inspected.add(blobId)) {
+          continue;
+        }
+        long size = objectLength(proposalRepository, blobId);
+        if (size > LIMIT_BYTES) {
+          throw oversizedRefusal(blob.getKey(), size);
+        }
       }
     }
   }

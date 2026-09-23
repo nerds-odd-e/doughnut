@@ -90,7 +90,7 @@ public class NotebookGitProposalPublisher {
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
     try (var accepted = repositoryStore.open(binding)) {
-      NotebookGitAttachmentSizeAdmission.admitTip(
+      NotebookGitAttachmentSizeAdmission.admit(
           proposal.repository(), proposal.mainHead(), accepted.repository(), acceptedHead);
     }
 
