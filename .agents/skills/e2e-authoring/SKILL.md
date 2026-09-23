@@ -11,7 +11,7 @@ Use this skill when writing or modifying E2E tests, Cypress/Cucumber feature fil
 
 ## Environment Assumption
 
-Assume the developer has already started services with `pnpm cy:run` (the wrapper owns its stack), including backend auto-reload, frontend HMR, and Mountebank. Services automatically restart when code changes are made.
+The `pnpm cy:run` wrapper owns its stack and compiles current backend source once per batch, without a continuous backend compiler. Local batches retain frontend HMR; backend edits need a new invocation. Use `pnpm cy:open` for an interactive session with backend reload and frontend HMR. Required mocks are owned by the selected invocation.
 
 If services are not running, suggest running `pnpm cy:run --spec <feature>` in a separate terminal.
 
@@ -193,31 +193,7 @@ Rules of thumb:
 
 ## Test Data And Service Mocking
 
-- Use Given steps to set up test data.
-- Mock external services, such as OpenAI, for reliable tests.
-- Use tags to indicate when mocks are required.
-- Keep mock responses consistent with real service behavior.
-- Store mock data separately from test code.
-- Clean up test data after each test.
-- Use data tables for complex test data.
-
-```gherkin
-Given I have a notebook "Geometry set" with notes:
-  | Title  |
-  | Shape  |
-  | Square |
-```
-
-Square is placed under Shape when the notebook is created in one inject batch. Do not add a `Folder` column; see testability inject ordering.
-
-```typescript
-Given("OpenAI assistant will reply below for user messages in a stream run:", (data: DataTable) => {
-  mock_services
-    .openAi()
-    .stubCreateThread("thread-123")
-    .createThreadAndStubMessages("thread-123", data.hashes())
-})
-```
+Follow [test data and service mocking](references/test-data-and-service-mocking.md) when writing Given setup or external-service fixtures.
 
 ## Assertions
 

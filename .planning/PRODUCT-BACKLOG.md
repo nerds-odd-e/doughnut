@@ -10,7 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Start local E2E reliably with an existing backend build](seeds/SEED-040-reliable-local-e2e-startup.md#story-1) — SEED-040#story-1 ([plan](quick/016-reliable-local-e2e-startup/PLAN.md))
 - [Simplify Git publication during note saves by eliminating unnecessary database work](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2) — SEED-037#story-2 ([plan](quick/017-simplify-note-save-publication/PLAN.md))
 
 ## Backlog list

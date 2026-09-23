@@ -810,6 +810,6 @@ Slice delivery requires a fresh `dough-post-change-refactor` agent and a verbati
 
 ## Retention
 
-- Highest allocated local number: 103
+- Highest allocated local number: 104
 - Recovery: `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad`
 - Occurrence history is partial

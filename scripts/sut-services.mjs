@@ -22,12 +22,12 @@ const repoRoot = path.resolve(
   '..'
 )
 
-export function sutServiceArgs(target) {
+export function sutServiceArgs(target, backendReload = true) {
   const args = [
     'exec',
     'run-p',
     '-lnr',
-    target.built ? 'backend:sut:ci' : 'backend:sut',
+    target.built || !backendReload ? 'backend:sut:ci' : 'backend:sut',
   ]
   if (target.mountebankPort != null) args.push('start:mb')
   // Built-asset target: serve the frontend from `frontend/dist` via the local
@@ -56,7 +56,8 @@ export function runSutServices({
   const target = resolveSutRuntimeTarget({ runtimeTarget, env })
   return runSupervisedServiceGroup({
     spawnFn,
-    serviceArgs: serviceArgs ?? sutServiceArgs(target),
+    serviceArgs:
+      serviceArgs ?? sutServiceArgs(target, env.SUT_BACKEND_RELOAD !== 'false'),
     cwd: checkoutRoot,
     env: withSutRuntimeTargetEnv(env, target),
     logWriter,

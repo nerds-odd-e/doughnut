@@ -20,19 +20,21 @@ export const PID_FILE = path.join(repoRoot, 'sut.pid')
  * Spawn the SUT service group detached. The wrapper keeps running after this
  * startup helper exits and writes stdout+stderr through a rotating log.
  *
- * @param {{ spawnFn?: typeof spawn, logFile?: string, runtimeTarget?: object }} [opts]
+ * @param {{ spawnFn?: typeof spawn, logFile?: string, runtimeTarget?: object, backendReload?: boolean }} [opts]
  * @returns {{ child: import('node:child_process').ChildProcess, logFile: string }}
  */
 export function spawnSutServices({
   spawnFn = spawn,
   logFile = LOG_FILE,
   runtimeTarget,
+  backendReload = true,
   owner,
   checkoutRoot = repoRoot,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget })
   const ownerEnv = {
     SUT_CHECKOUT_ROOT: checkoutRoot,
+    SUT_BACKEND_RELOAD: String(backendReload),
     ...(owner
       ? {
           SUT_OWNER_TOKEN: owner.token,
