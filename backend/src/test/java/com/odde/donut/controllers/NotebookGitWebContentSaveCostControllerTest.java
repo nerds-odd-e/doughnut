@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /** A web save's server work depends on what changed, not on the notebook's size. */
 class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentSaveCostTestSupport {
@@ -134,6 +136,15 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentS
     assertThat(wide.treeFetches(), lessThanOrEqualTo(13L));
     assertThat(wide.fetchedObjectBytes(), greaterThan(narrow.fetchedObjectBytes()));
     assertThat(wide.objectInsertRows(), lessThanOrEqualTo(15));
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {0, 12})
+  void contentSaveDoesNotRediscoverTheAppendedHead(int depth) throws Exception {
+    SaveCostObservation saved = measureContentSave(depth, 40, 0, 0, "accepted-head-depth" + depth);
+
+    assertThat(saved.postAppendRefReadExecutions(), equalTo(0L));
+    assertThat(saved.refReadExecutions(), equalTo(1L));
   }
 
   @Test

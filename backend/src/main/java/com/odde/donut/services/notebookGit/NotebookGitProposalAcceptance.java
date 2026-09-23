@@ -62,7 +62,8 @@ class NotebookGitProposalAcceptance {
         projectAttachments(published, proposal);
     NotebookGitStateLoader.LockedNotebookState reconciled =
         requireMatchingProposedTree(withAttachmentFolders, proposal);
-    return repositoryStore.store(reconciled.binding(), proposal.repository(), publishedAt);
+    return repositoryStore.store(
+        reconciled.binding(), proposal.repository(), proposal.mainHead(), publishedAt);
   }
 
   /**

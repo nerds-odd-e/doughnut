@@ -28,7 +28,10 @@ abstract class NotebookGitWebContentSaveCostTestSupport
     Notebook notebook = createGitBackedNotebook(label);
     Folder parent = buildDepthPath(notebook, depth);
     widenAncestors(notebook, parent, ancestorWidth);
-    Note note = makeMe.aNote().folder(parent).content(ACCEPTED_CONTENT).please();
+    Note note =
+        (parent == null ? makeMe.aNote().notebook(notebook) : makeMe.aNote().folder(parent))
+            .content(ACCEPTED_CONTENT)
+            .please();
     seedUnrelatedFoldersAndNotes(notebook, parent, unrelatedFolders, unrelatedNotes, null);
     storeFolderAttachmentAndSnapshot(
         notebook, null, "noise.bin", new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
@@ -133,6 +136,13 @@ abstract class NotebookGitWebContentSaveCostTestSupport
         callLog.fetchedObjectBytes(),
         callLog.countExecutionsMatching("UPDATE notebook_git_binding", "accepted_git_object_id"),
         callLog.executions().size(),
+        callLog.countExecutionsMatching("SELECT accepted_git_object_id FROM notebook_git_binding"),
+        callLog.executions().stream()
+            .dropWhile(
+                e -> !e.sql().startsWith("UPDATE notebook_git_binding SET accepted_git_object_id"))
+            .filter(
+                e -> e.sql().startsWith("SELECT accepted_git_object_id FROM notebook_git_binding"))
+            .count(),
         fetchedObjectIdsReturningType(callLog, Constants.OBJ_TREE));
   }
 
@@ -159,5 +169,7 @@ abstract class NotebookGitWebContentSaveCostTestSupport
       long fetchedObjectBytes,
       long bindingUpdateExecutions,
       int jdbcExecutions,
+      long refReadExecutions,
+      long postAppendRefReadExecutions,
       List<ObjectId> fetchedTreeIds) {}
 }

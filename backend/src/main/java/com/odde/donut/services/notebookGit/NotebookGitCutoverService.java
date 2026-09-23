@@ -3,8 +3,11 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +54,7 @@ public class NotebookGitCutoverService {
     try (Repository repository = buildRepository(notebook, cutoverTime, CUTOVER_COMMIT_MESSAGE)) {
       storeHistory(binding, repository, cutoverTime);
     }
-    return notebookGitBindingRepository.save(binding);
+    return binding;
   }
 
   /**
@@ -73,7 +76,7 @@ public class NotebookGitCutoverService {
     try (Repository repository = buildRepository(notebook, resetTime, RESET_COMMIT_MESSAGE)) {
       storeHistory(binding, repository, resetTime);
     }
-    return notebookGitBindingRepository.save(binding);
+    return binding;
   }
 
   private Repository buildRepository(Notebook notebook, Instant commitTime, String message) {
@@ -90,6 +93,14 @@ public class NotebookGitCutoverService {
     if (binding.getCreatedAt() == null) {
       binding.setCreatedAt(timestamp);
     }
-    repositoryStore.apply(binding, repository, timestamp);
+    try {
+      repositoryStore.store(
+          binding,
+          repository,
+          repository.exactRef(Constants.R_HEADS + "main").getObjectId(),
+          timestamp);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 }
