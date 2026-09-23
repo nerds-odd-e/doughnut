@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Keep remote note content aligned when an in-flight edit is undone](seeds/SEED-036-keep-undone-edits-consistent.md#story-1) — SEED-036#story-1 ([plan](quick/008-undone-edit-autosave/PLAN.md))
-
 ## Backlog list
 
 - [Publish a web save from a whole-notebook assembly that never moves content bytes](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-3) — SEED-037#story-3
