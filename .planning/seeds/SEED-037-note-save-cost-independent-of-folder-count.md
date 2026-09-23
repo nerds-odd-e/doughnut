@@ -93,7 +93,7 @@ ordinary single-note save, not just a cheaper hash.
 
 ### Simplify Git publication during note saves by eliminating unnecessary database work
 
-**Identity:** SEED-037#story-2. **Status: retry also abandoned; no-regression unestablished (2026-09-23).**
+**Identity:** SEED-037#story-2. **Status: done; owner accepted measured latency tradeoff (2026-09-23).**
 
 The accepted-head handoff removed the redundant post-append SQL read and passed
 all 2,581 backend tests (two opt-in measurement cases skipped). Independent
@@ -125,7 +125,7 @@ The plan retains individual timings and proof. No successor was queued.
 
 ## Ordering and Scope Reduction
 
-Stories 2 and 3 remain abandoned. Ancestor-only change-capture publication
+Story 2 is complete after the owner explicitly accepted root mean17.54→19.65ms, depth12 mean62.86→43.54ms, and equal-weight mean40.20→31.59ms. The averages are local observations, not a production workload claim. Story 3 remains abandoned. Ancestor-only change-capture publication
 remains unchanged. Neither story reserves a backlog position or authorizes an
 automatic retry; further work requires a fresh owner decision and evidence.
 

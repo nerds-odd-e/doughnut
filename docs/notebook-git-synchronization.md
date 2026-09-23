@@ -174,6 +174,12 @@ resolution, placement, and authored reference handling finish before that
 capture closes; newly created folders and all affected in-notebook content are
 captured with it. Do not publish individual low-level placement steps.
 
+Accepted repository persistence receives the commit ID already produced or validated
+by its caller; a web save does not reread the accepted ref after appending.
+The shared store sets the binding head and update time. A new binding is persisted
+before its objects are copied, and the final binding save remains in the publication
+transaction so a late persistence failure rolls back the publication.
+
 Placement, folder construction, reference choices, content persistence, deletion,
 and Portable encoding remain with their domain owners. Controllers do not
 duplicate Git coordination. Preserve existing non-Git behavior. A derived commit

@@ -97,14 +97,15 @@ public class AcceptedWebChangeService {
     if (tree.treeId().equals(acceptedRootTreeId)) {
       return;
     }
-    NotebookGitCommitBuilder.append(
-        accepted.repository(),
-        accepted.head(),
-        tree,
-        NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
-        NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,
-        message,
-        updatedAt.toInstant());
-    repositoryStore.store(notebook.binding(), accepted.repository(), updatedAt);
+    ObjectId newHead =
+        NotebookGitCommitBuilder.append(
+            accepted.repository(),
+            accepted.head(),
+            tree,
+            NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
+            NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,
+            message,
+            updatedAt.toInstant());
+    repositoryStore.store(notebook.binding(), accepted.repository(), newHead, updatedAt);
   }
 }

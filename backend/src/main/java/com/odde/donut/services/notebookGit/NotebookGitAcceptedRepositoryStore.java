@@ -8,7 +8,6 @@ import java.io.UncheckedIOException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import javax.sql.DataSource;
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectInserter;
 import org.eclipse.jgit.lib.Repository;
@@ -53,7 +52,7 @@ class NotebookGitAcceptedRepositoryStore {
   /**
    * Opens {@code binding}'s accepted repository from the native object store, on the JDBC
    * connection bound to the current Spring transaction (so a caller's later native writes
-   * commit/roll back with the rest of that transaction). Creation/cutover/reset ({@link #apply})
+   * commit/roll back with the rest of that transaction). Creation/cutover/reset ({@link #store})
    * write every object the accepted head reaches, so a later read of an object missing from the
    * native store fails loudly rather than being repaired here.
    */
@@ -65,22 +64,22 @@ class NotebookGitAcceptedRepositoryStore {
   }
 
   /**
-   * Writes {@code repository}'s {@code main} head as {@code binding}'s new accepted head and
-   * persists the binding. When {@code repository} is already the binding's native store (an
-   * ordinary web save appends directly against the repository {@link #open} returned), its objects
-   * and head are already durable - written by the append itself - and only the JPA-managed entity
-   * is brought back in sync. Otherwise (for example a proposal's imported repository), every object
-   * {@code main} reaches is copied into the native store first.
+   * Persists the caller's accepted head and binding timestamp. Imported repositories copy their
+   * reachable objects first; native appends already wrote them in the current transaction. A new
+   * binding must be inserted before copying because native objects reference its row.
    */
-  String store(NotebookGitBinding binding, Repository repository, Timestamp updatedAt) {
-    ObjectId newHead = mainHeadOf(repository);
-    if (!(repository instanceof JdbcNotebookGitRepository)) {
-      copyIntoNativeStore(binding, repository, newHead);
-    }
-    binding.setAcceptedGitObjectId(newHead.name());
+  String store(
+      NotebookGitBinding binding, Repository repository, ObjectId head, Timestamp updatedAt) {
+    binding.setAcceptedGitObjectId(head.name());
     binding.setUpdatedAt(updatedAt);
+    if (binding.getId() == null) {
+      entityPersister.save(binding);
+    }
+    if (!(repository instanceof JdbcNotebookGitRepository)) {
+      copyIntoNativeStore(binding, repository, head);
+    }
     entityPersister.save(binding);
-    return newHead.name();
+    return head.name();
   }
 
   /**
@@ -99,32 +98,6 @@ class NotebookGitAcceptedRepositoryStore {
     } finally {
       DataSourceUtils.releaseConnection(connection, dataSource);
     }
-  }
-
-  private static ObjectId mainHeadOf(Repository repository) {
-    try {
-      return repository.exactRef(Constants.R_HEADS + "main").getObjectId();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  /**
-   * Writes {@code repository}'s {@code main} head as {@code binding}'s new accepted head and copies
-   * every object it reaches into the native object store, for callers that own their own
-   * persistence call (creation/cutover/reset, which additionally save through {@code
-   * NotebookGitBindingRepository} alongside other binding fields such as {@code createdAt}). Native
-   * object rows carry a foreign key to the binding row, so this persists {@code binding} first if
-   * it does not have an ID yet (a brand-new binding); the caller's own later save then updates that
-   * same already-persisted row rather than inserting a second one.
-   */
-  String apply(NotebookGitBinding binding, Repository repository, Timestamp updatedAt) {
-    ObjectId head = mainHeadOf(repository);
-    binding.setAcceptedGitObjectId(head.name());
-    binding.setUpdatedAt(updatedAt);
-    entityPersister.save(binding);
-    copyIntoNativeStore(binding, repository, head);
-    return head.name();
   }
 
   /**

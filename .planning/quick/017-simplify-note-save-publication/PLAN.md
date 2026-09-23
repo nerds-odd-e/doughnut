@@ -1,6 +1,6 @@
 # Simplify Git publication during note saves
 
-Status: abandoned after authorized retry; no latency regression was not established.
+Status: done under explicit owner acceptance of the measured latency tradeoff.
 Work item: **SEED-037#story-2**.
 Source: [refined story](../../seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2)
 and the owner's 2026-09-23 simplify-or-abandon decision and planning request.
@@ -9,8 +9,7 @@ and the owner's 2026-09-23 simplify-or-abandon decision and planning request.
 
 Try one coherent simplification of existing publication persistence. Keep it
 only if it makes the design cleaner, does not increase affected production code,
-reduces unnecessary save-path SQL, preserves correctness, and leaves representative
-latency at least as good. Roughly one-second production saves are acceptable;
+reduces unnecessary save-path SQL, preserves correctness, and meets the owner-approved latency tradeoff below. Roughly one-second production saves are acceptable;
 this is not an incident response or a fixed-query-budget promise. Failure or
 unresolved evidence ends the attempt and removes the story from the backlog.
 
@@ -63,7 +62,7 @@ No new architectural decision or North Star change is needed.
 
 ### Save through one coherent accepted-head persistence handoff
 
-Type: Behavior. Status: abandoned.
+Type: Behavior. Status: done.
 
 Behavior: an author edits an existing root or deeply nested note → publication
 uses the already-known new head without rediscovering it → the same complete,
@@ -248,3 +247,9 @@ Retained raw evidence: `/tmp/donut-017-retry/` (four XML/log pairs, comparison.j
 Root candidate medians exceed both baseline medians, whereas depth12 varies markedly within/between batches. SQL/bytes remain steady across the roughly70→35ms within-batch shifts. Background VM/application workload was recorded and not modified. This supports caution about causation, not a claim of no regression; fresh independent review agrees no-regression is unestablished. It found no defensible additional comparison from the available noise evidence; repeating until favorable would not justify acceptance.
 
 Retry disposition: **discard**. No causal slowdown is proven, but no-regression was not established for both shapes. The relaxed size gate, design, SQL and correctness passed; performance did not. All seven code/test files restored; no product change retained. No new backlog entry or successor. Owner confirmed the retry entry need not be restored after asking about its absence. Retry closeout publishes only this plan and the seed lesson to `origin/main`.
+
+### Final owner decision (2026-09-23)
+
+After reviewing both shapes, the owner explicitly chose to keep the candidate and wrap up. This supersedes the per-shape no-regression gate and both abandonment dispositions above. Arithmetic means across both batches: root baseline17.5431ms/candidate19.645825ms; depth12 baseline62.8599ms/candidate43.53685ms; equal-weight mean40.2015ms/31.5913375ms (21.4% lower). The owner accepts measured root slowdown for the larger depth12 gain. Equal weighting is a decision assumption, not a measured production workload distribution; noisy timings do not establish causation or production speedup. Size remains no increase; SQL/design/correctness criteria remain unchanged. Restore the exact reviewed candidate; preserve sibling story3 and do not recreate a backlog entry.
+
+Final verification: fresh independent refactor corrected only even-sample diagnostic median output; production patch unchanged. Full backend suite passed (2,581 tests, zero failures/errors, two opt-in skips); coordinator format:changed passed. No API/schema generation required. SQL regression, rollback and shared-caller proof retained. Execution observer root-017-keep: cell7, PTY64592, mailbox /tmp/dough-ci-501/watch-rEiUkG, PID20390; target origin/codex/simplify-note-save-publication.
