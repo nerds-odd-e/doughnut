@@ -104,37 +104,74 @@ No executable plan or implementation is authorized by this seed.
 
 ### 12. Reject oversized supporting files without changing the notebook
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/018-attachment-size-admission/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"22c700fcec4e712baa096b85316d320379ef70e90ff9aa9500e26087d79661cf","plan":"4c16667dd93727d7cf6b00a2ce533a209b81b5761c9759b2660f8968ea6c556a"}}
 ```
 
 - **Identity:** SEED-035#story-12
-- **Goal:** Notebook owners receive a clear refusal before an oversized image,
-  PDF, or other attachment can consume accepted storage or leave their notebook
-  in a partially changed state.
-- **Evaluation:** An attachment within the 10 MiB boundary is accepted
-  through a supported attachment-publication path. An attachment just over the
-  boundary is refused with a clear size message; the accepted Git head,
-  application projection, notes, files, and learning histories remain unchanged.
-  Oversized uploads are refused before becoming durable verified objects;
-  abandoned staging data is not accepted content.
-- **Scope / value:** Establish one attachment-size rule at the common acceptance
-  boundary and apply it to every attachment ingress available when delivered,
-  including local publication rather than only multipart web requests. This is
-  useful before external binary storage exists and remains a safety constraint
-  afterward. It does not by itself reduce existing database or bundle size.
-- **Effort hypothesis:** M, medium confidence; the rejection behavior is small,
-  but inspecting every accepted path and the relevant submitted Git range may
-  reveal a wider proof boundary.
-- **Depends on:** No external-storage story. It must preserve the already
-  delivered attachment continuity for files within the limit.
-- **Safe stopping point:** Oversized attachments cannot enter accepted state;
-  current binary storage and Git history remain otherwise unchanged.
-- **Policy:** Accept up to 10 MiB (10,485,760 bytes), inclusive. Inspect
-  new attachment payloads across all submitted commits, including a file added
-  then deleted before the tip. Grandfather already accepted oversized content;
-  reject new oversized versions. Books keep their independent policy.
-- **Refinement remaining:** Map the existing ingress paths and boundary examples.
-  A per-file limit does not decide a proposal, notebook, or account quota.
+- **Goal:** Notebook owners receive an actionable refusal when publishing a new
+  oversized supporting file, without changing their accepted notebook or learning
+  history. This prevents individual accidental additions from becoming durable
+  raw-Git history before attachment use expands.
+- **Value now:** This is a credible preventive concern, not an experienced
+  incident or measured storage emergency. Keep it first because the guard is
+  small and independently useful. Browsing/download and guidance exclusion have
+  stronger direct workflow value; do not expand this story into LFS delivery.
+- **Scope:** Apply the inclusive 10 MiB (10,485,760 byte) limit to new attachment
+  payloads anywhere in newly submitted raw-Git history, including additions
+  deleted or replaced before the tip. Validate actual blob size, not compressed
+  bundle size. Root and nested attachments follow the same rule. Use current
+  Portable-tree classification; ordinary Markdown and structural markers keep
+  their existing rules. This does not introduce LFS metadata support.
+- **Grandfathering:** Payloads already accepted as attachments within this
+  notebook are exempt by content identity, including historical payloads no
+  longer at the current tip. They may remain, move, rename, or reappear. The
+  same filename with different oversized bytes is new content. Acceptance in a
+  different notebook grants no exemption; client claims grant none.
+- **Rejection:** Name an offending path, its byte size, the limit, and the need
+  to remove the oversized payload from unpublished history. The accepted head,
+  durable accepted objects, projection, notes, attachments, and private learning
+  state remain unchanged. Temporary proposal import/staging is allowed. No
+  promise to list every violation or prevent request-memory consumption.
+- **Recovery for this increment:** Amend or otherwise rewrite only unpublished
+  commits, then republish. Adding a later deletion/replacement commit is not
+  enough while raw Git retains the earlier blob. Never rewrite accepted history
+  or mutate the local checkout automatically.
+- **Existing ingress:** Git-bundle publication is the gap. Web note-image
+  multipart uploads already declare the same inclusive limit via
+  `NoteImageUploadDTO` and `MultipartFileValidator`; preserve and verify that
+  validation rather than merging the legacy image model with notebook files.
+  Web note saves and folder operations preserve accepted attachment content.
+  Books and their limits remain separate.
+- **Key examples:**
+  - A new root or nested attachment of exactly 10,485,760 bytes publishes and
+    can be reacquired byte-for-byte; one additional byte is refused.
+  - A proposal mixing a note edit, valid attachment, and oversized attachment
+    is refused with all accepted state unchanged, including learning data.
+  - An oversized file added then deleted, or replaced with a smaller version,
+    in the same unpublished range is refused even when the final tree is valid
+    or identical to the accepted tree. Rewriting only that unpublished range to
+    remove the offending payload permits publication.
+  - A grandfathered oversized file survives a web note save and local rename;
+    restoring its historical accepted bytes is allowed, but new oversized bytes
+    or bytes accepted only by another notebook are refused.
+  - Replacing/deleting a valid published attachment retains its earlier bytes
+    in downloadable history. The cap applies per file, not to the sum of files.
+- **Deferred promises / exclusions:** Story 13 owns standard LFS and recovery by
+  adding a corrective commit; story 14 owns existing-notebook conversion.
+  Exclude aggregate quotas, compression, historical shrinking, automatic history
+  rewriting, new upload/browse/preview UI, Book changes, garbage collection,
+  and latest-snapshot-only retention. Git recovery does not restore deleted
+  private learning identities.
+- **Owner decision, 2026-09-23:** Terry accepted the strict raw-Git guard first,
+  with easier recovery in LFS later. The accepted future preservation policy is
+  recorded under story 13; it does not weaken this increment's raw-Git rule.
+- **Effort hypothesis:** M (1–2 hours), medium confidence, including delivery and
+  required verification. Reassess if acceptance-path changes exceed this bound.
+- **Depends on:** Delivered root/nested attachment continuity, not external
+  storage. No schema migration or new infrastructure is expected.
+- **Safe stopping point:** On completion, new oversized raw attachment bytes
+  cannot enter accepted history; grandfathered content remains usable.
+- **Open product decisions:** None for this increment.
 
 <a id="story-13"></a>
 
@@ -144,6 +181,25 @@ No executable plan or implementation is authorized by this seed.
 ```
 
 - **Identity:** SEED-035#story-13
+- **Owner-approved recovery and retention, 2026-09-23:** Every successfully
+  published snapshot retains its exact attachment bytes. In a new LFS proposal,
+  a new oversized payload occurring only in unpublished intermediate commits
+  may be omitted when the tip is valid: a corrective follow-up commit suffices.
+  Preserve intermediate commits/pointers and ordinary within-limit versions;
+  report omitted content as unavailable on attempted hydration, never substitute
+  current bytes. Example: unpublished 20 MiB then 3 MiB versions publish with
+  only the latter payload stored; a fresh checkout of the tip succeeds, while
+  the intermediate oversized version cannot be fully restored from Donut.
+  Replacing/deleting any previously published file never authorizes removing
+  its retained bytes. Previously accepted same-notebook payloads remain
+  grandfathered. This replaces story 12's strict intermediate-blob rejection
+  only when LFS is adopted, including later conversion under story 14.
+- **Authorized architectural exception:** Terry explicitly accepted the above
+  narrow exception to ADR 0002 and `docs/notebook-git-lfs.md`'s all-intermediate-
+  objects availability rule during refinement. It permits omission only of new
+  oversized intermediate LFS payloads; commit IDs and successfully published
+  snapshots remain preserved. Align the durable LFS contract when implementing
+  this story; do not generalize the exception to latest-snapshot-only retention.
 - **Goal:** Notebook owners can publish and reacquire current images, PDFs, and
   other attachments in a new notebook without making MySQL storage and Git
   bundle transfer grow with the attachments' binary history.

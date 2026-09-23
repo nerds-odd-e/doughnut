@@ -77,6 +77,13 @@ Endpoint and credential configuration stay outside authored content.
    loop for new notebooks using LFS. Prove bundle growth against incompressible
    binary versions and measure object traffic separately. Note-only web saves
    must neither load unchanged payloads nor contact GCS to rewrite them.
+   Owner-approved retention refinement (2026-09-23): preserve every successfully
+   published snapshot, but allow new oversized payloads found only in unpublished
+   intermediate LFS commits to remain unavailable when the tip is valid. This
+   enables correction by a later commit. Keep within-limit intermediate content
+   and previously accepted payloads. Story 13 records the authorized exception
+   to the blanket historical-object availability rule; story 12 stays strict
+   while attachments remain raw Git blobs.
 3. Story 14 transitions existing notebooks without rewriting their accepted
    history or losing file access. Keep the legacy representation readable during
    rollout; once converted, require pointers for newly introduced attachments.
