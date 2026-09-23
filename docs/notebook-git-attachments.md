@@ -56,10 +56,11 @@ rule at each historical path, so a later rename to Markdown does not hide an
 earlier oversized attachment. Payloads already accepted as attachments in the
 same notebook's retained history remain reusable by content identity. Removing
 or shrinking the tip is not enough while an oversized unpublished blob remains
-in that range; rewrite only unpublished commits. Story 13's Git LFS transition
-is intended to replace this strict intermediate raw-blob refusal with the
-owner-approved omission of new oversized unpublished intermediate LFS payloads
-when the tip is valid; that exception is not delivered here.
+in that range; rewrite only unpublished commits. While attachments remain raw
+Git blobs, that intermediate refusal stays in force. The accepted Git LFS
+contract is intended to replace it by omitting new oversized unpublished
+intermediate LFS payloads when the tip is valid; that exception is not part of
+the current raw-Git admission.
 
 ## Placement and ownership
 
