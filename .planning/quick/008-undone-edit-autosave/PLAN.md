@@ -11,8 +11,8 @@ Status: delivered; both slices done.
 - Integration checkout: `/Users/terryyin/git/doughnut` (`main`).
 - Execution checkout: `/Users/terryyin/git/doughnut/.worktrees/008-undone-edit-autosave`, branch `008-undone-edit-autosave`, created this session from `19244e701cab42ed45060fcbf57559d0d09acc4d`.
 - Claim published: `dc29e4525a0fdb9b68a8afd94a820553850fc088` on `refs/heads/main`. Claim CI: unobserved (story-branch observer does not cover trunk).
-- Slice 1 published: `4bd112ff206bb75b37747235cfd58386dc2bedc8` on `refs/heads/008-undone-edit-autosave`, registered with observer `/tmp/dough-ci-501/watch-zDxIaG` (state undiscovered at registration).
-- Increment target: `refs/heads/008-undone-edit-autosave`. Previously published base for the next increment: `4bd112ff206bb75b37747235cfd58386dc2bedc8`.
+- Slice 1 published: `4bd112ff206bb75b37747235cfd58386dc2bedc8` on `refs/heads/008-undone-edit-autosave`.
+- Slice 2 published with `d03c25472c6992365ac0350c90d720b5c5d32f0c` on `refs/heads/008-undone-edit-autosave`. Observer: `/tmp/dough-ci-501/watch-zDxIaG`.
 - Default-checkout refresh after the trunk claim: deferred (unclear ownership of the open integration checkout). Its HEAD remains `19244e701cab42ed45060fcbf57559d0d09acc4d`.
 - Replanning: existing planning authority retained (refine this plan if active slice work exceeds 10 minutes, except the named verification-wait exception).
 - CI: GitHub Actions workflow `ci.yml`, display name `donut CI`. Observer directory `/tmp/dough-ci-501/watch-zDxIaG` for `nerds-odd-e/doughnut` branch `008-undone-edit-autosave`.
