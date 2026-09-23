@@ -11,6 +11,7 @@ and deletable in Web Donut.
 ## Taken
 
 - [Keep remote note content aligned when an in-flight edit is undone](seeds/SEED-036-keep-undone-edits-consistent.md#story-1) — SEED-036#story-1 ([plan](quick/008-undone-edit-autosave/PLAN.md))
+- [Prepare CI dependencies faster with a smaller effective cache](seeds/SEED-039-faster-ci-feedback.md#story-1) — SEED-039#story-1 ([plan](quick/015-smaller-ci-dependency-caches/PLAN.md))
 
 ## Backlog list
 
