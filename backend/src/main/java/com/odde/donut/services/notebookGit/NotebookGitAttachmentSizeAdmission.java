@@ -21,9 +21,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Admits attachment payloads across a proposal's first-parent range against the inclusive size
- * limit. Raw Git measures blob bytes; LFS verifies the tip's referenced objects' actual size,
- * digest, and durability before acceptance (ADR 0002; ADR 0004 Portable attachments; ADR 0006 loud
- * actionable refusal).
+ * limit. Raw measures blob bytes; LFS verifies digest, size, and durability, and may omit only new
+ * oversized intermediate-only payloads when the tip is valid (ADR 0002; ADR 0004; ADR 0006).
  */
 final class NotebookGitAttachmentSizeAdmission {
 
@@ -32,11 +31,8 @@ final class NotebookGitAttachmentSizeAdmission {
   private NotebookGitAttachmentSizeAdmission() {}
 
   /**
-   * Refuses a newly introduced attachment whose admitted size exceeds {@link #LIMIT_BYTES}. Raw
-   * notebooks inspect object length across the contiguous first-parent range from {@code
-   * acceptedHead} (exclusive) through {@code proposedHead}, grandfathering object identities
-   * already accepted as attachments in this notebook's retained history. LFS notebooks verify each
-   * tip attachment pointer against durable content and measure that verified payload size.
+   * Refuses newly introduced attachments over {@link #LIMIT_BYTES}. Both representations inspect
+   * the first-parent range from {@code acceptedHead} (exclusive) through {@code proposedHead}.
    */
   static void admit(
       Repository proposalRepository,
@@ -47,7 +43,8 @@ final class NotebookGitAttachmentSizeAdmission {
       Integer notebookId,
       NotebookAttachmentContent content) {
     if (representation == NotebookGitAttachmentRepresentation.LFS) {
-      admitLfsTip(proposalRepository, proposedHead, notebookId, content);
+      admitLfsRange(
+          proposalRepository, proposedHead, acceptedRepository, acceptedHead, notebookId, content);
       return;
     }
     admitRawRange(proposalRepository, proposedHead, acceptedRepository, acceptedHead);
@@ -78,34 +75,61 @@ final class NotebookGitAttachmentSizeAdmission {
     }
   }
 
-  private static void admitLfsTip(
+  private static void admitLfsRange(
       Repository proposalRepository,
       ObjectId proposedHead,
+      Repository acceptedRepository,
+      ObjectId acceptedHead,
       Integer notebookId,
       NotebookAttachmentContent content) {
-    for (Map.Entry<String, ObjectId> blob :
-        attachmentBlobIds(proposalRepository, proposedHead).entrySet()) {
-      byte[] gitBytes = objectBytes(proposalRepository, blob.getValue());
-      if (NotebookGitLfsPointer.isEmptyFile(gitBytes)) {
-        continue;
-      }
-      Optional<NotebookGitLfsPointer.Parsed> parsed = NotebookGitLfsPointer.parse(gitBytes);
-      if (parsed.isEmpty()) {
-        throw rawPayloadRefusal(blob.getKey());
-      }
-      NotebookGitLfsPointer.Parsed pointer = parsed.get();
-      Optional<byte[]> stored = content.get(notebookId, pointer.sha256Hex());
-      if (stored.isEmpty()) {
-        throw missingObjectRefusal(blob.getKey(), pointer.sha256Hex());
-      }
-      if (!VerifiedNotebookAttachmentBytes.matchesClaim(
-          stored.get(), pointer.sha256Hex(), pointer.size())) {
-        throw corruptObjectRefusal(blob.getKey(), pointer.sha256Hex());
-      }
-      if (pointer.size() > LIMIT_BYTES) {
-        throw oversizedRefusal(blob.getKey(), pointer.size());
+    Set<String> grandfathered = attachmentPayloadDigestsInHistory(acceptedRepository, acceptedHead);
+    Set<String> tipDigests = attachmentPayloadDigestsAt(proposalRepository, proposedHead);
+    Map<String, Long> inspectedSizes = new LinkedHashMap<>();
+    List<ObjectId> range =
+        NotebookGitProposalAncestry.firstParentRange(
+            proposalRepository, acceptedHead, proposedHead);
+    for (ObjectId commitId : range.subList(1, range.size())) {
+      for (Map.Entry<String, ObjectId> blob :
+          attachmentBlobIds(proposalRepository, commitId).entrySet()) {
+        byte[] gitBytes = objectBytes(proposalRepository, blob.getValue());
+        if (NotebookGitLfsPointer.isEmptyFile(gitBytes)) {
+          continue;
+        }
+        Optional<NotebookGitLfsPointer.Parsed> parsed = NotebookGitLfsPointer.parse(gitBytes);
+        if (parsed.isEmpty()) {
+          throw rawPayloadRefusal(blob.getKey());
+        }
+        NotebookGitLfsPointer.Parsed pointer = parsed.get();
+        String digest = pointer.sha256Hex();
+        Long seenSize = inspectedSizes.putIfAbsent(digest, pointer.size());
+        if (seenSize != null) {
+          if (!seenSize.equals(pointer.size())) {
+            throw corruptObjectRefusal(blob.getKey(), digest);
+          }
+          continue;
+        }
+        boolean previouslyAccepted = grandfathered.contains(digest);
+        boolean referencedAtTip = tipDigests.contains(digest);
+        if (isNewOversizedIntermediateOnly(pointer.size(), previouslyAccepted, referencedAtTip)) {
+          continue;
+        }
+        Optional<byte[]> stored = content.get(notebookId, digest);
+        if (stored.isEmpty()) {
+          throw missingObjectRefusal(blob.getKey(), digest);
+        }
+        if (!VerifiedNotebookAttachmentBytes.matchesClaim(stored.get(), digest, pointer.size())) {
+          throw corruptObjectRefusal(blob.getKey(), digest);
+        }
+        if (pointer.size() > LIMIT_BYTES && !previouslyAccepted) {
+          throw oversizedRefusal(blob.getKey(), pointer.size());
+        }
       }
     }
+  }
+
+  private static boolean isNewOversizedIntermediateOnly(
+      long claimedSize, boolean previouslyAccepted, boolean referencedAtTip) {
+    return claimedSize > LIMIT_BYTES && !previouslyAccepted && !referencedAtTip;
   }
 
   private static Set<ObjectId> attachmentObjectIdsInHistory(
@@ -121,6 +145,33 @@ final class NotebookGitAttachmentSizeAdmission {
           "Could not inspect accepted attachment history for size admission", e);
     }
     return attachmentObjectIds;
+  }
+
+  private static Set<String> attachmentPayloadDigestsInHistory(
+      Repository repository, ObjectId acceptedHead) {
+    Set<String> digests = new HashSet<>();
+    try (RevWalk walk = new RevWalk(repository)) {
+      walk.markStart(walk.parseCommit(acceptedHead));
+      for (RevCommit commit : walk) {
+        digests.addAll(attachmentPayloadDigestsAt(repository, commit.getId()));
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(
+          "Could not inspect accepted LFS attachment history for size admission", e);
+    }
+    return digests;
+  }
+
+  private static Set<String> attachmentPayloadDigestsAt(Repository repository, ObjectId commitId) {
+    Set<String> digests = new HashSet<>();
+    for (ObjectId blobId : attachmentBlobIds(repository, commitId).values()) {
+      byte[] gitBytes = objectBytes(repository, blobId);
+      if (NotebookGitLfsPointer.isEmptyFile(gitBytes)) {
+        continue;
+      }
+      NotebookGitLfsPointer.parse(gitBytes).ifPresent(pointer -> digests.add(pointer.sha256Hex()));
+    }
+    return digests;
   }
 
   private static Map<String, ObjectId> attachmentBlobIds(Repository repository, ObjectId commitId) {

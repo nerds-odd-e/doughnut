@@ -27,9 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `8f1910c4200ec0712a59f8a9cdc96284420d41d7` on
+- Published increment: `c51f7cbcd0840a286bb6c12fae02e71b47934804` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer. Parent on that branch: `d64bf4c00e8081da27e6a4c3cfeb752e45b93e28`.
+  observer. Parent on that branch: `8f1910c4200ec0712a59f8a9cdc96284420d41d7`.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
@@ -312,18 +312,29 @@ Accepted proof:
 
 ### 6. Retain required history while allowing oversized corrections
 Type: Behavior
-Status: planned
+Status: done
 
-Extend the same admission owner over the existing first-parent range. Require
-valid intermediate payloads; allow only new oversized intermediate-only LFS
-payloads to be omitted. Previously accepted same-notebook content remains exempt
-and retained. Preserve original commit IDs; no claimed client exemption.
+`NotebookGitAttachmentSizeAdmission` walks the unpublished first-parent range
+for LFS notebooks. In-limit intermediate payloads must be stored. A new
+oversized payload that appears only in unpublished intermediate commits may be
+absent when the tip is valid. Previously accepted same-notebook digests stay
+usable, including after removal and restore. Raw Git history stays strict.
+Original commit IDs are kept. There is no client-claimed exemption.
 
-Proof: extend story 12's history controller proof with valid multiple versions,
-unchanged-tip history, 20 MiB then 3 MiB correction, missing in-limit history,
-and trusted-history grandfathering. Raw admission stays strict. B.
-8–10 minutes: one range policy and shared content evidence.
-Safe stop: server policy complete, original retention promise unchanged.
+Accepted proof:
+- Promise: multi-version in-limit history, required temporary history, 20 MiB
+  then 3 MiB omission, missing in-limit history refusal, and grandfathered
+  oversized restore. Raw oversized intermediates still refuse.
+- Boundary: proposal publish through `NotebookGitAttachmentSizeAdmission`.
+- Setup: `enableLfs` and `pointerFor` store in-limit payloads. The 20 MiB
+  pointer is not stored before publish. Grandfathering plants an already
+  accepted oversized digest, then removes and restores it.
+- Observations: `NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest`
+  (omitted digest empty, tip payload present, first-parent chain, missing
+  intermediate 400, restored oversized bytes). Raw cases stay in
+  `NotebookGitAttachmentSizeAdmissionHistoryControllerTest`.
+- Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass. After the LFS cases moved to their own class, `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*AttachmentSizeAdmission*History*'` passed.
 
 ### 7. Clone current usable files with a recoverable failure path
 Type: Behavior

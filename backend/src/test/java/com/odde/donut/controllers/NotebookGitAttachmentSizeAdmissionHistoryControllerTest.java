@@ -21,8 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Attachment-size admission across unpublished first-parent history: intermediate oversize is
- * refused even when the tip is valid; within-limit ranges keep original commits and bytes.
+ * Raw Git attachment-size admission across unpublished first-parent history. Oversized intermediate
+ * blobs are refused even when the tip is valid; within-limit multi-version history is retained.
  */
 class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
     extends NotebookGitAttachmentSizeAdmissionTestSupport {
