@@ -3,7 +3,7 @@
  * and observing publish/fresh-clone size proof.
  */
 
-import { createHash, randomBytes } from 'node:crypto'
+import { randomBytes } from 'node:crypto'
 import {
   existsSync,
   mkdirSync,
@@ -13,11 +13,12 @@ import {
 } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { runOrThrow } from './cliE2eNotebookLfsTasks'
-
-function sha256Hex(bytes: Buffer): string {
-  return createHash('sha256').update(bytes).digest('hex')
-}
+import {
+  commitWithE2eAuthor,
+  lfsObjectPath,
+  runOrThrow,
+  sha256Hex,
+} from './cliE2eNotebookLfsHelpers'
 
 type LfsCommitResult = {
   head: string
@@ -38,20 +39,7 @@ function commitLfsAttachmentBytes(
   mkdirSync(dirname(filePath), { recursive: true })
   writeFileSync(filePath, bytes)
   runOrThrow('git', ['add', '--', relativePath], checkoutDir)
-  runOrThrow(
-    'git',
-    [
-      '-c',
-      'user.name=Donut E2E',
-      '-c',
-      'user.email=donut-e2e@example.com',
-      'commit',
-      '-m',
-      message,
-    ],
-    checkoutDir
-  )
-  const head = runOrThrow('git', ['rev-parse', 'HEAD'], checkoutDir).trim()
+  const head = commitWithE2eAuthor(checkoutDir, message)
   const pointerText = runOrThrow(
     'git',
     ['cat-file', 'blob', `${head}:${relativePath}`],
@@ -135,15 +123,7 @@ export function createCliE2eNotebookLfsPublishTasks() {
       checkoutDir: string
       oid: string
     }): number | null {
-      const path = join(
-        checkoutDir,
-        '.git',
-        'lfs',
-        'objects',
-        oid.slice(0, 2),
-        oid.slice(2, 4),
-        oid
-      )
+      const path = lfsObjectPath(checkoutDir, oid)
       if (!existsSync(path)) return null
       return readFileSync(path).length
     },

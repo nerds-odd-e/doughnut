@@ -92,3 +92,45 @@ Feature: Notebook Git LFS authenticated transfer
     When I clone the notebook "LFS Transfer Notebook" into a fresh temporary destination using the installed CLI
     Then the fresh clone LFS object cache holds only the tip digest
     And bundle traffic stays pointer-scale versus object traffic for versions "lfsRandV1, lfsRandV2, lfsRandV3"
+
+  @bundleCliE2eInstall @withCliConfig
+  Scenario: Explicit Git LFS fetch recovers a published version after replacement and after current-row deletion
+    Given the backend is serving the CLI and install script
+    And the CLI is installed from localhost
+    And the notebook "LFS Transfer Notebook" has an accepted LFS tip "payload.bin" with payload "seed-lfs-bytes" and obsolete payload "obsolete-lfs-bytes"
+    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
+    And I commit the LFS attachment "payload.bin" filled with 1024 bytes of "0x11" as "lfsVersionA"
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    When I commit the LFS attachment "payload.bin" filled with 2048 bytes of "0x22" as "lfsVersionB"
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And the LFS commit "lfsVersionA" remains an ancestor of "lfsVersionB"
+    When I clear the cloned checkout LFS object cache
+    And I fetch LFS objects for commit "lfsVersionA" with the standard Git LFS client
+    Then the cloned checkout LFS object cache holds the digest for "lfsVersionA"
+    And the cached LFS object for "lfsVersionA" is filled with 1024 bytes of "0x11"
+    When I remove the LFS attachment "payload.bin" from the cloned checkout
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And the notebook "LFS Transfer Notebook" has no root attachment named "payload.bin"
+    And the notebook "LFS Transfer Notebook" content store has object for "lfsVersionA" under attachment "payload.bin"
+    When I clear the cloned checkout LFS object cache
+    And I fetch LFS objects for commit "lfsVersionA" with the standard Git LFS client
+    Then the cached LFS object for "lfsVersionA" is filled with 1024 bytes of "0x11"
+
+  @bundleCliE2eInstall @withCliConfig
+  Scenario: Explicit Git LFS fetch of an omitted oversized intermediate reports unavailable
+    Given the backend is serving the CLI and install script
+    And the CLI is installed from localhost
+    And the notebook "LFS Transfer Notebook" has an accepted LFS tip "payload.bin" with payload "seed-lfs-bytes" and obsolete payload "obsolete-lfs-bytes"
+    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
+    And I commit the LFS attachment "payload.bin" filled with 20971520 bytes of "0x74" as "lfsOversizedIntermediate"
+    And I commit the LFS attachment "payload.bin" filled with 3145728 bytes of "0x75" as "lfsCorrectiveTip"
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And the notebook "LFS Transfer Notebook" content store lacks object for "lfsOversizedIntermediate" under attachment "payload.bin"
+    When I clear the cloned checkout LFS object cache
+    And I attempt to fetch LFS objects for commit "lfsOversizedIntermediate" with the standard Git LFS client
+    Then the standard Git LFS historical fetch reports the object unavailable
+    And the notebook "LFS Transfer Notebook" content store lacks object for "lfsOversizedIntermediate" under attachment "payload.bin"

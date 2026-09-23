@@ -3790,6 +3790,8 @@ components:
     InspectNotebookLfsAttachmentResponse:
       type: object
       properties:
+        attachmentPresent:
+          type: boolean
         acceptedGitContentLength:
           type: integer
           format: int32

@@ -2,7 +2,8 @@
  * Page-object observations for publishing LFS attachments from a CLI checkout
  * and verifying accepted tip / fresh-clone size proof.
  */
-import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
+import { notebookLfsHistoricalFetch } from './notebookLfsHistoricalFetch'
+import { inspectNotebookLfsAttachment } from './notebookLfsInspect'
 
 export function notebookLfsPublish() {
   return {
@@ -114,39 +115,32 @@ export function notebookLfsPublish() {
       return cy
         .get<{ oid: string; size: number }>(`@${versionAlias}`)
         .then((version) =>
-          cy
-            .request<{
-              acceptedGitContentLength: number
-              acceptedGitContentUtf8: string
-              objectStored: boolean
-              storedObjectSize?: number
-            }>({
-              method: 'POST',
-              url: `${e2eAppBaseUrl()}/api/testability/inspect_notebook_lfs_attachment_for_testability`,
-              body: {
-                notebookName,
-                filename,
-                oid: version.oid,
-              },
-            })
-            .then((response) => {
-              expect(response.status).to.eq(200)
-              expect(
-                response.body.acceptedGitContentLength,
-                'MySQL content must be pointer-sized'
-              ).to.be.lessThan(500)
-              expect(
-                response.body.acceptedGitContentLength,
-                'MySQL must not hold the payload'
-              ).to.be.lessThan(version.size)
-              expect(response.body.acceptedGitContentUtf8).to.include(
-                `oid sha256:${version.oid}`
-              )
-              expect(response.body.objectStored, 'tip object stored').to.equal(
-                true
-              )
-              expect(response.body.storedObjectSize).to.equal(version.size)
-            })
+          inspectNotebookLfsAttachment({
+            notebookName,
+            filename,
+            oid: version.oid,
+          }).then((response) => {
+            expect(response.status).to.eq(200)
+            expect(
+              response.body.attachmentPresent,
+              'attachment row must be present'
+            ).to.equal(true)
+            expect(
+              response.body.acceptedGitContentLength,
+              'MySQL content must be pointer-sized'
+            ).to.be.lessThan(500)
+            expect(
+              response.body.acceptedGitContentLength,
+              'MySQL must not hold the payload'
+            ).to.be.lessThan(version.size)
+            expect(response.body.acceptedGitContentUtf8).to.include(
+              `oid sha256:${version.oid}`
+            )
+            expect(response.body.objectStored, 'tip object stored').to.equal(
+              true
+            )
+            expect(response.body.storedObjectSize).to.equal(version.size)
+          })
         )
     },
     expectObjectStorage(
@@ -156,19 +150,13 @@ export function notebookLfsPublish() {
       stored: boolean
     ) {
       return cy.get<{ oid: string }>(`@${versionAlias}`).then((version) =>
-        cy
-          .request<{ objectStored: boolean }>({
-            method: 'POST',
-            url: `${e2eAppBaseUrl()}/api/testability/inspect_notebook_lfs_attachment_for_testability`,
-            body: {
-              notebookName,
-              filename,
-              oid: version.oid,
-            },
-          })
-          .then((response) => {
-            expect(response.body.objectStored).to.equal(stored)
-          })
+        inspectNotebookLfsAttachment({
+          notebookName,
+          filename,
+          oid: version.oid,
+        }).then((response) => {
+          expect(response.body.objectStored).to.equal(stored)
+        })
       )
     },
     expectFreshCloneLfsCacheHoldsOnlyTip() {
@@ -247,5 +235,6 @@ export function notebookLfsPublish() {
       }
       return loadNext(0)
     },
+    ...notebookLfsHistoricalFetch(),
   }
 }

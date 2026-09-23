@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -115,10 +116,7 @@ class NotebookGitTestabilityController {
     byte[] pointer = NotebookGitLfsPointer.format(oid, payload.length);
 
     NotebookAttachment attachment =
-        notebookAttachmentRepository.findByNotebook_Id(notebook.getId()).stream()
-            .filter(
-                row -> request.getFilename().equals(row.getFilename()) && row.getFolder() == null)
-            .findFirst()
+        findRootAttachment(notebook.getId(), request.getFilename())
             .orElseGet(NotebookAttachment::new);
     attachment.setNotebook(notebook);
     attachment.setFolder(null);
@@ -139,8 +137,9 @@ class NotebookGitTestabilityController {
   }
 
   /**
-   * Testability-only: returns the MySQL-projected accepted Git content for a root attachment and
-   * whether the content store holds a given digest for that notebook.
+   * Testability-only: returns whether a root attachment row is present, its MySQL-projected
+   * accepted Git content when present, and whether the content store holds a given digest. Row
+   * absence does not imply content-store deletion; the digest check still runs.
    */
   @PostMapping("/inspect_notebook_lfs_attachment_for_testability")
   @Transactional(readOnly = true)
@@ -152,23 +151,26 @@ class NotebookGitTestabilityController {
       throw new IllegalArgumentException("notebookName, filename, and oid are required");
     }
     Notebook notebook = requireNotebook(request.getNotebookName());
-    NotebookAttachment attachment =
-        notebookAttachmentRepository.findByNotebook_Id(notebook.getId()).stream()
-            .filter(
-                row -> request.getFilename().equals(row.getFilename()) && row.getFolder() == null)
-            .findFirst()
-            .orElseThrow(
-                () ->
-                    new IllegalArgumentException(
-                        "No root attachment named " + request.getFilename()));
-    byte[] accepted = attachment.getAcceptedGitContent();
     InspectNotebookLfsAttachmentResponse response = new InspectNotebookLfsAttachmentResponse();
-    response.setAcceptedGitContentLength(accepted.length);
-    response.setAcceptedGitContentUtf8(new String(accepted, StandardCharsets.US_ASCII));
+    findRootAttachment(notebook.getId(), request.getFilename())
+        .ifPresentOrElse(
+            attachment -> {
+              byte[] accepted = attachment.getAcceptedGitContent();
+              response.setAttachmentPresent(true);
+              response.setAcceptedGitContentLength(accepted.length);
+              response.setAcceptedGitContentUtf8(new String(accepted, StandardCharsets.US_ASCII));
+            },
+            () -> response.setAttachmentPresent(false));
     var stored = notebookAttachmentContent.get(notebook.getId(), request.getOid());
     response.setObjectStored(stored.isPresent());
     stored.ifPresent(bytes -> response.setStoredObjectSize((long) bytes.length));
     return response;
+  }
+
+  private Optional<NotebookAttachment> findRootAttachment(Integer notebookId, String filename) {
+    return notebookAttachmentRepository.findByNotebook_Id(notebookId).stream()
+        .filter(row -> filename.equals(row.getFilename()) && row.getFolder() == null)
+        .findFirst();
   }
 
   private Notebook requireNotebook(String notebookName) {
@@ -213,7 +215,8 @@ class NotebookGitTestabilityController {
   @Getter
   @Setter
   static class InspectNotebookLfsAttachmentResponse {
-    private int acceptedGitContentLength;
+    private boolean attachmentPresent;
+    private Integer acceptedGitContentLength;
     private String acceptedGitContentUtf8;
     private boolean objectStored;
     private Long storedObjectSize;

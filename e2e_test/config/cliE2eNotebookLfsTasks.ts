@@ -3,7 +3,6 @@
  * plus clone-checkout observations for hydrated LFS tips.
  */
 
-import { createHash } from 'node:crypto'
 import {
   existsSync,
   mkdtempSync,
@@ -16,31 +15,16 @@ import {
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import {
+  clearLfsObjectCache,
+  runOrThrow,
+  sha256Hex,
+} from './cliE2eNotebookLfsHelpers'
 
 export type NotebookLfsClientInput = {
   lfsUrl: string
   token: string
   payload: string
-}
-
-export function runOrThrow(
-  command: string,
-  args: string[],
-  cwd: string,
-  env?: NodeJS.ProcessEnv
-): string {
-  const result = spawnSync(command, args, {
-    cwd,
-    env: { ...process.env, ...env },
-    encoding: 'utf8',
-  })
-  if (result.status !== 0) {
-    throw new Error(
-      `${command} ${args.join(' ')} failed (status ${result.status}):\n` +
-        `${result.stdout ?? ''}\n${result.stderr ?? ''}`
-    )
-  }
-  return `${result.stdout ?? ''}${result.stderr ?? ''}`
 }
 
 function gitLfsVersion(): string {
@@ -51,10 +35,6 @@ function gitLfsVersion(): string {
     )
   }
   return (result.stdout || result.stderr || '').trim()
-}
-
-function sha256Hex(bytes: Buffer): string {
-  return createHash('sha256').update(bytes).digest('hex')
 }
 
 function prepareLfsRepo(payload: string): {
@@ -122,10 +102,7 @@ export function createCliE2eNotebookLfsTasks() {
       try {
         configureLfsEndpoint(dir, input.lfsUrl, input.token)
         runOrThrow('git', ['lfs', 'push', '--object-id', 'origin', oid], dir)
-        rmSync(join(dir, '.git', 'lfs', 'objects'), {
-          recursive: true,
-          force: true,
-        })
+        clearLfsObjectCache(dir)
         rmSync(join(dir, 'payload.bin'), { force: true })
         runOrThrow('git', ['lfs', 'fetch', 'origin'], dir)
         runOrThrow('git', ['lfs', 'checkout', 'payload.bin'], dir)

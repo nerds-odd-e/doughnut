@@ -51,6 +51,38 @@ although acquiring a file still transfers its bytes. GCS durability and retentio
 become part of content preservation. Delivery is incremental, under the
 [North Star](../.planning/NORTH-STAR.md#attachment-storage-transition).
 
+## Recovering a published attachment version
+
+Ordinary clone hydrates only the current tip. Previously published attachment
+bytes stay reachable from retained accepted history. Recover them with the
+standard Git LFS client (verified with Git LFS 3.7.1 against Donut's notebook
+endpoint). There is no Donut history UI or Donut-specific history command.
+
+Configure the notebook endpoint and bearer token in local Git config (clone
+already does this; transfers use `lfs.url`, not the placeholder `origin` URL):
+
+```bash
+git config lfs.url http://127.0.0.1:<port>/api/notebooks/<notebook-id>/lfs
+git config http.extraHeader "Authorization: Bearer <token>"
+```
+
+Clear the local object cache when you need a fresh download (Git LFS 3.7.1 has
+`push --object-id` but not `fetch --object-id`):
+
+```bash
+rm -rf .git/lfs/objects
+git lfs fetch origin <published-commit>
+```
+
+The requested digest's exact bytes land under `.git/lfs/objects/<aa>/<bb>/<oid>`.
+Removing the current attachment row never deletes those retained objects; fetch
+of a historical commit that still references them continues to succeed.
+
+An oversized intermediate object that was omitted at publication (corrective tip
+only) is not stored. Fetching that intermediate commit reports the object
+unavailable (standard batch/object-not-found failure) and does not begin storing
+the omitted payload.
+
 ## Related
 
 - [Notebook Git synchronization](./notebook-git-synchronization.md) owns
@@ -60,3 +92,6 @@ become part of content preservation. Delivery is incremental, under the
 - [Git LFS pointer/filter specification](https://github.com/git-lfs/git-lfs/blob/main/docs/spec.md),
   [Batch API](https://github.com/git-lfs/git-lfs/blob/main/docs/api/batch.md),
   [Basic transfers](https://github.com/git-lfs/git-lfs/blob/main/docs/api/basic-transfers.md).
+- Feature proof of these commands:
+  `e2e_test/features/cli/cli_notebook_lfs.feature` (explicit historical fetch
+  after replacement/deletion and omitted oversized intermediate).

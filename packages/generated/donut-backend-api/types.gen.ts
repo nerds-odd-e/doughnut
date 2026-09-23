@@ -125,6 +125,7 @@ export type InspectNotebookLfsAttachmentRequest = {
 };
 
 export type InspectNotebookLfsAttachmentResponse = {
+    attachmentPresent?: boolean;
     acceptedGitContentLength?: number;
     acceptedGitContentUtf8?: string;
     objectStored?: boolean;

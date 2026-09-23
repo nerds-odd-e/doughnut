@@ -27,9 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `a1396fb353189fae366f35eb6989735c3c36b4c3` on
+- Published increment: `de5d4e036437f3ee3b5e132195077339b5214ea6` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer. Parent on that branch: `fce754e518c12751539f33e51d5e92a5a266353e`.
+  observer. Parent on that branch: `a1396fb353189fae366f35eb6989735c3c36b4c3`.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
@@ -410,16 +410,32 @@ Safe stop: automated publish-to-fresh-clone journey complete in test mode.
 
 ### 9. Recover published versions explicitly after replacement or deletion
 Type: Behavior
-Status: planned
+Status: done
 
-From a fresh object cache, explicit standard LFS fetch of a previously published
-ref retrieves its exact bytes; omitted oversized intermediate content reports
-unavailable. Removal of a current row never deletes historical objects.
+From a fresh object cache, `git lfs fetch origin <published-commit>` retrieves
+that commit's exact attachment bytes. An omitted oversized intermediate reports
+unavailable and stays unstored. Removing the current attachment row does not
+delete historical objects. The verified commands are in
+`docs/notebook-git-lfs.md`. There is no Donut history command.
 
-Proof: E performs historical fetch against the configured endpoint after
-replacement/deletion, observes requested digest/bytes and omitted-object failure.
-Document the verified standard commands; no new Donut history UI/command.
-5–8 minutes. Safe stop: preserved history has independently observed access.
+Accepted proof:
+- Promise: historical fetch after replacement, the same object still fetchable
+  after the current row is gone, and omitted oversized fetch fails without
+  storing the payload.
+- Boundary: standard Git LFS against the notebook endpoint, after slice 8
+  publish.
+- Setup: installed CLI publishes two versions, then `git rm` and publish
+  removes the current row. The local `.git/lfs/objects` cache is deleted
+  before each fetch. The oversized case publishes a 20 MiB intermediate and a
+  3 MiB tip.
+- Observations: `cli_notebook_lfs.feature` cache digest and 1024 bytes of
+  `0x11` for `lfsVersionA` before and after `attachmentPresent` is false while
+  `objectStored` stays true. The omitted fetch is non-zero and the content
+  store still lacks that oid.
+- Command: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`
+- Result: pass (9 scenarios). The proof boundary stayed valid after the
+  historical-fetch helpers were split, so it was not rerun.
+Safe stop: preserved history has independently observed access.
 
 ### 10. Enable new notebooks with an honest interim receive boundary
 Type: Behavior
