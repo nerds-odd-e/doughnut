@@ -46,7 +46,7 @@ product code unchanged.
 
 ### 1. State the authorized exception in the durable Decision
 Type: Structure
-Status: planned
+Status: done
 
 Edit only `docs/notebook-git-lfs.md` Acceptance (and any immediately adjacent
 Decision bullets that would still contradict the exception) so the narrow
@@ -66,11 +66,21 @@ Accepted proof:
   consistent.
 - Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests '*AttachmentSizeAdmission*LfsHistory*'`
   (regression only; expect unchanged behavior).
-- Result: (not run — planned)
+- Result: passed — `NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest`
+  5 tests, 0 failures; Acceptance bullet inspected against
+  `admitLfsRange`/`isNewOversizedIntermediateOnly`. Refactor pass: no edits.
 
 ## Delivery notes
 
-- Planning-only from dough-execution-retrospective; not Taken; not authorized
-  for execution by this review.
+- Executed in Story Branch Mode on `story/lfs-contract-oversized-exception`
+  (worktree `../doughnut-worktrees/lfs-contract-oversized-exception`, base
+  `c8b175b224`); claim published to trunk as `ee8e900b54`.
+- CI: `ci.yml` ignores `docs/**` and `.planning/**`, so these publications
+  trigger no CI run; no observer armed.
+- Learning (follow-up candidate, out of this plan's scope):
+  `docs/notebook-git-synchronization.md` (history-wide availability sentence)
+  lacks the LFS exception qualifier, and `docs/notebook-git-attachments.md`
+  still says the LFS contract "is intended to replace" the intermediate
+  refusal.
 - No seed required for this correction.
 - Next plan number after `020-notebook-lfs-receive`.

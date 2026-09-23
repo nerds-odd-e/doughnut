@@ -30,9 +30,14 @@ local files with compact Git history and one attachment model, including images.
 - **Acceptance:** Upload immutable objects and verify actual size and digest
   before atomically accepting the Git head and application projection. Validate
   attachment representation and object availability across newly admitted
-  history, not only its tip. Missing objects or raw attachment payloads reject
-  publication without rewriting submitted commits. Failed publications may
-  leave unreferenced staged objects, never partially accepted content.
+  history, not only its tip. One exception: a new oversized payload that
+  appears only in unpublished intermediate commits, and not at a valid tip,
+  may be absent; it is never stored, and fetching it later reports the object
+  unavailable (see [Recovery](#recovering-a-published-attachment-version)).
+  Within-limit, previously accepted, and tip objects stay required. Missing
+  objects or raw attachment payloads reject publication without rewriting
+  submitted commits. Failed publications may leave unreferenced staged
+  objects, never partially accepted content.
 - **Access and lifetime:** Object access follows notebook authorization; knowing
   a hash grants no access. Keep objects reachable from retained accepted history,
   even after removing a current file. Backups include Git, referenced objects,
