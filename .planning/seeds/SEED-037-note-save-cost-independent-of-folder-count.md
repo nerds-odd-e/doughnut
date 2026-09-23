@@ -3,7 +3,7 @@ id: SEED-037
 status: dormant
 planted: 2026-09-22
 planted_during: owner report that production note saves take 7 to 10 seconds after SEED-034#story-3 shipped
-trigger_when: selecting the owner's bounded simplify-or-abandon attempt for story 2
+trigger_when: new owner evidence justifies revisiting abandoned save-path simplification
 scope: medium
 ---
 
@@ -92,82 +92,30 @@ ordinary single-note save, not just a cheaper hash.
 <a id="story-2"></a>
 
 ### Simplify Git publication during note saves by eliminating unnecessary database work
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/017-simplify-note-save-publication/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7129dccdf92414f6862496ab97e1d6f2a607b48ea382d6b0ef988b229c2c8476","plan":"bae497a4ae32448a3c21ebf28050d0fdd1362707c764bbc3faeaf25dd22e8e68"}}
-```
 
-- **Identity:** SEED-037#story-2
-- **Goal / beneficiary:** The owner and maintainers get a cleaner, smaller
-  publication implementation with less unnecessary SQL; note authors retain
-  acceptable save latency and complete history. Owner decision (2026-09-23):
-  roughly one-second production saves are already good enough. Speedup is
-  welcome, not mandatory; design improvement, fewer production lines, fewer
-  unnecessary queries, and no performance regression are all mandatory.
-- **Scope:** One bounded simplification attempt on the existing publication
-  and persistence owners, evaluated through an ordinary content-only save of
-  an existing note at an unchanged path. Include root and depth-12 notes,
-  without relying on a warmed application cache. Necessary shared-caller
-  changes belong to this outcome. Preserve native Git history, synchronous
-  atomic acceptance, learning identities, and existing operation semantics.
-  Fewer queries alone do not establish a better design. This replaces the
-  earlier promise of a fixed small query budget independent of nesting depth.
-- **Acceptance:** A net reduction in affected production implementation lines,
-  clearer responsibility ownership and less duplicate work, a demonstrated
-  reduction in unnecessary save-path SQL executions, and representative save
-  latency at least maintained under comparable conditions. Count all affected
-  production files, including new/moved code, SQL and configuration; do not
-  manufacture a reduction by deleting tests/comments or compressing layout.
-  Review test/support growth separately. Distinguish JDBC executions from
-  measured network round trips. Inconclusive performance evidence is not a pass.
-- **Key examples:**
-  1. Existing root or depth-12 note, fresh application persistence context →
-     change only its body → fewer unnecessary SQL executions, no demonstrated
-     latency regression, one correct new Git commit, and retained learning data.
-  2. More unrelated folders, notes or attachment bytes → the same edit → no
-     reintroduced whole-notebook scan or loading of unchanged attachment bytes.
-  3. Repeat canonical content → save → no new Git objects or accepted revision.
-  4. Failure after native object writes, before acceptance completes → a fresh
-     committed read sees the previous content, references and complete history.
-- **Constraints:** Follow ADR 0002's publication boundary and current North
-  Star ownership. Preserve live transactional ref semantics and existing
-  stale-update protection. No endpoint-specific bypass or second authority.
-- **Excluded promises:** Depth-independent total work or round-trip count;
-  speedups for moves, renames, imports, downloads or reset; asynchronous success;
-  history rewriting; persistent indexes/caches, schema/storage redesign,
-  whole-notebook reconstruction, and LFS implementation. Existing behavior of
-  shared callers remains a preservation obligation, not extra optimization scope.
-- **Decision and stopping rule:** Try the selected simple approach once. Keep
-  it only if every acceptance condition holds after independent review and
-  measurement. Otherwise discard attempt-owned changes and abandon this story,
-  removing it from the active backlog rather than deferring or automatically
-  replacing it with another experiment. Retain a short evidence-based reason;
-  a future need may justify fresh work. No fallback redesign campaign.
-- **Depends on:** No unfinished product story. Historical ancestor-only
-  measurements in `458496764f931f05b0d46d955e1bbbebf04beefc` are context, not a
-  matched baseline for this attempt; capture the current baseline before edits.
-- **Effort hypothesis:** S (30–60 minutes of active work), medium-low confidence;
-  complete backend verification and paired local measurements add waiting time.
-- **Plan:** [Bounded publication simplification](../quick/017-simplify-note-save-publication/PLAN.md).
-- **Open decisions:** None for product scope. Whether the selected approach
-  meets the conditions is the experiment's result, not an unresolved requirement.
+**Identity:** SEED-037#story-2. **Status: experiment failed, abandoned (2026-09-23).**
+
+The accepted-head handoff removed the redundant post-append SQL read and passed
+all 2,581 backend tests (two opt-in measurement cases skipped). Independent
+review found coherent persistence ownership and preserved creation/reset,
+proposal and rollback behavior. However, after mandatory formatting, affected
+production code had 397 nonblank, noncomment lines both before and after;
+the apparent 512 → 498 physical-line reduction came entirely from comments
+and blank lines. This failed the owner's strict implementation-size gate.
+The complete candidate and disposable test harness were discarded. No product
+change was delivered, no latency acceptance was claimed, and no successor was
+queued. Fewer SQL calls alone did not satisfy this simplify-or-abandon decision.
+
+Original contract and plan are recoverable from `2604bfcfee`;
+[execution evidence](../quick/017-simplify-note-save-publication/PLAN.md) retains
+the attempt's identity, baseline measurements and final disposition.
 
 ## Ordering and Scope Reduction
 
-Story 3 failed (2026-09-23); the codebase is unchanged from before it was
-attempted — the ancestor-only change-capture save (story 1, delivered) remains
-current behavior. Story 2, if pursued, starts from that unchanged ancestor-only
-save, not from a story-3 measurement that no longer applies. The owner now
-prefers an immediate, bounded simplify-or-abandon decision to deferral. Preserve
-its current queue position and unrelated order: this is a small attempt to
-improve the shared publication design, not an attachment prerequisite or an
-open-ended performance project. If the attempt fails, remove it rather than
-reserving another place ahead of attachment work. No index, alternate store,
-asynchronous worker or automatic story-3 retry belongs to this attempt.
-
-## When to Surface
-
-Story 2 is selected for preparation under the owner's simplify-or-abandon
-conditions. A failed attempt ends this queued story; it is not a deferred retry.
+Stories 2 and 3 were abandoned under their own acceptance gates; no attempt
+code remains. Ancestor-only change-capture publication remains current behavior.
+Neither story reserves a backlog position or authorizes an automatic retry.
+A future attempt requires a fresh owner decision and new evidence.
 
 ## Breadcrumbs
 

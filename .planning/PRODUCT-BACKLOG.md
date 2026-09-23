@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Simplify Git publication during note saves by eliminating unnecessary database work](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2) — SEED-037#story-2 ([plan](quick/017-simplify-note-save-publication/PLAN.md))
-
 ## Backlog list
 
 - [Reject oversized supporting files without changing the notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-12) — SEED-035#story-12

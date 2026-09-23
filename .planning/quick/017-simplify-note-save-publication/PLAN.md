@@ -1,6 +1,6 @@
 # Simplify Git publication during note saves
 
-Status: planned; preparation only, no implementation authorized or performed.
+Status: abandoned; strict implementation-size gate failed; no product change retained.
 Work item: **SEED-037#story-2**.
 Source: [refined story](../../seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2)
 and the owner's 2026-09-23 simplify-or-abandon decision and planning request.
@@ -63,7 +63,7 @@ No new architectural decision or North Star change is needed.
 
 ### Save through one coherent accepted-head persistence handoff
 
-Type: Behavior. Status: planned.
+Type: Behavior. Status: abandoned.
 
 Behavior: an author edits an existing root or deeply nested note → publication
 uses the already-known new head without rediscovering it → the same complete,
@@ -192,15 +192,44 @@ after its concise lesson is captured; the failed story-3 context remains intact.
 
 ## Preparation review
 
-One cohesive outcome and one proof/retention decision. No independent Structure
-slice or further slice-plan refinement is needed. The selected hypothesis may
-fail, but its success conditions and failure disposition are understood; no
-blocking product question or slice-specific planning concern was identified.
-No runtime results are claimed. Readiness is recorded in the canonical story.
+One coherent attempt, no independent Structure slice or further refinement needed; no blocking product decision and no preparation runtime claims. Readiness is in the seed.
+Preparation provenance is retained in `2604bfcfee`: session-created `/Users/terryyin/.codex/worktrees/simplify-note-save-planning/doughnut`, branch `codex/simplify-note-save-planning`, base `8c96f96894c4a8efd5923c5ae7bd4a334853af3c`; origin/integration `/Users/terryyin/git/doughnut`, publication target `origin/main`. The preparation has since been published.
 
-Preparation workspace (session-created):
-`/Users/terryyin/.codex/worktrees/simplify-note-save-planning/doughnut`, branch
-`codex/simplify-note-save-planning`, start `8c96f96894c4a8efd5923c5ae7bd4a334853af3c`.
+## Execution context (2026-09-23)
+
+User invoked dough-execute-plan 017. Story Branch Mode; no replanning or
+fallback candidate is authorized by this plan's stopping rule.
+Session-created execution checkout:
+`/Users/terryyin/.codex/worktrees/simplify-note-save-publication/doughnut`,
+branch `codex/simplify-note-save-publication`, starting revision
+`2604bfcfee8b34e346be2acecbba2a006e01fcff`.
 Originating/integration checkout: `/Users/terryyin/git/doughnut`.
-Publication target if explicitly kept: `origin/main`; this is separate from
-the integration checkout. Draft remains unpublished pending disposition.
+Claim published and confirmed on `origin/main`:
+`596ad1f7e4cde58b505404bae9ab15bccc40abcc`.
+Implementation destination: `origin/codex/simplify-note-save-publication`.
+Default checkout refresh deferred: no exclusive ownership established; clean
+main at `33939aa45a` preserved. Claim CI coverage: unobserved (Story Branch).
+Worktree setup succeeded using `./scripts/run.sh bash scripts/worktree_setup.sh`;
+locked dependencies installed, and the claim's check-only lint hook passed.
+CI source: GitHub Actions `ci.yml`, display name `donut CI` (push all branches).
+Execution observer: coordinator `root-017`, functions cell `20`, PTY `50444`,
+mailbox `/tmp/dough-ci-501/watch-iKcBgO`, PID `21932`; request identity verified
+against this execution checkout and `codex/simplify-note-save-publication`.
+No implementation revision was published. Branch observer stopped with no unread events; PID exit confirmed. Abandonment closure target: `origin/main`, under the plan's authorized closeout disposition.
+
+### Attempt evidence and disposition
+
+- Baseline production SHA: `596ad1f7e4cde58b505404bae9ab15bccc40abcc` (same production as base). Evidence: `/tmp/donut-017-evidence/`; baseline-harness.patch SHA-256 `882746431b776a0fd2400681bbb402e274b8b1091f0adb3234d351984c76c903`.
+- Baseline command, twice: `DONUT_MEASURE_REPRESENTATIVE_SAVE_COST=true CURSOR_DEV=true nix develop -c pnpm backend:test_only`. Both full suites passed, six tasks executed. Route confirmed `--rerun-tasks --no-build-cache --no-daemon` in route-processes.txt.
+- MySQL 8.4.11, port 3309, schema `doughnut_wt_ce756949e0f540b58e4167743c40394e_test`, connection isolation 4/autoCommit true outside controller. NOT_SUPPORTED test base; controller's SERIALIZABLE service completes its transaction within timing. Fresh context/note reload before timer; content and downloaded parent checks afterward.
+- Both shapes: 4,000 folders, 11,000 notes, unchanged attachment. Root explicitly associated with measured notebook. Initial builder error (notebook plus folder forbidden) corrected before valid baselines, with no production edits.
+- Baseline 1 root ms `[18,20,17,20,23]` (median20, range17–23); depth12 `[53,45,44,47,43]` (median45, range43–53). First entry is first-save timing.
+- Baseline 2 root ms `[14,13,22,13,12]` (median13, range12–22); depth12 `[76,71,69,69,73]` (median71, range69–76). First entry is first-save timing.
+- Both baseline JDBC totals: root `[25,26,27,27,27]`, depth12 `[60,61,62,62,62]`. Raw first-save trace proves redundant accepted-head SELECT after native CAS.
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only`: regression red in both root/depth12 cases (post-append reads expected0, actual1), then candidate green: 2,581 tests, zero failures/errors, two opt-in skips. Real controller/JDBC proof observed zero post-append reads and one preserved live ref read; canonical content/history/identity, no-op, committed rollback, creation/reset, proposal and native-ref tests remained green.
+- Fresh independent refactor: no changes needed, accepted proof unchanged. `./scripts/run.sh pnpm format:changed` passed once. After formatting, four production files total 512→498 physical lines but 397→397 nonblank/noncomment lines (per-file deltas +1,−13,+11,+1).
+- Final independent review rejected the size gate: all net physical-line savings were comments/blank lines. Genuine statement consolidation cannot replace the agreed size metric after observing the result. No cosmetic shortening or alternate candidate was attempted.
+- The plan's authorized abandonment applies. Restore only attempt-owned production/test/harness edits, remove SEED-037#story-2 from active backlog, retain seed lesson and this existing plan as evidence. Performance remains unaccepted; no replacement story, no product-delivery or successful-optimization claim.
+- Candidate batch 1 already running at rejection completed successfully before restoration: root `[19,17,19,19,17]` ms (median19, range17–19), depth12 `[78,89,71,74,73]` (median74, range71–89); first entry is first-save timing. JDBC totals root `[24,25,26,26,26]`, depth12 `[59,60,61,61,61]`: one fewer execution throughout. No second candidate batch was run after the decisive size failure; these timings do not establish performance acceptance.
+- All seven attempt-owned production/test files were restored to the published claim revision. Only this plan, seed lesson and backlog removal remain; the discarded patch/logs are local evidence. The slice is abandoned, not delivered.
+- Closeout observer: coordinator `root-017-closure`, target `origin/main`, cell `60`, PTY `71442`, mailbox `/tmp/dough-ci-501/watch-g9hLWU`, PID `73104`; verified same execution checkout. No implementation was published to the execution branch.
