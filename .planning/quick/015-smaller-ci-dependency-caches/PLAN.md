@@ -8,7 +8,8 @@
 The owner requested refinement, then slice planning if no open question remained,
 with plan refinement only if needed. The owner also authorized keeping, committing,
 and merging this session's preparation to main, syncing local and remote main,
-and reusing the worktree. Implementation is not authorized by this request.
+and reusing the worktree. The subsequent owner instruction authorized execution;
+the retained execution context below records that transition.
 
 ## Goal and scope
 
@@ -23,15 +24,23 @@ No test optimization, shard rebalancing, selective installs, per-job browser
 policy, package-script cleanup, dependency upgrade, runner migration, production
 release, or deletion of shared/persistent caches belongs in this plan.
 
-## Preparation workspace
+## Execution context
 
-- Reused session-created workspace: `/Users/terryyin/.codex/worktrees/ci-speed-stories/doughnut`,
-  branch `codex/ci-speed-stories`, originally based on `4f02d12cbc117df753ca39d0b0f75e9645d89643`.
-- Published preparation base: `017e33316117ed029a39a77f7e962d4bcf79df88`.
-- Originating/integration checkout: `/Users/terryyin/git/doughnut`, branch `main`.
-- Publication target for authorized preparation: `origin`, `refs/heads/main`.
-- This is preparation, not a Taken claim or an execution identity. Recheck
-  execution mode, runtime preparation, and publication context when authorized.
+- Owner authorized execution and a published Taken state on 2026-09-23.
+- Trunk publication from retained worktree `/Users/terryyin/.codex/worktrees/ci-speed-stories/doughnut`,
+  branch `codex/ci-speed-stories`; implementation target `origin/refs/heads/main`.
+- Starting fetched trunk: `853142c3f477588c2664dea5a757885f3850b2b4`.
+- Taken claim: `89f4b49b5f589af70db5c98b3277679e35df4d63`, confirmed on origin/main
+  and fast-forwarded into clean local main before implementation.
+- Replanning permission retained from the owner's refinement instruction; outcome
+  and story order remain unchanged.
+- `./scripts/run.sh bash scripts/worktree_setup.sh` completed against the locked
+  graph. `CURSOR_DEV=true nix develop -c node --test scripts/ci/ci-workflow.test.mjs`
+  passed 2/2 in this checkout.
+- CI observer: coordinator `ci-cache-story`, GitHub workflow ID `5208694`, name
+  `donut CI`, target `nerds-odd-e/doughnut:main`; mailbox
+  `/tmp/dough-ci-501/watch-GdUvTL`, PID 10353, terminal session 8763, yielded cell 44.
+  Claim registered. Temporary branch probes supply performance proof separately.
 
 ## Existing solutions and constraints
 
@@ -63,31 +72,16 @@ supports propagating failed installs/verification rather than disguising them.
 The current North Star concerns notebook content and adds no constraint here.
 No new architecture direction or ADR exception is needed.
 
-## Current decisions and experiment gate
+## Experiment gate and selected policy
 
-Use one bounded cache lifecycle, not a permanent matrix of competing strategies.
-The leading candidate is a fresh cache namespace with pnpm contents keyed to the
-locked dependency graph/toolchain and Cypress cached separately for its requested
-version/platform. Do not restore the historical combined namespace into the new
-caches. Avoid broad fallbacks that perpetuate old browser versions. Prefer exact
-dependency reuse initially; only retain a broader reuse policy if measured total
-cost and payload bounds justify its extra lifecycle work.
-
-This is an implementation hypothesis, not an observed payload diagnosis:
-
-- The five run links and measured 3,597 MB archive in the seed are baseline
-  evidence; their contents have not been inventoried. Before changing policy,
-  inspect a restored archive on a disposable Linux runner and record pnpm versus
-  Cypress sizes and versions. Compare a clean locked installation to determine
-  whether historical binaries, stale package data, or current required data
-  dominate. Do not infer that splitting an archive by itself reduces its bytes.
-- Reuse the pinned Node/pnpm/Cypress versions and actual action versions. A macOS
-  local install is not a Linux cache benchmark. `pnpm/action-setup@v6` already has
-  a post action; verify actual pruning/save order before adding redundant cleanup.
-- If a clean bounded cache still restores slower than a fresh install, compare
-  omitting the costly cache payload within the same outcome. If no simpler policy
-  demonstrates improvement, record no demonstrated gain and reassess this plan;
-  do not ship complexity or claim success based on archive size alone.
+The original hypothesis was exact locked-graph pnpm caching plus independently
+versioned Cypress caching in a fresh namespace. Before changing policy, inventory
+restored and clean Linux runners using current pinned toolchain/action versions.
+Measure total setup including restore, install and saves; a macOS local install
+is not comparable evidence. Confirm actual pnpm post-action ordering before
+adding cleanup. Compare omitting a payload if restoring it costs more than a
+fresh installation. Do not ship complexity or claim success from byte savings
+alone. The observations below record this gate and select Cypress-only caching.
 
 Supporting upstream behavior: [Cypress caching guidance](https://docs.cypress.io/app/continuous-integration/overview#caching)
 warns that lax cache keys accumulate binary versions. [GitHub cache documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching)
@@ -99,7 +93,7 @@ to replace an oversized entry. Neither proves this archive's composition.
 ### 1. Reuse bounded dependency caches without slowing correct installation
 
 Type: Behavior
-Status: planned
+Status: done (implementation and probe proof; ordinary CI observation pending publication)
 
 **Behavior:** Given the committed dependency graph on a fresh CI runner, setup
 installs correct dependencies from an empty cache or reuses bounded cached data;
@@ -155,37 +149,79 @@ delivery or unowned final verification phase is intended.
 | Existing force-install input remains compatible | Run the shared action with `force_install: 'true'` on disposable runner state and verify the installed Cypress binary; do not change its interface |
 | Isolation and unchanged test scope | Inspect retained diff: no persistent-cache cleanup, test/coverage reduction, matrix/parallelism change, dependency upgrade, or release trigger modification |
 
-Commands at the relevant boundary (repository tooling locally uses Nix):
+Focused local checks: `CURSOR_DEV=true nix develop -c node --test scripts/ci/ci-workflow.test.mjs`
+and `CURSOR_DEV=true nix develop -c bash scripts/check_diff_whitespace.sh`.
+Runtime probes invoke the real shared action, inventory `pnpm store path` and
+`pnpm exec cypress cache path` using `du -sk`, then run `pnpm exec cypress version`,
+`pnpm exec cypress cache list`, `pnpm exec cypress verify` and `pnpm cli:bundle`.
+GitHub logs are retrieved with `CURSOR_DEV=true nix develop -c gh api
+repos/nerds-odd-e/doughnut/actions/jobs/JOB_ID/logs`; resolve jobs from the linked
+runs below, not the workflow filename filter that returned stale history.
 
-```sh
-# Existing workflow checks; actual runtime proof comes from Linux Actions.
-CURSOR_DEV=true nix develop -c node --test scripts/ci/ci-workflow.test.mjs
-CURSOR_DEV=true nix develop -c bash scripts/check_diff_whitespace.sh
+## Execution observations
 
-# Inside the disposable Linux runner, after the actual shared setup action.
-pnpm --frozen-lockfile recursive install
-pnpm exec cypress version
-pnpm exec cypress cache list
-pnpm exec cypress verify
-pnpm cli:bundle
-```
+Baseline probe [35817649078](https://github.com/nerds-odd-e/doughnut/actions/runs/35817649078)
+used disposable branch revision `5cfb76a8018956f02347c4f55eaec8ff7423e624`,
+the unchanged shared action and current dependency graph. All four jobs passed
+on Ubuntu 24 image `20260907.300.1`, X64, Node 26.10.0, pnpm 11.27.1.
+Lockfile SHA256: `4e0bccda463eb1e4b516f439c78033e79b8a436c2a2b3e01202ab5d005d25cf5`.
 
-Inventory uses `pnpm store path` and `du -sk` on that resolved store and the
-resolved Cypress cache (`pnpm exec cypress cache path`); record their actual paths.
-Capture the action's own install duration separately from any additional
-verification install. GitHub collection uses run/job IDs and commit selection,
-not the filename filter that returned obsolete history in the original analysis:
+- Three exact legacy hits restored 3,771,345,708 compressed bytes. Setup before
+  inventory took 69.673, 72.910 and 73.899 seconds; cache post-actions added
+  approximately five seconds each (no save on exact hits).
+- Restored pnpm store occupied approximately 4,397,000 KiB; Cypress occupied
+  9,954,132 KiB with 12 versions from 15.15.0 through 16.1.0. This establishes
+  accumulated binaries as the largest payload, with stale pnpm data also present.
+- Uncached locked install took 18.77 seconds; total setup 28.035 seconds.
+  Required pnpm store was 797,464 KiB and Cypress 838,640 KiB (only 16.1.0).
+- All jobs verified package/binary version agreement and ran Cypress verification.
+  Actual logs show the cache post-action runs before pnpm's post-action, which
+  reported `Pruning is unnecessary.` No cleanup step is justified by assumption.
+- Temporary probe workflow replaces normal workflows only in its disposable Git
+  tree; no probe instrumentation is retained in the product change.
 
-```sh
-CURSOR_DEV=true nix develop -c gh run list --repo nerds-odd-e/doughnut --commit "$CI_REVISION" --json databaseId,workflowName,conclusion,createdAt,updatedAt
-CURSOR_DEV=true nix develop -c gh api "repos/nerds-odd-e/doughnut/actions/runs/$CI_RUN_ID/jobs?per_page=100"
-CURSOR_DEV=true nix develop -c gh api "repos/nerds-odd-e/doughnut/actions/jobs/$CI_JOB_ID/logs"
-```
+Measured selection: retain only the exact Cypress version/platform cache and
+install the locked package graph afresh. The initial separate pnpm cache was
+rejected because its restore and post-action overhead made it slower than an
+uncached install. This follows the plan's payload-omission experiment gate;
+the shared action remains the sole owner, with no new abstraction or slice.
 
-Resolve those variables from observed commits/runs during execution. Any temporary
-runner probe must invoke the real shared action on an isolated execution branch;
-do not claim a local mock measures Actions cache restoration. No probe or profile
-has been run by this planning session.
+| Policy, three successful observations | Median setup including post-actions | Range |
+| --- | --- | --- |
+| Original combined cache | 78.420 s | 75.268–79.700 s |
+| Separate exact pnpm and Cypress caches | 32.747 s | 31.798–33.204 s |
+| Uncached install, concurrent comparison | 27.253 s | 27.050–28.291 s |
+| Selected Cypress-only cache | 22.676 s | 22.331–25.290 s |
+
+Setup includes Node/pnpm setup, cache lookup/restore, install and all setup
+post-actions (save or hit handling). It excludes checkout, inventory, verification
+and job scheduling. Composite action durations come from native log markers;
+uncached post duration spans setup cleanup until checkout cleanup. Warm selected
+samples are 22.331, 25.290 and 22.676 seconds. The selected median saves 55.744
+seconds (71.1%) versus legacy; its range also stays below concurrent uncached
+observations. This is dependency-preparation evidence, not a claim that whole CI
+becomes 71% faster.
+
+Split-policy [run 35817984989](https://github.com/nerds-odd-e/doughnut/actions/runs/35817984989),
+revision `4e1d8c3dcfce12e11a74d26f7ad92f252caad886`, passed cold current,
+three warm, prior dependency fixture and force-install/bundle jobs. Cold total
+was 42.624 seconds including both saves; the retained Cypress save took 3.629
+seconds. The prior fixture `3d4a7af2ecf0d43739075156dc6dfabf4b6804e7`
+populated Cypress 16.0.0 and pnpm 11.27.0. Current runners selected only 16.1.0.
+
+Selected-policy [run 35818263221](https://github.com/nerds-odd-e/doughnut/actions/runs/35818263221),
+revision `8debaf862b4fcdca73513a227db2f6fafc1e30a6`, passed all seven jobs:
+three warm, three concurrent uncached, and force-install plus CLI bundle.
+All used the same runner image/toolchain/lock fingerprint as the baseline.
+The retained Cypress cache is 225,421,581 bytes (215 MiB), versus 3,771,345,708
+bytes (3,597 MiB) originally: 94% less transferred cache data. It restores only
+`~/.cache/Cypress/16.1.0`; assertions verified sole cached version, package/binary
+agreement, and successful `pnpm exec cypress verify`. No pnpm data is restored
+or saved. The previously populated 16.0.0 cache is not inherited. Job
+107044539284 exercised `force_install: 'true'` and `pnpm cli:bundle` successfully.
+Cold Cypress population proof remains valid because the retained cache key,
+path, install lifecycle and save action are unchanged from the split cold run;
+ordinary main CI will additionally exercise a fresh main-scoped cache.
 
 ## Delivery and readiness review
 
@@ -200,3 +236,12 @@ there is one outcome and one shared owner. The unmeasured payload composition is
 an explicit pre-change experiment gate within the slice, not an assumed fact.
 The external-wait exception is explicit; active-work overruns trigger refinement.
 No additional plan-refinement pass is needed for this single bounded slice.
+
+Delivery review: final action is semantically identical to the successful selected
+probe; YAML/Bash syntax and existing workflow tests passed. Independent refactor
+found no edits needed. Coordinator formatting passed. No API generation applies.
+Active implementation stayed below five minutes; Linux provisioning, transfer and
+probe measurements used the stated external-proof exception. Ordinary main CI,
+including all unchanged E2E shards, is the remaining post-publication observation;
+the execution observer owns its completion receipt. Keep this story Taken through
+execution and retrospective, until authorized story wrap-up.

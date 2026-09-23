@@ -1,5 +1,5 @@
-name: "Setup NodeJS with pnpm cache"
-description: "Setup NodeJS with pnpm cache"
+name: "Setup NodeJS with Cypress cache"
+description: "Install locked pnpm dependencies and cache the requested Cypress binary"
 inputs:
   node_version:
     description: "NodeJS Version"
@@ -19,19 +19,16 @@ runs:
     # (keeps CI in sync with Dependabot bumps; do not reintroduce vars.PNPM_VERSION).
     - name: Install pnpm
       uses: pnpm/action-setup@v6
-    - name: Get pnpm store directory
+    - name: Resolve Cypress cache version
+      id: cache-metadata
       shell: bash
       run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-    - name: Restore pnpm store and Cypress cache
+        echo "cypress-version=$(node -p 'require("./package.json").devDependencies.cypress')" >> "$GITHUB_OUTPUT"
+    - name: Restore Cypress binary
       uses: actions/cache@v6
       with:
-        path: |
-          ${{ env.STORE_PATH }}
-          ~/.cache/Cypress
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
+        path: ~/.cache/Cypress/${{ steps.cache-metadata.outputs.cypress-version }}
+        key: cypress-v2-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-metadata.outputs.cypress-version }}
     - name: Install dependencies
       shell: bash
       run: pnpm --frozen-lockfile recursive install
