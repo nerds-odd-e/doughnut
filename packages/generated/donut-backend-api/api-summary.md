@@ -3,6 +3,12 @@
 Generated from `open_api_docs.yaml` by `scripts/generate-api-summary.mjs`.
 Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact generated signatures.
 
+## Notebook Lfs Transfer Controller
+
+- `download`: GET `/api/notebooks/{notebook}/lfs/objects/{oid}` -> `DownloadResponse` (request: `DownloadData`; path: notebook, oid; response body: object)
+- `upload`: PUT `/api/notebooks/{notebook}/lfs/objects/{oid}` -> `UploadResponse` (request: `UploadData`; path: notebook, oid; response body: object)
+- `batch`: POST `/api/notebooks/{notebook}/lfs/objects/batch` -> `BatchResponse` (request: `BatchData`; path: notebook; body: BatchRequest; response body: object)
+
 ## Notebook Books Controller
 
 - `putNotebookBookBlockReadingRecord`: PUT `/api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record` -> `PutNotebookBookBlockReadingRecordResponse` (request: `PutNotebookBookBlockReadingRecordData`; path: notebook, bookBlock; body: BookBlockReadingRecordPutRequest; response body: Array<BookBlockReadingRecordListItem>)

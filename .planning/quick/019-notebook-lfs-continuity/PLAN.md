@@ -27,10 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `8adda16de33139831134ffbe3b91c4dc505c8ddf` on
+- Published increment: `d64bf4c00e8081da27e6a4c3cfeb752e45b93e28` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer. Earlier increment `7db86ca0a5f54aba91d6856c76864025eaa9d7b3` is its
-  parent on the same branch.
+  observer. Parent on that branch: `8adda16de33139831134ffbe3b91c4dc505c8ddf`.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
@@ -215,20 +214,34 @@ Accepted proof:
 
 ### 3. Transfer exact content with the standard authenticated client
 Type: Behavior
-Status: planned
+Status: done
 
-Given a permitted notebook owner/reader, standard LFS Batch/Basic upload/download
-uses the same verified content. Wrong notebook/access and missing objects return
-standard failures; a hash alone grants no access. Upload does not accept a commit.
+Permitted owners upload and download verified bytes through standard Git LFS
+Batch and Basic transfer at `/api/notebooks/{id}/lfs`. Readers can download.
+Missing access is forbidden. A missing object and the same digest on another
+notebook are standard object-not-found failures. Upload does not change the
+accepted Git head. Non-production uses the in-memory content store. Git LFS
+`3.7.1` authenticates with the existing bearer token via `http.extraHeader`.
+New notebooks stay raw.
 
-Proof: HTTP-boundary `NotebookLfsTransferControllerTest` plus a standard-client
-round trip in E against the in-memory content store. Observe upload, download,
-authorization denial and exact digest; slice 2 owns storage failure
-combinations. Add Git LFS to reproducible runtime and record actual version
-(host `git lfs version` previously failed).
-B and E; 8–10 minutes if the standard auth exchange fits existing bearer access.
-If not, stop this slice and reassess the precise integration issue.
-Safe stop: transfers work, user-facing LFS activation still off.
+Accepted proof:
+- Promise: exact upload/download, reader download, forbidden access, missing
+  object, cross-notebook hash isolation, no head change, and a real Git LFS
+  client round trip plus unauthorized refusal.
+- Boundary: MockMvc LFS controller and installed `git lfs` against the local
+  backend.
+- Setup: owned notebook and payload digest for the controller tests. E2E logs
+  in, creates the notebook and token; the denial scenario re-logs as
+  `another_old_learner`. The payload is not pre-stored for the owner upload.
+- Observations: `NotebookLfsTransferControllerTest` nested upload, reader,
+  forbidden, missing-object, and cross-notebook cases.
+  `cli_notebook_lfs.feature` compares downloaded bytes and SHA-256 in
+  `notebookLfsStandardClientRoundTrip`, and the denial Then checks non-zero
+  status plus denial-shaped output.
+- Commands: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (pass,
+  2620 tests, 2 skipped). After the denial assertion moved into the Then step,
+  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`
+  passed (2 scenarios). Backend proof was unchanged.
 
 ### 4. Represent attachments and metadata through the existing tree owner
 Type: Structure

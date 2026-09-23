@@ -5,6 +5,7 @@ import { interactiveCli } from './interactiveCli'
 import { useNotebook } from './notebookInteractiveCliSession'
 import { notebookClone } from './notebookClone'
 import { notebookCloneCheckout } from './notebookCloneCheckout'
+import { notebookLfs } from './notebookLfs'
 import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 /**
@@ -23,6 +24,7 @@ export const cli = {
   useNotebook,
   notebookClone,
   notebookCloneCheckout,
+  notebookLfs,
   installation,
   backend,
 }

@@ -5,6 +5,51 @@ info:
 servers:
 - url: ""
 paths:
+  /api/notebooks/{notebook}/lfs/objects/{oid}:
+    get:
+      tags:
+      - notebook-lfs-transfer-controller
+      operationId: download
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: oid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    put:
+      tags:
+      - notebook-lfs-transfer-controller
+      operationId: upload
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: oid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
   /api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record:
     put:
       tags:
@@ -947,6 +992,33 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/lfs/objects/batch:
+    post:
+      tags:
+      - notebook-lfs-transfer-controller
+      operationId: batch
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/vnd.git-lfs+json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/BatchRequest"
+          application/vnd.git-lfs+json:
+            schema:
+              $ref: "#/components/schemas/BatchRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.git-lfs+json:
+              schema:
+                type: object
   /api/notebooks/{notebook}/health/lint:
     post:
       tags:
@@ -4221,6 +4293,27 @@ components:
           maxLength: 150
           minLength: 0
           pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
+    BatchObjectRequest:
+      type: object
+      properties:
+        oid:
+          type: string
+        size:
+          type: integer
+          format: int64
+    BatchRequest:
+      type: object
+      properties:
+        operation:
+          type: string
+        transfers:
+          type: array
+          items:
+            type: string
+        objects:
+          type: array
+          items:
+            $ref: "#/components/schemas/BatchObjectRequest"
     HealthFindingGroup:
       type: object
       properties:

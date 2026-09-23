@@ -68,6 +68,7 @@
           lsof
           fzf
           git-secret
+          git-lfs
           gitleaks
           jq
           mysql_jdbc

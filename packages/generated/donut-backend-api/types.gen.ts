@@ -402,6 +402,17 @@ export type NotebookUpdateRequest = {
     name?: string;
 };
 
+export type BatchObjectRequest = {
+    oid?: string;
+    size?: number;
+};
+
+export type BatchRequest = {
+    operation?: string;
+    transfers?: Array<string>;
+    objects?: Array<BatchObjectRequest>;
+};
+
 export type HealthFindingGroup = {
     /**
      * Stable rule id
@@ -1288,6 +1299,48 @@ export type SubscriptionWritable = {
     fromDTO?: SubscriptionDto;
 };
 
+export type DownloadData = {
+    body?: never;
+    path: {
+        notebook: number;
+        oid: string;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/lfs/objects/{oid}';
+};
+
+export type DownloadResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type DownloadResponse = DownloadResponses[keyof DownloadResponses];
+
+export type UploadData = {
+    body?: never;
+    path: {
+        notebook: number;
+        oid: string;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/lfs/objects/{oid}';
+};
+
+export type UploadResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type UploadResponse = UploadResponses[keyof UploadResponses];
+
 export type PutNotebookBookBlockReadingRecordData = {
     body?: BookBlockReadingRecordPutRequest;
     path: {
@@ -2111,6 +2164,26 @@ export type ResetNotebookGitHistoryResponses = {
      */
     200: unknown;
 };
+
+export type BatchData = {
+    body: BatchRequest;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/lfs/objects/batch';
+};
+
+export type BatchResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type BatchResponse = BatchResponses[keyof BatchResponses];
 
 export type LintData = {
     body?: never;
