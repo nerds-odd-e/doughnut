@@ -73,3 +73,22 @@ owns its stack. Do not put lasting manual work in E2E — use `pnpm dev` instead
 
 To start only the E2E backend, use `pnpm backend:sut`. Run complete backend
 verification with `pnpm backend:verify`.
+
+## CI dependency preparation
+
+The shared [Node setup action](../.github/setup_nodejs_with_cache/action.yml)
+installs the complete locked workspace with `pnpm --frozen-lockfile recursive install`,
+including native build and postinstall scripts. pnpm follows `packageManager` in
+the root `package.json`.
+
+Only the requested Cypress binary is cached. Its key includes operating system,
+architecture and the exact Cypress version from `package.json`; the cached path
+contains only that version. There are no fallback keys. A cache miss downloads
+the binary during installation, and a version change cannot inherit old binaries.
+The optional `force_install` input remains available for emergency reinstallation.
+
+The pnpm store is installed afresh because restoring and saving it costs more
+than fetching the required packages in the measured hosted-runner workload.
+Evaluate future cache changes using total setup time, including post-job saves,
+with comparable cold and warm runs. Cache size alone does not establish a speedup.
+CI cache policy does not prune developer caches or change test selection.

@@ -93,7 +93,7 @@ to replace an oversized entry. Neither proves this archive's composition.
 ### 1. Reuse bounded dependency caches without slowing correct installation
 
 Type: Behavior
-Status: done (implementation and probe proof; ordinary CI observation pending publication)
+Status: done
 
 **Behavior:** Given the committed dependency graph on a fresh CI runner, setup
 installs correct dependencies from an empty cache or reuses bounded cached data;
@@ -237,11 +237,11 @@ an explicit pre-change experiment gate within the slice, not an assumed fact.
 The external-wait exception is explicit; active-work overruns trigger refinement.
 No additional plan-refinement pass is needed for this single bounded slice.
 
-Delivery review: final action is semantically identical to the successful selected
-probe; YAML/Bash syntax and existing workflow tests passed. Independent refactor
-found no edits needed. Coordinator formatting passed. No API generation applies.
-Active implementation stayed below five minutes; Linux provisioning, transfer and
-probe measurements used the stated external-proof exception. Ordinary main CI,
-including all unchanged E2E shards, is the remaining post-publication observation;
-the execution observer owns its completion receipt. Keep this story Taken through
-execution and retrospective, until authorized story wrap-up.
+Delivery: `cd57b491fa57e768997b5fc1b2e7d5eaaf5ab939` is published on main.
+Final action matches the selected probe; syntax, workflow checks, formatting and
+independent refactor review passed. [Full CI](https://github.com/nerds-odd-e/doughnut/actions/runs/35818732541)
+passed all jobs, including six unchanged E2E shards, in 6m56s. Dependency setup
+was cold on main; E2E setup plus post-actions took 30–36 seconds. The CLI shard
+finished last. Whole-run timing is one observation, not a controlled speed claim.
+Observer completion returned `observation_unavailable: worker_identity_unknown`;
+direct GitHub verification established success and observer shutdown was confirmed.
