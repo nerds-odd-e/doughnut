@@ -80,13 +80,16 @@ poll or claim notifications from a background shell or file. Use another native
 bridge only when its delivery contract is independently verified for this host.
 
 When the shared [observer lifecycle](ci-monitor.md#own-one-observer) calls for
-shutdown, consume delivered failures first. At normal execution completion,
-the shared [bounded wait](ci-monitor.md#await-the-applicable-revision-at-completion)
-must already have returned and been handled; this stop binding never substitutes
-for that wait. Copy it with the note's exact `directory`; do not `write_stdin`
-the stream PTY. Confirm receipt and a finite local `ps` wait for the recorded
-PID; never signal it. Report unread events and any still-unobserved coverage.
-The finite process-exit check waits only for local shutdown, never for CI.
+an explicit stop — human-judgment stop, cancellation, or coordinator
+replacement — consume delivered failures first. Normal execution completion
+uses the shared
+[completion operation](ci-monitor.md#await-the-applicable-revision-at-completion)
+instead; do not run this stop binding, `write_stdin` the stream PTY, or poll a
+PID after that receipt. This stop binding never substitutes for that completion
+operation. Copy it with the note's exact `directory`; do not `write_stdin` the
+stream PTY. Confirm receipt and a finite local `ps` wait for the recorded PID;
+never signal it. Report unread events and any still-unobserved coverage. The
+finite process-exit check waits only for local shutdown, never for CI.
 
 ```js
 const key = 'ci-watch-execution:OWNER/REPO:BRANCH:COORDINATOR'

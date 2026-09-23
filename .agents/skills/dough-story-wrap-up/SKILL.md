@@ -198,14 +198,14 @@ integration and resource cleanup below.
 
 Save the final-closure tip already published on the remote execution branch.
 Follow [Story Branch integration observation](../dough-execute-plan/references/trunk-publication.md#observe-story-branch-integration)
-for the target transition, publication, accepted integrated-SHA wait, and
-shutdown. Its publication uses [Preserve published history](../dough-execute-plan/references/publish-the-candidate.md#preserve-published-history)
+for the target transition, publication, and shared completion on the accepted
+integrated SHA. Its publication uses [Preserve published history](../dough-execute-plan/references/publish-the-candidate.md#preserve-published-history)
 from the owned execution workspace, excluding the integration checkout's
 unrelated commits and pending human edit.
 
 When the merge touches the product backlog, use the owned workspace's installed
-merge adapter as that procedure requires. A stopped result stays as Git left
-it. Resolve it through
+merge adapter as that procedure requires. A stopped result stays as Git left it.
+Resolve it through
 [a real conflict](../dough-product-backlog/references/merge-conflicts.md#a-real-conflict-resolve-by-hand-then-continue-through-the-same-adapter).
 If the adapter and that reference are unavailable, report the gap and leave the
 conflict. Stop when no coherent resolution is justified. Selected-work cleanup
@@ -219,32 +219,32 @@ and blocks completion. Do not force-push.
 ## Remove execution resources safely
 
 After Story Branch Mode's verified integration and required target push, or after
-Trunk Mode's final accepted closure has its bounded CI result handled and its
-wrap-up observer shut down, remove this execution's clean local worktree and
-local execution branch. Use retained
-identity and non-force operations. Preserve unrelated resources, unique or
-unpublished work, a dirty checkout, and a worktree that still hosts an active
-checkout-bound observer under [preserve pending local work](../dough-execute-plan/references/maintain-default-checkout.md#preserve-pending-local-work). Trunk Mode never deletes a remote execution branch.
-Story Branch Mode deletes the remote branch only when its tip is integrated in
-the remote target. Verify removal, accept already-absent resources on retry,
-report blocked or partial cleanup without repeating already-completed closure,
-and skip cleanup in direct-current-branch mode.
+Trunk Mode's final accepted closure has a completion receipt whose shutdown is
+confirmed, remove this execution's clean local worktree and local execution
+branch. Use retained identity and non-force operations. Preserve unrelated
+resources, unique or unpublished work, a dirty checkout, unconfirmed shutdown,
+and a worktree that still hosts an active checkout-bound observer under
+[preserve pending local work](../dough-execute-plan/references/maintain-default-checkout.md#preserve-pending-local-work).
+Trunk Mode never deletes a remote execution branch. Story Branch Mode deletes
+the remote branch only when its tip is integrated in the remote target. Verify
+removal, accept already-absent resources on retry, report blocked or partial
+cleanup without repeating already-completed closure, and skip cleanup in
+direct-current-branch mode.
 
 ## Report
 
-Report the selected work and identity, completion judgment, mode and retained
+Report selected work and identity, completion judgment, mode and retained
 checkout/branch/target, before-cleanup and final-closure commits when deletion
-happened, Trunk Mode published closure SHAs, bounded wait receipt, remaining CI
-coverage, assimilated
-knowledge, deleted paths, Story Branch saved tip and integration/push results when
-the target is `main`, worktree and branch cleanup results (remote deletion only when
-verified absent), preserved material and resources, and any gap. Distinguish a new
-merge from an already-integrated tip, integration from refused cleanup, an
-accepted trunk receipt from a superseded candidate, committed pending
-publication from an accepted receipt, and completed wrap-up from a refusal
-that left files intact.
-
-End successful closure with `## STORY WRAP-UP COMPLETE`. Missing context, unfinished
-work, unresolved recovery/integration, required push, unpublished Trunk Mode closure,
-an active wrap-up observer, or resource cleanup blocks that marker. Local-only
+happened, Trunk Mode published closure SHAs, the completion receipt (CI verdict
+or exact unresolved reason with shutdown evidence), remaining CI coverage,
+assimilated knowledge, deleted paths, Story Branch saved tip and
+integration/push results when the target is `main`, worktree and branch cleanup
+results (remote deletion only when verified absent), preserved material and
+resources, and any gap. Distinguish a new merge from an already-integrated tip,
+integration from refused cleanup, an accepted trunk receipt from a superseded
+candidate, committed pending publication from an accepted receipt, and completed
+wrap-up from a refusal that left files intact. End successful closure with
+`## STORY WRAP-UP COMPLETE`. Missing context, unfinished work, unresolved
+recovery/integration, required push, unpublished Trunk Mode closure, retained
+or unconfirmed observation, or resource cleanup blocks that marker. Local-only
 current-branch pending publication is not a required push.

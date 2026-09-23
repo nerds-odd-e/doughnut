@@ -90,13 +90,14 @@ Use the same shared mailbox directory for launcher and hooks as specified in
 runtime setup. Mailboxes survive stashing. Use the host's agent message and
 resume handles to follow the shared [pause contract](ci-monitor.md#pause-and-resume-writers).
 
-## Stop after completion observation
+## Stop for cancellation
 
-When the shared lifecycle calls for shutdown, consume delivered failures first.
-At normal execution completion, the shared
-[bounded wait](ci-monitor.md#await-the-applicable-revision-at-completion) must
-already have returned and been handled; this stop command never substitutes for
-that wait. Stop using the exact saved directory:
+When the shared lifecycle calls for an explicit stop — human-judgment stop,
+cancellation, or coordinator replacement — consume delivered failures first,
+then stop using the exact saved directory. Normal execution completion uses the
+shared [completion operation](ci-monitor.md#await-the-applicable-revision-at-completion)
+instead; do not run this stop, a process poll, or a terminal-report read after
+that receipt — this stop command never substitutes for that completion operation.
 
 ```sh
 node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' stop '/EXACT/RECORDED/MAILBOX'

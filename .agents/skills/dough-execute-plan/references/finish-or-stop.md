@@ -3,17 +3,17 @@
 On a human-judgment stop or cancellation, handle delivered failures, then close
 the observer through the current host adapter without waiting for CI and report
 pending CI as unobserved. On normal completion, use
-[the one bounded applicable-revision wait](ci-monitor.md#await-the-applicable-revision-at-completion),
-handle its result, and perform existing shutdown before the final handoff.
+[the one bounded completion operation](ci-monitor.md#await-the-applicable-revision-at-completion)
+and handle its combined CI and shutdown receipt before the final handoff.
 
 After all planned slices satisfy proof/delivery, `--skip-retro` skips only this
 execution's automatic retrospective; it changes no preferences or
-proof/delivery/wait/shutdown obligations. Explicit omit/defer instructions also
-take precedence. When skipped, await the applicable accepted revision at this
-execution-completion boundary, handle its result, shut down the observer, report
-the CI verdict or exact unresolved reason, and end with
-`## PLAN EXECUTION COMPLETE`, retaining plan/evidence for later review and
-wrap-up.
+proof/delivery/completion obligations. Explicit omit/defer instructions also
+take precedence. When skipped, invoke the completion operation for the
+applicable accepted revision at this execution-completion boundary, handle its
+receipt, report the CI verdict or exact unresolved reason with shutdown
+evidence, and end with `## PLAN EXECUTION COMPLETE`, retaining plan/evidence for
+later review and wrap-up.
 
 Otherwise invoke
 [dough-execution-retrospective](../../dough-execution-retrospective/SKILL.md)
@@ -22,9 +22,9 @@ including while applicable CI is pending. Preserve explicit review instructions
 and project preferences through its review selection; its authority excludes
 implementing findings or changing the backlog. Do not emit
 `## PLAN EXECUTION COMPLETE` first or require that banner as retrospective
-input. When review returns, perform the applicable-revision wait, handle its
-result, shut down the observer, then report completion, retained evidence, CI
-verdict or limitation, and `## PLAN EXECUTION COMPLETE` as the final
+input. When review returns, invoke the completion operation, handle its
+receipt, then report completion, retained evidence, CI verdict or limitation,
+shutdown evidence, and `## PLAN EXECUTION COMPLETE` as the final
 execution/review handoff.
 
 Continue in the recorded execution project/checkout. Supply available references/context:
@@ -47,10 +47,10 @@ resume those conclusions instead of restarting the full retrospective.
 
 Retain the completed plan, evidence, execution checkout, branch, and worktree for story
 wrap-up; do not invoke it here. Wholly planless completion retains source, conversation,
-identity, delivered changes, and proof, awaits the applicable accepted revision
-when publication created that CI obligation,
+identity, delivered changes, and proof, invokes the completion operation when
+publication created that CI obligation,
 reports delivered work, the CI verdict or exact unresolved reason, and shutdown,
-and ends with `## QUICK EXECUTION COMPLETE` after required delivery/wait/shutdown,
+and ends with `## QUICK EXECUTION COMPLETE` after required delivery/completion,
 without automatic retrospective. The coordinator invokes wrap-up after successful branch delivery. Do not
 report integrated completion here; wrap-up owns Story Branch merge and required
 target push, Trunk Mode closure publication, and resource cleanup.
@@ -59,4 +59,5 @@ For incomplete work, failed delivery/shutdown, cancellation, or a human-judgment
 source, active plan/next slice or quick-slice state, preserved work, observer state,
 and required decision/recovery action. An applicable CI failure that existing
 handling cannot resolve is such an incomplete stop, even when review finished
-and observer shutdown succeeded. Emit no completion marker or automatic retrospective.
+and the observer remains available for diagnosis. Emit no completion marker or
+automatic retrospective.

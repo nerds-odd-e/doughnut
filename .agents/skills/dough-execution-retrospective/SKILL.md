@@ -23,7 +23,7 @@ completion prerequisite. Review the delivered implementation while observation
 continues and state which conclusions remain conditional on unresolved CI. Do
 not invoke the CI wait, stop or replace its observer, acknowledge its events, or
 claim final execution/review handoff; the invoking execution owns those actions
-through its [completion wait](../dough-execute-plan/references/ci-monitor.md#await-the-applicable-revision-at-completion).
+through its [completion operation](../dough-execute-plan/references/ci-monitor.md#await-the-applicable-revision-at-completion).
 
 ## Select reviews
 
@@ -189,7 +189,7 @@ and revision as pending and make no success claim. End with
 `## EXECUTION RETROSPECTIVE COMPLETE`; this marker completes review, not the
 execution's final CI handoff. When this review was invoked automatically by an
 active `dough-execute-plan` execution, do not end the turn at this marker:
-return immediately to that execution's completion-wait and shutdown procedure,
+return immediately to that execution's completion operation,
 without asking for confirmation. If an authorized CI repair later changes
 reviewed code, resume only the affected conclusions using the retained review
 state.
