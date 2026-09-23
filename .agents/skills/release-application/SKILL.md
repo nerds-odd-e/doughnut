@@ -29,13 +29,18 @@ this skill.
 ## Release and verify
 
 For a requested release, establish the intended unused, increasing stable
-version and the exact tested commit on `main`. Confirm exact-SHA CI success and
-the required artifacts for that commit, then push the immutable tag only when
+version and the exact release commit on `main`. Confirm successful applicable CI
+and the required artifacts: exact-commit CI takes precedence; without it, the
+runbook permits the nearest first-parent ancestor with CI evidence only while
+tree differences match the tagged revision's workflow ignore policy. Pending or
+failed evidence must not be bypassed for an older green run. A documentation-only
+tag can reuse that build without starting CI. Push the immutable tag only when
 authorized. CI completion does not start Application Release; if a tag was pushed
 prematurely, an explicit release workflow rerun is needed after CI succeeds.
 Follow the runbook for the commands and admission rules.
 
-After the release request is admitted, inspect the selected tag and SHA, CI run
+After the release request is admitted, inspect the selected tag, release SHA,
+build SHA (`ciSha`), CI run
 and attempt, the actual publication job, and the production smoke-check
 evidence. Do not infer deployment from a tag, CI success, admission, or an
 overall workflow result alone. `waiting`, `blocked`, failed, or skipped
@@ -51,7 +56,12 @@ GitHub Release; it is outside this workflow.
 
 State whether the application is deployed; otherwise report the precise state,
 including `waiting`, `blocked`, failed, or publication skipped. Include the tag,
-exact SHA, selected CI run/attempt, Application Release run and publication-job result, and
+release SHA, build SHA, selected CI run/attempt, Application Release run and publication-job result, and
 production smoke result. Explicitly disclose evidence that could not be
 verified and name the next decision or authorized recovery action rather than
 masking uncertainty.
+
+For expired artifacts, the runbook's explicit recovery reruns the selected CI
+run at its build SHA, then the release workflow. Never automatically retry or
+rebuild current main as a substitute. Backend health identifies the build SHA;
+release identity and frontend publication prefixes retain the tagged SHA.

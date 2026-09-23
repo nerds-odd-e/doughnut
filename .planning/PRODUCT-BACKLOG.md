@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Prepare CI dependencies faster with a smaller effective cache](seeds/SEED-039-faster-ci-feedback.md#story-1) — SEED-039#story-1 ([plan](quick/015-smaller-ci-dependency-caches/PLAN.md))
+
 ## Backlog list
 
-- [Publish a web save from a whole-notebook assembly that never moves content bytes](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-3) — SEED-037#story-3
 - [Save a note with only a few database round trips for Git history](seeds/SEED-037-note-save-cost-independent-of-folder-count.md#story-2) — SEED-037#story-2
 - [Reject oversized supporting files without changing the notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-12) — SEED-035#story-12
 - [Acquire current supporting files without carrying their bytes in Git history](seeds/SEED-035-ai-workspace-supporting-files.md#story-13) — SEED-035#story-13

@@ -134,7 +134,7 @@ if [[ "$*" == *"managed describe"* ]]; then echo current-template; fi`
     'curl',
     `echo "curl $*" >> "$TRACE"
 while [[ "$1" != -o ]]; do shift; done
-printf 'OK . Commit: %s' "$GITHUB_SHA" > "$2"
+printf 'OK . Commit: %s' "$MOCK_BINARY_SHA" > "$2"
 printf 200`
   )
   const trace = join(root, 'trace')
@@ -160,6 +160,8 @@ printf 200`
         RELEASE_SOURCE_ROOT: root,
         RELEASE_REF: release.ref,
         RELEASE_REF_OID: release.refOid,
+        MOCK_BINARY_SHA: ci.ciSha ?? release.sha,
+        RELEASE_CI_SHA: ci.ciSha ?? release.sha,
         RELEASE_CI_RUN_ID: String(ci.runId),
         RELEASE_CI_RUN_ATTEMPT: String(ci.runAttempt),
         CAPTURED_MAP: join(root, 'captured-map'),

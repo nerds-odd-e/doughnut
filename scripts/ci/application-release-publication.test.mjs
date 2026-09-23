@@ -92,6 +92,7 @@ for (const scenario of [
           tag: 'v1.2.3',
           ref_oid: refOid,
           sha,
+          ci_sha: sha,
           ci_run_id: '42',
           ci_run_attempt: '3',
           outcome: 'publishing',
@@ -100,6 +101,7 @@ for (const scenario of [
           tag: 'v1.2.3',
           ref_oid: refOid,
           sha,
+          ci_sha: sha,
           ci_run_id: '42',
           ci_run_attempt: '3',
           outcome: 'succeeded',
@@ -168,5 +170,33 @@ test('workflows share publication commands and retain independent CLI build vers
   assert.equal(
     steps.at(-1).run,
     'infra/gcp/scripts/upload-cli-binary-to-gcs.sh'
+  )
+})
+
+test('reused artifacts retain separate release and binary source identities', (t) => {
+  const { publish, sha, applicationRecords, root } = makePublication(
+    t,
+    'forced'
+  )
+  const ciSha = 'a'.repeat(40)
+  const result = publish(undefined, { runId: 42, runAttempt: 3, ciSha })
+  assert.equal(result.status, 0, result.stderr)
+  assert.deepEqual(
+    readApplicationRecords(applicationRecords).map((record) => [
+      record.sha,
+      record.ci_sha,
+    ]),
+    [
+      [sha, ciSha],
+      [sha, ciSha],
+    ]
+  )
+  assert.equal(
+    JSON.parse(readFileSync(join(root, 'saved-record'))).git_sha,
+    ciSha
+  )
+  assert.match(
+    readFileSync(join(root, 'captured-map'), 'utf8'),
+    new RegExp(`/frontend/${sha}/`)
   )
 })

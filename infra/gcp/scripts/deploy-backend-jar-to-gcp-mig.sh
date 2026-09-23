@@ -4,7 +4,8 @@ set -euo pipefail
 # Compares the built jar and startup script SHA-256 values to
 # gs://${GCS_BUCKET}/deploy/last-successful-deploy.json. If both match, skips
 # GCS upload and MIG rolling replace (record only advances after success).
-# Env: GCS_BUCKET, ARTIFACT, VERSION; optional DEPLOY_JAR_PATH; GITHUB_SHA (set by CI).
+# Env: GCS_BUCKET, ARTIFACT, VERSION, GITHUB_SHA (release commit); optional DEPLOY_JAR_PATH.
+# DEPLOY_BUILD_SHA is the expected binary commit; standalone runs default it to GITHUB_SHA.
 # Optional FORCE_FULL_DEPLOY=1: run upload + rolling replace even when hashes match the record.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -66,13 +67,13 @@ bash "$SCRIPT_DIR/update-mig-startup-script.sh"
 
 bash "$SCRIPT_DIR/check-mig-rollout.sh"
 
-export GITHUB_SHA
-bash "$SCRIPT_DIR/app-instance-healthcheck.sh"
+DEPLOY_BUILD_SHA="${DEPLOY_BUILD_SHA:-$GITHUB_SHA}"
+GITHUB_SHA="$DEPLOY_BUILD_SHA" bash "$SCRIPT_DIR/app-instance-healthcheck.sh"
 
 jq -n \
   --arg sha "$new_hash" \
   --arg startup_script_sha "$new_startup_script_hash" \
-  --arg git "$GITHUB_SHA" \
+  --arg git "$DEPLOY_BUILD_SHA" \
   --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   '{sha256: $sha, startup_script_sha256: $startup_script_sha, git_sha: $git, recorded_at: $at}' \
   | gcloud storage cp - "$RECORD_URI"

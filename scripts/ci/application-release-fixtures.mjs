@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 
 export function makeReleaseRepository(t) {
   const root = mkdtempSync(join(tmpdir(), 'application-release-'))
@@ -37,13 +37,23 @@ export function makeReleaseRepository(t) {
       sha: git('rev-parse', `${ref}^{commit}`),
     }
   }
-  const clone = () =>
+  const write = (path, contents) => {
+    mkdirSync(dirname(join(origin, path)), { recursive: true })
+    writeFileSync(join(origin, path), contents)
+    git('add', path)
+  }
+  const clone = ({ fullHistory = false } = {}) =>
     execFileSync(
       'git',
-      ['clone', '--depth=1', `file://${origin}`, repository],
+      [
+        'clone',
+        ...(fullHistory ? [] : ['--depth=1']),
+        `file://${origin}`,
+        repository,
+      ],
       { stdio: 'ignore' }
     )
-  return { git, commit, tag, clone, release, sha, repository }
+  return { git, commit, tag, clone, write, release, sha, repository }
 }
 
 export const releaseIdentityChanges = [

@@ -52,6 +52,7 @@ function releaseIdentityFromLog(log) {
       record !== null &&
       record.state === 'ready' &&
       objectId.test(record.sha) &&
+      (record.ciSha === undefined || objectId.test(record.ciSha)) &&
       Number.isInteger(record.runId) &&
       Number.isInteger(record.runAttempt)
   )
@@ -69,6 +70,7 @@ function releaseIdentityFromLog(log) {
     tag: releases[0].tag,
     refOid: releases[0].refOid,
     sha: releases[0].sha,
+    ...(selectedCi[0].ciSha ? { ciSha: selectedCi[0].ciSha } : {}),
     runId: selectedCi[0].runId,
     runAttempt: selectedCi[0].runAttempt,
   }

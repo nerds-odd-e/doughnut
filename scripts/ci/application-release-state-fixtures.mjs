@@ -17,6 +17,15 @@ export const selectedReleaseRecord = {
   outcome: 'selected',
 }
 
+export const makePublishedReleaseRecord = (outcome) => ({
+  tag: 'v1.2.3',
+  ref_oid: 'a'.repeat(40),
+  sha: 'b'.repeat(40),
+  ci_run_id: '42',
+  ci_run_attempt: '3',
+  outcome,
+})
+
 export async function runStateCommand(
   t,
   {

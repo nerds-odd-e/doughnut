@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
-import { querySelectedCi } from './application-release-ci.mjs'
+import { queryReleaseCi } from './application-release-ci.mjs'
 import { writeReleaseOutput } from './application-release-output.mjs'
 import {
   checkApplicationReleaseState,
@@ -66,9 +66,10 @@ function releaseOnMain(repository, release) {
   }
 }
 
-async function releaseCiOutcome(githubRepository, release) {
+async function releaseCiOutcome(repositoryRoot, githubRepository, release) {
   try {
-    const ci = await querySelectedCi({
+    const ci = await queryReleaseCi({
+      repositoryRoot,
       repository: githubRepository,
       sha: release.sha,
     })
@@ -116,7 +117,7 @@ export async function reconcileApplicationRelease({
     return { state: admission.state, ...release }
   }
 
-  const result = await releaseCiOutcome(githubRepository, release)
+  const result = await releaseCiOutcome(repository, githubRepository, release)
   if (admission.state === 'continue') {
     await selectApplicationReleaseState({ bucket, ...release })
   }

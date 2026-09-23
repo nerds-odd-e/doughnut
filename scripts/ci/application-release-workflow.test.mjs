@@ -1,23 +1,10 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { parse } from 'yaml'
-
-const config = (path) =>
-  parse(readFileSync(new URL(path, import.meta.url), 'utf8'))
-const workflow = (name) => config(`../../.github/workflows/${name}.yml`)
-const action = (name) => config(`../../.github/${name}/action.yml`)
+import { workflow } from './workflow-fixtures.mjs'
 
 const nonTerminalRelease =
   "steps.release_state.outputs.state != 'already-released' && steps.release_state.outputs.state != 'superseded'"
 const selected = (field) => `\${{ steps.reconciliation.outputs.${field} }}`
-
-test('CI runs on every branch', () => {
-  const ci = workflow('ci')
-
-  assert.deepEqual(ci.on, { push: { branches: ['**'] } })
-  assert.equal(ci.name, 'donut CI')
-})
 
 test('application release starts only on application tags', () => {
   const deploy = workflow('deploy')
@@ -32,29 +19,6 @@ test('application release starts only on application tags', () => {
     deploy.jobs.Deploy.if,
     "needs.release-admission.outputs.deploy == 'true'"
   )
-})
-
-test('CI failure notification stays gated and receives only its Slack secret', () => {
-  const notificationJob = workflow('ci').jobs['Notify-on-failure']
-  const notification = action('notify_ci_failure')
-  const slack = notification.runs.steps[1]
-
-  assert.equal(
-    notificationJob.if,
-    "always() && contains(needs.*.result, 'failure')"
-  )
-  assert.equal(notificationJob.steps[1].uses, './.github/notify_ci_failure')
-  assert.deepEqual(notificationJob.steps[1].with, {
-    slack_webhook_url: '${{ secrets.SLACK_WEBHOOK_URL }}',
-  })
-  assert.equal(notification.on, undefined)
-  assert.deepEqual(Object.keys(notification.inputs), ['slack_webhook_url'])
-  assert.equal(notification.runs.using, 'composite')
-  assert.equal(notification.runs.steps[0].shell, 'bash')
-  assert.equal(slack.uses, 'slackapi/slack-github-action@v4.0.0')
-  assert.equal(slack.with.webhook, '${{ inputs.slack_webhook_url }}')
-  assert.equal(slack.with['webhook-type'], 'incoming-webhook')
-  assert.match(slack.with.payload, /CI\/CD failure/)
 })
 
 test('release pins orchestration separately from source and preserves deployment credentials', () => {
@@ -148,6 +112,14 @@ test('release pins orchestration separately from source and preserves deployment
     '${{ needs.release-admission.outputs.sha }}'
   )
   assert.equal(
+    publication.env.RELEASE_CI_SHA,
+    '${{ needs.release-admission.outputs.ci_sha }}'
+  )
+  assert.equal(
+    notify.steps.find((step) => step.env?.RELEASE_CI_SHA).env.RELEASE_CI_SHA,
+    '${{ needs.release-admission.outputs.ci_sha }}'
+  )
+  assert.equal(
     publication.env.RELEASE_SOURCE_ROOT,
     '${{ github.workspace }}/release-source'
   )
@@ -237,6 +209,7 @@ test('admission exposes the selected release identity using full Git history', (
   const admission = workflow('deploy').jobs['release-admission']
   assert.equal(admission.outputs.tag, selected('tag'))
   assert.equal(admission.outputs.sha, selected('sha'))
+  assert.equal(admission.outputs.ci_sha, selected('ciSha'))
   assert.equal(admission.outputs.ref, selected('ref'))
   assert.equal(admission.outputs.ref_oid, selected('refOid'))
   assert.equal(admission.outputs.run_id, selected('runId'))
