@@ -5,6 +5,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -32,6 +33,7 @@ public class NotebookGitProposalPublisher {
   private final NotebookGitProposalDocumentApplication documentApplication;
   private final NotebookGitProposalNoteAddition noteAddition;
   private final NotebookGitProposalOrdinaryNoteApplication ordinaryNoteApplication;
+  private final NotebookAttachmentContent notebookAttachmentContent;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -43,7 +45,8 @@ public class NotebookGitProposalPublisher {
       NotebookGitProposalFolderRelocation folderRelocation,
       NotebookGitProposalDocumentApplication documentApplication,
       NotebookGitProposalNoteAddition noteAddition,
-      NotebookGitProposalOrdinaryNoteApplication ordinaryNoteApplication) {
+      NotebookGitProposalOrdinaryNoteApplication ordinaryNoteApplication,
+      NotebookAttachmentContent notebookAttachmentContent) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
@@ -54,6 +57,7 @@ public class NotebookGitProposalPublisher {
     this.documentApplication = documentApplication;
     this.noteAddition = noteAddition;
     this.ordinaryNoteApplication = ordinaryNoteApplication;
+    this.notebookAttachmentContent = notebookAttachmentContent;
   }
 
   @Transactional(
@@ -91,7 +95,13 @@ public class NotebookGitProposalPublisher {
         proposal.repository(), proposal.mainHead(), acceptedHead);
     try (var accepted = repositoryStore.open(binding)) {
       NotebookGitAttachmentSizeAdmission.admit(
-          proposal.repository(), proposal.mainHead(), accepted.repository(), acceptedHead);
+          proposal.repository(),
+          proposal.mainHead(),
+          accepted.repository(),
+          acceptedHead,
+          binding.getAttachmentRepresentation(),
+          notebook.getId(),
+          notebookAttachmentContent);
     }
 
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
@@ -128,7 +138,7 @@ public class NotebookGitProposalPublisher {
               proposal.repository(), documents);
       List<NotebookGitProposalTreeShape.ChangedDocument> beforeRelocation = new ArrayList<>();
       List<NotebookGitProposalTreeShape.ChangedDocument> afterRelocation = new ArrayList<>();
-      partitionAroundRelocation(
+      NotebookGitProposalRelocatedDocuments.partitionAroundRelocation(
           admitted.documents(), relocation.get(), beforeRelocation, afterRelocation);
       published = state;
       if (!beforeRelocation.isEmpty()) {
@@ -143,8 +153,13 @@ public class NotebookGitProposalPublisher {
       }
       if (!afterRelocation.isEmpty()) {
         published =
-            applyDocumentsUnderRelocatedDestination(
-                published, proposal, afterRelocation, publishedAt);
+            NotebookGitProposalRelocatedDocuments.applyUnderDestination(
+                published,
+                proposal,
+                afterRelocation,
+                publishedAt,
+                noteAddition,
+                documentApplication);
       }
     } else {
       admitted =
@@ -183,60 +198,6 @@ public class NotebookGitProposalPublisher {
             published.binding(), published.notebook(), proposedFolders, proposedNotes),
         proposal,
         publishedAt);
-  }
-
-  /**
-   * Container or note documents under the relocated destination need the source Folder reparented
-   * first; documents that create or fill the destination parent must run before reparenting.
-   */
-  private static void partitionAroundRelocation(
-      List<NotebookGitProposalTreeShape.ChangedDocument> documents,
-      NotebookGitProposalFolderShape.FolderRelocation relocation,
-      List<NotebookGitProposalTreeShape.ChangedDocument> beforeRelocation,
-      List<NotebookGitProposalTreeShape.ChangedDocument> afterRelocation) {
-    String destPrefix = relocation.destPrefix();
-    for (NotebookGitProposalTreeShape.ChangedDocument document : documents) {
-      if (document.path().startsWith(destPrefix + "/")) {
-        afterRelocation.add(document);
-      } else {
-        beforeRelocation.add(document);
-      }
-    }
-  }
-
-  /**
-   * Tip concept notes under an already-reparented destination resolve against live folders and tip
-   * representation; they must not re-materialize the relocated ancestry from the accepted tree.
-   */
-  private NotebookGitStateLoader.LockedNotebookState applyDocumentsUnderRelocatedDestination(
-      NotebookGitStateLoader.LockedNotebookState published,
-      NotebookGitProposalImporter.ImportedProposal proposal,
-      List<NotebookGitProposalTreeShape.ChangedDocument> documents,
-      Timestamp publishedAt) {
-    ObjectId acceptedHead = ObjectId.fromString(published.binding().getAcceptedGitObjectId());
-    List<Note> proposedNotes = new ArrayList<>(published.storedNotes());
-    List<NotebookGitProposalTreeShape.ChangedDocument> containers = new ArrayList<>();
-    for (NotebookGitProposalTreeShape.ChangedDocument document : documents) {
-      if (document.role() == NotebookGitProposalTreeShape.DocumentRole.CONTAINER) {
-        containers.add(document);
-        continue;
-      }
-      proposedNotes.add(
-          noteAddition.applyAtRepresentedPath(
-              published.notebook(),
-              published.folders(),
-              proposal,
-              acceptedHead,
-              document.path(),
-              publishedAt));
-    }
-    NotebookGitStateLoader.LockedNotebookState withNotes =
-        new NotebookGitStateLoader.LockedNotebookState(
-            published.binding(), published.notebook(), published.folders(), proposedNotes);
-    if (containers.isEmpty()) {
-      return withNotes;
-    }
-    return documentApplication.apply(withNotes, proposal, containers, publishedAt);
   }
 
   private static boolean isEmptyAcceptedNotebook(

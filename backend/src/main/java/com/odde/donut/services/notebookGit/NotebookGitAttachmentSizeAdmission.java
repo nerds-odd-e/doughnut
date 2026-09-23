@@ -1,11 +1,15 @@
 package com.odde.donut.services.notebookGit;
 
+import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
+import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
@@ -16,9 +20,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Admits attachment payloads across a proposal's first-parent range against the inclusive raw-Git
- * size limit, grandfathering object identities already accepted as attachments in this notebook's
- * retained history (ADR 0002; ADR 0004 Portable attachments; ADR 0006 loud actionable refusal).
+ * Admits attachment payloads across a proposal's first-parent range against the inclusive size
+ * limit. Raw Git measures blob bytes; LFS verifies the tip's referenced objects' actual size,
+ * digest, and durability before acceptance (ADR 0002; ADR 0004 Portable attachments; ADR 0006 loud
+ * actionable refusal).
  */
 final class NotebookGitAttachmentSizeAdmission {
 
@@ -27,12 +32,28 @@ final class NotebookGitAttachmentSizeAdmission {
   private NotebookGitAttachmentSizeAdmission() {}
 
   /**
-   * Refuses a newly introduced attachment whose object length exceeds {@link #LIMIT_BYTES} at any
-   * path in the contiguous first-parent range from {@code acceptedHead} (exclusive) through {@code
-   * proposedHead}. Payloads already present as attachments anywhere in history rooted at {@code
-   * acceptedHead} in {@code acceptedRepository} are reused by content identity.
+   * Refuses a newly introduced attachment whose admitted size exceeds {@link #LIMIT_BYTES}. Raw
+   * notebooks inspect object length across the contiguous first-parent range from {@code
+   * acceptedHead} (exclusive) through {@code proposedHead}, grandfathering object identities
+   * already accepted as attachments in this notebook's retained history. LFS notebooks verify each
+   * tip attachment pointer against durable content and measure that verified payload size.
    */
   static void admit(
+      Repository proposalRepository,
+      ObjectId proposedHead,
+      Repository acceptedRepository,
+      ObjectId acceptedHead,
+      NotebookGitAttachmentRepresentation representation,
+      Integer notebookId,
+      NotebookAttachmentContent content) {
+    if (representation == NotebookGitAttachmentRepresentation.LFS) {
+      admitLfsTip(proposalRepository, proposedHead, notebookId, content);
+      return;
+    }
+    admitRawRange(proposalRepository, proposedHead, acceptedRepository, acceptedHead);
+  }
+
+  private static void admitRawRange(
       Repository proposalRepository,
       ObjectId proposedHead,
       Repository acceptedRepository,
@@ -53,6 +74,36 @@ final class NotebookGitAttachmentSizeAdmission {
         if (size > LIMIT_BYTES) {
           throw oversizedRefusal(blob.getKey(), size);
         }
+      }
+    }
+  }
+
+  private static void admitLfsTip(
+      Repository proposalRepository,
+      ObjectId proposedHead,
+      Integer notebookId,
+      NotebookAttachmentContent content) {
+    for (Map.Entry<String, ObjectId> blob :
+        attachmentBlobIds(proposalRepository, proposedHead).entrySet()) {
+      byte[] gitBytes = objectBytes(proposalRepository, blob.getValue());
+      if (NotebookGitLfsPointer.isEmptyFile(gitBytes)) {
+        continue;
+      }
+      Optional<NotebookGitLfsPointer.Parsed> parsed = NotebookGitLfsPointer.parse(gitBytes);
+      if (parsed.isEmpty()) {
+        throw rawPayloadRefusal(blob.getKey());
+      }
+      NotebookGitLfsPointer.Parsed pointer = parsed.get();
+      Optional<byte[]> stored = content.get(notebookId, pointer.sha256Hex());
+      if (stored.isEmpty()) {
+        throw missingObjectRefusal(blob.getKey(), pointer.sha256Hex());
+      }
+      if (!VerifiedNotebookAttachmentBytes.matchesClaim(
+          stored.get(), pointer.sha256Hex(), pointer.size())) {
+        throw corruptObjectRefusal(blob.getKey(), pointer.sha256Hex());
+      }
+      if (pointer.size() > LIMIT_BYTES) {
+        throw oversizedRefusal(blob.getKey(), pointer.size());
       }
     }
   }
@@ -92,6 +143,14 @@ final class NotebookGitAttachmentSizeAdmission {
     }
   }
 
+  private static byte[] objectBytes(Repository repository, ObjectId blobId) {
+    try {
+      return repository.open(blobId).getBytes();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Could not read attachment object for LFS admission", e);
+    }
+  }
+
   private static ResponseStatusException oversizedRefusal(String path, long size) {
     return new ResponseStatusException(
         HttpStatus.BAD_REQUEST,
@@ -104,5 +163,33 @@ final class NotebookGitAttachmentSizeAdmission {
             + "-byte limit. Amend or rebase the unpublished proposal so this oversized payload is"
             + " gone before publishing. Do not rewrite already accepted commits; a later tip"
             + " deletion alone does not clear an oversized payload from unpublished history.");
+  }
+
+  private static ResponseStatusException missingObjectRefusal(String path, String sha256Hex) {
+    return new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+        "Attachment \""
+            + path
+            + "\" references missing LFS object sha256:"
+            + sha256Hex
+            + ". Upload the object before publishing.");
+  }
+
+  private static ResponseStatusException corruptObjectRefusal(String path, String sha256Hex) {
+    return new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+        "Attachment \""
+            + path
+            + "\" references corrupt LFS object sha256:"
+            + sha256Hex
+            + ". Re-upload matching bytes before publishing.");
+  }
+
+  private static ResponseStatusException rawPayloadRefusal(String path) {
+    return new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+        "Attachment \""
+            + path
+            + "\" must be a Git LFS pointer or empty file when the notebook uses LFS.");
   }
 }

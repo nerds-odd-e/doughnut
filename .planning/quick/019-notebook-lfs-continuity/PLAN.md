@@ -27,9 +27,9 @@
 - Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
   `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
   cover trunk, and `ci.yml` ignores `.planning/**`.
-- Published increment: `d64bf4c00e8081da27e6a4c3cfeb752e45b93e28` on
+- Published increment: `8f1910c4200ec0712a59f8a9cdc96284420d41d7` on
   `refs/heads/story/notebook-lfs-continuity`. Registered with the story-branch
-  observer. Parent on that branch: `8adda16de33139831134ffbe3b91c4dc505c8ddf`.
+  observer. Parent on that branch: `d64bf4c00e8081da27e6a4c3cfeb752e45b93e28`.
 - Default-checkout refresh is deferred (`unclear-ownership`). That checkout
   stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
 - Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
@@ -280,21 +280,35 @@ Accepted proof:
 
 ### 5. Publish a valid LFS tree and preserve it through web edits
 Type: Behavior
-Status: planned
+Status: done
 
-A valid root/nested/empty attachment proposal is accepted through the existing
-publisher with pointers in Git and projection. Verify referenced actual size,
-digest and durability before acceptance. Preserve attributes, exact file identity
-and private learning state through existing web edits/folder operations.
-A note-only save performs no payload reads or object rewriting.
+An LFS tip is accepted through the existing publisher only when each pointer's
+stored bytes match its size and digest and are within 10,485,760 bytes. Git
+and the attachment projection hold pointer bytes. Root, nested, and empty
+files are accepted. One byte over, a missing object, or a corrupt pointer
+refuses without changing head, projection, learning, or native object rows.
+Web note save and folder rename keep attributes, pointer identity, and
+learning. A note-only save does not read or rewrite attachment content.
+Creation still does not select LFS. History-range policy remains slice 6.
 
-Proof: extend `NotebookGitAttachmentPublicationControllerTest`, committed-state
-rollback support, derived-tree oracles, and `NotebookGitWebContentSaveCostControllerTest`.
-Exact 10 MiB succeeds; one byte over/missing/corrupt required content refuses.
-One mixed refusal owns atomic head/projection/learning assertions. Scope SQL and
-content-store observations to the save, excluding setup. B; 8–10 minutes, reusing existing
-projection and admission rather than building another store.
-Safe stop: complete server current-tree behavior in test mode.
+Accepted proof:
+- Promise: valid pointers publish; oversize, missing, and corrupt tips refuse
+  atomically; web edits preserve identity; note-only save does not touch
+  payloads.
+- Boundary: proposal publish, web note save, and folder rename.
+- Setup: fixture sets the binding to `LFS` and stores payloads before publish.
+  Save-cost counts are reset immediately before the note save.
+- Observations: `NotebookGitAttachmentLfsPublicationControllerTest` (accept,
+  exact limit, mixed refusal) and
+  `NotebookGitAttachmentLfsWebContinuityControllerTest`.
+  `NotebookGitWebContentSaveCostControllerTest.noteOnlySaveOnLfsNotebookDoesNotReadPayloadsOrRewriteObjects`
+  sees zero content-store get/store calls and no `NotebookAttachment` query.
+- Command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Result: pass (2625 tests, 2 skipped). After claim matching moved to
+  `VerifiedNotebookAttachmentBytes.matchesClaim` and the LFS tests were split,
+  the focused Gradle tests for the LFS publication, web continuity, raw
+  publication, save-cost, content, size-admission, folder rename, and folder
+  relocation classes passed.
 
 ### 6. Retain required history while allowing oversized corrections
 Type: Behavior

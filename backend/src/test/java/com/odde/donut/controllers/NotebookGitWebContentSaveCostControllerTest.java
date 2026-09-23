@@ -13,17 +13,29 @@ import static org.hamcrest.Matchers.not;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
+import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.services.notebookAttachment.InMemoryNotebookAttachmentContent;
+import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookGit.NotebookGitAttributes;
+import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookGit.SqlStatementCallLog;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
+import java.io.ByteArrayInputStream;
+import java.security.MessageDigest;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /** A web save's server work depends on what changed, not on the notebook's size. */
 class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentSaveCostTestSupport {
+
+  @Autowired NotebookAttachmentContent notebookAttachmentContent;
 
   @Test
   void savingContentInALargeNotebookWithAttachmentsDoesNotQueryAttachmentsOrPortableTreeRows()
@@ -54,6 +66,62 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentS
    * execute* calls, not wire round trips; tree fetches stay within one whole-tree walk for this
    * fixture.
    */
+  @Test
+  void noteOnlySaveOnLfsNotebookDoesNotReadPayloadsOrRewriteObjects() throws Throwable {
+    Notebook notebook = createGitBackedNotebook("Lfs Save Cost");
+    NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
+    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
+    notebookGitBindingRepository.save(binding);
+    NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
+    byte[] payload = new byte[4096];
+    for (int i = 0; i < payload.length; i++) {
+      payload[i] = (byte) i;
+    }
+    String oid = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(payload));
+    byte[] pointer = NotebookGitLfsPointer.format(oid, payload.length);
+    assertThat(
+        notebookAttachmentContent.store(
+            notebook.getId(), oid, payload.length, new ByteArrayInputStream(payload)),
+        equalTo(true));
+    controller.publishNotebookGitProposal(
+        notebook.getId(),
+        empty.getAcceptedGitObjectId(),
+        proposalBundleBytes(
+            empty,
+            List.of(
+                new NotebookGitProposalFile(
+                    NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
+                new NotebookGitProposalFile("Root Note.md", ACCEPTED_CONTENT),
+                new NotebookGitProposalFile("diagram.png", pointer))));
+    Note note =
+        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .filter(n -> n.getTitle().equals("Root Note"))
+            .findFirst()
+            .orElseThrow();
+    InMemoryNotebookAttachmentContent memory =
+        (InMemoryNotebookAttachmentContent) notebookAttachmentContent;
+    memory.resetAccessCounts();
+    AcceptedHistory acceptedBefore = acceptedHistory(notebook);
+
+    Statistics contentSave =
+        hibernateStatisticsOf(
+            () -> textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT)));
+
+    var queries = List.of(contentSave.getQueries());
+    assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
+    assertThat(memory.getCalls(), equalTo(0L));
+    assertThat(memory.storeCalls(), equalTo(0L));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(acceptedBefore.commits()));
+    assertThat(
+        after.tipContent().stream()
+            .filter(entry -> entry.path().equals("diagram.png"))
+            .map(entry -> entry.content())
+            .findFirst()
+            .orElseThrow(),
+        equalTo(pointer));
+  }
+
   @Test
   void contentSaveJdbcObjectFetchesAreScopedToTheControllerCall() throws Throwable {
     Notebook notebook = createGitBackedNotebook("Jdbc Cost");
