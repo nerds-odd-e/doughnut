@@ -136,20 +136,6 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
 
 - Execution: quick/008-remove-zip-export / 38b5e1ef69; Timestamp: 2026-09-21T22:08:41+08:00; Tool: Cursor; Model: Cursor Grok 4.7; Open Dough release: 0.3.27.
 
-## DD-106 — CI observer finished after monitor failure while story-branch delivery continued
-
-After `CI_MONITOR_UNAVAILABLE`, the observer wrote `finished` and left later registered increments `undiscovered` even when GitHub later showed successful (or still-running) `ci.yml` runs on the same branch. Finished observers that still accept registration without rediscovery hide lost coverage.
-
-### Occurrences
-
-- Execution: SEED-035#story-13 / quick/019-notebook-lfs-continuity / 7db86ca0a5
-  - Timestamp: unknown (observer `result.json` mtime 2026-09-23T19:34:22+08:00; first unavailable event present; delivery continued through `df8c86b0db` at ~2026-09-23T22:42+08:00)
-  - Tool: Cursor
-  - Open Dough release: 0.3.32
-  - Evidence: `/tmp/dough-ci-501/watch-p2I1y8/result.json` `{"status":"finished"}`; `events/000000000001.json` `CI_MONITOR_UNAVAILABLE` (`gh run list` → api.github.com connection failure); coverage success only for `7db86ca0a5` and `8adda16de3`; `undiscovered` for later SHAs including GitHub-successful `7693f1df23` and registered HEAD `df8c86b0db` (`in_progress` on GitHub at review)
-  - Observed effect: story-branch CI handoff for most increments stayed unproved in the observer while execution kept publishing
-  - Inference: monitor unavailability ended observation without a live rediscovery path for later registrations; distinct from branch-never-triggers (ODF-034)
-
 ## Retention
 
 - Highest allocated local number: 106

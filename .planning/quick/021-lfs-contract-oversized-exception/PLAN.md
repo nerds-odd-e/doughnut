@@ -3,8 +3,8 @@
 ## Correction input
 
 - Kind: bounded retrospective correction (completed execution).
-- Source execution: SEED-035#story-13 /
-  [quick/019-notebook-lfs-continuity](../019-notebook-lfs-continuity/PLAN.md).
+- Source execution: completed fresh-checkout LFS delivery at
+  `0b532162accef12392c4070423eb255215264fb0:.planning/quick/019-notebook-lfs-continuity/PLAN.md`.
 - Provenance: story-branch commits
   `7db86ca0a5`…`df8c86b0db` on `story/notebook-lfs-continuity`
   (parent of first increment `e84967c03a`; branch base `e0fcf33229`).
@@ -20,7 +20,7 @@
     across newly admitted history without naming the owner-authorized exception
     for new oversized intermediate-only LFS payloads when the tip is valid.
   - Recovery already documents omitted oversized intermediates; North Star and
-    SEED-035#story-13 record Terry's ADR 0002 exception. Decision/Recovery
+    the completed plan records Terry's ADR 0002 exception. Decision/Recovery
     disagree.
 - Preserved promises and constraints:
   - Keep implemented admission (`NotebookGitAttachmentSizeAdmission` LFS path).

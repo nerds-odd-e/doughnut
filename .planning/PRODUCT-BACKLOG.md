@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Publish supporting files and acquire a fresh usable checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-13) — SEED-035#story-13 ([plan](quick/019-notebook-lfs-continuity/PLAN.md))
-
 ## Backlog list
 
 - [Align durable LFS contract with authorized oversized-intermediate exception](quick/021-lfs-contract-oversized-exception/PLAN.md)

@@ -100,170 +100,6 @@ dissolve/merge and cross-notebook operations that the delivered behavior
 refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
-<a id="story-13"></a>
-
-### 13. Publish supporting files and acquire a fresh usable checkout
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/019-notebook-lfs-continuity/PLAN.md","assessment":"not-ready","reasons":["Slices 2-3 need representative standard-client and isolated GCS proof; no test target or result is established. Product scope and first plan are refined."],"basis":{"document":"a8e49cb96a19199e7ab541a279f730a36b8315af625440bc64f6cc19f89d2726","plan":"22812a1a5979ccf00c66bc13ad645a7fce9139f9a7994b14e9e3321ab7b32a2c"}}
-```
-
-- **Identity:** SEED-035#story-13
-- **Slice plan:** [Publish supporting files and acquire a fresh usable checkout](../quick/019-notebook-lfs-continuity/PLAN.md).
-- **Resplit trace:** Original “Acquire current supporting files without carrying
-  their bytes in Git history” is partitioned between this story and story 15,
-  not completed or cancelled. Retain this identity/anchor and first plan.
-  Plan 019 maps every original leaf/promise; no implementation or evidence exists.
-- **First delivery boundary:** Automated Donut CLI clone and publish on current
-  accepted history, followed by fresh acquisition after web/remote changes.
-  Story 15 owns receiving into the same checkout and supported local rebase.
-  Until then, LFS pull stops before changing refs/files and advises a separate
-  fresh clone, preserving the original directory and unpublished work. Legacy
-  pull is unchanged. This is an explicit temporary safety boundary, removed by
-  story 15; stale publication keeps today's refusal.
-- **Alternatives reconsidered:** The owner said no user would use the proposed
-  manual whole API/Git-LFS workflow, conditionally accepting it only if it were
-  a good split. It fails independent user value here. Keep automated clone and
-  publish first, rather than creating storage/API infrastructure stories.
-  A fresh CLI clone is the interim receive workflow; web preservation, usable
-  files and historical retention cannot be postponed.
-- **Owner decisions, current refinement (2026-09-23):** Keep this first among
-  untaken work to prevent further binary-history growth before attachment use
-  expands. New notebooks only is a progressive delivery boundary, not an
-  urgency claim or preference for new users. Ordinary acquisition hydrates only
-  the current checkout's attachments; retained historical versions are fetched
-  when explicitly needed. Maintain a cohesive design with the taken story 12.
-- **Value now / alternatives:** Browsing/download and guidance-folder exclusion
-  offer more immediate workflow benefits and do not inherently depend on LFS.
-  The owner nevertheless selected prevention first: the per-file guard does not
-  bound accumulated binary versions. This is an intentional investment, not a
-  measured storage emergency. LFS moves retained payload storage and avoids
-  binary-driven Git transfer growth; it does not eliminate storage costs or the
-  transfer of current bytes. Existing notebooks benefit through later story 14,
-  which remains an unqueued migration candidate, not an implied delivery here.
-- **Owner-approved recovery and retention, 2026-09-23:** Every successfully
-  published snapshot retains its exact attachment bytes. In a new LFS proposal,
-  a new oversized payload occurring only in unpublished intermediate commits
-  may be omitted when the tip is valid: a corrective follow-up commit suffices.
-  Preserve intermediate commits/pointers and ordinary within-limit versions;
-  report omitted content as unavailable on attempted hydration, never substitute
-  current bytes. Example: unpublished 20 MiB then 3 MiB versions publish with
-  only the latter payload stored; a fresh checkout of the tip succeeds, while
-  the intermediate oversized version cannot be fully restored from Donut.
-  Replacing/deleting any previously published file never authorizes removing
-  its retained bytes. Previously accepted same-notebook payloads remain
-  grandfathered. This replaces story 12's strict intermediate-blob rejection
-  only when LFS is adopted, including later conversion under story 14.
-- **Authorized architectural exception:** Terry explicitly accepted the above
-  narrow exception to ADR 0002 and `docs/notebook-git-lfs.md`'s all-intermediate-
-  objects availability rule during refinement. It permits omission only of new
-  oversized intermediate LFS payloads; commit IDs and successfully published
-  snapshots remain preserved. Align the durable LFS contract when implementing
-  this story; do not generalize the exception to latest-snapshot-only retention.
-- **Goal:** Notebook owners use Donut CLI to publish current images, PDFs, and
-  other attachments in a new notebook and acquire a fresh usable checkout,
-  without making MySQL storage and Git bundle transfer grow with binary history.
-- **Evaluation:** In a new notebook, publish a valid attachment, change it in
-  later accepted history, and acquire the notebook in a fresh checkout. The current file is
-  available with its exact verified bytes, while the Git history and bundle
-  carry content-addressed pointer data rather than either binary version and
-  MySQL holds no attachment payload copy. Compare bundles containing several
-  incompressible binary versions: they carry pointers rather than payload-sized
-  growth. Measure separate LFS downloads honestly; current file bytes still move.
-- **Scope / value:** Use the standard Git LFS pointer representation for all
-  non-Markdown attachments and bucket-backed immutable object content. Never
-  store a raw GCS URL in a commit. Preserve notebook paths, references, access
-  control, atomic acceptance, and the common attachment model used by later
-  browsing, image, deletion, and folder-operation stories. Local workflows
-  require standard Git LFS; Donut's bundle workflow explicitly
-  coordinates its object transfers. Include web preservation, metadata/empty-file
-  classification, and missing-object failure in the same usable loop. Existing
-  notebooks retain current behavior until story 14; no generic web-upload UI is
-  added here.
-- **Architecture:** Follow the accepted Git LFS storage contract and North Star.
-  Client choice is decided; endpoint spelling and implementation details belong
-  in slice planning.
-- **Cohesion with taken story 12:** Preserve one server-owned attachment
-  admission policy at the existing publication boundary, the inclusive
-  10,485,760-byte limit, trusted same-notebook content-based grandfathering,
-  common Portable-tree classification, and atomic accepted-state changes.
-  Evolve the existing admission responsibility for LFS; do not create a second
-  synchronization path, client-authoritative size policy, or persistent
-  exemption registry. Raw Git measures blob bytes; LFS verifies actual payload
-  size and digest, never treating pointer length or a client size claim as
-  sufficient evidence. The approved intermediate-content exception changes
-  availability/recovery only for LFS; legacy raw-Git admission stays strict.
-  Storage identities differ between raw blobs and LFS payloads, but the domain
-  rule remains previously accepted content in this notebook. Do not equate a
-  Git blob ID with a payload SHA-256 or infer acceptance from mere object-store
-  presence. Keep format classification, publication, and projection with their
-  existing owners rather than inventing a generic storage framework in advance.
-- **Taken-work inspection:** Latest read-only inspection found story 12's three
-  slices marked done, published on its branch through `4e04fa3eb5` and now
-  integrated with cleanup through trunk `d1dc83a698`. CI completion is not
-  asserted here. Admission remains in
-  `NotebookGitAttachmentSizeAdmission` and the existing publisher.
-  The admission class reuses proposal ancestry, attachment classification,
-  accepted-history object identities, and object lengths without loading bytes
-  solely for size checks. Reinspect its delivered result before implementation;
-  preserve its ownership and behavior, not a frozen class layout.
-- **Key examples:**
-  - Publish several distinct incompressible attachment versions in a new
-    notebook. A fresh acquisition receives exact current bytes, downloads no
-    obsolete payload versions by default, and carries pointers in Git history.
-    Measure bundle growth separately from LFS traffic; MySQL retains metadata
-    and references without attachment payload copies.
-  - Explicitly request a previously published snapshot after replacement or
-    deletion of its attachment: fetch that snapshot's exact retained bytes,
-    never the current version as a substitute.
-  - A payload of exactly 10,485,760 bytes is admissible; one additional byte at
-    the proposed tip is refused without changing accepted state. Missing or
-    corrupt required objects likewise prevent acceptance. Preserve the approved
-    20 MiB intermediate / 3 MiB tip correction exception described above.
-  - A web note edit preserves unchanged attachment pointers and bytes without
-    loading their payloads or contacting GCS to rewrite them. A fresh CLI clone
-    receives that accepted result. The old directory and any unpublished work
-    remain intact; in-place receive/rebase belongs to story 15.
-  - Until story 15, LFS pull refuses before mutation with fresh-clone guidance.
-    Publishing from a checkout already based on accepted history still works;
-    a stale checkout is refused without overwriting either side.
-  - Acquisition configures the authenticated LFS endpoint before hydration.
-    Missing Git LFS, failed authorization, or interrupted hydration reports
-    incomplete acquisition with actionable recovery; retry can finish without
-    losing local work. Pointer text is never reported as a successfully acquired
-    attachment. Credentials stay outside authored content.
-- **Deferred promises / exclusions:** Story 15 owns in-place receive/rebase.
-  Existing-notebook conversion and arbitrary
-  legacy binary-history migration, historical bundle shrinking, new web file
-  browsing/upload/preview UI, legacy note-image conversion, Book changes,
-  aggregate quotas, automatic garbage collection, direct Git hosting, automatic
-  history rewriting, and latest-snapshot-only retention. Existing web behavior
-  must preserve accepted content; this does not promise sibling stories' new
-  presentation features. The ordinary new-notebook workflow is the initial
-  example, not a new rejection rule for other naturally valid inputs.
-- **Effort hypothesis:** L (2–4 hours), low-to-medium confidence after separating
-  in-place receive and removing redundant schema/standalone proof work. Ten
-  refined leaves; reassess actual overruns instead of inflating time exceptions.
-  Necessary standard-client/GCS work stays inside the usable first outcome.
-- **Depends on:** Story 12 supplies the accepted per-file boundary. Existing
-  root and nested attachment continuity supplies the paths and user model this
-  story changes internally.
-- **Safe stopping point:** New attachments publish and fresh-clone through
-  Donut CLI with exact bounded content and retained history, even if story 15
-  is indefinitely deferred. Web operations preserve them and old local work
-  stays intact. Later browsing uses the same attachment model.
-- **Refinement outcome:** First replacement story and its ten-slice plan are
-  refined. The second plan is mapped only, awaiting its own story refinement.
-  Outstanding standard-client/isolated-GCS representative proof is an execution
-  readiness concern, not inherited readiness or a remaining user-scope question.
-  The owner subsequently authorized keeping/publishing this preparation;
-  implementation remains separate.
-- **Architecture simplification:** The existing attachment column can retain
-  accepted Git representation (legacy raw content or LFS pointer bytes) with
-  explicit accessor semantics; inspected consumers are projection/tree/path
-  owners. Do not add redundant digest/size columns. Keep one explicit binding
-  mode to prevent accidental conversion and preserve accepted metadata through
-  both full and derived trees. No extra storage framework or migration here.
-
 <a id="story-15"></a>
 
 ### Receive supporting files into an existing working checkout
@@ -273,13 +109,14 @@ No executable plan or implementation is authorized by this seed.
 
 - **Identity:** SEED-035#story-15
 - **Slice plan:** [Receive LFS files into an existing working checkout](../quick/020-notebook-lfs-receive/PLAN.md).
-- **Resplit trace:** Receives original plan 019 leaves 11/12 and the receive
-  portion of activation. Mapped plan only: awaiting story refinement — not
-  ready for slice-plan refinement or execution.
+- **Resplit trace:** Receives the receive portion of the completed fresh-checkout
+  plan (`0b532162accef12392c4070423eb255215264fb0:.planning/quick/019-notebook-lfs-continuity/PLAN.md`).
+  Mapped plan only: awaiting story refinement — not ready for slice-plan
+  refinement or execution.
 - **Goal:** Owners continue in the same AI IDE checkout after web/other-checkout
   changes, preserving unpublished work without acquiring another directory.
-- **Scope direction:** Reuse story 13's standard setup, content and transfers in
-  existing pull/rebase owners. Remove its temporary LFS pull refusal; handle
+- **Scope direction:** Reuse the delivered LFS setup, content, and transfers in
+  existing pull/rebase owners. Remove the temporary LFS pull refusal; handle
   equal-head hydration retry and supported local reconciliation. No broader
   merge shapes, binary merge algorithm, new storage model, or migration.
 - **Evaluation:** Publish from one checkout, pull into another and get exact
@@ -291,7 +128,7 @@ No executable plan or implementation is authorized by this seed.
   than automatically inheriting the old story's first place.
 - **Effort hypothesis:** M (1–2 hours), low confidence pending failure/recovery
   examples. Three provisional leaves may consolidate during refinement.
-- **Depends on:** Story 13. Browsing is not a technical prerequisite.
+- **Depends on:** Delivered CLI publish and fresh-clone LFS acquisition. Browsing is not a technical prerequisite.
 - **Safe stopping point:** Existing-checkout continuity works through the same
   content/admission model; migration and visual authoring remain separate.
 - **Refinement remaining:** Post-rebase hydration failure recovery, dirty/readiness
