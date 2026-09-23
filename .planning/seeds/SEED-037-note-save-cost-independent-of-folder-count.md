@@ -3,7 +3,7 @@ id: SEED-037
 status: dormant
 planted: 2026-09-22
 planted_during: owner report that production note saves take 7 to 10 seconds after SEED-034#story-3 shipped
-trigger_when: new owner evidence justifies revisiting abandoned save-path simplification
+trigger_when: new owner evidence justifies revisiting abandoned whole-notebook assembly
 scope: medium
 ---
 
@@ -55,9 +55,7 @@ the accepted head before and after the edit.
 
 Historical decision (superseded by the failed attempt below): replace change capture with the MySQL-hashed full assembly and
 top-down diff (story 3), keeping story 1's write path. Ancestor-only
-publication was to remain current behavior until then. Story 2 then still had to choose
-whether fewer database round trips come from simpler use of the existing store
-or from a new index. That choice was not selected. The decision record and
+publication was to remain current behavior until then. The decision record and
 measurements are in commit `458496764f931f05b0d46d955e1bbbebf04beefc`.
 
 **Outcome (2026-09-23):** story 3's implementation failed this decision's own
@@ -66,8 +64,8 @@ measured requirement — see the story-3 stub below. Ancestor-only publication
 
 ## Story Decomposition
 
-S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. Estimates
-are hypotheses. Story 2 is not authorized for implementation by this seed.
+The retained story below records the abandoned whole-notebook assembly experiment.
+It reserves no backlog position and does not authorize an automatic retry.
 
 <a id="story-3"></a>
 
@@ -88,46 +86,6 @@ the opposite of this story's goal. No code from the attempt was kept; the
 prior change-capture-based save path is unchanged in the current codebase.
 A retry would need a design that avoids the whole-notebook row read on an
 ordinary single-note save, not just a cheaper hash.
-
-<a id="story-2"></a>
-
-### Simplify Git publication during note saves by eliminating unnecessary database work
-
-**Identity:** SEED-037#story-2. **Status: done; owner accepted measured latency tradeoff (2026-09-23).**
-
-The accepted-head handoff removed the redundant post-append SQL read and passed
-all 2,581 backend tests (two opt-in measurement cases skipped). Independent
-review found coherent persistence ownership and preserved creation/reset,
-proposal and rollback behavior. However, after mandatory formatting, affected
-production code had 397 nonblank, noncomment lines both before and after;
-the apparent 512 → 498 physical-line reduction came entirely from comments
-and blank lines. This failed the owner's strict implementation-size gate.
-The complete candidate and disposable test harness were discarded. No product
-change was delivered, no latency acceptance was claimed, and no successor was
-queued. Fewer SQL calls alone did not satisfy this simplify-or-abandon decision.
-
-Original contract and plan are recoverable from `2604bfcfee`;
-[execution evidence](../quick/017-simplify-note-save-publication/PLAN.md) retains
-the attempt's identity, baseline measurements and final disposition.
-
-The owner authorized a retry of the same candidate with **no increase in
-implementation size**, retaining the strict no-performance-regression condition.
-Four full-suite batches in baseline/candidate/candidate/baseline order measured
-20 saves at each depth per batch. Root medians were **18.127 / 18.841 / 18.836 /
-14.684 ms**; depth-12 medians were **41.447 / 35.367 / 41.301 / 74.032 ms**.
-Candidate root medians exceeded both baselines; depth-12 varied substantially,
-including roughly 70→35 ms shifts within both a baseline and candidate batch
-without SQL-count changes. These observations do not prove the change caused a
-slowdown, but they do not establish no regression for both shapes. Independent
-review agreed to discard under the owner's condition. All code and harness
-changes were restored; design, size, SQL reduction and correctness had passed.
-The plan retains individual timings and proof. No successor was queued.
-
-## Ordering and Scope Reduction
-
-Story 2 is complete after the owner explicitly accepted root mean17.54→19.65ms, depth12 mean62.86→43.54ms, and equal-weight mean40.20→31.59ms. The averages are local observations, not a production workload claim. Story 3 remains abandoned. Ancestor-only change-capture publication
-remains unchanged. Neither story reserves a backlog position or authorizes an
-automatic retry; further work requires a fresh owner decision and evidence.
 
 ## Breadcrumbs
 
