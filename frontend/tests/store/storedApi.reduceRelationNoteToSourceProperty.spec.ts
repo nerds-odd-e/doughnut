@@ -1,4 +1,7 @@
-import { RelationController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NoteController,
+  RelationController,
+} from "@generated/donut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
@@ -19,6 +22,7 @@ describe("storedApiCollection reduceRelationNoteToSourceProperty", () => {
       .title("Moon a part of Earth")
       .please()
     storage.refreshNoteRealm(relationRealm)
+    const relationRef = storage.refOfNoteRealm(relationRealm.id)
     const sourceRealm = makeMe.aNoteRealm.title("Moon").please()
     const reduceSpy = mockSdkService(
       RelationController,
@@ -36,8 +40,18 @@ describe("storedApiCollection reduceRelationNoteToSourceProperty", () => {
     })
     expect(result).toEqual(sourceRealm)
     expect(routerReplace).toHaveBeenCalledWith(noteShowLocation(sourceRealm.id))
+    expect(relationRef.value).toBeUndefined()
     expect(storage.refOfNoteRealm(relationRealm.id).value).toBeFalsy()
     expect(storage.peekUndo()).toBeNull()
     expect(sidebarStructuralRefreshKey.value).toBe(refreshKeyBefore + 1)
+
+    const showNoteSpy = mockSdkService(
+      NoteController,
+      "showNote",
+      relationRealm
+    )
+    storage.storedApi().getNoteRealmRefAndLoadWhenNeeded(relationRealm.id)
+    storage.storedApi().getNoteRealmRefAndLoadWhenNeeded(relationRealm.id)
+    expect(showNoteSpy).toHaveBeenCalledTimes(0)
   })
 })

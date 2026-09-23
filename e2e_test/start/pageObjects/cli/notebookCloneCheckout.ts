@@ -36,7 +36,7 @@ function isRetainedProposalTextFile(
 
 function expectRetainedProposalFile(
   file: RetainedProposalFile
-): Cypress.Chainable<null> | void {
+): Cypress.Chainable<null> | undefined {
   if (isRetainedProposalTextFile(file)) {
     expectCheckoutFileAt('cliCloneDestination', file.relativePath, file.content)
     return
