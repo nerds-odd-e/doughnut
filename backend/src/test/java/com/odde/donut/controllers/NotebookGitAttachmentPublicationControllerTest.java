@@ -12,17 +12,15 @@ import static org.hamcrest.Matchers.nullValue;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedTip;
 import java.util.List;
-import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
-import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -58,7 +56,7 @@ class NotebookGitAttachmentPublicationControllerTest
                 new NotebookGitProposalFile("diagram.png", LOWERCASE_DIAGRAM))));
 
     AcceptedTip published = acceptedTip(notebook);
-    assertThat(published.parent(), is(initialHead));
+    assertThat(published.ancestry().getFirst(), is(initialHead));
     assertThat(
         published.entries(),
         contains(
@@ -71,7 +69,7 @@ class NotebookGitAttachmentPublicationControllerTest
     textContentController.updateNoteContent(storedNote, contentDto(EDITED_CONTENT));
 
     AcceptedTip afterWebSave = acceptedTip(notebook);
-    assertThat(afterWebSave.parent(), is(published.head()));
+    assertThat(afterWebSave.ancestry().getFirst(), is(published.head()));
     assertThat(
         afterWebSave.entries(),
         contains(
@@ -79,6 +77,9 @@ class NotebookGitAttachmentPublicationControllerTest
             PortableTreeEntry.ofText("Root Note.md", EDITED_CONTENT),
             new PortableTreeEntry("diagram.png", LOWERCASE_DIAGRAM),
             PortableTreeEntry.ofText("reference.json", REFERENCE_JSON)));
+    assertThat(
+        reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
+        is(NotebookGitAttachmentRepresentation.RAW));
   }
 
   @Test
@@ -232,19 +233,6 @@ class NotebookGitAttachmentPublicationControllerTest
   }
 
   private AcceptedTip acceptedTip(Notebook notebook) throws Exception {
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
-        RevWalk revWalk = new RevWalk(repository)) {
-      RevCommit commit = revWalk.parseCommit(GitBundleTestReader.fetchHead(repository, downloaded));
-      return new AcceptedTip(
-          commit.getId(),
-          commit.getParent(0).getId(),
-          GitBundleTestReader.readTreeEntries(repository, commit));
-    }
+    return GitBundleTestReader.fetchAcceptedTip(acceptedBundleBytes(notebook));
   }
-
-  private record AcceptedTip(ObjectId head, ObjectId parent, List<PortableTreeEntry> entries) {}
 }

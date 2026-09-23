@@ -14,6 +14,30 @@
   Eventual preparation publication target: `origin/main`.
 - This plan replaces the original 18-leaf plan in place. Nothing was implemented;
   there is no completed proof or execution history to transfer.
+
+## Execution
+
+- Mode: Story Branch. Replanning is allowed; there was no `--no-replan`.
+- Originating and integration checkout: `/Users/terryyin/git/doughnut` on `main`.
+- Owned workspace, created this session:
+  `/Users/terryyin/git/worktrees/notebook-lfs-continuity`,
+  branch `story/notebook-lfs-continuity`, starting revision
+  `e0fcf33229fc7226031d54ddf399c3d7385478f4`.
+- Increment target: `refs/heads/story/notebook-lfs-continuity`.
+- Published claim: `e84967c03a86375eccb66a173f50db032fffc819` on
+  `refs/heads/main`. Claim CI is unobserved: the story-branch observer does not
+  cover trunk, and `ci.yml` ignores `.planning/**`.
+- Default-checkout refresh is deferred (`unclear-ownership`). That checkout
+  stayed at `e0fcf33229`, clean, one commit behind `origin/main`.
+- Preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded, then
+  `CURSOR_DEV=true nix develop -c node -e "console.log('worktree-command-ready')"`
+  printed `worktree-command-ready`.
+- Slices 2–3 stay blocked until an isolated GCS target and a representative
+  standard-client result exist. Slice 1 does not depend on that evidence.
+- CI observer: `/tmp/dough-ci-501/watch-p2I1y8`, GitHub Actions, workflow
+  `ci.yml` / `donut CI`, target `story/notebook-lfs-continuity` on
+  `nerds-odd-e/doughnut`. Armed after the claim; the claim itself stays
+  unobserved.
 - [Second replacement plan](../020-notebook-lfs-receive/PLAN.md) owns receiving
   into an existing checkout, equal-head hydration retry, and supported rebase.
 
@@ -123,17 +147,31 @@ stop and refine/resplit with evidence instead of hiding work in another title.
 
 ### 1. Preserve legacy bindings while adding representation selection
 Type: Structure
-Status: planned
+Status: done
 
-Add one compatible binding mode with existing rows/default behavior raw.
-No attachment payload migration or duplicate pointer metadata columns.
-This enables the immediately following content/transfer preparation and mode-aware
-admission. The separate schema release is required for safe deployment.
+`notebook_git_binding.attachment_representation` is `NOT NULL DEFAULT 'RAW'`,
+mapped as `NotebookGitAttachmentRepresentation` (`RAW` / `LFS`). Existing and
+new rows stay `RAW`. Nothing writes `LFS` yet. No payload migration and no
+digest or size columns. This enables the following content and admission work.
+The separate schema release is still required before deploying code that
+depends on the column. Commit and push are not that confirmation.
 
-Proof: DB; existing populated raw notebooks remain readable/publishable and no
-binding converts. Regenerate ERD. 5–8 minutes of edits. Safe stop: schema only.
-Deployment gate: because migrations run after readiness, release and confirm
-this schema before deploying dependent code. Commit/push is not confirmation.
+Accepted proof: populated raw notebooks remain readable and publishable, and
+the binding stays `RAW`.
+- Promise: existing populated raw notebooks remain readable/publishable and no
+  binding converts.
+- Boundary: Flyway on `notebook_git_binding`; Notebook Git proposal publish and
+  web note save.
+- Setup: `publishedRootFilesAreTheExactAcceptedTipAndSurviveTheNextWebNoteSave`
+  starts from `createGitBackedNotebook()` and does not set the representation.
+- Observations: tip entries after publish and after the web save stay the exact
+  attachment bytes; `reloadCommittedBinding(...).getAttachmentRepresentation()`
+  is `RAW`. First-parent ancestry is `AcceptedTip.ancestry().getFirst()`.
+- Command: `CURSOR_DEV=true nix develop -c pnpm backend:verify`
+- Result: pass
+- ERD: regenerated from
+  `doughnut_wt_8a981b514c284189bb0b2d030193d322_test`. `docs/database-erd.md`
+  was unchanged because the exporter lists key columns only.
 
 ### 2. Stage verified immutable content for standard transfers
 Type: Structure

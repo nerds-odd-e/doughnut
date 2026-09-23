@@ -2,6 +2,8 @@ package com.odde.donut.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -29,6 +31,13 @@ public class NotebookGitBinding extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private String acceptedGitObjectId;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "attachment_representation", nullable = false, length = 32)
+  @Getter
+  @Setter
+  private NotebookGitAttachmentRepresentation attachmentRepresentation =
+      NotebookGitAttachmentRepresentation.RAW;
 
   @Column(name = "created_at", nullable = false)
   @Getter
