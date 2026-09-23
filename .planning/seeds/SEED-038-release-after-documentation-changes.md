@@ -30,7 +30,7 @@ saving. The workflow YAML remains the authoritative ignored-path policy.
 
 **Identity:** SEED-038#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/009-release-after-documentation-changes/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"387716391c50b45c500e6276e9978fcb8ea0f640eea7a184c3f97e882889cad5","plan":"8d4bf01bcf036f0b0395dce1fa20fe014973f73450ea77f8df32bd4986ef46aa"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/014-release-after-documentation-changes/PLAN.md"}
 ```
 
 **Goal:** A maintainer can push documentation or planning changes without CI and

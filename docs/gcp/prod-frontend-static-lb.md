@@ -2,7 +2,7 @@
 
 Runbook for production static hosting: one browser-facing hostname, HTTPS load balancer path rules, backend bucket (and optional Cloud CDN) for the Vue build, managed instance group (MIG) for Spring Boot.
 
-**Related:** For a qualifying `vMAJOR.MINOR.PATCH` release with successful exact-SHA main CI, the [deploy workflow](../../.github/workflows/deploy.yml) uploads the selected commit’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` and the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh), [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh)). In [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
+**Related:** For a qualifying `vMAJOR.MINOR.PATCH` release with successful applicable main CI, the [deploy workflow](../../.github/workflows/deploy.yml) uploads the selected build’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` and the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh), [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh)). `GITHUB_SHA` identifies the tagged release; the build SHA may identify an equivalent ancestor when changes are entirely ignored by CI. The [release runbook](conditional-backend-deploy.md) defines selection and recovery. In [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
 
 ## Release at a glance
 
@@ -12,7 +12,7 @@ Runbook for production static hosting: one browser-facing hostname, HTTPS load b
 | Admitted application tag **Deploy** ([deploy workflow](../../.github/workflows/deploy.yml)) | Downloads CI artifacts; SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET`. Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves the selected release’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
 | Backend MIG | Jar upload + rolling replace when the jar hash or startup script hash differs from the record — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
 | Routing edits | Change [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI must pass `pnpm validate:path-routing`. |
-| **Release correction** | Retry an immutable interrupted release when its exact CI/artifacts remain recoverable. Otherwise test a correction/revert on main and issue the next patch version; overlapping tags reconcile the highest pending version. Never move tags. No automatic schema rollback. See the [release runbook](conditional-backend-deploy.md). |
+| **Release correction** | Retry an immutable interrupted release when its selected CI/artifacts remain recoverable. Otherwise test a correction/revert on main and issue the next patch version; overlapping tags reconcile the highest pending version. Never move tags. No automatic schema rollback. See the [release runbook](conditional-backend-deploy.md). |
 | **Backend record repair** | See [conditional-backend-deploy.md](conditional-backend-deploy.md) for deliberate infrastructure repair; the record is not an application release ledger. |
 
 ---
@@ -191,7 +191,7 @@ curl -sf "$BASE/api/healthcheck"
 curl -sfI "$BASE/doughnut-cli-latest/doughnut" | head -5
 ```
 
-Confirm: **HTML/JS** responses are from the **expected** revision (e.g. unique hash in a chunk filename or build metadata if you log it), **healthcheck** returns OK from the MIG, login and **attachments** still work, and the **CLI** URL returns the bundle from **`GCS_FRONTEND_BUCKET`** (via the LB), not the deploy bucket.
+Confirm: **HTML/JS** responses are from the **expected** build (e.g. unique hash in a chunk filename or build metadata if you log it), **healthcheck** returns OK and the selected build SHA (`ciSha`) from the MIG, login and **attachments** still work, and the **CLI** URL returns the bundle from **`GCS_FRONTEND_BUCKET`** (via the LB), not the deploy bucket. An ignored-only release retains the tagged SHA in its frontend prefix while health identifies the reused build SHA.
 
 ---
 

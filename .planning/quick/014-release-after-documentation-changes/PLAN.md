@@ -25,6 +25,10 @@ OpenDO watcher changes are outside this repository change.
 - CI observer: GitHub `ci.yml` / `donut CI`, target `nerds-odd-e/doughnut:main`,
   coordinator `release-docs`, mailbox `/tmp/dough-ci-501/watch-Uk5tp3`, PID 92312,
   terminal session 95195, yielded cell 24. Armed before first publication.
+- Slice 1 accepted on `origin/refs/heads/main`:
+  `03e7b50fcb66ff474ac250a7d8d701f9df4ecb68`; confirmed by fetched ancestry
+  and registered with that observer. Check-only lint hook passed; checkout
+  was clean and current after publication. CI pending at the next-slice start.
 
 ## Current decisions and existing solutions
 
@@ -95,13 +99,27 @@ the tagged SHA. Existing persisted records without `ci_sha` remain readable.
 
 ### 2. Skip documentation branch CI and document release recovery
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Pushes restricted to docs/planning create no CI run; application tags
 continue through ancestor-aware admission. Operators can identify and explicitly
 rerun the artifact source build if its artifacts expire.
 Proof: Workflow trigger tests and full focused release suite; updated release
 runbook and release skill agree with the implemented provenance/recovery contract.
 Sizing: Target 5 minutes plus focused verification.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test`
+passed 119 release cases plus 4 entry cases. Coordinator inspected native trigger
+configuration and assertions that `ci_sha` reaches deployment and failure
+notification. Independent refactor separated CI scheduling/notification tests into
+`scripts/ci/ci-workflow.test.mjs`, shared YAML loading in `workflow-fixtures.mjs`,
+and registered that test in the existing runner. Replacement workflow proof
+`CURSOR_DEV=true nix develop -c node --test scripts/ci/ci-workflow.test.mjs scripts/ci/application-release-workflow.test.mjs`
+passed 7/7; other accepted behavioral proof remained unchanged. Refactor returned
+`REFACTOR COMPLETE`; whitespace check and coordinator formatting passed.
+
+Numbering correction: renamed this same plan from 009 to 014 after confirming
+post-reset Git history already allocated 009–013. Story identity and execution
+remain unchanged; the source link was updated without a new queue entry.
 
 ## Delivery
 

@@ -4,13 +4,25 @@
 
 Production is published only by a stable `vMAJOR.MINOR.PATCH` tag through the
 [Application Release workflow](../../.github/workflows/deploy.yml). Ordinary `main`
-pushes run CI without starting Application Release. A release selects the tag's exact main commit, even when
+pushes run CI without starting Application Release, except pushes whose changes
+are entirely within `on.push.paths-ignore` in [ci.yml](../../.github/workflows/ci.yml).
+Those pushes create no CI workflow or jobs. A release selects the tag's exact main commit, even when
 main has advanced. Two-component tags such as `v1.2`, prereleases such as
 `v1.2.3-rc.1` and unrelated tags do not deploy the application.
-The workflow checks that commit's latest applicable `ci.yml` main-push run and
-attempt once per tag push or explicit workflow rerun. Missing or unfinished CI reports
-`waiting`; failed or cancelled CI reports `blocked`. Neither substitutes an older
-green run or another commit, and neither keeps a runner in a polling loop.
+The workflow checks that commit's latest `ci.yml` main-push run and attempt once
+per tag push or explicit workflow rerun. If no exact-commit run exists, it reads
+`paths-ignore` from the tagged revision and walks its first-parent ancestors,
+nearest first. It stops at the first ancestor whose tree differs outside ignored
+directories, or selects the first equivalent ancestor with CI evidence. The
+supported policy uses literal directory patterns ending in `/**`; the workflow
+is the sole source of ignored paths.
+
+The selected commit's latest run and attempt take precedence, even when pending
+or failed. Exact-commit CI always takes precedence over ancestor CI. Missing or
+unfinished CI reports `waiting`; failed or cancelled CI reports `blocked`. The
+workflow never searches past this evidence for an older green run, starts a new
+build, or keeps a runner in a polling loop. A documentation-only release reuses
+the selected successful ancestor's available artifacts without rebuilding.
 
 ## Release application versions
 
@@ -19,11 +31,11 @@ green run or another commit, and neither keeps a runner in a polling loop.
    concurrency group lets the active publication finish; a surviving queued tag
    or explicit workflow rerun then re-evaluates all current tags and selects the
    highest numeric pending version.
-2. Confirm successful exact-commit main CI and available backend, frontend and
+2. Confirm successful applicable main CI and available backend, frontend and
    CLI artifacts before pushing the tag. A premature tag with missing or
    unfinished CI reports `waiting`; failed or cancelled CI reports `blocked`.
    Both release the runner without publication. CI completion does not start
-   Application Release. Once the same commit's CI succeeds and artifacts are
+   Application Release. Once the selected artifact-source CI succeeds and artifacts are
    available, explicitly rerun the original Application Release workflow without
    moving the tag. A rerun still selects the highest pending numeric version.
    If a manual MIG template update or recovery rollout preceded the release,
@@ -41,15 +53,20 @@ green run or another commit, and neither keeps a runner in a polling loop.
 
    ```bash
    git fetch origin main --tags
-   git tag -a v1.2.3 <FULL_TESTED_MAIN_SHA> -m 'Release v1.2.3'
+   git tag -a v1.2.3 <FULL_RELEASE_MAIN_SHA> -m 'Release v1.2.3'
    git push origin refs/tags/v1.2.3
    ```
 
-5. Inspect **Application Release** admission outputs for the chosen tag, SHA and CI run/
+5. Inspect **Application Release** admission outputs for the chosen tag, release
+   SHA (`sha`), build SHA (`ciSha`), and CI run/
    attempt, then the publication result. All three artifacts must be available
    from that run before any production upload. The tag ref is checked again before
    writes. The selected source supplies routing, startup script and force token;
    publication runs the current main orchestration pinned at admission.
+   Release identity and the frontend GCS prefix retain the tagged SHA. Artifact
+   provenance records the build SHA separately as `ci_sha`. Backend health and
+   the deploy record's `git_sha` identify the build SHA, which can differ from
+   the tag after ignored-only changes.
 6. Confirm the SPA/CLI and backend health as described in the
    [frontend runbook](prod-frontend-static-lb.md#smoke-checks-after-a-change).
    Local tests do not prove GitHub scheduling, artifact service or GCP credentials;
@@ -73,7 +90,7 @@ CLI publication and URL-map application still run.
 
 ## Failed release and correction
 
-Inspect the reported tag, SHA, CI run/attempt and failure stage. Missing/expired
+Inspect the reported tag, release SHA, build SHA, CI run/attempt and failure stage. Missing/expired
 artifacts or failed validation stop before uploads. Later publication failure can
 leave a partial frontend/CLI/backend change. The application release record stays
 `publishing`; retry that workflow without moving or deleting its immutable tag.
@@ -84,14 +101,15 @@ retry reconciles current state:
 gh run rerun <APPLICATION_RELEASE_RUN_ID>
 ```
 
-Admission must report the same tag, raw refOid and SHA. It reselects successful CI
-for that exact SHA, so a newer successful run/attempt can replace the interrupted
-attempt's artifact source. Publication repeats permitted uploads and records
+Admission must report the same tag, raw refOid and release SHA. It re-evaluates
+applicable CI under the tagged revision's policy, so a newer successful
+run/attempt can replace the interrupted attempt's artifact source. Publication repeats permitted uploads and records
 `succeeded` only after every operation finishes. There is no compensating rollback
 or cross-service transaction.
 
 When the failure stage is **artifact admission**, rerun the reported CI run for
-the reported exact commit. After CI succeeds and its artifacts are available,
+the reported build SHA (`ciSha`), which may be an equivalent ancestor of the
+tagged commit. After CI succeeds and its artifacts are available,
 explicitly rerun the reported Application Release workflow:
 
 ```bash
@@ -101,8 +119,8 @@ gh run rerun <APPLICATION_RELEASE_RUN_ID>
 ```
 
 Keep the tag, raw refOid and peeled SHA unchanged. The retry may use the newer
-successful CI run/attempt for that same SHA; it must not rebuild from current
-`main` or select another commit's artifacts. If GitHub no longer retains enough
+successful CI run/attempt for that same build SHA; never rebuild from current
+`main` as a substitute for the selected source. If GitHub no longer retains enough
 history to rerun that CI and regenerate its artifacts, make and test a correction
 on `main`, then release a new patch version. The old tag is not recoverable by
 silently rebuilding a different source revision.
@@ -138,7 +156,8 @@ Matching is case-sensitive; extra spaces around `:` are allowed. The publisher
 reads `git log -1 --format=%B` for the selected SHA after CI admission. Other commits
 in the push, the newer main tip and the annotated tag message do not force rollout.
 For a squash or merge commit, put the token in that resulting commit's message;
-for rebase, put it in the selected rebased commit. Test and tag that exact commit.
+for rebase, put it in the selected rebased commit. Verify applicable CI and tag
+that exact release commit.
 
 ## Manual / local script runs
 

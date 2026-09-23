@@ -4,7 +4,8 @@ set -euo pipefail
 # Compares the built jar and startup script SHA-256 values to
 # gs://${GCS_BUCKET}/deploy/last-successful-deploy.json. If both match, skips
 # GCS upload and MIG rolling replace (record only advances after success).
-# Env: GCS_BUCKET, ARTIFACT, VERSION; optional DEPLOY_JAR_PATH; GITHUB_SHA (set by CI).
+# Env: GCS_BUCKET, ARTIFACT, VERSION, GITHUB_SHA (release commit); optional DEPLOY_JAR_PATH.
+# DEPLOY_BUILD_SHA is the expected binary commit; standalone runs default it to GITHUB_SHA.
 # Optional FORCE_FULL_DEPLOY=1: run upload + rolling replace even when hashes match the record.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

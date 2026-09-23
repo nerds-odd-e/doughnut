@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "**"
+    paths-ignore:
+      - ".planning/**"
+      - "docs/**"
 
 env:
   ARTIFACT: "donut"

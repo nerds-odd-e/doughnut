@@ -81,8 +81,12 @@ gcloud sql instances describe doughnut-db-instance \
 
 ## 5. Version-tag releases and conditional backend deploy
 
-Ordinary `main` pushes run CI without publishing. Increasing immutable
-`vMAJOR.MINOR.PATCH` tags select exact tested main commits for release. Tags may
+Ordinary `main` pushes run CI without publishing; pushes entirely within the
+workflow's ignored paths create no CI run. Increasing immutable
+`vMAJOR.MINOR.PATCH` tags select exact main commits for release. Successful
+exact-commit CI takes precedence; when absent, the release can reuse an
+equivalent ancestor's tested artifacts under the tagged workflow's ignore
+policy without rebuilding. Tags may
 overlap: one active deployment finishes, then a queued tag or explicit rerun
 reconciles the highest numeric pending version. Verify CI and artifacts before
 tagging. Application Release starts only on tags; after premature tagging,
@@ -94,7 +98,7 @@ A selected release may **skip** GCS jar upload and MIG rollout when the jar hash
 
 ## 6. Frontend static in GCS (CI publish + prod LB)
 
-Each green `main` CI run builds the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) and CLI bundle as GitHub Actions artifacts. A qualifying application tag admits that exact CI run; the deploy workflow uploads its artifacts to:
+Each green `main` CI run builds the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) and CLI bundle as GitHub Actions artifacts. A qualifying application tag admits its applicable CI run; the deploy workflow uploads those artifacts under the tagged release SHA, even when the build SHA is an equivalent ancestor:
 
 `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`
 
