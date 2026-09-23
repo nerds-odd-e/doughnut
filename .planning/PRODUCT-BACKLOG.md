@@ -12,8 +12,9 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Acquire current supporting files without carrying their bytes in Git history](seeds/SEED-035-ai-workspace-supporting-files.md#story-13) — SEED-035#story-13
+- [Publish supporting files and acquire a fresh usable checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-13) — SEED-035#story-13
 - [Browse and download local supporting files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
+- [Receive supporting files into an existing working checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-15) — SEED-035#story-15
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Skip common AI guidance folders during assimilation](seeds/SEED-035-ai-workspace-supporting-files.md#story-8) — SEED-035#story-8
 - [See locally added image files in Web Donut notes](seeds/SEED-035-ai-workspace-supporting-files.md#story-3) — SEED-035#story-3

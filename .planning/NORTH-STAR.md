@@ -73,8 +73,13 @@ Endpoint and credential configuration stay outside authored content.
    payloads throughout submitted history; retain already accepted oversized
    content without allowing it to bypass the rule for new content. Books keep
    their separate limits. Aggregate quotas remain outside this increment.
-2. Story 13 supplies the full local publication/acquisition and web-preservation
-   loop for new notebooks using LFS. Prove bundle growth against incompressible
+2. Story 13 supplies automated CLI publication/fresh acquisition and web
+   preservation for new notebooks using LFS. Story 15 completes receiving into
+   an existing checkout and supported local rebase. Until then, an LFS pull
+   stops before mutation and directs the owner to a separate fresh CLI clone;
+   legacy pull remains unchanged and unpublished work stays in its old checkout.
+   This is a usable workflow split, not manual API operation or separate
+   storage-layer delivery. Prove bundle growth against incompressible
    binary versions and measure object traffic separately. Note-only web saves
    must neither load unchanged payloads nor contact GCS to rewrite them.
    Owner-approved retention refinement (2026-09-23): preserve every successfully
