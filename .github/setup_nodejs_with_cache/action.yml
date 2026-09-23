@@ -19,19 +19,24 @@ runs:
     # (keeps CI in sync with Dependabot bumps; do not reintroduce vars.PNPM_VERSION).
     - name: Install pnpm
       uses: pnpm/action-setup@v6
-    - name: Get pnpm store directory
+    - name: Resolve dependency cache metadata
+      id: cache-metadata
       shell: bash
       run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-    - name: Restore pnpm store and Cypress cache
+        echo "store-path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+        echo "node-version=$(node --version)" >> "$GITHUB_OUTPUT"
+        echo "pnpm-version=$(pnpm --version)" >> "$GITHUB_OUTPUT"
+        echo "cypress-version=$(node -p 'require("./package.json").devDependencies.cypress')" >> "$GITHUB_OUTPUT"
+    - name: Restore pnpm store
       uses: actions/cache@v6
       with:
-        path: |
-          ${{ env.STORE_PATH }}
-          ~/.cache/Cypress
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
+        path: ${{ steps.cache-metadata.outputs.store-path }}
+        key: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-metadata.outputs.node-version }}-${{ steps.cache-metadata.outputs.pnpm-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+    - name: Restore Cypress binary
+      uses: actions/cache@v6
+      with:
+        path: ~/.cache/Cypress/${{ steps.cache-metadata.outputs.cypress-version }}
+        key: cypress-v2-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-metadata.outputs.cypress-version }}
     - name: Install dependencies
       shell: bash
       run: pnpm --frozen-lockfile recursive install

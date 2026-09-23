@@ -1,12 +1,47 @@
-name: Disposable dependency cache inventory
+name: Disposable candidate cache proof
 on:
   push:
     branches: [codex/ci-cache-probe]
 permissions:
   contents: read
 jobs:
-  baseline:
-    name: Legacy cache baseline ${{ matrix.sample }}
+  cold:
+    name: Candidate cold current
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Start preparation clock
+        run: echo "PROBE_START_MS=$(date +%s%3N)" >> "$GITHUB_ENV"
+      - name: Candidate setup
+        uses: ./.github/setup_nodejs_with_cache
+        with:
+          node_version: '26'
+      - name: Inventory and verify
+        shell: bash
+        run: &inventory |
+          set -euo pipefail
+          echo "PROBE setup_ms=$(( $(date +%s%3N) - PROBE_START_MS )) sample=${{ matrix.sample || 'single' }} mode=${{ github.job }}"
+          echo "PROBE revision=$GITHUB_SHA runner_os=$RUNNER_OS runner_arch=$RUNNER_ARCH image=$ImageOS image_version=$ImageVersion"
+          echo "PROBE node=$(node --version) pnpm=$(pnpm --version) lock_sha256=$(sha256sum pnpm-lock.yaml | cut -d' ' -f1)"
+          store_path=$(pnpm store path --silent)
+          cypress_path=$(pnpm exec cypress cache path)
+          echo "PROBE store_path=$store_path cypress_path=$cypress_path"
+          du -sk "$store_path" "$cypress_path"
+          du -k --max-depth=1 "$store_path" "$cypress_path" | sort -n
+          pnpm exec cypress cache list
+          pnpm exec cypress version
+          expected=$(node -p 'require("cypress/package.json").version')
+          actual=$(pnpm exec cypress version --component binary)
+          test "$expected" = "$actual"
+          mapfile -t cached_versions < <(find "$cypress_path" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+          test "${#cached_versions[@]}" -eq 1
+          test "${cached_versions[0]}" = "$expected"
+          echo "PROBE package_binary_match=$expected sole_cached_version=${cached_versions[0]}"
+          /usr/bin/time -f 'PROBE cypress_verify_seconds=%e' pnpm exec cypress verify
+  warm:
+    name: Candidate warm current ${{ matrix.sample }}
+    needs: cold
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -17,59 +52,59 @@ jobs:
       - uses: actions/checkout@v6
       - name: Start preparation clock
         run: echo "PROBE_START_MS=$(date +%s%3N)" >> "$GITHUB_ENV"
-      - name: Existing shared setup unchanged
+      - name: Candidate setup
         uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: '26'
       - name: Inventory and verify
         shell: bash
+        run: *inventory
+  prior:
+    name: Candidate prior dependency fixture
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          ref: 3d4a7af2ecf0d43739075156dc6dfabf4b6804e7
+          path: fixture
+      - name: Apply supported prior dependency graph
+        shell: bash
         run: |
           set -euo pipefail
-          echo "PROBE setup_ms=$(( $(date +%s%3N) - PROBE_START_MS )) sample=${{ matrix.sample }} mode=legacy"
-          echo "PROBE revision=$GITHUB_SHA runner_os=$RUNNER_OS runner_arch=$RUNNER_ARCH image=$ImageOS image_version=$ImageVersion"
-          echo "PROBE node=$(node --version) pnpm=$(pnpm --version) lock_sha256=$(sha256sum pnpm-lock.yaml | cut -d' ' -f1)"
-          store_path=$(pnpm store path --silent)
-          cypress_path=$(pnpm exec cypress cache path)
-          echo "PROBE store_path=$store_path cypress_path=$cypress_path"
-          du -sk "$store_path" "$cypress_path"
-          du -k --max-depth=1 "$store_path" "$cypress_path" | sort -n
-          pnpm exec cypress cache list
-          pnpm exec cypress version
-          expected=$(node -p 'require("cypress/package.json").version')
-          actual=$(pnpm exec cypress version --component binary)
-          test "$expected" = "$actual"
-          echo "PROBE package_binary_match=$expected"
-          /usr/bin/time -f 'PROBE cypress_verify_seconds=%e' pnpm exec cypress verify
-  clean:
-    name: Clean uncached installation
+          git -C fixture ls-files -z -- '*package.json' | while IFS= read -r -d '' manifest; do
+            mkdir -p "$(dirname "$manifest")"
+            cp "fixture/$manifest" "$manifest"
+          done
+          cp fixture/pnpm-lock.yaml pnpm-lock.yaml
+          python3 -c 'import shutil; shutil.rmtree("fixture")'
+          echo 'PROBE dependency_fixture=3d4a7af2ecf0d43739075156dc6dfabf4b6804e7'
+      - name: Start preparation clock
+        run: echo "PROBE_START_MS=$(date +%s%3N)" >> "$GITHUB_ENV"
+      - name: Candidate setup
+        uses: ./.github/setup_nodejs_with_cache
+        with:
+          node_version: '26'
+      - name: Inventory and verify
+        shell: bash
+        run: *inventory
+  current-after-update:
+    name: Current graph after prior cache population with forced Cypress install
+    needs: [prior, warm]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - name: Start preparation clock
         run: echo "PROBE_START_MS=$(date +%s%3N)" >> "$GITHUB_ENV"
-      - uses: actions/setup-node@v7
+      - name: Candidate setup with emergency input
+        uses: ./.github/setup_nodejs_with_cache
         with:
-          node-version: '26'
-      - uses: pnpm/action-setup@v6
-      - name: Install dependencies without cache
-        run: /usr/bin/time -f 'PROBE install_seconds=%e' pnpm --frozen-lockfile recursive install
+          node_version: '26'
+          force_install: 'true'
       - name: Inventory and verify
         shell: bash
-        run: |
-          set -euo pipefail
-          echo "PROBE setup_ms=$(( $(date +%s%3N) - PROBE_START_MS )) mode=clean"
-          echo "PROBE revision=$GITHUB_SHA runner_os=$RUNNER_OS runner_arch=$RUNNER_ARCH image=$ImageOS image_version=$ImageVersion"
-          echo "PROBE node=$(node --version) pnpm=$(pnpm --version) lock_sha256=$(sha256sum pnpm-lock.yaml | cut -d' ' -f1)"
-          store_path=$(pnpm store path --silent)
-          cypress_path=$(pnpm exec cypress cache path)
-          echo "PROBE store_path=$store_path cypress_path=$cypress_path"
-          du -sk "$store_path" "$cypress_path"
-          du -k --max-depth=1 "$store_path" "$cypress_path" | sort -n
-          pnpm exec cypress cache list
-          pnpm exec cypress version
-          expected=$(node -p 'require("cypress/package.json").version')
-          actual=$(pnpm exec cypress version --component binary)
-          test "$expected" = "$actual"
-          echo "PROBE package_binary_match=$expected"
-          /usr/bin/time -f 'PROBE cypress_verify_seconds=%e' pnpm exec cypress verify
+        run: *inventory
+      - name: Verify release build consumer
+        run: pnpm cli:bundle
