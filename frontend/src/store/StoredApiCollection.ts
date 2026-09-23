@@ -49,14 +49,6 @@ export default class StoredApiCollection {
     private storage: NoteStorage
   ) {}
 
-  // eslint-disable-next-line class-methods-use-this
-  private async routerReplaceFocus(router: Router, focusOnNote?: NoteRealm) {
-    if (!focusOnNote) {
-      return await router.replace({ name: "notebooks" })
-    }
-    return await router.replace(noteShowLocation(focusOnNote.id))
-  }
-
   private async updateTextContentWithoutUndo(
     noteId: Donut.ID,
     field: "edit title" | "edit content",
@@ -89,7 +81,9 @@ export default class StoredApiCollection {
 
   getNoteRealmRefAndLoadWhenNeeded(noteId: Donut.ID) {
     const result = this.storage.refOfNoteRealm(noteId)
-    if (!result.value) this.loadNote(noteId)
+    if (!result.value && !this.storage.isNotePermanentlyRemoved(noteId)) {
+      this.loadNote(noteId)
+    }
     return result
   }
 
@@ -99,7 +93,7 @@ export default class StoredApiCollection {
 
   private async navigateToFocusedNote(router: Router, focus: NoteRealm) {
     refreshSidebarStructuralListings()
-    await this.routerReplaceFocus(router, focus)
+    await router.replace(noteShowLocation(focus.id))
     return focus
   }
 
@@ -146,7 +140,7 @@ export default class StoredApiCollection {
 
   /** This note no longer exists: drop its cached realm and forget its undo entries. */
   private noteNoLongerExists(noteId: Donut.ID) {
-    this.storage.removeNoteRealm(noteId)
+    this.storage.permanentlyRemoveNoteRealm(noteId)
     this.noteEditingHistory.forgetNote(noteId)
   }
 
@@ -338,13 +332,13 @@ export default class StoredApiCollection {
     const ok = await permanentlyDeleteNoteRequest(noteId)
     if (!ok) return
 
+    this.noteNoLongerExists(noteId)
     await router.replace(
       containingLocation(
         cachedRealm.notebookRealm.notebook.id,
         realmLeafFolder(cachedRealm)?.id ?? null
       )
     )
-    this.noteNoLongerExists(noteId)
     refreshSidebarStructuralListings()
   }
 
@@ -360,8 +354,8 @@ export default class StoredApiCollection {
       await reduceRelationNoteToSourcePropertyRequest(relationNoteId)
     if (!sourceRealm) return
 
-    await router.replace(noteShowLocation(sourceRealm.id))
     this.noteNoLongerExists(relationNoteId)
+    await router.replace(noteShowLocation(sourceRealm.id))
     this.storage.refreshNoteRealm(sourceRealm)
     refreshSidebarStructuralListings()
     return sourceRealm
