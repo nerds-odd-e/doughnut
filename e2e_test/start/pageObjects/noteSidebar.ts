@@ -13,10 +13,8 @@ import {
   sidebarAddNoteButton,
 } from './sidebarToolbarButtons'
 import {
-  childTreeitems,
   expandFolder,
   expandFolderPath,
-  expectRowLabels,
   folderRowControls,
   folderTreitemByLabel,
   folderTreitemUnderOpenParent,
@@ -52,19 +50,6 @@ export const noteSidebar = () => {
     expandFolderPath(folderLabels: string[]) {
       expandFolderPath(folderLabels)
       return this
-    },
-
-    expectRootRows(expectedLabels: string[]) {
-      waitUntilAppIsNotBusy()
-      expectRowLabels(rowsAtPath([]), expectedLabels)
-    },
-
-    expectRowsUnderFolder(folderLabel: string, expectedLabels: string[]) {
-      expandFolder(folderLabel)
-      expectRowLabels(
-        childTreeitems(folderTreitemByLabel(folderLabel)),
-        expectedLabels
-      )
     },
 
     openFile(folderLabels: string[], filename: string) {

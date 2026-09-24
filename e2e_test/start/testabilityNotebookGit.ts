@@ -1,6 +1,11 @@
 /// <reference types="Cypress" />
 // @ts-check
-import { NotebookGitTestabilityController } from '@generated/donut-backend-api/sdk.gen'
+import {
+  NotebookGitTestabilityController,
+  NotebookLfsTestabilityController,
+} from '@generated/donut-backend-api/sdk.gen'
+import type { AcceptLfsAttachmentTipResponse } from '@generated/donut-backend-api'
+import { unwrapData } from './unwrapApi'
 
 /**
  * Test-only setup helper: rebuilds a notebook's `NotebookGitBinding` from its *current*
@@ -46,5 +51,27 @@ export const notebookGitTestabilityMethods = {
         body: { notebookName, path, content },
       })
     )
+  },
+
+  /**
+   * Stores an accepted LFS file at the notebook root (switching the notebook to LFS) and yields
+   * its tip oid. An obsolete payload, when given, is stored first as an unreferenced LFS object.
+   */
+  acceptLfsAttachmentTipForTestability(
+    notebookName: string,
+    filename: string,
+    payload: string,
+    obsoletePayload?: string
+  ) {
+    return cy
+      .wrap(
+        NotebookLfsTestabilityController.acceptLfsAttachmentTipForTestability({
+          body: { notebookName, filename, payload, obsoletePayload },
+        }),
+        { log: false }
+      )
+      .then(
+        (response) => unwrapData<AcceptLfsAttachmentTipResponse>(response).oid!
+      )
   },
 }

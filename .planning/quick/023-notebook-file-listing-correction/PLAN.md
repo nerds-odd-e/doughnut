@@ -115,7 +115,7 @@ projections `findRootListItemsByNotebookId` / `findListItemsByFolderId`; B-focus
 
 ### 3. File feature keeps only integration-bearing scenarios
 Type: Structure
-Status: planned
+Status: done
 
 Remove "Files appear in the sidebar where they live", trim Background rows
 only it used (`force.png`, `paper.pdf`, `results.csv`, and the `Force` note if
@@ -126,6 +126,9 @@ Surviving coverage: the two kept scenarios, the listing controller test and
 the sidebar sort spec named in finding 3.
 Proof: Command E (2 scenarios passing).
 Sizing: ~4 min.
+Accepted: E passed 2/2; the web and CLI LFS seeding share
+`testability().acceptLfsAttachmentTipForTestability` (optional obsolete
+payload), and `cli_notebook_lfs.feature` passed 10/10 with it.
 
 ## Proof ownership
 
@@ -143,8 +146,9 @@ Sizing: ~4 min.
 - G: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`.
 - E: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/notebooks/notebook_files.feature`.
 
-Slices 1–2 proof ran; slice 3 not yet run.
+All slice proof ran and passed.
 
 ## Learnings
 
-None yet.
+- `pnpm cy:run` must run outside the command sandbox; inside it Electron never
+  connects and Cypress aborts before any test runs.
