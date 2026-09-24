@@ -12,7 +12,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Tidy LFS test support into one vocabulary](quick/028-tidy-lfs-test-support/PLAN.md)
+- [Tidy LFS test support into one vocabulary](quick/028-tidy-lfs-test-support/PLAN.md) — quick/028-tidy-lfs-test-support
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
 - [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19
 - [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5

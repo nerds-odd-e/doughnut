@@ -1,5 +1,10 @@
 # Tidy LFS test support into one vocabulary
 
+**Identity:** quick/028-tidy-lfs-test-support
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"039fdcb9e5009b2cfc7157fa6e24d6d4720a8f1c60cdc30ec7cc7f9074119461"}}
+```
+
 ## Source
 
 - Kind: bounded retrospective correction (no backlog identity yet; no seed).
