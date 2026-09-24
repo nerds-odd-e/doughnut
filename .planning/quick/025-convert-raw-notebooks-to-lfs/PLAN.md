@@ -136,7 +136,7 @@ first-commit blob, and `assertAcceptedTreeMatchesTheFullAssembly`).
 ### 3. An existing local checkout pulls the conversion and continues on LFS
 
 Type: Behavior
-Status: planned
+Status: stopped — awaiting story review (CLI scope)
 Proof: a new scenario in `e2e_test/features/cli/cli_notebook_lfs.feature`,
 with a testability endpoint beside `force_raw_notebook_git_binding_for_testability`
 that calls the same conversion service.
@@ -157,10 +157,23 @@ as a pointer. No CLI or E2E test yet covers a pull whose incoming commit first
 introduces `.gitattributes`; this scenario is that coverage. If the pull still
 fails over HTTP, stop and replan; do not patch the CLI inside this slice.
 
+Execution finding (2026-09-24, E2E over the real HTTP LFS endpoint): the pull
+works (identical bytes, `.gitattributes`, clean checkout) and a new picture
+commits as a pointer, but the next `donut notebook publish` fails in the CLI
+before any server call: "Attachment at <commit> must be a Git LFS pointer or
+empty file when the notebook uses LFS." `selectRequiredLfsObjectIds` →
+`attachmentPayloadDigestsInHistory` (`cli/src/commands/notebook/notebookPublishLfsSelection.ts:71-111`)
+walks all accepted history and throws on the raw blobs from before the
+conversion, so every publish on a converted notebook fails. This contradicts
+the story's "the CLI does not change". The testability endpoint
+`convert_raw_notebook_to_lfs_for_testability`, generated client, step, and the
+failing scenario are kept uncommitted in the execution worktree for the
+decision.
+
 ### 4. One notebook's failure does not stop the others
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the same backend test. Make one raw binding unreadable (point its
 accepted head at an object that is not stored) and keep a second raw notebook
 healthy.
@@ -168,7 +181,15 @@ healthy.
 Behavior: Running the trigger converts the healthy notebook and leaves the
 broken one raw, with its id logged. The run does not throw.
 
+Delivered: the startup loop catches each notebook's failure, logs its id, and
+continues. Accepted proof:
+`NotebookGitLfsConversionControllerTest.aNotebookThatFailsToConvertStaysRawWhileTheOthersConvert`
+(the broken notebook stays raw, the healthy one becomes LFS, the run returns).
+Untested: the log line, and the `ApplicationReadyEvent` wiring.
+
 ## Remaining concerns
 
-None blocking. The slice 3 CLI path was observed to work (see its execution
-note); only the HTTP LFS endpoint remains to be exercised, by slice 3 itself.
+- Blocking (slice 3): the CLI rejects publishing a converted notebook because
+  pre-conversion history holds raw blobs. Needs an owner decision on story
+  scope: allow a CLI change (skip non-pointer blobs in accepted history) in
+  this story, and how CLI release relates to running the server conversion.

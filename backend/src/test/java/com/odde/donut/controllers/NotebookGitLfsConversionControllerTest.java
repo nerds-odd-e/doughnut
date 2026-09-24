@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
+import com.odde.donut.configs.NotebookGitLfsConversionOnStartup;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
@@ -33,7 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Converting a notebook still on legacy raw attachment storage moves it to LFS with one forward
- * Donut System commit; a notebook already on LFS is left as it is.
+ * Donut System commit; a notebook already on LFS is left as it is. When the startup trigger
+ * converts every raw notebook, one notebook's failure leaves it raw without stopping the others.
  */
 class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentControllerTestBase {
 
@@ -101,20 +103,6 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 
-  private void publish(Notebook notebook, List<NotebookGitProposalFile> files) throws Exception {
-    NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
-    controller.publishNotebookGitProposal(
-        notebook.getId(), accepted.getAcceptedGitObjectId(), proposalBundleBytes(accepted, files));
-  }
-
-  private byte[] download(Notebook notebook, NotebookAttachment attachment) throws Exception {
-    return attachmentController.downloadAttachment(notebook, attachment).getBody();
-  }
-
-  private static byte[] pointerOf(byte[] bytes) {
-    return NotebookGitLfsPointer.format(sha256Hex(bytes), bytes.length);
-  }
-
   @Test
   void aRawNotebookWithoutFilesBecomesLfsInOneForwardCommit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
@@ -126,9 +114,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
 
     conversionService.convert(notebook.getId(), Instant.now());
 
-    assertThat(
-        reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
-        is(NotebookGitAttachmentRepresentation.LFS));
+    assertThat(representationOf(notebook), is(NotebookGitAttachmentRepresentation.LFS));
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
       ObjectId head = GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
@@ -166,5 +152,37 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
     conversionService.convert(notebook.getId(), Instant.now());
 
     assertThat(acceptedHistory(notebook), equalTo(before));
+  }
+
+  @Test
+  void aNotebookThatFailsToConvertStaysRawWhileTheOthersConvert() throws Exception {
+    Notebook broken = createGitBackedNotebook("Broken");
+    NotebookGitBinding brokenBinding = reloadCommittedBinding(broken.getId());
+    deleteNativeObjectStoreRow(brokenBinding.getId(), brokenBinding.getAcceptedGitObjectId());
+    Notebook healthy = createGitBackedNotebook("Healthy");
+
+    new NotebookGitLfsConversionOnStartup(notebookGitBindingRepository, conversionService)
+        .convertRawNotebooks();
+
+    assertThat(representationOf(broken), is(NotebookGitAttachmentRepresentation.RAW));
+    assertThat(representationOf(healthy), is(NotebookGitAttachmentRepresentation.LFS));
+  }
+
+  private void publish(Notebook notebook, List<NotebookGitProposalFile> files) throws Exception {
+    NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
+    controller.publishNotebookGitProposal(
+        notebook.getId(), accepted.getAcceptedGitObjectId(), proposalBundleBytes(accepted, files));
+  }
+
+  private byte[] download(Notebook notebook, NotebookAttachment attachment) throws Exception {
+    return attachmentController.downloadAttachment(notebook, attachment).getBody();
+  }
+
+  private static byte[] pointerOf(byte[] bytes) {
+    return NotebookGitLfsPointer.format(sha256Hex(bytes), bytes.length);
+  }
+
+  private NotebookGitAttachmentRepresentation representationOf(Notebook notebook) {
+    return reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation();
   }
 }
