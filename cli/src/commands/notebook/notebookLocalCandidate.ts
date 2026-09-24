@@ -17,8 +17,8 @@ const LOCAL_MERGE =
   'Local main cannot receive the accepted history because an unpublished commit is a merge. ' +
   'Recreate the local work as ordinary commits, then try again.'
 
-export const LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION =
-  'Local work is preserved; reconcile or recreate it as commits directly on accepted history before publication.'
+const LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION =
+  'Local work is preserved, but it cannot be published from this checkout. To publish it, clone the notebook fresh elsewhere ("donut notebook clone") and move the unpublished work across as new commits there.'
 
 const LOCAL_NON_LINEAR_ACCEPTED =
   'Local main cannot receive the accepted history because the accepted history since the local parent is not one contiguous chain of saves. ' +

@@ -95,7 +95,7 @@ Sizing: ~5 min.
 
 ### 2. Binary conflict guidance chooses a side
 Type: Behavior
-Status: planned
+Status: dropped — unreachable today (see Learnings); reported to owner
 
 Pre-proof (isolated, job temp directory, `CURSOR_DEV=true nix develop -c bash`):
 assumption that a rebase conflict on a `-text`/LFS path pauses with the path
@@ -114,7 +114,7 @@ Sizing: ~6 min.
 
 ### 3. Refusals and guidance describe routes that exist
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: pull's accepted-structural refusal names clone-fresh-and-move; publish's
 divergence error names `donut notebook pull`; clone guidance mentions
@@ -168,9 +168,29 @@ Accepted proof:
 - Slice 1: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.lfs.test.ts`
   8/8 ("a failed download during a conflict pause names finishing the rebase before
   the rerun, which then fills in"); clone consumer `tests/notebookAcquisition.lfs.test.ts` 3/3.
+- Slice 3: `CURSOR_DEV=true nix develop -c pnpm cli:test` 462/464 (2 = clone-staging
+  parallel flake, pass alone with `--no-file-parallelism`, 12/12); after refactor
+  `vitest run tests/notebookPull.test.ts tests/notebookPull.lfs.test.ts` 104/104.
+  Wording pinned by `LOCAL_WORK_PRESERVED_GUIDANCE`, `rebasedReport`/`alreadyBasedReport`
+  (`notebookPull.testHelpers.ts`), clone and publish-ancestry `stringContaining` checks.
 
 ## Learnings
 
 - Slice 1: `fillInCurrentLfsFilesIfNeeded` takes the caller's whole `nextStep`
   text; pull builds it from the receive outcome. No test asserts clone's
   `rerun "donut notebook clone"` text (pre-existing gap, unchanged wording).
+- Slice 2 dropped: `inspectAcceptedInterval` accepts only ordinary `.md` note
+  paths from the web side, so a web change to `a.bin` is refused by
+  `structuralChangeError` before any rebase (probe: legacy checkout,
+  `prepareConflictingSameNote(..., 'a.bin', ...)` → structural refusal, no
+  unmerged paths). LFS mode keeps `*.md` as `text`, so every web-changeable file
+  is Markdown. Story 15's "binary conflict resolved by choosing a side" is
+  unreachable until the owner opens the web side to attachment changes.
+  Pre-proof for that day: rebase conflicts on `-text` paths pause unmerged
+  (stages 1–3); `git checkout --ours|--theirs -- <path>` + `git add` resolves
+  (`--ours` = accepted side, `--theirs` = local commit). LFS pointer conflicts
+  DO get text markers (no `merge=lfs` driver). `git diff --numstat` shows `0 0`
+  during a conflict, so it is not a binary signal; use attributes or content.
+
+- Slice 3: publish's divergence error names pull, but with a local merge commit
+  pull then refuses and gives the clone-fresh route — one extra hop, accepted.

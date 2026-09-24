@@ -100,6 +100,11 @@ export function describeNotebookPublishAncestry(): void {
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
         expect.stringContaining('contiguous single-parent commit range')
       )
+      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Run "donut notebook pull" to base your local commits on the accepted history'
+        )
+      )
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(before)
     })
 

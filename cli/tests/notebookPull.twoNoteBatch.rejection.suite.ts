@@ -2,10 +2,10 @@ import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { run } from '../src/run.js'
-import { LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION } from '../src/commands/notebook/notebookLocalCandidate.js'
 import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
+  LOCAL_WORK_PRESERVED_GUIDANCE,
   checkoutState,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
@@ -15,7 +15,7 @@ import { prepareTwoNoteBatchDivergence } from './notebookPull.twoNoteBatch.testH
 
 const LOCAL_NON_LINEAR_ACCEPTED =
   'Local main cannot receive the accepted history because the accepted history since the local parent is not one contiguous chain of saves. ' +
-  LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION
+  LOCAL_WORK_PRESERVED_GUIDANCE
 
 export function describeNotebookPullTwoNoteBatchRejection(): void {
   describe('notebook pull (unsupported two-note batch shapes)', () => {

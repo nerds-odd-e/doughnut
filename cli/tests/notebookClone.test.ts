@@ -83,6 +83,11 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
+        'Any non-Markdown file is an attachment and may be added, changed, or deleted.'
+      )
+    )
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
         'A Folder that contains concepts does not require a README.md; an empty Folder is represented by a .keep file'
       )
     )
