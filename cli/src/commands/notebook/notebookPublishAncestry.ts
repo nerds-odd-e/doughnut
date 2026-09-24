@@ -3,8 +3,8 @@ import { runSystemGitOrThrow } from './systemGit.js'
 
 const ANCESTRY_ERROR =
   'local main cannot be published: only a contiguous single-parent commit range on top of the ' +
-  "notebook's currently accepted history can be published. Rebase or recreate " +
-  'your change as commits directly on the accepted head, then try again.'
+  "notebook's currently accepted history can be published. " +
+  'Run "donut notebook pull" to base your local commits on the accepted history, then try again.'
 
 /**
  * Confirms `directory`'s local `main` either matches the notebook's currently accepted history

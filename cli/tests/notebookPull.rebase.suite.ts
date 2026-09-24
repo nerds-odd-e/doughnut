@@ -14,6 +14,7 @@ import {
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
   installNotebookPullAcceptedHistoryTest,
+  rebasedReport,
   serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
 import {
@@ -92,7 +93,7 @@ export function describeNotebookPullRebase(): void {
       expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
       expect(ctx.getFetchMock().mock.calls[0]?.[0]).toContain('/git-bundle')
       expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-        `Rebased onto the accepted history. Unpublished local commit: ${localHead}. Accepted head: ${setup.acceptedHead}. Inspect the result, then run "donut notebook publish ${setup.directory}".`
+        rebasedReport(setup.directory, localHead, setup.acceptedHead)
       )
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
 

@@ -108,7 +108,7 @@ async function completeNotebookClone(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
   console.log(
-    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one or more new single-parent commits directly on the accepted main containing one or more added Markdown notes with optional edits, including notes whose paths imply a new Folder under an already represented Folder without a Folder README, a new folder README alone or together with ordinary notes in that folder, one or more edited existing ordinary Markdown notes at unchanged paths, one or more uniquely matched unchanged-content Markdown note moves that may change folder and/or filename together with compatible same-path edits and either additions or deletions, one or more Markdown note deletions alone or together with same-path edits that leave existing links authored, or one complete same-name subtree whose source has its own accepted README, every active descendant is represented, the destination parent already exists in accepted history, and bytes, modes, and relative paths stay unchanged. Overwriting an existing note and changed-content moves are not supported yet. Authored referring links are not rewritten by a relocation or rename, so links to the old path may no longer resolve. Separate identity-uncertain additions or moves from deletions; do not delete and recreate the note. A Folder that contains concepts does not require a README.md; an empty Folder is represented by a .keep file. Run "donut notebook pull ${destination}" to receive newer accepted history. ${notebookPullNextSteps(destination)}`
+    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one or more new single-parent commits directly on the accepted main containing one or more added Markdown notes with optional edits, including notes whose paths imply a new Folder under an already represented Folder without a Folder README, a new folder README alone or together with ordinary notes in that folder, one or more edited existing ordinary Markdown notes at unchanged paths, one or more uniquely matched unchanged-content Markdown note moves that may change folder and/or filename together with compatible same-path edits and either additions or deletions, one or more Markdown note deletions alone or together with same-path edits that leave existing links authored, or one complete same-name subtree whose source has its own accepted README, every active descendant is represented, the destination parent already exists in accepted history, and bytes, modes, and relative paths stay unchanged. Any non-Markdown file is an attachment and may be added, changed, or deleted. Overwriting an existing note and changed-content moves are not supported yet. Authored referring links are not rewritten by a relocation or rename, so links to the old path may no longer resolve. Separate identity-uncertain additions or moves from deletions; do not delete and recreate the note. A Folder that contains concepts does not require a README.md; an empty Folder is represented by a .keep file. Run "donut notebook pull ${destination}" to receive newer accepted history. ${notebookPullNextSteps(destination)}`
   )
 }
 
@@ -158,7 +158,15 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
     const { notebookId } = resolveNotebookBinding(directory)
     assertLocalMainIsReadyToReceive(directory)
     result = await receiveAcceptedNotebookHead(directory, Number(notebookId))
-    fillInCurrentLfsFilesIfNeeded(directory, Number(notebookId), 'pull')
+    const rerunPull = 'rerun "donut notebook pull"'
+    // Pull refuses during an active rebase, so a paused pull is rerun only after the rebase ends.
+    fillInCurrentLfsFilesIfNeeded(
+      directory,
+      Number(notebookId),
+      result.kind === 'paused'
+        ? `finish ("git rebase --continue") or abort ("git rebase --abort") the rebase, then ${rerunPull}`
+        : rerunPull
+    )
   } catch (e) {
     // A paused conflict stays visible even when filling in attachments fails afterwards.
     const conflictGuidance =
@@ -172,7 +180,7 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
 
   if (result.kind === 'already-based') {
     console.log(
-      `Unpublished local commit is already based on the accepted history. Local head: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
+      `Unpublished local work is already based on the accepted history. Local head: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
     )
     return
   }
@@ -188,7 +196,7 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
   }
   if (result.kind === 'rebased') {
     console.log(
-      `Rebased onto the accepted history. Unpublished local commit: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
+      `Rebased onto the accepted history. Local head: ${result.localHead}. Accepted head: ${result.acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
     )
     return
   }

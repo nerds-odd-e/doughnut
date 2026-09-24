@@ -61,8 +61,11 @@ skip LFS smudging; after every outcome, including a rebase paused on a
 conflict, it refreshes the checkout's LFS endpoint and token from the CLI's
 current login and fills in current attachment files. A failed download is
 reported as incomplete attachments; rerunning pull once history is current
-fills them in before it reports the notebook unchanged. A conflicting
-attachment is resolved by choosing a side with Git; Donut does not merge binary
+fills them in before it reports the notebook unchanged. When the rebase is
+paused, pull says to finish or abort it first, because pull refuses while a Git
+operation is active. Pull rebases local work only over web history that changes
+ordinary Markdown notes; a web attachment change with unpublished local work is
+refused, so attachment conflicts do not arise. Donut does not merge binary
 content.
 
 ## Recovering a published attachment version

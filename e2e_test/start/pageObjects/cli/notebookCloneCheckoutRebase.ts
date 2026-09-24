@@ -87,7 +87,7 @@ function notebookCloneCheckoutRebaseObservations() {
       return originalAndRebasedCheckout().then(({ original, rebased }) => {
         expectCleanChildOfNewAcceptedHead(original, rebased, 'L′')
         return nonInteractiveOutput().expectContains(
-          `Unpublished local commit: ${rebased.head}. Accepted head: ${rebased.parent}.`
+          `Local head: ${rebased.head}. Accepted head: ${rebased.parent}.`
         )
       })
     },

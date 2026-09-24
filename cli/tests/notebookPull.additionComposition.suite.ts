@@ -14,8 +14,8 @@ import {
 import {
   LOCAL_NESTED_NOTE,
   LOCAL_ROOT_NOTE,
-  prepareTwoNoteBatchDivergence,
-} from './notebookPull.twoNoteBatch.testHelpers.js'
+  prepareContentBatchDivergence,
+} from './notebookPull.contentBatch.testHelpers.js'
 
 const ADDED_V1 = '---\ntype: Note\n---\n# Added\n\nFirst version.\n'
 const ADDED_V2 = '---\ntype: Note\n---\n# Added\n\nSecond version.\n'
@@ -71,7 +71,7 @@ export function describeNotebookPullAdditionComposition(): void {
     ])(
       'retains a two-path local batch as one unpublished child over $shape',
       async ({ acceptedChangeSets, shape }) => {
-        const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
+        const setup = prepareContentBatchDivergence(ctx.getWorkDir(), {
           acceptedChangeSets,
         })
         serveAcceptedBundle(ctx, setup.source, `addition-composition-${shape}`)
@@ -122,7 +122,7 @@ export function describeNotebookPullAdditionComposition(): void {
     )
 
     test('refuses the whole interval when an otherwise-eligible sequence ends in an unsupported addition, leaving local work and checkout intact', async () => {
-      const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
+      const setup = prepareContentBatchDivergence(ctx.getWorkDir(), {
         acceptedChangeSets: [
           [{ path: 'added.md', content: ADDED_V1 }],
           [{ path: 'added.md', content: ADDED_V2 }],

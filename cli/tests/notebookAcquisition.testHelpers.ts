@@ -5,14 +5,6 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
-export const STAGING_PREFIX = 'donut-notebook-clone-'
-
-export function stagingDirsUnderTmp(): string[] {
-  return fs
-    .readdirSync(tmpdir())
-    .filter((name) => name.startsWith(STAGING_PREFIX))
-}
-
 export function installAcquireNotebookGitCheckoutTest(): {
   getConfigDir: () => string
   getDestinationPath: () => string

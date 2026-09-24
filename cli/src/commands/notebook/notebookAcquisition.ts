@@ -124,7 +124,7 @@ export async function acquireNotebookGitCheckout(
   }
 
   const stagingDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'donut-notebook-clone-')
+    path.join(os.tmpdir(), `donut-notebook-clone-${process.pid}-`)
   )
   try {
     const bundleFile = path.join(stagingDir, 'notebook.bundle')
@@ -138,7 +138,13 @@ export async function acquireNotebookGitCheckout(
 
     recordLocalNotebookBinding(checkoutDir, notebookId, apiBaseUrl)
     removeOriginRemote(checkoutDir)
-    if (fillInCurrentLfsFilesIfNeeded(checkoutDir, notebookId, 'clone')) {
+    if (
+      fillInCurrentLfsFilesIfNeeded(
+        checkoutDir,
+        notebookId,
+        'rerun "donut notebook clone"'
+      )
+    ) {
       removeOriginRemote(checkoutDir)
     }
     moveCheckoutIntoDestination(checkoutDir, destinationPath)

@@ -21,6 +21,7 @@ import {
 } from './notebookPull.conflict.testHelpers.js'
 import {
   installNotebookPullAcceptedHistoryTest,
+  alreadyBasedReport,
   serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
 
@@ -90,7 +91,7 @@ export function describeNotebookPullResolvedContinuation(): void {
 
       expect(runGit(['rev-parse', 'HEAD'], setup.directory)).toBe(resolvedHead)
       expect(ctx.getLogSpy().mock.calls.at(-1)).toEqual([
-        `Unpublished local commit is already based on the accepted history. Local head: ${resolvedHead}. Accepted head: ${setup.acceptedHead}. Inspect the result, then run "donut notebook publish ${setup.directory}".`,
+        alreadyBasedReport(setup.directory, resolvedHead, setup.acceptedHead),
       ])
       expect(
         ctx
