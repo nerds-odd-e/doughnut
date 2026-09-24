@@ -1,5 +1,10 @@
 # Pull and publish tell owners a recovery path that works
 
+**Identity:** quick/021-pull-recovery-guidance
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"92599d2735edfd5daece34fdb0f92484005c4c9ee120feafc93f8c462ce37580"}}
+```
+
 ## Source
 
 - Kind: bounded retrospective correction (no seed required).
