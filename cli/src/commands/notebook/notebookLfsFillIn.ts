@@ -1,19 +1,14 @@
-import { loadAuthenticatedFetchContext } from '../../backendApi/donutBackendClient.js'
 import {
   checkoutUsesLfs,
-  configureLocalLfsEndpointAndAuth,
-  ensurePlaceholderOrigin,
-  requireGitLfs,
+  prepareAuthenticatedLfsCheckout,
   smudgeSkippedGitOptions,
 } from './notebookLfsLocal.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 /**
- * When the checkout enables Git LFS, refreshes the authenticated notebook LFS endpoint in
- * local Git config (never authored content) from the CLI's current login, then fills in only
+ * When the checkout enables Git LFS, prepares authenticated LFS transfers, then fills in only
  * the current checkout's files via `git lfs fetch` and `git lfs checkout`. Returns whether
- * the fill-in ran. A placeholder remote satisfies Git LFS's remote argument while transfers
- * use `lfs.url`. Failures end with the caller's `nextStep` (e.g. `rerun "donut notebook pull"`).
+ * the fill-in ran. Failures end with the caller's `nextStep` (e.g. `rerun "donut notebook pull"`).
  */
 export function fillInCurrentLfsFilesIfNeeded(
   checkoutDir: string,
@@ -23,26 +18,10 @@ export function fillInCurrentLfsFilesIfNeeded(
   if (!checkoutUsesLfs(checkoutDir)) {
     return false
   }
-  requireGitLfs(
-    (detail, status) =>
-      `Git LFS is required to receive this notebook's attachments${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }. Install Git LFS, then ${nextStep}.`
-  )
+  prepareAuthenticatedLfsCheckout(checkoutDir, notebookId, 'receive', nextStep)
   const noPrompt = {
     env: { ...smudgeSkippedGitOptions().env, GIT_TERMINAL_PROMPT: '0' },
   }
-  const { apiBaseUrl, token } = loadAuthenticatedFetchContext()
-  ensurePlaceholderOrigin(checkoutDir, apiBaseUrl)
-  configureLocalLfsEndpointAndAuth(checkoutDir, notebookId, apiBaseUrl, token)
-  runSystemGitOrThrow(
-    ['-C', checkoutDir, 'lfs', 'install', '--local'],
-    (detail, status) =>
-      `failed to configure Git LFS in the checkout${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }`,
-    noPrompt
-  )
   const incomplete =
     (verb: string) => (detail: string | undefined, status: number | null) =>
       `Notebook attachments are incomplete: failed to ${verb} current notebook attachments via Git LFS${

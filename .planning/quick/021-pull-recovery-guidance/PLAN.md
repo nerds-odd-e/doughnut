@@ -126,7 +126,7 @@ Sizing: ~5 min.
 
 ### 4. One authenticated LFS checkout setup
 Type: Structure
-Status: planned
+Status: done
 
 Extract the shared setup used by fill-in and publish; behavior unchanged.
 Proof: existing `notebookPull.lfs.test.ts`, `notebookAcquisition.lfs.test.ts`,
@@ -173,6 +173,8 @@ Accepted proof:
   `vitest run tests/notebookPull.test.ts tests/notebookPull.lfs.test.ts` 104/104.
   Wording pinned by `LOCAL_WORK_PRESERVED_GUIDANCE`, `rebasedReport`/`alreadyBasedReport`
   (`notebookPull.testHelpers.ts`), clone and publish-ancestry `stringContaining` checks.
+- Slice 4: `CURSOR_DEV=true nix develop -c pnpm cli:test` 464/464; after refactor
+  the three LFS files (`notebookPull.lfs`, `notebookAcquisition.lfs`, `notebookPublish.lfs`) 16/16.
 
 ## Learnings
 
@@ -191,6 +193,7 @@ Accepted proof:
   (`--ours` = accepted side, `--theirs` = local commit). LFS pointer conflicts
   DO get text markers (no `merge=lfs` driver). `git diff --numstat` shows `0 0`
   during a conflict, so it is not a binary signal; use attributes or content.
-
 - Slice 3: publish's divergence error names pull, but with a local merge commit
   pull then refuses and gives the clone-fresh route — one extra hop, accepted.
+- Slice 4: `prepareAuthenticatedLfsCheckout` (in `notebookLfsLocal.ts`) owns the
+  shared setup; callers pass `'receive' | 'publish'` and their next step.

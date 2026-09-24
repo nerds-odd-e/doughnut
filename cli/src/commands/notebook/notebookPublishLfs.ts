@@ -1,9 +1,6 @@
-import { loadAuthenticatedFetchContext } from '../../backendApi/donutBackendClient.js'
 import {
   checkoutUsesLfs,
-  configureLocalLfsEndpointAndAuth,
-  ensurePlaceholderOrigin,
-  requireGitLfs,
+  prepareAuthenticatedLfsCheckout,
 } from './notebookLfsLocal.js'
 import { selectRequiredLfsObjectIds } from './notebookPublishLfsSelection.js'
 import { runSystemGitOrThrow } from './systemGit.js'
@@ -21,22 +18,11 @@ export function uploadRequiredLfsObjectsBeforeProposal(
   if (!checkoutUsesLfs(directory)) {
     return
   }
-  requireGitLfs(
-    (detail, status) =>
-      `Git LFS is required to publish this notebook's attachments${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }. Install Git LFS, then retry "donut notebook publish".`
-  )
-  const { token, apiBaseUrl } = loadAuthenticatedFetchContext()
-  ensurePlaceholderOrigin(directory, apiBaseUrl)
-  configureLocalLfsEndpointAndAuth(directory, notebookId, apiBaseUrl, token)
-  runSystemGitOrThrow(
-    ['-C', directory, 'lfs', 'install', '--local'],
-    (detail, status) =>
-      `failed to configure Git LFS in the checkout${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }`,
-    { env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } }
+  prepareAuthenticatedLfsCheckout(
+    directory,
+    notebookId,
+    'publish',
+    'retry "donut notebook publish"'
   )
 
   const proposedHead = runSystemGitOrThrow(
