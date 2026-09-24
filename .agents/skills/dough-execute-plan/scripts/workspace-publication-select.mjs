@@ -1,9 +1,10 @@
 // Select or reuse the owned execution workspace, then commit the Taken claim
 // there. Publication of that SHA is a separate step.
 import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
 import { applyToBacklog } from "../../dough-product-backlog/scripts/product-backlog-store.mjs";
 import { takeEntry } from "../../dough-product-backlog/scripts/product-backlog-take.mjs";
-import { git, revParse } from "./publication-test-fixtures.mjs";
+import { git, revParse } from "./publication-git.mjs";
 import {
   claimCommitMessage,
   isAncestor,
@@ -14,7 +15,8 @@ import {
   trailers,
 } from "./workspace-publication-ownership.mjs";
 
-async function verifyRetained(retained) {
+async function verifyRetained(request) {
+  const { retained } = request;
   const recovery = {
     workspace: retained.workspace,
     branch: retained.branch,
@@ -34,7 +36,17 @@ async function verifyRetained(retained) {
       retained.startingRevision,
       "HEAD",
     );
-    if (!matches) {
+    const head = await revParse(retained.workspace, "HEAD");
+    const message = (await git(retained.workspace, "log", "-1", "--format=%B"))
+      .stdout;
+    const owned = trailers(message);
+    // A successful semantic replay rewrites the candidate onto newer trunk.
+    // In that case its original base need not remain an ancestor of HEAD.
+    const replayedCandidate =
+      retained.candidateSha === head &&
+      owned.publisher === request.publisherId &&
+      owned.identity === request.identity;
+    if (!matches && !replayedCandidate) {
       return stopped("setup-failed", {
         recovery: {
           ...recovery,
@@ -57,12 +69,43 @@ async function verifyRetained(retained) {
 }
 
 export async function selectOwnedWorkspace(request) {
-  if (request.retained?.workspace) return verifyRetained(request.retained);
+  if (request.retained?.workspace) return verifyRetained(request);
   const remote = remoteOf(request);
   const target = targetOf(request);
   try {
     await git(request.integration, "fetch", remote);
     const base = await revParse(request.integration, `${remote}/${target}`);
+    if (existsSync(request.workspace)) {
+      const actual = await revParse(request.workspace, "--show-toplevel");
+      const branch = (
+        await git(request.workspace, "branch", "--show-current")
+      ).stdout.trim();
+      const head = await revParse(request.workspace, "HEAD");
+      const status = (await git(request.workspace, "status", "--porcelain"))
+        .stdout;
+      if (
+        actual !== request.workspace ||
+        branch !== request.branch ||
+        head !== base ||
+        status !== ""
+      ) {
+        return stopped("setup-failed", {
+          recovery: {
+            workspace: request.workspace,
+            branch: request.branch,
+            error:
+              "existing workspace does not match clean fetched trunk and owned branch",
+          },
+        });
+      }
+      return {
+        ok: true,
+        created: false,
+        workspace: request.workspace,
+        branch,
+        startingRevision: base,
+      };
+    }
     await git(
       request.integration,
       "worktree",
@@ -84,7 +127,7 @@ export async function selectOwnedWorkspace(request) {
       recovery: {
         workspace: request.workspace,
         branch: request.branch,
-        error: error.stderr || error.message,
+        error: `${request.workspace}: ${error.stderr || error.message}`,
       },
     });
   }
@@ -103,10 +146,23 @@ export async function commitWorkspaceClaim(request) {
   ) {
     return { ok: true, candidateSha: head, committed: false };
   }
+  if (
+    head !== startingRevision ||
+    (await git(workspace, "status", "--porcelain")).stdout !== ""
+  ) {
+    return stopped("setup-failed", {
+      recovery: {
+        workspace,
+        branch: request.branch,
+        error: "claim workspace has unpublished commits or pending changes",
+      },
+    });
+  }
   let outcome;
   await applyToBacklog(join(workspace, file), (source) => {
     outcome = takeEntry(source, {
       identity,
+      ...(request.plan === undefined ? {} : { plan: request.plan }),
       backlogDirectory: dirname(join(workspace, file)),
     });
     return outcome.source;

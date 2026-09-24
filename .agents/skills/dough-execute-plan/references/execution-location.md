@@ -2,12 +2,12 @@
 
 Planned and planless work default to Story Branch Mode: one execution branch and
 Git worktree for the selected work. Explicit `--trunk` uses Trunk Mode: still
-one retained local execution branch and worktree, with claim and increment
-publication as in [trunk publication](trunk-publication.md). Explicit caller selection uses the
+one retained local execution branch and worktree, with claim startup through
+[Take queued work](../SKILL.md#take-queued-work) and increment publication as
+in [trunk publication](trunk-publication.md). Explicit caller selection uses the
 current branch instead. Story Branch and Trunk Mode select or reuse the owned
-workspace before the Taken claim, then publish that claim from the workspace
-per [trunk publication](trunk-publication.md#publish-a-queue-claim) and
-[Take queued work](../SKILL.md#take-queued-work). Caller-selected current-branch
+workspace and publish the claim through that installed startup operation.
+Caller-selected current-branch
 work commits its claim on the current checkout, which is never published.
 When no claim applies, including authorized contextual planless work,
 use verified current HEAD and create no story, plan, or queue entry; still
@@ -22,16 +22,11 @@ Select or create that workspace through
 recipe here. This execution chooses when selection runs and which verified
 base it supplies:
 
-- Queued Story Branch and Trunk Mode select or reuse the owned workspace from
-  fetched remote trunk before the Taken claim is committed. Do not wait for
-  the claim, and do not use the claim revision as that base. After the
-  workspace exists, commit the claim there and publish its SHA before
-  implementation. A matching retained execution resumes its own claim.
-  Ownership is that retained context together with the claim candidate's
-  publication provenance. Recheck remote membership before replaying a
-  competing claim. Identical **Taken** text is not evidence this execution
-  owns the claim. Another execution's published claim is a recoverable
-  conflict. Ambiguous ownership keeps the conflict.
+- Queued Story Branch and Trunk Mode supply the owned workspace path and
+  authority to the installed startup operation. It uses fetched remote trunk
+  as the base, confirms the Taken claim there, and returns the selected
+  workspace and publication receipt. A conflicting or ambiguous claim stops
+  implementation; identical **Taken** text alone proves no ownership.
 - Contextual planless work with no claim supplies verified current HEAD, after
   the default-checkout freshness check above when that HEAD is the default
   checkout. Create no story, plan, or queue entry.

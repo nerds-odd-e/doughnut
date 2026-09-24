@@ -143,9 +143,8 @@ before-cleanup commit, even when the current revision was already suitable. If
 commit conventions, ownership, or recovery cannot be resolved, leave the material
 intact, report the gap, and do not claim closure. When the selected mode is Trunk
 Mode, publish that commit through [wrap-up closure publication](../dough-execute-plan/references/trunk-publication.md#publish-wrap-up-closure)
-before deleting spent history. Preserve Git history as the sole recovery surface
-for spent execution material; keep current product knowledge in maintained project
-content.
+before deleting spent history. Keep current product knowledge in maintained
+project content.
 
 ## Delete spent history, including shared records
 
@@ -157,17 +156,20 @@ Mode before-cleanup publication — delete the selected work's spent history und
   when the plan was retained at execution completion;
 - its canonical story section when one exists, and its seed only when every
   remaining section is spent;
-- its **Taken** or **Backlog list** entry when one exists;
-- its process-log occurrences, and issues or containers left empty; and
+- its **Taken** or **Backlog list** entry when one exists; and
 - links whose sole purpose is preserving that history.
 
 Remove empty directories belonging to the spent work, including untracked ones.
 The current snapshot must be free of that history, both tracked and untracked,
 with recovery available from the recorded before-cleanup commit.
 
+Preserve process findings, occurrence facts, and unresolved judgments under
+[process-finding recording](../dough-execution-retrospective/references/process-finding-recording.md).
+Keep findings understandable when removing their spent sources.
+
 Preserve unrelated human text, sibling stories and log entries, product and
 version identity, maintained tests and documents, still-needed acceptance work,
-and active follow-ups. Shared records lose only the portions attributable to
+and active follow-ups. Shared records lose only spent portions attributable to
 the completed work; leave uncertain portions intact and report the ambiguity.
 
 Keep an active follow-up's queue link, correction input, and provenance. If its

@@ -115,7 +115,31 @@ export async function deliverRecordedCheckout(request) {
     previouslyPublishedBase: request.previouslyPublishedBase,
     targetRef: request.targetRef,
     register: request.register,
+    validate: request.validate,
+    validatedCandidate: request.validatedCandidate,
+    backlogPath: request.backlogPath,
   });
+  if (!published.ok) {
+    await assertStayed(checkout, before);
+    return {
+      ok: false,
+      classification: "remote",
+      operation: "publish",
+      publication: published.publication,
+      status: published.status,
+      report: published.status,
+      sha: published.candidate ?? null,
+      checkout: before.toplevel,
+      branch: before.branch,
+      receipt: null,
+      candidate: published.candidate,
+      preRebaseSha: published.preRebaseSha,
+      remoteTip: published.remoteTip,
+      previouslyPublishedBase: published.previouslyPublishedBase,
+      suffixBase: published.suffixBase,
+      maintenance: null,
+    };
+  }
   const maintenance = onDefault
     ? await refreshDefaultCheckout({
         checkout,

@@ -12,8 +12,8 @@ proof/delivery/completion obligations. Explicit omit/defer instructions also
 take precedence. When skipped, invoke the completion operation for the
 applicable accepted revision at this execution-completion boundary, handle its
 receipt, report the CI verdict or exact unresolved reason with shutdown
-evidence, and end with `## PLAN EXECUTION COMPLETE`, retaining plan/evidence for
-later review and wrap-up.
+evidence, and end with `## PLAN EXECUTION COMPLETE`, retaining the completed
+plan and judged proof for any later review and wrap-up.
 
 Otherwise invoke
 [dough-execution-retrospective](../../dough-execution-retrospective/SKILL.md)
@@ -23,7 +23,7 @@ and project preferences through its review selection; its authority excludes
 implementing findings or changing the backlog. Do not emit
 `## PLAN EXECUTION COMPLETE` first or require that banner as retrospective
 input. When review returns, invoke the completion operation, handle its
-receipt, then report completion, retained evidence, CI verdict or limitation,
+receipt, then report completion, judged proof, CI verdict or limitation,
 shutdown evidence, and `## PLAN EXECUTION COMPLETE` as the final
 execution/review handoff.
 
@@ -32,8 +32,9 @@ source contract, original plan and approved changes, attributable commits, decis
 delivery state, CI limitations, and checkout/branch identity. Trunk Mode attributable
 commits are that identity's retained published revisions, not another ledger or a
 rewrite's unpublished SHA. Include an initial quick attempt and its planned
-continuation as one execution. Reuse context without another handoff artifact
-or transcript copy; retrospective validates attribution and recovers real gaps.
+continuation as one execution. Pass existing context to retrospective, which
+validates attribution and follows its
+[process-review evidence rules](../../dough-execution-retrospective/SKILL.md#review-process-only-from-a-real-record).
 
 Execution completion and review completion are distinct. A retrospective context
 stop leaves implementation delivered but the final execution/review handoff
@@ -45,9 +46,13 @@ duplicate review or guessed completion. A CI failure handled through an
 authorized repair invalidates only the conclusions affected by changed code;
 resume those conclusions instead of restarting the full retrospective.
 
-Retain the completed plan, evidence, execution checkout, branch, and worktree for story
-wrap-up; do not invoke it here. Wholly planless completion retains source, conversation,
-identity, delivered changes, and proof, invokes the completion operation when
+When process history is unavailable, report the review limitation and continue
+independently supported outcome review and delivery.
+
+Retain the completed plan, proof decisions, execution checkout, branch, and
+worktree for story wrap-up; do not invoke it here. Wholly planless completion
+retains source, conversation, identity, delivered changes, and proof, invokes
+the completion operation when
 publication created that CI obligation,
 reports delivered work, the CI verdict or exact unresolved reason, and shutdown,
 and ends with `## QUICK EXECUTION COMPLETE` after required delivery/completion,

@@ -8,18 +8,55 @@ repair. Publication of a validated increment or that repair is
 
 Apply [proof ownership](../../dough-story-refinement/references/planning.md#own-executable-proof).
 Treat the implementation return as an index, not as accepted evidence. For each
-promise, inspect the actual uncommitted change at its reported product boundary
-and the concrete setup and assertion or signal locations. Confirm that setup
-supplies only the starting precondition and that the product establishes the
-promised outcome. A passing command, test name, `proof:` summary, or assertion
-whose setup supplies the outcome does not establish the promise.
+promise the return treats as covered or verified, inspect the uncommitted change
+at its reported product boundary and the concrete setup and assertion or signal
+locations it names. Confirm that setup supplies only the starting precondition,
+that an observing assertion or signal actually exercises the claimed behavior,
+and that the product at that boundary establishes the promised outcome. A
+passing command, test name, `proof:` summary, prose that says the fixture covers
+a behavior, or an assertion whose setup supplies the outcome does not establish
+the promise. When the return presents behavior as verified without a matching
+observation, or the product contradicts that claim, do not tell the developer it
+is covered: return the required behavior for correction, or obtain the matching
+observation within authority, before accepting it. A truthful description of
+untested or out-of-scope behavior stays incomplete for that claim; it is not
+verified evidence and does not invent a new story promise.
 
-Accept only the observations the inspected locations and result support. Retain
-the promise, accepted boundary, inspected locations, and literal command in the
-current slice wrap-up so refactoring can distinguish a proof reference from
-proof already inspected and accepted. Do not routinely load the raw agent trace,
-full command output, or reread unchanged parts of the diff. Expand inspection to
-the smallest relevant underlying callers, setup, assertions, or implementation
+When the claimed proof used name, pattern, or other filtering, verify which
+tests or observations were actually selected against the promises the return
+treats as covered. Accept only promises whose selected observations match.
+A zero-exit command that selected nothing, or that selected fewer observations
+than the claimed promises require, leaves those promises incomplete — obtain
+the missing observations (broader or corrected selection, retargeted titles, or
+another sufficient check) before accepting them, or return them as uncovered.
+A selected test count supports that check; it is never the full promise mapping.
+Reuse a trustworthy recorded selection and result when they still match the
+claimed command, filter, and candidate; do not rerun solely for process.
+
+When the return covers a changed shared operation or contract, check that
+contract's current consumers — including relevant test-support callers — against
+the claimed proof. Do not accept on a prior unaffected-suite or unused-consumer
+exclusion when the changed contract still reaches that caller: align the affected
+consumer and obtain matching proof, or leave the promise incomplete. Unrelated
+consumers and unchanged boundaries keep their accepted evidence. Reuse sufficient
+equivalent-purpose proof; do not require every suite or all callers. Apply the
+shared-operation caller analysis in
+[own executable proof](../../dough-story-refinement/references/planning.md#own-executable-proof).
+
+When a required observation is explicitly missing from the return — including
+required readiness or requeue behavior named as untested while delivery is still
+treated as ready — obtain that observation within authority before accepting the
+dependent promise, or name the required promise incomplete and leave its
+dependent delivery unaccepted. Recording the gap as a learning does not clear it.
+If the required proof cannot be obtained, stop only that dependent path and
+preserve independently valid accepted evidence. Honor a developer's explicit
+changed promise; do not silently weaken it. Once sufficient current proof is
+supplied, proceed without another approval or blanket rerun.
+
+During this slice, accept only observations supported by inspected locations and
+results. Retain the promise, accepted boundary, inspected locations, and literal
+command in the slice wrap-up for refactoring. Expand inspection to the smallest
+relevant underlying callers, setup, assertions, or implementation
 when a location is missing, the boundary is unclear, or evidence contradicts the
 change. Return incomplete or contradictory evidence to implementation, naming
 the promise, inspected locations, and gap; refactoring cannot supply missing
@@ -30,11 +67,11 @@ Judge the return by its substance, not its layout. The `proof:` block under
 is an example representation; accept an equivalent layout that carries the same
 inspectable evidence — literal commands, results, owned changes, promise
 coverage, boundaries, and setup and observation locations — without a
-report-only resend. Formatting never substitutes for substance: a
-canonical-looking report missing the terminal result or contradicting inspected
-evidence remains incomplete whatever its layout. Explicit completion markers
-with a separate workflow contract, such as `## REFACTOR COMPLETE`, stay
-verbatim.
+report-only resend or formatting-only retry. Formatting never substitutes for
+substance: a canonical-looking report missing the terminal result or
+contradicting inspected evidence remains incomplete whatever its layout.
+Explicit completion markers with a separate workflow contract, such as
+`## REFACTOR COMPLETE`, stay verbatim.
 
 Reuse accepted inspection while its promise, boundary, implementation, setup,
 and observations remain unchanged. Recover literal commands from the original
@@ -122,7 +159,7 @@ and continue that unfinished obligation only.
    design judgment. Do not run hook-owned lint independently. If hook repairs
    invalidate preparation, rerun formatting before restaging and retrying.
 8. Immediately before publishing, resolve the owned unpublished suffix in the
-   execution workspace. Publish it through
+   execution workspace. Publish it through managed
    [increment and repair publication](trunk-publication.md#publish-an-execution-increment-or-repair)
    when this caller has publication authority.
    Caller-selected current-branch work and an already-supported host-owned
@@ -130,9 +167,12 @@ and continue that unfinished obligation only.
    switch branches. Without that authority, commit there and report the
    revision as committed and pending publication. Do not push. Remote refs
    stay unchanged, and the checkout identity stays the recorded path.
-   With that authority, publish from that same checkout through the increment
-   owner above. The receipt is the accepted SHA and the authorized target.
-   A pending human edit on that checkout stays out of the published commit.
+   With that authority, invoke the installed managed delivery entry point from
+   that same checkout. The receipt is the accepted SHA, the authorized target,
+   and the observation result (attached, reused, or an explicit coverage gap).
+   Do not run a separate observer probe, start, or `register-push` for this
+   managed path, and do not copy mailbox directories by hand. A pending human
+   edit on that checkout stays out of the published commit.
    When the selected checkout is the default checkout, apply
    [default-checkout preservation](maintain-default-checkout.md#preserve-pending-local-work)
    before mutating it. A local commit or a local merge stays a local
@@ -149,17 +189,9 @@ and continue that unfinished obligation only.
    candidate or block a push from a separate owned workspace. Do not register
    a SHA the remote has not accepted, and do not treat that unpublished
    candidate as delivered.
-   After confirmed success, register the
-   accepted SHA with the existing observer bound to that target by running
-   `node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' register-push
-   OBSERVER_DIRECTORY SHA`. Use the observer directory and checkout-bound
-   runtime retained for this execution. Apply that same registration after an
-   owned repair publication and after a Trunk Mode claim once that observer
-   is armed. Do not register a publication stop. Do not read a later moving
-`HEAD` or start another observer. Registration failure is lost coverage:
-report it and do not claim the revision was observed. An unavailable bridge leaves publications
-   unobserved: report that gap and continue. Success completes routine
-   delivery; a post-slice decision stop occurs after safe work is delivered.
-   Keep the [CI observer](ci-monitor.md) running and handle delivered failures
-   through its repair protocol. Never wait for CI or deployment after a normal
-   or repair publication.
+   When observation is attached or reused, keep that observer running and
+   handle delivered failures through its repair protocol. An unavailable
+   bridge leaves publications unobserved: report that gap and continue.
+   Success completes routine delivery; a post-slice decision stop occurs after
+   safe work is delivered. Never wait for CI or deployment after a normal or
+   repair publication.

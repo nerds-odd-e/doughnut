@@ -1,42 +1,45 @@
 # Asynchronous CI observation and repair
-
 Read [runtime setup](runtime-setup.md) to resolve this project's CI source,
 repository, branch, runtime, and host-bridge readiness before launching.
 
 ## Own one observer
-Start one observer per repository/branch/coordinator before the first
-publication it must cover, where branch is the authorized **target** from the
-push destination, not the execution checkout's current branch. Trunk Mode
-observes shared trunk; Story Branch Mode observes the recorded remote
-execution branch it publishes. Reuse it across claim, normal, and repair pushes.
-Register each delivered revision through [slice delivery](wrap-up.md#deliver-the-change);
-register a Trunk Mode claim once the execution workspace exists and the observer
-is armed there. A Story Branch claim publishes to trunk before that
-story-branch observer exists or is armed, and trunk is not the target that
-observer will cover: report the claim `pendingCi: unobserved` unless a
-matching existing observer/coverage for that exact trunk target is already
-established with verified ownership and receipts. Do not start a second
-observer or register that claim with the story-branch observer to manufacture
-coverage; the story-branch observer still starts and covers ordinary
-implementation delivery once armed. The observer continues discovery after
-later publications, and a changed SHA does not require new setup. Publication
-success closes routine delivery without waiting for CI or deployment.
-The execution/review completion boundary below is the only routine CI wait;
-never add a wait after each slice or repair publication.
+Managed ordinary increments and authorized repairs use
+[managed delivery](trunk-publication.md#publish-an-execution-increment-or-repair)
+for establish/reuse and exact-revision attachment — no separate probe, start, or
+`register-push` recipe on that path.
+
+For callers not yet on managed delivery (queue claims before the story-branch
+observer is armed, wrap-up closure recovering an ended observer, and other
+explicit paths), start one observer per repository/branch/coordinator before
+the first publication it must cover, where branch is the authorized **target**
+from the push destination, not the execution checkout's current branch. Trunk
+Mode observes shared trunk; Story Branch Mode observes the recorded remote
+execution branch it publishes. Reuse across claim, normal, and repair pushes.
+Register delivered revisions through [slice delivery](wrap-up.md#deliver-the-change)
+on the explicit path; register a Trunk Mode claim once the workspace exists and
+the observer is armed. A Story Branch claim publishes to trunk before that
+observer is armed: report `pendingCi: unobserved` unless matching
+observer/coverage for that exact trunk target already exists with verified
+ownership and receipts. Do not start a second observer or register that claim on
+the story-branch observer; that observer still covers ordinary delivery once
+armed. Discovery continues after later publications without new setup.
+Publication success closes routine delivery without waiting for CI or
+deployment. The execution/review completion boundary below is the only routine CI wait; never
+wait after each slice or repair publication.
 
 Bind the observer's runtime, pause, stash, repair, delivery, and restoration to
 the selected execution checkout. Observe the target branch from that checkout.
-Verify the binding against the retained execution identity. Recover that
-observer from its `CI_OBSERVER` directory and coverage receipts before considering
-a replacement. A published SHA absent from those receipts is
+Verify binding against the retained execution identity. Recover from the
+`CI_OBSERVER` directory and coverage receipts before considering a replacement.
+A published SHA absent from those receipts is
 [missing CI registration](trunk-publication.md#resume-an-interrupted-publication).
 An unavailable host bridge is missing coverage: report it once and continue
 without promising notifications.
 
 The observer uses no AI calls. It emits failure, incomplete, and lost-coverage
-records incrementally. It never dispatches or retries a check, observes
-deployment, or changes the checkout. Use the bounds in runtime setup when
-assessing coverage.
+records incrementally; it never dispatches or retries a check, observes
+deployment, or changes the checkout. Use runtime-setup bounds when assessing
+coverage.
 
 Within the startup snapshot, inspect the newest completed attempt and unfinished
 attempts. Preserve opaque run and attempt identities. Retain unfinished
@@ -49,15 +52,15 @@ Select the **non-model notification bridge for the current host**:
 
 - **Cursor or Claude Code:** read [ci-notify-hosts.md](ci-notify-hosts.md), run
   its readiness probe, and use its mailbox launcher. Skip the Codex adapter;
-  the notification handling and repair protocol remain shared.
+  notification handling and repair stay shared.
 - **Codex:** read [ci-notify-codex.md](ci-notify-codex.md) and use its
-  yielded-cell adapter when those tools are exposed. Otherwise report the bridge unavailable as
-  described there.
+  yielded-cell adapter when those tools are exposed; otherwise report the
+  bridge unavailable as described there.
 
 Notifications arrive at the current host's next safe boundary. Act after a
-foreground agent or command returns; do not assume a notification interrupts it.
-Without a working bridge, report missing coverage once and continue without AI
-polling or promised notifications.
+foreground agent or command returns; do not assume interruption. Without a
+working bridge, report missing coverage once and continue without AI polling
+or promised notifications.
 
 At a stop requiring human judgment, cancellation, or coordinator replacement,
 use the host adapter to stop the exact observer and confirm local shutdown. At
@@ -73,7 +76,6 @@ shutdown; follow
 rather than treating execution shutdown as the end of Trunk Mode observation.
 
 ## Await the applicable revision at completion
-
 The coordinator owns one bounded completion operation whenever applicable CI
 evidence is required: execution/review handoff, wrap-up closure on the authorized
 target, and Story Branch trunk integration after the accepted
@@ -236,9 +238,7 @@ paused with both sets of work preserved. Do not silently resume with missing
 changes or pretend the failure was repaired. Ordinary CI defects, including
 flaky tests, use this recovery flow; only unresolved value/design/credential
 decisions need the developer.
-
 ## Pause and resume writers
-
 When the coordinator requests a CI pause, stop editing and finish or terminate
 write-capable commands. Return `## PAUSED FOR CI` with the current slice,
 changed and untracked paths, exact completed proof, incomplete commands, and

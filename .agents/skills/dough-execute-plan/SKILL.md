@@ -46,9 +46,11 @@ no-change conclusion through the explained-empty-change path.
 Use [planning level](../dough-story-refinement/references/planning.md#choose-the-planning-level)
 for source ownership, [proof ownership](../dough-story-refinement/references/planning.md#own-executable-proof)
 when mapping or accepting proof, and [active-plan refinement](../dough-story-refinement/references/planning.md#refine-the-active-plan)
-for plan updates. Retain completed plans, source history, and review evidence for
-retrospective and [story wrap-up](../dough-story-wrap-up/SKILL.md); quick work retains
-its source, conversation, and execution identity. Use [slice decomposition](../dough-story-decomposition/references/problem-decomposition.md#decompose-slices)
+for plan updates. Judge proof during execution; retain completed plans, source
+history, and proof decisions for retrospective and
+[story wrap-up](../dough-story-wrap-up/SKILL.md). Quick work retains its source,
+conversation, and execution identity. Use
+[slice decomposition](../dough-story-decomposition/references/problem-decomposition.md#decompose-slices)
 for Behavior/Structure types and [slice sizing](../dough-story-decomposition/references/problem-decomposition.md#size-and-escalate-slices)
 for budgets and learning escalation.
 
@@ -97,75 +99,45 @@ for omitted/truncated passages or bounded investigations; another step alone nee
 ## Take queued work
 
 After resolving execution source and authority, inspect the backlog before
-plan-status changes, observer recovery/startup, delegation, or implementation.
-For Story Branch and Trunk Mode, select or reuse the owned workspace under
-[execution location](references/execution-location.md) before the Taken commit,
-using fetched remote trunk as the base. Current-branch work uses the checkout
-it already recorded and creates no worktree. The claim is a same-branch backlog
-commit in that checkout; it needs no backlog Git integration adapter.
+plan-status changes, observer startup, delegation, or implementation. Resolve
+the selective formatter and claim commit hook contract. An absent or understood
+check-only hook permits the transition; an unknown, mutating, failing, or
+disputed hook stops with the queue unchanged. Resolve
+[publication preconditions](references/trunk-publication.md#preconditions),
+including the authorized remote/trunk, before a Story Branch or Trunk Mode
+startup. Existing current-branch and host-owned checkout restrictions still
+apply.
 
-Before the Taken commit, resolve selective formatting and that commit's hook
-contract. An absent or understood check-only hook permits the transition. An
-unknown, mutating, failing, or disputed hook stops it with the queue unchanged
-until safely resolved through execution decisions. Resolution runs neither
-delivery formatting nor hook-owned lint; obtain push/CI context only when
-another current boundary needs it. Keep a workspace already selected when the
-hook stops the commit.
+For authorized queued Story Branch or Trunk Mode work, invoke the installed
+`scripts/execution-start.mjs start` once with the originating integration
+checkout, owned workspace path and branch, selected identity, stable execution
+publisher ID, mode (`trunk` or `story-branch`), actual remote and trunk branch,
+and the established `--push-authorized --workspace-authorized` flags. Supply
+`--plan` as a path relative to the backlog directory when explicitly selected;
+the command also resolves the canonical
+published plan. Supply `--declared-owner` and matching `--requester` only when
+default-checkout access has actually been established. The command fetches
+trunk, checks the published selected source and preparation, selects or reuses
+the workspace, commits an isolated Take, confirms its publication on remote
+trunk, and reports local refresh separately. Preserve its exact receipt in the
+existing execution context. A refusal or unconfirmed receipt stops before
+implementation; a deferred local refresh does not erase accepted publication.
+If publication is interrupted, invoke the same installed command with the
+retained workspace, branch, publisher ID, identity, `--starting-revision` and
+`--candidate-sha` from the last receipt or confirmed pre-push candidate. Use
+the latest candidate SHA after a replay. A `resumed` receipt confirms current
+ownership through remote ancestry, even when trunk has advanced; it may finish
+eligible local refresh without another Take or push. A rival or ambiguous
+provenance stops implementation. Preserve the stopped candidate and exact
+recovery fields on an uncertain result.
 
-For Story Branch or Trunk Mode, also resolve
-[trunk publication's Preconditions](references/trunk-publication.md#preconditions) —
-the claim's publication authority and authorized push destination — before
-selecting the workspace or moving the entry. Reuse permission already
-established for this execution. An unresolved precondition stops the move with
-the backlog, index, and refs unchanged, and starts no implementation.
-[Default-checkout access](references/maintain-default-checkout.md#establish-access-before-local-mutation)
-applies when this claim or a later refresh mutates that checkout. Caller-selected
-current-branch work keeps its existing contract and gains no new publication
-authority here.
-
-For a queued planned feature story, invoke the installed writer from the
-product-backlog skill directory in the checkout that holds the claim:
-
-```text
-node <installed>/scripts/product-backlog.mjs take --identity <story-id> --plan <plan-path>
-```
-
-The writer owns the move and canonical plan link. Follow its
-[take contract](../dough-product-backlog/SKILL.md#take-queued-work-for-execution)
-and [execution and resume](../dough-product-backlog/references/record-preparation.md#execution-and-resume);
-do not construct the entry or record preparation state during Take. A refusal
-or ambiguous move stops implementation.
-
-Resume a remote **Taken** entry when retained execution context and publication
-provenance agree this execution owns it. Preserve its position without
-duplication. Work absent from both active lists needs no fabricated entry.
-Planning/refinement never takes work. Leave taken work through pauses,
+Then run this project's checkout-bound setup and applicable command under
+[execution location](references/execution-location.md). Setup failure preserves
+the accepted claim and workspace. The separate product-backlog Take tool keeps
+its local domain purpose; a local Taken entry alone does not satisfy this
+startup boundary. Queued current-branch work keeps its existing local Take
+contract and gains no publication authority. Leave taken work through pauses,
 failures, completion, and retrospective; wrap-up removes it.
-
-For a queue claim, preflight the checkout that will hold the commit: verify its
-branch, backlog path, tracked/staged changes, and that the isolated claim commit
-is the only staged backlog change. Ambiguous branch or ownership leaves the
-queue unchanged; apply
-[preserve pending local work](references/maintain-default-checkout.md#preserve-pending-local-work)
-rather than stashing, resetting, overwriting, or silently unstaging existing
-work. Queued current-branch execution requires the resolved integration branch;
-otherwise stop before changing the backlog.
-
-After moving, stage only the backlog path, inspect the staged diff, and commit
-the claim in that checkout. Claim setup may record provisional identity;
-complete it before dispatch. Staging/commit failure stops isolated execution:
-preserve and report backlog/index state and any workspace already selected.
-No-change cases produce no empty claim commit.
-
-Story Branch Mode and Trunk Mode both publish that commit's SHA from the owned
-workspace per
-[trunk publication](references/trunk-publication.md#publish-a-queue-claim)
-before implementation; do not invent a second publication procedure for either
-mode. Publication may require its defined rebase conflict procedure. Only a
-confirmed published revision starts implementation. Prepare required project
-commands after that confirmation under
-[execution location](references/execution-location.md). Publication and later
-preparation failure follow those references: no implementation and no new claim.
 
 ## Choose the execution location
 

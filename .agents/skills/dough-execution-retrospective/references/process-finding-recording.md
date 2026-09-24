@@ -1,5 +1,10 @@
 # Record supported process findings
 
+Record compact observed facts, supported judgments, and open questions that remain
+understandable after chat history is lost, with evidence locators where available.
+Preserve findings and occurrences beyond story closure, subject to bounded
+retention below or a separately authorized disposition.
+
 Use the explicit user/project `DearDough.md` location or `<project-root>/DearDough.md` for enabled
 process findings. Missing/conflicting root/location stops recording only: return findings and
 continue independent reviews without inventing or searching elsewhere.

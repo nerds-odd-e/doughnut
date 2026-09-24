@@ -10,33 +10,40 @@ armed from the execution checkout against the authorized target branch.
 
 ## Publish a queue claim
 
-After the owned execution workspace exists and
-[Take queued work](../SKILL.md#take-queued-work) commits the Taken claim there,
-publish that claim SHA to remote trunk with the steps below, before
-implementation. Do not start implementation from an unpublished claim. Retain
-its published SHA and register it after the observer is armed. Later
-environment preparation does not unpublish that SHA. An unavailable destination
-or failed publication leaves the exact remaining state and does not authorize
-starting unclaimed queued work. CI coverage for this claim, including a Story
-Branch claim's unobserved trunk target, follows
+For queued Story Branch and Trunk Mode, [Take queued work](../SKILL.md#take-queued-work)
+uses the installed startup operation to publish and confirm the claim on remote
+trunk before implementation. Retain its exact receipt and register the
+published SHA after the observer is armed. Later environment preparation does
+not unpublish that SHA. An unavailable destination or failed publication
+preserves the reported state and does not authorize starting unclaimed queued
+work. CI coverage for this claim, including a Story Branch claim's unobserved
+trunk target, follows
 [Own one observer](ci-monitor.md#own-one-observer).
 
 ## Publish an execution increment or repair
 
 After wrap-up proof, refactor, format, and commit succeed, publish the owned
-unpublished suffix through [Publish the candidate](#publish-the-candidate).
+unpublished suffix through managed delivery
+([Publish an execution increment or repair](#publish-an-execution-increment-or-repair)).
 Planned slices, planless and contextual work, bug repair, and a retrospective
 correction all use this delivery. An owned CI repair uses it too. Pause,
 stash, and restore stay in
 [CI observation](ci-monitor.md#handle-a-notification); do not add a second
 repair push.
 
+Managed delivery resolves this checkout's CI runtime, establishes or reuses the
+matching live observer for the authorized target, publishes the candidate, and
+attaches the accepted SHA. Do not run a separate probe, start, or `register-push`
+for ordinary increments or already-authorized repairs. Retain the delivery
+receipt's observation directory when present; do not transcribe mailbox handles
+by hand. An unavailable host bridge returns `pendingCi: unobserved` (or an
+equivalent coverage-gap receipt) while leaving remote acceptance intact.
+
 Trunk Mode builds the candidate from the local execution branch and pushes
 that candidate to remote trunk. It does not push the execution branch. Story
 Branch Mode pushes that candidate to the recorded remote execution branch and
-does not push it to remote trunk. Keep the same execution worktree. Register
-the receipt recorded by [Publish the candidate](#publish-the-candidate).
-Caller-selected current-branch work and host-owned execution enter this
+does not push it to remote trunk. Keep the same execution worktree. Caller-selected
+current-branch work and host-owned execution enter this
 sequence only from the recorded checkout, and only when that caller already
 supplied publication authority. Without it, do not push; report the commit
 as pending publication. A local commit or local merge does not enter this
@@ -64,20 +71,25 @@ It does not erase a remote acceptance the publisher has already recorded.
 
 ## Publish the candidate
 
-Apply [Preconditions](#preconditions), then run
-[publish the candidate](publish-the-candidate.md#publish-the-candidate) from
-the owned workspace. A claim uses the execution workspace selected before its
-commit; other publications retain theirs. Register the accepted revision and
-the target it was accepted on with any observer already bound to that target,
-only after the publisher's remote confirmation. A pre-rebase unpublished SHA
-is not the receipt. After confirmation of a publication whose target is
-remote trunk, attempt a refresh under
+Apply [Preconditions](#preconditions), then run managed delivery from the owned
+workspace through the installed
+`dough-execute-plan/scripts/execution-increment-delivery.mjs` entry point
+(`deliver` with the owned workspace, branch, previously published base,
+authorized target ref, repository, host, and publication authority). That
+operation owns runtime resolution, observer establish/reuse, the
+[publish the candidate](publish-the-candidate.md#publish-the-candidate) Git
+sequence, and exact-revision registration. A claim uses the execution workspace
+selected before its commit; other publications retain theirs. Do not invent a
+second publication sequence or a manual `register-push` after managed delivery.
+A pre-rebase unpublished SHA is not the receipt. After confirmation of a
+publication whose target is remote trunk, attempt a refresh under
 [Refresh eligibility](maintain-default-checkout.md#refresh-eligibility).
 A publication whose target is the remote execution branch does not refresh
-the default checkout. Report the publication acceptance and any maintenance
-result separately.
-A deferred or stopped refresh does not erase the accepted publication and
-does not authorize another push.
+the default checkout. Report the publication acceptance, observation result,
+and any maintenance result separately. A deferred or stopped refresh does not
+erase the accepted publication and does not authorize another push. An
+unavailable bridge is a coverage gap on the delivery receipt, not a reason to
+undo acceptance.
 
 ## Publish wrap-up closure
 

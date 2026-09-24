@@ -134,7 +134,7 @@ export async function streamMailboxWorker(request, options = {}) {
     return directory;
   });
 }
-async function startMailbox(request) {
+export async function startExecutionMailbox(request, options = {}) {
   const validRepository = /^[\w.-]+\/[\w.-]+$/.test(request.repo ?? "");
   const validExecution =
     request.mode === "execution" &&
@@ -145,14 +145,15 @@ async function startMailbox(request) {
     request.maxDurationMs > 0;
   if (!validExecution)
     throw new Error("Expected --execution OWNER/REPO BRANCH [BUDGET_MS]");
-  const directory = createMailbox(request);
+  const directory = createMailbox(request, options);
   const child = spawn(
     process.execPath,
     [mailboxWorkerPath, "worker", directory],
     {
-      cwd: checkoutRoot,
+      cwd: options.root ?? checkoutRoot,
       detached: true,
       stdio: "ignore",
+      env: options.env,
     },
   );
   await once(child, "spawn");
@@ -206,7 +207,7 @@ if (isDirectCliEntry(import.meta.url, process.argv[1])) {
         `${resultPrefix}${JSON.stringify({ directory, terminal })}\n`,
       );
     } else {
-      const directory = await startMailbox(request);
+      const directory = await startExecutionMailbox(request);
       process.stdout.write(
         `${receiptPrefix}${JSON.stringify({ directory })}\n`,
       );

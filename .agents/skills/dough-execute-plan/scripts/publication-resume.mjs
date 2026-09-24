@@ -8,7 +8,7 @@ import {
   originTrackingRef,
   pushExactRef,
   revParse,
-} from "./publication-test-fixtures.mjs";
+} from "./publication-git.mjs";
 
 const defaultTargetRef = "refs/heads/main";
 
@@ -60,6 +60,7 @@ export async function resumeInterruptedPublication({
   publishedRevisions,
   observer = null,
   targetRef = defaultTargetRef,
+  remote = "origin",
 }) {
   if (supersededShas.includes(candidateSha)) {
     throw new Error(
@@ -67,14 +68,14 @@ export async function resumeInterruptedPublication({
     );
   }
 
-  const remoteTarget = originTrackingRef(targetRef);
+  const remoteTarget = originTrackingRef(targetRef, remote);
   const preserved = await ownedCommitIdentity(ownedWorkspace);
-  await git(ownedWorkspace, "fetch", "origin");
+  await git(ownedWorkspace, "fetch", remote);
   const accepted = await isAncestor(ownedWorkspace, candidateSha, remoteTarget);
 
   if (!accepted) {
-    await pushExactRef(ownedWorkspace, candidateSha, targetRef);
-    await git(ownedWorkspace, "fetch", "origin");
+    await pushExactRef(ownedWorkspace, candidateSha, remote, targetRef);
+    await git(ownedWorkspace, "fetch", remote);
     if (!(await isAncestor(ownedWorkspace, candidateSha, remoteTarget))) {
       throw new Error("push did not accept the retained candidate");
     }
@@ -87,6 +88,8 @@ export async function resumeInterruptedPublication({
     const maintenance = await inspectMaintenance(
       ownedWorkspace,
       defaultCheckout,
+      remote,
+      targetRef,
     );
     return {
       classification: "not-on-remote",
@@ -114,7 +117,12 @@ export async function resumeInterruptedPublication({
     await ownedCommitIdentity(ownedWorkspace),
   );
   const identityAppended = appendIdentity(publishedRevisions, candidateSha);
-  const maintenance = await inspectMaintenance(ownedWorkspace, defaultCheckout);
+  const maintenance = await inspectMaintenance(
+    ownedWorkspace,
+    defaultCheckout,
+    remote,
+    targetRef,
+  );
   const published = {
     classification: "already-published",
     pushCount: 0,
@@ -165,8 +173,17 @@ function assertOwnedCommitsPreserved(before, after) {
   }
 }
 
-async function inspectMaintenance(ownedWorkspace, defaultCheckout) {
-  const remoteTip = await revParse(ownedWorkspace, "origin/main");
+async function inspectMaintenance(
+  ownedWorkspace,
+  defaultCheckout,
+  remote,
+  targetRef,
+) {
+  if (!defaultCheckout) return null;
+  const remoteTip = await revParse(
+    ownedWorkspace,
+    originTrackingRef(targetRef, remote),
+  );
   const checkout = await captureCheckout(defaultCheckout);
   return maintenanceFromInspection(
     { head: checkout.head, status: checkout.status },

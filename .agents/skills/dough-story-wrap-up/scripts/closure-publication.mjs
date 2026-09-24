@@ -5,30 +5,17 @@
 // closure stays in the recorded checkout and follows the caller's publication
 // authority through deliverRecordedCheckout. Installed guidance is the agent's
 // contract.
-import { existsSync } from "node:fs";
 import { deliverRecordedCheckout } from "../../dough-execute-plan/scripts/current-branch-publication.mjs";
 import { publishExecutionIncrement } from "../../dough-execute-plan/scripts/execution-increment-publication.mjs";
 import { refreshDefaultCheckout } from "../../dough-execute-plan/scripts/maintain-default-checkout.mjs";
 import {
-  git,
-  originTrackingRef,
-  revParse,
-} from "../../dough-execute-plan/scripts/publication-test-fixtures.mjs";
-import { resumeInterruptedPublication } from "../../dough-execute-plan/scripts/publication-resume.mjs";
-import {
-  findWorktree,
-  isAncestor,
-  removeExecutionResources,
+  registerClosureReceipt,
+  settleClosureCandidate,
   trunkTarget,
-} from "./closure-resources.mjs";
+} from "./closure-candidate-settlement.mjs";
+import { removeExecutionResources } from "./closure-resources.mjs";
 
 export { removeExecutionResources };
-
-function registerClosureReceipt(observer) {
-  return (receipt) => {
-    observer.register(receipt.sha, receipt.target);
-  };
-}
 
 async function refreshAfterAcceptance({
   defaultCheckout,
@@ -43,6 +30,21 @@ async function refreshAfterAcceptance({
   });
 }
 
+function unpublishedClosure(published) {
+  return {
+    ok: false,
+    publication: published.publication,
+    status: published.status,
+    receipt: null,
+    candidate: published.candidate,
+    preRebaseSha: published.preRebaseSha,
+    remoteTip: published.remoteTip,
+    previouslyPublishedBase: published.previouslyPublishedBase,
+    suffixBase: published.suffixBase,
+    maintenance: null,
+  };
+}
+
 export async function publishTrunkClosureRevision({
   workspace,
   branch,
@@ -51,6 +53,9 @@ export async function publishTrunkClosureRevision({
   defaultCheckout,
   declaredOwner,
   requester,
+  validate,
+  validatedCandidate,
+  backlogPath,
 }) {
   const published = await publishExecutionIncrement({
     workspace,
@@ -58,7 +63,13 @@ export async function publishTrunkClosureRevision({
     previouslyPublishedBase,
     targetRef: trunkTarget,
     register: registerClosureReceipt(observer),
+    validate,
+    validatedCandidate,
+    backlogPath,
   });
+  if (!published.ok) {
+    return unpublishedClosure(published);
+  }
   const maintenance = await refreshAfterAcceptance({
     defaultCheckout,
     declaredOwner,
@@ -69,91 +80,6 @@ export async function publishTrunkClosureRevision({
     receipt: published.receipt,
     preRebaseSha: published.preRebaseSha,
     maintenance,
-  };
-}
-
-async function ownedWorkspaceAvailable(integration, ownedWorkspace) {
-  if (await findWorktree(integration, ownedWorkspace)) {
-    return true;
-  }
-  return existsSync(ownedWorkspace);
-}
-
-async function settleClosureCandidate({
-  ownedWorkspace,
-  integration,
-  defaultCheckout,
-  branch,
-  sha,
-  previouslyPublishedBase,
-  supersededShas,
-  publishedRevisions,
-  observer,
-}) {
-  const workspaceReady = await ownedWorkspaceAvailable(
-    integration,
-    ownedWorkspace,
-  );
-  const inspectionWorkspace = workspaceReady ? ownedWorkspace : integration;
-  await git(inspectionWorkspace, "fetch", "origin");
-  const tracking = originTrackingRef(trunkTarget);
-  const remoteTip = await revParse(inspectionWorkspace, tracking);
-  const onRemote = await isAncestor(inspectionWorkspace, sha, tracking);
-  if (!workspaceReady && !onRemote) {
-    return {
-      classification: "stopped",
-      stopped: true,
-      completedObligation: "publish",
-      pushCount: 0,
-      acceptedSha: null,
-      cleanup: "not-performed",
-      reason: "execution worktree is absent before closure is on remote trunk",
-    };
-  }
-  const canFastForward =
-    onRemote || (await isAncestor(inspectionWorkspace, remoteTip, sha));
-  if (canFastForward) {
-    return resumeInterruptedPublication({
-      ownedWorkspace: workspaceReady ? ownedWorkspace : integration,
-      defaultCheckout,
-      candidateSha: sha,
-      supersededShas,
-      publishedRevisions,
-      observer,
-      targetRef: trunkTarget,
-    });
-  }
-  const tip = await revParse(ownedWorkspace, branch);
-  if (tip !== sha) {
-    return {
-      classification: "stopped",
-      stopped: true,
-      completedObligation: "publish",
-      pushCount: 0,
-      acceptedSha: null,
-      cleanup: "not-performed",
-      reason: "unpublished closure needs rebase and is not the branch tip",
-    };
-  }
-  const published = await publishExecutionIncrement({
-    workspace: ownedWorkspace,
-    branch,
-    previouslyPublishedBase,
-    targetRef: trunkTarget,
-    register: registerClosureReceipt(observer),
-  });
-  if (!publishedRevisions.includes(published.receipt.sha)) {
-    publishedRevisions.push(published.receipt.sha);
-  }
-  return {
-    classification: "not-on-remote",
-    completedObligation: "publish",
-    pushCount: 1,
-    acceptedSha: published.receipt.sha,
-    preRebaseSha: published.preRebaseSha,
-    receipt: published.receipt,
-    acceptedPublicationCount: publishedRevisions.length,
-    cleanup: "not-performed",
   };
 }
 

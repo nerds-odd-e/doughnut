@@ -5,7 +5,7 @@ import {
   parseBacklog,
   takenHeading,
 } from "../../dough-product-backlog/scripts/product-backlog-document.mjs";
-import { git } from "./publication-test-fixtures.mjs";
+import { git } from "./publication-git.mjs";
 
 export const backlogPath = ".planning/PRODUCT-BACKLOG.md";
 

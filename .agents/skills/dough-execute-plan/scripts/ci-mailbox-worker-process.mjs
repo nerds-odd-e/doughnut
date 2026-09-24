@@ -18,9 +18,19 @@ export const mailboxWorkerPath = fileURLToPath(
 function workerIsRunning(pid) {
   try {
     process.kill(pid, 0);
-    return true;
   } catch (error) {
     if (error.code === "ESRCH") return false;
+    throw error;
+  }
+  try {
+    // Linux may leave an exited detached worker as a zombie until its parent
+    // reaps it. kill(pid, 0) still succeeds for that PID, but it cannot run.
+    const state = execFileSync("ps", ["-p", String(pid), "-o", "stat="], {
+      encoding: "utf8",
+    }).trim();
+    return state !== "" && !state.startsWith("Z");
+  } catch (error) {
+    if (error.status === 1) return false;
     throw error;
   }
 }

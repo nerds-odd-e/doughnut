@@ -10,19 +10,23 @@ to launches if needed; hook commands must find Node directly without entering a
 build environment.
 
 For checkout-bound work, resolve the installed skill directory inside the
-selected execution checkout. It is normally
-`.agents/skills/dough-execute-plan` for Codex/Cursor or
-`.claude/skills/dough-execute-plan` for Claude Code. Do not reuse the installed
-directory that supplied the initially loaded skill when it belongs to another
-checkout. The runtime derives checkout identity four levels above its
-`scripts/` module; preserve that layout.
+selected execution checkout. Prefer the current host's alias
+(`.agents/skills/dough-execute-plan` for Codex/Cursor or
+`.claude/skills/dough-execute-plan` for Claude Code). When that alias is
+absent, use any other usable same-checkout installation rather than copying
+another checkout or declaring coverage unavailable solely from the missing
+path. Do not reuse the installed directory that supplied the initially loaded
+skill when it belongs to another checkout. The runtime derives checkout
+identity four levels above its `scripts/` module; preserve that layout.
 
-Before launch, canonicalize the selected execution checkout and the checkout
-identity implied by the resolved runtime path. Require them to be equal and
-require the selected runtime entry point to exist. A missing runtime or a path
-that identifies another checkout stops observation setup before an observer is
-armed. Report the selected checkout and candidate runtime path or identity for
-recovery; do not search other checkouts or the environment for a replacement.
+Managed delivery resolves that runtime itself for ordinary increments and
+repairs. Explicit observation callers below still canonicalize the selected
+execution checkout and the checkout identity implied by the resolved runtime
+path before launch. Require them to be equal and require the selected runtime
+entry point to exist. A missing runtime or a path that identifies another
+checkout stops observation setup before an observer is armed. Report the
+selected checkout and candidate runtime path or identity for recovery; do not
+search other checkouts or the environment for a replacement.
 Use the selected execution checkout as the launch working directory. Quote
 paths containing spaces and replace example placeholders before execution.
 

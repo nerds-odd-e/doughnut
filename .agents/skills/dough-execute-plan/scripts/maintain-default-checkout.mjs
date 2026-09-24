@@ -7,7 +7,7 @@ import {
   git,
   indexLockPath,
   revParse,
-} from "./publication-test-fixtures.mjs";
+} from "./publication-git.mjs";
 
 const IN_PROGRESS_REFS = [
   "MERGE_HEAD",
@@ -68,6 +68,7 @@ export async function refreshDefaultCheckout({
   declaredOwner,
   requester,
   integrationBranch = "main",
+  remote = "origin",
 }) {
   const ongoing = await ongoingOperation(checkout);
   const state = ongoing
@@ -88,9 +89,9 @@ export async function refreshDefaultCheckout({
     return decision("deferred", "ongoing-operation", state, null);
   }
 
-  await git(checkout, "fetch", "origin");
+  await git(checkout, "fetch", remote);
   const current = await captureCheckout(checkout);
-  const remoteRef = `origin/${integrationBranch}`;
+  const remoteRef = `${remote}/${integrationBranch}`;
   const remoteSha = await revParse(checkout, remoteRef);
   const branch = (
     await git(checkout, "branch", "--show-current")

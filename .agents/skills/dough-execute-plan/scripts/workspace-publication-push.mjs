@@ -7,9 +7,9 @@ import { promisify } from "node:util";
 import {
   git,
   lsRemoteSha,
-  pushCandidate,
+  pushExactRef,
   revParse,
-} from "./publication-test-fixtures.mjs";
+} from "./publication-git.mjs";
 import {
   claimProvenance,
   classifyOwnership,
@@ -98,31 +98,38 @@ export function conflictResult(request, ownership, provenance, candidateSha) {
 
 export async function publishClaimSha(request) {
   let sha = request.candidateSha;
-  let rejected = false;
+  let pushError;
   try {
-    await pushCandidate(request.workspace, sha);
+    await pushExactRef(
+      request.workspace,
+      sha,
+      remoteOf(request),
+      `refs/heads/${targetOf(request)}`,
+    );
   } catch (error) {
-    const text = `${error.message}\n${error.stderr ?? ""}`;
-    if (!/rejected|non-fast-forward/.test(text)) {
+    pushError = error;
+  }
+  if (pushError) {
+    let checked;
+    try {
+      checked = await claimMembership({ ...request, candidateSha: sha });
+    } catch (error) {
       return stopped("unpublished", {
         recovery: {
           workspace: request.workspace,
           branch: request.branch,
           candidateSha: sha,
-          error: text,
+          error: `push and verification failed: ${pushError.message}; ${error.message}`,
         },
       });
     }
-    rejected = true;
-  }
-  if (rejected) {
-    const checked = await claimMembership({ ...request, candidateSha: sha });
     if (checked.ownership === "owned") {
       return {
         ok: true,
         status: "resumed",
         ownership: checked.ownership,
         publishedSha: checked.provenance.sha,
+        candidateSha: sha,
         workspace: request.workspace,
         branch: request.branch,
       };
@@ -134,6 +141,31 @@ export async function publishClaimSha(request) {
         checked.provenance,
         sha,
       );
+    }
+    const text = `${pushError.message}\n${pushError.stderr ?? ""}`;
+    if (!/rejected|non-fast-forward/.test(text)) {
+      return stopped("unpublished", {
+        recovery: {
+          workspace: request.workspace,
+          branch: request.branch,
+          candidateSha: sha,
+          error: text,
+        },
+      });
+    }
+    if (request.recheckSource) {
+      try {
+        await request.recheckSource();
+      } catch (error) {
+        return stopped("source-refused", {
+          recovery: {
+            workspace: request.workspace,
+            branch: request.branch,
+            candidateSha: sha,
+            error: error.stderr || error.message,
+          },
+        });
+      }
     }
     const onto = await revParse(request.workspace, remoteRef(request));
     const replay = await replaySuffix(request, onto);
@@ -150,8 +182,15 @@ export async function publishClaimSha(request) {
     }
     sha = await revParse(request.workspace, "HEAD");
     try {
-      await pushCandidate(request.workspace, sha);
+      await pushExactRef(
+        request.workspace,
+        sha,
+        remoteOf(request),
+        `refs/heads/${targetOf(request)}`,
+      );
     } catch (error) {
+      // A second race is outside the one-retry bound. The rewritten candidate
+      // stays in this workspace for a later explicit resume.
       return stopped("unpublished", {
         recovery: {
           workspace: request.workspace,
@@ -162,13 +201,24 @@ export async function publishClaimSha(request) {
       });
     }
   }
-  await git(request.workspace, "fetch", remoteOf(request));
-  const tip = await lsRemoteSha(
-    request.origin,
-    `refs/heads/${targetOf(request)}`,
-  );
-  const present =
-    sha === tip || (await isAncestor(request.workspace, sha, tip));
+  let present;
+  try {
+    await git(request.workspace, "fetch", remoteOf(request));
+    const tip = await lsRemoteSha(
+      request.origin,
+      `refs/heads/${targetOf(request)}`,
+    );
+    present = sha === tip || (await isAncestor(request.workspace, sha, tip));
+  } catch (error) {
+    return stopped("unpublished", {
+      recovery: {
+        workspace: request.workspace,
+        branch: request.branch,
+        candidateSha: sha,
+        error: `push result could not be verified: ${error.message}`,
+      },
+    });
+  }
   if (!present) {
     return stopped("unpublished", {
       recovery: {

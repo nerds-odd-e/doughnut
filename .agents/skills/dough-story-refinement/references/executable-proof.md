@@ -18,11 +18,16 @@ leaves it unproved; keep the evidence for what it actually observes. An inner
 operation finishing does not prove completion for its caller.
 
 Before changing a shared operation or choosing its proof, inspect affected production
-call sites, reusing available product-wide search. Derive obligations from each caller's
-actual use, not method name or dominant use; exclude unrelated consumers. Incompatible
-purposes each need an observation; equivalent purposes may share sufficient proof.
-For unresolved domain purpose, ask precisely about that caller's requirement and stop
-its dependent obligation until answered rather than guessing policy.
+and relevant test-support call sites — fixtures, stand-ins, and harness helpers that
+invoke the contract — reusing available product-wide search. Derive obligations from
+each caller's actual use, not method name or dominant use; exclude unrelated consumers.
+A prior unaffected-suite or unused-consumer exclusion is invalid when this change still
+reaches that caller: reassess current consumers before relying on it. Incompatible
+purposes each need an observation; equivalent purposes may share sufficient proof. Do
+not require every suite or an exhaustive caller inventory when sufficient
+equivalent-purpose proof already exists. For unresolved domain purpose, ask precisely
+about that caller's requirement and stop its dependent obligation until answered rather
+than guessing policy.
 
 For artifact-preservation promises, identify installation, physical store, and
 predecessor using project-supplied identities/scope. Same-store continuity proves no

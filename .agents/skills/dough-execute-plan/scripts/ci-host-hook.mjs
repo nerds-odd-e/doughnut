@@ -17,6 +17,7 @@ import {
   recordDeliveryProgress,
   receiptPrefix,
 } from "./ci-mailbox.mjs";
+import { readMailboxTerminal } from "./ci-mailbox-match.mjs";
 import { isDirectCliEntry } from "./ci-direct-entry.mjs";
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -30,6 +31,9 @@ const isDiscoveryAdvisory = (event) => event.type === "CI_DISCOVERY_DELAYED";
 
 const lostWorkerMessage = (directory, lost) =>
   `CI observer lost its worker for this coordinator: ${directory} (${lost.coverage.reason})`;
+
+const endedObserverMessage = (directory, terminal) =>
+  `CI observer ended for this coordinator: ${directory} (${terminal.status})`;
 
 export function selectCiEvents(
   input,
@@ -103,11 +107,18 @@ export function selectCiEvents(
       if (host === "cursor")
         writeFileSync(generation, input.generation_id, { mode: 0o600 });
       attachedThisCall.add(directory);
-      const lostAtAttachment = mailboxWorkerLoss(directory);
-      if (lostAtAttachment)
-        context.push(lostWorkerMessage(directory, lostAtAttachment));
-      else if (!request.probe)
-        context.push(`CI observer attached to this coordinator: ${directory}`);
+      const ended = readMailboxTerminal(directory);
+      if (ended && ended.coverage?.state !== "lost" && !request.probe) {
+        context.push(endedObserverMessage(directory, ended));
+      } else {
+        const lostAtAttachment = mailboxWorkerLoss(directory);
+        if (lostAtAttachment)
+          context.push(lostWorkerMessage(directory, lostAtAttachment));
+        else if (!request.probe)
+          context.push(
+            `CI observer attached to this coordinator: ${directory}`,
+          );
+      }
     }
   }
 
