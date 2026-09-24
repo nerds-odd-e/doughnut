@@ -11,7 +11,6 @@ and deletable in Web Donut.
 ## Taken
 
 - [Pull and publish tell owners a recovery path that works](quick/021-pull-recovery-guidance/PLAN.md) — quick/021-pull-recovery-guidance
-- [Browse and download notebook files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1 ([plan](quick/022-browse-download-notebook-files/PLAN.md))
 
 ## Backlog list
 
