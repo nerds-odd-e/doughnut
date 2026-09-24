@@ -144,7 +144,10 @@ harness), so a harness problem cannot hold back slice 3.
 
 ### 5. A taken or unusable filename is refused
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteControllerUploadNoteImageTests` taken-name and non-plain-name cases
+(15 tests; the 6 new cases fail without the check). Taken → 409, non-plain → 400, both
+`ApiError` messages naming the path; nothing stored or accepted.
 Proof: `NoteControllerUploadNoteImageTests` — with `physics/diagram.png`
 present, uploading `diagram.png` to a note in `physics` is refused with a
 message naming `physics/diagram.png`; accepted head, note content, attachment
@@ -165,4 +168,7 @@ message, shown by the existing toast.
 
 ## Learnings
 
-None yet.
+- Clone already carried every current attachment; slice 4 needed only proof.
+- Managed delivery needs this host's session identity (`--session-json`) to attach CI
+  observation; without it the first publication was unobserved until an observer was
+  started by hand.

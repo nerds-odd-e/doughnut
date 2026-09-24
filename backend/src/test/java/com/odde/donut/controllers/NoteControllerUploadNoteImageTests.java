@@ -10,6 +10,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
@@ -18,7 +19,10 @@ import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import jakarta.validation.Validation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,6 +100,49 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
             .showAttachmentImage(noteRepository.findById(moon.getId()).orElseThrow(), "my.png")
             .getBody(),
         equalTo(picture.getBytes()));
+  }
+
+  @Test
+  void aNameTakenInTheNotesFolderIsRefusedAndNothingChanges() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
+    storeFolderAttachmentAndSnapshot(notebook, physics, "diagram.png", "earlier".getBytes());
+
+    assertUploadRefusedWithNothingChanged(force, "diagram.png", "physics/diagram.png");
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"", ".", "..", "a/b.png", ".keep.png"})
+  void aNameThatIsNotAPlainFilenameIsRefusedAndNothingChanges(String name) throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+
+    assertUploadRefusedWithNothingChanged(force, name, "physics/" + name);
+  }
+
+  private void assertUploadRefusedWithNothingChanged(Note note, String name, String path)
+      throws Exception {
+    Integer notebookId = note.getNotebook().getId();
+    List<String> commitsBefore = acceptedHistory(note.getNotebook()).commits();
+    long attachmentsBefore = notebookAttachmentRepository.count();
+    MultipartFile picture =
+        makeMe.anUploadedImage().originalFilename(name).toMultiplePartFilePlease();
+
+    ApiException refusal = assertThrows(ApiException.class, () -> upload(note, picture));
+
+    assertThat(refusal.getErrorBody().getMessage(), containsString(path));
+    assertThat(acceptedHistory(note.getNotebook()).commits(), equalTo(commitsBefore));
+    assertThat(
+        noteRepository.findById(note.getId()).orElseThrow().getContent(),
+        equalTo(ACCEPTED_CONTENT));
+    assertThat(notebookAttachmentRepository.count(), equalTo(attachmentsBefore));
+    assertThat(
+        notebookAttachmentContent.get(
+            notebookId, VerifiedNotebookAttachmentBytes.sha256Hex(picture.getBytes())),
+        equalTo(Optional.empty()));
   }
 
   @Test

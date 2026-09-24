@@ -24,6 +24,11 @@ public class UploadedImageBuilder {
     }
   }
 
+  public UploadedImageBuilder originalFilename(String originalFilename) {
+    this.originalFilename = originalFilename;
+    return this;
+  }
+
   public UploadedImageBuilder metrics(int width, int height) {
     this.width = width;
     this.height = height;
