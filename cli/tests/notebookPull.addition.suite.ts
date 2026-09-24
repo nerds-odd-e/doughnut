@@ -73,44 +73,47 @@ export function describeNotebookPullAddition(): void {
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
     })
 
-    test('receives a nested addition under a local frontmatter edit', async () => {
-      const workDir = ctx.getWorkDir()
-      const source = buildSourceRepo(workDir)
-      commitPortableFile(
-        source,
-        'Nested/Cell.md',
-        '---\ntype: Note\n---\n# Nested\n\nOriginal.\n',
-        'add nested folder'
-      )
-      const directory = cloneAsBoundCheckout(
-        workDir,
-        source,
-        getApiConfig().apiBaseUrl,
-        'checkout'
-      )
-      commitPortableFile(
-        directory,
-        'note.md',
-        localFrontmatter,
-        'unpublished frontmatter edit'
-      )
-      commitPortableFile(
-        source,
-        'Nested/Beta.md',
-        nestedAdded,
-        'accepted nested addition'
-      )
-      serveAcceptedBundle(ctx, source, 'addition-nested')
+    test.each(['Nested', '例文', '物理/例文'])(
+      'receives a nested addition under %s with a local frontmatter edit',
+      async (folder) => {
+        const workDir = ctx.getWorkDir()
+        const source = buildSourceRepo(workDir)
+        commitPortableFile(
+          source,
+          `${folder}/Cell.md`,
+          '---\ntype: Note\n---\n# Nested\n\nOriginal.\n',
+          'add nested folder'
+        )
+        const directory = cloneAsBoundCheckout(
+          workDir,
+          source,
+          getApiConfig().apiBaseUrl,
+          'checkout'
+        )
+        commitPortableFile(
+          directory,
+          'note.md',
+          localFrontmatter,
+          'unpublished frontmatter edit'
+        )
+        commitPortableFile(
+          source,
+          `${folder}/Beta.md`,
+          nestedAdded,
+          'accepted nested addition'
+        )
+        serveAcceptedBundle(ctx, source, 'addition-nested')
 
-      await run(['notebook', 'pull', directory])
+        await run(['notebook', 'pull', directory])
 
-      expect(fs.readFileSync(join(directory, 'note.md'), 'utf8')).toBe(
-        localFrontmatter
-      )
-      expect(
-        fs.readFileSync(join(directory, 'Nested', 'Beta.md'), 'utf8')
-      ).toBe(nestedAdded)
-    })
+        expect(fs.readFileSync(join(directory, 'note.md'), 'utf8')).toBe(
+          localFrontmatter
+        )
+        expect(
+          fs.readFileSync(join(directory, folder, 'Beta.md'), 'utf8')
+        ).toBe(nestedAdded)
+      }
+    )
 
     test.each([
       {
