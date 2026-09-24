@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Test file journeys on LFS notebooks as production has them
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/026-test-file-journeys-on-lfs/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"12dc00f195fb6b3272e28399bef3dbbe19e1297e21c2db963bd5440dc0db8fe2","plan":"e9e7f05ed78e5551a3e646c3a1abeb7591104cff3369d40da378615e4beaa4a1"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/026-test-file-journeys-on-lfs/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"67f758c6c8c8876988e428ecbaf9577d18f69b4a05c2e14ecb9aad074755e303","plan":"04364eafbf8cfe885fd819aac30c17a8f13043ed1e4d5237bb60255257c6c8d6"}}
 ```
 
 - **Identity:** SEED-035#story-20
@@ -110,8 +110,9 @@ No executable plan or implementation is authorized by this seed.
   tests then cover a path users no longer take, and miss the one they do.
 - **Scope (refined 2026-09-24, owner accepted):**
   - Remove the "uses legacy raw Git attachment storage" step from each E2E
-    scenario that uses it (25 steps in 14 feature files; 13 of those files
-    involve files). The notebook stays LFS as the product creates it.
+    scenario that uses it (24 steps in 14 feature files; 13 of those files
+    involve files). The notebook stays LFS as the product creates it. Story
+    14's conversion scenario keeps its own demotion.
   - Keep a scenario only when it proves something the existing LFS scenarios
     do not; otherwise delete it rather than convert it. These scenarios were
     demoted only to keep them passing when new notebooks moved to LFS, so

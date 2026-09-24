@@ -8,15 +8,13 @@
 - Governing direction: North Star
   [one attachment content model](../../NORTH-STAR.md#one-attachment-content-model),
   "Every notebook uses LFS": one representation, so tests should not choose one.
-- Depends on: story 14 (done; its plan is recoverable at `c8654d4b80:.planning/quick/025-convert-raw-notebooks-to-lfs/PLAN.md`)
-  merged to main. Its branch flips the `NotebookGitBinding` default to LFS and
-  adds `NotebookGitLfsConversionControllerTest` and the E2E conversion
-  scenario, which stay legitimate raw users. Re-read those on main before
-  slice 5 and slice 10.
-- Preparation workspace: `/Users/terryyin/git/doughnut/.claude/worktrees/prep-seed-035-story-20`,
-  branch `prep/seed-035-story-20`, session-created from `e09dec5daf`;
-  integration checkout `/Users/terryyin/git/doughnut`; publication target
-  `origin/main`. Implementation is not authorized by this plan.
+- Depends on: story 14 (done; its plan is recoverable at `c8654d4b80:.planning/quick/025-convert-raw-notebooks-to-lfs/PLAN.md`).
+  Checked on main (2026-09-24): the `NotebookGitBinding` default is LFS;
+  `NotebookGitLfsConversionControllerTest` gets its raw notebooks from
+  `createGitBackedNotebook`, so slice 5 moves it to `createLegacyRawNotebook`;
+  the E2E conversion scenario (`cli_notebook_lfs`) seeds its raw files by
+  local publish after the demotion, so slice 10's seeding change does not
+  touch it.
 
 ## Goal and scope
 
@@ -145,8 +143,8 @@ NotebookGitAttachmentSizeAdmission, …SizeAdmissionHistory,
 …AttachmentCreation, and story 14's `NotebookGitLfsConversionControllerTest`.
 
 Change: rename the demoting fixture to `createLegacyRawNotebook` for those
-users; `createGitBackedNotebook` returns the product LFS notebook (about 118
-classes); the LFS-subject tests (LfsPublication, SizeAdmissionLfsHistory,
+users; `createGitBackedNotebook` returns the product LFS notebook (about 128
+test files); the LFS-subject tests (LfsPublication, SizeAdmissionLfsHistory,
 LfsWebContinuity, WebContentSaveCost) drop `enableLfs` and hand-seeded
 attributes. Slices 1–4 remove the known failure families. If other failures
 remain after the first run, stop at 10 minutes, record their families here,
@@ -209,10 +207,8 @@ exact download, work on a product LFS notebook. `put_notebook_file_for_testabili
 and writes the pointer, for any folder path and binary content. Remove the
 demotion from both features and delete "LFS file downloads its real bytes",
 which the nested file scenario now covers. Afterwards grep shows the demotion
-step used only by story 14's conversion scenario. If that scenario seeds
-raw files through `put_notebook_file_for_testability`, have it seed before its
-demotion or through local publish instead; do not add a raw branch to the
-seeding.
+step used only by story 14's conversion scenario, which seeds by local publish
+and needs no raw branch in the seeding.
 
 ## Remaining concerns
 
