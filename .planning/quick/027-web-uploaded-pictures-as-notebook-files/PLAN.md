@@ -68,7 +68,10 @@ Assumptions (rechecked on main `115b281976`, 2026-09-24):
 
 ### 1. Uploaded pictures keep their original bytes
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteControllerUploadNoteImageTests.shouldKeepTheOriginalBytesOfAPictureWiderThan2000Pixels`
+(2001×2 PNG; bytes served by `AttachmentController.showImage` equal the upload).
+Slice 3 must move this observation to the notebook file.
 Proof: `NoteControllerUploadNoteImageTests` — uploading a PNG wider than 2000 px
 stores exactly the uploaded bytes.
 

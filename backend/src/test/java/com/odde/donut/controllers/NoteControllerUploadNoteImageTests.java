@@ -22,6 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class NoteControllerUploadNoteImageTests extends ControllerTestBase {
   @Autowired EntityManager entityManager;
   @Autowired NoteController controller;
+  @Autowired AttachmentController attachmentController;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -39,9 +40,25 @@ class NoteControllerUploadNoteImageTests extends ControllerTestBase {
     NoteImageUploadResult result = controller.uploadNoteImage(note, dto);
 
     assertThat(result.imagePath(), matchesPattern("/attachments/images/\\d+/my\\.png"));
-    int imageId = Integer.parseInt(result.imagePath().split("/")[3]);
-    Image saved = entityManager.find(Image.class, imageId);
-    assertThat(saved.getNote().getId(), equalTo(note.getId()));
+    assertThat(savedImage(result).getNote().getId(), equalTo(note.getId()));
+  }
+
+  @Test
+  void shouldKeepTheOriginalBytesOfAPictureWiderThan2000Pixels()
+      throws UnexpectedNoAccessRightException, IOException {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    NoteImageUploadDTO dto = new NoteImageUploadDTO();
+    dto.setUploadImage(makeMe.anUploadedImage().metrics(2001, 2).toMultiplePartFilePlease());
+
+    NoteImageUploadResult result = controller.uploadNoteImage(note, dto);
+
+    assertThat(
+        attachmentController.showImage(savedImage(result), "my.png").getBody(),
+        equalTo(dto.getUploadImage().getBytes()));
+  }
+
+  private Image savedImage(NoteImageUploadResult result) {
+    return entityManager.find(Image.class, Integer.parseInt(result.imagePath().split("/")[3]));
   }
 
   @Test

@@ -1,6 +1,5 @@
 package com.odde.donut.utils;
 
-import com.odde.donut.algorithms.ImageUtils;
 import com.odde.donut.entities.AttachmentBlob;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.User;
@@ -8,8 +7,6 @@ import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ImageBuilder {
-  private final ImageUtils imageUtils = new ImageUtils();
-
   public ImageBuilder() {}
 
   public Image buildImageFromUploadedImage(User user, MultipartFile file) throws IOException {
@@ -23,7 +20,7 @@ public class ImageBuilder {
   }
 
   private AttachmentBlob getImageBlob(MultipartFile file) throws IOException {
-    byte[] data = imageUtils.toResizedImageByteArray(file, file.getOriginalFilename());
+    byte[] data = file.getBytes();
     AttachmentBlob attachmentBlob = new AttachmentBlob();
     attachmentBlob.setData(data);
     return attachmentBlob;

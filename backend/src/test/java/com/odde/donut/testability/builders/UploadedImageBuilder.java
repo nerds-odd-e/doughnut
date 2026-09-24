@@ -2,12 +2,9 @@ package com.odde.donut.testability.builders;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import javax.imageio.ImageIO;
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,15 +22,6 @@ public class UploadedImageBuilder {
       e.printStackTrace();
       throw new RuntimeException("not likely to happen");
     }
-  }
-
-  public InputStreamSource toInputSteamSource() {
-    return new InputStreamSource() {
-      @Override
-      public InputStream getInputStream() throws IOException {
-        return new ByteArrayInputStream(buildImage().toByteArray());
-      }
-    };
   }
 
   public UploadedImageBuilder metrics(int width, int height) {
