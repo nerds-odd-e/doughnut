@@ -82,10 +82,11 @@ so existing local checkouts keep working with `donut notebook pull`.
 - Changes Donut makes on its own (conversion, migration) are ordinary forward
   commits by the Donut System identity. Owners receive them with
   `donut notebook pull`, which rebases their unpublished local commits.
-- When Donut chooses a filename itself, it takes a free name in the target
-  folder rather than overwriting or refusing, because it writes the only
-  reference at the same moment. Operations that move files the user placed keep
-  the refuse-on-clash rule.
+- When Donut chooses a filename itself (a move or migration), it takes a free
+  name in the target folder rather than overwriting or refusing, because it
+  writes the only reference at the same moment. A web upload keeps the name
+  the user gave and, like operations that move files the user placed, refuses
+  when that name is taken in the folder.
 - New payloads are limited to 10 MiB (10,485,760 bytes), inclusive. A Book's
   source file is the one exception and keeps the Book upload limit (currently
   100 MB). Content already accepted is never judged again.

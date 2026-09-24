@@ -301,35 +301,82 @@ No executable plan or implementation is authorized by this seed.
 
 ### Use newly web-uploaded note images from a local checkout
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/027-web-uploaded-pictures-as-notebook-files/PLAN.md","assessment":"not-ready","reasons":["Waits for story 20 (SEED-035#story-20) to be delivered: its last slice edits the same upload scenario and its fixture moves give the LFS test notebooks this plan relies on."],"basis":{"document":"3d2250296bcd6aae8bf70a8b042d6848d3902470b5e81cb5fd6e0a14d0f0abef","plan":"232a9107a2b8346efce1a304d5bc2add55928d46f53ee1210170f7a2e9556210"}}
 ```
 
 - **Identity:** SEED-035#story-4
-- **Goal:** Owners continue locally with pictures uploaded on the web, without
-  downloading and relinking them. It also stops new uploads adding to the
-  legacy pictures that story 5 must move and story 18 must remove.
-- **Evaluation:** Upload a picture with the note's `image` property on the web,
-  then pull: the picture is a file in the note's folder, `image:` names it, and
-  the web still shows it.
-- **Scope direction:** The one existing upload (the "Choose image…" button of
-  the frontmatter `image` property, `POST /api/notes/{note}/images`) stores the
-  upload as an Attachment in the note's folder and sets `image:` to it. Both
-  happen in one server-side accepted change, following the North Star's
-  [one attachment content model](../NORTH-STAR.md#one-attachment-content-model):
-  an LFS object, a free Donut-chosen filename, and the 10 MiB limit. New uploads
-  no longer create `image` rows. There is no other web upload path: nothing
-  pastes or drops pictures into the body, and nothing uploads pictures for AI.
-- **Deferred promises:** Body images, uploading other file types, SVG, removing
-  the previous file when a picture is replaced (story 2 owns deletion), and
-  converting old pictures (story 5).
-- **Effort hypothesis:** M, medium confidence; this is the first web action that
-  adds file bytes to a notebook.
-- **Depends on:** Story 14 (a single LFS write path). The note-relative
-  `image:` spelling and its web display are delivered.
+- **Goal:** An owner who uploads a picture on the web continues on that note in
+  a local checkout without downloading and relinking the picture. Today the
+  upload lands only in MySQL and `image:` gets a server path
+  (`/attachments/images/{id}/{name}`), which is broken in a checkout. The story
+  also stops new uploads adding to the legacy pictures that story 18 must
+  remove; that is the stronger reason for its place in the order. It is also
+  the first web action that adds file bytes to a notebook, the path that stories
+  5 and 17 reuse. It does not earn its place from that alone. The user value
+  is a hypothesis: no usage figures were supplied.
+- **Scope (refined 2026-09-24, owner accepted):**
+  - The one existing upload (the "Choose image…" button of the frontmatter
+    `image` property, `POST /api/notes/{note}/images`) stores the picture as
+    an Attachment in the note's folder (the notebook root for a root note),
+    under the uploaded filename. The same accepted change sets `image:` to that
+    filename, spelled note-relative (`diagram.png`, never `./diagram.png`), and
+    leaves `image_mask:` unchanged. Nothing creates an unreferenced
+    intermediate commit. It follows the North Star's
+    [one attachment content model](../NORTH-STAR.md#one-attachment-content-model):
+    the verified LFS object is stored first, then the pointer is accepted.
+  - The upload keeps today's types (PNG, JPEG, GIF, WebP) and the 10 MiB limit
+    (10,485,760 bytes, inclusive).
+  - **Name taken → refuse (owner decision 2026-09-24).** If the folder already
+    has a file with that name, the upload is refused with a clear message that
+    names the path. Nothing changes and nothing is renamed. The owner renames
+    the picture and uploads it again. A name that is not a plain filename
+    (empty, `.`, `..`, containing `/`, or starting with `.`) is refused the
+    same way. A leading dot would be hidden or reserved Git metadata such as
+    `.gitattributes` or `.keep`.
+  - **Original bytes (owner decision 2026-09-24).** Remove the resize of large
+    pictures (over 2000×2000) completely: `ImageUtils`, the upload's
+    `ImageBuilder`, and their tests. The file in the checkout is exactly what
+    was uploaded.
+  - New uploads create no `image` row. Legacy `/attachments/images/...` pictures
+    keep displaying. When a new upload replaces a legacy picture, the legacy row
+    stays (the orphan cleanup skips note-relative values), as the backup copy
+    that story 18 removes.
+  - The note's page shows the note-relative picture it already supports. The
+    editor keeps saving whole content after an upload. The last save wins and
+    it carries the same `image:`, so the follow-up save is normally no change.
+    Unsaved editor text is not lost. No new locking is added.
+  - **LFS only (owner accepted).** A notebook without an LFS binding fails
+    loudly (ADR 0006). No raw write path is added for story 19 to remove.
+- **Key examples:**
+  1. Note `force` in folder `physics` has no picture. The owner uploads
+     `diagram.png` and pulls: `physics/diagram.png` has the uploaded bytes, and
+     `physics/force.md` has `image: diagram.png`. The web shows the picture. One
+     accepted commit adds both, and no `image` row exists.
+  2. A note in the notebook root: the file is `diagram.png` at the root.
+  3. `physics/diagram.png` already exists (published locally or uploaded
+     earlier). Uploading another `diagram.png` to any note in `physics` is
+     refused with a message naming `physics/diagram.png`. The note, the file
+     and accepted history are unchanged.
+  4. A 4000×3000 photo under 10 MiB is stored byte-for-byte unchanged.
+  5. The note shows a legacy `/attachments/images/12/old.png`. A new upload sets
+     `image: new.png`; the legacy row remains.
+  6. The owner has an unpublished local commit that edits the same note's
+     frontmatter. After the web upload, `pull` rebases as for any web edit and
+     may give an ordinary conflict. Donut adds no special behaviour.
+- **Deferred promises:** Body images and paste/drop, uploading other file
+  types, SVG, choosing a free name automatically, reusing an identical existing
+  file, removing the previous file when a picture is replaced (story 2),
+  moving old pictures (story 5), and removing the `/attachments/images`
+  address (story 18).
+- **Depends on:** Story 14 (merged: every notebook is LFS). Plan after story 20
+  is delivered: its last slice edits the same picture scenario
+  (`note_frontmatter_image.feature`) and the backend fixtures.
+- **Effort hypothesis:** M, medium confidence. The new parts are putting an
+  inserted attachment into a web commit (`NotebookGitChangedFiles` puts only
+  notes today) and the upload itself. Storing the object and building the pointer
+  already exist in story 14's conversion.
 - **Safe stopping point:** New pictures work on the web and locally; old
   pictures keep working as before.
-- **Refinement remaining:** Key examples, including a filename clash, a note in
-  the notebook root, and an owner with unpublished local commits.
 
 <a id="story-2"></a>
 
@@ -442,8 +489,8 @@ loss. Operations that would rehome files refuse until their story delivers.
 
 ## Open Refinement Details
 
-- Stories 14, 5 and 17 each need key examples and their move/retry behaviour
-  before planning; story 4 needs key examples.
+- Stories 5 and 17 each need key examples and their move/retry behaviour
+  before planning.
 - Story 11 needs story refinement and plan realignment before slice
   refinement/execution.
 - File deletion needs an observable outcome for remaining references; warning,
