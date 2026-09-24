@@ -52,3 +52,9 @@ switching is blocked while that operation is pending, including the `M`
 shortcut. Confirmation can still complete or cancel; ordinary value edits do
 not use this blocking guard. This prevents the rich editor from being unmounted
 before an asynchronous property edit emits its content.
+
+## Rich body editing
+
+The rich editor rebuilds the Markdown body from its content on each edit, so it
+keeps body image embeds (`![alt](src)`) through an edit to other text. Showing
+those pictures in the editor is not promised.
