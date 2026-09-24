@@ -62,6 +62,12 @@ the pointer, and a raw notebook serves its content unchanged. `.gitattributes`
 and nested `.keep` markers are not rows, so, like `.git`, they are not shown on
 the web.
 
+Images uploaded to a note through the web image upload are served inline at
+`/attachments/images/{id}/{fileName}` under the same notebook read rule:
+owners, subscribers, and Bazaar readers (even logged out) receive them; another
+user is refused, and an anonymous request for a private notebook's image must
+log in.
+
 Publication admits each newly introduced raw-Git attachment blob against an
 inclusive 10 MiB (10,485,760 byte) limit across the contiguous first-parent
 proposal range, not only the tip. Classification uses the ordinary attachment
