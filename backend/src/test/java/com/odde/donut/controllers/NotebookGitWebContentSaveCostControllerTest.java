@@ -13,8 +13,6 @@ import static org.hamcrest.Matchers.not;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
-import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookAttachment.InMemoryNotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.SqlStatementCallLog;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
@@ -29,16 +27,19 @@ import org.junit.jupiter.params.provider.ValueSource;
 class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentSaveCostTestSupport {
 
   @Test
-  void savingContentInALargeNotebookWithAttachmentsDoesNotQueryAttachmentsOrPortableTreeRows()
-      throws Throwable {
+  void noteSaveInALargeLfsNotebookLeavesAttachmentsUntouched() throws Throwable {
     Notebook large = createGitBackedNotebook("Large");
     Note note = makeMe.aNote().notebook(large).content(ACCEPTED_CONTENT).please();
     for (int i = 0; i < 30; i++) {
       makeMe.aNote().notebook(large).title("Unrelated " + i).please();
     }
+    byte[] payload = new byte[4096];
     for (int i = 0; i < 3; i++) {
-      storeFolderAttachmentAndSnapshot(large, null, "attachment-" + i + ".bin", new byte[4096]);
+      storeFolderAttachmentAndSnapshot(large, null, "attachment-" + i + ".bin", payload);
     }
+    InMemoryNotebookAttachmentContent contentStore =
+        (InMemoryNotebookAttachmentContent) notebookAttachmentContent;
+    contentStore.resetAccessCounts();
     var acceptedBefore = acceptedHistory(large);
 
     Statistics contentSave =
@@ -48,62 +49,17 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentS
     var queries = List.of(contentSave.getQueries());
     assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
     assertThat(queries, not(hasItem(containsString("PortableTreeNoteRow"))));
+    assertThat(contentStore.getCalls(), equalTo(0L));
+    assertThat(contentStore.storeCalls(), equalTo(0L));
     AcceptedHistory after = acceptedHistory(large);
-    assertThat(after.parents(), equalTo(acceptedBefore.commits()));
-  }
-
-  /**
-   * Observes JDBC executions for one content save on a nested accepted tree. Counts are JDBC
-   * execute* calls, not wire round trips; tree fetches stay within one whole-tree walk for this
-   * fixture.
-   */
-  @Test
-  void noteOnlySaveOnLfsNotebookDoesNotReadPayloadsOrRewriteObjects() throws Throwable {
-    Notebook notebook = createGitBackedNotebook("Lfs Save Cost");
-    NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
-    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
-    notebookGitBindingRepository.save(binding);
-    NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
-    byte[] payload = new byte[4096];
-    for (int i = 0; i < payload.length; i++) {
-      payload[i] = (byte) i;
-    }
-    byte[] pointer = pointerFor(notebook, payload);
-    controller.publishNotebookGitProposal(
-        notebook.getId(),
-        empty.getAcceptedGitObjectId(),
-        proposalBundleBytes(
-            empty,
-            List.of(
-                new NotebookGitProposalFile("Root Note.md", ACCEPTED_CONTENT),
-                new NotebookGitProposalFile("diagram.png", pointer))));
-    Note note =
-        noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-            .filter(n -> n.getTitle().equals("Root Note"))
-            .findFirst()
-            .orElseThrow();
-    InMemoryNotebookAttachmentContent memory =
-        (InMemoryNotebookAttachmentContent) notebookAttachmentContent;
-    memory.resetAccessCounts();
-    AcceptedHistory acceptedBefore = acceptedHistory(notebook);
-
-    Statistics contentSave =
-        hibernateStatisticsOf(
-            () -> textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT)));
-
-    var queries = List.of(contentSave.getQueries());
-    assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
-    assertThat(memory.getCalls(), equalTo(0L));
-    assertThat(memory.storeCalls(), equalTo(0L));
-    AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(acceptedBefore.commits()));
     assertThat(
         after.exactTree().stream()
-            .filter(entry -> entry.path().equals("diagram.png"))
+            .filter(entry -> entry.path().equals("attachment-0.bin"))
             .map(entry -> entry.content())
             .findFirst()
             .orElseThrow(),
-        equalTo(pointer));
+        equalTo(pointerFor(large, payload)));
   }
 
   @Test

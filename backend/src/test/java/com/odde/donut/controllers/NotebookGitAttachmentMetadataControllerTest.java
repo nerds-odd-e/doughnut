@@ -2,7 +2,6 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
@@ -12,7 +11,6 @@ import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import com.odde.donut.testability.GitBundleTestReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -92,26 +90,5 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
     assertThat(
         acceptedHistory(notebook).exactTree(),
         contains(new PortableTreeEntry("legacy.bin", pointerLooking)));
-  }
-
-  @Test
-  void lfsRepresentationFixtureProjectsPointerBytesWithoutPublication() throws Exception {
-    byte[] payload = "diagram".getBytes(StandardCharsets.UTF_8);
-    Notebook notebook = createGitBackedNotebook();
-    storeFolderAttachmentAndSnapshot(notebook, null, "diagram.png", payload);
-    byte[] pointer = pointerFor(notebook, payload);
-
-    assertThat(
-        reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
-        is(NotebookGitAttachmentRepresentation.LFS));
-    assertThat(
-        GitBundleTestReader.fetchAcceptedTip(acceptedBundleBytes(notebook)).content(),
-        containsInAnyOrder(new PortableTreeEntry("diagram.png", pointer)));
-    assertThat(
-        notebookAttachmentRepository
-            .findByNotebook_Id(notebook.getId())
-            .getFirst()
-            .getAcceptedGitContent(),
-        equalTo(pointer));
   }
 }

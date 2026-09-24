@@ -175,7 +175,10 @@ in another.
 ### 3. One LFS save-cost test, and no fixture-only test
 
 Type: Structure (retrospective correction F6)
-Status: planned
+Status: done
+Accepted: merged test `noteSaveInALargeLfsNotebookLeavesAttachmentsUntouched`
+(save-cost 8 pass, AttachmentMetadata 2 pass); greps clean; flipping the
+pointer or store-count expectation fails the test.
 Proof: `--tests 'com.odde.donut.controllers.NotebookGitWebContentSaveCost*'`
 and `--tests 'com.odde.donut.controllers.NotebookGitAttachmentMetadata*'`
 green; grep shows no `setAttachmentRepresentation` in
