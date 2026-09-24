@@ -237,7 +237,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Keep Markdown image embeds when a note is edited on the web
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"39e95f678642e099ac37d32b490323fe84c7ca2d63d55cea0f6d072ecc6929e6"}}
 ```
 
 - **Identity:** SEED-035#story-16
