@@ -118,10 +118,12 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
 
   @Test
   void webFolderTrashAndRecoveryCarryNestedAttachmentBytes() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
-    storeFolderAttachmentAndSnapshot(notebook, diagrams, "force.png", FORCE_DIAGRAM);
+    byte[] forcePointer =
+        storeFolderAttachmentAndSnapshot(notebook, diagrams, "force.png", FORCE_DIAGRAM)
+            .getAcceptedGitContent();
 
     folderController.trashFolder(notebook, physics);
     ObjectId trashedHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
@@ -132,10 +134,10 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
       ObjectId recoveredHead = GitBundleTestReader.fetchHead(repo, downloadedBundle(notebook));
       assertThat(
           GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(trashedHead)),
-          hasItem(new PortableTreeEntry("_trash/physics/diagrams/force.png", FORCE_DIAGRAM)));
+          hasItem(new PortableTreeEntry("_trash/physics/diagrams/force.png", forcePointer)));
       assertThat(
           GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(recoveredHead)),
-          hasItem(new PortableTreeEntry("physics/diagrams/force.png", FORCE_DIAGRAM)));
+          hasItem(new PortableTreeEntry("physics/diagrams/force.png", forcePointer)));
     }
   }
 

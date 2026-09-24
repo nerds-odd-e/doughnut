@@ -34,7 +34,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
   void
       renamingAFolderRelocatesItsNotesAttachmentsAndSubfolderUnderTheNewPrefixAndMatchesTheFullAssembly()
           throws Throwable {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder photos = makeMe.aFolder().notebook(notebook).name("Photos").please();
     for (String title : List.of("Alps", "Beach", "City")) {
       makeMe.aNote(title).folder(photos).content(ACCEPTED_CONTENT).please();
@@ -78,7 +78,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
   @Test
   void trashingAndRecoveringAFolderMoveItsEntriesWithTheirBlobsAndMatchTheFullAssembly()
       throws Throwable {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder research = makeMe.aFolder().notebook(notebook).name("Research").please();
     Folder biology = makeMe.aFolder().parentFolder(research).name("Biology").please();
     makeMe.aNote("Cells").folder(biology).content(ACCEPTED_CONTENT).please();
@@ -89,7 +89,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
 
     Map<String, ObjectId> trashed = acceptedBlobIds(notebook);
     assertThat(
-        trashed.keySet(),
+        acceptedHistory(notebook).tipPaths(),
         containsInAnyOrder(
             "Research/.keep",
             "_trash/Research/Biology/Cells.md",
@@ -112,7 +112,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
   @Test
   void permanentlyDeletingAFolderDropsItsNotesAndAttachmentsWithItsPrefixAndMatchesTheFullAssembly()
       throws Throwable {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder trashedTopic = makeMe.aFolder().inTrashOf(notebook).name("Topic").please();
     Folder deeper = makeMe.aFolder().parentFolder(trashedTopic).name("Deeper").please();
     makeMe.aNote("Cells").folder(trashedTopic).content(ACCEPTED_CONTENT).please();

@@ -81,7 +81,7 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
     byte[] pointerLooking = NotebookGitLfsPointer.format(POINTER_OID, 7);
     Notebook notebook = createGitBackedNotebook();
     NotebookAttachment attachment =
-        storeFolderAttachmentAndSnapshot(notebook, null, "legacy.bin", pointerLooking);
+        storeLegacyRawAttachmentAndSnapshot(notebook, null, "legacy.bin", pointerLooking);
 
     assertThat(attachment.getAcceptedGitContent(), equalTo(pointerLooking));
     assertThat(
@@ -94,12 +94,13 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
 
   @Test
   void lfsRepresentationFixtureProjectsPointerBytesWithoutPublication() throws Exception {
-    byte[] pointer = NotebookGitLfsPointer.format(POINTER_OID, 7);
+    byte[] payload = "diagram".getBytes(StandardCharsets.UTF_8);
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
     binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
     notebookGitBindingRepository.save(binding);
-    storeFolderAttachmentAndSnapshot(notebook, null, "diagram.png", pointer);
+    storeFolderAttachmentAndSnapshot(notebook, null, "diagram.png", payload);
+    byte[] pointer = pointerFor(notebook, payload);
 
     assertThat(
         reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),

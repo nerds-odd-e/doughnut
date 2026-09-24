@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes.sha256Hex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -155,8 +156,9 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x78);
     Notebook notebook = createProductLfsNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
-    byte[] pointer = pointerFor(notebook, oversized);
-    storeFolderAttachmentAndSnapshot(notebook, null, "legacy.bin", pointer);
+    byte[] pointer =
+        storeFolderAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized)
+            .getAcceptedGitContent();
     NotebookGitBinding withLegacy = reloadCommittedBinding(notebook.getId());
 
     controller.publishNotebookGitProposal(

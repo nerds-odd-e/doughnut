@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes.sha256Hex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
@@ -13,11 +14,8 @@ import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
-import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
-import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import java.io.ByteArrayInputStream;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +30,6 @@ class NotebookGitAttachmentCreationControllerTest
     extends NotebookGitAttachmentLfsPublicationTestSupport {
 
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
-  @Autowired NotebookAttachmentContent notebookAttachmentContent;
 
   @Test
   void productCreationSelectsLfsAndInstallsInitialAttributes() throws Exception {
@@ -65,12 +62,7 @@ class NotebookGitAttachmentCreationControllerTest
     Notebook notebook = createProductLfsNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] payload = {(byte) 0x11, (byte) 0x22, (byte) 0x33};
-    String oid = sha256Hex(payload);
-    assertThat(
-        notebookAttachmentContent.store(
-            notebook.getId(), oid, payload.length, new ByteArrayInputStream(payload)),
-        is(true));
-    byte[] pointer = NotebookGitLfsPointer.format(oid, payload.length);
+    byte[] pointer = pointerFor(notebook, payload);
     controller.publishNotebookGitProposal(
         notebook.getId(),
         empty.getAcceptedGitObjectId(),
@@ -93,7 +85,8 @@ class NotebookGitAttachmentCreationControllerTest
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
             new PortableTreeEntry("payload.bin", pointer)));
     assertThat(
-        notebookAttachmentContent.get(notebook.getId(), oid).orElseThrow(), equalTo(payload));
+        notebookAttachmentContent.get(notebook.getId(), sha256Hex(payload)).orElseThrow(),
+        equalTo(payload));
     assertThat(
         notebookAttachmentRepository.findByNotebook_Id(notebook.getId()).stream()
             .map(NotebookAttachment::getFilename)

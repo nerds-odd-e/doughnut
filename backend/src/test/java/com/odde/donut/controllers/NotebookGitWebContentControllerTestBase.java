@@ -1,9 +1,11 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes.sha256Hex;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.controllers.dto.FolderRenameRequest;
@@ -19,7 +21,11 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +46,21 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   @Autowired NoteController noteController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
+  @Autowired NotebookAttachmentContent notebookAttachmentContent;
 
   NotebookGitBinding binding(Notebook notebook) {
     return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
   }
 
+  /** Seeds an attachment as the product stores it: payload in the content store, pointer row. */
   NotebookAttachment storeFolderAttachmentAndSnapshot(
+      Notebook notebook, Folder folder, String filename, byte[] payload) throws IOException {
+    return storeLegacyRawAttachmentAndSnapshot(
+        notebook, folder, filename, pointerFor(notebook, payload));
+  }
+
+  /** Seeds exact accepted bytes; only for raw-subject tests on a legacy raw notebook. */
+  NotebookAttachment storeLegacyRawAttachmentAndSnapshot(
       Notebook notebook, Folder folder, String filename, byte[] content) {
     NotebookAttachment attachment = new NotebookAttachment();
     attachment.setNotebook(notebook);
@@ -55,6 +70,16 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
     notebookAttachmentRepository.save(attachment);
     snapshotCurrentPortableTree(notebook);
     return attachment;
+  }
+
+  /** Stores {@code payload} in the notebook's content store and returns its LFS pointer. */
+  byte[] pointerFor(Notebook notebook, byte[] payload) throws IOException {
+    String oid = sha256Hex(payload);
+    assertThat(
+        notebookAttachmentContent.store(
+            notebook.getId(), oid, payload.length, new ByteArrayInputStream(payload)),
+        is(true));
+    return NotebookGitLfsPointer.format(oid, payload.length);
   }
 
   static NoteUpdateContentDTO contentDto(String content) {

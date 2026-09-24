@@ -25,7 +25,7 @@ abstract class NotebookGitWebContentSaveCostTestSupport
   SaveCostObservation measureContentSave(
       int depth, int unrelatedFolders, int ancestorWidth, int unrelatedNotes, String label)
       throws Exception {
-    Notebook notebook = createGitBackedNotebook(label);
+    Notebook notebook = createProductLfsNotebook(label);
     Folder parent = buildDepthPath(notebook, depth);
     widenAncestors(notebook, parent, ancestorWidth);
     Note note =

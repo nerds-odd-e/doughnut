@@ -26,7 +26,7 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
 
   @Test
   void folderContainingAFileCannotBeDissolved() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     Folder old = makeMe.aFolder().parentFolder(physics).name("old").please();
     NotebookAttachment sketch =
@@ -54,7 +54,7 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
 
   @Test
   void folderContainingAFileCannotBeMerged() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder target = makeMe.aFolder().notebook(notebook).name("physics").please();
     Folder holder = makeMe.aFolder().notebook(notebook).name("holder").please();
     Folder source = makeMe.aFolder().parentFolder(holder).name("physics").please();

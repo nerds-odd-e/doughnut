@@ -16,31 +16,23 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookAttachment.InMemoryNotebookAttachmentContent;
-import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
-import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookGit.SqlStatementCallLog;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
-import java.io.ByteArrayInputStream;
-import java.security.MessageDigest;
 import java.util.HashSet;
-import java.util.HexFormat;
 import java.util.List;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /** A web save's server work depends on what changed, not on the notebook's size. */
 class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentSaveCostTestSupport {
 
-  @Autowired NotebookAttachmentContent notebookAttachmentContent;
-
   @Test
   void savingContentInALargeNotebookWithAttachmentsDoesNotQueryAttachmentsOrPortableTreeRows()
       throws Throwable {
-    Notebook large = createGitBackedNotebook("Large");
+    Notebook large = createProductLfsNotebook("Large");
     Note note = makeMe.aNote().notebook(large).content(ACCEPTED_CONTENT).please();
     for (int i = 0; i < 30; i++) {
       makeMe.aNote().notebook(large).title("Unrelated " + i).please();
@@ -77,12 +69,7 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentS
     for (int i = 0; i < payload.length; i++) {
       payload[i] = (byte) i;
     }
-    String oid = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(payload));
-    byte[] pointer = NotebookGitLfsPointer.format(oid, payload.length);
-    assertThat(
-        notebookAttachmentContent.store(
-            notebook.getId(), oid, payload.length, new ByteArrayInputStream(payload)),
-        equalTo(true));
+    byte[] pointer = pointerFor(notebook, payload);
     controller.publishNotebookGitProposal(
         notebook.getId(),
         empty.getAcceptedGitObjectId(),

@@ -31,7 +31,7 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
 
   @Test
   void contentEditMatchesTheFullAssembly() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Note note = makeMe.aNote().notebook(notebook).content(ACCEPTED_CONTENT).please();
     makeMe.aNote().notebook(notebook).title("Unrelated").please();
     storeFolderAttachmentAndSnapshot(notebook, null, "picture.bin", new byte[64]);
@@ -74,7 +74,7 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
   @Test
   void renamingALinkedNoteReplacesItsPathAndItsReferrersOnlyAndMatchesTheFullAssembly()
       throws Throwable {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Note a = makeMe.aNote("A").notebook(notebook).content(ACCEPTED_CONTENT).please();
     for (String referrer : List.of("First", "Second", "Third")) {
       Note note = makeMe.aNote(referrer).notebook(notebook).please();

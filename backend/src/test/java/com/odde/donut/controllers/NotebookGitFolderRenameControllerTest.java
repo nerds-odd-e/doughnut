@@ -41,11 +41,13 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
 
   @Test
   void webFolderRenameCarriesNestedAttachmentsAndNoteIdentity() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
     Note force = makeMe.aNote("Force").folder(diagrams).content(CELLS_BODY).please();
-    storeFolderAttachmentAndSnapshot(notebook, diagrams, "force.png", FORCE_DIAGRAM);
+    byte[] forcePointer =
+        storeFolderAttachmentAndSnapshot(notebook, diagrams, "force.png", FORCE_DIAGRAM)
+            .getAcceptedGitContent();
 
     folderController.renameFolder(notebook, physics, renameTo("mechanics"));
 
@@ -59,7 +61,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
           equalTo(
               List.of(
                   ofText("mechanics/diagrams/Force.md", CELLS_BODY),
-                  new PortableTreeEntry("mechanics/diagrams/force.png", FORCE_DIAGRAM))));
+                  new PortableTreeEntry("mechanics/diagrams/force.png", forcePointer))));
     }
   }
 

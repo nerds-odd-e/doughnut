@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
@@ -33,7 +34,7 @@ class NotebookGitWebFolderPermanentDeleteControllerTest
 
   @Test
   void permanentDeleteOfATrashedFolderAppendsOneAcceptedChildWithoutTheSubtree() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder topic =
         makeMe.aFolder().inTrashOf(notebook).name("Topic").readmeContent("Topic readme").please();
     Folder nested = makeMe.aFolder().parentFolder(topic).name("Nested").please();
@@ -42,8 +43,8 @@ class NotebookGitWebFolderPermanentDeleteControllerTest
     Folder sibling =
         makeMe.aFolder().parentFolder(topic.getParentFolder()).name("Sibling").please();
     makeMe.aNote("Atoms").folder(sibling).content(ATOMS_BODY).please();
-    Integer attachmentId =
-        storeFolderAttachmentAndSnapshot(notebook, topic, "a.pdf", PDF_BYTES).getId();
+    NotebookAttachment attachment =
+        storeFolderAttachmentAndSnapshot(notebook, topic, "a.pdf", PDF_BYTES);
     ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     testabilitySettings.timeTravelTo(Timestamp.from(DELETE_AT));
 
@@ -68,8 +69,8 @@ class NotebookGitWebFolderPermanentDeleteControllerTest
           containsInAnyOrder("_trash/Sibling/Atoms.md"));
       assertThat(
           GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(acceptedA)),
-          hasItem(new PortableTreeEntry("_trash/Topic/a.pdf", PDF_BYTES)));
+          hasItem(new PortableTreeEntry("_trash/Topic/a.pdf", attachment.getAcceptedGitContent())));
     }
-    assertThat(notebookAttachmentRepository.findById(attachmentId).isPresent(), is(false));
+    assertThat(notebookAttachmentRepository.findById(attachment.getId()).isPresent(), is(false));
   }
 }

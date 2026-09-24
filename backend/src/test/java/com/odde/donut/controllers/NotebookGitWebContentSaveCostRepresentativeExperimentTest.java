@@ -38,7 +38,7 @@ class NotebookGitWebContentSaveCostRepresentativeExperimentTest
     int depthFolders = depth;
     int unrelatedFolders = REPRESENTATIVE_FOLDERS - depthFolders;
     int unrelatedNotes = REPRESENTATIVE_NOTES - 1;
-    Notebook notebook = createGitBackedNotebook("representative-4000f-11000n-depth" + depth);
+    Notebook notebook = createProductLfsNotebook("representative-4000f-11000n-depth" + depth);
     Folder parent = buildDepthPath(notebook, depthFolders);
     Note note =
         (parent == null ? makeMe.aNote().notebook(notebook) : makeMe.aNote().folder(parent))

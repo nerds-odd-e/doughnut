@@ -128,7 +128,7 @@ proposals silently drop `.gitattributes` again.
 ### 3. Folder-attachment seeding stores LFS files
 
 Type: Structure
-Status: planned
+Status: done
 Proof: the users of
 `NotebookGitWebContentControllerTestBase.storeFolderAttachmentAndSnapshot`
 green: DerivedFolderTreeOracle, DerivedTreeOracle, FolderDissolveGuard,
@@ -138,6 +138,12 @@ WebFolderTrash, WebContentSaveCost support and representative experiment.
 Change: promote `pointerFor` to the shared base; `storeFolderAttachmentAndSnapshot`
 stores the payload and the pointer row; its users create the product LFS
 notebook and assert pointers where they asserted raw bytes. Enables slice 5.
+Accepted: `NotebookGit*` backend tests green (428; the representative
+experiment is env-gated and skipped). Learnings: raw-subject seeding is the
+separately named `storeLegacyRawAttachmentAndSnapshot` (SizeAdmission,
+AttachmentMetadata legacy test), the pair of `createLegacyRawNotebook` for
+slice 5's grep. `pointerFor` lives in `NotebookGitWebContentControllerTestBase`.
+`backend:test:worktree` takes one `--tests` pattern per run.
 
 ### 4. Proposals carrying attachments send LFS pointers
 
