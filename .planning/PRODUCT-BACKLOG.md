@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Keep working in the same checkout after web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-15) — SEED-035#story-15 ([plan](quick/020-notebook-lfs-receive/PLAN.md))
+
 ## Backlog list
 
-- [Keep working in the same checkout after web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-15) — SEED-035#story-15
 - [Browse and download notebook files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Skip common AI guidance folders during assimilation](seeds/SEED-035-ai-workspace-supporting-files.md#story-8) — SEED-035#story-8
