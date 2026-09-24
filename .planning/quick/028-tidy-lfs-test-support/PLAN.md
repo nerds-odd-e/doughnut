@@ -131,9 +131,11 @@ pattern per run):
 ### 1. LFS seeding no longer goes through a raw-named helper
 
 Type: Structure (retrospective correction F3)
-Status: planned
+Status: done
 Proof: backend `NotebookGit*` green; grep for `storeLegacyRawAttachmentAndSnapshot`
 under `backend/` returns nothing.
+Accepted: `NotebookGit*` 428 tests, 0 failures; grep empty. Only the base,
+SizeAdmission (4) and AttachmentMetadata (1) called the primitive.
 
 Change: rename the primitive in `NotebookGitWebContentControllerTestBase`
 to `storeAcceptedAttachmentAndSnapshot` and update its javadoc. Update the

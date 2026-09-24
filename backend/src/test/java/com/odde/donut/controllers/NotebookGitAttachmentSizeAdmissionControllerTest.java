@@ -107,7 +107,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x44);
     Notebook notebook = createLegacyRawNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
-    storeLegacyRawAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized);
+    storeAcceptedAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized);
     NotebookGitBinding withLegacy = reloadCommittedBinding(notebook.getId());
 
     controller.publishNotebookGitProposal(
@@ -168,7 +168,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x45);
     Notebook notebook = createLegacyRawNotebook();
     Note note = makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
-    storeLegacyRawAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized);
+    storeAcceptedAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized);
 
     textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
 
@@ -183,7 +183,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
   void oversizedBytesAcceptedInAnotherNotebookAreNotExemptHere() throws Exception {
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x46);
     Notebook other = createLegacyRawNotebook("Other Notebook");
-    storeLegacyRawAttachmentAndSnapshot(other, null, "foreign.bin", oversized);
+    storeAcceptedAttachmentAndSnapshot(other, null, "foreign.bin", oversized);
 
     Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
@@ -204,7 +204,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
     byte[] different = filledBytes(LIMIT + 1, (byte) 0x48);
     Notebook notebook = createLegacyRawNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
-    storeLegacyRawAttachmentAndSnapshot(notebook, null, "legacy.bin", grandfathered);
+    storeAcceptedAttachmentAndSnapshot(notebook, null, "legacy.bin", grandfathered);
     NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
 
     ResponseStatusException exception =

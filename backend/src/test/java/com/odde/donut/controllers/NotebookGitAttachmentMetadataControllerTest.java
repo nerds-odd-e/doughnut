@@ -83,7 +83,7 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
     byte[] pointerLooking = NotebookGitLfsPointer.format(POINTER_OID, 7);
     Notebook notebook = createLegacyRawNotebook();
     NotebookAttachment attachment =
-        storeLegacyRawAttachmentAndSnapshot(notebook, null, "legacy.bin", pointerLooking);
+        storeAcceptedAttachmentAndSnapshot(notebook, null, "legacy.bin", pointerLooking);
 
     assertThat(attachment.getAcceptedGitContent(), equalTo(pointerLooking));
     assertThat(
