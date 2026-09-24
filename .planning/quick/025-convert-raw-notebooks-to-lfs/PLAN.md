@@ -60,8 +60,9 @@ conversion.
   transaction that locks the binding with `findByNotebookIdForUpdate` (the lock
   web changes use) and re-checks that it is still raw. Several instances or a
   restart can then run at the same time safely; an LFS binding is a no-op.
-  Store the bytes before the transaction: `NotebookAttachmentContent.store` is
-  idempotent per digest, and an unreferenced object is allowed.
+  Store the bytes inside that transaction, before the rows and commit change:
+  `NotebookAttachmentContent.store` is idempotent per digest, and a rollback
+  leaves only an unreferenced object, which is allowed.
 - **Commit:** The parent is the accepted head. The tree is the accepted tree
   with `.gitattributes` set to `NotebookGitAttributes` initial content
   (replacing any owner-published version, which stays in history), and each
@@ -114,7 +115,7 @@ compile-checked only; slice 4 tests it.
 ### 2. Current files become pointers with identical web bytes
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the same backend test. Publish `physics/diagram.png` twice and
 `refs/paper.pdf` to a raw notebook with the existing raw-publication support.
 
@@ -122,6 +123,15 @@ Behavior: After conversion, both paths in the head tree hold LFS pointers, the
 content store holds each digest, and the attachment rows hold the pointer text.
 `NotebookAttachmentController` download returns the original bytes. The first
 commit's `diagram.png` blob still reads as the original raw bytes.
+
+Delivered: `convert` now stores each non-empty row's bytes, sets the row to its
+pointer, and places the pointer in the tree. Deviation accepted: the bytes are
+stored inside the locked transaction rather than before it. The rows are only
+stable under the lock, `store` is idempotent, and a rollback leaves only an
+unreferenced object. Accepted proof:
+`NotebookGitLfsConversionControllerTest.currentFilesBecomePointersWhoseWebDownloadsKeepTheirBytes`
+(tip pointers, empty file kept, rows, web download bytes, content store, raw
+first-commit blob, and `assertAcceptedTreeMatchesTheFullAssembly`).
 
 ### 3. An existing local checkout pulls the conversion and continues on LFS
 

@@ -2,6 +2,7 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,10 @@ final class NotebookGitPortablePath {
 
   static String ofNote(String folderPrefix, String title) {
     return folderPrefix + title + ".md";
+  }
+
+  static String ofAttachment(NotebookAttachment attachment) {
+    return ofAttachment(folderPath(attachment.getFolder()), attachment.getFilename());
   }
 
   static String ofAttachment(String folderPrefix, String filename) {

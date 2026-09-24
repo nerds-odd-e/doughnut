@@ -25,7 +25,7 @@ public final class VerifiedNotebookAttachmentBytes {
     return matchesClaim(bytes, sha256Hex, size) ? bytes : null;
   }
 
-  private static String sha256Hex(byte[] bytes) {
+  public static String sha256Hex(byte[] bytes) {
     try {
       return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
     } catch (NoSuchAlgorithmException e) {
