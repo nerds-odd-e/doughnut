@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Pull receives web notes under non-ASCII folders like any other folder](seeds/SEED-041-pull-non-ascii-folders.md#story-1) — SEED-041#story-1
-
 ## Backlog list
 
 - [Tidy LFS test support into one vocabulary](quick/028-tidy-lfs-test-support/PLAN.md)
