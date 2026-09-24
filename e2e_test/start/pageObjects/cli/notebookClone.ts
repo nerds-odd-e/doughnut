@@ -81,6 +81,11 @@ function notebookClone() {
       )
     },
 
+    /** Runs the one-time conversion of a legacy raw notebook to LFS storage. */
+    convertToLfs(notebookName: string) {
+      return testability().convertRawNotebookToLfsForTestability(notebookName)
+    },
+
     /**
      * Resolves the notebook's numeric id, writes the owner's saved access token into the
      * isolated `@cliConfigDir`, then runs the installed CLI's non-interactive clone command

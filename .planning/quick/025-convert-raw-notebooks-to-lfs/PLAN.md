@@ -22,7 +22,9 @@ file with its LFS pointer, after the bytes are stored in the notebook's content
 store. The attachment rows then hold the pointers, and the binding becomes LFS.
 Earlier commits and their raw bytes are untouched. A failure on one notebook is
 logged, and the rest continue. Existing local checkouts receive the commit with
-`donut notebook pull`, and the CLI does not change.
+`donut notebook pull`. The CLI's publish check tolerates raw blobs in
+pre-conversion history (owner decision, option A); nothing else in the CLI
+changes.
 
 Excluded: removing the marker and the raw paths or fixtures (story 19),
 moving old-history bytes, shrinking bundles, and any web display of the
@@ -82,7 +84,8 @@ conversion.
   (ADR 0006 permits this catch). There is no retry beyond the next start.
 - **Home:** One small service in `services/notebookGit` owns "convert one raw
   notebook". The trigger owns only the loop.
-- **Unchanged:** CLI, frontend, size admission, and publication. The raw paths
+- **Unchanged:** frontend, size admission, server publication, and the CLI
+  apart from the publish check's history scan (slice 3). The raw paths
   stay working until story 19.
 
 ## Slices
@@ -136,7 +139,7 @@ first-commit blob, and `assertAcceptedTreeMatchesTheFullAssembly`).
 ### 3. An existing local checkout pulls the conversion and continues on LFS
 
 Type: Behavior
-Status: stopped — awaiting story review (CLI scope)
+Status: done
 Proof: a new scenario in `e2e_test/features/cli/cli_notebook_lfs.feature`,
 with a testability endpoint beside `force_raw_notebook_git_binding_for_testability`
 that calls the same conversion service.
@@ -170,6 +173,23 @@ the story's "the CLI does not change". The testability endpoint
 failing scenario are kept uncommitted in the execution worktree for the
 decision.
 
+Owner decision (2026-09-24, option A): allow the small CLI change in this
+story. When collecting digests already accepted in history, the publish check
+skips blobs that are not pointers instead of throwing; commits being published
+are still checked strictly. The kept scenario is the acceptance test, plus a
+CLI unit test in `cli/tests` beside the existing publish-selection tests.
+
+Delivered: the CLI publish check shares one attachment walker
+(`nonEmptyAttachmentsAt`) with one strict error (`requireLfsPointer`) for the
+tip and the published range; the accepted-history scan keeps only pointers.
+Testability `POST convert_raw_notebook_to_lfs_for_testability` (request type
+renamed `NotebookNameRequest`, shared with resnapshot and force-raw). Accepted
+proof: `cli/tests/notebookPublish.lfs.test.ts` (7, including "accepted raw
+history converted to LFS does not block publishing a pointer" and "rejects
+publishing a raw attachment in an LFS notebook") and
+`e2e_test/features/cli/cli_notebook_lfs.feature` (11, including "An existing
+checkout of a raw notebook pulls its conversion to LFS and continues on LFS").
+
 ### 4. One notebook's failure does not stop the others
 
 Type: Behavior
@@ -187,9 +207,25 @@ continues. Accepted proof:
 (the broken notebook stays raw, the healthy one becomes LFS, the run returns).
 Untested: the log line, and the `ApplicationReadyEvent` wiring.
 
+### 5. A history reset never creates a raw binding
+
+Type: Behavior
+Status: planned
+Source: owner-accepted scope added to story 14 on 2026-09-24 (key example 5,
+"No path creates a raw binding any more").
+Proof: backend test beside `NotebookGitHistoryResetControllerTest` (or in it).
+
+Behavior: A notebook with no binding → its owner resets its Git history → the
+created binding is LFS, and the new commit's tree has `.gitattributes` with
+`NotebookGitAttributes` initial content. Today
+`NotebookGitCutoverService.findOrCreateBinding` builds `new NotebookGitBinding()`,
+which takes the entity default RAW (`NotebookGitBinding.java:39`). Prefer
+making LFS the only default at creation (entity default or the creation site)
+over special-casing the reset; resetting a notebook that already has a raw
+binding keeps its representation (conversion owns that).
+
 ## Remaining concerns
 
-- Blocking (slice 3): the CLI rejects publishing a converted notebook because
-  pre-conversion history holds raw blobs. Needs an owner decision on story
-  scope: allow a CLI change (skip non-pointer blobs in accepted history) in
-  this story, and how CLI release relates to running the server conversion.
+- Release order: the CLI release with the slice 3 change must go out before the
+  server conversion runs in production; until then an older CLI cannot publish
+  a converted notebook.

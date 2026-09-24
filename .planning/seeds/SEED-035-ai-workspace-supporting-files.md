@@ -127,9 +127,13 @@ No executable plan or implementation is authorized by this seed.
   - History is not rewritten. Raw bytes in earlier commits stay where they are
     in the accepted Git object store, and full-history bundles still contain
     them.
-  - The CLI needs no change. A pull that receives `.gitattributes` configures
-    LFS and fills in the current files, as for new notebooks. Standard Git LFS
-    is required, as it already is for new notebooks.
+  - A pull that receives `.gitattributes` configures LFS and fills in the
+    current files, as for new notebooks. Standard Git LFS is required, as it
+    already is for new notebooks.
+  - One small CLI change (owner decision 2026-09-24, option A): publishing a
+    converted notebook tolerates the raw blobs in history from before the
+    conversion instead of refusing. The CLI release carrying it goes out before
+    the server conversion runs in production.
 - **Key examples:**
   1. A raw notebook has `physics/diagram.png` (an earlier version is in history)
      and `refs/paper.pdf`. After conversion, the accepted head has one new commit

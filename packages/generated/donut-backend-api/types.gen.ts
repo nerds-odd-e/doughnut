@@ -109,7 +109,7 @@ export type ShareToBazaarRequest = {
     notebookName: string;
 };
 
-export type ResnapshotNotebookGitBindingRequest = {
+export type NotebookNameRequest = {
     notebookName: string;
 };
 
@@ -1586,7 +1586,7 @@ export type ShareToBazaarResponses = {
 export type ShareToBazaarResponse = ShareToBazaarResponses[keyof ShareToBazaarResponses];
 
 export type ResnapshotNotebookGitBindingForTestabilityData = {
-    body: ResnapshotNotebookGitBindingRequest;
+    body: NotebookNameRequest;
     path?: never;
     query?: never;
     url: '/api/testability/resnapshot_notebook_git_binding_for_testability';
@@ -1734,7 +1734,7 @@ export type InjectMcqResponses = {
 export type InjectMcqResponse = InjectMcqResponses[keyof InjectMcqResponses];
 
 export type ForceRawNotebookGitBindingForTestabilityData = {
-    body: ResnapshotNotebookGitBindingRequest;
+    body: NotebookNameRequest;
     path?: never;
     query?: never;
     url: '/api/testability/force_raw_notebook_git_binding_for_testability';
@@ -1782,6 +1782,22 @@ export type EnableFeatureToggleResponses = {
 };
 
 export type EnableFeatureToggleResponse = EnableFeatureToggleResponses[keyof EnableFeatureToggleResponses];
+
+export type ConvertRawNotebookToLfsForTestabilityData = {
+    body: NotebookNameRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/convert_raw_notebook_to_lfs_for_testability';
+};
+
+export type ConvertRawNotebookToLfsForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ConvertRawNotebookToLfsForTestabilityResponse = ConvertRawNotebookToLfsForTestabilityResponses[keyof ConvertRawNotebookToLfsForTestabilityResponses];
 
 export type ResetDbAndTestabilitySettingsData = {
     body?: never;

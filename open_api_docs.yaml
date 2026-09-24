@@ -273,7 +273,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ResnapshotNotebookGitBindingRequest"
+              $ref: "#/components/schemas/NotebookNameRequest"
         required: true
       responses:
         "200":
@@ -438,7 +438,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ResnapshotNotebookGitBindingRequest"
+              $ref: "#/components/schemas/NotebookNameRequest"
         required: true
       responses:
         "200":
@@ -479,6 +479,24 @@ paths:
               schema:
                 type: array
                 items: {}
+  /api/testability/convert_raw_notebook_to_lfs_for_testability:
+    post:
+      tags:
+      - notebook-git-testability-controller
+      operationId: convertRawNotebookToLfsForTestability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotebookNameRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/clean_db_and_reset_testability_settings:
     post:
       tags:
@@ -3885,7 +3903,7 @@ components:
           type: string
       required:
       - notebookName
-    ResnapshotNotebookGitBindingRequest:
+    NotebookNameRequest:
       type: object
       properties:
         notebookName:
