@@ -17,7 +17,7 @@ plugins {
   id 'org.springframework.boot' version '4.1.1'
   // Spotless for the code style
   id "com.diffplug.spotless" version "8.10.2"
-  id "io.github.ben-manes.versions" version "0.63.1"
+  id "io.github.ben-manes.versions" version "0.64.0"
 }
 
 apply plugin: 'io.spring.dependency-management'
