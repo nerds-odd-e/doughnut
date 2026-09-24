@@ -6,9 +6,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import java.util.Optional;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * The file a notebook attachment row stands for: its size and exact bytes. The notebook's
@@ -41,8 +39,7 @@ public class NotebookAttachmentFile {
                     .get(attachment.getNotebook().getId(), pointer.sha256Hex())
                     .orElseThrow(
                         () ->
-                            new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                            new IllegalStateException(
                                 "File content unavailable: " + attachment.getFilename())))
         .orElse(attachment.getAcceptedGitContent());
   }

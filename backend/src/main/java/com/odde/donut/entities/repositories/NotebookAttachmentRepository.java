@@ -1,5 +1,6 @@
 package com.odde.donut.entities.repositories;
 
+import com.odde.donut.controllers.dto.NotebookAttachmentListItem;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.services.notebookTree.PortableTreeAttachmentRow;
 import java.util.Collection;
@@ -21,9 +22,22 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
 
   List<NotebookAttachment> findByNotebook_Id(Integer notebookId);
 
-  List<NotebookAttachment> findByNotebook_IdAndFolderIsNullOrderByIdAsc(Integer notebookId);
+  @Query(
+      """
+      SELECT NEW com.odde.donut.controllers.dto.NotebookAttachmentListItem(a.id, a.filename)
+      FROM NotebookAttachment a
+      WHERE a.notebook.id = :notebookId AND a.folder IS NULL ORDER BY a.id ASC
+      """)
+  List<NotebookAttachmentListItem> findRootListItemsByNotebookId(
+      @Param("notebookId") Integer notebookId);
 
-  List<NotebookAttachment> findByFolder_IdOrderByIdAsc(Integer folderId);
+  @Query(
+      """
+      SELECT NEW com.odde.donut.controllers.dto.NotebookAttachmentListItem(a.id, a.filename)
+      FROM NotebookAttachment a
+      WHERE a.folder.id = :folderId ORDER BY a.id ASC
+      """)
+  List<NotebookAttachmentListItem> findListItemsByFolderId(@Param("folderId") Integer folderId);
 
   boolean existsByFolder_IdIn(Collection<Integer> folderIds);
 }

@@ -67,8 +67,7 @@ abstract class NotebookFolderQuerySupport {
       return new FolderListing(
           noteTopologies,
           folders,
-          notebookAttachmentRepository.findByNotebook_IdAndFolderIsNullOrderByIdAsc(
-              notebook.getId()));
+          notebookAttachmentRepository.findRootListItemsByNotebookId(notebook.getId()));
     }
     Folder folder =
         folderRepository
@@ -86,7 +85,7 @@ abstract class NotebookFolderQuerySupport {
     return new FolderListing(
         noteTopologies,
         childFolders,
-        notebookAttachmentRepository.findByFolder_IdOrderByIdAsc(folder.getId()));
+        notebookAttachmentRepository.findListItemsByFolderId(folder.getId()));
   }
 
   @Operation(

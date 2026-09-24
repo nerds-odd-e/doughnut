@@ -1192,10 +1192,10 @@ export type SubscriptionForNotebooksListing = {
 export type FolderListing = {
     noteTopologies?: Array<NoteTopology>;
     folders?: Array<Folder>;
-    attachments?: Array<NotebookAttachment>;
+    attachments?: Array<NotebookAttachmentListItem>;
 };
 
-export type NotebookAttachment = {
+export type NotebookAttachmentListItem = {
     id: number;
     filename: string;
 };
@@ -1207,7 +1207,7 @@ export type BookUserLastReadPosition = {
 };
 
 /**
- * Notebook chrome plus one file for loading the file page: the shared realm sidebar with the folder trail from notebook root through the file's folder, the file row, and its size in bytes.
+ * Notebook chrome plus one file for loading the file page: the shared realm sidebar with the folder trail from notebook root through the file's folder, the file's id and filename, and its size in bytes.
  */
 export type NotebookAttachmentRealm = {
     /**
@@ -1222,7 +1222,7 @@ export type NotebookAttachmentRealm = {
      * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */
     scopedReadmeContent?: string;
-    attachment: NotebookAttachment;
+    attachment: NotebookAttachmentListItem;
     size: number;
 };
 

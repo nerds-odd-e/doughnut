@@ -22,21 +22,16 @@ export function notebookLfs() {
       payload: string,
       obsoletePayload: string
     ) {
-      return cy
-        .request<{ oid: string; size: number }>({
-          method: 'POST',
-          url: `${e2eAppBaseUrl()}/api/testability/accept_lfs_attachment_tip_for_testability`,
-          body: {
-            notebookName,
-            filename,
-            payload,
-            obsoletePayload,
-          },
-        })
-        .then((response) => {
-          expect(response.status).to.eq(200)
-          expect(response.body.oid).to.match(/^[a-f0-9]{64}$/)
-          cy.wrap(response.body.oid).as('lfsTipOid')
+      return testability()
+        .acceptLfsAttachmentTipForTestability(
+          notebookName,
+          filename,
+          payload,
+          obsoletePayload
+        )
+        .then((oid) => {
+          expect(oid).to.match(/^[a-f0-9]{64}$/)
+          cy.wrap(oid).as('lfsTipOid')
         })
     },
     uploadDownloadAndVerifyExactDigest(payload: string) {

@@ -1,6 +1,6 @@
 import type {
   FolderListing,
-  NotebookAttachment,
+  NotebookAttachmentListItem,
   NoteRealm,
   Options,
   ShowNoteData,
@@ -106,7 +106,7 @@ export function setupRootPeersWithFolders(options: {
     mango?: Partial<ReturnType<typeof testFolderStub>>
     banana?: Partial<ReturnType<typeof testFolderStub>>
   }
-  attachments?: NotebookAttachment[]
+  attachments?: NotebookAttachmentListItem[]
 }) {
   const {
     storageAccessor,

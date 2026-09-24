@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Notebook file browsing reports lost content and lists files cheaply](quick/023-notebook-file-listing-correction/PLAN.md) — quick/023-notebook-file-listing-correction
-
 ## Backlog list
 
 - [Keep uploaded note images private to readers of their notebook](seeds/SEED-040-private-note-images.md#story-1) — SEED-040#story-1

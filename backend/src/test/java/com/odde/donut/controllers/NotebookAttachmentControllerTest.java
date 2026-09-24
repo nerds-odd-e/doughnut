@@ -67,7 +67,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
       NotebookAttachmentRealm page = controller.getAttachmentPage(notebook, runJson);
 
-      assertThat(page.attachment().getFilename(), equalTo("run.json"));
+      assertThat(page.attachment().filename(), equalTo("run.json"));
       assertThat(page.size(), equalTo(7L));
       assertThat(
           page.sidebar().getAncestorFolders().stream().map(Folder::getName).toList(),
@@ -175,12 +175,11 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
     @Test
     void missingBytesFailLoudlyNamingTheFile() {
-      ResponseStatusException error =
+      IllegalStateException error =
           assertThrows(
-              ResponseStatusException.class,
-              () -> controller.downloadAttachment(notebook, diagram));
+              IllegalStateException.class, () -> controller.downloadAttachment(notebook, diagram));
 
-      assertThat(error.getReason(), equalTo("File content unavailable: diagram.png"));
+      assertThat(error.getMessage(), equalTo("File content unavailable: diagram.png"));
     }
 
     @Test

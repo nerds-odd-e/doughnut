@@ -1,7 +1,7 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
 import createNoteStorage from "@/store/createNoteStorage"
-import type { NotebookAttachment } from "@generated/donut-backend-api"
+import type { NotebookAttachmentListItem } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -60,7 +60,7 @@ describe("Sidebar peer sort", () => {
   }
 
   async function mountZebraAppleRootSidebar(
-    attachments: NotebookAttachment[] = []
+    attachments: NotebookAttachmentListItem[] = []
   ) {
     storageAccessor.value = createNoteStorage()
     const { realmZ, realmA } = zebraApplePeerRealms()

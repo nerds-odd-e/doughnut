@@ -22,14 +22,12 @@ Given(
   }
 )
 
-Then('I should see these rows at the sidebar root:', (data: DataTable) => {
-  start.noteSidebar().expectRootRows(data.raw().flat())
-})
-
-Then(
-  'I should see these rows in sidebar folder {string}:',
-  (folderLabel: string, data: DataTable) => {
-    start.noteSidebar().expectRowsUnderFolder(folderLabel, data.raw().flat())
+Given(
+  'the notebook {string} has an LFS file {string} with payload {string}',
+  (notebookName: string, filename: string, payload: string) => {
+    start
+      .testability()
+      .acceptLfsAttachmentTipForTestability(notebookName, filename, payload)
   }
 )
 

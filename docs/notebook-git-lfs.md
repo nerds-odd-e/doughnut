@@ -70,8 +70,9 @@ content.
 
 Web Donut downloads an LFS file's stored bytes and shows the pointer's size on
 the file's page. When the stored object is missing, the download fails with an
-error naming the file as unavailable; the pointer text is never served as the
-file. A zero-byte file is served empty.
+error naming the file as unavailable and is recorded as a server failure,
+because a missing tip object is lost content; the pointer text is never served
+as the file. A zero-byte file is served empty.
 
 ## Recovering a published attachment version
 
