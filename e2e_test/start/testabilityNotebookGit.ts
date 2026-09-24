@@ -78,8 +78,8 @@ export const notebookGitTestabilityMethods = {
   },
 
   /**
-   * Stores an accepted LFS file at the notebook root (switching the notebook to LFS) and yields
-   * its tip oid. An obsolete payload, when given, is stored first as an unreferenced LFS object.
+   * Stores an accepted LFS file at the notebook root, keeping the notebook's accepted Git
+   * metadata, and yields its tip oid. An obsolete payload, when given, is stored first as an unreferenced LFS object.
    */
   acceptLfsAttachmentTipForTestability(
     notebookName: string,

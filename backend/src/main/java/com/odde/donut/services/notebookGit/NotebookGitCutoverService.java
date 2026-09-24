@@ -88,8 +88,8 @@ public class NotebookGitCutoverService {
 
   /**
    * Like {@link #resetHistory(Notebook, Instant)}, but installs the supplied metadata entries (for
-   * example initial LFS {@code .gitattributes}) into the new tip instead of preserving the previous
-   * tip's metadata.
+   * example none, when demoting a notebook to raw) into the new tip instead of preserving the
+   * previous tip's metadata.
    */
   @Transactional
   public NotebookGitBinding resetHistory(

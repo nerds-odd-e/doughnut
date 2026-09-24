@@ -3,14 +3,10 @@ package com.odde.donut.testability;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
-import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
-import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
-import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 class NotebookLfsTestabilityController {
 
   @Autowired NotebookRepository notebookRepository;
-  @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
   @Autowired NotebookAttachmentContent notebookAttachmentContent;
   @Autowired TestabilitySettings testabilitySettings;
@@ -56,9 +51,9 @@ class NotebookLfsTestabilityController {
   }
 
   /**
-   * Testability-only: selects LFS representation, stores the tip payload (and optional obsolete
-   * payload), projects a root attachment as a pointer, and resets accepted history with LFS
-   * attributes so CLI clone can hydrate an already-accepted LFS tip.
+   * Testability-only: stores the tip payload (and optional obsolete payload), projects a root
+   * attachment as a pointer, and resets accepted history keeping the notebook's accepted Git
+   * metadata so CLI clone can hydrate an already-accepted LFS tip.
    */
   @PostMapping("/accept_lfs_attachment_tip_for_testability")
   @Transactional
@@ -70,13 +65,6 @@ class NotebookLfsTestabilityController {
       throw new IllegalArgumentException("notebookName, filename, and payload are required");
     }
     Notebook notebook = requireNotebook(request.getNotebookName());
-    NotebookGitBinding binding =
-        notebookGitBindingRepository
-            .findByNotebook_Id(notebook.getId())
-            .orElseThrow(() -> new IllegalArgumentException("Notebook has no Git binding"));
-    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
-    notebookGitBindingRepository.save(binding);
-
     if (request.getObsoletePayload() != null) {
       notebookAttachmentContent.storeAsLfsPointer(
           notebook.getId(), request.getObsoletePayload().getBytes(StandardCharsets.UTF_8));
@@ -94,9 +82,7 @@ class NotebookLfsTestabilityController {
     notebookAttachmentRepository.save(attachment);
 
     notebookGitCutoverService.resetHistory(
-        notebook,
-        testabilitySettings.getCurrentUTCTimestamp().toInstant(),
-        NotebookGitAttributes.initialMetadata());
+        notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
 
     AcceptLfsAttachmentTipResponse response = new AcceptLfsAttachmentTipResponse();
     response.setOid(VerifiedNotebookAttachmentBytes.sha256Hex(payload));

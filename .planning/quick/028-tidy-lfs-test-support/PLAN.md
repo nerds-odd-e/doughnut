@@ -204,7 +204,10 @@ plan 026).
 ### 4. E2E accepted-LFS-tip seeding keeps the notebook's own representation
 
 Type: Structure (retrospective correction F7)
-Status: planned
+Status: done
+Accepted: `cli_notebook_lfs.feature` 11/11; full backend 2666 tests,
+0 failures; grep clean; OpenAPI output unchanged. The metadata overload of
+`resetHistory` stays for the raw-demotion testability path (story 19).
 Proof: `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`
 green (11/11 per plan 026). `NotebookLfsTestabilityController` has no
 `setAttachmentRepresentation` and no `initialMetadata`. Backend compiles
