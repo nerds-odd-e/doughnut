@@ -5952,8 +5952,8 @@ components:
         attachments:
           type: array
           items:
-            $ref: "#/components/schemas/NotebookAttachment"
-    NotebookAttachment:
+            $ref: "#/components/schemas/NotebookAttachmentListItem"
+    NotebookAttachmentListItem:
       type: object
       properties:
         id:
@@ -5984,7 +5984,7 @@ components:
       type: object
       description: "Notebook chrome plus one file for loading the file page: the shared\
         \ realm sidebar with the folder trail from notebook root through the file's\
-        \ folder, the file row, and its size in bytes."
+        \ folder, the file's id and filename, and its size in bytes."
       properties:
         notebookRealm:
           $ref: "#/components/schemas/NotebookRealm"
@@ -6002,7 +6002,7 @@ components:
             non-blank title_pattern (inner scope toward notebook root). Omitted when
             none applies.
         attachment:
-          $ref: "#/components/schemas/NotebookAttachment"
+          $ref: "#/components/schemas/NotebookAttachmentListItem"
         size:
           type: integer
           format: int64

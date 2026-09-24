@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.donut.controllers.dto.FolderListing;
 import com.odde.donut.controllers.dto.NoteTopology;
+import com.odde.donut.controllers.dto.NotebookAttachmentListItem;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
 import java.util.Objects;
@@ -84,7 +84,7 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
   }
 
   private static List<String> filenames(FolderListing listing) {
-    return listing.attachments().stream().map(NotebookAttachment::getFilename).toList();
+    return listing.attachments().stream().map(NotebookAttachmentListItem::filename).toList();
   }
 
   @Test

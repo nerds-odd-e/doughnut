@@ -95,7 +95,7 @@ Accepted: B-focused on `NotebookAttachmentControllerTest` passed (14 tests);
 
 ### 2. Sidebar listing reads only id and filename
 Type: Structure
-Status: planned
+Status: done
 
 Replace entity loading in the folder listing with `(id, filename)` projection
 queries and a listing record; use the same record in the file page payload;
@@ -108,6 +108,10 @@ Proof: `NotebookFolderListingControllerTest` and `NotebookAttachmentControllerTe
 `tests/pages/AttachmentPage.spec.ts` (Command F), vue-tsc, Command G, and
 Command E (the kept scenarios exercise listing, page and download over HTTP).
 Sizing: ~7 min (API regeneration and E2E wait).
+Accepted: record `controllers/dto/NotebookAttachmentListItem` filled by JPQL
+projections `findRootListItemsByNotebookId` / `findListItemsByFolderId`; B-focused
+(24 tests), F (23 tests + vue-tsc), G (schema renamed to
+`NotebookAttachmentListItem`, fields unchanged), E (3/3) passed.
 
 ### 3. File feature keeps only integration-bearing scenarios
 Type: Structure
@@ -139,7 +143,7 @@ Sizing: ~4 min.
 - G: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`.
 - E: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/notebooks/notebook_files.feature`.
 
-Slice 1 proof ran; later slices not yet run.
+Slices 1–2 proof ran; slice 3 not yet run.
 
 ## Learnings
 

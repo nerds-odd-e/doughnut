@@ -19,11 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import type { NotebookAttachment } from "@generated/donut-backend-api"
+import type { NotebookAttachmentListItem } from "@generated/donut-backend-api"
 import { File } from "@lucide/vue"
 import { RouterLink } from "vue-router"
 
-defineProps<{ notebookId: number; attachment: NotebookAttachment }>()
+defineProps<{ notebookId: number; attachment: NotebookAttachmentListItem }>()
 </script>
 
 <style lang="scss" scoped>

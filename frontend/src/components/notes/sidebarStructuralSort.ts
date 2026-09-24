@@ -1,14 +1,14 @@
 import type {
   Folder,
   NoteTopology,
-  NotebookAttachment,
+  NotebookAttachmentListItem,
 } from "@generated/donut-backend-api"
 import type { PeerSortSpec } from "@/composables/usePeerSort"
 
 export type SidebarStructuralRow =
   | { kind: "note"; noteTopology: NoteTopology }
   | { kind: "folder"; folder: Folder }
-  | { kind: "attachment"; attachment: NotebookAttachment }
+  | { kind: "attachment"; attachment: NotebookAttachmentListItem }
 
 function parseTime(iso: string | undefined): number {
   if (iso == null || iso === "") return Number.NaN
@@ -103,7 +103,7 @@ export function sortSidebarStructuralRows(
 export function buildUnsortedStructuralRows(
   noteTopologies: NoteTopology[],
   folders: Folder[] | undefined,
-  attachments: NotebookAttachment[] | undefined
+  attachments: NotebookAttachmentListItem[] | undefined
 ): SidebarStructuralRow[] {
   type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
   type NoteRow = Extract<SidebarStructuralRow, { kind: "note" }>

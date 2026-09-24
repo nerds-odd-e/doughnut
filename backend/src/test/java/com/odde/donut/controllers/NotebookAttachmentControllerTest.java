@@ -67,7 +67,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
       NotebookAttachmentRealm page = controller.getAttachmentPage(notebook, runJson);
 
-      assertThat(page.attachment().getFilename(), equalTo("run.json"));
+      assertThat(page.attachment().filename(), equalTo("run.json"));
       assertThat(page.size(), equalTo(7L));
       assertThat(
           page.sidebar().getAncestorFolders().stream().map(Folder::getName).toList(),
