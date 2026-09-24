@@ -231,6 +231,9 @@ No executable plan or implementation is authorized by this seed.
 <a id="story-5"></a>
 
 ### Access existing note images as notebook folder files
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
 
 - **Identity:** SEED-035#story-5
 - **Goal:** Existing notebook owners use accumulated visual knowledge locally
@@ -244,10 +247,57 @@ No executable plan or implementation is authorized by this seed.
   URLs and Books are not implicitly copied or converted.
 - **Effort hypothesis:** L, low confidence until ownership/sharing/reference
   cases are understood; do not presume a fleet conversion fits this estimate.
-- **Depends on:** Story 6. Stories 1, 3, and 4 are not user prerequisites.
+- **Depends on:** Story 3 settles the reference spelling and web display that
+  a converted `image:` must use; story 4 stops new uploads recreating legacy
+  images. Converting before either repeats or pre-empts their work.
 - **Safe stopping point:** Existing images work locally and on the web even if
   later image-authoring flows are deferred. Preserve the only accessible copy
   throughout transition; avoid a separate permanent image-file model.
+
+#### Interim refinement (2026-09-24, not yet refined)
+
+- **Current state:** An uploaded image is an `image` row owned by exactly one
+  note, with its bytes in MySQL (`attachment_blob`), unrelated to
+  `notebook_attachment`. The note refers to it only through frontmatter
+  `image: /attachments/images/{id}/{name}`, optionally with `image_mask:`
+  rectangles. Export writes the note unchanged and no image bytes, so every
+  uploaded image is a broken server path in a local checkout. Display is only
+  `NoteShow` (note page, recall, conversations); no AI feature uses images.
+- **Value challenge:** Only owners who have uploaded images and work on those
+  notebooks locally benefit; how many images and notebooks are affected is
+  unknown. Images stay safe and visible on the web meanwhile, so deferral
+  loses nothing. The benefit is a complete local notebook, not a new capability
+  for AI work.
+- **Ordering (owner, 2026-09-24):** Placed after stories 3 and 4 in the
+  product backlog.
+- **Candidate narrow scope (proposal, undecided):** Conversion is triggered
+  by the owner per notebook as one accepted commit, not a fleet migration.
+  It covers `image` rows of that notebook's notes that the note's `image:`
+  currently references. The file is placed in the note's folder and `image:`
+  is rewritten to it; `image_mask:` is unchanged. Legacy rows and the
+  `/attachments/images/...` endpoint are kept.
+- **Candidate exclusions:** remote URLs; one note referencing another note's
+  image; notebooks the user does not own; automatic conversion of new uploads
+  (story 4); local mask presentation; removing the `image` table.
+- **Open decisions:**
+  - Raw-representation notebooks: the North Star places story 14 (LFS
+    migration, unqueued) before image conversion. Either limit this story to
+    LFS notebooks, queue story 14 first, or accept image bytes entering raw
+    Git history.
+  - Owner-triggered per notebook, or automatic?
+  - Filename clash when two notes in one folder share an image filename, or
+    the folder already has that file: rename or refuse? Refusing blocks
+    conversion permanently.
+  - Reference spelling (note-relative or notebook-root-relative) is shared
+    with story 3.
+  - An owner with unpublished local work will find `pull` refusing over the
+    web attachment change; acceptable, or does conversion need guidance?
+- **Related finding, owner decision pending:** `GET /attachments/images/{id}/{fileName}`
+  has no authorization check (the security configuration permits all but
+  `/login/continue`) and ignores the filename, and image IDs are sequential,
+  so images from private notebooks can be enumerated. Whether to queue a
+  separate bug item is undecided; this story's conversion would not remove
+  the exposure while legacy rows remain.
 
 <a id="story-3"></a>
 
@@ -263,7 +313,8 @@ No executable plan or implementation is authorized by this seed.
   recall modes, image prompts, or question-generation behavior is promised.
 - **Effort hypothesis:** M, low confidence until reference spelling and current
   presentation contexts are established.
-- **Depends on:** Story 6. Story 5 may supply reuse, not a user prerequisite.
+- **Depends on:** Story 6. Story 5 depends on this story's reference spelling
+  and web display, not the reverse.
 - **Safe stopping point:** Local diagrams work in notes without new web-upload
   portability. Downloadable bytes do not imply every image format renders.
 
@@ -375,8 +426,9 @@ should precede their image conversion when queued.
 This is delivery order, not a reason to withhold browsing from already supported
 legacy content. Delivered nested attachment continuity
 then enables the browsing journey that requires nested files. The remaining
-attachment order covers browser retrieval, existing images, guidance-folder
-assimilation, local visual authoring, new web-image portability, web cleanup,
+attachment order covers browser retrieval, guidance-folder assimilation, local
+visual authoring, new web-image portability, existing-image conversion (after
+the two image flows it relies on), web cleanup,
 and last the two conveniences whose absence loses nothing: dissolve/merge with
 files (story 11), then the rarer cross-notebook folder move (story 10). Root
 attachment continuity is also delivered.
