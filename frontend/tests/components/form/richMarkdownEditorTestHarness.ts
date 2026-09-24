@@ -197,6 +197,7 @@ export function createRichMarkdownEditorTestHarness() {
     lastEmittedMarkdown,
     lastEmittedPasteComplete,
     lastEmittedPasteContext,
+    quillInstance,
     quillEditorEl,
     quillModelHtml,
     quillReadonly,

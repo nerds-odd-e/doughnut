@@ -111,6 +111,7 @@ const options: QuillOptions = {
     "list",
     "indent",
     "link",
+    "image",
     "mark",
     "softbreak",
     "horizontalrule",

@@ -63,6 +63,18 @@ describe("RichMarkdownEditor", () => {
     ])
   })
 
+  it("keeps a body image embed when other text is edited", async () => {
+    await h.mountEditor("Intro\n\n![force](force-diagram.png)\n\nMore", {
+      attachToBody: true,
+    })
+    const quill = h.quillInstance()
+    quill.insertText(quill.getLength() - 1, " text", "user")
+    await nextTick()
+    expect(h.lastEmittedMarkdown()).toBe(
+      "Intro\n\n![force](force-diagram.png)\n\nMore text"
+    )
+  })
+
   it("does not paste when readonly", async () => {
     await h.mountEditor("", { readonly: true })
     await h.dispatchPasteHtmlToQuill("<p>Test</p>")
