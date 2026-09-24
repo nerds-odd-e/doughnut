@@ -89,7 +89,9 @@ export async function readPublishedExecutionSource(request, remoteRef) {
     );
     plan = await show(request.integration, remoteRef, planPath);
     if (plan === null) throw new Error("published plan is absent");
-    planTarget = posix.relative(backlogDir, planPath);
+    // A whole-document correction's plan is its canonical home: no plan link.
+    if (planPath !== homePath)
+      planTarget = posix.relative(backlogDir, planPath);
     if (entry.plan && entry.plan.target !== planTarget)
       throw new Error("queued plan link disagrees with preparation");
     if (request.plan && request.plan !== planTarget)
