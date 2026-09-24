@@ -52,7 +52,7 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
   @Test
   void lateBindingSaveFailureRollsBackMixedMoveDeleteAddRangeLeavingAcceptedStateA()
       throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     Note moved =
         makeMe.aNote().notebook(notebook).title("Original").content(MOVED_ORIGINAL).please();
     Note deleted =
@@ -115,27 +115,21 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterMoveDeleteAndCompanionEdit =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHeadId),
-              withAcceptedMetadata(
-                  repository,
-                  acceptedHeadId,
-                  List.of(
-                      new NotebookGitProposalFile("Renamed.md", MOVED_ORIGINAL),
-                      new NotebookGitProposalFile("Companion.md", COMPANION_EDITED))),
+              acceptedHeadId,
+              List.of(
+                  new NotebookGitProposalFile("Renamed.md", MOVED_ORIGINAL),
+                  new NotebookGitProposalFile("Companion.md", COMPANION_EDITED)),
               "Exact rename, delete learned note, edit companion");
       ObjectId tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterMoveDeleteAndCompanionEdit),
-              withAcceptedMetadata(
-                  repository,
-                  acceptedHeadId,
-                  List.of(
-                      new NotebookGitProposalFile("Renamed.md", MOVED_EDITED),
-                      new NotebookGitProposalFile("Companion.md", COMPANION_EDITED),
-                      new NotebookGitProposalFile("Added.md", ADDED_CONTENT))),
+              afterMoveDeleteAndCompanionEdit,
+              List.of(
+                  new NotebookGitProposalFile("Renamed.md", MOVED_EDITED),
+                  new NotebookGitProposalFile("Companion.md", COMPANION_EDITED),
+                  new NotebookGitProposalFile("Added.md", ADDED_CONTENT)),
               "Edit moved note and add unrelated note");
       proposal = bundleBytesForHead(repository, tip);
     }

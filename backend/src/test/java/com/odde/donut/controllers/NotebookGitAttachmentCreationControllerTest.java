@@ -27,13 +27,13 @@ import org.springframework.web.server.ResponseStatusException;
  * entry points.
  */
 class NotebookGitAttachmentCreationControllerTest
-    extends NotebookGitAttachmentLfsPublicationTestSupport {
+    extends NotebookGitAttachmentSizeAdmissionTestSupport {
 
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
 
   @Test
   void productCreationSelectsLfsAndInstallsInitialAttributes() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
 
     assertThat(binding.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.LFS));
@@ -46,7 +46,7 @@ class NotebookGitAttachmentCreationControllerTest
 
   @Test
   void demotedExistingNotebooksStayRawWithoutAttributesIncludingNeverCloned() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
 
     assertThat(binding.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.RAW));
@@ -59,19 +59,14 @@ class NotebookGitAttachmentCreationControllerTest
   @Test
   void historyResetPreservesLfsRepresentationAttributesAndRetainedContentObjects()
       throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] payload = {(byte) 0x11, (byte) 0x22, (byte) 0x33};
     byte[] pointer = pointerFor(notebook, payload);
     controller.publishNotebookGitProposal(
         notebook.getId(),
         empty.getAcceptedGitObjectId(),
-        proposalBundleBytes(
-            empty,
-            List.of(
-                new NotebookGitProposalFile(
-                    NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
-                new NotebookGitProposalFile("payload.bin", pointer))));
+        proposalBundleBytes(empty, List.of(new NotebookGitProposalFile("payload.bin", pointer))));
 
     controller.resetNotebookGitHistory(notebookRepository.findById(notebook.getId()).orElseThrow());
 
@@ -97,7 +92,7 @@ class NotebookGitAttachmentCreationControllerTest
   @Test
   void olderClientRawAttachmentPayloadIntoLfsNotebookIsRefusedWithoutStoringBytes()
       throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] rawPayload = {(byte) 0x89, (byte) 0xFF, (byte) 0xFE, 0x00};
 
@@ -106,11 +101,7 @@ class NotebookGitAttachmentCreationControllerTest
             notebook,
             empty.getAcceptedGitObjectId(),
             proposalBundleBytes(
-                empty,
-                List.of(
-                    new NotebookGitProposalFile(
-                        NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
-                    new NotebookGitProposalFile("diagram.png", rawPayload))),
+                empty, List.of(new NotebookGitProposalFile("diagram.png", rawPayload))),
             HttpStatus.BAD_REQUEST);
 
     assertThat(exception.getReason(), containsString("diagram.png"));

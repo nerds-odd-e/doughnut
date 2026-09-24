@@ -34,7 +34,7 @@ class NotebookGitWebFolderPermanentDeleteControllerTest
 
   @Test
   void permanentDeleteOfATrashedFolderAppendsOneAcceptedChildWithoutTheSubtree() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     Folder topic =
         makeMe.aFolder().inTrashOf(notebook).name("Topic").readmeContent("Topic readme").please();
     Folder nested = makeMe.aFolder().parentFolder(topic).name("Nested").please();

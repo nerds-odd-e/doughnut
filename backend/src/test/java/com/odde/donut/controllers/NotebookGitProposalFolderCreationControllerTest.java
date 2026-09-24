@@ -81,7 +81,7 @@ class NotebookGitProposalFolderCreationControllerTest
       afterB.add(new NotebookGitProposalFile(folderReadmePath, FOLDER_README));
       afterB.add(new NotebookGitProposalFile(addedNotePath, ADDED_INITIAL));
       ObjectId afterAddAndEdit =
-          commitOnTopOf(repository, List.of(acceptedHead), afterB, "Add folder and edit existing");
+          localCommitOnTopOf(repository, acceptedHead, afterB, "Add folder and edit existing");
       List<NotebookGitProposalFile> afterC = new ArrayList<>();
       afterC.add(new NotebookGitProposalFile("Existing.md", EDITED_EXISTING_WITH_LINK));
       if (nestedDestination) {
@@ -89,7 +89,7 @@ class NotebookGitProposalFolderCreationControllerTest
       }
       afterC.add(new NotebookGitProposalFile(folderReadmePath, FOLDER_README));
       afterC.add(new NotebookGitProposalFile(addedNotePath, ADDED_FINAL));
-      tip = commitOnTopOf(repository, List.of(afterAddAndEdit), afterC, "Edit newly added note");
+      tip = localCommitOnTopOf(repository, afterAddAndEdit, afterC, "Edit newly added note");
       proposalBytes = bundleBytesForHead(repository, tip);
     }
 

@@ -153,8 +153,13 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
     List<PortableTreeEntry> tipWithRootFiles =
         new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(notebook)));
-    tipWithRootFiles.add(new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES));
-    tipWithRootFiles.add(ofText("reference.json", REFERENCE_JSON));
+    List<PortableTreeEntry> rootFiles =
+        committedOnLfs(
+            notebook,
+            List.of(
+                new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES),
+                ofText("reference.json", REFERENCE_JSON)));
+    tipWithRootFiles.addAll(rootFiles);
     controller.publishNotebookGitProposal(
         notebook.getId(),
         markdownOnly.getAcceptedGitObjectId(),
@@ -170,10 +175,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
       assertThat(resetCommit.getParentCount(), equalTo(0));
       assertThat(
           GitBundleTestReader.readTreeEntries(repository, resetCommit),
-          contains(
-              new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES),
-              ofText("Overview.md", OVERVIEW_CONTENT),
-              ofText("reference.json", REFERENCE_JSON)));
+          contains(rootFiles.get(0), ofText("Overview.md", OVERVIEW_CONTENT), rootFiles.get(1)));
     }
   }
 }

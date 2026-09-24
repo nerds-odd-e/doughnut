@@ -40,7 +40,7 @@ class NotebookGitAttachmentPublicationControllerTest
 
   @Test
   void publishedRootFilesAreTheExactAcceptedTipAndSurviveTheNextWebNoteSave() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     ObjectId initialHead = ObjectId.fromString(empty.getAcceptedGitObjectId());
 
@@ -84,7 +84,7 @@ class NotebookGitAttachmentPublicationControllerTest
 
   @Test
   void anInitialPublicationMayBeFileOnlyWithNoNoteAtAll() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
 
     controller.publishNotebookGitProposal(
@@ -102,7 +102,7 @@ class NotebookGitAttachmentPublicationControllerTest
 
   @Test
   void anInitialPublicationMayContainOnlyAFileInNestedFolders() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     String attachmentPath = "tools/cache/reference.json";
 
@@ -129,7 +129,7 @@ class NotebookGitAttachmentPublicationControllerTest
 
   @Test
   void invalidMarkdownBesideAValidFileChangeLeavesTheHeadAndTheFilesUnchanged() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding accepted = publishNoteAndRootFile(notebook);
     List<PortableTreeEntry> filesBefore = committedRootAttachments(notebook);
 
@@ -148,7 +148,7 @@ class NotebookGitAttachmentPublicationControllerTest
 
   @Test
   void aStaleHeadLeavesTheAcceptedFilesUnchanged() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding accepted = publishNoteAndRootFile(notebook);
     List<PortableTreeEntry> filesBefore = committedRootAttachments(notebook);
 
@@ -167,7 +167,7 @@ class NotebookGitAttachmentPublicationControllerTest
 
   @Test
   void publishedFileBesideANoteIsExactAndSurvivesTheNextWebNoteSave() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
     NotebookGitBinding notesOnly = snapshotCurrentPortableTree(notebook);
 

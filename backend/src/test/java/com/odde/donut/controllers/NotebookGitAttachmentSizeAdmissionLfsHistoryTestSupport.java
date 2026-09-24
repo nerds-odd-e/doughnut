@@ -17,7 +17,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
  * history admission.
  */
 abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
-    extends NotebookGitAttachmentLfsPublicationTestSupport {
+    extends NotebookGitAttachmentSizeAdmissionTestSupport {
 
   record LfsHistoryRange(ObjectId afterFirst, ObjectId tip, byte[] proposalBytes) {}
 
@@ -27,22 +27,16 @@ abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, baseBundleBytes);
       ObjectId afterFirst =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(baseHead),
-              withAcceptedMetadata(
-                  repository,
-                  baseHead,
-                  List.of(new NotebookGitProposalFile("version.bin", firstPointer))),
+              baseHead,
+              List.of(new NotebookGitProposalFile("version.bin", firstPointer)),
               "First LFS version");
       ObjectId tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterFirst),
-              withAcceptedMetadata(
-                  repository,
-                  afterFirst,
-                  List.of(new NotebookGitProposalFile("version.bin", tipPointer))),
+              afterFirst,
+              List.of(new NotebookGitProposalFile("version.bin", tipPointer)),
               "Corrected LFS tip");
       return new LfsHistoryRange(afterFirst, tip, bundleBytesForHead(repository, tip));
     }
@@ -54,20 +48,13 @@ abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, baseBundleBytes);
       ObjectId afterFirst =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(baseHead),
-              withAcceptedMetadata(
-                  repository,
-                  baseHead,
-                  List.of(note, new NotebookGitProposalFile("temporary.bin", temporaryPointer))),
+              baseHead,
+              List.of(note, new NotebookGitProposalFile("temporary.bin", temporaryPointer)),
               "Temporary LFS attachment");
       ObjectId tip =
-          commitOnTopOf(
-              repository,
-              List.of(afterFirst),
-              withAcceptedMetadata(repository, afterFirst, List.of(note)),
-              "Remove temporary attachment");
+          localCommitOnTopOf(repository, afterFirst, List.of(note), "Remove temporary attachment");
       return new LfsHistoryRange(afterFirst, tip, bundleBytesForHead(repository, tip));
     }
   }

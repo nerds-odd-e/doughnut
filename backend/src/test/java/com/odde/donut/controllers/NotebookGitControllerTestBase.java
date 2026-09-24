@@ -16,41 +16,32 @@ import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
-import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
-import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
-import com.odde.donut.testability.NotebookGitAcceptedHistoryFixture;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.sql.DataSource;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Repository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Shared notebook/binding JPA fixtures for notebook Git controller tests. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTestSupport {
+abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectStoreTestSupport {
 
   private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
 
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
-  @Autowired PlatformTransactionManager transactionManager;
-  @Autowired DataSource dataSource;
   @Autowired NotebookAttachmentContent notebookAttachmentContent;
 
   private String testFixturePrefix;
@@ -88,24 +79,26 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
     return makeMe.aUser(testFixturePrefix + "additional-user").please();
   }
 
+  /** Real product creation: LFS representation and initial {@code .gitattributes}. */
   Notebook createGitBackedNotebook() throws UnexpectedNoAccessRightException {
     return createGitBackedNotebook("Git Backed Notebook");
   }
 
-  /**
-   * Product creation demoted to legacy RAW (most Git fixtures). Prefer {@link
-   * #createProductLfsNotebook}.
-   */
+  /** Product creation demoted to legacy RAW, only for tests whose subject is raw behaviour. */
+  Notebook createLegacyRawNotebook() throws UnexpectedNoAccessRightException {
+    return createLegacyRawNotebook("Git Backed Notebook");
+  }
+
+  Notebook createLegacyRawNotebook(String title) throws UnexpectedNoAccessRightException {
+    Notebook notebook = createGitBackedNotebook(title);
+    NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
+    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.RAW);
+    notebookGitBindingRepository.save(binding);
+    notebookGitCutoverService.resetHistory(notebook, Instant.now(), List.of());
+    return notebook;
+  }
+
   Notebook createGitBackedNotebook(String title) throws UnexpectedNoAccessRightException {
-    return demoteToLegacyRawBinding(createProductLfsNotebook(title));
-  }
-
-  /** Real product creation: LFS representation and initial {@code .gitattributes}. */
-  Notebook createProductLfsNotebook() throws UnexpectedNoAccessRightException {
-    return createProductLfsNotebook("Git Backed Notebook");
-  }
-
-  Notebook createProductLfsNotebook(String title) throws UnexpectedNoAccessRightException {
     NotebookCreationRequest request = new NotebookCreationRequest();
     request.setNewTitle(title);
     NotebookRealm response = controller.createNotebook(request);
@@ -147,14 +140,6 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
         && !NotebookGitAttributes.isMetadataPath(path);
   }
 
-  Notebook demoteToLegacyRawBinding(Notebook notebook) {
-    NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
-    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.RAW);
-    notebookGitBindingRepository.save(binding);
-    notebookGitCutoverService.resetHistory(notebook, Instant.now(), List.of());
-    return notebook;
-  }
-
   ResponseStatusException assertProposalRejectedWithoutMutatingBinding(
       Notebook notebook, String expectedHead, byte[] bundleBytes, HttpStatus expectedStatus)
       throws Exception {
@@ -179,58 +164,6 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
         expectedHead,
         bundleBytes,
         exceptionType);
-  }
-
-  /** Seeds accepted history from exact tree entries (disjoint from notebook content). */
-  NotebookGitBinding seedAcceptedBinding(Notebook notebook, List<PortableTreeEntry> entries) {
-    try (Repository seeded =
-        NotebookGitCommitBuilder.build(
-            NotebookGitTreeContent.of(entries),
-            "System",
-            "system@example.com",
-            "Seed content",
-            Instant.now())) {
-      return seedAcceptedHistory(
-          notebook, seeded, NotebookGitAcceptedHistoryFixture.mainHeadOf(seeded));
-    }
-  }
-
-  /** Seeds accepted history from an arbitrary repository tip into the native object store. */
-  NotebookGitBinding seedAcceptedHistory(Notebook notebook, Repository source, ObjectId head) {
-    NotebookGitBinding binding =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    binding.setAcceptedGitObjectId(head.name());
-    NotebookGitBinding saved = notebookGitBindingRepository.save(binding);
-    committed(
-        () ->
-            NotebookGitAcceptedHistoryFixture.seedNativeObjectStore(
-                dataSource, saved.getId(), source, head));
-    return saved;
-  }
-
-  void deleteNativeObjectStoreRow(Integer bindingId, String gitObjectId) {
-    committed(
-        () ->
-            entityManager
-                .createNativeQuery(
-                    "DELETE FROM notebook_git_accepted_object WHERE notebook_git_binding_id ="
-                        + " :bindingId AND git_object_id = :gitObjectId")
-                .setParameter("bindingId", bindingId)
-                .setParameter("gitObjectId", gitObjectId)
-                .executeUpdate());
-  }
-
-  long countNativeObjectStoreRows(Integer bindingId) {
-    return committed(
-        () ->
-            ((Number)
-                    entityManager
-                        .createNativeQuery(
-                            "SELECT COUNT(*) FROM notebook_git_accepted_object "
-                                + "WHERE notebook_git_binding_id = :bindingId")
-                        .setParameter("bindingId", bindingId)
-                        .getSingleResult())
-                .longValue());
   }
 
   NotebookGitBinding snapshotCurrentPortableTree(Notebook notebook) {

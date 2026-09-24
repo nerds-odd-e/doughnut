@@ -47,14 +47,20 @@ abstract class NotebookGitCommitFixtureTestSupport extends NoteDependentRowsCont
       throws IOException, URISyntaxException {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, currentBundle);
-      ObjectId childCommit =
-          commitOnTopOf(
-              repository,
-              List.of(acceptedHead),
-              withAcceptedMetadata(repository, acceptedHead, files),
-              "Proposal");
-      return bundleBytesForHead(repository, childCommit);
+      return bundleBytesForHead(
+          repository, localCommitOnTopOf(repository, acceptedHead, files, "Proposal"));
     }
+  }
+
+  /**
+   * A single-parent child of {@code parent} as a local checkout commits it: {@code files} as its
+   * tree plus the parent's reserved Git metadata that {@code files} do not name.
+   */
+  static ObjectId localCommitOnTopOf(
+      Repository repository, ObjectId parent, List<NotebookGitProposalFile> files, String message)
+      throws IOException {
+    return commitOnTopOf(
+        repository, List.of(parent), withAcceptedMetadata(repository, parent, files), message);
   }
 
   /** {@code files} plus the reserved Git metadata of {@code acceptedHead} they do not name. */

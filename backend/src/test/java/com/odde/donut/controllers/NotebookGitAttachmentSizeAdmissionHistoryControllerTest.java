@@ -38,7 +38,7 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
   @Test
   void refusesOversizedIntermediateAttachmentDeletedBeforeTipMatchingAcceptedTree()
       throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -73,7 +73,7 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
 
   @Test
   void refusesOversizedIntermediateAttachmentReplacedBySmallerTipVersion() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] over = filledBytes(LIMIT + 1, (byte) 0x62);
     byte[] small = filledBytes(32, (byte) 0x63);
@@ -98,7 +98,7 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
 
   @Test
   void refusesOversizedIntermediateAttachmentLaterRenamedToMarkdown() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] over = filledBytes(LIMIT + 1, (byte) 0x64);
     AttachmentRange range =
@@ -122,7 +122,7 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
 
   @Test
   void acceptsWithinLimitMultiVersionHistoryPreservingEarlierAttachmentBytes() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -163,7 +163,7 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
 
   @Test
   void acceptsTwoWithinLimitAttachmentsWhoseCombinedSizeExceedsLimit() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] other = filledBytes(LIMIT / 2 + 1, (byte) 0x54);
 
@@ -191,8 +191,8 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, baseBundleBytes);
       ObjectId middle =
-          commitOnTopOf(repository, List.of(baseHead), middleFiles, "Add oversized attachment");
-      ObjectId tip = commitOnTopOf(repository, List.of(middle), tipFiles, "Tip after intermediate");
+          localCommitOnTopOf(repository, baseHead, middleFiles, "Add oversized attachment");
+      ObjectId tip = localCommitOnTopOf(repository, middle, tipFiles, "Tip after intermediate");
       return new AttachmentRange(tip, bundleBytesForHead(repository, tip), blobIdOf(over));
     }
   }
@@ -203,19 +203,19 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, baseBundleBytes);
       ObjectId afterFirst =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(baseHead),
+              baseHead,
               List.of(note, new NotebookGitProposalFile("version.bin", FIRST_SMALL)),
               "First version");
       ObjectId afterSecond =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterFirst),
+              afterFirst,
               List.of(note, new NotebookGitProposalFile("version.bin", SECOND_SMALL)),
               "Second version");
       ObjectId tip =
-          commitOnTopOf(repository, List.of(afterSecond), List.of(note), "Delete attachment");
+          localCommitOnTopOf(repository, afterSecond, List.of(note), "Delete attachment");
       return new ValidVersionsRange(afterFirst, tip, bundleBytesForHead(repository, tip));
     }
   }

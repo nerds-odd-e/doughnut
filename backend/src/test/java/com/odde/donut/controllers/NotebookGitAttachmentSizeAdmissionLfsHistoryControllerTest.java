@@ -32,7 +32,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
   @Test
   void lfsAcceptsWithinLimitMultiVersionHistoryPreservingEarlierPayloadsAndCommitIds()
       throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] first = filledBytes(256, (byte) 0x71);
     byte[] second = filledBytes(512, (byte) 0x72);
@@ -65,7 +65,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
 
   @Test
   void lfsUnchangedTipHistoryStillRequiresWithinLimitIntermediatePayload() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -92,7 +92,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
 
   @Test
   void lfsAllowsOmittedOversizedIntermediateWhenTipCorrectionIsValid() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] over = filledBytes(TWENTY_MIB, (byte) 0x74);
     byte[] tipPayload = filledBytes(THREE_MIB, (byte) 0x75);
@@ -125,7 +125,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
 
   @Test
   void lfsRefusesMissingWithinLimitIntermediateHistoryEvenWhenTipIsValid() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] missingIntermediate = filledBytes(320, (byte) 0x76);
     byte[] tipPayload = filledBytes(400, (byte) 0x77);
@@ -154,7 +154,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
   @Test
   void lfsTrustedHistoryGrandfathersPreviouslyAcceptedOversizedPayload() throws Exception {
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x78);
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
     byte[] pointer =
         storeFolderAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized)

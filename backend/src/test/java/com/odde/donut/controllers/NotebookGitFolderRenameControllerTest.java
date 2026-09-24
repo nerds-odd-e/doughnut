@@ -41,7 +41,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
 
   @Test
   void webFolderRenameCarriesNestedAttachmentsAndNoteIdentity() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
     Note force = makeMe.aNote("Force").folder(diagrams).content(CELLS_BODY).please();

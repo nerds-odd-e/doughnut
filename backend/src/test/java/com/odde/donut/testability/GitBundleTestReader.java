@@ -175,9 +175,14 @@ public final class GitBundleTestReader {
       return commits.subList(1, commits.size());
     }
 
+    /** The notebook content at the tip, without reserved Git metadata. */
+    public List<PortableTreeEntry> content() {
+      return withoutMetadata(tipContent);
+    }
+
     /** The notebook content paths at the tip, without reserved Git metadata. */
     public List<String> tipPaths() {
-      return withoutMetadata(tipContent).stream().map(PortableTreeEntry::path).toList();
+      return content().stream().map(PortableTreeEntry::path).toList();
     }
   }
 

@@ -63,7 +63,8 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
     Notebook notebook = createGitBackedNotebook();
     Note original =
         makeMe.aNote().notebook(notebook).title("Original").content(ORIGINAL_CONTENT).please();
-    makeMe.aNote().notebook(notebook).title("Companion").content(COMPANION_ORIGINAL).please();
+    Note companion =
+        makeMe.aNote().notebook(notebook).title("Companion").content(COMPANION_ORIGINAL).please();
     MemoryTracker tracker =
         inCommittedTransaction(
             transactionManager,
@@ -90,17 +91,17 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterRename =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(
                   new NotebookGitProposalFile("Renamed.md", ORIGINAL_CONTENT),
                   new NotebookGitProposalFile("Companion.md", COMPANION_EDITED)),
               "Rename note and edit companion");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterRename),
+              afterRename,
               List.of(
                   new NotebookGitProposalFile("Renamed.md", EDITED_CONTENT),
                   new NotebookGitProposalFile("Companion.md", COMPANION_EDITED)),
@@ -118,7 +119,9 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
     Note renamed = noteRepository.findById(original.getId()).orElseThrow();
     assertThat(renamed.getTitle(), equalTo("Renamed"));
     assertThat(renamed.getContent(), equalTo(EDITED_CONTENT));
-    assertThat(noteByTitle(storedNotes, "Companion").getContent(), equalTo(COMPANION_EDITED));
+    assertThat(
+        noteRepository.findById(companion.getId()).orElseThrow().getContent(),
+        equalTo(COMPANION_EDITED));
 
     MemoryTracker reloadedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
     assertThat(reloadedTracker.getNote().getId(), equalTo(original.getId()));
@@ -156,25 +159,25 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterAddFolder =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(
                   new NotebookGitProposalFile("note.md", ORIGINAL_CONTENT),
                   new NotebookGitProposalFile("Dest/README.md", FOLDER_README)),
               "Add dest folder");
       ObjectId afterMove =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterAddFolder),
+              afterAddFolder,
               List.of(
                   new NotebookGitProposalFile("Dest/README.md", FOLDER_README),
                   new NotebookGitProposalFile("Dest/note.md", ORIGINAL_CONTENT)),
               "Move note into dest");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterMove),
+              afterMove,
               List.of(
                   new NotebookGitProposalFile("Dest/README.md", FOLDER_README),
                   new NotebookGitProposalFile("Dest/note.md", EDITED_CONTENT)),
@@ -241,10 +244,6 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
         .filter(folder -> name.equals(folder.getName()))
         .findFirst()
         .orElseThrow();
-  }
-
-  private static Note noteByTitle(List<Note> notes, String title) {
-    return notes.stream().filter(note -> title.equals(note.getTitle())).findFirst().orElseThrow();
   }
 
   private record LearnedAssociations(Integer mcqId, Integer conversationId) {}

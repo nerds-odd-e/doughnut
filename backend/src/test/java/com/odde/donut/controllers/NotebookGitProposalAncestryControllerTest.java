@@ -75,14 +75,9 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitControllerTes
 
   /** A bundle whose {@code main} is a genuine single-parent child of the accepted head. */
   private byte[] singleParentChildBundleBytes(Notebook notebook) throws Exception {
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead =
-          GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
-      ObjectId childCommit =
-          commitOnTopOf(
-              repository, List.of(acceptedHead), "proposal.md", "proposal content", "Proposal");
-      return bundleBytesForHead(repository, childCommit);
-    }
+    return proposalBundleBytes(
+        acceptedBundleBytes(notebook),
+        List.of(new NotebookGitProposalFile("proposal.md", "proposal content")));
   }
 
   /**

@@ -99,17 +99,17 @@ class NotebookGitComposedDeletionAdditionControllerTest extends NotebookGitContr
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterDeleteAndEdit =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(
                   new NotebookGitProposalFile("Retained.md", EDITED_CONTENT),
                   new NotebookGitProposalFile("Referrer.md", REFERRER_CONTENT)),
               "Delete learned note and edit retained");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterDeleteAndEdit),
+              afterDeleteAndEdit,
               List.of(
                   new NotebookGitProposalFile("Retained.md", EDITED_CONTENT),
                   new NotebookGitProposalFile("Referrer.md", REFERRER_CONTENT),

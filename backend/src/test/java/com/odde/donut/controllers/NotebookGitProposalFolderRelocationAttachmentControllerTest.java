@@ -30,7 +30,7 @@ class NotebookGitProposalFolderRelocationAttachmentControllerTest
 
   @Test
   void localFolderRenameRetainsLearnedNoteIdentityAndCarriesItsAttachment() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     byte[] forceDiagram = pointerFor(notebook, FORCE_DIAGRAM);
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     List<NotebookGitProposalFile> physicsTree =

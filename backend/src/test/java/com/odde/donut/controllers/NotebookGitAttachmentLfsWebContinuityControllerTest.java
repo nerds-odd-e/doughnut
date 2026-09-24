@@ -9,19 +9,23 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.util.List;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /** Web note and folder edits keep LFS attributes, pointer identity, and learning. */
 class NotebookGitAttachmentLfsWebContinuityControllerTest
-    extends NotebookGitAttachmentLfsPublicationTestSupport {
+    extends NotebookGitAttachmentSizeAdmissionTestSupport {
+
+  @Autowired FolderRepository folderRepository;
 
   @Test
   void lfsWebEditsAndFolderOpsPreserveAttributesFileIdentityAndLearning() throws Exception {
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] payload = {(byte) 0xAB, (byte) 0xCD};
     byte[] pointer = pointerFor(notebook, payload);
@@ -31,8 +35,6 @@ class NotebookGitAttachmentLfsWebContinuityControllerTest
         proposalBundleBytes(
             empty,
             List.of(
-                new NotebookGitProposalFile(
-                    NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
                 new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
                 new NotebookGitProposalFile("Photos/alps.png", pointer))));
     Note note =

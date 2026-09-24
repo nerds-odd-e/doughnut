@@ -210,15 +210,15 @@ class NotebookGitPublicationConcurrencyControllerTest
       ObjectId acceptedHead =
           GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(binding.getNotebook()));
       ObjectId middle =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(new NotebookGitProposalFile(NOTE_PATH, middleContent)),
               "First local edit");
       ObjectId tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(middle),
+              middle,
               List.of(new NotebookGitProposalFile(NOTE_PATH, tipContent)),
               "Second local edit");
       return new Proposal(bundleBytesForHead(repository, tip), tip);

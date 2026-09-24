@@ -43,8 +43,7 @@ class NotebookGitProposalCommitRangeControllerTest extends NotebookGitController
     Note note = makeMe.aNote().notebook(notebook).title("Topic").content(ORIGINAL_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    ContentEditRange range =
-        contentEditRangeOn(acceptedBundleBytes(notebook), acceptedHead, SECOND_EDIT);
+    ContentEditRange range = contentEditRangeOn(acceptedBundleBytes(notebook), SECOND_EDIT);
 
     String publishedHead =
         controller.publishNotebookGitProposal(
@@ -63,8 +62,7 @@ class NotebookGitProposalCommitRangeControllerTest extends NotebookGitController
     Note note = makeMe.aNote().notebook(notebook).title("Topic").content(ORIGINAL_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    ContentEditRange range =
-        contentEditRangeOn(acceptedBundleBytes(notebook), acceptedHead, ORIGINAL_CONTENT);
+    ContentEditRange range = contentEditRangeOn(acceptedBundleBytes(notebook), ORIGINAL_CONTENT);
 
     ObjectId acceptedTree;
     ObjectId restoredTree;
@@ -96,8 +94,7 @@ class NotebookGitProposalCommitRangeControllerTest extends NotebookGitController
         makeMe.aNote().notebook(notebook).title("Surviving").content(ORIGINAL_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-    TemporaryNoteRange range =
-        temporaryNoteRemovedRangeOn(acceptedBundleBytes(notebook), acceptedHead);
+    TemporaryNoteRange range = temporaryNoteRemovedRangeOn(acceptedBundleBytes(notebook));
 
     String publishedHead =
         controller.publishNotebookGitProposal(
@@ -161,14 +158,16 @@ class NotebookGitProposalCommitRangeControllerTest extends NotebookGitController
           commitOnTopOf(
               repository,
               List.of(priorAccepted, otherParent),
-              List.of(new NotebookGitProposalFile("Topic.md", ORIGINAL_CONTENT)),
+              withAcceptedMetadata(
+                  repository,
+                  priorAccepted,
+                  List.of(new NotebookGitProposalFile("Topic.md", ORIGINAL_CONTENT))),
               "Merge below accepted tip");
       acceptedWithMergeBelowBundle = bundleBytesForHead(repository, acceptedWithMergeBelow);
       seedAcceptedHistory(notebook, repository, acceptedWithMergeBelow);
     }
 
-    ContentEditRange range =
-        contentEditRangeOn(acceptedWithMergeBelowBundle, acceptedWithMergeBelow, SECOND_EDIT);
+    ContentEditRange range = contentEditRangeOn(acceptedWithMergeBelowBundle, SECOND_EDIT);
 
     String publishedHead =
         controller.publishNotebookGitProposal(
@@ -194,20 +193,20 @@ class NotebookGitProposalCommitRangeControllerTest extends NotebookGitController
   }
 
   /** Edits {@code Topic.md} to {@link #FIRST_EDIT}, then to {@code secondContent}. */
-  private ContentEditRange contentEditRangeOn(
-      byte[] baseBundleBytes, ObjectId baseHead, String secondContent) throws Exception {
+  private ContentEditRange contentEditRangeOn(byte[] baseBundleBytes, String secondContent)
+      throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(repository, baseBundleBytes);
+      ObjectId baseHead = GitBundleTestReader.fetchHead(repository, baseBundleBytes);
       ObjectId firstEdit =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(baseHead),
+              baseHead,
               List.of(new NotebookGitProposalFile("Topic.md", FIRST_EDIT)),
               "First edit");
       ObjectId secondEdit =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(firstEdit),
+              firstEdit,
               List.of(new NotebookGitProposalFile("Topic.md", secondContent)),
               "Second edit");
       return new ContentEditRange(
@@ -215,30 +214,29 @@ class NotebookGitProposalCommitRangeControllerTest extends NotebookGitController
     }
   }
 
-  private TemporaryNoteRange temporaryNoteRemovedRangeOn(byte[] baseBundleBytes, ObjectId baseHead)
-      throws Exception {
+  private TemporaryNoteRange temporaryNoteRemovedRangeOn(byte[] baseBundleBytes) throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      GitBundleTestReader.fetchHead(repository, baseBundleBytes);
+      ObjectId baseHead = GitBundleTestReader.fetchHead(repository, baseBundleBytes);
       ObjectId afterAdd =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(baseHead),
+              baseHead,
               List.of(
                   new NotebookGitProposalFile("Surviving.md", ORIGINAL_CONTENT),
                   new NotebookGitProposalFile("Temporary.md", TEMPORARY_INITIAL)),
               "Add temporary note");
       ObjectId afterEditTemporary =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterAdd),
+              afterAdd,
               List.of(
                   new NotebookGitProposalFile("Surviving.md", ORIGINAL_CONTENT),
                   new NotebookGitProposalFile("Temporary.md", TEMPORARY_EDITED)),
               "Edit temporary note");
       ObjectId tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterEditTemporary),
+              afterEditTemporary,
               List.of(new NotebookGitProposalFile("Surviving.md", SURVIVING_FINAL)),
               "Remove temporary and edit surviving");
       return new TemporaryNoteRange(

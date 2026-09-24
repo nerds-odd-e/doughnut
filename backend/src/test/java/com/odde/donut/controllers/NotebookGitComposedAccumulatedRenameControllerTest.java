@@ -126,15 +126,15 @@ class NotebookGitComposedAccumulatedRenameControllerTest extends NotebookGitCont
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterFirstRename =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(new NotebookGitProposalFile("Renamed.md", BODY_B_AFTER_FIRST_EDIT)),
               "Rename and edit note once");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterFirstRename),
+              afterFirstRename,
               List.of(new NotebookGitProposalFile("Final.md", BODY_C_AFTER_SECOND_EDIT)),
               "Rename and edit note again");
       proposalBytes = bundleBytesForHead(repository, tip);

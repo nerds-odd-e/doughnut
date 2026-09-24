@@ -55,9 +55,9 @@ class NotebookGitComposedFolderRelocationControllerTest extends NotebookGitContr
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterParent =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(
                   new NotebookGitProposalFile("Topics/README.md", README),
                   new NotebookGitProposalFile("Topics/A.md", NOTE),
@@ -65,9 +65,9 @@ class NotebookGitComposedFolderRelocationControllerTest extends NotebookGitContr
                   new NotebookGitProposalFile("Archive/README.md", ARCHIVE_README)),
               "Add Archive parent");
       ObjectId afterRelocate =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterParent),
+              afterParent,
               List.of(
                   new NotebookGitProposalFile("Archive/README.md", ARCHIVE_README),
                   new NotebookGitProposalFile("Archive/Topics/README.md", README),
@@ -75,9 +75,9 @@ class NotebookGitComposedFolderRelocationControllerTest extends NotebookGitContr
                   new NotebookGitProposalFile("Archive/Topics/Sub/B.md", NOTE)),
               "Relocate Topics under Archive");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterRelocate),
+              afterRelocate,
               List.of(
                   new NotebookGitProposalFile("Archive/README.md", ARCHIVE_README),
                   new NotebookGitProposalFile("Archive/Topics/README.md", README),

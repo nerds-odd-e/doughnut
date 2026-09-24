@@ -39,8 +39,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
   private static final PortableTreeEntry REFERENCE = ofText("reference.json", REFERENCE_JSON);
   private static final PortableTreeEntry DIAGRAM =
       new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES);
-  // Identical bytes under a second name: a no-op-byte guard must not let one stand in for the
-  // other.
+  // Identical bytes under a second name: a no-op-byte guard must not conflate the two.
   private static final PortableTreeEntry TWIN = new PortableTreeEntry("copy.png", DIAGRAM_BYTES);
 
   /** Git tree order is byte-wise by path, so capitals sort before lowercase. */
@@ -66,22 +65,20 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
   @ParameterizedTest
   @MethodSource("fileOnlyChanges")
   void aFileOnlyProposalBecomesExactlyItsFinalRootFileSet(FileOnlyChange change) throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding accepted = publishBaseline(notebook);
 
     controller.publishNotebookGitProposal(
         notebook.getId(),
         accepted.getAcceptedGitObjectId(),
-        proposalBundleBytes(
-            accepted,
-            NotebookGitProposalFile.asProposal(committedOnLfs(notebook, change.finalTree()))));
+        proposalBundleBytes(accepted, proposedOnLfs(notebook, change.finalTree())));
 
     assertFinalRootFileSet(notebook, acceptedTip(notebook), change.finalTree());
   }
 
   @Test
   void aMultiCommitRenameAndEditRangeLandsAsItsFinalSetOnItsOriginalAncestry() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding accepted = publishBaseline(notebook);
     ObjectId acceptedHead = ObjectId.fromString(accepted.getAcceptedGitObjectId());
     List<PortableTreeEntry> finalTree =
@@ -91,37 +88,27 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
     ObjectId tip;
     byte[] proposalBytes;
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      byte[] currentBundle =
-          controller
-              .downloadNotebookGitBundle(
-                  notebookRepository.findById(notebook.getId()).orElseThrow())
-              .getBody();
-      GitBundleTestReader.fetchHead(repository, currentBundle);
+      GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       firstRename =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               proposedOnLfs(
-                  repository,
-                  notebook,
-                  acceptedHead,
-                  List.of(DIAGRAM, NOTE, TWIN, ofText("interim.json", REFERENCE_JSON))),
+                  notebook, List.of(DIAGRAM, NOTE, TWIN, ofText("interim.json", REFERENCE_JSON))),
               "Rename the reference file");
       edit =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(firstRename),
+              firstRename,
               proposedOnLfs(
-                  repository,
                   notebook,
-                  acceptedHead,
                   List.of(DIAGRAM, NOTE, TWIN, ofText("interim.json", CHANGED_REFERENCE_JSON))),
               "Edit the renamed file");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(edit),
-              proposedOnLfs(repository, notebook, acceptedHead, finalTree),
+              edit,
+              proposedOnLfs(notebook, finalTree),
               "Rename again and drop the identical-byte copy");
       proposalBytes = bundleBytesForHead(repository, tip);
     }
@@ -141,7 +128,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
 
   @Test
   void nestedFileChangesBecomeExactlyTheirFinalSetAndDissolveEmptyFolders() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     List<PortableTreeEntry> nested =
         committedOnLfs(
@@ -178,7 +165,10 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
 
     assertThat(acceptedTip(notebook).content(), equalTo(referenceRemoved));
     assertThat(committedAttachmentTree(notebook), equalTo(referenceRemoved));
-    assertThat(committedFolderPaths(notebook), equalTo(List.of("physics", "physics/diagrams")));
+    assertThat(
+        NotebookLiveProjectionTestReader.folderPaths(
+            transactionManager, folderRepository, notebook.getId()),
+        equalTo(List.of("physics", "physics/diagrams")));
   }
 
   private NotebookGitBinding publishBaseline(Notebook notebook) throws Exception {
@@ -186,8 +176,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
     controller.publishNotebookGitProposal(
         notebook.getId(),
         empty.getAcceptedGitObjectId(),
-        proposalBundleBytes(
-            empty, NotebookGitProposalFile.asProposal(committedOnLfs(notebook, BASELINE))));
+        proposalBundleBytes(empty, proposedOnLfs(notebook, BASELINE)));
     assertThat(acceptedTip(notebook).content(), equalTo(committedOnLfs(notebook, BASELINE)));
     return reloadCommittedBinding(notebook.getId());
   }
@@ -218,7 +207,10 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
         committedRootAttachmentNames(notebook).stream().filter(removed::contains).toList(),
         is(empty()));
 
-    assertThat(committedNoteTitles(notebook), contains("Root Note"));
+    assertThat(
+        NotebookLiveProjectionTestReader.noteTitles(
+            transactionManager, noteRepository, notebook.getId()),
+        contains("Root Note"));
     assertThat(
         NotebookLiveProjectionTestReader.memoryTrackerCount(entityManager, notebook.getId()),
         is(0L));
@@ -233,32 +225,15 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
     return committedRootAttachments(notebook).stream().map(PortableTreeEntry::path).toList();
   }
 
-  private List<String> committedNoteTitles(Notebook notebook) {
-    return NotebookLiveProjectionTestReader.noteTitles(
-        transactionManager, noteRepository, notebook.getId());
-  }
-
   private List<PortableTreeEntry> committedAttachmentTree(Notebook notebook) {
     return NotebookLiveProjectionTestReader.attachmentTree(
         transactionManager, notebookAttachmentRepository, folderRepository, notebook.getId());
   }
 
-  private List<String> committedFolderPaths(Notebook notebook) {
-    return NotebookLiveProjectionTestReader.folderPaths(
-        transactionManager, folderRepository, notebook.getId());
-  }
-
-  /** {@code tree} as a local LFS checkout commits it on top of the accepted head. */
+  /** {@code tree} as a local LFS checkout stages it. */
   private List<NotebookGitProposalFile> proposedOnLfs(
-      InMemoryRepository repository,
-      Notebook notebook,
-      ObjectId acceptedHead,
-      List<PortableTreeEntry> tree)
-      throws IOException {
-    return withAcceptedMetadata(
-        repository,
-        acceptedHead,
-        NotebookGitProposalFile.asProposal(committedOnLfs(notebook, tree)));
+      Notebook notebook, List<PortableTreeEntry> tree) throws IOException {
+    return NotebookGitProposalFile.asProposal(committedOnLfs(notebook, tree));
   }
 
   private AcceptedTip acceptedTip(Notebook notebook) throws Exception {

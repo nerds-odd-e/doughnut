@@ -21,13 +21,9 @@ import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.TreeWalk;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.function.Executable;
@@ -117,19 +113,6 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
       return statistics;
     } finally {
       statistics.setStatisticsEnabled(previouslyEnabled);
-    }
-  }
-
-  static List<String> portablePaths(InMemoryRepository repository, ObjectId head) throws Exception {
-    try (RevWalk revWalk = new RevWalk(repository);
-        TreeWalk treeWalk = new TreeWalk(repository)) {
-      treeWalk.addTree(revWalk.parseCommit(head).getTree());
-      treeWalk.setRecursive(true);
-      List<String> paths = new ArrayList<>();
-      while (treeWalk.next()) {
-        paths.add(treeWalk.getPathString());
-      }
-      return paths;
     }
   }
 

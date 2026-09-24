@@ -51,7 +51,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
 
   @Test
   void currentFilesBecomePointersWhoseWebDownloadsKeepTheirBytes() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     publish(
         notebook,
         List.of(
@@ -105,7 +105,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
 
   @Test
   void aRawNotebookWithoutFilesBecomesLfsInOneForwardCommit() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     makeMe.aNote().notebook(notebook).title("note").content(NOTE_CONTENT).please();
     String previousHead = snapshotCurrentPortableTree(notebook).getAcceptedGitObjectId();
     List<PortableTreeEntry> expectedEntries =
@@ -136,7 +136,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
 
   @Test
   void convertingAgainLeavesTheHeadUnchanged() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     conversionService.convert(notebook.getId(), Instant.now());
     AcceptedHistory converted = acceptedHistory(notebook);
 
@@ -147,7 +147,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
 
   @Test
   void anLfsNotebookIsLeftAsItIs() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     AcceptedHistory before = acceptedHistory(notebook);
 
     conversionService.convert(notebook.getId(), Instant.now());
@@ -157,10 +157,10 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
 
   @Test
   void aNotebookThatFailsToConvertStaysRawWhileTheOthersConvert() throws Exception {
-    Notebook broken = createGitBackedNotebook("Broken");
+    Notebook broken = createLegacyRawNotebook("Broken");
     NotebookGitBinding brokenBinding = reloadCommittedBinding(broken.getId());
     deleteNativeObjectStoreRow(brokenBinding.getId(), brokenBinding.getAcceptedGitObjectId());
-    Notebook healthy = createGitBackedNotebook("Healthy");
+    Notebook healthy = createLegacyRawNotebook("Healthy");
 
     new NotebookGitLfsConversionOnStartup(notebookGitBindingRepository, conversionService)
         .convertRawNotebooks();

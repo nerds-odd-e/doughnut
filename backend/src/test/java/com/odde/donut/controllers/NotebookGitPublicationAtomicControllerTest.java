@@ -14,6 +14,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -117,8 +118,9 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitControllerTe
 
   @Test
   void lateBindingSaveFailureRollsBackTheProjectedRootFilesAndAcceptedBinding() throws Exception {
-    String referenceJson = "{\"schema\": \"donut\"}\n";
     Notebook notebook = createGitBackedNotebook();
+    byte[] referenceJson =
+        pointerFor(notebook, "{\"schema\": \"donut\"}\n".getBytes(StandardCharsets.UTF_8));
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -157,7 +159,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitControllerTe
                   .stream()
                   .map(row -> new PortableTreeEntry(row.filename(), row.acceptedGitContent()))
                   .toList(),
-              equalTo(List.of(PortableTreeEntry.ofText("reference.json", referenceJson))));
+              equalTo(List.of(new PortableTreeEntry("reference.json", referenceJson))));
           NotebookGitBinding reloaded =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           assertThat(reloaded.getAcceptedGitObjectId(), is(acceptedHead));

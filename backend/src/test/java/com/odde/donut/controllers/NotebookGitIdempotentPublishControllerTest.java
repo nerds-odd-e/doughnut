@@ -119,15 +119,15 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       afterDeleteAndEdit =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(new NotebookGitProposalFile("Retained.md", RETAINED_EDITED_CONTENT)),
               "Delete learned note and edit retained");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterDeleteAndEdit),
+              afterDeleteAndEdit,
               List.of(
                   new NotebookGitProposalFile("Retained.md", RETAINED_EDITED_CONTENT),
                   new NotebookGitProposalFile("Added.md", ADDED_CONTENT)),

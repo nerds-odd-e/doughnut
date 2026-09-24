@@ -133,7 +133,7 @@ class NotebookGitAttachmentIndependenceControllerTest
    * publication boundary.
    */
   private Fixture publishRootFilesOverNotesAndFolders() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     Folder biology =
         makeMe.aFolder().notebook(notebook).name("Biology").readmeContent("readme").please();
     Folder study =

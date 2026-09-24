@@ -22,14 +22,14 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
 
   @Test
   void folderContainingAFileCannotMoveToAnotherNotebook() throws Exception {
-    Notebook source = createProductLfsNotebook("Source");
+    Notebook source = createGitBackedNotebook("Source");
     Folder refs = makeMe.aFolder().notebook(source).name("refs").please();
     Folder papers = makeMe.aFolder().parentFolder(refs).name("papers").please();
     NotebookAttachment paper =
         storeFolderAttachmentAndSnapshot(source, papers, "paper.pdf", new byte[] {1, 2, 3});
     ObjectId sourceHead = ObjectId.fromString(binding(source).getAcceptedGitObjectId());
 
-    Notebook destination = createProductLfsNotebook("Destination");
+    Notebook destination = createGitBackedNotebook("Destination");
     Folder library = makeMe.aFolder().notebook(destination).name("library").please();
     NotebookAttachment existing =
         storeFolderAttachmentAndSnapshot(

@@ -118,7 +118,7 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
 
   @Test
   void webFolderTrashAndRecoveryCarryNestedAttachmentBytes() throws Exception {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
     byte[] forcePointer =

@@ -166,7 +166,7 @@ refused, so any remaining raw `.json`/`.png` proposal fails with that refusal.
 ### 5. The default backend Git fixture is the product LFS notebook
 
 Type: Structure
-Status: planned
+Status: done
 Proof: full backend test suite green; `createLegacyRawNotebook` is used only by
 NotebookGitAttachmentSizeAdmission, …SizeAdmissionHistory,
 …AttachmentPublication, …AttachmentMetadata, the contrast assertion in
@@ -179,6 +179,15 @@ LfsWebContinuity, WebContentSaveCost) drop `enableLfs` and hand-seeded
 attributes. Slices 1–4 remove the known failure families. If other failures
 remain after the first run, stop at 10 minutes, record their families here,
 and replan them as separate slices before this one.
+Accepted: full backend suite green (`pnpm backend:test:worktree`, 2668 tests,
+2 env-gated skips); after refactoring, `NotebookGit*` (428) and the other
+subclasses green. The first run's 8 failures were all in the known families;
+no replan. `createLegacyRawNotebook` is used only by the planned raw-subject
+classes. Single-parent proposal chains go through
+`NotebookGitCommitFixtureTestSupport.localCommitOnTopOf` (keeps the parent's
+metadata); `commitOnTopOf` remains for root and merge commits.
+Learning for E2E: raw `.json`/`.png` published into an LFS notebook is refused
+("must be a Git LFS pointer or empty file when the notebook uses LFS").
 
 ### 6. E2E checkout listings skip reserved Git metadata
 

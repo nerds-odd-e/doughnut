@@ -16,7 +16,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookAttachment.InMemoryNotebookAttachmentContent;
-import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.SqlStatementCallLog;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.util.HashSet;
@@ -32,7 +31,7 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentS
   @Test
   void savingContentInALargeNotebookWithAttachmentsDoesNotQueryAttachmentsOrPortableTreeRows()
       throws Throwable {
-    Notebook large = createProductLfsNotebook("Large");
+    Notebook large = createGitBackedNotebook("Large");
     Note note = makeMe.aNote().notebook(large).content(ACCEPTED_CONTENT).please();
     for (int i = 0; i < 30; i++) {
       makeMe.aNote().notebook(large).title("Unrelated " + i).please();
@@ -76,8 +75,6 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentS
         proposalBundleBytes(
             empty,
             List.of(
-                new NotebookGitProposalFile(
-                    NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
                 new NotebookGitProposalFile("Root Note.md", ACCEPTED_CONTENT),
                 new NotebookGitProposalFile("diagram.png", pointer))));
     Note note =

@@ -167,7 +167,8 @@ class NotebookGitWebContentHistoryControllerTest
             renamed.getId(), is(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId())));
         assertThat(renamed.getParent(0).getId(), is(preRenameParent));
         assertThat(
-            portablePaths(repository, renamed), equalTo(List.of("Biology/Cell structure.md")));
+            GitBundleTestReader.pathsIn(repository, renamed),
+            equalTo(List.of("Biology/Cell structure.md")));
       }
     }
   }

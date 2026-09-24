@@ -78,7 +78,8 @@ class NotebookGitWebContentFolderSaveControllerTest
         assertThat(commit.getParent(0).getId(), is(acceptedHead));
       }
       assertThat(
-          portablePaths(repository, editedHead), contains("Field Notes/Alpine/Observation.md"));
+          GitBundleTestReader.pathsIn(repository, editedHead),
+          contains("Field Notes/Alpine/Observation.md"));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(
               repository, editedHead, "Field Notes/Alpine/Observation.md"),

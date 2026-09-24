@@ -128,7 +128,7 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
         assertThat(commit.getCommitTime(), is((int) editedAt.toInstant().getEpochSecond()));
         assertThat(revWalk.parseCommit(acceptedHead).getId(), is(acceptedHead));
       }
-      assertThat(portablePaths(repository, editedHead), contains("Root Note.md"));
+      assertThat(GitBundleTestReader.pathsIn(repository, editedHead), contains("Root Note.md"));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(repository, editedHead, "Root Note.md"),
           is(EDITED_CONTENT));

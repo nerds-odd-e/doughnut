@@ -11,6 +11,7 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
@@ -19,16 +20,19 @@ import com.odde.donut.testability.GitBundleTestReader.AcceptedTip;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /** LFS tip publication admits valid pointers and refuses mixed invalid proposals. */
 class NotebookGitAttachmentLfsPublicationControllerTest
-    extends NotebookGitAttachmentLfsPublicationTestSupport {
+    extends NotebookGitAttachmentSizeAdmissionTestSupport {
+
+  @Autowired FolderRepository folderRepository;
 
   @Test
   void lfsPublicationAcceptsRootNestedAndEmptyPointersInGitAndProjection() throws Exception {
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] rootPayload = {(byte) 0x89, 0x01, 0x02};
     byte[] nestedPayload = {(byte) 0xFF, 0x00};
@@ -42,8 +46,6 @@ class NotebookGitAttachmentLfsPublicationControllerTest
         proposalBundleBytes(
             empty,
             List.of(
-                new NotebookGitProposalFile(
-                    NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
                 new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
                 new NotebookGitProposalFile("diagram.png", rootPointer),
                 new NotebookGitProposalFile("tools/cache/nested.bin", nestedPointer),
@@ -70,7 +72,7 @@ class NotebookGitAttachmentLfsPublicationControllerTest
 
   @Test
   void lfsExactLimitTipPointerIsAccepted() throws Exception {
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] exact = filledBytes(LIMIT, (byte) 0x41);
     byte[] pointer = pointerFor(notebook, exact);
@@ -78,12 +80,7 @@ class NotebookGitAttachmentLfsPublicationControllerTest
     controller.publishNotebookGitProposal(
         notebook.getId(),
         empty.getAcceptedGitObjectId(),
-        proposalBundleBytes(
-            empty,
-            List.of(
-                new NotebookGitProposalFile(
-                    NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
-                new NotebookGitProposalFile("payload.bin", pointer))));
+        proposalBundleBytes(empty, List.of(new NotebookGitProposalFile("payload.bin", pointer))));
 
     assertThat(
         acceptedTip(notebook).entries(),
@@ -107,7 +104,7 @@ class NotebookGitAttachmentLfsPublicationControllerTest
 
   @Test
   void lfsMixedRefusalLeavesAcceptedHeadProjectionAndLearningUnchanged() throws Exception {
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] acceptedPayload = {(byte) 0x10, 0x20};
     byte[] acceptedPointer = pointerFor(notebook, acceptedPayload);
@@ -117,8 +114,6 @@ class NotebookGitAttachmentLfsPublicationControllerTest
         proposalBundleBytes(
             empty,
             List.of(
-                new NotebookGitProposalFile(
-                    NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
                 new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
                 new NotebookGitProposalFile("kept.png", acceptedPointer))));
     NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
@@ -153,8 +148,6 @@ class NotebookGitAttachmentLfsPublicationControllerTest
             proposalBundleBytes(
                 accepted,
                 List.of(
-                    new NotebookGitProposalFile(
-                        NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
                     new NotebookGitProposalFile("Root Note.md", EDITED_CONTENT),
                     new NotebookGitProposalFile("kept.png", acceptedPointer),
                     new NotebookGitProposalFile("huge.bin", overPointer))),
@@ -169,8 +162,6 @@ class NotebookGitAttachmentLfsPublicationControllerTest
             proposalBundleBytes(
                 accepted,
                 List.of(
-                    new NotebookGitProposalFile(
-                        NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
                     new NotebookGitProposalFile("Root Note.md", EDITED_CONTENT),
                     new NotebookGitProposalFile("kept.png", acceptedPointer),
                     new NotebookGitProposalFile("gone.bin", missingPointer))),
@@ -185,8 +176,6 @@ class NotebookGitAttachmentLfsPublicationControllerTest
             proposalBundleBytes(
                 accepted,
                 List.of(
-                    new NotebookGitProposalFile(
-                        NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
                     new NotebookGitProposalFile("Root Note.md", EDITED_CONTENT),
                     new NotebookGitProposalFile("kept.png", acceptedPointer),
                     new NotebookGitProposalFile("bad.bin", corruptPointer))),

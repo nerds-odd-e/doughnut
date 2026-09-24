@@ -29,7 +29,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
   @ParameterizedTest
   @MethodSource("attachmentPaths")
   void exactLimitTipAttachmentIsAcceptedAtRootOrNestedPath(String path) throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] exact = filledBytes(LIMIT, (byte) 0x41);
 
@@ -44,7 +44,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
   @ParameterizedTest
   @MethodSource("attachmentPaths")
   void overLimitTipAttachmentIsRefusedWithPathSizeAndLimit(String path) throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] over = filledBytes(LIMIT + 1, (byte) 0x42);
 
@@ -60,7 +60,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
 
   @Test
   void mixedOversizedRefusalLeavesAcceptedStateLearningAndObjectsUnchanged() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -105,7 +105,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
   void grandfatheredOversizedBytesRemainReusableAcrossKeepRenameAndHistoricalRestoration()
       throws Exception {
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x44);
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
     storeLegacyRawAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized);
     NotebookGitBinding withLegacy = reloadCommittedBinding(notebook.getId());
@@ -166,7 +166,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
   @Test
   void webNoteSavePreservesGrandfatheredOversizedAttachmentBytes() throws Exception {
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x45);
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     Note note = makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
     storeLegacyRawAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized);
 
@@ -182,10 +182,10 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
   @Test
   void oversizedBytesAcceptedInAnotherNotebookAreNotExemptHere() throws Exception {
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x46);
-    Notebook other = createGitBackedNotebook("Other Notebook");
+    Notebook other = createLegacyRawNotebook("Other Notebook");
     storeLegacyRawAttachmentAndSnapshot(other, null, "foreign.bin", oversized);
 
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -202,7 +202,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
   void differentOversizedBytesAreRefusedEvenWhenGrandfatheredBytesExist() throws Exception {
     byte[] grandfathered = filledBytes(LIMIT + 1, (byte) 0x47);
     byte[] different = filledBytes(LIMIT + 1, (byte) 0x48);
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createLegacyRawNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
     storeLegacyRawAttachmentAndSnapshot(notebook, null, "legacy.bin", grandfathered);
     NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());

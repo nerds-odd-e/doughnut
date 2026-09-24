@@ -34,7 +34,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
   void
       renamingAFolderRelocatesItsNotesAttachmentsAndSubfolderUnderTheNewPrefixAndMatchesTheFullAssembly()
           throws Throwable {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     Folder photos = makeMe.aFolder().notebook(notebook).name("Photos").please();
     for (String title : List.of("Alps", "Beach", "City")) {
       makeMe.aNote(title).folder(photos).content(ACCEPTED_CONTENT).please();
@@ -78,7 +78,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
   @Test
   void trashingAndRecoveringAFolderMoveItsEntriesWithTheirBlobsAndMatchTheFullAssembly()
       throws Throwable {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     Folder research = makeMe.aFolder().notebook(notebook).name("Research").please();
     Folder biology = makeMe.aFolder().parentFolder(research).name("Biology").please();
     makeMe.aNote("Cells").folder(biology).content(ACCEPTED_CONTENT).please();
@@ -112,7 +112,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
   @Test
   void permanentlyDeletingAFolderDropsItsNotesAndAttachmentsWithItsPrefixAndMatchesTheFullAssembly()
       throws Throwable {
-    Notebook notebook = createProductLfsNotebook();
+    Notebook notebook = createGitBackedNotebook();
     Folder trashedTopic = makeMe.aFolder().inTrashOf(notebook).name("Topic").please();
     Folder deeper = makeMe.aFolder().parentFolder(trashedTopic).name("Deeper").please();
     makeMe.aNote("Cells").folder(trashedTopic).content(ACCEPTED_CONTENT).please();
@@ -142,7 +142,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
     AcceptedHistory afterEdit = acceptedHistory(notebook);
     assertThat(afterEdit.parents(), equalTo(beforeEdit.commits()));
     assertThat(
-        afterEdit.tipContent(),
+        afterEdit.content(),
         contains(
             PortableTreeEntry.ofText(
                 "Docs/README.md", PortableTreeReadmeMarkdown.assemble("Read these first"))));
@@ -169,7 +169,7 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
     AcceptedHistory afterEdit = acceptedHistory(notebook);
     assertThat(afterEdit.parents(), equalTo(beforeEdit.commits()));
     assertThat(
-        afterEdit.tipContent(),
+        afterEdit.content(),
         contains(
             PortableTreeEntry.ofText("README.md", PortableTreeReadmeMarkdown.assemble("Welcome"))));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);

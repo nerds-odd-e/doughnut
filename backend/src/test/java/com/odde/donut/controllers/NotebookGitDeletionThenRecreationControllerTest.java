@@ -60,17 +60,17 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControl
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterRename =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(
                   new NotebookGitProposalFile("Renamed.md", ORIGINAL_CONTENT),
                   new NotebookGitProposalFile("Retained.md", RETAINED_CONTENT)),
               "Exact rename");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterRename),
+              afterRename,
               List.of(
                   new NotebookGitProposalFile("Renamed.md", ORIGINAL_CONTENT),
                   new NotebookGitProposalFile("Retained.md", RETAINED_EDITED)),
@@ -106,15 +106,15 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControl
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       ObjectId afterDelete =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(acceptedHead),
+              acceptedHead,
               List.of(new NotebookGitProposalFile("Retained.md", RETAINED_CONTENT)),
               "Delete target");
       tip =
-          commitOnTopOf(
+          localCommitOnTopOf(
               repository,
-              List.of(afterDelete),
+              afterDelete,
               List.of(
                   new NotebookGitProposalFile("Target.md", tipContent),
                   new NotebookGitProposalFile("Retained.md", RETAINED_CONTENT)),

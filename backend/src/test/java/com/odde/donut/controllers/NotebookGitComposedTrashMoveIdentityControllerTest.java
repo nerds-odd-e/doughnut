@@ -143,9 +143,9 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       GitBundleTestReader.fetchHead(repository, acceptedBundle);
       ObjectId trashCommit =
-          commitOnTopOf(repository, List.of(acceptedHead), trashTree, "Move note into trash");
+          localCommitOnTopOf(repository, acceptedHead, trashTree, "Move note into trash");
       ObjectId tip =
-          commitOnTopOf(repository, List.of(trashCommit), finalTree, "Move note to final path");
+          localCommitOnTopOf(repository, trashCommit, finalTree, "Move note to final path");
       return new ComposedTrashRange(trashCommit, tip, bundleBytesForHead(repository, tip));
     }
   }
