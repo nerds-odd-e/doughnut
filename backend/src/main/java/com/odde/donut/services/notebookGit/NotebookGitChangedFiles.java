@@ -3,6 +3,7 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.NotebookProjectionChange;
@@ -14,7 +15,7 @@ import java.util.stream.Stream;
 
 /**
  * Note and attachment rows of a projection change: previous paths to clear on the accepted tree,
- * and current note blobs to put after folder relocation.
+ * and current note and attachment blobs to put after folder relocation.
  */
 final class NotebookGitChangedFiles {
   private final NoteRepository noteRepository;
@@ -62,27 +63,34 @@ final class NotebookGitChangedFiles {
             });
   }
 
-  /** The current file of every note the change updated or inserted. */
-  List<PortableTreeEntry> currentNoteEntries() {
-    Stream<Note> updated =
-        change.updated.keySet().stream()
-            .filter(row -> row.kind() == Note.class)
-            .map(row -> noteRepository.findById(row.id()).orElseThrow());
-    Stream<Note> inserted =
-        change.inserted.stream().filter(Note.class::isInstance).map(Note.class::cast);
-    return Stream.concat(updated, inserted)
-        .map(
-            note ->
-                PortableTreeEntry.ofNote(NotebookGitPortablePath.ofNote(note), note.getContent()))
+  /** The current file of every note and attachment the change updated or inserted. */
+  List<PortableTreeEntry> currentEntries() {
+    return Stream.concat(
+            change.updated.keySet().stream().filter(row -> isFile(row.kind())).map(this::stored),
+            change.inserted.stream().filter(row -> isFile(row.getClass())))
+        .map(NotebookGitChangedFiles::currentEntry)
         .toList();
   }
 
   private String currentFilePath(ProjectionRow row) {
-    if (row.kind() == Note.class) {
-      return NotebookGitPortablePath.ofNote(noteRepository.findById(row.id()).orElseThrow());
+    return currentEntry(stored(row)).path();
+  }
+
+  /** The stored note or attachment of a file row. */
+  private Object stored(ProjectionRow row) {
+    return row.kind() == Note.class
+        ? noteRepository.findById(row.id()).orElseThrow()
+        : notebookAttachmentRepository.findById(row.id()).orElseThrow();
+  }
+
+  /** A note's Markdown or an attachment's accepted Git content at its current path. */
+  private static PortableTreeEntry currentEntry(Object file) {
+    if (file instanceof Note note) {
+      return PortableTreeEntry.ofNote(NotebookGitPortablePath.ofNote(note), note.getContent());
     }
-    return NotebookGitPortablePath.ofAttachment(
-        notebookAttachmentRepository.findById(row.id()).orElseThrow());
+    NotebookAttachment attachment = (NotebookAttachment) file;
+    return new PortableTreeEntry(
+        NotebookGitPortablePath.ofAttachment(attachment), attachment.getAcceptedGitContent());
   }
 
   private static boolean isFile(Class<?> kind) {

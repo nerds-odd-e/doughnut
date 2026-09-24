@@ -81,7 +81,10 @@ Behavior: an owner uploads a large picture → it is kept byte-for-byte. Delete
 
 ### 2. Web commits carry the files a web change adds
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `NotebookGitTreeEncoderTest.derivingAChangeThatInsertsAnAttachmentPutsItsAcceptedContentAtItsPath`
+(red without the change); `*NotebookGit*` suite green. `NotebookGitChangedFiles.currentEntries`
+now puts every inserted or updated note and attachment.
 Proof: `NotebookGitTreeEncoderTest` — deriving a change with an inserted
 attachment row puts its path with the row's accepted content; existing derived
 tree oracle tests stay green.

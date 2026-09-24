@@ -48,7 +48,8 @@ class NotebookGitTreeEncoder {
 
   /**
    * Accepted tree edited by the projection change: stale file paths cleared, folder subtrees
-   * relocated, note blobs and container readmes refreshed, {@code .keep} re-evaluated.
+   * relocated, note and attachment blobs and container readmes refreshed, {@code .keep}
+   * re-evaluated.
    */
   NotebookGitTreeContent derive(
       NotebookProjectionChange change, Repository repository, ObjectId acceptedRootTreeId) {
@@ -63,7 +64,7 @@ class NotebookGitTreeEncoder {
       folders.relocate(tree);
       folders.currentFolders().keySet().forEach(tree::ensureDirectory);
       return encode(
-          tree, files.currentNoteEntries(), readmeContents(change, folders), touchedDirectories);
+          tree, files.currentEntries(), readmeContents(change, folders), touchedDirectories);
     }
   }
 

@@ -6,6 +6,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import com.odde.donut.entities.DisplayName;
+import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.NotebookAttachment;
+import com.odde.donut.services.notebookGit.ProjectionChangeCapture.NotebookProjectionChange;
 import com.odde.donut.services.notebookTree.PortableTreeAttachmentRow;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
@@ -13,10 +17,17 @@ import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectInserter;
+import org.eclipse.jgit.lib.TreeFormatter;
 import org.junit.jupiter.api.Test;
 
-/** The full assembly: every projection row as an insertion over an empty base. */
+/**
+ * The full assembly (every projection row as an insertion over an empty base) and a web commit's
+ * tree derived from a projection change.
+ */
 class NotebookGitTreeEncoderTest {
 
   private static final String README_FENCE = "---\ntype: Readme\n---\n";
@@ -135,6 +146,31 @@ class NotebookGitTreeEncoderTest {
             List.of(new PortableTreeAttachmentRow(null, "legacy.bin", pointerLooking)));
 
     assertThat(tree.blobs().get(tree.blobIds().get("legacy.bin")), equalTo(pointerLooking));
+  }
+
+  @Test
+  void derivingAChangeThatInsertsAnAttachmentPutsItsAcceptedContentAtItsPath() throws Exception {
+    Folder physics = new Folder();
+    physics.setName(new DisplayName("physics"));
+    NotebookAttachment moon = new NotebookAttachment();
+    moon.setFolder(physics);
+    moon.setFilename("moon.jpg");
+    byte[] pointer = NotebookGitLfsPointer.format(POINTER_OID, 12345);
+    moon.setAcceptedGitContent(pointer);
+    NotebookProjectionChange change = new NotebookProjectionChange();
+    change.inserted.add(moon);
+
+    try (InMemoryRepository repository =
+            new InMemoryRepository(new DfsRepositoryDescription("accepted"));
+        ObjectInserter inserter = repository.newObjectInserter()) {
+      ObjectId emptyRoot = inserter.insert(new TreeFormatter());
+      inserter.flush();
+
+      NotebookGitTreeContent tree =
+          new NotebookGitTreeEncoder(null, null, null, null).derive(change, repository, emptyRoot);
+
+      assertThat(tree.blobs().get(tree.blobIds().get("physics/moon.jpg")), equalTo(pointer));
+    }
   }
 
   private static Map<String, ObjectId> blobIdsOf(PortableTreeEntry... entries) {
