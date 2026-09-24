@@ -244,7 +244,7 @@ No executable plan or implementation is authorized by this seed.
   URLs and Books are not implicitly copied or converted.
 - **Effort hypothesis:** L, low confidence until ownership/sharing/reference
   cases are understood; do not presume a fleet conversion fits this estimate.
-- **Depends on:** Story 6. Stories 1, 3, and 4 are not user prerequisites.
+- **Depends on:** Story 6. Stories 3 and 4 are not user prerequisites.
 - **Safe stopping point:** Existing images work locally and on the web even if
   later image-authoring flows are deferred. Preserve the only accessible copy
   throughout transition; avoid a separate permanent image-file model.
@@ -374,8 +374,8 @@ loop. Candidate story 14 applies the completed workflow to existing notebooks an
 should precede their image conversion when queued.
 This is delivery order, not a reason to withhold browsing from already supported
 legacy content. Delivered nested attachment continuity
-then enables the browsing journey that requires nested files. The remaining
-attachment order covers browser retrieval, existing images, guidance-folder
+then enables the browsing journey that requires nested files. Web browsing and download are delivered. The remaining
+attachment order covers existing images, guidance-folder
 assimilation, local visual authoring, new web-image portability, web cleanup,
 and last the two conveniences whose absence loses nothing: dissolve/merge with
 files (story 11), then the rarer cross-notebook folder move (story 10). Root

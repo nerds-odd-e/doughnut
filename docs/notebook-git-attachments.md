@@ -20,7 +20,8 @@ carries a complete filename, extension included, and exact bytes, and it has no
 note identity, title or learning history.
 
 `notebook_attachment` holds each file's notebook, nullable folder, filename and
-bytes. It is a projection of accepted Git content, not a second authority, and
+accepted Git content: the file's bytes in a raw notebook, or its Git LFS pointer
+in an LFS notebook. It is a projection of accepted Git content, not a second authority, and
 it is deleted with its notebook or folder. Filenames are unique within their
 notebook-root or folder location under a binary collation, so paths differing
 only in case remain distinct files exactly as Git treats them.
@@ -48,6 +49,18 @@ the Git side re-sorts by path.
 
 A root `.keep` is an ordinary attachment. The empty-folder marker is a `.keep`
 inside a folder, which keeps its structural role.
+
+Web Donut shows every attachment row to whoever can read the notebook,
+including Bazaar readers. The sidebar lists files at their folder or the root,
+sorted with notes by filename. A file's page (`/notebooks/:notebookId/attachments/:attachmentId`)
+shows its filename and size and downloads its exact bytes under its exact
+filename, always as `Content-Disposition: attachment` with
+`application/octet-stream` and `nosniff`, so an SVG or HTML file never renders
+in Donut's origin. The notebook's attachment representation, never the bytes,
+decides how a row is read: an LFS notebook serves the stored object named by
+the pointer, and a raw notebook serves its content unchanged. `.gitattributes`
+and nested `.keep` markers are not rows, so, like `.git`, they are not shown on
+the web.
 
 Publication admits each newly introduced raw-Git attachment blob against an
 inclusive 10 MiB (10,485,760 byte) limit across the contiguous first-parent
