@@ -27,7 +27,6 @@ Feature: CLI notebook web trash
       Membranes
       """
     And I assimilate the note "Cells"
-    And the notebook "CLI Web Trash Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Web Trash Notebook"'s Git binding reflects its current content
     And I capture the note id of "Cells"
     When I clone the notebook "CLI Web Trash Notebook" into a temporary destination using the installed CLI
@@ -92,7 +91,6 @@ Feature: CLI notebook web trash
       Membranes
       """
     And I assimilate the note "Cells"
-    And the notebook "CLI Web Trash Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Web Trash Notebook"'s Git binding reflects its current content
     And I capture the note id of "Cells"
     When I clone the notebook "CLI Web Trash Notebook" into a temporary destination using the installed CLI

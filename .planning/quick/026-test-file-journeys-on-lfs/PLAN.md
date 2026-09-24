@@ -223,7 +223,7 @@ scenario (whole profile run 41s vs 35s raw, single noisy runs).
 ### 8. Folder, trash, clone and reset journeys run on LFS notebooks
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `cli_notebook_web_folder_moves`, `cli_notebook_web_trash`,
 `cli_notebook_folder_relocation`, `cli_notebook_clone`,
 `cli_notebook_git_history_reset` green.
@@ -231,6 +231,9 @@ Proof: `cli_notebook_web_folder_moves`, `cli_notebook_web_trash`,
 Behavior: the same journeys on product LFS notebooks; the history reset
 scenario now really needs its reset, and its single-commit clone keeps
 `.gitattributes`. Remove the demotion step from these files.
+Accepted: the five features 15/15. The reset is observed by the existing
+"cloned checkout contains exactly" (fails without the reset step); the kept
+`.gitattributes` by the existing step `the cloned checkout file ".gitattributes" is:`.
 
 ### 9. Locally published files travel on LFS notebooks
 

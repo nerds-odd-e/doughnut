@@ -26,7 +26,6 @@ Feature: CLI notebook folder relocation
       Boil water
       """
     And the notebook "CLI Clone Notebook" has a readme-only folder "Kitchen" with readme "Kitchen landing"
-    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
@@ -122,7 +121,6 @@ Feature: CLI notebook folder relocation
       """
     And the notebook "CLI Folder Trash Notebook" has a folder "Empty" under note "Pasta"
     And the notebook "CLI Folder Trash Notebook" has an empty folder "_trash"
-    And the notebook "CLI Folder Trash Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Folder Trash Notebook"'s Git binding reflects its current content
     When I clone the notebook "CLI Folder Trash Notebook" into a temporary destination using the installed CLI
     And I clone the notebook "CLI Folder Trash Notebook" into a second temporary destination using the installed CLI

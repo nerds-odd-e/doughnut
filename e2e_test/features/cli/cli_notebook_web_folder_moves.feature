@@ -22,7 +22,6 @@ Feature: CLI notebook web folder moves
       Membranes
       """
     And I assimilate the note "Cells"
-    And the notebook "CLI Web Folder Move Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Web Folder Move Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
@@ -78,7 +77,6 @@ Feature: CLI notebook web folder moves
     And the notebook "CLI Web Folder Trash Notebook" has a folder "Empty" under note "Cells"
     And I open the folder page for "Biology" in notebook "CLI Web Folder Trash Notebook"
     And I type and save the folder readme with text "Biology landing"
-    And the notebook "CLI Web Folder Trash Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Web Folder Trash Notebook"'s Git binding reflects its current content
     When I clone the notebook "CLI Web Folder Trash Notebook" into a temporary destination using the installed CLI
     And I open the folder page for "Biology" in notebook "CLI Web Folder Trash Notebook"
