@@ -237,10 +237,11 @@ No executable plan or implementation is authorized by this seed.
 
 ### See locally added image files in Web Donut notes
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/024-note-local-picture-file/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"47966f94907dd6f8e74ba5873fc0c822046f7f30663c977b18a5dafcbab287a9","plan":"cae16fb4deb0ef04e8f734ced3f7de3a6405479e4730c80f41fff42a7bd66fdb"}}
 ```
 
 - **Identity:** SEED-035#story-3
+- **Slice plan:** [Show a note's local picture file](../quick/024-note-local-picture-file/PLAN.md)
 - **Goal:** An owner who works locally keeps a picture as a file in the
   notebook, points the note at it, and publishes; opening the note in Web Donut
   (note page, recall, conversations) shows that picture, without uploading it
@@ -259,7 +260,8 @@ No executable plan or implementation is authorized by this seed.
 - **Deferred promises (not built or verified here):**
   - Markdown body images (`![](force-diagram.png)`). They are the natural IDE
     form, but showing them is new display behavior in the editor; it needs its
-    own story. A web edit already keeps them in the body.
+    own story. A web edit keeps them in the body (story 16, delivered
+    2026-09-24).
   - SVG inline display: an SVG opened directly can run scripts.
   - Paths starting with `/` (easily confused with legacy
     `/attachments/images/` paths), paths leaving the notebook, and remote URLs.
@@ -272,7 +274,12 @@ No executable plan or implementation is authorized by this seed.
   web page URL and shows broken. The file download
   (`/api/notebooks/{n}/attachments/{id}/content`) is addressed by ID and forces
   a download (`attachment`, octet-stream, `nosniff`), so it cannot serve an
-  `<img>` as it is.
+  `<img>` as it is. Its bytes come from `NotebookAttachmentFile`, which reads
+  LFS notebooks (the default for new notebooks) from the content store and
+  fails loudly when an object is missing; the picture reuses that reader.
+  Rechecked 2026-09-24 after the private-images and listing corrections: the
+  legacy image endpoint now also follows the notebook read rule, so example 4
+  keeps that rule; nothing else in this story changed.
 - **Key examples:**
   1. `physics/force.md` has `image: force-diagram.png` and
      `physics/force-diagram.png` exists → after publishing, the web note page
