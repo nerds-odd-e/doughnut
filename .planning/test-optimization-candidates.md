@@ -9,11 +9,9 @@ Permanent E2E profile exclusion uses
 Feature. That is a developer decision after review except where an explicit
 `--resolve` pass is authorized by the public skill.
 
-Profile E2E with:
-
-```bash
---expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'
-```
+Profile E2E by leaving tagged features out of the `pnpm cy:run --spec` list
+(the wrapper drops `--expose tags=...`); see the `e2e-authoring` skill's
+test-optimization profiling notes.
 
 ## Frontend profiling note
 

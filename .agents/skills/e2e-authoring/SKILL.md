@@ -49,11 +49,10 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_gene
 Important notes:
 
 - Do not use `cypress run -- --spec`; the empty `--` causes the `--spec` parameter to be ignored.
-- The default tag filter is `expose.tags` in `e2e_test/config/ci.ts`, for example `not @ignore`. Override per run with `--expose tags='...'` (`-x`), not `--env tags=...` (ignored by `@badeball/cypress-cucumber-preprocessor` v27 on Cypress >= 15.17).
+- The default tag filter is `expose.tags` in `e2e_test/config/ci.ts`, for example `not @ignore`. Override per raw `pnpm cypress run` with `--expose tags='...'` (`-x`; the `pnpm cy:run` wrapper drops it), not `--env tags=...` (ignored by `@badeball/cypress-cucumber-preprocessor` v27 on Cypress >= 15.17).
 - `@skipOptimizationDueToKnownNecessarySlowness` is Donut's profile-only
   exclusion for known-necessary slowness. `dough-test-optimization` profiles
-  exclude it with
-  `--expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'`.
+  exclude it as described under "Test-optimization profiling" below.
   Normal CI/dev runs still execute these scenarios. Do not add this tag without
   developer review, except when an explicit `dough-test-optimization --resolve`
   pass makes an evident exclusion under the public skill's candidate-resolution
@@ -64,16 +63,24 @@ Important notes:
 ### Test-optimization profiling
 
 For per-scenario timing, run the selected feature scope through the owning
-wrapper, tee reporter output to a local file, and keep the profile-only exclusion:
+wrapper and tee its output to a local file:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm cy:run --spec '<feature selection>' --reporter json --expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness' 2>&1 | tee /tmp/donut-e2e-profile.log
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec '<feature,feature,...>' 2>&1 | tee /tmp/donut-e2e-profile.log
 ```
 
-The JSON reporter prints one `stats`/`tests` object per spec. Associate each
-object with the preceding `Running: <feature>` line; do not assume reporter file
-output works. If mirroring CI, also exclude `@wip`. This filter is profiling-only
-and must not narrow normal verification.
+- The wrapper forwards only `--spec` (and `--browser`) to Cypress
+  (`scripts/e2e-cypress-process.mjs`); `--reporter` and `--expose tags=...`
+  are dropped. Apply the profile-only exclusion by leaving
+  `@skipOptimizationDueToKnownNecessarySlowness` features out of the spec list,
+  and subtract excluded scenarios inside a selected feature from the profile.
+- Per-scenario times are the spec reporter's `✓ <scenario> (<N>ms)` lines;
+  associate them with the preceding `Running: <feature>` line.
+- An isolated checkout (a linked worktree, or a primary with
+  `.worktree.local.json`) refuses glob spec selections; list the features
+  comma-separated. If mirroring CI, also leave out `@wip` features.
+
+This exclusion is profiling-only and must not narrow normal verification.
 
 ## Debugging
 
