@@ -9,6 +9,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -58,8 +59,14 @@ class NotebookFolderController extends NotebookFolderQuerySupport {
       NotebookRepository notebookRepository,
       EntityPersister entityPersister,
       AcceptedWebChangeService acceptedWebChangeService,
-      TestabilitySettings testabilitySettings) {
-    super(authorizationService, noteService, folderRepository, notebookCatalogService);
+      TestabilitySettings testabilitySettings,
+      NotebookAttachmentRepository notebookAttachmentRepository) {
+    super(
+        authorizationService,
+        noteService,
+        folderRepository,
+        notebookCatalogService,
+        notebookAttachmentRepository);
     this.webFolderCreationService = webFolderCreationService;
     this.folderRelocationService = folderRelocationService;
     this.notebookRepository = notebookRepository;

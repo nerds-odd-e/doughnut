@@ -1,5 +1,7 @@
 package com.odde.donut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,17 +29,20 @@ public class NotebookAttachment extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "notebook_id", nullable = false)
+  @JsonIgnore
   @Getter
   @Setter
   private Notebook notebook;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "folder_id")
+  @JsonIgnore
   @Getter
   @Setter
   private Folder folder;
 
   @Column(name = "filename", nullable = false)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @Getter
   @Setter
   private String filename;
@@ -50,6 +55,7 @@ public class NotebookAttachment extends EntityIdentifiedByIdOnly {
    * Accepted Git blob bytes for this attachment: legacy raw payload, or a standard Git LFS pointer.
    * Never hydrated LFS object bytes.
    */
+  @JsonIgnore
   public byte[] getAcceptedGitContent() {
     return content;
   }
@@ -59,6 +65,7 @@ public class NotebookAttachment extends EntityIdentifiedByIdOnly {
   }
 
   /** JPA property for column {@code content}; prefer {@link #getAcceptedGitContent()}. */
+  @JsonIgnore
   public byte[] getContent() {
     return getAcceptedGitContent();
   }

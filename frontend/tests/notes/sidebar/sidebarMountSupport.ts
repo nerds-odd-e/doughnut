@@ -56,11 +56,12 @@ export function rootRowLabels(w: VueWrapper<unknown>): string[] {
       .querySelector(".sidebar-folder-label")
       ?.textContent?.trim()
     const noteText = li.querySelector(".title-text")?.textContent?.trim()
-    return folderText
-      ? `folder:${folderText}`
-      : noteText
-        ? `note:${noteText}`
-        : "?"
+    const fileText = li
+      .querySelector(".sidebar-attachment-label")
+      ?.textContent?.trim()
+    if (folderText) return `folder:${folderText}`
+    if (noteText) return `note:${noteText}`
+    return fileText ? `file:${fileText}` : "?"
   })
 }
 

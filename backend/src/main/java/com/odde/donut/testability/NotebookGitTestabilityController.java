@@ -8,17 +8,10 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
-import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
-import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.HexFormat;
 import java.util.List;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -38,9 +31,9 @@ class NotebookGitTestabilityController {
   @Autowired NotebookRepository notebookRepository;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
-  @Autowired NotebookAttachmentContent notebookAttachmentContent;
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
+  @Autowired InjectNotesWorker injectNotesWorker;
 
   @Schema(name = "ResnapshotNotebookGitBindingRequest")
   @Getter
@@ -50,21 +43,19 @@ class NotebookGitTestabilityController {
     private String notebookName;
   }
 
-  @Schema(name = "AcceptLfsAttachmentTipRequest")
+  @Schema(name = "PutNotebookFileRequest")
   @Getter
   @Setter
-  static class AcceptLfsAttachmentTipRequest {
+  static class PutNotebookFileRequest {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String notebookName;
 
+    /** Slash-separated notebook path; missing folders are created. */
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    private String filename;
+    private String path;
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    private String payload;
-
-    /** Optional prior payload retained in the content store only (not the tip). */
-    private String obsoletePayload;
+    private String content;
   }
 
   /**
@@ -82,6 +73,32 @@ class NotebookGitTestabilityController {
     notebookGitCutoverService.resetHistory(
         requireNotebook(request.getNotebookName()),
         testabilitySettings.getCurrentUTCTimestamp().toInstant());
+    return "OK";
+  }
+
+  /**
+   * Testability-only: stores a file's content as-is at a notebook path, creating missing folders,
+   * then resnapshots the accepted Git binding so the file is part of the accepted tree.
+   */
+  @PostMapping("/put_notebook_file_for_testability")
+  @Transactional
+  public String putNotebookFileForTestability(@RequestBody PutNotebookFileRequest request) {
+    Notebook notebook = requireNotebook(request.getNotebookName());
+    int slash = request.getPath().lastIndexOf('/');
+    NotebookAttachment attachment = new NotebookAttachment();
+    attachment.setNotebook(notebook);
+    if (slash >= 0) {
+      attachment.setFolder(
+          injectNotesWorker.resolveOrCreateFolderPath(
+              notebook,
+              request.getPath().substring(0, slash),
+              testabilitySettings.getCurrentUTCTimestamp()));
+    }
+    attachment.setFilename(request.getPath().substring(slash + 1));
+    attachment.setAcceptedGitContent(request.getContent().getBytes(StandardCharsets.UTF_8));
+    notebookAttachmentRepository.save(attachment);
+    notebookGitCutoverService.resetHistory(
+        notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
     return "OK";
   }
 
@@ -108,137 +125,9 @@ class NotebookGitTestabilityController {
     return "OK";
   }
 
-  /**
-   * Testability-only: selects LFS representation, stores the tip payload (and optional obsolete
-   * payload), projects a root attachment as a pointer, and resets accepted history with LFS
-   * attributes so CLI clone can hydrate an already-accepted LFS tip.
-   */
-  @PostMapping("/accept_lfs_attachment_tip_for_testability")
-  @Transactional
-  public AcceptLfsAttachmentTipResponse acceptLfsAttachmentTipForTestability(
-      @RequestBody AcceptLfsAttachmentTipRequest request) throws Exception {
-    if (Strings.isEmpty(request.getNotebookName())
-        || Strings.isEmpty(request.getFilename())
-        || request.getPayload() == null) {
-      throw new IllegalArgumentException("notebookName, filename, and payload are required");
-    }
-    Notebook notebook = requireNotebook(request.getNotebookName());
-    NotebookGitBinding binding =
-        notebookGitBindingRepository
-            .findByNotebook_Id(notebook.getId())
-            .orElseThrow(() -> new IllegalArgumentException("Notebook has no Git binding"));
-    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
-    notebookGitBindingRepository.save(binding);
-
-    if (request.getObsoletePayload() != null) {
-      storePayload(notebook.getId(), request.getObsoletePayload().getBytes(StandardCharsets.UTF_8));
-    }
-    byte[] payload = request.getPayload().getBytes(StandardCharsets.UTF_8);
-    String oid = storePayload(notebook.getId(), payload);
-    byte[] pointer = NotebookGitLfsPointer.format(oid, payload.length);
-
-    NotebookAttachment attachment =
-        findRootAttachment(notebook.getId(), request.getFilename())
-            .orElseGet(NotebookAttachment::new);
-    attachment.setNotebook(notebook);
-    attachment.setFolder(null);
-    attachment.setFilename(request.getFilename());
-    attachment.setAcceptedGitContent(pointer);
-    notebookAttachmentRepository.save(attachment);
-
-    notebookGitCutoverService.resetHistory(
-        notebook,
-        testabilitySettings.getCurrentUTCTimestamp().toInstant(),
-        NotebookGitAttributes.initialMetadata());
-
-    AcceptLfsAttachmentTipResponse response = new AcceptLfsAttachmentTipResponse();
-    response.setOid(oid);
-    response.setSize(payload.length);
-    return response;
-  }
-
-  /**
-   * Testability-only: returns whether a root attachment row is present, its MySQL-projected
-   * accepted Git content when present, and whether the content store holds a given digest. Row
-   * absence does not imply content-store deletion; the digest check still runs.
-   */
-  @PostMapping("/inspect_notebook_lfs_attachment_for_testability")
-  @Transactional(readOnly = true)
-  public InspectNotebookLfsAttachmentResponse inspectNotebookLfsAttachmentForTestability(
-      @RequestBody InspectNotebookLfsAttachmentRequest request) {
-    if (Strings.isEmpty(request.getNotebookName())
-        || Strings.isEmpty(request.getFilename())
-        || Strings.isEmpty(request.getOid())) {
-      throw new IllegalArgumentException("notebookName, filename, and oid are required");
-    }
-    Notebook notebook = requireNotebook(request.getNotebookName());
-    InspectNotebookLfsAttachmentResponse response = new InspectNotebookLfsAttachmentResponse();
-    findRootAttachment(notebook.getId(), request.getFilename())
-        .ifPresentOrElse(
-            attachment -> {
-              byte[] accepted = attachment.getAcceptedGitContent();
-              response.setAttachmentPresent(true);
-              response.setAcceptedGitContentLength(accepted.length);
-              response.setAcceptedGitContentUtf8(new String(accepted, StandardCharsets.US_ASCII));
-            },
-            () -> response.setAttachmentPresent(false));
-    var stored = notebookAttachmentContent.get(notebook.getId(), request.getOid());
-    response.setObjectStored(stored.isPresent());
-    stored.ifPresent(bytes -> response.setStoredObjectSize((long) bytes.length));
-    return response;
-  }
-
-  private Optional<NotebookAttachment> findRootAttachment(Integer notebookId, String filename) {
-    return notebookAttachmentRepository.findByNotebook_Id(notebookId).stream()
-        .filter(row -> filename.equals(row.getFilename()) && row.getFolder() == null)
-        .findFirst();
-  }
-
   private Notebook requireNotebook(String notebookName) {
     return notebookRepository
         .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(new DisplayName(notebookName))
         .orElseThrow(() -> new IllegalArgumentException("No notebook with name: " + notebookName));
-  }
-
-  private String storePayload(Integer notebookId, byte[] payload) throws Exception {
-    String oid = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(payload));
-    if (!notebookAttachmentContent.store(
-        notebookId, oid, payload.length, new ByteArrayInputStream(payload))) {
-      throw new IllegalStateException("Failed to store LFS payload for testability");
-    }
-    return oid;
-  }
-
-  @Schema(name = "AcceptLfsAttachmentTipResponse")
-  @Getter
-  @Setter
-  static class AcceptLfsAttachmentTipResponse {
-    private String oid;
-    private long size;
-  }
-
-  @Schema(name = "InspectNotebookLfsAttachmentRequest")
-  @Getter
-  @Setter
-  static class InspectNotebookLfsAttachmentRequest {
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    private String notebookName;
-
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    private String filename;
-
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    private String oid;
-  }
-
-  @Schema(name = "InspectNotebookLfsAttachmentResponse")
-  @Getter
-  @Setter
-  static class InspectNotebookLfsAttachmentResponse {
-    private boolean attachmentPresent;
-    private Integer acceptedGitContentLength;
-    private String acceptedGitContentUtf8;
-    private boolean objectStored;
-    private Long storedObjectSize;
   }
 }

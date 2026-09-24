@@ -8,6 +8,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteService;
@@ -27,24 +28,27 @@ abstract class NotebookFolderQuerySupport {
   private final NoteService noteService;
   private final FolderRepository folderRepository;
   private final NotebookCatalogService notebookCatalogService;
+  private final NotebookAttachmentRepository notebookAttachmentRepository;
 
   NotebookFolderQuerySupport(
       AuthorizationService authorizationService,
       NoteService noteService,
       FolderRepository folderRepository,
-      NotebookCatalogService notebookCatalogService) {
+      NotebookCatalogService notebookCatalogService,
+      NotebookAttachmentRepository notebookAttachmentRepository) {
     this.authorizationService = authorizationService;
     this.noteService = noteService;
     this.folderRepository = folderRepository;
     this.notebookCatalogService = notebookCatalogService;
+    this.notebookAttachmentRepository = notebookAttachmentRepository;
   }
 
   @Operation(
-      summary = "List notes and folders at notebook root or under a parent folder",
+      summary = "List notes, folders, and files at notebook root or under a parent folder",
       description =
-          "Without parent: notes with no folder assignment and top-level folders (notebook root"
-              + " scope). With parent: notes assigned to that folder and its immediate child"
-              + " folders. The parent folder must belong to the notebook.")
+          "Without parent: notes and files with no folder assignment and top-level folders"
+              + " (notebook root scope). With parent: notes and files in that folder and its"
+              + " immediate child folders. The parent folder must belong to the notebook.")
   @GetMapping("/{notebook}/folder-listing")
   public FolderListing listNotebookFolderListing(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
@@ -60,7 +64,11 @@ abstract class NotebookFolderQuerySupport {
       List<Folder> folders =
           folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
               .toList();
-      return new FolderListing(noteTopologies, folders);
+      return new FolderListing(
+          noteTopologies,
+          folders,
+          notebookAttachmentRepository.findByNotebook_IdAndFolderIsNullOrderByIdAsc(
+              notebook.getId()));
     }
     Folder folder =
         folderRepository
@@ -75,7 +83,10 @@ abstract class NotebookFolderQuerySupport {
     List<Folder> childFolders =
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
             .toList();
-    return new FolderListing(noteTopologies, childFolders);
+    return new FolderListing(
+        noteTopologies,
+        childFolders,
+        notebookAttachmentRepository.findByFolder_IdOrderByIdAsc(folder.getId()));
   }
 
   @Operation(

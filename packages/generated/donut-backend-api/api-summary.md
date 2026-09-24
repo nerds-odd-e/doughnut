@@ -62,8 +62,12 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Notebook Git Testability Controller
 
 - `resnapshotNotebookGitBindingForTestability`: POST `/api/testability/resnapshot_notebook_git_binding_for_testability` -> `ResnapshotNotebookGitBindingForTestabilityResponse` (request: `ResnapshotNotebookGitBindingForTestabilityData`; body: ResnapshotNotebookGitBindingRequest; response body: string)
-- `inspectNotebookLfsAttachmentForTestability`: POST `/api/testability/inspect_notebook_lfs_attachment_for_testability` -> `InspectNotebookLfsAttachmentForTestabilityResponse` (request: `InspectNotebookLfsAttachmentForTestabilityData`; body: InspectNotebookLfsAttachmentRequest; response body: InspectNotebookLfsAttachmentResponse)
+- `putNotebookFileForTestability`: POST `/api/testability/put_notebook_file_for_testability` -> `PutNotebookFileForTestabilityResponse` (request: `PutNotebookFileForTestabilityData`; body: PutNotebookFileRequest; response body: string)
 - `forceRawNotebookGitBindingForTestability`: POST `/api/testability/force_raw_notebook_git_binding_for_testability` -> `ForceRawNotebookGitBindingForTestabilityResponse` (request: `ForceRawNotebookGitBindingForTestabilityData`; body: ResnapshotNotebookGitBindingRequest; response body: string)
+
+## Notebook Lfs Testability Controller
+
+- `inspectNotebookLfsAttachmentForTestability`: POST `/api/testability/inspect_notebook_lfs_attachment_for_testability` -> `InspectNotebookLfsAttachmentForTestabilityResponse` (request: `InspectNotebookLfsAttachmentForTestabilityData`; body: InspectNotebookLfsAttachmentRequest; response body: InspectNotebookLfsAttachmentResponse)
 - `acceptLfsAttachmentTipForTestability`: POST `/api/testability/accept_lfs_attachment_tip_for_testability` -> `AcceptLfsAttachmentTipForTestabilityResponse` (request: `AcceptLfsAttachmentTipForTestabilityData`; body: AcceptLfsAttachmentTipRequest; response body: AcceptLfsAttachmentTipResponse)
 
 ## Subscription Controller

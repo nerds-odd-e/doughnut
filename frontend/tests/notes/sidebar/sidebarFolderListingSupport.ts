@@ -1,5 +1,6 @@
 import type {
   FolderListing,
+  NotebookAttachment,
   NoteRealm,
   Options,
   ShowNoteData,
@@ -105,9 +106,16 @@ export function setupRootPeersWithFolders(options: {
     mango?: Partial<ReturnType<typeof testFolderStub>>
     banana?: Partial<ReturnType<typeof testFolderStub>>
   }
+  attachments?: NotebookAttachment[]
 }) {
-  const { storageAccessor, topNoteRealm, realmZ, realmA, folderExtras } =
-    options
+  const {
+    storageAccessor,
+    topNoteRealm,
+    realmZ,
+    realmA,
+    folderExtras,
+    attachments,
+  } = options
   const nbId = topNoteRealm.notebookRealm.notebook.id
   storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
   storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
@@ -126,6 +134,7 @@ export function setupRootPeersWithFolders(options: {
     [String(undefined)]: {
       noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
       folders: [folderMango, folderBanana],
+      attachments,
     },
   }
   mockSdkServiceWithImplementation(

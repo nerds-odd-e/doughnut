@@ -19,6 +19,15 @@
   integration checkout `/Users/terryyin/git/doughnut`; publication target
   `origin/main`. Implementation is not authorized by this plan.
 
+## Execution
+
+- Mode: Story Branch. Workspace `/Users/terryyin/git/doughnut/.claude/worktrees/browse-download-notebook-files`
+  (created), branch `story/browse-download-notebook-files`, starting revision
+  `15ec80eee6`; integration checkout `/Users/terryyin/git/doughnut`; publisher
+  `claude-job-dd72230f`.
+- Claim published on `origin/main` as `2725f1ecf0`. Increments publish to
+  `origin/story/browse-download-notebook-files`.
+
 ## Goal and scope
 
 Anyone who can read a notebook sees its non-Markdown files in the sidebar tree
@@ -87,7 +96,7 @@ attachment page.
 
 ### 1. Files appear in the sidebar at their place
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: raw notebook with note `physics/Force`, files `physics/force.png`,
 `physics/data/run.json`, and `refs/paper.pdf` only → open the notebook sidebar,
@@ -172,4 +181,15 @@ Sizing: ~6 min.
 
 ## Learnings
 
-None yet.
+- Seeding: testability step `the notebook "…" has files:` (`put_notebook_file_for_testability`,
+  path + content) creates folders and resnapshots. Its helper chains SDK calls with
+  `cy.then` because parallel `cy.wrap(promise)` puts race on the accepted tree.
+  Slices 2 and 3 reuse it.
+- A new feature file must be listed in `scripts/isolated-cypress-active-specs.mjs`
+  before a worktree `cy:run` accepts it.
+- `FolderListing.attachments` returns `NotebookAttachment` (id, filename); notebook,
+  folder and content are `@JsonIgnore`. Sidebar rows use `SidebarAttachmentItem.vue`
+  (no link yet; slice 2 adds the page link).
+- Slice 1 proof: `NotebookFolderListingControllerTest.listsFilesAtRootAndInsideFolderOnlyInTheirOwnScope`,
+  `SidebarPeerSort.spec.ts` "lists files with notes after folders…", E2E
+  "Files appear in the sidebar where they live".

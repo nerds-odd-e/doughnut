@@ -1,9 +1,14 @@
-import type { Folder, NoteTopology } from "@generated/donut-backend-api"
+import type {
+  Folder,
+  NoteTopology,
+  NotebookAttachment,
+} from "@generated/donut-backend-api"
 import type { PeerSortSpec } from "@/composables/usePeerSort"
 
 export type SidebarStructuralRow =
   | { kind: "note"; noteTopology: NoteTopology }
   | { kind: "folder"; folder: Folder }
+  | { kind: "attachment"; attachment: NotebookAttachment }
 
 function parseTime(iso: string | undefined): number {
   if (iso == null || iso === "") return Number.NaN
@@ -12,27 +17,28 @@ function parseTime(iso: string | undefined): number {
 }
 
 function peerTitle(row: SidebarStructuralRow): string {
-  return row.kind === "folder"
-    ? row.folder.name.toLocaleLowerCase()
-    : row.noteTopology.title.toLocaleLowerCase()
+  if (row.kind === "folder") return row.folder.name.toLocaleLowerCase()
+  if (row.kind === "note") return row.noteTopology.title.toLocaleLowerCase()
+  return row.attachment.filename.toLocaleLowerCase()
 }
 
-function peerCreated(row: SidebarStructuralRow): number {
-  const iso =
-    row.kind === "folder" ? row.folder.createdAt : row.noteTopology.createdAt
-  return parseTime(iso)
+function peerDates(row: SidebarStructuralRow): {
+  createdAt?: string
+  updatedAt?: string
+} {
+  if (row.kind === "folder") return row.folder
+  if (row.kind === "note") return row.noteTopology
+  return {}
 }
 
-function peerUpdated(row: SidebarStructuralRow): number {
-  const iso =
-    row.kind === "folder" ? row.folder.updatedAt : row.noteTopology.updatedAt
-  return parseTime(iso)
+function peerId(row: SidebarStructuralRow): number {
+  if (row.kind === "folder") return row.folder.id
+  if (row.kind === "note") return row.noteTopology.id
+  return row.attachment.id
 }
 
 function tieBreak(a: SidebarStructuralRow, b: SidebarStructuralRow): number {
-  const idA = a.kind === "folder" ? a.folder.id : a.noteTopology.id
-  const idB = b.kind === "folder" ? b.folder.id : b.noteTopology.id
-  return idA - idB
+  return peerId(a) - peerId(b)
 }
 
 function compareDates(
@@ -64,11 +70,19 @@ function compare(
     return tieBreak(a, b)
   }
   if (spec.field === "created") {
-    const d = compareDates(peerCreated(a), peerCreated(b), spec.direction)
+    const d = compareDates(
+      parseTime(peerDates(a).createdAt),
+      parseTime(peerDates(b).createdAt),
+      spec.direction
+    )
     if (d !== 0) return d
     return tieBreak(a, b)
   }
-  const d = compareDates(peerUpdated(a), peerUpdated(b), spec.direction)
+  const d = compareDates(
+    parseTime(peerDates(a).updatedAt),
+    parseTime(peerDates(b).updatedAt),
+    spec.direction
+  )
   if (d !== 0) return d
   return tieBreak(a, b)
 }
@@ -77,21 +91,19 @@ export function sortSidebarStructuralRows(
   rows: SidebarStructuralRow[],
   spec: PeerSortSpec
 ): SidebarStructuralRow[] {
-  type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
-  type NoteRow = Extract<SidebarStructuralRow, { kind: "note" }>
-
-  const folderRows = rows.filter((r): r is FolderRow => r.kind === "folder")
-  const noteRows = rows.filter((r): r is NoteRow => r.kind === "note")
+  const folderRows = rows.filter((r) => r.kind === "folder")
+  const leafRows = rows.filter((r) => r.kind !== "folder")
 
   folderRows.sort((a, b) => compare(a, b, spec))
-  noteRows.sort((a, b) => compare(a, b, spec))
+  leafRows.sort((a, b) => compare(a, b, spec))
 
-  return [...folderRows, ...noteRows]
+  return [...folderRows, ...leafRows]
 }
 
 export function buildUnsortedStructuralRows(
   noteTopologies: NoteTopology[],
-  folders: Folder[] | undefined
+  folders: Folder[] | undefined,
+  attachments: NotebookAttachment[] | undefined
 ): SidebarStructuralRow[] {
   type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
   type NoteRow = Extract<SidebarStructuralRow, { kind: "note" }>
@@ -108,5 +120,10 @@ export function buildUnsortedStructuralRows(
     noteTopology,
   }))
 
-  return [...folderRows, ...noteRows]
+  const attachmentRows = (attachments ?? []).map((attachment) => ({
+    kind: "attachment" as const,
+    attachment,
+  }))
+
+  return [...folderRows, ...noteRows, ...attachmentRows]
 }

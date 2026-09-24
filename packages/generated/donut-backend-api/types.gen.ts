@@ -118,6 +118,12 @@ export type Randomization = {
     seed?: number;
 };
 
+export type PutNotebookFileRequest = {
+    notebookName: string;
+    path: string;
+    content: string;
+};
+
 export type InspectNotebookLfsAttachmentRequest = {
     notebookName: string;
     filename: string;
@@ -1181,11 +1187,17 @@ export type SubscriptionForNotebooksListing = {
 };
 
 /**
- * Note topologies and child folders in a structural listing scope (e.g. notebook root or a folder).
+ * Note topologies, child folders, and files in a structural listing scope (e.g. notebook root or a folder).
  */
 export type FolderListing = {
     noteTopologies?: Array<NoteTopology>;
     folders?: Array<Folder>;
+    attachments?: Array<NotebookAttachment>;
+};
+
+export type NotebookAttachment = {
+    id: number;
+    filename: string;
 };
 
 export type BookUserLastReadPosition = {
@@ -1600,6 +1612,22 @@ export type RandomizerResponses = {
 };
 
 export type RandomizerResponse = RandomizerResponses[keyof RandomizerResponses];
+
+export type PutNotebookFileForTestabilityData = {
+    body: PutNotebookFileRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/put_notebook_file_for_testability';
+};
+
+export type PutNotebookFileForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type PutNotebookFileForTestabilityResponse = PutNotebookFileForTestabilityResponses[keyof PutNotebookFileForTestabilityResponses];
 
 export type SetOpenAiTokenData = {
     body?: {

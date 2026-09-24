@@ -1,6 +1,7 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
 import createNoteStorage from "@/store/createNoteStorage"
+import type { NotebookAttachment } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -58,7 +59,9 @@ describe("Sidebar peer sort", () => {
     expect(wrapper.findAll(".sidebar-folder-label")).toHaveLength(2)
   }
 
-  async function mountZebraAppleRootSidebar() {
+  async function mountZebraAppleRootSidebar(
+    attachments: NotebookAttachment[] = []
+  ) {
     storageAccessor.value = createNoteStorage()
     const { realmZ, realmA } = zebraApplePeerRealms()
     const { nbId, realmA: activeA } = setupRootPeersWithFolders({
@@ -66,6 +69,7 @@ describe("Sidebar peer sort", () => {
       topNoteRealm: fixtures.topNoteRealm,
       realmZ,
       realmA,
+      attachments,
     })
     wrapper = mountSidebarSignedIn(helper, activeA, nbId)
     await flushRootFolderLabels()
@@ -98,5 +102,21 @@ describe("Sidebar peer sort", () => {
     await flushRootFolderLabels()
 
     expect(rootRowLabels(wrapper)).toEqual(titleZaRootOrder)
+  })
+
+  it("lists files with notes after folders, ordered by filename as title", async () => {
+    await mountZebraAppleRootSidebar([
+      { id: 5001, filename: "Kiwi.png" },
+      { id: 5002, filename: ".keep" },
+    ])
+
+    expect(rootRowLabels(wrapper)).toEqual([
+      "folder:banana",
+      "folder:mango",
+      "file:.keep",
+      "note:apple",
+      "file:Kiwi.png",
+      "note:zebra",
+    ])
   })
 })

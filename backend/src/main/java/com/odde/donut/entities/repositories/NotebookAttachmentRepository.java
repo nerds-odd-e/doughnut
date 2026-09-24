@@ -21,5 +21,9 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
 
   List<NotebookAttachment> findByNotebook_Id(Integer notebookId);
 
+  List<NotebookAttachment> findByNotebook_IdAndFolderIsNullOrderByIdAsc(Integer notebookId);
+
+  List<NotebookAttachment> findByFolder_IdOrderByIdAsc(Integer folderId);
+
   boolean existsByFolder_IdIn(Collection<Integer> folderIds);
 }
