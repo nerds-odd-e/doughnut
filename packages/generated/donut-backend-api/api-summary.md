@@ -279,6 +279,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `recalling`: GET `/api/recalls/recalling` -> `RecallingResponse` (request: `RecallingData`; query: timezone, dueindays; response body: DueMemoryTrackers)
 - `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<AnsweredQuestion>)
 
+## Note Attachment Image Controller
+
+- `showAttachmentImage`: GET `/api/notes/{note}/attachment-image` -> `ShowAttachmentImageResponse` (request: `ShowAttachmentImageData`; path: note; query: path; response body: string)
+
 ## Notebook Attachment Controller
 
 - `getAttachmentPage`: GET `/api/notebooks/{notebook}/attachments/{attachment}` -> `GetAttachmentPageResponse` (request: `GetAttachmentPageData`; path: notebook, attachment; response body: NotebookAttachmentRealm)

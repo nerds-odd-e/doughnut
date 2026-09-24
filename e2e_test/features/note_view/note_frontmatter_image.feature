@@ -27,3 +27,11 @@ Feature: Note header image from frontmatter
     And I reload the current page for note "shown"
     Then I should see note "shown" has an image
     And I should see rich note property "image" with value "https://example.com/a.png"
+
+  Scenario: Note shows a picture file from its own folder
+    Given I have a notebook "Physics" with notes:
+      | Title | Folder  | Content   | Image Url         |
+      | force | physics | Body text | force-diagram.png |
+    And the notebook "Physics" uses legacy raw Git attachment storage
+    And the notebook "Physics" has the picture "physics/force-diagram.png" from fixture "example.png"
+    Then I should see note "force" shows its picture

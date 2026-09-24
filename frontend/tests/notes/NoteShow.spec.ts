@@ -111,3 +111,46 @@ describe("note availability warning", () => {
     wrapper.unmount()
   })
 })
+
+describe("note header image", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
+  const imageSourceFor = async (image: string) => {
+    const note = makeMe.aNoteRealm
+      .content(`---\nimage: ${image}\n---\n\nBody`)
+      .please()
+    mockSdkService(NoteController, "showNote", note)
+    wrapper = helper
+      .component(NoteShow)
+      .withRouter()
+      .withCleanStorage()
+      .withProps({ noteId: note.id, expandChildren: true })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+    return {
+      noteId: note.id,
+      src: wrapper.find("#note-image img").attributes("src"),
+    }
+  }
+
+  it("shows a relative picture file through the note's attachment image address", async () => {
+    const { noteId, src } = await imageSourceFor("images/force diagram.png")
+
+    expect(src).toBe(
+      `/api/notes/${noteId}/attachment-image?path=images%2Fforce%20diagram.png`
+    )
+  })
+
+  it.each(["/attachments/images/42/x.png", "https://example.com/a.png"])(
+    "keeps %s as it is",
+    async (image) => {
+      expect((await imageSourceFor(image)).src).toBe(image)
+    }
+  )
+})

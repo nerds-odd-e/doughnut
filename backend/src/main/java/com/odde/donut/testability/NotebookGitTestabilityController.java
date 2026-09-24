@@ -10,7 +10,7 @@ import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,8 +54,9 @@ class NotebookGitTestabilityController {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String path;
 
+    /** The file's exact bytes, base64-encoded. */
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    private String content;
+    private String contentBase64;
   }
 
   /**
@@ -95,7 +96,7 @@ class NotebookGitTestabilityController {
               testabilitySettings.getCurrentUTCTimestamp()));
     }
     attachment.setFilename(request.getPath().substring(slash + 1));
-    attachment.setAcceptedGitContent(request.getContent().getBytes(StandardCharsets.UTF_8));
+    attachment.setAcceptedGitContent(Base64.getDecoder().decode(request.getContentBase64()));
     notebookAttachmentRepository.save(attachment);
     notebookGitCutoverService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());

@@ -23,6 +23,17 @@ Given(
 )
 
 Given(
+  'the notebook {string} has the picture {string} from fixture {string}',
+  (notebookName: string, path: string, fixture: string) => {
+    cy.fixture(fixture, 'base64').then((contentBase64: string) =>
+      start
+        .testability()
+        .putNotebookFileBytesForTestability(notebookName, path, contentBase64)
+    )
+  }
+)
+
+Given(
   'the notebook {string} has an LFS file {string} with payload {string}',
   (notebookName: string, filename: string, payload: string) => {
     start

@@ -2,6 +2,7 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.controllers.dto.NotebookAttachmentListItem;
 import com.odde.donut.entities.NotebookAttachment;
+import com.odde.donut.services.notebookGit.NotebookAttachmentPlacement;
 import com.odde.donut.services.notebookTree.PortableTreeAttachmentRow;
 import java.util.Collection;
 import java.util.List;
@@ -38,6 +39,15 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
       WHERE a.folder.id = :folderId ORDER BY a.id ASC
       """)
   List<NotebookAttachmentListItem> findListItemsByFolderId(@Param("folderId") Integer folderId);
+
+  @Query(
+      """
+      SELECT NEW com.odde.donut.services.notebookGit.NotebookAttachmentPlacement(a.id, f)
+      FROM NotebookAttachment a LEFT JOIN a.folder f
+      WHERE a.notebook.id = :notebookId AND a.filename = :filename
+      """)
+  List<NotebookAttachmentPlacement> findPlacementsByNotebookIdAndFilename(
+      @Param("notebookId") Integer notebookId, @Param("filename") String filename);
 
   boolean existsByFolder_IdIn(Collection<Integer> folderIds);
 }

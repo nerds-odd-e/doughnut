@@ -2848,6 +2848,45 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AuthoredPortablePath"
+  /api/notes/{note}/attachment-image:
+    get:
+      tags:
+      - note-attachment-image-controller
+      summary: Show a picture file the note refers to
+      description: "The notebook file at a path relative to the note's folder, served\
+        \ inline when it is a PNG, JPEG, GIF or WebP picture."
+      operationId: showAttachmentImage
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                format: byte
+            image/jpeg:
+              schema:
+                type: string
+                format: byte
+            image/gif:
+              schema:
+                type: string
+                format: byte
+            image/webp:
+              schema:
+                type: string
+                format: byte
   /api/notes/{note}/ai-context-markdown:
     get:
       tags:
@@ -3872,10 +3911,10 @@ components:
           type: string
         path:
           type: string
-        content:
+        contentBase64:
           type: string
       required:
-      - content
+      - contentBase64
       - notebookName
       - path
     InspectNotebookLfsAttachmentRequest:

@@ -120,6 +120,7 @@ Still body`
   it("composes edited body with existing frontmatter when emitting updates", async () => {
     const markdown = `---
 diligence: high
+image: force-diagram.png
 topic: training
 ---
 
@@ -129,6 +130,7 @@ topic: training
 
     const last = h.lastEmittedMarkdown()
     expect(last).toContain("diligence:")
+    expect(last).toContain("image: force-diagram.png")
     expect(last).toContain("Edited Heading")
   })
 

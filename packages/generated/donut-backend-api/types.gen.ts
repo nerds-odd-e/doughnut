@@ -121,7 +121,7 @@ export type Randomization = {
 export type PutNotebookFileRequest = {
     notebookName: string;
     path: string;
-    content: string;
+    contentBase64: string;
 };
 
 export type InspectNotebookLfsAttachmentRequest = {
@@ -3775,6 +3775,26 @@ export type AuthoredPortablePathResponses = {
 };
 
 export type AuthoredPortablePathResponse = AuthoredPortablePathResponses[keyof AuthoredPortablePathResponses];
+
+export type ShowAttachmentImageData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query: {
+        path: string;
+    };
+    url: '/api/notes/{note}/attachment-image';
+};
+
+export type ShowAttachmentImageResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ShowAttachmentImageResponse = ShowAttachmentImageResponses[keyof ShowAttachmentImageResponses];
 
 export type GetAiContextMarkdownData = {
     body?: never;

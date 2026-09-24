@@ -40,15 +40,29 @@ export const notebookGitTestabilityMethods = {
     )
   },
 
-  /** Stores a file at a slash-separated notebook path (creating folders), then resnapshots. */
+  /** Stores text as a file at a slash-separated notebook path (creating folders), then resnapshots. */
   putNotebookFileForTestability(
     notebookName: string,
     path: string,
     content: string
   ) {
+    const utf8 = new TextEncoder().encode(content)
+    return this.putNotebookFileBytesForTestability(
+      notebookName,
+      path,
+      btoa(Array.from(utf8, (byte) => String.fromCharCode(byte)).join(''))
+    )
+  },
+
+  /** Stores base64-encoded bytes as a file at a slash-separated notebook path, then resnapshots. */
+  putNotebookFileBytesForTestability(
+    notebookName: string,
+    path: string,
+    contentBase64: string
+  ) {
     return cy.then(() =>
       NotebookGitTestabilityController.putNotebookFileForTestability({
-        body: { notebookName, path, content },
+        body: { notebookName, path, contentBase64 },
       })
     )
   },

@@ -79,7 +79,7 @@ uploads (story 4), converting legacy images (story 5).
 
 ### 1. A note shows a picture file from its own folder
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: raw notebook with note `physics/force` whose content has
 `image: force-diagram.png` and real PNG bytes at `physics/force-diagram.png`
@@ -145,6 +145,24 @@ normalizing `./` or `..` (deferred promise).
   changes.
 - E: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_view/note_frontmatter_image.feature`.
 
+## Accepted proof (slice 1)
+
+- B: `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NoteAttachmentImageControllerTest'`
+  — 11 pass (same folder, subfolder with decoy, JPEG case, SVG 415,
+  `missing.png`/`../x.png`/`/x.png`/`./force-diagram.png` 404, LFS bytes,
+  Bazaar reader served, non-reader refused, inline + `nosniff`).
+- F: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteShow.spec.ts tests/components/form/RichMarkdownEditor.properties.spec.ts`
+  plus `vue-tsc --noEmit` — relative → endpoint source, legacy and URL
+  passthrough, rich body edit keeps `image: force-diagram.png`.
+- E: `note_frontmatter_image.feature` 4/4, including "Note shows a picture
+  file from its own folder" (`naturalWidth > 0`); `notebook_files.feature`
+  2/2 for the changed testability file contract (`contentBase64`).
+
 ## Learnings
 
-None yet.
+- The `I have a note … in folder … with content:` step cannot carry an
+  `image:` line: `NotesTestData.buildNote` rewrites image frontmatter from the
+  table's `Image Url` column. The scenario uses the notes table with
+  `Image Url: force-diagram.png` instead.
+- `noteImageSource` lives in `NoteShow.vue` (its only caller), keeping the
+  frontmatter parser free of the API client.
