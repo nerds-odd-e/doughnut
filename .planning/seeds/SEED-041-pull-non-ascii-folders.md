@@ -48,7 +48,7 @@ SEED-035 story 20, which fixed the same fault on the publish side
 
 ### Pull receives web notes under non-ASCII folders like any other folder
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"1b83f45923156d27e032878c7b735f4aa253672e38c29295a5b3d54a8c9e50fa"}}
 ```
 
 - **Identity:** SEED-041#story-1
