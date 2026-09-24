@@ -228,31 +228,106 @@ No executable plan or implementation is authorized by this seed.
     with story 3.
   - An owner with unpublished local work will find `pull` refusing over the
     web attachment change; acceptable, or does conversion need guidance?
-- **Related finding, owner decision pending:** `GET /attachments/images/{id}/{fileName}`
-  has no authorization check (the security configuration permits all but
-  `/login/continue`) and ignores the filename, and image IDs are sequential,
-  so images from private notebooks can be enumerated. Whether to queue a
-  separate bug item is undecided; this story's conversion would not remove
-  the exposure while legacy rows remain.
+- **Related finding:** the public legacy image endpoint is queued first as
+  [SEED-040 story 1](SEED-040-private-note-images.md#story-1) (owner,
+  2026-09-24); this story's conversion would not remove the exposure while
+  legacy rows remain.
+
+<a id="story-16"></a>
+
+### Keep Markdown image embeds when a note is edited on the web
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+- **Identity:** SEED-035#story-16
+- **Kind:** Bug, queued first priority by the owner (2026-09-24).
+- **Goal:** An owner who embeds a picture in a note body locally
+  (`![](force-diagram.png)`) does not lose that line because the note was later
+  edited in Web Donut's rich editor and then pulled.
+- **Expected:** A web edit changes only what the user changed; other authored
+  body content, including image embeds, survives the save.
+- **Actual (2026-09-24):** The body is shown in Quill, whose allowed formats
+  (`frontend/src/components/form/QuillEditor.vue`) exclude `image`, so the
+  `<img>` produced by `marked` is dropped. The first rich-mode edit rebuilds the
+  whole body from Quill HTML (`RichMarkdownEditor.vue` `htmlValueUpdated`), so
+  `![...](...)` is removed and published; `pull` then deletes it locally.
+  Viewing alone writes nothing, and Markdown (textarea) mode keeps text verbatim.
+  Applies to any body image, including remote URLs.
+- **Scope:** Preserve the embed through a rich-mode edit. Showing the picture
+  is not promised here (story 3 covers frontmatter `image:` only; body image
+  display needs its own story), so a preserved but invisible embed is acceptable.
+- **Key examples:**
+  1. Body `Intro\n\n![force](force-diagram.png)\n\nMore` → the owner edits
+     "More" to "More text" on the web → the saved body still contains
+     `![force](force-diagram.png)` in the same place.
+  2. A note without images saves exactly as before.
+- **Effort hypothesis:** S–M, low confidence until the editor round trip is
+  inspected; route through dough-bug-fixing.
+- **Depends on:** none.
+- **Safe stopping point:** Authored embeds are no longer lost; display unchanged.
 
 <a id="story-3"></a>
 
 ### See locally added image files in Web Donut notes
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
 
 - **Identity:** SEED-035#story-3
-- **Goal:** Learners use locally collected diagrams when returning to a note in
-  Web Donut without uploading them again.
-- **Evaluation:** Publish an image and a note reference authored locally; open
-  the note on the web and see that image, retaining the note's learning history.
-- **Scope / value:** Notebook-local image references in note content complete the
-  local visual-authoring handoff. Preserve existing image presentation; no new
-  recall modes, image prompts, or question-generation behavior is promised.
-- **Effort hypothesis:** M, low confidence until reference spelling and current
-  presentation contexts are established.
-- **Depends on:** Story 6. Story 5 depends on this story's reference spelling
-  and web display, not the reverse.
-- **Safe stopping point:** Local diagrams work in notes without new web-upload
-  portability. Downloadable bytes do not imply every image format renders.
+- **Goal:** An owner who works locally keeps a picture as a file in the
+  notebook, points the note at it, and publishes; opening the note in Web Donut
+  (note page, recall, conversations) shows that picture, without uploading it
+  again. The owner confirmed this is a real scenario (2026-09-24): users want
+  to embed an image in Markdown with the image kept in the notebook.
+- **Scope (owner decision 2026-09-24: frontmatter only):**
+  - The note's frontmatter `image:` accepts a path relative to the note's own
+    folder, such as `force-diagram.png` or `images/force.png`. Wherever the
+    note image already appears, the web shows that notebook file, with
+    `image_mask:` unchanged.
+  - Reading the picture needs the same notebook read authorization as the
+    existing file download (Bazaar readers allowed, non-readers refused).
+  - Only raster pictures are shown inline: PNG, JPEG, GIF and WebP. The file
+    download itself stays a forced download.
+  - Existing `/attachments/images/...` values behave as before.
+- **Deferred promises (not built or verified here):**
+  - Markdown body images (`![](force-diagram.png)`). They are the natural IDE
+    form, but showing them is new display behavior in the editor; it needs its
+    own story. The bug that deletes them on a web edit is
+    [story 16](#story-16), queued first.
+  - SVG inline display: an SVG opened directly can run scripts.
+  - Paths starting with `/` (easily confused with legacy
+    `/attachments/images/` paths), paths leaving the notebook, and remote URLs.
+  - Rewriting references when a file is renamed or moved (same stance as
+    story 11), and any special display for a missing file: a broken reference
+    stays visibly broken, as today.
+  - New web uploads (story 4), converting old images (story 5), and closing
+    the public legacy image endpoint
+    ([SEED-040 story 1](SEED-040-private-note-images.md#story-1)).
+- **Current state (2026-09-24):** `image: force-diagram.png` is stored as-is
+  and rendered as `<img src="force-diagram.png">`, which resolves against the
+  web page URL and shows broken. The file download
+  (`/api/notebooks/{n}/attachments/{id}/content`) is addressed by ID and forces
+  a download (`attachment`, octet-stream, `nosniff`), so it cannot serve an
+  `<img>` as it is.
+- **Key examples:**
+  1. `physics/force.md` has `image: force-diagram.png` and
+     `physics/force-diagram.png` exists → after publishing, the web note page
+     and that note's recall show the diagram; the note keeps its learning
+     history.
+  2. `image: images/force.png` → shows `physics/images/force.png`.
+  3. A notebook reader (including a Bazaar reader) sees the picture; a user who
+     cannot read the notebook is refused the picture.
+  4. A note with `image: /attachments/images/42/x.png` looks the same as before.
+  5. Editing the note's text on the web keeps its `image:` line.
+- **Why now (owner, 2026-09-24):** Order kept above story 8 (skip guidance
+  folders); story 4 relies on this story's display and reference spelling, and
+  story 5 rewrites `image:` to this spelling.
+- **Effort hypothesis:** S–M, medium confidence; reuses the existing note image
+  display.
+- **Depends on:** Delivered web file browsing (story 6).
+- **Safe stopping point:** Locally added pictures show on the web; nothing
+  about existing images, uploads, or body images changes.
 
 <a id="story-4"></a>
 
