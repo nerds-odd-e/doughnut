@@ -20,10 +20,10 @@ vi.mock('node:fs', async () => {
   return { ...actual, renameSync: vi.fn(actual.renameSync) }
 })
 
-describe('acquireNotebookGitCheckout — LFS tip hydration', () => {
+describe('acquireNotebookGitCheckout — LFS tip fill-in', () => {
   const ctx = installAcquireNotebookGitCheckoutTest()
 
-  test('LFS tip configures the endpoint, hydrates current files, then installs', async () => {
+  test('LFS tip configures the endpoint, fills in current files, then installs', async () => {
     const destinationPath = ctx.getDestinationPath()
     stubBundleFetch()
     let checkoutDir = ''
@@ -148,7 +148,7 @@ describe('acquireNotebookGitCheckout — LFS tip hydration', () => {
     expect(stagingDirsUnderTmp()).toEqual(before)
   })
 
-  test('failed LFS hydration leaves destination untouched and cleans staging', async () => {
+  test('failed LFS fill-in leaves destination untouched and cleans staging', async () => {
     const destinationPath = ctx.getDestinationPath()
     stubBundleFetch()
     vi.mocked(childProcess.spawnSync).mockImplementation(((

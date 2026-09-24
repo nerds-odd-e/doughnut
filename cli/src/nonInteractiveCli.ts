@@ -11,7 +11,7 @@ import {
 import { assertLocalMainFollowsAcceptedHistory } from './commands/notebook/notebookPublishAncestry.js'
 import { uploadRequiredLfsObjectsBeforeProposal } from './commands/notebook/notebookPublishLfs.js'
 import { submitNotebookGitProposal } from './commands/notebook/notebookPublishSubmission.js'
-import { checkoutUsesLfs } from './commands/notebook/notebookLfsLocal.js'
+import { fillInCurrentLfsFilesIfNeeded } from './commands/notebook/notebookLfsFillIn.js'
 import { receiveAcceptedNotebookHead } from './commands/notebook/notebookPull.js'
 
 /**
@@ -62,36 +62,14 @@ export function notebookPullNextSteps(directory: string): string {
   )
 }
 
-/** Supported receive path until in-place LFS pull ships: publish, then clone fresh elsewhere. */
-export function notebookFreshCloneReceiveGuidance(
-  notebookId: number | string = '<notebook-id>'
-): string {
-  return (
-    `After remote or web changes, acquire a fresh checkout elsewhere with "donut notebook clone ${notebookId} <destination>" rather than pulling into an LFS checkout. ` +
-    'Keep this directory and any unpublished work until you finish moving it.'
-  )
-}
-
-export function notebookLfsPullRefusalMessage(
-  directory: string,
-  notebookId: number | string
-): string {
-  return (
-    `Receiving into an existing LFS checkout is not supported yet. ${notebookFreshCloneReceiveGuidance(notebookId)} ` +
-    `This checkout (${directory}) and any unpublished work are left unchanged.`
-  )
-}
-
 const NOTEBOOK_CLONE_USAGE =
   'usage: donut notebook clone <notebook-id> <destination>'
 const NOTEBOOK_PUBLISH_USAGE =
   'usage: donut notebook publish <directory>\n' +
-  'Publishes one unpublished commit based on the accepted main. ' +
-  notebookFreshCloneReceiveGuidance()
+  'Publishes one unpublished commit based on the accepted main.'
 const NOTEBOOK_PULL_USAGE =
   'usage: donut notebook pull <directory>\n' +
-  'Receives accepted notebook history onto a clean local main for legacy raw checkouts. ' +
-  'LFS checkouts refuse pull until in-place receive ships; clone fresh elsewhere instead. ' +
+  'Receives accepted notebook history onto a clean local main and fills in current attachment files. ' +
   notebookPullNextSteps('<directory>')
 
 async function completeNotebookSubcommand(
@@ -130,7 +108,7 @@ async function completeNotebookClone(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
   console.log(
-    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main containing one or more added Markdown notes with optional edits, including notes whose paths imply a new Folder under an already represented Folder without a Folder README, a new folder README alone or together with ordinary notes in that folder, one or more edited existing ordinary Markdown notes at unchanged paths, one or more uniquely matched unchanged-content Markdown note moves that may change folder and/or filename together with compatible same-path edits and either additions or deletions, one or more Markdown note deletions alone or together with same-path edits that leave existing links authored, or one complete same-name subtree whose source has its own accepted README, every active descendant is represented, the destination parent already exists in accepted history, and bytes, modes, and relative paths stay unchanged. Overwriting an existing note and changed-content moves are not supported yet. Authored referring links are not rewritten by a relocation or rename, so links to the old path may no longer resolve. Separate identity-uncertain additions or moves from deletions; do not delete and recreate the note. A Folder that contains concepts does not require a README.md; an empty Folder is represented by a .keep file. ${notebookFreshCloneReceiveGuidance(notebookId)} For legacy raw checkouts, run "donut notebook pull ${destination}" to receive newer accepted history. ${notebookPullNextSteps(destination)}`
+    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main containing one or more added Markdown notes with optional edits, including notes whose paths imply a new Folder under an already represented Folder without a Folder README, a new folder README alone or together with ordinary notes in that folder, one or more edited existing ordinary Markdown notes at unchanged paths, one or more uniquely matched unchanged-content Markdown note moves that may change folder and/or filename together with compatible same-path edits and either additions or deletions, one or more Markdown note deletions alone or together with same-path edits that leave existing links authored, or one complete same-name subtree whose source has its own accepted README, every active descendant is represented, the destination parent already exists in accepted history, and bytes, modes, and relative paths stay unchanged. Overwriting an existing note and changed-content moves are not supported yet. Authored referring links are not rewritten by a relocation or rename, so links to the old path may no longer resolve. Separate identity-uncertain additions or moves from deletions; do not delete and recreate the note. A Folder that contains concepts does not require a README.md; an empty Folder is represented by a .keep file. Run "donut notebook pull ${destination}" to receive newer accepted history. ${notebookPullNextSteps(destination)}`
   )
 }
 
@@ -163,9 +141,7 @@ async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
 
-  console.log(
-    `Published notebook. Accepted head: ${acceptedHead}. ${notebookFreshCloneReceiveGuidance()}`
-  )
+  console.log(`Published notebook. Accepted head: ${acceptedHead}.`)
 }
 
 async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
@@ -175,16 +151,23 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
     exitCliError(NOTEBOOK_PULL_USAGE)
   }
 
-  let result: Awaited<ReturnType<typeof receiveAcceptedNotebookHead>>
+  let result:
+    | Awaited<ReturnType<typeof receiveAcceptedNotebookHead>>
+    | undefined
   try {
     const { notebookId } = resolveNotebookBinding(directory)
-    if (checkoutUsesLfs(directory)) {
-      throw new Error(notebookLfsPullRefusalMessage(directory, notebookId))
-    }
     assertLocalMainIsReadyToReceive(directory)
     result = await receiveAcceptedNotebookHead(directory, Number(notebookId))
+    fillInCurrentLfsFilesIfNeeded(directory, Number(notebookId), 'pull')
   } catch (e) {
-    exitCliError(exceptionText(e))
+    // A paused conflict stays visible even when filling in attachments fails afterwards.
+    const conflictGuidance =
+      result?.kind === 'paused' ? [result.conflictGuidance] : []
+    exitCliError([...conflictGuidance, exceptionText(e)].join('\n'))
+  }
+
+  if (result.kind === 'paused') {
+    exitCliError(result.conflictGuidance)
   }
 
   if (result.kind === 'already-based') {

@@ -7,7 +7,8 @@ import {
 } from '../../backendApi/donutBackendClient.js'
 import { exceptionText } from '../../exceptionText.js'
 import { errnoCode } from '../../errnoCode.js'
-import { configureAndHydrateCurrentLfsCheckoutIfNeeded } from './notebookAcquisitionLfs.js'
+import { fillInCurrentLfsFilesIfNeeded } from './notebookLfsFillIn.js'
+import { smudgeSkippedGitOptions } from './notebookLfsLocal.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 /**
@@ -19,7 +20,7 @@ import { runSystemGitOrThrow } from './systemGit.js'
 export async function downloadNotebookGitBundle(
   notebookId: number,
   destinationFile: string
-): Promise<{ apiBaseUrl: string; token: string }> {
+): Promise<{ apiBaseUrl: string }> {
   const { token, apiBaseUrl } = loadAuthenticatedFetchContext()
 
   const buffer = await withBackendClient(token, async () => {
@@ -34,7 +35,7 @@ export async function downloadNotebookGitBundle(
   })
 
   fs.writeFileSync(destinationFile, Buffer.from(buffer))
-  return { apiBaseUrl, token }
+  return { apiBaseUrl }
 }
 
 /** Runs the system `git` executable to produce a clean checkout from a local bundle file. */
@@ -43,9 +44,8 @@ function cloneBundleWithSystemGit(bundleFile: string, targetDir: string): void {
     ['clone', '--quiet', bundleFile, targetDir],
     (detail, status) =>
       `git clone of the notebook bundle failed${detail ? `: ${detail}` : ` (exit code ${status})`}`,
-    // Skip LFS smudge during clone so pointers stay pointers until the LFS endpoint
-    // and credentials are configured. Hydration runs only after that setup.
-    { env: { ...process.env, GIT_LFS_SKIP_SMUDGE: '1' } }
+    // Pointers stay pointers until the LFS endpoint and credentials are configured.
+    smudgeSkippedGitOptions()
   )
 }
 
@@ -110,8 +110,8 @@ function moveCheckoutIntoDestination(
  * `destinationPath`, with a local-only (untracked) Git config binding
  * ({@link recordLocalNotebookBinding}) recording the source notebook id and API origin, and
  * with the bundle-pointing `origin` remote removed ({@link removeOriginRemote}). When the tip
- * enables Git LFS, configures the authenticated notebook LFS endpoint and hydrates only the
- * selected current checkout before install. `destinationPath` is only ever touched by the final
+ * enables Git LFS, fills in the current checkout's files ({@link fillInCurrentLfsFilesIfNeeded})
+ * before install. `destinationPath` is only ever touched by the final
  * atomic move, and only once staging fully succeeds. Staging is always removed afterward,
  * success or failure.
  */
@@ -128,7 +128,7 @@ export async function acquireNotebookGitCheckout(
   )
   try {
     const bundleFile = path.join(stagingDir, 'notebook.bundle')
-    const { apiBaseUrl, token } = await downloadNotebookGitBundle(
+    const { apiBaseUrl } = await downloadNotebookGitBundle(
       notebookId,
       bundleFile
     )
@@ -138,14 +138,7 @@ export async function acquireNotebookGitCheckout(
 
     recordLocalNotebookBinding(checkoutDir, notebookId, apiBaseUrl)
     removeOriginRemote(checkoutDir)
-    if (
-      configureAndHydrateCurrentLfsCheckoutIfNeeded(
-        checkoutDir,
-        notebookId,
-        apiBaseUrl,
-        token
-      )
-    ) {
+    if (fillInCurrentLfsFilesIfNeeded(checkoutDir, notebookId, 'clone')) {
       removeOriginRemote(checkoutDir)
     }
     moveCheckoutIntoDestination(checkoutDir, destinationPath)

@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import { smudgeSkippedGitOptions } from './notebookLfsLocal.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 function unpublishedCommitAuthor(directory: string): {
@@ -76,11 +77,6 @@ function describePausedRebaseConflict(
   )
 }
 
-const REBASE_EDITOR_ENV = {
-  GIT_EDITOR: 'true',
-  GIT_SEQUENCE_EDITOR: 'true',
-} as const
-
 function stageBlobBytes(
   directory: string,
   stage: 2 | 3,
@@ -112,7 +108,8 @@ function tryAbsorbFinalLfOnlyConflictPath(
   runSystemGitOrThrow(
     ['-C', directory, 'checkout', '--ours', '--', relativePath],
     (detail, status) =>
-      `failed to keep the accepted note while absorbing a final-LF-only conflict${detail ? `: ${detail}` : ` (exit code ${status})`}`
+      `failed to keep the accepted note while absorbing a final-LF-only conflict${detail ? `: ${detail}` : ` (exit code ${status})`}`,
+    smudgeSkippedGitOptions()
   )
   runSystemGitOrThrow(
     ['-C', directory, 'add', '--', relativePath],
@@ -134,14 +131,14 @@ function stagedChangeSurvivesOntoPoint(directory: string): boolean {
 /**
  * Rebases the unpublished local commits since mergeBase onto acceptedHead,
  * preserving their author identity. Each pause whose conflicts are only an
- * optional final LF is absorbed; a real conflict surfaces with recovery
- * guidance.
+ * optional final LF is absorbed; a real conflict leaves the rebase paused and returns its
+ * recovery guidance.
  */
 export function rebaseUnpublishedCommits(
   directory: string,
   acceptedHead: string,
   mergeBase: string
-): void {
+): string | undefined {
   const { name, email } = unpublishedCommitAuthor(directory)
   let step = ['rebase', '--onto', acceptedHead, mergeBase]
   for (;;) {
@@ -158,9 +155,15 @@ export function rebaseUnpublishedCommits(
         ],
         (detail, status) =>
           `failed to rebase the unpublished local commits onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`,
-        { env: { ...process.env, ...REBASE_EDITOR_ENV } }
+        {
+          env: {
+            ...smudgeSkippedGitOptions().env,
+            GIT_EDITOR: 'true',
+            GIT_SEQUENCE_EDITOR: 'true',
+          },
+        }
       )
-      return
+      return undefined
     } catch (e) {
       const conflictPaths = pausedRebaseConflictPaths(directory)
       if (conflictPaths === undefined) throw e
@@ -170,9 +173,7 @@ export function rebaseUnpublishedCommits(
       )
       if (remainingConflictPaths.length > 0) {
         const cause = e instanceof Error ? e.message : String(e)
-        throw new Error(
-          `${describePausedRebaseConflict(directory, remainingConflictPaths)}\n${cause}`
-        )
+        return `${describePausedRebaseConflict(directory, remainingConflictPaths)}\n${cause}`
       }
       step = [
         'rebase',

@@ -3,17 +3,26 @@ import { withDownloadedAcceptedNotebookHistory } from './notebookAcceptedHistory
 import { assertLocalMainIsReadyToReceive } from './notebookCheckoutReadiness.js'
 import { buildExactSubtreeMoveReplayCommit } from './notebookExactSubtreeMoveReplay.js'
 import { inspectUnpublishedLocalHistory } from './notebookLocalCandidate.js'
+import { smudgeSkippedGitOptions } from './notebookLfsLocal.js'
 import { rebaseUnpublishedCommits } from './notebookPullRebase.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 const RECEIVE_CHECKOUT_CHANGED =
   'Local main changed while the accepted history was downloading. Try again from the unchanged clean main.'
 
-interface AcceptedNotebookReceiveResult {
-  kind: 'unchanged' | 'already-based' | 'rebased' | 'absorbed' | 'fast-forward'
-  acceptedHead: string
-  localHead: string
-}
+type AcceptedNotebookReceiveResult =
+  | {
+      kind:
+        | 'unchanged'
+        | 'already-based'
+        | 'rebased'
+        | 'absorbed'
+        | 'fast-forward'
+      acceptedHead: string
+      localHead: string
+    }
+  /** A real conflict left the rebase paused; `conflictGuidance` tells the owner how to recover. */
+  | { kind: 'paused'; conflictGuidance: string }
 
 function readHead(directory: string): string {
   return runSystemGitOrThrow(
@@ -120,7 +129,8 @@ export async function receiveAcceptedNotebookHead(
         runSystemGitOrThrow(
           ['-C', directory, 'reset', '--hard', '--quiet', installCommit],
           (detail, status) =>
-            `failed to install the replayed unpublished local commit onto the accepted folder move${detail ? `: ${detail}` : ` (exit code ${status})`}`
+            `failed to install the replayed unpublished local commit onto the accepted folder move${detail ? `: ${detail}` : ` (exit code ${status})`}`,
+          smudgeSkippedGitOptions()
         )
         return {
           kind: 'rebased',
@@ -129,11 +139,14 @@ export async function receiveAcceptedNotebookHead(
         }
       }
       if (localHistory.kind === 'rebase') {
-        rebaseUnpublishedCommits(
+        const conflictGuidance = rebaseUnpublishedCommits(
           directory,
           acceptedHead,
           localHistory.mergeBase
         )
+        if (conflictGuidance !== undefined) {
+          return { kind: 'paused', conflictGuidance }
+        }
         const localHead = readHead(directory)
         return {
           kind: localHead === acceptedHead ? 'absorbed' : 'rebased',
@@ -145,7 +158,8 @@ export async function receiveAcceptedNotebookHead(
       runSystemGitOrThrow(
         ['-C', directory, 'merge', '--quiet', '--ff-only', acceptedHead],
         (detail, status) =>
-          `failed to fast-forward local main to the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`
+          `failed to fast-forward local main to the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`,
+        smudgeSkippedGitOptions()
       )
 
       return {

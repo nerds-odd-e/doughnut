@@ -60,12 +60,7 @@ export function describeNotebookPublishAncestryTipEdges(): void {
         await run(['notebook', 'publish', dir])
 
         expect(logSpy).toHaveBeenCalledWith(
-          expect.stringContaining(`Published notebook. Accepted head: ${tip}`)
-        )
-        expect(logSpy).toHaveBeenCalledWith(
-          expect.stringContaining(
-            'acquire a fresh checkout elsewhere with "donut notebook clone'
-          )
+          `Published notebook. Accepted head: ${tip}.`
         )
         expect(postCount(fetchMock)).toBe(1)
         const postCall = fetchMock.mock.calls.find(

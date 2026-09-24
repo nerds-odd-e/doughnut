@@ -14,6 +14,14 @@ function placeholderNotebookRemoteUrl(apiBaseUrl: string): string {
   return `${stripTrailingSlash(apiBaseUrl)}/donut-notebook.git`
 }
 
+/**
+ * Options for worktree-changing Git operations: LFS pointers stay pointers until the
+ * authenticated fill-in downloads the current files once.
+ */
+export function smudgeSkippedGitOptions(): { env: NodeJS.ProcessEnv } {
+  return { env: { ...process.env, GIT_LFS_SKIP_SMUDGE: '1' } }
+}
+
 /** True when the checkout's `.gitattributes` enables the standard LFS filter. */
 export function checkoutUsesLfs(checkoutDir: string): boolean {
   const attributesPath = path.join(checkoutDir, '.gitattributes')

@@ -36,8 +36,8 @@ merging, Donut-assisted conflict resolution.
   refusal applies.
 - **Final-LF conflict absorption** repeats for each rebase pause until Git
   finishes or a real conflict remains; a real conflict is reported as today.
-- **LFS fill-in (PFE):** reuse clone's `configureAndHydrateCurrentLfsCheckoutIfNeeded`
-  (`notebookAcquisitionLfs.ts`), generalizing only its command-specific rerun
+- **LFS fill-in (PFE):** reuse clone's fill-in, now `fillInCurrentLfsFilesIfNeeded`
+  (`notebookLfsFillIn.ts`), generalizing only its command-specific rerun
   wording; it already refreshes `lfs.url` and the token from the CLI's current
   login, like publish. Pull's own Git operations run with
   `GIT_LFS_SKIP_SMUDGE=1` so downloads happen once, in that step. The step runs
@@ -104,7 +104,7 @@ one-commit local rule.
 
 ### 3. Pull fills in current LFS files in an existing checkout
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: an LFS checkout → pull, for unchanged, already-based, fast-forward,
 rebased and paused-conflict outcomes → Git history moves as for legacy and
@@ -123,6 +123,18 @@ fill-in after fast-forward, rebase and conflict pause, smudge skipped for pull's
 Git operations, failure message then successful rerun, and no LFS call for a
 legacy checkout. Command C.
 Sizing: ~8 min (one shared step, several outcome observations).
+
+Accepted proof (2026-09-24, Command C full run, 464 tests pass; refactor reran
+the pull and clone suites): `cli/tests/notebookPull.lfs.test.ts` "fills in
+current files after $outcome with the refreshed login" (unchanged,
+already-based, fast-forward, rebase, conflict pause: filled bytes, exact LFS
+steps, smudge skipped on merge/rebase/reset, refreshed `lfs.url` and auth
+header, conflict error after the fill-in); "a failed download reports
+incomplete attachments; the rerun fills them in, then reports unchanged"; "a
+failed download during a conflict pause still shows the conflict guidance"
+(added at acceptance: the guidance was otherwise lost); "a legacy checkout pulls
+without Git LFS". The refusal suite, fresh-clone guidance and LFS usage line are
+gone.
 
 ### 4. Installed-CLI journey: same-checkout pull with local notes and files
 Type: Behavior
