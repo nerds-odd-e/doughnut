@@ -168,10 +168,11 @@ No executable plan or implementation is authorized by this seed.
 
 ### Browse and download notebook files in Web Donut
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/022-browse-download-notebook-files/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"38a4b4da14718395f3cf2bb428758b906b03bf4b0c0ba0713af4d7a0227a7e3f","plan":"1abf048548894e2aafd1d606bad45e2f15593d4eaedd6bd794ef7990e5532599"}}
 ```
 
 - **Identity:** SEED-035#story-1
+- **Slice plan:** [Browse and download notebook files](../quick/022-browse-download-notebook-files/PLAN.md).
 - **Goal:** Anyone reading a notebook in Web Donut sees the non-Markdown files
   it holds, where they are, and can download any of them. Today these files
   are accepted, stored and carried through web folder operations, yet the web
@@ -186,9 +187,9 @@ No executable plan or implementation is authorized by this seed.
     whichever way the notebook stores them (raw Git content or Git LFS).
   - Access follows the notebook's existing read authorization: whoever can read
     the notebook can browse and download its files. No owner-only rule.
-  - Every non-Markdown file is an ordinary file of unknown format here, with no
-    special case: `.keep` (usually empty), `.gitattributes`, and any other
-    dot-file are listed and downloadable like the rest.
+  - Every non-Markdown attachment is an ordinary file of unknown format here,
+    with no special case: a root `.keep` (usually empty) and any other dot-file
+    are listed and downloadable like the rest.
   - Files in a trashed folder behave the same as files anywhere else.
   - Downloads are always served as a download, never rendered inline in Donut's
     origin, so an uploaded SVG or HTML file cannot run script in the page.
@@ -212,13 +213,14 @@ No executable plan or implementation is authorized by this seed.
     read its notes; a user without read access to the notebook gets neither.
   - `drawing.svg` is downloaded as a file; opening its download link does not
     render it inside Donut.
-  - A root `.keep` of zero bytes and the root `.gitattributes` both appear and
-    download like any other file.
-- **Architecture note:** `.gitattributes` is preserved as reserved Git metadata
-  outside the attachment rows today ([North Star](../NORTH-STAR.md#use-standard-git-lfs-end-to-end)).
-  Browsing and downloading it leaves it unchanged, so this story does not
-  conflict; deleting it from the web (story 2) would, and needs an owner
-  decision there.
+  - A root `.keep` of zero bytes appears and downloads like any other file.
+- **Git metadata stays hidden (owner decision 2026-09-24):** `.gitattributes`
+  is reserved Git metadata kept outside the attachment rows
+  ([North Star](../NORTH-STAR.md#use-standard-git-lfs-end-to-end)), and nested
+  `.keep` files are generated empty-folder markers. Like `.git`, neither is
+  listed on the web; they stay visible in local checkouts. This keeps one
+  row-backed file model instead of a second, read-only source from the Git
+  tree. Web deletion (story 2) therefore cannot reach `.gitattributes`.
 - **Effort hypothesis:** M, medium confidence; the sidebar listing cache and
   the two byte representations are the main unknowns.
 - **Depends on:** Delivered root and nested attachment continuity and the
