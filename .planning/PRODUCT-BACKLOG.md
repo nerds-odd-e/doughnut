@@ -13,6 +13,7 @@ and deletable in Web Donut.
 ## Backlog list
 
 - [Make one web picture upload one commit and refuse names a note or folder uses](quick/030-one-commit-per-web-picture-upload/PLAN.md)
+- [Give end-to-end test contributors clear, consistent authoring rules](seeds/SEED-040-e2e-test-guidance.md#story-1) — SEED-040#story-1
 - [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19
 - [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17
