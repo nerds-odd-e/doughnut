@@ -8,7 +8,7 @@
 - Governing direction: North Star
   [one attachment content model](../../NORTH-STAR.md#one-attachment-content-model),
   "Every notebook uses LFS": one representation, so tests should not choose one.
-- Depends on: story 14 ([plan 025](../025-convert-raw-notebooks-to-lfs/PLAN.md))
+- Depends on: story 14 (done; its plan is recoverable at `c8654d4b80:.planning/quick/025-convert-raw-notebooks-to-lfs/PLAN.md`)
   merged to main. Its branch flips the `NotebookGitBinding` default to LFS and
   adds `NotebookGitLfsConversionControllerTest` and the E2E conversion
   scenario, which stay legitimate raw users. Re-read those on main before
