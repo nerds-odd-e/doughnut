@@ -9,7 +9,6 @@ import {
   When,
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import type { TitleRenameReferenceChoice } from '../start/pageObjects/notePage'
 
 When(
   'I update note {string} to become:',
@@ -64,13 +63,6 @@ When(
     start
       .assumeNotePage()
       .saveReferencedNoteTitle(newTitle, 'UPDATE_VISIBLE_TEXT')
-  }
-)
-
-When(
-  /^I set the note title to "([^"]+)" using (KEEP_VISIBLE_TEXT|UPDATE_VISIBLE_TEXT) reference handling$/,
-  (newTitle: string, choice: TitleRenameReferenceChoice) => {
-    start.assumeNotePage().saveReferencedNoteTitle(newTitle, choice)
   }
 )
 

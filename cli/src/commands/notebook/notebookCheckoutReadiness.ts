@@ -49,14 +49,13 @@ function gitOperationIsActive(directory: string): boolean {
     'REVERT_HEAD',
   ]
 
-  return operationMarkers.some((marker) => {
-    const gitPath = readGitOutput(directory, [
-      'rev-parse',
-      '--git-path',
-      marker,
-    ]).trim()
-    return fs.existsSync(path.resolve(directory, gitPath))
-  })
+  return readGitOutput(directory, [
+    'rev-parse',
+    ...operationMarkers.flatMap((marker) => ['--git-path', marker]),
+  ])
+    .trim()
+    .split('\n')
+    .some((gitPath) => fs.existsSync(path.resolve(directory, gitPath)))
 }
 
 /** Refuses active operations first — porcelain may be empty or dirty, and HEAD may be detached. */

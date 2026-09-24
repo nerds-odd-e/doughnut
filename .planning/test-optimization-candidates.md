@@ -61,3 +61,15 @@ Consequences for future profiling passes:
   needed: whether a `GitBundleTestWriter` mirror for the proposal-crafting half is
   worth a sweep across the 51 `fetchHead` callers, or whether the local idiom is
   preferred.
+
+- `e2e_test/start/pageObjects/cli/notebookCloneCheckout.ts` `pull()` and
+  `readCliNotebookCheckoutState` in `e2e_test/config/cliE2eNotebookCloneTasks.ts`
+  (measured 2026-09-24) — every CLI pull step reads the whole checkout state
+  (~10 `git` spawns: head, parents, branch, root count, status, author,
+  message, and blobs of HEAD and its parent) before and after the pull, ~350ms
+  per pull step across ~41 pull steps — unique protection: supplies the
+  original/rebased heads later ancestry and rebase assertions compare — not yet
+  attempted; plan 031 (`.planning/quick/031-faster-cli-e2e-feedback/`) stopped
+  after retiring redundant journeys and making the CLI readiness check one
+  `git` call. Candidate experiment: read only the heads the pull step needs and
+  let the assertions read what they observe — no decision needed.

@@ -29,44 +29,7 @@ Feature: CLI notebook web note renames
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
-  Scenario: Pulling a web note rename into a clean checkout
-    Given I have a note "Cells" under notebook "CLI Clone Notebook" in folder "Biology" with content:
-      """
-      ---
-      author: Linnaeus
-      type: Note
-      ---
-      Cells
-      =====
-
-      Membranes
-      """
-    And I assimilate the note "Cells"
-    And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I update note title "Cells" to become "Cell structure"
-    And I pull the cloned checkout using the installed CLI
-    Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
-    And the cloned checkout contains exactly:
-      | README.md                   |
-      | Overview.md                 |
-      | Biology/Cell structure.md   |
-      | Kitchen/README.md           |
-      | Recipes/README.md           |
-      | Recipes/Pasta.md            |
-    And the cloned checkout file "Biology/Cell structure.md" is:
-      """
-      ---
-      author: Linnaeus
-      type: Note
-      ---
-      Cells
-      =====
-
-      Membranes
-      """
-
-  Scenario Outline: Pulling a web note rename and its selected reference rewrite into a clean checkout
+  Scenario: Pulling a web note rename that keeps the reference's visible text into a clean checkout
     Given I have a note "Cells" under notebook "CLI Clone Notebook" in folder "Biology" with content:
       """
       ---
@@ -85,7 +48,7 @@ Feature: CLI notebook web note renames
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I route to the note "Cells"
-    And I set the note title to "Cell structure" using <referenceChoice> reference handling
+    And I set the note title to "Cell structure" keeping visible reference text
     And I pull the cloned checkout using the installed CLI
     Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
     And the cloned checkout contains exactly:
@@ -107,12 +70,7 @@ Feature: CLI notebook web note renames
       """
       ---
       type: Note
-      related: '<expectedReference>'
+      related: '[[Cell structure|Cells]]'
       ---
-      See <expectedReference>.
+      See [[Cell structure|Cells]].
       """
-
-    Examples:
-      | referenceChoice     | expectedReference          |
-      | KEEP_VISIBLE_TEXT   | [[Cell structure\|Cells]] |
-      | UPDATE_VISIBLE_TEXT | [[Cell structure]]         |

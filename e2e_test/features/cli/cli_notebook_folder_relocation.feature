@@ -29,28 +29,6 @@ Feature: CLI notebook folder relocation
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
-  Scenario: Publishing a committed folder relocation updates the same Donut note at the new folder path
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I commit a rename of "Recipes" to "Kitchen/Recipes" in the cloned checkout
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Kitchen/Recipes/Pasta" has content "Boil water"
-
-  Scenario: Pulling a clean checkout receives an accepted folder relocation
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
-    And I commit a rename of "Recipes" to "Kitchen/Recipes" in the cloned checkout
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    When I pull the second cloned checkout using the installed CLI
-    Then the second cloned checkout contains exactly:
-      | README.md                     |
-      | Overview.md                   |
-      | Kitchen/README.md             |
-      | Kitchen/Recipes/README.md     |
-      | Kitchen/Recipes/Pasta.md      |
-    And the second cloned checkout retains its original head as an ancestor
-
   Scenario: Publishing a Pasta edit committed before an accepted folder relocation updates the same Donut note
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
