@@ -1,5 +1,7 @@
 package com.odde.donut.services.notebookAttachment;
 
+import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -19,6 +21,18 @@ public interface NotebookAttachmentContent {
    */
   boolean store(Integer notebookId, String sha256Hex, long size, InputStream content)
       throws IOException;
+
+  /**
+   * Stores a file's {@code bytes} under their own digest and returns the Git LFS pointer that
+   * stands for them in a notebook tree.
+   */
+  default byte[] storeAsLfsPointer(Integer notebookId, byte[] bytes) throws IOException {
+    String digest = VerifiedNotebookAttachmentBytes.sha256Hex(bytes);
+    if (!store(notebookId, digest, bytes.length, new ByteArrayInputStream(bytes))) {
+      throw new IllegalStateException("Notebook attachment content failed verification");
+    }
+    return NotebookGitLfsPointer.format(digest, bytes.length);
+  }
 
   /** Returns verified bytes for the notebook-scoped digest, if present. */
   Optional<byte[]> get(Integer notebookId, String sha256Hex);

@@ -32,6 +32,5 @@ Feature: Note header image from frontmatter
     Given I have a notebook "Physics" with notes:
       | Title | Folder  | Content   | Image Url         |
       | force | physics | Body text | force-diagram.png |
-    And the notebook "Physics" uses legacy raw Git attachment storage
     And the notebook "Physics" has the picture "physics/force-diagram.png" from fixture "example.png"
     Then I should see note "force" shows its picture

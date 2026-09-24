@@ -269,7 +269,7 @@ scenario's only step (`the fresh clone file … holds exactly:`) went with it.
 ### 10. Web pictures and file pages are served from LFS files
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `note_frontmatter_image.feature` and `notebooks/notebook_files.feature`
 green.
 
@@ -281,6 +281,11 @@ demotion from both features and delete "LFS file downloads its real bytes",
 which the nested file scenario now covers. Afterwards grep shows the demotion
 step used only by story 14's conversion scenario, which seeds by local publish
 and needs no raw branch in the seeding.
+Accepted: both features 5/5; `cli_notebook_lfs` 11/11 and the full backend
+suite (2668) after refactoring. The demotion step is now used only by
+`cli_notebook_lfs.feature` (story 14's conversion). Store-and-point has one
+production home, `NotebookAttachmentContent.storeAsLfsPointer`, used by the
+conversion service, both testability controllers and the backend test base.
 
 ## Remaining concerns
 

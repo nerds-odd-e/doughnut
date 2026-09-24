@@ -6,10 +6,8 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
 import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.sql.Timestamp;
@@ -82,14 +80,12 @@ public class NotebookGitLfsConversionService {
   }
 
   private PortableTreeEntry storeAsPointer(Integer notebookId, NotebookAttachment attachment) {
-    byte[] bytes = attachment.getAcceptedGitContent();
-    String digest = VerifiedNotebookAttachmentBytes.sha256Hex(bytes);
+    byte[] pointer;
     try {
-      attachmentContent.store(notebookId, digest, bytes.length, new ByteArrayInputStream(bytes));
+      pointer = attachmentContent.storeAsLfsPointer(notebookId, attachment.getAcceptedGitContent());
     } catch (IOException e) {
       throw new UncheckedIOException("Could not store attachment content for LFS conversion", e);
     }
-    byte[] pointer = NotebookGitLfsPointer.format(digest, bytes.length);
     attachment.setAcceptedGitContent(pointer);
     return new PortableTreeEntry(NotebookGitPortablePath.ofAttachment(attachment), pointer);
   }

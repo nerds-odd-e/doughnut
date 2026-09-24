@@ -8,9 +8,11 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
+import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.services.notebookGit.NotebookGitLfsConversionService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
@@ -37,6 +39,7 @@ class NotebookGitTestabilityController {
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired InjectNotesWorker injectNotesWorker;
   @Autowired NotebookGitLfsConversionService notebookGitLfsConversionService;
+  @Autowired NotebookAttachmentContent notebookAttachmentContent;
 
   @Schema(name = "NotebookNameRequest")
   @Getter
@@ -81,12 +84,14 @@ class NotebookGitTestabilityController {
   }
 
   /**
-   * Testability-only: stores a file's content as-is at a notebook path, creating missing folders,
-   * then resnapshots the accepted Git binding so the file is part of the accepted tree.
+   * Testability-only: stores a file at a notebook path as the product does on an LFS notebook
+   * (payload in the content store, pointer in the accepted tree), creating missing folders, then
+   * resnapshots the accepted Git binding so the file is part of the accepted tree.
    */
   @PostMapping("/put_notebook_file_for_testability")
   @Transactional
-  public String putNotebookFileForTestability(@RequestBody PutNotebookFileRequest request) {
+  public String putNotebookFileForTestability(@RequestBody PutNotebookFileRequest request)
+      throws IOException {
     Notebook notebook = requireNotebook(request.getNotebookName());
     int slash = request.getPath().lastIndexOf('/');
     NotebookAttachment attachment = new NotebookAttachment();
@@ -99,7 +104,9 @@ class NotebookGitTestabilityController {
               testabilitySettings.getCurrentUTCTimestamp()));
     }
     attachment.setFilename(request.getPath().substring(slash + 1));
-    attachment.setAcceptedGitContent(Base64.getDecoder().decode(request.getContentBase64()));
+    attachment.setAcceptedGitContent(
+        notebookAttachmentContent.storeAsLfsPointer(
+            notebook.getId(), Base64.getDecoder().decode(request.getContentBase64())));
     notebookAttachmentRepository.save(attachment);
     notebookGitCutoverService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());

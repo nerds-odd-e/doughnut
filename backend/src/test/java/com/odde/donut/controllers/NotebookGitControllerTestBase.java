@@ -1,10 +1,7 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes.sha256Hex;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
@@ -17,11 +14,9 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
-import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -107,12 +102,7 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
 
   /** Stores {@code payload} in the notebook's content store and returns its LFS pointer. */
   byte[] pointerFor(Notebook notebook, byte[] payload) throws IOException {
-    String oid = sha256Hex(payload);
-    assertThat(
-        notebookAttachmentContent.store(
-            notebook.getId(), oid, payload.length, new ByteArrayInputStream(payload)),
-        is(true));
-    return NotebookGitLfsPointer.format(oid, payload.length);
+    return notebookAttachmentContent.storeAsLfsPointer(notebook.getId(), payload);
   }
 
   /**

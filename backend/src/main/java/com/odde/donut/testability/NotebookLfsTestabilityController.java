@@ -12,9 +12,7 @@ import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
-import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import lombok.Getter;
@@ -80,11 +78,11 @@ class NotebookLfsTestabilityController {
     notebookGitBindingRepository.save(binding);
 
     if (request.getObsoletePayload() != null) {
-      storePayload(notebook.getId(), request.getObsoletePayload().getBytes(StandardCharsets.UTF_8));
+      notebookAttachmentContent.storeAsLfsPointer(
+          notebook.getId(), request.getObsoletePayload().getBytes(StandardCharsets.UTF_8));
     }
     byte[] payload = request.getPayload().getBytes(StandardCharsets.UTF_8);
-    String oid = storePayload(notebook.getId(), payload);
-    byte[] pointer = NotebookGitLfsPointer.format(oid, payload.length);
+    byte[] pointer = notebookAttachmentContent.storeAsLfsPointer(notebook.getId(), payload);
 
     NotebookAttachment attachment =
         findRootAttachment(notebook.getId(), request.getFilename())
@@ -101,7 +99,7 @@ class NotebookLfsTestabilityController {
         NotebookGitAttributes.initialMetadata());
 
     AcceptLfsAttachmentTipResponse response = new AcceptLfsAttachmentTipResponse();
-    response.setOid(oid);
+    response.setOid(VerifiedNotebookAttachmentBytes.sha256Hex(payload));
     response.setSize(payload.length);
     return response;
   }
@@ -147,15 +145,6 @@ class NotebookLfsTestabilityController {
     return notebookRepository
         .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(new DisplayName(notebookName))
         .orElseThrow(() -> new IllegalArgumentException("No notebook with name: " + notebookName));
-  }
-
-  private String storePayload(Integer notebookId, byte[] payload) throws Exception {
-    String oid = VerifiedNotebookAttachmentBytes.sha256Hex(payload);
-    if (!notebookAttachmentContent.store(
-        notebookId, oid, payload.length, new ByteArrayInputStream(payload))) {
-      throw new IllegalStateException("Failed to store LFS payload for testability");
-    }
-    return oid;
   }
 
   @Schema(name = "AcceptLfsAttachmentTipResponse")

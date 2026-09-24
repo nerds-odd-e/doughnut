@@ -33,15 +33,6 @@ Given(
   }
 )
 
-Given(
-  'the notebook {string} has an LFS file {string} with payload {string}',
-  (notebookName: string, filename: string, payload: string) => {
-    start
-      .testability()
-      .acceptLfsAttachmentTipForTestability(notebookName, filename, payload)
-  }
-)
-
 When(
   'I open the file {string} in sidebar folder path {string}',
   (filename: string, folderPath: string) => {
