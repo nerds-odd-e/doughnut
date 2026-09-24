@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Notebook file browsing reports lost content and lists files cheaply](quick/023-notebook-file-listing-correction/PLAN.md) — quick/023-notebook-file-listing-correction
+
 ## Backlog list
 
-- [Notebook file browsing reports lost content and lists files cheaply](quick/023-notebook-file-listing-correction/PLAN.md) — quick/023-notebook-file-listing-correction
 - [See locally added image files in Web Donut notes](seeds/SEED-035-ai-workspace-supporting-files.md#story-3) — SEED-035#story-3
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
