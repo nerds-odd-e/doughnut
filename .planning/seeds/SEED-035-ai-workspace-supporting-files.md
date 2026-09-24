@@ -241,72 +241,6 @@ No executable plan or implementation is authorized by this seed.
   note's notebook; conversion must keep that read rule for legacy rows that
   remain.
 
-<a id="story-3"></a>
-
-### See locally added image files in Web Donut notes
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/024-note-local-picture-file/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"47966f94907dd6f8e74ba5873fc0c822046f7f30663c977b18a5dafcbab287a9","plan":"cae16fb4deb0ef04e8f734ced3f7de3a6405479e4730c80f41fff42a7bd66fdb"}}
-```
-
-- **Identity:** SEED-035#story-3
-- **Slice plan:** [Show a note's local picture file](../quick/024-note-local-picture-file/PLAN.md)
-- **Goal:** An owner who works locally keeps a picture as a file in the
-  notebook, points the note at it, and publishes; opening the note in Web Donut
-  (note page, recall, conversations) shows that picture, without uploading it
-  again. The owner confirmed this is a real scenario (2026-09-24): users want
-  to embed an image in Markdown with the image kept in the notebook.
-- **Scope (owner decision 2026-09-24: frontmatter only):**
-  - The note's frontmatter `image:` accepts a path relative to the note's own
-    folder, such as `force-diagram.png` or `images/force.png`. Wherever the
-    note image already appears, the web shows that notebook file, with
-    `image_mask:` unchanged.
-  - Reading the picture needs the same notebook read authorization as the
-    existing file download (Bazaar readers allowed, non-readers refused).
-  - Only raster pictures are shown inline: PNG, JPEG, GIF and WebP. The file
-    download itself stays a forced download.
-  - Existing `/attachments/images/...` values behave as before.
-- **Deferred promises (not built or verified here):**
-  - Markdown body images (`![](force-diagram.png)`). They are the natural IDE
-    form, but showing them is new display behavior in the editor; it needs its
-    own story. A web edit keeps them in the body (story 16, delivered
-    2026-09-24).
-  - SVG inline display: an SVG opened directly can run scripts.
-  - Paths starting with `/` (easily confused with legacy
-    `/attachments/images/` paths), paths leaving the notebook, and remote URLs.
-  - Rewriting references when a file is renamed or moved (same stance as
-    story 11), and any special display for a missing file: a broken reference
-    stays visibly broken, as today.
-  - New web uploads (story 4) and converting old images (story 5).
-- **Current state (2026-09-24):** `image: force-diagram.png` is stored as-is
-  and rendered as `<img src="force-diagram.png">`, which resolves against the
-  web page URL and shows broken. The file download
-  (`/api/notebooks/{n}/attachments/{id}/content`) is addressed by ID and forces
-  a download (`attachment`, octet-stream, `nosniff`), so it cannot serve an
-  `<img>` as it is. Its bytes come from `NotebookAttachmentFile`, which reads
-  LFS notebooks (the default for new notebooks) from the content store and
-  fails loudly when an object is missing; the picture reuses that reader.
-  Rechecked 2026-09-24 after the private-images and listing corrections: the
-  legacy image endpoint now also follows the notebook read rule, so example 4
-  keeps that rule; nothing else in this story changed.
-- **Key examples:**
-  1. `physics/force.md` has `image: force-diagram.png` and
-     `physics/force-diagram.png` exists → after publishing, the web note page
-     and that note's recall show the diagram; the note keeps its learning
-     history.
-  2. `image: images/force.png` → shows `physics/images/force.png`.
-  3. A notebook reader (including a Bazaar reader) sees the picture; a user who
-     cannot read the notebook is refused the picture.
-  4. A note with `image: /attachments/images/42/x.png` looks the same as before.
-  5. Editing the note's text on the web keeps its `image:` line.
-- **Why now (owner, 2026-09-24):** Order kept above story 8 (skip guidance
-  folders); story 4 relies on this story's display and reference spelling, and
-  story 5 rewrites `image:` to this spelling.
-- **Effort hypothesis:** S–M, medium confidence; reuses the existing note image
-  display.
-- **Depends on:** Delivered web file browsing (story 6).
-- **Safe stopping point:** Locally added pictures show on the web; nothing
-  about existing images, uploads, or body images changes.
-
 <a id="story-4"></a>
 
 ### Use newly web-uploaded note images from a local checkout
@@ -444,8 +378,9 @@ section "Redistribution of the original 15 slices").
   refinement/execution.
 - Story 8 owns common guidance folder identification and assimilation/ignore
   behavior; the owner deferred those decisions until its refinement.
-- Image stories must establish existing ownership, sharing, reference spelling,
-  and current presentation contexts before promising a conversion scope.
+- Image stories must establish existing ownership, sharing, and current
+  presentation contexts before promising a conversion scope; the note-relative
+  frontmatter `image:` spelling is already displayed on the web.
 - File deletion needs an observable outcome for remaining references; warning,
   refusal, dangling-reference presentation, and Trash are different promises.
 
