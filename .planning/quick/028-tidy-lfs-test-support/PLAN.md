@@ -4,7 +4,8 @@
 
 - Kind: bounded retrospective correction (no backlog identity yet; no seed).
 - Provenance: execution retrospective of story SEED-035#story-20
-  ([plan 026](../026-test-file-journeys-on-lfs/PLAN.md)), reviewed commits
+  (plan 026, recoverable at
+  `4e0e684f1a:.planning/quick/026-test-file-journeys-on-lfs/PLAN.md`), reviewed commits
   `5859e6d663..47a3bdd0ab` on main. Findings F3, F4, F6, F7; evidence
   locations below are at HEAD `47a3bdd0ab`.
 - Governing direction: North Star

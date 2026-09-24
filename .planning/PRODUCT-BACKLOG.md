@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Test file journeys on LFS notebooks as production has them](seeds/SEED-035-ai-workspace-supporting-files.md#story-20) — SEED-035#story-20 ([plan](quick/026-test-file-journeys-on-lfs/PLAN.md))
-
 ## Backlog list
 
 - [Tidy LFS test support into one vocabulary](quick/028-tidy-lfs-test-support/PLAN.md)

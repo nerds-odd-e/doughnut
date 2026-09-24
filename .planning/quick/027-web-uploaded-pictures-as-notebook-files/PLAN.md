@@ -11,8 +11,8 @@
   the reference that uses it in one accepted change, through the existing
   accepted-change owner. A web upload keeps the user's filename and refuses
   when it is taken.
-- **Start condition:** story 20 ([plan](../026-test-file-journeys-on-lfs/PLAN.md))
-  delivered. Its slice 10 edits `note_frontmatter_image.feature` and its slices
+- **Start condition:** story 20 delivered (plan recoverable at
+  `4e0e684f1a:.planning/quick/026-test-file-journeys-on-lfs/PLAN.md`). Its slice 10 edits `note_frontmatter_image.feature` and its slices
   move backend fixtures to LFS; this plan edits the same scenario and relies on
   LFS test notebooks.
 

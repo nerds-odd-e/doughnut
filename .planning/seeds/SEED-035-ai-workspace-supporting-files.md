@@ -95,52 +95,6 @@ dissolve/merge and cross-notebook operations that the delivered behavior
 refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
-<a id="story-20"></a>
-
-### Test file journeys on LFS notebooks as production has them
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/026-test-file-journeys-on-lfs/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"67f758c6c8c8876988e428ecbaf9577d18f69b4a05c2e14ecb9aad074755e303","plan":"04364eafbf8cfe885fd819aac30c17a8f13043ed1e4d5237bb60255257c6c8d6"}}
-```
-
-- **Identity:** SEED-035#story-20
-- **Slice plan:** [Test file journeys on LFS notebooks](../quick/026-test-file-journeys-on-lfs/PLAN.md)
-- **Goal:** Maintainers' tests prove the file path production uses. After
-  story 14 no production notebook is raw, yet most web and local file journeys
-  in E2E and the backend Git tests still demote their notebook to raw. Those
-  tests then cover a path users no longer take, and miss the one they do.
-- **Scope (refined 2026-09-24, owner accepted):**
-  - Remove the "uses legacy raw Git attachment storage" step from each E2E
-    scenario that uses it (24 steps in 14 feature files; 13 of those files
-    involve files). The notebook stays LFS as the product creates it. Story
-    14's conversion scenario keeps its own demotion.
-  - Keep a scenario only when it proves something the existing LFS scenarios
-    do not; otherwise delete it rather than convert it. These scenarios were
-    demoted only to keep them passing when new notebooks moved to LFS, so
-    several are expected to repeat covered LFS journeys.
-  - Backend Git tests use the product LFS notebook fixture by default. The raw
-    fixture stays only for tests of raw-only behaviour (the conversion and the
-    raw branches), which story 19 deletes.
-  - Afterwards the raw demotion is used only by story 14's conversion tests.
-- **Key examples:**
-  1. A web note move carries a picture to another folder. Without the
-     demotion the notebook is LFS: the owner pulls, and the picture is in the
-     new folder with identical bytes.
-  2. A scenario that differs from an existing LFS scenario only in being raw is
-     deleted, not converted.
-  3. The raw size-refusal scenario in `cli_notebook_attachment_size_admission`
-     is replaced by, or merged into, the LFS size refusal; one scenario proves
-     the limit.
-- **Deferred promises:** Removing raw production code (story 19); E2E speed
-  work beyond what the move needs; new coverage.
-- **Depends on:** Story 14 merged to main. Production confirmation is not
-  needed.
-- **Effort hypothesis:** L, medium confidence after planning: about 118
-  backend test classes get raw only through one shared fixture, and three
-  shared helpers need to follow LFS first; E2E changes are mostly removing a
-  step.
-- **Safe stopping point:** Each feature file moves on its own; scenarios not
-  yet moved still pass on raw because the raw paths remain until story 19.
-
 <a id="story-19"></a>
 
 ### Remove the legacy raw file storage
