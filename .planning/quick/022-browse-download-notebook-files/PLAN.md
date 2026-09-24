@@ -137,7 +137,7 @@ and download if it overruns.
 
 ### 3. LFS notebook files download their real bytes
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a new LFS notebook has `diagram.png` at its root (testability LFS
 tip) → the sidebar lists it, its page shows the pointer's size, and download
@@ -199,3 +199,9 @@ Sizing: ~6 min.
   `/notebooks/:notebookId(\d+)/` to sit in the sidebar layout. Proof:
   `NotebookAttachmentControllerTest` (FilePage/Download/Access), `AttachmentPage.spec.ts`,
   E2E "Open a file and download its exact bytes".
+- Slice 3: `NotebookAttachmentFile.lfsPointer` is the single decision (non-empty row in an
+  LFS-bound notebook → parsed pointer; no binding counts as RAW). Missing store bytes →
+  404 "File content unavailable: <filename>" (backend proof only; no E2E hook for an empty
+  store). Test binding fixture: `makeMe.aGitBindingFor(notebook).representation(...)`. Proof:
+  `NotebookAttachmentControllerTest.LfsNotebook.*`, `rawNotebookServesPointerLookingContentUnchanged`,
+  E2E "LFS file downloads its real bytes".

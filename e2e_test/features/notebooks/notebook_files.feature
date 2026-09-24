@@ -36,3 +36,13 @@ Feature: Notebook files
     Then I should see the file page for "run.json" of 12 bytes
     And after reloading, the sidebar is open at folder "data" showing "run.json"
     And downloading the file gives '{"speed": 3}' named "run.json"
+
+  Scenario: LFS file downloads its real bytes
+    Given I have a notebook "Figures"
+    And the notebook "Figures" has an accepted LFS tip "diagram.png" with payload "diagram-png-bytes" and obsolete payload "old-diagram-bytes"
+    When I jump to the notebook "Figures"
+    Then I should see these rows at the sidebar root:
+      | diagram.png |
+    When I open the root file "diagram.png" in the sidebar
+    Then I should see the file page for "diagram.png" of 17 bytes
+    And downloading the file gives "diagram-png-bytes" named "diagram.png"

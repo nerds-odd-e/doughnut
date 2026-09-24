@@ -18,11 +18,10 @@ import {
   expandFolderPath,
   expectRowLabels,
   folderRowControls,
-  folderTreeitemAtPath,
   folderTreitemByLabel,
   folderTreitemUnderOpenParent,
-  noteTree,
   revealFolderInSidebar,
+  rowsAtPath,
   sidebarActionTimeoutMs,
 } from './sidebarTreeItems'
 
@@ -57,7 +56,7 @@ export const noteSidebar = () => {
 
     expectRootRows(expectedLabels: string[]) {
       waitUntilAppIsNotBusy()
-      expectRowLabels(noteTree().children('[role="treeitem"]'), expectedLabels)
+      expectRowLabels(rowsAtPath([]), expectedLabels)
     },
 
     expectRowsUnderFolder(folderLabel: string, expectedLabels: string[]) {
@@ -70,7 +69,7 @@ export const noteSidebar = () => {
 
     openFile(folderLabels: string[], filename: string) {
       expandFolderPath(folderLabels)
-      childTreeitems(folderTreeitemAtPath(folderLabels))
+      rowsAtPath(folderLabels)
         .filter(`[aria-label="${filename}"]`)
         .find('.sidebar-attachment-label')
         .click()

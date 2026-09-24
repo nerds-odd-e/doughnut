@@ -60,18 +60,19 @@ export function folderTreitemUnderOpenParent(
     .last()
 }
 
-export function folderTreeitemAtPath(folderLabels: string[]) {
-  const [rootLabel, ...childLabels] = folderLabels
-  if (rootLabel == null) throw new Error('folder path must not be empty')
-
-  let treeitem = visibleFolderLabelled(
-    noteTree().children('[role="treeitem"]'),
-    rootLabel
-  )
-  for (const childLabel of childLabels) {
-    treeitem = visibleFolderLabelled(childTreeitems(treeitem), childLabel)
+/** Treeitems directly inside the folder at `folderLabels`; the empty path is the sidebar root. */
+export function rowsAtPath(folderLabels: string[]) {
+  let rows = noteTree().children('[role="treeitem"]')
+  for (const label of folderLabels) {
+    rows = childTreeitems(visibleFolderLabelled(rows, label))
   }
-  return treeitem
+  return rows
+}
+
+export function folderTreeitemAtPath(folderLabels: string[]) {
+  const label = folderLabels.at(-1)
+  if (label == null) throw new Error('folder path must not be empty')
+  return visibleFolderLabelled(rowsAtPath(folderLabels.slice(0, -1)), label)
 }
 
 export function expectRowLabels(
