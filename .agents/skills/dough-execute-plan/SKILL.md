@@ -116,7 +116,8 @@ and the established `--push-authorized --workspace-authorized` flags. Supply
 `--plan` as a path relative to the backlog directory when explicitly selected;
 the command also resolves the canonical
 published plan. Supply `--declared-owner` and matching `--requester` only when
-default-checkout access has actually been established. The command fetches
+default-checkout access has actually been established. Missing declarations
+do not prevent a safe automatic refresh. The command fetches
 trunk, checks the published selected source and preparation, selects or reuses
 the workspace, commits an isolated Take, confirms its publication on remote
 trunk, and reports local refresh separately. Preserve its exact receipt in the

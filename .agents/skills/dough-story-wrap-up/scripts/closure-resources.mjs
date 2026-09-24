@@ -1,7 +1,6 @@
-// Git mechanics for execution-resource cleanup. Eligible local removal is
-// `git worktree remove` plus `git branch -d`. Trunk Mode leaves the remote
-// execution branch in place. Story Branch Mode deletes that remote branch only
-// when its tip is an ancestor of remote trunk.
+// Git mechanics for wrap-up's execution-resource cleanup: Dough Land
+// "Retire the worktree" behind wrap-up's gate (confirmed completion receipt,
+// no checkout-bound observer). Trunk Mode passes no remote execution branch.
 import { existsSync, realpathSync } from "node:fs";
 import {
   git,

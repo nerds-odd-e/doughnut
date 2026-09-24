@@ -7,6 +7,7 @@ import { dirname, resolve } from "node:path";
 import { splitHref } from "./product-backlog-identity.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 import { applyToFile, readFile } from "./product-backlog-store.mjs";
+import { preparationPayload } from "./product-backlog-story-state-preparation.mjs";
 import {
   readStoryState,
   recordStoryState,
@@ -65,7 +66,12 @@ export async function recordPreparation(backlogDirectory, request) {
   await applyToFile(
     path,
     (source) => {
-      const options = planLoadOptions(path, request.approach, request.plan);
+      const preparation = preparationPayload(request);
+      const options = planLoadOptions(
+        path,
+        preparation.approach,
+        preparation.plan,
+      );
       outcome = recordStoryState(source, request, options);
       return outcome.source;
     },

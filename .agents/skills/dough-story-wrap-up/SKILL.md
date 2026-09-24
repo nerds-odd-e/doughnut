@@ -134,17 +134,15 @@ the choice; do not invent scope, launch discovery, or start another review.
 After supported follow-up queue changes and before deleting anything, make the
 current revision recoverable with this project's ordinary Git conventions.
 Commit all owned review and closure-input changes in that revision, including
-applicable retrospective edits to the process log, an uncommitted active
-follow-up plan and its queue edit, assimilated product knowledge, and the spent
-material. Preserve unrelated changes and include only files or portions whose
-ownership is unambiguous. Resolve ownership of the intended cleanup targets at
-this boundary too, before deleting any of them. Then record that revision as the
-before-cleanup commit, even when the current revision was already suitable. If
-commit conventions, ownership, or recovery cannot be resolved, leave the material
-intact, report the gap, and do not claim closure. When the selected mode is Trunk
-Mode, publish that commit through [wrap-up closure publication](../dough-execute-plan/references/trunk-publication.md#publish-wrap-up-closure)
-before deleting spent history. Keep current product knowledge in maintained
-project content.
+applicable retrospective edits to the process log in the execution checkout, an
+uncommitted active follow-up plan and its queue edit, assimilated product
+knowledge, and the spent material. Preserve unrelated changes and include only
+files or portions whose ownership is unambiguous. Resolve ownership of the
+intended cleanup targets at this boundary too, before deleting any of them. Then
+record that revision as the before-cleanup commit, even when the current
+revision was already suitable. If commit conventions, ownership, or recovery
+cannot be resolved, leave the material intact, report the gap, and do not claim
+closure. In Trunk Mode, publish that commit through [wrap-up closure publication](../dough-execute-plan/references/trunk-publication.md#publish-wrap-up-closure) before deleting spent history.
 
 ## Delete spent history, including shared records
 
@@ -220,18 +218,16 @@ and blocks completion. Do not force-push.
 
 ## Remove execution resources safely
 
-After Story Branch Mode's verified integration and required target push, or after
-Trunk Mode's final accepted closure has a completion receipt whose shutdown is
-confirmed, remove this execution's clean local worktree and local execution
-branch. Use retained identity and non-force operations. Preserve unrelated
-resources, unique or unpublished work, a dirty checkout, unconfirmed shutdown,
-and a worktree that still hosts an active checkout-bound observer under
+Retire this execution's worktree and branch from their retained identity under
+Dough Land's [Retire the worktree](../dough-land/SKILL.md#retire-the-worktree).
+Wrap-up's gate: the final accepted publication (Trunk Mode's final closure, or
+Story Branch Mode's integrated SHA) has a completion receipt whose shutdown is
+confirmed, and no active checkout-bound observer still hosts the worktree under
 [preserve pending local work](../dough-execute-plan/references/maintain-default-checkout.md#preserve-pending-local-work).
-Trunk Mode never deletes a remote execution branch. Story Branch Mode deletes
-the remote branch only when its tip is integrated in the remote target. Verify
-removal, accept already-absent resources on retry, report blocked or partial
-cleanup without repeating already-completed closure, and skip cleanup in
-direct-current-branch mode.
+Trunk Mode publishes no remote execution branch and never deletes one. A
+deferred [refresh](../dough-land/SKILL.md#refresh-the-default-checkout) does
+not block retirement. Report blocked or partial cleanup without repeating
+already-completed closure. Skip cleanup in direct-current-branch mode.
 
 ## Report
 

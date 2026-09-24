@@ -173,28 +173,22 @@ When the owned workspace contains an authorized canonical story, executable
 plan, backlog change, or other durable planning evidence, those records
 follow
 [preparation disposition](../dough-story-refinement/references/preparation-disposition.md).
-Carry out that disposition with
+Remove the disposable reproduction with
 [retained-artifacts.mjs](scripts/retained-artifacts.mjs). Name the disposable
 reproduction paths and the durable record. It removes only those disposable
-paths and leaves unrelated exploration content. An explicit keep commits
-only the retained record in this owned workspace and publishes that SHA
-through that disposition's
+paths, leaves unrelated exploration content, and never commits or pushes.
+Until an explicit keep, the local draft remains in the owned workspace, is not
+published, and the module's result states that pending disposition. An
+explicit keep lands this owned workspace through that disposition's
 [keep and publish](../dough-story-refinement/references/preparation-disposition.md#keep-and-publish-the-retained-result),
-which uses
-[publish the candidate](../dough-execute-plan/references/publish-the-candidate.md).
-This owned workspace is the publication checkout. A different checkout that
-holds a pending human edit stays untouched. Without an explicit keep, that
-module does not commit or push. The local draft remains in the owned
-workspace, is not published, and the module's result states that pending
-disposition.
+which uses [Dough Land](../dough-land/SKILL.md); that keep stops while
+unrelated exploration content remains in the workspace. A different checkout
+that holds a pending human edit stays untouched.
 
-Workspace removal stays with the shared
-[exploration workspace lifecycle](../dough-manual-testing/references/exploration-workspace.md).
-Remove only a clean, unambiguous workspace this session created, after a
-confirmed disposition. A reused workspace stays with its owner. An unrelated
-exploration workspace is not this session's workspace; leave it in place.
-If that cleanup is unsafe, ambiguous, or incomplete, use the lifecycle's
-retained-workspace handoff. Do not force cleanup or start repair.
+Workspace retirement after a confirmed disposition follows Dough Land's
+[Retire the worktree](../dough-land/SKILL.md#retire-the-worktree). An
+unrelated exploration workspace is not this session's workspace; leave it in
+place. Do not start repair.
 
 An established checkout remains under its owning workflow's delivery and
 cleanup rules; do not impose this retention sequence or create a nested

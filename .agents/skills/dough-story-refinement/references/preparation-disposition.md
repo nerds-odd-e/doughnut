@@ -5,12 +5,12 @@ workspace](preparation-workspace.md) has established this preparation's owned
 workspace and recorded its local checkout role and target selection in
 that reference's [Select or reuse the
 workspace](preparation-workspace.md#select-or-reuse-the-workspace). It covers
-only what happens to an already-written seed, story, plan, or bug-triage
-record. A bug-triage record is the authorized canonical story, executable
-plan, or backlog change left after disposable reproduction changes are
-removed. Unrelated exploration content is not that record. After applying
-it, the calling skill returns to [Close or retain the
-workspace](preparation-workspace.md#close-or-retain-the-workspace). Bug
+only what happens to an already-written seed, story, plan, bug-triage
+record, or standalone retrospective record. A bug-triage record is the
+authorized canonical story, executable plan, or backlog change left after
+disposable reproduction changes are removed. Unrelated exploration content
+is not that record. After applying it, the calling skill returns to [Close or
+retain the workspace](preparation-workspace.md#close-or-retain-the-workspace). Bug
 fixing supplies the explicit keep, leave-unpublished, or discard instruction
 and does not choose the backlog home here.
 
@@ -24,9 +24,8 @@ authorization to skip this step.
 Three explicit developer decisions change that default:
 
 - **An explicit instruction to keep this preparation's retained result**
-  authorizes committing it in the owned workspace, reconciling it with the
-  fetched authorized remote target, and publishing it from that workspace
-  through
+  authorizes landing it from the owned workspace onto the authorized remote
+  target through
   [Keep and publish the retained result](#keep-and-publish-the-retained-result)
   below. Only an explicit instruction counts as keep: continuing discussion,
   pausing for more review, or silence is never a keep decision.
@@ -67,13 +66,21 @@ discussion, not the start of that sequence — do not treat it as one.
 
 Before committing or publishing anything, confirm — or require the calling
 skill (one of the four preparation skills [prepare records in an owned
-workspace](preparation-workspace.md) applies to, or bug fixing for a
-bug-triage record, per its disposition/report step) to have already
-confirmed — that the keep instruction:
+workspace](preparation-workspace.md) applies to, bug fixing for a bug-triage
+record, per its disposition/report step, or a standalone execution
+retrospective for its process-finding or correction-plan record) to have
+already confirmed — that the keep instruction:
 
-- names this session's own retained seed, story, plan, or bug-triage
-  record, not implementation, unrelated exploration content, disposable
-  reproduction changes, or another session's work;
+- names this session's own retained seed, story, plan, bug-triage record, or
+  retrospective record, not implementation, unrelated exploration content,
+  disposable reproduction changes, or another session's work;
+- applies to an owned workspace that holds nothing else, committed or
+  uncommitted, beyond the workspace's recorded starting revision and the
+  fetched authorized remote target. Landing commits and publishes everything
+  in that workspace, so other content there — another session's draft,
+  unrelated exploration content, or disposable reproduction changes — stops
+  the keep. Name that content; the developer removes it, discards it, or
+  confirms it belongs in the landing;
   and
 - has a known, unambiguous local checkout role and a separate target
   selection, per the record in
@@ -88,82 +95,24 @@ guess a destination or assume "the usual place."
 
 ## Keep and publish the retained result
 
-Apply this sequence only after a validated explicit keep instruction.
+After a validated explicit keep instruction, land the owned workspace through
+[Dough Land](../../dough-land/SKILL.md).
+Reuse the local checkout role and the target
+selection recorded in
+[Select or reuse the workspace](preparation-workspace.md#select-or-reuse-the-workspace).
+The owned workspace is the worktree to land.
+The integration checkout path is the default checkout Dough Land refreshes.
+The authorized remote target is the publication destination.
+The checkout is not a stage the candidate must pass through.
+Dough Land owns committing, publishing, refreshing the default checkout,
+retiring the workspace, and continuing an interrupted landing from its first
+unfinished step. Report its publication,
+refresh, and cleanup results as the keep's results.
 
-1. **Commit the retained result.** If the developer's retained seed, story,
-   plan, or bug-triage record is not already committed in the owned
-   workspace, commit exactly the files the keep instruction names there —
-   nothing else. This produces the owned workspace's unpublished suffix: one
-   or more commits on its branch, since its recorded starting revision, not
-   yet on the authorized remote target. Do not commit implementation,
-   unrelated exploration content, disposable reproduction changes, or another
-   session's changes.
-2. **Use the recorded target.** Reuse the local checkout role and the target
-   selection recorded in
-   [Select or reuse the workspace](preparation-workspace.md#select-or-reuse-the-workspace).
-   The integration checkout path is the default checkout for the separate
-   maintenance outcome. The authorized remote target is the publication
-   destination. The checkout is not a stage the candidate must pass through.
-   If either record is missing, contradictory, or ambiguous, stop before any
-   commit or publication and report the exact gap.
-3. **Publish from the owned workspace.** Apply
-   [publish the candidate](../../dough-execute-plan/references/publish-the-candidate.md)
-   from this preparation workspace. Do not invent a second publication
-   sequence. For this caller the suffix is step 1's commit(s). The supplied
-   validation is that those commits are exactly the named retained record and
-   nothing else. No CI observer is bound, so nothing is registered. After the
-   remote accepts the candidate, record the separate
-   [maintenance outcome](../../dough-execute-plan/references/maintain-default-checkout.md#independent-maintenance-outcome)
-   by that owner's inspection. Do not refresh the default checkout in this
-   sequence. After acceptance, attempt
-   [Refresh eligibility](../../dough-execute-plan/references/maintain-default-checkout.md#refresh-eligibility).
-   This publication does not acquire default-checkout access, so without a
-   declared owner that is this caller the attempt is deferred and does not
-   fast-forward. Report that result separately from acceptance. An unresolved
-   rejection stops as the publisher describes; report it and do not loop.
-
-After a successful push, the retained result is on the authorized remote
-target, including other writers' reconciled commits. Report that acceptance
-and the maintenance outcome separately. A deferred checkout is not a failed
-publication. When the developer gave an explicit no-push instruction, this
-section is never entered: the record stays in the owned workspace,
-recoverable and unpublished, and the remote is unchanged.
-
-[Close or retain the workspace](preparation-workspace.md#close-or-retain-the-workspace)
-treats remote acceptance of that candidate — the fetched authorized target
-contains the SHA — as the confirmed keep-and-publish. Default-checkout
-convergence is not required. An attempt interrupted before that acceptance is
-not confirmed; see
-[Resume an interrupted keep-and-publish](#resume-an-interrupted-keep-and-publish).
-
-## Resume an interrupted keep-and-publish
-
-A resumed session may find publication interrupted before the remote accepted
-the candidate, or after a push whose response was lost. This is recovery of a
-publication already under way, distinct from
-[Pause and resume a preparation session](preparation-workspace.md#pause-and-resume-a-preparation-session)
-before any keep decision. Reuse the same workspace and recorded target. Do
-not create a replacement.
-
-Apply [publish the candidate's resume](../../dough-execute-plan/references/publish-the-candidate.md#resume-an-interrupted-publication)
-from real Git and remote refs, and continue only the first unfinished
-obligation. The suffix is step 1's commit(s) in the owned workspace. The
-candidate is the SHA retained immediately before the push, which is the
-rewritten SHA when a rewrite was retained. When that resume still has to
-publish, the previously published base is the last SHA this session recorded
-as published or, for a first keep, the workspace's recorded starting
-revision. Preparation binds no observer, so
-the "Missing registration" row does not apply. Resume classification does
-not refresh the default checkout and does not remove this workspace. Record
-the separate maintenance inspection. Once that classification has recorded
-acceptance, attempt
-[Refresh eligibility](../../dough-execute-plan/references/maintain-default-checkout.md#refresh-eligibility)
-as in step 3, still without acquiring default-checkout access. Cleanup stays in
-[Close or retain the workspace](preparation-workspace.md#close-or-retain-the-workspace)
-and runs only after remote acceptance.
-
-Never duplicate the commit or the push, and never create a replacement
-workspace.
+A keep is **confirmed** once the fetched authorized remote target contains the
+landed SHA, whatever the refresh result. A landing that stopped before that
+acceptance is not confirmed; rerun the same landing from the same workspace
+and recorded target, never a replacement.
 
 **Conflicting scope change.** If resuming reveals that the human's story or
 plan scope changed in a way that conflicts with what was about to be
@@ -171,17 +120,14 @@ published — not merely that the remote advanced, which is ordinary
 reconciliation — preserve both the retained draft and the remote target, and
 name the exact human decision needed. This is
 [Stop for human judgment](../../dough-execute-plan/references/execution-decisions.md#stop-for-human-judgment).
-
-This publication does not acquire default-checkout access. A step that must
-mutate that checkout uses
-[establish access before local mutation](../../dough-execute-plan/references/maintain-default-checkout.md#establish-access-before-local-mutation);
-nothing here releases that access on a timeout. Do not turn an unavailable
-mutation of that checkout into a failed publication.
+When the developer gave an explicit no-push instruction, this section is never
+entered: the record stays in the owned workspace, recoverable and unpublished,
+and the remote is unchanged.
 
 ## What keep does not do
 
-Keep authorizes only committing and publishing this session's own retained
-seed, story, plan, or bug-triage record. It does not:
+Keep authorizes only landing this session's own retained seed, story, plan,
+bug-triage record, or retrospective record. It does not:
 
 - move a backlog entry to **Taken** or perform any part of
   [take queued work](../../dough-execute-plan/SKILL.md#take-queued-work);

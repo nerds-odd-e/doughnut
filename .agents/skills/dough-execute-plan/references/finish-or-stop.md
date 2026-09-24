@@ -29,8 +29,10 @@ execution/review handoff.
 
 Continue in the recorded execution project/checkout. Supply available references/context:
 source contract, original plan and approved changes, attributable commits, decisions, proof,
-delivery state, CI limitations, and checkout/branch identity. Trunk Mode attributable
-commits are that identity's retained published revisions, not another ledger or a
+delivery state, CI limitations, and checkout/branch identity. Supply the execution checkout
+path as the retrospective's write location, so its process findings and correction plans stay
+with this execution's changes for wrap-up to commit. Trunk Mode attributable commits
+are that identity's retained published revisions, not another ledger or a
 rewrite's unpublished SHA. Include an initial quick attempt and its planned
 continuation as one execution. Pass existing context to retrospective, which
 validates attribution and follows its

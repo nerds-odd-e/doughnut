@@ -1,6 +1,6 @@
 // Git mechanics for maintain-default-checkout.md "Refresh eligibility".
-// Fast-forwards only a clean checkout this caller owns and that is strictly
-// behind fetched trunk. Installed guidance is the agent's contract.
+// Fast-forwards only a clean checkout that is strictly behind fetched trunk
+// and has no declared competing writer. Installed guidance is the agent's contract.
 import { existsSync } from "node:fs";
 import {
   captureCheckout,
@@ -20,8 +20,7 @@ function singleOwner(owner) {
   return typeof owner === "string" && owner.trim() !== "";
 }
 
-// Refresh eligibility's declared-owner rule, before any fetch or mutation.
-// Another caller applies the same refusal when it would mutate this checkout.
+// Direct edits and publication from this checkout still require declared access.
 export function declaredOwnerRefusal(declaredOwner, requester) {
   if (!singleOwner(declaredOwner) || !singleOwner(requester)) {
     return "unclear-ownership";
@@ -60,8 +59,8 @@ async function ongoingOperation(checkout) {
   return null;
 }
 
-// Re-reads the checkout after the declared owner is applied. `declaredOwner`
-// comes from explicit coordinator context; this module does not create a lock.
+// Ownership declarations are optional for refresh. A declared owner must match
+// the requester; this module does not acquire exclusive access or create a lock.
 // A missing snapshot argument is intentional: callers cannot supply a stale one.
 export async function refreshDefaultCheckout({
   checkout,
@@ -81,7 +80,9 @@ export async function refreshDefaultCheckout({
       }
     : await captureCheckout(checkout);
 
-  const ownerRefusal = declaredOwnerRefusal(declaredOwner, requester);
+  const ownerRefusal = singleOwner(declaredOwner)
+    ? declaredOwnerRefusal(declaredOwner, requester)
+    : null;
   if (ownerRefusal) {
     return decision("deferred", ownerRefusal, state, null);
   }

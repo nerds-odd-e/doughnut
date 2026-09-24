@@ -33,22 +33,26 @@ A caller attempts refresh only by following
 
 ## Establish access before local mutation
 
-Before mutating the default checkout's working tree, index, or checked-out
-branch — including a later refresh that advances that branch — acquire
-exclusive local access through available coordinator context and inspect the
-checkout. A clean directory or Git lock file does not establish exclusivity;
+For a direct edit or publication that mutates the default checkout's working
+tree, index, or checked-out branch, acquire exclusive local access through
+available coordinator context and inspect the checkout. A clean directory or Git lock file does not establish exclusivity;
 coordinate with a declared owner or stop. Do not invent a merge queue, lock,
 or extra claim.
 
-These checks gate shared default-checkout mutation. They do not gate
+Automatic refresh follows [Refresh eligibility](#refresh-eligibility) instead.
+It does not require an ownership declaration when none is available and does
+not acquire exclusive access. Preserve a known competing writer's checkout.
+
+These access checks gate direct edits and publication from the default checkout. They do not gate
 commits, proof, formatting, or a remote push from a separate owned
 execution or preparation workspace. Publishing that workspace does not
 acquire this checkout's access.
 
 ## Preserve pending local work
 
-Unknown ownership, dirty or ambiguous checkout state, or unrelated
-unpublished local commits stop local mutation of that checkout. Preserve
+Dirty or ambiguous checkout state, or unrelated unpublished local commits,
+stop local mutation of that checkout. Unknown ownership also stops direct
+edits; a missing declaration alone does not stop automatic refresh. Preserve
 exact refs, worktrees, index, and staged/unstaged content; do not stash,
 reset, unstage, revert, or silently include unrelated work in a refresh or
 in a publication that mutates this checkout.
@@ -71,14 +75,15 @@ using this checkout's commit as a new task base. A new owned workspace may
 start from fetched remote trunk without advancing the default checkout.
 Publication success does not decide eligibility.
 
-Re-read the checkout after access is acquired, and re-read it again after
-any handoff. Do not reuse a snapshot taken before that access.
+Inspect current checkout state on every refresh attempt and again after any
+handoff. These checks preserve local work; they do not provide mutual exclusion
+between simultaneous writers.
 
-1. Require one declared owner from explicit coordinator context. A clean
-   directory or a Git lock file does not establish that owner. When that
-   owner is not this caller, do not fetch, merge, or otherwise change the
-   checkout. Another declared owner is **deferred** (`another-writer`). A
-   missing or ambiguous owner is **deferred** (`unclear-ownership`).
+1. Honor any declared owner from coordinator context. Another declared owner
+   is **deferred** (`another-writer`); a declared owner with no identified
+   requester is **deferred** (`unclear-ownership`). Without a declared owner,
+   continue with the Git checks below. Do not require or invent an ownership
+   declaration merely to refresh.
 2. Re-read the working tree, index, `HEAD`, checked-out branch, and any
    in-progress operation. An `index.lock`, or an in-progress merge, rebase,
    cherry-pick, or revert, is **deferred** (`ongoing-operation`). Leave the

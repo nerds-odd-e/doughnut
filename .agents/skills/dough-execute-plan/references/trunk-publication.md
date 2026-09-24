@@ -118,11 +118,11 @@ A publication stop leaves the commit recoverable on the execution branch.
 Do not delete spent history, remove resources, or claim closure. Invoke
 completion only after the final applicable wrap-up publication, never between
 intermediate recovery-record publications. After a success or bounded
-unresolved receipt with confirmed shutdown, wrap-up removes only this
-execution's clean local worktree and local execution branch, applying
-[preserve pending local work](maintain-default-checkout.md#preserve-pending-local-work)
-when cleanup would mutate or discard a dirty or ambiguous checkout. Unconfirmed
-shutdown or retained observation preserves those resources.
+unresolved receipt with confirmed shutdown, wrap-up retires only this
+execution's worktree under Dough Land's
+[Retire the worktree](../../dough-land/SKILL.md#retire-the-worktree), with that
+receipt as its gate. Unconfirmed shutdown or retained observation preserves the
+worktree and branch.
 
 ## Observe Story Branch integration
 
@@ -149,9 +149,11 @@ with the trunk observer. A saved branch tip or superseded merge candidate is
 not that receipt. Invoke
 [the shared completion operation](ci-monitor.md#await-the-applicable-revision-at-completion)
 once for the accepted integrated SHA on that trunk observer and handle its
-combined receipt. Resource cleanup follows confirmed shutdown and the existing
-ownership checks; publication recovery retains the same observer and repeats
-neither target setup nor an already accepted push.
+combined receipt. With confirmed shutdown as its gate, wrap-up then retires
+the execution resources under the same
+[Retire the worktree](../../dough-land/SKILL.md#retire-the-worktree);
+publication recovery retains the same observer and repeats neither target
+setup nor an already accepted push.
 
 ## Recover a rejected push
 

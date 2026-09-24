@@ -53,6 +53,16 @@ Preserve worktree changes. Separate report artifacts require a request; allowed 
 correction plans and process recording below. A complete correction plan needs no seed.
 Quick inputs follow the recovery rules below.
 
+### Write only in an owned checkout
+
+Make every allowed write in one owned checkout. When an invoking execution supplies its execution
+checkout as the write location, write there; wrap-up commits those records with that execution's
+closure. Otherwise, immediately before the first write, select or reuse an owned workspace under
+[prepare records in an owned workspace](../dough-story-refinement/references/preparation-workspace.md),
+write there, and report the written result's pending disposition. Do not write in the checkout the review
+started from unless it is that supplied execution checkout. A review that writes nothing creates no
+workspace. Resolve the process-log path and correction-plan location in the chosen checkout.
+
 Before residue assessment, read [refactoring](../dough-post-change-refactor/SKILL.md) and its
 checks; use the smell definitions on the aggregate result without editing. For needed correction
 planning, load [slice planning](../dough-slice-planning/SKILL.md#require-understood-planning-input)

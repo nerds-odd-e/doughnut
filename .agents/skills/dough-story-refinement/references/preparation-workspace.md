@@ -5,8 +5,11 @@ Apply this rule in [dough-story-decomposition](../../dough-story-decomposition/S
 [dough-slice-planning](../../dough-slice-planning/SKILL.md), and
 [dough-slice-plan-refinement](../../dough-slice-plan-refinement/SKILL.md)
 before any of them writes a seed, story, or plan record, including a small,
-already-decided correction. Reading, discussing, answering questions, or
-reviewing an existing seed or plan needs no workspace at all.
+already-decided correction.
+[dough-execution-retrospective](../../dough-execution-retrospective/SKILL.md#write-only-in-an-owned-checkout)
+applies it too before writing a process-finding or correction-plan record when
+no invoking execution supplies its checkout. Reading, discussing, answering
+questions, or reviewing an existing record needs no workspace at all.
 
 Once a write is done, [decide what happens to the written
 result](preparation-disposition.md) is the only disposition for that record.
@@ -16,8 +19,8 @@ another path. Then close or retain the workspace below.
 
 ## Determine whether a write needs a workspace
 
-Only the first write to a seed, story, or plan record in this preparation
-session requires an owned workspace. Continue ordinary discussion, inspection,
+Only the first write to a record named above in this preparation session
+requires an owned workspace. Continue ordinary discussion, inspection,
 and question-answering without one. Once a write is about to happen, establish
 or confirm the workspace immediately before making it.
 
@@ -29,7 +32,7 @@ and "Use and resume it" as this preparation's Git lifecycle; do not duplicate
 its recipe here. First check whether the current story, active plan, session,
 or a host-supplied workspace already owns a suitable checkout for this
 preparation. Use it, and do not create a nested or per-invocation workspace
-merely because a different one of the four skills above is now writing. When
+merely because a different skill named above is now writing. When
 no suitable owned workspace exists, start one using that reference's create
 step, from a suitable existing host workspace when one is available, otherwise
 from the verified current revision of the checkout this preparation was
@@ -136,11 +139,11 @@ what happens to the written result](preparation-disposition.md#decide-what-happe
 is actually **confirmed**, never merely attempted or merely because the
 session is ending:
 
-- a **keep-and-publish** whose candidate the fetched authorized remote
-  contains, per
+- a **keep** whose landed SHA the fetched authorized remote target contains,
+  per
   [Keep and publish the retained result](preparation-disposition.md#keep-and-publish-the-retained-result).
-  The default checkout need not match that SHA. A deferred maintenance result
-  does not withhold this confirmation;
+  The default checkout need not match that SHA. A deferred refresh does not
+  withhold this confirmation;
 - an explicit **discard** that actually removed the identified draft under
   [Discard an identified draft](preparation-disposition.md#discard-an-identified-draft),
   not one that stopped because the content could not be unambiguously
@@ -154,45 +157,27 @@ session is ending:
   session](#pause-and-resume-a-preparation-session) above and confirms no
   disposition for cleanup purposes.
 
-Failed or unconfirmed publication never triggers cleanup. A keep-and-publish
-interrupted before the authorized remote contains the candidate — see [Resume
-an interrupted keep-and-publish](preparation-disposition.md#resume-an-interrupted-keep-and-publish) —
-is not a confirmed disposition merely because the session is ending. Treat it
-as still unresolved and preserve every resource exactly as found under
+Failed or unconfirmed publication never triggers cleanup. A keep whose
+landing stopped before the authorized remote contains its SHA is not a
+confirmed disposition merely because the session is ending. Treat it as still
+unresolved and preserve every resource exactly as found under
 [preserve pending local work](../../dough-execute-plan/references/maintain-default-checkout.md#preserve-pending-local-work),
 including a pending human edit on the default checkout. Pausing, going quiet,
 or ending the conversation before a decision is confirmed is never itself a
 trigger, exactly as it is never itself a keep or discard decision.
 
-Once a confirmed disposition applies, apply [own a temporary exploration
-workspace](../../dough-manual-testing/references/exploration-workspace.md)
-"Close or retain it": remove only a clean, unambiguous, session-created
-workspace; retain and report a reused, host-owned, or otherwise unsafe one
-instead of forcing its removal. Delete a removed session-created branch only
-when its tip is contained in the fetched authorized remote target. That
-containment is what makes deletion safe; the default checkout being behind
-that target does not make the branch unmerged, and it does not authorize a
-force delete. A clean working directory is a necessary
-check there, not by itself proof of ownership: a workspace can be clean
-because a keep-and-publish just succeeded in it while still being the same
-reused or host-owned workspace [Select or reuse the
-workspace](#select-or-reuse-the-workspace) above recorded — one that may
-still hold other in-progress work belonging to a different story, plan, or
-session, the same "other in-progress work ... that must survive" concept
-[Discard an identified draft](preparation-disposition.md#discard-an-identified-draft)
-already preserves for discard. Removal depends on the session-created-versus-
-reused/host-owned identity that step already recorded, not on cleanliness
-alone; do not infer ownership from a clean directory, an empty `git status`,
-or the absence of other visible edits.
+Once a confirmed disposition applies, retire the workspace under Dough Land's
+[Retire the worktree](../../dough-land/SKILL.md#retire-the-worktree): a keep
+already did so as part of its landing, and a confirmed discard or finished
+no-publish applies the same rule. Removal depends on the session-created
+versus reused or host-owned identity recorded in [Select or reuse the
+workspace](#select-or-reuse-the-workspace), never on a clean directory alone:
+a reused or host-owned workspace may still hold another story's, plan's, or
+session's in-progress work, and stays with its owner. State any retained
+workspace's path, branch, and reason alongside, not instead of, any
+disposition report already owed to the developer.
 
-When cleanup is unsafe, report the exact workspace path and branch, and why
-it is being retained — reused, host-owned, holds other in-progress work, or
-otherwise unsafe or ambiguous — the same report [own a temporary exploration
-workspace](../../dough-manual-testing/references/exploration-workspace.md)
-"Close or retain it" already requires. State this alongside, not instead of,
-any disposition report already owed to the developer.
-
-Preparation work that never reached a confirmed keep-and-publish — still
+Preparation work that never reached a confirmed keep — still
 isolated in an owned workspace, discarded, or left unpublished by a
 confirmed no-publish/session-finished instruction — has no presence in any
 progress view this project derives only from published remote state (an

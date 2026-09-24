@@ -6,7 +6,9 @@ Preserve findings and occurrences beyond story closure, subject to bounded
 retention below or a separately authorized disposition.
 
 Use the explicit user/project `DearDough.md` location or `<project-root>/DearDough.md` for enabled
-process findings. Missing/conflicting root/location stops recording only: return findings and
+process findings, resolved in the checkout chosen under
+[write only in an owned checkout](../SKILL.md#write-only-in-an-owned-checkout).
+Missing/conflicting root/location stops recording only: return findings and
 continue independent reviews without inventing or searching elsewhere.
 
 Reuse logged execution identity, else canonical plan/story plus first related implementation commit,

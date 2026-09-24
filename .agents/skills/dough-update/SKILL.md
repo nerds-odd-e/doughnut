@@ -89,7 +89,7 @@ Ordinary Open Dough release updates remain available from the recorded source.
       inspected files write solely to the release-declared payload paths
       under both native skill roots, each updater's `SOURCE` and `VERSION`
       records, and the managed host-hook settings they register
-      (`.cursor/hooks.json` and `.claude/settings.json`) in the captured
+      (`.codex/hooks.json`, `.cursor/hooks.json`, and `.claude/settings.json`) in the captured
       target project, preserving distributable source, unrelated project
       files, unrelated settings entries, and home guidance. Registration is an
       install/update concern; after apply, observation readiness and observer
